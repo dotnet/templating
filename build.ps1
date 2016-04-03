@@ -33,14 +33,7 @@ param(
     [string]$newversion,
 
     [Parameter(ParameterSetName='getversion',Position=0)]
-    [switch]$getversion,
-
-    # temporary switches for debugging via appv
-    [Parameter(ParameterSetName='build',Position=6)]
-    [switch]$onlyBuildDOtnetProjects,
-
-    [Parameter(ParameterSetName='install',Position=0)]
-    [switch]$installOnly
+    [switch]$getversion
 )
 
 #$dotnetNugetFeedSource='https://dotnet.myget.org/f/dotnet-cli'
@@ -157,7 +150,7 @@ function CleanOutputFolder{
         }
         elseif(Test-Path $outputroot.FullName){
             'Removing output folder at [{0}]' -f $outputroot.FullName | Write-Output
-            Remove-Item $outputroot -Recurse
+            Remove-Item $outputroot -Recurse -Force
         }
     }
 }
@@ -202,7 +195,7 @@ function CopyStaticFilesToOutputDir{
     [cmdletbinding()]
     param()
     process{
-        Get-ChildItem $scriptDir *.nuspec | Copy-Item -Destination $outputroot
+        Get-ChildItem $scriptDir *.nuspec -File | Copy-Item -Destination $outputroot
     }
 }
 
@@ -297,9 +290,8 @@ function BuildSolution{
                 }
 
                 Invoke-CommandString -command dotnet -commandArgs $restoreArgs
-                $buildargs = @('build','--configuration', $configuration, <# '--build-base-path', $dnoutputpath.FullName,#> ' --no-incremental')
+                $buildargs = @('build','--configuration', $configuration,  '--build-base-path', $dnoutputpath.FullName, ' --no-incremental')
                 Invoke-CommandString -command dotnet -commandArgs $buildargs
-
             }
         }
         finally{
@@ -358,8 +350,8 @@ function FullBuild{
         CopyStaticFilesToOutputDir
 
         BuildSolution
-        #Update-FilesWithCommitId
-        #Build-NuGetPackage
+        Update-FilesWithCommitId
+        Build-NuGetPackage
 
         if($publishToNuget){
             (Get-ChildItem -Path ($outputPathNuget) 'pecan-*.nupkg').FullName | PublishNuGetPackage -nugetApiKey $nugetApiKey
@@ -367,27 +359,19 @@ function FullBuild{
     }
 }
 
-# begin script
-EnsurePsbuildInstlled
-CleanOutputFolder
-InternalEnsure-DirectoryExists -path $outputroot
-Import-NuGetPowershell
+try{
+    EnsurePsbuildInstlled
+    CleanOutputFolder
+    InternalEnsure-DirectoryExists -path $outputroot
+    Import-NuGetPowershell
 
-if($installOnly){
-    InstallDotNetCli
-}
-elseif($onlyBuildDOtnetProjects){
-    BuildSolution
-}
-else{
-    try{
-        if(-not ($SkipInstallDotNet) ){
-            InstallDotNetCli
-        }
+    if(-not ($SkipInstallDotNet) ){
+        InstallDotNetCli
+    }
 
-        FullBuild
-    }
-    catch{
-        throw ("{0}`r`n{1}" -f $_.Exception,(Get-PSCallStack|format-table|Out-String))
-    }
+    FullBuild
 }
+catch{
+    throw ("{0}`r`n{1}" -f $_.Exception,(Get-PSCallStack|format-table|Out-String))
+}
+
