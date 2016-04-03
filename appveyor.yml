@@ -1,0 +1,14 @@
+os: Visual Studio 2015
+
+environment:
+  DeployExtension: false
+  NuGetApiKey:
+    secure: HFUEQanhaxHV/sRQYznQqg7LToxSGeIoSvrmyY29PJ1eDbXxUuYrEQ6MPAsZIQFT
+
+build_script:
+  - ps: .\appveyor.ps1
+
+artifacts:
+  - path: OutputRoot\vs\N3P*
+  - path: 'OutputRoot\*.ps*1'
+  - path: 'OutputRoot\_nuget-pkg\*.nupkg'
