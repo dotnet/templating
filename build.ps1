@@ -15,6 +15,13 @@ param(
     [Parameter(ParameterSetName='build',Position=4)]
     [string]$dotnetNugetFeedSource='https://dotnet.myget.org/f/dotnet-cli',
 
+    [Parameter(ParameterSetName='build',Position=5)]
+    [string]$dotnetInstallChannel = 'preview',
+
+    # TODO: Revert back to https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/install.ps1 when bug fixed
+    [Parameter(ParameterSetName='build',Position=5)]
+    [string]$dotnetInstallUrl = 'https://raw.githubusercontent.com/sayedihashimi/cli/issue2236/scripts/obtain/install.ps1',
+
     # version parameters
     [Parameter(ParameterSetName='setversion',Position=10)]
     [switch]$setversion,
@@ -23,7 +30,14 @@ param(
     [string]$newversion,
 
     [Parameter(ParameterSetName='getversion',Position=0)]
-    [switch]$getversion
+    [switch]$getversion,
+
+    # temporary switches for debugging via appv
+    [Parameter(ParameterSetName='build',Position=6)]
+    [switch]$onlyBuildDOtnetProjects,
+
+    [Parameter(ParameterSetName='install',Position=0)]
+    [switch]$installOnly
 )
 
 #$dotnetNugetFeedSource='https://dotnet.myget.org/f/dotnet-cli'
@@ -104,11 +118,8 @@ function InstallDotNetCli{
         try{
             Set-Location ($slnfile.DirectoryName)
             $tempfile = '{0}.ps1' -f ([System.IO.Path]::GetTempFileName())
-            $url = 'https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/install.ps1'
-            # TODO: Reset back to dotnet repo when bug is fixed
-            $url = 'https://raw.githubusercontent.com/sayedihashimi/cli/issue2236/scripts/obtain/install.ps1'
-            (new-object net.webclient).DownloadFile($url,$tempfile)
-            $installArgs = '-Channel preview'
+            (new-object net.webclient).DownloadFile($dotnetInstallUrl,$tempfile)
+            $installArgs = '-Channel ' + $dotnetInstallChannel
             Invoke-Expression "& `"$tempfile`" $installArgs"
             & dotnet --version
             Remove-Item $tempfile -ErrorAction SilentlyContinue
@@ -238,9 +249,9 @@ function BuildSolution{
     param()
     process{
 
-        #if(-not (Test-Path $slnfile.FullName)){
-        #    throw ('Solution not found at [{0}]' -f $slnfile.FullName)
-        #}
+        if(-not (Test-Path $slnfile.FullName)){
+            throw ('Solution not found at [{0}]' -f $slnfile.FullName)
+        }
 
         if($outputroot -eq $null){
             throw ('output path is null')
@@ -261,7 +272,9 @@ function BuildSolution{
         InternalEnsure-DirectoryExists -path $vsoutputpath.FullName
 
         'Building projects at [{0}]' -f ($csProjects.FullName -join ';') | Write-Output
-        Invoke-MSBuild -projectsToBuild $csProjects.FullName -visualStudioVersion 14.0 -configuration $configuration -outputpath $vsoutputpath.FullName
+        if(-not ($onlyBuildDOtnetProjects -eq $true)){
+            Invoke-MSBuild -projectsToBuild $csProjects.FullName -visualStudioVersion 14.0 -configuration $configuration -outputpath $vsoutputpath.FullName
+        }
 
         [System.IO.DirectoryInfo]$dnoutputpath = (Join-Path $outputroot.FullName "dotnet")
         InternalEnsure-DirectoryExists -path $dnoutputpath.FullName
@@ -271,6 +284,11 @@ function BuildSolution{
             foreach($pj in $projectJsonToBuild){
                 Set-Location $pj.DirectoryName
                 $restoreArgs = ('restore','-s',$dotnetNugetFeedSource)
+
+                if(-not ([string]::IsNullOrWhiteSpace($dotnetNugetFeedSource))){
+                    $restoreArgs += ('-s',$dotnetNugetFeedSource)
+                }
+
                 Invoke-CommandString -command dotnet -commandArgs $restoreArgs
                 $buildargs = @('build','--configuration', '$configuration', '--build-base-path', $dnoutputpath.FullName, '--no-incremental')
                 Invoke-CommandString -command dotnet -commandArgs $buildargs
@@ -349,10 +367,16 @@ function FullBuild{
     }
 }
 
+
 # begin script
-try{
-    FullBuild
+if(-not $installOnly){
+    try{
+        FullBuild
+    }
+    catch{
+        throw ("{0}`r`n{1}" -f $_.Exception,(Get-PSCallStack|format-table|Out-String))
+    }
 }
-catch{
-    throw ("{0}`r`n{1}" -f $_.Exception,(Get-PSCallStack|format-table|Out-String))
+else{
+    InstallDotNetCli
 }
