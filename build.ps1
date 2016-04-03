@@ -14,7 +14,7 @@ param(
 
     [Parameter(ParameterSetName='build',Position=4)]
     [Parameter(ParameterSetName='install',Position=1)]
-    [string]$dotnetNugetFeedSource='https://dotnet.myget.org/f/dotnet-cli',
+    [string]$dotnetNugetFeedSource=$null,
 
     [Parameter(ParameterSetName='build',Position=5)]
     [Parameter(ParameterSetName='install',Position=2)]
