@@ -13,13 +13,16 @@ param(
     [string]$nugetApiKey = ($env:NuGetApiKey),
 
     [Parameter(ParameterSetName='build',Position=4)]
+    [Parameter(ParameterSetName='install',Position=1)]
     [string]$dotnetNugetFeedSource='https://dotnet.myget.org/f/dotnet-cli',
 
     [Parameter(ParameterSetName='build',Position=5)]
+    [Parameter(ParameterSetName='install',Position=2)]
     [string]$dotnetInstallChannel = 'preview',
 
     # TODO: Revert back to https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/install.ps1 when bug fixed
     [Parameter(ParameterSetName='build',Position=5)]
+    [Parameter(ParameterSetName='install',Position=3)]
     [string]$dotnetInstallUrl = 'https://raw.githubusercontent.com/sayedihashimi/cli/issue2236/scripts/obtain/install.ps1',
 
     # version parameters
@@ -119,8 +122,12 @@ function InstallDotNetCli{
             Set-Location ($slnfile.DirectoryName)
             $tempfile = '{0}.ps1' -f ([System.IO.Path]::GetTempFileName())
             (new-object net.webclient).DownloadFile($dotnetInstallUrl,$tempfile)
-            $installArgs = '-Channel ' + $dotnetInstallChannel
+            $installArgs = ''
+            if(-not ([string]::IsNullOrWhiteSpace($dotnetInstallChannel))){
+                $installArgs = '-Channel ' + $dotnetInstallChannel
+            }
             Invoke-Expression "& `"$tempfile`" $installArgs"
+            $env:path+=";$env:localappdata\Microsoft\dotnet\bin"
             & dotnet --version
             Remove-Item $tempfile -ErrorAction SilentlyContinue
         }
@@ -283,14 +290,14 @@ function BuildSolution{
         try{
             foreach($pj in $projectJsonToBuild){
                 Set-Location $pj.DirectoryName
-                $restoreArgs = ('restore','-s',$dotnetNugetFeedSource)
+                $restoreArgs = ('restore')
 
                 if(-not ([string]::IsNullOrWhiteSpace($dotnetNugetFeedSource))){
-                    $restoreArgs += ('-s',$dotnetNugetFeedSource)
+                    $restoreArgs += (' -s',$dotnetNugetFeedSource)
                 }
 
                 Invoke-CommandString -command dotnet -commandArgs $restoreArgs
-                $buildargs = @('build','--configuration', '$configuration', '--build-base-path', $dnoutputpath.FullName, '--no-incremental')
+                $buildargs = @('build','--configuration', $configuration, <# '--build-base-path', $dnoutputpath.FullName,#> ' --no-incremental')
                 Invoke-CommandString -command dotnet -commandArgs $buildargs
 
             }
@@ -346,20 +353,13 @@ function FullBuild{
     [cmdletbinding()]
     param()
     process{
-        EnsurePsbuildInstlled
-        if(-not ($SkipInstallDotNet) ){
-            InstallDotNetCli
-        }        
-        CleanOutputFolder
-        InternalEnsure-DirectoryExists -path $outputroot
-        Import-NuGetPowershell
         RestoreNuGetPackages
 
         CopyStaticFilesToOutputDir
 
         BuildSolution
-        Update-FilesWithCommitId
-        Build-NuGetPackage
+        #Update-FilesWithCommitId
+        #Build-NuGetPackage
 
         if($publishToNuget){
             (Get-ChildItem -Path ($outputPathNuget) 'pecan-*.nupkg').FullName | PublishNuGetPackage -nugetApiKey $nugetApiKey
@@ -367,16 +367,27 @@ function FullBuild{
     }
 }
 
-
 # begin script
-if(-not $installOnly){
+EnsurePsbuildInstlled
+CleanOutputFolder
+InternalEnsure-DirectoryExists -path $outputroot
+Import-NuGetPowershell
+
+if($installOnly){
+    InstallDotNetCli
+}
+elseif($onlyBuildDOtnetProjects){
+    BuildSolution
+}
+else{
     try{
+        if(-not ($SkipInstallDotNet) ){
+            InstallDotNetCli
+        }
+
         FullBuild
     }
     catch{
         throw ("{0}`r`n{1}" -f $_.Exception,(Get-PSCallStack|format-table|Out-String))
     }
-}
-else{
-    InstallDotNetCli
 }
