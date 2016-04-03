@@ -1,0 +1,24 @@
+﻿[
+  {
+    "wholeLine": true,
+    "trimWhitespace": true,
+    "type": "condition",
+    "if": "$if$",
+    "else": "$else$",
+    "elseif": "$elseif$",
+    "endif": "$endif$"
+  },
+  {
+    "type": "replacement",
+    "find": "value1",
+    "replaceWith": "HELLLOOOO!"
+  },
+  {
+    "wholeLine": false,
+    "trimWhitespace": true,
+    "type": "region",
+    "start": "<region>",
+    "end": "</region>",
+    "include": false
+  }
+]
