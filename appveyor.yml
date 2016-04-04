@@ -9,6 +9,7 @@ build_script:
   - ps: .\appveyor.ps1
 
 artifacts:
-  - path: OutputRoot\vs\N3P*
+  - path: OutputRoot\vs\Mutant*
+  - path: OutputRoot\dotnet\Mutant*
   - path: 'OutputRoot\*.ps*1'
   - path: 'OutputRoot\_nuget-pkg\*.nupkg'
