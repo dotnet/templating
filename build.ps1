@@ -341,10 +341,71 @@ function Update-FilesWithCommitId{
     }
 }
 
+<#
+.SYNOPSIS 
+This will inspect the nuspec file and return the value for the Version element.
+#>
+function GetExistingVersion{
+    [cmdletbinding()]
+    param(
+        [ValidateScript({test-path $_ -PathType Leaf})]
+        $nuspecFile = (Join-Path $scriptDir 'mutant-chicken.nuspec')
+    )
+    process{
+        ([xml](Get-Content $nuspecFile)).package.metadata.version
+    }
+}
+
+function SetVersion{
+    [cmdletbinding()]
+    param(
+        [Parameter(Position=1,Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$newversion,
+
+        [Parameter(Position=2)]
+        [ValidateNotNullOrEmpty()]
+        [string]$oldversion = (GetExistingVersion),
+
+        [Parameter(Position=3)]
+        [string]$filereplacerVersion = '0.4.0-beta'
+    )
+    begin{
+        EnsureFileReplacerInstlled
+    }
+    process{
+        $folder = $scriptDir
+        $include = '*.nuspec;*.ps*1'
+        # In case the script is in the same folder as the files you are replacing add it to the exclude list
+        $exclude = "$($MyInvocation.MyCommand.Name);"
+        $exclude += ';build.ps1'
+        $replacements = @{
+            "$oldversion"="$newversion"
+        }
+        Replace-TextInFolder -folder $folder -include $include -exclude $exclude -replacements $replacements | Write-Verbose
+
+        # update the .psd1 file if there is one
+        $replacements = @{
+            ($oldversion.Replace('-beta','.1'))=($newversion.Replace('-beta','.1'))
+        }
+        Replace-TextInFolder -folder $folder -include '*.psd1' -exclude $exclude -replacements $replacements | Write-Verbose
+        'Replacement complete' | Write-Verbose
+    }
+}
+
 function FullBuild{
     [cmdletbinding()]
     param()
     process{
+        EnsurePsbuildInstlled
+        CleanOutputFolder
+        InternalEnsure-DirectoryExists -path $outputroot
+        Import-NuGetPowershell
+
+        if(-not ($SkipInstallDotNet) ){
+            InstallDotNetCli
+        }
+
         RestoreNuGetPackages
 
         CopyStaticFilesToOutputDir
@@ -360,16 +421,15 @@ function FullBuild{
 }
 
 try{
-    EnsurePsbuildInstlled
-    CleanOutputFolder
-    InternalEnsure-DirectoryExists -path $outputroot
-    Import-NuGetPowershell
-
-    if(-not ($SkipInstallDotNet) ){
-        InstallDotNetCli
+    if($getversion -eq $true){
+        GetExistingVersion
     }
-
-    FullBuild
+    elseif($setversion -eq $true){
+        SetVersion -newversion $newversion
+    }
+    else{
+        FullBuild
+    }
 }
 catch{
     throw ("{0}`r`n{1}" -f $_.Exception,(Get-PSCallStack|format-table|Out-String))
