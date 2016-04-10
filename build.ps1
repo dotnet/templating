@@ -562,7 +562,7 @@ function GetCoverageReport{
         $reportArgs += ('-reporttypes:{0}' -f $reportTypes)
         Invoke-CommandString -command $repgenexe -commandArgs $reportArgs
 
-        Add-AppveyorArtifact -pathToAdd (Get-ChildItem -Path $coveragedir -Recurse -File)
+        Add-AppveyorArtifact -pathToAdd ((Get-ChildItem -Path $coveragedir -Recurse -File).FullName)
 
         $summaryfile = (Join-Path $coveragedir 'Summary.csv')
         if(Test-Path $summaryfile){
