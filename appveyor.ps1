@@ -8,10 +8,11 @@ try{
         . $buildFile.FullName -publishToNuget
     }
     else{
-        . $buildFile.FullName
+        . $buildFile.FullName -verbose
     }
     
 }
 catch{
     throw ( 'Build error {0} {1}' -f $_.Exception, (Get-PSCallStack|Out-String) )
 }
+'After build'|Write-Output

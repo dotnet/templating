@@ -8,8 +8,11 @@ environment:
 build_script:
   - ps: .\appveyor.ps1
 
+test: off
+
 artifacts:
   - path: OutputRoot\vs\Mutant*
   - path: OutputRoot\dotnet\Mutant*
   - path: 'OutputRoot\*.ps*1'
   - path: 'OutputRoot\_nuget-pkg\*.nupkg'
+  - path: OutputRoot\vs\TestResults\*.trx

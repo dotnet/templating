@@ -22,7 +22,7 @@
     <file src="vs\Replacements.json" target="tools\Replacements.json" />
     <file src="vs\Example.html" target="tools\Example.html" />
 
-	  <file src="dotnet\Mutant.Chicken\bin\Release\netstandard1.5\Mutant.Chicken.dll" target="lib\dotnet\Mutant.Chicken.dll" />
-    <file src="dotnet\Mutant.Chicken\bin\Release\netstandard1.5\Mutant.Chicken.pdb" target="lib\dotnet\Mutant.Chicken.pdb" />
+	  <file src="dotnet\netstandard1.5\Mutant.Chicken.dll" target="lib\dotnet\Mutant.Chicken.dll" />
+    <file src="dotnet\netstandard1.5\Mutant.Chicken.pdb" target="lib\dotnet\Mutant.Chicken.pdb" />
   </files>
 </package>
