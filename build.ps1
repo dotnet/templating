@@ -41,13 +41,15 @@ param(
 $scriptDir = split-path -parent $MyInvocation.MyCommand.Definition
 
 [System.IO.FileInfo]$slnfile = (join-path $scriptDir 'Mutant.Chicken.sln')
-[System.IO.FileInfo[]]$csProjects = (Join-Path $scriptDir 'src\Mutant.Chicken.Net4\Mutant.Chicken.Net4.csproj'),(Join-Path $scriptDir 'src\Mutant.Chicken.Net4.Demo\Mutant.Chicken.Net4.Demo.csproj' ),(Join-Path $scriptDir 'test\Mutant.Chicken.Net4.UnitTests\Mutant.Chicken.Net4.UnitTests.csproj' )
+[System.IO.FileInfo[]]$csProjects = (Join-Path $scriptDir 'src\Mutant.Chicken.Net4\Mutant.Chicken.Net4.csproj'),(Join-Path $scriptDir 'src\Mutant.Chicken.Net4.Demo\Mutant.Chicken.Net4.Demo.csproj' )
+$csProjects += (Join-Path $scriptDir 'test\Mutant.Chicken.Net4.UnitTests\Mutant.Chicken.Net4.UnitTests.csproj' ), (Join-Path $scriptDir 'tool-src\CoverageConverter\CoverageConverter.csproj')
+
 [System.IO.FileInfo[]]$projectJsonToBuild = (Join-Path $scriptDir 'src\Mutant.Chicken\project.json')
 [System.IO.DirectoryInfo]$outputroot=(join-path $scriptDir 'OutputRoot')
 [System.IO.DirectoryInfo]$outputPathNuget = (Join-Path $outputroot '_nuget-pkg')
 [string]$localNugetFolder = 'c:\temp\nuget\local'
 [string]$testFilePattern ='*mutant*test*.dll'
-
+[string]$testResultsDir = (Join-Path $outputroot.FullName "vs\TestResults")
 <#
 .SYNOPSIS
     You can add this to you build script to ensure that psbuild is available before calling
@@ -476,7 +478,7 @@ function Run-Tests{
         [switch]$disableInIsolation,
         [switch]$disableTrx,
         [string]$frameworkValue = 'Framework45',
-        [string]$testResultsDir = (Join-Path $outputroot.FullName "vs\TestResults")
+        [string]$testResultsDir = ($testResultsDir)
     )
     process{
         $vsoutroot = (Join-Path $outputroot 'vs')
@@ -522,10 +524,96 @@ function Run-Tests{
         finally{
             Pop-Location
         }
+
+        if(-not $disableCodeCoverage){
+            GetCoverageReport
+        }
     }
 }
 
-function GetCoverageRepot{
+function ConvertCoverageFileToXml{
+    [cmdletbinding()]
+    param(
+        [string]$testResultsDir = (Join-Path $outputroot.FullName 'vs\TestResults'),        
+        [string[]]$coverageFiles,
+        [string]$assemblyDir = (Join-Path $outputroot.FullName 'vs\TestResults')
+    )
+    process{        
+        if(-not (Test-Path $testResultsDir)){
+            'Test results directory not fount at [{0}]' -f $testResultsDir | Write-Warning
+            return
+        }
+
+        if($coverageFiles -eq $null){
+            $coverageFiles = (Get-ChildItem $testResultsDir *.coverage -Recurse -File).FullName
+        }
+
+        if( ($coverageFiles -eq $null) -or ($coverageFiles.Length -le 0)){
+            'No .coverage files found in [{0}]' -f $testResultsDir | Write-Warning
+            return
+        }
+        
+        $coverageexe = (GetCoverageConverterPath)
+
+        foreach($cFile in $coverageFiles){
+            $cFile = [System.IO.FileInfo]$cFile
+            $xmloutputpath =(Join-Path $cFile.Directory.FullName ('{0}.coverage.xml' -f $cFile.BaseName))
+            $convertArgs = @( ('"{0}"' -f $cfile.FullName), """$assemblyDir""", """$xmloutputpath""")
+            Invoke-CommandString -command $coverageexe -commandArgs $convertArgs | Write-Verbose
+
+            # return the path to the xml file
+            $xmloutputpath
+        }
+    }
+}
+
+function GetReportGeneratorExe{
+    [cmdletbinding()]
+    param(
+        [string]$reportGenVersion = '2.4.4'
+    )
+    process{
+        $binpath = (Get-NuGetPackage -name 'ReportGenerator' -version $reportGenVersion -binpath)
+        $reportgenexepath = (Join-Path $binpath 'ReportGenerator.exe')
+
+        if(-not (Test-Path $reportgenexepath)){
+            throw ('Unable to get ReportGenerator from NuGet, did not find file at [{1}]' -f $reportgenexepath)
+        }
+
+        $reportgenexepath
+    }
+}
+
+function GetCoverageReport{
+    [cmdletbinding()]
+    param(
+        [string]$reportTypes = 'HtmlSummary;CsvSummary'
+    )
+    process{
+        $coverageXmlFiles = (ConvertCoverageFileToXml)
+        $repgenexe = (GetReportGeneratorExe)        
+        $coveragedir = (Join-Path $outputroot.FullName "vs\TestResults\coverage")
+        if(-not (Test-Path $coveragedir)){
+            New-Item -Path $coveragedir -ItemType Directory | Write-Verbose
+        }
+        # reportgen "-reports:C:\Data\mycode\mutant-chicken\OutputRoot\vs\TestResults\converted.coveragexml" -targetDir:C:\Data\mycode\mutant-chicken\OutputRoot\vs\TestResults\report\ "-reporttypes:Html;HtmlSummary;CsvSummary"
+
+        $reportArgs = @()
+        $reportArgs += ('"-reports:{0}"' -f ($coverageXmlFiles -join ';'))
+        $reportArgs += ('"-targetDir:{0}"' -f $coveragedir)
+        $reportArgs += ('-reporttypes:{0}' -f $reportTypes)
+        Invoke-CommandString -command $repgenexe -commandArgs $reportArgs
+
+        Add-AppveyorArtifact -pathToAdd (Get-ChildItem -Path $coveragedir -Recurse -File)
+
+        $summaryfile = (Join-Path $coveragedir 'Summary.csv')
+        if(Test-Path $summaryfile){
+            Get-Content $summaryfile | Write-Output
+        }
+    }
+}
+
+function GetCoverageRepotOld{
     [cmdletbinding()]
     param(
         [string]$testResultsDir = (Join-Path $outputroot.FullName "vs\TestResults")
@@ -587,6 +675,14 @@ function Add-AppveyorArtifact{
     }
 }
 
+function GetCoverageConverterPath{
+    [cmdletbinding()]
+    param()
+    process{
+        ([System.IO.FileInfo](Join-Path $outputroot.FullName "vs\CoverageConverter.exe")).FullName
+    }
+}
+
 function FullBuild{
     [cmdletbinding()]
     param()
@@ -609,7 +705,7 @@ function FullBuild{
         
         try{
             Run-Tests
-            GetCoverageRepot
+            # GetCoverageRepot
         }
         catch{
             '**********************************************' | Write-Output
