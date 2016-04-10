@@ -564,9 +564,11 @@ function GetCoverageReport{
 
         Add-AppveyorArtifact -pathToAdd ((Get-ChildItem -Path $coveragedir -Recurse -File).FullName)
 
-        $summaryfile = (Join-Path $coveragedir 'Summary.csv')
+        $summaryfile = (([System.IO.FileInfo](Join-Path $coveragedir 'Summary.csv')).FullName)
         if(Test-Path $summaryfile){
+            '************** Code Coverage Report **************' | write-Output
             Get-Content $summaryfile | Write-Output
+            '**************************************************' | write-Output
         }
     }
 }
