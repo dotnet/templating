@@ -42,7 +42,7 @@ $scriptDir = split-path -parent $MyInvocation.MyCommand.Definition
 
 [System.IO.FileInfo]$slnfile = (join-path $scriptDir 'Mutant.Chicken.sln')
 [System.IO.FileInfo[]]$csProjects = (Join-Path $scriptDir 'src\Mutant.Chicken.Net4\Mutant.Chicken.Net4.csproj'),(Join-Path $scriptDir 'src\Mutant.Chicken.Net4.Demo\Mutant.Chicken.Net4.Demo.csproj' )
-$csProjects += (Join-Path $scriptDir 'test\Mutant.Chicken.Net4.UnitTests\Mutant.Chicken.Net4.UnitTests.csproj' )<#, (Join-Path $scriptDir 'tool-src\CoverageConverter\CoverageConverter.csproj')#>
+$csProjects += (Join-Path $scriptDir 'test\Mutant.Chicken.Net4.UnitTests\Mutant.Chicken.Net4.UnitTests.csproj' )
 
 [System.IO.FileInfo[]]$projectJsonToBuild = (Join-Path $scriptDir 'src\Mutant.Chicken\project.json')
 [System.IO.DirectoryInfo]$outputroot=(join-path $scriptDir 'OutputRoot')
@@ -50,6 +50,7 @@ $csProjects += (Join-Path $scriptDir 'test\Mutant.Chicken.Net4.UnitTests\Mutant.
 [string]$localNugetFolder = 'c:\temp\nuget\local'
 [string]$testFilePattern ='*mutant*test*.dll'
 [string]$testResultsDir = (Join-Path $outputroot.FullName "vs\TestResults")
+[string]$sayedToolsversion='0.0.3-beta'
 <#
 .SYNOPSIS
     You can add this to you build script to ensure that psbuild is available before calling
@@ -428,49 +429,6 @@ function GetVsTestConsole{
     }
 }
 
-function GetVsCoverageExe{
-    [cmdletbinding()]
-    param(
-        [string]$tempDir = ("$env:LOCALAPPDATA\LigerShark\PSBuild\tools\testcoverage"),
-        [string]$downloadUrl = 'https://dl.dropboxusercontent.com/u/40134810/psbuild/tools/visualcoverage-bin.zip'
-
-    )
-    process{
-        if(-not (Test-Path $tempDir)){
-            New-Item -Path $tempDir -ItemType Directory | Write-Verbose
-        }
-
-        # see if the .exe is already there
-        $coverageExePath = (Join-Path $tempDir 'VisualCoverage.exe')
-
-        if(-not (Test-Path $coverageExePath)){
-            # download and extract the zip file
-            # (new-object net.webclient).DownloadFile($dotnetInstallUrl,$tempfile)
-            $zipFileDest = (Join-Path $tempDir 'visualcoverage-bin.zip')
-            if(Test-Path $zipFileDest){
-                Remove-Item $zipFileDest | Write-Verbose
-            }
-
-            (new-object net.webclient).DownloadFile($downloadUrl,$zipFileDest) | Write-Verbose
-
-            if(-not (Test-Path $zipFileDest)){
-                throw ('Unable to download file from [{0}] to [{1}]' -f $downloadUrl,$zipFileDest)
-            }
-
-            # extract it
-            Add-Type -assembly 'system.io.compression.filesystem' | Out-Null
-            [io.compression.zipfile]::ExtractToDirectory($zipFileDest, $tempDir) | Write-Verbose
-        }
-
-        if(-not (Test-Path $coverageExePath)){
-            throw ('Unable to find/download visualcoverage at [{0}]' -f $coverageExePath)
-        }
-
-        # return the path
-        $coverageExePath
-    }
-}
-
 function Run-Tests{
     [cmdletbinding()]
     param(
@@ -613,48 +571,6 @@ function GetCoverageReport{
     }
 }
 
-function GetCoverageRepotOld{
-    [cmdletbinding()]
-    param(
-        [string]$testResultsDir = (Join-Path $outputroot.FullName "vs\TestResults")
-    )
-    process{
-        if(-not (Test-Path $testResultsDir)){
-            return
-        }
-
-        $coverageFiles = Get-ChildItem $testResultsDir *.coverage -Recurse -File
-        if( ($coverageFiles -eq $null) -or ($coverageFiles.Length -le 0)){
-            'No .coverage files found in [{0}]' -f $testResultsDir | Write-Warning
-            return
-        }
-
-        $vscoveragexe = GetVsCoverageExe
-        # vscoverage -i '.\Sayed_IBR-PC2 2016-04-09 09_27_21.coverage' --clover foo.clover
-        foreach($coveragefile in $coverageFiles){
-            $coveragefile =[System.IO.FileInfo]$coveragefile
-            Add-AppveyorArtifact -pathToAdd $coveragefile.FullName
-
-            $htmlreportpath =(Join-Path $coveragefile.Directory.FullName ('{0}.report.html' -f $coveragefile.BaseName))
-            $cloverreportpath =(Join-Path $coveragefile.Directory.FullName ('{0}.report.xml.clover' -f $coveragefile.BaseName))
-
-            $coverArgs = @('-i',('"{0}"' -f $coveragefile.FullName),'--html',"""$htmlreportpath""",'--clover',"""$cloverreportpath""")
-
-            Invoke-CommandString -command $vscoveragexe -commandArgs $coverArgs -ignoreErrors $true
-
-            if(Test-Path $htmlreportpath){
-                Add-AppveyorArtifact -pathToAdd $htmlreportpath
-            }
-            if(Test-Path $cloverreportpath){
-                Add-AppveyorArtifact -pathToAdd $cloverreportpath
-            }
-
-            # return the xml path in case someone want's to consume it
-            $cloverreportpath
-        }
-    }
-}
-
 function Add-AppveyorArtifact{
     [cmdletbinding()]
     param(
@@ -677,9 +593,19 @@ function Add-AppveyorArtifact{
 
 function GetCoverageConverterPath{
     [cmdletbinding()]
-    param()
+    param(
+        [string]$sayedToolsVersion=($sayedToolsVersion)
+    )
     process{
-        ([System.IO.FileInfo](Join-Path $outputroot.FullName "vs\CoverageConverter.exe")).FullName
+        $binpath = (Get-NuGetPackage -name 'sayed-tools' -version $sayedToolsVersion -binpath)
+        $exepath = (([System.IO.FileInfo](Join-Path $binpath 'CoverageConverter.exe')).FullName)
+
+        if(-not (Test-Path $exepath)){
+            throw ('Unable to find exe at [{0}]' -f $exepath)
+        }
+
+        # return the path
+        $exepath
     }
 }
 
@@ -704,7 +630,7 @@ function FullBuild{
         Update-FilesWithCommitId
         
         try{
-            Run-Tests -disableCodeCoverage
+            Run-Tests
         }
         catch{
             '**********************************************' | Write-Output
