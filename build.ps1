@@ -42,7 +42,7 @@ $scriptDir = split-path -parent $MyInvocation.MyCommand.Definition
 
 [System.IO.FileInfo]$slnfile = (join-path $scriptDir 'Mutant.Chicken.sln')
 [System.IO.FileInfo[]]$csProjects = (Join-Path $scriptDir 'src\Mutant.Chicken.Net4\Mutant.Chicken.Net4.csproj'),(Join-Path $scriptDir 'src\Mutant.Chicken.Net4.Demo\Mutant.Chicken.Net4.Demo.csproj' )
-$csProjects += (Join-Path $scriptDir 'test\Mutant.Chicken.Net4.UnitTests\Mutant.Chicken.Net4.UnitTests.csproj' ), (Join-Path $scriptDir 'tool-src\CoverageConverter\CoverageConverter.csproj')
+$csProjects += (Join-Path $scriptDir 'test\Mutant.Chicken.Net4.UnitTests\Mutant.Chicken.Net4.UnitTests.csproj' )<#, (Join-Path $scriptDir 'tool-src\CoverageConverter\CoverageConverter.csproj')#>
 
 [System.IO.FileInfo[]]$projectJsonToBuild = (Join-Path $scriptDir 'src\Mutant.Chicken\project.json')
 [System.IO.DirectoryInfo]$outputroot=(join-path $scriptDir 'OutputRoot')
@@ -704,8 +704,7 @@ function FullBuild{
         Update-FilesWithCommitId
         
         try{
-            Run-Tests
-            # GetCoverageRepot
+            Run-Tests -disableCodeCoverage
         }
         catch{
             '**********************************************' | Write-Output
