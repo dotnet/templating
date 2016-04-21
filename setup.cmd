@@ -13,3 +13,4 @@ dotnet new3 reset
 dotnet new3 component add "dotnet-new3, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
 dotnet new3 component add "Mutant.Chicken.Orchestrator.VsTemplates, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
 dotnet new3 source add VSProj "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\ProjectTemplates"
+cd ..\..\..\..\..\..
