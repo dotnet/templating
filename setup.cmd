@@ -1,9 +1,9 @@
 @echo off
-cd src\dotnet-new3
+cd src
 dotnet restore
+cd dotnet-new3
 dotnet build -r win10-x64
 cd ..\Mutant.Chicken.Orchestrator.VsTemplates
-dotnet restore
 dotnet build
 copy bin\Debug\netstandard1.5\Mutant.Chicken.Runner.dll ..\dotnet-new3\bin\Debug\netcoreapp1.0\win10-x64\Mutant.Chicken.Runner.dll
 copy bin\Debug\netstandard1.5\Mutant.Chicken.Orchestrator.VsTemplates.dll ..\dotnet-new3\bin\Debug\netcoreapp1.0\win10-x64\Mutant.Chicken.Orchestrator.VsTemplates.dll
