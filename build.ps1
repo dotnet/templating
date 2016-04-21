@@ -41,13 +41,16 @@ param(
 $scriptDir = split-path -parent $MyInvocation.MyCommand.Definition
 
 [System.IO.FileInfo]$slnfile = (join-path $scriptDir 'Mutant.Chicken.sln')
-[System.IO.FileInfo[]]$csProjects = (Join-Path $scriptDir 'src\Mutant.Chicken.Net4\Mutant.Chicken.Net4.csproj'),(Join-Path $scriptDir 'src\Mutant.Chicken.Net4.Demo\Mutant.Chicken.Net4.Demo.csproj' ),(Join-Path $scriptDir 'test\Mutant.Chicken.Net4.UnitTests\Mutant.Chicken.Net4.UnitTests.csproj' )
+[System.IO.FileInfo[]]$csProjects = (Join-Path $scriptDir 'src\Mutant.Chicken.Net4\Mutant.Chicken.Net4.csproj'),(Join-Path $scriptDir 'src\Mutant.Chicken.Net4.Demo\Mutant.Chicken.Net4.Demo.csproj' )
+$csProjects += (Join-Path $scriptDir 'test\Mutant.Chicken.Net4.UnitTests\Mutant.Chicken.Net4.UnitTests.csproj' )
+
 [System.IO.FileInfo[]]$projectJsonToBuild = (Join-Path $scriptDir 'src\Mutant.Chicken\project.json')
 [System.IO.DirectoryInfo]$outputroot=(join-path $scriptDir 'OutputRoot')
 [System.IO.DirectoryInfo]$outputPathNuget = (Join-Path $outputroot '_nuget-pkg')
 [string]$localNugetFolder = 'c:\temp\nuget\local'
 [string]$testFilePattern ='*mutant*test*.dll'
-
+[string]$testResultsDir = (Join-Path $outputroot.FullName "vs\TestResults")
+[string]$sayedToolsversion='0.0.3-beta'
 <#
 .SYNOPSIS
     You can add this to you build script to ensure that psbuild is available before calling
@@ -426,49 +429,6 @@ function GetVsTestConsole{
     }
 }
 
-function GetVsCoverageExe{
-    [cmdletbinding()]
-    param(
-        [string]$tempDir = ("$env:LOCALAPPDATA\LigerShark\PSBuild\tools\testcoverage"),
-        [string]$downloadUrl = 'https://dl.dropboxusercontent.com/u/40134810/psbuild/tools/visualcoverage-bin.zip'
-
-    )
-    process{
-        if(-not (Test-Path $tempDir)){
-            New-Item -Path $tempDir -ItemType Directory | Write-Verbose
-        }
-
-        # see if the .exe is already there
-        $coverageExePath = (Join-Path $tempDir 'VisualCoverage.exe')
-
-        if(-not (Test-Path $coverageExePath)){
-            # download and extract the zip file
-            # (new-object net.webclient).DownloadFile($dotnetInstallUrl,$tempfile)
-            $zipFileDest = (Join-Path $tempDir 'visualcoverage-bin.zip')
-            if(Test-Path $zipFileDest){
-                Remove-Item $zipFileDest | Write-Verbose
-            }
-
-            (new-object net.webclient).DownloadFile($downloadUrl,$zipFileDest) | Write-Verbose
-
-            if(-not (Test-Path $zipFileDest)){
-                throw ('Unable to download file from [{0}] to [{1}]' -f $downloadUrl,$zipFileDest)
-            }
-
-            # extract it
-            Add-Type -assembly 'system.io.compression.filesystem' | Out-Null
-            [io.compression.zipfile]::ExtractToDirectory($zipFileDest, $tempDir) | Write-Verbose
-        }
-
-        if(-not (Test-Path $coverageExePath)){
-            throw ('Unable to find/download visualcoverage at [{0}]' -f $coverageExePath)
-        }
-
-        # return the path
-        $coverageExePath
-    }
-}
-
 function Run-Tests{
     [cmdletbinding()]
     param(
@@ -476,7 +436,7 @@ function Run-Tests{
         [switch]$disableInIsolation,
         [switch]$disableTrx,
         [string]$frameworkValue = 'Framework45',
-        [string]$testResultsDir = (Join-Path $outputroot.FullName "vs\TestResults")
+        [string]$testResultsDir = ($testResultsDir)
     )
     process{
         $vsoutroot = (Join-Path $outputroot 'vs')
@@ -522,47 +482,93 @@ function Run-Tests{
         finally{
             Pop-Location
         }
+
+        if(-not $disableCodeCoverage){
+            GetCoverageReport
+        }
     }
 }
 
-function GetCoverageRepot{
+function ConvertCoverageFileToXml{
     [cmdletbinding()]
     param(
-        [string]$testResultsDir = (Join-Path $outputroot.FullName "vs\TestResults")
+        [string]$testResultsDir = (Join-Path $outputroot.FullName 'vs\TestResults'),        
+        [string[]]$coverageFiles,
+        [string]$assemblyDir = (Join-Path $outputroot.FullName 'vs\TestResults')
     )
-    process{
+    process{        
         if(-not (Test-Path $testResultsDir)){
+            'Test results directory not fount at [{0}]' -f $testResultsDir | Write-Warning
             return
         }
 
-        $coverageFiles = Get-ChildItem $testResultsDir *.coverage -Recurse -File
+        if($coverageFiles -eq $null){
+            $coverageFiles = (Get-ChildItem $testResultsDir *.coverage -Recurse -File).FullName
+        }
+
         if( ($coverageFiles -eq $null) -or ($coverageFiles.Length -le 0)){
             'No .coverage files found in [{0}]' -f $testResultsDir | Write-Warning
             return
         }
+        
+        $coverageexe = (GetCoverageConverterPath)
 
-        $vscoveragexe = GetVsCoverageExe
-        # vscoverage -i '.\Sayed_IBR-PC2 2016-04-09 09_27_21.coverage' --clover foo.clover
-        foreach($coveragefile in $coverageFiles){
-            $coveragefile =[System.IO.FileInfo]$coveragefile
-            Add-AppveyorArtifact -pathToAdd $coveragefile.FullName
+        foreach($cFile in $coverageFiles){
+            $cFile = [System.IO.FileInfo]$cFile
+            $xmloutputpath =(Join-Path $cFile.Directory.FullName ('{0}.coverage.xml' -f $cFile.BaseName))
+            $convertArgs = @( ('"{0}"' -f $cfile.FullName), """$assemblyDir""", """$xmloutputpath""")
+            Invoke-CommandString -command $coverageexe -commandArgs $convertArgs | Write-Verbose
 
-            $htmlreportpath =(Join-Path $coveragefile.Directory.FullName ('{0}.report.html' -f $coveragefile.BaseName))
-            $cloverreportpath =(Join-Path $coveragefile.Directory.FullName ('{0}.report.xml.clover' -f $coveragefile.BaseName))
+            # return the path to the xml file
+            $xmloutputpath
+        }
+    }
+}
 
-            $coverArgs = @('-i',('"{0}"' -f $coveragefile.FullName),'--html',"""$htmlreportpath""",'--clover',"""$cloverreportpath""")
+function GetReportGeneratorExe{
+    [cmdletbinding()]
+    param(
+        [string]$reportGenVersion = '2.4.4'
+    )
+    process{
+        $binpath = (Get-NuGetPackage -name 'ReportGenerator' -version $reportGenVersion -binpath)
+        $reportgenexepath = (Join-Path $binpath 'ReportGenerator.exe')
 
-            Invoke-CommandString -command $vscoveragexe -commandArgs $coverArgs -ignoreErrors $true
+        if(-not (Test-Path $reportgenexepath)){
+            throw ('Unable to get ReportGenerator from NuGet, did not find file at [{1}]' -f $reportgenexepath)
+        }
 
-            if(Test-Path $htmlreportpath){
-                Add-AppveyorArtifact -pathToAdd $htmlreportpath
-            }
-            if(Test-Path $cloverreportpath){
-                Add-AppveyorArtifact -pathToAdd $cloverreportpath
-            }
+        $reportgenexepath
+    }
+}
 
-            # return the xml path in case someone want's to consume it
-            $cloverreportpath
+function GetCoverageReport{
+    [cmdletbinding()]
+    param(
+        [string]$reportTypes = 'HtmlSummary;CsvSummary'
+    )
+    process{
+        $coverageXmlFiles = (ConvertCoverageFileToXml)
+        $repgenexe = (GetReportGeneratorExe)        
+        $coveragedir = (Join-Path $outputroot.FullName "vs\TestResults\coverage")
+        if(-not (Test-Path $coveragedir)){
+            New-Item -Path $coveragedir -ItemType Directory | Write-Verbose
+        }
+        # reportgen "-reports:C:\Data\mycode\mutant-chicken\OutputRoot\vs\TestResults\converted.coveragexml" -targetDir:C:\Data\mycode\mutant-chicken\OutputRoot\vs\TestResults\report\ "-reporttypes:Html;HtmlSummary;CsvSummary"
+
+        $reportArgs = @()
+        $reportArgs += ('"-reports:{0}"' -f ($coverageXmlFiles -join ';'))
+        $reportArgs += ('"-targetDir:{0}"' -f $coveragedir)
+        $reportArgs += ('-reporttypes:{0}' -f $reportTypes)
+        Invoke-CommandString -command $repgenexe -commandArgs $reportArgs
+
+        Add-AppveyorArtifact -pathToAdd ((Get-ChildItem -Path $coveragedir -Recurse -File).FullName)
+
+        $summaryfile = (([System.IO.FileInfo](Join-Path $coveragedir 'Summary.csv')).FullName)
+        if(Test-Path $summaryfile){
+            '************** Code Coverage Report **************' | write-Output
+            Get-Content $summaryfile | Write-Output
+            '**************************************************' | write-Output
         }
     }
 }
@@ -584,6 +590,24 @@ function Add-AppveyorArtifact{
                 }    
             }
         }
+    }
+}
+
+function GetCoverageConverterPath{
+    [cmdletbinding()]
+    param(
+        [string]$sayedToolsVersion=($sayedToolsVersion)
+    )
+    process{
+        $binpath = (Get-NuGetPackage -name 'sayed-tools' -version $sayedToolsVersion -binpath)
+        $exepath = (([System.IO.FileInfo](Join-Path $binpath 'CoverageConverter.exe')).FullName)
+
+        if(-not (Test-Path $exepath)){
+            throw ('Unable to find exe at [{0}]' -f $exepath)
+        }
+
+        # return the path
+        $exepath
     }
 }
 
@@ -609,7 +633,6 @@ function FullBuild{
         
         try{
             Run-Tests
-            GetCoverageRepot
         }
         catch{
             '**********************************************' | Write-Output
