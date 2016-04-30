@@ -45,15 +45,15 @@ echo Resetting to defaults...
 dotnet new3 reset
 
 echo Registering core components...
-dotnet new3 component add "dotnet-new3, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+dotnet new3 -i "dotnet-new3, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
 echo Registering VS Template components...
-dotnet new3 component add "Mutant.Chicken.Orchestrator.VsTemplates, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+dotnet new3 -i "Mutant.Chicken.Orchestrator.VsTemplates, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
 echo Registering Runnable Project components...
-dotnet new3 component add "Mutant.Chicken.Orchestrator.RunnableProjects, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
+dotnet new3 -i "Mutant.Chicken.Orchestrator.RunnableProjects, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
 
 echo Updating sources...
-dotnet new3 source add VSProj "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\ProjectTemplates"
-dotnet new3 source add RunProj "c:\RunnableProjectTemplates"
+dotnet new3 -i "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\ProjectTemplates"
+dotnet new3 -i "c:\RunnableProjectTemplates"
 
 echo Done.
 POPD
