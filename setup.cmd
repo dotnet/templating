@@ -42,7 +42,7 @@ echo Updating path...
 SET PATH=%CD%;%PATH%
 
 echo Resetting to defaults...
-dotnet new3 reset
+dotnet new3 -u *
 
 echo Registering core components...
 dotnet new3 -i "dotnet-new3, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
@@ -61,5 +61,4 @@ POPD
 echo You can now use `dn3setup` from anywhere (in this console session) to run setup again.
 
 @echo on
-dotnet new3 component list
-dotnet new3 source list
+dotnet new3 -c
