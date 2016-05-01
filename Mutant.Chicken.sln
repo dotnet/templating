@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7DAC892E-ADAE-4CEB-8A0C-EDC452A5826A}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Mutant.Chicken", "src\Mutant.Chicken\Mutant.Chicken.xproj", "{72213E25-DEA2-4A6F-9FA9-AC03F3DE7DCF}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Mutant.Chicken.Core", "src\Mutant.Chicken\Mutant.Chicken.Core.xproj", "{72213E25-DEA2-4A6F-9FA9-AC03F3DE7DCF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mutant.Chicken.Net4", "src\Mutant.Chicken.Net4\Mutant.Chicken.Net4.csproj", "{46922F20-1842-4B76-A775-EACF40BD770B}"
 EndProject
