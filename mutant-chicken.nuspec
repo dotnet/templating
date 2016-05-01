@@ -1,28 +1,26 @@
 <?xml version="1.0"?>
 <package>
-  <metadata>
-    <id>mutant-chicken</id>
-    <version>0.0.1-beta</version>
-    <authors>LigerShark</authors>
-    <owners>LigerShark</owners>
-    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
-    <projectUrl>https://github.com/ligershark/mutant-chicken</projectUrl>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>
-       Forward only stream mutations including replacements and conditionally included regions. 
-       This will process the replacements and conditions in projects in SideWaffle, PecanWaffle and DotNetWaffle.
+	<metadata>
+		<id>mutant-chicken</id>
+		<version>0.0.1-beta</version>
+		<authors>LigerShark</authors>
+		<owners>LigerShark</owners>
+		<licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+		<projectUrl>https://github.com/ligershark/mutant-chicken</projectUrl>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<description>
+			Forward only stream mutations including replacements and conditionally included regions. 
+			This will process the replacements and conditions in projects in SideWaffle, PecanWaffle and DotNetWaffle.
 
-       Commit: https://github.com/ligershark/mutant-chicken/commit/$(COMMIT_ID)
-    </description>
-    <copyright>Copyright 2016 LigerShark</copyright>
-  </metadata>
-  <files>
-	  <file src="vs\Mutant.Chicken.dll" target="lib\Mutant.Chicken.dll" />
-    <file src="vs\Mutant.Chicken.pdb" target="lib\Mutant.Chicken.pdb" />
-    <file src="vs\Replacements.json" target="tools\Replacements.json" />
-    <file src="vs\Example.html" target="tools\Example.html" />
+			Commit: https://github.com/ligershark/mutant-chicken/commit/$(COMMIT_ID)
+		</description>
+		<copyright>Copyright 2016 LigerShark</copyright>
+	</metadata>
+	<files>
+		<file src="vs\Mutant.Chicken.Core.dll" target="lib\Mutant.Chicken.Core.dll" />
+		<file src="vs\Mutant.Chicken.Core.pdb" target="lib\Mutant.Chicken.Core.pdb" />
 
-	  <file src="dotnet\netstandard1.5\Mutant.Chicken.dll" target="lib\dotnet\Mutant.Chicken.dll" />
-    <file src="dotnet\netstandard1.5\Mutant.Chicken.pdb" target="lib\dotnet\Mutant.Chicken.pdb" />
-  </files>
+		<file src="dotnet\netstandard1.5\Mutant.Chicken.Core.dll" target="lib\dotnet\Mutant.Chicken.Core.dll" />
+		<file src="dotnet\netstandard1.5\Mutant.Chicken.Core.pdb" target="lib\dotnet\Mutant.Chicken.Core.pdb" />
+	</files>
 </package>
