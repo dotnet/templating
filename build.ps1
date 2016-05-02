@@ -41,10 +41,10 @@ param(
 $scriptDir = split-path -parent $MyInvocation.MyCommand.Definition
 
 [System.IO.FileInfo]$slnfile = (join-path $scriptDir 'Mutant.Chicken.sln')
-[System.IO.FileInfo[]]$csProjects = (Join-Path $scriptDir 'src\Mutant.Chicken.Net4\Mutant.Chicken.Net4.csproj'),(Join-Path $scriptDir 'src\Mutant.Chicken.Net4.Demo\Mutant.Chicken.Net4.Demo.csproj' )
+[System.IO.FileInfo[]]$csProjects = (Join-Path $scriptDir 'src\Mutant.Chicken.Net4\Mutant.Chicken.Net4.csproj')
 $csProjects += (Join-Path $scriptDir 'test\Mutant.Chicken.Net4.UnitTests\Mutant.Chicken.Net4.UnitTests.csproj' )
 
-[System.IO.FileInfo[]]$projectJsonToBuild = (Join-Path $scriptDir 'src\Mutant.Chicken\project.json')
+[System.IO.FileInfo[]]$projectJsonToBuild = (Join-Path $scriptDir 'src\Mutant.Chicken.Core\project.json')
 [System.IO.DirectoryInfo]$outputroot=(join-path $scriptDir 'OutputRoot')
 [System.IO.DirectoryInfo]$outputPathNuget = (Join-Path $outputroot '_nuget-pkg')
 [string]$localNugetFolder = 'c:\temp\nuget\local'
@@ -167,7 +167,7 @@ function RestoreNuGetPackages{
         try{
             'restoring nuget packages' | Write-Output
             Set-Location $slnfile.Directory.FullName
-            Invoke-CommandString -command (Get-Nuget) -commandArgs restore
+            dotnet restore --infer-runtimes --ignore-failed-sources
         }
         finally{
             Set-Location $oldloc
@@ -298,9 +298,9 @@ function BuildSolution{
                 Invoke-CommandString -command dotnet -commandArgs $buildargs
 
                 # copy build results to output folder
-                # \OutputRoot\dotnet\Mutant.Chicken\bin\Release
+                # \OutputRoot\dotnet\Mutant.Chicken.Core\bin\Release
                 # Join-Path c:\temp one|join-path -ChildPath two|join-path -ChildPath three
-                $buildBinFolder = (Join-Path $dnoutputpath -ChildPath 'Mutant.Chicken'|Join-Path -ChildPath 'bin'|Join-Path -ChildPath $configuration)
+                $buildBinFolder = (Join-Path $dnoutputpath -ChildPath 'Mutant.Chicken.Core'|Join-Path -ChildPath 'bin'|Join-Path -ChildPath $configuration)
                 if( (-not [string]::IsNullOrWhiteSpace($buildBinFolder)) -and (Test-Path $buildBinFolder)){
                     # copy the folder to
                     Get-ChildItem $buildBinFolder | ForEach-Object{
@@ -308,7 +308,7 @@ function BuildSolution{
                     }
                 }
                 else{
-                    'bin folder not found for Mutant.Chicken at [{0}]' -f $buildBinFolder | Write-Warning
+                    'bin folder not found for Mutant.Chicken.Core at [{0}]' -f $buildBinFolder | Write-Warning
                 }
 
             }
