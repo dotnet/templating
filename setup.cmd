@@ -57,8 +57,7 @@ echo Registering Runnable Project components...
 dotnet new3 -i "Mutant.Chicken.Orchestrator.RunnableProjects, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"
 
 echo Updating sources...
-dotnet new3 -i "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\ProjectTemplates"
-dotnet new3 -i "c:\RunnableProjectTemplates"
+dotnet new3 -i "%~dp0templates"
 SET DN3RESET=Done
 )
 
