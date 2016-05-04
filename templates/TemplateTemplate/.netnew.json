@@ -1,0 +1,114 @@
+/*-:vars*/
+/*-:cnd*/
+/*-:replacements*/
+/*-:flags*/
+/*-:include*/
+{
+  "name": "Template Definition",
+  "defaultName": "Template",
+  "shortName": "tmplt",
+  "sources": [
+    {
+      "include": [
+        "**/*"
+      ],
+      "copyOnly": [ ],
+      "exclude": [
+        ".netnew.json"
+      ],
+      "source": "./",
+      "target": "./",
+      "rename": {
+        "File.netnew.json": ".netnew.json"
+      }
+    }
+  ],
+  "parameters": {
+    "TemplateName": {
+      "isName": true,
+      "description": "The name of your project",
+      "defaultValue": "Template Name",
+      "requirement": "implicit",
+      "type": "string",
+      "isVariable": true
+    },
+    "TemplateDefaultName": {
+      "description": "The default name for instantiations of this template",
+      "defaultValue": "Template1",
+      "requirement": "required",
+      "type": "string",
+      "isVariable": true
+    },
+    "TemplateShortName": {
+      "description": "The default name for instantiations of this template",
+      "defaultValue": "tmplt1",
+      "requirement": "required",
+      "type": "string",
+      "isVariable": true
+    },
+    "ProjectGuid": {
+      "description": "The GUID for the project the template is being created for",
+      "defaultValue": "",
+      "requirement": "optional",
+      "type": "string",
+      "isVariable": true
+    },
+    "SourceItemName": {
+      "description": "The source name for the primary thing being created.",
+      "defaultValue": "",
+      "requirement": "required",
+      "type": "string",
+      "isVariable":  true
+    },
+    "PrimaryItemExtension": {
+      "description": "The file extension for the primary thing being created.",
+      "defaultValue": "",
+      "requirement": "required",
+      "type": "string",
+      "isVariable": true
+    }
+  },
+  "config": {
+    "flags": {
+      "conditionals": {
+        "on": "/*+:cnd*/",
+        "off": "/*-:cnd*/"
+      },
+      "replacements": {
+        "on": "/*+:replacements*/",
+        "off": "/*-:replacements*/"
+      },
+      "expandVariables": {
+        "on": "/*+:vars*/",
+        "off": "/*-:vars*/"
+      },
+      "flags": {
+        "off": "/*-:flags*/"
+      },
+      "include": {
+        "on": "/*+:include*/",
+        "off": "/*-:include*/"
+      }
+    },
+    "conditionals": {
+      "if": "//if",
+      "else": "//else",
+      "elseif": "//elseif",
+      "endif": "//endif",
+      "evaluator": "C++",
+      "wholeLine": true,
+      "trim": true
+    },
+    "macros": {
+    },
+    "variables": {
+      "sources": {
+        "environment": "env_{0}",
+        "user": "usr_{0}"
+      },
+      "order": [ "environment", "user" ],
+      "fallbackFormat": "{0}",
+      "expand": true
+    }
+  }
+}

@@ -1,0 +1,103 @@
+/*-:flags*/{
+  "name": "TemplateName",
+  "defaultName": "TemplateDefaultName",
+  "shortName": "TemplateShortName",
+  "sources": [
+    {
+      "include": [
+        "**/*"
+      ],
+      "copyOnly": [ ],
+      "exclude": [
+        ".netnew.json",
+        "**/[Bb]in/",
+        "**/[Oo]bj/",
+        "**/*.[Uu]ser"
+      ],
+      "source": "./",
+      "target": "./",
+      "rename": {
+        "SourceItemName.PrimaryItemExtension": "SAFE_NAME.PrimaryItemExtension"
+      }
+    }
+  ],
+  /*-:vars*/
+  /*-:cnd*/
+  /*-:replacements*/
+  /*-:flags*/
+  /*-:include*/
+  "parameters": {
+    "name": {
+      "isName": true,
+      "description": "The name of your project",
+      "defaultValue": "TemplateDefaultName",
+      "requirement": "implicit",
+      "type": "string",
+      "isVariable": true
+    }
+  },
+  "config": {
+    "flags": {
+      "conditionals": {
+        "on": "/*+:cnd*/",
+        "off": "/*-:cnd*/"
+      },
+      "replacements": {
+        "on": "/*+:replacements*/",
+        "off": "/*-:replacements*/"
+      },
+      "expandVariables": {
+        "on": "/*+:vars*/",
+        "off": "/*-:vars*/"
+      },
+      "flags": {
+        "off": "/*-:flags*/"
+      },
+      "include": {
+        "on": "/*+:include*/",
+        "off": "/*-:include*/"
+      }
+    },
+    "conditionals": {
+      "if": "#if",
+      "else": "#else",
+      "elseif": "#elseif",
+      "endif": "#endif",
+      "evaluator": "C++",
+      "wholeLine": true,
+      "trim": true
+    },
+    "replacements": {
+      "SourceItemName": "name"
+    },
+    "macros": {
+      //if (ProjectGuid != "")
+      "ProjectGuid": {
+        "type": "guid",
+        "action": "new",
+        "format": "B"
+      },
+      //endif
+      "SAFE_NAME": {
+        "type": "regex",
+        "action": "replace",
+        "source": "name",
+        "steps": [
+          {
+            "regex": "\\W",
+            "replacement": "_"
+          }
+        ]
+      }
+    },
+    "variables": {
+      "sources": {
+        "environment": "env_{0}",
+        "user": "usr_{0}"
+      },
+      "order": [ "environment", "user" ],
+      "fallbackFormat": "{0}",
+      "expand": true
+    }
+  }
+}
