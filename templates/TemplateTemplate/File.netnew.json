@@ -1,4 +1,4 @@
-/*-:flags*/{
+/*-:flags-*/{
   "name": "TemplateName",
   "defaultName": "TemplateDefaultName",
   "shortName": "TemplateShortName",
@@ -51,7 +51,10 @@
         "off": "/*-:vars*/"
       },
       "flags": {
-        "off": "/*-:flags*/"
+        "on": "/*+:flags*/",
+        "onNoEmit": "/*+:flags-*/",
+        "off": "/*-:flags*/",
+        "offNoEmit": "/*-:flags-*/"
       },
       "include": {
         "on": "/*+:include*/",

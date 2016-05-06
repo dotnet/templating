@@ -1,7 +1,7 @@
 /*-:vars*/
 /*-:cnd*/
 /*-:replacements*/
-/*-:flags*/
+/*-:flags-*/
 /*-:include*/
 {
   "name": "Template Definition",
@@ -83,7 +83,7 @@
         "off": "/*-:vars*/"
       },
       "flags": {
-        "off": "/*-:flags*/"
+        "offNoEmit": "/*-:flags-*/"
       },
       "include": {
         "on": "/*+:include*/",
