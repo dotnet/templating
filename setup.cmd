@@ -5,6 +5,8 @@ doskey build="%~dp0\dn3build.cmd"
 doskey debug="%~dp0\dn3buildmode-debug.cmd"
 doskey release="%~dp0\dn3buildmode-release.cmd"
 
+SET DN3BASEDIR=%~dp0
+
 PUSHD %~dp0\src
 IF "%DN3B%" == "" (SET DN3B=Release)
 echo Using build configuration "%DN3B%"...
@@ -17,34 +19,34 @@ cd dotnet-new3
 dotnet build -r win10-x64 -c %DN3B% 1>nul
 
 echo Building core...
-cd ..\Mutant.Chicken.Core
+cd ..\Microsoft.TemplateEngine.Core
 dotnet build -c %DN3B% 1>nul
 
 echo Packing core...
 dotnet pack -c %DN3B% -o %~dp0\feed 1>nul
 
 echo Building abstractions...
-cd ..\Mutant.Chicken.Abstractions
+cd ..\Microsoft.TemplateEngine.Abstractions
 dotnet build -c %DN3B% 1>nul
 
 echo Packing abstractions...
 dotnet pack -c %DN3B% -o %~dp0\feed 1>nul
 
 echo Building runner...
-cd ..\Mutant.Chicken.Runner
+cd ..\Microsoft.TemplateEngine.Runner
 dotnet build -c %DN3B% 1>nul
 
 echo Packing runner...
 dotnet pack -c %DN3B% -o %~dp0\feed 1>nul
 
 echo Building VS Template support...
-cd ..\Mutant.Chicken.Orchestrator.VsTemplates
+cd ..\Microsoft.TemplateEngine.Orchestrator.VsTemplates
 dotnet build -c %DN3B% 1>nul
 echo Packing VS Template Support...
 dotnet pack -c %DN3B% -o %~dp0\feed 1>nul
 
 echo Building Runnable Project support...
-cd ..\Mutant.Chicken.Orchestrator.RunnableProjects
+cd ..\Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 dotnet build -c %DN3B% 1>nul
 echo Packing Runnable Project Support...
 dotnet pack -c %DN3B% -o %~dp0\feed 1>nul
@@ -59,11 +61,12 @@ SET "PATH=%CD%;%OLDPATH%"
 
 IF "%DN3RESET%" == "" (
 echo Resetting to defaults...
-dotnet new3 -u *
+dotnet new3 --reset
 
 echo Updating sources...
-mkdir %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\Templates
-dotnet new3 -i %~dp0src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\Templates
+mkdir %userprofile%\.netnew\Templates
+dotnet new3 -i %userprofile%\.netnew\Templates
+COPY "%~dp0\userdir.nuget.config" "%userprofile%\.netnew\nuget.config" /Y
 SET DN3RESET=Done
 )
 
