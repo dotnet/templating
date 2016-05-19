@@ -40,11 +40,11 @@ param(
 #$dotnetNugetFeedSource='https://api.nuget.org/v3/index.json'
 $scriptDir = split-path -parent $MyInvocation.MyCommand.Definition
 
-[System.IO.FileInfo]$slnfile = (join-path $scriptDir 'Mutant.Chicken.sln')
-[System.IO.FileInfo[]]$csProjects = (Join-Path $scriptDir 'src\Mutant.Chicken.Net4\Mutant.Chicken.Net4.csproj')
-$csProjects += (Join-Path $scriptDir 'test\Mutant.Chicken.Net4.UnitTests\Mutant.Chicken.Net4.UnitTests.csproj' )
+[System.IO.FileInfo]$slnfile = (join-path $scriptDir 'Microsoft.TemplateEngine.sln')
+[System.IO.FileInfo[]]$csProjects = (Join-Path $scriptDir 'src\Microsoft.TemplateEngine.Net4\Microsoft.TemplateEngine.Net4.csproj')
+$csProjects += (Join-Path $scriptDir 'test\Microsoft.TemplateEngine.Net4.UnitTests\Microsoft.TemplateEngine.Net4.UnitTests.csproj' )
 
-[System.IO.FileInfo[]]$projectJsonToBuild = (Join-Path $scriptDir 'src\Mutant.Chicken.Core\project.json')
+[System.IO.FileInfo[]]$projectJsonToBuild = (Join-Path $scriptDir 'src\Microsoft.TemplateEngine.Core\project.json')
 [System.IO.DirectoryInfo]$outputroot=(join-path $scriptDir 'OutputRoot')
 [System.IO.DirectoryInfo]$outputPathNuget = (Join-Path $outputroot '_nuget-pkg')
 [string]$localNugetFolder = 'c:\temp\nuget\local'
@@ -298,9 +298,9 @@ function BuildSolution{
                 Invoke-CommandString -command dotnet -commandArgs $buildargs
 
                 # copy build results to output folder
-                # \OutputRoot\dotnet\Mutant.Chicken.Core\bin\Release
+                # \OutputRoot\dotnet\Microsoft.TemplateEngine.Core\bin\Release
                 # Join-Path c:\temp one|join-path -ChildPath two|join-path -ChildPath three
-                $buildBinFolder = (Join-Path $dnoutputpath -ChildPath 'Mutant.Chicken.Core'|Join-Path -ChildPath 'bin'|Join-Path -ChildPath $configuration)
+                $buildBinFolder = (Join-Path $dnoutputpath -ChildPath 'Microsoft.TemplateEngine.Core'|Join-Path -ChildPath 'bin'|Join-Path -ChildPath $configuration)
                 if( (-not [string]::IsNullOrWhiteSpace($buildBinFolder)) -and (Test-Path $buildBinFolder)){
                     # copy the folder to
                     Get-ChildItem $buildBinFolder | ForEach-Object{
@@ -308,7 +308,7 @@ function BuildSolution{
                     }
                 }
                 else{
-                    'bin folder not found for Mutant.Chicken.Core at [{0}]' -f $buildBinFolder | Write-Warning
+                    'bin folder not found for Microsoft.TemplateEngine.Core at [{0}]' -f $buildBinFolder | Write-Warning
                 }
 
             }
@@ -449,7 +449,7 @@ function Run-Tests{
 
         $vstestexe = GetVsTestConsole
 
-        # vstest Mutant.Chicken.Net4.UnitTests.dll  /EnableCodeCoverage /InIsolation /Framework:Framework45 /logger:trx
+        # vstest Microsoft.TemplateEngine.Net4.UnitTests.dll  /EnableCodeCoverage /InIsolation /Framework:Framework45 /logger:trx
         $testArgs = @()
         
         $testdlls.FullName|ForEach-Object {
