@@ -48,7 +48,7 @@ $csProjects += (Join-Path $scriptDir 'test\Microsoft.TemplateEngine.Net4.UnitTes
 [System.IO.DirectoryInfo]$outputroot=(join-path $scriptDir 'OutputRoot')
 [System.IO.DirectoryInfo]$outputPathNuget = (Join-Path $outputroot '_nuget-pkg')
 [string]$localNugetFolder = 'c:\temp\nuget\local'
-[string]$testFilePattern ='*mutant*test*.dll'
+[string]$testFilePattern ='*Microsoft.TemplateEngine*test*.dll'
 [string]$testResultsDir = (Join-Path $outputroot.FullName "vs\TestResults")
 [string]$sayedToolsversion='0.0.3-beta'
 <#
@@ -368,7 +368,7 @@ function GetExistingVersion{
     [cmdletbinding()]
     param(
         [ValidateScript({test-path $_ -PathType Leaf})]
-        $nuspecFile = (Join-Path $scriptDir 'mutant-chicken.nuspec')
+        $nuspecFile = (Join-Path $scriptDir 'Microsoft.TemplateEngine.nuspec')
     )
     process{
         ([xml](Get-Content $nuspecFile)).package.metadata.version
@@ -554,7 +554,7 @@ function GetCoverageReport{
         if(-not (Test-Path $coveragedir)){
             New-Item -Path $coveragedir -ItemType Directory | Write-Verbose
         }
-        # reportgen "-reports:C:\Data\mycode\mutant-chicken\OutputRoot\vs\TestResults\converted.coveragexml" -targetDir:C:\Data\mycode\mutant-chicken\OutputRoot\vs\TestResults\report\ "-reporttypes:Html;HtmlSummary;CsvSummary"
+        # reportgen "-reports:C:\Data\mycode\Microsoft.TemplateEngine\OutputRoot\vs\TestResults\converted.coveragexml" -targetDir:C:\Data\mycode\Microsoft.TemplateEngine\OutputRoot\vs\TestResults\report\ "-reporttypes:Html;HtmlSummary;CsvSummary"
 
         $reportArgs = @()
         $reportArgs += ('"-reports:{0}"' -f ($coverageXmlFiles -join ';'))
@@ -645,7 +645,7 @@ function FullBuild{
         Build-NuGetPackage
 
         if($publishToNuget){
-            (Get-ChildItem -Path ($outputPathNuget) 'mutant-*.nupkg').FullName | PublishNuGetPackage -nugetApiKey $nugetApiKey
+            (Get-ChildItem -Path ($outputPathNuget) 'Microsoft.*.nupkg').FullName | PublishNuGetPackage -nugetApiKey $nugetApiKey
         }
     }
 }
