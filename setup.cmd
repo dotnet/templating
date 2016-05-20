@@ -4,6 +4,8 @@ doskey setup="%~dp0\setup.cmd"
 doskey build="%~dp0\dn3build.cmd"
 doskey debug="%~dp0\dn3buildmode-debug.cmd"
 doskey release="%~dp0\dn3buildmode-release.cmd"
+doskey hardreset="%~dp0\hardreset.cmd"
+doskey harderreset="%~dp0\harderreset.cmd"
 
 SET DN3BASEDIR=%~dp0
 
@@ -73,6 +75,5 @@ echo You can now use `setup` from anywhere (in this console session) to run setu
 echo You can now use `build` from anywhere (in this console session) to build dotnet-new3 in the current configuration.
 echo You can now use `debug` from anywhere (in this console session) to change the active build configuration to DEBUG.
 echo You can now use `release` from anywhere (in this console session) to change the active build configuration to RELEASE.
-
-@echo on
-dotnet new3 -c
+echo.
+echo dotnet new3 is ready!
