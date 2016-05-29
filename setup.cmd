@@ -6,12 +6,15 @@ doskey debug="%~dp0\dn3buildmode-debug.cmd"
 doskey release="%~dp0\dn3buildmode-release.cmd"
 doskey hardreset="%~dp0\hardreset.cmd"
 doskey harderreset="%~dp0\harderreset.cmd"
+doskey bundle="%~dp0\bundle.cmd"
 
 SET DN3BASEDIR=%~dp0
 
 PUSHD %~dp0\src
 IF "%DN3B%" == "" (SET DN3B=Release)
 echo Using build configuration "%DN3B%"...
+
+CALL "%~dp0\harderreset.cmd"
 
 echo Restoring all packages...
 dotnet restore --infer-runtimes --ignore-failed-sources 1>nul
@@ -21,7 +24,11 @@ cd dotnet-new3
 dotnet build -r win10-x64 -c %DN3B% 1>nul
 
 echo Creating local feed...
-mkdir %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns
+if EXIST %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns (
+    RMDIR %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns /S /Q
+)
+
+mkdir %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns 1>nul
 
 echo Building core...
 cd ..\Microsoft.TemplateEngine.Core
@@ -66,6 +73,9 @@ COPY %~dp0\template_feed\*.nupkg %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\
 
 echo Copying configuration for builtins...
 COPY %~dp0\src\dotnet-new3\defaultinstall.*.list %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64 /Y 1>nul
+
+echo Deleting NuGet caches...
+for /f %%f in ('dir /AD /B "%USERPROFILE%\.nuget\packages\Microsoft.TemplateEngine.*"') do RMDIR "%USERPROFILE%\.nuget\packages\%%f" /S /Q
 
 echo Done.
 POPD
