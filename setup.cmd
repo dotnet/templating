@@ -7,6 +7,7 @@ doskey release="%~dp0\dn3buildmode-release.cmd"
 doskey hardreset="%~dp0\hardreset.cmd"
 doskey harderreset="%~dp0\harderreset.cmd"
 doskey bundle="%~dp0\bundle.cmd"
+doskey bin="%~dp0\bin.cmd"
 
 SET DN3BASEDIR=%~dp0
 
@@ -76,6 +77,7 @@ COPY %~dp0\src\dotnet-new3\defaultinstall.*.list %~dp0\src\dotnet-new3\bin\%DN3B
 
 echo Deleting NuGet caches...
 for /f %%f in ('dir /AD /B "%USERPROFILE%\.nuget\packages\Microsoft.TemplateEngine.*"') do RMDIR "%USERPROFILE%\.nuget\packages\%%f" /S /Q
+for /f %%f in ('dir /AD /B "%USERPROFILE%\.nuget\packages\Microsoft.DotNet.*.Templates.*"') do RMDIR "%USERPROFILE%\.nuget\packages\%%f" /S /Q
 
 echo Done.
 POPD
