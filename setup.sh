@@ -1,14 +1,11 @@
 #!/bin/bash
 
 CWD="$( pwd )"
-DN3BASEDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-if [ "$PRESETDN3BASEDIR" == "" ]; then
-PRESETDN3BASEDIR="$DN3BASEDIR"; export PRESETDN3BASEDIR
-else
-DN3BASEDIR="$PRESETDN3BASEDIR"
-fi
+DN3BASEDIR0="$( realpath ${BASH_SOURCE[0]} )"
+DN3BASEDIR1="$( dirname $DN3BASEDIR0 )"
+DN3BASEDIR="$( cd $DN3BASEDIR1 && pwd )"
 
-if [ "$DN3B" == "" ]; then
+if [ -z $DN3B ]; then
 DN3B="Debug"; export DN3B
 fi 
 
@@ -61,14 +58,10 @@ dotnet build -c $DN3B > /dev/null 2>&1
 echo Packing Runnable Project support...
 dotnet pack -c $DN3B -o "$DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/ubuntu.14.04-x64/BuiltIns" > /dev/null 2>&1
 
-if [ -L /usr/local/bin/setup.sh ]; then
-rm -f /usr/local/bin/setup.sh
-fi
-
+if [ ! -L /usr/local/bin/setup.sh ]; then
 ln -s "$DN3BASEDIR/setup.sh" /usr/local/bin/setup.sh
-
-if [ -L /usr/local/bin/dotnet-new3 ]; then
-rm -f /usr/local/bin/dotnet-new3
 fi
 
+if [ ! -L /usr/local/bin/dotnet-new3 ]; then
 ln -s "$DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/ubuntu.14.04-x64/dotnet-new3" /usr/local/bin/dotnet-new3 
+fi
