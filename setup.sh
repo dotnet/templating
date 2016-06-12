@@ -58,6 +58,8 @@ dotnet build -c $DN3B > /dev/null 2>&1
 echo Packing Runnable Project support...
 dotnet pack -c $DN3B -o "$DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/ubuntu.14.04-x64/BuiltIns" > /dev/null 2>&1
 
+cp -r "$DN3BASEDIR/template_feed/"* "$DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/ubuntu.14.04-x64/BuiltIns/"
+
 if [ ! -L /usr/local/bin/setup.sh ]; then
 ln -s "$DN3BASEDIR/setup.sh" /usr/local/bin/setup.sh
 fi
