@@ -71,8 +71,4 @@ if [ -L /usr/local/bin/dotnet-new3 ]; then
 rm -f /usr/local/bin/dotnet-new3
 fi
 
-echo "$DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/ubuntu.14.04-x64/dotnet-new3 -> /usr/local/bin/dotnet-new3"
 ln -s "$DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/ubuntu.14.04-x64/dotnet-new3" /usr/local/bin/dotnet-new3 
-
-cd "$CWD"
-
