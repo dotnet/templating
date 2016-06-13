@@ -6,6 +6,10 @@ if ["$DN3BASEDIR" == ""]; then
 DN3BASEDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 fi
 
-rm -rf "$DN3BASEDIR\src\dotnet-new3\bin"
-rm -rf "$DN3BASEDIR\src\dotnet-new3\obj"
+for proj in `dir -1G $DN3BASEDIR/src`; do
+  for item in `dir -1G $DN3BASEDIR/src/$proj | grep -P "^(bin|obj)$"`; do
+    rm -rf "$DN3BASEDIR/src/$proj/$item"
+  done
+done
+
 rm -rf "~/.netnew"
