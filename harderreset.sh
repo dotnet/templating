@@ -13,3 +13,4 @@ for proj in `dir -1G $DN3BASEDIR/src`; do
 done
 
 rm -rf "~/.netnew"
+rm -rf ~/.nuget/packages/Microsoft.TemplateEngine.*
