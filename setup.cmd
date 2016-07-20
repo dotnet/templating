@@ -20,7 +20,7 @@ CALL "%~dp0\harderreset.cmd"
 echo Restoring all packages...
 dotnet restore --infer-runtimes --ignore-failed-sources 1>nul
 
-echo Building dotnet new3...
+echo Building...
 cd dotnet-new3
 dotnet build -r win10-x64 -c %DN3B% 1>nul
 
@@ -31,34 +31,29 @@ if EXIST %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns (
 
 mkdir %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns 1>nul
 
+echo Building...
+dotnet build -c %DN3B% **/project.json
+
 echo Building core...
 cd ..\Microsoft.TemplateEngine.Core
 dotnet build -c %DN3B% 1>nul
 echo Packing core...
 dotnet pack -c %DN3B% -o %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns\ 1>nul
 
-echo Building abstractions...
-cd ..\Microsoft.TemplateEngine.Abstractions
-dotnet build -c %DN3B% 1>nul
+echo Packing edge...
+cd ..\Microsoft.TemplateEngine.Edge
+dotnet pack -c %DN3B% -o %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns\ 1>nul
+
 echo Packing abstractions...
+cd ..\Microsoft.TemplateEngine.Abstractions
 dotnet pack -c %DN3B% -o %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns\ 1>nul
 
-echo Building runner...
-cd ..\Microsoft.TemplateEngine.Runner
-dotnet build -c %DN3B% 1>nul
-echo Packing runner...
-dotnet pack -c %DN3B% -o %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns\ 1>nul
-
-echo Building VS Template support...
-cd ..\Microsoft.TemplateEngine.Orchestrator.VsTemplates
-dotnet build -c %DN3B% 1>nul
 echo Packing VS Template Support...
+cd ..\Microsoft.TemplateEngine.Orchestrator.VsTemplates
 dotnet pack -c %DN3B% -o %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns\ 1>nul
 
-echo Building Runnable Project support...
-cd ..\Microsoft.TemplateEngine.Orchestrator.RunnableProjects
-dotnet build -c %DN3B% 1>nul
 echo Packing Runnable Project Support...
+cd ..\Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 dotnet pack -c %DN3B% -o %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns\ 1>nul
 
 echo Artifacts built and placed.
