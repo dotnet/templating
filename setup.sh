@@ -1,19 +1,27 @@
 #!/bin/bash
 
-RID="$( dotnet --info | grep -Po "(?<=RID:)(?:\s+).*" | grep -Po "\S+" )"
-OS="$( echo "$RID" | grep -Po ".*?(?=-)" )"
-ARCH="$( echo "$RID" | grep -Po "(?<=-).*" )"
+RID="$( dotnet --info | egrep -e 'RID:' | egrep -o -e ':.*' | egrep -o -e '[^:]+' | egrep -o -e '(\w|\.|-)+' )"
+OS="$( echo "$RID" | egrep -o -e .*- | egrep -o -e [^-]+ )"
+ARCH="$( echo "$RID" | egrep -o -e -.* | egrep -o -e [^-]+ )"
 
 if [ "$OS" == "ubuntu.16.04" ]; then
     OS="ubuntu.14.04"
+    SPECIAL_OS="YES"
 fi
 
-RID="$OS-$ARCH"
+if [ "$SPECIAL_OS" == "YES" ]; then 
+    RID="$OS-$ARCH"
+fi
 
 echo "Using RID: $RID"
+echo "Using OS: $OS"
 
 CWD="$( pwd )"
-DN3BASEDIR0="$( realpath ${BASH_SOURCE[0]} )"
+if [ ! "$OS" == "osx.10.11" ]; then
+    DN3BASEDIR0="$( realpath ${BASH_SOURCE[0]} )"
+else
+    DN3BASEDIR0=$BASH_SOURCE[0]
+fi
 DN3BASEDIR1="$( dirname $DN3BASEDIR0 )"
 DN3BASEDIR="$( cd $DN3BASEDIR1 && pwd )"
 
@@ -40,27 +48,27 @@ cd src
 
 echo Building/Packing core...
 cd Microsoft.TemplateEngine.Core
-dotnet pack -c $DN3B -o "$DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID/BuiltIns" | grep -P --color=never "(Compilation|Error|Warning)"
+dotnet pack -c $DN3B -o "$DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID/BuiltIns" | egrep -e "(Compilation|Error|Warning)"
 
 echo Building/Packing abstractions...
 cd ../Microsoft.TemplateEngine.Abstractions
-dotnet pack -c $DN3B -o "$DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID/BuiltIns" | grep -P --color=never "(Compilation|Error|Warning)"
+dotnet pack -c $DN3B -o "$DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID/BuiltIns" | egrep -e "(Compilation|Error|Warning)"
 
 echo Building/Packing runner...
 cd ../Microsoft.TemplateEngine.Runner
-dotnet pack -c $DN3B -o "$DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID/BuiltIns" | grep -P --color=never "(Compilation|Error|Warning)"
+dotnet pack -c $DN3B -o "$DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID/BuiltIns" | egrep -e "(Compilation|Error|Warning)"
 
 echo Building/Packing VS template support...
 cd ../Microsoft.TemplateEngine.Orchestrator.VsTemplates
-dotnet pack -c $DN3B -o "$DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID/BuiltIns" | grep -P --color=never "(Compilation|Error|Warning)"
+dotnet pack -c $DN3B -o "$DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID/BuiltIns" | egrep -e "(Compilation|Error|Warning)"
 
 echo Building/Packing Runnable Project support...
 cd ../Microsoft.TemplateEngine.Orchestrator.RunnableProjects
-dotnet pack -c $DN3B -o "$DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID/BuiltIns" | grep -P --color=never "(Compilation|Error|Warning)"
+dotnet pack -c $DN3B -o "$DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID/BuiltIns" | egrep -e "(Compilation|Error|Warning)"
 
 echo Building dotnet new3...
 cd ../dotnet-new3
-dotnet build -r "$RID" -c $DN3B | grep -P --color=never "(Compilation|Error|Warning)"
+dotnet build -r "$RID" -c $DN3B | egrep -e "(Compilation|Error|Warning)"
 
 echo Importing built in templates...
 cp -r "$DN3BASEDIR/template_feed/"* "$DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID/BuiltIns/"
