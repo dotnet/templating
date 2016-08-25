@@ -1,5 +1,3 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/co28ei02qcpln54e/branch/master?svg=true)](https://ci.appveyor.com/project/sayedihashimi/mutant-chicken/branch/master)
-
 # Overview
 Template Engine is the next iteration of the replacement capabilities built in to [Template Builder](https://github.com/ligershark/template-builder) and will eventually be used as the replacement engine in [SideWaffle](https://github.com/ligershark/side-waffle), [PecanWaffle](https://github.com/ligershark/pecan-waffle) and DotNetWaffle.
 
