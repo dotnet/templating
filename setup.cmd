@@ -34,9 +34,15 @@ mkdir %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns 1>nul
 echo Building...
 dotnet build -c %DN3B% **/project.json
 
+echo Building utils...
+cd ..\Microsoft.TemplateEngine.Utils
+dotnet build -c %DN3B% 1>nul
+echo Packing core...
+dotnet pack -c %DN3B% -o %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns\ 1>nul
+
 echo Building core...
 cd ..\Microsoft.TemplateEngine.Core
-dotnet build -c %DN3B% -r win10-x64 1>nul
+dotnet build -c %DN3B% 1>nul
 echo Packing core...
 dotnet pack -c %DN3B% -o %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns\ 1>nul
 
