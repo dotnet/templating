@@ -54,10 +54,6 @@ echo Packing abstractions...
 cd ..\Microsoft.TemplateEngine.Abstractions
 dotnet pack -c %DN3B% -o %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns\ 1>nul
 
-echo Packing VS Template Support...
-cd ..\Microsoft.TemplateEngine.Orchestrator.VsTemplates
-dotnet pack -c %DN3B% -o %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns\ 1>nul
-
 echo Packing Runnable Project Support...
 cd ..\Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 dotnet pack -c %DN3B% -o %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns\ 1>nul
