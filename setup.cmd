@@ -17,13 +17,6 @@ echo Using build configuration "%DN3B%"...
 
 CALL "%~dp0\harderreset.cmd"
 
-echo Restoring all packages...
-dotnet restore --infer-runtimes --ignore-failed-sources 1>nul
-
-echo Building...
-cd dotnet-new3
-dotnet build -r win10-x64 -c %DN3B% 1>nul
-
 echo Creating local feed...
 if EXIST %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns (
     RMDIR %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns /S /Q
@@ -31,38 +24,8 @@ if EXIST %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns (
 
 mkdir %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns 1>nul
 
-echo Building...
-dotnet build -c %DN3B% **/project.json
-
-echo Building utils...
-cd ..\Microsoft.TemplateEngine.Utils
-dotnet build -c %DN3B% 1>nul
-echo Packing core...
-dotnet pack -c %DN3B% -o %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns\ 1>nul
-
-echo Building core contracts...
-cd ..\Microsoft.TemplateEngine.Core.Contracts
-dotnet build -c %DN3B% 1>nul
-echo Packing core contracts...
-dotnet pack -c %DN3B% -o %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns\ 1>nul
-
-echo Building core...
-cd ..\Microsoft.TemplateEngine.Core
-dotnet build -c %DN3B% 1>nul
-echo Packing core...
-dotnet pack -c %DN3B% -o %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns\ 1>nul
-
-echo Packing edge...
-cd ..\Microsoft.TemplateEngine.Edge
-dotnet pack -c %DN3B% -o %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns\ 1>nul
-
-echo Packing abstractions...
-cd ..\Microsoft.TemplateEngine.Abstractions
-dotnet pack -c %DN3B% -o %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns\ 1>nul
-
-echo Packing Runnable Project Support...
-cd ..\Microsoft.TemplateEngine.Orchestrator.RunnableProjects
-dotnet pack -c %DN3B% -o %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns\ 1>nul
+echo "Calling build.ps1"
+powershell -NoProfile -NoLogo -Command "& \"%~dp0build.ps1\" %*; exit $LastExitCode;"
 
 echo Artifacts built and placed.
 
@@ -71,6 +34,9 @@ cd %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\
 echo Updating path...
 IF "%OLDPATH%" == "" (SET "OLDPATH=%PATH%")
 SET "PATH=%CD%;%OLDPATH%"
+
+echo Copying packages...
+COPY %~dp0\artifacts\packages\*.nupkg %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns /Y 1>nul
 
 echo Copying templates...
 COPY %~dp0\template_feed\*.nupkg %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns /Y 1>nul
