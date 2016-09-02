@@ -82,8 +82,9 @@ foreach ($ProjectName in $ProjectsToPack) {
 Write-Host "Running tests..."
 foreach ($ProjectName in $TestProjects) {
     $ProjectFile = "$RepoRoot\test\$ProjectName\project.json"
+    $TestResultFile = "$RepoRoot\test\$ProjectName\$ProjectFile-testResults.xml"
 
-    & dotnet test "$ProjectFile" --configuration "$env:CONFIGURATION"
+    & dotnet test "$ProjectFile" --configuration "$env:CONFIGURATION" -xml "$TestResultFile"
     if (!$?) {
         Write-Host "dotnet test failed for: $ProjectFile"
         Exit 1
