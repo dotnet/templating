@@ -3,6 +3,7 @@
 RID="$( dotnet --info | egrep -e 'RID:' | egrep -o -e ':.*' | egrep -o -e '[^:]+' | egrep -o -e '(\w|\.|-)+' )"
 OS="$( echo "$RID" | egrep -o -e .*- | egrep -o -e [^-]+ )"
 ARCH="$( echo "$RID" | egrep -o -e -.* | egrep -o -e [^-]+ )"
+REPOROOT="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 if [ "$OS" == "ubuntu.16.04" ]; then
     OS="ubuntu.14.04"
@@ -34,9 +35,6 @@ cd "$DN3BASEDIR"
 echo Using build configuration "$DN3B"
 /bin/bash harderreset.sh
 
-echo Restoring all packages...
-dotnet restore --ignore-failed-sources -v Error
-
 echo Creating directory structure...
 mkdir "src/dotnet-new3/bin"
 mkdir "src/dotnet-new3/bin/$DN3B"
@@ -44,31 +42,7 @@ mkdir "src/dotnet-new3/bin/$DN3B/netcoreapp1.0"
 mkdir "src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID"
 mkdir "src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID/BuiltIns"
 
-cd src
-
-echo Building/Packing core...
-cd Microsoft.TemplateEngine.Core
-dotnet pack -c $DN3B -o "$DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID/BuiltIns" | egrep -e "(Compilation|Error|Warning)"
-
-echo Building/Packing abstractions...
-cd ../Microsoft.TemplateEngine.Abstractions
-dotnet pack -c $DN3B -o "$DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID/BuiltIns" | egrep -e "(Compilation|Error|Warning)"
-
-echo Building/Packing runner...
-cd ../Microsoft.TemplateEngine.Runner
-dotnet pack -c $DN3B -o "$DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID/BuiltIns" | egrep -e "(Compilation|Error|Warning)"
-
-echo Building/Packing VS template support...
-cd ../Microsoft.TemplateEngine.Orchestrator.VsTemplates
-dotnet pack -c $DN3B -o "$DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID/BuiltIns" | egrep -e "(Compilation|Error|Warning)"
-
-echo Building/Packing Runnable Project support...
-cd ../Microsoft.TemplateEngine.Orchestrator.RunnableProjects
-dotnet pack -c $DN3B -o "$DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID/BuiltIns" | egrep -e "(Compilation|Error|Warning)"
-
-echo Building dotnet new3...
-cd ../dotnet-new3
-dotnet build -r "$RID" -c $DN3B | egrep -e "(Compilation|Error|Warning)"
+$REPOROOT/build.sh -c $DN3B
 
 echo Importing built in templates...
 cp -r "$DN3BASEDIR/template_feed/"* "$DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID/BuiltIns/"
