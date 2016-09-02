@@ -236,3 +236,6 @@ _Pvt_Extensions
 # FAKE - F# Make
 .fake/
 Microsoft.TemplateEngine.VC.db
+
+# Dotnet CLI
+.dotnet
