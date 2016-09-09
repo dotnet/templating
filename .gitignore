@@ -35,6 +35,9 @@ bld/
 *.VisualState.xml
 TestResult.xml
 
+#XUNIT
+*-testResults.xml
+
 # Build Results of an ATL Project
 [Dd]ebugPS/
 [Rr]eleasePS/
@@ -236,3 +239,6 @@ _Pvt_Extensions
 # FAKE - F# Make
 .fake/
 Microsoft.TemplateEngine.VC.db
+
+# Dotnet CLI
+.dotnet
