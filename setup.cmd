@@ -17,32 +17,39 @@ echo Using build configuration "%DN3B%"...
 
 CALL "%~dp0\harderreset.cmd"
 
-echo Creating local feed...
-if EXIST %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns (
-    RMDIR %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns /S /Q
+echo Creating developer environment...
+if EXIST %~dp0\dev (
+    RMDIR %~dp0\dev /S /Q
 )
 
-mkdir %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns 1>nul
+mkdir %~dp0\dev 1>nul
+mkdir %~dp0\dev\builtins 1>nul
 
 echo "Calling build.ps1"
-powershell -NoProfile -NoLogo -Command "& \"%~dp0build.ps1\" %*; exit $LastExitCode;"
+powershell -NoProfile -NoLogo -Command "& \"%~dp0build.ps1\" -Configuration %DN3B%; exit $LastExitCode;"
 
 echo Artifacts built and placed.
 
-cd %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\
+SET DN3BINDIR=
+for /f %%f in ('dir /AD /B "%~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0"') do SET DN3BINDIR="%~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\%%f"
+
+echo %DN3BINDIR%
+
+xcopy /s %DN3BINDIR% %~dp0\dev 1>nul
+cd %~dp0\dev
 
 echo Updating path...
 IF "%OLDPATH%" == "" (SET "OLDPATH=%PATH%")
 SET "PATH=%CD%;%OLDPATH%"
 
 echo Copying packages...
-COPY %~dp0\artifacts\packages\*.nupkg %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns /Y 1>nul
+COPY %~dp0\artifacts\packages\*.nupkg %~dp0\dev\BuiltIns /Y 1>nul
 
 echo Copying templates...
-COPY %~dp0\template_feed\*.nupkg %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64\BuiltIns /Y 1>nul
+COPY %~dp0\template_feed\*.nupkg %~dp0\dev\BuiltIns /Y 1>nul
 
 echo Copying configuration for builtins...
-COPY %~dp0\src\dotnet-new3\defaultinstall.*.list %~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\win10-x64 /Y 1>nul
+COPY %~dp0\src\dotnet-new3\defaultinstall.*.list %~dp0\dev /Y 1>nul
 
 echo Deleting NuGet caches...
 for /f %%f in ('dir /AD /B "%USERPROFILE%\.nuget\packages\Microsoft.TemplateEngine.*"') do RMDIR "%USERPROFILE%\.nuget\packages\%%f" /S /Q
