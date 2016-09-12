@@ -222,48 +222,4 @@ namespace Microsoft.TemplateEngine.Core.Operations
             }
         }
     }
-
-    public class MarkupTokenMapping
-    {
-        public MarkupTokenMapping(int openOpenElementToken, int openCloseElementToken, int closeCloseElementToken, int selfClosingElementEndToken)
-        {
-            OpenOpenElementToken = openOpenElementToken;
-            OpenCloseElementToken = openCloseElementToken;
-            CloseElementTagToken = closeCloseElementToken;
-            SelfClosingElementEndToken = selfClosingElementEndToken;
-        }
-
-        public int CloseElementTagToken { get; }
-
-        public int OpenCloseElementToken { get; }
-
-        public int OpenOpenElementToken { get; }
-
-        public int SelfClosingElementEndToken { get; }
-    }
-
-    public class MarkupTokens
-    {
-        public MarkupTokens(string openOpenElementToken, string openCloseElementToken, string closeElementTagToken, string selfClosingElementEndToken, string openConditionExpression, string closeConditionExpression)
-        {
-            OpenOpenElementToken = openOpenElementToken;
-            OpenCloseElementToken = openCloseElementToken;
-            CloseElementTagToken = closeElementTagToken;
-            SelfClosingElementEndToken = selfClosingElementEndToken;
-            OpenConditionExpression = openConditionExpression;
-            CloseConditionExpression = closeConditionExpression;
-        }
-
-        public string CloseConditionExpression { get; }
-
-        public string CloseElementTagToken { get; }
-
-        public string OpenCloseElementToken { get; }
-
-        public string OpenConditionExpression { get; }
-
-        public string OpenOpenElementToken { get; }
-
-        public string SelfClosingElementEndToken { get; }
-    }
 }
