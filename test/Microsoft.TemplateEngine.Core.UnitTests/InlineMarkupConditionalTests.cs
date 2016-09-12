@@ -8,7 +8,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
 {
     public class InlineMarkupConditionalTests : TestBase
     {
-        private static IProcessor SetupMSBuildProcessor(IVariableCollection vc)
+        private static IProcessor SetupXmlPlusCppProcessor(IVariableCollection vc)
         {
             EngineConfig cfg = new EngineConfig(vc, "$({0})");
             return Processor.Create(cfg, new InlineMarkupConditional(
@@ -45,7 +45,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
                 ["FIRST_IF"] = true,
                 ["SECOND_IF"] = true
             };
-            IProcessor processor = SetupMSBuildProcessor(vc);
+            IProcessor processor = SetupXmlPlusCppProcessor(vc);
             RunAndVerify(originalValue, expectedValue, processor, 9999);
         }
 
@@ -73,7 +73,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
                 ["FIRST_IF"] = false,
                 ["SECOND_IF"] = true
             };
-            IProcessor processor = SetupMSBuildProcessor(vc);
+            IProcessor processor = SetupXmlPlusCppProcessor(vc);
             RunAndVerify(originalValue, expectedValue, processor, 9999);
         }
 
@@ -97,7 +97,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
                 ["FIRST_IF"] = true,
                 ["SECOND_IF"] = false
             };
-            IProcessor processor = SetupMSBuildProcessor(vc);
+            IProcessor processor = SetupXmlPlusCppProcessor(vc);
             RunAndVerify(originalValue, expectedValue, processor, 9999);
         }
 
@@ -120,7 +120,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
                 ["FIRST_IF"] = false,
                 ["SECOND_IF"] = false
             };
-            IProcessor processor = SetupMSBuildProcessor(vc);
+            IProcessor processor = SetupXmlPlusCppProcessor(vc);
             RunAndVerify(originalValue, expectedValue, processor, 9999);
         }
     }
