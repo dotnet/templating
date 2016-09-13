@@ -1,5 +1,5 @@
 ﻿using Microsoft.TemplateEngine.Core.Contracts;
-using Microsoft.TemplateEngine.Core.Expressions.Cpp;
+using Microsoft.TemplateEngine.Core.Expressions.MSBuild;
 using Microsoft.TemplateEngine.Core.Operations;
 using Microsoft.TemplateEngine.Core.Util;
 using Xunit;
@@ -15,7 +15,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
                 new MarkupTokens("<", "</", ">", "/>", "Condition=\"", "\""),
                 true,
                 true,
-                CppStyleEvaluatorDefinition.CppStyleEvaluator,
+                MSBuildStyleEvaluatorDefinition.MSBuildStyleEvaluator,
                 null
             ));
         }
@@ -121,6 +121,82 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
                 ["SECOND_IF"] = false
             };
             IProcessor processor = SetupXmlPlusCppProcessor(vc);
+            RunAndVerify(originalValue, expectedValue, processor, 9999);
+        }
+
+        [Fact]
+        public void VerifyInlineMarkupExpandedConditions1()
+        {
+            string originalValue = @"<root>
+    <element Condition=""('$(FIRST_IF)' == '$(SECOND_IF)') AND !$(FIRST_IF)"" />
+</root>";
+
+            string expectedValue = @"<root>
+    <element />
+</root>";
+            VariableCollection vc = new VariableCollection
+            {
+                ["FIRST_IF"] = false,
+                ["SECOND_IF"] = false
+            };
+            IProcessor processor = SetupXmlPlusCppProcessor(vc);
+            RunAndVerify(originalValue, expectedValue, processor, 9999);
+        }
+
+        [Fact]
+        public void VerifyInlineMarkupExpandedConditions2()
+        {
+            string originalValue = @"<root>
+    <element Condition=""!!!$(FIRST_IF) AND !$(SECOND_IF) == !$(FIRST_IF)"" />
+</root>";
+
+            string expectedValue = @"<root>
+    <element />
+</root>";
+            VariableCollection vc = new VariableCollection
+            {
+                ["FIRST_IF"] = false,
+                ["SECOND_IF"] = false
+            };
+            IProcessor processor = SetupXmlPlusCppProcessor(vc);
+            RunAndVerify(originalValue, expectedValue, processor, 9999);
+        }
+
+        [Fact]
+        public void VerifyInlineMarkupExpandedConditions3()
+        {
+            string originalValue = @"<root>
+    <element Condition=""'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'"" />
+</root>";
+
+            string expectedValue = @"<root>
+    <element />
+</root>";
+            VariableCollection vc = new VariableCollection
+            {
+                ["Configuration"] = "Debug",
+                ["Platform"] = "AnyCPU"
+            };
+            IProcessor processor = SetupXmlPlusCppProcessor(vc);
+            RunAndVerify(originalValue, expectedValue, processor, 9999);
+
+            originalValue = @"<root>
+    <element Condition=""'$(Configuration)|$(Platform)' == 'debug|anycpu'"" />
+</root>";
+
+            expectedValue = @"<root>
+    <element />
+</root>";
+
+            RunAndVerify(originalValue, expectedValue, processor, 9999);
+
+            originalValue = @"<root>
+    <element Condition=""'$(Configuration)|$(Platform)' == 'Debug|x86'"" />
+</root>";
+
+            expectedValue = @"<root>
+</root>";
+
             RunAndVerify(originalValue, expectedValue, processor, 9999);
         }
     }
