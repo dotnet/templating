@@ -163,6 +163,24 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
         }
 
         [Fact]
+        public void VerifyInlineMarkupExpandedConditionsEscaping()
+        {
+            string originalValue = @"<root>
+    <element Condition=""'$(FIRST_IF)' == '&gt;&lt;&#x0020;&amp;&apos;&#0032;&quot;'"" />
+</root>";
+
+            string expectedValue = @"<root>
+    <element />
+</root>";
+            VariableCollection vc = new VariableCollection
+            {
+                ["FIRST_IF"] = ">< &' \""
+            };
+            IProcessor processor = SetupXmlPlusCppProcessor(vc);
+            RunAndVerify(originalValue, expectedValue, processor, 9999);
+        }
+
+        [Fact]
         public void VerifyInlineMarkupExpandedConditions3()
         {
             string originalValue = @"<root>

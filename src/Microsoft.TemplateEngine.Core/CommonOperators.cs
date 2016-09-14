@@ -121,12 +121,12 @@ namespace Microsoft.TemplateEngine.Core
 
         private static IEvaluable CreateLessThan(IEvaluable active)
         {
-            return CreateBinaryChild(active, Operators.LessThan, x => false, (l, r) => ((IComparable)l).CompareTo(r) > 0);
+            return CreateBinaryChild(active, Operators.LessThan, x => false, (l, r) => ((IComparable)l).CompareTo(r) < 0);
         }
 
         private static IEvaluable CreateLessThanOrEqualTo(IEvaluable active)
         {
-            return CreateBinaryChild(active, Operators.LessThanOrEqualTo, x => false, (l, r) => ((IComparable)l).CompareTo(r) >= 0);
+            return CreateBinaryChild(active, Operators.LessThanOrEqualTo, x => false, (l, r) => ((IComparable)l).CompareTo(r) <= 0);
         }
 
         private static IEvaluable CreateNotEquals(IEvaluable active)

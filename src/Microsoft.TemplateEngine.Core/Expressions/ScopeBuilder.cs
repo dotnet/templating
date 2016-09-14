@@ -23,6 +23,8 @@ namespace Microsoft.TemplateEngine.Core.Expressions
         private readonly ITokenTrie _tokens;
         private readonly int _knownTokensCount;
         private readonly IProcessorState _processor;
+        private readonly Func<string, string> _valueDecoder;
+        private readonly Func<string, string> _valueEncoder;
 
         private class ScopeIsolator
         {
@@ -38,7 +40,8 @@ namespace Microsoft.TemplateEngine.Core.Expressions
             TToken openGroup, TToken closeGroup,
             TToken literal, TOperator identity,
             ISet<TToken> literalSequenceBoundsMarkers,
-            ISet<TToken> whitespace, ISet<TToken> terminators)
+            ISet<TToken> whitespace, ISet<TToken> terminators,
+            Func<string, string> valueEncoder, Func<string, string> valueDecoder)
         {
             TokenTrie trie = new TokenTrie();
             trie.Append(tokens);
@@ -53,6 +56,8 @@ namespace Microsoft.TemplateEngine.Core.Expressions
             _isSymbolDereferenceInLiteralSequenceRequired = dereferenceInLiterals;
             _processor = processor;
             _knownTokensCount = tokens.Count;
+            _valueEncoder = valueEncoder ?? (o => o);
+            _valueDecoder = valueDecoder ?? (o => o);
 
             List<object> symbolValues = new List<object>();
 
@@ -110,6 +115,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions
                                 {
                                     activeLiteralSequenceBoundsMarker = null;
                                     string value = _processor.Encoding.GetString(currentLiteral.ToArray());
+                                    value = _valueDecoder(value);
                                     currentLiteral.Clear();
                                     Token<TToken> t = new Token<TToken>(_literal, value);
                                     TokenScope<TToken> scope = new TokenScope<TToken>(isolator.Active, t);
@@ -139,6 +145,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions
                             {
                                 object val = _symbolValues[token - _knownTokensCount];
                                 string valText = (val ?? "null").ToString();
+                                valText = _valueEncoder(valText);
                                 byte[] data = _processor.Encoding.GetBytes(valText);
                                 currentLiteral.AddRange(data);
                             }
@@ -168,7 +175,8 @@ namespace Microsoft.TemplateEngine.Core.Expressions
                         //Is it a variable?
                         else if (_knownTokensCount <= token)
                         {
-                            Token<TToken> t = new Token<TToken>(_literal, (_symbolValues[token - _knownTokensCount] ?? "null").ToString());
+                            string value = (_symbolValues[token - _knownTokensCount] ?? "null").ToString();
+                            Token<TToken> t = new Token<TToken>(_literal, value);
                             TokenScope<TToken> scope = new TokenScope<TToken>(isolator.Active, t);
 
                             while (isolator.Active != null && !isolator.Active.TryAccept(scope))
