@@ -8,6 +8,8 @@
             Token = token;
         }
 
+        public bool IsQuoted { get; set; }
+
         public IEvaluable Parent { get; set; }
 
         public Token<TToken> Token { get; }

@@ -12,6 +12,7 @@
         LessThanOrEqualTo,
         EqualTo,
         NotEqualTo,
+        BadSyntax,
         Identity,
     }
 }

@@ -19,7 +19,8 @@ namespace Microsoft.TemplateEngine.Core.Expressions.MSBuild
             .LessThan(Tokens.LessThan, evaluate: (x, y) => Compare(x, y) < 0)
             .LessThanOrEqualTo(Tokens.LessThanOrEqualTo, evaluate: (x, y) => Compare(x, y) <= 0)
             .EqualTo(Tokens.EqualTo, evaluate: (x, y) => Compare(x, y) == 0)
-            .NotEqualTo(Tokens.NotEqualTo, evaluate: (x, y) => Compare(x, y) != 0);
+            .NotEqualTo(Tokens.NotEqualTo, evaluate: (x, y) => Compare(x, y) != 0)
+            .BadSyntax(Tokens.VariableStart);
 
         private static readonly IOperationProvider[] NoOperationProviders = new IOperationProvider[0];
 
@@ -44,7 +45,8 @@ namespace Microsoft.TemplateEngine.Core.Expressions.MSBuild
             UnixEOL = 14,
             LegacyMacEOL = 15,
             Quote = 16,
-            Literal = 17,
+            VariableStart = 17,
+            Literal = 18,
         }
 
         public static bool EvaluateFromString(string text, IVariableCollection variables)
@@ -241,6 +243,10 @@ namespace Microsoft.TemplateEngine.Core.Expressions.MSBuild
 
                 // quotes
                 trie.AddToken(processor.Encoding.GetBytes("'"));
+
+                // variable start
+                trie.AddToken(processor.Encoding.GetBytes("$("));
+
                 TokenCache[processor.Encoding] = tokens = trie;
             }
 

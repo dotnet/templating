@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.TemplateEngine.Core.Expressions.MSBuild;
 
 namespace Microsoft.TemplateEngine.Core.Expressions
 {
     public class OperatorSetBuilder<TToken> : IOperatorMap<Operators, TToken>
+        where TToken : struct
     {
         private readonly Func<string, string> _decoder;
         private readonly Func<string, string> _encoder;
@@ -37,6 +39,8 @@ namespace Microsoft.TemplateEngine.Core.Expressions
         {
             return _encoder(value);
         }
+
+        public TToken? BadSyntaxToken { get; private set; }
 
         public OperatorSetBuilder<TToken> EqualTo(TToken token, Func<Operators, bool> precedesOperator = null, Func<object, object, object> evaluate = null)
         {
@@ -99,6 +103,13 @@ namespace Microsoft.TemplateEngine.Core.Expressions
             _operatorScopeLookupFactory[Operators.Or] =
                 x => CreateBinaryChild(x, Operators.Or, precedesOperator ?? OrPrecedence, evaluate ?? Or);
             _tokensToOperatorsMap[token] = Operators.Or;
+            return this;
+        }
+
+        public OperatorSetBuilder<TToken> Other(Operators @operator, TToken token, Func<IEvaluable, IEvaluable> nodeFactory)
+        {
+            _operatorScopeLookupFactory[@operator] = nodeFactory;
+            _tokensToOperatorsMap[token] = @operator;
             return this;
         }
 
@@ -227,11 +238,6 @@ namespace Microsoft.TemplateEngine.Core.Expressions
                    && (arg != Operators.EqualTo && arg != Operators.NotEqualTo && arg != Operators.GreaterThan && arg != Operators.LessThan && arg != Operators.LessThanOrEqualTo && arg != Operators.LessThanOrEqualTo);
         }
 
-        private static bool NoPrecedence(Operators arg)
-        {
-            return false;
-        }
-
         private static object Not(object operand)
         {
             bool l = (bool)Convert.ChangeType(operand, typeof(bool));
@@ -281,6 +287,12 @@ namespace Microsoft.TemplateEngine.Core.Expressions
         private static bool XorPrecedence(Operators arg)
         {
             return arg != Operators.EqualTo && arg != Operators.NotEqualTo && arg != Operators.GreaterThan && arg != Operators.LessThan && arg != Operators.LessThanOrEqualTo && arg != Operators.LessThanOrEqualTo && arg != Operators.And && arg != Operators.Or;
+        }
+
+        public IOperatorMap<Operators, TToken> BadSyntax(TToken token)
+        {
+            BadSyntaxToken = token;
+            return this;
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace Microsoft.TemplateEngine.Core.Expressions
 {
     public interface IOperatorMap<TOperator, TToken>
+        where TToken : struct
     {
         IReadOnlyDictionary<TOperator, Func<IEvaluable, IEvaluable>> OperatorScopeLookupFactory { get; }
 
@@ -12,5 +13,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions
         string Decode(string value);
 
         string Encode(string value);
+
+        TToken? BadSyntaxToken { get; }
     }
 }

@@ -199,6 +199,22 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
         }
 
         [Fact]
+        public void VerifyInlineMarkupExpandedConditionsUndefinedSymbolEmitsOriginal()
+        {
+            string originalValue = @"<root>
+    <element Condition=""'$(FIRST_IF)' == '1.2.3'"" />
+</root>";
+
+            string expectedValue = @"<root>
+    <element Condition=""'$(FIRST_IF)' == '1.2.3'"" />
+</root>";
+
+            VariableCollection vc = new VariableCollection();
+            IProcessor processor = SetupXmlPlusCppProcessor(vc);
+            RunAndVerify(originalValue, expectedValue, processor, 9999, true);
+        }
+
+        [Fact]
         public void VerifyInlineMarkupExpandedConditionsNumerics()
         {
             string originalValue = @"<root>

@@ -25,6 +25,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions
         private readonly IProcessorState _processor;
         private readonly Func<string, string> _valueDecoder;
         private readonly Func<string, string> _valueEncoder;
+        private readonly TToken? _badSyntaxToken;
 
         private class ScopeIsolator
         {
@@ -44,6 +45,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions
             TokenTrie trie = new TokenTrie();
             trie.Append(tokens);
 
+            _badSyntaxToken = operatorMap.BadSyntaxToken;
             _openGroup = openGroup;
             _closeGroup = closeGroup;
             _literal = literal;
@@ -95,6 +97,12 @@ namespace Microsoft.TemplateEngine.Core.Expressions
                         allData.AddRange(_tokens.Tokens[token]);
                         TToken mappedToken = (TToken)(object)token;
 
+                        if (_badSyntaxToken.HasValue && Equals(mappedToken, _badSyntaxToken.Value))
+                        {
+                            onFault(allData);
+                            return null;
+                        }
+
                         //Hit a terminator? Return the root
                         if (_terminators.Contains(mappedToken))
                         {
@@ -139,7 +147,10 @@ namespace Microsoft.TemplateEngine.Core.Expressions
                                     value = _valueDecoder(value);
                                     currentLiteral.Clear();
                                     Token<TToken> t = new Token<TToken>(_literal, value);
-                                    TokenScope<TToken> scope = new TokenScope<TToken>(isolator.Active, t);
+                                    TokenScope<TToken> scope = new TokenScope<TToken>(isolator.Active, t)
+                                    {
+                                        IsQuoted = true
+                                    };
 
                                     while (isolator.Active != null && !isolator.Active.TryAccept(scope))
                                     {
