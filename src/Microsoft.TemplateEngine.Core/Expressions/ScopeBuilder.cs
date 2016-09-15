@@ -34,14 +34,12 @@ namespace Microsoft.TemplateEngine.Core.Expressions
         }
 
         public ScopeBuilder(IProcessorState processor, ITokenTrie tokens, IVariableCollection variableCollection,
-            IReadOnlyDictionary<TToken, TOperator> tokenToOperationMap,
-            IReadOnlyDictionary<TOperator, Func<IEvaluable, IEvaluable>> operatorScopeFactory,
+            IOperatorMap<TOperator,TToken> operatorMap,
             bool dereferenceInLiterals,
             TToken openGroup, TToken closeGroup,
             TToken literal, TOperator identity,
             ISet<TToken> literalSequenceBoundsMarkers,
-            ISet<TToken> whitespace, ISet<TToken> terminators,
-            Func<string, string> valueEncoder, Func<string, string> valueDecoder)
+            ISet<TToken> whitespace, ISet<TToken> terminators)
         {
             TokenTrie trie = new TokenTrie();
             trie.Append(tokens);
@@ -56,8 +54,8 @@ namespace Microsoft.TemplateEngine.Core.Expressions
             _isSymbolDereferenceInLiteralSequenceRequired = dereferenceInLiterals;
             _processor = processor;
             _knownTokensCount = tokens.Count;
-            _valueEncoder = valueEncoder ?? (o => o);
-            _valueDecoder = valueDecoder ?? (o => o);
+            _valueEncoder = operatorMap.Encode;
+            _valueDecoder = operatorMap.Decode;
 
             List<object> symbolValues = new List<object>();
 
@@ -68,8 +66,8 @@ namespace Microsoft.TemplateEngine.Core.Expressions
             }
 
             _symbolValues = symbolValues;
-            _tokenToOperatorMap = tokenToOperationMap;
-            _operatorScopeFactory = operatorScopeFactory;
+            _tokenToOperatorMap = operatorMap.TokensToOperatorsMap;
+            _operatorScopeFactory = operatorMap.OperatorScopeLookupFactory;
             _tokens = trie;
         }
 
@@ -101,13 +99,36 @@ namespace Microsoft.TemplateEngine.Core.Expressions
                         if (_terminators.Contains(mappedToken))
                         {
                             bufferPosition = oldBufferPos;
+
+                            //If we had an active literal, it has to be over now - all literal types have already been processed
+                            if (currentLiteral.Count > 0)
+                            {
+                                string value = _processor.Encoding.GetString(currentLiteral.ToArray());
+                                value = _valueDecoder(value);
+                                currentLiteral.Clear();
+                                Token<TToken> t = new Token<TToken>(_literal, value);
+                                TokenScope<TToken> scope = new TokenScope<TToken>(isolator.Active, t);
+
+                                while (isolator.Active != null && !isolator.Active.TryAccept(scope))
+                                {
+                                    isolator.Active = isolator.Active.Parent;
+                                }
+
+                                if (isolator.Active == null)
+                                {
+                                    onFault(allData);
+                                    return null;
+                                }
+                            }
+
                             return isolator.Root;
                         }
 
                         //Start or end of a literal sequence (string)?
                         if (_literalSequenceBoundsMarkers.Contains(mappedToken))
                         {
-                            currentLiteral.AddRange(_tokens.Tokens[token]);
+                            //Don't add the literal start/end, otherwise we'll have to deal with them
+                            //  in strings, guessing whether they're supposed to be there or not
 
                             if (activeLiteralSequenceBoundsMarker.HasValue)
                             {
@@ -154,62 +175,87 @@ namespace Microsoft.TemplateEngine.Core.Expressions
                                 currentLiteral.AddRange(_tokens.Tokens[token]);
                             }
                         }
-                        //Start of a group?
-                        else if (Equals(_openGroup, mappedToken))
-                        {
-                            parents.Push(isolator);
-                            isolator = new ScopeIsolator
-                            {
-                                Root = new UnaryScope<TOperator>(null, _identity, o => o),
-                            };
-                            isolator.Active = isolator.Root;
-                        }
-                        //End of a group?
-                        else if (Equals(_closeGroup, mappedToken))
-                        {
-                            ScopeIsolator tmp = parents.Pop();
-                            tmp.Active.TryAccept(isolator.Root);
-                            isolator.Root = tmp.Active;
-                            isolator = tmp;
-                        }
-                        //Is it a variable?
-                        else if (_knownTokensCount <= token)
-                        {
-                            string value = (_symbolValues[token - _knownTokensCount] ?? "null").ToString();
-                            Token<TToken> t = new Token<TToken>(_literal, value);
-                            TokenScope<TToken> scope = new TokenScope<TToken>(isolator.Active, t);
-
-                            while (isolator.Active != null && !isolator.Active.TryAccept(scope))
-                            {
-                                isolator.Active = isolator.Active.Parent;
-                            }
-
-                            if (isolator.Active == null)
-                            {
-                                onFault(allData);
-                                return null;
-                            }
-                        }
-                        //Discardable whitespace?
-                        else if (_whitespace.Contains(mappedToken))
-                        {
-                        }
-                        //All the special possibilities have been exhausted, try to process operations
                         else
                         {
-                            //We got a token we understand, but it's not an operator
-                            TOperator op;
-                            if (_tokenToOperatorMap.TryGetValue(mappedToken, out op))
+                            //If we had an active literal, it has to be over now - all literal types have already been processed
+                            if (currentLiteral.Count > 0)
                             {
-                                Func<IEvaluable, IEvaluable> factory;
-                                if (_operatorScopeFactory.TryGetValue(op, out factory))
-                                {
-                                    IEvaluable oldActive = isolator.Active;
-                                    isolator.Active = factory(isolator.Active);
+                                activeLiteralSequenceBoundsMarker = null;
+                                string value = _processor.Encoding.GetString(currentLiteral.ToArray());
+                                value = _valueDecoder(value);
+                                currentLiteral.Clear();
+                                Token<TToken> t = new Token<TToken>(_literal, value);
+                                TokenScope<TToken> scope = new TokenScope<TToken>(isolator.Active, t);
 
-                                    if (oldActive.Parent == isolator.Active && oldActive == isolator.Root)
+                                while (isolator.Active != null && !isolator.Active.TryAccept(scope))
+                                {
+                                    isolator.Active = isolator.Active.Parent;
+                                }
+
+                                if (isolator.Active == null)
+                                {
+                                    onFault(allData);
+                                    return null;
+                                }
+                            }
+
+                            //Start of a group?
+                            if (Equals(_openGroup, mappedToken))
+                            {
+                                parents.Push(isolator);
+                                isolator = new ScopeIsolator
+                                {
+                                    Root = new UnaryScope<TOperator>(null, _identity, o => o),
+                                };
+                                isolator.Active = isolator.Root;
+                            }
+                            //End of a group?
+                            else if (Equals(_closeGroup, mappedToken))
+                            {
+                                ScopeIsolator tmp = parents.Pop();
+                                tmp.Active.TryAccept(isolator.Root);
+                                isolator.Root = tmp.Active;
+                                isolator = tmp;
+                            }
+                            //Is it a variable?
+                            else if (_knownTokensCount <= token)
+                            {
+                                string value = (_symbolValues[token - _knownTokensCount] ?? "null").ToString();
+                                Token<TToken> t = new Token<TToken>(_literal, value);
+                                TokenScope<TToken> scope = new TokenScope<TToken>(isolator.Active, t);
+
+                                while (isolator.Active != null && !isolator.Active.TryAccept(scope))
+                                {
+                                    isolator.Active = isolator.Active.Parent;
+                                }
+
+                                if (isolator.Active == null)
+                                {
+                                    onFault(allData);
+                                    return null;
+                                }
+                            }
+                            //Discardable whitespace?
+                            else if (_whitespace.Contains(mappedToken))
+                            {
+                            }
+                            //All the special possibilities have been exhausted, try to process operations
+                            else
+                            {
+                                //We got a token we understand, but it's not an operator
+                                TOperator op;
+                                if (_tokenToOperatorMap.TryGetValue(mappedToken, out op))
+                                {
+                                    Func<IEvaluable, IEvaluable> factory;
+                                    if (_operatorScopeFactory.TryGetValue(op, out factory))
                                     {
-                                        isolator.Root = isolator.Active;
+                                        IEvaluable oldActive = isolator.Active;
+                                        isolator.Active = factory(isolator.Active);
+
+                                        if (oldActive.Parent == isolator.Active && oldActive == isolator.Root)
+                                        {
+                                            isolator.Root = isolator.Active;
+                                        }
                                     }
                                 }
                             }
@@ -243,7 +289,29 @@ namespace Microsoft.TemplateEngine.Core.Expressions
                 bufferLength = _processor.CurrentBufferLength;
             }
 
+            //If we had an active literal, it has to be over now - all literal types have already been processed
+            if (currentLiteral.Count > 0)
+            {
+                string value = _processor.Encoding.GetString(currentLiteral.ToArray());
+                value = _valueDecoder(value);
+                currentLiteral.Clear();
+                Token<TToken> t = new Token<TToken>(_literal, value);
+                TokenScope<TToken> scope = new TokenScope<TToken>(isolator.Active, t);
+
+                while (isolator.Active != null && !isolator.Active.TryAccept(scope))
+                {
+                    isolator.Active = isolator.Active.Parent;
+                }
+
+                if (isolator.Active == null)
+                {
+                    onFault(allData);
+                    return null;
+                }
+            }
+
             return isolator.Root;
         }
     }
 }
+

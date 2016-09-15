@@ -181,6 +181,42 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
         }
 
         [Fact]
+        public void VerifyInlineMarkupExpandedConditionsVersion()
+        {
+            string originalValue = @"<root>
+    <element Condition=""'$(FIRST_IF)' == '1.2.3'"" />
+</root>";
+
+            string expectedValue = @"<root>
+    <element />
+</root>";
+            VariableCollection vc = new VariableCollection
+            {
+                ["FIRST_IF"] = "1.2.3"
+            };
+            IProcessor processor = SetupXmlPlusCppProcessor(vc);
+            RunAndVerify(originalValue, expectedValue, processor, 9999);
+        }
+
+        [Fact]
+        public void VerifyInlineMarkupExpandedConditionsNumerics()
+        {
+            string originalValue = @"<root>
+    <element Condition=""0x20 == '32'"" />
+</root>";
+
+            string expectedValue = @"<root>
+    <element />
+</root>";
+            VariableCollection vc = new VariableCollection
+            {
+                ["FIRST_IF"] = ">< &' \""
+            };
+            IProcessor processor = SetupXmlPlusCppProcessor(vc);
+            RunAndVerify(originalValue, expectedValue, processor, 9999);
+        }
+
+        [Fact]
         public void VerifyInlineMarkupExpandedConditions3()
         {
             string originalValue = @"<root>

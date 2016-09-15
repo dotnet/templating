@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Core.Util;
@@ -9,7 +10,203 @@ namespace Microsoft.TemplateEngine.Core.Expressions.MSBuild
 {
     public class MSBuildStyleEvaluatorDefinition
     {
+        private static readonly IOperatorMap<Operators, Tokens> Map = new OperatorSetBuilder<Tokens>(XmlEncode, XmlDecode)
+            .And(Tokens.And)
+            .Or(Tokens.Or)
+            .Not(Tokens.Not)
+            .GreaterThan(Tokens.GreaterThan, evaluate: (x, y) => Compare(x, y) > 0)
+            .GreaterThanOrEqualTo(Tokens.GreaterThanOrEqualTo, evaluate: (x, y) => Compare(x, y) >= 0)
+            .LessThan(Tokens.LessThan, evaluate: (x, y) => Compare(x, y) < 0)
+            .LessThanOrEqualTo(Tokens.LessThanOrEqualTo, evaluate: (x, y) => Compare(x, y) <= 0)
+            .EqualTo(Tokens.EqualTo, evaluate: (x, y) => Compare(x, y) == 0)
+            .NotEqualTo(Tokens.NotEqualTo, evaluate: (x, y) => Compare(x, y) != 0);
+
+        private static readonly IOperationProvider[] NoOperationProviders = new IOperationProvider[0];
+
         private static readonly Dictionary<Encoding, ITokenTrie> TokenCache = new Dictionary<Encoding, ITokenTrie>();
+
+        private enum Tokens
+        {
+            And = 0,
+            Or = 1,
+            Not = 2,
+            GreaterThan = 3,
+            GreaterThanOrEqualTo = 4,
+            LessThan = 5,
+            LessThanOrEqualTo = 6,
+            EqualTo = 7,
+            NotEqualTo = 8,
+            OpenBrace = 9,
+            CloseBrace = 10,
+            Space = 11,
+            Tab = 12,
+            WindowsEOL = 13,
+            UnixEOL = 14,
+            LegacyMacEOL = 15,
+            Quote = 16,
+            Literal = 17,
+        }
+
+        public static bool EvaluateFromString(string text, IVariableCollection variables)
+        {
+            using (MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(text)))
+            using (MemoryStream res = new MemoryStream())
+            {
+                EngineConfig cfg = new EngineConfig(variables);
+                IProcessorState state = new ProcessorState(ms, res, (int) ms.Length, (int) ms.Length, cfg, NoOperationProviders);
+                int len = (int) ms.Length;
+                int pos = 0;
+                bool faulted;
+                return MSBuildStyleEvaluator(state, ref len, ref pos, out faulted);
+            }
+        }
+
+        public static bool MSBuildStyleEvaluator(IProcessorState processor, ref int bufferLength, ref int currentBufferPosition, out bool faulted)
+        {
+            ITokenTrie tokens = GetSymbols(processor);
+            ScopeBuilder<Operators, Tokens> builder = new ScopeBuilder<Operators, Tokens>(processor, tokens, processor.Config.Variables,
+                Map, true,
+                Tokens.OpenBrace, Tokens.CloseBrace,
+                Tokens.Literal, Operators.Identity,
+                new HashSet<Tokens> { Tokens.Quote },
+                new HashSet<Tokens> { Tokens.Space, Tokens.Tab },
+                new HashSet<Tokens> { Tokens.WindowsEOL, Tokens.UnixEOL, Tokens.LegacyMacEOL });
+            bool isFaulted = false;
+            IEvaluable result = builder.Build(ref bufferLength, ref currentBufferPosition, x => isFaulted = true);
+
+            if (isFaulted)
+            {
+                faulted = true;
+                return false;
+            }
+
+            try
+            {
+                object evalResult = result.Evaluate();
+                bool r = (bool)Convert.ChangeType(evalResult, typeof(bool));
+                faulted = false;
+                return r;
+            }
+            catch
+            {
+                faulted = true;
+                return false;
+            }
+        }
+
+        private static int? AttemptComparableComparison(object left, object right)
+        {
+            IComparable ls = left as IComparable;
+            IComparable rs = right as IComparable;
+
+            if (ls == null || rs == null)
+            {
+                return null;
+            }
+
+            return ls.CompareTo(rs);
+        }
+
+        private static int? AttemptLexographicComparison(object left, object right)
+        {
+            string ls = left as string;
+            string rs = right as string;
+
+            if (ls == null || rs == null)
+            {
+                return null;
+            }
+
+            return string.Compare(ls, rs, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static int? AttemptNumericComparison(object left, object right)
+        {
+            bool leftIsDouble = left is double;
+            bool rightIsDouble = right is double;
+            double ld = leftIsDouble ? (double)left : 0;
+            double rd = rightIsDouble ? (double)right : 0;
+
+            if (!leftIsDouble)
+            {
+                string ls = left as string;
+
+                if (ls != null)
+                {
+                    int lh;
+                    if (double.TryParse(ls, out ld))
+                    {
+                    }
+                    else if (ls.StartsWith("0x", StringComparison.OrdinalIgnoreCase) && int.TryParse(ls.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out lh))
+                    {
+                        ld = lh;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }
+
+            if (!rightIsDouble)
+            {
+                string rs = right as string;
+
+                if (rs != null)
+                {
+                    int rh;
+                    if (double.TryParse(rs, out rd))
+                    {
+                    }
+                    else if (rs.StartsWith("0x", StringComparison.OrdinalIgnoreCase) && int.TryParse(rs.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out rh))
+                    {
+                        rd = rh;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }
+
+            return ld.CompareTo(rd);
+        }
+
+        private static int? AttemptVersionComparison(object left, object right)
+        {
+            Version lv = left as Version;
+
+            if (lv == null)
+            {
+                string ls = left as string;
+                if (ls == null || !Version.TryParse(ls, out lv))
+                {
+                    return null;
+                }
+            }
+
+            Version rv = right as Version;
+
+            if (rv == null)
+            {
+                string rs = right as string;
+                if (rs == null || !Version.TryParse(rs, out rv))
+                {
+                    return null;
+                }
+            }
+
+            return lv.CompareTo(rv);
+        }
+
+        private static int Compare(object left, object right)
+        {
+            return AttemptNumericComparison(left, right)
+                   ?? AttemptVersionComparison(left, right)
+                   ?? AttemptLexographicComparison(left, right)
+                   ?? AttemptComparableComparison(left, right)
+                   ?? 0;
+        }
 
         private static ITokenTrie GetSymbols(IProcessorState processor)
         {
@@ -49,81 +246,6 @@ namespace Microsoft.TemplateEngine.Core.Expressions.MSBuild
 
             return tokens;
         }
-
-        private enum Tokens
-        {
-            And = 0,
-            Or = 1,
-            Not = 2,
-            GreaterThan = 3,
-            GreaterThanOrEqualTo = 4,
-            LessThan = 5,
-            LessThanOrEqualTo = 6,
-            EqualTo = 7,
-            NotEqualTo = 8,
-            OpenBrace = 9,
-            CloseBrace = 10,
-            Space = 11,
-            Tab = 12,
-            WindowsEOL = 13,
-            UnixEOL = 14,
-            LegacyMacEOL = 15,
-            Quote = 16,
-            Literal = 17,
-        }
-
-        private static readonly IReadOnlyDictionary<Tokens, Operators> TokensToOperatorsMap = new Dictionary<Tokens, Operators>
-        {
-            {Tokens.And, Operators.And},
-            {Tokens.Or, Operators.Or},
-            {Tokens.Not, Operators.Not},
-            {Tokens.GreaterThan, Operators.GreaterThan},
-            {Tokens.GreaterThanOrEqualTo, Operators.GreaterThanOrEqualTo},
-            {Tokens.LessThan, Operators.LessThan},
-            {Tokens.LessThanOrEqualTo, Operators.LessThanOrEqualTo},
-            {Tokens.EqualTo, Operators.EqualTo},
-            {Tokens.NotEqualTo, Operators.NotEqualTo},
-        };
-
-        public static bool MSBuildStyleEvaluator(IProcessorState processor, ref int bufferLength, ref int currentBufferPosition, out bool faulted)
-        {
-            ITokenTrie tokens = GetSymbols(processor);
-            ScopeBuilder<Operators, Tokens> builder = new ScopeBuilder<Operators, Tokens>(processor, tokens, processor.Config.Variables,
-                TokensToOperatorsMap, CommonOperators.OperatorScopeFactoryLookup, true,
-                Tokens.OpenBrace, Tokens.CloseBrace,
-                Tokens.Literal, Operators.Identity,
-                new HashSet<Tokens> { Tokens.Quote },
-                new HashSet<Tokens> { Tokens.Space, Tokens.Tab },
-                new HashSet<Tokens> { Tokens.WindowsEOL, Tokens.UnixEOL, Tokens.LegacyMacEOL },
-                XmlEncode, XmlDecode);
-            bool isFaulted = false;
-            IEvaluable result = builder.Build(ref bufferLength, ref currentBufferPosition, x => isFaulted = true);
-
-            if (isFaulted)
-            {
-                faulted = true;
-                return false;
-            }
-
-            try
-            {
-                object evalResult = result.Evaluate();
-                bool r = (bool)Convert.ChangeType(evalResult, typeof(bool));
-                faulted = false;
-                return r;
-            }
-            catch
-            {
-                faulted = true;
-                return false;
-            }
-        }
-
-        private static string XmlEncode(string arg)
-        {
-            return arg.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quot;").Replace("'", "&apos;");
-        }
-
         private static string XmlDecode(string arg)
         {
             List<char> output = new List<char>();
@@ -147,14 +269,14 @@ namespace Microsoft.TemplateEngine.Core.Expressions.MSBuild
                     if (arg[i] == 'x')
                     {
                         string hex = arg.Substring(i + 1, 4);
-                        char c = (char) short.Parse(hex.TrimStart('0'), NumberStyles.HexNumber);
+                        char c = (char)short.Parse(hex.TrimStart('0'), NumberStyles.HexNumber);
                         output.Add(c);
                         i += 5; //x, 4 digits, semicolon (consumed by the loop bound)
                     }
                     else
                     {
                         string dec = arg.Substring(i, 4);
-                        char c = (char) short.Parse(dec.TrimStart('0'), NumberStyles.Integer);
+                        char c = (char)short.Parse(dec.TrimStart('0'), NumberStyles.Integer);
                         output.Add(c);
                         i += 4; //4 digits, semicolon (consumed by the loop bound)
                     }
@@ -177,7 +299,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.MSBuild
                                                     {
                                                         case ';':
                                                             output.Add('"');
-                                                            i += 5;
+                                                            i += 4;
                                                             break;
                                                     }
                                                     break;
@@ -198,7 +320,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.MSBuild
                                             {
                                                 case ';':
                                                     output.Add('&');
-                                                    i += 4;
+                                                    i += 3;
                                                     break;
                                             }
                                             break;
@@ -215,7 +337,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.MSBuild
                                                     {
                                                         case ';':
                                                             output.Add('\'');
-                                                            i += 5;
+                                                            i += 4;
                                                             break;
                                                     }
                                                     break;
@@ -233,7 +355,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.MSBuild
                                     {
                                         case ';':
                                             output.Add('<');
-                                            i += 3;
+                                            i += 2;
                                             break;
                                     }
                                     break;
@@ -247,7 +369,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.MSBuild
                                     {
                                         case ';':
                                             output.Add('>');
-                                            i += 3;
+                                            i += 2;
                                             break;
                                     }
                                     break;
@@ -259,6 +381,11 @@ namespace Microsoft.TemplateEngine.Core.Expressions.MSBuild
 
             string s = new string(output.ToArray());
             return s;
+        }
+
+        private static string XmlEncode(string arg)
+        {
+            return arg.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quot;").Replace("'", "&apos;");
         }
     }
 }
