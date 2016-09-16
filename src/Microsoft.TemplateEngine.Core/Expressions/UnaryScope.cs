@@ -13,11 +13,15 @@ namespace Microsoft.TemplateEngine.Core.Expressions
             _evaluate = evaluate;
         }
 
-        public IEvaluable Parent { get; set; }
+        public bool IsFull => Operand != null;
+
+        public bool IsIndivisible => true;
+
+        public IEvaluable Operand { get; set; }
 
         public TOperator Operator { get; }
 
-        public IEvaluable Operand { get; set; }
+        public IEvaluable Parent { get; set; }
 
         public object Evaluate()
         {
@@ -25,9 +29,10 @@ namespace Microsoft.TemplateEngine.Core.Expressions
             return _evaluate(operand);
         }
 
-        public bool IsIndivisible => true;
-
-        public bool IsFull => Operand != null;
+        public override string ToString()
+        {
+            return $@"{Operator}({Operand})";
+        }
 
         public bool TryAccept(IEvaluable child)
         {
@@ -38,11 +43,6 @@ namespace Microsoft.TemplateEngine.Core.Expressions
             }
 
             return false;
-        }
-
-        public override string ToString()
-        {
-            return $@"{Operator}({Operand})";
         }
     }
 }

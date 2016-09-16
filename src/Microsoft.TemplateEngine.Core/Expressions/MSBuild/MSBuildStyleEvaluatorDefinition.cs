@@ -20,7 +20,13 @@ namespace Microsoft.TemplateEngine.Core.Expressions.MSBuild
             .LessThanOrEqualTo(Tokens.LessThanOrEqualTo, evaluate: (x, y) => Compare(x, y) <= 0)
             .EqualTo(Tokens.EqualTo, evaluate: (x, y) => Compare(x, y) == 0)
             .NotEqualTo(Tokens.NotEqualTo, evaluate: (x, y) => Compare(x, y) != 0)
-            .BadSyntax(Tokens.VariableStart);
+            .BadSyntax(Tokens.VariableStart)
+            .Ignore(Tokens.Space, Tokens.Tab)
+            .LiteralBoundsMarkers(Tokens.Quote)
+            .OpenGroup(Tokens.OpenBrace)
+            .CloseGroup(Tokens.CloseBrace)
+            .TerminateWith(Tokens.WindowsEOL, Tokens.UnixEOL, Tokens.LegacyMacEOL)
+            .Literal(Tokens.Literal);
 
         private static readonly IOperationProvider[] NoOperationProviders = new IOperationProvider[0];
 
@@ -66,13 +72,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.MSBuild
         public static bool MSBuildStyleEvaluator(IProcessorState processor, ref int bufferLength, ref int currentBufferPosition, out bool faulted)
         {
             ITokenTrie tokens = GetSymbols(processor);
-            ScopeBuilder<Operators, Tokens> builder = new ScopeBuilder<Operators, Tokens>(processor, tokens, processor.Config.Variables,
-                Map, true,
-                Tokens.OpenBrace, Tokens.CloseBrace,
-                Tokens.Literal, Operators.Identity,
-                new HashSet<Tokens> { Tokens.Quote },
-                new HashSet<Tokens> { Tokens.Space, Tokens.Tab },
-                new HashSet<Tokens> { Tokens.WindowsEOL, Tokens.UnixEOL, Tokens.LegacyMacEOL });
+            ScopeBuilder<Operators, Tokens> builder = processor.ScopeBuilder(tokens, Map, true);
             bool isFaulted = false;
             IEvaluable result = builder.Build(ref bufferLength, ref currentBufferPosition, x => isFaulted = true);
 
@@ -252,6 +252,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.MSBuild
 
             return tokens;
         }
+
         private static string XmlDecode(string arg)
         {
             List<char> output = new List<char>();

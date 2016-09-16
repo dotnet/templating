@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.TemplateEngine.Core.Expressions.MSBuild;
 
 namespace Microsoft.TemplateEngine.Core.Expressions
 {
@@ -16,17 +15,58 @@ namespace Microsoft.TemplateEngine.Core.Expressions
         {
             _encoder = encoder ?? Passthrough;
             _decoder = decoder ?? Passthrough;
+            BadSyntaxTokens = new HashSet<TToken>();
+            NoOpTokens = new HashSet<TToken>();
+            LiteralSequenceBoundsMarkers = new HashSet<TToken>();
+            Terminators = new HashSet<TToken>();
         }
+
+        public ISet<TToken> BadSyntaxTokens { get; }
+
+        public TToken CloseGroupToken { get; private set; }
+
+        public Operators Identity => Operators.Identity;
+
+        public ISet<TToken> LiteralSequenceBoundsMarkers { get; }
+
+        public TToken LiteralToken { get; private set; }
+
+        public ISet<TToken> NoOpTokens { get; }
+
+        public TToken OpenGroupToken { get; private set; }
 
         public IReadOnlyDictionary<Operators, Func<IEvaluable, IEvaluable>> OperatorScopeLookupFactory => _operatorScopeLookupFactory;
 
+        public ISet<TToken> Terminators { get; }
+
         public IReadOnlyDictionary<TToken, Operators> TokensToOperatorsMap => _tokensToOperatorsMap;
+
+        public static bool ComparisonPrecedence(Operators arg)
+        {
+            return
+                //Take precedence over logic
+                (arg == Operators.And || arg == Operators.Or || arg == Operators.Xor || arg == Operators.Not)
+                   //but still process comparisons left to right
+                   && (arg != Operators.EqualTo && arg != Operators.NotEqualTo && arg != Operators.GreaterThan && arg != Operators.LessThan && arg != Operators.LessThanOrEqualTo && arg != Operators.LessThanOrEqualTo);
+        }
 
         public OperatorSetBuilder<TToken> And(TToken token, Func<Operators, bool> precedesOperator = null, Func<object, object, object> evaluate = null)
         {
             _operatorScopeLookupFactory[Operators.And] =
                 x => CreateBinaryChild(x, Operators.And, precedesOperator ?? AndPrecedence, evaluate ?? And);
             _tokensToOperatorsMap[token] = Operators.And;
+            return this;
+        }
+
+        public OperatorSetBuilder<TToken> BadSyntax(params TToken[] token)
+        {
+            BadSyntaxTokens.UnionWith(token);
+            return this;
+        }
+
+        public OperatorSetBuilder<TToken> CloseGroup(TToken token)
+        {
+            CloseGroupToken = token;
             return this;
         }
 
@@ -39,8 +79,6 @@ namespace Microsoft.TemplateEngine.Core.Expressions
         {
             return _encoder(value);
         }
-
-        public TToken? BadSyntaxToken { get; private set; }
 
         public OperatorSetBuilder<TToken> EqualTo(TToken token, Func<Operators, bool> precedesOperator = null, Func<object, object, object> evaluate = null)
         {
@@ -66,6 +104,12 @@ namespace Microsoft.TemplateEngine.Core.Expressions
             return this;
         }
 
+        public OperatorSetBuilder<TToken> Ignore(params TToken[] token)
+        {
+            NoOpTokens.UnionWith(token);
+            return this;
+        }
+
         public OperatorSetBuilder<TToken> LessThan(TToken token, Func<Operators, bool> precedesOperator = null, Func<object, object, object> evaluate = null)
         {
             _operatorScopeLookupFactory[Operators.LessThan] =
@@ -79,6 +123,18 @@ namespace Microsoft.TemplateEngine.Core.Expressions
             _operatorScopeLookupFactory[Operators.LessThanOrEqualTo] =
                 x => CreateBinaryChild(x, Operators.LessThanOrEqualTo, precedesOperator ?? ComparisonPrecedence, evaluate ?? LessThanOrEqualTo);
             _tokensToOperatorsMap[token] = Operators.LessThanOrEqualTo;
+            return this;
+        }
+
+        public OperatorSetBuilder<TToken> Literal(TToken token)
+        {
+            LiteralToken = token;
+            return this;
+        }
+
+        public OperatorSetBuilder<TToken> LiteralBoundsMarkers(params TToken[] token)
+        {
+            LiteralSequenceBoundsMarkers.UnionWith(token);
             return this;
         }
 
@@ -98,6 +154,12 @@ namespace Microsoft.TemplateEngine.Core.Expressions
             return this;
         }
 
+        public OperatorSetBuilder<TToken> OpenGroup(TToken token)
+        {
+            OpenGroupToken = token;
+            return this;
+        }
+
         public OperatorSetBuilder<TToken> Or(TToken token, Func<Operators, bool> precedesOperator = null, Func<object, object, object> evaluate = null)
         {
             _operatorScopeLookupFactory[Operators.Or] =
@@ -110,6 +172,12 @@ namespace Microsoft.TemplateEngine.Core.Expressions
         {
             _operatorScopeLookupFactory[@operator] = nodeFactory;
             _tokensToOperatorsMap[token] = @operator;
+            return this;
+        }
+
+        public OperatorSetBuilder<TToken> TerminateWith(params TToken[] token)
+        {
+            Terminators.UnionWith(token);
             return this;
         }
 
@@ -229,15 +297,6 @@ namespace Microsoft.TemplateEngine.Core.Expressions
             return ((IComparable)left).CompareTo(right) <= 0;
         }
 
-        public static bool ComparisonPrecedence(Operators arg)
-        {
-            return
-                //Take precedence over logic
-                (arg == Operators.And || arg == Operators.Or || arg == Operators.Xor || arg == Operators.Not)
-                   //but still process comparisons left to right
-                   && (arg != Operators.EqualTo && arg != Operators.NotEqualTo && arg != Operators.GreaterThan && arg != Operators.LessThan && arg != Operators.LessThanOrEqualTo && arg != Operators.LessThanOrEqualTo);
-        }
-
         private static object Not(object operand)
         {
             bool l = (bool)Convert.ChangeType(operand, typeof(bool));
@@ -287,12 +346,6 @@ namespace Microsoft.TemplateEngine.Core.Expressions
         private static bool XorPrecedence(Operators arg)
         {
             return arg != Operators.EqualTo && arg != Operators.NotEqualTo && arg != Operators.GreaterThan && arg != Operators.LessThan && arg != Operators.LessThanOrEqualTo && arg != Operators.LessThanOrEqualTo && arg != Operators.And && arg != Operators.Or;
-        }
-
-        public IOperatorMap<Operators, TToken> BadSyntax(TToken token)
-        {
-            BadSyntaxToken = token;
-            return this;
         }
     }
 }

@@ -2,13 +2,13 @@
 {
     public interface IEvaluable
     {
-        IEvaluable Parent { get; set; }
-
-        object Evaluate();
+        bool IsFull { get; }
 
         bool IsIndivisible { get; }
 
-        bool IsFull { get; }
+        IEvaluable Parent { get; set; }
+
+        object Evaluate();
 
         bool TryAccept(IEvaluable child);
     }

@@ -9,50 +9,37 @@ namespace Microsoft.TemplateEngine.Core.Expressions
         where TOperator : struct
         where TToken : struct
     {
-        private readonly IReadOnlyDictionary<TToken, TOperator> _tokenToOperatorMap;
-        private readonly IReadOnlyDictionary<TOperator, Func<IEvaluable, IEvaluable>> _operatorScopeFactory;
-        private readonly IReadOnlyList<object> _symbolValues;
-        private readonly TToken _openGroup;
+        private readonly ISet<TToken> _badSyntaxTokens;
         private readonly TToken _closeGroup;
-        private readonly TToken _literal;
         private readonly TOperator _identity;
-        private readonly ISet<TToken> _literalSequenceBoundsMarkers;
-        private readonly ISet<TToken> _terminators;
-        private readonly ISet<TToken> _whitespace;
         private readonly bool _isSymbolDereferenceInLiteralSequenceRequired;
-        private readonly ITokenTrie _tokens;
         private readonly int _knownTokensCount;
+        private readonly TToken _literal;
+        private readonly ISet<TToken> _literalSequenceBoundsMarkers;
+        private readonly ISet<TToken> _noops;
+        private readonly TToken _openGroup;
+        private readonly IReadOnlyDictionary<TOperator, Func<IEvaluable, IEvaluable>> _operatorScopeFactory;
         private readonly IProcessorState _processor;
+        private readonly IReadOnlyList<object> _symbolValues;
+        private readonly ISet<TToken> _terminators;
+        private readonly ITokenTrie _tokens;
+        private readonly IReadOnlyDictionary<TToken, TOperator> _tokenToOperatorMap;
         private readonly Func<string, string> _valueDecoder;
         private readonly Func<string, string> _valueEncoder;
-        private readonly TToken? _badSyntaxToken;
 
-        private class ScopeIsolator
-        {
-            public IEvaluable Root { get; set; }
-
-            public IEvaluable Active { get; set; }
-        }
-
-        public ScopeBuilder(IProcessorState processor, ITokenTrie tokens, IVariableCollection variableCollection,
-            IOperatorMap<TOperator,TToken> operatorMap,
-            bool dereferenceInLiterals,
-            TToken openGroup, TToken closeGroup,
-            TToken literal, TOperator identity,
-            ISet<TToken> literalSequenceBoundsMarkers,
-            ISet<TToken> whitespace, ISet<TToken> terminators)
+        public ScopeBuilder(IProcessorState processor, ITokenTrie tokens, IOperatorMap<TOperator, TToken> operatorMap, bool dereferenceInLiterals)
         {
             TokenTrie trie = new TokenTrie();
             trie.Append(tokens);
 
-            _badSyntaxToken = operatorMap.BadSyntaxToken;
-            _openGroup = openGroup;
-            _closeGroup = closeGroup;
-            _literal = literal;
-            _identity = identity;
-            _literalSequenceBoundsMarkers = literalSequenceBoundsMarkers;
-            _terminators = terminators;
-            _whitespace = whitespace;
+            _badSyntaxTokens = operatorMap.BadSyntaxTokens;
+            _noops = operatorMap.NoOpTokens;
+            _openGroup = operatorMap.OpenGroupToken;
+            _closeGroup = operatorMap.CloseGroupToken;
+            _literal = operatorMap.LiteralToken;
+            _identity = operatorMap.Identity;
+            _literalSequenceBoundsMarkers = operatorMap.LiteralSequenceBoundsMarkers;
+            _terminators = operatorMap.Terminators;
             _isSymbolDereferenceInLiteralSequenceRequired = dereferenceInLiterals;
             _processor = processor;
             _knownTokensCount = tokens.Count;
@@ -61,7 +48,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions
 
             List<object> symbolValues = new List<object>();
 
-            foreach (KeyValuePair<string, object> variable in variableCollection)
+            foreach (KeyValuePair<string, object> variable in processor.Config.Variables)
             {
                 trie.AddToken(processor.Encoding.GetBytes(string.Format(processor.Config.VariableFormatString, variable.Key)));
                 symbolValues.Add(variable.Value);
@@ -97,7 +84,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions
                         allData.AddRange(_tokens.Tokens[token]);
                         TToken mappedToken = (TToken)(object)token;
 
-                        if (_badSyntaxToken.HasValue && Equals(mappedToken, _badSyntaxToken.Value))
+                        if (_badSyntaxTokens.Contains(mappedToken))
                         {
                             onFault(allData);
                             return null;
@@ -246,8 +233,8 @@ namespace Microsoft.TemplateEngine.Core.Expressions
                                     return null;
                                 }
                             }
-                            //Discardable whitespace?
-                            else if (_whitespace.Contains(mappedToken))
+                            //Discardable tokens?
+                            else if (_noops.Contains(mappedToken))
                             {
                             }
                             //All the special possibilities have been exhausted, try to process operations
@@ -322,6 +309,13 @@ namespace Microsoft.TemplateEngine.Core.Expressions
             }
 
             return isolator.Root;
+        }
+
+        private class ScopeIsolator
+        {
+            public IEvaluable Active { get; set; }
+
+            public IEvaluable Root { get; set; }
         }
     }
 }

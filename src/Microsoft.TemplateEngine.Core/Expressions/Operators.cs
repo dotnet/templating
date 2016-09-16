@@ -2,6 +2,7 @@
 {
     public enum Operators
     {
+        None,
         And,
         Or,
         Xor,

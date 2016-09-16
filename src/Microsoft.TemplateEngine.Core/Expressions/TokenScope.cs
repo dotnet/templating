@@ -8,6 +8,10 @@
             Token = token;
         }
 
+        public bool IsFull => true;
+
+        public bool IsIndivisible => true;
+
         public bool IsQuoted { get; set; }
 
         public IEvaluable Parent { get; set; }
@@ -19,15 +23,11 @@
             return Token.Value;
         }
 
-        public bool IsIndivisible => true;
-
-        public bool IsFull => true;
-
-        public bool TryAccept(IEvaluable child) => false;
-
         public override string ToString()
         {
             return $@"""{Token.Value}""";
         }
+
+        public bool TryAccept(IEvaluable child) => false;
     }
 }

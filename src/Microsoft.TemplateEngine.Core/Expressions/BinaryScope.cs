@@ -13,15 +13,29 @@ namespace Microsoft.TemplateEngine.Core.Expressions
             _evaluate = evaluate;
         }
 
-        public IEvaluable Parent { get; set; }
+        public bool IsFull => Left != null && Right != null;
 
-        public TOperator Operator { get; }
+        public bool IsIndivisible => false;
 
         public IEvaluable Left { get; set; }
 
+        public TOperator Operator { get; }
+
+        public IEvaluable Parent { get; set; }
+
         public IEvaluable Right { get; set; }
 
-        public bool IsFull => Left != null && Right != null;
+        public object Evaluate()
+        {
+            object left = Left.Evaluate();
+            object right = Right.Evaluate();
+            return _evaluate(left, right);
+        }
+
+        public override string ToString()
+        {
+            return $@"({Left} -{Operator}- {Right})";
+        }
 
         public bool TryAccept(IEvaluable child)
         {
@@ -38,20 +52,6 @@ namespace Microsoft.TemplateEngine.Core.Expressions
             }
 
             return false;
-        }
-
-        public bool IsIndivisible => false;
-
-        public object Evaluate()
-        {
-            object left = Left.Evaluate();
-            object right = Right.Evaluate();
-            return _evaluate(left, right);
-        }
-
-        public override string ToString()
-        {
-            return $@"({Left} -{Operator}- {Right})";
         }
     }
 }
