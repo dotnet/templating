@@ -263,7 +263,7 @@ namespace Microsoft.TemplateEngine.Core.Util
                 {
                     int token;
                     int ic = i;
-                    if (match.GetOperation(buffer, nRead, ref ic, out token))
+                    if (match.GetOperation(buffer, nRead, ref ic, out token) && ic == nRead)
                     {
                         bestPos = ic;
                         best = token;
