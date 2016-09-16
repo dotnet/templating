@@ -259,7 +259,7 @@ namespace Microsoft.TemplateEngine.Core.Util
                 int nRead = _target.Read(buffer, 0, buffer.Length);
                 int best = -1;
                 int bestPos = -1;
-                for (int i = nRead - match.MaxLength; i >= 0; --i)
+                for (int i = nRead - match.MinLength; i >= 0; --i)
                 {
                     int token;
                     int ic = i;
