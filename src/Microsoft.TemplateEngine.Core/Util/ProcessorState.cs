@@ -259,7 +259,7 @@ namespace Microsoft.TemplateEngine.Core.Util
                 int nRead = _target.Read(buffer, 0, buffer.Length);
                 int best = -1;
                 int bestPos = -1;
-                for (int i = nRead - 1; i >= 0; --i)
+                for (int i = nRead - match.MaxLength; i >= 0; --i)
                 {
                     int token;
                     int ic = i;
@@ -272,7 +272,7 @@ namespace Microsoft.TemplateEngine.Core.Util
 
                 if (best != -1)
                 {
-                    _target.Position -= (consume ? match.TokenLength[best] : 0);
+                    _target.Position -= nRead - bestPos + (consume ? match.TokenLength[best] : 0);
                     _target.SetLength(_target.Position);
                     return;
                 }
