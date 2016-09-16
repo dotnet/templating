@@ -102,9 +102,6 @@ dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Utils/project.json" -c $CON
 echo "Build dotnet new3..."
 dotnet build "$REPOROOT/src/dotnet-new3/project.json" -c $CONFIGURATION -f netcoreapp1.0
 
-echo "Build dotnet new3..."
-dotnet build "$REPOROOT/src/dotnet-new3/project.json" -c $CONFIGURATION -f netcoreapp1.0
-
 for projectToPack in ${PROJECTSTOPACK[@]}
 do
     dotnet pack "$REPOROOT/src/$projectToPack/project.json" --output "$PACKAGESDIR" --configuration "$CONFIGURATION"
