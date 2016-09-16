@@ -36,7 +36,7 @@ platformList.each { platform ->
                 // Batch
                 batchFile(buildCommand)
             }
-            else {
+            else{
                 // Shell
                 shell(buildCommand)
             }
