@@ -76,13 +76,31 @@ fi
 
 # Restore
 echo "Restoring all src projects..."
-dotnet restore "$REPOROOT/src"
+dotnet restore "$REPOROOT/src" --ignore-failed-sources
 
 echo "Restoring all test projects..."
-dotnet restore "$REPOROOT/test"
+dotnet restore "$REPOROOT/test" --ignore-failed-sources
+
+echo "Build abstractions..."
+dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Abstractions/project.json" -c $CONFIGURATION -f netstandard1.3
+
+echo "Build Core..."
+dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Core/project.json" -c $CONFIGURATION -f netstandard1.3
+
+echo "Build Core Contracts..."
+dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Core.Contracts/project.json" -c $CONFIGURATION -f netstandard1.3
+
+echo "Build Edge..."
+dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Edge/project.json" -c $CONFIGURATION -f netstandard1.3
+
+echo "Build Runnable Projects..."
+dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Orchestrator.RunnableProjects/project.json" -c $CONFIGURATION -f netstandard1.3
+
+echo "Build Runnable Utils..."
+dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Utils/project.json" -c $CONFIGURATION -f netstandard1.3
 
 echo "Build dotnet new3..."
-dotnet build "$REPOROOT/src/dotnet-new3/project.json" -c $CONFIGURATION
+dotnet build "$REPOROOT/src/dotnet-new3/project.json" -c $CONFIGURATION -f netcoreapp1.0
 
 for projectToPack in ${PROJECTSTOPACK[@]}
 do
