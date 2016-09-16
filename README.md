@@ -1,3 +1,7 @@
+|Windows x64 |
+|:------:|
+|[![](http://dotnet-ci.cloudapp.net/job/dotnet_templating/job/master/job/debug_windows_nt_prtest/badge/icon)](http://dotnet-ci.cloudapp.net/job/dotnet_templating/job/master/job/debug_windows_nt_prtest/) |
+
 # Overview
 Template Engine is the next iteration of the replacement capabilities built in to [Template Builder](https://github.com/ligershark/template-builder) and will eventually be used as the replacement engine in [SideWaffle](https://github.com/ligershark/side-waffle), [PecanWaffle](https://github.com/ligershark/pecan-waffle) and DotNetWaffle.
 
