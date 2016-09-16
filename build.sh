@@ -110,5 +110,5 @@ done
 echo "Running tests..."
 for projectToTest in ${TESTPROJECTS[@]}
 do
-    dotnet test "$REPOROOT/test/$projectToTest/project.json" --configuration "$CONFIGURATION" -xml "$REPOROOT/test/$projectToTest/$projectToTest-testResults.xml"
+    dotnet test "$REPOROOT/test/$projectToTest/project.json" --configuration "$CONFIGURATION" -xml "$projectToTest-testResults.xml"
 done
