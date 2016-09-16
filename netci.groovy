@@ -22,7 +22,7 @@ platformList.each { platform ->
 
     // Calculate job name
     def jobName = getBuildJobName(configuration, os)
-    def buildCommand = './build.sh -Configuration ${configuration}';
+    def buildCommand = '/bin/sh ./build.sh -Configuration ${configuration}';
 
     // Calculate the build command
     if (os == 'Windows_NT') {
