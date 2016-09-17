@@ -9,7 +9,7 @@ def project = GithubProject
 def branch = GithubBranchName
 def isPR = true
 
-def platformList = ['Windows_NT:Release', 'Windows_NT:Debug']
+def platformList = ['Windows_NT:Release', 'Windows_NT:Debug', 'Ubuntu16.04:x64:Debug', 'OSX:x64:Release']
 
 def static getBuildJobName(def configuration, def os) {
     return configuration.toLowerCase() + '_' + os.toLowerCase()
@@ -27,6 +27,9 @@ platformList.each { platform ->
     // Calculate the build command
     if (os == 'Windows_NT') {
         buildCommand = ".\\build.cmd -Configuration ${configuration}"
+    }
+    else {
+        buildCommand = "./build.sh -Configuration ${configuration}"
     }
     
     def newJob = job(Utilities.getFullJobName(project, jobName, isPR)) {
