@@ -91,7 +91,7 @@ echo "Build Core Contracts..."
 dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Core.Contracts/project.json" -c $CONFIGURATION -f netstandard1.3
 
 echo "Build Edge..."
-dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Edge/project.json" -c $CONFIGURATION -f netstandard1.3
+dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Edge/project.json" -c $CONFIGURATION -f netcoreapp1.0
 
 echo "Build Runnable Projects..."
 dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Orchestrator.RunnableProjects/project.json" -c $CONFIGURATION -f netstandard1.3
