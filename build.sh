@@ -90,21 +90,21 @@ dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Core/project.json" -c $CONF
 echo "Build Core Contracts..."
 dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Core.Contracts/project.json" -c $CONFIGURATION -f netstandard1.3
 
-echo "Build Edge..."
-dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Edge/project.json" -c $CONFIGURATION -f netcoreapp1.0
-
 echo "Build Runnable Projects..."
 dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Orchestrator.RunnableProjects/project.json" -c $CONFIGURATION -f netstandard1.3
 
 echo "Build Runnable Utils..."
 dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Utils/project.json" -c $CONFIGURATION -f netstandard1.3
 
+echo "Build Edge..."
+dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Edge/project.json" -c $CONFIGURATION -f netcoreapp1.0
+
 echo "Build dotnet new3..."
 dotnet build "$REPOROOT/src/dotnet-new3/project.json" -c $CONFIGURATION -f netcoreapp1.0
 
 for projectToPack in ${PROJECTSTOPACK[@]}
 do
-    dotnet pack "$REPOROOT/src/$projectToPack/project.json" --output "$PACKAGESDIR" --configuration "$CONFIGURATION"
+    dotnet pack "$REPOROOT/src/$projectToPack/project.json" --output "$PACKAGESDIR" --configuration "$CONFIGURATION" --no-build
 done
 
 echo "Running tests..."
