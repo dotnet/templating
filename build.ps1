@@ -27,7 +27,8 @@ $ProjectsToPack = @(
  )
 
 $TestProjects = @(
-    "Microsoft.TemplateEngine.Core.UnitTests"
+    "Microsoft.TemplateEngine.Core.UnitTests",
+    "Microsoft.TemplateEngine.Utils.UnitTests"
 )
 
 $RepoRoot = "$PSScriptRoot"

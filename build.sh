@@ -26,7 +26,8 @@ PROJECTSTOPACK=( \
  )
 
 TESTPROJECTS=( \
-    Microsoft.TemplateEngine.Core.UnitTests
+    Microsoft.TemplateEngine.Core.UnitTests \
+    Microsoft.TemplateEngine.Utils.UnitTests
 )
 
 source "$REPOROOT/scripts/common/_prettyprint.sh"
