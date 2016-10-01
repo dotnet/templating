@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.TemplateEngine.Core.Expressions.Cpp;
+using Microsoft.TemplateEngine.Core.Expressions.Cpp2;
 using Microsoft.TemplateEngine.Core.Expressions.MSBuild;
 using Microsoft.TemplateEngine.Core.Operations;
 
@@ -14,6 +15,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             switch (evaluatorName)
             {
+                case "C++2":
+                    evaluator = Cpp2StyleEvaluatorDefinition.Cpp2StyleEvaluator;
+                    break;
                 case "C++":
                 case "":
                     evaluator = CppStyleEvaluatorDefinition.CppStyleEvaluator;
