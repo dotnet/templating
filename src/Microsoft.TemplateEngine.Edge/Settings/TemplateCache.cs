@@ -87,7 +87,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 if (factory.TryMount(null, templateDir, out mountPoint))
                 {
                     ScanForComponents(mountPoint, templateDir);
-
                     SettingsLoader.AddMountPoint(mountPoint);
 
                     foreach (IGenerator generator in SettingsLoader.Components.OfType<IGenerator>())
@@ -130,8 +129,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     diskPath = path;
                 }
 
-                IEnumerable<string> failures;
-                foreach (Assembly asm in AssemblyLoader.LoadAllAssemblies(out failures))
+                foreach (Assembly asm in AssemblyLoader.LoadAllAssemblies(out IEnumerable<string> failures))
                 {
                     try
                     {

@@ -18,7 +18,7 @@ namespace dotnet_new3
     {
         public static int Main(string[] args)
         {
-            Console.ReadLine();
+            //Console.ReadLine();
             
             CommandLineApplication app = new CommandLineApplication(false)
             {

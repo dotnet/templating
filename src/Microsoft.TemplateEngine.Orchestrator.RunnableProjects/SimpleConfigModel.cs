@@ -640,6 +640,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 SourceName = source.ToString(nameof(config.SourceName)),
                 PlaceholderFilename = source.ToString(nameof(config.PlaceholderFilename))
             };
+
             List <ExtendedFileSource> sources = new List<ExtendedFileSource>();
             config.Sources = sources;
 
