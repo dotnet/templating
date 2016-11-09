@@ -16,14 +16,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             switch (evaluatorName)
             {
                 case "C++2":
-                    evaluator = Cpp2StyleEvaluatorDefinition.Cpp2StyleEvaluator;
+                    evaluator = Cpp2StyleEvaluatorDefinition.Evaluate;
                     break;
                 case "C++":
                 case "":
-                    evaluator = CppStyleEvaluatorDefinition.CppStyleEvaluator;
+                    evaluator = CppStyleEvaluatorDefinition.Evaluate;
                     break;
                 case "MSBUILD":
-                    evaluator = MSBuildStyleEvaluatorDefinition.MSBuildStyleEvaluator;
+                    evaluator = MSBuildStyleEvaluatorDefinition.Evaluate;
                     break;
                 default:
                     throw new Exception($"Unrecognized evaluator {evaluatorName}");

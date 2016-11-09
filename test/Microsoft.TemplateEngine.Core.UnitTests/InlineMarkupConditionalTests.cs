@@ -15,7 +15,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
                 new MarkupTokens("<", "</", ">", "/>", "Condition=\"", "\""),
                 true,
                 true,
-                MSBuildStyleEvaluatorDefinition.MSBuildStyleEvaluator,
+                MSBuildStyleEvaluatorDefinition.Evaluate,
                 null
             ));
         }

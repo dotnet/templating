@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Microsoft.TemplateEngine.Core.Expressions
 {
@@ -188,6 +189,11 @@ namespace Microsoft.TemplateEngine.Core.Expressions
         {
             Terminators.UnionWith(token);
             return this;
+        }
+
+        public bool TryConvert<T>(object sender, out T result)
+        {
+            return _converter.TryConvert(sender, out result);
         }
 
         public OperatorSetBuilder<TToken> TypeConverter<TSelf>(Action<ITypeConverter> configureConverter)
@@ -619,6 +625,18 @@ namespace Microsoft.TemplateEngine.Core.Expressions
 
             public bool TryCoreConvert<T>(object source, out T result)
             {
+                if (typeof(T).GetTypeInfo().IsEnum && source is string)
+                {
+                    try
+                    {
+                        result = (T) Enum.Parse(typeof(T), (string) source, true);
+                        return true;
+                    }
+                    catch
+                    {
+                    }
+                }
+
                 try
                 {
                     result = (T)Convert.ChangeType(source, typeof(T));

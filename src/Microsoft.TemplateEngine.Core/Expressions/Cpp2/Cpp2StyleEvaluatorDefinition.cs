@@ -34,6 +34,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Cpp2
             .BitwiseAnd(Tokens.BitwiseAnd)
             .BitwiseOr(Tokens.BitwiseOr)
             .Literal(Tokens.Literal)
+            .LiteralBoundsMarkers(Tokens.SingleQuote, Tokens.DoubleQuote)
             .TypeConverter<Cpp2StyleEvaluatorDefinition>(ConfigureConverters);
 
         private static readonly IOperationProvider[] NoOperationProviders = new IOperationProvider[0];
@@ -67,10 +68,12 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Cpp2
             Divide = 22,
             BitwiseAnd = 23,
             BitwiseOr = 24,
-            Literal = 25,
+            SingleQuote = 25,
+            DoubleQuote = 26,
+            Literal = 27,
         }
 
-        public static bool Cpp2StyleEvaluator(IProcessorState processor, ref int bufferLength, ref int currentBufferPosition, out bool faulted)
+        public static bool Evaluate(IProcessorState processor, ref int bufferLength, ref int currentBufferPosition, out bool faulted)
         {
             ITokenTrie tokens = GetSymbols(processor);
             ScopeBuilder<Operators, Tokens> builder = processor.ScopeBuilder(tokens, Map, true);
@@ -106,8 +109,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Cpp2
                 IProcessorState state = new ProcessorState(ms, res, (int)ms.Length, (int)ms.Length, cfg, NoOperationProviders);
                 int len = (int)ms.Length;
                 int pos = 0;
-                bool faulted;
-                return Cpp2StyleEvaluator(state, ref len, ref pos, out faulted);
+                return Evaluate(state, ref len, ref pos, out bool faulted);
             }
         }
 
@@ -139,54 +141,43 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Cpp2
 
         private static int? AttemptNumericComparison(object left, object right)
         {
-            bool leftIsDouble = left is double;
-            bool rightIsDouble = right is double;
-            double ld = leftIsDouble ? (double)left : 0;
-            double rd = rightIsDouble ? (double)right : 0;
+            bool leftIsDouble = Map.TryConvert(left, out double ld);
+            bool rightIsDouble = Map.TryConvert(right, out double rd);
 
             if (!leftIsDouble)
             {
-                string ls = left as string;
-
-                if (ls != null)
+                if (!Map.TryConvert(left, out long ll))
                 {
-                    int lh;
-                    if (double.TryParse(ls, out ld))
-                    {
-                    }
-                    else if (ls.StartsWith("0x", StringComparison.OrdinalIgnoreCase) && int.TryParse(ls.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out lh))
-                    {
-                        ld = lh;
-                    }
-                    else
-                    {
-                        return null;
-                    }
+                    return null;
                 }
+
+                ld = ll;
             }
 
             if (!rightIsDouble)
             {
-                string rs = right as string;
-
-                if (rs != null)
+                if (!Map.TryConvert(right, out long rl))
                 {
-                    int rh;
-                    if (double.TryParse(rs, out rd))
-                    {
-                    }
-                    else if (rs.StartsWith("0x", StringComparison.OrdinalIgnoreCase) && int.TryParse(rs.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out rh))
-                    {
-                        rd = rh;
-                    }
-                    else
-                    {
-                        return null;
-                    }
+                    return null;
                 }
+
+                rd = rl;
             }
 
             return ld.CompareTo(rd);
+        }
+
+        private static int? AttemptBooleanComparison(object left, object right)
+        {
+            bool leftIsBool = Map.TryConvert(left, out bool lb);
+            bool rightIsBool = Map.TryConvert(right, out bool rb);
+
+            if (!leftIsBool || !rightIsBool)
+            {
+                return null;
+            }
+
+            return lb.CompareTo(rb);
         }
 
         private static int? AttemptVersionComparison(object left, object right)
@@ -218,7 +209,20 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Cpp2
 
         private static int Compare(object left, object right)
         {
+            //TODO: Make "null" token configurable
+            if (Equals(right, "null"))
+            {
+                right = null;
+            }
+
+            //TODO: Make "null" token configurable
+            if (Equals(left, "null"))
+            {
+                left = null;
+            }
+
             return AttemptNumericComparison(left, right)
+                   ?? AttemptBooleanComparison(left, right)
                    ?? AttemptVersionComparison(left, right)
                    ?? AttemptLexographicComparison(left, right)
                    ?? AttemptComparableComparison(left, right)
@@ -258,8 +262,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Cpp2
 
         private static ITokenTrie GetSymbols(IProcessorState processor)
         {
-            ITokenTrie tokens;
-            if (!TokenCache.TryGetValue(processor.Encoding, out tokens))
+            if (!TokenCache.TryGetValue(processor.Encoding, out ITokenTrie tokens))
             {
                 TokenTrie trie = new TokenTrie();
 
@@ -304,6 +307,10 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Cpp2
                 trie.AddToken(processor.Encoding.GetBytes("&"));
                 trie.AddToken(processor.Encoding.GetBytes("|"));
 
+                // quotes
+                trie.AddToken(processor.Encoding.GetBytes("'"));
+                trie.AddToken(processor.Encoding.GetBytes("\""));
+
                 TokenCache[processor.Encoding] = tokens = trie;
             }
 
@@ -312,8 +319,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Cpp2
 
         private static bool TryHexConvert(ITypeConverter obj, object source, out long result)
         {
-            string ls;
-            if (!obj.TryConvert(source, out ls))
+            if (!obj.TryConvert(source, out string ls))
             {
                 result = 0;
                 return false;
@@ -330,8 +336,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Cpp2
 
         private static bool TryHexConvert(ITypeConverter obj, object source, out int result)
         {
-            string ls;
-            if (!obj.TryConvert(source, out ls))
+            if (!obj.TryConvert(source, out string ls))
             {
                 result = 0;
                 return false;

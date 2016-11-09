@@ -88,7 +88,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
             VariableCollection vc = new VariableCollection
             {
                 ["FIRST"] = "4",
-                ["SECOND"] = "16"
+                ["SECOND"] = "64"
             };
             bool result = Cpp2StyleEvaluatorDefinition.EvaluateFromString("FIRST << 2 == SECOND >> 2", vc);
             Assert.True(result);
@@ -98,7 +98,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
         public void VerifyCpp2EvaluatorMath()
         {
             VariableCollection vc = new VariableCollection();
-            bool result = Cpp2StyleEvaluatorDefinition.EvaluateFromString("9 / (2 + 1) == (0x38 >> 2) / (1 << 0x01)", vc);
+            bool result = Cpp2StyleEvaluatorDefinition.EvaluateFromString("4 + 9 / (2 + 1) == (0x38 >> 2) / (1 << 0x01)", vc);
             Assert.True(result);
         }
     }
