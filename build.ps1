@@ -5,6 +5,7 @@
 
 param(
     [string]$Configuration="Debug",
+    [string]$Runtime="win7-x86",
     [switch]$Help)
 
 if($Help)
@@ -62,16 +63,17 @@ $env:PATH = "$env:DOTNET_INSTALL_DIR;$env:PATH"
 
 # Restore
 Write-Host "Restoring all src projects..."
-dotnet restore "$RepoRoot\src"
+dotnet restore "$RepoRoot\src\dotnet-new3\dotnet-new3.csproj"
 
 Write-Host "Restoring all test projects..."
-dotnet restore "$RepoRoot\test"
+dotnet restore "$RepoRoot\test\Microsoft.TemplateEngine.Core.UnitTests\Microsoft.TemplateEngine.Core.UnitTests.csproj"
+dotnet restore "$RepoRoot\test\Microsoft.TemplateEngine.Utils.UnitTests\Microsoft.TemplateEngine.Utils.UnitTests.csproj"
 
 Write-Host "Build dotnet new3..."
-dotnet build "$RepoRoot\src\dotnet-new3\project.json" -c $Configuration
+dotnet build "$RepoRoot\Microsoft.TemplateEngine.sln" -c $Configuration
 
 foreach ($ProjectName in $ProjectsToPack) {
-    $ProjectFile = "$RepoRoot\src\$ProjectName\project.json"
+    $ProjectFile = "$RepoRoot\src\$ProjectName\$ProjectName.csproj"
 
     & dotnet pack "$ProjectFile" --output "$PackagesDir" --configuration "$env:CONFIGURATION"
     if (!$?) {
@@ -80,12 +82,18 @@ foreach ($ProjectName in $ProjectsToPack) {
     }
 }
 
+dotnet publish "$RepoRoot\src\dotnet-new3\dotnet-new3.csproj" -c $Configuration -r $Runtime
+
+rm "$RepoRoot\src\dotnet-new3\bin\$Configuration\netcoreapp1.0\*.*" -Force
+copy "$RepoRoot\src\dotnet-new3\bin\$Configuration\netcoreapp1.0\$Runtime\publish\*" "$RepoRoot\src\dotnet-new3\bin\$Configuration\netcoreapp1.0\"
+rm "$RepoRoot\src\dotnet-new3\bin\$Configuration\netcoreapp1.0\$Runtime" -Force -Recurse
+
 Write-Host "Running tests..."
 foreach ($ProjectName in $TestProjects) {
-    $ProjectFile = "$RepoRoot\test\$ProjectName\project.json"
+    $ProjectFile = "$RepoRoot\test\$ProjectName\$ProjectName.csproj"
     $TestResultFile = "$ProjectName-testResults.xml"
 
-    & dotnet test "$ProjectFile" --configuration "$env:CONFIGURATION" -xml "$TestResultFile"
+    & dotnet test "$ProjectFile" --configuration "$env:CONFIGURATION" -l trx
     if (!$?) {
         Write-Host "dotnet test failed for: $ProjectFile"
         Exit 1

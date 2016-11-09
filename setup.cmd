@@ -18,8 +18,10 @@ echo Using build configuration "%DN3B%"...
 CALL "%~dp0\harderreset.cmd"
 
 echo Creating developer environment...
+echo %~dp0
 if EXIST %~dp0\dev (
     RMDIR %~dp0\dev /S /Q
+    DEL %~dp0dev /Q
 )
 
 mkdir %~dp0\dev 1>nul
@@ -31,12 +33,14 @@ powershell -NoProfile -NoLogo -Command "& \"%~dp0build.ps1\" -Configuration %DN3
 echo Artifacts built and placed.
 
 SET DN3BINDIR=
-for /f %%f in ('dir /AD /B "%~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0"') do SET DN3BINDIR="%~dp0\src\dotnet-new3\bin\%DN3B%\netcoreapp1.0\%%f"
+for /f %%f in ('dir /AD /B "%~dp0\src\dotnet-new3\bin\%DN3B%"') do SET DN3BINDIR="%~dp0\src\dotnet-new3\bin\%DN3B%\%%f"
 
 echo %DN3BINDIR%
 
-xcopy /s %DN3BINDIR% %~dp0\dev 1>nul
+xcopy /Y /s %DN3BINDIR% %~dp0\dev 1>nul
 cd %~dp0\dev
+
+SET %DN3%=%~dp0\dev
 
 echo Updating path...
 IF "%OLDPATH%" == "" (SET "OLDPATH=%PATH%")
