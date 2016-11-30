@@ -40,7 +40,7 @@ echo %DN3BINDIR%
 xcopy /Y /s %DN3BINDIR% %~dp0\dev 1>nul
 cd %~dp0\dev
 
-SET %DN3%=%~dp0\dev
+SET DN3=%~dp0\dev
 
 echo Updating path...
 IF "%OLDPATH%" == "" (SET "OLDPATH=%PATH%")
