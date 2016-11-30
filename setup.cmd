@@ -44,7 +44,7 @@ SET DN3=%~dp0\dev
 
 echo Updating path...
 IF "%OLDPATH%" == "" (SET "OLDPATH=%PATH%")
-SET "PATH=%CD%;%OLDPATH%"
+SET "PATH=%CD%;%~dp0\.dotnet;%OLDPATH%"
 
 echo Copying packages...
 COPY %~dp0\artifacts\packages\*.nupkg %~dp0\dev\BuiltIns /Y 1>nul
