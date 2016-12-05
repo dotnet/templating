@@ -62,17 +62,14 @@ if($LASTEXITCODE -ne 0) { throw "Failed to install dotnet cli" }
 $env:PATH = "$env:DOTNET_INSTALL_DIR;$env:PATH"
 
 # Restore
-Write-Host "Restoring all src projects..."
-dotnet restore "$RepoRoot\src\dotnet-new3\dotnet-new3.csproj"
-
-Write-Host "Restoring all test projects..."
-dotnet restore "$RepoRoot\test\Microsoft.TemplateEngine.Core.UnitTests\Microsoft.TemplateEngine.Core.UnitTests.csproj"
-dotnet restore "$RepoRoot\test\Microsoft.TemplateEngine.Utils.UnitTests\Microsoft.TemplateEngine.Utils.UnitTests.csproj"
+Write-Host "Restoring all projects..."
+dotnet restore "$RepoRoot\Microsoft.TemplateEngine.sln"
 
 Write-Host "Build dotnet new3..."
 dotnet build "$RepoRoot\Microsoft.TemplateEngine.sln" -c $Configuration
 
 foreach ($ProjectName in $ProjectsToPack) {
+    Write-Host "Packing $ProjectName..."
     $ProjectFile = "$RepoRoot\src\$ProjectName\$ProjectName.csproj"
 
     & dotnet pack "$ProjectFile" --output "$PackagesDir" --configuration "$env:CONFIGURATION"
@@ -82,11 +79,11 @@ foreach ($ProjectName in $ProjectsToPack) {
     }
 }
 
-dotnet publish "$RepoRoot\src\dotnet-new3\dotnet-new3.csproj" -c $Configuration -r $Runtime
+Write-Host "Publishing dotnet-new3..."
+dotnet publish "$RepoRoot\src\dotnet-new3\dotnet-new3.csproj" -c $Configuration
 
 rm "$RepoRoot\src\dotnet-new3\bin\$Configuration\netcoreapp1.0\*.*" -Force
-copy "$RepoRoot\src\dotnet-new3\bin\$Configuration\netcoreapp1.0\$Runtime\publish\*" "$RepoRoot\src\dotnet-new3\bin\$Configuration\netcoreapp1.0\"
-rm "$RepoRoot\src\dotnet-new3\bin\$Configuration\netcoreapp1.0\$Runtime" -Force -Recurse
+copy "$RepoRoot\src\dotnet-new3\bin\$Configuration\netcoreapp1.0\publish\*" "$RepoRoot\src\dotnet-new3\bin\$Configuration\netcoreapp1.0\"
 
 Write-Host "Running tests..."
 foreach ($ProjectName in $TestProjects) {
