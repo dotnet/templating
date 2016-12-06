@@ -34,7 +34,11 @@ $TestProjects = @(
 
 $RepoRoot = "$PSScriptRoot"
 $PackagesDir = "$RepoRoot\artifacts\packages"
+$DevDir = "$RepoRoot\dev"
 $env:CONFIGURATION = $Configuration;
+
+rm "$DevDir" -Force -Recurse
+mkdir "$DevDir"
 
 # Use a repo-local install directory (but not the artifacts directory because that gets cleaned a lot
 if (!$env:DOTNET_INSTALL_DIR)
@@ -61,15 +65,29 @@ if($LASTEXITCODE -ne 0) { throw "Failed to install dotnet cli" }
 # Put the stage0 on the path
 $env:PATH = "$env:DOTNET_INSTALL_DIR;$env:PATH"
 
-# Restore
-Write-Host "Restoring all projects..."
-dotnet restore "$RepoRoot\Microsoft.TemplateEngine.sln"
+#Write-Host "Restoring all test projects..."
+dotnet restore "$RepoRoot\test\Microsoft.TemplateEngine.Core.UnitTests\Microsoft.TemplateEngine.Core.UnitTests.csproj"
+dotnet restore "$RepoRoot\test\Microsoft.TemplateEngine.Utils.UnitTests\Microsoft.TemplateEngine.Utils.UnitTests.csproj"
 
-Write-Host "Build dotnet new3..."
+# New Restore
+
+Write-Host "Restoring all projects..."
+foreach ($ProjectName in $ProjectsToPack) {
+    $ProjectFile = "$RepoRoot\src\$ProjectName\$ProjectName.csproj"
+
+	& dotnet restore "$ProjectFile"
+	if (!$?) {
+		Write-Host "dotnet restore failed for: $ProjectFile"
+		Exit 1
+	}
+}
+
+Write-Host "Build dependencies..."
 dotnet build "$RepoRoot\Microsoft.TemplateEngine.sln" -c $Configuration
 
 foreach ($ProjectName in $ProjectsToPack) {
     Write-Host "Packing $ProjectName..."
+
     $ProjectFile = "$RepoRoot\src\$ProjectName\$ProjectName.csproj"
 
     & dotnet pack "$ProjectFile" --output "$PackagesDir" --configuration "$env:CONFIGURATION"
@@ -79,11 +97,18 @@ foreach ($ProjectName in $ProjectsToPack) {
     }
 }
 
-Write-Host "Publishing dotnet-new3..."
-dotnet publish "$RepoRoot\src\dotnet-new3\dotnet-new3.csproj" -c $Configuration
+$x = PWD
+# Restore
+Write-Host "Restoring dotnet new3..."
+cd "$RepoRoot\src\dotnet-new3"
+& dotnet msbuild /t:Restore "/p:RuntimeIdentifier=win7-x86;TargetFramework=netcoreapp1.0;RestoreRecursive=False"
+cd $x
 
+Write-Host "Publishing dotnet-new3..."
+& dotnet publish "$RepoRoot\src\dotnet-new3\dotnet-new3.csproj" -c $Configuration -r $Runtime -f netcoreapp1.0 -o "$DevDir"
+
+Write-Host "Cleaning up after publish..."
 rm "$RepoRoot\src\dotnet-new3\bin\$Configuration\netcoreapp1.0\*.*" -Force
-copy "$RepoRoot\src\dotnet-new3\bin\$Configuration\netcoreapp1.0\publish\*" "$RepoRoot\src\dotnet-new3\bin\$Configuration\netcoreapp1.0\"
 
 Write-Host "Running tests..."
 foreach ($ProjectName in $TestProjects) {

@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.25909.2
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7DAC892E-ADAE-4CEB-8A0C-EDC452A5826A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{8B498D0C-F488-4B38-8A7D-B20BF9DB6F60}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnet-new3", "src\dotnet-new3\dotnet-new3.csproj", "{16CBF7CF-FF0F-4362-9EA6-5AF2FAC79E34}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D2080472-48DF-4546-96E5-3B0AD7D50966}"
+	ProjectSection(SolutionItems) = preProject
+		src\dotnet-new3\NuGet.Config = src\dotnet-new3\NuGet.Config
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{16CBF7CF-FF0F-4362-9EA6-5AF2FAC79E34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16CBF7CF-FF0F-4362-9EA6-5AF2FAC79E34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16CBF7CF-FF0F-4362-9EA6-5AF2FAC79E34}.Debug|x64.ActiveCfg = Debug|x64
+		{16CBF7CF-FF0F-4362-9EA6-5AF2FAC79E34}.Debug|x64.Build.0 = Debug|x64
+		{16CBF7CF-FF0F-4362-9EA6-5AF2FAC79E34}.Debug|x86.ActiveCfg = Debug|x86
+		{16CBF7CF-FF0F-4362-9EA6-5AF2FAC79E34}.Debug|x86.Build.0 = Debug|x86
+		{16CBF7CF-FF0F-4362-9EA6-5AF2FAC79E34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16CBF7CF-FF0F-4362-9EA6-5AF2FAC79E34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16CBF7CF-FF0F-4362-9EA6-5AF2FAC79E34}.Release|x64.ActiveCfg = Release|x64
+		{16CBF7CF-FF0F-4362-9EA6-5AF2FAC79E34}.Release|x64.Build.0 = Release|x64
+		{16CBF7CF-FF0F-4362-9EA6-5AF2FAC79E34}.Release|x86.ActiveCfg = Release|x86
+		{16CBF7CF-FF0F-4362-9EA6-5AF2FAC79E34}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{16CBF7CF-FF0F-4362-9EA6-5AF2FAC79E34} = {7DAC892E-ADAE-4CEB-8A0C-EDC452A5826A}
+	EndGlobalSection
+EndGlobal
