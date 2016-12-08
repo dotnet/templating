@@ -37,7 +37,6 @@ for /f %%f in ('dir /AD /B "%~dp0\src\dotnet-new3\bin\%DN3B%"') do SET DN3BINDIR
 
 echo %DN3BINDIR%
 
-xcopy /Y /s %DN3BINDIR% %~dp0\dev 1>nul
 cd %~dp0\dev
 
 SET DN3=%~dp0\dev
