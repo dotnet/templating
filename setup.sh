@@ -36,16 +36,13 @@ echo Using build configuration "$DN3B"
 /bin/bash harderreset.sh
 
 echo Creating directory structure...
-mkdir "src/dotnet-new3/bin"
-mkdir "src/dotnet-new3/bin/$DN3B"
-mkdir "src/dotnet-new3/bin/$DN3B/netcoreapp1.0"
-mkdir "src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID"
-mkdir "src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID/BuiltIns"
+mkdir dev
+mkdir dev/BuiltIns
 
-$REPOROOT/build.sh -c $DN3B
+$REPOROOT/build.sh -c $DN3B -r $RID
 
 echo Importing built in templates...
-cp -r "$DN3BASEDIR/template_feed/"* "$DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID/BuiltIns/"
+cp -r "$DN3BASEDIR/template_feed/"* "$DN3BASEDIR/dev/BuiltIns/"
 echo Done!
 
 if [ ! -L /usr/local/bin/setup.sh ]; then
@@ -63,8 +60,14 @@ fi
 echo You can now use harderreset.sh from anywhere to delete dotnet new3 artifacts
 
 if [ ! -L /usr/local/bin/dotnet-new3 ]; then
-echo "Creating symbolic link /usr/local/bin/dotnet-new3 -> $DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID/dotnet-new3"
-sudo ln -s "$DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID/dotnet-new3" /usr/local/bin/dotnet-new3 
+echo "Creating symbolic link /usr/local/bin/dotnet-new3 -> $DN3BASEDIR/dev'/dotnet-new3"
+sudo ln -s "$DN3BASEDIR/dev/dotnet-new3" /usr/local/bin/dotnet-new3 
 fi
+
+CWD2="$( echo $CWD | sed -e 's/\//\\\//g' )"
+cd $DN3BASEDIR/dev
+sed -i 's/\\/\//g' defaultinstall.*.list
+sed -i "s/%DN3%\/../$CWD2/g" defaultinstall.*.list
+cd $CWD
 
 echo dotnet new3 is ready!
