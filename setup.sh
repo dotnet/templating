@@ -42,7 +42,7 @@ mkdir "src/dotnet-new3/bin/$DN3B/netcoreapp1.0"
 mkdir "src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID"
 mkdir "src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID/BuiltIns"
 
-$REPOROOT/build.sh -c $DN3B
+$REPOROOT/build.sh -c $DN3B -r $RID
 
 echo Importing built in templates...
 cp -r "$DN3BASEDIR/template_feed/"* "$DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID/BuiltIns/"
@@ -63,8 +63,8 @@ fi
 echo You can now use harderreset.sh from anywhere to delete dotnet new3 artifacts
 
 if [ ! -L /usr/local/bin/dotnet-new3 ]; then
-echo "Creating symbolic link /usr/local/bin/dotnet-new3 -> $DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID/dotnet-new3"
-sudo ln -s "$DN3BASEDIR/src/dotnet-new3/bin/$DN3B/netcoreapp1.0/$RID/dotnet-new3" /usr/local/bin/dotnet-new3 
+echo "Creating symbolic link /usr/local/bin/dotnet-new3 -> $DN3BASEDIR/dev/dotnet-new3"
+sudo ln -s "$DN3BASEDIR/dev/dotnet-new3" /usr/local/bin/dotnet-new3 
 fi
 
 echo dotnet new3 is ready!

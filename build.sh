@@ -14,6 +14,7 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
 done
 REPOROOT="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 PACKAGESDIR="$REPOROOT/artifacts/packages"
+DDIR="$REPOROOT/dev"
 export CONFIGURATION="Debug"
 
 PROJECTSTOPACK=( \
@@ -37,6 +38,10 @@ while [[ $# > 0 ]]; do
     case $lowerI in
         -c|--configuration)
             export CONFIGURATION=$2
+            shift
+            ;;
+        -r|--runtime)
+            export RID=$2
             shift
             ;;
         --help)
@@ -77,39 +82,51 @@ fi
 
 # Restore
 echo "Restoring all src projects..."
-dotnet restore "$REPOROOT/src" --ignore-failed-sources
+for projectToTest in ${PROJECTSTOPACK[@]}
+do
+    $DOTNET_INSTALL_DIR/dotnet restore "$REPOROOT/src/$projectToTest/$projectToTest.csproj"
+done
 
 echo "Restoring all test projects..."
-dotnet restore "$REPOROOT/test" --ignore-failed-sources
+for projectToTest in ${TESTPROJECTS[@]}
+do
+    dotnet restore "$REPOROOT/test/$projectToTest/$projectToTest.csproj"
+done
 
 echo "Build abstractions..."
-dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Abstractions/project.json" -c $CONFIGURATION -f netstandard1.3
+dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Abstractions/Microsoft.TemplateEngine.Abstractions.csproj" -c $CONFIGURATION -f netstandard1.3
 
 echo "Build Core..."
-dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Core/project.json" -c $CONFIGURATION -f netstandard1.3
+dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Core/Microsoft.TemplateEngine.Core.csproj" -c $CONFIGURATION -f netstandard1.3
 
 echo "Build Core Contracts..."
-dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Core.Contracts/project.json" -c $CONFIGURATION -f netstandard1.3
+dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Core.Contracts/Microsoft.TemplateEngine.Core.Contracts.csproj" -c $CONFIGURATION -f netstandard1.3
 
 echo "Build Runnable Projects..."
-dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Orchestrator.RunnableProjects/project.json" -c $CONFIGURATION -f netstandard1.3
+dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Orchestrator.RunnableProjects/Microsoft.TemplateEngine.Orchestrator.RunnableProjects.csproj" -c $CONFIGURATION -f netstandard1.3
 
 echo "Build Runnable Utils..."
-dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Utils/project.json" -c $CONFIGURATION -f netstandard1.3
+dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Utils/Microsoft.TemplateEngine.Utils.csproj" -c $CONFIGURATION -f netstandard1.3
 
 echo "Build Edge..."
-dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Edge/project.json" -c $CONFIGURATION -f netcoreapp1.0
-
-echo "Build dotnet new3..."
-dotnet build "$REPOROOT/src/dotnet-new3/project.json" -c $CONFIGURATION -f netcoreapp1.0
+dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Edge/Microsoft.TemplateEngine.Edge.csproj" -c $CONFIGURATION -f netcoreapp1.0
 
 for projectToPack in ${PROJECTSTOPACK[@]}
 do
-    dotnet pack "$REPOROOT/src/$projectToPack/project.json" --output "$PACKAGESDIR" --configuration "$CONFIGURATION" --no-build
+    dotnet pack "$REPOROOT/src/$projectToPack/$projectToPack.csproj" --output "$PACKAGESDIR" --configuration "$CONFIGURATION" --no-build
 done
+
+echo "Build dotnet new3..."
+THISDIR=$(pwd)
+cd $REPOROOT/src/dotnet-new3
+dotnet msbuild "$REPOROOT/src/dotnet-new3/dotnet-new3.csproj" /t:Restore "/p:RuntimeIdentifier=$RID;TargetFramework=netcoreapp1.0;RestoreRecursive=False;RestoreSources=$REPOROOT/artifacts"
+dotnet publish "$REPOROOT/src/dotnet-new3/dotnet-new3.csproj" -c $CONFIGURATION -f netcoreapp1.0 -o "$DDIR" -r $RID
+cd $THISDIR
 
 echo "Running tests..."
 for projectToTest in ${TESTPROJECTS[@]}
 do
-    dotnet test "$REPOROOT/test/$projectToTest/project.json" --configuration "$CONFIGURATION" -xml "$projectToTest-testResults.xml"
+    dotnet test "$REPOROOT/test/$projectToTest/$projectToTest.csproj" --configuration "$CONFIGURATION"
 done
+
+echo $RID
