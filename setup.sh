@@ -60,7 +60,7 @@ fi
 echo You can now use harderreset.sh from anywhere to delete dotnet new3 artifacts
 
 if [ ! -L /usr/local/bin/dotnet-new3 ]; then
-echo "Creating symbolic link /usr/local/bin/dotnet-new3 -> $DN3BASEDIR/dev'/dotnet-new3"
+echo "Creating symbolic link /usr/local/bin/dotnet-new3 -> $DN3BASEDIR/dev/dotnet-new3"
 sudo ln -s "$DN3BASEDIR/dev/dotnet-new3" /usr/local/bin/dotnet-new3 
 fi
 
