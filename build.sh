@@ -128,5 +128,3 @@ for projectToTest in ${TESTPROJECTS[@]}
 do
     dotnet test "$REPOROOT/test/$projectToTest/$projectToTest.csproj" --configuration "$CONFIGURATION"
 done
-
-echo $RID
