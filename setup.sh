@@ -36,7 +36,8 @@ echo Using build configuration "$DN3B"
 /bin/bash harderreset.sh
 
 echo Creating directory structure...
-mkdir "dev/BuiltIns"
+mkdir dev
+mkdir dev/BuiltIns
 
 $REPOROOT/build.sh -c $DN3B -r $RID
 
