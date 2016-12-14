@@ -20,7 +20,7 @@ namespace dotnet_new3
 {
     public class Program
     {
-        private static readonly string HostIdentifier = "cli";
+        private static readonly string HostIdentifier = "dotnetcli";
 
         private static void SetupInternalCommands(ExtendedCommandParser appExt)
         {
