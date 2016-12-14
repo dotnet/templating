@@ -34,6 +34,7 @@ $TestProjects = @(
 
 $RepoRoot = "$PSScriptRoot"
 $PackagesDir = "$RepoRoot\artifacts\packages"
+$PackagesNoTimeStampDir = "$RepoRoot\artifacts\packages-notimestamp"
 $DevDir = "$RepoRoot\dev"
 $env:CONFIGURATION = $Configuration;
 
@@ -85,12 +86,28 @@ foreach ($ProjectName in $ProjectsToPack) {
 Write-Host "Build dependencies..."
 dotnet build "$RepoRoot\Microsoft.TemplateEngine.sln" -c $Configuration
 
+if ($env:BUILD_NUMBER)
+{
+  # Build timestamp packages if a build number was set in the environment
+  foreach ($ProjectName in $ProjectsToPack) {
+      Write-Host "Packing (timestamp) $ProjectName..."
+
+      $ProjectFile = "$RepoRoot\src\$ProjectName\$ProjectName.csproj"
+
+      & dotnet pack "$ProjectFile" --output "$PackagesDir" --configuration "$env:CONFIGURATION" /p:CreateTimestampPackages=true
+      if (!$?) {
+          Write-Host "dotnet pack failed for: $ProjectFile"
+          Exit 1
+      }
+  }
+}
+
 foreach ($ProjectName in $ProjectsToPack) {
-    Write-Host "Packing $ProjectName..."
+    Write-Host "Packing (no-timestamp) $ProjectName..."
 
     $ProjectFile = "$RepoRoot\src\$ProjectName\$ProjectName.csproj"
 
-    & dotnet pack "$ProjectFile" --output "$PackagesDir" --configuration "$env:CONFIGURATION"
+    & dotnet pack "$ProjectFile" --output "$PackagesNoTimeStampDir" --configuration "$env:CONFIGURATION"
     if (!$?) {
         Write-Host "dotnet pack failed for: $ProjectFile"
         Exit 1
