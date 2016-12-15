@@ -67,7 +67,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             string searchTarget = Path.Combine(EngineEnvironmentSettings.Host.FileSystem.GetCurrentDirectory(), templateDir.Trim());
             List<string> matches = EngineEnvironmentSettings.Host.FileSystem.EnumerateFileSystemEntries(Path.GetDirectoryName(searchTarget), Path.GetFileName(searchTarget), SearchOption.TopDirectoryOnly).ToList();
 
-            if(matches.Count == 1)
+            if (matches.Count == 1)
             {
                 templateDir = matches[0];
             }
