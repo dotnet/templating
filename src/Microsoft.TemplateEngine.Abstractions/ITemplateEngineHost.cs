@@ -11,9 +11,7 @@ namespace Microsoft.TemplateEngine.Abstractions
 
         string HostIdentifier { get; }
 
-        string AssemblyName { get; }
-
-        Version AssemblyVersion { get; }
+        Version Version { get; }
 
         void LogMessage(string message);
 

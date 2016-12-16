@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 
@@ -34,15 +33,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
 
         public string HostIdentifier { get; set; }
 
-        public string AssemblyName
-        {
-            get {  return typeof(TestHost).GetTypeInfo().Assembly.GetName().Name; }
-        }
-
-        public Version AssemblyVersion
-        {
-            get {  return typeof(TestHost).GetTypeInfo().Assembly.GetName().Version; }
-        }
+        public Version Version { get; set; }
 
         public bool TryGetHostParamDefault(string paramName, out string value)
         {
