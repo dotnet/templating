@@ -84,7 +84,9 @@ namespace dotnet_new3
                     EngineEnvironmentSettings.Host.LogMessage(string.Format("Invalid format for input locale: [{0}]. Example valid formats: [en] [en-US]", locale));
                     return -1;
                 }
-                EngineEnvironmentSettings.Host = new DefaultTemplateEngineHost(HostIdentifier, locale);
+                string assemblyName = typeof(Program).GetTypeInfo().Assembly.GetName().Name;
+                Version version = typeof(Program).GetTypeInfo().Assembly.GetName().Version;
+                EngineEnvironmentSettings.Host = new DefaultTemplateEngineHost(HostIdentifier, locale, assemblyName, version);
 
                 int resultCode = InitializationAndDebugging(app, out bool shouldExit);
                 if (shouldExit)

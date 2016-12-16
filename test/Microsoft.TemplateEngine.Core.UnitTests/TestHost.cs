@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Reflection;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 
@@ -33,6 +33,16 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
         public string Locale { get; set; }
 
         public string HostIdentifier { get; set; }
+
+        public string AssemblyName
+        {
+            get {  return typeof(TestHost).GetTypeInfo().Assembly.GetName().Name; }
+        }
+
+        public Version AssemblyVersion
+        {
+            get {  return typeof(TestHost).GetTypeInfo().Assembly.GetName().Version; }
+        }
 
         public bool TryGetHostParamDefault(string paramName, out string value)
         {

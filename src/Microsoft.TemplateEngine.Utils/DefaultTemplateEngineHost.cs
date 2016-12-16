@@ -9,19 +9,19 @@ namespace Microsoft.TemplateEngine.Utils
     {
         private readonly IReadOnlyDictionary<string, string> _hostDefaults;
 
-        public DefaultTemplateEngineHost(string hostIdentifier, string locale)
+        public DefaultTemplateEngineHost(string hostIdentifier, string locale, string assemblyName, Version version)
+            : this(hostIdentifier, locale, assemblyName, version, null)
         {
-            Locale = locale;
-            HostIdentifier = hostIdentifier;
-            _hostDefaults = new Dictionary<string, string>();
-            FileSystem = new PhysicalFileSystem();
         }
 
-        public DefaultTemplateEngineHost(string hostIdentifier, string locale, Dictionary<string, string> defaults)
+        public DefaultTemplateEngineHost(string hostIdentifier, string locale, string assemblyName, Version version, Dictionary<string, string> defaults)
         {
             Locale = locale;
             HostIdentifier = hostIdentifier;
-            _hostDefaults = defaults;
+            _hostDefaults = defaults ?? new Dictionary<string, string>();
+            FileSystem = new PhysicalFileSystem();
+            AssemblyName = assemblyName;
+            AssemblyVersion = version;
         }
 
         public IPhysicalFileSystem FileSystem { get; }
@@ -29,6 +29,10 @@ namespace Microsoft.TemplateEngine.Utils
         public string Locale { get; }
 
         public string HostIdentifier { get; }
+
+        public string AssemblyName { get; }
+
+        public Version AssemblyVersion { get; }
 
         public virtual void LogMessage(string message)
         {

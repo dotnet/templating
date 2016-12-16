@@ -13,10 +13,12 @@ namespace Microsoft.TemplateEngine.Utils
     public static class EngineEnvironmentSettings
     {
         private static readonly string DefaultLocale = "en_US";
+        private static readonly string DefaultAssemblyName = "None";
+        private static readonly Version DefaultAssemblyVersion = new Version("0.0.0.1");
 
         static EngineEnvironmentSettings()
         {
-            Host = new DefaultTemplateEngineHost(string.Empty, DefaultLocale);
+            Host = new DefaultTemplateEngineHost(string.Empty, DefaultLocale, DefaultAssemblyName, DefaultAssemblyVersion);
             Paths = new DefaultPathInfo();
         }
 
@@ -57,7 +59,7 @@ namespace Microsoft.TemplateEngine.Utils
                 {
                     if (_baseDir == null)
                     {
-                        _baseDir = Path.Combine(UserProfileDir, ".netnew");
+                        _baseDir = Path.Combine(UserProfileDir, ".netnew", Host.AssemblyName, Host.AssemblyVersion.ToString());
                     }
 
                     return _baseDir;
