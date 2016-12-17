@@ -3,6 +3,7 @@
     <PackageReleaseVersion>1.0.0</PackageReleaseVersion>
     <PackageBuildQuality Condition=" '$(PackageBuildQuality)' == '' ">beta1</PackageBuildQuality>
     <PackageVersion>$(PackageReleaseVersion)-$(PackageBuildQuality)</PackageVersion>
+    <CreateTimestampPackages Condition=" '$(CreateTimestampPackages)' == '' ">True</CreateTimestampPackages>
     <PackageVersion Condition=" '$(CreateTimestampPackages)' == 'true' AND '$(BUILD_NUMBER)' != '' ">$(PackageVersion)-$([System.DateTime]::Now.ToString("yyyyMMdd"))-$(BUILD_NUMBER)</PackageVersion>
   </PropertyGroup>
 </Project>
