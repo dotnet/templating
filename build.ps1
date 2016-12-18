@@ -35,6 +35,7 @@ $TestProjects = @(
 $RepoRoot = "$PSScriptRoot"
 $PackagesDir = "$RepoRoot\artifacts\packages"
 $PackagesNoTimeStampDir = "$RepoRoot\artifacts\packages-notimestamp"
+$TemplatesNoTimeStampDir = "$RepoRoot\artifacts\templates-notimestamp"
 $DevDir = "$RepoRoot\dev"
 $env:CONFIGURATION = $Configuration;
 
@@ -135,7 +136,7 @@ Write-Host "Packaging templates (timestamp)..."
 & msbuild "$RepoRoot\template_feed\Template.proj" /p:CreateTimestampPackages=true
 
 Write-Host "Packaging templates (no timestamp)..."
-& msbuild "$RepoRoot\template_feed\Template.proj" /p:CreateTimestampPackages=false /p:PackOutput="$PackagesNoTimeStampDir"
+& msbuild "$RepoRoot\template_feed\Template.proj" /p:CreateTimestampPackages=false /p:PackOutput="$TemplatesNoTimeStampDir"
 
 
 Write-Host "Running tests..."
