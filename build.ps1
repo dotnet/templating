@@ -133,10 +133,10 @@ Write-Host "Cleaning up after publish..."
 rm "$RepoRoot\src\dotnet-new3\bin\$Configuration\netcoreapp1.0\*.*" -Force
 
 Write-Host "Packaging templates (timestamp)..."
-& msbuild "$RepoRoot\template_feed\Template.proj" /p:CreateTimestampPackages=true
+& dotnet msbuild "$RepoRoot\template_feed\Template.proj" /p:CreateTimestampPackages=true
 
 Write-Host "Packaging templates (no timestamp)..."
-& msbuild "$RepoRoot\template_feed\Template.proj" /p:CreateTimestampPackages=false /p:PackOutput="$TemplatesNoTimeStampDir"
+& dotnet msbuild "$RepoRoot\template_feed\Template.proj" /p:CreateTimestampPackages=false /p:PackOutput="$TemplatesNoTimeStampDir"
 
 
 Write-Host "Running tests..."
