@@ -25,7 +25,6 @@ if EXIST %~dp0\dev (
 )
 
 mkdir %~dp0\dev 1>nul
-mkdir %~dp0\dev\builtins 1>nul
 
 echo "Calling build.ps1"
 powershell -NoProfile -NoLogo -Command "& \"%~dp0build.ps1\" -Configuration %DN3B%; exit $LastExitCode;"
@@ -44,12 +43,6 @@ SET DN3=%~dp0\dev
 echo Updating path...
 IF "%OLDPATH%" == "" (SET "OLDPATH=%PATH%")
 SET "PATH=%CD%;%~dp0\.dotnet;%OLDPATH%"
-
-echo Copying packages...
-COPY %~dp0\artifacts\packages\*.nupkg %~dp0\dev\BuiltIns /Y 1>nul
-
-echo Copying templates...
-COPY %~dp0\template_feed\*.nupkg %~dp0\dev\BuiltIns /Y 1>nul
 
 echo Copying configuration for builtins...
 COPY %~dp0\src\dotnet-new3\defaultinstall.*.list %~dp0\dev /Y 1>nul
