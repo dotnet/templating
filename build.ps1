@@ -52,10 +52,12 @@ if (!(Test-Path $env:DOTNET_INSTALL_DIR))
     mkdir $env:DOTNET_INSTALL_DIR | Out-Null
 }
 
-if (!(Test-Path "$RepoRoot\artifacts"))
+if (Test-Path "$RepoRoot\artifacts")
 {
-    mkdir "$RepoRoot\artifacts" | Out-Null
+    rm "$RepoRoot\artifacts" -Force -Recurse
 }
+
+mkdir "$RepoRoot\artifacts" | Out-Null
 
 $DOTNET_INSTALL_SCRIPT_URL="https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/dotnet-install.ps1"
 Invoke-WebRequest $DOTNET_INSTALL_SCRIPT_URL -OutFile "$RepoRoot\artifacts\dotnet-install.ps1"
@@ -109,7 +111,7 @@ foreach ($ProjectName in $ProjectsToPack) {
 
     $ProjectFile = "$RepoRoot\src\$ProjectName\$ProjectName.csproj"
 
-    & dotnet pack "$ProjectFile" --output "$PackagesNoTimeStampDir" --configuration "$env:CONFIGURATION"
+    & dotnet pack "$ProjectFile" --output "$PackagesNoTimeStampDir" --configuration "$env:CONFIGURATION" --no-build
     if (!$?) {
         Write-Host "dotnet pack failed for: $ProjectFile"
         Exit 1
@@ -120,14 +122,21 @@ $x = PWD
 # Restore
 Write-Host "Restoring dotnet new3..."
 cd "$RepoRoot\src\dotnet-new3"
-& dotnet msbuild /t:Restore "/p:RuntimeIdentifier=win7-x86;TargetFramework=netcoreapp1.0;RestoreRecursive=False"
+& dotnet msbuild /t:Restore "/p:RuntimeIdentifier=win7-x86;TargetFramework=netcoreapp1.0;RestoreRecursive=False;CreateTimestampPackages=true"
 cd $x
 
 Write-Host "Publishing dotnet-new3..."
-& dotnet publish "$RepoRoot\src\dotnet-new3\dotnet-new3.csproj" -c $Configuration -r $Runtime -f netcoreapp1.0 -o "$DevDir"
+& dotnet publish "$RepoRoot\src\dotnet-new3\dotnet-new3.csproj" -c $Configuration -r $Runtime -f netcoreapp1.0 -o "$DevDir" -p:CreateTimestampPackages=true
 
 Write-Host "Cleaning up after publish..."
 rm "$RepoRoot\src\dotnet-new3\bin\$Configuration\netcoreapp1.0\*.*" -Force
+
+Write-Host "Packaging templates (timestamp)..."
+& msbuild "$RepoRoot\template_feed\Template.proj" /p:CreateTimestampPackages=true
+
+Write-Host "Packaging templates (no timestamp)..."
+& msbuild "$RepoRoot\template_feed\Template.proj" /p:CreateTimestampPackages=false /p:PackOutput="$PackagesNoTimeStampDir"
+
 
 Write-Host "Running tests..."
 foreach ($ProjectName in $TestProjects) {

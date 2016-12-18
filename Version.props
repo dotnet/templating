@@ -11,4 +11,10 @@
     <Copyright>Copyright © Microsoft Corporation</Copyright>
     <PackageVersion Condition=" '$(CreateTimestampPackages)' == 'true' AND '$(BUILD_NUMBER)' != '' ">$(PackageVersion)-$([System.DateTime]::Now.ToString("yyyyMMdd"))-$(BUILD_NUMBER)</PackageVersion>
   </PropertyGroup>
+  <PropertyGroup>
+    <ArtifactsFolder>$(MSBuildThisFileDirectory)artifacts\</ArtifactsFolder>
+    <TemplatesFolder>$(ArtifactsFolder)templates\</TemplatesFolder>
+    <BuildToolsFolder>$(MSBuildThisFileDirectory)build\</BuildToolsFolder>
+    <NuGet>&quot;$(BuildToolsFolder)nuget.exe&quot;</NuGet>
+  </PropertyGroup>
 </Project>
