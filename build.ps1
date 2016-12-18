@@ -86,20 +86,22 @@ foreach ($ProjectName in $ProjectsToPack) {
 Write-Host "Build dependencies..."
 dotnet build "$RepoRoot\Microsoft.TemplateEngine.sln" -c $Configuration
 
-if ($env:BUILD_NUMBER)
+if (-not $env:BUILD_NUMBER)
 {
-  # Build timestamp packages if a build number was set in the environment
-  foreach ($ProjectName in $ProjectsToPack) {
-      Write-Host "Packing (timestamp) $ProjectName..."
+  $env:BUILD_NUMBER = 0
+}
 
-      $ProjectFile = "$RepoRoot\src\$ProjectName\$ProjectName.csproj"
+# Build timestamp packages if a build number was set in the environment
+foreach ($ProjectName in $ProjectsToPack) {
+    Write-Host "Packing (timestamp) $ProjectName..."
 
-      & dotnet pack "$ProjectFile" --output "$PackagesDir" --configuration "$env:CONFIGURATION" /p:CreateTimestampPackages=true
-      if (!$?) {
-          Write-Host "dotnet pack failed for: $ProjectFile"
-          Exit 1
-      }
-  }
+    $ProjectFile = "$RepoRoot\src\$ProjectName\$ProjectName.csproj"
+
+    & dotnet pack "$ProjectFile" --output "$PackagesDir" --configuration "$env:CONFIGURATION" /p:CreateTimestampPackages=true
+    if (!$?) {
+        Write-Host "dotnet pack failed for: $ProjectFile"
+        Exit 1
+    }
 }
 
 foreach ($ProjectName in $ProjectsToPack) {
