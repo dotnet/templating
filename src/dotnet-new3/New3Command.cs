@@ -211,7 +211,7 @@ namespace dotnet_new3
                     break;
                 case CreationResultStatus.InvalidParamValues:
                     // DisplayHelp() will figure out the details on the invalid params.
-                    DisplayHelp(templateName, app, app.AllTemplateParams);
+                    DisplayHelp(templateName, language, app, app.AllTemplateParams);
                     break;
                 default:
                     break;
@@ -426,6 +426,7 @@ namespace dotnet_new3
         {
             IEnumerable<ITemplateInfo> results = TemplateCreator.List(templateNames, language);
             IEnumerable<IGrouping<string, ITemplateInfo>> grouped = results.GroupBy(x => x.GroupIdentity);
+            EngineEnvironmentSettings.Host.TryGetHostParamDefault("prefs:language", out string defaultLanguage);
 
             Dictionary<ITemplateInfo, string> templatesVersusLanguages = new Dictionary<ITemplateInfo, string>();
             
@@ -440,6 +441,12 @@ namespace dotnet_new3
                     if (enumerator.Current.Tags.TryGetValue("language", out string lang))
                     {
                         anyLangs = true;
+
+                        if(string.IsNullOrEmpty(language) && string.Equals(defaultLanguage, lang, StringComparison.OrdinalIgnoreCase))
+                        {
+                            lang = $"[{lang}]";
+                        }
+
                         languages.Append(lang);
                     }
 
@@ -447,6 +454,11 @@ namespace dotnet_new3
                     {
                         if (enumerator.Current.Tags.TryGetValue("language", out lang))
                         {
+                            if (string.IsNullOrEmpty(language) && string.Equals(defaultLanguage, lang, StringComparison.OrdinalIgnoreCase))
+                            {
+                                lang = $"[{lang}]";
+                            }
+
                             if (!anyLangs)
                             {
                                 anyLangs = true;
