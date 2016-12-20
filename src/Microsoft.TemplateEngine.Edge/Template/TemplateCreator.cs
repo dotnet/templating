@@ -38,7 +38,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 {
                     aliasSearchResult = aliasSearchResult.Where(x =>
                     {
-                        return x.Tags == null || !x.Tags.TryGetValue("language", out string langVal) || string.Equals(langVal, language);
+                        return x.Tags == null || !x.Tags.TryGetValue("language", out string langVal) || string.Equals(langVal, language, StringComparison.OrdinalIgnoreCase);
                     }).ToList();
                 }
 
@@ -56,7 +56,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 {
                     if (!string.IsNullOrEmpty(language))
                     {
-                        if (template.Tags != null && template.Tags.TryGetValue("language", out string langVal) && !string.Equals(langVal, language))
+                        if (template.Tags != null && template.Tags.TryGetValue("language", out string langVal) && !string.Equals(langVal, language, StringComparison.OrdinalIgnoreCase))
                         {
                             continue;
                         }
