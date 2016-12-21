@@ -27,9 +27,14 @@ $ProjectsToPack = @(
     "Microsoft.TemplateEngine.Orchestrator.RunnableProjects"
  )
 
+ $TestProjectsToPack = @(
+    "Microsoft.TemplateEngine.Mocks"
+ )
+
 $TestProjects = @(
     "Microsoft.TemplateEngine.Core.UnitTests",
-    "Microsoft.TemplateEngine.Utils.UnitTests"
+    "Microsoft.TemplateEngine.Utils.UnitTests",
+    "dotnet-new3.UnitTests"
 )
 
 $RepoRoot = "$PSScriptRoot"
@@ -70,10 +75,6 @@ if($LASTEXITCODE -ne 0) { throw "Failed to install dotnet cli" }
 # Put the stage0 on the path
 $env:PATH = "$env:DOTNET_INSTALL_DIR;$env:PATH"
 
-#Write-Host "Restoring all test projects..."
-dotnet restore "$RepoRoot\test\Microsoft.TemplateEngine.Core.UnitTests\Microsoft.TemplateEngine.Core.UnitTests.csproj"
-dotnet restore "$RepoRoot\test\Microsoft.TemplateEngine.Utils.UnitTests\Microsoft.TemplateEngine.Utils.UnitTests.csproj"
-
 # New Restore
 
 Write-Host "Restoring all projects..."
@@ -85,6 +86,16 @@ foreach ($ProjectName in $ProjectsToPack) {
 		Write-Host "dotnet restore failed for: $ProjectFile"
 		Exit 1
 	}
+}
+
+foreach ($ProjectName in $TestProjectsToPack) {
+    $ProjectFile = "$RepoRoot\test\$ProjectName\$ProjectName.csproj"
+
+    & dotnet restore "$ProjectFile"
+    if (!$?) {
+        Write-Host "dotnet restore failed for: $ProjectFile"
+        Exit 1
+    }
 }
 
 Write-Host "Build dependencies..."
@@ -114,6 +125,18 @@ foreach ($ProjectName in $ProjectsToPack) {
     $ProjectFile = "$RepoRoot\src\$ProjectName\$ProjectName.csproj"
 
     & dotnet pack "$ProjectFile" --output "$PackagesNoTimeStampDir" --configuration "$env:CONFIGURATION" --no-build
+    if (!$?) {
+        Write-Host "dotnet pack failed for: $ProjectFile"
+        Exit 1
+    }
+}
+
+foreach ($ProjectName in $TestProjectsToPack) {
+    Write-Host "Packing (timestamp) $ProjectName..."
+
+    $ProjectFile = "$RepoRoot\test\$ProjectName\$ProjectName.csproj"
+
+    & dotnet pack "$ProjectFile" --output "$PackagesDir" --configuration "$env:CONFIGURATION" /p:CreateTimestampPackages=true
     if (!$?) {
         Write-Host "dotnet pack failed for: $ProjectFile"
         Exit 1
@@ -155,6 +178,39 @@ if ($LastExitCode -ne 0)
     exit $LastExitCode
 }
 
+#Write-Host "Restoring all test projects..."
+foreach ($ProjectName in $TestProjectsToPack) {
+    $ProjectFile = "$RepoRoot\test\$ProjectName\$ProjectName.csproj"
+
+    & dotnet restore "$ProjectFile"
+    if (!$?) {
+        Write-Host "dotnet restore failed for: $ProjectFile"
+        Exit 1
+    }
+}
+
+foreach ($ProjectName in $TestProjectsToPack) {
+    Write-Host "Packing (no-timestamp) $ProjectName..."
+
+    $ProjectFile = "$RepoRoot\test\$ProjectName\$ProjectName.csproj"
+
+    & dotnet pack "$ProjectFile" --output "$PackagesNoTimeStampDir" --configuration "$env:CONFIGURATION" --no-build
+    if (!$?) {
+        Write-Host "dotnet pack failed for: $ProjectFile"
+        Exit 1
+    }
+}
+
+#Write-Host "Restoring all test projects..."
+foreach ($ProjectName in $TestProjects) {
+    $ProjectFile = "$RepoRoot\test\$ProjectName\$ProjectName.csproj"
+
+    & dotnet restore "$ProjectFile"
+    if (!$?) {
+        Write-Host "dotnet restore failed for: $ProjectFile"
+        Exit 1
+    }
+}
 
 Write-Host "Running tests..."
 foreach ($ProjectName in $TestProjects) {
