@@ -38,9 +38,10 @@ $TestProjects = @(
 )
 
 $RepoRoot = "$PSScriptRoot"
-$PackagesDir = "$RepoRoot\artifacts\packages"
-$PackagesNoTimeStampDir = "$RepoRoot\artifacts\packages-notimestamp"
-$TemplatesNoTimeStampDir = "$RepoRoot\artifacts\templates-notimestamp"
+$ArtifactsDir = "$RepoRoot\artifacts" 
+$PackagesDir = "$ArtifactsDir\packages"
+$PackagesNoTimeStampDir = "$ArtifactsDir\packages-notimestamp"
+$TemplatesNoTimeStampDir = "$ArtifactsDir\templates-notimestamp"
 $DevDir = "$RepoRoot\dev"
 $env:CONFIGURATION = $Configuration;
 
@@ -88,13 +89,26 @@ foreach ($ProjectName in $ProjectsToPack) {
 	}
 }
 
-Write-Host "Build dependencies..."
-dotnet build "$RepoRoot\Microsoft.TemplateEngine.sln" -c $Configuration
-
 if (-not $env:BUILD_NUMBER)
 {
   $env:BUILD_NUMBER = 0
 }
+
+if (-not $env:PACKAGE_VERSION)
+{
+  $env:PACKAGE_VERSION = "1.0.0"
+}
+
+$NoTimestampPackageVersion=$env:PACKAGE_VERSION
+
+if (-not $env:BUILD_QUALITY)
+{
+  $env:BUILD_QUALITY = "beta1"
+}
+
+$NoTimestampPackageVersion=$env:PACKAGE_VERSION + "-" + $env:BUILD_QUALITY
+
+$TimestampPackageVersion=$NoTimestampPackageVersion + "-" + [System.DateTime]::Now.ToString("yyyyMMdd") + "-" + $env:BUILD_NUMBER
 
 # Build timestamp packages if a build number was set in the environment
 foreach ($ProjectName in $ProjectsToPack) {
@@ -102,7 +116,7 @@ foreach ($ProjectName in $ProjectsToPack) {
 
     $ProjectFile = "$RepoRoot\src\$ProjectName\$ProjectName.csproj"
 
-    & dotnet pack "$ProjectFile" --output "$PackagesDir" --configuration "$env:CONFIGURATION" /p:CreateTimestampPackages=true
+    & dotnet pack "$ProjectFile" --output "$PackagesDir" --configuration "$env:CONFIGURATION" /p:PackageVersion="$TimestampPackageVersion"
     if (!$?) {
         Write-Host "dotnet pack failed for: $ProjectFile"
         Exit 1
@@ -114,7 +128,7 @@ foreach ($ProjectName in $ProjectsToPack) {
 
     $ProjectFile = "$RepoRoot\src\$ProjectName\$ProjectName.csproj"
 
-    & dotnet pack "$ProjectFile" --output "$PackagesNoTimeStampDir" --configuration "$env:CONFIGURATION" --no-build
+    & dotnet pack "$ProjectFile" --output "$PackagesNoTimeStampDir" --configuration "$env:CONFIGURATION"  /p:PackageVersion="$NoTimestampPackageVersion"
     if (!$?) {
         Write-Host "dotnet pack failed for: $ProjectFile"
         Exit 1
@@ -125,7 +139,7 @@ $x = PWD
 # Restore
 Write-Host "Restoring dotnet new3..."
 cd "$RepoRoot\src\dotnet-new3"
-& dotnet msbuild /t:Restore "/p:RuntimeIdentifier=win7-x86;TargetFramework=netcoreapp1.0;RestoreRecursive=False;CreateTimestampPackages=true"
+& dotnet msbuild /t:Restore "/p:RuntimeIdentifier=win7-x86;TargetFramework=netcoreapp1.0;RestoreRecursive=False;PackageVersion=$TimestampPackageVersion"
 if ($LastExitCode -ne 0)
 {
     exit $LastExitCode
@@ -133,7 +147,7 @@ if ($LastExitCode -ne 0)
 cd $x
 
 Write-Host "Publishing dotnet-new3..."
-& dotnet publish "$RepoRoot\src\dotnet-new3\dotnet-new3.csproj" -c $Configuration -r $Runtime -f netcoreapp1.0 -o "$DevDir" -p:CreateTimestampPackages=true
+& dotnet publish "$RepoRoot\src\dotnet-new3\dotnet-new3.csproj" -c $Configuration -r $Runtime -f netcoreapp1.0 -o "$DevDir" -p:PackageVersion="$TimestampPackageVersion"
 if ($LastExitCode -ne 0)
 {
     exit $LastExitCode
@@ -143,26 +157,29 @@ Write-Host "Cleaning up after publish..."
 rm "$RepoRoot\src\dotnet-new3\bin\$Configuration\netcoreapp1.0\*.*" -Force
 
 Write-Host "Packaging templates (timestamp)..."
-& dotnet msbuild "$RepoRoot\template_feed\Template.proj" /p:CreateTimestampPackages=true
+& dotnet msbuild "$RepoRoot\template_feed\Template.proj" /p:PackageVersion="$TimestampPackageVersion"
 if ($LastExitCode -ne 0)
 {
     exit $LastExitCode
 }
 
 Write-Host "Packaging templates (no timestamp)..."
-& dotnet msbuild "$RepoRoot\template_feed\Template.proj" /p:CreateTimestampPackages=false /p:PackOutput="$TemplatesNoTimeStampDir"
+& dotnet msbuild "$RepoRoot\template_feed\Template.proj" /p:PackOutput="$TemplatesNoTimeStampDir" /p:PackageVersion="$NoTimestampPackageVersion"
 if ($LastExitCode -ne 0)
 {
     exit $LastExitCode
 }
 
-#Write-Host "Restoring mocks..."
+#Write-Host "Packing mocks..."
 foreach ($ProjectName in $TestProjectsToPack) {
+    Write-Host "Packing (timestamp) $ProjectName..."
+
     $ProjectFile = "$RepoRoot\test\$ProjectName\$ProjectName.csproj"
 
-    & dotnet restore "$ProjectFile"
+    & dotnet restore "$ProjectFile" --source "$ArtifactsDir" /p:PackageVersion="$TimestampPackageVersion"
+    & dotnet pack "$ProjectFile" --output "$PackagesDir" --configuration "$env:CONFIGURATION" /p:PackageVersion="$TimestampPackageVersion"
     if (!$?) {
-        Write-Host "dotnet restore failed for: $ProjectFile"
+        Write-Host "dotnet pack failed for: $ProjectFile"
         Exit 1
     }
 }
@@ -173,19 +190,8 @@ foreach ($ProjectName in $TestProjectsToPack) {
 
     $ProjectFile = "$RepoRoot\test\$ProjectName\$ProjectName.csproj"
 
-    & dotnet pack "$ProjectFile" --output "$PackagesDir" --configuration "$env:CONFIGURATION" /p:CreateTimestampPackages=true
-    if (!$?) {
-        Write-Host "dotnet pack failed for: $ProjectFile"
-        Exit 1
-    }
-}
-
-foreach ($ProjectName in $TestProjectsToPack) {
-    Write-Host "Packing (no-timestamp) $ProjectName..."
-
-    $ProjectFile = "$RepoRoot\test\$ProjectName\$ProjectName.csproj"
-
-    & dotnet pack "$ProjectFile" --output "$PackagesNoTimeStampDir" --configuration "$env:CONFIGURATION" --no-build
+    & dotnet restore "$ProjectFile" /p:PackageVersion="$NoTimestampPackageVersion"
+    & dotnet pack "$ProjectFile" --output "$PackagesNoTimeStampDir" --configuration "$env:CONFIGURATION" /p:PackageVersion="$TimestampPackageVersion"
     if (!$?) {
         Write-Host "dotnet pack failed for: $ProjectFile"
         Exit 1
