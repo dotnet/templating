@@ -3,15 +3,15 @@
     <PackageReleaseVersion>1.0.0</PackageReleaseVersion>
     <PackageBuildQuality Condition=" '$(PackageBuildQuality)' == '' ">beta1</PackageBuildQuality>
     <PackageVersion>$(PackageReleaseVersion)-$(PackageBuildQuality)</PackageVersion>
+    <PackageVersion Condition=" '$(CreateTimestampPackages)' == 'true' AND '$(BUILD_NUMBER)' != '' ">$(PackageVersion)-$([System.DateTime]::Now.ToString("yyyyMMdd"))-$(BUILD_NUMBER)</PackageVersion>
+  </PropertyGroup>
+  <PropertyGroup>
     <Authors>Microsoft</Authors>
     <ProjectUrl>https://github.com/dotnet/templating</ProjectUrl>
     <LicenseUrl>https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</LicenseUrl>
     <ImageUrl>http://go.microsoft.com/fwlink/?LinkID=288859</ImageUrl>
     <Tags>template</Tags>
     <Copyright>Copyright © Microsoft Corporation</Copyright>
-    <PackageVersion Condition=" '$(CreateTimestampPackages)' == 'true' AND '$(BUILD_NUMBER)' != '' ">$(PackageVersion)-$([System.DateTime]::Now.ToString("yyyyMMdd"))-$(BUILD_NUMBER)</PackageVersion>
-  </PropertyGroup>
-  <PropertyGroup>
     <ArtifactsFolder>$(MSBuildThisFileDirectory)artifacts\</ArtifactsFolder>
     <TemplatesFolder>$(ArtifactsFolder)templates\</TemplatesFolder>
     <TemplatesNoTimestampFolder>$(ArtifactsFolder)templates-notimestamp\</TemplatesNoTimestampFolder>
