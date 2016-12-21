@@ -88,16 +88,6 @@ foreach ($ProjectName in $ProjectsToPack) {
 	}
 }
 
-foreach ($ProjectName in $TestProjectsToPack) {
-    $ProjectFile = "$RepoRoot\test\$ProjectName\$ProjectName.csproj"
-
-    & dotnet restore "$ProjectFile"
-    if (!$?) {
-        Write-Host "dotnet restore failed for: $ProjectFile"
-        Exit 1
-    }
-}
-
 Write-Host "Build dependencies..."
 dotnet build "$RepoRoot\Microsoft.TemplateEngine.sln" -c $Configuration
 
@@ -125,18 +115,6 @@ foreach ($ProjectName in $ProjectsToPack) {
     $ProjectFile = "$RepoRoot\src\$ProjectName\$ProjectName.csproj"
 
     & dotnet pack "$ProjectFile" --output "$PackagesNoTimeStampDir" --configuration "$env:CONFIGURATION" --no-build
-    if (!$?) {
-        Write-Host "dotnet pack failed for: $ProjectFile"
-        Exit 1
-    }
-}
-
-foreach ($ProjectName in $TestProjectsToPack) {
-    Write-Host "Packing (timestamp) $ProjectName..."
-
-    $ProjectFile = "$RepoRoot\test\$ProjectName\$ProjectName.csproj"
-
-    & dotnet pack "$ProjectFile" --output "$PackagesDir" --configuration "$env:CONFIGURATION" /p:CreateTimestampPackages=true
     if (!$?) {
         Write-Host "dotnet pack failed for: $ProjectFile"
         Exit 1
@@ -178,13 +156,26 @@ if ($LastExitCode -ne 0)
     exit $LastExitCode
 }
 
-#Write-Host "Restoring all test projects..."
+#Write-Host "Restoring mocks..."
 foreach ($ProjectName in $TestProjectsToPack) {
     $ProjectFile = "$RepoRoot\test\$ProjectName\$ProjectName.csproj"
 
     & dotnet restore "$ProjectFile"
     if (!$?) {
         Write-Host "dotnet restore failed for: $ProjectFile"
+        Exit 1
+    }
+}
+
+#Write-Host "Packing mocks..."
+foreach ($ProjectName in $TestProjectsToPack) {
+    Write-Host "Packing (timestamp) $ProjectName..."
+
+    $ProjectFile = "$RepoRoot\test\$ProjectName\$ProjectName.csproj"
+
+    & dotnet pack "$ProjectFile" --output "$PackagesDir" --configuration "$env:CONFIGURATION" /p:CreateTimestampPackages=true
+    if (!$?) {
+        Write-Host "dotnet pack failed for: $ProjectFile"
         Exit 1
     }
 }
