@@ -40,6 +40,7 @@ $DevDir = "$RepoRoot\dev"
 $env:CONFIGURATION = $Configuration;
 
 rm "$DevDir" -Force -Recurse
+if(Test-Path "$DevDir") { throw "Failed to remove 'dev'" }
 mkdir "$DevDir"
 
 # Use a repo-local install directory (but not the artifacts directory because that gets cleaned a lot
@@ -124,19 +125,35 @@ $x = PWD
 Write-Host "Restoring dotnet new3..."
 cd "$RepoRoot\src\dotnet-new3"
 & dotnet msbuild /t:Restore "/p:RuntimeIdentifier=win7-x86;TargetFramework=netcoreapp1.0;RestoreRecursive=False;CreateTimestampPackages=true"
+if ($LastExitCode -ne 0)
+{
+    exit $LastExitCode
+}
 cd $x
 
 Write-Host "Publishing dotnet-new3..."
 & dotnet publish "$RepoRoot\src\dotnet-new3\dotnet-new3.csproj" -c $Configuration -r $Runtime -f netcoreapp1.0 -o "$DevDir" -p:CreateTimestampPackages=true
+if ($LastExitCode -ne 0)
+{
+    exit $LastExitCode
+}
 
 Write-Host "Cleaning up after publish..."
 rm "$RepoRoot\src\dotnet-new3\bin\$Configuration\netcoreapp1.0\*.*" -Force
 
 Write-Host "Packaging templates (timestamp)..."
 & dotnet msbuild "$RepoRoot\template_feed\Template.proj" /p:CreateTimestampPackages=true
+if ($LastExitCode -ne 0)
+{
+    exit $LastExitCode
+}
 
 Write-Host "Packaging templates (no timestamp)..."
 & dotnet msbuild "$RepoRoot\template_feed\Template.proj" /p:CreateTimestampPackages=false /p:PackOutput="$TemplatesNoTimeStampDir"
+if ($LastExitCode -ne 0)
+{
+    exit $LastExitCode
+}
 
 
 Write-Host "Running tests..."
