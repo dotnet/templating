@@ -18,4 +18,9 @@
     <BuildToolsFolder>$(MSBuildThisFileDirectory)build\</BuildToolsFolder>
     <NuGet>&quot;$(BuildToolsFolder)nuget.exe&quot;</NuGet>
   </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)Key.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
+  </PropertyGroup>
 </Project>
