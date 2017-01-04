@@ -24,12 +24,12 @@ $PortableSourceProjectsToBuild = @(
 )
 
 $PortableSourceProjectsToPack = @(
-    "Microsoft.TemplateEngine.Utils",
     "Microsoft.TemplateEngine.Core.Contracts",
-    "Microsoft.TemplateEngine.Core",
-    "Microsoft.TemplateEngine.Edge",
     "Microsoft.TemplateEngine.Abstractions",
+    "Microsoft.TemplateEngine.Utils",
+    "Microsoft.TemplateEngine.Core",
     "Microsoft.TemplateEngine.Orchestrator.RunnableProjects",
+    "Microsoft.TemplateEngine.Edge",
     "Microsoft.TemplateEngine.Cli"
  )
 
@@ -118,26 +118,13 @@ $NoTimestampPackageVersion=$env:PACKAGE_VERSION + "-" + $env:BUILD_QUALITY
 
 $TimestampPackageVersion=$NoTimestampPackageVersion + "-" + [System.DateTime]::Now.ToString("yyyyMMdd") + "-" + $env:BUILD_NUMBER
 
-# Build top level projects
-foreach ($ProjectName in $PortableSourceProjectsToBuild) {
-    Write-Host "Building $ProjectName..."
-
-    $ProjectFile = "$RepoRoot\src\$ProjectName\$ProjectName.csproj"
-
-    & dotnet build "$ProjectFile" --configuration "$env:CONFIGURATION" /p:PackageVersion="$TimestampPackageVersion"
-    if (!$?) {
-        Write-Host "dotnet pack failed for: $ProjectFile"
-        Exit 1
-    }
-}
-
 # Build timestamp packages if a build number was set in the environment
 foreach ($ProjectName in $PortableSourceProjectsToPack) {
     Write-Host "Packing (timestamp) $ProjectName..."
 
     $ProjectFile = "$RepoRoot\src\$ProjectName\$ProjectName.csproj"
 
-    & dotnet pack "$ProjectFile" --output "$PackagesDir" --configuration "$env:CONFIGURATION" /p:PackageVersion="$TimestampPackageVersion" --no-build
+    & dotnet pack "$ProjectFile" --output "$PackagesDir" --configuration "$env:CONFIGURATION" /p:PackageVersion="$TimestampPackageVersion"
     if (!$?) {
         Write-Host "dotnet pack failed for: $ProjectFile"
         Exit 1
