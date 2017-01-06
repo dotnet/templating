@@ -18,16 +18,22 @@ if($Help)
     exit 0
 }
 
-$ProjectsToPack = @(
-    "Microsoft.TemplateEngine.Utils",
+$PortableSourceProjectsToBuild = @(
+    "Microsoft.TemplateEngine.Orchestrator.RunnableProjects",
+    "Microsoft.TemplateEngine.Cli"
+)
+
+$PortableSourceProjectsToPack = @(
     "Microsoft.TemplateEngine.Core.Contracts",
-    "Microsoft.TemplateEngine.Core",
-    "Microsoft.TemplateEngine.Edge",
     "Microsoft.TemplateEngine.Abstractions",
-    "Microsoft.TemplateEngine.Orchestrator.RunnableProjects"
+    "Microsoft.TemplateEngine.Utils",
+    "Microsoft.TemplateEngine.Core",
+    "Microsoft.TemplateEngine.Orchestrator.RunnableProjects",
+    "Microsoft.TemplateEngine.Edge",
+    "Microsoft.TemplateEngine.Cli"
  )
 
- $TestProjectsToPack = @(
+ $PortableTestProjectsToPack = @(
     "Microsoft.TemplateEngine.Mocks"
  )
 
@@ -81,10 +87,10 @@ $env:PATH = "$env:DOTNET_INSTALL_DIR;$env:PATH"
 # New Restore
 
 Write-Host "Restoring all projects..."
-foreach ($ProjectName in $ProjectsToPack) {
+foreach ($ProjectName in $PortableSourceProjectsToPack) {
     $ProjectFile = "$RepoRoot\src\$ProjectName\$ProjectName.csproj"
 
-	& dotnet restore "$ProjectFile"
+	& dotnet restore "$ProjectFile" --no-dependencies
 	if (!$?) {
 		Write-Host "dotnet restore failed for: $ProjectFile"
 		Exit 1
@@ -113,24 +119,12 @@ $NoTimestampPackageVersion=$env:PACKAGE_VERSION + "-" + $env:BUILD_QUALITY
 $TimestampPackageVersion=$NoTimestampPackageVersion + "-" + [System.DateTime]::Now.ToString("yyyyMMdd") + "-" + $env:BUILD_NUMBER
 
 # Build timestamp packages if a build number was set in the environment
-foreach ($ProjectName in $ProjectsToPack) {
+foreach ($ProjectName in $PortableSourceProjectsToPack) {
     Write-Host "Packing (timestamp) $ProjectName..."
 
     $ProjectFile = "$RepoRoot\src\$ProjectName\$ProjectName.csproj"
 
     & dotnet pack "$ProjectFile" --output "$PackagesDir" --configuration "$env:CONFIGURATION" /p:PackageVersion="$TimestampPackageVersion"
-    if (!$?) {
-        Write-Host "dotnet pack failed for: $ProjectFile"
-        Exit 1
-    }
-}
-
-foreach ($ProjectName in $ProjectsToPack) {
-    Write-Host "Packing (no-timestamp) $ProjectName..."
-
-    $ProjectFile = "$RepoRoot\src\$ProjectName\$ProjectName.csproj"
-
-    & dotnet pack "$ProjectFile" --output "$PackagesNoTimeStampDir" --configuration "$env:CONFIGURATION"  /p:PackageVersion="$NoTimestampPackageVersion"
     if (!$?) {
         Write-Host "dotnet pack failed for: $ProjectFile"
         Exit 1
@@ -165,20 +159,13 @@ if ($LastExitCode -ne 0)
     exit $LastExitCode
 }
 
-#Write-Host "Packaging templates (no timestamp)..."
-#& dotnet msbuild "$RepoRoot\template_feed\Template.proj" /p:PackOutput="$TemplatesNoTimeStampDir" /p:PackageVersion="$NoTimestampPackageVersion"
-#if ($LastExitCode -ne 0)
-#{
-#    exit $LastExitCode
-#}
-
 #Write-Host "Packing mocks..."
-foreach ($ProjectName in $TestProjectsToPack) {
+foreach ($ProjectName in $PortableTestProjectsToPack) {
     Write-Host "Packing (timestamp) $ProjectName..."
 
     $ProjectFile = "$RepoRoot\test\$ProjectName\$ProjectName.csproj"
 
-    & dotnet restore "$ProjectFile" --source "$ArtifactsDir" /p:PackageVersion="$TimestampPackageVersion"
+    & dotnet restore "$ProjectFile" --source "$ArtifactsDir" --no-dependencies /p:PackageVersion="$TimestampPackageVersion"
     & dotnet pack "$ProjectFile" --output "$PackagesDir" --configuration "$env:CONFIGURATION" /p:PackageVersion="$TimestampPackageVersion"
     if (!$?) {
         Write-Host "dotnet pack failed for: $ProjectFile"
@@ -186,25 +173,11 @@ foreach ($ProjectName in $TestProjectsToPack) {
     }
 }
 
-#Write-Host "Packing mocks..."
-#foreach ($ProjectName in $TestProjectsToPack) {
-#    Write-Host "Packing (no timestamp) $ProjectName..."
-
-#    $ProjectFile = "$RepoRoot\test\$ProjectName\$ProjectName.csproj"
-
-#    & dotnet restore "$ProjectFile" /p:PackageVersion="$NoTimestampPackageVersion"
-#    & dotnet pack "$ProjectFile" --output "$PackagesNoTimeStampDir" --configuration "$env:CONFIGURATION" /p:PackageVersion="$TimestampPackageVersion"
-#    if (!$?) {
-#        Write-Host "dotnet pack failed for: $ProjectFile"
-#        Exit 1
-#    }
-#}
-
 #Write-Host "Restoring all test projects..."
 foreach ($ProjectName in $TestProjects) {
     $ProjectFile = "$RepoRoot\test\$ProjectName\$ProjectName.csproj"
 
-    & dotnet restore "$ProjectFile"
+    & dotnet restore "$ProjectFile" --no-dependencies
     if (!$?) {
         Write-Host "dotnet restore failed for: $ProjectFile"
         Exit 1
