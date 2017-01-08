@@ -39,7 +39,7 @@ $PortableSourceProjectsToPack = @(
 
 $TestProjects = @(
     "Microsoft.TemplateEngine.TestHelper",
-#	"Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests",
+    "Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests",
     "Microsoft.TemplateEngine.Core.UnitTests",
     "Microsoft.TemplateEngine.Utils.UnitTests",
     "dotnet-new3.UnitTests"
