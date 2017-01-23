@@ -3,7 +3,8 @@
     <PackageReleaseVersion>1.0.0</PackageReleaseVersion>
     <PackageBuildQuality Condition=" '$(PackageBuildQuality)' == '' ">beta1</PackageBuildQuality>
     <PackageVersion>$(PackageReleaseVersion)-$(PackageBuildQuality)</PackageVersion>
-    <PackageVersion Condition=" '$(CreateTimestampPackages)' == 'true' AND '$(BUILD_NUMBER)' != '' ">$(PackageVersion)-$([System.DateTime]::Now.ToString("yyyyMMdd"))-$(BUILD_NUMBER)</PackageVersion>
+    <BUILD_NUMBER Condition="'$(BUILD_NUMBER)' == ''">0</BUILD_NUMBER>
+    <PackageVersion Condition="'$(NO_TIMESTAMP)' != 'true'">$(PackageVersion)-$([System.DateTime]::Now.ToString("yyyyMMdd"))-$(BUILD_NUMBER)</PackageVersion>
   </PropertyGroup>
   <PropertyGroup>
     <Authors>Microsoft</Authors>
