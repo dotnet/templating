@@ -5,6 +5,7 @@ root = true
 
 # Newline ending every file
 [*]
+end_of_line = crlf
 indent_style = space
 indent_size = 4
 tab_width = 4
