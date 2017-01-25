@@ -861,11 +861,11 @@ namespace Microsoft.TemplateEngine.Cli
 
             if (contextProblemMatches.Keys.Count + remainingPartialMatches.Keys.Count > 1)
             {
-                Reporter.Error.WriteLine($"Unable to determine the desired template from the input template name: [{_templateName.Value}]");
+                Reporter.Error.WriteLine(string.Format(LocalizableStrings.AmbiguousInputTemplateName, _templateName.Value));
             }
             else if (contextProblemMatches.Keys.Count + remainingPartialMatches.Keys.Count == 0)
             {
-                Reporter.Error.WriteLine($"No templates matched the input template name: [{_templateName.Value}]");
+                Reporter.Error.WriteLine(string.Format(LocalizableStrings.NoTemplatesMatchName, _templateName.Value));
                 Reporter.Error.WriteLine();
                 return;
             }
@@ -876,23 +876,26 @@ namespace Microsoft.TemplateEngine.Cli
                 {
                     if (string.Equals(type, "item"))
                     {
-                        Reporter.Error.WriteLine($"\t- [{template.Info.Name}] is an item template. By default it's only created in a target location containing a project. Force creation with the -all flag.");
+                        Reporter.Error.WriteLine("\t- " + string.Format(LocalizableStrings.ItemTemplateNotInProjectContext, template.Info.Name));
                     }
                     else
                     {   // project template
-                        Reporter.Error.WriteLine($"\t- [{template.Info.Name}] is a project template. By default it's not created in a target location containing a project. Force creation with the -all flag.");
+                        Reporter.Error.WriteLine("\t- " + string.Format(LocalizableStrings.ProjectTemplateInProjectContext, template.Info.Name));
                     }
                 }
                 else
                 {   // this really shouldn't ever happen. But better to have a generic error than quietly ignore the partial match.
-                    Reporter.Error.WriteLine($"\t- [{template.Info.Name}] cannot be created in the target location.");
+                    Reporter.Error.WriteLine("\t- " + string.Format(LocalizableStrings.GenericPlaceholderTemplateContextError, template.Info.Name));
                 }
             }
 
-            Reporter.Error.WriteLine("The following templates partially match the input. Please be more specific with the template name and/or language.");
-            foreach (IFilteredTemplateInfo template in remainingPartialMatches.Values)
+            if (remainingPartialMatches.Keys.Count > 0)
             {
-                Reporter.Error.WriteLine($"\t{template.Info.Name}");
+                Reporter.Error.WriteLine(LocalizableStrings.TemplateMultiplePartialNameMatches);
+                foreach (IFilteredTemplateInfo template in remainingPartialMatches.Values)
+                {
+                    Reporter.Error.WriteLine($"\t{template.Info.Name}");
+                }
             }
 
             Reporter.Error.WriteLine();
