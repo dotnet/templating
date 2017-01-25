@@ -131,7 +131,7 @@ namespace Microsoft.TemplateEngine.Cli
 
         public const string ItemTemplateNotInProjectContext = "[{0}] is an item template. By default it's only created in a target location containing a project. Force creation with the -all flag.";
 
-        public const string ProjectTemplateInProjectContext = "[{0}]  is a project template. By default it's not created in a target location containing a project. Force creation with the -all flag.";
+        public const string ProjectTemplateInProjectContext = "[{0}] is a project template. By default it's not created in a target location containing a project. Force creation with the -all flag.";
 
         public const string GenericPlaceholderTemplateContextError = "[{0}] cannot be created in the target location.";
 
