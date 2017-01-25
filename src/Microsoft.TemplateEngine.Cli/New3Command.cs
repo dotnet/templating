@@ -272,6 +272,14 @@ namespace Microsoft.TemplateEngine.Cli
 
         private Task<int> EnterAmbiguousTemplateManipulationFlowAsync()
         {
+            if (!string.IsNullOrEmpty(_templateName.Value))
+            {
+                ShowTemplateNameMismatchHelp();
+                ShowUsageHelp();
+                DisplayTemplateList();
+                return Task.FromResult(-1);
+            }
+
             if (!ValidateRemainingParameters())
             {
                 ShowUsageHelp();
@@ -826,6 +834,72 @@ namespace Microsoft.TemplateEngine.Cli
             }
 
             ParameterHelp(allParams, additionalInfo, _hostSpecificTemplateData.HiddenParameterNames);
+        }
+
+        private void ShowTemplateNameMismatchHelp()
+        {
+            if (_matchedTemplates.Count == 0)
+            {
+                Reporter.Error.WriteLine("No installed template's names were similiar enough.");
+                return;
+            }
+
+            IDictionary<string, IFilteredTemplateInfo> contextProblemMatches = new Dictionary<string, IFilteredTemplateInfo>();
+            IDictionary<string, IFilteredTemplateInfo> remainingPartialMatches = new Dictionary<string, IFilteredTemplateInfo>();
+
+            // this filtering / grouping ignores language differences.
+            foreach (IFilteredTemplateInfo template in _matchedTemplates)
+            {
+                if (contextProblemMatches.ContainsKey(template.Info.Name) || remainingPartialMatches.ContainsKey(template.Info.Name))
+                {
+                    continue;
+                }
+
+                if (template.MatchDisposition.Any(x => x.Location == MatchLocation.Context && x.Kind != MatchKind.Exact))
+                {
+                    contextProblemMatches.Add(template.Info.Name, template);
+                }
+                else if(template.MatchDisposition.Any(t => t.Location != MatchLocation.Context && t.Kind != MatchKind.Mismatch && t.Kind != MatchKind.Unspecified))
+                {
+                    remainingPartialMatches.Add(template.Info.Name, template);
+                }
+            }
+
+            if (contextProblemMatches.Keys.Count + remainingPartialMatches.Keys.Count > 1)
+            {
+                Reporter.Error.WriteLine($"Unable to determine the desired template from the input template name: [{_templateName}]");
+            }
+            else if (contextProblemMatches.Keys.Count + remainingPartialMatches.Keys.Count == 0)
+            {
+                Reporter.Error.WriteLine($"No templates matched the input template name: [{_templateName}]");
+                return;
+            }
+
+            foreach (IFilteredTemplateInfo template in contextProblemMatches.Values)
+            {
+                if (template.Info.Tags != null && template.Info.Tags.TryGetValue("type", out string type))
+                {
+                    if (string.Equals(type, "item"))
+                    {
+                        Reporter.Error.WriteLine($"\t- [{template.Info.Name}] is an item template. By default it's only created in a target location containing a project. Force creation with the -all flag.");
+                    }
+                    else
+                    {   // project template
+                        Reporter.Error.WriteLine($"\t- [{template.Info.Name}] is a project template. By default it's not created in a target location containing a project. Force creation with the -all flag.");
+                    }
+                }
+                else
+                {   // this really shouldn't ever happen. But better to have a generic error than quietly ignore the partial match.
+                    Reporter.Error.WriteLine($"\t- [{template.Info.Name}] cannot be created in the target location.");
+                }
+            }
+
+            foreach (IFilteredTemplateInfo template in remainingPartialMatches.Values)
+            {
+                Reporter.Error.WriteLine($"\t- [{template.Info.Name}] partially matches the input. Please be more specific with the template name and/or language.");
+            }
+
+            Reporter.Error.WriteLine();
         }
 
         private void ShowUsageHelp()
