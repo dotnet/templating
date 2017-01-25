@@ -838,12 +838,6 @@ namespace Microsoft.TemplateEngine.Cli
 
         private void ShowTemplateNameMismatchHelp()
         {
-            if (_matchedTemplates.Count == 0)
-            {
-                Reporter.Error.WriteLine("No installed template's names were similiar enough.");
-                return;
-            }
-
             IDictionary<string, IFilteredTemplateInfo> contextProblemMatches = new Dictionary<string, IFilteredTemplateInfo>();
             IDictionary<string, IFilteredTemplateInfo> remainingPartialMatches = new Dictionary<string, IFilteredTemplateInfo>();
 
@@ -867,11 +861,12 @@ namespace Microsoft.TemplateEngine.Cli
 
             if (contextProblemMatches.Keys.Count + remainingPartialMatches.Keys.Count > 1)
             {
-                Reporter.Error.WriteLine($"Unable to determine the desired template from the input template name: [{_templateName}]");
+                Reporter.Error.WriteLine($"Unable to determine the desired template from the input template name: [{_templateName.Value}]");
             }
             else if (contextProblemMatches.Keys.Count + remainingPartialMatches.Keys.Count == 0)
             {
-                Reporter.Error.WriteLine($"No templates matched the input template name: [{_templateName}]");
+                Reporter.Error.WriteLine($"No templates matched the input template name: [{_templateName.Value}]");
+                Reporter.Error.WriteLine();
                 return;
             }
 
@@ -894,9 +889,10 @@ namespace Microsoft.TemplateEngine.Cli
                 }
             }
 
+            Reporter.Error.WriteLine("The following templates partially match the input. Please be more specific with the template name and/or language.");
             foreach (IFilteredTemplateInfo template in remainingPartialMatches.Values)
             {
-                Reporter.Error.WriteLine($"\t- [{template.Info.Name}] partially matches the input. Please be more specific with the template name and/or language.");
+                Reporter.Error.WriteLine($"\t{template.Info.Name}");
             }
 
             Reporter.Error.WriteLine();
