@@ -68,11 +68,19 @@ namespace Microsoft.TemplateEngine.Cli
             proj.WriteAllText(content);
 
             Paths.User.Packages.CreateDirectory();
-            string restored = Path.Combine(Paths.User.ScratchDir, "Packages");
-            CommandResult commandResult = Command.CreateDotNet("restore", new[] { proj, "--packages", restored }).ForwardStdErr().Execute();
+            string nugetPackagesEnvVar = Environment.GetEnvironmentVariable("NUGET_PACKAGES");
+            // Nuget gives precedence to the --packages flag, over the NUGET_PACKAGES environment variable.
+            // But if NUGET_PACKAGES is set elsewhere, we want to use its value.
+            // Either way, we'll explicitly put the target dir on the command line args.
+            // Checking for the var was done for cli unit tests, which should be the only thing calling this which sets NUGET_PACKAGES.
+            // But if someone sets it on their own, they either:
+            // (a) really know what they're doing
+            // (b) are completely lost anyway.
+            string restoreToDirectory = nugetPackagesEnvVar ?? Path.Combine(Paths.User.ScratchDir, "Packages");
+            CommandResult commandResult = Command.CreateDotNet("restore", new[] { proj, "--packages", restoreToDirectory }).ForwardStdErr().Execute();
 
             List<string> newLocalPackages = new List<string>();
-            foreach (string packagePath in restored.EnumerateFiles("*.nupkg", SearchOption.AllDirectories))
+            foreach (string packagePath in restoreToDirectory.EnumerateFiles("*.nupkg", SearchOption.AllDirectories))
             {
                 string path = Path.Combine(Paths.User.Packages, Path.GetFileName(packagePath));
                 packagePath.Copy(path);
