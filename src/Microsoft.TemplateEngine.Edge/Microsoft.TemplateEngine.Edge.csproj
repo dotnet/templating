@@ -13,6 +13,7 @@
     <PackageReference Include="System.IO.Compression" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp1.0'">    
+    <PackageReference Update="Microsoft.NetCore.App" Version="1.0.3" />
     <PackageReference Include="System.Runtime.Loader" Version="4.0.0" />
   </ItemGroup>
 </Project>
