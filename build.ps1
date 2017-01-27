@@ -34,7 +34,6 @@ $PortableSourceProjectsToPack = @(
  )
 
  $PortableTestProjectsToPack = @(
-    "Microsoft.TemplateEngine.Mocks",
     "Microsoft.TemplateEngine.TestHelper"
  )
 
@@ -160,12 +159,21 @@ if ($LastExitCode -ne 0)
 }
 
 #Write-Host "Packing mocks..."
+Write-Host "Packing (timestamp) $ProjectName..."
+
+& dotnet restore "$RepoRoot\test\Microsoft.TemplateEngine.Mocks\Microsoft.TemplateEngine.Mocks.csproj" --source "$ArtifactsDir" --no-dependencies /p:PackageVersion="$TimestampPackageVersion"
+& dotnet pack "$RepoRoot\test\Microsoft.TemplateEngine.Mocks\Microsoft.TemplateEngine.Mocks.csproj" --output "$PackagesDir" --configuration "$env:CONFIGURATION" /p:PackageVersion="$TimestampPackageVersion"
+if (!$?) {
+    Write-Host "dotnet pack failed for: $ProjectFile"
+    Exit 1
+}
+
 foreach ($ProjectName in $PortableTestProjectsToPack) {
     Write-Host "Packing (timestamp) $ProjectName..."
 
     $ProjectFile = "$RepoRoot\test\$ProjectName\$ProjectName.csproj"
 
-    & dotnet restore "$ProjectFile" --source "$ArtifactsDir" --no-dependencies /p:PackageVersion="$TimestampPackageVersion"
+    & dotnet restore "$ProjectFile" --no-dependencies /p:PackageVersion="$TimestampPackageVersion"
     & dotnet pack "$ProjectFile" --output "$PackagesDir" --configuration "$env:CONFIGURATION" /p:PackageVersion="$TimestampPackageVersion"
     if (!$?) {
         Write-Host "dotnet pack failed for: $ProjectFile"
