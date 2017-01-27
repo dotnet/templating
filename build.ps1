@@ -34,11 +34,11 @@ $PortableSourceProjectsToPack = @(
  )
 
  $PortableTestProjectsToPack = @(
-    "Microsoft.TemplateEngine.Mocks"
+    "Microsoft.TemplateEngine.Mocks",
+    "Microsoft.TemplateEngine.TestHelper"
  )
 
 $TestProjects = @(
-    "Microsoft.TemplateEngine.TestHelper",
     "Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests",
     "Microsoft.TemplateEngine.Core.UnitTests",
     "Microsoft.TemplateEngine.Utils.UnitTests",
@@ -90,11 +90,11 @@ Write-Host "Restoring all projects..."
 foreach ($ProjectName in $PortableSourceProjectsToPack) {
     $ProjectFile = "$RepoRoot\src\$ProjectName\$ProjectName.csproj"
 
-	& dotnet restore "$ProjectFile" --no-dependencies
-	if (!$?) {
-		Write-Host "dotnet restore failed for: $ProjectFile"
-		Exit 1
-	}
+    & dotnet restore "$ProjectFile" --no-dependencies
+    if (!$?) {
+        Write-Host "dotnet restore failed for: $ProjectFile"
+        Exit 1
+    }
 }
 
 if (-not $env:BUILD_NUMBER)
