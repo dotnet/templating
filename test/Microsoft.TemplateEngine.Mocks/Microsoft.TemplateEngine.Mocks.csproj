@@ -10,4 +10,7 @@
     <PackageReference Include="Microsoft.TemplateEngine.Utils" Version="$(PackageVersion)" />
     <PackageReference Include="Microsoft.TemplateEngine.Orchestrator.RunnableProjects" Version="$(PackageVersion)" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="Microsoft.NetCore.App" Version="1.0.3" />
+  </ItemGroup>
 </Project>
