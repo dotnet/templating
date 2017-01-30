@@ -134,7 +134,7 @@ $x = PWD
 # Restore
 Write-Host "Restoring dotnet new3..."
 cd "$RepoRoot\src\dotnet-new3"
-& dotnet msbuild /t:Restore "/p:RuntimeIdentifier=win7-x86;TargetFramework=netcoreapp1.0;RestoreRecursive=False;PackageVersion=$TimestampPackageVersion"
+& dotnet msbuild /t:Restore "/p:RuntimeIdentifier=win7-x86;TargetFramework=netcoreapp1.1;RestoreRecursive=False;PackageVersion=$TimestampPackageVersion"
 if ($LastExitCode -ne 0)
 {
     exit $LastExitCode
@@ -142,14 +142,14 @@ if ($LastExitCode -ne 0)
 cd $x
 
 Write-Host "Publishing dotnet-new3..."
-& dotnet publish "$RepoRoot\src\dotnet-new3\dotnet-new3.csproj" -c $Configuration -r $Runtime -f netcoreapp1.0 -o "$DevDir" -p:PackageVersion="$TimestampPackageVersion"
+& dotnet publish "$RepoRoot\src\dotnet-new3\dotnet-new3.csproj" -c $Configuration -r $Runtime -f netcoreapp1.1 -o "$DevDir" -p:PackageVersion="$TimestampPackageVersion"
 if ($LastExitCode -ne 0)
 {
     exit $LastExitCode
 }
 
 Write-Host "Cleaning up after publish..."
-rm "$RepoRoot\src\dotnet-new3\bin\$Configuration\netcoreapp1.0\*.*" -Force
+rm "$RepoRoot\src\dotnet-new3\bin\$Configuration\netcoreapp1.1\*.*" -Force
 
 Write-Host "Packaging templates (timestamp)..."
 & dotnet msbuild "$RepoRoot\template_feed\Template.proj" /p:PackageVersion="$TimestampPackageVersion"
