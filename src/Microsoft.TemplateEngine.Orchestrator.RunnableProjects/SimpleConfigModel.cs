@@ -305,6 +305,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                         new SpecialOperationConfigParams("**/*.less", "/*", "C++", ConditionalType.CBlockComments),
                         new SpecialOperationConfigParams("**/*.sass", "/*", "C++", ConditionalType.CBlockComments),
                         new SpecialOperationConfigParams("**/*.cshtml", "@*", "C++", ConditionalType.Razor),
+                        //For VB, we probably need some new syntax handling, VB directives MSDN page https://msdn.microsoft.com/en-us/library/tx6yas69.aspx
+                        //new SpecialOperationConfigParams("**/*.vb", "//", "C++", ConditionalType.CNoComments),
+                        //new SpecialOperationConfigParams("**/*.vbhtml", "@*", "C++", ConditionalType.Razor),
                         new SpecialOperationConfigParams("**/*.cs", "//", "C++", ConditionalType.CNoComments),
                         new SpecialOperationConfigParams("**/*.fs", "//", "C++", ConditionalType.CNoComments),
                         new SpecialOperationConfigParams("**/*.c", "//", "C++", ConditionalType.CNoComments),
@@ -314,6 +317,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                         new SpecialOperationConfigParams("**/*.hxx", "//", "C++", ConditionalType.CNoComments),
                         new SpecialOperationConfigParams("**/*.hpp", "//", "C++", ConditionalType.CNoComments),
                         new SpecialOperationConfigParams("**/*.*proj", "<!--/", "MSBUILD", ConditionalType.MSBuild),
+                        new SpecialOperationConfigParams("**/*.msbuild", "<!--/", "MSBUILD", ConditionalType.MSBuild),
+                        new SpecialOperationConfigParams("**/*.props", "<!--/", "MSBUILD", ConditionalType.MSBuild),
+                        new SpecialOperationConfigParams("**/*.targets", "<!--/", "MSBUILD", ConditionalType.MSBuild),
                         new SpecialOperationConfigParams("**/*.handlebars", "<!--", "C++", ConditionalType.Xml),
                         new SpecialOperationConfigParams("**/*.hbs", "<!--", "C++", ConditionalType.Xml),
                         new SpecialOperationConfigParams("**/*.*htm", "<!--", "C++", ConditionalType.Xml),
@@ -321,6 +327,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                         new SpecialOperationConfigParams("**/*.vue", "<!--", "C++", ConditionalType.Xml),
                         new SpecialOperationConfigParams("**/web.*.config", "<!--", "C++", ConditionalType.Xml),
                         new SpecialOperationConfigParams("**/packages.config", "<!--", "C++", ConditionalType.Xml),
+                        new SpecialOperationConfigParams("**/*.nuspec", "<!--", "C++", ConditionalType.Xml),
                         new SpecialOperationConfigParams("**/*.xml", "<!--", "C++", ConditionalType.Xml),
                         new SpecialOperationConfigParams("**/*.xaml", "<!--", "C++", ConditionalType.Xml),
                         new SpecialOperationConfigParams("**/*.resx", "<!--", "C++", ConditionalType.Xml),
@@ -330,7 +337,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                         new SpecialOperationConfigParams("**/*.bat", "rem --:", "C++", ConditionalType.RemLineComment),
                         new SpecialOperationConfigParams("**/*.cmd", "rem --:", "C++", ConditionalType.RemLineComment),
                         new SpecialOperationConfigParams("**/nginx.conf", "#--", "C++", ConditionalType.HashSignLineComment),
-                        new SpecialOperationConfigParams("**/robots.txt", "#--", "C++", ConditionalType.HashSignLineComment)
+                        new SpecialOperationConfigParams("**/robots.txt", "#--", "C++", ConditionalType.HashSignLineComment),
+                        new SpecialOperationConfigParams("**/*.sln", "#", "C++", ConditionalType.HashSignLineComment),
+                        new SpecialOperationConfigParams("**/.gitignore", "#", "C++", ConditionalType.HashSignLineComment),
+                        new SpecialOperationConfigParams("**/*.sh", "#", "C++", ConditionalType.HashSignLineComment),
+                        new SpecialOperationConfigParams("**/*.haml", "-#", "C++", ConditionalType.HashSignLineComment)
                     };
                     List<KeyValuePair<string, IGlobalRunConfig>> specialOperationConfig = new List<KeyValuePair<string, IGlobalRunConfig>>();
 
