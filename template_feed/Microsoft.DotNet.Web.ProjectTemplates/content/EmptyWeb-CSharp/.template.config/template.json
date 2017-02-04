@@ -4,7 +4,7 @@
   "name": "Empty ASP.NET Core Web Application",
   "groupIdentity": "Microsoft.Web.Empty",
   "identity": "Microsoft.Web.Empty.CSharp",
-  "shortName": "web",
+  "shortName": "emptyweb",
   "tags": {
     "language": "C#",
     "type": "project"
