@@ -109,7 +109,7 @@ namespace Microsoft.TemplateEngine.Cli
 
         public const string Assembly = "Assembly";
 
-        public const string TemplateType = "The type of template to create.";
+        public const string TemplateType = "The type of template to create. This switch takes precedence over the \"template\" argument.";
 
         public const string Type = "Type";
 
