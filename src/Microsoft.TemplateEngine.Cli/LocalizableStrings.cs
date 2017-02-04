@@ -7,7 +7,7 @@ namespace Microsoft.TemplateEngine.Cli
     {
         public const string ShowsAllTemplates = "Shows all templates";
 
-        public const string DisplaysHelp = "Displays help for this command.";
+        public const string DisplaysHelp = "Displays help for this command";
 
         public const string ParameterNamePrefixError = "Parameter names must start with -- or -";
 
@@ -25,29 +25,29 @@ namespace Microsoft.TemplateEngine.Cli
 
         public const string OptionVariantAlreadyDefined = "Option variant {0} for canonical {1} was already defined for canonical {2}";
 
-        public const string ListsTemplates = "List templates containing the specified name.";
+        public const string ListsTemplates = "List templates containing the specified name";
 
-        public const string NameOfOutput = "The name for the output being created. If no name is specified, the name of the current directory is used.";
+        public const string NameOfOutput = "The name for the output being created. If no name is specified, the name of the current directory is used";
 
-        public const string OutputPath = "Location to place the generated output.";
+        public const string OutputPath = "Location to place the generated output";
 
-        public const string CreateDirectoryHelp = "Indicates whether to create a directory for the generated content.";
+        public const string CreateDirectoryHelp = "Indicates whether to create a directory for the generated content";
 
-        public const string CreateAliasHelp = "Creates an alias for the specified template.";
+        public const string CreateAliasHelp = "Creates an alias for the specified template";
 
-        public const string ExtraArgsFileHelp = "Specifies a file containing additional parameters.";
+        public const string ExtraArgsFileHelp = "Specifies a file containing additional parameters";
 
         public const string LocaleHelp = "The locale to use";
 
-        public const string QuietModeHelp = "Doesn't output any status information.";
+        public const string QuietModeHelp = "Doesn't output any status information";
 
-        public const string InstallHelp = "Installs a source or a template pack.";
+        public const string InstallHelp = "Installs a source or a template pack";
 
-        public const string UpdateHelp = "Update matching templates.";
+        public const string UpdateHelp = "Update matching templates";
 
-        public const string CommandDescription = "Template Instantiation Commands for .NET Core CLI.";
+        public const string CommandDescription = "Template Instantiation Commands for .NET Core CLI";
 
-        public const string TemplateArgumentHelp = "The template to instantiate.";
+        public const string TemplateArgumentHelp = "The template to instantiate";
 
         public const string BadLocaleError = "Invalid format for input locale: \"{0}\". Example valid formats: [en] [en-US]";
 
@@ -108,6 +108,8 @@ namespace Microsoft.TemplateEngine.Cli
         public const string Parent = "Parent";
 
         public const string Assembly = "Assembly";
+
+        public const string TemplateType = "The type of template to create";
 
         public const string Type = "Type";
 
