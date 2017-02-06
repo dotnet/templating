@@ -25,7 +25,7 @@ namespace Microsoft.TemplateEngine.Cli
 
         public const string OptionVariantAlreadyDefined = "Option variant {0} for canonical {1} was already defined for canonical {2}";
 
-        public const string ListsTemplates = "Lists templates containing the specified argument. If no argument is specified, lists all templates.";
+        public const string ListsTemplates = "Lists templates containing the specified name. If no name is specified, lists all templates.";
 
         public const string NameOfOutput = "The name for the output being created. If no name is specified, the name of the current directory is used.";
 
