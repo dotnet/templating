@@ -1,8 +1,8 @@
 <Project Sdk="FSharp.NET.Sdk;Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework Condition="'$(Framework)' != 'netcoreapp1.1'">netcoreapp1.0</TargetFramework>
-    <TargetFramework Condition="'$(Framework)' == 'netcoreapp1.1'">netcoreapp1.1</TargetFramework>
+    <TargetFramework>netcoreapp1.0</TargetFramework>
+    <RuntimeFrameworkVersion Condition="'$(RuntimeFrameworkVersion)' != ''">2.0.0-beta-001507</RuntimeFrameworkVersion>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
 
@@ -14,7 +14,7 @@
     <None Remove="**/*.fs" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(Framework)' != 'netcoreapp1.1'">
+  <ItemGroup Condition="'$(Framework)' == 'netcoreapp1.0'">
     <PackageReference Include="FSharp.NET.Sdk" Version="1.0.0-beta-*" PrivateAssets="All" />
     <PackageReference Include="Microsoft.AspNetCore" Version="1.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="1.0.2" />
@@ -29,6 +29,14 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="1.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="1.1.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="1.1.0" />
+    <PackageReference Include="Microsoft.FSharp.Core.netcore" Version="1.0.0-alpha-161023" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Framework)' == 'netcoreapp2.0'">
+    <PackageReference Include="FSharp.NET.Sdk" Version="1.0.0-beta-*" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="1.2.0-preview1-23339" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="1.2.0-preview1-23339" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="1.2.0-preview1-23339" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="1.2.0-preview1-23339" />
     <PackageReference Include="Microsoft.FSharp.Core.netcore" Version="1.0.0-alpha-161023" />
   </ItemGroup>
 

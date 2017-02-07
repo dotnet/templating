@@ -9,6 +9,16 @@
     "language": "C#",
     "type": "project"
   },
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "condition": "(!IsNetStandard2)",
+          "exclude": [ "NuGet.config" ]
+        }
+      ]
+    }
+  ],
   "sourceName": "Company.ClassLibrary1",
   "preferNameDirectory": true,
   "symbols": {
@@ -16,6 +26,12 @@
       "type": "bind",
       "binding": "dotnet-cli-version",
       "replaces": "1.0.0-preview5-004445"
+    },
+    "RuntimeFrameworkVersion": {
+      "type": "parameter",
+      "replaces": "2.0.0-beta-001507",
+      "datatype": "string",
+      "defaultValue": ""
     },
     "Framework": {
       "type": "parameter",
@@ -29,6 +45,10 @@
         {
           "choice": "netcoreapp1.1",
           "description": "Target netcoreapp1.1"
+        },
+        {
+          "choice": "netcoreapp2.0",
+          "description": "Target netcoreapp2.0"
         },
         {
           "choice": "netstandard1.0",
@@ -57,9 +77,17 @@
         {
           "choice": "netstandard1.6",
           "description": "Target netstandard1.6"
+        },
+        {
+          "choice": "netstandard2.0",
+          "description": "Target netstandard2.0"
         }
       ],
       "defaultValue": "netstandard1.4"
+    },
+    "IsNetStandard2": {
+      "type": "computed",
+      "value": "(Framework == 'netcoreapp2.0' || Framework == 'netstandard2.0')"
     }
   }
 }

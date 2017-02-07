@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.6</TargetFramework>
+    <RuntimeFrameworkVersion Condition="'$(RuntimeFrameworkVersion)' != ''">2.0.0-beta-001507</RuntimeFrameworkVersion>
     <Version>1.0.0-alpha</Version>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>

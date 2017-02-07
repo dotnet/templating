@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.4</TargetFramework>
+    <RuntimeFrameworkVersion Condition="'$(RuntimeFrameworkVersion)' != ''">2.0.0-beta-001507</RuntimeFrameworkVersion>
   </PropertyGroup>
 
 </Project>
