@@ -28,7 +28,7 @@ namespace Microsoft.TemplateEngine.Cli
         private ExtendedCommandParser _app;
         private HostSpecificTemplateData _hostSpecificTemplateData;
         private IReadOnlyList<IFilteredTemplateInfo> _matchedTemplates;
-        private CommandArgument _templateName;
+        private CommandArgument _templateNameArgument;
         private ITemplateInfo _unambiguousTemplateToUse;
         private readonly TemplateCreator _templateCreator;
         private readonly TemplateCache _templateCache;
@@ -44,7 +44,7 @@ namespace Microsoft.TemplateEngine.Cli
         private bool _forceAmbiguousFlow;
         private readonly Action<IEngineEnvironmentSettings, IInstaller> _onFirstRun;
 
-        public New3Command(string commandName, ITemplateEngineHost host, Action<IEngineEnvironmentSettings, IInstaller> onFirstRun, ExtendedCommandParser app, CommandArgument templateNames)
+        public New3Command(string commandName, ITemplateEngineHost host, Action<IEngineEnvironmentSettings, IInstaller> onFirstRun, ExtendedCommandParser app, CommandArgument templateName)
         {
             host = new ExtendedTemplateEngineHost(host, this);
             EnvironmentSettings = new EngineEnvironmentSettings(host, x => new SettingsLoader(x));
@@ -55,7 +55,7 @@ namespace Microsoft.TemplateEngine.Cli
             CommandName = commandName;
             _paths = new Paths(EnvironmentSettings);
             _app = app;
-            _templateName = templateNames;
+            _templateNameArgument = templateName;
             _onFirstRun = onFirstRun;
         }
 
@@ -90,6 +90,13 @@ namespace Microsoft.TemplateEngine.Cli
         public string Name => _app.InternalParamValue("--name");
 
         public string OutputPath => _app.InternalParamValue("--output");
+
+        public string TemplateType => _app.InternalParamValue("--type");
+
+        public string TemplateName
+        {
+            get { return string.IsNullOrEmpty(TemplateType) ? _templateNameArgument.Value : TemplateType; }
+        }
 
         public bool SkipUpdateCheck => _app.InternalParamHasValue("--skip-update-check");
 
@@ -204,7 +211,7 @@ namespace Microsoft.TemplateEngine.Cli
         {
             string fallbackName = new DirectoryInfo(OutputPath ?? Directory.GetCurrentDirectory()).Name;
             TemplateCreationResult instantiateResult = await _templateCreator.InstantiateAsync(template, Name, fallbackName, OutputPath, _app.AllTemplateParams, SkipUpdateCheck).ConfigureAwait(false);
-            string resultTemplateName = string.IsNullOrEmpty(instantiateResult.TemplateFullName) ? _templateName.Value : instantiateResult.TemplateFullName;
+            string resultTemplateName = string.IsNullOrEmpty(instantiateResult.TemplateFullName) ? TemplateName : instantiateResult.TemplateFullName;
 
             switch (instantiateResult.Status)
             {
@@ -282,7 +289,7 @@ namespace Microsoft.TemplateEngine.Cli
 
         private Task<int> EnterAmbiguousTemplateManipulationFlowAsync()
         {
-            if (!string.IsNullOrEmpty(_templateName.Value))
+            if (!string.IsNullOrEmpty(TemplateName))
             {
                 bool anyPartialMatchesDisplayed = ShowTemplateNameMismatchHelp();
                 ShowUsageHelp();
@@ -433,7 +440,7 @@ namespace Microsoft.TemplateEngine.Cli
             ConfigureLocale();
             Initialize();
 
-            if (string.IsNullOrWhiteSpace(_templateName.Value))
+            if (string.IsNullOrWhiteSpace(TemplateName))
             {
                 return await EnterMaintenanceFlowAsync().ConfigureAwait(false);
             }
@@ -673,9 +680,9 @@ namespace Microsoft.TemplateEngine.Cli
             IReadOnlyCollection<IFilteredTemplateInfo> templates = _templateCreator.List
             (
                 false,
-                WellKnownSearchFilters.AliasFilter(_templateName.Value),
-                WellKnownSearchFilters.NameFilter(_templateName.Value),
-                WellKnownSearchFilters.ClassificationsFilter(_templateName.Value),
+                WellKnownSearchFilters.AliasFilter(TemplateName),
+                WellKnownSearchFilters.NameFilter(TemplateName),
+                WellKnownSearchFilters.ClassificationsFilter(TemplateName),
                 WellKnownSearchFilters.LanguageFilter(Language),
                 WellKnownSearchFilters.ContextFilter(context)
             );
@@ -741,6 +748,7 @@ namespace Microsoft.TemplateEngine.Cli
             appExt.InternalOption("-lang|--language", "--language", LocalizableStrings.LanguageParameter, CommandOptionType.SingleValue);
             appExt.InternalOption("-n|--name", "--name", LocalizableStrings.NameOfOutput, CommandOptionType.SingleValue);
             appExt.InternalOption("-o|--output", "--output", LocalizableStrings.OutputPath, CommandOptionType.SingleValue);
+            appExt.InternalOption("-t|--type", "--type", LocalizableStrings.TemplateType, CommandOptionType.SingleValue);
             appExt.InternalOption("-h|--help", "--help", LocalizableStrings.DisplaysHelp, CommandOptionType.NoValue);
             appExt.InternalOption("-all|--show-all", "--show-all", LocalizableStrings.ShowsAllTemplates, CommandOptionType.NoValue);
 
@@ -893,11 +901,11 @@ namespace Microsoft.TemplateEngine.Cli
 
             if (contextProblemMatches.Keys.Count + remainingPartialMatches.Keys.Count > 1)
             {
-                Reporter.Error.WriteLine(string.Format(LocalizableStrings.AmbiguousInputTemplateName, _templateName.Value));
+                Reporter.Error.WriteLine(string.Format(LocalizableStrings.AmbiguousInputTemplateName, TemplateName));
             }
             else if (contextProblemMatches.Keys.Count + remainingPartialMatches.Keys.Count == 0)
             {
-                Reporter.Error.WriteLine(string.Format(LocalizableStrings.NoTemplatesMatchName, _templateName.Value));
+                Reporter.Error.WriteLine(string.Format(LocalizableStrings.NoTemplatesMatchName, TemplateName));
                 Reporter.Error.WriteLine();
                 return false;
             }

@@ -5,7 +5,7 @@ namespace Microsoft.TemplateEngine.Cli
 {
     internal class LocalizableStrings
     {
-        public const string ShowsAllTemplates = "Shows all templates";
+        public const string ShowsAllTemplates = "Shows all templates.";
 
         public const string DisplaysHelp = "Displays help for this command.";
 
@@ -37,7 +37,7 @@ namespace Microsoft.TemplateEngine.Cli
 
         public const string ExtraArgsFileHelp = "Specifies a file containing additional parameters.";
 
-        public const string LocaleHelp = "The locale to use";
+        public const string LocaleHelp = "The locale to use.";
 
         public const string QuietModeHelp = "Doesn't output any status information.";
 
@@ -91,7 +91,7 @@ namespace Microsoft.TemplateEngine.Cli
 
         public const string Language = "Language";
 
-        public const string LanguageParameter = "Specifies the language of the template to create";
+        public const string LanguageParameter = "Specifies the language of the template to create.";
 
         public const string CurrentConfiguration = "Current configuration:";
 
@@ -108,6 +108,8 @@ namespace Microsoft.TemplateEngine.Cli
         public const string Parent = "Parent";
 
         public const string Assembly = "Assembly";
+
+        public const string TemplateType = "The type of template to create. This switch takes precedence over the \"template\" argument.";
 
         public const string Type = "Type";
 

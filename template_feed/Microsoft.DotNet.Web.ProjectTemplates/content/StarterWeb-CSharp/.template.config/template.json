@@ -4,7 +4,7 @@
   "name": "MVC ASP.NET Core Web Application",
   "groupIdentity": "Microsoft.Web.Mvc",
   "identity": "Microsoft.Web.Mvc.CSharp",
-  "shortName": "mvc",
+  "shortName": "web",
   "tags": {
     "language": "C#",
     "type": "project"
