@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
-    <id>Microsoft.DotNet.Web.ProjectTemplates</id>
+    <id>Microsoft.DotNet.Web.ProjectTemplates.2.0</id>
     <version>$version$</version>
     <authors>Microsoft</authors>
     <description>ASP.NET Core Web Template Pack for Microsoft Template Engine</description>
