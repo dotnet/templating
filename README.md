@@ -1,7 +1,3 @@
-|Windows x64 |Mac OS X |Ubuntu 16.04 |
-|:------:|:------:|:------:|
-|[![](https://ci.dot.net/job/dotnet_templating/job/master/job/debug_windows_nt_prtest/badge/icon)](https://ci.dot.net/job/dotnet_templating/job/master/job/debug_windows_nt_prtest/) |[![Build Status](https://ci.dot.net/job/dotnet_templating/job/master/job/x64_osx_prtest/badge/icon)](https://ci.dot.net/job/dotnet_templating/job/master/job/x64_osx_prtest/) |[![Build Status](https://ci.dot.net/job/dotnet_templating/job/master/job/x64_ubuntu16.04_prtest/badge/icon)](https://ci.dot.net/job/dotnet_templating/job/master/job/x64_ubuntu16.04_prtest/) |
-
 # Overview
 
 This repository is the home for the .NET Core Template Engine. It contains the brains for `dotnet new`. 
@@ -38,11 +34,10 @@ Options:
 ```
 
 Let's create a new project named "MyAwesomeProject" in the "src/MyProject" directory. This project should be an ASP.NET MVC project with Individual Auth. To create that template
-execute `dotnet new mvc MyAwesomeProject -o src/MyProject -au Individual`. Let's try that now, the result is below.
+execute `dotnet new mvc -n MyAwesomeProject -o src/MyProject -au Individual`. Let's try that now, the result is below.
 
 ```bash
-$ dotnet new mvc MyAwesomeProject -o src/MyProject -au Individual
-Content generation time: 302.4513 ms
+$ dotnet new mvc -n MyAwesomeProject -o src/MyProject -au Individual
 The template "MVC Application" created successfully.
 ```
 
@@ -113,7 +108,7 @@ To install a new template use the command:
 ## Template creation
 
     dotnet new3 MvcWebTemplate --name MyProject --output src --ParameterName1 Value1 --ParameterName2 Value2 ... --ParameterNameN ValueN
-    dotnet new3 MvcWebTemplate -n MyProject -d --ParameterName1 Value1 --ParameterName2 Value2 ... --ParameterNameN ValueN
+    dotnet new3 MvcWebTemplate -n MyProject -o --ParameterName1 Value1 --ParameterName2 Value2 ... --ParameterNameN ValueN
 
 # Roadmap
 * Create formal docs
