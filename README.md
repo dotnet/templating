@@ -108,7 +108,7 @@ To install a new template use the command:
 ## Template creation
 
     dotnet new3 MvcWebTemplate --name MyProject --output src --ParameterName1 Value1 --ParameterName2 Value2 ... --ParameterNameN ValueN
-    dotnet new3 MvcWebTemplate -n MyProject -o --ParameterName1 Value1 --ParameterName2 Value2 ... --ParameterNameN ValueN
+    dotnet new3 MvcWebTemplate -n MyProject -o src --ParameterName1 Value1 --ParameterName2 Value2 ... --ParameterNameN ValueN
 
 # Roadmap
 * Create formal docs
