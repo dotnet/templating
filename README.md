@@ -1,127 +1,122 @@
-|Windows x64 |Mac OS X |Ubuntu 16.04 |
-|:------:|:------:|:------:|
-|[![](https://ci.dot.net/job/dotnet_templating/job/master/job/debug_windows_nt_prtest/badge/icon)](https://ci.dot.net/job/dotnet_templating/job/master/job/debug_windows_nt_prtest/) |[![Build Status](https://ci.dot.net/job/dotnet_templating/job/master/job/x64_osx_prtest/badge/icon)](https://ci.dot.net/job/dotnet_templating/job/master/job/x64_osx_prtest/) |[![Build Status](https://ci.dot.net/job/dotnet_templating/job/master/job/x64_ubuntu16.04_prtest/badge/icon)](https://ci.dot.net/job/dotnet_templating/job/master/job/x64_ubuntu16.04_prtest/) |
-
 # Overview
-Template Engine is the next iteration of the replacement capabilities built in to [Template Builder](https://github.com/ligershark/template-builder) and will eventually be used as the replacement engine in [SideWaffle](https://github.com/ligershark/side-waffle), [PecanWaffle](https://github.com/ligershark/pecan-waffle) and DotNetWaffle.
 
-Template Engine is a library for manipulating streams, including operations to replace values, include/exclude regions and process `if`/`else if`/`else`/`end if` style statements.
+This repository is the home for the .NET Core Template Engine. It contains the brains for `dotnet new`. 
+When `dotnet new` is invoked, it will call the Template Engine to create the artifacts on disk.
+Template Engine is a library for manipulating streams, including operations to replace values, include/exclude 
+regions and process `if`, `else if`, `else` and `end if` style statements.
 
-#Getting Started
+# Info for `dotnet new` users
+
+You can create new projects with `dotnet new`, this section will briefly describe that. For more info take a look at
+[Announcing .NET Core Tools Updates in VS 2017 RC](https://blogs.msdn.microsoft.com/dotnet/2017/02/07/announcing-net-core-tools-updates-in-vs-2017-rc/).
+
+To get started let's find out what options we have by executing `dotnet new --help`. The result is pasted in the block below.
+
+```bash
+$ dotnet new mvc --help
+
+MVC ASP.NET Web Application (C#)
+Author: Microsoft
+Options:
+  -au|--auth           The type of authentication to use
+                           None          - No authentication
+                           Individual    - Individual authentication
+                       Default: None
+
+  -uld|--use-local-db  Whether or not to use LocalDB instead of SQLite
+                       bool - Optional
+                       Default: false
+
+  -f|--framework
+                           1.0    - Target netcoreapp1.0
+                           1.1    - Target netcoreapp1.1
+                       Default: 1.0
+```
+
+Let's create a new project named "MyAwesomeProject" in the "src/MyProject" directory. This project should be an ASP.NET MVC project with Individual Auth. To create that template
+execute `dotnet new mvc -n MyAwesomeProject -o src/MyProject -au Individual`. Let's try that now, the result is below.
+
+```bash
+$ dotnet new mvc -n MyAwesomeProject -o src/MyProject -au Individual
+The template "MVC Application" created successfully.
+```
+
+The project was successfully created on disk as expected in `src/MyProject`. From here, we can run normal `dotnet` commands like `dotnet restore` and `dotnet build`.
+
+We have a pretty good help system built in, including template specific help (_for example `dotnet new mvc --help`_). If you're not sure the syntax please try that,
+if you have any difficulties please file a new [issue](https://github.com/dotnet/templating/issues/new).
+
+Now that we've covered the basics of using `dotnew new`, lets move on to info for template authors and contributors.
+
+# How to build and run the latest
+
+If you're authoring templates, or interested in contributing to this repo, then you're likely interested in how to use the latest version of this experience.
+The steps required are outlined below.
 
 Step 1: Get the SDK for your platform from [dotnet/cli](https://github.com/dotnet/cli)
 
-Step 2: Get the source
+Step 2: Clone this repository to your local machine
 
-Windows:
+Step 3:  Run the setup script
+ - **Windows:** [setup.cmd](https://github.com/dotnet/templating/blob/master/setup.cmd)
+ - **Mac/Linux**: [setup.sh](https://github.com/dotnet/templating/blob/master/setup.sh) 
 
-Step 3: At the command prompt, run
-  
-    Setup.cmd
+When running the setup script, the existing built in command `dotnet new` will be preserved. A new command `dotnet new3` will be enabled which allows you to create
+files with the latest Template Engine.
 
-Step 4: Done! You can now use dotnet new3 in that console session
+Step 4: That's it! Now you can run `dotnet new3`.
 
-Other Platforms:
+For example, here is the result of running `dotnet new3 --help` on a Mac (_truncated to save space here_).
 
-Step 3: In src/dotnet-new3/project.json make sure that the runtime ID for your platform is included in the runtimes section
+```bash
+$ dotnet new3 --help
+Template Instantiation Commands for .NET Core CLI.
 
-Step 4: At the command prompt, run
-  
-    dotnet restore --infer-runtimes --ignore-failed-sources
-          
-Step 5: Change the working directory to src/dotnet-new3 and run
-  
-    dotnet build -r {your RID here} -c Release
+Usage: dotnet new3 [arguments] [options]
 
-Step 6: Change the working directory to src/Microsoft.TemplateEngine.Core and run
-  
-    dotnet build -c Release
-    dotnet pack -c Release -o ../../feed
+Arguments:
+  template  The template to instantiate.
 
-Step 7-10: Repeat step 6 for the following directories
-  
-    src/Microsoft.TemplateEngine.Abstractions
-    src/Microsoft.TemplateEngine.Runner
-    src/Microsoft.TemplateEngine.Orchestrator.VsTemplates
-    src/Microsoft.TemplateEngine.Orchestrator.RunnableProjects
-
-Step 11: Prepend the following to the PATH environment variable
-  
-    {path to the source}/src/dotnet-new3/bin/Release/netcoreapp1.0/{your RID here}/
-
-Step 12: Create a directory in the root of your user profile called `.netnew`
-
-Step 13: Create a nuget.config file in the directory created in step 12 with the following contents
-  
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<configuration>
-    <packageSources>
-        <clear />
-        <!-- Add sources for templates and components here -->
-        <add key="Templates" value="{path to the source}\template_feed" />
-        <add key="Components" value="{path to the source}\feed" />
-        <add key="api.nuget.org" value="https://api.nuget.org/v3/index.json" />
-        <add key="CLI Deps" value="https://dotnet.myget.org/F/cli-deps/api/v3/index.json" />
-    </packageSources>
-    <packageRestore>
-        <add key="enabled" value="False" />
-        <add key="automatic" value="False" />
-    </packageRestore>
-</configuration>
+<truncated>
 ```
 
-Step 14: To make sure everything worked correctly, run
-  
-    dotnet new3 -c
-
-#Installing Templates
+# Installing templates
 
 Templates can be installed from packages in any NuGet feed, directories on the file system or ZIP type archives (zip, nupkg, vsix, etc.)
-All templates are installed the command:
+To install a new template use the command:
 
     dotnet new3 -i {the path to the folder containing the templates}
 
-If installing templates from a NuGet feed, the template may specify any additional components required to instantiate it (the "generator" is the most common thing to require). The `template_feed` directory in the source contains several pre-build template packs that will automatically install the required generator (in this case, it's `Microsoft.TemplateEngine.Orchestrator.RunnableProjects` which gets placed in the `feed` directory during setup).
-
-If installing templates from a ZIP or from a directory and a required component to make them is not already installed, run
-
-    dotnet new3 --install-component {the ID of the NuGet package containing the required component}
-
-#Basic Commands
-##Showing help
+# Basic Commands
+## Showing help
 
     dotnet new3 --help
     dotnet new3 -h
     dotnet new3
 
-##Listing templates
+## Listing templates
 
     dotnet new3 --list
     dotnet new3 -l
     dotnet new3 mvc -l            Lists all templates containing the text "mvc"
 
-##Template parameter help
+## Template parameter help
 
-    dotnet new3 MvcWebTemplate --help
-    dotnet new3 MvcWebTemplate -h
+    dotnet new3 mvc --help
+    dotnet new3 mvc -h
 
-##Template creation
+## Template creation
 
-    dotnet new3 MvcWebTemplate --name MyProject --directory --ParameterName1 Value1 --ParameterName2 Value2 ... --ParameterNameN ValueN
-    dotnet new3 MvcWebTemplate -n MyProject -d --ParameterName1 Value1 --ParameterName2 Value2 ... --ParameterNameN ValueN
+    dotnet new3 MvcWebTemplate --name MyProject --output src --ParameterName1 Value1 --ParameterName2 Value2 ... --ParameterNameN ValueN
+    dotnet new3 MvcWebTemplate -n MyProject -o src --ParameterName1 Value1 --ParameterName2 Value2 ... --ParameterNameN ValueN
 
-##Favoriting templates
-Creates a shortcut (t1 in the example) for a template, after creating an alias, you can use it instead of the template name
-
-    dotnet new3 MvcWebTemplate --alias t1
-    dotnet new3 MvcWebTemplate -a t1
-
-#Roadmap
-* Integration packs for each of the Waffles
- * Given that the Waffles are already widely used, integration packs for each of the Waffles will be provided here so that no substantial changes will be required to use Template Engine
-* Aliases that embed template parameters
-* Easy setup for platforms other than Windows
-* Cascading configuration
-* Additional Operations
- * Suggestions welcome!
+# Roadmap
+* Create formal docs
+* Interactive mode (i.e. interactive prompts similar to [`yo aspnet`](https://github.com/omnisharp/generator-aspnet)
+* Integration with Visual Studio One ASP.NET dialog
+* Integration with Visual Studio for Mac for .NET Core projects
+* Integration with [`yo aspnet`](https://github.com/omnisharp/generator-aspnet)
+* Template updates (both required and optional)
+* Visual Studio wizard to enable community members to plug into VS as well
+* Maybe: Visual Studio wizard which can display templates given a feed URL
+* Suggestions welcome, please file [an issue](https://github.com/dotnet/templating/issues/new)
