@@ -92,6 +92,8 @@ namespace Microsoft.TemplateEngine.Core.Util
 
         public int CurrentBufferPosition { get; private set; }
 
+        public int CurrentSequenceNumber { get; private set; }
+
         public Encoding Encoding
         {
             get { return _encoding; }
@@ -111,6 +113,13 @@ namespace Microsoft.TemplateEngine.Core.Util
                 CurrentBufferPosition = 0;
                 return false;
             }
+
+            //At this point we know that CurrentBufferPosition and CurrentSequenceNumber are related
+            //  and we know that CurrentBufferPosition will be set to the head of the buffer at the
+            //  end of this method, shifting off bufferPosition bytes. The number of bytes that then
+            //  would be advanced in the sequence is then the number of bytes the bufferPosition was
+            //  ahead of the CurrentBuffer position
+            CurrentSequenceNumber += bufferPosition - CurrentBufferPosition;
 
             int offset = 0;
             if (bufferPosition != CurrentBufferLength)
@@ -178,11 +187,14 @@ namespace Microsoft.TemplateEngine.Core.Util
                         writtenSinceFlush += writeCount;
                     }
 
+                    //Advance the sequence number by the number of bytes taken by the token
+                    CurrentSequenceNumber += posedPosition - CurrentBufferPosition;
                     CurrentBufferPosition = posedPosition;
 
                     try
                     {
                         writtenSinceFlush += op.HandleMatch(this, CurrentBufferLength, ref posedPosition, token, _target);
+                        CurrentSequenceNumber += posedPosition - CurrentBufferPosition;
                     }
                     catch (Exception ex)
                     {
@@ -197,6 +209,7 @@ namespace Microsoft.TemplateEngine.Core.Util
                 {
                     // If the operation is disabled, it's as if the token were just arbitrary text, so do nothing special with it.
                     ++CurrentBufferPosition;
+                    ++CurrentSequenceNumber;
                 }
 
                 if (CurrentBufferPosition == CurrentBufferLength)
