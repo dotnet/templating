@@ -23,12 +23,28 @@ PROJECTSTOPACK=( \
     Microsoft.TemplateEngine.Core \
     Microsoft.TemplateEngine.Edge \
     Microsoft.TemplateEngine.Abstractions \
-    Microsoft.TemplateEngine.Orchestrator.RunnableProjects
+    Microsoft.TemplateEngine.Orchestrator.RunnableProjects \
+    Microsoft.TemplateEngine.Cli
+ )
+
+NETSTANDARDVERSIONS=( \
+    netstandard1.3 \
+    netstandard1.3 \
+    netstandard1.3 \
+    netcoreapp1.1 \
+    netstandard1.3 \
+    netstandard1.3 \
+    netcoreapp1.1 
  )
 
 TESTPROJECTS=( \
     Microsoft.TemplateEngine.Core.UnitTests \
     Microsoft.TemplateEngine.Utils.UnitTests
+)
+
+TESTFRAMEWORKS=( \
+    netcoreapp1.1 \
+    netcoreapp1.1
 )
 
 source "$REPOROOT/scripts/common/_prettyprint.sh"
@@ -68,7 +84,7 @@ rm -rf $REPOROOT/artifacts
 
 [ -d "$REPOROOT/artifacts" ] || mkdir -p $REPOROOT/artifacts
 
-DOTNET_INSTALL_SCRIPT_URL="https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/dotnet-install.sh"
+DOTNET_INSTALL_SCRIPT_URL="https://raw.githubusercontent.com/dotnet/cli/master/scripts/obtain/dotnet-install.sh"
 curl -sSL "$DOTNET_INSTALL_SCRIPT_URL" | bash /dev/stdin --verbose
 
 # Put stage 0 on the PATH (for this shell only)
@@ -95,38 +111,34 @@ do
     dotnet restore "$REPOROOT/test/$projectToTest/$projectToTest.csproj"
 done
 
-echo "Build abstractions..."
-dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Abstractions/Microsoft.TemplateEngine.Abstractions.csproj" -c $CONFIGURATION -f netstandard1.3
-
-echo "Build Core..."
-dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Core/Microsoft.TemplateEngine.Core.csproj" -c $CONFIGURATION -f netstandard1.3
-
-echo "Build Core Contracts..."
-dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Core.Contracts/Microsoft.TemplateEngine.Core.Contracts.csproj" -c $CONFIGURATION -f netstandard1.3
-
-echo "Build Runnable Projects..."
-dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Orchestrator.RunnableProjects/Microsoft.TemplateEngine.Orchestrator.RunnableProjects.csproj" -c $CONFIGURATION -f netstandard1.3
-
-echo "Build Runnable Utils..."
-dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Utils/Microsoft.TemplateEngine.Utils.csproj" -c $CONFIGURATION -f netstandard1.3
-
-echo "Build Edge..."
-dotnet build "$REPOROOT/src/Microsoft.TemplateEngine.Edge/Microsoft.TemplateEngine.Edge.csproj" -c $CONFIGURATION -f netcoreapp1.0
-
-for projectToPack in ${PROJECTSTOPACK[@]}
+length=${#PROJECTSTOPACK[@]}
+for (( i=0; i<${length} ; i++ ));
 do
-    dotnet pack "$REPOROOT/src/$projectToPack/$projectToPack.csproj" --output "$PACKAGESDIR" --configuration "$CONFIGURATION" --no-build
+    projectToPack=${PROJECTSTOPACK[$i]}
+    framework=${NETSTANDARDVERSIONS[$i]}
+    echo "Build $projectToPack..."
+    dotnet msbuild "$REPOROOT/src/$projectToPack/$projectToPack.csproj" /p:"Configuration=$CONFIGURATION;TargetFramework=$framework"
+done
+
+for (( i=0; i<${length} ; i++ ));
+do
+    projectToPack=${PROJECTSTOPACK[$i]}
+    framework=${NETSTANDARDVERSIONS[$i]}
+    dotnet pack "$REPOROOT/src/$projectToPack/$projectToPack.csproj" --output "$PACKAGESDIR" --configuration "$CONFIGURATION" --no-build /p:TargetFramework=$framework
 done
 
 echo "Build dotnet new3..."
 THISDIR=$(pwd)
 cd $REPOROOT/src/dotnet-new3
-dotnet msbuild "$REPOROOT/src/dotnet-new3/dotnet-new3.csproj" /t:Restore "/p:RuntimeIdentifier=$RID;TargetFramework=netcoreapp1.0;RestoreRecursive=False;RestoreSources=$REPOROOT/artifacts"
-dotnet publish "$REPOROOT/src/dotnet-new3/dotnet-new3.csproj" -c $CONFIGURATION -f netcoreapp1.0 -o "$DDIR" -r $RID
+dotnet msbuild "$REPOROOT/src/dotnet-new3/dotnet-new3.csproj" /t:Restore /p:RuntimeIdentifier=$RID /p:TargetFramework=netcoreapp1.1 /p:RestoreRecursive=False /p:RestoreSources="https:%2F%2Fapi.nuget.org%2Fv3%2Findex.json;$REPOROOT/artifacts"
+dotnet publish "$REPOROOT/src/dotnet-new3/dotnet-new3.csproj" -c $CONFIGURATION -f netcoreapp1.1 -o "$DDIR" -r $RID
 cd $THISDIR
 
 echo "Running tests..."
-for projectToTest in ${TESTPROJECTS[@]}
+length=${#TESTPROJECTS[@]}
+for (( i=0; i<${length} ; i++ ));
 do
-    dotnet test "$REPOROOT/test/$projectToTest/$projectToTest.csproj" --configuration "$CONFIGURATION"
+    projectToPack=${TESTPROJECTS[$i]}
+    framework=${TESTFRAMEWORKS[$i]}
+    dotnet test "$REPOROOT/test/$projectToTest/$projectToTest.csproj" /p:"Configuration=$CONFIGURATION;TargetFramework=$framework"
 done
