@@ -134,6 +134,13 @@ namespace Microsoft.TemplateEngine.Core.Util
             //  should be preserved
             int bytesToPreserveInBuffer = CurrentBufferLength - bufferPosition;
 
+            if (CurrentBufferLength < CurrentBuffer.Length && bytesToPreserveInBuffer == 0)
+            {
+                CurrentBufferLength = 0;
+                CurrentBufferPosition = 0;
+                return false;
+            }
+
             //If we actually have to preserve any data, shift it to the start
             if (bytesToPreserveInBuffer > 0)
             {
@@ -150,7 +157,7 @@ namespace Microsoft.TemplateEngine.Core.Util
             //  position pointed at (which is now at the head of the buffer)
             CurrentBufferPosition = 0;
 
-            return nRead != 0;
+            return true;
         }
 
         public bool Run()
@@ -280,7 +287,6 @@ namespace Microsoft.TemplateEngine.Core.Util
             {
                 int toWrite = CurrentSequenceNumber - lastWrittenSequenceNumber;
                 _target.Write(CurrentBuffer, CurrentSequenceNumber - toWrite, toWrite);
-                bytesWrittenSinceLastFlush += toWrite;
             }
 
             _target.Flush();

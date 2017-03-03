@@ -3,19 +3,20 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Microsoft.TemplateEngine.Core.Contracts;
+using Microsoft.TemplateEngine.Core.Matching;
 
 namespace Microsoft.TemplateEngine.Core.Util
 {
-    public class ProcessorState : IProcessorState
+    public class ProcessorState2 : IProcessorState
     {
         private readonly int _flushThreshold;
         private readonly Stream _source;
         private readonly Stream _target;
-        private readonly OperationTrie _trie;
+        private readonly TrieEvaluator<OperationTerminal> _trie;
         private Encoding _encoding;
-        private static readonly Dictionary<IReadOnlyList<IOperationProvider>, Dictionary<Encoding, OperationTrie>> TrieLookup = new Dictionary<IReadOnlyList<IOperationProvider>, Dictionary<Encoding, OperationTrie>>();
+        private static readonly Dictionary<IReadOnlyList<IOperationProvider>, Dictionary<Encoding, Trie<OperationTerminal>>> TrieLookup = new Dictionary<IReadOnlyList<IOperationProvider>, Dictionary<Encoding, Trie<OperationTerminal>>>();
 
-        public ProcessorState(Stream source, Stream target, int bufferSize, int flushThreshold, IEngineConfig config, IReadOnlyList<IOperationProvider> operationProviders)
+        public ProcessorState2(Stream source, Stream target, int bufferSize, int flushThreshold, IEngineConfig config, IReadOnlyList<IOperationProvider> operationProviders)
         {
             bool sizedToStream = false;
 
@@ -54,31 +55,40 @@ namespace Microsoft.TemplateEngine.Core.Util
             CurrentBufferPosition = bom.Length;
             target.Write(bom, 0, bom.Length);
 
-            Dictionary<Encoding, OperationTrie> byEncoding;
+            Dictionary<Encoding, Trie<OperationTerminal>> byEncoding;
             if(!TrieLookup.TryGetValue(operationProviders, out byEncoding))
             {
-                TrieLookup[operationProviders] = byEncoding = new Dictionary<Encoding, OperationTrie>();
+                TrieLookup[operationProviders] = byEncoding = new Dictionary<Encoding, Trie<OperationTerminal>>();
             }
 
-            if (!byEncoding.TryGetValue(encoding, out _trie))
+            if (!byEncoding.TryGetValue(encoding, out Trie<OperationTerminal> trie))
             {
-                List<IOperation> operations = new List<IOperation>(operationProviders.Count);
+                trie = new Trie<OperationTerminal>();
 
                 for (int i = 0; i < operationProviders.Count; ++i)
                 {
                     IOperation op = operationProviders[i].GetOperation(encoding, this);
+
                     if (op != null)
                     {
-                        operations.Add(op);
+                        for (int j = 0; j < op.Tokens.Count; ++j)
+                        {
+                            if (op.Tokens[j] != null)
+                            {
+                                trie.AddPath(op.Tokens[j], new OperationTerminal(op, j, op.Tokens[j].Length));
+                            }
+                        }
                     }
                 }
 
-                byEncoding[encoding] = _trie = OperationTrie.Create(operations);
+                byEncoding[encoding] = trie;
             }
 
-            if (bufferSize < _trie.MaxLength && !sizedToStream)
+            _trie = new TrieEvaluator<OperationTerminal>(trie);
+
+            if (bufferSize < _trie.MaxLength + 1)
             {
-                byte[] tmp = new byte[_trie.MaxLength];
+                byte[] tmp = new byte[_trie.MaxLength + 1];
                 Buffer.BlockCopy(CurrentBuffer, CurrentBufferPosition, tmp, 0, CurrentBufferLength - CurrentBufferPosition);
                 int nRead = _source.Read(tmp, CurrentBufferLength - CurrentBufferPosition, tmp.Length - CurrentBufferLength);
                 CurrentBuffer = tmp;
@@ -114,6 +124,11 @@ namespace Microsoft.TemplateEngine.Core.Util
             if (CurrentBufferLength == 0)
             {
                 CurrentBufferPosition = 0;
+                return false;
+            }
+
+            if(bufferPosition == 0)
+            {
                 return false;
             }
 
@@ -155,9 +170,9 @@ namespace Microsoft.TemplateEngine.Core.Util
                 int token;
                 int posedPosition = CurrentBufferPosition;
 
-                if (CurrentBufferLength == CurrentBuffer.Length && CurrentBufferLength - CurrentBufferPosition < _trie.MaxLength)
+                if (CurrentBufferLength == CurrentBuffer.Length && CurrentBufferLength == CurrentBufferPosition)
                 {
-                    int writeCount = CurrentBufferPosition - lastWritten;
+                    int writeCount = CurrentBufferLength - lastWritten;
 
                     if (writeCount > 0)
                     {
@@ -165,12 +180,18 @@ namespace Microsoft.TemplateEngine.Core.Util
                         writtenSinceFlush += writeCount;
                     }
 
-                    AdvanceBuffer(CurrentBufferPosition);
+                    AdvanceBuffer(CurrentBufferLength - (CurrentSequenceNumber - _trie.OldestRequiredSequenceNumber));
                     lastWritten = 0;
                     posedPosition = 0;
                 }
 
-                IOperation op = _trie.GetOperation(CurrentBuffer, CurrentBufferLength, ref posedPosition, out token);
+                int sn = CurrentSequenceNumber;
+                bool isMatch = _trie.Accept(CurrentBuffer[CurrentBufferPosition], ref sn, out TerminalLocation<OperationTerminal> terminal);
+                IOperation op = isMatch ? terminal.Terminal.Operation : null;
+                sn = isMatch ? terminal.Location + terminal.Terminal.End - terminal.Terminal.Start : sn;
+                CurrentBufferPosition -= CurrentSequenceNumber - sn;
+                CurrentSequenceNumber = sn;
+                token = isMatch ? terminal.Terminal.Token : -1;
                 bool opEnabledFlag;
 
                 if ((op != null)
@@ -182,7 +203,7 @@ namespace Microsoft.TemplateEngine.Core.Util
                     // - The operation doesn't have an id (thus can't be disabled)
                     // - The flag for the Id exists and is true.
 
-                    int writeCount = CurrentBufferPosition - lastWritten;
+                    int writeCount = CurrentBufferPosition - (CurrentSequenceNumber - terminal.Location) - lastWritten;
 
                     if (writeCount > 0)
                     {
@@ -217,7 +238,7 @@ namespace Microsoft.TemplateEngine.Core.Util
 
                 if (CurrentBufferPosition == CurrentBufferLength)
                 {
-                    int writeCount = CurrentBufferPosition - lastWritten;
+                    int writeCount = CurrentBufferPosition - lastWritten - (CurrentSequenceNumber - _trie.OldestRequiredSequenceNumber);
 
                     if (writeCount > 0)
                     {
@@ -225,7 +246,12 @@ namespace Microsoft.TemplateEngine.Core.Util
                         writtenSinceFlush += writeCount;
                     }
 
-                    AdvanceBuffer(CurrentBufferPosition);
+                    int advanceBufferMax = CurrentBufferLength - (CurrentSequenceNumber - _trie.OldestRequiredSequenceNumber);
+                    if (!AdvanceBuffer(Math.Min(CurrentBufferPosition, Math.Max(0, advanceBufferMax))) && CurrentBufferPosition == CurrentBufferLength)
+                    {
+                        break;
+                    }
+
                     lastWritten = 0;
                 }
 
@@ -233,6 +259,30 @@ namespace Microsoft.TemplateEngine.Core.Util
                 {
                     writtenSinceFlush = 0;
                     _target.Flush();
+                }
+            }
+
+            int n = CurrentSequenceNumber;
+            _trie.FinalizeMatchesInProgress(ref n, out TerminalLocation<OperationTerminal> term);
+
+            if(term != null)
+            {
+                IOperation op = term.Terminal.Operation;
+                int sn = term.Location + term.Terminal.End - term.Terminal.Start;
+                CurrentBufferPosition -= CurrentSequenceNumber - sn;
+                CurrentSequenceNumber = sn;
+                bool opEnabledFlag;
+
+                if ((op != null)
+                        && ((op.Id == null)
+                            || (Config.Flags.TryGetValue(op.Id, out opEnabledFlag) && opEnabledFlag))
+                    )
+                {
+                    int pos = CurrentBufferPosition;
+                    op.HandleMatch(this, CurrentBufferLength, ref pos, term.Terminal.Token, _target);
+                    lastWritten = pos;
+                    _target.Flush();
+                    modified = true;
                 }
             }
 
