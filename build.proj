@@ -6,7 +6,17 @@
     <PackageOutputPath>$(ArtifactsDir)packages/</PackageOutputPath>
     <TemplatesOutputPath>$(ArtifactsDir)templates/</TemplatesOutputPath>
     <DevPath>$(MSBuildThisFileDirectory)dev</DevPath>
+
     <New3TargetFramework>netcoreapp1.1</New3TargetFramework>
+    <PortableLibraryTargetFramework>netstandard1.3</PortableLibraryTargetFramework>
+    <FullFrameworkBuildTarget>net45</FullFrameworkBuildTarget>
+
+    <NetStandardPackTargets>$(PortableLibraryTargetFramework)</NetStandardPackTargets>
+    <NetStandardPackTargets Condition="'$(IsFullFrameworkBuildSupported)' == 'true'">$(NetStandardPackTargets);$(FullFrameworkBuildTarget)</NetStandardPackTargets>
+
+    <NetCoreAppPackTargets>$(New3TargetFramework)</NetCoreAppPackTargets>
+    <NetCoreAppPackTargets Condition="'$(IsFullFrameworkBuildSupported)' == 'true'">$(NetCoreAppPackTargets);$(FullFrameworkBuildTarget)</NetCoreAppPackTargets>
+
     <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win7-x86</RuntimeIdentifier>
   </PropertyGroup>
 
@@ -20,11 +30,16 @@
     </PortableSourceProjectsToPack_netstandard13>
 
     <PortableSourceProjectsToPack_netcoreapp11>
-        src/Microsoft.TemplateEngine.Edge/Microsoft.TemplateEngine.Edge.csproj;
         src/Microsoft.TemplateEngine.Cli/Microsoft.TemplateEngine.Cli.csproj;
         test/Microsoft.TemplateEngine.TestHelper/Microsoft.TemplateEngine.TestHelper.csproj;
-        test/Microsoft.TemplateEngine.Mocks/Microsoft.TemplateEngine.Mocks.csproj;
     </PortableSourceProjectsToPack_netcoreapp11>
+
+    <PortableSourceProjectsToPack_fullframework>
+        src/Microsoft.TemplateEngine.Edge/Microsoft.TemplateEngine.Edge.csproj;
+        test/Microsoft.TemplateEngine.Mocks/Microsoft.TemplateEngine.Mocks.csproj
+    </PortableSourceProjectsToPack_fullframework>
+
+    <PortableSourceProjectsToRestore_both>$(PortableSourceProjectsToPack_netcoreapp11);$(PortableSourceProjectsToPack_fullframework)</PortableSourceProjectsToRestore_both>
 
     <TestProjects>
         test/Microsoft.TemplateEngine.Core.UnitTests/Microsoft.TemplateEngine.Core.UnitTests.csproj;
@@ -38,12 +53,34 @@
     <MakeDir Directories="$(ArtifactsDir);$(PackageOutputPath);$(TemplatesOutputPath);$(DevPath)" />
     <CallTarget Targets="CollectGitInfo" />
 
-    <MSBuild Projects="$(PortableSourceProjectsToPack_netstandard13)" Targets="Restore;Pack" 
-             Properties="TargetFramework=netstandard1.3;Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath)" 
+    <MSBuild Projects="$(PortableSourceProjectsToPack_netstandard13)" Targets="Restore;Build" 
+             Properties="TargetFramework=$(PortableLibraryTargetFramework);Configuration=$(Configuration)" 
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
-    <MSBuild Projects="$(PortableSourceProjectsToPack_netcoreapp11)" Targets="Restore;Pack" 
+    <MSBuild Projects="$(PortableSourceProjectsToPack_netstandard13)" Targets="Restore;Build" 
+             Condition="'$(IsFullFrameworkBuildSupported)' == 'true'"
+             Properties="TargetFramework=$(FullFrameworkBuildTarget);Configuration=$(Configuration)" 
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+
+    <MSBuild Projects="$(PortableSourceProjectsToPack_netstandard13)" Targets="Pack" 
+             Properties="TargetFrameworks=$(NetStandardPackTargets);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath);NoBuild=true" 
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+
+    <MSBuild Projects="$(PortableSourceProjectsToRestore_both)" Targets="Restore;Build" 
              Properties="TargetFramework=$(New3TargetFramework);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath)" 
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+
+    <MSBuild Projects="$(PortableSourceProjectsToPack_fullframework)" Targets="Restore;Build" 
+             Condition="'$(IsFullFrameworkBuildSupported)' == 'true'"
+             Properties="TargetFramework=$(FullFrameworkBuildTarget);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath)" 
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+
+    <MSBuild Projects="$(PortableSourceProjectsToPack_fullframework)" Targets="Pack" 
+             Properties="TargetFrameworks=$(NetCoreAppPackTargets);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath);NoBuild=true" 
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+
+    <MSBuild Projects="$(PortableSourceProjectsToPack_netcoreapp11)" Targets="Pack" 
+             Properties="TargetFrameworks=$(New3TargetFramework);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath);NoBuild=true" 
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <MSBuild Projects="template_feed/template.proj" Targets="Build"
