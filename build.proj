@@ -17,7 +17,7 @@
     <NetCoreAppPackTargets>$(New3TargetFramework)</NetCoreAppPackTargets>
     <NetCoreAppPackTargets Condition="'$(IsFullFrameworkBuildSupported)' == 'true'">$(NetCoreAppPackTargets);$(FullFrameworkBuildTarget)</NetCoreAppPackTargets>
 
-    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win7-x86</RuntimeIdentifier>
+    <New3RuntimeIdentifier Condition="'$(New3RuntimeIdentifier)' == ''">win7-x86</New3RuntimeIdentifier>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -88,7 +88,7 @@
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <MSBuild Projects="src/dotnet-new3/dotnet-new3.csproj" Targets="Restore;Publish"
-             Properties="TargetFramework=$(New3TargetFramework);RuntimeIdentifier=$(RuntimeIdentifier);Configuration=$(Configuration);PublishDir=$(DevPath);RestoreRecursive=false"
+             Properties="TargetFramework=$(New3TargetFramework);RuntimeIdentifier=$(New3RuntimeIdentifier);Configuration=$(Configuration);PublishDir=$(DevPath);RestoreRecursive=false"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <MSBuild Projects="$(TestProjects)" Targets="Restore;Build"
