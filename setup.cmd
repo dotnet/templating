@@ -34,8 +34,6 @@ echo Artifacts built and placed.
 SET DN3BINDIR=
 for /f %%f in ('dir /AD /B "%~dp0\src\dotnet-new3\bin\%DN3B%"') do SET DN3BINDIR="%~dp0\src\dotnet-new3\bin\%DN3B%\%%f"
 
-echo %DN3BINDIR%
-
 cd %~dp0\dev
 
 SET DN3=%~dp0\dev

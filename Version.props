@@ -24,4 +24,36 @@
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
   </PropertyGroup>
+  <Target Name="CollectGitInfo" BeforeTargets="Build">
+    <Exec Command="git rev-list --count HEAD" ConsoleToMSBuild="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="GitInfoCommitCount" />
+    </Exec>
+
+    <Exec Command="git rev-parse HEAD" ConsoleToMSBuild="true">
+      <Output TaskParameter="ConsoleOutput" PropertyName="GitInfoCommitHash" />
+    </Exec>
+
+    <PropertyGroup>
+      <GitCommitInfoContent>
+<![CDATA[
+namespace Microsoft.TemplateEngine
+{
+    internal static class GitInfo
+    {
+        public static string CommitCount { get%3B } = "$(GitInfoCommitCount)"%3B
+        public static string CommitHash { get%3B } = "$(GitInfoCommitHash)"%3B
+    }
+}
+]]>
+      </GitCommitInfoContent>
+    </PropertyGroup>
+
+    <WriteLinesToFile File="$(MSBuildThisFileDirectory)artifacts\GitInfo.cs"
+                      Lines="$(GitCommitInfoContent)"
+                      Overwrite="true" />
+  </Target>
+  
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)\artifacts\GitInfo.cs" Condition="Exists('$(MSBuildThisFileDirectory)\GitInfo.cs')" Link="%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
 </Project>

@@ -18,11 +18,6 @@ if($Help)
     exit 0
 }
 
-$PortableSourceProjectsToBuild = @(
-    "Microsoft.TemplateEngine.Orchestrator.RunnableProjects",
-    "Microsoft.TemplateEngine.Cli"
-)
-
 $PortableSourceProjectsToPack = @(
     "Microsoft.TemplateEngine.Core.Contracts",
     "Microsoft.TemplateEngine.Abstractions",
