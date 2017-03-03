@@ -84,6 +84,7 @@
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <MSBuild Projects="template_feed/template.proj" Targets="Build"
+             Condition="'$(IsFullFrameworkBuildSupported)' == 'true'"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <MSBuild Projects="src/dotnet-new3/dotnet-new3.csproj" Targets="Restore;Publish"
