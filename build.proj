@@ -1,0 +1,65 @@
+<Project DefaultTargets="Build">
+  <Import Project="Version.props" />
+
+  <PropertyGroup>
+    <ArtifactsDir>$(MSBuildThisFileDirectory)artifacts/</ArtifactsDir>
+    <PackageOutputPath>$(ArtifactsDir)packages/</PackageOutputPath>
+    <TemplatesOutputPath>$(ArtifactsDir)templates/</TemplatesOutputPath>
+    <DevPath>$(MSBuildThisFileDirectory)dev</DevPath>
+    <New3TargetFramework>netcoreapp1.1</New3TargetFramework>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win7-x86</RuntimeIdentifier>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PortableSourceProjectsToPack_netstandard13>
+        src/Microsoft.TemplateEngine.Abstractions/Microsoft.TemplateEngine.Abstractions.csproj;
+        src/Microsoft.TemplateEngine.Core.Contracts/Microsoft.TemplateEngine.Core.Contracts.csproj;
+        src/Microsoft.TemplateEngine.Utils/Microsoft.TemplateEngine.Utils.csproj;
+        src/Microsoft.TemplateEngine.Core/Microsoft.TemplateEngine.Core.csproj;
+        src/Microsoft.TemplateEngine.Orchestrator.RunnableProjects/Microsoft.TemplateEngine.Orchestrator.RunnableProjects.csproj
+    </PortableSourceProjectsToPack_netstandard13>
+
+    <PortableSourceProjectsToPack_netcoreapp11>
+        src/Microsoft.TemplateEngine.Edge/Microsoft.TemplateEngine.Edge.csproj;
+        src/Microsoft.TemplateEngine.Cli/Microsoft.TemplateEngine.Cli.csproj;
+        test/Microsoft.TemplateEngine.TestHelper/Microsoft.TemplateEngine.TestHelper.csproj;
+        test/Microsoft.TemplateEngine.Mocks/Microsoft.TemplateEngine.Mocks.csproj;
+    </PortableSourceProjectsToPack_netcoreapp11>
+
+    <TestProjects>
+        test/Microsoft.TemplateEngine.Core.UnitTests/Microsoft.TemplateEngine.Core.UnitTests.csproj;
+        test/Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests/Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.csproj;
+        test/Microsoft.TemplateEngine.Utils.UnitTests/Microsoft.TemplateEngine.Utils.UnitTests.csproj;
+        test/dotnet-new3.UnitTests/dotnet-new3.UnitTests.csproj
+    </TestProjects>
+  </PropertyGroup>
+
+  <Target Name="Build">
+    <MakeDir Directories="$(ArtifactsDir);$(PackageOutputPath);$(TemplatesOutputPath);$(DevPath)" />
+    <CallTarget Targets="CollectGitInfo" />
+
+    <MSBuild Projects="$(PortableSourceProjectsToPack_netstandard13)" Targets="Restore;Pack" 
+             Properties="TargetFramework=netstandard1.3;Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath)" 
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+
+    <MSBuild Projects="$(PortableSourceProjectsToPack_netcoreapp11)" Targets="Restore;Pack" 
+             Properties="TargetFramework=$(New3TargetFramework);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath)" 
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+
+    <MSBuild Projects="template_feed/template.proj" Targets="Build"
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+
+    <MSBuild Projects="src/dotnet-new3/dotnet-new3.csproj" Targets="Restore;Publish"
+             Properties="TargetFramework=$(New3TargetFramework);RuntimeIdentifier=$(RuntimeIdentifier);Configuration=$(Configuration);PublishDir=$(DevPath);RestoreRecursive=false"
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+
+    <MSBuild Projects="$(TestProjects)" Targets="Restore;Build"
+             Properties="TargetFramework=$(New3TargetFramework);Configuration=$(Configuration)"
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+
+    <MSBuild Projects="$(TestProjects)" Targets="VSTest" 
+             Properties="TargetFramework=$(New3TargetFramework);Configuration=$(Configuration);VSTestLogger=trx"
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+
+  </Target>
+</Project>
