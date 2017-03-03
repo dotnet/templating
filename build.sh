@@ -27,7 +27,7 @@ PROJECTSTOPACK=( \
     Microsoft.TemplateEngine.Cli
  )
 
-NETSTANDARDVERSIONS=( \
+PROJECTFRAMEWORKS=( \
     netstandard1.3 \
     netstandard1.3 \
     netstandard1.3 \
@@ -42,10 +42,7 @@ TESTPROJECTS=( \
     Microsoft.TemplateEngine.Utils.UnitTests
 )
 
-TESTFRAMEWORKS=( \
-    netcoreapp1.1 \
-    netcoreapp1.1
-)
+TESTFRAMEWORK="netcoreapp1.1"
 
 source "$REPOROOT/scripts/common/_prettyprint.sh"
 
@@ -84,7 +81,7 @@ rm -rf $REPOROOT/artifacts
 
 [ -d "$REPOROOT/artifacts" ] || mkdir -p $REPOROOT/artifacts
 
-DOTNET_INSTALL_SCRIPT_URL="https://raw.githubusercontent.com/dotnet/cli/master/scripts/obtain/dotnet-install.sh"
+DOTNET_INSTALL_SCRIPT_URL="https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/dotnet-install.sh"
 curl -sSL "$DOTNET_INSTALL_SCRIPT_URL" | bash /dev/stdin --verbose
 
 # Put stage 0 on the PATH (for this shell only)
@@ -115,7 +112,7 @@ length=${#PROJECTSTOPACK[@]}
 for (( i=0; i<${length} ; i++ ));
 do
     projectToPack=${PROJECTSTOPACK[$i]}
-    framework=${NETSTANDARDVERSIONS[$i]}
+    framework=${PROJECTFRAMEWORKS[$i]}
     echo "Build $projectToPack..."
     dotnet msbuild "$REPOROOT/src/$projectToPack/$projectToPack.csproj" /p:"Configuration=$CONFIGURATION;TargetFramework=$framework"
 done
@@ -123,7 +120,7 @@ done
 for (( i=0; i<${length} ; i++ ));
 do
     projectToPack=${PROJECTSTOPACK[$i]}
-    framework=${NETSTANDARDVERSIONS[$i]}
+    framework=${PROJECTFRAMEWORKS[$i]}
     dotnet pack "$REPOROOT/src/$projectToPack/$projectToPack.csproj" --output "$PACKAGESDIR" --configuration "$CONFIGURATION" --no-build /p:TargetFramework=$framework
 done
 
@@ -139,6 +136,5 @@ length=${#TESTPROJECTS[@]}
 for (( i=0; i<${length} ; i++ ));
 do
     projectToPack=${TESTPROJECTS[$i]}
-    framework=${TESTFRAMEWORKS[$i]}
-    dotnet test "$REPOROOT/test/$projectToTest/$projectToTest.csproj" /p:"Configuration=$CONFIGURATION;TargetFramework=$framework"
+    dotnet test "$REPOROOT/test/$projectToTest/$projectToTest.csproj" /p:"Configuration=$CONFIGURATION;TargetFramework=$TESTFRAMEWORK"
 done
