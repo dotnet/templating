@@ -134,7 +134,7 @@ $x = PWD
 # Restore
 Write-Host "Restoring dotnet new3..."
 cd "$RepoRoot\src\dotnet-new3"
-& dotnet msbuild /t:Restore "/p:RuntimeIdentifier=win7-x86;TargetFramework=netcoreapp1.1;RestoreRecursive=False;PackageVersion=$TimestampPackageVersion"
+& dotnet msbuild /t:Restore "/p:RuntimeIdentifier=$Runtime;TargetFramework=netcoreapp1.1;RestoreRecursive=False;PackageVersion=$TimestampPackageVersion"
 if ($LastExitCode -ne 0)
 {
     exit $LastExitCode
