@@ -248,10 +248,11 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 UpdateTemplateListFromCache(_userTemplateCache, templates);
         }
 
-        public void WriteTemplateCache(IList<ITemplateInfo> templates, string locale, bool isCurrentCache)
+        public void WriteTemplateCache(IList<ITemplateInfo> templates, string cacheVersion, string locale, bool isCurrentCache)
         {
             TemplateCache cache = new TemplateCache(_environmentSettings);
             cache.TemplateInfo.AddRange(templates.Cast<TemplateInfo>());
+            cache.CacheVersion = cacheVersion;
             JObject serialized = JObject.FromObject(cache);
             _paths.WriteAllText(_paths.User.ExplicitLocaleTemplateCacheFile(locale), serialized.ToString());
 

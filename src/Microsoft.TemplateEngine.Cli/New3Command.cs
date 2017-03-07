@@ -808,6 +808,8 @@ namespace Microsoft.TemplateEngine.Cli
 
         private async Task<CreationResultStatus> ExecuteAsync()
         {
+            ((ExtendedTemplateEngineHost)EnvironmentSettings.Host).RebuildCacheFromSettingsIfNotCurrent(EnvironmentSettings);
+
             //Parse non-template specific arguments
             try
             {

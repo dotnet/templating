@@ -4,7 +4,9 @@ using System.IO;
 using System.Linq;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
+using Microsoft.TemplateEngine.Edge.Settings;
 
 namespace Microsoft.TemplateEngine.Cli
 {
@@ -143,6 +145,27 @@ namespace Microsoft.TemplateEngine.Cli
 
                 return found;
             }
+        }
+
+        public void RebuildCacheFromSettingsIfNotCurrent(IEngineEnvironmentSettings environmentSettings)
+        {
+            TemplateCache cache = new TemplateCache(environmentSettings);
+            cache.LoadTemplateCacheForLocale(Locale, out string cacheVersion);
+
+            if (TemplateCache.CheckIfCacheVersionIsCurrent(cacheVersion))
+            {
+                return;
+            }
+
+            cache.CacheVersion = TemplateCache.CurrentCacheVersion;
+            cache.TemplateInfo.Clear();
+
+            foreach (MountPointInfo mountPoint in environmentSettings.SettingsLoader.MountPoints)
+            {
+                cache.Scan(mountPoint.Place);
+            }
+
+            cache.WriteTemplateCaches();
         }
     }
 }
