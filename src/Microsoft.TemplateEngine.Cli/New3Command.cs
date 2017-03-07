@@ -33,6 +33,7 @@ namespace Microsoft.TemplateEngine.Cli
         private readonly TemplateCache _templateCache;
         private readonly AliasRegistry _aliasRegistry;
         private readonly Paths _paths;
+        private readonly ExtendedTemplateEngineHost _host;
 
         private static readonly Regex LocaleFormatRegex = new Regex(@"
                     ^
@@ -45,7 +46,7 @@ namespace Microsoft.TemplateEngine.Cli
 
         public New3Command(string commandName, ITemplateEngineHost host, Action<IEngineEnvironmentSettings, IInstaller> onFirstRun, ExtendedCommandParser app, CommandArgument templateName)
         {
-            host = new ExtendedTemplateEngineHost(host, this);
+            host = _host = new ExtendedTemplateEngineHost(host, this);
             EnvironmentSettings = new EngineEnvironmentSettings(host, x => new SettingsLoader(x));
             Installer = new Installer(EnvironmentSettings);
             _templateCreator = new TemplateCreator(EnvironmentSettings);
@@ -808,8 +809,6 @@ namespace Microsoft.TemplateEngine.Cli
 
         private async Task<CreationResultStatus> ExecuteAsync()
         {
-            ((ExtendedTemplateEngineHost)EnvironmentSettings.Host).RebuildCacheFromSettingsIfNotCurrent(EnvironmentSettings);
-
             //Parse non-template specific arguments
             try
             {
@@ -856,6 +855,7 @@ namespace Microsoft.TemplateEngine.Cli
 
             ConfigureLocale();
             Initialize();
+            _host.RebuildCacheFromSettingsIfNotCurrent(EnvironmentSettings);
 
             try
             {
