@@ -405,7 +405,8 @@ namespace Microsoft.TemplateEngine.Core.Operations
                         break;
                     }
 
-                    bufferAdvanceFailed = !processor.AdvanceBuffer(bufferLength - _trie.MaxLength);
+                    int moveBufferTo = bufferLength - _trie.MaxLength;
+                    bufferAdvanceFailed = !processor.AdvanceBuffer(moveBufferTo);
                     currentBufferPosition = processor.CurrentBufferPosition;
                     bufferLength = processor.CurrentBufferLength;
                 }

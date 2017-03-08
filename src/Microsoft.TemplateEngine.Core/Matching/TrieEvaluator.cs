@@ -153,6 +153,7 @@ namespace Microsoft.TemplateEngine.Core.Matching
             {
                 int endedAt = 0;
                 T best = null;
+                int bestPath = -1;
                 int minNonTerminatedPathStart = int.MaxValue;
                 int minTerminalStart = int.MaxValue;
 
@@ -184,6 +185,7 @@ namespace Microsoft.TemplateEngine.Core.Matching
                             {
                                 if (start < minNonTerminatedPathStart && (best == null || start < minTerminalStart || start == minTerminalStart && terminal.End > best.End))
                                 {
+                                    bestPath = i;
                                     best = terminal;
                                     minTerminalStart = start;
                                     endedAt = terminal.End + ssn;
@@ -207,6 +209,12 @@ namespace Microsoft.TemplateEngine.Core.Matching
                     terminalLocation = new TerminalLocation<T>(best, minTerminalStart);
                     _lastReturnedTerminalEndSequenceNumber = endedAt;
                     sequenceNumber = endedAt;
+
+                    if (bestPath > -1 && bestPath < _activePaths.Count && _activePaths[bestPath].EncounteredTerminals.Contains(best))
+                    {
+                        _activePaths.RemoveAt(bestPath);
+                    }
+
                     return true;
                 }
             }
