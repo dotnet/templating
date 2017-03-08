@@ -118,7 +118,7 @@ namespace Microsoft.TemplateEngine.Core.Util
 
         public bool AdvanceBuffer(int bufferPosition)
         {
-            if(CurrentBufferLength == 0)
+            if(CurrentBufferLength == 0 || bufferPosition == 0)
             {
                 return false;
             }
@@ -162,7 +162,7 @@ namespace Microsoft.TemplateEngine.Core.Util
 
         public bool Run()
         {
-            int lastWrittenSequenceNumber = 0;
+            int nextSequenceNumberThatCouldBeWritten = 0;
             int bytesWrittenSinceLastFlush = 0;
             bool anyOperationsExecuted = false;
 
@@ -179,12 +179,12 @@ namespace Microsoft.TemplateEngine.Core.Util
                         int matchLength = terminal.Terminal.End - terminal.Terminal.Start;
                         int handoffBufferPosition = CurrentBufferPosition + matchLength - (CurrentSequenceNumber - terminal.Location - terminal.Terminal.Start);
 
-                        if (CurrentSequenceNumber > lastWrittenSequenceNumber)
+                        if (terminal.Location + terminal.Terminal.Start > nextSequenceNumberThatCouldBeWritten)
                         {
-                            int toWrite = terminal.Location + terminal.Terminal.Start - lastWrittenSequenceNumber;
+                            int toWrite = terminal.Location + terminal.Terminal.Start - nextSequenceNumberThatCouldBeWritten;
                             _target.Write(CurrentBuffer, handoffBufferPosition - toWrite - matchLength, toWrite);
                             bytesWrittenSinceLastFlush += toWrite;
-                            lastWrittenSequenceNumber = posedPosition - matchLength;
+                            nextSequenceNumberThatCouldBeWritten = posedPosition - matchLength;
                         }
 
                         if(operation.Id == null || (Config.Flags.TryGetValue(operation.Id, out bool opEnabledFlag) && opEnabledFlag))
@@ -197,7 +197,7 @@ namespace Microsoft.TemplateEngine.Core.Util
 
                             CurrentSequenceNumber += posedPosition - CurrentBufferPosition;
                             CurrentBufferPosition = posedPosition;
-                            lastWrittenSequenceNumber = CurrentSequenceNumber;
+                            nextSequenceNumberThatCouldBeWritten = CurrentSequenceNumber;
                             skipAdvanceBuffer = true;
                             anyOperationsExecuted = true;
                         }
@@ -223,21 +223,22 @@ namespace Microsoft.TemplateEngine.Core.Util
 
                 //Calculate the sequence number at the head of the buffer
                 int headSequenceNumber = CurrentSequenceNumber - CurrentBufferPosition;
-                int bytesToTrim = _trie.OldestRequiredSequenceNumber - headSequenceNumber;
+                int bufferPositionToAdvanceTo = _trie.OldestRequiredSequenceNumber - headSequenceNumber;
+                int numberOfUncommittedBytesBeforeThePositionToAdvanceTo = _trie.OldestRequiredSequenceNumber - nextSequenceNumberThatCouldBeWritten;
 
                 //If we'd advance data out of the buffer that hasn't been
                 //  handled already, write it out
-                if(bytesToTrim > CurrentBufferLength - (_trie.OldestRequiredSequenceNumber - lastWrittenSequenceNumber))
+                if (numberOfUncommittedBytesBeforeThePositionToAdvanceTo > 0)
                 {
-                    int toWrite = _trie.OldestRequiredSequenceNumber - lastWrittenSequenceNumber;
-                    _target.Write(CurrentBuffer, bytesToTrim - toWrite, toWrite);
+                    int toWrite = numberOfUncommittedBytesBeforeThePositionToAdvanceTo;
+                    _target.Write(CurrentBuffer, bufferPositionToAdvanceTo - toWrite, toWrite);
                     bytesWrittenSinceLastFlush += toWrite;
-                    lastWrittenSequenceNumber = _trie.OldestRequiredSequenceNumber;
+                    nextSequenceNumberThatCouldBeWritten = _trie.OldestRequiredSequenceNumber;
                 }
 
                 //We ran out of data in the buffer, so attempt to advance
                 //  if we fail, 
-                if (!AdvanceBuffer(bytesToTrim))
+                if (!AdvanceBuffer(bufferPositionToAdvanceTo))
                 {
                     int posedPosition = CurrentSequenceNumber;
                     _trie.FinalizeMatchesInProgress(ref posedPosition, out TerminalLocation<OperationTerminal> terminal);
@@ -248,12 +249,12 @@ namespace Microsoft.TemplateEngine.Core.Util
                         int matchLength = terminal.Terminal.End - terminal.Terminal.Start;
                         int handoffBufferPosition = CurrentBufferPosition - (CurrentSequenceNumber - terminal.Location - terminal.Terminal.Start);
 
-                        if (terminal.Location + terminal.Terminal.Start > lastWrittenSequenceNumber)
+                        if (terminal.Location + terminal.Terminal.Start > nextSequenceNumberThatCouldBeWritten)
                         {
-                            int toWrite = terminal.Location + terminal.Terminal.Start - lastWrittenSequenceNumber;
+                            int toWrite = terminal.Location + terminal.Terminal.Start - nextSequenceNumberThatCouldBeWritten;
                             _target.Write(CurrentBuffer, handoffBufferPosition - toWrite - matchLength, toWrite);
                             bytesWrittenSinceLastFlush += toWrite;
-                            lastWrittenSequenceNumber = terminal.Location + terminal.Terminal.Start;
+                            nextSequenceNumberThatCouldBeWritten = terminal.Location + terminal.Terminal.Start;
                         }
 
                         if (operation.Id == null || (Config.Flags.TryGetValue(operation.Id, out bool opEnabledFlag) && opEnabledFlag))
@@ -266,7 +267,7 @@ namespace Microsoft.TemplateEngine.Core.Util
 
                             CurrentSequenceNumber += posedPosition - CurrentBufferPosition;
                             CurrentBufferPosition = posedPosition;
-                            lastWrittenSequenceNumber = CurrentSequenceNumber;
+                            nextSequenceNumberThatCouldBeWritten = CurrentSequenceNumber;
                             anyOperationsExecuted = true;
                         }
                         else
@@ -283,9 +284,9 @@ namespace Microsoft.TemplateEngine.Core.Util
                 }
             }
 
-            if (CurrentSequenceNumber > lastWrittenSequenceNumber)
+            if (CurrentSequenceNumber > nextSequenceNumberThatCouldBeWritten)
             {
-                int toWrite = CurrentSequenceNumber - lastWrittenSequenceNumber;
+                int toWrite = CurrentSequenceNumber - nextSequenceNumberThatCouldBeWritten;
                 _target.Write(CurrentBuffer, CurrentSequenceNumber - toWrite, toWrite);
             }
 
