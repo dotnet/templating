@@ -855,7 +855,8 @@ namespace Microsoft.TemplateEngine.Cli
 
             ConfigureLocale();
             Initialize();
-            _settingsLoader.RebuildCacheFromSettingsIfNotCurrent();
+            bool forceCacheRebuild = _app.RemainingArguments.Any(x => x == "--debug:rebuildcache");
+            _settingsLoader.RebuildCacheFromSettingsIfNotCurrent(forceCacheRebuild);
 
             try
             {

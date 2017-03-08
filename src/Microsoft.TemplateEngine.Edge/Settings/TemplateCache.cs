@@ -40,8 +40,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             Reinitialize(parsed, cacheVersion);
         }
 
-        // TODO: unify this with the _templateMemoryCache
-        // TemplateInfo is used for reading, the _templateMemoryCache is used for writing. 
         [JsonProperty]
         public List<TemplateInfo> TemplateInfo { get; set; }
 
@@ -211,7 +209,16 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             }
         }
 
-        private List<TemplateInfo> LoadTemplateCacheForLocale(string locale, string existingCacheVersion)
+        // returns a list of the templates with the specified localization.
+        // does not change which locale is cached in this TemplateCache instance.
+        public IReadOnlyList<TemplateInfo> GetTemplatesForLocale(string locale, string existingCacheVersion)
+        {
+            string cacheContent = _paths.ReadAllText(_paths.User.ExplicitLocaleTemplateCacheFile(locale), "{}");
+            JObject parsed = JObject.Parse(cacheContent);
+            return ParseCacheContent(parsed, existingCacheVersion);
+        }
+
+        private IReadOnlyList<TemplateInfo> LoadTemplateCacheForLocale(string locale, string existingCacheVersion)
         {
             string cacheContent = _paths.ReadAllText(_paths.User.ExplicitLocaleTemplateCacheFile(locale), "{}");
             JObject parsed = JObject.Parse(cacheContent);
@@ -219,11 +226,17 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             return TemplateInfo;
         }
 
-        public void Reinitialize(JObject parsed, string cacheVersion)
+        public void Reinitialize(JObject unparsed, string cacheVersion)
         {
             TemplateInfo.Clear();
+            TemplateInfo.AddRange(ParseCacheContent(unparsed, cacheVersion));
+        }
 
-            if (parsed.TryGetValue("TemplateInfo", StringComparison.OrdinalIgnoreCase, out JToken templateInfoToken))
+        private static IReadOnlyList<TemplateInfo> ParseCacheContent(JObject contentJobject, string cacheVersion)
+        {
+            List<TemplateInfo> templateList = new List<Settings.TemplateInfo>();
+
+            if (contentJobject.TryGetValue("TemplateInfo", StringComparison.OrdinalIgnoreCase, out JToken templateInfoToken))
             {
                 if (templateInfoToken is JArray arr)
                 {
@@ -231,11 +244,13 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     {
                         if (entry != null && entry.Type == JTokenType.Object)
                         {
-                            TemplateInfo.Add(Settings.TemplateInfo.FromJObject((JObject)entry, cacheVersion));
+                            templateList.Add(Settings.TemplateInfo.FromJObject((JObject)entry, cacheVersion));
                         }
                     }
                 }
             }
+
+            return templateList;
         }
 
         // Writes template caches for each of the following:
@@ -264,19 +279,12 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
             // read the cache dir for other locale caches, and re-write them.
             // there may be new templates to add to them.
-            string fileSearchPattern = "*." + _paths.User.TemplateCacheFileBaseName;
-            foreach (string fullFilename in _paths.EnumerateFiles(_paths.User.BaseDir, fileSearchPattern, SearchOption.TopDirectoryOnly))
+            foreach (string locale in AllLocalesWithCacheFiles)
             {
-                string filename = Path.GetFileName(fullFilename);
-                string[] fileParts = filename.Split(new char[] { '.' }, 2);
-                string fileLocale = fileParts[0];
-
-                if (!string.IsNullOrEmpty(fileLocale) &&
-                    (fileParts[1] == _paths.User.TemplateCacheFileBaseName)
-                    && !localesWritten.Contains(fileLocale))
+                if (!localesWritten.Contains(locale))
                 {
-                    WriteTemplateCacheForLocale(fileLocale, existingCacheVersion);
-                    localesWritten.Add(fileLocale);
+                    WriteTemplateCacheForLocale(locale, existingCacheVersion);
+                    localesWritten.Add(locale);
                 }
             }
 
@@ -290,20 +298,37 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             WriteTemplateCacheForLocale(null, existingCacheVersion);
         }
 
+        [JsonIgnore]
+        public IReadOnlyList<string> AllLocalesWithCacheFiles
+        {
+            get
+            {
+                List<string> locales = new List<string>();
+
+                string fileSearchPattern = "*." + _paths.User.TemplateCacheFileBaseName;
+                foreach (string fullFilename in _paths.EnumerateFiles(_paths.User.BaseDir, fileSearchPattern, SearchOption.TopDirectoryOnly))
+                {
+                    string filename = Path.GetFileName(fullFilename);
+                    string[] fileParts = filename.Split(new char[] { '.' }, 2);
+                    string fileLocale = fileParts[0];
+
+                    if (!string.IsNullOrEmpty(fileLocale) &&
+                        (fileParts[1] == _paths.User.TemplateCacheFileBaseName))
+                    {
+                        locales.Add(fileLocale);
+                    }
+                }
+
+                return locales;
+            }
+        }
+
         public void DeleteAllLocaleCacheFiles()
         {
-            string fileSearchPattern = "*." + _paths.User.TemplateCacheFileBaseName;
-            foreach (string fullFilename in _paths.EnumerateFiles(_paths.User.BaseDir, fileSearchPattern, SearchOption.TopDirectoryOnly))
+            foreach (string locale in AllLocalesWithCacheFiles)
             {
-                string filename = Path.GetFileName(fullFilename);
-                string[] fileParts = filename.Split(new char[] { '.' }, 2);
-                string fileLocale = fileParts[0];
-
-                if (!string.IsNullOrEmpty(fileLocale) &&
-                    (fileParts[1] == _paths.User.TemplateCacheFileBaseName))
-                {
-                    _paths.Delete(fullFilename);
-                }
+                string fullFilename = _paths.User.ExplicitLocaleTemplateCacheFile(locale);
+                _paths.Delete(fullFilename);
             }
 
             _paths.Delete(_paths.User.CultureNeutralTemplateCacheFile);
@@ -311,7 +336,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         private void WriteTemplateCacheForLocale(string locale, string existingCacheVersion)
         {
-            List<TemplateInfo> existingTemplatesForLocale = LoadTemplateCacheForLocale(locale, existingCacheVersion);
+            IReadOnlyList<TemplateInfo> existingTemplatesForLocale = LoadTemplateCacheForLocale(locale, existingCacheVersion);
             IDictionary<string, ILocalizationLocator> existingLocatorsForLocale;
 
             if (existingTemplatesForLocale.Count == 0)
@@ -476,7 +501,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         }
 
         // return dict is: Identity -> locator
-        private IDictionary<string, ILocalizationLocator> GetLocalizationsFromTemplates(IList<TemplateInfo> templateList, string locale)
+        private IDictionary<string, ILocalizationLocator> GetLocalizationsFromTemplates(IReadOnlyList<TemplateInfo> templateList, string locale)
         {
             IDictionary<string, ILocalizationLocator> locatorLookup = new Dictionary<string, ILocalizationLocator>();
 

@@ -16,6 +16,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             ComponentGuidToAssemblyQualifiedName = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             ComponentTypeToGuidList = new Dictionary<string, HashSet<Guid>>();
             ProbingPaths = new HashSet<string>();
+            Version = string.Empty;
         }
 
         public SettingsStore(JObject obj)

@@ -162,20 +162,47 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 templates.UnionWith(cache.TemplateInfo);
         }
 
-        public void RebuildCacheFromSettingsIfNotCurrent()
+        public void RebuildCacheFromSettingsIfNotCurrent(bool forceRebuild)
         {
             EnsureLoaded();
 
-            if (IsVersionCurrent)
+            if (IsVersionCurrent && !forceRebuild)
             {
                 return;
             }
 
-            _userTemplateCache.TemplateInfo.Clear();
+            // load up the culture neutral cache
+            // and get the mount points for templates from the culture neutral cache
+            IReadOnlyList<TemplateInfo> cultureNeutralTemplates = _userTemplateCache.GetTemplatesForLocale(null, _userSettings.Version);
+            HashSet<Guid> templateMountPointIds = new HashSet<Guid>(cultureNeutralTemplates.Select(x => x.ConfigMountPointId));
 
+            _userTemplateCache.TemplateInfo.Clear();
+            HashSet<Guid> scannedMountPoints = new HashSet<Guid>();
+
+            // Scan the unique mount points for the templates.
             foreach (MountPointInfo mountPoint in MountPoints)
             {
-                _userTemplateCache.Scan(mountPoint.Place);
+                if (templateMountPointIds.Contains(mountPoint.MountPointId) && scannedMountPoints.Add(mountPoint.MountPointId))
+                {
+                    _userTemplateCache.Scan(mountPoint.Place);
+                }
+            }
+
+            // loop through the localized caches and get all the locale mount points
+            HashSet<Guid> localeMountPointIds = new HashSet<Guid>();
+            foreach (string locale in _userTemplateCache.AllLocalesWithCacheFiles)
+            {
+                IReadOnlyList<TemplateInfo> templatesForLocale = _userTemplateCache.GetTemplatesForLocale(locale, _userSettings.Version);
+                localeMountPointIds.UnionWith(templatesForLocale.Select(x => x.LocaleConfigMountPointId));
+            }
+
+            // Scan the unique local mount points
+            foreach (MountPointInfo mountPoint in MountPoints)
+            {
+                if (localeMountPointIds.Contains(mountPoint.MountPointId) && scannedMountPoints.Add(mountPoint.MountPointId))
+                {
+                    _userTemplateCache.Scan(mountPoint.Place);
+                }
             }
 
             Save();
