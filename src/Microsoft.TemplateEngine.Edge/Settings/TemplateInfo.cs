@@ -28,7 +28,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         {
             Func<JObject, TemplateInfo> infoReader;
 
-            if (!_infoVersionReaders.TryGetValue(cacheVersion, out infoReader))
+            if (string.IsNullOrEmpty(cacheVersion) || !_infoVersionReaders.TryGetValue(cacheVersion, out infoReader))
             {
                 infoReader = _defaultReader;
             }

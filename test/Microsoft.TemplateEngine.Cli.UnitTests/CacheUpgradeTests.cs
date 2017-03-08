@@ -12,22 +12,18 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
         public void CanReadUnversionedCache()
         {
             IEngineEnvironmentSettings mockEnvironmentSettings = new MockEngineEnvironmentSettings();
-            TemplateCache cache = new TemplateCache(mockEnvironmentSettings, CacheDataOriginalStyle);
+            TemplateCache cache = new TemplateCache(mockEnvironmentSettings, CacheDataOriginalStyle, string.Empty);
 
             Assert.Equal(3, cache.TemplateInfo.Count);
-            Assert.True(string.Equals(cache.CacheVersion, string.Empty));
-            Assert.False(TemplateCache.CheckIfCacheVersionIsCurrent(cache.CacheVersion));
         }
 
         [Fact(DisplayName = nameof(CanReadVersion1000Cache))]
         public void CanReadVersion1000Cache()
         {
             IEngineEnvironmentSettings mockEnvironmentSettings = new MockEngineEnvironmentSettings();
-            TemplateCache cache = new TemplateCache(mockEnvironmentSettings, CacheDataVersion1000);
+            TemplateCache cache = new TemplateCache(mockEnvironmentSettings, CacheDataVersion1000, "1.0.0.0");
 
             Assert.Equal(3, cache.TemplateInfo.Count);
-            Assert.True(string.Equals(cache.CacheVersion, TemplateCache.CurrentCacheVersion));
-            Assert.True(TemplateCache.CheckIfCacheVersionIsCurrent(cache.CacheVersion));
         }
 
         private static JObject CacheDataVersion1000

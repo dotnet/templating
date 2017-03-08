@@ -18,8 +18,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 {
     public class TemplateCache
     {
-        public static readonly string CurrentCacheVersion = "1.0.0.0";
-
         private IDictionary<string, ITemplate> _templateMemoryCache = new Dictionary<string, ITemplate>();
 
         // locale -> identity -> locator
@@ -33,35 +31,13 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             _environmentSettings = environmentSettings;
             _paths = new Paths(environmentSettings);
             TemplateInfo = new List<TemplateInfo>();
-            CacheVersion = CurrentCacheVersion;
             _aliasRegistry = new AliasRegistry(environmentSettings);
         }
 
-        public TemplateCache(IEngineEnvironmentSettings environmentSettings, JObject parsed)
+        public TemplateCache(IEngineEnvironmentSettings environmentSettings, JObject parsed, string cacheVersion)
             : this(environmentSettings)
         {
-            if (parsed.TryGetValue(nameof(CacheVersion), StringComparison.Ordinal, out JToken cacheVersionToken))
-            {
-                CacheVersion = cacheVersionToken.ToString() ?? string.Empty;
-            }
-            else
-            {
-                CacheVersion = string.Empty;
-            }
-
-            if (parsed.TryGetValue("TemplateInfo", StringComparison.OrdinalIgnoreCase, out JToken templateInfoToken))
-            {
-                if (templateInfoToken is JArray arr)
-                {
-                    foreach (JToken entry in arr)
-                    {
-                        if (entry != null && entry.Type == JTokenType.Object)
-                        {
-                            TemplateInfo.Add(Settings.TemplateInfo.FromJObject((JObject)entry, CacheVersion));
-                        }
-                    }
-                }
-            }
+            Reinitialize(parsed, cacheVersion);
         }
 
         // TODO: unify this with the _templateMemoryCache
@@ -69,25 +45,11 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         [JsonProperty]
         public List<TemplateInfo> TemplateInfo { get; set; }
 
-        [JsonProperty]
-        public string CacheVersion { get; set; }
-
-        public static bool CheckIfCacheVersionIsCurrent(string cacheVersion)
-        {
-            if (string.IsNullOrEmpty(cacheVersion) || !string.Equals(cacheVersion, CurrentCacheVersion, StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
-
-            return true;
-        }
-
         public IReadOnlyCollection<IFilteredTemplateInfo> List(bool exactMatchesOnly, params Func<ITemplateInfo, string, MatchInfo?>[] fitlers)
         {
             HashSet<IFilteredTemplateInfo> matchingTemplates = new HashSet<IFilteredTemplateInfo>(FilteredTemplateEqualityComparer.Default);
-            List<TemplateInfo> templatesInCache = LoadTemplateCacheForLocale(_environmentSettings.Host.Locale, out string cacheVersion);
 
-            foreach (ITemplateInfo template in templatesInCache)
+            foreach (ITemplateInfo template in TemplateInfo)
             {
                 string alias = _aliasRegistry.GetAliasForTemplate(template);
                 List<MatchInfo> matchInformation = new List<MatchInfo>();
@@ -249,17 +211,17 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             }
         }
 
-        public List<TemplateInfo> LoadTemplateCacheForLocale(string locale, out string cacheVersion)
+        private List<TemplateInfo> LoadTemplateCacheForLocale(string locale, string existingCacheVersion)
         {
             string cacheContent = _paths.ReadAllText(_paths.User.ExplicitLocaleTemplateCacheFile(locale), "{}");
             JObject parsed = JObject.Parse(cacheContent);
-            List<TemplateInfo> templates = new List<TemplateInfo>();
-            cacheVersion = string.Empty;
+            Reinitialize(parsed, existingCacheVersion);
+            return TemplateInfo;
+        }
 
-            if (parsed.TryGetValue(nameof(CacheVersion), StringComparison.Ordinal, out JToken cacheVersionToken))
-            {
-                cacheVersion = cacheVersionToken.ToString() ?? string.Empty;
-            }
+        public void Reinitialize(JObject parsed, string cacheVersion)
+        {
+            TemplateInfo.Clear();
 
             if (parsed.TryGetValue("TemplateInfo", StringComparison.OrdinalIgnoreCase, out JToken templateInfoToken))
             {
@@ -269,13 +231,11 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     {
                         if (entry != null && entry.Type == JTokenType.Object)
                         {
-                            templates.Add(Settings.TemplateInfo.FromJObject((JObject)entry, cacheVersion));
+                            TemplateInfo.Add(Settings.TemplateInfo.FromJObject((JObject)entry, cacheVersion));
                         }
                     }
                 }
             }
-
-            return templates;
         }
 
         // Writes template caches for each of the following:
@@ -283,7 +243,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         //  - cultures for which new langpacks are installed
         //  - other locales with existing caches are regenerated.
         //  - neutral locale
-        public void WriteTemplateCaches()
+        internal void WriteTemplateCaches(string existingCacheVersion)
         {
             string currentLocale = _environmentSettings.Host.Locale;
             HashSet<string> localesWritten = new HashSet<string>();
@@ -291,14 +251,14 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             // If the current locale exists, always write it.
             if (! string.IsNullOrEmpty(currentLocale))
             {
-                WriteTemplateCacheForLocale(currentLocale);
+                WriteTemplateCacheForLocale(currentLocale, existingCacheVersion);
                 localesWritten.Add(currentLocale);
             }
 
             // write caches for any locales which had new langpacks installed
             foreach (string langpackLocale in _localizationMemoryCache.Keys)
             {
-                WriteTemplateCacheForLocale(langpackLocale);
+                WriteTemplateCacheForLocale(langpackLocale, existingCacheVersion);
                 localesWritten.Add(langpackLocale);
             }
 
@@ -315,7 +275,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     (fileParts[1] == _paths.User.TemplateCacheFileBaseName)
                     && !localesWritten.Contains(fileLocale))
                 {
-                    WriteTemplateCacheForLocale(fileLocale);
+                    WriteTemplateCacheForLocale(fileLocale, existingCacheVersion);
                     localesWritten.Add(fileLocale);
                 }
             }
@@ -327,7 +287,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             // the new cache will have duplicate values.
             //
             // being last may not matter anymore due to changes after the comment was written.
-            WriteTemplateCacheForLocale(null);
+            WriteTemplateCacheForLocale(null, existingCacheVersion);
         }
 
         public void DeleteAllLocaleCacheFiles()
@@ -349,15 +309,14 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             _paths.Delete(_paths.User.CultureNeutralTemplateCacheFile);
         }
 
-        private void WriteTemplateCacheForLocale(string locale)
+        private void WriteTemplateCacheForLocale(string locale, string existingCacheVersion)
         {
-            string throwawayReadCacheVersion;
-            List<TemplateInfo> existingTemplatesForLocale = LoadTemplateCacheForLocale(locale, out throwawayReadCacheVersion);
+            List<TemplateInfo> existingTemplatesForLocale = LoadTemplateCacheForLocale(locale, existingCacheVersion);
             IDictionary<string, ILocalizationLocator> existingLocatorsForLocale;
 
             if (existingTemplatesForLocale.Count == 0)
             {   // the cache for this locale didn't exist previously. Start with the neutral locale as if it were the existing (no locales)
-                existingTemplatesForLocale = LoadTemplateCacheForLocale(null, out throwawayReadCacheVersion);
+                existingTemplatesForLocale = LoadTemplateCacheForLocale(null, existingCacheVersion);
                 existingLocatorsForLocale = new Dictionary<string, ILocalizationLocator>();
             }
             else
@@ -397,7 +356,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             bool isCurrentLocale = string.IsNullOrEmpty(locale)
                 && string.IsNullOrEmpty(_environmentSettings.Host.Locale)
                 || (locale == _environmentSettings.Host.Locale);
-            _environmentSettings.SettingsLoader.WriteTemplateCache(mergedTemplateList, CacheVersion, locale, isCurrentLocale);
+            _environmentSettings.SettingsLoader.WriteTemplateCache(mergedTemplateList, locale, isCurrentLocale);
         }
 
         // find the best locator (if any). New is preferred over old

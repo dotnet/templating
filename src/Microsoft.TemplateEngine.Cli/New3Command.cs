@@ -30,7 +30,7 @@ namespace Microsoft.TemplateEngine.Cli
         private IReadOnlyList<IFilteredTemplateInfo> _matchedTemplates;
         private CommandArgument _templateNameArgument;
         private readonly TemplateCreator _templateCreator;
-        private readonly TemplateCache _templateCache;
+        private readonly SettingsLoader _settingsLoader;
         private readonly AliasRegistry _aliasRegistry;
         private readonly Paths _paths;
         private readonly ExtendedTemplateEngineHost _host;
@@ -48,9 +48,9 @@ namespace Microsoft.TemplateEngine.Cli
         {
             host = _host = new ExtendedTemplateEngineHost(host, this);
             EnvironmentSettings = new EngineEnvironmentSettings(host, x => new SettingsLoader(x));
-            Installer = new Installer(EnvironmentSettings);
+            _settingsLoader = (SettingsLoader)EnvironmentSettings.SettingsLoader;
+            Installer = new Installer(EnvironmentSettings, _settingsLoader.UserTemplateCache);
             _templateCreator = new TemplateCreator(EnvironmentSettings);
-            _templateCache = new TemplateCache(EnvironmentSettings);
             _aliasRegistry = new AliasRegistry(EnvironmentSettings);
             CommandName = commandName;
             _paths = new Paths(EnvironmentSettings);
@@ -479,7 +479,7 @@ namespace Microsoft.TemplateEngine.Cli
                     {
                         foreach (string lang in languageTag.ChoicesAndDescriptions.Keys)
                         {
-                            if (!uniqueLanguages.Add(lang))
+                            if (uniqueLanguages.Add(lang))
                             {
                                 if (string.IsNullOrEmpty(Language) && string.Equals(defaultLanguage, lang, StringComparison.OrdinalIgnoreCase))
                                 {
@@ -855,7 +855,7 @@ namespace Microsoft.TemplateEngine.Cli
 
             ConfigureLocale();
             Initialize();
-            _host.RebuildCacheFromSettingsIfNotCurrent(EnvironmentSettings);
+            _settingsLoader.RebuildCacheFromSettingsIfNotCurrent();
 
             try
             {
@@ -884,6 +884,8 @@ namespace Microsoft.TemplateEngine.Cli
                 }
 
                 EnvironmentSettings.Host.UpdateLocale(newLocale);
+                // cache the templates for the new locale
+                _settingsLoader.ReloadTemplates();
             }
         }
 
@@ -981,7 +983,7 @@ namespace Microsoft.TemplateEngine.Cli
             {
                 _paths.Delete(_paths.User.AliasesFile);
                 _paths.Delete(_paths.User.SettingsFile);
-                _templateCache.DeleteAllLocaleCacheFiles();
+                _settingsLoader.UserTemplateCache.DeleteAllLocaleCacheFiles();
                 return false;
             }
 
@@ -1144,7 +1146,7 @@ namespace Microsoft.TemplateEngine.Cli
         {
             string context = DetermineTemplateContext();
 
-            IReadOnlyCollection<IFilteredTemplateInfo> templates = _templateCache.List
+            IReadOnlyCollection<IFilteredTemplateInfo> templates = _settingsLoader.UserTemplateCache.List
             (
                 false,
                 WellKnownSearchFilters.AliasFilter(TemplateName),
@@ -1236,7 +1238,7 @@ namespace Microsoft.TemplateEngine.Cli
         {
             string context = DetermineTemplateContext();
 
-            IReadOnlyCollection<IFilteredTemplateInfo> templates = _templateCache.List
+            IReadOnlyCollection<IFilteredTemplateInfo> templates = _settingsLoader.UserTemplateCache.List
             (
                 false,
                 WellKnownSearchFilters.ContextFilter(context),

@@ -8,6 +8,8 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 {
     public class SettingsStore
     {
+        internal static readonly string CurrentVersion = "1.0.0.0";
+
         public SettingsStore()
         {
             MountPoints = new List<MountPointInfo>();
@@ -19,6 +21,12 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         public SettingsStore(JObject obj)
             : this()
         {
+            JToken versionToken;
+            if (obj.TryGetValue(nameof(Version), StringComparison.OrdinalIgnoreCase, out versionToken))
+            {
+                Version = versionToken.ToString();
+            }
+
             JToken mountPointsToken;
             if (obj.TryGetValue("MountPoints", StringComparison.OrdinalIgnoreCase, out mountPointsToken))
             {
@@ -129,6 +137,14 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 }
             }
         }
+
+        public void SetVersionToCurrent()
+        {
+            Version = CurrentVersion;
+        }
+
+        [JsonProperty]
+        public string Version { get; private set; }
 
         [JsonProperty]
         public List<MountPointInfo> MountPoints { get; }

@@ -26,7 +26,6 @@ namespace Microsoft.TemplateEngine.Cli
         public string Locale => _baseHost.Locale;
 
         public void UpdateLocale(string newLocale) => _baseHost.UpdateLocale(newLocale);
-        
 
         public string HostIdentifier => _baseHost.HostIdentifier;
 
@@ -145,27 +144,6 @@ namespace Microsoft.TemplateEngine.Cli
 
                 return found;
             }
-        }
-
-        public void RebuildCacheFromSettingsIfNotCurrent(IEngineEnvironmentSettings environmentSettings)
-        {
-            TemplateCache cache = new TemplateCache(environmentSettings);
-            cache.LoadTemplateCacheForLocale(Locale, out string cacheVersion);
-
-            if (TemplateCache.CheckIfCacheVersionIsCurrent(cacheVersion))
-            {
-                return;
-            }
-
-            cache.CacheVersion = TemplateCache.CurrentCacheVersion;
-            cache.TemplateInfo.Clear();
-
-            foreach (MountPointInfo mountPoint in environmentSettings.SettingsLoader.MountPoints)
-            {
-                cache.Scan(mountPoint.Place);
-            }
-
-            cache.WriteTemplateCaches();
         }
     }
 }

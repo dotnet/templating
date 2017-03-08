@@ -36,36 +36,42 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             // parse the cached tags
             Dictionary<string, ICacheTag> tags = new Dictionary<string, ICacheTag>();
             JObject tagsObject = entry.Get<JObject>(nameof(TemplateInfo.Tags));
-            foreach (JProperty item in tagsObject.Properties())
+            if (tagsObject != null)
             {
-                Dictionary<string, string> choicesAndDescriptions = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                JObject cdToken = item.Value.Get<JObject>(nameof(ICacheTag.ChoicesAndDescriptions));
-                foreach (JProperty cdPair in cdToken.Properties())
+                foreach (JProperty item in tagsObject.Properties())
                 {
-                    choicesAndDescriptions.Add(cdPair.Name.ToString(), cdPair.Value.ToString());
-                }
+                    Dictionary<string, string> choicesAndDescriptions = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                    JObject cdToken = item.Value.Get<JObject>(nameof(ICacheTag.ChoicesAndDescriptions));
+                    foreach (JProperty cdPair in cdToken.Properties())
+                    {
+                        choicesAndDescriptions.Add(cdPair.Name.ToString(), cdPair.Value.ToString());
+                    }
 
-                ICacheTag cacheTag = new CacheTag(
-                    item.Value.ToString(nameof(ICacheTag.Description)),
-                    choicesAndDescriptions,
-                    item.Value.ToString(nameof(ICacheTag.DefaultValue)));
-                tags.Add(item.Name.ToString(), cacheTag);
+                    ICacheTag cacheTag = new CacheTag(
+                        item.Value.ToString(nameof(ICacheTag.Description)),
+                        choicesAndDescriptions,
+                        item.Value.ToString(nameof(ICacheTag.DefaultValue)));
+                    tags.Add(item.Name.ToString(), cacheTag);
+                }
             }
             info.Tags = tags;
 
             // parse the cached params
             JObject cacheParamsObject = entry.Get<JObject>(nameof(TemplateInfo.CacheParameters));
             Dictionary<string, ICacheParameter> cacheParams = new Dictionary<string, ICacheParameter>();
-            foreach (JProperty item in cacheParamsObject.Properties())
+            if (cacheParamsObject != null)
             {
-                ICacheParameter param = new CacheParameter
+                foreach (JProperty item in cacheParamsObject.Properties())
                 {
-                    DataType = item.Value.ToString(nameof(ICacheParameter.DataType)),
-                    DefaultValue = item.Value.ToString(nameof(ICacheParameter.DefaultValue)),
-                    Description = item.Value.ToString(nameof(ICacheParameter.Description))
-                };
+                    ICacheParameter param = new CacheParameter
+                    {
+                        DataType = item.Value.ToString(nameof(ICacheParameter.DataType)),
+                        DefaultValue = item.Value.ToString(nameof(ICacheParameter.DefaultValue)),
+                        Description = item.Value.ToString(nameof(ICacheParameter.Description))
+                    };
 
-                cacheParams[item.Name.ToString()] = param;
+                    cacheParams[item.Name.ToString()] = param;
+                }
             }
             info.CacheParameters = cacheParams;
 
