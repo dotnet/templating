@@ -39,10 +39,10 @@ namespace Microsoft.TemplateEngine.Core.Operations
         private class Impl : IOperation
         {
             private readonly Include _source;
-            private readonly TokenTrie _endTokenMatcher;
+            private readonly ITokenTrie _endTokenMatcher;
             private readonly string _id;
 
-            public Impl(byte[] token, TokenTrie endTokenMatcher, Include source, string id)
+            public Impl(byte[] token, ITokenTrie endTokenMatcher, Include source, string id)
             {
                 Tokens = new[] {token};
                 _source = source;

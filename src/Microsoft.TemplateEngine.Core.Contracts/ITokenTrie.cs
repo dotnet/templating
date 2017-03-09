@@ -6,8 +6,6 @@ namespace Microsoft.TemplateEngine.Core.Contracts
     {
         int Count { get; }
 
-        int Index { get; }
-
         int MaxLength { get; }
 
         int MinLength { get; }
@@ -23,5 +21,7 @@ namespace Microsoft.TemplateEngine.Core.Contracts
         bool GetOperation(byte[] buffer, int bufferLength, ref int currentBufferPosition, out int token);
 
         void Append(ITokenTrie trie);
+
+        ITokenTrieEvaluator CreateEvaluator();
     }
 }
