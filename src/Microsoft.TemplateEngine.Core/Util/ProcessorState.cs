@@ -19,8 +19,6 @@ namespace Microsoft.TemplateEngine.Core.Util
 
         public ProcessorState2(Stream source, Stream target, int bufferSize, int flushThreshold, IEngineConfig config, IReadOnlyList<IOperationProvider> operationProviders)
         {
-            bool sizedToStream = false;
-
             //Buffer has to be at least as large as the largest BOM we could expect
             if (bufferSize < 4)
             {
@@ -32,7 +30,6 @@ namespace Microsoft.TemplateEngine.Core.Util
                 {
                     if (source.Length < bufferSize)
                     {
-                        sizedToStream = true;
                         bufferSize = (int) source.Length;
                     }
                 }

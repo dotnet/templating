@@ -6,9 +6,9 @@ namespace Microsoft.TemplateEngine.Core.Matching
         private readonly TrieEvaluator<T> _evaluator;
         private int _sequenceNumber;
 
-        public TrieEvaluationDriver(Trie<T> trie)
+        public TrieEvaluationDriver(TrieEvaluator<T> trie)
         {
-            _evaluator = new TrieEvaluator<T>(trie);
+            _evaluator = trie;
         }
 
         public TerminalLocation<T> Evaluate(byte[] buffer, int bufferLength, bool isFinalBuffer, int lastNetBufferEffect, ref int bufferPosition)
@@ -28,10 +28,7 @@ namespace Microsoft.TemplateEngine.Core.Matching
                     {
                         if (!isFinalBuffer)
                         {
-                            //TODO: Advance the buffer, preserving data from _evaluator.OldestRequiredSequenceNumber on
-                            //  this is _sequenceNumber - _evaluator.OldestRequiredSequenceNumber bytes
-                            //  bufferPosition should be reset to that value, but _sequenceNumber should remain unchanged
-                            sequenceNumberToBufferPositionRelationship = _sequenceNumber - bufferPosition;
+                            break;
                         }
                         else
                         {

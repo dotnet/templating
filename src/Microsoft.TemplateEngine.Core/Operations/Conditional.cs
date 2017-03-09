@@ -99,7 +99,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
         /// <param name="tokensOfType"></param>
         /// <param name="typeRemainder"></param>
         /// <param name="encoding"></param>
-        private void AddTokensOfTypeToTokenListAndTrie(TokenTrie trie, List<byte[]> tokenMasterList, IReadOnlyList<string> tokensOfType, int typeRemainder, Encoding encoding)
+        private void AddTokensOfTypeToTokenListAndTrie(ITokenTrie trie, List<byte[]> tokenMasterList, IReadOnlyList<string> tokensOfType, int typeRemainder, Encoding encoding)
         {
             int tokenIndex = typeRemainder;
 
@@ -130,10 +130,10 @@ namespace Microsoft.TemplateEngine.Core.Operations
             private readonly Conditional _definition;
             private EvaluationState _current;
             private readonly Stack<EvaluationState> _pendingCompletion = new Stack<EvaluationState>();
-            private readonly TokenTrie _trie;
+            private readonly ITokenTrie _trie;
             private readonly string _id;
 
-            public Impl(Conditional definition, IReadOnlyList<byte[]> tokens, TokenTrie trie, string id)
+            public Impl(Conditional definition, IReadOnlyList<byte[]> tokens, ITokenTrie trie, string id)
             {
                 _trie = trie;
                 _definition = definition;
@@ -385,13 +385,15 @@ namespace Microsoft.TemplateEngine.Core.Operations
             // returns false if the end of the buffer was reached without finding a token.
             private bool SeekToToken(IProcessorState processor, ref int bufferLength, ref int currentBufferPosition, out int token)
             {
+                //TODO: This needs to become sequence number aware in some capacity (even if only locally)
                 bool bufferAdvanceFailed = false;
+                ITokenTrieEvaluator evaluator = _trie.CreateEvaluator();
 
-                while (bufferLength >= _trie.MinLength)
+                while (currentBufferPosition < bufferLength)
                 {
-                    for (; currentBufferPosition < bufferLength - _trie.MinLength + 1; ++currentBufferPosition)
+                    for (; currentBufferPosition < bufferLength; ++currentBufferPosition)
                     {
-                        if (_trie.GetOperation(processor.CurrentBuffer, bufferLength, ref currentBufferPosition, out token))
+                        if (evaluator.Accept(processor.CurrentBuffer[currentBufferPosition], ref currentBufferPosition, out token))
                         {
                             if (bufferAdvanceFailed || (currentBufferPosition != bufferLength))
                             {
@@ -402,11 +404,15 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
                     if (bufferAdvanceFailed)
                     {
+                        if(evaluator.TryFinalizeMatchesInProgress(ref currentBufferPosition, out token))
+                        {
+                            return true;
+                        }
+
                         break;
                     }
 
-                    int moveBufferTo = bufferLength - _trie.MaxLength;
-                    bufferAdvanceFailed = !processor.AdvanceBuffer(moveBufferTo);
+                    bufferAdvanceFailed = !processor.AdvanceBuffer(bufferLength);
                     currentBufferPosition = processor.CurrentBufferPosition;
                     bufferLength = processor.CurrentBufferLength;
                 }

@@ -63,13 +63,13 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
         public class Impl : IOperation
         {
-            private readonly TokenTrie _closeConditionTrie;
+            private readonly ITokenTrie _closeConditionTrie;
             private readonly InlineMarkupConditional _definition;
             private readonly MarkupTokenMapping _mapping;
-            private readonly TokenTrie _scanBackTrie;
-            private readonly TokenTrie _structureTrie;
+            private readonly ITokenTrie _scanBackTrie;
+            private readonly ITokenTrie _structureTrie;
 
-            public Impl(InlineMarkupConditional definition, IReadOnlyList<byte[]> tokens, TokenTrie structureTrie, TokenTrie closeConditionTrie, TokenTrie scanBackTrie, MarkupTokenMapping mapping, string id)
+            public Impl(InlineMarkupConditional definition, IReadOnlyList<byte[]> tokens, ITokenTrie structureTrie, ITokenTrie closeConditionTrie, ITokenTrie scanBackTrie, MarkupTokenMapping mapping, string id)
             {
                 _definition = definition;
                 Id = id;
