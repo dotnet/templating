@@ -87,6 +87,8 @@ namespace Microsoft.TemplateEngine.Core.Util
         {
         }
 
+        public int BytesToKeepInBuffer => _currentSequenceNumber - OldestRequiredSequenceNumber + 1;
+
         public bool Accept(byte data, ref int bufferPosition, out int token)
         {
             ++_currentSequenceNumber;

@@ -385,7 +385,6 @@ namespace Microsoft.TemplateEngine.Core.Operations
             // returns false if the end of the buffer was reached without finding a token.
             private bool SeekToToken(IProcessorState processor, ref int bufferLength, ref int currentBufferPosition, out int token)
             {
-                //TODO: This needs to become sequence number aware in some capacity (even if only locally)
                 bool bufferAdvanceFailed = false;
                 ITokenTrieEvaluator evaluator = _trie.CreateEvaluator();
 
@@ -412,8 +411,8 @@ namespace Microsoft.TemplateEngine.Core.Operations
                         break;
                     }
 
-                    bufferAdvanceFailed = !processor.AdvanceBuffer(bufferLength);
-                    currentBufferPosition = processor.CurrentBufferPosition;
+                    bufferAdvanceFailed = !processor.AdvanceBuffer(bufferLength - evaluator.BytesToKeepInBuffer);
+                    currentBufferPosition = evaluator.BytesToKeepInBuffer;
                     bufferLength = processor.CurrentBufferLength;
                 }
 
