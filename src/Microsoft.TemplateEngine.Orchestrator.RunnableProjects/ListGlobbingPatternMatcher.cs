@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Core.Contracts;
+using System.Text;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
@@ -24,9 +25,23 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         {
             get
             {
-                throw new NotImplementedException();
+                if (_displayPattern == null)
+                {
+                    StringBuilder displaySB = new StringBuilder(128);
+                    displaySB.AppendLine("Composite matcher - matches any of these:");
+
+                    foreach (IPathMatcher matcher in _pathMatchers)
+                    {
+                        displaySB.AppendLine($"\t{matcher.Pattern}");
+                    }
+
+                    _displayPattern = displaySB.ToString();
+                }
+
+                return _displayPattern;
             }
         }
+        private string _displayPattern;
 
         public bool IsMatch(string path)
         {

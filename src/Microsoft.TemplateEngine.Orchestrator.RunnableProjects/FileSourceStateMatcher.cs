@@ -20,7 +20,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         {
             get
             {
-                throw new NotImplementedException();
+                return $"Composite matcher for disposition: {_checkState.ToString()}";
             }
         }
 
