@@ -12,11 +12,4 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         IReadOnlyList<IReplacementContext> ReplacementContexts { get; }
     }
-
-    public interface IReplacementContext
-    {
-        string OnlyIfBefore { get; }
-
-        string OnlyIfAfter { get; }
-    }
 }
