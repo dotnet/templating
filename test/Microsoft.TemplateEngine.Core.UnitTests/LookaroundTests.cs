@@ -164,8 +164,8 @@ color:red;";
             Verify(Encoding.UTF8, output, changed, value, expected);
         }
 
-        [Fact(DisplayName = nameof(TestReadaheadBreaksLookbehinds))]
-        public void TestReadaheadBreaksLookbehinds()
+        [Fact(DisplayName = nameof(TestReadAheadBreaksLookBehinds))]
+        public void TestReadAheadBreaksLookBehinds()
         {
             string value = @"footbarbaz";
             string expected = @"barbaz";
@@ -178,6 +178,53 @@ color:red;";
             {
                 new MockOperationProvider(new MockOperation(null, ReadaheadOneByte, Encoding.UTF8.GetBytes("foo"))),
                 new Replacement("bar".TokenConfigBuilder().OnlyIfAfter("foot"), "b", null)
+            };
+            EngineConfig cfg = new EngineConfig(EnvironmentSettings, VariableCollection.Environment(EnvironmentSettings), "${0}$");
+            IProcessor processor = Processor.Create(cfg, operations);
+
+            //Changes should be made
+            bool changed = processor.Run(input, output, 1);
+            Verify(Encoding.UTF8, output, changed, value, expected);
+        }
+
+        [Fact(DisplayName = nameof(TestLookBehindWithValueOverlappingPriorMatchGetsSkipped))]
+        public void TestLookBehindWithValueOverlappingPriorMatchGetsSkipped()
+        {
+            string value = @"foobarbaz";
+            string expected = @"aarc";
+
+            byte[] valueBytes = Encoding.UTF8.GetBytes(value);
+            MemoryStream input = new MemoryStream(valueBytes);
+            MemoryStream output = new MemoryStream();
+
+            IOperationProvider[] operations =
+            {
+                new Replacement("foob".TokenConfigBuilder(), "a", null),
+                new Replacement("bar".TokenConfigBuilder().OnlyIfAfter("foo"), "b", null),
+                new Replacement("baz".TokenConfigBuilder().OnlyIfAfter("bar"), "c", null)
+            };
+            EngineConfig cfg = new EngineConfig(EnvironmentSettings, VariableCollection.Environment(EnvironmentSettings), "${0}$");
+            IProcessor processor = Processor.Create(cfg, operations);
+
+            //Changes should be made
+            bool changed = processor.Run(input, output, 1);
+            Verify(Encoding.UTF8, output, changed, value, expected);
+        }
+
+        [Fact(DisplayName = nameof(TestLookBehindCoveringMatchedValueGetsMatched))]
+        public void TestLookBehindCoveringMatchedValueGetsMatched()
+        {
+            string value = @"foobarbaz";
+            string expected = @"fooba";
+
+            byte[] valueBytes = Encoding.UTF8.GetBytes(value);
+            MemoryStream input = new MemoryStream(valueBytes);
+            MemoryStream output = new MemoryStream();
+
+            IOperationProvider[] operations =
+            {
+                new Replacement("baz".TokenConfigBuilder().OnlyIfAfter("foobar"), "a", null),
+                new Replacement("bar".TokenConfigBuilder().OnlyIfAfter("foo"), "b", null)
             };
             EngineConfig cfg = new EngineConfig(EnvironmentSettings, VariableCollection.Environment(EnvironmentSettings), "${0}$");
             IProcessor processor = Processor.Create(cfg, operations);
