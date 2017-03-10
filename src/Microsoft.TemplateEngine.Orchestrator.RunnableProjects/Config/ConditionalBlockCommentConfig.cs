@@ -72,17 +72,17 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config
 
             ConditionalTokens tokens = new ConditionalTokens
             {
-                EndIfTokens = new ITokenConfig[] { $"{keywords.KeywordPrefix}{keywords.EndIfKeyword}".TokenConfig(), $"{startToken}{keywords.KeywordPrefix}{keywords.EndIfKeyword}".TokenConfig() },
-                ActionableIfTokens = new ITokenConfig[] { $"{startToken}{keywords.KeywordPrefix}{keywords.IfKeyword}".TokenConfig() },
-                ActionableElseTokens = new ITokenConfig[] { $"{keywords.KeywordPrefix}{keywords.ElseKeyword}".TokenConfig(), $"{startToken}{keywords.KeywordPrefix}{keywords.ElseKeyword}".TokenConfig() },
-                ActionableElseIfTokens = new ITokenConfig[] { $"{keywords.KeywordPrefix}{keywords.ElseIfKeyword}".TokenConfig(), $"{startToken}{keywords.KeywordPrefix}{keywords.ElseIfKeyword}".TokenConfig() },
+                EndIfTokens = new[] { $"{keywords.KeywordPrefix}{keywords.EndIfKeyword}".TokenConfig(), $"{startToken}{keywords.KeywordPrefix}{keywords.EndIfKeyword}".TokenConfig() },
+                ActionableIfTokens = new[] { $"{startToken}{keywords.KeywordPrefix}{keywords.IfKeyword}".TokenConfig() },
+                ActionableElseTokens = new[] { $"{keywords.KeywordPrefix}{keywords.ElseKeyword}".TokenConfig(), $"{startToken}{keywords.KeywordPrefix}{keywords.ElseKeyword}".TokenConfig() },
+                ActionableElseIfTokens = new[] { $"{keywords.KeywordPrefix}{keywords.ElseIfKeyword}".TokenConfig(), $"{startToken}{keywords.KeywordPrefix}{keywords.ElseIfKeyword}".TokenConfig() },
             };
 
             if (!string.IsNullOrWhiteSpace(pseudoEndToken))
             {
                 Guid operationIdGuid = new Guid();
-                string commentFixOperationId = $"Fix pseudo tokens ({pseudoEndToken} {operationIdGuid.ToString()})";
-                string commentFixResetId = $"Reset pseudo token fixer ({pseudoEndToken} {operationIdGuid.ToString()})";
+                string commentFixOperationId = $"Fix pseudo tokens ({pseudoEndToken} {operationIdGuid})";
+                string commentFixResetId = $"Reset pseudo token fixer ({pseudoEndToken} {operationIdGuid})";
 
                 tokens.ActionableOperations = new[] { commentFixOperationId, commentFixResetId };
 

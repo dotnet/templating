@@ -2,7 +2,6 @@
 using System.IO;
 using System.Text;
 using Microsoft.TemplateEngine.Core.Contracts;
-using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Core.Operations
 {

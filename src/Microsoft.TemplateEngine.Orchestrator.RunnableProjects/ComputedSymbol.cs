@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json.Linq;

@@ -1,5 +1,9 @@
 using System;
 using System.Reflection;
+#if !NET45
+using System.Runtime.Loader;
+#endif
+
 
 namespace Microsoft.TemplateEngine.Edge
 {
