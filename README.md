@@ -53,18 +53,39 @@ Now that we've covered the basics of using `dotnew new`, lets move on to info fo
 If you're authoring templates, or interested in contributing to this repo, then you're likely interested in how to use the latest version of this experience.
 The steps required are outlined below.
 
-Step 1: Get the SDK for your platform from [dotnet/cli](https://github.com/dotnet/cli)
+## Prerequisites
+In order to work with this project, you will need the following.
+- [Visual Studio 2017](https://www.visualstudio.com/)
 
-Step 2: Clone this repository to your local machine
+## Setup
 
-Step 3:  Run the setup script
- - **Windows:** [setup.cmd](https://github.com/dotnet/templating/blob/master/setup.cmd)
- - **Mac/Linux**: [setup.sh](https://github.com/dotnet/templating/blob/master/setup.sh) 
+Step 1:
+- Get the SDK for your platform from [dotnet/cli](https://github.com/dotnet/cli)
+- Typically, development is  done against the latest RC FTS Release.  
+  - It is best to ask the team to clear up any compatibility concerns before starting development.
 
-When running the setup script, the existing built in command `dotnet new` will be preserved. A new command `dotnet new3` will be enabled which allows you to create
+Step 2:
+- Clone this repository to your local machine.
+
+```bash
+git clone https://github.com/dotnet/templating.git
+```
+
+- There is no guarantee that **master** is the current working branch. 
+  - It is recommended that you check with the team to insure you are working from the correct branch. 
+
+Step 3: 
+- Open up a command prompt and navigation to the root of your source code.
+- Run the setup script.
+     - **Windows:** [setup.cmd](https://github.com/dotnet/templating/blob/master/setup.cmd)
+     - **Mac/Linux**: [setup.sh](https://github.com/dotnet/templating/blob/master/setup.sh) 
+- When running the setup script, the existing built in command `dotnet new` will be preserved. A new command `dotnet new3` will be enabled which allows you to create
 files with the latest Template Engine.
+- Closing your console window or "session" will destroy your current instance of `dotnet new3`.
+  - The next a console window is opened, you will again need to run the setup script. 
 
-Step 4: That's it! Now you can run `dotnet new3`.
+Step 4: 
+ - That's it! Now you can run `dotnet new3`.
 
 For example, here is the result of running `dotnet new3 --help` on a Mac (_truncated to save space here_).
 
@@ -79,6 +100,48 @@ Arguments:
 
 <truncated>
 ```
+    
+# Debugging
+Debugging code requires your current `dotnet new3` session to have its active build session configured to DEBUG, and a debug process from Visual Studio to be attached to the current running `dotnet new3` session. The steps required to accomplish this are outlined below.
+
+## Setup
+
+Start by opening up the **Microsoft.Templating.sln** in Visual Studio. This solution contains the projects needed to run, modify & debug the application. Once your solution is loaded, open up a new command prompt and navigate to the root of your repository. At this point, you can take one of two paths.
+
+Path 1:
+- Run the "setup" script that applies to your environment. 
+- Once complete, type "debug" and press enter.
+  - The "debug" command is an alias that kicks off a command to run a script named **dn3buildmode-debug.cmd**. 
+    - Of which sets the build to a DEBUG mode.
+
+Path 2:
+- Execute **dn3buildmode-debug.cmd** prior to running your "setup" script the first time. 
+  - This will save you from having to run "setup" to reach a command prompt that you can run the "debug" command against. 
+
+After your build is set to DEBUG mode, run the "setup" script to build a new `dotnet new3` session. Once "setup" has completed successfully, run the following command.
+```bash
+dotnet new3 --debug:attach {{additonal args}}
+```
+By supplying the `--debug:attach` argument along side any other argument you are running, you are triggering a ` Console.ReadLine();` request which pauses execution of the templating engine at an early point in its logical loop.
+
+Once the engine is "paused", you have the opportunity to attach a debugger to the running 'dotnet new3' process. In Visual studio...
+- Open **Microsoft.TemplateEngine.Cli.New3Command** class and locate the following function
+  - `New3Command.Run()`
+- Set a breakpoint after the following block of code inside the "Run" function.
+
+```csharp
+if (args.Any(x => string.Equals(x, "--debug:attach", StringComparison.Ordinal)))
+{
+    // This is the line that is executed when --debug:attach is passed as 
+    // an argument. 
+    Console.ReadLine();
+}
+```
+- Execute the following keyboard shortcut - `ctrl + alt + p`.
+- This will open up a dialog that allows you to search for the **dotnet-new3.exe** process.
+- Locate the desired process, select it and hit the **Attach** button.
+
+Now that you have a debug session attached to your properly configured `dotnet new3` session, head back to your command line and hit `enter`.  This will trigger `Console.Readline()` to execute and your proceeding breakpoint to execute inside of Visual Studio.
 
 # Installing templates
 
