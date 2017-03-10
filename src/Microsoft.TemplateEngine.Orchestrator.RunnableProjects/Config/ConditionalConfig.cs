@@ -118,10 +118,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config
         {
             ConditionalTokens tokens = new ConditionalTokens
             {
-                IfTokens = new ITokenConfig[] { "#if".TokenConfig() },
-                ElseTokens = new ITokenConfig[] { "#else".TokenConfig() },
-                ElseIfTokens = new ITokenConfig[] { "#elseif".TokenConfig() },
-                EndIfTokens = new ITokenConfig[] { "#endif".TokenConfig() }
+                IfTokens = new[] { "#if".TokenConfig() },
+                ElseTokens = new[] { "#else".TokenConfig() },
+                ElseIfTokens = new[] { "#elseif".TokenConfig() },
+                EndIfTokens = new[] { "#endif".TokenConfig() }
             };
 
             ConditionEvaluator evaluator = EvaluatorSelector.Select(evaluatorType);
