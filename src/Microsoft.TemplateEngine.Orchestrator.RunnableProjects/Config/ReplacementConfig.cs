@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
+using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Core.Operations;
 using Microsoft.TemplateEngine.Utils;
@@ -20,7 +21,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config
             if (parameters.TryGetRuntimeValue(environmentSettings, tokens.VariableName, out object newValueObject))
             {
                 string newValue = newValueObject.ToString();
-                return new Replacement(tokens.OriginalValue, newValue, null);
+                return new Replacement(tokens.OriginalValue.TokenConfig(), newValue, null);
             }
             else
             {
@@ -35,7 +36,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config
             string replacement = rawConfiguration.ToString("replacement");
             string id = rawConfiguration.ToString("id");
 
-            yield return new Replacement(original, replacement, id);
+            yield return new Replacement(original.TokenConfig(), replacement, id);
         }
     }
 }

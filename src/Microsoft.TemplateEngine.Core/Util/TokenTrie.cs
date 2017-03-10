@@ -7,7 +7,7 @@ namespace Microsoft.TemplateEngine.Core.Util
 {
     public class TokenTrie : Trie<Token>, ITokenTrie
     {
-        private List<byte[]> _tokens = new List<byte[]>();
+        private List<IToken> _tokens = new List<IToken>();
         private List<int> _lengths = new List<int>();
 
         public int Count => _tokens.Count;
@@ -18,21 +18,31 @@ namespace Microsoft.TemplateEngine.Core.Util
 
         public IReadOnlyList<int> TokenLength => _lengths;
 
-        public IReadOnlyList<byte[]> Tokens => _tokens;
+        public IReadOnlyList<IToken> Tokens => _tokens;
 
-        public int AddToken(byte[] token)
+        public int AddToken(byte[] literalToken)
+        {
+            return AddToken(TokenConfig.LiteralToken(literalToken));
+        }
+
+        public void AddToken(byte[] literalToken, int index)
+        {
+            AddToken(TokenConfig.LiteralToken(literalToken), index);
+        }
+
+        public int AddToken(IToken token)
         {
             int count = _tokens.Count;
             AddToken(token, count);
             return count;
         }
 
-        public void AddToken(byte[] token, int index)
+        public void AddToken(IToken token, int index)
         {
             _tokens.Add(token);
             _lengths.Add(token.Length);
-            Token t = new Token(token, index);
-            AddPath(token, t);
+            Token t = new Token(token.Value, index, token.Start, token.End);
+            AddPath(token.Value, t);
 
             if (token.Length > MaxLength)
             {
@@ -47,7 +57,7 @@ namespace Microsoft.TemplateEngine.Core.Util
 
         public void Append(ITokenTrie trie)
         {
-            foreach (byte[] token in trie.Tokens)
+            foreach (IToken token in trie.Tokens)
             {
                 AddToken(token);
             }
