@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
+using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Core.Expressions.Cpp;
 using Microsoft.TemplateEngine.Core.Operations;
@@ -1002,7 +1003,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     List<IOperationProvider> localizationsForFile = new List<IOperationProvider>();
                     foreach (KeyValuePair<string, string> localizationInfo in fileLocalization.Localizations)
                     {
-                        localizationsForFile.Add(new Replacement(localizationInfo.Key, localizationInfo.Value, null));
+                        localizationsForFile.Add(new Replacement(localizationInfo.Key.TokenConfig(), localizationInfo.Value, null));
                     }
 
                     localizations.Add(fileLocalization.File, localizationsForFile);

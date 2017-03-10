@@ -74,7 +74,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
         {
             TokenTrie trie = new TokenTrie();
 
-            List<byte[]> tokens = new List<byte[]>(TokenTypeModulus * LongestTokenVariantListSize);
+            List<IToken> tokens = new List<IToken>(TokenTypeModulus * LongestTokenVariantListSize);
             for (int i = 0; i < tokens.Capacity; i++)
             {
                 tokens.Add(null);
@@ -99,15 +99,14 @@ namespace Microsoft.TemplateEngine.Core.Operations
         /// <param name="tokensOfType"></param>
         /// <param name="typeRemainder"></param>
         /// <param name="encoding"></param>
-        private void AddTokensOfTypeToTokenListAndTrie(ITokenTrie trie, List<byte[]> tokenMasterList, IReadOnlyList<string> tokensOfType, int typeRemainder, Encoding encoding)
+        private void AddTokensOfTypeToTokenListAndTrie(ITokenTrie trie, List<IToken> tokenMasterList, IReadOnlyList<ITokenConfig> tokensOfType, int typeRemainder, Encoding encoding)
         {
             int tokenIndex = typeRemainder;
 
             for (int i = 0; i < tokensOfType.Count; i++)
             {
-                byte[] byteToken = encoding.GetBytes(tokensOfType[i]);
-                tokenMasterList[tokenIndex] = byteToken;
-                trie.AddToken(byteToken, typeRemainder);
+                tokenMasterList[tokenIndex] = tokensOfType[i].ToToken(encoding);
+                trie.AddToken(tokenMasterList[tokenIndex], typeRemainder);
                 tokenIndex += TokenTypeModulus;
             }
         }
@@ -133,7 +132,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
             private readonly ITokenTrie _trie;
             private readonly string _id;
 
-            public Impl(Conditional definition, IReadOnlyList<byte[]> tokens, ITokenTrie trie, string id)
+            public Impl(Conditional definition, IReadOnlyList<IToken> tokens, ITokenTrie trie, string id)
             {
                 _trie = trie;
                 _definition = definition;
@@ -143,16 +142,15 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
             public string Id => _id;
 
-            public IReadOnlyList<byte[]> Tokens { get; }
+            public IReadOnlyList<IToken> Tokens { get; }
 
             public int HandleMatch(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int token, Stream target)
             {
                 bool flag;
-                if (processor.Config.Flags.TryGetValue(Conditional.OperationName, out flag) && !flag)
+                if (processor.Config.Flags.TryGetValue(OperationName, out flag) && !flag)
                 {
-                    byte[] tokenValue = Tokens[token];
-                    target.Write(tokenValue, 0, tokenValue.Length);
-                    return tokenValue.Length;
+                    target.Write(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
+                    return Tokens[token].Length;
                 }
 
                 // conditional has not started, or this is the "if"
@@ -211,9 +209,8 @@ namespace Microsoft.TemplateEngine.Core.Operations
                 // If we've got an unbalanced statement, emit the token
                 if (_current == null)
                 {
-                    byte[] tokenValue = Tokens[token];
-                    target.Write(tokenValue, 0, tokenValue.Length);
-                    return tokenValue.Length;
+                    target.Write(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
+                    return Tokens[token].Length;
                 }
 
                 //Got the endif token, exit to the parent "if" scope if it exists

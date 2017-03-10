@@ -68,9 +68,11 @@ namespace Microsoft.TemplateEngine.Core.Matching
                     _waitForSequenceNumberCatchUp = true;
                 }
 
+                //We may be walking through an overlapped match
+                //  here, check to see if we've made it to the
+                //  end of an already completed path
                 _lastSeenSequenceNumber = sequenceNumber;
-                terminal = null;
-                return false;
+                return TryGetNext(false, ref sequenceNumber, out terminal);
             }
 
             _lastSeenSequenceNumber = sequenceNumber;
@@ -99,7 +101,7 @@ namespace Microsoft.TemplateEngine.Core.Matching
 
                         if (next.IsTerminal)
                         {
-                            path.EncounteredTerminals.Add(next.Terminal);
+                            path.EncounteredTerminals.AddRange(next.Terminals);
                         }
                     }
                     //If we didn't match and no terminals were found in the
@@ -127,7 +129,7 @@ namespace Microsoft.TemplateEngine.Core.Matching
 
                 if (next.IsTerminal)
                 {
-                    path.EncounteredTerminals.Add(next.Terminal);
+                    path.EncounteredTerminals.AddRange(next.Terminals);
                 }
 
                 _activePaths.Add(path);
@@ -212,7 +214,12 @@ namespace Microsoft.TemplateEngine.Core.Matching
 
                     if (bestPath > -1 && bestPath < _activePaths.Count && _activePaths[bestPath].EncounteredTerminals.Contains(best))
                     {
-                        _activePaths.RemoveAt(bestPath);
+                        _activePaths[bestPath].EncounteredTerminals.Remove(best);
+
+                        if (_activePaths[bestPath].EncounteredTerminals.Count == 0)
+                        {
+                            _activePaths.RemoveAt(bestPath);
+                        }
                     }
 
                     return true;

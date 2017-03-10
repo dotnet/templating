@@ -94,7 +94,7 @@ namespace Microsoft.TemplateEngine.Core.Util
                         {
                             if (op.Tokens[j] != null)
                             {
-                                trie.AddPath(op.Tokens[j], new OperationTerminal(op, j, op.Tokens[j].Length));
+                                trie.AddPath(op.Tokens[j].Value, new OperationTerminal(op, j, op.Tokens[j].Length, op.Tokens[j].Start, op.Tokens[j].End));
                             }
                         }
                     }
@@ -177,11 +177,11 @@ namespace Microsoft.TemplateEngine.Core.Util
                     {
                         IOperation operation = terminal.Terminal.Operation;
                         int matchLength = terminal.Terminal.End - terminal.Terminal.Start;
-                        int handoffBufferPosition = CurrentBufferPosition + matchLength - (CurrentSequenceNumber - terminal.Location - terminal.Terminal.Start);
+                        int handoffBufferPosition = CurrentBufferPosition + matchLength - (CurrentSequenceNumber - terminal.Location);
 
-                        if (terminal.Location + terminal.Terminal.Start > nextSequenceNumberThatCouldBeWritten)
+                        if (terminal.Location > nextSequenceNumberThatCouldBeWritten)
                         {
-                            int toWrite = terminal.Location + terminal.Terminal.Start - nextSequenceNumberThatCouldBeWritten;
+                            int toWrite = terminal.Location - nextSequenceNumberThatCouldBeWritten;
                             _target.Write(CurrentBuffer, handoffBufferPosition - toWrite - matchLength, toWrite);
                             bytesWrittenSinceLastFlush += toWrite;
                             nextSequenceNumberThatCouldBeWritten = posedPosition - matchLength;
@@ -247,14 +247,14 @@ namespace Microsoft.TemplateEngine.Core.Util
                     {
                         IOperation operation = terminal.Terminal.Operation;
                         int matchLength = terminal.Terminal.End - terminal.Terminal.Start;
-                        int handoffBufferPosition = CurrentBufferPosition - (CurrentSequenceNumber - terminal.Location - terminal.Terminal.Start);
+                        int handoffBufferPosition = CurrentBufferPosition + matchLength - (CurrentSequenceNumber - terminal.Location);
 
-                        if (terminal.Location + terminal.Terminal.Start > nextSequenceNumberThatCouldBeWritten)
+                        if (terminal.Location > nextSequenceNumberThatCouldBeWritten)
                         {
-                            int toWrite = terminal.Location + terminal.Terminal.Start - nextSequenceNumberThatCouldBeWritten;
+                            int toWrite = terminal.Location - nextSequenceNumberThatCouldBeWritten;
                             _target.Write(CurrentBuffer, handoffBufferPosition - toWrite - matchLength, toWrite);
                             bytesWrittenSinceLastFlush += toWrite;
-                            nextSequenceNumberThatCouldBeWritten = terminal.Location + terminal.Terminal.Start;
+                            nextSequenceNumberThatCouldBeWritten = terminal.Location;
                         }
 
                         if (operation.Id == null || (Config.Flags.TryGetValue(operation.Id, out bool opEnabledFlag) && opEnabledFlag))
@@ -284,10 +284,11 @@ namespace Microsoft.TemplateEngine.Core.Util
                 }
             }
 
-            if (CurrentSequenceNumber > nextSequenceNumberThatCouldBeWritten)
+            int endSequenceNumber = CurrentSequenceNumber - CurrentBufferPosition + CurrentBufferLength;
+            if (endSequenceNumber > nextSequenceNumberThatCouldBeWritten)
             {
-                int toWrite = CurrentSequenceNumber - nextSequenceNumberThatCouldBeWritten;
-                _target.Write(CurrentBuffer, CurrentSequenceNumber - toWrite, toWrite);
+                int toWrite = endSequenceNumber - nextSequenceNumberThatCouldBeWritten;
+                _target.Write(CurrentBuffer, CurrentBufferLength - toWrite, toWrite);
             }
 
             _target.Flush();

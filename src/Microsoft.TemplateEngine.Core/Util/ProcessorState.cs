@@ -72,7 +72,7 @@ namespace Microsoft.TemplateEngine.Core.Util
                         {
                             if (op.Tokens[j] != null)
                             {
-                                trie.AddPath(op.Tokens[j], new OperationTerminal(op, j, op.Tokens[j].Length));
+                                trie.AddPath(op.Tokens[j].Value, new OperationTerminal(op, j, op.Tokens[j].Value.Length, op.Tokens[j].Start, op.Tokens[j].End));
                             }
                         }
                     }

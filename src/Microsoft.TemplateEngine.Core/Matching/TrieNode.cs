@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Microsoft.TemplateEngine.Core.Matching
 {
     public class TrieNode<T> : Trie<T>
@@ -5,13 +7,13 @@ namespace Microsoft.TemplateEngine.Core.Matching
     {
         public readonly byte Match;
 
-        public T Terminal;
+        public List<T> Terminals;
 
         public TrieNode(byte match)
         {
             Match = match;
         }
 
-        public bool IsTerminal => Terminal != null;
+        public bool IsTerminal => Terminals != null;
     }
 }

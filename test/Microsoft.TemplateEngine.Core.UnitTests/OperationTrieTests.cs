@@ -14,14 +14,14 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
         {
             private readonly MatchHandler _onMatch;
 
-            public MockOperation(string id, MatchHandler onMatch, params byte[][] tokens)
+            public MockOperation(string id, MatchHandler onMatch, params IToken[] tokens)
             {
                 Tokens = tokens;
                 Id = id;
                 _onMatch = onMatch;
             }
 
-            public IReadOnlyList<byte[]> Tokens { get; }
+            public IReadOnlyList<IToken> Tokens { get; }
 
             public string Id { get; }
 
@@ -36,8 +36,8 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
         {
             OperationTrie trie = OperationTrie.Create(new IOperation[]
             {
-                new MockOperation("Test1", null, new byte[] {1, 2, 3, 4}),
-                new MockOperation("Test2", null, new byte[] {2, 3})
+                new MockOperation("Test1", null, TokenConfig.LiteralToken(new byte[]{1, 2, 3, 4})),
+                new MockOperation("Test2", null, TokenConfig.LiteralToken(new byte[] {2, 3}))
             });
 
             byte[] buffer = { 1, 2, 3, 4, 5 };
@@ -55,8 +55,8 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
         {
             OperationTrie trie = OperationTrie.Create(new IOperation[]
             {
-                new MockOperation("Test1", null, new byte[] {5, 2, 3, 4}),
-                new MockOperation("Test2", null, new byte[] {4, 6}, new byte[] {2, 3})
+                new MockOperation("Test1", null, TokenConfig.LiteralToken(new byte[] {5, 2, 3, 4})),
+                new MockOperation("Test2", null, TokenConfig.LiteralToken(new byte[] {4, 6}), TokenConfig.LiteralToken(new byte[] {2, 3}))
             });
 
             byte[] buffer = { 1, 2, 3, 4, 5 };
@@ -79,8 +79,8 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
         {
             OperationTrie trie = OperationTrie.Create(new IOperation[]
             {
-                new MockOperation("Test1", null, new byte[] {5, 2, 3, 4}),
-                new MockOperation("Test2", null, new byte[] {4, 5}, new byte[] {2, 3})
+                new MockOperation("Test1", null, TokenConfig.LiteralToken(new byte[] {5, 2, 3, 4})),
+                new MockOperation("Test2", null, TokenConfig.LiteralToken(new byte[] {4, 5}), TokenConfig.LiteralToken(new byte[] {2, 3}))
             });
 
             byte[] buffer = { 1, 2, 3, 4, 5 };
@@ -102,9 +102,9 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
                 foreach (IOperation operation in operations)
                 {
                     int tokenNumber = 0;
-                    foreach (byte[] token in operation.Tokens)
+                    foreach (IToken token in operation.Tokens)
                     {
-                        trie.AddPath(token, new OperationTerminal(operation, tokenNumber++, token.Length));
+                        trie.AddPath(token.Value, new OperationTerminal(operation, tokenNumber++, token.Length, token.Start, token.End));
                     }
                 }
 

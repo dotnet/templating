@@ -43,7 +43,12 @@ namespace Microsoft.TemplateEngine.Core.Matching
 
                 if (i == path.Length - 1)
                 {
-                    next.Terminal = terminal;
+                    if(next.Terminals == null)
+                    {
+                        next.Terminals = new List<T>();
+                    }
+
+                    next.Terminals.Add(terminal);
                 }
 
                 current = next.NextNodes;
