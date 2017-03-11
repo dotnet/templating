@@ -234,7 +234,29 @@ color:red;";
             Verify(Encoding.UTF8, output, changed, value, expected);
         }
 
-        private int ReadaheadOneByte(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int token, Stream target)
+        [Fact(DisplayName = nameof(TestLookAroundsCanBeUsedForInsertion))]
+        public void TestLookAroundsCanBeUsedForInsertion()
+        {
+            string value = @"foobaz";
+            string expected = @"foobarbaz";
+
+            byte[] valueBytes = Encoding.UTF8.GetBytes(value);
+            MemoryStream input = new MemoryStream(valueBytes);
+            MemoryStream output = new MemoryStream();
+
+            IOperationProvider[] operations =
+            {
+                new Replacement("".TokenConfigBuilder().OnlyIfAfter("foo").OnlyIfBefore("baz"), "bar", null)
+            };
+            EngineConfig cfg = new EngineConfig(EnvironmentSettings, VariableCollection.Environment(EnvironmentSettings), "${0}$");
+            IProcessor processor = Processor.Create(cfg, operations);
+
+            //Changes should be made
+            bool changed = processor.Run(input, output, 1);
+            Verify(Encoding.UTF8, output, changed, value, expected);
+        }
+
+        private static int ReadaheadOneByte(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int token, Stream target)
         {
             ++currentBufferPosition;
             return 0;
