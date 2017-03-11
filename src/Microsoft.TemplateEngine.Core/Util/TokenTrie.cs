@@ -74,10 +74,10 @@ namespace Microsoft.TemplateEngine.Core.Util
             TrieEvaluationDriver<Token> driver = new TrieEvaluationDriver<Token>(evaluator);
             TerminalLocation<Token> location = driver.Evaluate(buffer, bufferLength, true, 0, ref currentBufferPosition);
 
-            if (location != null && location.Location + location.Terminal.Start == originalPosition)
+            if (location != null && currentBufferPosition - location.Terminal.Value.Length == originalPosition)
             {
                 token = location.Terminal.Index;
-                currentBufferPosition = location.Location + location.Terminal.End;
+                currentBufferPosition = location.Location + location.Terminal.End - location.Terminal.Start;
                 return true;
             }
 
