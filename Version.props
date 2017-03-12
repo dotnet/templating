@@ -12,18 +12,24 @@
     <LicenseUrl>https://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</LicenseUrl>
     <ImageUrl>http://go.microsoft.com/fwlink/?LinkID=288859</ImageUrl>
     <Tags>template</Tags>
+    <Company>Microsoft</Company>
     <Copyright>Copyright © Microsoft Corporation</Copyright>
     <ArtifactsFolder>$(MSBuildThisFileDirectory)artifacts\</ArtifactsFolder>
     <TemplatesFolder>$(ArtifactsFolder)templates\</TemplatesFolder>
     <TemplatesNoTimestampFolder>$(ArtifactsFolder)templates-notimestamp\</TemplatesNoTimestampFolder>
     <BuildToolsFolder>$(MSBuildThisFileDirectory)build\</BuildToolsFolder>
     <NuGet>&quot;$(BuildToolsFolder)nuget.exe&quot;</NuGet>
+
+    <GenerateAssemblyFileVersionAttribute>False</GenerateAssemblyFileVersionAttribute>
+    <GenerateAssemblyVersionAttribute>False</GenerateAssemblyVersionAttribute>
+    <GenerateAssemblyInformationalVersionAttribute>False</GenerateAssemblyInformationalVersionAttribute>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)Key.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <GitInfoFile>$(MSBuildThisFileDirectory)artifacts\GitInfo.cs</GitInfoFile>
+    <GitInfoProps>$(MSBuildThisFileDirectory)artifacts\GitInfo.props</GitInfoProps>
   </PropertyGroup>
   <Target Name="CollectGitInfo">
     <Exec Command="git rev-list --count HEAD" ConsoleToMSBuild="true">
@@ -37,6 +43,10 @@
     <PropertyGroup>
       <GitCommitInfoContent>
 <![CDATA[
+[assembly: System.Reflection.AssemblyVersionAttribute("$(PackageReleaseVersion)")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("$(PackageReleaseVersion)")]
+[assembly: System.Reflection.AssemblyInformationalVersion("$(PackageVersion)+$(GitInfoCommitCount).$(GitInfoCommitHash)")]
+
 namespace Microsoft.TemplateEngine
 {
     internal static class GitInfo
@@ -47,10 +57,26 @@ namespace Microsoft.TemplateEngine
 }
 ]]>
       </GitCommitInfoContent>
+      <GitInfoPropsContent>
+<![CDATA[
+<Project ToolsVersion="15.0">
+  <PropertyGroup>
+    <Version>$(PackageReleaseVersion)</Version>
+    <FileVersion>$(PackageReleaseVersion)</FileVersion>
+    <InformationalVersion>$(PackageVersion)+$(GitInfoCommitCount).$(GitInfoCommitHash)</InformationalVersion>
+    <PackageReleaseNotes>Commit Hash: $(GitInfoCommitHash)</PackageReleaseNotes>
+  </PropertyGroup>
+</Project>
+]]>
+      </GitInfoPropsContent>
     </PropertyGroup>
 
     <WriteLinesToFile File="$(GitInfoFile)"
                       Lines="$(GitCommitInfoContent)"
+                      Overwrite="true" />
+
+    <WriteLinesToFile File="$(GitInfoProps)"
+                      Lines="$(GitInfoPropsContent)"
                       Overwrite="true" />
   </Target>
   
@@ -58,4 +84,6 @@ namespace Microsoft.TemplateEngine
     <Compile Include="$(GitInfoFile)" Condition="Exists('$(GitInfoFile)')" Link="%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="$(MSBuildThisFileDirectory)src/GitInfo.cs" Condition="!Exists('$(GitInfoFile)')" Link="%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
+
+  <Import Project="$(GitInfoProps)" Condition="Exists('$(GitInfoProps)')" />
 </Project>
