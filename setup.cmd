@@ -24,14 +24,6 @@ powershell -NoProfile -NoLogo -Command "& \"%~dp0build.ps1\" -Configuration %DN3
 
 echo Artifacts built and placed.
 
-cd %~dp0\dev
-
-SET DN3=%~dp0\dev
-echo Updating path...
-
-IF "%OLDPATH%" == "" (SET "OLDPATH=%PATH%")
-SET "PATH=%CD%;%~dp0\.dotnet;%OLDPATH%"
-
 echo Copying configuration for builtins...
 COPY %~dp0\src\dotnet-new3\defaultinstall.*.list %~dp0\dev /Y 1>nul
 
