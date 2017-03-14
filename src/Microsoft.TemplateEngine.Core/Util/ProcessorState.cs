@@ -2,6 +2,8 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
+using System.Net.Sockets;
 using System.Text;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Core.Matching;
@@ -41,18 +43,13 @@ namespace Microsoft.TemplateEngine.Core.Util
 
         public ProcessorState(Stream source, Stream target, int bufferSize, int flushThreshold, IEngineConfig config, IReadOnlyList<IOperationProvider> operationProviders)
         {
-            //Buffer has to be at least as large as the largest BOM we could expect
-            if (bufferSize < 4)
-            {
-                bufferSize = 4;
-            }
-            else
+            if (!(source is GZipStream) && !(source is NetworkStream))
             {
                 try
                 {
                     if (source.Length < bufferSize)
                     {
-                        bufferSize = (int)source.Length;
+                        bufferSize = (int) source.Length;
                     }
                 }
                 catch
@@ -60,6 +57,11 @@ namespace Microsoft.TemplateEngine.Core.Util
                     //The stream may not support getting the length property (in NetworkStream for instance, which throw a NotSupportedException), suppress any errors in
                     //  accessing the property and continue with the specified buffer size
                 }
+            }
+            //Buffer has to be at least as large as the largest BOM we could expect
+            else
+            {
+                bufferSize = 4;
             }
 
             _source = source;
@@ -166,7 +168,7 @@ namespace Microsoft.TemplateEngine.Core.Util
             while (true)
             {
                 //Loop until we run out of data in the buffer
-                for(; CurrentBufferPosition < CurrentBufferLength;)
+                while (CurrentBufferPosition < CurrentBufferLength)
                 {
                     int posedPosition = CurrentSequenceNumber;
                     bool skipAdvanceBuffer = false;
