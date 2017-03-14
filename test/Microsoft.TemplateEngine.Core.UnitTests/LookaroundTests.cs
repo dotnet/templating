@@ -256,6 +256,29 @@ color:red;";
             Verify(Encoding.UTF8, output, changed, value, expected);
         }
 
+        [Fact(DisplayName = nameof(TestLongestActualWins))]
+        public void TestLongestActualWins()
+        {
+            string value = @"foobarbaz";
+            string expected = @"testarbaz";
+
+            byte[] valueBytes = Encoding.UTF8.GetBytes(value);
+            MemoryStream input = new MemoryStream(valueBytes);
+            MemoryStream output = new MemoryStream();
+
+            IOperationProvider[] operations =
+            {
+                new Replacement("foob".TokenConfigBuilder().OnlyIfBefore("arbaz"), "test", null),
+                new Replacement("foo".TokenConfigBuilder().OnlyIfBefore("barbaz"), "test2", null)
+            };
+            EngineConfig cfg = new EngineConfig(EnvironmentSettings, VariableCollection.Environment(EnvironmentSettings), "${0}$");
+            IProcessor processor = Processor.Create(cfg, operations);
+
+            //Changes should be made
+            bool changed = processor.Run(input, output, 1);
+            Verify(Encoding.UTF8, output, changed, value, expected);
+        }
+
         private static int ReadaheadOneByte(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int token, Stream target)
         {
             ++currentBufferPosition;
