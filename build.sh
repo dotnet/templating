@@ -66,4 +66,4 @@ then
     ulimit -n 1024
 fi
 
-$DOTNET_INSTALL_DIR/dotnet msbuild "$REPOROOT/build.csproj" /p:Configuration=$CONFIGURATION /p:New3RuntimeIdentifier=$RID
+$DOTNET_INSTALL_DIR/dotnet msbuild "$REPOROOT/build.proj" /p:Configuration=$CONFIGURATION /p:New3RuntimeIdentifier=$RID
