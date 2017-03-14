@@ -385,7 +385,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
                 bool bufferAdvanceFailed = false;
                 ITokenTrieEvaluator evaluator = _trie.CreateEvaluator();
 
-                while (currentBufferPosition < bufferLength)
+                while (true)
                 {
                     for (; currentBufferPosition < bufferLength; ++currentBufferPosition)
                     {

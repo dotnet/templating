@@ -59,7 +59,7 @@ namespace Microsoft.TemplateEngine.Core.Util
                 }
             }
             //Buffer has to be at least as large as the largest BOM we could expect
-            else
+            else if (bufferSize < 4)
             {
                 bufferSize = 4;
             }
