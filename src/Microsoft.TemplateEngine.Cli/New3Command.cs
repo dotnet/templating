@@ -462,16 +462,15 @@ namespace Microsoft.TemplateEngine.Cli
         private void DisplayTemplateList()
         {
             IReadOnlyList<ITemplateInfo> results = TemplatesToDisplayInfoAbout;
-
-            IEnumerable<IGrouping<string, ITemplateInfo>> grouped = results.GroupBy(x => x.GroupIdentity);
+            IEnumerable<IGrouping<string, ITemplateInfo>> grouped = results.GroupBy(x => x.GroupIdentity, x => !string.IsNullOrEmpty(x.GroupIdentity));
             EnvironmentSettings.Host.TryGetHostParamDefault("prefs:language", out string defaultLanguage);
-
             Dictionary<ITemplateInfo, string> templatesVersusLanguages = new Dictionary<ITemplateInfo, string>();
 
             foreach (IGrouping<string, ITemplateInfo> grouping in grouped)
             {
                 List<string> languageForDisplay = new List<string>();
                 HashSet<string> uniqueLanguages = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                string defaultLanguageDisplay = string.Empty;
 
                 foreach (ITemplateInfo info in grouping)
                 {
@@ -483,7 +482,7 @@ namespace Microsoft.TemplateEngine.Cli
                             {
                                 if (string.IsNullOrEmpty(Language) && string.Equals(defaultLanguage, lang, StringComparison.OrdinalIgnoreCase))
                                 {
-                                    languageForDisplay.Add($"[{lang}]");
+                                    defaultLanguageDisplay = $"[{lang}]";
                                 }
                                 else
                                 {
@@ -492,6 +491,12 @@ namespace Microsoft.TemplateEngine.Cli
                             }
                         }
                     }
+                }
+
+                languageForDisplay.Sort();
+                if (!string.IsNullOrEmpty(defaultLanguageDisplay))
+                {
+                    languageForDisplay.Insert(0, defaultLanguageDisplay);
                 }
 
                 templatesVersusLanguages[grouping.First()] = string.Join(", ", languageForDisplay);
