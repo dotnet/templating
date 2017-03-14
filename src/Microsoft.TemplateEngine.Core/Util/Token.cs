@@ -9,8 +9,6 @@ namespace Microsoft.TemplateEngine.Core.Util
         {
             Value = token;
             Index = index;
-            Start = start;
-            End = end != -1 ? end : token.Length;
         }
 
         public byte[] Value { get; }
