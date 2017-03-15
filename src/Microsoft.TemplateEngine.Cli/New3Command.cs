@@ -446,9 +446,13 @@ namespace Microsoft.TemplateEngine.Cli
                 {
                     templateList = _matchedTemplatesWithSecondaryMatchInfo.Select(x => x.Info);
                 }
-                else if (_matchedTemplates != null && _matchedTemplates.Where(x => x.IsMatch).Count() > 0)
+                else if (_matchedTemplates != null && _matchedTemplates.Any(x => x.IsMatch))
                 {
                     templateList = _matchedTemplates.Where(x => x.IsMatch).Select(x => x.Info);
+                }
+                else if (_matchedTemplates != null && _matchedTemplates.Any(X => X.IsPartialMatch))
+                {
+                    templateList = _matchedTemplates.Where(x => x.IsPartialMatch).Select(x => x.Info);
                 }
                 else
                 {
@@ -493,7 +497,7 @@ namespace Microsoft.TemplateEngine.Cli
                     }
                 }
 
-                languageForDisplay.Sort();
+                languageForDisplay.Sort(StringComparer.OrdinalIgnoreCase);
                 if (!string.IsNullOrEmpty(defaultLanguageDisplay))
                 {
                     languageForDisplay.Insert(0, defaultLanguageDisplay);
@@ -534,7 +538,9 @@ namespace Microsoft.TemplateEngine.Cli
 
         private CreationResultStatus EnterAmbiguousTemplateManipulationFlow()
         {
-            if (!string.IsNullOrEmpty(TemplateName) && _matchedTemplates.All(x => x.MatchDisposition.Any(d => d.Location == MatchLocation.Language && d.Kind == MatchKind.Mismatch)))
+            if (!string.IsNullOrEmpty(TemplateName)
+                && _matchedTemplates.Count > 0
+                && _matchedTemplates.All(x => x.MatchDisposition.Any(d => d.Location == MatchLocation.Language && d.Kind == MatchKind.Mismatch)))
             {
                 string errorMessage = GetLanguageMismatchErrorMessage(Language);
                 Reporter.Error.WriteLine(errorMessage.Bold().Red());
