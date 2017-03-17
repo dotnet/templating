@@ -53,6 +53,18 @@ if($LASTEXITCODE -ne 0) { throw "Failed to install dotnet cli" }
 # Put the stage0 on the path
 $env:PATH = "$env:DOTNET_INSTALL_DIR;$env:PATH"
 
+#Download nuget.exe for template packaging
+
+if (!(Test-Path "$RepoRoot\.tools"))
+{
+    mkdir "$RepoRoot\.tools" | Out-Null
+}
+
+Invoke-WebRequest "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" -OutFile "$RepoRoot\.tools\nuget.exe"
+
+& "$RepoRoot\artifacts\dotnet-install.ps1" -Verbose
+if($LASTEXITCODE -ne 0) { throw "Failed to acquire NuGet.exe" }
+
 if (-not $env:BUILD_NUMBER)
 {
   $env:BUILD_NUMBER = 0
