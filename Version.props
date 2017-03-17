@@ -33,11 +33,16 @@
     <GitInfoProps>$(MSBuildThisFileDirectory)artifacts\GitInfo.props</GitInfoProps>
   </PropertyGroup>
   <Target Name="CollectGitInfo">
-    <Exec Command="git rev-list --count HEAD" ConsoleToMSBuild="true">
+    <PropertyGroup>
+      <GitInfoCommitCount Condition="'$(COMMIT_HASH)' != ''">0</GitInfoCommitCount>
+      <GitInfoCommitHash Condition="'$(COMMIT_HASH)' != ''">$(COMMIT_HASH)</GitInfoCommitHash>
+    </PropertyGroup>
+
+    <Exec Command="git rev-list --count HEAD" ConsoleToMSBuild="true" Condition="'$(COMMIT_HASH)' == ''">
       <Output TaskParameter="ConsoleOutput" PropertyName="GitInfoCommitCount" />
     </Exec>
 
-    <Exec Command="git rev-parse HEAD" ConsoleToMSBuild="true">
+    <Exec Command="git rev-parse HEAD" ConsoleToMSBuild="true" Condition="'$(COMMIT_HASH)' == ''">
       <Output TaskParameter="ConsoleOutput" PropertyName="GitInfoCommitHash" />
     </Exec>
 
