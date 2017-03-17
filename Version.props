@@ -17,7 +17,7 @@
     <ArtifactsFolder>$(MSBuildThisFileDirectory)artifacts\</ArtifactsFolder>
     <TemplatesFolder>$(ArtifactsFolder)templates\</TemplatesFolder>
     <TemplatesNoTimestampFolder>$(ArtifactsFolder)templates-notimestamp\</TemplatesNoTimestampFolder>
-    <BuildToolsFolder>$(MSBuildThisFileDirectory)build\</BuildToolsFolder>
+    <BuildToolsFolder>$(MSBuildThisFileDirectory).tools\</BuildToolsFolder>
     <NuGet>&quot;$(BuildToolsFolder)nuget.exe&quot;</NuGet>
 
     <GenerateAssemblyInfo Condition="'$(BuildingInsideVisualStudio)' != ''">False</GenerateAssemblyInfo>

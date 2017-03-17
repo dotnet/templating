@@ -243,6 +243,7 @@ Microsoft.TemplateEngine.VC.db
 
 # Dotnet CLI
 .dotnet
+.tools
 
 # Mac
 .DS_Store
