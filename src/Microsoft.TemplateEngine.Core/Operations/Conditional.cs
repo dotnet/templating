@@ -36,6 +36,8 @@ namespace Microsoft.TemplateEngine.Core.Operations
         private const int TokenTypeModulus = 10;
         private bool _initialState;
 
+        public string Id => _id;
+
         public bool WholeLine => _wholeLine;
 
         public bool TrimWhitespace => _trimWhitespace;

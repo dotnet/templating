@@ -19,6 +19,8 @@ namespace Microsoft.TemplateEngine.Core.Operations
             _initialState = initialState;
         }
 
+        public string Id => _id;
+
         public IOperation GetOperation(Encoding encoding, IProcessorState processor)
         {
             return new Impl(processor, _id, _initialState);

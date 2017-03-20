@@ -20,6 +20,8 @@ namespace Microsoft.TemplateEngine.Core.Operations
             _initialState = initialState;
         }
 
+        public string Id => _id;
+
         public IOperation GetOperation(Encoding encoding, IProcessorState processorState)
         {
             Dictionary<ITokenConfig, int> tokenMap = new Dictionary<ITokenConfig, int>();

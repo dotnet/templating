@@ -31,6 +31,8 @@ namespace Microsoft.TemplateEngine.Core.Operations
             _initialState = initialState;
         }
 
+        public string Id => _id;
+
         public IOperation GetOperation(Encoding encoding, IProcessorState processorState)
         {
             IToken startToken = _start.ToToken(encoding);

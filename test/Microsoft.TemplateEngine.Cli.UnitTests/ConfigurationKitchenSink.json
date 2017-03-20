@@ -20,6 +20,16 @@
     "path": "Company.ClassLibrary1.csproj",
     "text": "<None Include=\"Foo4.cs\" />"
   },
+  {
+    "kind": "file_contains",
+    "path": "Company.ClassLibrary1.csproj",
+    "text": "\r\n    <None Include=\"Foo5.cs\" Condition=\"'$(defaultFalse)' == 'true'\" />\r\n    <None Include=\"Foo5.5.cs\" />\r\n"
+  },
+  {
+    "kind": "file_contains",
+    "path": "Company.ClassLibrary1.csproj",
+    "text": "\r\n    <!--#if (defaultFalse) -->\r\n    <None Include=\"Foo6.cs\" />\r\n    <!--#endif -->\r\n    <None Include=\"Foo6.6.cs\" />\r\n"
+  },
   // **/*.cs
   {
     "kind": "file_contains",

@@ -26,6 +26,8 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
         public ConditionEvaluator Evaluator { get; }
 
+        public string Id => _id;
+
         public MarkupTokens Tokens { get; }
 
         public bool TrimWhitespace { get; }

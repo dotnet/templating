@@ -14,5 +14,19 @@
     <!--#if (defaultFalse) -->
     <None Include="Foo4.cs" />
     <!--#endif -->
+
+<!--/-:msbuild-conditional:noEmit -->
+    <None Include="Foo5.cs" Condition="'$(defaultFalse)' == 'true'" />
+<!--/+:msbuild-conditional:noEmit -->
+    <None Include="Foo5.5.cs" Condition="'$(defaultTrue)' == 'true'" />
+
+<!--/-:cnd:noEmit -->
+    <!--#if (defaultFalse) -->
+    <None Include="Foo6.cs" />
+    <!--#endif -->
+<!--/+:cnd:noEmit -->
+    <!--#if (defaultTrue) -->
+    <None Include="Foo6.6.cs" />
+    <!--#endif -->
   </ItemGroup>
 </Project>

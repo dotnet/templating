@@ -29,6 +29,8 @@ namespace Microsoft.TemplateEngine.Core.Operations
         private readonly string _id;
         private readonly bool _initialState;
 
+        public string Id => _id;
+
         public IOperation GetOperation(Encoding encoding, IProcessorState processorState)
         {
             IToken tokenBytes = StartToken.ToToken(encoding);

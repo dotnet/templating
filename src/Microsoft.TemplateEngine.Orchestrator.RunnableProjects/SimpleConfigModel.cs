@@ -591,7 +591,20 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 customOperationConfig = new List<ICustomOperationModel>();
             }
-            
+
+            foreach (IOperationProvider p in operations.ToList())
+            {
+                if(!string.IsNullOrEmpty(p.Id))
+                {
+                    string prefix = (customGlobModel == null || string.IsNullOrEmpty(customGlobModel.FlagPrefix)) ? defaultModel.FlagPrefix : customGlobModel.FlagPrefix;
+                    string on = $"{prefix}+:{p.Id}";
+                    string off = $"{prefix}-:{p.Id}";
+                    string onNoEmit = $"{prefix}+:{p.Id}:noEmit";
+                    string offNoEmit = $"{prefix}-:{p.Id}:noEmit";
+                    operations.Add(new SetFlag(p.Id, on.TokenConfig(), off.TokenConfig(), onNoEmit.TokenConfig(), offNoEmit.TokenConfig(), null, true));
+                }
+            }
+
             GlobalRunConfig config = new GlobalRunConfig()
             {
                 Operations = operations,

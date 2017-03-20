@@ -13,6 +13,8 @@ namespace Microsoft.TemplateEngine.Core.Operations
         private readonly string _id;
         private readonly bool _initialState;
 
+        public string Id => _id;
+
         public string Name { get; }
 
         public ITokenConfig On { get; }
