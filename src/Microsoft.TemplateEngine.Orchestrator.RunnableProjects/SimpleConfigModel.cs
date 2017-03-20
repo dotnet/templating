@@ -216,6 +216,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                                     IsName = isName,
                                     IsVariable = true,
                                     Name = symbol.Key,
+                                    FileRename = param.FileRename,
                                     Requirement = param.IsRequired ? TemplateParameterPriority.Required : isName ? TemplateParameterPriority.Implicit : TemplateParameterPriority.Optional,
                                     Type = param.Type,
                                     DataType = param.DataType,
@@ -837,28 +838,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     }
                 }
 
-                Dictionary<string, string> coreRenames = new Dictionary<string, string>(fileRenames);
                 string sourceTargetName = source.Target ?? "./";
-
-                if (resolvedNameParamValue != null && SourceName != null)
-                {
-                    string targetName = ((string)resolvedNameParamValue).Trim();
-
-                    foreach (KeyValuePair<string, string> entry in coreRenames)
-                    {
-                        string outRel = entry.Value.Replace(SourceName, targetName);
-                        fileRenames[entry.Key] = outRel;
-                    }
-
-                    foreach (IFileSystemInfo entry in configFile.Parent.Parent.EnumerateFileSystemInfos("*", SearchOption.AllDirectories))
-                    {
-                        string tmpltRel = entry.PathRelativeTo(configFile.Parent.Parent);
-                        string outRel = tmpltRel.Replace(SourceName, targetName);
-                        fileRenames[tmpltRel] = outRel;
-                    }
-
-                    sourceTargetName = sourceTargetName.Replace(SourceName, targetName);
-                }
+                AugmentRenames(configFile, ref sourceTargetName, resolvedNameParamValue, parameters, fileRenames);
 
                 FileSourceMatchInfo sourceMatcher = new FileSourceMatchInfo(
                     source.Source ?? "./",
@@ -876,20 +857,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 IReadOnlyList<string> copyOnlyPattern = CopyOnlyPatternDefaults;
                 FileSourceEvaluable topLevelPatterns = new FileSourceEvaluable(includePattern, excludePattern, copyOnlyPattern);
 
+                string sourceTargetName = string.Empty;
                 Dictionary<string, string> fileRenames = new Dictionary<string, string>();
-
-                if (SourceName != null)
-                {
-                    if (parameters.ResolvedValues.TryGetValue(NameParameter, out object resolvedValue))
-                    {
-                        foreach (IFileSystemInfo entry in configFile.Parent.Parent.EnumerateFileSystemInfos("*", SearchOption.AllDirectories))
-                        {
-                            string tmpltRel = entry.PathRelativeTo(configFile.Parent.Parent);
-                            string outRel = tmpltRel.Replace(SourceName, (string)resolvedValue);
-                            fileRenames[tmpltRel] = outRel;
-                        }
-                    }
-                }
+                AugmentRenames(configFile, ref sourceTargetName, resolvedNameParamValue, parameters, fileRenames);
 
                 FileSourceMatchInfo sourceMatcher = new FileSourceMatchInfo(
                     "./",
@@ -901,6 +871,59 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
 
             return sources;
+        }
+
+        private void AugmentRenames(IFileSystemInfo configFile, ref string sourceTargetName, object resolvedNameParamValue, IParameterSet parameters, Dictionary<string, string> fileRenames)
+        {
+            List<KeyValuePair<string, string>> fileRenameMappings = new List<KeyValuePair<string, string>>();
+            Dictionary<string, string> coreRenames = new Dictionary<string, string>(fileRenames);
+
+            if (resolvedNameParamValue != null && SourceName != null)
+            {
+                string targetName = ((string)resolvedNameParamValue).Trim();
+                sourceTargetName = sourceTargetName.Replace(SourceName, targetName);
+                fileRenameMappings.Add(new KeyValuePair<string, string>(SourceName, targetName));
+            }
+
+            foreach (IExtendedTemplateParameter p in parameters.ParameterDefinitions.OfType<IExtendedTemplateParameter>())
+            {
+                if (!string.IsNullOrEmpty(p.FileRename))
+                {
+                    if (parameters.TryGetRuntimeValue(EnvironmentSettings, p.Name, out object value) && value is string s)
+                    {
+                        fileRenameMappings.Add(new KeyValuePair<string, string>(p.FileRename, s));
+                    }
+                }
+            }
+
+            foreach (KeyValuePair<string, string> entry in coreRenames)
+            {
+                foreach (KeyValuePair<string, string> rename in fileRenameMappings)
+                {
+                    string outRel = entry.Value.Replace(rename.Key, rename.Value);
+
+                    if (!string.Equals(outRel, entry.Value, StringComparison.Ordinal))
+                    {
+                        fileRenames[entry.Key] = outRel;
+                        break;
+                    }
+                }
+            }
+
+            foreach (IFileSystemInfo entry in configFile.Parent.Parent.EnumerateFileSystemInfos("*", SearchOption.AllDirectories))
+            {
+                string tmpltRel = entry.PathRelativeTo(configFile.Parent.Parent);
+                foreach (KeyValuePair<string, string> rename in fileRenameMappings)
+                {
+                    string outRel = tmpltRel.Replace(rename.Key, rename.Value);
+
+                    if (!string.Equals(outRel, tmpltRel, StringComparison.Ordinal))
+                    {
+                        fileRenames[tmpltRel] = outRel;
+                        break;
+                    }
+                }
+            }
         }
 
         public static SimpleConfigModel FromJObject(IEngineEnvironmentSettings environmentSettings, JObject source, JObject localeSource = null)

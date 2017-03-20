@@ -8,11 +8,42 @@
   <ItemGroup>
     <None Include="**/*.list" CopyToOutputDirectory="Always" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="test_templates\TemplateWithRenames\bar.cs" />
+    <Compile Remove="test_templates\TemplateWithRenames\x.cs" />
+    <Compile Remove="test_templates\TemplateWithSourceName\bar.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="test_templates\TemplateWithRenames\x.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="test_templates\TemplateWithSourceName\bar.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="test_templates\TemplateWithSourceName\.template.config\template.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="test_templates\TemplateWithSourceName\bar.cs" />
+    <None Include="test_templates\TemplateWithRenames\.template.config\template.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <Content Include="test_templates\TemplateWithRenames\bar.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   
   <ItemGroup>
     <ProjectReference Include="..\..\src\Microsoft.TemplateEngine.Cli\Microsoft.TemplateEngine.Cli.csproj" />
     <ProjectReference Include="..\..\src\Microsoft.TemplateEngine.Edge\Microsoft.TemplateEngine.Edge.csproj" />
     <ProjectReference Include="..\..\src\Microsoft.TemplateEngine.Utils\Microsoft.TemplateEngine.Utils.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Update="test_templates\TemplateWithSourceName\bar.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
   </ItemGroup>
 
 </Project>
