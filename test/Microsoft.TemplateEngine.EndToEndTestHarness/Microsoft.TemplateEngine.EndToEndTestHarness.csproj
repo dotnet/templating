@@ -11,7 +11,6 @@
 
   <ItemGroup>
     <Compile Remove="test_templates\TemplateWithRenames\bar.cs" />
-    <Compile Remove="test_templates\TemplateWithRenames\x.cs" />
     <Compile Remove="test_templates\TemplateWithSourceName\bar.cs" />
   </ItemGroup>
 
