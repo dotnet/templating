@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.4</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="Foo1.cs" Condition="'$(defaultTrue)' == 'true'" />
+    <!--#if (defaultTrue) -->
+    <None Include="Foo2.cs" />
+    <!--#endif -->
+
+    <None Include="Foo3.cs" Condition="'$(defaultFalse)' == 'true'" />
+    <!--#if (defaultFalse) -->
+    <None Include="Foo4.cs" />
+    <!--#endif -->
+  </ItemGroup>
+</Project>

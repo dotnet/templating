@@ -6,5 +6,9 @@
   {
     "kind": "file_exists",
     "path": "baz.cs"
+  },
+  {
+    "kind": "file_exists",
+    "path": "baz/baz.cs"
   }
 ]

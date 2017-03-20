@@ -877,6 +877,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         {
             List<KeyValuePair<string, string>> fileRenameMappings = new List<KeyValuePair<string, string>>();
             Dictionary<string, string> coreRenames = new Dictionary<string, string>(fileRenames);
+            string originalSourceName = sourceTargetName;
 
             if (resolvedNameParamValue != null && SourceName != null)
             {
@@ -900,26 +901,26 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 foreach (KeyValuePair<string, string> rename in fileRenameMappings)
                 {
-                    string outRel = entry.Value.Replace(rename.Key, rename.Value);
+                    string outputRelativePath = entry.Value.Replace(rename.Key, rename.Value);
 
-                    if (!string.Equals(outRel, entry.Value, StringComparison.Ordinal))
+                    if (!string.Equals(outputRelativePath, entry.Value, StringComparison.Ordinal))
                     {
-                        fileRenames[entry.Key] = outRel;
+                        fileRenames[entry.Key] = outputRelativePath;
                         break;
                     }
                 }
             }
 
-            foreach (IFileSystemInfo entry in configFile.Parent.Parent.EnumerateFileSystemInfos("*", SearchOption.AllDirectories))
+            foreach (IFileSystemInfo entry in configFile.Parent.Parent.DirectoryInfo(originalSourceName.TrimEnd('/')).EnumerateFileSystemInfos("*", SearchOption.AllDirectories))
             {
-                string tmpltRel = entry.PathRelativeTo(configFile.Parent.Parent);
+                string templateRelativePath = entry.PathRelativeTo(configFile.Parent.Parent);
                 foreach (KeyValuePair<string, string> rename in fileRenameMappings)
                 {
-                    string outRel = tmpltRel.Replace(rename.Key, rename.Value);
+                    string outputRelativePath = templateRelativePath.Replace(rename.Key, rename.Value);
 
-                    if (!string.Equals(outRel, tmpltRel, StringComparison.Ordinal))
+                    if (!string.Equals(outputRelativePath, templateRelativePath, StringComparison.Ordinal))
                     {
-                        fileRenames[tmpltRel] = outRel;
+                        fileRenames[templateRelativePath] = outputRelativePath;
                         break;
                     }
                 }
@@ -1055,7 +1056,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     List<IOperationProvider> localizationsForFile = new List<IOperationProvider>();
                     foreach (KeyValuePair<string, string> localizationInfo in fileLocalization.Localizations)
                     {
-                        localizationsForFile.Add(new Replacement(localizationInfo.Key.TokenConfig(), localizationInfo.Value, null));
+                        localizationsForFile.Add(new Replacement(localizationInfo.Key.TokenConfig(), localizationInfo.Value, null, true));
                     }
 
                     localizations.Add(fileLocalization.File, localizationsForFile);

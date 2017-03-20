@@ -1,0 +1,79 @@
+﻿[
+  // **/*.*proj
+  {
+    "kind": "file_contains",
+    "path": "Company.ClassLibrary1.csproj",
+    "text": "<None Include=\"Foo1.cs\" />"
+  },
+  {
+    "kind": "file_contains",
+    "path": "Company.ClassLibrary1.csproj",
+    "text": "<None Include=\"Foo2.cs\" />"
+  },
+  {
+    "kind": "file_does_not_contain",
+    "path": "Company.ClassLibrary1.csproj",
+    "text": "<None Include=\"Foo3.cs\" />"
+  },
+  {
+    "kind": "file_does_not_contain",
+    "path": "Company.ClassLibrary1.csproj",
+    "text": "<None Include=\"Foo4.cs\" />"
+  },
+  // **/*.cs
+  {
+    "kind": "file_contains",
+    "path": "Test.cs",
+    "text": "#if DEBUG1"
+  },
+  {
+    "kind": "file_contains",
+    "path": "Test.cs",
+    "text": "#if DEBUG2"
+  },
+  {
+    "kind": "file_does_not_contain",
+    "path": "Test.cs",
+    "text": "#if defaultFalse"
+  },
+  {
+    "kind": "file_does_not_contain",
+    "path": "Test.cs",
+    "text": "#if defaultTrue"
+  },
+  {
+    "kind": "file_does_not_contain",
+    "path": "Test.cs",
+    "text": "DefaultFalseExcluded"
+  },
+  {
+    "kind": "file_does_not_contain",
+    "path": "Test.cs",
+    "text": "DefaultTrueExcluded"
+  },
+  {
+    "kind": "file_contains",
+    "path": "Test.cs",
+    "text": "DefaultFalseIncluded"
+  },
+  {
+    "kind": "file_contains",
+    "path": "Test.cs",
+    "text": "DefaultTrueIncluded"
+  },
+  {
+    "kind": "file_contains",
+    "path": "Test.cs",
+    "text": "//-:cnd\r\n#if DEBUG2\r\n    public class InsideUnknownDirectiveEmit { }\r\n#endif\r\n//+:cnd\r\n"
+  },
+  {
+    "kind": "file_contains",
+    "path": "Test.cs",
+    "text": "#if DEBUG1\r\n    public class InsideUnknownDirectiveNoEmit { }\r\n#endif\r\n"
+  },
+  {
+    "kind": "file_does_not_contain",
+    "path": "Test.cs",
+    "text": "//-:cnd:noEmit\r\n#if DEBUG1\r\n    public class InsideUnknownDirectiveNoEmit { }\r\n#endif\r\n//+:cnd:noEmit\r\n"
+  }
+]

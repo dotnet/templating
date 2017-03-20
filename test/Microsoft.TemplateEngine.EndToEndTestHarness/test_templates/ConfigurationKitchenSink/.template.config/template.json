@@ -1,0 +1,21 @@
+﻿{
+  "author": "Test Asset",
+  "classifications": [ "Test Asset" ],
+  "name": "ConfigurationKitchenSink",
+  "groupIdentity": "TestAssets.ConfigurationKitchenSink",
+  "precedence": "100",
+  "identity": "TestAssets.ConfigurationKitchenSink",
+  "shortName": "TestAssets.ConfigurationKitchenSink",
+  "symbols": {
+    "defaultFalse": {
+      "type": "parameter",
+      "dataType": "boolean",
+      "defaultValue": "false"
+    },
+    "defaultTrue": {
+      "type": "parameter",
+      "dataType": "boolean",
+      "defaultValue": "true"
+    }
+  }
+}
