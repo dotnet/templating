@@ -1,2 +1,31 @@
-# default all files to crlf
-* text eol=crlf
+# make these file types use crlf
+*.cs text eol=crlf
+*.fs text eol=crlf
+*.cpp text eol=crlf
+*.h text eol=crlf
+*.hpp text eol=crlf
+*.htm text eol=crlf
+*.html text eol=crlf
+*.jsp text eol=crlf
+*.asp text eol=crlf
+*.aspx text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.config text eol=crlf
+*.txt text eol=crlf
+*.haml text eol=crlf
+*.jsx text eol=crlf
+*.tsx text eol=crlf
+*.sln text eol=crlf
+*.csproj text eol=crlf
+*.fsproj text eol=crlf
+*.json text eol=crlf
+*.xml text eol=crlf
+*.xaml text eol=crlf
+*.config text eol=crlf
+*.bowerrc text eol=crlf
+*.css text eol=crlf
+*.css.min text eol=crlf
+*.cshtml text eol=crlf
+*.proj text eol=crlf
+*.nuspec text eol=crlf
