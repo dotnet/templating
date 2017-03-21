@@ -1,0 +1,2 @@
+# default all files to crlf
+*.* text eol=crlf
