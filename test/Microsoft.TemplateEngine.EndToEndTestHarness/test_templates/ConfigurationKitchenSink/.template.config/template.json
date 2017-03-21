@@ -22,6 +22,15 @@
       "dataType": "string",
       "replaces": "Things",
       "defaultValue": "Things"
+    },
+    "replaceThere": {
+      "type": "parameter",
+      "dataType": "string",
+      "replaces": "There",
+      "onlyIf": [
+        { "after": "Hello ", "before": "!" }
+      ],
+      "defaultValue": "Things"
     }
   }
 }

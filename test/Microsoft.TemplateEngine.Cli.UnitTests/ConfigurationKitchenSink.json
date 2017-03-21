@@ -35,6 +35,26 @@
     "path": "Company.ClassLibrary1.csproj",
     "text": "\r\n    <None Include=\"Stuff\" />\r\n"
   },
+  {
+    "kind": "file_contains",
+    "path": "Company.ClassLibrary1.csproj",
+    "text": "<!-- Hello You! -->"
+  },
+  {
+    "kind": "file_contains",
+    "path": "Company.ClassLibrary1.csproj",
+    "text": "<!-- Hello There. -->"
+  },
+  {
+    "kind": "file_contains",
+    "path": "Company.ClassLibrary1.csproj",
+    "text": "<!-- Hi There! -->"
+  },
+  {
+    "kind": "file_does_not_contain",
+    "path": "Company.ClassLibrary1.csproj",
+    "text": "<!-- Hello There! -->"
+  },
   // **/*.cs
   {
     "kind": "file_contains",
