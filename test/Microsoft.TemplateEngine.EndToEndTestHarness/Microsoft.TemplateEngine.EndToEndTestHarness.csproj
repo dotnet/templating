@@ -27,6 +27,7 @@
     <None Include="test_templates\ConfigurationKitchenSink\.template.config\template.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="test_templates\ConfigurationKitchenSink\Test.css" />
     <None Include="test_templates\ConfigurationKitchenSink\Test.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -157,4 +157,126 @@
     "path": "Test.json",
     "text": "//Stuff"
   },
+  // **/*.json
+  {
+    "kind": "file_contains",
+    "path": "Test.json",
+    "text": "//#if DEBUG1"
+  },
+  {
+    "kind": "file_contains",
+    "path": "Test.json",
+    "text": "//#if DEBUG2"
+  },
+  {
+    "kind": "file_does_not_contain",
+    "path": "Test.json",
+    "text": "//#if defaultFalse"
+  },
+  {
+    "kind": "file_does_not_contain",
+    "path": "Test.json",
+    "text": "//#if defaultTrue"
+  },
+  {
+    "kind": "file_does_not_contain",
+    "path": "Test.json",
+    "text": "DefaultFalseExcluded"
+  },
+  {
+    "kind": "file_does_not_contain",
+    "path": "Test.json",
+    "text": "DefaultTrueExcluded"
+  },
+  {
+    "kind": "file_contains",
+    "path": "Test.json",
+    "text": "DefaultFalseIncluded"
+  },
+  {
+    "kind": "file_contains",
+    "path": "Test.json",
+    "text": "DefaultTrueIncluded"
+  },
+  {
+    "kind": "file_contains",
+    "path": "Test.json",
+    "text": "//-:cnd\r\n  //#if DEBUG2\r\n  \"InsideUnknownDirectiveEmit\": 0\r\n  //#endif\r\n//+:cnd\r\n"
+  },
+  {
+    "kind": "file_contains",
+    "path": "Test.json",
+    "text": "  //#if DEBUG1\r\n  \"InsideUnknownDirectiveNoEmit\": 0,\r\n  //#endif\r\n"
+  },
+  {
+    "kind": "file_does_not_contain",
+    "path": "Test.json",
+    "text": "//-:cnd:noEmit\r\n  //#if DEBUG1\r\n  \"InsideUnknownDirectiveNoEmit\": 0,\r\n  //#endif\r\n//+:cnd:noEmit\r\n"
+  },
+  {
+    "kind": "file_contains",
+    "path": "Test.json",
+    "text": "//Stuff"
+  },
+  // **/*.css
+  {
+    "kind": "file_contains",
+    "path": "Test.css",
+    "text": "/*#if (DEBUG1) */"
+  },
+  {
+    "kind": "file_contains",
+    "path": "Test.css",
+    "text": "/*#if (DEBUG2) */"
+  },
+  {
+    "kind": "file_does_not_contain",
+    "path": "Test.css",
+    "text": "/*#if (defaultFalse) */"
+  },
+  {
+    "kind": "file_does_not_contain",
+    "path": "Test.css",
+    "text": "/*#if (defaultTrue) */"
+  },
+  {
+    "kind": "file_does_not_contain",
+    "path": "Test.css",
+    "text": "DefaultFalseExcluded"
+  },
+  {
+    "kind": "file_does_not_contain",
+    "path": "Test.css",
+    "text": "DefaultTrueExcluded"
+  },
+  {
+    "kind": "file_contains",
+    "path": "Test.css",
+    "text": "DefaultFalseIncluded"
+  },
+  {
+    "kind": "file_contains",
+    "path": "Test.css",
+    "text": "DefaultTrueIncluded"
+  },
+  {
+    "kind": "file_contains",
+    "path": "Test.css",
+    "text": "/*-:cnd*/\r\n  /*#if (DEBUG2) */\r\n  InsideUnknownDirectiveEmit: 0;\r\n  /*#endif*/\r\n/*+:cnd*/\r\n"
+  },
+  {
+    "kind": "file_contains",
+    "path": "Test.css",
+    "text": "  /*#if (DEBUG1) */\r\n  InsideUnknownDirectiveNoEmit: 0;\r\n  /*#endif*/\r\n"
+  },
+  {
+    "kind": "file_does_not_contain",
+    "path": "Test.css",
+    "text": "/*-:cnd:noEmit*/\r\n  /*#if (DEBUG1) */\r\n  InsideUnknownDirectiveNoEmit: 0;\r\n  /*#endif*/\r\n/*+:cnd:noEmit*/\r\n"
+  },
+  {
+    "kind": "file_contains",
+    "path": "Test.css",
+    "text": "/*Stuff*/"
+  }
 ]
