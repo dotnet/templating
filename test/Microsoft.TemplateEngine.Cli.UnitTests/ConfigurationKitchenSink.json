@@ -30,6 +30,11 @@
     "path": "Company.ClassLibrary1.csproj",
     "text": "\r\n    <!--#if (defaultFalse) -->\r\n    <None Include=\"Foo6.cs\" />\r\n    <!--#endif -->\r\n    <None Include=\"Foo6.6.cs\" />\r\n"
   },
+  {
+    "kind": "file_contains",
+    "path": "Company.ClassLibrary1.csproj",
+    "text": "\r\n    <None Include=\"Stuff\" />\r\n"
+  },
   // **/*.cs
   {
     "kind": "file_contains",
@@ -85,5 +90,10 @@
     "kind": "file_does_not_contain",
     "path": "Test.cs",
     "text": "//-:cnd:noEmit\r\n#if DEBUG1\r\n    public class InsideUnknownDirectiveNoEmit { }\r\n#endif\r\n//+:cnd:noEmit\r\n"
+  },
+  {
+    "kind": "file_contains",
+    "path": "Test.cs",
+    "text": "//Stuff"
   }
 ]

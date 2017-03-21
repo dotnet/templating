@@ -28,5 +28,7 @@
     <!--#if (defaultTrue) -->
     <None Include="Foo6.6.cs" />
     <!--#endif -->
+
+    <None Include="Things" />
   </ItemGroup>
 </Project>

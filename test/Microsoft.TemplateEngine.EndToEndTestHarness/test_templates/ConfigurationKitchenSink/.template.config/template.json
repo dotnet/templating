@@ -16,6 +16,12 @@
       "type": "parameter",
       "dataType": "boolean",
       "defaultValue": "true"
+    },
+    "replaceThings": {
+      "type": "parameter",
+      "dataType": "string",
+      "replaces": "Things",
+      "defaultValue": "Things"
     }
   }
 }
