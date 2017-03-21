@@ -30,6 +30,7 @@
     <None Include="test_templates\ConfigurationKitchenSink\Test.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="test_templates\ConfigurationKitchenSink\Test.json" />
     <None Include="test_templates\TemplateWithRenames\bar\bar.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
