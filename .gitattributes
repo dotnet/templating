@@ -1,2 +1,2 @@
 # default all files to crlf
-*.* text eol=crlf
+* text eol=crlf
