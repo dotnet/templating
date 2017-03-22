@@ -1,5 +1,6 @@
 <Project DefaultTargets="Build">
   <Import Project="Version.props" />
+  <Import Project="Loc.Settings.targets" />
 
   <PropertyGroup>
     <ArtifactsDir>$(MSBuildThisFileDirectory)artifacts/</ArtifactsDir>
@@ -144,4 +145,24 @@
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
   </Target>
+
+  <Target Name="BuildLocalized" DependsOnTargets="SetLanguages" Condition="Exists('.tools\loc\loc.proj')">
+    <MSBuild Projects=".tools\loc\loc.proj" Targets="Build"
+             Properties="Lang=%(Languages.Identity)" />
+
+  </Target>
+
+  <!-- Localization -->
+  <Target Name="SetLanguages">
+    <ItemGroup>
+      <Languages Remove="@(Languages)" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Languages Include="$(AllLanguages)" Condition="'$(Lang)' == 'all'" />
+      <Languages Include="$(Lang)" Condition="'$(Lang)' != 'all'" />
+      <Languages Include="ploc" Condition="'$(Lang)' == ''" />
+    </ItemGroup>
+  </Target>
+
 </Project>

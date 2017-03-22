@@ -38,13 +38,20 @@
       <GitInfoCommitHash Condition="'$(COMMIT_HASH)' != ''">$(COMMIT_HASH)</GitInfoCommitHash>
     </PropertyGroup>
 
-    <Exec Command="git rev-list --count HEAD" ConsoleToMSBuild="true" Condition="'$(COMMIT_HASH)' == ''">
+    <Exec Command="git rev-list --count HEAD" ConsoleToMSBuild="true" Condition="'$(COMMIT_HASH)' == ''" IgnoreExitCode="true">
       <Output TaskParameter="ConsoleOutput" PropertyName="GitInfoCommitCount" />
+      <Output TaskParameter="ExitCode" PropertyName="GitExitCode" />
     </Exec>
 
-    <Exec Command="git rev-parse HEAD" ConsoleToMSBuild="true" Condition="'$(COMMIT_HASH)' == ''">
+    <Exec Command="git rev-parse HEAD" ConsoleToMSBuild="true" Condition="'$(COMMIT_HASH)' == ''" IgnoreExitCode="true">
       <Output TaskParameter="ConsoleOutput" PropertyName="GitInfoCommitHash" />
+      <Output TaskParameter="ExitCode" PropertyName="GitExitCode" />
     </Exec>
+
+    <PropertyGroup Condition="'$(GitExitCode)' != '0'">
+      <GitInfoCommitCount>0</GitInfoCommitCount>
+      <GitInfoCommitHash>UNKNOWN</GitInfoCommitHash>
+    </PropertyGroup>
 
     <PropertyGroup>
       <GitCommitInfoContent>
