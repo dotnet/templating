@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <ArtifactsDir>$(MSBuildThisFileDirectory)artifacts/</ArtifactsDir>
+    <PackageOutputPath>$(ArtifactsDir)packages/</PackageOutputPath>
+    <TemplatesOutputPath>$(ArtifactsDir)templates/</TemplatesOutputPath>
+    <DevPath>$(MSBuildThisFileDirectory)dev</DevPath>
+    <ToolsPath>$(MSBuildThisFileDirectory).tools</ToolsPath>
+  </PropertyGroup>
+</Project>
