@@ -1,13 +1,9 @@
 <Project DefaultTargets="Build">
   <Import Project="Version.props" />
+  <Import Project="Settings.props" />
   <Import Project="Loc.Settings.targets" />
 
   <PropertyGroup>
-    <ArtifactsDir>$(MSBuildThisFileDirectory)artifacts/</ArtifactsDir>
-    <PackageOutputPath>$(ArtifactsDir)packages/</PackageOutputPath>
-    <TemplatesOutputPath>$(ArtifactsDir)templates/</TemplatesOutputPath>
-    <DevPath>$(MSBuildThisFileDirectory)dev</DevPath>
-
     <New3TargetFramework>netcoreapp1.1</New3TargetFramework>
     <InnerRingTargetFramework>netstandard1.3</InnerRingTargetFramework>
     <OuterRingTargetFramework>netstandard1.5</OuterRingTargetFramework>
@@ -146,13 +142,13 @@
 
   </Target>
 
+  <!-- Localization -->
   <Target Name="BuildLocalized" DependsOnTargets="SetLanguages" Condition="Exists('.tools\loc\loc.proj')">
     <MSBuild Projects=".tools\loc\loc.proj" Targets="Build"
              Properties="Lang=%(Languages.Identity)" />
 
   </Target>
 
-  <!-- Localization -->
   <Target Name="SetLanguages">
     <ItemGroup>
       <Languages Remove="@(Languages)" />
@@ -165,4 +161,10 @@
     </ItemGroup>
   </Target>
 
+  <!-- Signing -->
+  <Target Name="SignBinaries" Condition="Exists('.tools\sign\sign.proj')">
+    <MSBuild Projects=".tools\sign\sign.proj" Targets="Build"
+             Properties="CodeSignCreateTestJob=$(CodeSignCreateTestJob);TestSign=$(TestSign)" />
+
+  </Target>
 </Project>
