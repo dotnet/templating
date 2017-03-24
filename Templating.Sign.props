@@ -1,0 +1,5 @@
+<Project>
+  <ItemGroup>
+    <PackageSources Include="$(ArtifactsDir)packages"/>
+  </ItemGroup>
+</Project>

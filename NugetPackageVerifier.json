@@ -1,0 +1,6 @@
+{
+    "default": { // Not running any verifier rules for other packages
+        "rules": [],
+        "packages": {}
+    }
+}

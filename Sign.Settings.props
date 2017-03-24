@@ -1,0 +1,10 @@
+<Project>
+  <Import Project="Settings.props" />
+
+  <PropertyGroup>
+    <CodeSignToolsPath>$(ToolsPath)</CodeSignToolsPath>
+    <CodeSignOutputPath Condition="'$(CodeSignOutputPath)' == ''">$(ArtifactsDir)Signed\</CodeSignOutputPath>
+    <IntermediateOutputPath Condition="'$(IntermediateOutputPath)' == ''">$(MSBuildThisFileDirectory)obj</IntermediateOutputPath>
+    <SignProps>$(MSBuildThisFileDirectory)Templating.sign.props</SignProps>
+  </PropertyGroup>
+</Project>
