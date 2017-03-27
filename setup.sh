@@ -64,10 +64,6 @@ echo "Creating symbolic link /usr/local/bin/dotnet-new3 -> $DN3BASEDIR/dev/dotne
 sudo ln -s "$DN3BASEDIR/dev/dotnet-new3" /usr/local/bin/dotnet-new3 
 fi
 
-CWD2="$( echo $CWD | sed -e 's/\//\\\//g' )"
-cd $DN3BASEDIR/dev
-sed -i 's/\\/\//g' defaultinstall.*.list
-sed -i "s/%DN3%\/../$CWD2/g" defaultinstall.*.list
 cd $CWD
 
 echo dotnet new3 is ready!
