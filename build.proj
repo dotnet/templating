@@ -36,6 +36,7 @@
 
     <OuterRingProjects>
         src/Microsoft.TemplateEngine.Edge/Microsoft.TemplateEngine.Edge.csproj;
+        src/Microsoft.TemplateEngine.IDE/Microsoft.TemplateEngine.IDE.csproj;
         test/Microsoft.TemplateEngine.Mocks/Microsoft.TemplateEngine.Mocks.csproj
     </OuterRingProjects>
 
@@ -61,6 +62,7 @@
   </PropertyGroup>
 
   <Target Name="Build">
+
     <MakeDir Directories="$(ArtifactsDir);$(PackageOutputPath);$(TemplatesOutputPath);$(DevPath)" />
     <CallTarget Targets="CollectGitInfo" />
 
