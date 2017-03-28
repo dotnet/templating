@@ -1,6 +1,7 @@
 <Project ToolsVersion="15.0">
   <PropertyGroup Condition=" '$(PackageVersion)' == '' ">
     <PackageReleaseVersion>1.0.0</PackageReleaseVersion>
+    <PackageBuildQuality>$(BUILD_QUALITY)</PackageBuildQuality>
     <PackageBuildQuality Condition=" '$(PackageBuildQuality)' == '' ">beta1</PackageBuildQuality>
     <PackageVersion>$(PackageReleaseVersion)-$(PackageBuildQuality)</PackageVersion>
     <BUILD_NUMBER Condition="'$(BUILD_NUMBER)' == ''">0</BUILD_NUMBER>
@@ -36,6 +37,7 @@
     <PropertyGroup>
       <GitInfoCommitCount Condition="'$(COMMIT_HASH)' != ''">$(COMMIT_COUNT)</GitInfoCommitCount>
       <GitInfoCommitHash Condition="'$(COMMIT_HASH)' != ''">$(COMMIT_HASH)</GitInfoCommitHash>
+      <GitExitCode>0</GitExitCode>
     </PropertyGroup>
 
     <Exec Command="git rev-list --count HEAD" ConsoleToMSBuild="true" Condition="'$(COMMIT_HASH)' == ''" IgnoreExitCode="true">
