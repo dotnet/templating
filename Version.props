@@ -34,7 +34,7 @@
   </PropertyGroup>
   <Target Name="CollectGitInfo">
     <PropertyGroup>
-      <GitInfoCommitCount Condition="'$(COMMIT_HASH)' != ''">0</GitInfoCommitCount>
+      <GitInfoCommitCount Condition="'$(COMMIT_HASH)' != ''">$(COMMIT_COUNT)</GitInfoCommitCount>
       <GitInfoCommitHash Condition="'$(COMMIT_HASH)' != ''">$(COMMIT_HASH)</GitInfoCommitHash>
     </PropertyGroup>
 
