@@ -27,21 +27,21 @@ platformList.each { platform ->
 
     // Calculate the build command
     if (os == 'Windows_NT') {
-        buildCommand = ".\\build.cmd -Configuration ${configuration} -Architecture ${architecture} -Targets Default"
+        buildCommand = ".\\build.cmd -Configuration ${configuration}"
     }
     else if (os == 'Windows_2016') {
-        buildCommand = ".\\build.cmd -Configuration ${configuration} -Architecture ${architecture} -RunInstallerTestsInDocker -Targets Default"
+        buildCommand = ".\\build.cmd -Configuration ${configuration}"
     }
     else if (os == 'Ubuntu') {
-        buildCommand = "./build.sh --skip-prereqs --configuration ${configuration} --docker ubuntu.14.04 --targets Default"
+        buildCommand = "./build.sh --configuration ${configuration}"
     }
     else if (os == 'Linux') {
         osUsedForMachineAffinity = 'Ubuntu16.04';
-        buildCommand = "./build.sh --linux-portable --skip-prereqs --configuration ${configuration} --targets Default"
+        buildCommand = "./build.sh --configuration ${configuration}"
     }
     else {
         // Jenkins non-Ubuntu CI machines don't have docker
-        buildCommand = "./build.sh --skip-prereqs --configuration ${configuration} --targets Default"
+        buildCommand = "./build.sh --configuration ${configuration}"
     }
 
     def newJob = job(Utilities.getFullJobName(project, jobName, isPR)) {
