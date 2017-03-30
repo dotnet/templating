@@ -1263,17 +1263,32 @@ namespace Microsoft.TemplateEngine.Cli
                         string paramName = matchedParamInfo.Key;
                         string paramValue = matchedParamInfo.Value;
 
-                        if (templateWithFilterInfo.Info.Tags.TryGetValue(paramName, out ICacheTag paramDetails)
-                            && (
-                                paramDetails.ChoicesAndDescriptions.ContainsKey(paramValue)
-                                || paramDetails.ChoicesAndDescriptions.Any(x => x.Value.StartsWith(paramValue, StringComparison.OrdinalIgnoreCase))
-                            ))
+                        ITemplateParameter paramInfo = templateWithFilterInfo.Info.Parameters.FirstOrDefault(x => string.Equals(x.Name, paramName, StringComparison.OrdinalIgnoreCase));
+                        if (paramInfo != null)
                         {
-                            dispositionForTemplate.Add(new MatchInfo { Location = MatchLocation.OtherParameter, Kind = MatchKind.Exact, ChoiceIfLocationIsOtherChoice = paramName });
-                        }
-                        else
-                        {
-                            dispositionForTemplate.Add(new MatchInfo { Location = MatchLocation.OtherParameter, Kind = MatchKind.InvalidParameterValue, ChoiceIfLocationIsOtherChoice = paramName });
+                            if (string.Equals(paramInfo.DataType, "choice", StringComparison.OrdinalIgnoreCase))
+                            {
+                                if (paramInfo.Choices.ContainsKey(paramValue)
+                                    || paramInfo.Choices.Any(x => x.Value.StartsWith(paramValue, StringComparison.OrdinalIgnoreCase)))
+                                {
+                                    dispositionForTemplate.Add(new MatchInfo { Location = MatchLocation.OtherParameter, Kind = MatchKind.Exact, ChoiceIfLocationIsOtherChoice = paramName });
+                                }
+                                else
+                                {
+                                    dispositionForTemplate.Add(new MatchInfo { Location = MatchLocation.OtherParameter, Kind = MatchKind.InvalidParameterValue, ChoiceIfLocationIsOtherChoice = paramName });
+                                }
+                            }
+                            else if (string.Equals(paramInfo.DataType, "bool", StringComparison.OrdinalIgnoreCase))
+                            {
+                                if (string.IsNullOrEmpty(paramValue) || string.Equals(paramValue, "true", StringComparison.OrdinalIgnoreCase) || string.Equals(paramValue, "false", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    dispositionForTemplate.Add(new MatchInfo { Location = MatchLocation.OtherParameter, Kind = MatchKind.Exact, ChoiceIfLocationIsOtherChoice = paramName });
+                                }
+                                else
+                                {
+                                    dispositionForTemplate.Add(new MatchInfo { Location = MatchLocation.OtherParameter, Kind = MatchKind.InvalidParameterValue, ChoiceIfLocationIsOtherChoice = paramName });
+                                }
+                            }
                         }
                     }
 
