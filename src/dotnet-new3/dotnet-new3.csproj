@@ -2,7 +2,7 @@
   <Import Project="..\..\Version.props" />
   <PropertyGroup>
     <Description>Template Instantiation Commands for .NET Core CLI.</Description>
-    <TargetFrameworks>netcoreapp1.1</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
 
@@ -19,6 +19,12 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+
+    <!-- Pull up explicit references to lower versions -->
+    <PackageReference Include="System.IO.FileSystem" Version="4.4.0-beta-24913-02" />
+    <PackageReference Include="System.Net.Primitives" Version="4.4.0-beta-24913-02" />
+    <PackageReference Include="System.Globalization" Version="4.4.0-beta-24913-02" />
+    <PackageReference Include="System.Linq.Parallel" Version="4.4.0-beta-24913-02" />
   </ItemGroup>
 
   <ItemGroup>

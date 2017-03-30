@@ -2,7 +2,7 @@
   <Import Project="..\..\Version.props" />
 
   <PropertyGroup>    
-    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,6 +13,12 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
     <PackageReference Include="xunit" Version="2.2.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
+
+    <!-- Pull up explicit references to lower versions -->
+    <PackageReference Include="System.IO.FileSystem" Version="4.4.0-beta-24913-02" />
+    <PackageReference Include="System.Net.Primitives" Version="4.4.0-beta-24913-02" />
+    <PackageReference Include="System.Globalization" Version="4.4.0-beta-24913-02" />
+    <PackageReference Include="System.Linq.Parallel" Version="4.4.0-beta-24913-02" />
   </ItemGroup>
 
   <ItemGroup>

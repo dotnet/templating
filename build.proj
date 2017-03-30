@@ -8,7 +8,7 @@
     <EngineBuild Condition="'$(EngineBuild)' == '' AND '$(CIBuild)' == 'false'">true</EngineBuild>
     <TemplatesBuild Condition="'$(TemplatesBuild)' == '' AND '$(CIBuild)' == 'false'">true</TemplatesBuild>
     <SkipTests Condition="'$(SkipTests)' == ''">false</SkipTests>
-    <New3TargetFramework>netcoreapp1.1</New3TargetFramework>
+    <New3TargetFramework>netcoreapp2.0</New3TargetFramework>
     <InnerRingTargetFramework>netstandard1.3</InnerRingTargetFramework>
     <OuterRingTargetFramework>netstandard1.5</OuterRingTargetFramework>
     <FullFrameworkTargetFramework>net45</FullFrameworkTargetFramework>
