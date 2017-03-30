@@ -21,6 +21,7 @@
     <TemplatesNoTimestampFolder>$(ArtifactsFolder)templates-notimestamp\</TemplatesNoTimestampFolder>
     <BuildToolsFolder>$(MSBuildThisFileDirectory).tools\</BuildToolsFolder>
     <NuGet>&quot;$(BuildToolsFolder)nuget.exe&quot;</NuGet>
+    <RuntimeFrameworkVersion>2.0.0-beta-001863-00</RuntimeFrameworkVersion>
 
     <GenerateAssemblyInfo Condition="'$(BuildingInsideVisualStudio)' != ''">False</GenerateAssemblyInfo>
     <GenerateAssemblyFileVersionAttribute>False</GenerateAssemblyFileVersionAttribute>
