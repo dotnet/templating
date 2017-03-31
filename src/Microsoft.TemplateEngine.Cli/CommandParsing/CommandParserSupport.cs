@@ -18,14 +18,54 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             _settingsLoader = (SettingsLoader)_environment.SettingsLoader;
         }
 
-        public static Command NewWithVisibleArgs(string commandName) => GetNewCommand(commandName, NewCommandVisibleArgs);
+        //public static Command NewWithVisibleArgs(string commandName) => GetNewCommand(commandName, NewCommandVisibleArgs);
 
-        public static Command NewWithActiveArgs(string commandName) => GetNewCommand(commandName, NewCommandVisibleArgs, NewCommandHiddenArgs, DebuggingCommandArgs);
+        //public static Command NewWithAllArgs(string commandName) => GetNewCommand(commandName, NewCommandVisibleArgs, NewCommandHiddenArgs, NewCommandReservedArgs, DebuggingCommandArgs);
 
-        public static Command NewWithAllArgs(string commandName) => GetNewCommand(commandName, NewCommandVisibleArgs, NewCommandHiddenArgs, NewCommandReservedArgs, DebuggingCommandArgs);
-        
+        public static Command CreateNewCommandWithoutTemplateInfo(string commandName, bool unmatchedArgsAreErrors = false) => GetNewCommand(commandName, unmatchedArgsAreErrors, NewCommandVisibleArgs, NewCommandHiddenArgs, DebuggingCommandArgs);
+
+        private static Command GetNewCommand(string commandName, bool unmatchedArgsAreErrors, params Option[][] args)
+        {
+            Option[] combinedArgs = CombineArrays(args);
+
+            return Create.Command(commandName,
+                           "Initialize .NET projects.",
+                           Accept.ZeroOrMoreArguments(),    // this can't be ZeroOrOneArguments() because template args would cause errors
+                           unmatchedArgsAreErrors,
+                           combinedArgs);
+        }
+
+        // Final parser for when there is no template name provided.
+        // Unmatched args are errors.
+        public static Command CreateNewCommandForNoTemplateName(string commandName)
+        {
+            Option[] combinedArgs = CombineArrays(NewCommandVisibleArgs, NewCommandHiddenArgs, DebuggingCommandArgs);
+
+            return Create.Command(commandName,
+                           "Initialize .NET projects.",
+                           Accept.NoArguments(),
+                           //true,
+                           combinedArgs);
+        }
+
+        private static Command GetNewCommandForTemplate(string commandName, string templateName, bool unmatchedArgsAreErrors, params Option[][] args)
+        {
+            Option[] combinedArgs = CombineArrays(args);
+
+            return Create.Command(commandName,
+                           "Initialize .NET projects.",
+                           Accept.ExactlyOneArgument().WithSuggestionsFrom(templateName),
+                           unmatchedArgsAreErrors,
+                           combinedArgs);
+        }
+
         // Creates a command setup with the args for "new", plus args for the input template parameters.
-        public static Command CreateNewCommandWithArgsForTemplate(string commandName, string templateName, IReadOnlyList<ITemplateParameter> parameterDefinitions, IDictionary<string, string> longNameOverrides, IDictionary<string, string> shortNameOverrides, out Dictionary<string, IList<string>> templateParamMap)
+        public static Command CreateNewCommandWithArgsForTemplate(string commandName, string templateName, 
+                    IReadOnlyList<ITemplateParameter> parameterDefinitions, 
+                    IDictionary<string, string> longNameOverrides, 
+                    IDictionary<string, string> shortNameOverrides, 
+                    out Dictionary<string, IList<string>> templateParamMap,
+                    bool unmatchedArgsAreErrors = false)
         {
             IList<Option> paramOptionList = new List<Option>();
             Option[] allBuiltInArgs = CombineArrays(NewCommandVisibleArgs, NewCommandHiddenArgs, NewCommandReservedArgs, DebuggingCommandArgs);
@@ -80,63 +120,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                 throw new Exception($"Template is malformed. The following parameter names are invalid: {unusableDisplayList}");
             }
 
-            return GetNewCommandForTemplate(commandName, templateName, NewCommandVisibleArgs, NewCommandHiddenArgs, DebuggingCommandArgs, paramOptionList.ToArray());
-        }
-
-        private static HashSet<string> VariantsForOptions(Option[] options)
-        {
-            HashSet<string> variants = new HashSet<string>();
-
-            if (options == null)
-            {
-                return variants;
-            }
-
-            for (int i = 0; i < options.Length; i++)
-            {
-                variants.UnionWith(options[i].RawAliases);
-            }
-
-            return variants;
-        }
-
-        private static T[] CombineArrays<T>(params T[][] arrayList)
-        {
-            int combinedLength = 0;
-            foreach (T[] arg in arrayList)
-            {
-                combinedLength += arg.Length;
-            }
-
-            T[] combinedArray = new T[combinedLength];
-            int nextIndex = 0;
-            foreach (T[] arg in arrayList)
-            {
-                Array.Copy(arg, 0, combinedArray, nextIndex, arg.Length);
-                nextIndex += arg.Length;
-            }
-
-            return combinedArray;
-        }
-        
-        private static Command GetNewCommandForTemplate(string commandName, string templateName, params Option[][] args)
-        {
-            Option[] combinedArgs = CombineArrays(args);
-
-            return Create.Command(commandName,
-                           "Initialize .NET projects.",
-                           Accept.ExactlyOneArgument().WithSuggestionsFrom(templateName),
-                           combinedArgs);
-        }
-
-        private static Command GetNewCommand(string commandName, params Option[][] args)
-        {
-            Option[] combinedArgs = CombineArrays(args);
-
-            return Create.Command(commandName,
-                           "Initialize .NET projects.",
-                           Accept.ZeroOrMoreArguments(),    // this can't be ZeroOrOneArguments() because template args would cause errors
-                           combinedArgs);
+            return GetNewCommandForTemplate(commandName, templateName, unmatchedArgsAreErrors, NewCommandVisibleArgs, NewCommandHiddenArgs, DebuggingCommandArgs, paramOptionList.ToArray());
         }
 
         private static Option[] NewCommandVisibleArgs
@@ -194,12 +178,6 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
         {
             get
             {
-                // Including these is probably better. It'll require changes in how they're accessed
-                // that will cause the old parser interface to not work correctly.
-                // So wait to change things until we're definitely done with the old parser.
-                //
-                //return new Option[0];
-
                 return new[]
                 {
                     Create.Option("--debug:attach", string.Empty, Accept.NoArguments()),
@@ -210,6 +188,42 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                     Create.Option("--debug:showconfig", string.Empty, Accept.NoArguments())
                 };
             }
+        }
+
+        private static HashSet<string> VariantsForOptions(Option[] options)
+        {
+            HashSet<string> variants = new HashSet<string>();
+
+            if (options == null)
+            {
+                return variants;
+            }
+
+            for (int i = 0; i < options.Length; i++)
+            {
+                variants.UnionWith(options[i].RawAliases);
+            }
+
+            return variants;
+        }
+
+        private static T[] CombineArrays<T>(params T[][] arrayList)
+        {
+            int combinedLength = 0;
+            foreach (T[] arg in arrayList)
+            {
+                combinedLength += arg.Length;
+            }
+
+            T[] combinedArray = new T[combinedLength];
+            int nextIndex = 0;
+            foreach (T[] arg in arrayList)
+            {
+                Array.Copy(arg, 0, combinedArray, nextIndex, arg.Length);
+                nextIndex += arg.Length;
+            }
+
+            return combinedArray;
         }
     }
 }

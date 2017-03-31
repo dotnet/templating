@@ -27,7 +27,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
         public NewCommandInputCli2(string commandName)
         {
             _commandName = commandName;
-            _noTemplateCommand = CommandParserSupport.NewWithActiveArgs(_commandName);
+            _noTemplateCommand = CommandParserSupport.CreateNewCommandWithoutTemplateInfo(_commandName);
             _currentCommand = _noTemplateCommand;
         }
 
@@ -38,7 +38,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
             if (_parseResult.TryGetAppliedOption(out IList<string> templateNameList, new[] { _commandName }))
             {
-                if (templateNameList.Count > 0)
+                if ((templateNameList.Count > 0) && !templateNameList[0].StartsWith("-", StringComparison.Ordinal))
                 {
                     _templateNameArg = templateNameList[0];
                 }
@@ -50,6 +50,12 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             else
             {
                 _templateNameArg = string.Empty;
+            }
+
+            if (string.IsNullOrEmpty(_templateNameArg))
+            {
+                _currentCommand = CommandParserSupport.CreateNewCommandForNoTemplateName(_commandName);
+                ParseArgs();
             }
 
             return _invoke.Invoke().Result;
@@ -72,7 +78,6 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
             Parser parser = new Parser(new[] { '=' }, _currentCommand);
             _parseResult = parser.Parse(argsWithCommand.ToArray());
-            
             _templateParamCanonicalToVariantMap = null;
         }
 
@@ -224,8 +229,6 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
         }
         private IReadOnlyDictionary<string, string> _templateParamVariantToCanonicalMap;
 
-
-        // TODO: verify this
         public List<string> RemainingArguments
         {
             get
@@ -234,12 +237,20 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             }
         }
 
-        // TODO: fill this in correctly
+        // TODO: probably deprecate one of RemainingArguments | RemainingParameters
+
         public IDictionary<string, IList<string>> RemainingParameters
         {
             get
             {
-                return new Dictionary<string, IList<string>>();
+                Dictionary<string, IList<string>> remainingParameters = new Dictionary<string, IList<string>>();
+
+                foreach (string param in _parseResult.UnmatchedTokens)
+                {
+                    remainingParameters[param] = new List<string>();
+                }
+
+                return remainingParameters;
             }
         }
 
