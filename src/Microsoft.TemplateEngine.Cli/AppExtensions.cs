@@ -19,7 +19,24 @@ namespace Microsoft.TemplateEngine.Cli
             return app.Option("-h|--help", LocalizableStrings.DisplaysHelp, CommandOptionType.NoValue);
         }
 
-        public static IReadOnlyDictionary<string, IList<string>> ParseExtraArgs(this CommandLineApplication app, IList<string> extraArgFileNames)
+        public static List<string> CreateArgListFromAdditionalFiles(IList<string> extraArgFileNames)
+        {
+            IDictionary<string, IList<string>> argsDict = ParseArgsFromFile(extraArgFileNames);
+
+            List<string> argsFlattened = new List<string>();
+            foreach (KeyValuePair<string, IList<string>> oneArg in argsDict)
+            {
+                argsFlattened.Add(oneArg.Key);
+                if (oneArg.Value.Count > 0)
+                {
+                    argsFlattened.AddRange(oneArg.Value);
+                }
+            }
+
+            return argsFlattened;
+        }
+
+        public static Dictionary<string, IList<string>> ParseArgsFromFile(IList<string> extraArgFileNames)
         {
             Dictionary<string, IList<string>> parameters = new Dictionary<string, IList<string>>();
 
@@ -66,6 +83,13 @@ namespace Microsoft.TemplateEngine.Cli
                     }
                 }
             }
+
+            return parameters;
+        }
+
+        public static IReadOnlyDictionary<string, IList<string>> ParseExtraArgs(this CommandLineApplication app, IList<string> extraArgFileNames)
+        {
+            Dictionary<string, IList<string>> parameters = ParseArgsFromFile(extraArgFileNames);
 
             for (int i = 0; i < app.RemainingArguments.Count; ++i)
             {

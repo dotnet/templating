@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.CommandLineUtils;
+using Microsoft.TemplateEngine.Cli.CommandParsing;
 using Microsoft.TemplateEngine.Edge.Template;
 
 namespace Microsoft.TemplateEngine.Cli
@@ -68,9 +69,15 @@ namespace Microsoft.TemplateEngine.Cli
         }
 
         // TODO: consider optionally showing help for things not handled by the CommandLineApplication instance
-        public void ShowHelp()
+        //public void ShowHelp()
+        //{
+        //    _helpDisplayer.ShowHelp();
+        //}
+
+        // This replaces ShowHelp() so that it returns the help text instead of writing it 
+        public string HelpView()
         {
-            _helpDisplayer.ShowHelp();
+            return _helpDisplayer.GetHelpText();
         }
 
         public string GetOptionsHelp()
@@ -292,97 +299,30 @@ namespace Microsoft.TemplateEngine.Cli
             }
         }
 
-        // Canonical is the template param name without any dashes. The things mapped to it all have dashes, including the param name itself.
-        // allParameters: name -> dataType
         public void SetupTemplateParameters(IEnumerable<KeyValuePair<string, string>> allParameters, IReadOnlyDictionary<string, string> longNameOverrides, IReadOnlyDictionary<string, string> shortNameOverrides)
         {
             HashSet<string> invalidParams = new HashSet<string>();
 
             foreach (KeyValuePair<string, string> parameter in allParameters)
             {
-                string parameterName = parameter.Key;
+                string canonical = parameter.Key;
+                string dataType = parameter.Value;
+                longNameOverrides.TryGetValue(canonical, out string longNameOverride);
+                shortNameOverrides.TryGetValue(canonical, out string shortNameOverride);
 
-                if (parameterName.IndexOf(':') >= 0)
-                {   // Colon is reserved, template param names cannot have any.
-                    invalidParams.Add(parameterName);
-                    continue;
-                }
+                IReadOnlyList<string> aliases;
 
-                if (longNameOverrides == null || !longNameOverrides.TryGetValue(parameterName, out string flagFullText))
+                if (CommandAliasAssigner.TryAssignAliasesForParameter((name) => IsParameterNameTaken(name), canonical, longNameOverride, shortNameOverride, out aliases))
                 {
-                    flagFullText = parameterName;
-                }
-
-                bool longNameFound = false;
-                bool shortNameFound = false;
-
-                // always unless taken
-                string nameAsParameter = "--" + flagFullText;
-                if (!IsParameterNameTaken(nameAsParameter))
-                {
-                    MapTemplateParamToCanonical(nameAsParameter, parameterName);
-                    longNameFound = true;
-                }
-
-                // only as fallback
-                string qualifiedName = "--param:" + flagFullText;
-                if (!longNameFound && !IsParameterNameTaken(qualifiedName))
-                {
-                    MapTemplateParamToCanonical(qualifiedName, parameterName);
-                    longNameFound = true;
-                }
-
-                if (shortNameOverrides != null && shortNameOverrides.TryGetValue(parameterName, out string shortNameOverride))
-                {
-                    if (string.IsNullOrEmpty(shortNameOverride))
+                    foreach (string alias in aliases)
                     {
-                        shortNameFound = true;
-                    }
-                    else
-                    {
-                        // short name starting point was explicitly specified
-                        string fullShortNameOverride = "-" + shortNameOverride;
-                        if (!IsParameterNameTaken(shortNameOverride))
-                        {
-                            MapTemplateParamToCanonical(fullShortNameOverride, parameterName);
-                            shortNameFound = true;
-                        }
-
-                        string qualifiedShortNameOverride = "-p:" + shortNameOverride;
-                        if (!shortNameFound && !IsParameterNameTaken(qualifiedShortNameOverride))
-                        {
-                            MapTemplateParamToCanonical(qualifiedShortNameOverride, parameterName);
-                            shortNameFound = true;
-                        }
+                        MapTemplateParamToCanonical(alias, canonical);
+                        _templateParamDataTypeMapping[canonical] = parameter.Value;
                     }
                 }
                 else
-                {   // no explicit short name specification, try generating one
-
-                    // always unless taken
-                    string shortName = GetFreeShortName(flagFullText);
-                    if (!IsParameterNameTaken(shortName))
-                    {
-                        MapTemplateParamToCanonical(shortName, parameterName);
-                        shortNameFound = true;
-                    }
-
-                    // only as fallback
-                    string qualifiedShortName = GetFreeShortName(flagFullText, "p:");
-                    if (!shortNameFound && !IsParameterNameTaken(qualifiedShortName))
-                    {
-                        MapTemplateParamToCanonical(qualifiedShortName, parameterName);
-                        shortNameFound = true;
-                    }
-                }
-
-                if (!shortNameFound && !longNameFound)
                 {
-                    invalidParams.Add(flagFullText);
-                }
-                else
-                {
-                    _templateParamDataTypeMapping[parameterName] = parameter.Value;
+                    invalidParams.Add(canonical);
                 }
             }
 
@@ -391,41 +331,6 @@ namespace Microsoft.TemplateEngine.Cli
                 string unusableDisplayList = string.Join(", ", invalidParams);
                 throw new Exception($"Template is malformed. The following parameter names are invalid: {unusableDisplayList}");
             }
-        }
-
-        private string GetFreeShortName(string name, string prefix = "")
-        {
-            string[] parts = name.Split(new[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
-            string[] buckets = new string[parts.Length];
-
-            for (int i = 0; i < buckets.Length; ++i)
-            {
-                buckets[i] = parts[i].Substring(0, 1);
-            }
-
-            int lastBucket = parts.Length - 1;
-            while (IsParameterNameTaken("-" + prefix + string.Join("", buckets)))
-            {
-                //Find the next thing we can take a character from
-                bool first = true;
-                int end = (lastBucket + 1) % parts.Length;
-                int i = (lastBucket + 1) % parts.Length;
-                for (; first || i != end; first = false, i = (i + 1) % parts.Length)
-                {
-                    if (parts[i].Length > buckets[i].Length)
-                    {
-                        buckets[i] = parts[i].Substring(0, buckets[i].Length + 1);
-                        break;
-                    }
-                }
-
-                if (i == end)
-                {
-                    break;
-                }
-            }
-
-            return "-" + prefix + string.Join("", buckets);
         }
 
         private void MapTemplateParamToCanonical(string variant, string canonical)
