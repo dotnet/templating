@@ -213,7 +213,7 @@ namespace Microsoft.TemplateEngine.Cli
                 Console.ReadLine();
             }
 
-            if(args.Length == 0)
+            if (args.Length == 0)
             {
                 telemetryLogger.TrackEvent(commandName + "-CalledWithNoArgs");
             }
@@ -879,15 +879,11 @@ namespace Microsoft.TemplateEngine.Cli
 
         private async Task<CreationResultStatus> ExecuteAsync()
         {
-            //Parse non-template specific arguments
-            try
+            if (_commandInput.HasParseError)
             {
-                _commandInput.ParseArgs();
-            }
-            catch (CommandParserException ex)
-            {
-                Reporter.Error.WriteLine(ex.Message.Bold().Red());
+                ValidateRemainingParameters();
 
+                // TODO: get a meaningful error message from the parser
                 if (_commandInput.IsHelpFlagSpecified)
                 {
                     _telemetryLogger.TrackEvent(CommandName + "-Help");
@@ -901,34 +897,8 @@ namespace Microsoft.TemplateEngine.Cli
                 return CreationResultStatus.InvalidParamValues;
             }
 
-            // todo - make this more elegant with the extra args file
-            if (_commandInput.ExtraArgs != null && _commandInput.ExtraArgs.Count > 0 && _commandInput.ExtraArgs[0] != null)
-            {
-                try
-                {
-                    _commandInput.ParseArgs(_commandInput.ExtraArgs);
-                }
-                catch (CommandParserException ex)
-                {
-                    Reporter.Error.WriteLine(ex.Message.Bold().Red());
-
-                    if (_commandInput.IsHelpFlagSpecified)
-                    {
-                        _telemetryLogger.TrackEvent(CommandName + "-Help");
-                        ShowUsageHelp();
-                    }
-                    else
-                    {
-                        Reporter.Error.WriteLine(string.Format(LocalizableStrings.RunHelpForInformationAboutAcceptedParameters, CommandName).Bold().Red());
-                    }
-
-                    return CreationResultStatus.InvalidParamValues;
-                }
-            }
-
             ConfigureLocale();
             Initialize();
-            //bool forceCacheRebuild = _commandInput.RemainingArguments.Any(x => x == "--debug:rebuildcache");
             bool forceCacheRebuild = _commandInput.HasDebuggingFlag("--debug:rebuildcache");
             _settingsLoader.RebuildCacheFromSettingsIfNotCurrent(forceCacheRebuild);
 
@@ -1025,7 +995,6 @@ namespace Microsoft.TemplateEngine.Cli
 
         private bool Initialize()
         {
-            //bool ephemeralHiveFlag = _commandInput.RemainingArguments.Any(x => x == "--debug:ephemeral-hive");
             bool ephemeralHiveFlag = _commandInput.HasDebuggingFlag("--debug:ephemeral-hive");
 
             if (ephemeralHiveFlag)
@@ -1033,7 +1002,6 @@ namespace Microsoft.TemplateEngine.Cli
                 EnvironmentSettings.Host.VirtualizeDirectory(_paths.User.BaseDir);
             }
 
-            //bool reinitFlag = _commandInput.RemainingArguments.Any(x => x == "--debug:reinit");
             bool reinitFlag = _commandInput.HasDebuggingFlag("--debug:reinit");
             if (reinitFlag)
             {
@@ -1042,7 +1010,6 @@ namespace Microsoft.TemplateEngine.Cli
 
             // Note: this leaves things in a weird state. Might be related to the localized caches.
             // not sure, need to look into it.
-            //if (reinitFlag || _commandInput.RemainingArguments.Any(x => x == "--debug:reset-config"))
             if (reinitFlag || _commandInput.HasDebuggingFlag("--debug:reset-config"))
             {
                 _paths.Delete(_paths.User.AliasesFile);
@@ -1063,7 +1030,6 @@ namespace Microsoft.TemplateEngine.Cli
                 _paths.WriteAllText(_paths.User.FirstRunCookie, "");
             }
 
-            //if (_commandInput.RemainingArguments.Any(x => x == "--debug:showconfig"))
             if (_commandInput.HasDebuggingFlag("--debug:showconfig"))
             {
                 ShowConfig();
@@ -1256,34 +1222,6 @@ namespace Microsoft.TemplateEngine.Cli
                     {
                         string paramName = matchedParamInfo.Key;
                         string paramValue = matchedParamInfo.Value;
-
-                        //ITemplateParameter paramInfo = templateWithFilterInfo.Info.Parameters.FirstOrDefault(x => string.Equals(x.Name, paramName, StringComparison.OrdinalIgnoreCase));
-                        //if (paramInfo != null)
-                        //{
-                        //    if (string.Equals(paramInfo.DataType, "choice", StringComparison.OrdinalIgnoreCase))
-                        //    {
-                        //        if (paramInfo.Choices.ContainsKey(paramValue)
-                        //            || paramInfo.Choices.Any(x => x.Value.StartsWith(paramValue, StringComparison.OrdinalIgnoreCase)))
-                        //        {
-                        //            dispositionForTemplate.Add(new MatchInfo { Location = MatchLocation.OtherParameter, Kind = MatchKind.Exact, ChoiceIfLocationIsOtherChoice = paramName });
-                        //        }
-                        //        else
-                        //        {
-                        //            dispositionForTemplate.Add(new MatchInfo { Location = MatchLocation.OtherParameter, Kind = MatchKind.InvalidParameterValue, ChoiceIfLocationIsOtherChoice = paramName });
-                        //        }
-                        //    }
-                        //    else if (string.Equals(paramInfo.DataType, "bool", StringComparison.OrdinalIgnoreCase))
-                        //    {
-                        //        if (string.IsNullOrEmpty(paramValue) || string.Equals(paramValue, "true", StringComparison.OrdinalIgnoreCase) || string.Equals(paramValue, "false", StringComparison.OrdinalIgnoreCase))
-                        //        {
-                        //            dispositionForTemplate.Add(new MatchInfo { Location = MatchLocation.OtherParameter, Kind = MatchKind.Exact, ChoiceIfLocationIsOtherChoice = paramName });
-                        //        }
-                        //        else
-                        //        {
-                        //            dispositionForTemplate.Add(new MatchInfo { Location = MatchLocation.OtherParameter, Kind = MatchKind.InvalidParameterValue, ChoiceIfLocationIsOtherChoice = paramName });
-                        //        }
-                        //    }
-                        //}
 
                         if (templateWithFilterInfo.Info.Tags.TryGetValue(paramName, out ICacheTag paramDetails)
                                 && (
@@ -1537,7 +1475,7 @@ namespace Microsoft.TemplateEngine.Cli
             get
             {
                 // should not have to check for "--debug:" anymore, with the new parser setup
-                return _commandInput.RemainingParameters.Any(x => !x.Key.StartsWith("--debug:"));
+                return _commandInput.RemainingParameters.Any(); //.Any(x => !x.Key.StartsWith("--debug:"));
             }
         }
 

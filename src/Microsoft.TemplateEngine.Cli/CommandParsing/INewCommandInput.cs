@@ -12,7 +12,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
         string Alias { get; }
 
-        IList<string> ExtraArgs { get; }
+        IList<string> ExtraArgsFileNames { get; }
 
         IList<string> ToInstallList { get; }
 
@@ -58,7 +58,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
         string TemplateParamValue(string paramName);
 
-        void ParseArgs(IList<string> extraArgFileNames = null);
+        void ParseArgs();
 
         void ReParseForTemplate(ITemplateInfo templateInfo, HostSpecificTemplateData hostSpecificTemplateData);
 
@@ -67,5 +67,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
         int Execute(params string[] args);
 
         void OnExecute(Func<Task<CreationResultStatus>> invoke);
+
+        bool HasParseError { get; }
     }
 }

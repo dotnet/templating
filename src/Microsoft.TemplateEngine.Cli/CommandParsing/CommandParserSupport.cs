@@ -18,20 +18,15 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             _settingsLoader = (SettingsLoader)_environment.SettingsLoader;
         }
 
-        //public static Command NewWithVisibleArgs(string commandName) => GetNewCommand(commandName, NewCommandVisibleArgs);
+        public static Command CreateNewCommandWithoutTemplateInfo(string commandName) => GetNewCommand(commandName, NewCommandVisibleArgs, NewCommandHiddenArgs, DebuggingCommandArgs);
 
-        //public static Command NewWithAllArgs(string commandName) => GetNewCommand(commandName, NewCommandVisibleArgs, NewCommandHiddenArgs, NewCommandReservedArgs, DebuggingCommandArgs);
-
-        public static Command CreateNewCommandWithoutTemplateInfo(string commandName, bool unmatchedArgsAreErrors = false) => GetNewCommand(commandName, unmatchedArgsAreErrors, NewCommandVisibleArgs, NewCommandHiddenArgs, DebuggingCommandArgs);
-
-        private static Command GetNewCommand(string commandName, bool unmatchedArgsAreErrors, params Option[][] args)
+        private static Command GetNewCommand(string commandName, params Option[][] args)
         {
             Option[] combinedArgs = CombineArrays(args);
 
             return Create.Command(commandName,
                            "Initialize .NET projects.",
                            Accept.ZeroOrMoreArguments(),    // this can't be ZeroOrOneArguments() because template args would cause errors
-                           unmatchedArgsAreErrors,
                            combinedArgs);
         }
 
@@ -44,28 +39,26 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             return Create.Command(commandName,
                            "Initialize .NET projects.",
                            Accept.NoArguments(),
-                           //true,
+                           true,
                            combinedArgs);
         }
 
-        private static Command GetNewCommandForTemplate(string commandName, string templateName, bool unmatchedArgsAreErrors, params Option[][] args)
+        private static Command GetNewCommandForTemplate(string commandName, string templateName, params Option[][] args)
         {
             Option[] combinedArgs = CombineArrays(args);
 
             return Create.Command(commandName,
                            "Initialize .NET projects.",
                            Accept.ExactlyOneArgument().WithSuggestionsFrom(templateName),
-                           unmatchedArgsAreErrors,
                            combinedArgs);
         }
 
         // Creates a command setup with the args for "new", plus args for the input template parameters.
-        public static Command CreateNewCommandWithArgsForTemplate(string commandName, string templateName, 
-                    IReadOnlyList<ITemplateParameter> parameterDefinitions, 
-                    IDictionary<string, string> longNameOverrides, 
-                    IDictionary<string, string> shortNameOverrides, 
-                    out Dictionary<string, IList<string>> templateParamMap,
-                    bool unmatchedArgsAreErrors = false)
+        public static Command CreateNewCommandWithArgsForTemplate(string commandName, string templateName,
+                    IReadOnlyList<ITemplateParameter> parameterDefinitions,
+                    IDictionary<string, string> longNameOverrides,
+                    IDictionary<string, string> shortNameOverrides,
+                    out Dictionary<string, IList<string>> templateParamMap)
         {
             IList<Option> paramOptionList = new List<Option>();
             Option[] allBuiltInArgs = CombineArrays(NewCommandVisibleArgs, NewCommandHiddenArgs, NewCommandReservedArgs, DebuggingCommandArgs);
@@ -120,7 +113,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                 throw new Exception($"Template is malformed. The following parameter names are invalid: {unusableDisplayList}");
             }
 
-            return GetNewCommandForTemplate(commandName, templateName, unmatchedArgsAreErrors, NewCommandVisibleArgs, NewCommandHiddenArgs, DebuggingCommandArgs, paramOptionList.ToArray());
+            return GetNewCommandForTemplate(commandName, templateName, NewCommandVisibleArgs, NewCommandHiddenArgs, DebuggingCommandArgs, paramOptionList.ToArray());
         }
 
         private static Option[] NewCommandVisibleArgs
@@ -156,6 +149,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                     Create.Option("--quiet", string.Empty, Accept.NoArguments()),
                     Create.Option("-i|--install", string.Empty, Accept.OneOrMoreArguments()),
                     Create.Option("-all|--show-all", string.Empty, Accept.NoArguments()),
+                    Create.Option("--allow-scripts", string.Empty, Accept.ZeroOrOneArgument()),
                 };
             }
         }
@@ -169,7 +163,6 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                     Create.Option("-up|--update", string.Empty, Accept.ZeroOrOneArgument()),
                     Create.Option("-u|--uninstall", string.Empty, Accept.ZeroOrOneArgument()),
                     Create.Option("--skip-update-check", string.Empty, Accept.NoArguments()),
-                    Create.Option("--allow-scripts", string.Empty, Accept.ZeroOrOneArgument()),
                 };
             }
         }
