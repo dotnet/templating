@@ -11,14 +11,14 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
     public class NewCommandInputCli2 : INewCommandInput
     {
         private ParseResult _parseResult;
-        private string[] _args;
+        private IReadOnlyList<string> _args;
         private string _templateNameArg;
 
         private Command _currentCommand;
         private Func<Task<int>> _invoke;
 
         private IReadOnlyDictionary<string, string> _templateParamValues;
-        private IDictionary<string, IList<string>> _templateParamCanonicalToVariantMap;
+        private IReadOnlyDictionary<string, IList<string>> _templateParamCanonicalToVariantMap;
 
         // used for parsing args outside the context of a specific template.
         private readonly Command _noTemplateCommand;
@@ -31,30 +31,66 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             _currentCommand = _noTemplateCommand;
         }
 
+        public bool HasParseError
+        {
+            get
+            {
+                return _parseResult.Errors.Count() > 0;
+            }
+        }
+
         public int Execute(params string[] args)
         {
-            _args = args;
-            ParseArgs();
+            //_args = args;
 
-            if (_parseResult.TryGetAppliedOption(out IList<string> templateNameList, new[] { _commandName }))
+            // TODO: remove this and replace with the above after my parser no-unbundling PR is accepted
+            // HACK HACK HACK
+            // This gets around the unbundling problem where '-all' becomes '-a -l -l' (--alias --list)
+            List<string> argsHack = new List<string>();
+            foreach (string argValue in args)
             {
-                if ((templateNameList.Count > 0) && !templateNameList[0].StartsWith("-", StringComparison.Ordinal))
+                if (string.Equals(argValue, "-all"))
                 {
-                    _templateNameArg = templateNameList[0];
+                    argsHack.Add("--show-all");
                 }
                 else
                 {
-                    _templateNameArg = string.Empty;
+                    argsHack.Add(argValue);
                 }
+            }
+            _args = argsHack;
+            // END HACK HACK HACK
+
+            ParseArgs();
+
+            bool needsReparse = false;
+
+            if (ExtraArgsFileNames != null && ExtraArgsFileNames.Count > 0)
+            {   // add the extra args to the _args and force a reparse
+                List<string> extraArgs = AppExtensions.CreateArgListFromAdditionalFiles(ExtraArgsFileNames);
+                List<string> allArgs = new List<string>(_args);
+                allArgs.AddRange(extraArgs);
+                _args = allArgs;
+                needsReparse = true;
+            }
+
+            IList<string> templateNameList = _parseResult.GetArgumentListAtPath(new[] { _commandName }).ToList();
+            if ((templateNameList.Count > 0) &&
+                !templateNameList[0].StartsWith("-", StringComparison.Ordinal)
+                && (_parseResult.Tokens.Count >= 2)
+                && string.Equals(templateNameList[0], _parseResult.Tokens.ToList()[1], StringComparison.Ordinal))
+            {
+                _templateNameArg = templateNameList[0];
             }
             else
             {
                 _templateNameArg = string.Empty;
+                _currentCommand = CommandParserSupport.CreateNewCommandForNoTemplateName(_commandName);
+                needsReparse = true;
             }
 
-            if (string.IsNullOrEmpty(_templateNameArg))
+            if (needsReparse)
             {
-                _currentCommand = CommandParserSupport.CreateNewCommandForNoTemplateName(_commandName);
                 ParseArgs();
             }
 
@@ -66,16 +102,13 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             _invoke = async () => (int)await invoke().ConfigureAwait(false);
         }
 
-        public void ParseArgs(IList<string> extraArgFileNames = null)
+        public void ParseArgs()
         {
             List<string> argsWithCommand = new List<string>() { _commandName };
-            argsWithCommand.AddRange(_args.ToList());
+            argsWithCommand.AddRange(_args);
 
-            if (extraArgFileNames != null)
-            {
-                argsWithCommand.AddRange(AppExtensions.CreateArgListFromAdditionalFiles(extraArgFileNames));
-            }
-
+            // TODO: Add a no-unbundling flag  once my PR is accepted and the parser version is upgraded.
+            //Parser parser = new Parser(new[] { '=' }, false, _currentCommand);
             Parser parser = new Parser(new[] { '=' }, _currentCommand);
             _parseResult = parser.Parse(argsWithCommand.ToArray());
             _templateParamCanonicalToVariantMap = null;
@@ -99,8 +132,6 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                 _currentCommand = _templateSpecificCommand;
                 ParseArgs();
 
-                //Console.WriteLine($"Template = {templateInfo.ShortName} | {templateInfo.Identity}: {_parseResult.ToString()}");
-
                 // this must happen after ParseArgs(), which resets _templateParamCanonicalToVariantMap
                 _templateParamCanonicalToVariantMap = templateParamMap;
 
@@ -111,10 +142,12 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                     string paramName = paramInfo.Key;
                     string firstVariant = paramInfo.Value[0];
 
-                    if (_parseResult.TryGetAppliedOption(out string inputValue, new[] { _commandName, firstVariant }))
+                    // This returns true if the arg was specified, irrespecitve of whether it has a value.
+                    // If the arg was specified, it goes in the list. 
+                    // Null valued args are important - they facilitate bools & other value-optional args.
+                    if (_parseResult.TryGetArgumentValueAtPath(out string argValue, new[] { _commandName, firstVariant }))
                     {
-                        templateParamValues.Add(paramName, inputValue);
-                        //Console.WriteLine($"\t{paramName} = {inputValue}");
+                        templateParamValues.Add(paramName, argValue);
                     }
                 }
 
@@ -122,19 +155,17 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error setting up parser for template. Template name = {templateInfo.Name} | ShortName = {templateInfo.ShortName} | Precedence = {templateInfo.Precedence}");
-                Console.WriteLine(ex.StackTrace);
-                throw ex;
+                throw new CommandParserException("Error parsing input parameters", string.Join(" ", _args), ex);
             }
         }
 
         public string TemplateName => _templateNameArg;
 
-        public string Alias => _parseResult.GetAppliedOptionOrDefault<string>(new[] { _commandName, "alias" });
+        public string Alias => _parseResult.GetArgumentValueAtPath(new[] { _commandName, "alias" });
 
-        public IList<string> ExtraArgs => _parseResult.GetArgumentsAtPath(new[] { _commandName, "extra-args" }).ToList();
+        public IList<string> ExtraArgsFileNames => _parseResult.GetArgumentListAtPath(new[] { _commandName, "extra-args" }).ToList();
 
-        public IList<string> ToInstallList => _parseResult.GetArgumentsAtPath(new[] { _commandName, "install" }).ToList();
+        public IList<string> ToInstallList => _parseResult.GetArgumentListAtPath(new[] { _commandName, "install" }).ToList();
 
         public bool IsForceFlagSpecified => _parseResult.HasAppliedOption(new[] { _commandName, "force" });
 
@@ -146,19 +177,30 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
         public bool IsShowAllFlagSpecified => _parseResult.HasAppliedOption(new[] { _commandName, "all" });
 
-        public string TypeFilter => _parseResult.GetAppliedOptionOrDefault<string>(new[] { _commandName, "type" });
+        public string TypeFilter => _parseResult.GetArgumentValueAtPath(new[] { _commandName, "type" });
 
-        public string Language => _parseResult.GetAppliedOptionOrDefault<string>(new[] { _commandName, "language" });
+        public string Language => _parseResult.GetArgumentValueAtPath(new[] { _commandName, "language" });
 
-        public string Locale => _parseResult.GetAppliedOptionOrDefault<string>(new[] { _commandName, "locale" });
+        public string Locale => _parseResult.GetArgumentValueAtPath(new[] { _commandName, "locale" });
 
-        public string Name => _parseResult.GetAppliedOptionOrDefault<string>(new[] { _commandName, "name" });
+        public string Name => _parseResult.GetArgumentValueAtPath(new[] { _commandName, "name" });
 
-        public string OutputPath => _parseResult.GetAppliedOptionOrDefault<string>(new[] { _commandName, "output" });
+        public string OutputPath => _parseResult.GetArgumentValueAtPath(new[] { _commandName, "output" });
 
         public bool SkipUpdateCheck => _parseResult.HasAppliedOption(new[] { _commandName, "skip-update-check" });
 
-        public string AllowScriptsToRun => _parseResult.GetAppliedOptionOrDefault<string>(new[] { _commandName, "allow-scripts" });
+        public string AllowScriptsToRun
+        {
+            get
+            {
+                if (_parseResult.TryGetArgumentValueAtPath(out string argValue, new[] { _commandName, "allow-scripts" }))
+                {
+                    return argValue;
+                }
+
+                return null;
+            }
+        }
 
         public bool HasDebuggingFlag(string flag)
         {
@@ -180,7 +222,16 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
         public string TemplateParamInputFormat(string canonical)
         {
-            throw new NotImplementedException();
+            foreach (string variant in VariantsForCanonical(canonical))
+            {
+                if (_parseResult.Tokens.Contains(variant))
+                {
+                    return variant;
+                }
+            }
+
+            // this is really an error. But returning the canonical is "safe"
+            return canonical;
         }
 
         public IReadOnlyList<string> VariantsForCanonical(string canonical)

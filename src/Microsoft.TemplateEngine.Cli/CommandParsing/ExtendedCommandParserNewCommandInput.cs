@@ -26,7 +26,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
         public string Alias => _parser.InternalParamValue("--alias");
 
-        public IList<string> ExtraArgs => _parser.InternalParamValueList("--extra-args");
+        public IList<string> ExtraArgsFileNames => _parser.InternalParamValueList("--extra-args");
 
         public IList<string> ToInstallList => _parser.InternalParamValueList("--install");
 
@@ -103,9 +103,9 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             return _parser.TemplateParamValue(paramName);
         }
 
-        public void ParseArgs(IList<string> extraArgFileNames = null)
+        public void ParseArgs()
         {
-            _parser.ParseArgs(extraArgFileNames);
+            _parser.ParseArgs(ExtraArgsFileNames);
         }
 
         public void ReParseForTemplate(ITemplateInfo templateInfo, HostSpecificTemplateData hostSpecificTemplateData)
@@ -120,7 +120,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                                                             .Select(x => new KeyValuePair<string, string>(x.Name, x.DataType));
 
             _parser.SetupTemplateParameters(argParameters, hostSpecificTemplateData.LongNameOverrides, hostSpecificTemplateData.ShortNameOverrides);
-            ParseArgs(ExtraArgs);
+            ParseArgs();
         }
 
         public string HelpText
@@ -139,6 +139,14 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
         public void OnExecute(Func<Task<CreationResultStatus>> invoke)
         {
             _parser.OnExecute(invoke);
+        }
+
+        public bool HasParseError
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }
