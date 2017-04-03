@@ -4,9 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using Microsoft.Extensions.CommandLineUtils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -14,11 +12,6 @@ namespace Microsoft.TemplateEngine.Cli
 {
     internal static class AppExtensions
     {
-        public static CommandOption Help(this CommandLineApplication app)
-        {
-            return app.Option("-h|--help", LocalizableStrings.DisplaysHelp, CommandOptionType.NoValue);
-        }
-
         public static List<string> CreateArgListFromAdditionalFiles(IList<string> extraArgFileNames)
         {
             IDictionary<string, IList<string>> argsDict = ParseArgsFromFile(extraArgFileNames);
@@ -82,68 +75,6 @@ namespace Microsoft.TemplateEngine.Cli
                         throw new CommandParserException(string.Format(LocalizableStrings.ArgsFileWrongFormat, argFile), argFile, ex);
                     }
                 }
-            }
-
-            return parameters;
-        }
-
-        public static IReadOnlyDictionary<string, IList<string>> ParseExtraArgs(this CommandLineApplication app, IList<string> extraArgFileNames)
-        {
-            Dictionary<string, IList<string>> parameters = ParseArgsFromFile(extraArgFileNames);
-
-            for (int i = 0; i < app.RemainingArguments.Count; ++i)
-            {
-                string key = app.RemainingArguments[i];
-                CommandOption arg = app.Options.FirstOrDefault(x => x.Template.Split('|').Any(y => string.Equals(y, key, StringComparison.OrdinalIgnoreCase)));
-                bool handled = false;
-
-                if (arg != null)
-                {
-                    if (arg.OptionType != CommandOptionType.NoValue)
-                    {
-                        handled = arg.TryParse(app.RemainingArguments[i + 1]);
-                        ++i;
-                    }
-                    else
-                    {
-                        handled = arg.TryParse(null);
-                    }
-                }
-
-                if (handled)
-                {
-                    continue;
-                }
-
-                if (!key.StartsWith("-", StringComparison.Ordinal))
-                {
-                    throw new CommandParserException(string.Format(LocalizableStrings.MultipleArgsSpecifiedError, key), key);
-                }
-
-                // Check the next value. If it doesn't start with a '-' then it's a value for the current param.
-                // Otherwise it's its own param.
-                string value = null;
-                if (app.RemainingArguments.Count > i + 1)
-                {
-                    value = app.RemainingArguments[i + 1];
-
-                    if (value.StartsWith("-", StringComparison.Ordinal))
-                    {
-                        value = null;
-                    }
-                    else
-                    {
-                        ++i;
-                    }
-                }
-
-                if (!parameters.TryGetValue(key, out IList<string> valueList))
-                {
-                    valueList = new List<string>();
-                    parameters.Add(key, valueList);
-                }
-
-                valueList.Add(value);
             }
 
             return parameters;
