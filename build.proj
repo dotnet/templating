@@ -119,7 +119,6 @@
 
     <!-- Build templates -->
     <MSBuild Projects="template_feed/template.proj" Targets="Build"
-             Condition="'$(IsFullFrameworkBuildSupported)' == 'true'"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <!-- Build new3 -->
