@@ -897,7 +897,11 @@ namespace Microsoft.TemplateEngine.Cli
                 return CreationResultStatus.InvalidParamValues;
             }
 
-            ConfigureLocale();
+            if (!ConfigureLocale())
+            {
+                return CreationResultStatus.InvalidParamValues;
+            }
+
             Initialize();
             bool forceCacheRebuild = _commandInput.HasDebuggingFlag("--debug:rebuildcache");
             _settingsLoader.RebuildCacheFromSettingsIfNotCurrent(forceCacheRebuild);
@@ -918,7 +922,7 @@ namespace Microsoft.TemplateEngine.Cli
             }
         }
 
-        private void ConfigureLocale()
+        private bool ConfigureLocale()
         {
             if (!string.IsNullOrEmpty(_commandInput.Locale))
             {
@@ -926,12 +930,15 @@ namespace Microsoft.TemplateEngine.Cli
                 if (!ValidateLocaleFormat(newLocale))
                 {
                     Reporter.Error.WriteLine(string.Format(LocalizableStrings.BadLocaleError, newLocale).Bold().Red());
+                    return false;
                 }
 
                 EnvironmentSettings.Host.UpdateLocale(newLocale);
                 // cache the templates for the new locale
                 _settingsLoader.Reload();
             }
+
+            return true;
         }
 
         // Note: This method explicitly filters out "type" and "language", in addition to other filtering.
