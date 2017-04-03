@@ -118,7 +118,7 @@
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <!-- Build templates -->
-    <MSBuild Projects="template_feed/template.proj" Targets="Build"
+    <MSBuild Projects="template_feed/Template.proj" Targets="Build"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <!-- Build new3 -->
