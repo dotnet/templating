@@ -19,7 +19,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.DotNet.Cli.CommandLine" Version="0.1.0-alpha-138" />
     <PackageReference Include="Microsoft.DotNet.Cli.Utils" Version="1.0.1" />
-    <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
   </ItemGroup>
 

@@ -82,7 +82,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             _invoke = async () => (int)await invoke().ConfigureAwait(false);
         }
 
-        public void ParseArgs()
+        private void ParseArgs()
         {
             List<string> argsWithCommand = new List<string>() { _commandName };
             argsWithCommand.AddRange(_args);

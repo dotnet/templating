@@ -58,8 +58,6 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
         string TemplateParamValue(string paramName);
 
-        void ParseArgs();
-
         void ReparseForTemplate(ITemplateInfo templateInfo, HostSpecificTemplateData hostSpecificTemplateData);
 
         string HelpText { get; }
