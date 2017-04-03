@@ -3,29 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Edge.Settings;
+using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Cli.CommandParsing
 {
-    public class CommandParserSupport
+    public static class CommandParserSupport
     {
-        private static IEngineEnvironmentSettings _environment;
-        private static SettingsLoader _settingsLoader;
-
-        public static void Setup(IEngineEnvironmentSettings environment)
-        {
-            _environment = environment;
-            _settingsLoader = (SettingsLoader)_environment.SettingsLoader;
-        }
-
         public static Command CreateNewCommandWithoutTemplateInfo(string commandName) => GetNewCommand(commandName, NewCommandVisibleArgs, NewCommandHiddenArgs, DebuggingCommandArgs);
 
         private static Command GetNewCommand(string commandName, params Option[][] args)
         {
-            Option[] combinedArgs = CombineArrays(args);
+            Option[] combinedArgs = ArrayExtensions.CombineArrays(args);
 
             return Create.Command(commandName,
-                           "Initialize .NET projects.",
+                           LocalizableStrings.CommandDescription,
                            Accept.ZeroOrMoreArguments(),    // this can't be ZeroOrOneArguments() because template args would cause errors
                            combinedArgs);
         }
@@ -34,10 +25,10 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
         // Unmatched args are errors.
         public static Command CreateNewCommandForNoTemplateName(string commandName)
         {
-            Option[] combinedArgs = CombineArrays(NewCommandVisibleArgs, NewCommandHiddenArgs, DebuggingCommandArgs);
+            Option[] combinedArgs = ArrayExtensions.CombineArrays(NewCommandVisibleArgs, NewCommandHiddenArgs, DebuggingCommandArgs);
 
             return Create.Command(commandName,
-                           "Initialize .NET projects.",
+                           LocalizableStrings.CommandDescription,
                            Accept.NoArguments(),
                            true,
                            combinedArgs);
@@ -45,10 +36,10 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
         private static Command GetNewCommandForTemplate(string commandName, string templateName, params Option[][] args)
         {
-            Option[] combinedArgs = CombineArrays(args);
+            Option[] combinedArgs = ArrayExtensions.CombineArrays(args);
 
             return Create.Command(commandName,
-                           "Initialize .NET projects.",
+                           LocalizableStrings.CommandDescription,
                            Accept.ExactlyOneArgument().WithSuggestionsFrom(templateName),
                            combinedArgs);
         }
@@ -58,13 +49,13 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                     IReadOnlyList<ITemplateParameter> parameterDefinitions,
                     IDictionary<string, string> longNameOverrides,
                     IDictionary<string, string> shortNameOverrides,
-                    out Dictionary<string, IList<string>> templateParamMap)
+                    out IReadOnlyDictionary<string, IReadOnlyList<string>> templateParamMap)
         {
             IList<Option> paramOptionList = new List<Option>();
-            Option[] allBuiltInArgs = CombineArrays(NewCommandVisibleArgs, NewCommandHiddenArgs, NewCommandReservedArgs, DebuggingCommandArgs);
+            Option[] allBuiltInArgs = ArrayExtensions.CombineArrays(NewCommandVisibleArgs, NewCommandHiddenArgs, NewCommandReservedArgs, DebuggingCommandArgs);
             HashSet<string> takenAliases = VariantsForOptions(allBuiltInArgs);
             HashSet<string> invalidParams = new HashSet<string>();
-            templateParamMap = new Dictionary<string, IList<string>>();
+            Dictionary<string, IReadOnlyList<string>> canonicalToVariantMap = new Dictionary<string, IReadOnlyList<string>>();
 
             foreach (ITemplateParameter parameter in parameterDefinitions.Where(x => x.Priority != TemplateParameterPriority.Implicit))
             {
@@ -98,7 +89,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                     }
 
                     paramOptionList.Add(option);    // add the option
-                    templateParamMap.Add(canonical, assignedAliases.ToList());   // map the template canonical name to its aliases.
+                    canonicalToVariantMap.Add(canonical, assignedAliases.ToList());   // map the template canonical name to its aliases.
                     takenAliases.UnionWith(assignedAliases);  // add the aliases to the taken aliases
                 }
                 else
@@ -113,6 +104,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                 throw new Exception($"Template is malformed. The following parameter names are invalid: {unusableDisplayList}");
             }
 
+            templateParamMap = canonicalToVariantMap;
             return GetNewCommandForTemplate(commandName, templateName, NewCommandVisibleArgs, NewCommandHiddenArgs, DebuggingCommandArgs, paramOptionList.ToArray());
         }
 
@@ -133,6 +125,8 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                     Create.Option("-h|--help", LocalizableStrings.DisplaysHelp, Accept.NoArguments()),
                     Create.Option("--type", LocalizableStrings.ShowsFilteredTemplates, Accept.ExactlyOneArgument()),
                     Create.Option("--force", LocalizableStrings.ForcesTemplateCreation, Accept.NoArguments()),
+                    Create.Option("-i|--install", LocalizableStrings.InstallHelp, Accept.OneOrMoreArguments()),
+                    Create.Option("-u|--uninstall", LocalizableStrings.UninstallHelp, Accept.OneOrMoreArguments()),
                 };
             }
         }
@@ -147,7 +141,6 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                     Create.Option("-x|--extra-args", string.Empty, Accept.OneOrMoreArguments()),
                     Create.Option("--locale", string.Empty, Accept.ExactlyOneArgument()),
                     Create.Option("--quiet", string.Empty, Accept.NoArguments()),
-                    Create.Option("-i|--install", string.Empty, Accept.OneOrMoreArguments()),
                     Create.Option("-all|--show-all", string.Empty, Accept.NoArguments()),
                     Create.Option("--allow-scripts", string.Empty, Accept.ZeroOrOneArgument()),
                 };
@@ -161,7 +154,6 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                 return new[]
                 {
                     Create.Option("-up|--update", string.Empty, Accept.ZeroOrOneArgument()),
-                    Create.Option("-u|--uninstall", string.Empty, Accept.ZeroOrOneArgument()),
                     Create.Option("--skip-update-check", string.Empty, Accept.NoArguments()),
                 };
             }
@@ -198,25 +190,6 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             }
 
             return variants;
-        }
-
-        private static T[] CombineArrays<T>(params T[][] arrayList)
-        {
-            int combinedLength = 0;
-            foreach (T[] arg in arrayList)
-            {
-                combinedLength += arg.Length;
-            }
-
-            T[] combinedArray = new T[combinedLength];
-            int nextIndex = 0;
-            foreach (T[] arg in arrayList)
-            {
-                Array.Copy(arg, 0, combinedArray, nextIndex, arg.Length);
-                nextIndex += arg.Length;
-            }
-
-            return combinedArray;
         }
     }
 }

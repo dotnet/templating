@@ -43,7 +43,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             {
                 if (option.Arguments.Count > 0)
                 {
-                    argValue = option.Arguments.ToList()[0];
+                    argValue = option.Arguments.ElementAt(0);
                 }
                 else
                 {

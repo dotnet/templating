@@ -12,12 +12,12 @@ namespace Microsoft.TemplateEngine.Cli
 {
     internal static class AppExtensions
     {
-        public static List<string> CreateArgListFromAdditionalFiles(IList<string> extraArgFileNames)
+        public static IReadOnlyList<string> CreateArgListFromAdditionalFiles(IList<string> extraArgFileNames)
         {
-            IDictionary<string, IList<string>> argsDict = ParseArgsFromFile(extraArgFileNames);
+            IReadOnlyDictionary<string, IReadOnlyList<string>> argsDict = ParseArgsFromFile(extraArgFileNames);
 
             List<string> argsFlattened = new List<string>();
-            foreach (KeyValuePair<string, IList<string>> oneArg in argsDict)
+            foreach (KeyValuePair<string, IReadOnlyList<string>> oneArg in argsDict)
             {
                 argsFlattened.Add(oneArg.Key);
                 if (oneArg.Value.Count > 0)
@@ -29,9 +29,9 @@ namespace Microsoft.TemplateEngine.Cli
             return argsFlattened;
         }
 
-        public static Dictionary<string, IList<string>> ParseArgsFromFile(IList<string> extraArgFileNames)
+        public static IReadOnlyDictionary<string, IReadOnlyList<string>> ParseArgsFromFile(IList<string> extraArgFileNames)
         {
-            Dictionary<string, IList<string>> parameters = new Dictionary<string, IList<string>>();
+            Dictionary<string, IReadOnlyList<string>> parameters = new Dictionary<string, IReadOnlyList<string>>();
 
             // Note: If the same param is specified multiple times across the files, last-in-wins
             // TODO: consider another course of action.
@@ -56,10 +56,10 @@ namespace Microsoft.TemplateEngine.Cli
                             {
                                 if (property.Value.Type == JTokenType.String)
                                 {
-                                    IList<string> values = new List<string>
-                                {
-                                    property.Value.ToString()
-                                };
+                                    IReadOnlyList<string> values = new List<string>
+                                    {
+                                        property.Value.ToString()
+                                    };
 
                                     // adding 2 dashes to the file-based params
                                     // won't work right if there's a param that should have 1 dash

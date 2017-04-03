@@ -219,7 +219,7 @@ namespace Microsoft.TemplateEngine.Cli
             }
 
             // new parser
-            INewCommandInput commandInput = new NewCommandInputCli2(commandName);
+            INewCommandInput commandInput = new NewCommandInputCli(commandName);
             // old parser
             //INewCommandInput commandInput = ExtendedCommandParserSupport.SetupParser(commandName);
 
@@ -1170,7 +1170,7 @@ namespace Microsoft.TemplateEngine.Cli
         private void ParseTemplateArgs(ITemplateInfo templateInfo)
         {
             _hostSpecificTemplateData = ReadHostSpecificTemplateData(templateInfo);
-            _commandInput.ReParseForTemplate(templateInfo, _hostSpecificTemplateData);
+            _commandInput.ReparseForTemplate(templateInfo, _hostSpecificTemplateData);
         }
 
         private string DetermineTemplateContext()

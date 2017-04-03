@@ -60,7 +60,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
         void ParseArgs();
 
-        void ReParseForTemplate(ITemplateInfo templateInfo, HostSpecificTemplateData hostSpecificTemplateData);
+        void ReparseForTemplate(ITemplateInfo templateInfo, HostSpecificTemplateData hostSpecificTemplateData);
 
         string HelpText { get; }
 

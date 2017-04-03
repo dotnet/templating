@@ -8,7 +8,7 @@ using Microsoft.TemplateEngine.Edge.Template;
 
 namespace Microsoft.TemplateEngine.Cli.CommandParsing
 {
-    public class NewCommandInputCli2 : INewCommandInput
+    public class NewCommandInputCli : INewCommandInput
     {
         private ParseResult _parseResult;
         private IReadOnlyList<string> _args;
@@ -18,13 +18,13 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
         private Func<Task<int>> _invoke;
 
         private IReadOnlyDictionary<string, string> _templateParamValues;
-        private IReadOnlyDictionary<string, IList<string>> _templateParamCanonicalToVariantMap;
+        private IReadOnlyDictionary<string, IReadOnlyList<string>> _templateParamCanonicalToVariantMap;
 
         // used for parsing args outside the context of a specific template.
         private readonly Command _noTemplateCommand;
         private readonly string _commandName;
 
-        public NewCommandInputCli2(string commandName)
+        public NewCommandInputCli(string commandName)
         {
             _commandName = commandName;
             _noTemplateCommand = CommandParserSupport.CreateNewCommandWithoutTemplateInfo(_commandName);
@@ -35,7 +35,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
         {
             get
             {
-                return _parseResult.Errors.Count() > 0;
+                return _parseResult.Errors.Any();
             }
         }
 
@@ -47,7 +47,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
             if (ExtraArgsFileNames != null && ExtraArgsFileNames.Count > 0)
             {   // add the extra args to the _args and force a reparse
-                List<string> extraArgs = AppExtensions.CreateArgListFromAdditionalFiles(ExtraArgsFileNames);
+                IReadOnlyList<string> extraArgs = AppExtensions.CreateArgListFromAdditionalFiles(ExtraArgsFileNames);
                 List<string> allArgs = new List<string>(_args);
                 allArgs.AddRange(extraArgs);
                 _args = allArgs;
@@ -58,7 +58,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             if ((templateNameList.Count > 0) &&
                 !templateNameList[0].StartsWith("-", StringComparison.Ordinal)
                 && (_parseResult.Tokens.Count >= 2)
-                && string.Equals(templateNameList[0], _parseResult.Tokens.ToList()[1], StringComparison.Ordinal))
+                && string.Equals(templateNameList[0], _parseResult.Tokens.ElementAt(1), StringComparison.Ordinal))
             {
                 _templateNameArg = templateNameList[0];
             }
@@ -92,9 +92,11 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             _templateParamCanonicalToVariantMap = null;
         }
 
-        public void ReParseForTemplate(ITemplateInfo templateInfo, HostSpecificTemplateData hostSpecificTemplateData)
+        public void ReparseForTemplate(ITemplateInfo templateInfo, HostSpecificTemplateData hostSpecificTemplateData)
         {
-            List<ITemplateParameter> filteredParams = templateInfo.Parameters.Where(x => !string.Equals(x.Name, "type") && !string.Equals(x.Name, "language")).ToList();
+            List<ITemplateParameter> filteredParams = templateInfo.Parameters.Where(x => !string.Equals(x.Name, "type", StringComparison.OrdinalIgnoreCase) 
+                                                                                    && !string.Equals(x.Name, "language", StringComparison.OrdinalIgnoreCase))
+                                                                                    .ToList();
             Command _templateSpecificCommand;
 
             try
@@ -105,7 +107,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                             filteredParams,
                             hostSpecificTemplateData.LongNameOverrides,
                             hostSpecificTemplateData.ShortNameOverrides,
-                            out Dictionary<string, IList<string>> templateParamMap);
+                            out IReadOnlyDictionary<string, IReadOnlyList<string>> templateParamMap);
 
                 _currentCommand = _templateSpecificCommand;
                 ParseArgs();
@@ -115,7 +117,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
                 Dictionary<string, string> templateParamValues = new Dictionary<string, string>();
 
-                foreach (KeyValuePair<string, IList<string>> paramInfo in _templateParamCanonicalToVariantMap)
+                foreach (KeyValuePair<string, IReadOnlyList<string>> paramInfo in _templateParamCanonicalToVariantMap)
                 {
                     string paramName = paramInfo.Key;
                     string firstVariant = paramInfo.Value[0];
@@ -214,12 +216,12 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
         public IReadOnlyList<string> VariantsForCanonical(string canonical)
         {
-            if (_templateParamCanonicalToVariantMap == null || !_templateParamCanonicalToVariantMap.TryGetValue(canonical, out IList<string> variants))
+            if (_templateParamCanonicalToVariantMap == null || !_templateParamCanonicalToVariantMap.TryGetValue(canonical, out IReadOnlyList<string> variants))
             {
                 return new List<string>();
             }
 
-            return variants.ToList();
+            return variants;
         }
 
         public bool TryGetCanonicalNameForVariant(string variant, out string canonical)
@@ -238,7 +240,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
                     if (_templateParamCanonicalToVariantMap != null)
                     {
-                        foreach (KeyValuePair<string, IList<string>> canonicalToVariants in _templateParamCanonicalToVariantMap)
+                        foreach (KeyValuePair<string, IReadOnlyList<string>> canonicalToVariants in _templateParamCanonicalToVariantMap)
                         {
                             string canonical = canonicalToVariants.Key;
 
