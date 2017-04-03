@@ -48,6 +48,12 @@ if you have any difficulties please file a new [issue](https://github.com/dotnet
 
 Now that we've covered the basics of using `dotnew new`, lets move on to info for template authors and contributors.
 
+# What to expect when working with this repo
+
+The instructions below enable a new command at the `dotnet` CLI, `dotnet new3`, that uses the bits and templates contained in this repo. Think of it as a "preview" version of `dotnet new` for trying out new switches, interactions and display styles before rolling them in to the product.
+
+Commands executed against `dotnet new3` won't impact the behavior of `dotnet new`, Visual Studio for Mac, Visual Studio, nor any other environment.
+
 # How to build, run & debug the latest
 
 If you're authoring templates, or interested in contributing to this repo, then you're likely interested in how to use the latest version of this experience.
