@@ -142,6 +142,13 @@ To install a new template use the command:
 
     dotnet new3 -i {the path to the folder containing the templates}
 
+## Uninstalling & Cleanup
+
+Obsolete templates can be uninstalled by modifying files residing in the `%USERPROFILE%\.templateengine\dotnetcli\v1.0.0\` folder.
+First, open the `templatecache.json` file and find the template using its friendly name or the short name. Note down the `ConfigMountPointId` property value (the GUID). Remove the section that represents the template.
+Second, open the `settings.json`. Search for the occurrences of the GUID. Note down the path of the physical file found in the `Place` property, delete that file and remove the section in the `settings.json` file. Save the file.
+Third, open the `[LCID].templatecache.json` files (e.g. `en-US.templatecache.json`). Search for the occurrences of the GUID and remove the section in each of the files.
+
 # Basic Commands
 ## Showing help
 
