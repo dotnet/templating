@@ -41,28 +41,8 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
         public int Execute(params string[] args)
         {
-            //_args = args;
-
-            // TODO: remove this and replace with the above after my parser no-unbundling PR is accepted
-            // HACK HACK HACK
-            // This gets around the unbundling problem where '-all' becomes '-a -l -l' (--alias --list)
-            List<string> argsHack = new List<string>();
-            foreach (string argValue in args)
-            {
-                if (string.Equals(argValue, "-all"))
-                {
-                    argsHack.Add("--show-all");
-                }
-                else
-                {
-                    argsHack.Add(argValue);
-                }
-            }
-            _args = argsHack;
-            // END HACK HACK HACK
-
+            _args = args;
             ParseArgs();
-
             bool needsReparse = false;
 
             if (ExtraArgsFileNames != null && ExtraArgsFileNames.Count > 0)
@@ -106,10 +86,8 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
         {
             List<string> argsWithCommand = new List<string>() { _commandName };
             argsWithCommand.AddRange(_args);
-
-            // TODO: Add a no-unbundling flag  once my PR is accepted and the parser version is upgraded.
-            //Parser parser = new Parser(new[] { '=' }, false, _currentCommand);
-            Parser parser = new Parser(new[] { '=' }, _currentCommand);
+            ParserConfiguration parseConfig = new ParserConfiguration(new Option[] { _currentCommand }, argumentDelimiters: new[] { '=' }, allowUnbundling: false);
+            Parser parser = new Parser(parseConfig);
             _parseResult = parser.Parse(argsWithCommand.ToArray());
             _templateParamCanonicalToVariantMap = null;
         }
@@ -142,7 +120,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                     string paramName = paramInfo.Key;
                     string firstVariant = paramInfo.Value[0];
 
-                    // This returns true if the arg was specified, irrespecitve of whether it has a value.
+                    // This returns true if the arg was specified, irrespective of whether it has a value.
                     // If the arg was specified, it goes in the list. 
                     // Null valued args are important - they facilitate bools & other value-optional args.
                     if (_parseResult.TryGetArgumentValueAtPath(out string argValue, new[] { _commandName, firstVariant }))
