@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
-using Microsoft.DotNet.Cli.Utils;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 using Microsoft.TemplateEngine.Cli;
@@ -188,7 +187,7 @@ namespace Microsoft.TemplateEngine.EndToEndTestHarness
 
             try
             {
-                string versionString = Command.CreateDotNet("", new[] { "--version" }).CaptureStdOut().Execute().StdOut;
+                string versionString = Dotnet.Version().CaptureStdOut().Execute().StdOut;
                 if (!string.IsNullOrWhiteSpace(versionString))
                 {
                     preferences["dotnet-cli-version"] = versionString.Trim();
