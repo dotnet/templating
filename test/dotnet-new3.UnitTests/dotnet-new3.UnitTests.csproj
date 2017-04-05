@@ -12,11 +12,5 @@
     <ProjectReference Include="..\..\src\dotnet-new3\dotnet-new3.csproj" />
     <ProjectReference Include="..\..\test\Microsoft.TemplateEngine.Mocks\Microsoft.TemplateEngine.Mocks.csproj" />
     <ProjectReference Include="..\..\test\Microsoft.TemplateEngine.TestHelper\Microsoft.TemplateEngine.TestHelper.csproj" />
-
-    <!-- Pull up explicit references to lower versions -->
-    <PackageReference Include="System.IO.FileSystem" Version="4.4.0-beta-24913-02" />
-    <PackageReference Include="System.Net.Primitives" Version="4.4.0-beta-24913-02" />
-    <PackageReference Include="System.Globalization" Version="4.4.0-beta-24913-02" />
-    <PackageReference Include="System.Linq.Parallel" Version="4.4.0-beta-24913-02" />
   </ItemGroup>
 </Project>
