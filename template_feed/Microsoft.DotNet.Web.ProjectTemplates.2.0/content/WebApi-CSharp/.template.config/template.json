@@ -109,7 +109,7 @@
     "HttpsPort": {
       "type": "parameter",
       "datatype": "integer",
-      "description": "Port number to used to configure SSL in launchSettings.json."
+      "description": "Port number to use to configure SSL in launchSettings.json."
     },
     "HttpsPortGenerated": {
       "type": "generated",
@@ -127,7 +127,7 @@
     "KestrelPort": {
       "type": "parameter",
       "datatype": "integer",
-      "description": "Port number to used to configure Kestrel in launchSettings.json."
+      "description": "Port number to use to configure Kestrel in launchSettings.json."
     },
     "KestrelPortGenerated": {
       "type": "generated",
