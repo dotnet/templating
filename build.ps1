@@ -6,6 +6,7 @@
 param(
     [string]$Configuration="Debug",
     [string]$Runtime="win7-x86",
+    [bool]$PerformFullFrameworkBuild=$true,
     [switch]$Help)
 
 if($Help)
@@ -13,9 +14,19 @@ if($Help)
     Write-Host "Usage: .\build.ps1 [-Configuration <CONFIGURATION>] [-Help]"
     Write-Host ""
     Write-Host "Options:"
-    Write-Host "  -Configuration <CONFIGURATION>     Build the specified Configuration (Debug or Release, default: Debug)"
-    Write-Host "  -Help                              Display this help message"
+    Write-Host "  -Configuration <CONFIGURATION>                Build the specified Configuration (Debug or Release, default: Debug)"
+    Write-Host "  -PerformFullFrameworkBuild <$true|$false>     Whether or not to build for NET45 as well as .NET Core"
+    Write-Host "  -Help                                         Display this help message"
     exit 0
+}
+
+if (!$PerformFullFrameworkBuild)
+{
+    Write-Host "Skipping NET45 build..."
+}
+else
+{
+    Write-Host "NET45 build is enabled, if invoking from setup, set the environment variable DN3FFB to $false to prevent this..."
 }
 
 $RepoRoot = "$PSScriptRoot"
@@ -74,7 +85,7 @@ $NoTimestampPackageVersion=$env:PACKAGE_VERSION + "-" + $env:BUILD_QUALITY
 
 $TimestampPackageVersion=$NoTimestampPackageVersion + "-" + [System.DateTime]::Now.ToString("yyyyMMdd") + "-" + $env:BUILD_NUMBER
 
-& dotnet msbuild $RepoRoot\build.proj /p:IsFullFrameworkBuildSupported=true /p:New3RuntimeIdentifier=$Runtime /p:Configuration=$Configuration
+& dotnet msbuild $RepoRoot\build.proj /p:IsFullFrameworkBuildSupported=$PerformFullFrameworkBuild /p:New3RuntimeIdentifier=$Runtime /p:Configuration=$Configuration
 $NewPath = $DevDir + ";" + (($env:PATH.Split(';') | where {-not $_.StartsWith($RepoRoot)}) -join ";")
 [Environment]::SetEnvironmentVariable("Path", "$NewPath", [System.EnvironmentVariableTarget]::User)
 $env:Path = $NewPath
