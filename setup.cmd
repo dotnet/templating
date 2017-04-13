@@ -15,12 +15,14 @@ PUSHD %~dp0\src
 IF "%DN3B%" == "" (SET DN3B=Release)
 echo Using build configuration "%DN3B%"...
 
+IF "%DN3FFB%" == "" (SET DN3FFB=$true)
+
 CALL "%~dp0\harderreset.cmd"
 
 mkdir %~dp0\dev 1>nul
 
 echo "Calling build.ps1"
-powershell -NoProfile -NoLogo -Command "& \"%~dp0build.ps1\" -Configuration %DN3B%; exit $LastExitCode;"
+powershell -NoProfile -NoLogo -Command "& \"%~dp0build.ps1\" -Configuration %DN3B% -$PerformFullFrameworkBuild %DN3FFB%; exit $LastExitCode;"
 
 echo Artifacts built and placed.
 
