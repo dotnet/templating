@@ -22,7 +22,7 @@ CALL "%~dp0\harderreset.cmd"
 mkdir %~dp0\dev 1>nul
 
 echo "Calling build.ps1"
-powershell -NoProfile -NoLogo -Command "& \"%~dp0build.ps1\" -Configuration %DN3B% -$PerformFullFrameworkBuild %DN3FFB%; exit $LastExitCode;"
+powershell -NoProfile -NoLogo -Command "& \"%~dp0build.ps1\" -Configuration %DN3B% -PerformFullFrameworkBuild %DN3FFB%; exit $LastExitCode;"
 
 echo Artifacts built and placed.
 
