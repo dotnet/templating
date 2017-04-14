@@ -28,8 +28,9 @@ namespace RazorPagesWebApplication
 
                     builder.AddEnvironmentVariables();
                 })
-                .ConfigureLogging(logger => logger.AddConsole()
-                                                  .AddDebug())
+                .ConfigureLogging(logger => logger
+                    .AddConsole()
+                    .AddDebug())
                 .UseIISIntegration()
                 .UseStartup<Startup>()
                 .Build();
