@@ -33,7 +33,7 @@ fi
 cd "$DN3BASEDIR"
 
 echo Using build configuration "$DN3B"
-/bin/bash harderreset.sh
+/bin/bash $REPOROOT/harderreset.sh
 
 echo Creating directory structure...
 mkdir dev

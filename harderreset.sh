@@ -14,7 +14,8 @@ for proj in `ls -1G $DN3BASEDIR/src`; do
 done
 
 echo "Removing ~/.templateengine..."
-rm -rf ~/.templateengine
+rm -rf ~/.templateengine/dotnetcli-preview
+rm -rf ~/.templateengine/endtoendtestharness
 echo "Removing packages from cache..."
 rm -rf ~/.nuget/packages/Microsoft.TemplateEngine.*
 echo "Done"
