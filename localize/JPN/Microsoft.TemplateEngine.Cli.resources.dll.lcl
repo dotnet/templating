@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <LCX SchemaVersion="6.0" Name="C:\BuildAgent\work\971a9203d238fea8\dev\Microsoft.TemplateEngine.Cli.dll" PsrId="211" FileType="1" SrcCul="en-US" TgtCul="ja-JP" xmlns="http://schemas.microsoft.com/locstudio/2006/6/lcx">
   <OwnedComments>
     <Cmt Name="Dev" />
@@ -138,6 +138,12 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";CouldntUninstall" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Could not find something to uninstall called '{0}'.]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";CreateAliasHelp" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Creates an alias for the specified template.]]></Val>
@@ -267,6 +273,12 @@
       <Item ItemId=";InvalidInputSwitch" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Invalid input switch:]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";InvalidParameterDefault" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[{0} {1}]A;    The default value '{1}' is not a valid value for {0}.]]></Val>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -470,7 +482,7 @@
       </Item>
       <Item ItemId=";ProcessingPostActions" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Processing Post Actions]]></Val>
+          <Val><![CDATA[Processing post-creation actions...]]></Val>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -570,9 +582,21 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";ThirdPartyNotices" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[This template contains technologies from parties other than Microsoft, see {0} for details.]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";Type" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Type]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";UninstallHelp" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Uninstalls a source or a template pack.]]></Val>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -631,6 +655,9 @@
     <Item ItemId=";CompanyName" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text">
         <Val><![CDATA[Microsoft]]></Val>
+        <Tgt Cat="Text" Stat="Loc" Orig="New">
+          <Val><![CDATA[Microsoft]]></Val>
+        </Tgt>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -655,6 +682,9 @@
     <Item ItemId=";LegalCopyright" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text">
         <Val><![CDATA[Copyright © Microsoft Corporation]]></Val>
+        <Tgt Cat="Text" Stat="Loc" Orig="New">
+          <Val><![CDATA[Copyright © Microsoft Corporation]]></Val>
+        </Tgt>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -672,7 +702,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0-beta2-20170328-178+178.f36806c1981474b487021d087f07ebd10db752cc]]></Val>
+        <Val><![CDATA[1.0.0-beta2-20170411-190+190.936a34cae8b113f8dd1a4b6722097f0899fd0680]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
