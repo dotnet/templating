@@ -86,6 +86,4 @@ $NoTimestampPackageVersion=$env:PACKAGE_VERSION + "-" + $env:BUILD_QUALITY
 $TimestampPackageVersion=$NoTimestampPackageVersion + "-" + [System.DateTime]::Now.ToString("yyyyMMdd") + "-" + $env:BUILD_NUMBER
 
 & dotnet msbuild $RepoRoot\build.proj /p:IsFullFrameworkBuildSupported=$PerformFullFrameworkBuild /p:New3RuntimeIdentifier=$Runtime /p:Configuration=$Configuration
-$NewPath = $DevDir + ";" + (($env:PATH.Split(';') | where {-not $_.StartsWith($RepoRoot)}) -join ";")
-[Environment]::SetEnvironmentVariable("Path", "$NewPath", [System.EnvironmentVariableTarget]::User)
-$env:Path = $NewPath
+& $RepoRoot\SetPath.ps1 -DevDir "$DevDir"
