@@ -11,7 +11,7 @@ namespace Company.WebApplication1
 {
     public class Program
     {
-        public static IWebHostBuilder BuildWebHost() => new WebHostBuilder()
+        public static IWebHostBuilder BuildWebHost(string[] args) => new WebHostBuilder()
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseIISIntegration()
@@ -43,7 +43,7 @@ namespace Company.WebApplication1
 
         public static void Main(string[] args)
         {
-            var host = BuildWebHost();
+            var host = BuildWebHost(args);
 
             host.Run();
         }
