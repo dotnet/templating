@@ -36,6 +36,10 @@ for /f %%f in ('dir /AD /B "%USERPROFILE%\.nuget\packages\Microsoft.DotNet.*.Tem
 echo Done.
 POPD
 
+powershell -NoProfile -NoLogo -Command "& \"%~dp0SetPath.ps1\" -ComputeOnly -DevDir \"%~dp0\dev\"; exit $LastExitCode;" > %~dp0\artifacts\NewPath.txt
+SET /p PATH= < "%~dp0\artifacts\NewPath.txt"
+del "%~dp0\artifacts\NewPath.txt"
+
 echo.
 echo You can now use `setup` from anywhere (in this console session) to run setup again.
 echo You can now use `build` from anywhere (in this console session) to build dotnet-new3 in the current configuration.
