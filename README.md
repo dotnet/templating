@@ -48,6 +48,10 @@ if you have any difficulties please file a new [issue](https://github.com/dotnet
 
 Now that we've covered the basics of using `dotnew new`, lets move on to info for template authors and contributors.
 
+# Available templates
+
+You can install additional templates that can be used by `dotnet new`. See [Available templates for dotnet new](https://github.com/dotnet/templating/wiki/Available-templates-for-dotnet-new).
+
 # What to expect when working with this repo
 
 The instructions below enable a new command at the `dotnet` CLI, `dotnet new3`, that uses the bits and templates contained in this repo. Think of it as a "preview" version of `dotnet new` for trying out new switches, interactions and display styles before rolling them in to the product.
