@@ -1,0 +1,17 @@
+﻿@using Company.WebApplication1.Identity.Models.ApplicationViewModels
+@model ApplicationDetailsViewModel
+<div>
+    <h4>View your application settings</h4>
+    <hr />
+    <p>
+        Name: <a asp-controller="Applications" asp-action="Edit" asp-route-id="@Model.Id">@Model.Name</a>
+    </p>
+    <p>Client Id: @Model.ClientId</p>
+    <p>Redirect Uris:</p>
+    <ul>
+        @foreach (var redirectUri in @Model.RedirectUris)
+        {
+        <li>@redirectUri</li>
+        }
+    </ul>
+</div>

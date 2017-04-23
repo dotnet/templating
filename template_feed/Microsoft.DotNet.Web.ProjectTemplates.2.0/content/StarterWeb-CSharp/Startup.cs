@@ -9,11 +9,10 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 #endif
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 #if (IndividualLocalAuth)
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Diagnostics.Identity.Service;
 #endif
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 #if (IndividualB2CAuth || OrganizationalAuth)
@@ -24,11 +23,6 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 #endif
 #if (MultiOrgAuth)
 using Microsoft.IdentityModel.Tokens;
-#endif
-#if (IndividualLocalAuth)
-using Company.WebApplication1.Data;
-using Company.WebApplication1.Models;
-using Company.WebApplication1.Services;
 #endif
 
 namespace Company.WebApplication1
@@ -47,25 +41,12 @@ namespace Company.WebApplication1
         {
             // Add framework services.
 #if (IndividualLocalAuth)
-            services.AddDbContext<ApplicationDbContext>(options =>
-  #if (UseLocalDB)
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-  #else
-                options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
-  #endif
+            services.AddIdentityService(Configuration);
 
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders();
+            services.AddIdentityServiceAuthentication();
 
 #endif
             services.AddMvc();
-#if (IndividualLocalAuth)
-
-            // Add application services.
-            services.AddTransient<IEmailSender, AuthMessageSender>();
-            services.AddTransient<ISmsSender, AuthMessageSender>();
-#endif
 #if (OrganizationalAuth || IndividualB2CAuth)
 
             services.AddAuthentication(sharedOptions => 
@@ -87,17 +68,11 @@ namespace Company.WebApplication1
             services.AddSingleton<IConfigureOptions<OpenIdConnectOptions>, OpenIdConnectOptionsSetup>();
 #endif
 
-#if (IndividualLocalAuth)
-
-            // Add external authentication handlers below. To configure them please see https://go.microsoft.com/fwlink/?LinkID=532715
-
-#elseif (OrganizationalAuth || IndividualB2CAuth)
+#if (OrganizationalAuth || IndividualB2CAuth)
             services.AddCookieAuthentication();
 
             services.AddOpenIdConnectAuthentication();
-            
 #endif
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -108,6 +83,7 @@ namespace Company.WebApplication1
                 app.UseDeveloperExceptionPage();
 #if (IndividualLocalAuth)
                 app.UseDatabaseErrorPage();
+                app.UseDevelopmentCertificateErrorPage(Configuration);
 #endif
                 //app.UseBrowserLink();
             }
@@ -118,7 +94,7 @@ namespace Company.WebApplication1
 
             app.UseStaticFiles();
 
-#if (IndividualLocalAuth || OrganizationalAuth || IndividualB2CAuth)
+#if (OrganizationalAuth || IndividualAuth)
             app.UseAuthentication();
 
 #endif

@@ -1,20 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Company.WebApplication1.Models;
-using Company.WebApplication1.Models.ManageViewModels;
+using System.Linq;
+using System.Threading.Tasks;
+using Company.WebApplication1.Identity.Models;
+using Company.WebApplication1.Identity.Models.ManageViewModels;
 using Company.WebApplication1.Services;
 
-namespace Company.WebApplication1.Controllers
+namespace Company.WebApplication1.Identity.Controllers
 {
-    [Authorize]
+    [Authorize(IdentityServiceOptions.LoginPolicyName)]
+    [Area(IdentityServiceConstants.Tenant)]
+    [Route(IdentityServiceConstants.RoutePrefix + "/[area]/[controller]/[action]")]
+    [RequireHttps]
     public class ManageController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -37,8 +38,6 @@ namespace Company.WebApplication1.Controllers
             _logger = loggerFactory.CreateLogger<ManageController>();
         }
 
-        //
-        // GET: /Manage/Index
         [HttpGet]
         public async Task<IActionResult> Index(ManageMessageId? message = null)
         {
@@ -67,8 +66,6 @@ namespace Company.WebApplication1.Controllers
             return View(model);
         }
 
-        //
-        // POST: /Manage/RemoveLogin
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoveLogin(RemoveLoginViewModel account)
@@ -87,15 +84,12 @@ namespace Company.WebApplication1.Controllers
             return RedirectToAction(nameof(ManageLogins), new { Message = message });
         }
 
-        //
-        // GET: /Manage/AddPhoneNumber
+        [HttpGet]
         public IActionResult AddPhoneNumber()
         {
             return View();
         }
 
-        //
-        // POST: /Manage/AddPhoneNumber
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddPhoneNumber(AddPhoneNumberViewModel model)
@@ -115,8 +109,6 @@ namespace Company.WebApplication1.Controllers
             return RedirectToAction(nameof(VerifyPhoneNumber), new { PhoneNumber = model.PhoneNumber });
         }
 
-        //
-        // POST: /Manage/EnableTwoFactorAuthentication
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EnableTwoFactorAuthentication()
@@ -131,8 +123,6 @@ namespace Company.WebApplication1.Controllers
             return RedirectToAction(nameof(Index), "Manage");
         }
 
-        //
-        // POST: /Manage/DisableTwoFactorAuthentication
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DisableTwoFactorAuthentication()
@@ -147,8 +137,6 @@ namespace Company.WebApplication1.Controllers
             return RedirectToAction(nameof(Index), "Manage");
         }
 
-        //
-        // GET: /Manage/VerifyPhoneNumber
         [HttpGet]
         public async Task<IActionResult> VerifyPhoneNumber(string phoneNumber)
         {
@@ -162,8 +150,6 @@ namespace Company.WebApplication1.Controllers
             return phoneNumber == null ? View("Error") : View(new VerifyPhoneNumberViewModel { PhoneNumber = phoneNumber });
         }
 
-        //
-        // POST: /Manage/VerifyPhoneNumber
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> VerifyPhoneNumber(VerifyPhoneNumberViewModel model)
@@ -187,8 +173,6 @@ namespace Company.WebApplication1.Controllers
             return View(model);
         }
 
-        //
-        // POST: /Manage/RemovePhoneNumber
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RemovePhoneNumber()
@@ -206,16 +190,12 @@ namespace Company.WebApplication1.Controllers
             return RedirectToAction(nameof(Index), new { Message = ManageMessageId.Error });
         }
 
-        //
-        // GET: /Manage/ChangePassword
         [HttpGet]
         public IActionResult ChangePassword()
         {
             return View();
         }
 
-        //
-        // POST: /Manage/ChangePassword
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
@@ -240,16 +220,12 @@ namespace Company.WebApplication1.Controllers
             return RedirectToAction(nameof(Index), new { Message = ManageMessageId.Error });
         }
 
-        //
-        // GET: /Manage/SetPassword
         [HttpGet]
         public IActionResult SetPassword()
         {
             return View();
         }
 
-        //
-        // POST: /Manage/SetPassword
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SetPassword(SetPasswordViewModel model)
@@ -274,7 +250,6 @@ namespace Company.WebApplication1.Controllers
             return RedirectToAction(nameof(Index), new { Message = ManageMessageId.Error });
         }
 
-        //GET: /Manage/ManageLogins
         [HttpGet]
         public async Task<IActionResult> ManageLogins(ManageMessageId? message = null)
         {
@@ -299,8 +274,6 @@ namespace Company.WebApplication1.Controllers
             });
         }
 
-        //
-        // POST: /Manage/LinkLogin
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> LinkLogin(string provider)
@@ -314,8 +287,6 @@ namespace Company.WebApplication1.Controllers
             return Challenge(properties, provider);
         }
 
-        //
-        // GET: /Manage/LinkLoginCallback
         [HttpGet]
         public async Task<ActionResult> LinkLoginCallback()
         {
