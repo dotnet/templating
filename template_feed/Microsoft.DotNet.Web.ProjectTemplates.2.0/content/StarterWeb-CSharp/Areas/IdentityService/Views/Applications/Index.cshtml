@@ -1,0 +1,18 @@
+﻿@model IEnumerable<IdentityServiceApplication>
+@{
+    ViewData["Title"] = "Manage your applications";
+}
+
+<h2>@ViewData["Title"].</h2>
+<p class="text-success">@ViewData["StatusMessage"]</p>
+
+<div>
+    <h4>Change your application settings</h4>
+    <hr />
+    <ul>
+        @foreach (var application in Model)
+        {
+            <li><a asp-controller="Applications" asp-action="Details" asp-route-id="@application.Id">@application.Name</a></li>
+        }
+    </ul>
+</div>
