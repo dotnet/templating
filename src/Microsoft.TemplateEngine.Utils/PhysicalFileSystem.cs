@@ -44,6 +44,10 @@ namespace Microsoft.TemplateEngine.Utils
 
         public void DirectoryDelete(string path, bool recursive)
         {
+            foreach(var file in Directory.GetFiles(path, "*", SearchOption.AllDirectories))
+            {
+                File.SetAttributes(file, FileAttributes.Normal);
+            }
             Directory.Delete(path, recursive);
         }
 
