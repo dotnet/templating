@@ -204,11 +204,11 @@ namespace Microsoft.TemplateEngine.Cli
         {
             _paths.CreateDirectory(_paths.User.ScratchDir);
 
-            var newLocalPackages = new List<string>();
+            List<string> newLocalPackages = new List<string>();
 
-            foreach (var source in gitSources)
+            foreach (GitSource source in gitSources)
             {
-                var targetPath = $"{_paths.User.ScratchDir}/{source.RepositoryName}";
+                string targetPath = $"{_paths.User.ScratchDir}/{source.RepositoryName}";
                 ExecuteProcess("git", "clone", source.GitUrl, targetPath);
                 newLocalPackages.Add($"{targetPath}/{source.SubFolder}");
             }
@@ -270,20 +270,14 @@ namespace Microsoft.TemplateEngine.Cli
         internal virtual bool ExecuteProcess(string command, params string[] args)
         {
 
-            var info = new ProcessStartInfo
+            ProcessStartInfo info = new ProcessStartInfo
             {
                 FileName = command,
                 Arguments = string.Join(" ", args)
             };
             using (Process p = Process.Start(info))
             {
-                //p.BeginOutputReadLine();
-                //p.BeginErrorReadLine();
-                //p.ErrorDataReceived += OnErrorDataReceived;
-                //p.OutputDataReceived += OnOutputDataReceived;
                 p.WaitForExit();
-
-                //return new Result(_stdout?.ToString(), _stderr?.ToString(), p.ExitCode);
                 return p.ExitCode == 0;
             }
         }

@@ -28,18 +28,18 @@ namespace Microsoft.TemplateEngine.Cli
             }
             else
             {
-                var index = gitIndex + 4;
-                var indexOfLastSlashBeforeGit = -1;
-                var indexOfSlash = -1;
+                int index = gitIndex + 4;
+                int indexOfLastSlashBeforeGit = -1;
+                int indexOfSlash = -1;
                 while ((indexOfSlash = spec.IndexOf('/', indexOfLastSlashBeforeGit + 1)) < index && indexOfSlash != -1)
                 {
                     indexOfLastSlashBeforeGit = indexOfSlash;
                 }
 
-                var gitUrl = spec.Substring(0, index);
-                var subFolder = spec.Substring(index);
+                string gitUrl = spec.Substring(0, index);
+                string subFolder = spec.Substring(index);
                 subFolder = subFolder.Trim('/');
-                var repoName = gitUrl.Substring(indexOfLastSlashBeforeGit + 1).Replace(".git", string.Empty);
+                string repoName = gitUrl.Substring(indexOfLastSlashBeforeGit + 1).Replace(".git", string.Empty);
                 package = new GitSource(gitUrl, subFolder, repoName);
                 return true;
             }
