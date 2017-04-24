@@ -21,7 +21,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
         {
             InstallerTestWrapper installer = new InstallerTestWrapper(this.EnvironmentSettings);
 
-            var installationRequests = new[] { request };
+            string[] installationRequests = new[] { request };
             installer.InstallPackages(installationRequests);
 
             GitSource gitSource = null;
@@ -52,8 +52,8 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
                 }
             };
 
-            var installer = new Installer(this.EnvironmentSettings);
-            var installationRequests = new[] { request };
+            Installer installer = new Installer(this.EnvironmentSettings);
+            string[] installationRequests = new[] { request };
             installer.InstallPackages(installationRequests);
 
             Assert.True(cloneDirectoryFound, "Clone directory was found.");

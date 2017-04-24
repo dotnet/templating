@@ -19,7 +19,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
         public void GitUrlReturnsGitPackageWithUrl(string request, string gitUrl)
         {
             GitSource source = null;
-            var result = GitSource.TryParseGitSource(request, out source);
+            bool result = GitSource.TryParseGitSource(request, out source);
             
             Assert.Equal(gitUrl, source.GitUrl);
             Assert.Equal(true, result);
@@ -30,7 +30,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
         public void GitUrlReturnsGitPackageWithSubFolder(string request, string subFolder)
         {
             GitSource source = null;
-            var result = GitSource.TryParseGitSource(request, out source);
+            bool result = GitSource.TryParseGitSource(request, out source);
 
             Assert.Equal(subFolder, source.SubFolder);
             Assert.Equal(true, result);
@@ -40,7 +40,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
         public void GitUrlReturnsGitPackageWithRepoName(string request, string repoName)
         {
             GitSource source = null;
-            var result = GitSource.TryParseGitSource(request, out source);
+            bool result = GitSource.TryParseGitSource(request, out source);
 
             Assert.Equal(repoName, source.RepositoryName);
             Assert.Equal(true, result);
@@ -53,7 +53,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
         public void NonGitUrlReturnsFalseNull(string request)
         {
             GitSource source = null;
-            var result = GitSource.TryParseGitSource(request, out source);
+            bool result = GitSource.TryParseGitSource(request, out source);
 
             //IReadOnlyList<string> projFilesFound = actionProcessor.FindProjFileAtOrAbovePath(EngineEnvironmentSettings.Host.FileSystem, outputBasePath, new HashSet<string>());
             Assert.Equal(null, source);
