@@ -148,6 +148,14 @@ To install a new template use the command:
 
     dotnet new3 -i {the path to the folder containing the templates}
 
+Additionally, templates can be installed from a Git repo:
+    
+    dotnet new3 -i {Git repo URL.git}[OPTIONAL template subfolder]
+
+For example:
+
+    dotnet new3 -i https://github.com/sayedihashimi/dotnet-new-samples.git/01-basic-template/SayedHa.StarterWeb
+
 # Basic Commands
 ## Showing help
 

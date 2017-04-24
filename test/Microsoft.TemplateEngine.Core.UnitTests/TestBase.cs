@@ -20,7 +20,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
                 Locale = "en-US"
             };
 
-            EnvironmentSettings = new EngineEnvironmentSettings(host, s => null);
+            EnvironmentSettings = new EngineEnvironmentSettings(host, s => new StubSettingsLoader());
             string home = "%USERPROFILE%";
 
             if (Path.DirectorySeparatorChar == '/')
