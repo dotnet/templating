@@ -11,9 +11,7 @@ namespace RazorPagesWebApplication
 {
     public class Program
     {
-        public static void Main(string[] args)
-        {
-            var host = new WebHostBuilder()
+        public static IWebHost BuildWebHost(string[] args) => new WebHostBuilder()
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .ConfigureAppConfiguration((context, builder) => {
@@ -34,6 +32,10 @@ namespace RazorPagesWebApplication
                 .UseIISIntegration()
                 .UseStartup<Startup>()
                 .Build();
+
+        public static void Main(string[] args)
+        {
+            var host = BuildWebHost(args);
 
             host.Run();
         }
