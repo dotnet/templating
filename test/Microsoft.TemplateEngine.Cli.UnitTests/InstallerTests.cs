@@ -1,14 +1,10 @@
-﻿using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Core.UnitTests;
-using Microsoft.TemplateEngine.Utils;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using System.Linq;
-using Xunit;
+using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
-using System;
-using Microsoft.TemplateEngine.Cli;
+using Microsoft.TemplateEngine.Utils;
+using Xunit;
 
 namespace Microsoft.TemplateEngine.Cli.UnitTests
 {

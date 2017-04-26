@@ -6,6 +6,7 @@ using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.TestHelper;
 using Microsoft.TemplateEngine.Utils;
 using Xunit;
+using Microsoft.TemplateEngine.Mocks;
 
 namespace Microsoft.TemplateEngine.Core.UnitTests
 {
@@ -20,7 +21,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
                 Locale = "en-US"
             };
 
-            EnvironmentSettings = new EngineEnvironmentSettings(host, s => new StubSettingsLoader());
+            EnvironmentSettings = new EngineEnvironmentSettings(host, s => new MockSettingsLoader());
             string home = "%USERPROFILE%";
 
             if (Path.DirectorySeparatorChar == '/')
