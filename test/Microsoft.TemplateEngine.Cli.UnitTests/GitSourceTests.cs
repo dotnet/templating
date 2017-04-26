@@ -1,5 +1,4 @@
 ﻿using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Core.UnitTests;
 using Microsoft.TemplateEngine.Utils;
 using System;
 using System.Collections.Generic;

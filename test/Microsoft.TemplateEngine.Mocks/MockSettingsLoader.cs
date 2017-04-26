@@ -1,11 +1,12 @@
-﻿using Microsoft.TemplateEngine.Abstractions;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
+using Microsoft.TemplateEngine.Mocks;
 
-namespace Microsoft.TemplateEngine.Core.UnitTests
+namespace Microsoft.TemplateEngine.Mocks
 {
-    internal class StubSettingsLoader : ISettingsLoader
+    public class MockSettingsLoader : ISettingsLoader
     {
         public IComponentManager Components => throw new NotImplementedException();
 
@@ -15,42 +16,41 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
 
         public void AddMountPoint(IMountPoint mountPoint)
         {
-            throw new NotImplementedException();
         }
 
         public void AddProbingPath(string probeIn)
         {
-            throw new NotImplementedException();
         }
 
         public IFile FindBestHostTemplateConfigFile(IFileSystemInfo config)
         {
-            throw new NotImplementedException();
+            return new MockFile(string.Empty, new MockMountPoint(this.EnvironmentSettings));
         }
 
         public void GetTemplates(HashSet<ITemplateInfo> templates)
         {
-            throw new NotImplementedException();
         }
 
         public ITemplate LoadTemplate(ITemplateInfo info)
         {
-            throw new NotImplementedException();
+            return null;
+        }
+
+        public ITemplate LoadTemplate(ITemplateInfo info, string baselineName)
+        {
+            return null;
         }
 
         public void ReleaseMountPoint(IMountPoint mountPoint)
         {
-            throw new NotImplementedException();
         }
 
         public void RemoveMountPoint(IMountPoint mountPoint)
         {
-            throw new NotImplementedException();
         }
 
         public void RemoveMountPoints(IEnumerable<Guid> mountPoints)
         {
-            throw new NotImplementedException();
         }
 
         public void Save()
@@ -60,22 +60,25 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
 
         public bool TryGetFileFromIdAndPath(Guid mountPointId, string place, out IFile file, out IMountPoint mountPoint)
         {
-            throw new NotImplementedException();
+            file = new MockFile(string.Empty, new MockMountPoint(this.EnvironmentSettings));
+            mountPoint = new MockMountPoint(this.EnvironmentSettings);
+            return true;
         }
 
         public bool TryGetMountPointFromPlace(string mountPointPlace, out IMountPoint mountPoint)
         {
-            throw new NotImplementedException();
+            mountPoint = new MockMountPoint(this.EnvironmentSettings);
+            return true;
         }
 
         public bool TryGetMountPointInfo(Guid mountPointId, out MountPointInfo info)
         {
-            throw new NotImplementedException();
+            info = new MountPointInfo(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), string.Empty);
+            return true;
         }
 
         public void WriteTemplateCache(IList<ITemplateInfo> templates, string locale)
         {
-            throw new NotImplementedException();
         }
     }
 }
