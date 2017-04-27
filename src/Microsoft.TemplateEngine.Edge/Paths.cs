@@ -141,6 +141,14 @@ namespace Microsoft.TemplateEngine.Edge
             }
         }
 
+        public void SetAllFilesToNormal(string path)
+        {
+            if (_environmentSettings.Host.FileSystem.DirectoryExists(path))
+            {
+                _environmentSettings.Host.FileSystem.SetAllFilesToNormal(path, true);
+            }
+        }
+
         public void DeleteFile(string path)
         {
             if (_environmentSettings.Host.FileSystem.FileExists(path))

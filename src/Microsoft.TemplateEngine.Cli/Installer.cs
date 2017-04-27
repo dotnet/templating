@@ -214,6 +214,7 @@ namespace Microsoft.TemplateEngine.Cli
             }
 
             InstallLocalPackages(newLocalPackages);
+            _paths.SetAllFilesToNormal(_paths.User.ScratchDir);
             _paths.DeleteDirectory(_paths.User.ScratchDir);
         }
 

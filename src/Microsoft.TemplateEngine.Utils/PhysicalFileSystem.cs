@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
@@ -44,11 +45,19 @@ namespace Microsoft.TemplateEngine.Utils
 
         public void DirectoryDelete(string path, bool recursive)
         {
-            foreach(string file in Directory.GetFiles(path, "*", SearchOption.AllDirectories))
+            Directory.Delete(path, recursive);
+        }
+        public void SetAllFilesToNormal(string path, bool recursive)
+        {
+            SearchOption option = SearchOption.TopDirectoryOnly;
+            if (recursive)
+            {
+                option = SearchOption.AllDirectories;
+            }
+            foreach (string file in Directory.GetFiles(path, "*", option))
             {
                 File.SetAttributes(file, FileAttributes.Normal);
             }
-            Directory.Delete(path, recursive);
         }
 
         public string ReadAllText(string path)
@@ -84,5 +93,6 @@ namespace Microsoft.TemplateEngine.Utils
         {
             File.Delete(path);
         }
+
     }
 }
