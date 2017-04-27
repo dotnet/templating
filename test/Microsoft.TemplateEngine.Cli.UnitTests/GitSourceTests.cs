@@ -48,6 +48,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
         [InlineData("C:\\temp\\MyTemplate")]
         [InlineData("Nuget::1")]
         [InlineData(null)]
+        [InlineData("not_a_url/templates.GIT")]
         [InlineData("")]
         public void NonGitUrlReturnsFalseNull(string request)
         {
