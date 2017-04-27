@@ -267,6 +267,9 @@ namespace Microsoft.TemplateEngine.Utils
 
             parent.Directories.Remove(currentDir.Name);
         }
+        public void SetAllFilesToNormal(string path, bool recursive)
+        {
+        }
 
         public bool DirectoryExists(string directory)
         {

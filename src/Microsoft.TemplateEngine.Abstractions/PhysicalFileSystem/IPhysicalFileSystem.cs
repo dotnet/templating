@@ -20,6 +20,7 @@ namespace Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem
         void FileCopy(string sourcePath, string targetPath, bool overwrite);
 
         void DirectoryDelete(string path, bool recursive);
+        void SetAllFilesToNormal(string path, bool recursive);
 
         string ReadAllText(string path);
 

@@ -124,6 +124,10 @@ namespace Microsoft.TemplateEngine.Mocks
             }
         }
 
+        public void SetAllFilesToNormal(string path, bool recursive)
+        {
+        }
+
         public void FileCopy(string sourcePath, string targetPath, bool overwrite)
         {
             if (!overwrite && FileExists(targetPath))
@@ -152,5 +156,6 @@ namespace Microsoft.TemplateEngine.Mocks
                 }
             }
         }
+
     }
 }
