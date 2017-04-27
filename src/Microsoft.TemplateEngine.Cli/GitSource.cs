@@ -21,8 +21,11 @@ namespace Microsoft.TemplateEngine.Cli
         {
             package = null;
             int gitIndex = -1;
+            Uri uri = null;
 
-            if (string.IsNullOrEmpty(spec) || (gitIndex = spec.IndexOf(".git", StringComparison.OrdinalIgnoreCase)) < 0)
+            if (string.IsNullOrEmpty(spec) 
+                || Uri.TryCreate(spec, UriKind.Absolute, out uri) == false
+                || (gitIndex = spec.IndexOf(".git", StringComparison.OrdinalIgnoreCase)) < 0)
             {
                 return false;
             }
