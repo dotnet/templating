@@ -6,6 +6,8 @@ namespace Microsoft.TemplateEngine.Cli
 {
     internal class GitSource
     {
+        static readonly string _gitExtension = ".git";
+
         public string GitUrl { get; set; }
         public string SubFolder { get; set; }
         public string RepositoryName { get; set; }
@@ -25,13 +27,13 @@ namespace Microsoft.TemplateEngine.Cli
 
             if (string.IsNullOrEmpty(spec) 
                 || Uri.TryCreate(spec, UriKind.Absolute, out uri) == false
-                || (gitIndex = spec.IndexOf(".git", StringComparison.OrdinalIgnoreCase)) < 0)
+                || (gitIndex = spec.IndexOf(_gitExtension, StringComparison.OrdinalIgnoreCase)) < 0)
             {
                 return false;
             }
             else
             {
-                int index = gitIndex + 4;
+                int index = gitIndex + _gitExtension.Length;
                 int indexOfLastSlashBeforeGit = -1;
                 int indexOfSlash = -1;
                 while ((indexOfSlash = spec.IndexOf('/', indexOfLastSlashBeforeGit + 1)) < index && indexOfSlash != -1)
