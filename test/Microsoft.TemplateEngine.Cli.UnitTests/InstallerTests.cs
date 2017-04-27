@@ -23,7 +23,6 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             GitSource gitSource = null;
             GitSource.TryParseGitSource(request, out gitSource);
 
-            //IReadOnlyList<string> projFilesFound = actionProcessor.FindProjFileAtOrAbovePath(EngineEnvironmentSettings.Host.FileSystem, outputBasePath, new HashSet<string>());
             Assert.Equal("git", installer.ExecuteProcessCommands[0][0]);
             Assert.Equal("clone", installer.ExecuteProcessCommands[0][1]);
             Assert.Equal(gitSource.GitUrl, installer.ExecuteProcessCommands[0][2]);
@@ -48,11 +47,33 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
                 }
             };
 
-            Installer installer = new Installer(this.EnvironmentSettings);
+            InstallerTestWrapper installer = new InstallerTestWrapper(this.EnvironmentSettings);
             string[] installationRequests = new[] { request };
             installer.InstallPackages(installationRequests);
 
             Assert.True(cloneDirectoryFound, "Clone directory was found.");
+        }
+
+        [Fact(DisplayName = nameof(GitCloneFailureStopsTemplateInstall))]
+        public void GitCloneFailureStopsTemplateInstall()
+        {
+            FileSystemTestWrapper fileSystemTestWrapper = new FileSystemTestWrapper();
+            (this.EnvironmentSettings.Host as TestHelper.TestHost).FileSystem = fileSystemTestWrapper;
+            List<string> directoryExistChecks = new List<string>();
+            fileSystemTestWrapper.VerifyDirectoryExists = path =>
+            {
+                directoryExistChecks.Add(path);
+            };
+
+            InstallerTestWrapper installer = new InstallerTestWrapper(this.EnvironmentSettings);
+            installer.ExecuteProcessReturn = false;
+
+            string[] installationRequests = new[] { "http://myurl.com/myrepo.git" };
+            installer.InstallPackages(installationRequests);
+
+            // Should only check directory exists twice
+            // More calls indicate package was installed as local package
+            Assert.Equal(2, directoryExistChecks.Count);
         }
     }
 
@@ -71,6 +92,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
         public InstallerTestWrapper(IEngineEnvironmentSettings environmentSettings) : base(environmentSettings)
         {
             ExecuteProcessCommands = new List<string[]>();
+            ExecuteProcessReturn = true;
         }
 
         public List<string[]> ExecuteProcessCommands { get; set; }

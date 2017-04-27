@@ -209,8 +209,11 @@ namespace Microsoft.TemplateEngine.Cli
             foreach (GitSource source in gitSources)
             {
                 string targetPath = $"{_paths.User.ScratchDir}/{source.RepositoryName}";
-                ExecuteProcess("git", "clone", source.GitUrl, targetPath);
-                newLocalPackages.Add($"{targetPath}/{source.SubFolder}");
+                bool cloneSuccessful = ExecuteProcess("git", "clone", source.GitUrl, targetPath);
+                if (cloneSuccessful)
+                {
+                    newLocalPackages.Add($"{targetPath}/{source.SubFolder}");
+                }
             }
 
             InstallLocalPackages(newLocalPackages);
