@@ -48,6 +48,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";AddRefPostActionFrameworkNotSupported" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Unable to automatically add the framework reference {0} to the project. Manually edit the project file to add it.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Nie można automatycznie dodać odwołania do platformy {0} do projektu. Ręcznie edytuj plik projektu, aby go dodać.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";AddRefPostActionMisconfigured" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Add reference action is not configured correctly in the template.]]></Val>
@@ -1275,7 +1284,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0-beta2-20170419-195+195.103f5b6d5627854816123a1e84e4a8a5cf3617f7]]></Val>
+        <Val><![CDATA[1.0.0-beta2-20170425-203+203.43e794e4db64bad7639e3016e8ab58522c4ada30]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
