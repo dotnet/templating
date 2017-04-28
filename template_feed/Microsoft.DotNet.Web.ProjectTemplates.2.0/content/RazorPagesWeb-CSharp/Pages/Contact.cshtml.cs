@@ -4,13 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace RazorPagesWebApplication.Pages
+namespace Company.WebApplication1.Pages
 {
     public class ContactModel : PageModel
     {
+        public string Message { get; set; }
+
         public void OnGet()
         {
-            ViewData["Message"] = "Your contact page.";
+            Message = "Your contact page.";
         }
     }
 }

@@ -9,7 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace RazorPagesWebApplication
+namespace Company.WebApplication1
 {
     public class Startup
     {
@@ -23,11 +23,7 @@ namespace RazorPagesWebApplication
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc()
-                    .AddRazorPagesOptions(options =>
-                    {
-                        options.RootDirectory = "/Pages";
-                    });
+            services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
