@@ -241,7 +241,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Unknown alias name '{0}'.]A;Run 'dotnet {1} --show-aliases' with no args to show all aliases.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Nombre de alias desconocido: "{0}2.]A;Ejecute "dotnet {1} --show-aliases" sin argumentos para mostrar todos los alias.]]></Val>
+            <Val><![CDATA[Nombre de alias desconocido: "{0}".]A;Ejecute "dotnet {1} --show-aliases" sin argumentos para mostrar todos los alias.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1269,7 +1269,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0-beta2-20170425-201+201.5bb2752c5a592e161108f4f719590fc6c8da20c9]]></Val>
+        <Val><![CDATA[1.0.0-beta2-20170425-203+203.43e794e4db64bad7639e3016e8ab58522c4ada30]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
