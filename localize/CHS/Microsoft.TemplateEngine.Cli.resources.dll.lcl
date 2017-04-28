@@ -939,6 +939,9 @@
       <Item ItemId=";PostActionInvalidInputRePrompt" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Invalid input "{0}". Please enter one of (Y|N).]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[输入“{0}”无效。请输入(是|否)中的一个。]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -954,6 +957,9 @@
       <Item ItemId=";PostActionPromptRequest" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Do you want to run this action (Y|N)?]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[是否要运行此操作(是|否)?]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
