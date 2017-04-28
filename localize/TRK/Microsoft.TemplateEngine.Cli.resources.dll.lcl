@@ -42,6 +42,9 @@
       <Item ItemId=";AddRefPostActionFrameworkNotSupported" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Unable to automatically add the framework reference {0} to the project. Manually edit the project file to add it.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[{0} çerçeve başvurusu, projeye otomatik olarak eklenemiyor. Eklemek için proje dosyasını el ile düzenleyin.]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1272,7 +1275,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0-beta2-20170421-198+198.2e5516d8f5f5ced27e0c9c6e693605297d549ba0]]></Val>
+        <Val><![CDATA[1.0.0-beta2-20170427-205+205.09165e8eaad453519afe3517845e4ac58d99d321]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
