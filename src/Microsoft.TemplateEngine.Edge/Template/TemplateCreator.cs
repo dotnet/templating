@@ -138,44 +138,47 @@ namespace Microsoft.TemplateEngine.Edge.Template
         //
         public IParameterSet SetupDefaultParamValuesFromTemplateAndHost(ITemplate templateInfo, string realName, out IReadOnlyList<string> paramsWithInvalidValues)
         {
-            ITemplateEngineHost host = _environmentSettings.Host;
-            IParameterSet templateParams = templateInfo.Generator.GetParametersForTemplate(_environmentSettings, templateInfo);
-            List<string> paramsWithInvalidValuesList = new List<string>();
-
-            foreach (ITemplateParameter param in templateParams.ParameterDefinitions)
+            using (Timing.Over(_environmentSettings.Host, "SetupDefaultParamValuesFromTemplateAndHost"))
             {
-                if (param.IsName)
-                {
-                    templateParams.ResolvedValues[param] = realName;
-                }
-                else if (host.TryGetHostParamDefault(param.Name, out string hostParamValue) && hostParamValue != null)
-                {
-                    object resolvedValue = templateInfo.Generator.ConvertParameterValueToType(_environmentSettings, param, hostParamValue, out bool valueResolutionError);
-                    if (!valueResolutionError)
-                    {
-                        templateParams.ResolvedValues[param] = resolvedValue;
-                    }
-                    else
-                    {
-                        paramsWithInvalidValuesList.Add(param.Name);
-                    }
-                }
-                else if (param.Priority != TemplateParameterPriority.Required && param.DefaultValue != null)
-                {
-                    object resolvedValue = templateInfo.Generator.ConvertParameterValueToType(_environmentSettings, param, param.DefaultValue, out bool valueResolutionError);
-                    if (!valueResolutionError)
-                    {
-                        templateParams.ResolvedValues[param] = resolvedValue;
-                    }
-                    else
-                    {
-                        paramsWithInvalidValuesList.Add(param.Name);
-                    }
-                }
-            }
+                ITemplateEngineHost host = _environmentSettings.Host;
+                IParameterSet templateParams = templateInfo.Generator.GetParametersForTemplate(_environmentSettings, templateInfo);
+                List<string> paramsWithInvalidValuesList = new List<string>();
 
-            paramsWithInvalidValues = paramsWithInvalidValuesList;
-            return templateParams;
+                foreach (ITemplateParameter param in templateParams.ParameterDefinitions)
+                {
+                    if (param.IsName)
+                    {
+                        templateParams.ResolvedValues[param] = realName;
+                    }
+                    else if (host.TryGetHostParamDefault(param.Name, out string hostParamValue) && hostParamValue != null)
+                    {
+                        object resolvedValue = templateInfo.Generator.ConvertParameterValueToType(_environmentSettings, param, hostParamValue, out bool valueResolutionError);
+                        if (!valueResolutionError)
+                        {
+                            templateParams.ResolvedValues[param] = resolvedValue;
+                        }
+                        else
+                        {
+                            paramsWithInvalidValuesList.Add(param.Name);
+                        }
+                    }
+                    else if (param.Priority != TemplateParameterPriority.Required && param.DefaultValue != null)
+                    {
+                        object resolvedValue = templateInfo.Generator.ConvertParameterValueToType(_environmentSettings, param, param.DefaultValue, out bool valueResolutionError);
+                        if (!valueResolutionError)
+                        {
+                            templateParams.ResolvedValues[param] = resolvedValue;
+                        }
+                        else
+                        {
+                            paramsWithInvalidValuesList.Add(param.Name);
+                        }
+                    }
+                }
+
+                paramsWithInvalidValues = paramsWithInvalidValuesList;
+                return templateParams;
+            }
         }
 
         // 

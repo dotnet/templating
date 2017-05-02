@@ -1,4 +1,4 @@
-<Project DefaultTargets="Build">
+﻿<Project DefaultTargets="Build">
   <Import Project="Version.props" />
   <Import Project="Settings.props" />
   <Import Project="Loc.Settings.targets" />

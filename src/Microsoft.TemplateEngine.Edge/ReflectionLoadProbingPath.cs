@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -209,6 +210,14 @@ namespace Microsoft.TemplateEngine.Edge
             AssemblyName assemblyName = new AssemblyName(stringName);
 #endif
 
+            if (stringName.StartsWith("System.", StringComparison.OrdinalIgnoreCase)
+                || stringName.StartsWith("Microsoft.Win32.", StringComparison.OrdinalIgnoreCase)
+                || stringName.Equals("Microsoft.CSharp", StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
+            //Stopwatch sw = Stopwatch.StartNew();
             foreach (ReflectionLoadProbingPath selector in Instance)
             {
                 DirectoryInfo info = new DirectoryInfo(Path.Combine(selector._path, stringName));
@@ -251,10 +260,14 @@ namespace Microsoft.TemplateEngine.Edge
 #endif
                     }
 
+                    //sw.Stop();
+                    //Console.WriteLine($"Resolve {assemblyName} in {sw.Elapsed.TotalMilliseconds} - {found}");
                     return found;
                 }
             }
 
+            //sw.Stop();
+            //Console.WriteLine($"Resolve {assemblyName} in {sw.Elapsed.TotalMilliseconds} - false");
             return null;
         }
     }
