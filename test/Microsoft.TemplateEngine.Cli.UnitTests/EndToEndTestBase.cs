@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using Xunit;
@@ -23,7 +24,9 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             string configuration = "Release";
 #endif
 
-            string harnessPath = Path.Combine(dir, "..", "..", "..", "..", "Microsoft.TemplateEngine.EndToEndTestHarness", "bin", configuration, "netcoreapp1.1");
+            string harnessPath = Path.Combine(dir, "..", "..", "..", "..", "Microsoft.TemplateEngine.EndToEndTestHarness", "bin", configuration);
+            harnessPath = Directory.GetDirectories(harnessPath, "netcoreapp*", SearchOption.TopDirectoryOnly).FirstOrDefault();
+
             int scriptCount = scripts.Length;
             StringBuilder builder = new StringBuilder();
             builder.Append(scriptCount);
