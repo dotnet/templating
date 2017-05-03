@@ -15,11 +15,13 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
         [InlineData("https://github.com/acme/templates.git/sub/folder", "https://github.com/acme/templates.git")]
         [InlineData("https://github.com/acme/templates.git", "https://github.com/acme/templates.git")]
         [InlineData("https://github.com/acme/templates.GIT", "https://github.com/acme/templates.GIT")]
+        [InlineData("git@github.com:sayedihashimi/dotnet-new-samples.git", "git@github.com:sayedihashimi/dotnet-new-samples.git")]
         public void GitUrlReturnsGitPackageWithUrl(string request, string gitUrl)
         {
             GitSource source = null;
             bool result = GitSource.TryParseGitSource(request, out source);
-            
+
+            Assert.NotNull(source);
             Assert.Equal(gitUrl, source.GitUrl);
             Assert.Equal(true, result);
         }
@@ -36,11 +38,13 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
         }
         [Theory(DisplayName = nameof(GitUrlReturnsGitPackageWithRepoName))]
         [InlineData("https://github.com/acme/templates.git/sub/folder", "templates")]
+        [InlineData("git@github.com:sayedihashimi/dotnet-new-samples.git", "dotnet-new-samples")]
         public void GitUrlReturnsGitPackageWithRepoName(string request, string repoName)
         {
             GitSource source = null;
             bool result = GitSource.TryParseGitSource(request, out source);
 
+            Assert.NotNull(source);
             Assert.Equal(repoName, source.RepositoryName);
             Assert.Equal(true, result);
         }

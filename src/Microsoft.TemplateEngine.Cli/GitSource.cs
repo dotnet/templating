@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Microsoft.TemplateEngine.Cli
 {
@@ -26,7 +27,8 @@ namespace Microsoft.TemplateEngine.Cli
             Uri uri = null;
 
             if (string.IsNullOrEmpty(spec) 
-                || Uri.TryCreate(spec, UriKind.Absolute, out uri) == false
+                || (Uri.TryCreate(spec, UriKind.Absolute, out uri) == false
+                    && Regex.IsMatch(spec, ".*@.*:.*") == false)
                 || (gitIndex = spec.IndexOf(_gitExtension, StringComparison.OrdinalIgnoreCase)) < 0)
             {
                 return false;
