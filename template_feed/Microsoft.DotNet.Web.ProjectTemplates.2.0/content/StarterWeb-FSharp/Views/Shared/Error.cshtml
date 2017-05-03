@@ -1,4 +1,5 @@
-﻿@{
+﻿@using System.Diagnostics
+@{
     ViewData["Title"] = "Error";
 }
 
@@ -12,3 +13,9 @@
 <p>
     <strong>Development environment should not be enabled in deployed applications</strong>, as it can result in sensitive information from exceptions being displayed to end users. For local debugging, development environment can be enabled by setting the <strong>ASPNETCORE_ENVIRONMENT</strong> environment variable to <strong>Development</strong>, and restarting the application.
 </p>
+@if (Activity.Current != null)
+{
+<p>
+    <strong>Correlation ID:</strong> <code>@Activity.Current.Id</code>
+</p>
+}
