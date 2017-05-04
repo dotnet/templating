@@ -9,13 +9,13 @@ namespace Company.WebApplication1.Pages
 {
     public class ErrorModel : PageModel
     {
-        public string CorrelationId { get; set; }
+        public string RequestId { get; set; }
 
-        public bool ShowCorrelationId => !string.IsNullOrEmpty(CorrelationId);
+        public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
 
         public void OnGet()
         {
-            CorrelationId = Activity.Current?.Id;
+            RequestId = Activity.Current?.Id;
         }
     }
 }

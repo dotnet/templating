@@ -7,10 +7,10 @@
 <h1 class="text-danger">Error.</h1>
 <h2 class="text-danger">An error occurred while processing your request.</h2>
 
-@if (Model.ShowCorrelationId)
+@if (Model.ShowRequestId)
 {
     <p>
-        <strong>Correlation ID:</strong> <code>@Model.CorrelationId</code>
+        <strong>Request ID:</strong> <code>@Model.RequestId</code>
     </p>
 }
 
