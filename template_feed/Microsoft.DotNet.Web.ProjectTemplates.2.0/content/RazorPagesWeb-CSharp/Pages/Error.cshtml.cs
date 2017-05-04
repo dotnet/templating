@@ -15,7 +15,7 @@ namespace Company.WebApplication1.Pages
 
         public void OnGet()
         {
-            RequestId = Activity.Current?.Id;
+            RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
         }
     }
 }
