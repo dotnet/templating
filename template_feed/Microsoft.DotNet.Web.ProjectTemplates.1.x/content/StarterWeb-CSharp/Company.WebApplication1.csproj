@@ -26,10 +26,18 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="1.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="1.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="1.0.4" PrivateAssets="All" Condition="'$(IndividualAuth)' == 'True'" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="1.0.4" Condition=" '$(IndividualAuth)' == 'True' AND '$(UseLocalDB)' != 'True' " />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Design" Version="1.0.4" PrivateAssets="All" Condition=" '$(IndividualAuth)' == 'True' AND '$(UseLocalDB)' != 'True' " />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="1.0.4" Condition=" '$(IndividualAuth)' == 'True' AND '$(UseLocalDB)' == 'True' " />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.Design" Version="1.0.4" PrivateAssets="All" Condition=" '$(IndividualAuth)' == 'True' AND '$(UseLocalDB)' == 'True' " />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="1.0.3" Condition=" '$(IndividualAuth)' == 'True' AND '$(EFProvider)' == 'InMemory' " />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="1.0.4" Condition=" '$(IndividualAuth)' == 'True' AND '$(EFProvider)' != 'SQLite' " />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Design" Version="1.0.4" PrivateAssets="All" Condition=" '$(IndividualAuth)' == 'True' AND '$(EFProvider)' != 'SQLite' " />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="1.0.4" Condition=" '$(IndividualAuth)' == 'True' AND '$(EFProvider)' == 'SqlServer' " />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.Design" Version="1.0.4" PrivateAssets="All" Condition=" '$(IndividualAuth)' == 'True' AND '$(EFProvider)' == 'SqlServer' " />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="1.1.0" Condition=" '$(IndividualAuth)' == 'True' AND '$(EFProvider)' == 'PostgreSQL' " />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.Design" Version="1.1.0" PrivateAssets="All" Condition=" '$(IndividualAuth)' == 'True' AND '$(EFProvider)' == 'PostgreSQL' " />
+    <PackageReference Include="MySql.Data.EntityFrameworkCore" Version="7.0.7-m61" Condition=" '$(IndividualAuth)' == 'True' AND '$(EFProvider)' == 'MySql' " />
+    <PackageReference Include="MySql.Data.EntityFrameworkCore.Design" Version="6.10.1-beta" PrivateAssets="All" Condition=" '$(IndividualAuth)' == 'True' AND '$(EFProvider)' == 'MySql' " />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="1.1.1" Condition=" '$(IndividualAuth)' == 'True' AND '$(EFProvider)' == 'PomeloMySql' " />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql.Design" Version="1.1.1" PrivateAssets="All" Condition=" '$(IndividualAuth)' == 'True' AND '$(EFProvider)' == 'PomeloMySql' " />
+    <PackageReference Include="SapientGuardian.EntityFrameworkCore.MySql" Version="7.1.23" Condition=" '$(IndividualAuth)' == 'True' AND '$(EFProvider)' == 'SapientGuardian' ">
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="1.0.1" PrivateAssets="All" Condition="'$(IndividualAuth)' == 'True'" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="1.0.2" Condition="'$(IndividualAuth)' == 'True' OR '$(OrganizationalAuth)' == 'True'" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="1.0.2" />

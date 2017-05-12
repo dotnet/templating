@@ -30,7 +30,7 @@
           ]
         },
         {
-          "condition": "(UseLocalDB || !IndividualAuth)",
+          "condition": "(!UseSQLiteProvider || !IndividualAuth)",
           "exclude": [
             "*.db"
           ]
@@ -105,6 +105,42 @@
       ],
       "defaultValue": "None",
       "description": "The type of authentication to use"
+    },
+    "EFProvider": {
+      "type": "parameter",
+      "datatype": "choice",
+      "choices": [
+        {
+          "choice": "InMemory",
+          "description": "This database provider allows Entity Framework Core to be used with an in-memory database. This is useful when testing code that uses Entity Framework Core. The provider is maintained as part of the EntityFramework GitHub project."
+        },
+        {
+          "choice": "SqlServer",
+          "description": "This database provider allows Entity Framework Core to be used with Microsoft SQL Server (including SQL Azure). The provider is maintained as part of the EntityFramework GitHub project."
+        },
+        {
+          "choice": "SQLite",
+          "description": "This database provider allows Entity Framework Core to be used with SQLite. The provider is maintained as part of the EntityFramework GitHub project."
+        },
+        {
+          "choice": "MySql",
+          "description": "This database provider allows Entity Framework Core to be used with MySQL. The provider is maintained as part of the MySQL project."
+        },
+        {
+          "choice": "PostgreSQL",
+          "description": "This database provider allows Entity Framework Core to be used with PostgreSQL. The provider is maintained as part of the Npgsql project."
+        },
+        {
+          "choice": "PomeloMySql",
+          "description": "This database provider allows Entity Framework Core to be used with MySQL. The provider is maintained as part of the Pomelo Foundation Project."
+        },
+        {
+          "choice": "SapientGuardian",
+          "description": "This database provider allows Entity Framework Core to be used with MySQL. The provider is maintained as part of the Sapient Guardian Project."
+        }
+      ],
+      "defaultValue": "InMemory",
+      "description": "Specifies the Entity Framework Provider to use for Individual Authentication"
     },
     "AADInstance": {
       "type": "parameter",
@@ -228,15 +264,29 @@
       "type": "computed",
       "value": "(!(IndividualAuth || MultiOrgAuth || SingleOrgAuth || WindowsAuth))"
     },
+    "UseInMemoryProvider": {
+      "type": "computed",
+      "value": "(EFProvider == \"InMemory\")"
+    },
+    "UseSqlServerProvider": {
+      "type": "computed",
+      "value": "(EFProvider == \"SqlServer\")"
+    },
+    "UseSQLiteProvider": {
+      "type": "computed",
+      "value": "(EFProvider == \"SQLite\")"
+    },
+    "UsePostgreSQLProvider": {
+      "type": "computed",
+      "value": "(EFProvider == \"PostgreSQL\")"
+    },
+    "UseMySqlProvider": {
+      "type": "computed",
+      "value": "(EFProvider == \"MySql\" || EFProvider == \"PomeloMySql\" || EFProvider == \"SapientGuardian\")"
+    },
     "RequiresHttps": {
       "type": "computed",
       "value": "(OrganizationalAuth)"
-    },
-    "UseLocalDB": {
-      "type": "parameter",
-      "datatype": "bool",
-      "defaultValue": "false",
-      "description": "Whether or not to use LocalDB instead of SQLite"
     },
     "UseBrowserLink": {
       "type": "parameter",
