@@ -51,6 +51,9 @@
       <Item ItemId=";AddRefPostActionFrameworkNotSupported" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Unable to automatically add the framework reference {0} to the project. Manually edit the project file to add it.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Не удается автоматически добавить ссылку на платформу {0} в проект. Чтобы добавить ее, измените файл проекта вручную.]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -120,6 +123,9 @@
       <Item ItemId=";AliasCannotBeShortName" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Alias '{0}' is a template short name, and therefore cannot be aliased.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Псевдоним "{0}" — это короткое имя шаблона, которому не может быть назначен псевдоним.]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -171,6 +177,9 @@
       <Item ItemId=";AliasHelp" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Creates, updates, or deletes the named alias. The alias value is the remainder of the command. If extra args files are specified, the alias value includes their expansions.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Создает, обновляет или удаляет именованные псевдонимы. Значение псевдонима — это остальная часть команды. Если указаны файлы дополнительных аргументов, значение псевдонима включает их расширения.]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -213,6 +222,9 @@
       <Item ItemId=";AliasRemoved" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Successfully removed alias named '{0}' whose value was '{1}'.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Псевдоним с именем "{0}", значение которого — "{1}", успешно удален.]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -237,6 +249,9 @@
       <Item ItemId=";AliasUpdated" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Successfully updated alias named '{0}' to value '{1}'.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Значение псевдонима с именем "{0}" успешно изменено на "{1}".]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1269,7 +1284,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0-beta2-20170421-198+198.2e5516d8f5f5ced27e0c9c6e693605297d549ba0]]></Val>
+        <Val><![CDATA[1.0.0-beta2-20170425-203+203.43e794e4db64bad7639e3016e8ab58522c4ada30]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>

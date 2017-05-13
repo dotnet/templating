@@ -48,6 +48,9 @@
       <Item ItemId=";AddRefPostActionFrameworkNotSupported" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Unable to automatically add the framework reference {0} to the project. Manually edit the project file to add it.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[无法将框架引用 {0} 自动添加到项目中。请手动编辑项目文件进行添加。]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -342,6 +345,9 @@
       <Item ItemId=";BadLocaleError" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Invalid format for input locale: "{0}". Example valid formats: [en]5D; [en-US]5D;.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[无效的输入区域设置格式:“{0}”。有效的格式示例: [en]5D; [en-US]5D;。]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -933,6 +939,9 @@
       <Item ItemId=";PostActionInvalidInputRePrompt" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Invalid input "{0}". Please enter one of (Y|N).]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[输入“{0}”无效。请输入(是|否)中的一个。]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -948,6 +957,9 @@
       <Item ItemId=";PostActionPromptRequest" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Do you want to run this action (Y|N)?]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[是否要运行此操作(是|否)?]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1266,7 +1278,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0-beta2-20170421-198+198.2e5516d8f5f5ced27e0c9c6e693605297d549ba0]]></Val>
+        <Val><![CDATA[1.0.0-beta2-20170425-203+203.43e794e4db64bad7639e3016e8ab58522c4ada30]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
