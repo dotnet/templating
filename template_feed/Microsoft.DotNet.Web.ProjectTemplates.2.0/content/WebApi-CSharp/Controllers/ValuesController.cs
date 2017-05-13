@@ -23,7 +23,7 @@ namespace Company.WebApplication1.Controllers
         }
 
         // GET api/values/5
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public string Get(int id)
         {
             return "value";
@@ -39,7 +39,7 @@ namespace Company.WebApplication1.Controllers
         }
 
         // PUT api/values/5
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         public void Put(int id, [FromBody]string value)
         {
 #if (OrganizationalAuth || WindowsAuth)
@@ -48,7 +48,7 @@ namespace Company.WebApplication1.Controllers
         }
 
         // DELETE api/values/5
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public void Delete(int id)
         {
 #if (OrganizationalAuth || WindowsAuth)
