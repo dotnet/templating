@@ -5,6 +5,7 @@
     <PackageBuildQuality Condition=" '$(PackageBuildQuality)' == '' ">beta1</PackageBuildQuality>
     <PackageVersion>$(PackageReleaseVersion)-$(PackageBuildQuality)</PackageVersion>
     <BUILD_NUMBER Condition="'$(BUILD_NUMBER)' == ''">0</BUILD_NUMBER>
+    <AssemblyReleaseVersion>$(PackageReleaseVersion).$(BUILD_NUMBER)</AssemblyReleaseVersion>
     <PackageVersion Condition="'$(NO_TIMESTAMP)' != 'true'">$(PackageVersion)-$([System.DateTime]::Now.ToString("yyyyMMdd"))-$(BUILD_NUMBER)</PackageVersion>
   </PropertyGroup>
   <PropertyGroup>
@@ -58,8 +59,8 @@
     <PropertyGroup>
       <GitCommitInfoContent>
 <![CDATA[
-[assembly: System.Reflection.AssemblyVersion("$(PackageReleaseVersion)")]
-[assembly: System.Reflection.AssemblyFileVersion("$(PackageReleaseVersion)")]
+[assembly: System.Reflection.AssemblyVersion("$(AssemblyReleaseVersion)")]
+[assembly: System.Reflection.AssemblyFileVersion("$(AssemblyReleaseVersion)")]
 [assembly: System.Reflection.AssemblyInformationalVersion("$(PackageVersion)+$(GitInfoCommitCount).$(GitInfoCommitHash)")]
 
 namespace Microsoft.TemplateEngine
