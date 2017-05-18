@@ -12,6 +12,48 @@
     <Disp Icon="Str" Expand="true" Disp="true" LocTbl="false" Path=" \ ;Managed Resources \ 0 \ 0" />
     <Item ItemId=";Strings" ItemType="0" PsrId="211" Leaf="false">
       <Disp Icon="Str" LocTbl="false" />
+      <Item ItemId=";AddProjToSlnPostActionFailed" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Failed to add project(s) {0} to solution file {1}]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[No se pudieron agregar los proyectos ({0}) al archivo de la solución {1}.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";AddProjToSlnPostActionNoProjFiles" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Add project reference to solution action is not configured correctly in the template. Unable to determine the project files to add.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[La acción para agregar una referencia de proyecto a la solución no está configurada correctamente en la plantilla. No se pueden determinar los archivos de proyecto que se van a agregar.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";AddProjToSlnPostActionRunning" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Adding project reference(s) to solution file. Running dotnet sln {0} add {1}]]></Val>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";AddProjToSlnPostActionSucceeded" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Successfully added]A;    project(s): {0}]A;    to solution file: {1}]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Los proyectos ({0})]A;    se agregaron correctamente]A;    al archivo de solución: {1}]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";AddProjToSlnPostActionUnresolvedSlnFile" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Unable to determine which solution file to add the reference to.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[No se puede determinar el archivo de solución al que se va a agregar la referencia.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";AddRefPostActionAddPackageRef" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Adding a package reference. Running dotnet add {0} package {1}]]></Val>
@@ -1269,7 +1311,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0-beta2-20170425-203+203.43e794e4db64bad7639e3016e8ab58522c4ada30]]></Val>
+        <Val><![CDATA[1.0.0-beta2-20170515-223+223.91688ac171c11b17df40377fdfc1a3545aa24e66]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
