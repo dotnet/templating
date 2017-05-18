@@ -14,6 +14,13 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0-preview1-final" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="1.1.0" Condition=" '$(IndividualAuth)' == 'True' AND '$(EFProvider)' == 'PostgreSQL' " />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.Design" Version="1.1.0" PrivateAssets="All" Condition=" '$(IndividualAuth)' == 'True' AND '$(EFProvider)' == 'PostgreSQL' " />
+    <PackageReference Include="MySql.Data.EntityFrameworkCore" Version="7.0.7-m61" Condition=" '$(IndividualAuth)' == 'True' AND '$(EFProvider)' == 'MySql' " />
+    <PackageReference Include="MySql.Data.EntityFrameworkCore.Design" Version="6.10.1-beta" PrivateAssets="All" Condition=" '$(IndividualAuth)' == 'True' AND '$(EFProvider)' == 'MySql' " />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="1.1.1" Condition=" '$(IndividualAuth)' == 'True' AND '$(EFProvider)' == 'PomeloMySql' " />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql.Design" Version="1.1.1" PrivateAssets="All" Condition=" '$(IndividualAuth)' == 'True' AND '$(EFProvider)' == 'PomeloMySql' " />
+    <PackageReference Include="SapientGuardian.EntityFrameworkCore.MySql" Version="7.1.23" Condition=" '$(IndividualAuth)' == 'True' AND '$(EFProvider)' == 'SapientGuardian' ">
   </ItemGroup>
 
   <ItemGroup Condition="'$(NoTools)' != 'True'">

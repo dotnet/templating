@@ -68,10 +68,16 @@ namespace Company.WebApplication1
             // Add framework services.
 #if (IndividualAuth)
             services.AddDbContext<ApplicationDbContext>(options =>
-  #if (UseLocalDB)
+  #if (UseSqlServerProvider)
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-  #else
+  #elseif (UsePostgreSQLProvider)
+                options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+  #elseif (UseMySqlProvider)
+                options.UseMySql(Configuration.GetConnectionString("DefaultConnection")));
+  #elseif (UseSQLiteProvider)
                 options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+  #else
+                options.UseInMemoryDatabase(Configuration.GetConnectionString("DefaultConnection")));
   #endif
 
             services.AddIdentity<ApplicationUser, IdentityRole>()

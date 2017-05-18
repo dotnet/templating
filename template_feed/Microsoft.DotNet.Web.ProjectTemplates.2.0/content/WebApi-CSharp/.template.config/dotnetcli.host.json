@@ -6,8 +6,9 @@
       "longName": "target-framework-override",
       "shortName": ""
     },
-    "UseLocalDB": {
-      "longName": "use-local-db"
+    "EFProvider": {
+      "longName": "ef-provider",
+      "shortName": "ef"
     },
     "AADInstance": {
       "longName": "aad-instance",

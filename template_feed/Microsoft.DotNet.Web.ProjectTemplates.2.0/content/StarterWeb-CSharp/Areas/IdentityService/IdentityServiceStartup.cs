@@ -27,11 +27,17 @@ namespace Company.WebApplication1.Identity
             {
                 // Add framework services.
                 services.AddDbContext<IdentityServiceDbContext>(options =>
-#if (UseLocalDB)
-                    options.UseSqlServer(context.Configuration.GetConnectionString("DefaultConnection")));
-#else
-                    options.UseSqlite(context.Configuration.GetConnectionString("DefaultConnection")));
-#endif
+  #if (UseSqlServerProvider)
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+  #elseif (UsePostgreSQLProvider)
+                options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+  #elseif (UseMySqlProvider)
+                options.UseMySql(Configuration.GetConnectionString("DefaultConnection")));
+  #elseif (UseSQLiteProvider)
+                options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+  #else
+                options.UseInMemoryDatabase(Configuration.GetConnectionString("DefaultConnection")));
+  #endif
 
                 services.AddIdentity<ApplicationUser, IdentityRole>()
                     .AddEntityFrameworkStores<IdentityServiceDbContext>()
