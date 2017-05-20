@@ -52,6 +52,8 @@ rm -rf $REPOROOT/artifacts
 
 [ -d "$REPOROOT/artifacts" ] || mkdir -p $REPOROOT/artifacts
 
+export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
+
 DOTNET_INSTALL_SCRIPT_URL="https://raw.githubusercontent.com/dotnet/cli/master/scripts/obtain/dotnet-install.sh"
 curl -sSL "$DOTNET_INSTALL_SCRIPT_URL" | bash /dev/stdin --verbose --version 1.0.4
 
