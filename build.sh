@@ -69,4 +69,5 @@ then
     ulimit -n 1024
 fi
 
+export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 $DOTNET_INSTALL_DIR/dotnet msbuild "$REPOROOT/build.proj" /p:Configuration=$CONFIGURATION /p:New3RuntimeIdentifier=$RID
