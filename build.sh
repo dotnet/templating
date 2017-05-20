@@ -52,6 +52,7 @@ rm -rf $REPOROOT/artifacts
 
 [ -d "$REPOROOT/artifacts" ] || mkdir -p $REPOROOT/artifacts
 
+[ -z $NUGET_PACKAGES ] && export NUGET_PACKAGES="$REPOROOT/.nuget/packages"
 export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 
 DOTNET_INSTALL_SCRIPT_URL="https://raw.githubusercontent.com/dotnet/cli/master/scripts/obtain/dotnet-install.sh"
