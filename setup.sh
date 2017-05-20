@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
+
 RID="$( dotnet --info | egrep -e 'RID:' | egrep -o -e ':.*' | egrep -o -e '[^:]+' | egrep -o -e '(\w|\.|-)+' )"
 OS="$( echo "$RID" | egrep -o -e .*- | egrep -o -e [^-]+ )"
 ARCH="$( echo "$RID" | egrep -o -e -.* | egrep -o -e [^-]+ )"
