@@ -24,10 +24,6 @@ while [[ $# > 0 ]]; do
             export CONFIGURATION=$2
             shift
             ;;
-        -r|--runtime)
-            export RID=$2
-            shift
-            ;;
         --help)
             echo "Usage: $0 [--configuration <CONFIGURATION>] [--help]"
             echo ""
@@ -70,4 +66,4 @@ then
 fi
 
 export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
-$DOTNET_INSTALL_DIR/dotnet msbuild "$REPOROOT/build.proj" /p:Configuration=$CONFIGURATION /p:New3RuntimeIdentifier=$RID
+$DOTNET_INSTALL_DIR/dotnet msbuild "$REPOROOT/build.proj" /p:Configuration=$CONFIGURATION

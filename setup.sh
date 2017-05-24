@@ -5,15 +5,6 @@ OS="$( echo "$RID" | egrep -o -e .*- | egrep -o -e [^-]+ )"
 ARCH="$( echo "$RID" | egrep -o -e -.* | egrep -o -e [^-]+ )"
 REPOROOT="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-if [ "$OS" == "ubuntu.16.04" ]; then
-    OS="ubuntu.14.04"
-    SPECIAL_OS="YES"
-fi
-
-if [ "$SPECIAL_OS" == "YES" ]; then
-    RID="$OS-$ARCH"
-fi
-
 echo "Using RID: $RID"
 echo "Using OS: $OS"
 
@@ -32,7 +23,7 @@ echo Creating directory structure...
 mkdir dev
 mkdir dev/BuiltIns
 
-$REPOROOT/build.sh -c $DN3B -r $RID
+$REPOROOT/build.sh -c $DN3B
 
 echo Importing built in templates...
 cp -r "$REPOROOT/template_feed/"* "$REPOROOT/dev/BuiltIns/"
@@ -53,8 +44,9 @@ fi
 echo You can now use harderreset.sh from anywhere to delete dotnet new3 artifacts
 
 if [ ! -L /usr/local/bin/dotnet-new3 ]; then
-echo "Creating symbolic link /usr/local/bin/dotnet-new3 -> $REPOROOT/dev/dotnet-new3"
-ln -s "$REPOROOT/dev/dotnet-new3" /usr/local/bin/dotnet-new3
+echo "Creating symbolic link /usr/local/bin/dotnet-new3 -> $REPOROOT/dev/dotnet-new3.sh"
+ln -s "$REPOROOT/dev/dotnet-new3.sh" /usr/local/bin/dotnet-new3
+chmod 777 /usr/local/bin/dotnet-new3
 fi
 
 cd $CWD
