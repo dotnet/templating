@@ -21,8 +21,6 @@
 
     <NetCoreAppPackTargets>$(New3TargetFramework)</NetCoreAppPackTargets>
     <NetCoreAppPackTargets Condition="'$(IsFullFrameworkBuildSupported)' == 'true'">$(NetCoreAppPackTargets);$(FullFrameworkBuildTarget)</NetCoreAppPackTargets>
-
-    <New3RuntimeIdentifier Condition="'$(New3RuntimeIdentifier)' == ''">win7-x86</New3RuntimeIdentifier>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -67,54 +65,54 @@
     <CallTarget Targets="CollectGitInfo" />
 
     <!-- Build the inner ring (abstractions, core, core contracts, etc.) -->
-    <MSBuild Projects="$(InnerRingProjects)" Targets="Restore;Build" 
-             Properties="TargetFramework=$(InnerRingTargetFramework);Configuration=$(Configuration)" 
+    <MSBuild Projects="$(InnerRingProjects)" Targets="Restore;Build"
+             Properties="TargetFramework=$(InnerRingTargetFramework);Configuration=$(Configuration)"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
-    <MSBuild Projects="$(InnerRingProjects)" Targets="Restore;Build" 
+    <MSBuild Projects="$(InnerRingProjects)" Targets="Restore;Build"
              Condition="'$(IsFullFrameworkBuildSupported)' == 'true'"
-             Properties="TargetFramework=$(FullFrameworkTargetFramework);Configuration=$(Configuration)" 
+             Properties="TargetFramework=$(FullFrameworkTargetFramework);Configuration=$(Configuration)"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
-    <MSBuild Projects="$(InnerRingProjects)" Targets="Pack" 
-             Properties="TargetFrameworks=$(InnerRingPackTargetFrameworks);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath);NoBuild=true;IncludeSymbols=true" 
+    <MSBuild Projects="$(InnerRingProjects)" Targets="Pack"
+             Properties="TargetFrameworks=$(InnerRingPackTargetFrameworks);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath);NoBuild=true;IncludeSymbols=true"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <!-- Build the outer ring (edge, mocks, etc.) -->
-    <MSBuild Projects="$(OuterRingProjects)" Targets="Restore;Build" 
-             Properties="TargetFramework=$(OuterRingTargetFramework);Configuration=$(Configuration)" 
+    <MSBuild Projects="$(OuterRingProjects)" Targets="Restore;Build"
+             Properties="TargetFramework=$(OuterRingTargetFramework);Configuration=$(Configuration)"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
-    <MSBuild Projects="$(OuterRingProjects)" Targets="Restore;Build" 
+    <MSBuild Projects="$(OuterRingProjects)" Targets="Restore;Build"
              Condition="'$(IsFullFrameworkBuildSupported)' == 'true'"
-             Properties="TargetFramework=$(FullFrameworkTargetFramework);Configuration=$(Configuration)" 
+             Properties="TargetFramework=$(FullFrameworkTargetFramework);Configuration=$(Configuration)"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
-    <MSBuild Projects="$(OuterRingProjects)" Targets="Pack" 
-             Properties="TargetFrameworks=$(OuterRingPackTargetFrameworks);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath);NoBuild=true;IncludeSymbols=true" 
+    <MSBuild Projects="$(OuterRingProjects)" Targets="Pack"
+             Properties="TargetFrameworks=$(OuterRingPackTargetFrameworks);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath);NoBuild=true;IncludeSymbols=true"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <!-- Build the shared test projects (test helper, etc.) -->
-    <MSBuild Projects="$(SharedTestProjects)" Targets="Restore;Build" 
-             Properties="TargetFramework=$(OuterRingTargetFramework);Configuration=$(Configuration)" 
+    <MSBuild Projects="$(SharedTestProjects)" Targets="Restore;Build"
+             Properties="TargetFramework=$(OuterRingTargetFramework);Configuration=$(Configuration)"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
-    <MSBuild Projects="$(SharedTestProjects)" Targets="Restore;Build" 
+    <MSBuild Projects="$(SharedTestProjects)" Targets="Restore;Build"
              Condition="'$(IsFullFrameworkBuildSupported)' == 'true'"
-             Properties="TargetFramework=$(FullFrameworkTestTargetFramework);Configuration=$(Configuration)" 
+             Properties="TargetFramework=$(FullFrameworkTestTargetFramework);Configuration=$(Configuration)"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
-    <MSBuild Projects="$(SharedTestProjects)" Targets="Pack" 
-             Properties="TargetFrameworks=$(SharedTestPackTargetFrameworks);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath);NoBuild=true;IncludeSymbols=true" 
+    <MSBuild Projects="$(SharedTestProjects)" Targets="Pack"
+             Properties="TargetFrameworks=$(SharedTestPackTargetFrameworks);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath);NoBuild=true;IncludeSymbols=true"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <!-- Build projects that only build for the dotnet CLI -->
-    <MSBuild Projects="$(CliProjects)" Targets="Restore;Build" 
-             Properties="TargetFramework=$(OuterRingTargetFramework);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath);NoBuild=true" 
+    <MSBuild Projects="$(CliProjects)" Targets="Restore;Build"
+             Properties="TargetFramework=$(OuterRingTargetFramework);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath);NoBuild=true"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
-    <MSBuild Projects="$(CliProjects)" Targets="Pack" 
-             Properties="TargetFramework=$(OuterRingTargetFramework);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath);NoBuild=true;IncludeSymbols=true" 
+    <MSBuild Projects="$(CliProjects)" Targets="Pack"
+             Properties="TargetFramework=$(OuterRingTargetFramework);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath);NoBuild=true;IncludeSymbols=true"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <!-- Build templates -->
@@ -123,11 +121,11 @@
 
     <!-- Build new3 -->
     <MSBuild Projects="src/dotnet-new3/dotnet-new3.csproj" Targets="Restore;Publish"
-             Properties="TargetFramework=$(New3TargetFramework);RuntimeIdentifier=$(New3RuntimeIdentifier);Configuration=$(Configuration);PublishDir=$(DevPath);RestoreRecursive=false"
+             Properties="TargetFramework=$(New3TargetFramework);Configuration=$(Configuration);PublishDir=$(DevPath);RestoreRecursive=false"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <!-- Build the test harness -->
-    <MSBuild Projects="$(TestUtilities)" Targets="Restore;Build" 
+    <MSBuild Projects="$(TestUtilities)" Targets="Restore;Build"
              Properties="TargetFramework=$(New3TargetFramework);Configuration=$(Configuration)"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
@@ -137,7 +135,7 @@
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <!-- Run tests -->
-    <MSBuild Projects="$(TestProjects)" Targets="VSTest" 
+    <MSBuild Projects="$(TestProjects)" Targets="VSTest"
              Properties="TargetFramework=$(New3TargetFramework);Configuration=$(Configuration);VSTestLogger=trx"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
