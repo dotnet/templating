@@ -16,6 +16,10 @@ REPOROOT="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 export CONFIGURATION="Debug"
 
 source "$REPOROOT/scripts/common/_prettyprint.sh"
+export TEMPLATES_BUILD=true
+export ENGINE_BUILD=true
+export CI_BUILD=false
+export SKIP_TESTS=false
 
 while [[ $# > 0 ]]; do
     lowerI="$(echo $1 | awk '{print tolower($0)}')"
@@ -23,6 +27,18 @@ while [[ $# > 0 ]]; do
         -c|--configuration)
             export CONFIGURATION=$2
             shift
+            ;;
+        --skip-tests)
+            export SKIP_TESTS=true
+            ;;
+        --ci-build)
+            export CI_BUILD=true
+            ;;
+        --no-engine-build)
+            export ENGINE_BUILD=false
+            ;;
+        --no-templates-build)
+            export TEMPLATES_BUILD=false
             ;;
         --help)
             echo "Usage: $0 [--configuration <CONFIGURATION>] [--help]"
@@ -66,4 +82,4 @@ then
 fi
 
 export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
-$DOTNET_INSTALL_DIR/dotnet msbuild "$REPOROOT/build.proj" /p:Configuration=$CONFIGURATION
+$DOTNET_INSTALL_DIR/dotnet msbuild "$REPOROOT/build.proj" /p:Configuration=$CONFIGURATION /p:CIBuild=$CI_BUILD /p:EngineBuild=$ENGINE_BUILD /p:TemplatesBuild=$TEMPLATES_BUILD /p:SkipTests=$SKIP_TESTS
