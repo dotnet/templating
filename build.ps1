@@ -5,7 +5,6 @@
 
 param(
     [string]$Configuration="Debug",
-    [string]$Runtime="win7-x86",
     [bool]$PerformFullFrameworkBuild=$true,
     [bool]$CIBuild=$false,
     [bool]$SkipTests=$false,
@@ -89,5 +88,5 @@ $NoTimestampPackageVersion=$env:PACKAGE_VERSION + "-" + $env:BUILD_QUALITY
 
 $TimestampPackageVersion=$NoTimestampPackageVersion + "-" + [System.DateTime]::Now.ToString("yyyyMMdd") + "-" + $env:BUILD_NUMBER
 
-& dotnet msbuild $RepoRoot\build.proj /p:IsFullFrameworkBuildSupported=$PerformFullFrameworkBuild /p:New3RuntimeIdentifier=$Runtime /p:Configuration=$Configuration /p:CIBuild=$CIBuild /p:SkipTests=$SkipTests /p:TemplatesBuild=$TemplatesBuild /p:EngineBuild=$EngineBuild
+& dotnet msbuild $RepoRoot\build.proj /p:IsFullFrameworkBuildSupported=$PerformFullFrameworkBuild /p:Configuration=$Configuration /p:CIBuild=$CIBuild /p:SkipTests=$SkipTests /p:TemplatesBuild=$TemplatesBuild /p:EngineBuild=$EngineBuild
 & $RepoRoot\SetPath.ps1 -DevDir "$DevDir"
