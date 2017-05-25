@@ -23,7 +23,7 @@ echo Creating directory structure...
 mkdir dev
 mkdir dev/BuiltIns
 
-$REPOROOT/build.sh -c $DN3B
+$REPOROOT/build.sh -c $DN3B "$@"
 
 echo Importing built in templates...
 cp -r "$REPOROOT/template_feed/"* "$REPOROOT/dev/BuiltIns/"
