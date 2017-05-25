@@ -24,10 +24,6 @@ while [[ $# > 0 ]]; do
             export CONFIGURATION=$2
             shift
             ;;
-        -r|--runtime)
-            export RID=$2
-            shift
-            ;;
         --help)
             echo "Usage: $0 [--configuration <CONFIGURATION>] [--help]"
             echo ""
@@ -52,6 +48,9 @@ rm -rf $REPOROOT/artifacts
 
 [ -d "$REPOROOT/artifacts" ] || mkdir -p $REPOROOT/artifacts
 
+[ -z $NUGET_PACKAGES ] && export NUGET_PACKAGES="$REPOROOT/.nuget/packages"
+export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
+
 DOTNET_INSTALL_SCRIPT_URL="https://raw.githubusercontent.com/dotnet/cli/master/scripts/obtain/dotnet-install.sh"
 curl -sSL "$DOTNET_INSTALL_SCRIPT_URL" | bash /dev/stdin --verbose --version 1.0.4
 
@@ -66,4 +65,5 @@ then
     ulimit -n 1024
 fi
 
-$DOTNET_INSTALL_DIR/dotnet msbuild "$REPOROOT/build.proj" /p:Configuration=$CONFIGURATION /p:New3RuntimeIdentifier=$RID
+export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
+$DOTNET_INSTALL_DIR/dotnet msbuild "$REPOROOT/build.proj" /p:Configuration=$CONFIGURATION
