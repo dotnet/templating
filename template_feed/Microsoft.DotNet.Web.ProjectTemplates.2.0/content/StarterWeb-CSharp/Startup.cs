@@ -47,7 +47,24 @@ namespace Company.WebApplication1
         public void ConfigureServices(IServiceCollection services)
         {
 #if (IndividualLocalAuth)
-            services.AddIdentityServiceAuthentication();
+            #if (IndividualLocalAuth)
+            services.AddDbContext<IdentityServiceDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            var builder = services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddDefaultTokenProviders()
+                .AddApplications()
+                .AddEntityFrameworkStores<IdentityServiceDbContext>()
+                .AddClientInfoBinding();
+
+            services.AddOpenIdConnectAuthentication()
+                .WithIntegratedWebClient();
+
+            services.AddCookieAuthentication();
+
+            services.AddTransient<IEmailSender, AuthMessageSender>();
+            services.AddTransient<ISmsSender, AuthMessageSender>();
+
 #elseif (IndividualB2CAuth)
             services.AddAzureAdB2CAuthentication();
 #elseif (OrganizationalAuth)
@@ -74,15 +91,18 @@ namespace Company.WebApplication1
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-
-            app.UseStaticFiles();
-
 #if (OrganizationalAuth || IndividualAuth)
             app.UseRewriter(new RewriteOptions().AddIISUrlRewrite(env.ContentRootFileProvider, "urlRewrite.config"));
-
-            app.UseAuthentication();
-
 #endif
+
+#if (IndividualLocalAuth)
+            app.UseStaticFiles();
+#endif
+
+#if (OrganizationalAuth || IndividualAuth)
+            app.UseAuthentication();
+#endif
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
