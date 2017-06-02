@@ -1,49 +1,89 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Identity.Service;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Newtonsoft.Json;
 
-namespace Microsoft.AspNetCore.Identity.Service.Extensions
+namespace Company.WebApplication1.Identity.Service.Extensions
 {
     public static class IdentityServiceExtensions
     {
-        public static IIdentityServiceBuilder AddIdentityService<TUser, TApplication>(this IServiceCollection services, IConfiguration config)
-            where TUser : class
-            where TApplication : class
-        {
-            services.Configure<IdentityServiceOptions>(config.GetSection("IdentityService"));
-            return services.AddIdentityService<TUser, TApplication>(_ => { })
-                .AddSigningCertificates(() => new CertificateLoader(config.GetSection("Certificates")).Load(config.GetSection("IdentityService:SigningCertificates")));
-        }
-
-        public static IIdentityServiceBuilder AddIdentityServiceExtensions(this IIdentityServiceBuilder builder)
+        public static IIdentityServiceBuilder AddClientInfoBinding(this IIdentityServiceBuilder builder)
         {
             builder.Services.AddSingleton<IAuthorizationResponseParameterProvider, ClientInfoProvider>();
             builder.Services.AddSingleton<ITokenResponseParameterProvider, ClientInfoProvider>();
-            builder.Services.Configure<IdentityServiceOptions>(options =>
-            {
-                AddContextClaims(options.IdTokenOptions.ContextClaims);
-                AddContextClaims(options.AccessTokenOptions.ContextClaims);
-            });
             return builder;
         }
 
-        private static void AddContextClaims(TokenMapping tokenMapping)
+        public static IIdentityServiceBuilder AddApplications<TUser, TApplication>(this IdentityBuilder builder)
+            where TUser : class
+            where TApplication : class
         {
-            tokenMapping.AddSingle(IdentityServiceExtensionsClaimTypes.TrustFrameworkPolicy, IdentityServiceExtensionsAmbientClaimTypes.Policy);
-            tokenMapping.AddSingle(IdentityServiceExtensionsClaimTypes.Version, IdentityServiceExtensionsAmbientClaimTypes.Version);
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IConfigureOptions<IdentityServiceOptions>, DefaultSetup>());
+            return builder.AddApplications<TUser, TApplication>(options =>
+                        {
+                            options.IdTokenOptions.ContextClaims.AddSingle("tfp", "policy");
+                            options.IdTokenOptions.ContextClaims.AddSingle("ver", "version");
+                            options.AccessTokenOptions.ContextClaims.AddSingle("tfp", "policy");
+                            options.AccessTokenOptions.ContextClaims.AddSingle("ver", "version");
+                        });
         }
 
-        public static void AddExtensionsAmbientClaims(
-            this TokenGeneratingContext context, string policy, string version, string tenantId)
+        private class DefaultSetup : ConfigureOptions<IdentityServiceOptions>
         {
-            context.AmbientClaims.Add(new Claim(IdentityServiceExtensionsAmbientClaimTypes.Policy, policy));
-            context.AmbientClaims.Add(new Claim(IdentityServiceExtensionsAmbientClaimTypes.Version, version));
-            context.AmbientClaims.Add(new Claim(IdentityServiceExtensionsAmbientClaimTypes.TenantId, tenantId));
+            public DefaultSetup(IConfiguration configuration) : base(options => configuration.GetSection("Identity:Protocol").Bind(options))
+            {
+            }
+        }
+
+        private class ClientInfoProvider : IAuthorizationResponseParameterProvider, ITokenResponseParameterProvider
+        {
+            public const string ClientInfo = "client_info";
+
+            private readonly IdentityOptions _options;
+
+            public int Order => 100;
+
+            public ClientInfoProvider(IOptions<IdentityOptions> options)
+            {
+                _options = options.Value;
+            }
+
+            public Task AddParameters(TokenGeneratingContext context, AuthorizationResponse response)
+            {
+                return AddParameters(context, response.Message);
+            }
+
+            public Task AddParameters(TokenGeneratingContext context, OpenIdConnectMessage response)
+            {
+                var clientInfo = CreateClientInfo(context);
+                response.Parameters.Add(ClientInfo, clientInfo);
+                return Task.CompletedTask;
+            }
+
+            public string CreateClientInfo(TokenGeneratingContext context)
+            {
+                var userId = context.User.Claims.Single(c => string.Equals(c.Type, _options.ClaimsIdentity.UserIdClaimType, StringComparison.Ordinal)).Value;
+                var tentantId = context.AmbientClaims.Single(c => string.Equals(c.Type, "tenantId", StringComparison.Ordinal)).Value;
+
+                var json = JsonConvert.SerializeObject(new ClientInfoModel { UserId = userId, TenantId = tentantId });
+                return WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(json));
+            }
+
+            private class ClientInfoModel
+            {
+                [JsonProperty(PropertyName = "uid")]
+                public string UserId { get; set; }
+                [JsonProperty(PropertyName = "utid")]
+                public string TenantId { get; set; }
+            }
         }
     }
 }

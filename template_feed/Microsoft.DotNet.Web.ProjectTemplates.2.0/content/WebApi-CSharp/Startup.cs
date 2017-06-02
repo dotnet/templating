@@ -34,7 +34,20 @@ namespace Company.WebApplication1
         public void ConfigureServices(IServiceCollection services)
         {
 #if (IndividualLocalAuth)
-            services.AddIdentityServiceAuthentication();
+            services.AddDbContext<IdentityServiceDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            var builder = services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddDefaultTokenProviders()
+                .AddApplications()
+                .AddEntityFrameworkStores<IdentityServiceDbContext>()
+                .AddClientInfoBinding();
+
+            services.AddJwtBearerAuthentication();
+
+            services.AddTransient<IEmailSender, AuthMessageSender>();
+            services.AddTransient<ISmsSender, AuthMessageSender>();
+
 #elseif (IndividualB2CAuth)
             services.AddAzureAdB2CBearerAuthentication();
 #elseif (OrganizationalAuth)
@@ -57,15 +70,19 @@ namespace Company.WebApplication1
                 app.UseDevelopmentCertificateErrorPage(Configuration);
             }
 
-            app.UseStaticFiles();
-
 #endif
 #if (OrganizationalAuth || IndividualAuth)
             app.UseRewriter(new RewriteOptions().AddIISUrlRewrite(env.ContentRootFileProvider, "urlRewrite.config"));
-
-            app.UseAuthentication();
-
 #endif
+
+#if (IndividualLocalAuth)
+            app.UseStaticFiles();
+#endif
+
+#if (OrganizationalAuth || IndividualAuth)
+            app.UseAuthentication();
+#endif
+
             app.UseMvc();
         }
     }

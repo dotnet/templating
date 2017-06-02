@@ -1,21 +1,21 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Company.WebApplication1.Identity.Models;
+using Company.WebApplication1.Identity.Models.ManageViewModels;
+using Company.WebApplication1.Identity.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Service;
-using Microsoft.AspNetCore.Identity.Service.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Company.WebApplication1.Identity.Models;
-using Company.WebApplication1.Identity.Models.ManageViewModels;
-using Company.WebApplication1.Identity.Services;
 
 namespace Company.WebApplication1.Identity.Controllers
 {
+    [Authorize(IdentityServiceOptions.SessionPolicyName)]
     [Authorize(IdentityServiceOptions.LoginPolicyName)]
-    [Area("IdentityService")]
-    [IdentityServiceRoute("[controller]/[action]")]
+    [Area("Identity")]
+    [Route("tfp/Identity/signinsignup/[controller]/[action]")]
     public class ManageController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -279,7 +279,7 @@ namespace Company.WebApplication1.Identity.Controllers
         public async Task<IActionResult> LinkLogin(string provider)
         {
             // Clear the existing external cookie to ensure a clean login process
-            await HttpContext.SignOutAsync(IdentityCookieOptions.ExternalScheme);
+            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
             // Request a redirect to the external login provider to link a login for the current user
             var redirectUrl = Url.Action(nameof(LinkLoginCallback), "Manage");
@@ -306,7 +306,7 @@ namespace Company.WebApplication1.Identity.Controllers
             {
                 message = ManageMessageId.AddLoginSuccess;
                 // Clear the existing external cookie to ensure a clean login process
-                await HttpContext.SignOutAsync(IdentityCookieOptions.ExternalScheme);
+                await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
             }
             return RedirectToAction(nameof(ManageLogins), new { Message = message });
         }
