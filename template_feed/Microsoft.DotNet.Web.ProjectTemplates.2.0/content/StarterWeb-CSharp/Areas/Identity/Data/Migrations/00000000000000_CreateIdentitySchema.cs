@@ -336,7 +336,7 @@ namespace Company.WebApplication1.Identity.Data.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetApplications",
                 columns: new[] { "Id", "ClientId", "Name" },
-                values: new object[] { clientAppId, clientId, IdentityServiceClientConstants.ClientName });
+                values: new object[] { clientAppId, clientId, "Company.WebApplication1" });
 
             var clientOpenIdScopeId = "d2e0a81e-e08e-42ea-bbae-bec4c4ac6aed";
             migrationBuilder.InsertData(
@@ -351,8 +351,8 @@ namespace Company.WebApplication1.Identity.Data.Migrations
                 columns: new[] { "Id", "ApplicationId", "IsLogout", "Value" },
                 values: new object[,]
                 {
-                    { clientRedirectUriId, clientAppId, false, IdentityServiceClientConstants.ClientRedirectUri},
-                    { clientLogoutRedirectUriId, clientAppId, true, IdentityServiceClientConstants.ClientLogoutRedirectUri }
+                    { clientRedirectUriId, clientAppId, false, "urn:self:aspnet:identity:integrated"},
+                    { clientLogoutRedirectUriId, clientAppId, true, "urn:self:aspnet:identity:integrated" }
                 });
         }
 
