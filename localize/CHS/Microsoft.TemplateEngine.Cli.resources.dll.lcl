@@ -69,6 +69,9 @@
       <Item ItemId=";AddRefPostActionAddPackageRefWithVersion" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Adding a package reference. Running dotnet add {0} package {1} --version {2}]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[正在添加包引用。正在运行 dotnet 添加 {0} 包 {1} --版本 {2}]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -473,6 +476,15 @@
           <Val><![CDATA[Continue?]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[是否继续?]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";CouldNotFindItemToInstall" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Couldn't find item to install: "{0}".]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[找不到要安装的项:“{0}”。]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1110,6 +1122,9 @@
       <Item ItemId=";ShowsFilteredTemplates" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Filters templates based on available types. Predefined values are "project", "item" or "other".]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[基于可用类型的筛选器模板。预定义的值是“项目”、“项”或“其他”。]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1254,7 +1269,7 @@
     <Disp Icon="Ver" Disp="true" LocTbl="false" Path=" \ ;Version \ 8 \ 0" />
     <Item ItemId=";AssemblyVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0.0]]></Val>
+        <Val><![CDATA[1.0.0.247]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1287,7 +1302,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0]]></Val>
+        <Val><![CDATA[1.0.0.247]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1323,7 +1338,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0-beta2-20170515-223+223.91688ac171c11b17df40377fdfc1a3545aa24e66]]></Val>
+        <Val><![CDATA[1.0.0-beta2-20170531-247+247.c6424324369a1b512fadee78aec0a6cd0d01c824]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
