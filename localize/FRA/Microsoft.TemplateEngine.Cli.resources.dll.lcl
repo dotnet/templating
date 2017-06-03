@@ -480,6 +480,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";CouldNotFindItemToInstall" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Couldn't find item to install: "{0}".]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[L'élément à installer est introuvable : "{0}".]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";CouldntUninstall" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Could not find something to uninstall called '{0}'.]]></Val>
@@ -1260,7 +1269,7 @@
     <Disp Icon="Ver" Disp="true" LocTbl="false" Path=" \ ;Version \ 8 \ 0" />
     <Item ItemId=";AssemblyVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0.0]]></Val>
+        <Val><![CDATA[1.0.0.249]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1293,7 +1302,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0]]></Val>
+        <Val><![CDATA[1.0.0.249]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1329,7 +1338,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0-beta2-20170515-223+223.91688ac171c11b17df40377fdfc1a3545aa24e66]]></Val>
+        <Val><![CDATA[1.0.0-beta2-20170602-249+249.de6f4c7cf37a1839d03d3b752e0bba7a22a37fa5]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
