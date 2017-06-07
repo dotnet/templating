@@ -1,23 +1,23 @@
 ﻿using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Company.WebApplication1.Identity.Models;
+using Company.WebApplication1.Identity.Models.AccountViewModels;
+using Company.WebApplication1.Identity.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Service;
-using Microsoft.AspNetCore.Identity.Service.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
-using Company.WebApplication1.Identity.Models;
-using Company.WebApplication1.Identity.Models.AccountViewModels;
-using Company.WebApplication1.Identity.Services;
 
 namespace Company.WebApplication1.Identity.Controllers
 {
-    [Area("IdentityService")]
-    [IdentityServiceRoute("[controller]/[action]")]
+    [Area("Identity")]
+    [Route("tfp/Identity/signinsignup/[controller]/[action]")]
     [Authorize(IdentityServiceOptions.LoginPolicyName)]
+    [Authorize(IdentityServiceOptions.SessionPolicyName)]
     [AllowAnonymous]
     public class AccountController : Controller
     {
@@ -45,7 +45,7 @@ namespace Company.WebApplication1.Identity.Controllers
         public async Task<IActionResult> Login(string returnUrl = null)
         {
             // Clear the existing external cookie to ensure a clean login process
-            await HttpContext.SignOutAsync(IdentityCookieOptions.ExternalScheme);
+            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
             ViewData["ReturnUrl"] = returnUrl;
             return View();

@@ -1,15 +1,23 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-#if (OrganizationalAuth || IndividualAuth)
-using Microsoft.AspNetCore.Authentication.Extensions;
+#if (IndividualLocalAuth)
+using Company.WebApplication1.Identity.Data;
+using Company.WebApplication1.Identity.Models;
+using Company.WebApplication1.Identity.Services;
 #endif
 #if (OrganizationalAuth || IndividualB2CAuth)
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 #endif
 using Microsoft.AspNetCore.Builder;
 #if (IndividualLocalAuth)
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.Service.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.Service.Extensions;
+using Microsoft.AspNetCore.Identity.Service.IntegratedWebClient;
 using Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore;
 using Microsoft.AspNetCore.Diagnostics.Identity.Service;
 #endif
@@ -47,14 +55,28 @@ namespace Company.WebApplication1
         public void ConfigureServices(IServiceCollection services)
         {
 #if (IndividualLocalAuth)
-            services.AddIdentityServiceAuthentication();
+            services.AddDbContext<IdentityServiceDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddDefaultTokenProviders()
+                .AddApplications()
+                .AddEntityFrameworkStores<IdentityServiceDbContext>()
+                .AddClientExtensions();
+
 #elseif (IndividualB2CAuth)
             services.AddAzureAdB2CAuthentication();
 #elseif (OrganizationalAuth)
             services.AddAzureAdAuthentication();
 #endif
-#if (OrganizationalAuth || IndividualAuth)
-
+#if (IndividualAuth)
+            services.AddOpenIdConnectAuthentication()
+                .WithIntegratedWebClient();
+            
+            services.AddCookieAuthentication();
+#elseif (OrganizationalAuth)
+            services.AddOpenIdConnectAuthentication();            
+            services.AddCookieAuthentication();
 #endif
             services.AddMvc();
         }
@@ -70,7 +92,7 @@ namespace Company.WebApplication1
 #endif
 #if (IndividualLocalAuth)
                 app.UseDatabaseErrorPage();
-                app.UseDevelopmentCertificateErrorPage(Configuration);
+                app.UseDevelopmentCertificateErrorPage();
 #endif
             }
             else
@@ -78,13 +100,14 @@ namespace Company.WebApplication1
                 app.UseExceptionHandler("/Home/Error");
             }
 
+#if (OrganizationalAuth || IndividualAuth)
+            app.UseRewriter(new RewriteOptions().AddIISUrlRewrite(env.ContentRootFileProvider, "urlRewrite.config"));
+#endif
+            
             app.UseStaticFiles();
 
 #if (OrganizationalAuth || IndividualAuth)
-            app.UseRewriter(new RewriteOptions().AddIISUrlRewrite(env.ContentRootFileProvider, "urlRewrite.config"));
-
             app.UseAuthentication();
-
 #endif
             app.UseMvc(routes =>
             {

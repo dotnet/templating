@@ -1,21 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Security.Claims;
 using System.Threading.Tasks;
+using Company.WebApplication1.Identity.Models;
 using Microsoft.AspNetCore.Identity.Service;
-using Microsoft.AspNetCore.Identity.Service.Extensions;
 using Microsoft.AspNetCore.Identity.Service.IntegratedWebClient;
 using Microsoft.AspNetCore.Identity.Service.Mvc;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Company.WebApplication1.Identity.Models;
 
 namespace Company.WebApplication1.Identity.Controllers
 {
-    [Area("IdentityService")]
-    [IdentityServiceRoute(IdentityServiceConstants.DefaultPolicy + "/oauth2/v" + IdentityServiceConstants.Version + "/[action]")]
-    public class IdentityServiceController : Controller
+    [Area("Identity")]
+    public class ApplicationAuthorizationController : Controller
     {
         private readonly IOptions<IdentityServiceOptions> _options;
         private readonly ITokenManager _tokenManager;
@@ -23,7 +19,7 @@ namespace Company.WebApplication1.Identity.Controllers
         private readonly IAuthorizationResponseFactory _authorizationResponseFactory;
         private readonly ITokenResponseFactory _tokenResponseFactory;
 
-        public IdentityServiceController(
+        public ApplicationAuthorizationController(
             IOptions<IdentityServiceOptions> options,
             ITokenManager tokenManager,
             SessionManager<ApplicationUser, IdentityServiceApplication> sessionManager,
@@ -37,7 +33,7 @@ namespace Company.WebApplication1.Identity.Controllers
             _tokenResponseFactory = tokenResponseFactory;
         }
 
-        [AcceptVerbs("GET", "POST")]
+        [HttpGet("tfp/Identity/signinsignup/oauth2/v2.0/authorize/")]
         public async Task<IActionResult> Authorize(
             [EnableIntegratedWebClient, ModelBinder(typeof(AuthorizationRequestModelBinder))] AuthorizationRequest authorization)
         {
@@ -61,7 +57,9 @@ namespace Company.WebApplication1.Identity.Controllers
                 authorizationResult.User,
                 authorizationResult.Application);
 
-            AddAmbientClaims(context);
+            context.AmbientClaims.Add(new Claim("policy", "signinsignup"));
+            context.AmbientClaims.Add(new Claim("version", "1.0"));
+            context.AmbientClaims.Add(new Claim("tenantId", "CDF07358 -BA97-470F-93CD-FC46E1B57F99"));
 
             await _tokenManager.IssueTokensAsync(context);
             var response = await _authorizationResponseFactory.CreateAuthorizationResponseAsync(context);
@@ -71,7 +69,7 @@ namespace Company.WebApplication1.Identity.Controllers
             return this.ValidAuthorization(response);
         }
 
-        [HttpPost]
+        [HttpPost("tfp/Identity/signinsignup/oauth2/v2.0/token")]
         [Produces("application/json")]
         public async Task<IActionResult> Token(
             [ModelBinder(typeof(TokenRequestModelBinder))] TokenRequest request)
@@ -85,14 +83,16 @@ namespace Company.WebApplication1.Identity.Controllers
 
             var context = request.CreateTokenGeneratingContext(session.User, session.Application);
 
-            AddAmbientClaims(context);
+            context.AmbientClaims.Add(new Claim("policy", "signinsignup"));
+            context.AmbientClaims.Add(new Claim("version", "1.0"));
+            context.AmbientClaims.Add(new Claim("tenantId", "CDF07358 -BA97-470F-93CD-FC46E1B57F99"));
 
             await _tokenManager.IssueTokensAsync(context);
             var response = await _tokenResponseFactory.CreateTokenResponseAsync(context);
             return Ok(response.Parameters);
         }
 
-        [HttpGet]
+        [HttpGet("tfp/Identity/signinsignup/oauth2/v2.0/logout")]
         public async Task<IActionResult> Logout(
             [EnableIntegratedWebClient, ModelBinder(typeof(LogoutRequestModelBinder))] LogoutRequest request)
         {
@@ -119,19 +119,10 @@ namespace Company.WebApplication1.Identity.Controllers
 
             var parameters = new
             {
-                ReturnUrl = Url.Action("Authorize", "IdentityService", messageCopy.Parameters)
+                ReturnUrl = Url.Action("Authorize", "ApplicationAuthorization", messageCopy.Parameters)
             };
 
             return RedirectToAction(action, controller, parameters);
-        }
-
-        private void AddAmbientClaims(TokenGeneratingContext context)
-        {
-            context.AddExtensionsAmbientClaims(
-                policy: IdentityServiceConstants.DefaultPolicy,
-                version: IdentityServiceConstants.Version,
-                tenantId: IdentityServiceConstants.TenantId
-            );
         }
     }
 }
