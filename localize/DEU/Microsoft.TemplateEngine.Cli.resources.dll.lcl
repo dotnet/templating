@@ -33,6 +33,9 @@
       <Item ItemId=";AddProjToSlnPostActionRunning" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Adding project reference(s) to solution file. Running dotnet sln {0} add {1}]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Projektverweise werden zur Projektmappendatei hinzugefügt. Ausführen von "dotnet sln {0} add {1}"]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -57,18 +60,27 @@
       <Item ItemId=";AddRefPostActionAddPackageRef" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Adding a package reference. Running dotnet add {0} package {1}]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Ein Paketverweis wird hinzugefügt. Ausführen von "dotnet add {0} package {1}"]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
       <Item ItemId=";AddRefPostActionAddPackageRefWithVersion" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Adding a package reference. Running dotnet add {0} package {1} --version {2}]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Ein Paketverweis wird hinzugefügt. Ausführen von "dotnet add {0} package {1} --version {2}"]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
       <Item ItemId=";AddRefPostActionAddProjectRef" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Adding a project reference. Running dotnet add {0} reference {1}]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Ein Projektverweis wird hinzugefügt. Ausführen von "dotnet add {0} reference {1}"]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -381,6 +393,9 @@
       <Item ItemId=";BadLocaleError" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Invalid format for input locale: "{0}". Example valid formats: [en]5D; [en-US]5D;.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Ungültiges Format für Eingabegebietsschema: "{0}". Beispiele für gültige Formate: [de]5D; [de-DE]5D;.]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -864,6 +879,9 @@
       <Item ItemId=";OptionVariantAlreadyDefined" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Option variant {0} for canonical {1} was already defined for canonical {2}.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Die Optionsvariante {0} für die kanonische Form {1} wurde bereits für die kanonische Form {2} verwendet.]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -978,6 +996,9 @@
       <Item ItemId=";PostActionInvalidInputRePrompt" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Invalid input "{0}". Please enter one of (Y|N).]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Ungültige Eingabe "{0}". Machen Sie eine der folgenden Eingaben: (Y|N).]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -993,6 +1014,9 @@
       <Item ItemId=";PostActionPromptRequest" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Do you want to run this action (Y|N)?]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Möchten Sie diese Aktion ausführen (Y|N)?]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1098,6 +1122,9 @@
       <Item ItemId=";ShowsFilteredTemplates" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Filters templates based on available types. Predefined values are "project", "item" or "other".]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Filtert Vorlagen ausgehend von den verfügbaren Typen. Vordefinierte Werte sind "project", "item" oder "other".]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1242,7 +1269,7 @@
     <Disp Icon="Ver" Disp="true" LocTbl="false" Path=" \ ;Version \ 8 \ 0" />
     <Item ItemId=";AssemblyVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0.251]]></Val>
+        <Val><![CDATA[1.0.0.253]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1275,7 +1302,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0.251]]></Val>
+        <Val><![CDATA[1.0.0.253]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1311,7 +1338,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0-beta2-20170602-251+251.ba8329b1cc70c3b909ee934a55652da234024dc4]]></Val>
+        <Val><![CDATA[1.0.0-beta2-20170606-253+253.9560b6305ce327d1f13b6705490be37a8450a9ac]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
