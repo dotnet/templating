@@ -33,6 +33,9 @@
       <Item ItemId=";AddProjToSlnPostActionRunning" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Adding project reference(s) to solution file. Running dotnet sln {0} add {1}]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Agregando referencias del proyecto al archivo de la solución. Ejecutando dotnet sln {0} add {1}]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -873,6 +876,9 @@
       <Item ItemId=";OptionVariantAlreadyDefined" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Option variant {0} for canonical {1} was already defined for canonical {2}.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[La variante de opción {0} para la forma canónica {1} se había definido ya para la forma canónica {2}.]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -978,6 +984,9 @@
       <Item ItemId=";PostActionInstructions" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Manual instructions: {0}]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Instrucciones manuales: {0}]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1251,7 +1260,7 @@
     <Disp Icon="Ver" Disp="true" LocTbl="false" Path=" \ ;Version \ 8 \ 0" />
     <Item ItemId=";AssemblyVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0.251]]></Val>
+        <Val><![CDATA[1.0.0.257]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1284,7 +1293,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0.251]]></Val>
+        <Val><![CDATA[1.0.0.257]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1320,7 +1329,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0-beta2-20170602-251+251.ba8329b1cc70c3b909ee934a55652da234024dc4]]></Val>
+        <Val><![CDATA[1.0.0-beta2-20170610-257+257.0b368928d10663d9babfdff9b7ebeed3f87e477f]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
