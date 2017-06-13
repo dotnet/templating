@@ -30,7 +30,8 @@
           "condition": "(!UseDocker)",
           "exclude": [
               "Dockerfile",
-              ".dockerignore"
+              ".dockerignore",
+              "docker-run.*"
           ]
         }
       ]
