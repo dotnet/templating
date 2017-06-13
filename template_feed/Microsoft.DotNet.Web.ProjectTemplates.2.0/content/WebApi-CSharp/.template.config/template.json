@@ -46,6 +46,13 @@
           "exclude": [
             "AzureAdB2C/**"
           ]
+        },
+        {
+          "condition": "(!UseDocker)",
+          "exclude": [
+            "Dockerfile",
+            ".dockerignore"
+          ]
         }
       ]
     }
@@ -259,6 +266,12 @@
       "type": "parameter",
       "datatype": "bool",
       "description": "If specified, skips the automatic restore of the project on create.",
+      "defaultValue": "false"
+    },
+    "UseDocker": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "If specified, includes a Dockerfile in the projects.",
       "defaultValue": "false"
     }
   },

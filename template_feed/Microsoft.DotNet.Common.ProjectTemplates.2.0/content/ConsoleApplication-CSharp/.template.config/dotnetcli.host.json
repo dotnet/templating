@@ -12,6 +12,10 @@
     "skipRestore": {
       "longName": "no-restore",
       "shortName": ""
+    },
+    "UseDocker": {
+      "longName": "docker",
+      "shortName": ""
     }
   },
   "usageExamples": [

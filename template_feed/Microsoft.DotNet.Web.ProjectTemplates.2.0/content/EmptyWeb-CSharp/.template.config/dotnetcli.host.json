@@ -22,6 +22,10 @@
     "IncludeLaunchSettings": {
       "longName": "use-launch-settings",
       "shortName": ""
+    },
+    "UseDocker": {
+      "longName": "docker",
+      "shortName": ""
     }
   },
   "usageExamples": [
