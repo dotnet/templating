@@ -1038,6 +1038,9 @@
       <Item ItemId=";RerunCommandAndPassForceToCreateAnyway" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Rerun the command and pass --force to accept and create.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Vuelva a ejecutar el comando y pase --force para aceptar y crear el proyecto o elemento.]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1116,6 +1119,9 @@
       <Item ItemId=";ShowsFilteredTemplates" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Filters templates based on available types. Predefined values are "project", "item" or "other".]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Filtra las plantillas por los tipos disponibles. Los valores predefinidos son "other", "project" o "item".]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
