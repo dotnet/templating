@@ -3,7 +3,7 @@
 This repository is the home for the .NET Core Template Engine. It contains the brains for `dotnet new`. 
 When `dotnet new` is invoked, it will call the Template Engine to create the artifacts on disk.
 Template Engine is a library for manipulating streams, including operations to replace values, include/exclude 
-regions and process `if`, `else if`, `else` and `end if` style statements.
+regions and process `if`, `else if`, `else` and `end if` style statements. Check out the [samples repo](https://github.com/dotnet/dotnet-template-samples) to see how to do many of the things you may want to do with your templates.
 
 # Info for `dotnet new` users
 
