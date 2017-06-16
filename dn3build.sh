@@ -15,7 +15,6 @@ done
 REPOROOT="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 DDIR="$REPOROOT/dev"
 export CONFIGURATION="Debug"
-export RID="ubuntu.14.04-x64"
 
 source "$REPOROOT/scripts/common/_prettyprint.sh"
 
@@ -24,10 +23,6 @@ while [[ $# > 0 ]]; do
     case $lowerI in
         -c|--configuration)
             export CONFIGURATION=$2
-            shift
-            ;;
-        -r|--runtime)
-            export RID=$2
             shift
             ;;
         --help)
@@ -49,6 +44,6 @@ done
 echo "Build dotnet new3..."
 THISDIR=$(pwd)
 cd $REPOROOT/src/dotnet-new3
-dotnet msbuild "$REPOROOT/src/dotnet-new3/dotnet-new3.csproj" /t:Restore "/p:RuntimeIdentifier=$RID;TargetFramework=netcoreapp1.0;RestoreRecursive=False;RestoreSources=$REPOROOT/artifacts"
-dotnet publish "$REPOROOT/src/dotnet-new3/dotnet-new3.csproj" -c $CONFIGURATION -f netcoreapp1.0 -o "$DDIR" -r $RID
+dotnet msbuild "$REPOROOT/src/dotnet-new3/dotnet-new3.csproj" /t:Restore "/p:TargetFramework=netcoreapp1.0;RestoreRecursive=False;RestoreSources=$REPOROOT/artifacts"
+dotnet publish "$REPOROOT/src/dotnet-new3/dotnet-new3.csproj" -c $CONFIGURATION -f netcoreapp1.0 -o "$DDIR"
 cd $THISDIR
