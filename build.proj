@@ -68,13 +68,18 @@
     <MakeDir Directories="$(ArtifactsDir);$(PackageOutputPath);$(TemplatesOutputPath);$(DevPath)" />
     <CallTarget Targets="CollectGitInfo" />
 
+    <!-- Restore the universe -->
+    <MSBuild Projects="$(MSBuildThisFileDirectory)\Microsoft.TemplateEngine.sln" Targets="Restore"
+             Properties="Configuration=$(Configuration)"
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+
     <!-- Build the inner ring (abstractions, core, core contracts, etc.) -->
-    <MSBuild Projects="$(InnerRingProjects)" Targets="Restore;Build"
+    <MSBuild Projects="$(InnerRingProjects)" Targets="Build"
              Condition="'$(EngineBuild)' == 'true'"
              Properties="TargetFramework=$(InnerRingTargetFramework);Configuration=$(Configuration)"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
-    <MSBuild Projects="$(InnerRingProjects)" Targets="Restore;Build"
+    <MSBuild Projects="$(InnerRingProjects)" Targets="Build"
              Condition="'$(IsFullFrameworkBuildSupported)' == 'true' AND '$(EngineBuild)' == 'true'"
              Properties="TargetFramework=$(FullFrameworkTargetFramework);Configuration=$(Configuration)"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
@@ -85,12 +90,12 @@
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <!-- Build the outer ring (edge, mocks, etc.) -->
-    <MSBuild Projects="$(OuterRingProjects)" Targets="Restore;Build"
+    <MSBuild Projects="$(OuterRingProjects)" Targets="Build"
              Condition="'$(EngineBuild)' == 'true'"
              Properties="TargetFramework=$(OuterRingTargetFramework);Configuration=$(Configuration)"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
-    <MSBuild Projects="$(OuterRingProjects)" Targets="Restore;Build"
+    <MSBuild Projects="$(OuterRingProjects)" Targets="Build"
              Condition="'$(IsFullFrameworkBuildSupported)' == 'true' AND '$(EngineBuild)' == 'true'"
              Properties="TargetFramework=$(FullFrameworkTargetFramework);Configuration=$(Configuration)"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
@@ -101,12 +106,12 @@
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <!-- Build the shared test projects (test helper, etc.) -->
-    <MSBuild Projects="$(SharedTestProjects)" Targets="Restore;Build"
+    <MSBuild Projects="$(SharedTestProjects)" Targets="Build"
              Condition="'$(EngineBuild)' == 'true'"
              Properties="TargetFramework=$(OuterRingTargetFramework);Configuration=$(Configuration)"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
-    <MSBuild Projects="$(SharedTestProjects)" Targets="Restore;Build"
+    <MSBuild Projects="$(SharedTestProjects)" Targets="Build"
              Condition="'$(IsFullFrameworkBuildSupported)' == 'true' AND '$(EngineBuild)' == 'true'"
              Properties="TargetFramework=$(FullFrameworkTestTargetFramework);Configuration=$(Configuration)"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
@@ -117,7 +122,7 @@
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <!-- Build projects that only build for the dotnet CLI -->
-    <MSBuild Projects="$(CliProjects)" Targets="Restore;Build"
+    <MSBuild Projects="$(CliProjects)" Targets="Build"
              Condition="'$(EngineBuild)' == 'true'"
              Properties="TargetFramework=$(OuterRingTargetFramework);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath);NoBuild=true"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
@@ -133,19 +138,19 @@
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <!-- Build new3 -->
-    <MSBuild Projects="src/dotnet-new3/dotnet-new3.csproj" Targets="Restore;Publish"
+    <MSBuild Projects="src/dotnet-new3/dotnet-new3.csproj" Targets="Publish"
              Condition="'$(EngineBuild)' == 'true'"
-             Properties="TargetFramework=$(New3TargetFramework);Configuration=$(Configuration);PublishDir=$(DevPath);RestoreRecursive=false"
+             Properties="TargetFramework=$(New3TargetFramework);Configuration=$(Configuration);PublishDir=$(DevPath)"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <!-- Build the test harness -->
-    <MSBuild Projects="$(TestUtilities)" Targets="Restore;Build"
+    <MSBuild Projects="$(TestUtilities)" Targets="Build"
              Condition="'$(EngineBuild)' == 'true'"
              Properties="TargetFramework=$(New3TargetFramework);Configuration=$(Configuration)"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <!-- Build tests -->
-    <MSBuild Projects="$(TestProjects)" Targets="Restore;Build"
+    <MSBuild Projects="$(TestProjects)" Targets="Build"
              Condition="'$(EngineBuild)' == 'true'"
              Properties="TargetFramework=$(New3TargetFramework);Configuration=$(Configuration)"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
