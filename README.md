@@ -5,6 +5,11 @@ When `dotnet new` is invoked, it will call the Template Engine to create the art
 Template Engine is a library for manipulating streams, including operations to replace values, include/exclude 
 regions and process `if`, `else if`, `else` and `end if` style statements.
 
+# Template Samples
+
+We have created a [dotnet template samples repo](https://github.com/dotnet/dotnet-template-samples), which shows how you can use
+the Template Engine to create new templates. The samples are setup to be stand alone for specific examples. If you are in need of a sample, and it doesn't exist please [create an issue](https://github.com/dotnet/dotnet-template-samples/issues/new) in the samples repo.
+
 # Info for `dotnet new` users
 
 You can create new projects with `dotnet new`, this section will briefly describe that. For more info take a look at
