@@ -79,6 +79,10 @@
     "UseBrowserLink": {
       "longName": "use-browserlink",
       "shortName": ""
+    },
+        "UseDocker": {
+      "longName": "docker",
+      "shortName": ""
     }
   },
   "usageExamples": [

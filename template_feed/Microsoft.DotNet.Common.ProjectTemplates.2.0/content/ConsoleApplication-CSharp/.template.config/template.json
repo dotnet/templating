@@ -13,6 +13,19 @@
     "language": "C#",
     "type": "project"
   },
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "condition": "(!UseDocker)",
+          "exclude": [
+              "Dockerfile",
+              ".dockerignore"
+          ]
+        }
+      ]
+    }
+  ],
   "sourceName": "Company.ConsoleApplication1",
   "preferNameDirectory": true,
   "symbols": {
@@ -44,6 +57,12 @@
       "type": "parameter",
       "datatype": "bool",
       "description": "If specified, skips the automatic restore of the project on create.",
+      "defaultValue": "false"
+    },
+    "UseDocker": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "If specified, includes a Dockerfile in the projects.",
       "defaultValue": "false"
     }
   },

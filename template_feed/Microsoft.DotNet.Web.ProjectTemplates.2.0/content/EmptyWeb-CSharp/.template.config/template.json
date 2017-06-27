@@ -26,6 +26,14 @@
             "Properties/launchSettings.json"
           ]
         },
+        {
+          "condition": "(!UseDocker)",
+          "exclude": [
+              "Dockerfile",
+              ".dockerignore",
+              "docker-run.*"
+          ]
+        }
       ]
     }
   ],
@@ -104,6 +112,12 @@
       "type": "parameter",
       "datatype": "bool",
       "description": "If specified, skips the automatic restore of the project on create.",
+      "defaultValue": "false"
+    },
+    "UseDocker": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "If specified, includes a Dockerfile in the projects.",
       "defaultValue": "false"
     }
   },

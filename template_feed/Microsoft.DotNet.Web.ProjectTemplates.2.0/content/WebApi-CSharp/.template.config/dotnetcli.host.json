@@ -67,6 +67,10 @@
     },
     "UserSecretsId": {
       "isHidden": true
+    },
+    "UseDocker": {
+      "longName": "docker",
+      "shortName": ""
     }
   },
   "usageExamples": [

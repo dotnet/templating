@@ -16,6 +16,20 @@
   "guids": ["0ce56475-d1db-490f-8af1-a881ea4fcd2d"],
   "sourceName": "Company.WebApplication1",
   "preferNameDirectory": true,
+  "sources":[
+    {
+      "modifiers":[
+        {
+          "condition": "(!UseDocker)",
+          "exclude": [
+            "Dockerfile",
+            ".dockerignore",
+            "docker-run.*"
+          ]
+        }
+      ]
+    }
+  ],
   "symbols": {
     "TargetFrameworkOverride": {
       "type": "parameter",
@@ -92,6 +106,12 @@
         "fallbackVariableName": "IISExpressPortGenerated"
       },
       "replaces": "55555"
+    },
+        "UseDocker": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "If specified, includes a Dockerfile in the projects.",
+      "defaultValue": "false"
     }
   },
   "primaryOutputs": [ { "path": "Company.WebApplication1.csproj" } ],
