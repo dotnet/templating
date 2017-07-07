@@ -50,6 +50,10 @@
         src/Microsoft.TemplateEngine.Cli/Microsoft.TemplateEngine.Cli.csproj;
     </CliProjects>
 
+    <LocProjects>
+        src/Microsoft.TemplateEngine.Cli.Localization/Microsoft.TemplateEngine.Cli.Localization.csproj;
+    </LocProjects>
+
     <PortableSourceProjectsToRestore_both>$(PortableSourceProjectsToPack_netcoreapp11);$(PortableSourceProjectsToPack_fullframework)</PortableSourceProjectsToRestore_both>
 
     <TestUtilities>test/Microsoft.TemplateEngine.EndToEndTestHarness/Microsoft.TemplateEngine.EndToEndTestHarness.csproj</TestUtilities>
@@ -162,6 +166,10 @@
   <Target Name="BuildLocalized" DependsOnTargets="SetLanguages" Condition="Exists('.tools\loc\loc.proj')">
     <MSBuild Projects=".tools\loc\loc.proj" Targets="Build"
              Properties="Lang=%(Languages.Identity)" />
+
+    <MSBuild Projects="$(LocProjects)" Targets="Restore;Pack"
+             Properties="Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath)"
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
   </Target>
 
