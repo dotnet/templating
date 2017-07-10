@@ -80,7 +80,7 @@
         <RFC4646>pl-PL</RFC4646>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Lang)' == 'ptb'">
-        <DstLocale>pt-br</DstLocale>
+        <DstLocale>pt-BR</DstLocale>
         <LCID>1046</LCID>
         <RFC4646>pt-BR</RFC4646>
     </PropertyGroup>
