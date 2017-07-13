@@ -64,8 +64,7 @@ namespace Company.WebApplication1.Pages.Account.Manage
             Input = new InputModel()
             {
                 Email = await _userManager.GetEmailAsync(user);
-                PhoneNumber = 
-                GetPhoneNumberAsync(user);
+                PhoneNumber = await _userManager.GetPhoneNumberAsync(user);
             };
 
             IsEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
@@ -123,8 +122,7 @@ namespace Company.WebApplication1.Pages.Account.Manage
             }
 
             var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var userId = await _userManager.GetUserIdAsync(user);
-            var callbackUrl = Url.EmailConfirmationLink(userId, code, Request.Scheme);
+            var callbackUrl = Url.EmailConfirmationLink(_userManager.GetUserId(User), code, Request.Scheme);
             var email = await _userManager.GetEmailAsync(user);
             await _emailSender.SendEmailConfirmationAsync(email, callbackUrl);
 
