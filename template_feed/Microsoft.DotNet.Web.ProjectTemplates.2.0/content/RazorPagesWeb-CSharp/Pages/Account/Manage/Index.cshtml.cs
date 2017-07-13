@@ -53,18 +53,19 @@ namespace Company.WebApplication1.Pages.Account.Manage
 
         public async Task<IActionResult> OnGetAsync()
         {
-            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
                 return RedirectToPage("/Error");
             }
 
-            Username = user.UserName;
+            Username = await _userManager.GetUserNameAsync(user);
 
             Input = new InputModel()
             {
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber
+                Email = await _userManager.GetEmailAsync(user);
+                PhoneNumber = 
+                GetPhoneNumberAsync(user);
             };
 
             IsEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
@@ -79,13 +80,14 @@ namespace Company.WebApplication1.Pages.Account.Manage
                 return Page();
             }
 
-            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
                 return RedirectToPage("/Error");
             }
 
-            if (Input.Email != user.Email)
+            var email = await _userManager.GetEmailAsync(user);
+            if (Input.Email != email)
             {
                 var setEmailResult = await _userManager.SetEmailAsync(user, Input.Email);
                 if (!setEmailResult.Succeeded)
@@ -94,7 +96,8 @@ namespace Company.WebApplication1.Pages.Account.Manage
                 }
             }
 
-            if (Input.PhoneNumber != user.PhoneNumber)
+            var phoneNumber = await _userManager.GetPhoneNumber(user);
+            if (Input.PhoneNumber != phoneNumber)
             {
                 var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
                 if (!setPhoneResult.Succeeded)
@@ -113,15 +116,17 @@ namespace Company.WebApplication1.Pages.Account.Manage
                 return Page();
             }
 
-            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
                 return RedirectToPage("/Error");
             }
 
             var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
-            await _emailSender.SendEmailConfirmationAsync(user.Email, callbackUrl);
+            var userId = await _userManager.GetUserIdAsync(user);
+            var callbackUrl = Url.EmailConfirmationLink(userId, code, Request.Scheme);
+            var email = await _userManager.GetEmailAsync(user);
+            await _emailSender.SendEmailConfirmationAsync(email, callbackUrl);
 
             StatusMessage = "Verification email sent. Please check your email.";
             return RedirectToPage();
