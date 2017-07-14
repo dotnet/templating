@@ -1200,6 +1200,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";UnableToSetPermissions" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Unable to apply permissions {0} to "{1}".]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Nie można zastosować uprawnień {0} do elementu „{1}”.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";UninstallHelp" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Uninstalls a source or a template pack.]]></Val>
@@ -1269,7 +1278,7 @@
     <Disp Icon="Ver" Disp="true" LocTbl="false" Path=" \ ;Version \ 8 \ 0" />
     <Item ItemId=";AssemblyVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0.247]]></Val>
+        <Val><![CDATA[1.0.0.286]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1302,7 +1311,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0.247]]></Val>
+        <Val><![CDATA[1.0.0.286]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1338,7 +1347,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0-beta2-20170531-247+247.c6424324369a1b512fadee78aec0a6cd0d01c824]]></Val>
+        <Val><![CDATA[1.0.0-beta2-20170713-286+286.66110ff1f4c4179ce89df79a02792816f53d3ffd]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
