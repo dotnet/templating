@@ -1067,10 +1067,13 @@
       </Item>
       <Item ItemId=";RunHelpForInformationAboutAcceptedParameters" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Run dotnet {0} --help for usage information.]]></Val>
-          <Tgt Cat="Text" Stat="Loc" Orig="New">
+          <Val><![CDATA[Run dotnet {0} --help for usage information.]A;See https://aka.ms/dotnet-install-templates to learn how to install additional template packs.]]></Val>
+          <Tgt Cat="Text" Stat="Update" Orig="New">
             <Val><![CDATA[Execute o dotnet {0} --help para obter informações de uso.]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Run dotnet {0} --help for usage information.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1123,7 +1126,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Filters templates based on available types. Predefined values are "project", "item" or "other".]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Filtra os modelos com base nos tipos disponíveis. Os valores predefinidos são "projeto", "item" ou "outros".]]></Val>
+            <Val><![CDATA[Filtra os modelos com base nos tipos disponíveis. Os valores predefinidos são "project", "item" ou "other".]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1278,7 +1281,7 @@
     <Disp Icon="Ver" Disp="true" LocTbl="false" Path=" \ ;Version \ 8 \ 0" />
     <Item ItemId=";AssemblyVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0.287]]></Val>
+        <Val><![CDATA[1.0.0.290]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1311,7 +1314,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0.287]]></Val>
+        <Val><![CDATA[1.0.0.290]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1347,7 +1350,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0-beta2-20170714-287+287.88ed23009679949db19e6c5ad4927e44d1a077fb]]></Val>
+        <Val><![CDATA[1.0.0-beta2-20170718-290+290.65cec4d62f6ed1e6a7979d4dad2c66ff8a9c4999]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
