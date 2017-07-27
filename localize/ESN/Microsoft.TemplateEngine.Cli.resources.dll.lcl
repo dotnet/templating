@@ -1064,10 +1064,13 @@
       </Item>
       <Item ItemId=";RunHelpForInformationAboutAcceptedParameters" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Run dotnet {0} --help for usage information.]]></Val>
+          <Val><![CDATA[Run dotnet {0} --help for usage information.]A;See https://aka.ms/dotnet-install-templates to learn how to install additional template packs.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Ejecute dotnet {0} --help para obtener información de uso.]]></Val>
+            <Val><![CDATA[Ejecute dotnet {0} --help para ver información de uso.]A;Consulte https://aka.ms/dotnet-install-templates para obtener información sobre cómo instalar paquetes de plantillas adicionales.]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Run dotnet {0} --help for usage information.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1275,7 +1278,7 @@
     <Disp Icon="Ver" Disp="true" LocTbl="false" Path=" \ ;Version \ 8 \ 0" />
     <Item ItemId=";AssemblyVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0.286]]></Val>
+        <Val><![CDATA[1.0.0.300]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1308,7 +1311,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0.286]]></Val>
+        <Val><![CDATA[1.0.0.300]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1344,7 +1347,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0-beta2-20170713-286+286.66110ff1f4c4179ce89df79a02792816f53d3ffd]]></Val>
+        <Val><![CDATA[1.0.0-beta2-20170725-300+300.8433c1579f25dbb84e0b0901e75b6a488e80a9f6]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
