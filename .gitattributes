@@ -41,7 +41,7 @@
 *.vb			eol=crlf
 *.vbproj		eol=crlf
 *.js			eol=crlf
-
+*.svg			eol=crlf
 
 # make these file types use lf
 *.sh		eol=lf
