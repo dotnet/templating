@@ -61,7 +61,8 @@ mkdir "$RepoRoot\artifacts" | Out-Null
 $DOTNET_INSTALL_SCRIPT_URL="https://raw.githubusercontent.com/dotnet/cli/master/scripts/obtain/dotnet-install.ps1"
 Invoke-WebRequest $DOTNET_INSTALL_SCRIPT_URL -OutFile "$RepoRoot\artifacts\dotnet-install.ps1"
 
-& "$RepoRoot\artifacts\dotnet-install.ps1" -Verbose -Version 1.0.4
+& "$RepoRoot\artifacts\dotnet-install.ps1" -Verbose -Version 2.0.0-preview2-006470
+
 if($LASTEXITCODE -ne 0) { throw "Failed to install dotnet cli" }
 
 # Put the stage0 on the path

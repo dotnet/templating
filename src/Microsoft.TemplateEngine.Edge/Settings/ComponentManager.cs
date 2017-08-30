@@ -1,5 +1,6 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
+//using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -174,15 +175,24 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         public bool TryGetComponent<T>(Guid id, out T component)
             where T : class, IIdentifiedComponent
         {
+            //Stopwatch sw = Stopwatch.StartNew();
             if (Cache<T>.Instance.Parts.TryGetValue(id, out component))
             {
+                //sw.Stop();
+                //Console.WriteLine("Cache hit: " + sw.Elapsed.TotalMilliseconds);
                 return true;
             }
 
             if (_componentIdToAssemblyQualifiedTypeName.TryGetValue(id, out string assemblyQualifiedName))
             {
+                //sw.Stop();
+                //Console.WriteLine("Cache miss (known component): " + sw.Elapsed.TotalMilliseconds);
+
+                //sw.Restart();
                 Type t = TypeEx.GetType(assemblyQualifiedName);
                 component = Activator.CreateInstance(t) as T;
+                //sw.Stop();
+                //Console.WriteLine("Part creation: " + sw.Elapsed.TotalMilliseconds);
 
                 if (component != null)
                 {
@@ -190,6 +200,9 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     return true;
                 }
             }
+
+            //sw.Stop();
+            //Console.WriteLine("Cache miss (unknown component or load failure): " + sw.Elapsed.TotalMilliseconds);
 
             return false;
         }

@@ -9,7 +9,7 @@
     <ProjectReference Include="..\..\src\Microsoft.TemplateEngine.Utils\Microsoft.TemplateEngine.Utils.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0-preview-20170601-03" PrivateAssets="All" />
     <PackageReference Include="xunit" Version="2.2.0" />
   </ItemGroup>
 </Project>

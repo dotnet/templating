@@ -240,48 +240,56 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         public ITemplate LoadTemplate(ITemplateInfo info, string baselineName)
         {
-            IGenerator generator;
-            if (!Components.TryGetComponent(info.GeneratorId, out generator))
+            using (Timing.Over(_environmentSettings.Host, "Load Template"))
             {
+                IGenerator generator;
+                using (Timing.Over(_environmentSettings.Host, "Get generator"))
+                    if (!Components.TryGetComponent(info.GeneratorId, out generator))
+                    {
+                        return null;
+                    }
+
+                IMountPoint mountPoint;
+                using (Timing.Over(_environmentSettings.Host, "Get template mount point"))
+                    if (!_mountPointManager.TryDemandMountPoint(info.ConfigMountPointId, out mountPoint))
+                    {
+                        return null;
+                    }
+
+                IFileSystemInfo config = mountPoint.FileSystemInfo(info.ConfigPlace);
+
+                IFileSystemInfo localeConfig = null;
+                if (!string.IsNullOrEmpty(info.LocaleConfigPlace)
+                        && info.LocaleConfigMountPointId != null
+                        && info.LocaleConfigMountPointId != Guid.Empty)
+                {
+                    IMountPoint localeMountPoint;
+                    if (!_mountPointManager.TryDemandMountPoint(info.LocaleConfigMountPointId, out localeMountPoint))
+                    {
+                        // TODO: decide if we should proceed without loc info, instead of bailing.
+                        return null;
+                    }
+
+                    localeConfig = localeMountPoint.FileSystemInfo(info.LocaleConfigPlace);
+                }
+
+                IFile hostTemplateConfigFile;
+                using (Timing.Over(_environmentSettings.Host, "Find best host config file"))
+                    hostTemplateConfigFile = FindBestHostTemplateConfigFile(config);
+
+                ITemplate template;
+                using (Timing.Over(_environmentSettings.Host, "Template from config"))
+                    if (generator.TryGetTemplateFromConfigInfo(config, out template, localeConfig, hostTemplateConfigFile, baselineName))
+                    {
+                        return template;
+                    }
+                    else
+                    {
+                        //TODO: Log the failure to read the template info
+                    }
+
                 return null;
             }
-
-            IMountPoint mountPoint;
-            if (!_mountPointManager.TryDemandMountPoint(info.ConfigMountPointId, out mountPoint))
-            {
-                return null;
-            }
-            IFileSystemInfo config = mountPoint.FileSystemInfo(info.ConfigPlace);
-
-            IFileSystemInfo localeConfig = null;
-            if (!string.IsNullOrEmpty(info.LocaleConfigPlace)
-                    && info.LocaleConfigMountPointId != null
-                    && info.LocaleConfigMountPointId != Guid.Empty)
-            {
-                IMountPoint localeMountPoint;
-                if (!_mountPointManager.TryDemandMountPoint(info.LocaleConfigMountPointId, out localeMountPoint))
-                {
-                    // TODO: decide if we should proceed without loc info, instead of bailing.
-                    return null;
-                }
-
-                localeConfig = localeMountPoint.FileSystemInfo(info.LocaleConfigPlace);
-            }
-
-            IFile hostTemplateConfigFile = FindBestHostTemplateConfigFile(config);
-
-            ITemplate template;
-            using (Timing.Over(_environmentSettings.Host, "Template from config"))
-                if (generator.TryGetTemplateFromConfigInfo(config, out template, localeConfig, hostTemplateConfigFile, baselineName))
-                {
-                    return template;
-                }
-                else
-                {
-                    //TODO: Log the failure to read the template info
-                }
-
-            return null;
         }
 
         public IFile FindBestHostTemplateConfigFile(IFileSystemInfo config)
