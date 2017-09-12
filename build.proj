@@ -63,6 +63,7 @@
         test/Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests/Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.csproj;
         test/Microsoft.TemplateEngine.Utils.UnitTests/Microsoft.TemplateEngine.Utils.UnitTests.csproj;
         test/Microsoft.TemplateEngine.Cli.UnitTests/Microsoft.TemplateEngine.Cli.UnitTests.csproj;
+		test/Microsoft.TemplateEngine.Edge.UnitTests/Microsoft.TemplateEngine.Edge.UnitTests.csproj;
         test/dotnet-new3.UnitTests/dotnet-new3.UnitTests.csproj
     </TestProjects>
   </PropertyGroup>
