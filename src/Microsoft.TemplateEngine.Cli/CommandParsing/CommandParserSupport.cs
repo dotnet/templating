@@ -162,6 +162,8 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                     Create.Option("-all|--show-all", string.Empty, Accept.NoArguments()),
                     Create.Option("--allow-scripts", string.Empty, Accept.ZeroOrOneArgument()),
                     Create.Option("--baseline", string.Empty, Accept.ExactlyOneArgument()),
+                    Create.Option("-up|--update", string.Empty, Accept.NoArguments()),
+                    Create.Option("-un|--update-no-prompt", string.Empty, Accept.NoArguments()),
                 };
             }
         }
@@ -172,7 +174,6 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             {
                 return new[]
                 {
-                    Create.Option("-up|--update", string.Empty, Accept.ZeroOrOneArgument()),
                     Create.Option("--skip-update-check", string.Empty, Accept.NoArguments()),
                 };
             }
