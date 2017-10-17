@@ -34,7 +34,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Adding project reference(s) to solution file. Running dotnet sln {0} add {1}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[Proje başvuruları, çözüm dosyasına ekleniyor. Dotnet sln {0} ekleme {1} çalıştırılıyor]]></Val>
+            <Val><![CDATA[Proje başvuruları, çözüm dosyasına ekleniyor. dotnet sln {0} add {1} çalıştırılıyor]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1281,7 +1281,7 @@
     <Disp Icon="Ver" Disp="true" LocTbl="false" Path=" \ ;Version \ 8 \ 0" />
     <Item ItemId=";AssemblyVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0.300]]></Val>
+        <Val><![CDATA[1.0.0.310]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1314,7 +1314,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0.300]]></Val>
+        <Val><![CDATA[1.0.0.310]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1350,7 +1350,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0-beta2-20170725-300+300.8433c1579f25dbb84e0b0901e75b6a488e80a9f6]]></Val>
+        <Val><![CDATA[1.0.0-beta2-20171009-310+310.27f3b01126a2ac67a52b3970835b94bf8148700c]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
