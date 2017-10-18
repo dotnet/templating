@@ -67,6 +67,7 @@ namespace Microsoft.TemplateEngine
 {
     internal static class GitInfo
     {
+        public static string PackageVersion { get%3B } = "$(PackageVersion)"%3B
         public static string CommitCount { get%3B } = "$(GitInfoCommitCount)"%3B
         public static string CommitHash { get%3B } = "$(GitInfoCommitHash)"%3B
     }
