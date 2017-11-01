@@ -1,4 +1,4 @@
-Imports Microsoft.VisualStudio.TestTools.UnitTesting
+﻿Imports Microsoft.VisualStudio.TestTools.UnitTesting
 
 Namespace Company.TestProject1
     <TestClass>
