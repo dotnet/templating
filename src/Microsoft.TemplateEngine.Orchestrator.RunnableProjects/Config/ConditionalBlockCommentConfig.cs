@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Core.Contracts;
@@ -107,7 +107,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config
 
             if (!string.IsNullOrWhiteSpace(pseudoEndToken))
             {
-                Guid operationIdGuid = new Guid();
+                Guid operationIdGuid = Guid.NewGuid();
                 string commentFixOperationId = $"Fix pseudo tokens ({pseudoEndToken} {operationIdGuid})";
                 string commentFixResetId = $"Reset pseudo token fixer ({pseudoEndToken} {operationIdGuid})";
 

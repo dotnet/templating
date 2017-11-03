@@ -17,6 +17,16 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config
 
         public IEnumerable<IOperationProvider> ConfigureFromJObject(JObject rawConfiguration, IDirectory templateRoot)
         {
+            IEnumerable<IOperationProvider> operations = SetupFromJObject(rawConfiguration);
+
+            foreach (IOperationProvider op in operations)
+            {
+                yield return op;
+            }
+        }
+
+        public static IEnumerable<IOperationProvider> SetupFromJObject(JObject rawConfiguration)
+        {
             string commentStyle = rawConfiguration.ToString("style");
             IEnumerable<IOperationProvider> operations = null;
 
@@ -32,130 +42,40 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config
             {
                 operations = ConditionalBlockCommentConfig.ConfigureFromJObject(rawConfiguration);
             }
+            else if (string.Equals(commentStyle, "builtin", StringComparison.OrdinalIgnoreCase))
+            {
+                operations = ConditionalBuiltinConfig.GetConfig(rawConfiguration);
+            }
+            else if (string.Equals(commentStyle, "msbuild", StringComparison.OrdinalIgnoreCase))
+            {
+                operations = MSBuildConditionalSetupFromJObject(rawConfiguration);
+            }
             else
             {
                 throw new TemplateAuthoringException($"Template authoring error. Invalid comment style [{commentStyle}].", "style");
             }
 
-            foreach (IOperationProvider op in operations)
-            {
-                yield return op;
-            }
+            return operations;
         }
 
-        public static IReadOnlyList<IOperationProvider> ConditionalSetup(ConditionalType style, string evaluatorType, bool wholeLine, bool trimWhiteSpace, string id)
+        public static List<IOperationProvider> MSBuildConditionalSetupFromJObject(JObject rawConfig)
         {
-            List<IOperationProvider> setup;
-
-            switch (style)
-            {
-                case ConditionalType.MSBuild:
-                    setup = new List<IOperationProvider>();
-                    setup.AddRange(MSBuildConditionalSetup(evaluatorType, wholeLine, trimWhiteSpace, "msbuild-conditional"));
-                    setup.AddRange(ConditionalBlockCommentConfig.GenerateConditionalSetup("<!--", "-->"));
-                    break;
-                case ConditionalType.Xml:
-                    setup = ConditionalBlockCommentConfig.GenerateConditionalSetup("<!--", "-->");
-                    break;
-                case ConditionalType.Razor:
-                    setup = ConditionalBlockCommentConfig.GenerateConditionalSetup("@*", "*@");
-                    break;
-                case ConditionalType.CLineComments:
-                    setup = ConditionalLineCommentConfig.GenerateConditionalSetup("//");
-                    break;
-                case ConditionalType.CNoComments:
-                    setup = CStyleNoCommentsConditionalSetup(evaluatorType, wholeLine, trimWhiteSpace, id);
-                    break;
-                case ConditionalType.CBlockComments:
-                    setup = ConditionalBlockCommentConfig.GenerateConditionalSetup("/*", "*/");
-                    break;
-                case ConditionalType.HashSignLineComment:
-                    // Most line comment conditional tags use: <comment symbol><keyword prefix><keyword>
-                    // But for this one, the '#' comment symbol is all that's needed, so it uses an empty keyword prefix.
-                    // So we end up with regular conditionals suchs as '#if', '#else'
-                    // and actionables such as '##if'
-                    ConditionalKeywords keywords = new ConditionalKeywords()
-                    {
-                        KeywordPrefix = string.Empty
-                    };
-                    setup = ConditionalLineCommentConfig.GenerateConditionalSetup("#", keywords, new ConditionalOperationOptions());
-                    break;
-                case ConditionalType.RemLineComment:
-                    setup = ConditionalLineCommentConfig.GenerateConditionalSetup("rem ");
-                    break;
-                case ConditionalType.HamlLineComment:
-                    setup = ConditionalLineCommentConfig.GenerateConditionalSetup("-#");
-                    break;
-                case ConditionalType.JsxBlockComment:
-                    setup = ConditionalBlockCommentConfig.GenerateConditionalSetup("{/*", "*/}");
-                    break;
-                default:
-                    throw new Exception($"Unrecognized conditional type {style}");
-            }
-
-            return setup;
-        }
-
-        // Nice to have: Generalize this type of setup similarly to Line, Block, & Custom
-        public static List<IOperationProvider> MSBuildConditionalSetup(string evaluatorType, bool wholeLine, bool trimWhiteSpace, string id)
-        {
-            ConditionEvaluator evaluator = EvaluatorSelector.Select(evaluatorType);
-            IOperationProvider conditional = new InlineMarkupConditional(
-                new MarkupTokens("<".TokenConfig(), "</".TokenConfig(), ">".TokenConfig(), "/>".TokenConfig(), "Condition=\"".TokenConfig(), "\"".TokenConfig()),
-                wholeLine,
-                trimWhiteSpace,
-                evaluator,
-                "$({0})",
-                id,
-                true
-            );
-
-            return new List<IOperationProvider>()
-            {
-                conditional
-            };
-        }
-
-        // Nice to have: Generalize this type of setup similarly to Line, Block, & Custom
-        public static List<IOperationProvider> CStyleNoCommentsConditionalSetup(string evaluatorType, bool wholeLine, bool trimWhiteSpace, string id)
-        {
-            ConditionalKeywords defaultKeywords = new ConditionalKeywords();
-
-            List<ITokenConfig> ifTokens = new List<ITokenConfig>();
-            List<ITokenConfig> elseifTokens = new List<ITokenConfig>();
-            List<ITokenConfig> elseTokens = new List<ITokenConfig>();
-            List<ITokenConfig> endifTokens = new List<ITokenConfig>();
-
-            foreach (string ifKeyword in defaultKeywords.IfKeywords)
-            {
-                ifTokens.Add($"{defaultKeywords.KeywordPrefix}{ifKeyword}".TokenConfig());
-            }
-
-            foreach (string elseifKeyword in defaultKeywords.ElseIfKeywords)
-            {
-                elseifTokens.Add($"{defaultKeywords.KeywordPrefix}{elseifKeyword}".TokenConfig());
-            }
-
-            foreach (string elseKeyword in defaultKeywords.ElseKeywords)
-            {
-                elseTokens.Add($"{defaultKeywords.KeywordPrefix}{elseKeyword}".TokenConfig());
-            }
-
-            foreach (string endifKeyword in defaultKeywords.EndIfKeywords)
-            {
-                endifTokens.Add($"{defaultKeywords.KeywordPrefix}{endifKeyword}".TokenConfig());
-            }
-
-            ConditionalTokens tokens = new ConditionalTokens
-            {
-                IfTokens = ifTokens,
-                ElseTokens = elseTokens,
-                ElseIfTokens = elseifTokens,
-                EndIfTokens = endifTokens
-            };
+            string openOpenToken = rawConfig.ToString("OpenOpenToken");
+            string openCloseToken = rawConfig.ToString("OpenCloseToken");
+            string closeToken = rawConfig.ToString("CloseToken");
+            string selfClosingEndToken = rawConfig.ToString("SelfClosingEndToken");
+            string conditionOpenExpression = rawConfig.ToString("ConditionOpenExpression");
+            string conditionCloseExpression = rawConfig.ToString("ConditionCloseExpression");
+            string variableFormat = rawConfig.ToString("VariableFormat");
+            string id = rawConfig.ToString("Id");
+            bool trim = rawConfig.ToBool("Trim", true);
+            bool wholeline = rawConfig.ToBool("WholeLine", true);
+            bool onByDefault = rawConfig.ToBool("OnByDefault", true);
+            string evaluatorType = rawConfig.ToString("evaluator");
 
             ConditionEvaluator evaluator = EvaluatorSelector.Select(evaluatorType);
-            IOperationProvider conditional = new Conditional(tokens, wholeLine, trimWhiteSpace, evaluator, id, true);
+            MarkupTokens tokens = new MarkupTokens(openOpenToken.TokenConfig(), openCloseToken.TokenConfig(), closeToken.TokenConfig(), selfClosingEndToken.TokenConfig(), conditionOpenExpression.TokenConfig(), conditionCloseExpression.TokenConfig());
+            IOperationProvider conditional = new InlineMarkupConditional(tokens, wholeline, trim, evaluator, variableFormat, id, onByDefault);
 
             return new List<IOperationProvider>()
             {

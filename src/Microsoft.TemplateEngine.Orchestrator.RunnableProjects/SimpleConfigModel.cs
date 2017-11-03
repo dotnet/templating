@@ -329,7 +329,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 if (_operationConfig == null)
                 {
-                    SpecialOperationConfigParams defaultOperationParams = new SpecialOperationConfigParams(string.Empty, "//", "C++", ConditionalType.CLineComments);
+                    FileGlobOperationConfigParameters defaultOperationParams = new FileGlobOperationConfigParameters(string.Empty, "//", ConditionalOperationConfigType.CLineComment);
                     _operationConfig = ProduceOperationSetup(defaultOperationParams, true, CustomOperations);
                 }
 
@@ -337,42 +337,91 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
         }
 
-        private class SpecialOperationConfigParams
-        {
-            public SpecialOperationConfigParams(string glob, string flagPrefix, string evaluatorName, ConditionalType type)
-            {
-                EvaluatorName = evaluatorName;
-                Glob = glob;
-                FlagPrefix = flagPrefix;
-                ConditionalStyle = type;
-            }
-
-            public string Glob { get; }
-
-            public string EvaluatorName { get; }
-
-            public string FlagPrefix { get; }
-
-            public ConditionalType ConditionalStyle { get; }
-
-            public string VariableFormat { get; set; }
-
-            private static readonly SpecialOperationConfigParams _Defaults = new SpecialOperationConfigParams(string.Empty, string.Empty, "C++", ConditionalType.None);
-
-            public static SpecialOperationConfigParams Defaults
-            {
-                get
-                {
-                    return _Defaults;
-                }
-            }
-        }
-
         // file -> replacements
         public IReadOnlyDictionary<string, IReadOnlyList<IOperationProvider>> LocalizationOperations { get; private set; }
 
-
         private IReadOnlyList<ICustomFileGlobModel> SpecialCustomSetup = new List<ICustomFileGlobModel>();
+
+        private IReadOnlyDictionary<string, FileGlobOperationConfigParameters> _defaultConditionals;
+
+        // TODO: make this a dictionary whose keys are the globs
+        private IReadOnlyDictionary<string, FileGlobOperationConfigParameters> DefaultConditionals
+        {
+            get
+            {
+                if (_defaultConditionals == null)
+                {
+                    List<FileGlobOperationConfigParameters> conditionals = new List<FileGlobOperationConfigParameters>
+                    {
+                        new FileGlobOperationConfigParameters("**/*.json", "//", ConditionalOperationConfigType.CLineComment),
+                        new FileGlobOperationConfigParameters("**/*.jsonld", "//", ConditionalOperationConfigType.CLineComment),
+                        new FileGlobOperationConfigParameters("**/*.hjson", "//", ConditionalOperationConfigType.CLineComment),
+                        new FileGlobOperationConfigParameters("**/*.json5", "//", ConditionalOperationConfigType.CLineComment),
+                        new FileGlobOperationConfigParameters("**/*.geojson", "//", ConditionalOperationConfigType.CLineComment),
+                        new FileGlobOperationConfigParameters("**/*.topojson", "//", ConditionalOperationConfigType.CLineComment),
+                        new FileGlobOperationConfigParameters("**/*.bowerrc", "//", ConditionalOperationConfigType.CLineComment),
+                        new FileGlobOperationConfigParameters("**/*.npmrc", "//", ConditionalOperationConfigType.CLineComment),
+                        new FileGlobOperationConfigParameters("**/*.job", "//", ConditionalOperationConfigType.CLineComment),
+                        new FileGlobOperationConfigParameters("**/*.postcssrc", "//", ConditionalOperationConfigType.CLineComment),
+                        new FileGlobOperationConfigParameters("**/*.babelrc", "//", ConditionalOperationConfigType.CLineComment),
+                        new FileGlobOperationConfigParameters("**/*.csslintrc", "//", ConditionalOperationConfigType.CLineComment),
+                        new FileGlobOperationConfigParameters("**/*.eslintrc", "//", ConditionalOperationConfigType.CLineComment),
+                        new FileGlobOperationConfigParameters("**/*.jade-lintrc", "//", ConditionalOperationConfigType.CLineComment),
+                        new FileGlobOperationConfigParameters("**/*.pug-lintrc", "//", ConditionalOperationConfigType.CLineComment),
+                        new FileGlobOperationConfigParameters("**/*.jshintrc", "//", ConditionalOperationConfigType.CLineComment),
+                        new FileGlobOperationConfigParameters("**/*.stylelintrc", "//", ConditionalOperationConfigType.CLineComment),
+                        new FileGlobOperationConfigParameters("**/*.yarnrc", "//", ConditionalOperationConfigType.CLineComment),
+                        new FileGlobOperationConfigParameters("**/*.css.min", "/*", ConditionalOperationConfigType.CBlockComment),
+                        new FileGlobOperationConfigParameters("**/*.css", "/*", ConditionalOperationConfigType.CBlockComment),
+                        new FileGlobOperationConfigParameters("**/*.cshtml", "@*", ConditionalOperationConfigType.RazorBlockComment),
+                        new FileGlobOperationConfigParameters("**/*.cs", "//", ConditionalOperationConfigType.CNoComment),
+                        new FileGlobOperationConfigParameters("**/*.fs", "//", ConditionalOperationConfigType.CNoComment),
+                        new FileGlobOperationConfigParameters("**/*.cpp", "//", ConditionalOperationConfigType.CNoComment),
+                        new FileGlobOperationConfigParameters("**/*.h", "//", ConditionalOperationConfigType.CNoComment),
+                        new FileGlobOperationConfigParameters("**/*.hpp", "//", ConditionalOperationConfigType.CNoComment),
+                        new FileGlobOperationConfigParameters("**/*.*proj", "<!--/", ConditionalOperationConfigType.MSBuildInline, ConditionalOperationConfigType.XmlBlockComment),
+                        new FileGlobOperationConfigParameters("**/*.*proj.user", "<!--/", ConditionalOperationConfigType.MSBuildInline, ConditionalOperationConfigType.XmlBlockComment),
+                        new FileGlobOperationConfigParameters("**/*.msbuild", "<!--/", ConditionalOperationConfigType.MSBuildInline, ConditionalOperationConfigType.XmlBlockComment),
+                        new FileGlobOperationConfigParameters("**/*.targets", "<!--/", ConditionalOperationConfigType.MSBuildInline, ConditionalOperationConfigType.XmlBlockComment),
+                        new FileGlobOperationConfigParameters("**/*.props", "<!--/", ConditionalOperationConfigType.MSBuildInline, ConditionalOperationConfigType.XmlBlockComment),
+                        new FileGlobOperationConfigParameters("**/*.*htm", "<!--", ConditionalOperationConfigType.XmlBlockComment),
+                        new FileGlobOperationConfigParameters("**/*.*html", "<!--", ConditionalOperationConfigType.XmlBlockComment),
+                        new FileGlobOperationConfigParameters("**/*.jsp", "<!--", ConditionalOperationConfigType.XmlBlockComment),
+                        new FileGlobOperationConfigParameters("**/*.asp", "<!--", ConditionalOperationConfigType.XmlBlockComment),
+                        new FileGlobOperationConfigParameters("**/*.aspx", "<!--", ConditionalOperationConfigType.XmlBlockComment),
+                        new FileGlobOperationConfigParameters("**/app.config", "<!--", ConditionalOperationConfigType.XmlBlockComment),
+                        new FileGlobOperationConfigParameters("**/web.config", "<!--", ConditionalOperationConfigType.XmlBlockComment),
+                        new FileGlobOperationConfigParameters("**/web.*.config", "<!--", ConditionalOperationConfigType.XmlBlockComment),
+                        new FileGlobOperationConfigParameters("**/packages.config", "<!--", ConditionalOperationConfigType.XmlBlockComment),
+                        new FileGlobOperationConfigParameters("**/*.nuspec", "<!--", ConditionalOperationConfigType.XmlBlockComment),
+                        new FileGlobOperationConfigParameters("**/*.xslt", "<!--", ConditionalOperationConfigType.XmlBlockComment),
+                        new FileGlobOperationConfigParameters("**/*.xsd", "<!--", ConditionalOperationConfigType.XmlBlockComment),
+                        new FileGlobOperationConfigParameters("**/*.vsixmanifest", "<!--", ConditionalOperationConfigType.XmlBlockComment),
+                        new FileGlobOperationConfigParameters("**/*.vsct", "<!--", ConditionalOperationConfigType.XmlBlockComment),
+                        new FileGlobOperationConfigParameters("**/*.storyboard", "<!--", ConditionalOperationConfigType.XmlBlockComment),
+                        new FileGlobOperationConfigParameters("**/*.axml", "<!--", ConditionalOperationConfigType.XmlBlockComment),
+                        new FileGlobOperationConfigParameters("**/*.plist", "<!--", ConditionalOperationConfigType.XmlBlockComment),
+                        new FileGlobOperationConfigParameters("**/*.xib", "<!--", ConditionalOperationConfigType.XmlBlockComment),
+                        new FileGlobOperationConfigParameters("**/*.strings", "<!--", ConditionalOperationConfigType.XmlBlockComment),
+                        new FileGlobOperationConfigParameters("**/*.bat", "rem --:", ConditionalOperationConfigType.RemLineComment),
+                        new FileGlobOperationConfigParameters("**/*.cmd", "rem --:", ConditionalOperationConfigType.RemLineComment),
+                        new FileGlobOperationConfigParameters("**/nginx.conf", "#--", ConditionalOperationConfigType.HashLineComment),
+                        new FileGlobOperationConfigParameters("**/robots.txt", "#--", ConditionalOperationConfigType.HashLineComment),
+                        new FileGlobOperationConfigParameters("**/*.sh", "#--", ConditionalOperationConfigType.HashLineComment),
+                        new FileGlobOperationConfigParameters("**/*.haml", "-#", ConditionalOperationConfigType.HamlLineComment),
+                        new FileGlobOperationConfigParameters("**/*.jsx", "{/*", ConditionalOperationConfigType.JsxBlockComment),
+                        new FileGlobOperationConfigParameters("**/*.tsx", "{/*", ConditionalOperationConfigType.JsxBlockComment),
+                        new FileGlobOperationConfigParameters("**/*.xml", "<!--", ConditionalOperationConfigType.XmlBlockComment),
+                        new FileGlobOperationConfigParameters("**/*.xaml", "<!--", ConditionalOperationConfigType.XmlBlockComment),
+                        new FileGlobOperationConfigParameters("**/*.sln", "#-", ConditionalOperationConfigType.HashLineComment)
+                    };
+
+                    _defaultConditionals = conditionals.ToDictionary(x => x.Glob, x => x);
+                }
+
+                return _defaultConditionals;
+            }
+        }
 
         IReadOnlyList<KeyValuePair<string, IGlobalRunConfig>> IRunnableProjectConfig.SpecialOperationConfig
         {
@@ -380,70 +429,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 if (_specialOperationConfig == null)
                 {
-                    List<SpecialOperationConfigParams> defaultSpecials = new List<SpecialOperationConfigParams>
-                    {
-                        new SpecialOperationConfigParams("**/*.json", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.jsonld", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.hjson", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.json5", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.geojson", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.topojson", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.bowerrc", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.npmrc", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.job", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.postcssrc", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.babelrc", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.csslintrc", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.eslintrc", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.jade-lintrc", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.pug-lintrc", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.jshintrc", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.stylelintrc", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.yarnrc", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.css.min", "/*", "C++", ConditionalType.CBlockComments),
-                        new SpecialOperationConfigParams("**/*.css", "/*", "C++", ConditionalType.CBlockComments),
-                        new SpecialOperationConfigParams("**/*.cshtml", "@*", "C++", ConditionalType.Razor),
-                        new SpecialOperationConfigParams("**/*.cs", "//", "C++", ConditionalType.CNoComments),
-                        new SpecialOperationConfigParams("**/*.fs", "//", "C++", ConditionalType.CNoComments),
-                        new SpecialOperationConfigParams("**/*.cpp", "//", "C++", ConditionalType.CNoComments),
-                        new SpecialOperationConfigParams("**/*.h", "//", "C++", ConditionalType.CNoComments),
-                        new SpecialOperationConfigParams("**/*.hpp", "//", "C++", ConditionalType.CNoComments),
-                        new SpecialOperationConfigParams("**/*.*proj", "<!--/", "MSBUILD", ConditionalType.MSBuild),
-                        new SpecialOperationConfigParams("**/*.*proj.user", "<!--/", "MSBUILD", ConditionalType.MSBuild),
-                        new SpecialOperationConfigParams("**/*.msbuild", "<!--/", "MSBUILD", ConditionalType.MSBuild),
-                        new SpecialOperationConfigParams("**/*.targets", "<!--/", "MSBUILD", ConditionalType.MSBuild),
-                        new SpecialOperationConfigParams("**/*.props", "<!--/", "MSBUILD", ConditionalType.MSBuild),
-                        new SpecialOperationConfigParams("**/*.*htm", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.*html", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.jsp", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.asp", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.aspx", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/app.config", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/web.config", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/web.*.config", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/packages.config", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.nuspec", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.xslt", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.xsd", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.vsixmanifest", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.vsct", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.storyboard", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.axml", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.plist", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.xib", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.strings", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.bat", "rem --:", "C++", ConditionalType.RemLineComment),
-                        new SpecialOperationConfigParams("**/*.cmd", "rem --:", "C++", ConditionalType.RemLineComment),
-                        new SpecialOperationConfigParams("**/nginx.conf", "#--", "C++", ConditionalType.HashSignLineComment),
-                        new SpecialOperationConfigParams("**/robots.txt", "#--", "C++", ConditionalType.HashSignLineComment),
-                        new SpecialOperationConfigParams("**/*.sh", "#--", "C++", ConditionalType.HashSignLineComment),
-                        new SpecialOperationConfigParams("**/*.haml", "-#", "C++", ConditionalType.HamlLineComment),
-                        new SpecialOperationConfigParams("**/*.jsx", "{/*", "C++", ConditionalType.JsxBlockComment),
-                        new SpecialOperationConfigParams("**/*.tsx", "{/*", "C++", ConditionalType.JsxBlockComment),
-                        new SpecialOperationConfigParams("**/*.xml", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.xaml", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.sln", "#-", "C++", ConditionalType.HashSignLineComment)
-                    };
                     List<KeyValuePair<string, IGlobalRunConfig>> specialOperationConfig = new List<KeyValuePair<string, IGlobalRunConfig>>();
 
                     // put the custom configs first in the list
@@ -453,11 +438,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     {
                         if (customGlobModel.ConditionResult)
                         {   // only add the special if the condition is true
-                            SpecialOperationConfigParams defaultParams = defaultSpecials.Where(x => x.Glob == customGlobModel.Glob).FirstOrDefault();
-
-                            if (defaultParams == null)
+                            // if there's an existing default setup for this glob, use it too. Otherwise use the default glob setup.
+                            if (!DefaultConditionals.TryGetValue(customGlobModel.Glob, out FileGlobOperationConfigParameters defaultParams))
                             {
-                                defaultParams = SpecialOperationConfigParams.Defaults;
+                                defaultParams = FileGlobOperationConfigParameters.Defaults;
                             }
 
                             IGlobalRunConfig runConfig = ProduceOperationSetup(defaultParams, false, customGlobModel);
@@ -470,7 +454,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     }
 
                     // add the remaining default configs in the order specified above
-                    foreach (SpecialOperationConfigParams defaultParams in defaultSpecials)
+                    foreach (FileGlobOperationConfigParameters defaultParams in DefaultConditionals.Values)
                     {
                         if (processedGlobs.Contains(defaultParams.Glob))
                         {   // this one was already setup due to a custom config
@@ -490,14 +474,17 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         public IEngineEnvironmentSettings EnvironmentSettings { get; private set; }
 
-        private IGlobalRunConfig ProduceOperationSetup(SpecialOperationConfigParams defaultModel, bool generateMacros, ICustomFileGlobModel customGlobModel = null)
+        private IGlobalRunConfig ProduceOperationSetup(FileGlobOperationConfigParameters defaultModel, bool generateMacros, ICustomFileGlobModel customGlobModel = null)
         {
             List<IOperationProvider> operations = new List<IOperationProvider>();
 
             // TODO: if we allow custom config to specify a built-in conditional type, decide what to do.
-            if (defaultModel.ConditionalStyle != ConditionalType.None)
+            if (defaultModel.ConditionalConfigs != null)
             {
-                operations.AddRange(ConditionalConfig.ConditionalSetup(defaultModel.ConditionalStyle, defaultModel.EvaluatorName, true, true, null));
+                foreach (ConditionalOperationConfigType configType in defaultModel.ConditionalConfigs)
+                {
+                    operations.AddRange(ConditionalBuiltinConfig.GetConfigByType(configType));
+                }
             }
 
             if (customGlobModel == null || string.IsNullOrEmpty(customGlobModel.FlagPrefix))
@@ -516,7 +503,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
             else
             {
-                variableConfig = VariableConfig.DefaultVariableSetup(defaultModel.VariableFormat);
+                variableConfig = VariableConfig.DefaultVariableSetup(null);
             }
 
             List<IMacroConfig> macros = null;
