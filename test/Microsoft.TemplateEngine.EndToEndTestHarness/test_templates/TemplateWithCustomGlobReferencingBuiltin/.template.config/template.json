@@ -1,0 +1,33 @@
+{
+  "author": "Test Asset",
+  "classifications": [ "Test Asset" ],
+  "name": "TemplateWithCustomGlobReferencingBuiltin",
+  "generatorVersions": "[1.0.0.0-*)",
+  "groupIdentity": "TestAssets.TemplateWithCustomGlobReferencingBuiltin",
+  "precedence": "100",
+  "identity": "TestAssets.TemplateWithCustomGlobReferencingBuiltin",
+  "shortName": "TestAssets.TemplateWithCustomGlobReferencingBuiltin",
+  "sourceName": "Company.Web.Application1",
+  "description": "Testing specifying a built-in conditional",
+  "SpecialCustomOperations": {
+    "**/*.abc": {
+      "operations": [
+        {
+          "type": "conditional",
+          "configuration": {
+            "style": "builtin",
+            "name": "XmlBlockComment"
+          }
+        }
+      ]
+    }
+  },
+  "Symbols": {
+    "Extra": {
+      "type": "parameter",
+      "description": "Controls extra content",
+      "datatype": "bool",
+      "defaultValue": "false"
+    }
+  }
+}

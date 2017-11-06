@@ -1,0 +1,27 @@
+[
+  {
+    "kind": "file_contains",
+    "path": "Test.abc",
+    "text": "Random text."
+  },
+  {
+    "kind": "file_contains",
+    "path": "Test.abc",
+    "text": "XML Extra content."
+  },
+  {
+    "kind": "file_does_not_contain",
+    "path": "Test.abc",
+    "text": "XML Wrong content."
+  },
+  {
+    "kind": "file_contains",
+    "path": "Test.abc",
+    "text": "Hash Extra content."
+  },
+  {
+    "kind": "file_does_not_contain",
+    "path": "Test.abc",
+    "text": "Hash Wrong content."
+  }
+]

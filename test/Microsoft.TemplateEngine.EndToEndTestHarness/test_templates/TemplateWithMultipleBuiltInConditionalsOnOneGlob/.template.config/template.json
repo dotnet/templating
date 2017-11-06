@@ -1,0 +1,33 @@
+{
+  "author": "Test Asset",
+  "classifications": [ "Test Asset" ],
+  "name": "TemplateWithMultipleBuiltInConditionalsOnOneGlob",
+  "generatorVersions": "[1.0.0.0-*)",
+  "groupIdentity": "TestAssets.TemplateWithMultipleBuiltInConditionalsOnOneGlob",
+  "precedence": "100",
+  "identity": "TestAssets.TemplateWithMultipleBuiltInConditionalsOnOneGlob",
+  "shortName": "TestAssets.TemplateWithMultipleBuiltInConditionalsOnOneGlob",
+  "sourceName": "Company.Web.Application1",
+  "description": "Testing specifying multiple built-in conditionals",
+  "SpecialCustomOperations": {
+    "**/*.abc": {
+      "operations": [
+        {
+          "type": "conditional",
+          "configuration": {
+            "style": "builtin",
+            "name": [ "XmlBlockComment", "HashLineComment" ]
+          }
+        }
+      ]
+    }
+  },
+  "Symbols": {
+    "Extra": {
+      "type": "parameter",
+      "description": "Controls extra content",
+      "datatype": "bool",
+      "defaultValue": "false"
+    }
+  }
+}

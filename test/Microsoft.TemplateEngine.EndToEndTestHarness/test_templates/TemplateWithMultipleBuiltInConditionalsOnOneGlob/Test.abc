@@ -1,0 +1,12 @@
+Random text.
+<!--#if (Extra) -->
+    XML Extra content.
+<!--#else -->
+    XML Wrong content.
+<!--#endif-->
+
+#if (Extra)
+    Hash Extra content.
+#else
+    Hash Wrong content.
+#endif

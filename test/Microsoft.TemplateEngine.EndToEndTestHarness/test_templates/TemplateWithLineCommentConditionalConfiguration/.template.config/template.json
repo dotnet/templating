@@ -1,0 +1,34 @@
+{
+  "author": "Test Asset",
+  "classifications": [ "Test Asset" ],
+  "name": "TemplateWithLineCommentConditionalConfiguration",
+  "generatorVersions": "[1.0.0.0-*)",
+  "groupIdentity": "TestAssets.TemplateWithLineCommentConditionalConfiguration",
+  "precedence": "100",
+  "identity": "TestAssets.TemplateWithLineCommentConditionalConfiguration",
+  "shortName": "TestAssets.TemplateWithLineCommentConditionalConfiguration",
+  "sourceName": "Company.Web.Application1",
+  "description": "Testing specifying a line comment conditional",
+  "SpecialCustomOperations": {
+    "**/*.abc": {
+      "operations": [
+        {
+          "type": "conditional",
+          "configuration": {
+            "style": "line",
+            "token": "$$",
+            "keywordPrefix": "@"
+          }
+        }
+      ]
+    }
+  },
+  "Symbols": {
+    "Extra": {
+      "type": "parameter",
+      "description": "Controls extra content",
+      "datatype": "bool",
+      "defaultValue": "false"
+    }
+  }
+}

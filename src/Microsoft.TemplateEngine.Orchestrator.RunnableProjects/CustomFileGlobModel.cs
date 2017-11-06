@@ -11,8 +11,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         public IReadOnlyList<ICustomOperationModel> Operations { get; set; }
 
-        // TODO: reference to built-in conditional config ???
-
         public IVariableConfig VariableFormat { get; set; }
 
         public string FlagPrefix { get; set; }

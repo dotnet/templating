@@ -1,0 +1,36 @@
+{
+  "author": "Test Asset",
+  "classifications": [ "Test Asset" ],
+  "name": "TemplateWithBlockCommentConditionalConfiguration",
+  "generatorVersions": "[1.0.0.0-*)",
+  "groupIdentity": "TestAssets.TemplateWithBlockCommentConditionalConfiguration",
+  "precedence": "100",
+  "identity": "TestAssets.TemplateWithBlockCommentConditionalConfiguration",
+  "shortName": "TestAssets.TemplateWithBlockCommentConditionalConfiguration",
+  "sourceName": "Company.Web.Application1",
+  "description": "Testing specifying a block comment conditional",
+  "SpecialCustomOperations": {
+    "**/*.abc": {
+      "operations": [
+        {
+          "type": "conditional",
+          "configuration": {
+            "style": "block",
+            "startToken": "&--",
+            "endToken": "--&",
+            "pseudoEndToken": "-- &",
+            "keywordPrefix": "#"
+          }
+        }
+      ]
+    }
+  },
+  "Symbols": {
+    "Extra": {
+      "type": "parameter",
+      "description": "Controls extra content",
+      "datatype": "bool",
+      "defaultValue": "false"
+    }
+  }
+}

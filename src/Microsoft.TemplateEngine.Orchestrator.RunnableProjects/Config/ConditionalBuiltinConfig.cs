@@ -62,7 +62,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config
         public static List<IOperationProvider> GetConfig(JObject rawConfig)
         {
             List<IOperationProvider> allOperations = new List<IOperationProvider>();
-            IReadOnlyList<string> configNames = ConfigurationNamesFromConfig(rawConfig);
+            IReadOnlyList<string> configNames = BuiltinConfigurationNamesFromConfig(rawConfig);
 
             if (configNames.Count == 0)
             {
@@ -73,7 +73,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config
             {
                 if (!Enum.TryParse(builtInConfigName, out ConditionalOperationConfigType configType))
                 {
-                    throw new TemplateAuthoringException($"Template authoring error. Invalid built in conditional configuration: {builtInConfigName}", "style");
+                    throw new TemplateAuthoringException($"Template authoring error. Invalid built in conditional configuration name: {builtInConfigName}", "style");
                 }
 
                 IEnumerable<IOperationProvider> configOperations = GetConfigByType(configType);
@@ -83,10 +83,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config
             return allOperations;
         }
 
-        private static IReadOnlyList<string> ConfigurationNamesFromConfig(JObject rawConfig)
+        private static IReadOnlyList<string> BuiltinConfigurationNamesFromConfig(JObject rawConfig)
         {
-            // "configuration" could be a single string value, or an array of strings.
-            JToken builtInConfigsToken = rawConfig.Get<JToken>("configuration");
+            // "name" could be a single string value, or an array of strings.
+            JToken builtInConfigsToken = rawConfig.Get<JToken>("name");
             if (builtInConfigsToken == null)
             {
                 return new List<string>();
@@ -145,7 +145,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config
             }
         }
 
-    private static JObject CNoCommentConfig
+        private static JObject CNoCommentConfig
         {
             get
             {

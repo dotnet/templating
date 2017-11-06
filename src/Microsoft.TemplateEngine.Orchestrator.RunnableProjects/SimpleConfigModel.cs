@@ -483,6 +483,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 foreach (ConditionalOperationConfigType configType in defaultModel.ConditionalConfigs)
                 {
+                    if (configType == ConditionalOperationConfigType.None)
+                    {
+                        continue;
+                    }
+
                     operations.AddRange(ConditionalBuiltinConfig.GetConfigByType(configType));
                 }
             }

@@ -1,0 +1,32 @@
+[
+  {
+    "kind": "file_contains",
+    "path": "Test.abc",
+    "text": "Random text."
+  },
+  {
+    "kind": "file_contains",
+    "path": "Test.abc",
+    "text": "Extra content."
+  },
+  {
+    "kind": "file_does_not_contain",
+    "path": "Test.abc",
+    "text": "Wrong content."
+  },
+  {
+    "kind": "file_contains",
+    "path": "Test.abc",
+    "text": "#if (Extra)"
+  },
+  {
+    "kind": "file_contains",
+    "path": "Test.abc",
+    "text": "Invalid conditional."
+  },
+  {
+    "kind": "file_contains",
+    "path": "Test.abc",
+    "text": "Also invalid."
+  }
+]

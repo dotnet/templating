@@ -1,0 +1,19 @@
+Random text.
+&--#if (Extra) --&
+    Extra content.
+&--#else --&
+    Wrong content.
+&--#endif --&
+
+&--#if (true)
+    OuterContent
+    &--#if (Extra) -- &
+        InnerContent
+    #endif
+#endif-- & --&
+
+#if (Extra)
+    Invalid conditional.
+#else
+    Also invalid.
+#endif

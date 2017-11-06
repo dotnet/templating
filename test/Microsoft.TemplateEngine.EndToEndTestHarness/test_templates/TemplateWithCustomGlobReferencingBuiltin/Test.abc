@@ -1,0 +1,12 @@
+Random text.
+<!--#if (Extra) -->
+    Extra content.
+<!--#else -->
+    Wrong content.
+<!--#endif-->
+
+#if (Extra)
+    Invalid conditional.
+#else
+    Also invalid.
+#endif
