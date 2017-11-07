@@ -11,7 +11,7 @@ param(
     [bool]$TemplatesBuild=-not $CIBuild,
     [bool]$EngineBuild=-not $CIBuild,
     [switch]$Help,
-	[string]$PB_SkipTests="false")
+    [string]$PB_SkipTests="false")
 
 switch ($PB_SkipTests.ToLower())
 {
