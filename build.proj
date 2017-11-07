@@ -8,6 +8,7 @@
     <EngineBuild Condition="'$(EngineBuild)' == '' AND '$(CIBuild)' == 'false'">true</EngineBuild>
     <TemplatesBuild Condition="'$(TemplatesBuild)' == '' AND '$(CIBuild)' == 'false'">true</TemplatesBuild>
     <SkipTests Condition="'$(SkipTests)' == ''">false</SkipTests>
+    <PB_SkipTests Condition="'$(PB_SkipTests)' == ''">false</PB_SkipTests>
     <New3TargetFramework>netcoreapp1.1</New3TargetFramework>
     <InnerRingTargetFramework>netstandard1.3</InnerRingTargetFramework>
     <OuterRingTargetFramework>netstandard1.5</OuterRingTargetFramework>
@@ -107,7 +108,7 @@
 
     <!-- Build the shared test projects (test helper, etc.) -->
     <MSBuild Projects="$(SharedTestProjects)" Targets="Restore;Build"
-             Condition="'$(EngineBuild)' == 'true'"
+             Condition="'$(EngineBuild)' == 'true' AND '$(PB_SkipTests)' != 'true'"
              Properties="TargetFramework=$(OuterRingTargetFramework);Configuration=$(Configuration)"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
@@ -117,7 +118,7 @@
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <MSBuild Projects="$(SharedTestProjects)" Targets="Pack"
-             Condition="'$(EngineBuild)' == 'true'"
+             Condition="'$(EngineBuild)' == 'true' AND '$(PB_SkipTests)' != 'true'"
              Properties="TargetFrameworks=$(SharedTestPackTargetFrameworks);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath);NoBuild=true;IncludeSymbols=true"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
@@ -145,19 +146,19 @@
 
     <!-- Build the test harness -->
     <MSBuild Projects="$(TestUtilities)" Targets="Restore;Build"
-             Condition="'$(EngineBuild)' == 'true'"
+             Condition="'$(EngineBuild)' == 'true' AND '$(PB_SkipTests)' != 'true'"
              Properties="TargetFramework=$(New3TargetFramework);Configuration=$(Configuration)"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <!-- Build tests -->
     <MSBuild Projects="$(TestProjects)" Targets="Restore;Build"
-             Condition="'$(EngineBuild)' == 'true'"
+             Condition="'$(EngineBuild)' == 'true' AND '$(PB_SkipTests)' != 'true'"
              Properties="TargetFramework=$(New3TargetFramework);Configuration=$(Configuration)"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <!-- Run tests -->
     <MSBuild Projects="$(TestProjects)" Targets="VSTest"
-             Condition="'$(EngineBuild)' == 'true' AND '$(SkipTests)' != 'true'"
+             Condition="'$(EngineBuild)' == 'true' AND '$(SkipTests)' != 'true' AND '$(PB_SkipTests)' != 'true'"
              Properties="TargetFramework=$(New3TargetFramework);Configuration=$(Configuration);VSTestLogger=trx"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 

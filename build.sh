@@ -31,6 +31,9 @@ while [[ $# > 0 ]]; do
         --skip-tests)
             export SKIP_TESTS=true
             ;;
+		-- pb_skiptests)
+			export PB_SKIPTESTS=true
+			;;
         --ci-build)
             export CI_BUILD=true
             ;;
@@ -82,4 +85,4 @@ then
 fi
 
 export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
-$DOTNET_INSTALL_DIR/dotnet msbuild "$REPOROOT/build.proj" /p:Configuration=$CONFIGURATION /p:CIBuild=$CI_BUILD /p:EngineBuild=$ENGINE_BUILD /p:TemplatesBuild=$TEMPLATES_BUILD /p:SkipTests=$SKIP_TESTS
+$DOTNET_INSTALL_DIR/dotnet msbuild "$REPOROOT/build.proj" /p:Configuration=$CONFIGURATION /p:CIBuild=$CI_BUILD /p:EngineBuild=$ENGINE_BUILD /p:TemplatesBuild=$TEMPLATES_BUILD /p:SkipTests=$SKIP_TESTS /p:PB_SkipTests=$PB_SKIPTESTS
