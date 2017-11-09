@@ -20,6 +20,7 @@ export TEMPLATES_BUILD=true
 export ENGINE_BUILD=true
 export CI_BUILD=false
 export SKIP_TESTS=false
+export PB_SKIPTESTS=false
 
 while [[ $# > 0 ]]; do
     lowerI="$(echo $1 | awk '{print tolower($0)}')"
@@ -30,6 +31,18 @@ while [[ $# > 0 ]]; do
             ;;
         --skip-tests)
             export SKIP_TESTS=true
+            ;;
+        --pb_skiptests)
+            lowerPbSkipTests="$(echo $2 | awk '{print tolower($0)}')"
+            if [ -z $2 ]
+            then
+                export PB_SKIPTESTS='false'
+            elif [ $lowerPbSkipTests == 'true' ];
+            then
+                export PB_SKIPTESTS='true'
+            else
+                export PB_SKIPTESTS='false'
+            fi
             ;;
         --ci-build)
             export CI_BUILD=true
@@ -82,4 +95,4 @@ then
 fi
 
 export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
-$DOTNET_INSTALL_DIR/dotnet msbuild "$REPOROOT/build.proj" /p:Configuration=$CONFIGURATION /p:CIBuild=$CI_BUILD /p:EngineBuild=$ENGINE_BUILD /p:TemplatesBuild=$TEMPLATES_BUILD /p:SkipTests=$SKIP_TESTS
+$DOTNET_INSTALL_DIR/dotnet msbuild "$REPOROOT/build.proj" /p:Configuration=$CONFIGURATION /p:CIBuild=$CI_BUILD /p:EngineBuild=$ENGINE_BUILD /p:TemplatesBuild=$TEMPLATES_BUILD /p:SkipTests=$SKIP_TESTS /p:PB_SkipTests=$PB_SKIPTESTS

@@ -10,7 +10,14 @@ param(
     [bool]$SkipTests=$false,
     [bool]$TemplatesBuild=-not $CIBuild,
     [bool]$EngineBuild=-not $CIBuild,
-    [switch]$Help)
+    [switch]$Help,
+    [string]$PB_SkipTests="false")
+
+switch ($PB_SkipTests.ToLower())
+{
+	"true" { $PB_SkipTests = "True" }
+	default { $PB_SkipTests = "False" }
+}
 
 if($Help)
 {
@@ -88,5 +95,5 @@ $NoTimestampPackageVersion=$env:PACKAGE_VERSION + "-" + $env:BUILD_QUALITY
 
 $TimestampPackageVersion=$NoTimestampPackageVersion + "-" + [System.DateTime]::Now.ToString("yyyyMMdd") + "-" + $env:BUILD_NUMBER
 
-& dotnet msbuild $RepoRoot\build.proj /p:IsFullFrameworkBuildSupported=$PerformFullFrameworkBuild /p:Configuration=$Configuration /p:CIBuild=$CIBuild /p:SkipTests=$SkipTests /p:TemplatesBuild=$TemplatesBuild /p:EngineBuild=$EngineBuild
+& dotnet msbuild $RepoRoot\build.proj /p:IsFullFrameworkBuildSupported=$PerformFullFrameworkBuild /p:Configuration=$Configuration /p:CIBuild=$CIBuild /p:SkipTests=$SkipTests /p:TemplatesBuild=$TemplatesBuild /p:EngineBuild=$EngineBuild /p:PB_SkipTests=$PB_SkipTests
 & $RepoRoot\SetPath.ps1 -DevDir "$DevDir"
