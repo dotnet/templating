@@ -98,9 +98,9 @@ Arguments:
 
 <truncated>
 ```
-### Template Nuget Packages
-- The build the that produces the **template Nuget packages** currently has a dependency on **Nuget.exe**.
-  - Because of this, those that wish to `install` using the **template Nuget packages** will need to be on Windows in order to produce the appropriate assets. 
+### Template NuGet Packages
+- The build the that produces the **template NuGet packages** currently has a dependency on **nuget.exe**.
+  - Because of this, those that wish to `install` using the **template NuGet packages** will need to be on Windows in order to produce the appropriate assets. 
     
 ## Debugging
 Debugging code requires your current `dotnet new3` session to have its active build session configured to DEBUG, and a debugger from your application of choice to be attached to the current running `dotnet new3` process. The steps required to accomplish this are outlined below.
