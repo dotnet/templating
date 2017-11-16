@@ -401,6 +401,33 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to All.
+        /// </summary>
+        public static string AllUpdates_AllResponse {
+            get {
+                return ResourceManager.GetString("AllUpdates_AllResponse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to None.
+        /// </summary>
+        public static string AllUpdates_NoneResponse {
+            get {
+                return ResourceManager.GetString("AllUpdates_NoneResponse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Prompt.
+        /// </summary>
+        public static string AllUpdates_PromptResponse {
+            get {
+                return ResourceManager.GetString("AllUpdates_PromptResponse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Apply updates ([A]ll|[N]one|[P]rompt)?.
         /// </summary>
         public static string AllUpdatesApplyPrompt {
@@ -1109,11 +1136,29 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid input &quot;{0}&quot;. Please enter one of (Y|N)..
+        ///   Looks up a localized string similar to Invalid input &quot;{0}&quot;. Please enter one of ([Y]es|[N]o)..
         /// </summary>
         public static string PostActionInvalidInputRePrompt {
             get {
                 return ResourceManager.GetString("PostActionInvalidInputRePrompt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No.
+        /// </summary>
+        public static string PostActionPrompt_NoResponse {
+            get {
+                return ResourceManager.GetString("PostActionPrompt_NoResponse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yes.
+        /// </summary>
+        public static string PostActionPrompt_YesResponse {
+            get {
+                return ResourceManager.GetString("PostActionPrompt_YesResponse", resourceCulture);
             }
         }
         
@@ -1127,7 +1172,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Do you want to run this action (Y|N)?.
+        ///   Looks up a localized string similar to Do you want to run this action ([Y]es|[N]o)?.
         /// </summary>
         public static string PostActionPromptRequest {
             get {
@@ -1250,6 +1295,24 @@ namespace Microsoft.TemplateEngine.Cli {
         public static string ShowsFilteredTemplates {
             get {
                 return ResourceManager.GetString("ShowsFilteredTemplates", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No.
+        /// </summary>
+        public static string SingleChoice_NoResponse {
+            get {
+                return ResourceManager.GetString("SingleChoice_NoResponse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yes.
+        /// </summary>
+        public static string SingleChoice_YesResponse {
+            get {
+                return ResourceManager.GetString("SingleChoice_YesResponse", resourceCulture);
             }
         }
         

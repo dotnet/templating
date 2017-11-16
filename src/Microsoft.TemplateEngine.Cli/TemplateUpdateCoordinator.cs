@@ -113,24 +113,25 @@ namespace Microsoft.TemplateEngine.Cli
                 Reporter.Output.WriteLine(LocalizableStrings.AllUpdatesApplyPrompt.Bold().Red());
                 string userChoice = inputGetter();
 
-                switch (userChoice.ToLowerInvariant())
+                if (string.Equals(userChoice, LocalizableStrings.AllUpdates_AllResponse, StringComparison.CurrentCultureIgnoreCase)
+                        || string.Equals(userChoice, LocalizableStrings.AllUpdates_AllResponse.Substring(0, 1), StringComparison.CurrentCultureIgnoreCase))
                 {
-                    case "a":
-                    case "all":
-                        choice = ApplyUpdatesChoice.All;
-                        break;
-                    case "n":
-                    case "none":
-                        choice = ApplyUpdatesChoice.None;
-                        break;
-                    case "p":
-                    case "prompt":
-                        choice = ApplyUpdatesChoice.Prompt;
-                        break;
-                    default:
-                        choice = ApplyUpdatesChoice.InvalidChoice;
-                        Reporter.Output.Write(LocalizableStrings.ApplyUpdatesInvalidChoiceResponse.Bold().Red());
-                        break;
+                    choice = ApplyUpdatesChoice.All;
+                }
+                else if (string.Equals(userChoice, LocalizableStrings.AllUpdates_NoneResponse, StringComparison.CurrentCultureIgnoreCase)
+                        || string.Equals(userChoice, LocalizableStrings.AllUpdates_NoneResponse.Substring(0, 1), StringComparison.CurrentCultureIgnoreCase))
+                {
+                    choice = ApplyUpdatesChoice.None;
+                }
+                else if (string.Equals(userChoice, LocalizableStrings.AllUpdates_PromptResponse, StringComparison.CurrentCultureIgnoreCase)
+                        || string.Equals(userChoice, LocalizableStrings.AllUpdates_PromptResponse.Substring(0, 1), StringComparison.CurrentCultureIgnoreCase))
+                {
+                    choice = ApplyUpdatesChoice.Prompt;
+                }
+                else
+                {
+                    choice = ApplyUpdatesChoice.InvalidChoice;
+                    Reporter.Output.Write(LocalizableStrings.ApplyUpdatesInvalidChoiceResponse.Bold().Red());
                 }
             } while (choice == ApplyUpdatesChoice.InvalidChoice);
 
@@ -145,24 +146,23 @@ namespace Microsoft.TemplateEngine.Cli
             do
             {
                 Reporter.Output.WriteLine(string.Format(LocalizableStrings.SingleUpdateApplyPrompt.Bold().Red(), descriptor.UpdateDisplayInfo));
-
                 string userChoice = inputGetter();
 
-                switch (userChoice.ToLowerInvariant())
+                if (string.Equals(userChoice, LocalizableStrings.SingleChoice_YesResponse, StringComparison.CurrentCultureIgnoreCase)
+                        || string.Equals(userChoice, LocalizableStrings.SingleChoice_YesResponse.Substring(0, 1), StringComparison.CurrentCultureIgnoreCase))
                 {
-                    case "y":
-                    case "yes":
-                        installChoice = true;
-                        validChoice = true;
-                        break;
-                    case "n":
-                    case "no":
-                        installChoice = false;
-                        validChoice = true;
-                        break;
-                    default:
-                        Reporter.Output.WriteLine(LocalizableStrings.ApplyUpdatesInvalidChoiceResponse.Bold().Red());
-                        break;
+                    installChoice = true;
+                    validChoice = true;
+                }
+                else if (string.Equals(userChoice, LocalizableStrings.SingleChoice_NoResponse, StringComparison.CurrentCultureIgnoreCase)
+                        || string.Equals(userChoice, LocalizableStrings.SingleChoice_NoResponse.Substring(0, 1), StringComparison.CurrentCultureIgnoreCase))
+                {
+                    installChoice = false;
+                    validChoice = true;
+                }
+                else
+                {
+                    Reporter.Output.WriteLine(LocalizableStrings.ApplyUpdatesInvalidChoiceResponse.Bold().Red());
                 }
             } while (!validChoice);
 

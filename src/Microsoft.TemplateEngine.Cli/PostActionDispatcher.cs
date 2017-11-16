@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Cli.PostActionProcessors;
 using Microsoft.TemplateEngine.Edge.Template;
@@ -118,11 +118,13 @@ namespace Microsoft.TemplateEngine.Cli
             {
                 string input = inputGetter();
 
-                if (input.Equals("Y", StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(input, LocalizableStrings.PostActionPrompt_YesResponse, StringComparison.CurrentCultureIgnoreCase)
+                        || string.Equals(input, LocalizableStrings.PostActionPrompt_YesResponse.Substring(0, 1), StringComparison.CurrentCultureIgnoreCase))
                 {
                     return true;
                 }
-                else if (input.Equals("N", StringComparison.OrdinalIgnoreCase))
+                else if (string.Equals(input, LocalizableStrings.PostActionPrompt_NoResponse, StringComparison.CurrentCultureIgnoreCase)
+                        || string.Equals(input, LocalizableStrings.PostActionPrompt_NoResponse.Substring(0, 1), StringComparison.CurrentCultureIgnoreCase))
                 {
                     return false;
                 }
