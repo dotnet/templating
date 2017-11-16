@@ -318,6 +318,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";AllUpdatesApplyPrompt" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Apply updates ([A]5D;ll|[N]5D;one|[P]5D;rompt)?]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[¿Aplicar actualizaciones ([T]5D;odas|[N]5D;inguna|[P]5D;reguntar)?]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";AllowScriptsNoChoice" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Do not allow scripts to run]]></Val>
@@ -350,6 +359,15 @@
           <Val><![CDATA[Unable to determine the desired template from the input template name: {0}.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[No se pudo determinar la plantilla deseada con el nombre de plantilla de entrada: {0}.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";ApplyUpdatesInvalidChoiceResponse" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Invalid choice...]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Opción no válida...]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -458,6 +476,15 @@
           <Val><![CDATA[Command succeeded.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[El comando se ejecutó correctamente.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";CommitHash" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[ Commit Hash: {0}]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[ Hash de confirmación: {0}]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -687,6 +714,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";InstalledItems" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Currently installed items:]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Elementos instalados actualmente:]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";InstallingUpdates" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Installing updates...]]></Val>
@@ -876,6 +912,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";NoUpdatesFound" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[No updates found.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[No se encontraron actualizaciones.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";OptionVariantAlreadyDefined" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Option variant {0} for canonical {1} was already defined for canonical {2}.]]></Val>
@@ -953,6 +998,15 @@
           <Val><![CDATA[Parent]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Elemento primario]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";PartialTemplateMatchSwitchesNotValidForAllMatches" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Some partially matched templates may not support these input switches:]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Puede que algunas plantillas con coincidencia parcial no admitan estos modificadores de entrada:]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1095,6 +1149,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";SettingsReadError" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Error reading the installed configuration, file may be corrupted. If this problem persists, try resetting with the `--debug:reinit' flag]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Error al leer la configuración instalada; puede que el archivo esté dañado. Si el problema persiste, pruebe a restablecer con la marca "--debug:reinit".]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";ShortName" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Short Name]]></Val>
@@ -1127,6 +1190,24 @@
           <Val><![CDATA[Filters templates based on available types. Predefined values are "project", "item" or "other".]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Filtra las plantillas por los tipos disponibles. Los valores predefinidos son "other", "project" o "item".]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";SingleTemplateGroupPartialMatchSwitchesNotValidForAllMatches" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[The following parameter(s) or their value(s) are not valid in combination with other supplied parameters or their values:]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Los parámetros siguientes o sus valores no son válidos en combinación con otros que se han proporcionado o con sus valores:]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";SingleUpdateApplyPrompt" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[{0} : update ([Y]5D;es|[N]5D;o)?]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[{0}: ¿Actualizar ([S]5D;í|[N]5D;o)?]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1172,6 +1253,15 @@
           <Val><![CDATA[{0} matches the specified name, but has been excluded by the --type parameter. Remove or change the --type parameter to use that template.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[{0} coincide con el nombre especificado, pero se ha excluido con el parámetro --type. Quite o cambie el parámetro --type para usar esa plantilla.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";TemplateUpdateError" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[An error occured updating templates for: {0}]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Error al actualizar las plantillas para: {0}]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1239,6 +1329,24 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";UpdateCheckError" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[An error occured checking for {0} template updates.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Error al comprobar las actualizaciones de plantilla para {0}.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";UpdateCheckerNotAvailable" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[No update checker(s) for the following:]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[No hay comprobadores de actualizaciones para lo siguiente:]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";UpdateHelp" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Update matching templates.]]></Val>
@@ -1248,11 +1356,29 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";UpdatesAvailableListHeader" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Updates are available for the following:]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Actualizaciones disponibles para lo siguiente:]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";ValueSpecifiedForValuelessParameter" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Value specified for valueless parameter: {0}.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Se ha especificado un valor para un parámetro sin valor: {0}.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";Version" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[ Version:     {0}]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[ Versión:     {0}]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1281,7 +1407,7 @@
     <Disp Icon="Ver" Disp="true" LocTbl="false" Path=" \ ;Version \ 8 \ 0" />
     <Item ItemId=";AssemblyVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0.305]]></Val>
+        <Val><![CDATA[1.0.0.312]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1314,7 +1440,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0.305]]></Val>
+        <Val><![CDATA[1.0.0.312]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1350,7 +1476,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0-beta2-20170828-305+305.399968b62f0d673b27fbca6e7864f10a4b9e45df]]></Val>
+        <Val><![CDATA[1.0.0-beta3-20171110-312+312.aebe22d9251cfc16cfeffdbb80942308573764f4]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
