@@ -96,11 +96,20 @@ namespace Microsoft.TemplateEngine
                       Lines="$(GitInfoPropsContent)"
                       Overwrite="true" />
   </Target>
-  
-  <ItemGroup>
-    <Compile Include="$(GitInfoFile)" Condition="Exists('$(GitInfoFile)')" Link="%(RecursiveDir)%(Filename)%(Extension)" />
-    <Compile Include="$(MSBuildThisFileDirectory)src/GitInfo.cs" Condition="!Exists('$(GitInfoFile)')" Link="%(RecursiveDir)%(Filename)%(Extension)" />
-  </ItemGroup>
+
+    <ItemGroup>
+        <Compile Include="$(GitInfoFile)" Condition="Exists('$(GitInfoFile)')" Link="%(RecursiveDir)%(Filename)%(Extension)" />
+        <Compile Include="$(MSBuildThisFileDirectory)src/GitInfo.cs" Condition="!Exists('$(GitInfoFile)')" Link="%(RecursiveDir)%(Filename)%(Extension)" />
+    </ItemGroup>
+    <ItemGroup>
+        <FilesToSign Include="$(TargetPath)">
+            <Authenticode>Microsoft400</Authenticode>
+            <StrongName>StrongName</StrongName>
+        </FilesToSign>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="MicroBuild.Core" Version="0.2.0" />
+    </ItemGroup>
 
   <Import Project="$(GitInfoProps)" Condition="Exists('$(GitInfoProps)')" />
 </Project>
