@@ -30,6 +30,7 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)Key.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
+    <DelaySign>true</DelaySign>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <GitInfoFile>$(MSBuildThisFileDirectory)artifacts\GitInfo.cs</GitInfoFile>
     <GitInfoProps>$(MSBuildThisFileDirectory)artifacts\GitInfo.props</GitInfoProps>
