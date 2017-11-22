@@ -69,7 +69,7 @@ $env:PATH = "$env:DOTNET_INSTALL_DIR;$env:PATH"
 
 if (!$env:MSBuildExePath)
 {
-    $env:MSBuildExePath= "${Env:ProgramFiles(x86)}" + "\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin\MSBuild.exe"
+    $env:MSBuildExePath= "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin\msbuild.exe"
 }
 
 $env:PATH = "$env:MSBuildExePath;$env:PATH"
