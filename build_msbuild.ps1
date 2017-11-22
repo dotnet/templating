@@ -67,12 +67,6 @@ if($LASTEXITCODE -ne 0) { throw "Failed to install dotnet cli" }
 # Put the stage0 on the path
 $env:PATH = "$env:DOTNET_INSTALL_DIR;$env:PATH"
 
-if (!$env:MSBuildExePath)
-{
-    $env:MSBuildExePath= "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin\msbuild.exe"
-}
-
-$env:PATH = "$env:MSBuildExePath;$env:PATH"
 
 if (-not $env:BUILD_NUMBER)
 {
@@ -95,5 +89,5 @@ $NoTimestampPackageVersion=$env:PACKAGE_VERSION + "-" + $env:BUILD_QUALITY
 
 $TimestampPackageVersion=$NoTimestampPackageVersion + "-" + [System.DateTime]::Now.ToString("yyyyMMdd") + "-" + $env:BUILD_NUMBER
 
-& msbuild $RepoRoot\build.proj /p:IsFullFrameworkBuildSupported=$PerformFullFrameworkBuild /p:Configuration=$Configuration /p:CIBuild=$CIBuild /p:SkipTests=$SkipTests /p:TemplatesBuild=$TemplatesBuild /p:EngineBuild=$EngineBuild
+& "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin\msbuild.exe" $RepoRoot\build.proj /p:IsFullFrameworkBuildSupported=$PerformFullFrameworkBuild /p:Configuration=$Configuration /p:CIBuild=$CIBuild /p:SkipTests=$SkipTests /p:TemplatesBuild=$TemplatesBuild /p:EngineBuild=$EngineBuild
 & $RepoRoot\SetPath.ps1 -DevDir "$DevDir"
