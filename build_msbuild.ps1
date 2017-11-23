@@ -89,5 +89,5 @@ $NoTimestampPackageVersion=$env:PACKAGE_VERSION + "-" + $env:BUILD_QUALITY
 
 $TimestampPackageVersion=$NoTimestampPackageVersion + "-" + [System.DateTime]::Now.ToString("yyyyMMdd") + "-" + $env:BUILD_NUMBER
 
-& "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin\msbuild.exe" $RepoRoot\build.proj /p:IsFullFrameworkBuildSupported=$PerformFullFrameworkBuild /p:Configuration=$Configuration /p:CIBuild=$CIBuild /p:SkipTests=$SkipTests /p:TemplatesBuild=$TemplatesBuild /p:EngineBuild=$EngineBuild
+& $env:MSBuildExePath $RepoRoot\build.proj /p:IsFullFrameworkBuildSupported=$PerformFullFrameworkBuild /p:Configuration=$Configuration /p:CIBuild=$CIBuild /p:SkipTests=$SkipTests /p:TemplatesBuild=$TemplatesBuild /p:EngineBuild=$EngineBuild
 & $RepoRoot\SetPath.ps1 -DevDir "$DevDir"

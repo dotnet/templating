@@ -168,12 +168,13 @@
   <Target Name="BuildLocalized" DependsOnTargets="SetLanguages" Condition="Exists('.tools\loc\loc.proj')">
     <MSBuild Projects=".tools\loc\loc.proj" Targets="Build"
              Properties="Lang=%(Languages.Identity)" />
-
-    <MSBuild Projects="$(LocProjects)" Targets="Restore;Build"
-             Properties="Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath)"
+			 	
+	<MSBuild Condition="'$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test'"
+             Projects="sign.proj"
+             Targets="PostCompileSign"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 			 
-	<MSBuild Projects="$(LocProjects)" Targets="Pack"
+	<MSBuild Projects="$(LocProjects)" Targets="Restore;Build;Pack"
              Properties="Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath)"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
@@ -191,10 +192,4 @@
     </ItemGroup>
   </Target>
 
-  <!-- Signing -->
-  <Target Name="SignBinaries" Condition="Exists('.tools\sign\sign.proj')">
-    <MSBuild Projects=".tools\sign\sign.proj" Targets="Build"
-             Properties="CodeSignCreateTestJob=$(CodeSignCreateTestJob);TestSign=$(TestSign)" />
-
-  </Target>
 </Project>
