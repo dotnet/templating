@@ -169,7 +169,11 @@
     <MSBuild Projects=".tools\loc\loc.proj" Targets="Build"
              Properties="Lang=%(Languages.Identity)" />
 
-    <MSBuild Projects="$(LocProjects)" Targets="Restore;Pack"
+    <MSBuild Projects="$(LocProjects)" Targets="Restore;Build"
+             Properties="Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath)"
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+			 
+	<MSBuild Projects="$(LocProjects)" Targets="Pack"
              Properties="Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath)"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
