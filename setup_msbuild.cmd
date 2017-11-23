@@ -21,6 +21,10 @@ CALL "%~dp0\harderreset.cmd"
 
 mkdir %~dp0\dev 1>nul
 
+if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin\MSBuild.exe" (
+    set "MSBuildExePath=%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin\MsBuild.exe"
+)
+
 echo "Calling build.ps1"
 powershell -NoProfile -NoLogo -Command "& \"%~dp0build_msbuild.ps1\" -Configuration %DN3B% -PerformFullFrameworkBuild %DN3FFB% %*; exit $LastExitCode;"
 

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project InitialTargets="SetSigningProperties" DefaultTargets="SignFiles" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <NuGetPackageRoot Condition="'$(NuGetPackageRoot)' == ''">$(NUGET_PACKAGES)</NuGetPackageRoot> <!-- Respect environment variable if set -->
+    <NuGetPackageRoot Condition="'$(NuGetPackageRoot)' == ''">$(UserProfile)\.nuget\packages</NuGetPackageRoot>
+    <MicroBuildVersion>0.2.0</MicroBuildVersion>
+    <MicroBuildPropsAndTargetsPath>$(NuGetPackageRoot)/microbuild.core/$(MicroBuildVersion)/build/</MicroBuildPropsAndTargetsPath>
+  </PropertyGroup>
+  
+  <Import Project="$(MicroBuildPropsAndTargetsPath)MicroBuild.Core.props" Condition="Exists('$(MicroBuildPropsAndTargetsPath)MicroBuild.Core.props')" />
+
+  <!-- This will be overridden if we're building with MicroBuild. -->
+  <Target Name="SignFiles">
+    <Message Text="Fake sign target.  Would sign: @(FilesToSign)" />
+  </Target>
+
+  <Target Name="SetSigningProperties">
+    <PropertyGroup>
+
+      <!-- The OutDir and IntermediateOutputPath properties are required by MicroBuild. MicroBuild only
+           signs files that are under these paths. -->
+      <OutDir Condition="'$(OutDir)' == ''">$(MSBuildThisFileDirectory)artifacts\</OutDir>
+      <IntermediateOutputPath Condition="'$(IntermediateOutputPath)' == ''">$(MSBuildThisFileDirectory)\artifacts\scratch</IntermediateOutputPath>
+    </PropertyGroup>
+  </Target>
+
+  <Target Name="PostCompileSign" DependsOnTargets="GetPostCompileSignFiles;SignFiles" />
+
+  <Target Name="GetPostCompileSignFiles">
+    <ItemGroup>
+      <!-- Built loc binaries -->
+      <FilesToSign Include="$(OutDir)\localize\**\Microsoft.TemplateEngine.Cli.resources.dll">
+		<Authenticode>Microsoft400</Authenticode>
+		<StrongName>StrongName</StrongName>
+	  </FilesToSign>
+    </ItemGroup>
+  </Target>
+
+  <Import Project="$(MicroBuildPropsAndTargetsPath)MicroBuild.Core.targets" Condition="Exists('$(MicroBuildPropsAndTargetsPath)MicroBuild.Core.targets')" />
+</Project>
