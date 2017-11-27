@@ -165,6 +165,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                     Create.Option("--baseline", string.Empty, Accept.ExactlyOneArgument()),
                     Create.Option("--update", string.Empty, Accept.NoArguments()),
                     Create.Option("--update-no-prompt", string.Empty, Accept.NoArguments()),
+                    Create.Option("--search", string.Empty, Accept.NoArguments()),
                 };
             }
         }

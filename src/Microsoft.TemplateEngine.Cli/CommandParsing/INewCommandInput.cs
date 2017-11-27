@@ -54,6 +54,8 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
         bool CheckForUpdatesNoPrompt { get; }
 
+        bool SearchForTemplates { get; }
+
         string AllowScriptsToRun { get; }
 
         bool HasDebuggingFlag(string flag);
