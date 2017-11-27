@@ -1,7 +1,6 @@
-using Microsoft.TemplateEngine.Edge.Template;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using Microsoft.TemplateEngine.Edge.Template;
 
 namespace Microsoft.TemplateEngine.Cli.TemplateSearch
 {

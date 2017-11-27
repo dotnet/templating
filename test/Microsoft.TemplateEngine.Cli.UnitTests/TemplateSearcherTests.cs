@@ -1,26 +1,17 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Cli.TemplateSearch;
 using Microsoft.TemplateEngine.Cli.UnitTests.CliMocks;
 using Microsoft.TemplateEngine.Mocks;
 using Microsoft.TemplateEngine.TestHelper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Xunit;
 
 namespace Microsoft.TemplateEngine.Cli.UnitTests
 {
     public class TemplateSearcherTests : TestBase
     {
-        // TODO: create a helper that creates the different mock sources.
-        // It'll take a list of lists of "possible results", and a mock source will be created / registered for each one.
-        // It'll have to create the sources with the possible results, then assign them to the instances.
-        // The input possible results should probably each be assigned a display name for the mock source (which will also need to be reset after registration)
-        //
-        // ... This is mostly done (but untested) in MockTemplateSearchSource
-
-
         [Fact(DisplayName = nameof(TwoSourcesAreBothSearched))]
         public void TwoSourcesAreBothSearched()
         {
