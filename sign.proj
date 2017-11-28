@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project InitialTargets="SetSigningProperties" DefaultTargets="SignFiles" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="SignFiles" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup>
     <NuGetPackageRoot Condition="'$(NuGetPackageRoot)' == ''">$(NUGET_PACKAGES)</NuGetPackageRoot> <!-- Respect environment variable if set -->
@@ -15,22 +15,48 @@
     <Message Text="Fake sign target.  Would sign: @(FilesToSign)" />
   </Target>
 
-  <Target Name="SetSigningProperties">
+
+  <Target Name="PostCompileSign" DependsOnTargets="GetPostCompileSignFiles;SignFiles" />
+  <Target Name="GetPostCompileSignFiles">
     <PropertyGroup>
 
       <!-- The OutDir and IntermediateOutputPath properties are required by MicroBuild. MicroBuild only
            signs files that are under these paths. -->
-      <OutDir Condition="'$(OutDir)' == ''">$(MSBuildThisFileDirectory)artifacts\</OutDir>
-      <IntermediateOutputPath Condition="'$(IntermediateOutputPath)' == ''">$(MSBuildThisFileDirectory)\artifacts\scratch</IntermediateOutputPath>
+      <OutDir>$(MSBuildThisFileDirectory)</OutDir>
+      <IntermediateOutputPath>$(MSBuildThisFileDirectory)artifacts\scratch</IntermediateOutputPath>
     </PropertyGroup>
-  </Target>
-
-  <Target Name="PostCompileSign" DependsOnTargets="GetPostCompileSignFiles;SignFiles" />
-
-  <Target Name="GetPostCompileSignFiles">
+	
     <ItemGroup>
       <!-- Built loc binaries -->
-      <FilesToSign Include="$(OutDir)\localize\**\Microsoft.TemplateEngine.Cli.resources.dll">
+      <FilesToSign Include="$(OutDir)src\**\microsoft.templateengine.abstractions.dll;
+							$(OutDir)src\**\microsoft.templateengine.cli.dll;
+							$(OutDir)src\**\microsoft.templateengine.cli.resources.dll;
+							$(OutDir)src\**\microsoft.templateengine.core.dll;
+							$(OutDir)src\**\microsoft.templateengine.core.contracts.dll;
+							$(OutDir)src\**\microsoft.templateengine.edge.dll;
+							$(OutDir)src\**\microsoft.templateengine.ide.dll;
+							$(OutDir)src\**\microsoft.templateengine.orchestrator.runnableprojects.dll;
+							$(OutDir)src\**\microsoft.templateengine.utils.dll;
+							$(OutDir)test\**\microsoft.templateengine.mocks.dll">
+		<Authenticode>Microsoft400</Authenticode>
+		<StrongName>StrongName</StrongName>
+	  </FilesToSign>
+    </ItemGroup>
+  </Target>
+  
+  <Target Name="PostCompileLocSign" DependsOnTargets="GetPostCompileLocSignFiles;SignFiles" />
+  <Target Name="GetPostCompileLocSignFiles">
+    <PropertyGroup>
+
+      <!-- The OutDir and IntermediateOutputPath properties are required by MicroBuild. MicroBuild only
+           signs files that are under these paths. -->
+      <OutDir>$(MSBuildThisFileDirectory)artifacts\</OutDir>
+      <IntermediateOutputPath>$(MSBuildThisFileDirectory)artifacts\scratch</IntermediateOutputPath>
+    </PropertyGroup>
+	
+    <ItemGroup>
+      <!-- Built loc binaries -->
+      <FilesToSign Include="$(OutDir)localize\**\Microsoft.TemplateEngine.Cli.resources.dll">
 		<Authenticode>Microsoft400</Authenticode>
 		<StrongName>StrongName</StrongName>
 	  </FilesToSign>
