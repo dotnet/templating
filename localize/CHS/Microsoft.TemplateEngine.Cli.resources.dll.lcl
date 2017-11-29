@@ -321,6 +321,9 @@
       <Item ItemId=";AllUpdatesApplyPrompt" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Apply updates ([A]5D;ll|[N]5D;one|[P]5D;rompt)?]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[应用更新([A]5D;ll|[N]5D;one|[P]5D;rompt)?]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -363,6 +366,9 @@
       <Item ItemId=";ApplyUpdatesInvalidChoiceResponse" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Invalid choice...]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[选择无效...]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -477,6 +483,9 @@
       <Item ItemId=";CommitHash" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[ Commit Hash: {0}]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[ 提交哈希: {0}]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -708,6 +717,9 @@
       <Item ItemId=";InstalledItems" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Currently installed items:]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[当前已安装的项目:]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -903,6 +915,9 @@
       <Item ItemId=";NoUpdatesFound" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[No updates found.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[未找到更新。]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -990,6 +1005,9 @@
       <Item ItemId=";PartialTemplateMatchSwitchesNotValidForAllMatches" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Some partially matched templates may not support these input switches:]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[某些部分匹配的模板可能不支持这些输入开关:]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1134,6 +1152,9 @@
       <Item ItemId=";SettingsReadError" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Error reading the installed configuration, file may be corrupted. If this problem persists, try resetting with the `--debug:reinit' flag]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[读取已安装的配置时出错，文件可能已损坏。如果此问题仍然存在，请尝试使用 `--debug:reinit' 标志进行重置]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1176,12 +1197,18 @@
       <Item ItemId=";SingleTemplateGroupPartialMatchSwitchesNotValidForAllMatches" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[The following parameter(s) or their value(s) are not valid in combination with other supplied parameters or their values:]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[与提供的其他参数或它们的值相结合时，以下参数或它们的值无效:]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
       <Item ItemId=";SingleUpdateApplyPrompt" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[{0} : update ([Y]5D;es|[N]5D;o)?]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[{0} : 更新([Y]5D;es|[N]5D;o)?]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1233,6 +1260,9 @@
       <Item ItemId=";TemplateUpdateError" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[An error occured updating templates for: {0}]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[更新 {0} 的模板时出错]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1302,12 +1332,18 @@
       <Item ItemId=";UpdateCheckError" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[An error occured checking for {0} template updates.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[检查 {0} 模板的更新时出错。]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
       <Item ItemId=";UpdateCheckerNotAvailable" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[No update checker(s) for the following:]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[以下项没有更新检查器:]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1323,6 +1359,9 @@
       <Item ItemId=";UpdatesAvailableListHeader" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Updates are available for the following:]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[更新不适用于以下项:]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
