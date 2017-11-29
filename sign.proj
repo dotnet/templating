@@ -27,7 +27,7 @@
     </PropertyGroup>
 	
     <ItemGroup>
-      <!-- Built loc binaries -->
+      <!-- Adding the assemblies to sign -->
       <FilesToSign Include="$(OutDir)src\**\microsoft.templateengine.abstractions.dll;
 							$(OutDir)src\**\microsoft.templateengine.cli.dll;
 							$(OutDir)src\**\microsoft.templateengine.cli.resources.dll;
@@ -37,7 +37,8 @@
 							$(OutDir)src\**\microsoft.templateengine.ide.dll;
 							$(OutDir)src\**\microsoft.templateengine.orchestrator.runnableprojects.dll;
 							$(OutDir)src\**\microsoft.templateengine.utils.dll;
-							$(OutDir)test\**\microsoft.templateengine.mocks.dll">
+							$(OutDir)test\**\microsoft.templateengine.mocks.dll;
+							$(OutDir)test\**\microsoft.templateengine.testhelper.dll">
 		<Authenticode>Microsoft400</Authenticode>
 		<StrongName>StrongName</StrongName>
 	  </FilesToSign>
@@ -55,7 +56,7 @@
     </PropertyGroup>
 	
     <ItemGroup>
-      <!-- Built loc binaries -->
+      <!-- Adding the loc assemblies to sign. -->
       <FilesToSign Include="$(OutDir)localize\**\Microsoft.TemplateEngine.Cli.resources.dll">
 		<Authenticode>Microsoft400</Authenticode>
 		<StrongName>StrongName</StrongName>

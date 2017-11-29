@@ -97,7 +97,17 @@
              Properties="TargetFramework=$(FullFrameworkTargetFramework);Configuration=$(Configuration)"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
-
+	<MSBuild Projects="$(SharedTestProjects)" Targets="Restore;Build"
+             Condition="'$(IsFullFrameworkBuildSupported)' == 'true' AND '$(EngineBuild)' == 'true'"
+             Properties="TargetFramework=$(FullFrameworkTestTargetFramework);Configuration=$(Configuration)"
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+			 
+	<!-- Build the shared test projects (test helper, etc.) -->
+    <MSBuild Projects="$(SharedTestProjects)" Targets="Restore;Build"
+             Condition="'$(EngineBuild)' == 'true'"
+             Properties="TargetFramework=$(OuterRingTargetFramework);Configuration=$(Configuration)"
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+			 
     <!-- Build projects that only build for the dotnet CLI -->
     <MSBuild Projects="$(CliProjects)" Targets="Restore;Build"
              Condition="'$(EngineBuild)' == 'true'"
@@ -142,6 +152,11 @@
              Condition="'$(EngineBuild)' == 'true'"
              Properties="TargetFramework=$(OuterRingTargetFramework);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath);NoBuild=true;IncludeSymbols=true"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+			 
+	<MSBuild Projects="$(SharedTestProjects)" Targets="Pack"
+             Condition="'$(EngineBuild)' == 'true'"
+             Properties="TargetFrameworks=$(SharedTestPackTargetFrameworks);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath);NoBuild=true;IncludeSymbols=true"
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <MSBuild Projects="src/dotnet-new3/dotnet-new3.csproj" Targets="Publish"
              Condition="'$(EngineBuild)' == 'true'"
@@ -151,23 +166,7 @@
   </Target>
   
  <Target Name="Test" Condition="'$(PB_SkipTests)' != 'true'">
- 
-  <MSBuild Projects="$(SharedTestProjects)" Targets="Restore;Build"
-             Condition="'$(IsFullFrameworkBuildSupported)' == 'true' AND '$(EngineBuild)' == 'true'"
-             Properties="TargetFramework=$(FullFrameworkTestTargetFramework);Configuration=$(Configuration)"
-             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
-			 
-	<!-- Build the shared test projects (test helper, etc.) -->
-    <MSBuild Projects="$(SharedTestProjects)" Targets="Restore;Build"
-             Condition="'$(EngineBuild)' == 'true'"
-             Properties="TargetFramework=$(OuterRingTargetFramework);Configuration=$(Configuration)"
-             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
-			 
-	<MSBuild Projects="$(SharedTestProjects)" Targets="Pack"
-             Condition="'$(EngineBuild)' == 'true'"
-             Properties="TargetFrameworks=$(SharedTestPackTargetFrameworks);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath);NoBuild=true;IncludeSymbols=true"
-             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
-			 
+ 			 
     <!-- Build the test harness -->
     <MSBuild Projects="$(TestUtilities)" Targets="Restore;Build"
              Condition="'$(EngineBuild)' == 'true'"
