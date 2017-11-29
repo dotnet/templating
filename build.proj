@@ -136,11 +136,6 @@
     <MSBuild Projects="$(OuterRingProjects)" Targets="Pack"
              Condition="'$(EngineBuild)' == 'true'"
              Properties="TargetFrameworks=$(OuterRingPackTargetFrameworks);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath);NoBuild=true;IncludeSymbols=true"
-             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
-
-    <MSBuild Projects="$(SharedTestProjects)" Targets="Pack"
-             Condition="'$(EngineBuild)' == 'true' AND '$(PB_SkipTests)' != 'true'"
-             Properties="TargetFrameworks=$(SharedTestPackTargetFrameworks);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath);NoBuild=true;IncludeSymbols=true"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />			 
 
 	<MSBuild Projects="$(CliProjects)" Targets="Pack"
@@ -153,38 +148,46 @@
              Properties="TargetFramework=$(New3TargetFramework);Configuration=$(Configuration);PublishDir=$(DevPath);RestoreRecursive=false"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />			 
 
+  </Target>
+  
+ <Target Name="Test" Condition="'$(PB_SkipTests)' != 'true'">
+ 
+  <MSBuild Projects="$(SharedTestProjects)" Targets="Restore;Build"
+             Condition="'$(IsFullFrameworkBuildSupported)' == 'true' AND '$(EngineBuild)' == 'true'"
+             Properties="TargetFramework=$(FullFrameworkTestTargetFramework);Configuration=$(Configuration)"
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+			 
 	<!-- Build the shared test projects (test helper, etc.) -->
     <MSBuild Projects="$(SharedTestProjects)" Targets="Restore;Build"
-             Condition="'$(EngineBuild)' == 'true' AND '$(PB_SkipTests)' != 'true'"
+             Condition="'$(EngineBuild)' == 'true'"
              Properties="TargetFramework=$(OuterRingTargetFramework);Configuration=$(Configuration)"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
-
-    <MSBuild Projects="$(SharedTestProjects)" Targets="Restore;Build"
-             Condition="'$(IsFullFrameworkBuildSupported)' == 'true' AND '$(EngineBuild)' == 'true' AND '$(PB_SkipTests)' != 'true'"
-             Properties="TargetFramework=$(FullFrameworkTestTargetFramework);Configuration=$(Configuration)"
+			 
+	<MSBuild Projects="$(SharedTestProjects)" Targets="Pack"
+             Condition="'$(EngineBuild)' == 'true'"
+             Properties="TargetFrameworks=$(SharedTestPackTargetFrameworks);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath);NoBuild=true;IncludeSymbols=true"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 			 
     <!-- Build the test harness -->
     <MSBuild Projects="$(TestUtilities)" Targets="Restore;Build"
-             Condition="'$(EngineBuild)' == 'true' AND '$(PB_SkipTests)' != 'true'"
+             Condition="'$(EngineBuild)' == 'true'"
              Properties="TargetFramework=$(New3TargetFramework);Configuration=$(Configuration)"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <!-- Build tests -->
     <MSBuild Projects="$(TestProjects)" Targets="Restore;Build"
-             Condition="'$(EngineBuild)' == 'true' AND '$(PB_SkipTests)' != 'true'"
+             Condition="'$(EngineBuild)' == 'true'"
              Properties="TargetFramework=$(New3TargetFramework);Configuration=$(Configuration)"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <!-- Run tests -->
     <MSBuild Projects="$(TestProjects)" Targets="VSTest"
-             Condition="'$(EngineBuild)' == 'true' AND '$(SkipTests)' != 'true' AND '$(PB_SkipTests)' != 'true'"
+             Condition="'$(EngineBuild)' == 'true' AND '$(SkipTests)' != 'true'"
              Properties="TargetFramework=$(New3TargetFramework);Configuration=$(Configuration);VSTestLogger=trx"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
-			 
 
-  </Target>
-
+	</Target>
+	
   <!-- Localization -->
   <Target Name="BuildLocalized" DependsOnTargets="SetLanguages" Condition="Exists('.tools\loc\loc.proj')">
     <MSBuild Projects=".tools\loc\loc.proj" Targets="Build"
