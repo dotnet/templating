@@ -25,23 +25,24 @@
       <OutDir>$(MSBuildThisFileDirectory)</OutDir>
       <IntermediateOutputPath>$(MSBuildThisFileDirectory)artifacts\scratch</IntermediateOutputPath>
     </PropertyGroup>
-	
+    
     <ItemGroup>
       <!-- Adding the assemblies to sign -->
       <FilesToSign Include="$(OutDir)src\**\microsoft.templateengine.abstractions.dll;
-							$(OutDir)src\**\microsoft.templateengine.cli.dll;
-							$(OutDir)src\**\microsoft.templateengine.cli.resources.dll;
-							$(OutDir)src\**\microsoft.templateengine.core.dll;
-							$(OutDir)src\**\microsoft.templateengine.core.contracts.dll;
-							$(OutDir)src\**\microsoft.templateengine.edge.dll;
-							$(OutDir)src\**\microsoft.templateengine.ide.dll;
-							$(OutDir)src\**\microsoft.templateengine.orchestrator.runnableprojects.dll;
-							$(OutDir)src\**\microsoft.templateengine.utils.dll;
-							$(OutDir)test\**\microsoft.templateengine.mocks.dll;
-							$(OutDir)test\**\microsoft.templateengine.testhelper.dll">
-		<Authenticode>Microsoft400</Authenticode>
-		<StrongName>StrongName</StrongName>
-	  </FilesToSign>
+                            $(OutDir)src\**\microsoft.templateengine.cli.dll;
+                            $(OutDir)src\**\microsoft.templateengine.cli.resources.dll;
+                            $(OutDir)src\**\microsoft.templateengine.core.dll;
+                            $(OutDir)src\**\microsoft.templateengine.core.contracts.dll;
+                            $(OutDir)src\**\microsoft.templateengine.edge.dll;
+                            $(OutDir)src\**\microsoft.templateengine.ide.dll;
+                            $(OutDir)src\**\microsoft.templateengine.orchestrator.runnableprojects.dll;
+                            $(OutDir)src\**\microsoft.templateengine.utils.dll;
+                            $(OutDir)test\**\microsoft.templateengine.mocks.dll;
+                            $(OutDir)test\**\microsoft.templateengine.testhelper.dll"
+                   Exclude="$(OutDir)src\**\obj\**\*.dll;
+                            $(OutDir)test\**\obj\**\*.dll">
+        <Authenticode>Microsoft400</Authenticode>
+      </FilesToSign>
     </ItemGroup>
   </Target>
   
@@ -54,13 +55,12 @@
       <OutDir>$(MSBuildThisFileDirectory)artifacts\</OutDir>
       <IntermediateOutputPath>$(MSBuildThisFileDirectory)artifacts\scratch</IntermediateOutputPath>
     </PropertyGroup>
-	
+    
     <ItemGroup>
       <!-- Adding the loc assemblies to sign. -->
       <FilesToSign Include="$(OutDir)localize\**\Microsoft.TemplateEngine.Cli.resources.dll">
-		<Authenticode>Microsoft400</Authenticode>
-		<StrongName>StrongName</StrongName>
-	  </FilesToSign>
+        <Authenticode>Microsoft400</Authenticode>
+      </FilesToSign>
     </ItemGroup>
   </Target>
 

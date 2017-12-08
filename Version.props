@@ -31,7 +31,6 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)Key.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
-    <DelaySign Condition="'$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test'">true</DelaySign>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
     <GitInfoFile>$(MSBuildThisFileDirectory)artifacts\GitInfo.cs</GitInfoFile>
     <GitInfoProps>$(MSBuildThisFileDirectory)artifacts\GitInfo.props</GitInfoProps>
