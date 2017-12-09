@@ -192,7 +192,7 @@
     <MSBuild Projects=".tools\loc\loc.proj" Targets="Build"
              Properties="Lang=%(Languages.Identity)" />
 
-    <!-- String name the localized assemblies-->
+    <!-- Strong name the localized assemblies-->
     <MSBuild Projects="sign.proj"
             Targets="SNSignLocResources"
             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
