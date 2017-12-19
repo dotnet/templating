@@ -1,0 +1,35 @@
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!--
+  
+    PB_PublishType         {''|store1-store2-...-storeN}  List of stores where to publish assets to.
+    PB_PublishBlobFeedUrl  {''|URL}                       Target feed URL.
+    PB_PublishBlobFeedKey  {''|string}                    Account key.   
+  -->
+  
+  <PropertyGroup>
+    <NuGetPackageRoot Condition="'$(NuGetPackageRoot)' == ''">$(NUGET_PACKAGES)</NuGetPackageRoot> <!-- Respect environment variable if set -->
+    <NuGetPackageRoot Condition="'$(NuGetPackageRoot)' == ''">$(UserProfile)\.nuget\packages</NuGetPackageRoot>
+  </PropertyGroup>
+
+  <Import Project="$(NuGetPackageRoot)\$(FeedTasksPackage)\$(FeedTasksPackageVersion)\build\Microsoft.DotNet.Build.Tasks.Feed.targets" Condition="Exists('$(NuGetPackageRoot)\$(FeedTasksPackage)\$(FeedTasksPackageVersion)\build\Microsoft.DotNet.Build.Tasks.Feed.targets')" />
+  
+  <Target Name="Publish" Condition="'$(BlobFeedAccessToken)' != ''" >
+    <Error Condition="!Exists('$(NuGetPackageRoot)\$(FeedTasksPackage)\$(FeedTasksPackageVersion)\build\Microsoft.DotNet.Build.Tasks.Feed.targets')" Text="Missing the Publish blob target" />
+
+    <PropertyGroup>
+      <ExpectedFeedUrl Condition="'$(ExpectedFeedUrl)' == ''">https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json</ExpectedFeedUrl>
+    </PropertyGroup>
+	
+	<ItemGroup>
+      <SignedPackages Include="$(SignedPackagesPath)/**/*.nupkg" />
+    </ItemGroup>
+
+    <Message Text="Publish NuPkgs to blob feed started: $(ExpectedFeedUrl)" Importance="High" />
+    <PushToBlobFeed AccountKey="$(BlobFeedAccessToken)"
+                ExpectedFeedUrl="$(ExpectedFeedUrl)"
+                ItemsToPush="@(SignedPackages)"
+                Overwrite="false" />
+  </Target>
+
+  </Project>

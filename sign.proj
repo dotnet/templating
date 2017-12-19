@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="SignFiles" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <NuGetPackageRoot Condition="'$(NuGetPackageRoot)' == ''">$(NUGET_PACKAGES)</NuGetPackageRoot> <!-- Respect environment variable if set -->
+    <NuGetPackageRoot Condition="'$(NuGetPackageRoot)' == ''">$(UserProfile)\.nuget\packages</NuGetPackageRoot>
+    <MicroBuildVersion>0.2.0</MicroBuildVersion>
+    <MicroBuildPropsAndTargetsPath>$(NuGetPackageRoot)/microbuild.core/$(MicroBuildVersion)/build/</MicroBuildPropsAndTargetsPath>
+  </PropertyGroup>
+  
+  <Import Project="$(MicroBuildPropsAndTargetsPath)MicroBuild.Core.props" Condition="Exists('$(MicroBuildPropsAndTargetsPath)MicroBuild.Core.props')" />
+
+  <!-- This will be overridden if we're building with MicroBuild. -->
+  <Target Name="SignFiles">
+    <Message Text="Fake sign target.  Would sign: @(FilesToSign)" />
+  </Target>
+
+
+  <Target Name="PostCompileSign" DependsOnTargets="GetPostCompileSignFiles;SignFiles" />
+  <Target Name="GetPostCompileSignFiles">
+    <PropertyGroup>
+
+      <!-- The OutDir and IntermediateOutputPath properties are required by MicroBuild. MicroBuild only
+           signs files that are under these paths. -->
+      <OutDir>$(MSBuildThisFileDirectory)</OutDir>
+      <IntermediateOutputPath>$(MSBuildThisFileDirectory)artifacts\scratch</IntermediateOutputPath>
+    </PropertyGroup>
+    
+    <ItemGroup>
+      <!-- Adding the assemblies to sign -->
+      <FilesToSign Include="$(OutDir)src\**\microsoft.templateengine.abstractions.dll;
+                            $(OutDir)src\**\microsoft.templateengine.cli.dll;
+                            $(OutDir)src\**\microsoft.templateengine.cli.resources.dll;
+                            $(OutDir)src\**\microsoft.templateengine.core.dll;
+                            $(OutDir)src\**\microsoft.templateengine.core.contracts.dll;
+                            $(OutDir)src\**\microsoft.templateengine.edge.dll;
+                            $(OutDir)src\**\microsoft.templateengine.ide.dll;
+                            $(OutDir)src\**\microsoft.templateengine.orchestrator.runnableprojects.dll;
+                            $(OutDir)src\**\microsoft.templateengine.utils.dll;
+                            $(OutDir)test\**\microsoft.templateengine.mocks.dll;
+                            $(OutDir)test\**\microsoft.templateengine.testhelper.dll"
+                   Exclude="$(OutDir)src\**\obj\**\*.dll;
+                            $(OutDir)test\**\obj\**\*.dll">
+        <Authenticode>Microsoft400</Authenticode>
+      </FilesToSign>
+    </ItemGroup>
+  </Target>
+
+   <Target Name="SNSignLocResources">
+       
+    <ItemGroup>
+        <LocAssemblies Include="$(MSBuildThisFileDirectory)artifacts\localize\**\Microsoft.TemplateEngine.Cli.resources.dll" />
+    </ItemGroup>
+       
+    <GetFrameworkSdkPath>  
+      <Output TaskParameter="Path" PropertyName="SdkPath" />  
+    </GetFrameworkSdkPath>
+       
+    <Exec Command="&quot;$(SdkPath)bin\NETFX 4.6.1 Tools\sn.exe&quot; -R &quot;%(LocAssemblies.Identity)&quot; &quot;$(MSBuildThisFileDirectory)key.snk&quot;" />
+  </Target>
+  
+  <Target Name="PostCompileLocSign" DependsOnTargets="GetPostCompileLocSignFiles;SignFiles" />
+  <Target Name="GetPostCompileLocSignFiles">
+    <PropertyGroup>
+
+      <!-- The OutDir and IntermediateOutputPath properties are required by MicroBuild. MicroBuild only
+           signs files that are under these paths. -->
+      <OutDir>$(MSBuildThisFileDirectory)artifacts\</OutDir>
+      <IntermediateOutputPath>$(MSBuildThisFileDirectory)artifacts\scratch</IntermediateOutputPath>
+    </PropertyGroup>
+    
+    <ItemGroup>
+      <!-- Adding the loc assemblies to sign. -->
+      <FilesToSign Include="$(OutDir)localize\**\Microsoft.TemplateEngine.Cli.resources.dll">
+        <Authenticode>Microsoft400</Authenticode>
+      </FilesToSign>
+    </ItemGroup>
+  </Target>
+
+  <Import Project="$(MicroBuildPropsAndTargetsPath)MicroBuild.Core.targets" Condition="Exists('$(MicroBuildPropsAndTargetsPath)MicroBuild.Core.targets')" />
+</Project>
