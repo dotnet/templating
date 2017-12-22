@@ -38,7 +38,7 @@ namespace Microsoft.TemplateEngine.Core
             {
                 processor.SeekForwardWhile(processor.EncodingConfig.Whitespace, ref bufferLength, ref currentBufferPosition);
                 //Consume the trailing line end if possible
-                processor.EncodingConfig.LineEndings.GetOperation(processor.CurrentBuffer, bufferLength, ref currentBufferPosition, out int token);
+                processor.EncodingConfig.LineEndings.GetOperation(processor.CurrentBuffer, bufferLength, ref currentBufferPosition, out int _);
             }
         }
     }

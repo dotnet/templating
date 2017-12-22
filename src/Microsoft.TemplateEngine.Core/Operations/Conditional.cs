@@ -165,7 +165,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
                     }
                 }
 
-            BEGIN:
+                BEGIN:
                 //Got the "if" token...
                 if (IsTokenIndexOfType(token, IfTokenBaseIndex) || IsTokenIndexOfType(token, IfTokenActionableBaseIndex))
                 {
@@ -317,19 +317,17 @@ namespace Microsoft.TemplateEngine.Core.Operations
             // moves the buffer to the next token at the same level.
             // Returns false if no end token can be found at the same level.
             //      this is probably indicative of a template authoring problem, or possibly a buffer problem.
-            private bool SkipToMatchingEndif(IProcessorState processor, ref int bufferLength, ref int currentBufferPosition, ref int token)
+            private void SkipToMatchingEndif(IProcessorState processor, ref int bufferLength, ref int currentBufferPosition, ref int token)
             {
                 while (!IsTokenIndexOfType(token, EndTokenBaseIndex))
                 {
                     bool seekSucceeded = SeekToNextTokenAtSameLevel(processor, ref bufferLength, ref currentBufferPosition, out token);
 
-                    if (! seekSucceeded)
+                    if (!seekSucceeded)
                     {
-                        return false;
+                        return;
                     }
                 }
-
-                return true;
             }
 
             // Moves the buffer to the next token at the same level of nesting as the current token.
@@ -393,7 +391,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
                     if (bufferAdvanceFailed)
                     {
-                        if(evaluator.TryFinalizeMatchesInProgress(ref currentBufferPosition, out token))
+                        if (evaluator.TryFinalizeMatchesInProgress(ref currentBufferPosition, out token))
                         {
                             return true;
                         }
@@ -425,7 +423,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
                 internal bool Evaluate(IProcessorState processor, ref int bufferLength, ref int currentBufferPosition)
                 {
-                    BranchTaken = _impl._definition.Evaluator(processor, ref bufferLength, ref currentBufferPosition, out bool faulted);
+                    BranchTaken = _impl._definition.Evaluator(processor, ref bufferLength, ref currentBufferPosition, out bool _);
                     return BranchTaken;
                 }
 

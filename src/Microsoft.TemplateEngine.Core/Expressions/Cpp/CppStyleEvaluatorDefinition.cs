@@ -27,7 +27,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Cpp
                 IProcessorState state = new ProcessorState(ms, res, (int)ms.Length, (int)ms.Length, cfg, NoOperationProviders);
                 int len = (int)ms.Length;
                 int pos = 0;
-                return Evaluate(state, ref len, ref pos, out bool faulted);
+                return Evaluate(state, ref len, ref pos, out bool _);
             }
         }
 

@@ -460,7 +460,7 @@ namespace Microsoft.TemplateEngine.Core.Util
                         return;
                     }
 
-                    if (!trie.GetOperation(CurrentBuffer, bufferLength, ref currentBufferPosition, out int token))
+                    if (!trie.GetOperation(CurrentBuffer, bufferLength, ref currentBufferPosition, out int _))
                     {
                         return;
                     }
