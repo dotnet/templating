@@ -5,7 +5,7 @@ namespace Microsoft.TemplateEngine.Core.Matching
         protected TerminalBase(int tokenLength, int start, int end)
         {
             Start = start;
-            End = end != -1 ? end : (tokenLength - 1);
+            End = end == -1 ? tokenLength - 1 : end;
             Length = tokenLength;
         }
 

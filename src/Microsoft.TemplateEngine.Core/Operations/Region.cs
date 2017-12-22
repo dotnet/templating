@@ -1,4 +1,3 @@
-﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -16,7 +15,6 @@ namespace Microsoft.TemplateEngine.Core.Operations
         private readonly bool _toggle;
         private readonly bool _wholeLine;
         private readonly bool _trimWhitespace;
-        private readonly string _id;
         private readonly bool _initialState;
 
         public Region(ITokenConfig start, ITokenConfig end, bool include, bool wholeLine, bool trimWhitespace, string id, bool initialState)
@@ -27,17 +25,17 @@ namespace Microsoft.TemplateEngine.Core.Operations
             _end = end;
             _include = include;
             _toggle = _start.Equals(_end);
-            _id = id;
+            Id = id;
             _initialState = initialState;
         }
 
-        public string Id => _id;
+        public string Id { get; }
 
         public IOperation GetOperation(Encoding encoding, IProcessorState processorState)
         {
             IToken startToken = _start.ToToken(encoding);
             IToken endToken = _end.ToToken(encoding);
-            return new Impl(this, startToken, endToken, _include, _toggle, _id, _initialState);
+            return new Impl(this, startToken, endToken, _include, _toggle, Id, _initialState);
         }
 
         private class Impl : IOperation
@@ -47,7 +45,6 @@ namespace Microsoft.TemplateEngine.Core.Operations
             private readonly bool _startAndEndAreSame;
             private bool _waitingForEnd;
             private readonly Region _definition;
-            private readonly string _id;
 
             public Impl(Region owner, IToken startToken, IToken endToken, bool include, bool toggle, string id, bool initialState)
             {
@@ -57,26 +54,25 @@ namespace Microsoft.TemplateEngine.Core.Operations
                 _startAndEndAreSame = toggle;
 
                 Tokens = toggle ? new[] {startToken} : new[] {startToken, endToken};
-                _id = id;
+                Id = id;
                 IsInitialStateOn = string.IsNullOrEmpty(id) || initialState;
             }
 
             public IReadOnlyList<IToken> Tokens { get; }
 
-            public string Id => _id;
+            public string Id { get; }
 
             public bool IsInitialStateOn { get; }
 
             public int HandleMatch(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int token, Stream target)
             {
-                bool flag;
-                if (processor.Config.Flags.TryGetValue(Region.OperationName, out flag) && !flag)
+                if (processor.Config.Flags.TryGetValue(OperationName, out bool flag) && !flag)
                 {
                     target.Write(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
                     return Tokens[token].Length;
                 }
 
-                processor.WhitespaceHandler(ref bufferLength, ref currentBufferPosition, wholeLine: _definition._wholeLine, trim: _definition._trimWhitespace);
+                processor.WhitespaceHandler(ref bufferLength, ref currentBufferPosition, _definition._wholeLine, _definition._trimWhitespace);
 
                 if (_startAndEndAreSame)
                 {
@@ -129,7 +125,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
                 i += j;
 
-                processor.WhitespaceHandler(ref bufferLength, ref i, wholeLine: _definition._wholeLine, trim: _definition._trimWhitespace);
+                processor.WhitespaceHandler(ref bufferLength, ref i, _definition._wholeLine, _definition._trimWhitespace);
 
                 currentBufferPosition = i;
                 return 0;

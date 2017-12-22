@@ -97,25 +97,18 @@ namespace Microsoft.TemplateEngine.Core.Util
             return processorList;
         }
 
-        private IReadOnlyList<IFileChange> GetFileChangesInternal(IEngineEnvironmentSettings environmentSettings, IDirectory sourceDir, string targetDir, IGlobalRunSpec spec)
+        private static IReadOnlyList<IFileChange> GetFileChangesInternal(IEngineEnvironmentSettings environmentSettings, IDirectory sourceDir, string targetDir, IGlobalRunSpec spec)
         {
-            EngineConfig cfg = new EngineConfig(environmentSettings, EngineConfig.DefaultWhitespaces, EngineConfig.DefaultLineEndings, spec.RootVariableCollection);
-            IProcessor fallback = Processor.Create(cfg, spec.Operations);
-
             List<IFileChange> changes = new List<IFileChange>();
-            List<KeyValuePair<IPathMatcher, IProcessor>> fileGlobProcessors = CreateFileGlobProcessors(sourceDir.MountPoint.EnvironmentSettings, spec);
 
             foreach (IFile file in sourceDir.EnumerateFiles("*", SearchOption.AllDirectories))
             {
                 string sourceRel = file.PathRelativeTo(sourceDir);
                 string fileName = Path.GetFileName(sourceRel);
-                bool checkingDirWithPlaceholderFile = false;
 
-                if (spec.IgnoreFileNames.Contains(fileName))
-                {   // The placeholder file should never get copied / created / processed. It just causes the dir to get created if needed.
-                    // The change checking / reporting is different, setting this variable tracks it.
-                    checkingDirWithPlaceholderFile = true;
-                }
+                // The placeholder file should never get copied / created / processed. It just causes the dir to get created if needed.
+                // The change checking / reporting is different, setting this variable tracks it.
+                bool checkingDirWithPlaceholderFile = spec.IgnoreFileNames.Contains(fileName);
 
                 foreach (IPathMatcher include in spec.Include)
                 {
@@ -145,14 +138,9 @@ namespace Microsoft.TemplateEngine.Core.Util
                                 targetPath = Path.GetDirectoryName(targetPath);
                                 targetRel = Path.GetDirectoryName(targetRel);
 
-                                if (environmentSettings.Host.FileSystem.DirectoryExists(targetPath))
-                                {
-                                    changes.Add(new FileChange(targetRel, ChangeKind.Overwrite));
-                                }
-                                else
-                                {
-                                    changes.Add(new FileChange(targetRel, ChangeKind.Create));
-                                }
+                                changes.Add(environmentSettings.Host.FileSystem.DirectoryExists(targetPath)
+                                    ? new FileChange(targetRel, ChangeKind.Overwrite)
+                                    : new FileChange(targetRel, ChangeKind.Create));
                             }
                             else if (environmentSettings.Host.FileSystem.FileExists(targetPath))
                             {
@@ -183,13 +171,10 @@ namespace Microsoft.TemplateEngine.Core.Util
             {
                 string sourceRel = file.PathRelativeTo(sourceDir);
                 string fileName = Path.GetFileName(sourceRel);
-                bool checkingDirWithPlaceholderFile = false;
 
-                if (spec.IgnoreFileNames.Contains(fileName))
-                {   // The placeholder file should never get copied / created / processed. It just causes the dir to get created if needed.
-                    // The change checking / reporting is different, setting this variable tracks it.
-                    checkingDirWithPlaceholderFile = true;
-                }
+                // The placeholder file should never get copied / created / processed. It just causes the dir to get created if needed.
+                // The change checking / reporting is different, setting this variable tracks it.
+                bool checkingDirWithPlaceholderFile = spec.IgnoreFileNames.Contains(fileName);
 
                 foreach (IPathMatcher include in spec.Include)
                 {

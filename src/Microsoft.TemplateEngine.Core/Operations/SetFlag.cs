@@ -1,4 +1,3 @@
-﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -10,10 +9,9 @@ namespace Microsoft.TemplateEngine.Core.Operations
     {
         public static readonly string OperationName = "flags";
 
-        private readonly string _id;
         private readonly bool _initialState;
 
-        public string Id => _id;
+        public string Id { get; }
 
         public string Name { get; }
 
@@ -35,13 +33,13 @@ namespace Microsoft.TemplateEngine.Core.Operations
             OnNoEmit = onNoEmit;
             OffNoEmit = offNoEmit;
             Default = @default;
-            _id = id;
+            Id = id;
             _initialState = initialState;
         }
 
         public IOperation GetOperation(Encoding encoding, IProcessorState processorState)
         {
-            IToken[] tokens = new[]
+            IToken[] tokens =
             {
                 On.ToToken(encoding),
                 Off.ToToken(encoding),
@@ -54,25 +52,24 @@ namespace Microsoft.TemplateEngine.Core.Operations
                 processorState.Config.Flags[Name] = Default.Value;
             }
 
-            return new Impl(this, tokens, _id, _initialState);
+            return new Impl(this, tokens, Id, _initialState);
         }
 
         private class Impl : IOperation
         {
             private readonly SetFlag _owner;
-            private readonly string _id;
 
             public Impl(SetFlag owner, IReadOnlyList<IToken> tokens, string id, bool initialState)
             {
                 _owner = owner;
                 Tokens = tokens;
-                _id = id;
+                Id = id;
                 IsInitialStateOn = string.IsNullOrEmpty(id) || initialState;
             }
 
             public IReadOnlyList<IToken> Tokens { get; }
 
-            public string Id => _id;
+            public string Id { get; }
 
             public bool IsInitialStateOn { get; }
 
@@ -84,7 +81,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
                 }
 
                 bool emit = token < 2 || !flagsOn;
-                bool turnOn = (token % 2) == 0;
+                bool turnOn = token % 2 == 0;
                 int written = 0;
 
                 if (emit)
@@ -105,9 +102,9 @@ namespace Microsoft.TemplateEngine.Core.Operations
                 {
                     processor.Config.Flags[_owner.Name] = turnOn;
                 }
-                else if (_owner.Name == SetFlag.OperationName && turnOn)
+                else if (_owner.Name == OperationName && turnOn)
                 {
-                    processor.Config.Flags[SetFlag.OperationName] = true;
+                    processor.Config.Flags[OperationName] = true;
                 }
 
                 return written;

@@ -2,8 +2,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
-using System.Net.Sockets;
 using System.Text;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Core.Matching;
@@ -34,7 +32,7 @@ namespace Microsoft.TemplateEngine.Core.Util
 
         public Encoding Encoding
         {
-            get { return _encoding; }
+            get => _encoding;
             set
             {
                 _encoding = value;
@@ -72,8 +70,7 @@ namespace Microsoft.TemplateEngine.Core.Util
             CurrentBuffer = new byte[bufferSize];
             CurrentBufferLength = source.Read(CurrentBuffer, 0, CurrentBuffer.Length);
 
-            byte[] bom;
-            Encoding encoding = EncodingUtil.Detect(CurrentBuffer, CurrentBufferLength, out bom);
+            Encoding encoding = EncodingUtil.Detect(CurrentBuffer, CurrentBufferLength, out byte[] bom);
             Encoding = encoding;
             CurrentBufferPosition = bom.Length;
             CurrentSequenceNumber = bom.Length;
@@ -357,9 +354,8 @@ namespace Microsoft.TemplateEngine.Core.Util
                 int bestPos = -1;
                 for (int i = nRead - match.MinLength; i >= 0; --i)
                 {
-                    int token;
                     int ic = i;
-                    if (match.GetOperation(buffer, nRead, ref ic, out token) && ic >= bestPos)
+                    if (match.GetOperation(buffer, nRead, ref ic, out int token) && ic >= bestPos)
                     {
                         bestPos = ic;
                         best = token;
@@ -464,8 +460,7 @@ namespace Microsoft.TemplateEngine.Core.Util
                         return;
                     }
 
-                    int token;
-                    if (!trie.GetOperation(CurrentBuffer, bufferLength, ref currentBufferPosition, out token))
+                    if (!trie.GetOperation(CurrentBuffer, bufferLength, ref currentBufferPosition, out int token))
                     {
                         return;
                     }
@@ -499,8 +494,7 @@ namespace Microsoft.TemplateEngine.Core.Util
                         return;
                     }
 
-                    int token;
-                    if (match.GetOperation(CurrentBuffer, bufferLength, ref currentBufferPosition, out token))
+                    if (match.GetOperation(CurrentBuffer, bufferLength, ref currentBufferPosition, out int token))
                     {
                         if (!consumeToken)
                         {

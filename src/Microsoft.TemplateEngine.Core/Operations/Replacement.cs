@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,16 +12,15 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
         private readonly ITokenConfig _match;
         private readonly string _replaceWith;
-        private readonly string _id;
         private readonly bool _initialState;
 
-        public string Id => _id;
+        public string Id { get; }
 
         public Replacement(ITokenConfig match, string replaceWith, string id, bool initialState)
         {
             _match = match;
             _replaceWith = replaceWith;
-            _id = id;
+            Id = id;
             _initialState = initialState;
         }
 
@@ -31,39 +29,32 @@ namespace Microsoft.TemplateEngine.Core.Operations
             IToken token = _match.ToToken(encoding);
             byte[] replaceWith = encoding.GetBytes(_replaceWith);
             
-            if(token.Value.Skip(token.Start).Take(token.Length).SequenceEqual(replaceWith))
-            {
-                return null;
-            }
-
-            return new Impl(token, replaceWith, _id, _initialState);
+            return token.Value.Skip(token.Start).Take(token.Length).SequenceEqual(replaceWith)
+                ? null
+                : new Impl(token, replaceWith, Id, _initialState);
         }
 
         private class Impl : IOperation
         {
             private readonly byte[] _replacement;
-            private readonly IToken _token;
-            private readonly string _id;
 
             public Impl(IToken token, byte[] replaceWith, string id, bool initialState)
             {
                 _replacement = replaceWith;
-                _token = token;
-                _id = id;
+                Id = id;
                 Tokens = new[] {token};
                 IsInitialStateOn = string.IsNullOrEmpty(id) || initialState;
             }
 
             public IReadOnlyList<IToken> Tokens { get; }
 
-            public string Id => _id;
+            public string Id { get; }
 
             public bool IsInitialStateOn { get; }
 
             public int HandleMatch(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int token, Stream target)
             {
-                bool flag;
-                if (processor.Config.Flags.TryGetValue(OperationName, out flag) && !flag)
+                if (processor.Config.Flags.TryGetValue(OperationName, out bool flag) && !flag)
                 {
                     target.Write(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
                     return Tokens[token].Length;

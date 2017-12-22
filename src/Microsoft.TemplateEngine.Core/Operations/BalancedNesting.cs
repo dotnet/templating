@@ -1,4 +1,3 @@
-﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -21,7 +20,6 @@ namespace Microsoft.TemplateEngine.Core.Operations
         private readonly ITokenConfig _startToken;
         private readonly ITokenConfig _realEndToken;
         private readonly ITokenConfig _pseudoEndToken;
-        private readonly string _id;
         private readonly string _resetFlag;
         private readonly bool _initialState;
 
@@ -30,12 +28,12 @@ namespace Microsoft.TemplateEngine.Core.Operations
             _startToken = startToken;
             _realEndToken = realEndToken;
             _pseudoEndToken = pseudoEndToken;
-            _id = id;
+            Id = id;
             _resetFlag = resetFlag;
             _initialState = initialState;
         }
 
-        public string Id => _id;
+        public string Id { get; }
 
         public IOperation GetOperation(Encoding encoding, IProcessorState processorState)
         {
@@ -43,15 +41,13 @@ namespace Microsoft.TemplateEngine.Core.Operations
             IToken realEndToken = _realEndToken.ToToken(encoding);
             IToken pseudoEndToken = _pseudoEndToken.ToToken(encoding);
 
-            return new Impl(startToken, realEndToken, pseudoEndToken, _id, _resetFlag, _initialState);
+            return new Impl(startToken, realEndToken, pseudoEndToken, Id, _resetFlag, _initialState);
         }
 
         private class Impl : IOperation
         {
-            private readonly IToken _startToken;
             private readonly IToken _realEndToken;
             private readonly IToken _psuedoEndToken;
-            private readonly string _id;
             private readonly string _resetFlag;
             private int _depth;
 
@@ -62,17 +58,16 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
             public Impl(IToken start, IToken realEnd, IToken pseudoEnd, string id, string resetFlag, bool initialState)
             {
-                _startToken = start;
                 _realEndToken = realEnd;
                 _psuedoEndToken = pseudoEnd;
-                _id = id;
+                Id = id;
                 _resetFlag = resetFlag;
-                Tokens = new[] { _startToken, _realEndToken, _psuedoEndToken };
+                Tokens = new[] { start, _realEndToken, _psuedoEndToken };
                 _depth = 0;
                 IsInitialStateOn = string.IsNullOrEmpty(id) || initialState;
             }
 
-            public string Id => _id;
+            public string Id { get; }
 
             public IReadOnlyList<IToken> Tokens { get; }
 
@@ -91,13 +86,15 @@ namespace Microsoft.TemplateEngine.Core.Operations
                     _depth = 0;
                 }
 
-                if (token == StartTokenIndex)
+                switch (token)
                 {
-                    ++_depth;
-                }
-                else if (token == RealEndTokenIndex || token == PseudoEndTokenIndex)
-                {
-                    --_depth;
+                    case StartTokenIndex:
+                        ++_depth;
+                        break;
+                    case RealEndTokenIndex:
+                    case PseudoEndTokenIndex:
+                        --_depth;
+                        break;
                 }
 
                 if (_depth < 0)
@@ -114,11 +111,8 @@ namespace Microsoft.TemplateEngine.Core.Operations
                     target.Write(_realEndToken.Value, _realEndToken.Start, _realEndToken.Length);
                     return _psuedoEndToken.Length;  // the source buffer needs to skip over this token.
                 }
-                else
-                {
-                    target.Write(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
-                }
 
+                target.Write(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
                 return 0;
             }
         }

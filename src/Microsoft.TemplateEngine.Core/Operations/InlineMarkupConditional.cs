@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,13 +9,12 @@ namespace Microsoft.TemplateEngine.Core.Operations
 {
     public class InlineMarkupConditional : IOperationProvider
     {
-        private readonly string _id;
         private readonly bool _initialState;
 
         public InlineMarkupConditional(MarkupTokens tokens, bool wholeLine, bool trimWhitespace, ConditionEvaluator evaluator, string variableFormat, string id, bool initialState)
         {
             Tokens = tokens;
-            _id = id;
+            Id = id;
             Evaluator = evaluator;
             WholeLine = wholeLine;
             TrimWhitespace = trimWhitespace;
@@ -26,7 +24,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
         public ConditionEvaluator Evaluator { get; }
 
-        public string Id => _id;
+        public string Id { get; }
 
         public MarkupTokens Tokens { get; }
 
@@ -63,7 +61,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
             );
 
             IReadOnlyList<IToken> start = new[] { Tokens.OpenConditionExpression.ToToken(processorState.Encoding) };
-            return new Impl(this, start, structureTrie, closeConditionTrie, scanBackTrie, mapping, _id, _initialState);
+            return new Impl(this, start, structureTrie, closeConditionTrie, scanBackTrie, mapping, Id, _initialState);
         }
 
         public class Impl : IOperation
@@ -94,8 +92,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
             public int HandleMatch(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int token, Stream target)
             {
-                bool flag;
-                if (processor.Config.Flags.TryGetValue(Conditional.OperationName, out flag) && !flag)
+                if (processor.Config.Flags.TryGetValue(Conditional.OperationName, out bool flag) && !flag)
                 {
                     target.Write(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
                     return Tokens[token].Length;
@@ -109,8 +106,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
                 int pos = 0;
                 int len = conditionBytes.Count;
 
-                bool faulted;
-                bool value = _definition.Evaluator(localState, ref len, ref pos, out faulted);
+                bool value = _definition.Evaluator(localState, ref len, ref pos, out bool faulted);
 
                 if (faulted)
                 {
@@ -164,8 +160,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
                         }
 
 
-                        int token;
-                        if (_structureTrie.GetOperation(processorState.CurrentBuffer, bufferLength, ref currentBufferPosition, out token))
+                        if (_structureTrie.GetOperation(processorState.CurrentBuffer, bufferLength, ref currentBufferPosition, out int token))
                         {
                             if (token == _mapping.OpenOpenElementToken)
                             {
@@ -232,8 +227,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
                         }
 
 
-                        int token;
-                        if (_closeConditionTrie.GetOperation(processorState.CurrentBuffer, bufferLength, ref currentBufferPosition, out token))
+                        if (_closeConditionTrie.GetOperation(processorState.CurrentBuffer, bufferLength, ref currentBufferPosition, out int token))
                         {
                             conditionBytes.AddRange(processorState.CurrentBuffer.Skip(previousPosition).Take(currentBufferPosition - previousPosition - _closeConditionTrie.Tokens[token].Length));
                             return;

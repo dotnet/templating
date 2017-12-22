@@ -18,7 +18,7 @@ namespace Microsoft.TemplateEngine.Core
         {
         }
 
-        public VariableCollection(VariableCollection parent)
+        public VariableCollection(IVariableCollection parent)
             : this(parent, new Dictionary<string, object>())
         {
         }
@@ -46,7 +46,7 @@ namespace Microsoft.TemplateEngine.Core
 
         public IVariableCollection Parent
         {
-            get { return _parent; }
+            get => _parent;
             set
             {
                 _parent = value;
@@ -258,7 +258,7 @@ namespace Microsoft.TemplateEngine.Core
 
             foreach (string order in variableConfig.Order)
             {
-                IVariableCollection current = collections[order.ToString()];
+                IVariableCollection current = collections[order];
 
                 IVariableCollection tmp = current;
                 while (tmp.Parent != null)
@@ -284,22 +284,24 @@ namespace Microsoft.TemplateEngine.Core
                 {
                     if (param.Priority != TemplateParameterPriority.Optional && param.Priority != TemplateParameterPriority.Suggested)
                     {
-                        while(environmentSettings.Host.OnParameterError(param, null, "ParameterValueNotSpecified", out string val))
+                        string val;
+                        while(environmentSettings.Host.OnParameterError(param, null, "ParameterValueNotSpecified", out val))
                         {
                         }
 
-                        parameters.ResolvedValues[param] = value;
+                        parameters.ResolvedValues[param] = val;
                     }
                 }
                 else if (value == null)
                 {
                     if (param.Priority != TemplateParameterPriority.Optional && param.Priority != TemplateParameterPriority.Suggested)
                     {
-                        while (environmentSettings.Host.OnParameterError(param, null, "ParameterValueNull", out string val))
+                        string val;
+                        while (environmentSettings.Host.OnParameterError(param, null, "ParameterValueNull", out val))
                         {
                         }
 
-                        parameters.ResolvedValues[param] = value;
+                        parameters.ResolvedValues[param] = val;
                     }
                 }
                 else

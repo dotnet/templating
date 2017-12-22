@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -12,12 +12,6 @@ namespace Microsoft.TemplateEngine.Core.Operations
     public class Conditional : IOperationProvider
     {
         public static readonly string OperationName = "conditional";
-
-        private readonly ConditionEvaluator _evaluator;
-        private readonly bool _wholeLine;
-        private readonly bool _trimWhitespace;
-        private readonly ConditionalTokens _tokens;
-        private readonly string _id;
 
         // the unusual order of these is historical, no special meaning
         // if actual_token_index % 10 == baseTokenIndex
@@ -34,25 +28,25 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
         // must be > the highest token type index
         private const int TokenTypeModulus = 10;
-        private bool _initialState;
+        private readonly bool _initialState;
 
-        public string Id => _id;
+        public string Id { get; }
 
-        public bool WholeLine => _wholeLine;
+        public bool WholeLine { get; }
 
-        public bool TrimWhitespace => _trimWhitespace;
+        public bool TrimWhitespace { get; }
 
-        public ConditionEvaluator Evaluator => _evaluator;
+        public ConditionEvaluator Evaluator { get; }
 
-        public ConditionalTokens Tokens => _tokens;
+        public ConditionalTokens Tokens { get; }
 
         public Conditional(ConditionalTokens tokenVariants, bool wholeLine, bool trimWhitespace, ConditionEvaluator evaluator, string id, bool initialState)
         {
-            _trimWhitespace = trimWhitespace;
-            _wholeLine = wholeLine;
-            _evaluator = evaluator;
-            _tokens = tokenVariants;
-            _id = id;
+            TrimWhitespace = trimWhitespace;
+            WholeLine = wholeLine;
+            Evaluator = evaluator;
+            Tokens = tokenVariants;
+            Id = id;
             _initialState = initialState;
         }
 
@@ -92,7 +86,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
             AddTokensOfTypeToTokenListAndTrie(trie, tokens, Tokens.ActionableElseTokens, ElseTokenActionableBaseIndex, encoding);
             AddTokensOfTypeToTokenListAndTrie(trie, tokens, Tokens.ActionableElseIfTokens, ElseIfTokenActionableBaseIndex, encoding);
 
-            return new Impl(this, tokens, trie, _id, _initialState);
+            return new Impl(this, tokens, trie, Id, _initialState);
         }
 
         /// <summary>
@@ -103,7 +97,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
         /// <param name="tokensOfType"></param>
         /// <param name="typeRemainder"></param>
         /// <param name="encoding"></param>
-        private void AddTokensOfTypeToTokenListAndTrie(ITokenTrie trie, List<IToken> tokenMasterList, IReadOnlyList<ITokenConfig> tokensOfType, int typeRemainder, Encoding encoding)
+        private static void AddTokensOfTypeToTokenListAndTrie(ITokenTrie trie, IList<IToken> tokenMasterList, IReadOnlyList<ITokenConfig> tokensOfType, int typeRemainder, Encoding encoding)
         {
             int tokenIndex = typeRemainder;
 
@@ -125,7 +119,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool IsTokenIndexOfType(int tokenIndex, int baseTypeIndex)
         {
-            return (tokenIndex % TokenTypeModulus) == baseTypeIndex;
+            return tokenIndex % TokenTypeModulus == baseTypeIndex;
         }
 
         private class Impl : IOperation
@@ -134,18 +128,17 @@ namespace Microsoft.TemplateEngine.Core.Operations
             private EvaluationState _current;
             private readonly Stack<EvaluationState> _pendingCompletion = new Stack<EvaluationState>();
             private readonly ITokenTrie _trie;
-            private readonly string _id;
 
             public Impl(Conditional definition, IReadOnlyList<IToken> tokens, ITokenTrie trie, string id, bool initialState)
             {
                 _trie = trie;
                 _definition = definition;
                 Tokens = tokens;
-                _id = id;
+                Id = id;
                 IsInitialStateOn = string.IsNullOrEmpty(id) || initialState;
             }
 
-            public string Id => _id;
+            public string Id { get; }
 
             public IReadOnlyList<IToken> Tokens { get; }
 
@@ -153,8 +146,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
             public int HandleMatch(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int token, Stream target)
             {
-                bool flag;
-                if (processor.Config.Flags.TryGetValue(OperationName, out flag) && !flag)
+                if (processor.Config.Flags.TryGetValue(OperationName, out bool flag) && !flag)
                 {
                     target.Write(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
                     return Tokens[token].Length;
@@ -163,11 +155,11 @@ namespace Microsoft.TemplateEngine.Core.Operations
                 // conditional has not started, or this is the "if"
                 if (_current != null || IsTokenIndexOfType(token, IfTokenBaseIndex) || IsTokenIndexOfType(token, IfTokenActionableBaseIndex))
                 {
-                    if (_definition._wholeLine)
+                    if (_definition.WholeLine)
                     {
                         processor.SeekBackUntil(processor.EncodingConfig.LineEndings);
                     }
-                    else if (_definition._trimWhitespace)
+                    else if (_definition.TrimWhitespace)
                     {
                         processor.TrimWhitespace(false, true, ref bufferLength, ref currentBufferPosition);
                     }
@@ -205,12 +197,10 @@ namespace Microsoft.TemplateEngine.Core.Operations
                         // if (true_condition) was found.
                         return 0;
                     }
-                    else
-                    {
-                        // if (false_condition) was found. Skip to the next token of the if-elseif-elseif-...elseif-else-endif
-                        SeekToNextTokenAtSameLevel(processor, ref bufferLength, ref currentBufferPosition, out token);
-                        goto BEGIN;
-                    }
+
+                    // if (false_condition) was found. Skip to the next token of the if-elseif-elseif-...elseif-else-endif
+                    SeekToNextTokenAtSameLevel(processor, ref bufferLength, ref currentBufferPosition, out token);
+                    goto BEGIN;
                 }
 
                 // If we've got an unbalanced statement, emit the token
@@ -235,11 +225,11 @@ namespace Microsoft.TemplateEngine.Core.Operations
                         _current = null;
                     }
 
-                    if (_definition._wholeLine)
+                    if (_definition.WholeLine)
                     {
                         processor.SeekForwardThrough(processor.EncodingConfig.LineEndings, ref bufferLength, ref currentBufferPosition);
                     }
-                    else if (_definition._trimWhitespace)
+                    else if (_definition.TrimWhitespace)
                     {
                         processor.TrimWhitespace(true, false, ref bufferLength, ref currentBufferPosition);
                     }
@@ -266,11 +256,11 @@ namespace Microsoft.TemplateEngine.Core.Operations
                         _current = null;
                     }
 
-                    if (_definition._wholeLine)
+                    if (_definition.WholeLine)
                     {
                         processor.SeekForwardUntil(processor.EncodingConfig.LineEndings, ref bufferLength, ref currentBufferPosition);
                     }
-                    else if (_definition._trimWhitespace)
+                    else if (_definition.TrimWhitespace)
                     {
                         processor.TrimWhitespace(true, false, ref bufferLength, ref currentBufferPosition);
                     }
@@ -298,14 +288,12 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
                         return 0;
                     }
-                    else
-                    {
-                        SeekToNextTokenAtSameLevel(processor, ref bufferLength, ref currentBufferPosition, out token);
 
-                        // In the original version this was conditional on SeekToToken() succeeding.
-                        // Not sure if it should be conditional. It should never fail, unless the template is malformed.
-                        goto BEGIN;
-                    }
+                    SeekToNextTokenAtSameLevel(processor, ref bufferLength, ref currentBufferPosition, out token);
+
+                    // In the original version this was conditional on SeekToToken() succeeding.
+                    // Not sure if it should be conditional. It should never fail, unless the template is malformed.
+                    goto BEGIN;
                 }
 
                 //We have an "else" token and haven't taken any other branches, return control
@@ -318,14 +306,12 @@ namespace Microsoft.TemplateEngine.Core.Operations
                     }
 
                     _current.BranchTaken = true;
-                    processor.WhitespaceHandler(ref bufferLength, ref currentBufferPosition, wholeLine: _definition._wholeLine, trim: _definition._trimWhitespace);
+                    processor.WhitespaceHandler(ref bufferLength, ref currentBufferPosition, _definition.WholeLine, _definition.TrimWhitespace);
                     return 0;
                 }
-                else
-                {
-                    Debug.Assert(true, "Unknown token index: " + token);
-                    return 0;   // TODO: revisit. Not sure what's best here.
-                }
+
+                Debug.Assert(true, "Unknown token index: " + token);
+                return 0;   // TODO: revisit. Not sure what's best here.
             }
 
             // moves the buffer to the next token at the same level.
@@ -398,7 +384,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
                     {
                         if (evaluator.Accept(processor.CurrentBuffer[currentBufferPosition], ref currentBufferPosition, out token))
                         {
-                            if (bufferAdvanceFailed || (currentBufferPosition != bufferLength))
+                            if (bufferAdvanceFailed || currentBufferPosition != bufferLength)
                             {
                                 return true;
                             }
@@ -439,15 +425,14 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
                 internal bool Evaluate(IProcessorState processor, ref int bufferLength, ref int currentBufferPosition)
                 {
-                    bool faulted;
-                    BranchTaken = _impl._definition._evaluator(processor, ref bufferLength, ref currentBufferPosition, out faulted);
+                    BranchTaken = _impl._definition.Evaluator(processor, ref bufferLength, ref currentBufferPosition, out bool faulted);
                     return BranchTaken;
                 }
 
                 public bool BranchTaken
                 {
-                    get { return _branchTaken; }
-                    set { _branchTaken |= value; }
+                    get => _branchTaken;
+                    set => _branchTaken |= value;
                 }
 
                 public bool ActionableOperationsEnabled { get; private set; }

@@ -1,4 +1,3 @@
-﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,17 +9,16 @@ namespace Microsoft.TemplateEngine.Core.Operations
     public class PhasedOperation : IOperationProvider
     {
         private readonly IReadOnlyList<Phase> _config;
-        private readonly string _id;
         private readonly bool _initialState;
 
         public PhasedOperation(string id, IReadOnlyList<Phase> config, bool initialState)
         {
-            _id = id;
+            Id = id;
             _config = config;
             _initialState = initialState;
         }
 
-        public string Id => _id;
+        public string Id { get; }
 
         public IOperation GetOperation(Encoding encoding, IProcessorState processorState)
         {
@@ -37,6 +35,12 @@ namespace Microsoft.TemplateEngine.Core.Operations
                 while (currentSource?.MoveNext() ?? false)
                 {
                     Phase c = currentSource.Current;
+
+                    if (c == null)
+                    {
+                        continue;
+                    }
+
                     if (!tokenMap.TryGetValue(c.Match, out int existingMatchToken))
                     {
                         IToken bytes = c.Match.ToToken(encoding);
@@ -47,7 +51,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
                     SpecializedPhase target = new SpecializedPhase
                     {
                         Replacement = c.Replacement != null ? encoding.GetBytes(c.Replacement) : tokens[existingMatchToken].Value,
-                        Match = existingMatchToken,
+                        Match = existingMatchToken
                     };
 
                     foreach (ITokenConfig reset in c.ResetsWith)
@@ -66,7 +70,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
                     if (c.Next.Count > 0)
                     {
                         sourceParents.Push(currentSource);
-                        currentSource = currentSource.Current.Next.GetEnumerator();
+                        currentSource = currentSource.Current?.Next?.GetEnumerator();
 
                         targetParents.Push(currentTarget);
                         currentTarget = new List<SpecializedPhase>();
@@ -99,10 +103,10 @@ namespace Microsoft.TemplateEngine.Core.Operations
                 _definition = definition;
                 Tokens = config;
                 _entryPoints = entryPoints;
-                IsInitialStateOn = string.IsNullOrEmpty(_definition._id) || initialState;
+                IsInitialStateOn = string.IsNullOrEmpty(_definition.Id) || initialState;
             }
 
-            public string Id => _definition._id;
+            public string Id => _definition.Id;
 
             public IReadOnlyList<IToken> Tokens { get; }
 
@@ -145,13 +149,6 @@ namespace Microsoft.TemplateEngine.Core.Operations
             public byte[] Replacement { get; set; }
 
             public List<int> ResetsWith { get; }
-        }
-
-        private class SpecializedPhasedOperationConfig
-        {
-            public IReadOnlyList<SpecializedPhase> EntryPoints { get; set; }
-
-            public IReadOnlyList<ITokenConfig> Tokens { get; set; }
         }
     }
 }

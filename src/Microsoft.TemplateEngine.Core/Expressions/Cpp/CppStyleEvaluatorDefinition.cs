@@ -526,7 +526,8 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Cpp
             }
 
             Debug.Assert(parents.Count == 0, "Unbalanced condition");
-            return (bool)Convert.ChangeType(current.Evaluate() ?? "false", typeof(bool));
+            object result = current?.Evaluate() ?? "false";
+            return Convert.ChangeType(result, typeof(bool)) is bool b && b;
         }
 
         private static object InferTypeAndConvertLiteral(string literal)

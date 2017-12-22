@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -16,7 +16,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
             SourceStreamOpener = sourceStreamOpener;
             StartToken = startToken;
             EndToken = endToken;
-            _id = id;
+            Id = id;
             _initialState = initialState;
         }
 
@@ -26,10 +26,9 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
         public Func<string, Stream> SourceStreamOpener { get; }
 
-        private readonly string _id;
         private readonly bool _initialState;
 
-        public string Id => _id;
+        public string Id { get; }
 
         public IOperation GetOperation(Encoding encoding, IProcessorState processorState)
         {
@@ -37,34 +36,32 @@ namespace Microsoft.TemplateEngine.Core.Operations
             IToken endTokenBytes = EndToken.ToToken(encoding);
             TokenTrie endTokenMatcher = new TokenTrie();
             endTokenMatcher.AddToken(endTokenBytes);
-            return new Impl(tokenBytes, endTokenMatcher, this, _id, _initialState);
+            return new Impl(tokenBytes, endTokenMatcher, this, Id, _initialState);
         }
 
         private class Impl : IOperation
         {
             private readonly Include _source;
             private readonly ITokenTrie _endTokenMatcher;
-            private readonly string _id;
 
             public Impl(IToken token, ITokenTrie endTokenMatcher, Include source, string id, bool initialState)
             {
                 Tokens = new[] {token};
                 _source = source;
                 _endTokenMatcher = endTokenMatcher;
-                _id = id;
+                Id = id;
                 IsInitialStateOn = string.IsNullOrEmpty(id) || initialState;
             }
 
             public IReadOnlyList<IToken> Tokens { get; }
 
-            public string Id => _id;
+            public string Id { get; }
 
             public bool IsInitialStateOn { get; }
 
             public int HandleMatch(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int token, Stream target)
             {
-                bool flag;
-                if (processor.Config.Flags.TryGetValue(OperationName, out flag) && !flag)
+                if (processor.Config.Flags.TryGetValue(OperationName, out bool flag) && !flag)
                 {
                     target.Write(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
                     return Tokens[token].Length;
@@ -112,8 +109,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
                     totalLength = composite.Length - (pageSize - nRead);
                 }
 
-                byte[] bom;
-                Encoding realEncoding = EncodingUtil.Detect(composite, totalLength, out bom);
+                Encoding realEncoding = EncodingUtil.Detect(composite, totalLength, out byte[] bom);
 
                 if (!Equals(realEncoding, processor.Encoding))
                 {

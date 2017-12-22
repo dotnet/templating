@@ -6,8 +6,8 @@ namespace Microsoft.TemplateEngine.Core.Util
 {
     public class TokenTrie : Trie<Token>, ITokenTrie
     {
-        private List<IToken> _tokens = new List<IToken>();
-        private List<int> _lengths = new List<int>();
+        private readonly List<IToken> _tokens = new List<IToken>();
+        private readonly List<int> _lengths = new List<int>();
 
         public int Count => _tokens.Count;
 

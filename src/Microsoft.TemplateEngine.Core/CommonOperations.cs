@@ -1,4 +1,4 @@
-﻿using Microsoft.TemplateEngine.Core.Contracts;
+using Microsoft.TemplateEngine.Core.Contracts;
 
 namespace Microsoft.TemplateEngine.Core
 {
@@ -38,8 +38,7 @@ namespace Microsoft.TemplateEngine.Core
             {
                 processor.SeekForwardWhile(processor.EncodingConfig.Whitespace, ref bufferLength, ref currentBufferPosition);
                 //Consume the trailing line end if possible
-                int tok;
-                processor.EncodingConfig.LineEndings.GetOperation(processor.CurrentBuffer, bufferLength, ref currentBufferPosition, out tok);
+                processor.EncodingConfig.LineEndings.GetOperation(processor.CurrentBuffer, bufferLength, ref currentBufferPosition, out int token);
             }
         }
     }

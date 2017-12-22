@@ -37,7 +37,7 @@ namespace Microsoft.TemplateEngine.Core
 
         public static IToken LiteralToken(byte[] data, int start = 0, int end = -1)
         {
-            int realEnd = end != -1 ? end : (data.Length - start - 1);
+            int realEnd = end == -1 ? data.Length - start - 1 : end;
             return new Token(data, start, realEnd);
         }
 
