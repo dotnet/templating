@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
@@ -8,7 +8,6 @@ namespace Microsoft.TemplateEngine.Utils
     public class DefaultTemplateEngineHost : ITemplateEngineHost
     {
         private readonly IReadOnlyDictionary<string, string> _hostDefaults;
-        private readonly IReadOnlyList<KeyValuePair<Guid, Func<Type>>> _hostBuiltInComponents;
         private static readonly IReadOnlyList<KeyValuePair<Guid, Func<Type>>> NoComponents = new KeyValuePair<Guid, Func<Type>>[0];
 
         public DefaultTemplateEngineHost(string hostIdentifier, string version, string locale)
@@ -38,7 +37,7 @@ namespace Microsoft.TemplateEngine.Utils
             Locale = locale;
             _hostDefaults = defaults ?? new Dictionary<string, string>();
             FileSystem = new PhysicalFileSystem();
-            _hostBuiltInComponents = builtIns ?? NoComponents;
+            BuiltInComponents = builtIns ?? NoComponents;
             FallbackHostTemplateConfigNames = fallbackHostTemplateConfigNames ?? new List<string>();
             _diagnosticLoggers = new Dictionary<string, Action<string, string[]>>();
         }
@@ -60,7 +59,7 @@ namespace Microsoft.TemplateEngine.Utils
 
         public string Version { get; }
 
-        public virtual IReadOnlyList<KeyValuePair<Guid, Func<Type>>> BuiltInComponents => _hostBuiltInComponents;
+        public virtual IReadOnlyList<KeyValuePair<Guid, Func<Type>>> BuiltInComponents { get; }
 
         public virtual void LogMessage(string message)
         {
@@ -116,7 +115,7 @@ namespace Microsoft.TemplateEngine.Utils
             return true;
         }
 
-        private Dictionary<string, Action<string, string[]>> _diagnosticLoggers;
+        private readonly Dictionary<string, Action<string, string[]>> _diagnosticLoggers;
 
         public void RegisterDiagnosticLogger(string category, Action<string, string[]> messageHandler)
         {

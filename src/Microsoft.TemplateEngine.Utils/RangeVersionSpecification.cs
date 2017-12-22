@@ -1,6 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.TemplateEngine.Abstractions;
 
 namespace Microsoft.TemplateEngine.Utils
@@ -47,12 +44,14 @@ namespace Microsoft.TemplateEngine.Utils
                 specification = null;
                 return false;
             }
-            else if (!IsWildcardVersion(startVersion) && !VersionStringHelpers.IsVersionWellFormed(startVersion))
+
+            if (!IsWildcardVersion(startVersion) && !VersionStringHelpers.IsVersionWellFormed(startVersion))
             {
                 specification = null;
                 return false;
             }
-            else if (!IsWildcardVersion(endVersion) && !VersionStringHelpers.IsVersionWellFormed(endVersion))
+
+            if (!IsWildcardVersion(endVersion) && !VersionStringHelpers.IsVersionWellFormed(endVersion))
             {
                 specification = null;
                 return false;

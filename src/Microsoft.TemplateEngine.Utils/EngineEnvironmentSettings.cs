@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -68,18 +68,7 @@ namespace Microsoft.TemplateEngine.Utils
                 }
             }
 
-            public string BaseDir
-            {
-                get
-                {
-                    if (_baseDir == null)
-                    {
-                        _baseDir = Path.Combine(UserProfileDir, ".templateengine", _parent.Host.HostIdentifier, _parent.Host.Version);
-                    }
-
-                    return _baseDir;
-                }
-            }
+            public string BaseDir => _baseDir ?? (_baseDir = Path.Combine(UserProfileDir, ".templateengine", _parent.Host.HostIdentifier, _parent.Host.Version));
         }
 
         private class DefaultEnvironment : IEnvironment

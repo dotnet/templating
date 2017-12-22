@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
 
@@ -24,14 +24,8 @@ namespace Microsoft.TemplateEngine.Utils
 
         public IReadOnlyDictionary<string, string> Choices
         {
-            get
-            {
-                return _choices;
-            }
-            set
-            {
-                _choices = value.CloneIfDifferentComparer(StringComparer.OrdinalIgnoreCase);
-            }
+            get => _choices;
+            set => _choices = value.CloneIfDifferentComparer(StringComparer.OrdinalIgnoreCase);
         }
     }
 }

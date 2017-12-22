@@ -1,17 +1,17 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Microsoft.TemplateEngine.Utils
 {
     public static class EqualityExtensions
     {
-        public static bool AllAreTheSame<T, TValue>(this IEnumerable<T> items, Func<T, TValue> selector)
+        public static bool AllAreTheSame<T, TValue>(this IEnumerable<T> items, Func<T, TValue> selector, bool noElementsValue = true)
             where TValue : IEquatable<TValue>
         {
-            return items.AllAreTheSame(selector, (x, y) => x?.Equals(y) ?? (y == null));
+            return items.AllAreTheSame(selector, (x, y) => x?.Equals(y) ?? y == null, noElementsValue);
         }
 
-        public static bool AllAreTheSame<T, TValue>(this IEnumerable<T> items, Func<T, TValue> selector, IEqualityComparer<TValue> comparer = null)
+        public static bool AllAreTheSame<T, TValue>(this IEnumerable<T> items, Func<T, TValue> selector, IEqualityComparer<TValue> comparer, bool noElementsValue = true)
             where TValue : IEquatable<TValue>
         {
             if (comparer == null)
@@ -19,10 +19,10 @@ namespace Microsoft.TemplateEngine.Utils
                 comparer = EqualityComparer<TValue>.Default;
             }
 
-            return items.AllAreTheSame(selector, comparer.Equals);
+            return items.AllAreTheSame(selector, comparer.Equals, noElementsValue);
         }
 
-        public static bool AllAreTheSame<T, TValue>(this IEnumerable<T> items, Func<T, TValue> selector, Func<TValue, TValue, bool> comparer = null)
+        public static bool AllAreTheSame<T, TValue>(this IEnumerable<T> items, Func<T, TValue> selector, Func<TValue, TValue, bool> comparer, bool noElementsValue = true)
             where TValue : IEquatable<TValue>
         {
             if (comparer == null)
@@ -34,7 +34,7 @@ namespace Microsoft.TemplateEngine.Utils
             {
                 if (!enumerator.MoveNext())
                 {
-                    return true; //If there are no elements they're all the same
+                    return noElementsValue;
                 }
 
                 TValue firstValue = selector(enumerator.Current);

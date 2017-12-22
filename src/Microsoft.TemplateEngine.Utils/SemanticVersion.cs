@@ -6,6 +6,7 @@ namespace Microsoft.TemplateEngine.Utils
     /// <summary>
     /// Wrapper for working with Semantic Versioning v2.0 (http://semver.org/)
     /// </summary>
+    /// <inheritdoc cref="IEquatable{T}" />
     public class SemanticVersion : IEquatable<SemanticVersion>, IComparable
     {
         private readonly int _hashCode;
@@ -67,6 +68,7 @@ namespace Microsoft.TemplateEngine.Utils
         /// </summary>
         /// <param name="obj">An object to compare with this instance.</param>
         /// <returns>A value that indicates the relative order of the objects being compared.</returns>
+        /// <inheritdoc />
         public int CompareTo(object obj)
         {
             SemanticVersion other = obj as SemanticVersion;
@@ -82,7 +84,7 @@ namespace Microsoft.TemplateEngine.Utils
         /// <returns>A value that indicates the relative order of the objects being compared.</returns>
         public int CompareTo(SemanticVersion other)
         {
-            return CompareTo(other, out bool ignored);
+            return CompareTo(other, out bool _);
         }
 
         /// <summary>
@@ -142,6 +144,7 @@ namespace Microsoft.TemplateEngine.Utils
         /// </summary>
         /// <param name="other">The object to compare with the current object.</param>
         /// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
+        /// <inheritdoc />
         public bool Equals(SemanticVersion other)
         {
             if (other is null)
@@ -197,12 +200,11 @@ namespace Microsoft.TemplateEngine.Utils
             }
 
             source = source.Trim();
-            int majorEnd = 0,
-                minorEnd = 0,
+            int minorEnd = 0,
                 patchEnd = 0,
-                tail = 0;
+                tail;
 
-            if (!IsolateVersionRange(source, -1, ref majorEnd))
+            if (!IsolateVersionRange(source, -1, out int majorEnd))
             {
                 version = null;
                 return false;
@@ -214,7 +216,7 @@ namespace Microsoft.TemplateEngine.Utils
                 return TryParsePrereleaseAndBuildMetadata(source, majorEnd, minorEnd, patchEnd, tail, out version);
             }
 
-            if (!IsolateVersionRange(source, majorEnd, ref minorEnd))
+            if (!IsolateVersionRange(source, majorEnd, out minorEnd))
             {
                 version = null;
                 return false;
@@ -226,7 +228,7 @@ namespace Microsoft.TemplateEngine.Utils
                 return TryParsePrereleaseAndBuildMetadata(source, majorEnd, minorEnd, patchEnd, tail, out version);
             }
 
-            if (!IsolateVersionRange(source, minorEnd, ref patchEnd))
+            if (!IsolateVersionRange(source, minorEnd, out patchEnd))
             {
                 version = null;
                 return false;
@@ -362,19 +364,14 @@ namespace Microsoft.TemplateEngine.Utils
             //
             if (BuildMetadata != null)
             {
-                if (other.BuildMetadata != null)
-                {
-                    return StringComparer.OrdinalIgnoreCase.Compare(BuildMetadata, other.BuildMetadata);
-                }
-
-                return 1;
-            }
-            else if (other.BuildMetadata != null)
-            {
-                return -1;
+                return other.BuildMetadata != null
+                    ? StringComparer.OrdinalIgnoreCase.Compare(BuildMetadata, other.BuildMetadata)
+                    : 1;
             }
 
-            return 0;
+            return other.BuildMetadata != null
+                ? -1
+                : 0;
         }
 
         //Must apply the following rules to the prerelease section (per http://semver.org/#spec-item-11)
@@ -415,9 +412,9 @@ namespace Microsoft.TemplateEngine.Utils
 
         private static int CompareToPrereleaseInfoSegment(string left, string right)
         {
-            if (IsNumericSegment(left, out bool ignored))
+            if (IsNumericSegment(left, out bool _))
             {
-                if (IsNumericSegment(right, out ignored))
+                if (IsNumericSegment(right, out _))
                 {
                     int us = int.Parse(left, NumberStyles.None, CultureInfo.InvariantCulture);
                     int them = int.Parse(right, NumberStyles.None, CultureInfo.InvariantCulture);
@@ -433,19 +430,12 @@ namespace Microsoft.TemplateEngine.Utils
                     return -1;
                 }
             }
-            else if (IsNumericSegment(right, out ignored))
+            else if (IsNumericSegment(right, out _))
             {
                 return 1;
             }
 
-            int segmentCompare = StringComparer.OrdinalIgnoreCase.Compare(left, right);
-
-            if (segmentCompare != 0)
-            {
-                return segmentCompare;
-            }
-
-            return 0;
+            return StringComparer.OrdinalIgnoreCase.Compare(left, right);
         }
 
         private int CompareVersionInformation(SemanticVersion other)
@@ -459,19 +449,9 @@ namespace Microsoft.TemplateEngine.Utils
 
             int minorCompare = Minor.CompareTo(other.Minor);
 
-            if (minorCompare != 0)
-            {
-                return minorCompare;
-            }
-
-            int patchCompare = Patch.CompareTo(other.Patch);
-
-            if (patchCompare != 0)
-            {
-                return patchCompare;
-            }
-
-            return 0;
+            return minorCompare != 0
+                ? minorCompare
+                : Patch.CompareTo(other.Patch);
         }
 
         private int ComparePrereleaseInfo(SemanticVersion other)
@@ -487,14 +467,12 @@ namespace Microsoft.TemplateEngine.Utils
                 //prerelease < stable
                 return -1;
             }
-            else if (other.PrereleaseInfo != null)
-            {
-                //stable > prerelease
-                return 1;
-            }
 
-            //both are stable
-            return 0;
+            return other.PrereleaseInfo != null
+                //stable > prerelease
+                ? 1
+                //both are stable
+                : 0;
         }
 
         //Determines whether a numeric segment is valid per the rules in
@@ -518,7 +496,7 @@ namespace Microsoft.TemplateEngine.Utils
             return isNumeric && doesNotHaveLeadingZero;
         }
 
-        private static bool IsolateVersionRange(string source, int start, ref int end)
+        private static bool IsolateVersionRange(string source, int start, out int end)
         {
             for (end = start + 1; end < source.Length && source[end] >= '0' && source[end] <= '9'; ++end)
             {
@@ -553,8 +531,6 @@ namespace Microsoft.TemplateEngine.Utils
             int major = int.Parse(source.Substring(0, majorEnd), NumberStyles.None, CultureInfo.InvariantCulture);
             int minor = minorEnd > majorEnd ? int.Parse(source.Substring(majorEnd + 1, minorEnd - majorEnd - 1), NumberStyles.None, CultureInfo.InvariantCulture) : 0;
             int patch = patchEnd > minorEnd ? int.Parse(source.Substring(minorEnd + 1, patchEnd - minorEnd - 1), NumberStyles.None, CultureInfo.InvariantCulture) : 0;
-            string prerelease = null;
-            string metadata = null;
 
             if (tail < source.Length && !(source[tail] == '-' || source[tail] == '+'))
             {
@@ -562,43 +538,19 @@ namespace Microsoft.TemplateEngine.Utils
                 return false;
             }
 
-            if (!ValidateAndExtractPrereleaseSection(source, ref tail, out prerelease))
+            if (!ValidateAndExtractPrereleaseSection(source, ref tail, out string prerelease))
             {
                 version = null;
                 return false;
             }
 
-            if (!ValidateAndExtractBuildMetadataSection(source, tail, out metadata))
+            if (!ValidateAndExtractBuildMetadataSection(source, tail, out string metadata))
             {
                 version = null;
                 return false;
             }
 
             version = new SemanticVersion(source, major, minor, patch, prerelease, metadata);
-            return true;
-        }
-
-        private static bool TryParseSegment(string source, ref int nextDot, out int value)
-        {
-            nextDot = source.IndexOf('.', nextDot);
-
-            if (nextDot < 0 || nextDot == source.Length - 1)
-            {
-                value = 0;
-                return false;
-            }
-
-            string segment = source.Substring(0, nextDot);
-
-            if (string.IsNullOrWhiteSpace(segment)
-                || (segment.Length > 1 && segment[0] == '0')
-                || !int.TryParse(segment, NumberStyles.None, CultureInfo.InvariantCulture, out value)
-                || value < 0)
-            {
-                value = 0;
-                return false;
-            }
-
             return true;
         }
 

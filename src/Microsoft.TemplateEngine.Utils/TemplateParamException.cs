@@ -1,13 +1,15 @@
-﻿using System;
+using System;
 using System.Text;
 
 namespace Microsoft.TemplateEngine.Utils
 {
     public class TemplateParamException : Exception
     {
-        public string ParamName { get; private set; }
-        public string InputValue { get; private set; }
-        public string DataType { get; private set; }
+        public string ParamName { get; }
+
+        public string InputValue { get; }
+
+        public string DataType { get; }
 
         public TemplateParamException()
         {

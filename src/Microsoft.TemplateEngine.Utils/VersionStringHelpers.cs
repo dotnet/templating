@@ -1,6 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.TemplateEngine.Abstractions;
 
 namespace Microsoft.TemplateEngine.Utils
@@ -14,14 +11,10 @@ namespace Microsoft.TemplateEngine.Utils
                 specification = null;
                 return false;
             }
-            else if (versionString.Contains("-"))
-            {
-                return RangeVersionSpecification.TryParse(versionString, out specification);
-            }
-            else
-            {
-                return ExactVersionSpecification.TryParse(versionString, out specification);
-            }
+
+            return versionString.Contains("-")
+                ? RangeVersionSpecification.TryParse(versionString, out specification)
+                : ExactVersionSpecification.TryParse(versionString, out specification);
         }
 
         // returns the relative order of the versions:
@@ -42,7 +35,8 @@ namespace Microsoft.TemplateEngine.Utils
                 {
                     return 1;
                 }
-                else if (parts1[i] < parts2[i])
+
+                if (parts1[i] < parts2[i])
                 {
                     return -1;
                 }
@@ -53,7 +47,7 @@ namespace Microsoft.TemplateEngine.Utils
 
         public static bool IsVersionWellFormed(string version)
         {
-            return TryParseVersionString(version, out int[] parsed);
+            return TryParseVersionString(version, out int[] _);
         }
 
         // tries to parse a version into 4 int parts, zero-padding on the rght if needed.
@@ -67,7 +61,7 @@ namespace Microsoft.TemplateEngine.Utils
                 return false;
             }
 
-            string[] parts = version.Split(new[] { '.' });
+            string[] parts = version.Split('.');
             if (parts.Length < 2 || parts.Length > 4)
             {
                 parsed = null;

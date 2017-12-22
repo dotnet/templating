@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -64,7 +64,7 @@ namespace Microsoft.TemplateEngine.Utils
             }
 
 
-            public T Val { get; private set; }
+            public T Val { get; }
         }
 
         private class Grouping<TKey, TElement> : IGrouping<TKey, TElement>
@@ -75,7 +75,7 @@ namespace Microsoft.TemplateEngine.Utils
                 _element = element;
             }
 
-            private IEnumerable<TElement> _element;
+            private readonly IEnumerable<TElement> _element;
 
             public TKey Key { get; }
 
