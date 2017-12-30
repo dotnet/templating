@@ -80,9 +80,10 @@ namespace Microsoft.TemplateEngine.Edge.Template
 
                 try
                 {
+                    IEngineEnvironmentSettings runSettings = new RunSpecificEngineEnvironmentSettings(_environmentSettings);
                     _paths.CreateDirectory(targetDir);
                     Stopwatch sw = Stopwatch.StartNew();
-                    IComponentManager componentManager = _environmentSettings.SettingsLoader.Components;
+                    IComponentManager componentManager = runSettings.SettingsLoader.Components;
 
                     // setup separate sets of parameters to be used for GetCreationEffects() and by CreateAsync().
                     if (!TryCreateParameterSet(template, realName, inputParameters, out IParameterSet effectParams, out TemplateCreationResult resultIfParameterCreationFailed))
@@ -90,12 +91,12 @@ namespace Microsoft.TemplateEngine.Edge.Template
                         return resultIfParameterCreationFailed;
                     }
 
-                    IReadOnlyList<IFileChange> changes = template.Generator.GetCreationEffects(_environmentSettings, template, effectParams, componentManager, targetDir).FileChanges;
+                    IReadOnlyList<IFileChange> changes = template.Generator.GetCreationEffects(runSettings, template, effectParams, componentManager, targetDir).FileChanges;
                     IReadOnlyList<IFileChange> destructiveChanges = changes.Where(x => x.ChangeKind != ChangeKind.Create).ToList();
 
                     if (!forceCreation && destructiveChanges.Count > 0)
                     {
-                        if (!_environmentSettings.Host.OnPotentiallyDestructiveChangesDetected(changes, destructiveChanges))
+                        if (!runSettings.Host.OnPotentiallyDestructiveChangesDetected(changes, destructiveChanges))
                         {
                             return new TemplateCreationResult("Cancelled", CreationResultStatus.Cancelled, template.Name);
                         }
@@ -106,9 +107,9 @@ namespace Microsoft.TemplateEngine.Edge.Template
                         return resultIfParameterCreationFailed;
                     }
 
-                    creationResult = await template.Generator.CreateAsync(_environmentSettings, template, creationParams, componentManager, targetDir).ConfigureAwait(false);
+                    creationResult = await template.Generator.CreateAsync(runSettings, template, creationParams, componentManager, targetDir).ConfigureAwait(false);
                     sw.Stop();
-                    _environmentSettings.Host.LogTiming("Content generation time", sw.Elapsed, 0);
+                    runSettings.Host.LogTiming("Content generation time", sw.Elapsed, 0);
                     return new TemplateCreationResult(string.Empty, CreationResultStatus.Success, template.Name, creationResult, targetDir);
                 }
                 catch (ContentGenerationException cx)

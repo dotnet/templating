@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -113,7 +113,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
                 }
 
                 byte[] bom;
-                Encoding realEncoding = EncodingUtil.Detect(composite, totalLength, out bom);
+                Encoding realEncoding = Utils.EncodingUtil.Detect(composite, totalLength, out bom);
 
                 if (!Equals(realEncoding, processor.Encoding))
                 {

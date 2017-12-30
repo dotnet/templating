@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
+using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Core.Util
 {
-    public class Processor : IProcessor
+    public class Processor : IProcessor, IContextAccess
     {
         private const int DefaultBufferSize = 8 * 1024 * 1024;
         private const int DefaultFlushThreshold = 8 * 1024 * 1024;
@@ -40,8 +41,26 @@ namespace Microsoft.TemplateEngine.Core.Util
 
         public bool Run(Stream source, Stream target, int bufferSize, int flushThreshold)
         {
-            ProcessorState state = new ProcessorState(source, target, bufferSize, flushThreshold, Config, _operations);
+            ProcessorState state = new ProcessorState(EnvironmentSettings, InputFile, OutputFile, source, target, bufferSize, flushThreshold, Config, _operations);
             return state.Run();
         }
+
+        public IEngineEnvironmentSettings EnvironmentSettings { get; private set; }
+
+        public void SetContext(IEngineEnvironmentSettings environmentSettings, string inputFile, string outputFile)
+        {
+            EnvironmentSettings = environmentSettings;
+            InputFile = inputFile;
+            OutputFile = outputFile;
+
+            if (!string.IsNullOrEmpty(inputFile) && !string.IsNullOrEmpty(outputFile) && environmentSettings is IOutputValuesContainer c)
+            {
+                c.MapFile(inputFile, outputFile);
+            }
+        }
+
+        public string InputFile { get; private set; }
+
+        public string OutputFile { get; private set; }
     }
 }

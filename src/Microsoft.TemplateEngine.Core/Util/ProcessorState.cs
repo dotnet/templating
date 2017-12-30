@@ -2,15 +2,14 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
-using System.Net.Sockets;
 using System.Text;
+using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Core.Matching;
 
 namespace Microsoft.TemplateEngine.Core.Util
 {
-    public class ProcessorState : IProcessorState
+    public class ProcessorState : IProcessorState, IOutputValuesContainerAccessor
     {
         private Stream _source;
         private readonly Stream _target;
@@ -19,6 +18,9 @@ namespace Microsoft.TemplateEngine.Core.Util
         private static readonly ConcurrentDictionary<IReadOnlyList<IOperationProvider>, Dictionary<Encoding, Trie<OperationTerminal>>> TrieLookup = new ConcurrentDictionary<IReadOnlyList<IOperationProvider>, Dictionary<Encoding, Trie<OperationTerminal>>>();
         private static readonly ConcurrentDictionary<IReadOnlyList<IOperationProvider>, List<string>> OperationsToExplicitlySetOnByDefault = new ConcurrentDictionary<IReadOnlyList<IOperationProvider>, List<string>>();
         private readonly int _flushThreshold;
+        private readonly string _inputFilePath;
+        private readonly string _outputFilePath;
+        private readonly IEngineEnvironmentSettings _environmentSettings;
 
         public IEngineConfig Config { get; }
 
@@ -34,7 +36,7 @@ namespace Microsoft.TemplateEngine.Core.Util
 
         public Encoding Encoding
         {
-            get { return _encoding; }
+            get => _encoding;
             set
             {
                 _encoding = value;
@@ -43,7 +45,16 @@ namespace Microsoft.TemplateEngine.Core.Util
         }
 
         public ProcessorState(Stream source, Stream target, int bufferSize, int flushThreshold, IEngineConfig config, IReadOnlyList<IOperationProvider> operationProviders)
+            : this(null, null, null, source, target, bufferSize, flushThreshold, config, operationProviders)
         {
+        }
+
+        public ProcessorState(IEngineEnvironmentSettings environmentSettings, string inputFilePath, string outputFilePath, Stream source, Stream target, int bufferSize, int flushThreshold, IEngineConfig config, IReadOnlyList<IOperationProvider> operationProviders)
+        {
+            _environmentSettings = environmentSettings;
+            _inputFilePath = inputFilePath;
+            _outputFilePath = outputFilePath;
+
             if (source.CanSeek)
             {
                 try
@@ -72,8 +83,7 @@ namespace Microsoft.TemplateEngine.Core.Util
             CurrentBuffer = new byte[bufferSize];
             CurrentBufferLength = source.Read(CurrentBuffer, 0, CurrentBuffer.Length);
 
-            byte[] bom;
-            Encoding encoding = EncodingUtil.Detect(CurrentBuffer, CurrentBufferLength, out bom);
+            Encoding encoding = Utils.EncodingUtil.Detect(CurrentBuffer, CurrentBufferLength, out byte[] bom);
             Encoding = encoding;
             CurrentBufferPosition = bom.Length;
             CurrentSequenceNumber = bom.Length;
@@ -133,6 +143,8 @@ namespace Microsoft.TemplateEngine.Core.Util
                 CurrentSequenceNumber = 0;
             }
         }
+
+        public IEngineEnvironmentSettings EnvironmentSettings => _environmentSettings ?? Config.EnvironmentSettings;
 
         public bool AdvanceBuffer(int bufferPosition)
         {
@@ -357,9 +369,8 @@ namespace Microsoft.TemplateEngine.Core.Util
                 int bestPos = -1;
                 for (int i = nRead - match.MinLength; i >= 0; --i)
                 {
-                    int token;
                     int ic = i;
-                    if (match.GetOperation(buffer, nRead, ref ic, out token) && ic >= bestPos)
+                    if (match.GetOperation(buffer, nRead, ref ic, out int token) && ic >= bestPos)
                     {
                         bestPos = ic;
                         best = token;
@@ -464,8 +475,7 @@ namespace Microsoft.TemplateEngine.Core.Util
                         return;
                     }
 
-                    int token;
-                    if (!trie.GetOperation(CurrentBuffer, bufferLength, ref currentBufferPosition, out token))
+                    if (!trie.GetOperation(CurrentBuffer, bufferLength, ref currentBufferPosition, out int _))
                     {
                         return;
                     }
@@ -499,8 +509,7 @@ namespace Microsoft.TemplateEngine.Core.Util
                         return;
                     }
 
-                    int token;
-                    if (match.GetOperation(CurrentBuffer, bufferLength, ref currentBufferPosition, out token))
+                    if (match.GetOperation(CurrentBuffer, bufferLength, ref currentBufferPosition, out int token))
                     {
                         if (!consumeToken)
                         {
@@ -521,6 +530,14 @@ namespace Microsoft.TemplateEngine.Core.Util
             _source = new CombinedStream(staged, _source, inner => _source = inner);
             CurrentBufferLength = _source.Read(CurrentBuffer, 0, CurrentBufferLength);
             CurrentBufferPosition = 0;
+        }
+
+        public void SetValue(string name, object value)
+        {
+            if (!string.IsNullOrEmpty(_inputFilePath) && !string.IsNullOrEmpty(_outputFilePath) && !string.IsNullOrEmpty(name) && EnvironmentSettings is IOutputValuesContainer container)
+            {
+                container[_inputFilePath, _outputFilePath, name] = value;
+            }
         }
     }
 }

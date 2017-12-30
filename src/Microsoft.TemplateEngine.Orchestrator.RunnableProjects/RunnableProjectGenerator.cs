@@ -34,7 +34,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             IVariableCollection variables = VariableCollection.SetupVariables(environmentSettings, parameters, template.Config.OperationConfig.VariableSetup);
             template.Config.Evaluate(parameters, variables, template.ConfigFile);
 
-            IOrchestrator basicOrchestrator = new Core.Util.Orchestrator();
+            Core.Util.Orchestrator basicOrchestrator = new Core.Util.Orchestrator
+            {
+                EnvironmentSettings = environmentSettings
+            };
             RunnableProjectOrchestrator orchestrator = new RunnableProjectOrchestrator(basicOrchestrator);
 
             GlobalRunSpec runSpec = new GlobalRunSpec(template.TemplateSourceRoot, componentManager, parameters, variables, template.Config.OperationConfig, template.Config.SpecialOperationConfig, template.Config.LocalizationOperations, template.Config.IgnoreFileNames);
@@ -51,11 +54,18 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         private static ICreationResult GetCreationResult(IEngineEnvironmentSettings environmentSettings, RunnableProjectTemplate template, IVariableCollection variables)
         {
-            return new CreationResult()
+            CreationResult result = new CreationResult
             {
                 PostActions = PostAction.ListFromModel(environmentSettings, template.Config.PostActionModel, variables),
                 PrimaryOutputs = CreationPath.ListFromModel(environmentSettings, template.Config.PrimaryOutputs, variables)
             };
+
+            if (environmentSettings is IOutputValuesContainer container)
+            {
+                result.SetOutputValues(container);
+            }
+
+            return result;
         }
 
         // Note the deferred-config macros (generated) are part of the runConfig.Macros
@@ -580,7 +590,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             IVariableCollection variables = VariableCollection.SetupVariables(environmentSettings, parameters, template.Config.OperationConfig.VariableSetup);
             template.Config.Evaluate(parameters, variables, template.ConfigFile);
 
-            IOrchestrator basicOrchestrator = new Core.Util.Orchestrator();
+            Core.Util.Orchestrator basicOrchestrator = new Core.Util.Orchestrator
+            {
+                EnvironmentSettings = environmentSettings
+            };
             RunnableProjectOrchestrator orchestrator = new RunnableProjectOrchestrator(basicOrchestrator);
 
             GlobalRunSpec runSpec = new GlobalRunSpec(template.TemplateSourceRoot, componentManager, parameters, variables, template.Config.OperationConfig, template.Config.SpecialOperationConfig, template.Config.LocalizationOperations, template.Config.IgnoreFileNames);
