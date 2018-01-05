@@ -16,7 +16,7 @@
     <ImageUrl>http://go.microsoft.com/fwlink/?LinkID=288859</ImageUrl>
     <Tags>template</Tags>
     <Company>Microsoft</Company>
-    <Copyright>Copyright © Microsoft Corporation</Copyright>
+    <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
     <ArtifactsFolder>$(MSBuildThisFileDirectory)artifacts\</ArtifactsFolder>
     <TemplatesFolder>$(ArtifactsFolder)templates\</TemplatesFolder>
     <TemplatesNoTimestampFolder>$(ArtifactsFolder)templates-notimestamp\</TemplatesNoTimestampFolder>
