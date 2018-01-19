@@ -56,6 +56,8 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
         bool CheckForUpdatesNoPrompt { get; }
 
+        bool JsonOutputMode { get; }
+
         string AllowScriptsToRun { get; }
 
         bool HasDebuggingFlag(string flag);

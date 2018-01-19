@@ -548,6 +548,14 @@ namespace Microsoft.TemplateEngine.Cli
                 return HelpForTemplateResolution.HandleParseError(_commandInput, _telemetryLogger);
             }
 
+            // This is the earliest possible place where output modes can be set based on the parsed input.
+            // Nothing should be sent to the reporter prior to this.
+            // The exception being handling a parse error (above) - because if that occurs, we exit.
+            if (_commandInput.JsonOutputMode)
+            {
+                Reporter.SetMode(ReporterMode.Json);
+            }
+
             if (_commandInput.IsHelpFlagSpecified)
             {
                 _telemetryLogger.TrackEvent(CommandName + TelemetryConstants.HelpEventSuffix);

@@ -22,14 +22,22 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             }
 
             IReadOnlyList<ITemplateInfo> templateInfoList = templateGroup.Select(x => x.Info).ToList();
-            ShowTemplateDetailHeaders(templateInfoList);
 
             TemplateGroupParameterDetails groupParameterDetails = DetermineParameterDispositionsForTemplateGroup(templateInfoList, environmentSettings, commandInput, hostDataLoader, templateCreator);
 
             // get the input params valid for any param in the group
             IReadOnlyDictionary<string, string> inputTemplateParams = CoalesceInputParameterValuesFromTemplateGroup(templateGroup);
 
-            ShowParameterHelp(inputTemplateParams, showImplicitlyHiddenParams, groupParameterDetails, environmentSettings);
+            if (!commandInput.JsonOutputMode)
+            {
+                ShowTemplateDetailHeaders(templateInfoList);
+                ShowParameterHelp(inputTemplateParams, showImplicitlyHiddenParams, groupParameterDetails, environmentSettings);
+            }
+            else
+            {
+                JsonOutputTemplateDetailsFormatter jsonOutputter = new JsonOutputTemplateDetailsFormatter(templateInfoList, groupParameterDetails, true);
+                Reporter.Output.WriteLine(jsonOutputter.JsonSerializedDetails, ReporterMode.Json);
+            }
         }
 
         private static void ShowTemplateDetailHeaders(IReadOnlyList<ITemplateInfo> templateGroup)
@@ -323,18 +331,6 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                 HasPostActionScriptRunner = groupHasPostActionScriptRunner,
                 ParametersToAlwaysShow = parametersToAlwaysShow,
             };
-        }
-
-        private struct TemplateGroupParameterDetails
-        {
-            public IParameterSet AllParams;
-            public string AdditionalInfo;       // TODO: rename (probably)
-            public IReadOnlyList<string> InvalidParams;
-            public HashSet<string> ExplicitlyHiddenParams;
-            public IReadOnlyDictionary<string, IReadOnlyList<string>> GroupVariantsForCanonicals;
-            public HashSet<string> GroupUserParamsWithDefaultValues;
-            public bool HasPostActionScriptRunner;
-            public HashSet<string> ParametersToAlwaysShow;
         }
     }
 }

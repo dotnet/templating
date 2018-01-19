@@ -59,7 +59,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                     unambiguousTemplateGroupForList = new List<ITemplateMatchInfo>();
                 }
 
-                DisplayTemplateList(unambiguousTemplateGroupForList, environmentSettings, commandInput.Language, defaultLanguage);
+                DisplayTemplateList(unambiguousTemplateGroupForList, environmentSettings, commandInput.Language, defaultLanguage, commandInput.JsonOutputMode);
                 // list flag specified, so no usage examples or detailed help
                 return CreationResultStatus.Success;
             }
@@ -138,7 +138,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             }
 
             ShowContextAndTemplateNameMismatchHelp(templateResolutionResult, commandInput.TemplateName, commandInput.TypeFilter);
-            DisplayTemplateList(templatesForDisplay, environmentSettings, commandInput.Language, defaultLanguage);
+            DisplayTemplateList(templatesForDisplay, environmentSettings, commandInput.Language, defaultLanguage, commandInput.JsonOutputMode);
 
             if (!commandInput.IsListFlagSpecified)
             {
@@ -181,6 +181,19 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             Reporter.Error.WriteLine(string.Format(LocalizableStrings.RunHelpForInformationAboutAcceptedParameters, commandName).Bold().Red());
         }
 
+        private static void DisplayTemplateList(IReadOnlyList<ITemplateMatchInfo> templates, IEngineEnvironmentSettings environmentSettings, string language, string defaultLanguage, bool jsonMode)
+        {
+            if (jsonMode)
+            {
+                JsonOutputTemplateListFormatter jsonDisplay = new JsonOutputTemplateListFormatter(templates);
+                Reporter.Output.WriteLine(jsonDisplay.JsonSerializedList, ReporterMode.Json);
+            }
+            else
+            {
+                DisplayTemplateListConsoleTable(templates, environmentSettings, language, defaultLanguage);
+            }
+        }
+
         // Displays the list of templates in a table, one row per template group.
         // 
         // The columns displayed are as follows
@@ -190,7 +203,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
         //  - Short Name
         //  - Language: All languages supported by the group are displayed, with the default language in brackets, e.g.: [C#]
         //  - Tags
-        private static void DisplayTemplateList(IReadOnlyList<ITemplateMatchInfo> templates, IEngineEnvironmentSettings environmentSettings, string language, string defaultLanguage)
+        private static void DisplayTemplateListConsoleTable(IReadOnlyList<ITemplateMatchInfo> templates, IEngineEnvironmentSettings environmentSettings, string language, string defaultLanguage)
         {
             IReadOnlyDictionary<ITemplateInfo, string> templateGroupsLanguages = GetLanguagesForTemplateGroups(templates, language, defaultLanguage);
 

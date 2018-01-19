@@ -202,6 +202,8 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
                     Create.Option("--trace:authoring", string.Empty, Accept.NoArguments()),
                     Create.Option("--trace:install", string.Empty, Accept.NoArguments()),
+
+                    Create.Option("--mode:json", string.Empty, Accept.NoArguments())
                 };
             }
         }

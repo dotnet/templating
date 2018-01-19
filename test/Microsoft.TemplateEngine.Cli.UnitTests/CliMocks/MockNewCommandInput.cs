@@ -78,6 +78,8 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
 
         public bool CheckForUpdatesNoPrompt { get; set; }
 
+        public bool JsonOutputMode { get; }
+
         public string AllowScriptsToRun { get; set; }
 
         public IReadOnlyDictionary<string, string> InputTemplateParams { get; set; }

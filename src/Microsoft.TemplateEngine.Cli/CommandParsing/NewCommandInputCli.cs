@@ -248,6 +248,8 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
         public bool CheckForUpdatesNoPrompt => _parseResult.HasAppliedOption(new[] { _commandName, "update-no-prompt" });
 
+        public bool JsonOutputMode => _parseResult.HasAppliedOption(new[] { _commandName, "mode:json" });
+
         public string AllowScriptsToRun
         {
             get
