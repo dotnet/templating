@@ -29,7 +29,12 @@
     <PushToBlobFeed AccountKey="$(BlobFeedAccessToken)"
                 ExpectedFeedUrl="$(ExpectedFeedUrl)"
                 ItemsToPush="@(SignedPackages)"
-                Overwrite="false" />
+                Overwrite="false"
+                ManifestBranch="$(ManifestBranch)"
+                ManifestBuildId="$(ManifestBuildId)"
+                ManifestCommit="$(ManifestCommit)"
+                ManifestName="templating"
+                SkipCreateManifest="false" />
   </Target>
 
   </Project>
