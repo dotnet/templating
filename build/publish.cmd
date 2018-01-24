@@ -4,7 +4,7 @@ if not defined FeedTasksPackage (
 )
 
 if not defined FeedTasksPackageVersion (
-    set FeedTasksPackageVersion=1.0.0-prerelease-02203-01
+    set FeedTasksPackageVersion=2.1.0-prerelease-02419-02
 )
 
 if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin\MSBuild.exe" (
