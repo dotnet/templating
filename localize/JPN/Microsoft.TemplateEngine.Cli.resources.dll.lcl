@@ -322,7 +322,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Apply updates ([A]5D;ll|[N]5D;one|[P]5D;rompt)?]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[更新を適用しますか([A]5D;ll|[N]5D;one|[P]5D;rompt)?]]></Val>
+            <Val><![CDATA[更新を適用しますか ([A]5D;ll|[N]5D;one|[P]5D;rompt)?]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1407,7 +1407,7 @@
     <Disp Icon="Ver" Disp="true" LocTbl="false" Path=" \ ;Version \ 8 \ 0" />
     <Item ItemId=";AssemblyVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0.312]]></Val>
+        <Val><![CDATA[1.0.0.315]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1440,7 +1440,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0.312]]></Val>
+        <Val><![CDATA[1.0.0.315]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1476,7 +1476,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0-beta3-20171110-312+312.aebe22d9251cfc16cfeffdbb80942308573764f4]]></Val>
+        <Val><![CDATA[1.0.0-beta3-20171204-315+315.b1c1851198203f96ce7295f55766e3f414fdc479]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
