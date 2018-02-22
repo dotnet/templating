@@ -7,7 +7,7 @@
     <PackageDateTime Condition="'$(PackageDateTime)' == ''">$([System.DateTime]::Now.ToString("yyyyMMdd"))</PackageDateTime>
     <BUILD_NUMBER Condition="'$(BUILD_NUMBER)' == ''">0</BUILD_NUMBER>
     <BUILD_NUMBER Condition="'$(BUILD_NUMBER)' == '0' And '$(BUILD_BUILDNUMBER)' != ''">$(BUILD_BUILDNUMBER)</BUILD_NUMBER>
-    <AssemblyReleaseVersion>$(PackageReleaseVersion).$(BUILD_NUMBER)</AssemblyReleaseVersion>
+    <AssemblyReleaseVersion>$(PackageReleaseVersion).$([MSBuild]::Modulo($(BUILD_NUMBER), 65535))</AssemblyReleaseVersion>
     <PackageVersion Condition="'$(NO_TIMESTAMP)' != 'true'">$(PackageVersion)-$(PackageDateTime)-$(BUILD_NUMBER)</PackageVersion>
   </PropertyGroup>
   <PropertyGroup>
