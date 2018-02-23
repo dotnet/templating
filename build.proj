@@ -69,6 +69,42 @@
     </TestProjects>
   </PropertyGroup>
 
+  <Target Name="BuildForCli">
+    <MakeDir Directories="$(ArtifactsDir);$(PackageOutputPath);$(TemplatesOutputPath);$(DevPath)" />
+    <CallTarget Targets="CollectGitInfo" />
+
+    <!-- Build the inner ring (abstractions, core, core contracts, etc.) -->
+    <MSBuild Projects="$(InnerRingProjects)" Targets="Restore;Build"
+             Properties="TargetFramework=$(InnerRingTargetFramework);Configuration=$(Configuration)"
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+
+    <MSBuild Projects="$(InnerRingProjects)" Targets="Pack"
+             Properties="TargetFrameworks=$(InnerRingPackTargetFrameworks);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath);NoBuild=true;IncludeSymbols=true"
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+
+    <!-- Build Edge (the only outerring component that CLI depends on) -->
+    <MSBuild Projects="src/Microsoft.TemplateEngine.Edge/Microsoft.TemplateEngine.Edge.csproj" Targets="Restore;Build"
+             Properties="TargetFramework=$(OuterRingTargetFramework);Configuration=$(Configuration)"
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+
+    <MSBuild Projects="src/Microsoft.TemplateEngine.Edge/Microsoft.TemplateEngine.Edge.csproj" Targets="Pack"
+             Properties="TargetFrameworks=$(OuterRingPackTargetFrameworks);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath);NoBuild=true;IncludeSymbols=true"
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+
+    <!-- Build projects that only build for the dotnet CLI -->
+    <MSBuild Projects="$(CliProjects)" Targets="Restore;Build"
+             Properties="TargetFramework=$(OuterRingTargetFramework);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath);NoBuild=true"
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+
+    <MSBuild Projects="$(CliProjects)" Targets="Pack"
+             Properties="TargetFramework=$(OuterRingTargetFramework);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath);NoBuild=true;IncludeSymbols=true"
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+
+    <!-- Build templates -->
+    <MSBuild Projects="template_feed/Template.proj" Targets="Build"
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+  </Target>
+
   <Target Name="Build">
 
     <MakeDir Directories="$(ArtifactsDir);$(PackageOutputPath);$(TemplatesOutputPath);$(DevPath)" />
