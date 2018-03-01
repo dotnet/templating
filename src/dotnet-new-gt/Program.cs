@@ -15,14 +15,14 @@ using Microsoft.TemplateEngine.Utils;
 namespace dotnet_new
 {
     /// <summary>
-    /// apparently i need a comment here to avoid a warning
+    /// Entry point for dotnet new as a global tool ref.
     /// </summary>
     public class Program
     {
+        // TODO: finalize these values
         private const string HostIdentifier = "dotnet-new-gt";
         private const string HostVersion = "1.0.0";
-        private const string CommandName = "new";
-
+        private const string CommandName = "new-gt";
         private static readonly string PathEnvironmentVariableName = "DNGT";    // DotnetNewGlobalTool
 
         static int Main(string[] args)
@@ -110,7 +110,6 @@ namespace dotnet_new
             host.RegisterDiagnosticLogger("Install", installLogger);
         }
 
-        // TODO: make this appropriate for the global tool
         private static void FirstRun(IEngineEnvironmentSettings environmentSettings, IInstaller installer)
         {
             string baseDir = Environment.ExpandEnvironmentVariables($"%{PathEnvironmentVariableName}%");
@@ -125,11 +124,6 @@ namespace dotnet_new
 
             List<string> toInstallList = new List<string>();
             Paths paths = new Paths(environmentSettings);
-
-            if (paths.FileExists(paths.Global.DefaultInstallPackageList))
-            {
-                toInstallList.AddRange(paths.ReadAllText(paths.Global.DefaultInstallPackageList).Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries));
-            }
 
             if (paths.FileExists(paths.Global.DefaultInstallTemplateList))
             {
