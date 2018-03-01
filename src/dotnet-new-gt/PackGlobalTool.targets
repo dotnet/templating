@@ -1,0 +1,23 @@
+<Project>
+  <Target Name="PackGlobalTool" Condition="'$(PackageType)' == 'DotnetTool'" BeforeTargets="GenerateNuspec" DependsOnTargets="Publish">
+    <PropertyGroup>
+      <NuspecProperties>
+        publishDir=$(PublishDir);
+        version=1;
+		
+		<!-- TODO: get these filled in as needed -->
+        <!--licenseUrl=$(PackageLicenseUrl);
+        projectUrl=$(PackageProjectUrl);
+        iconUrl=$(PackageIconUrl);
+        serviceable=$(Serviceable);
+        copyright=$(Copyright);
+        description=$(Description);
+        repositoryUrl=$(RepositoryUrl);-->
+		
+		targetFramework=$(TargetFramework);
+        
+        MicrosoftNETCorePlatformsPackageVersion=$(MicrosoftNETCorePlatformsPackageVersion);
+      </NuspecProperties>
+    </PropertyGroup>
+  </Target>
+</Project>

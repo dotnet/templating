@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="PackGlobalTool.targets" />
+  <Import Project="build\dependencies.props" />
+  
+  <PropertyGroup>
+    <Description>Template generation tool for dotnet.</Description>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <PackageType>DotnetTool</PackageType>
+    <ToolCommandName>dotnet-new-gt</ToolCommandName>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+    <PackageBasePath>tools/any/any/</PackageBasePath>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <RootNamespace>Microsoft.TemplateEngine.Cli</RootNamespace>
+  </PropertyGroup>
+
+  <!--TODO: decide whether we want a separate template list for the global tool than for new-->
+  <ItemGroup>
+    <Content Include="defaultinstall.template.list" CopyToOutputDirectory="Always" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\template_feed\**\*" Link="template_feed\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="Always" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Microsoft.TemplateEngine.Abstractions\Microsoft.TemplateEngine.Abstractions.csproj" />
+    <ProjectReference Include="..\Microsoft.TemplateEngine.Cli\Microsoft.TemplateEngine.Cli.csproj" />
+    <ProjectReference Include="..\Microsoft.TemplateEngine.Core\Microsoft.TemplateEngine.Core.csproj" />
+    <ProjectReference Include="..\Microsoft.TemplateEngine.Core.Contracts\Microsoft.TemplateEngine.Core.Contracts.csproj" />
+    <ProjectReference Include="..\Microsoft.TemplateEngine.Edge\Microsoft.TemplateEngine.Edge.csproj" />
+    <ProjectReference Include="..\Microsoft.TemplateEngine.Orchestrator.RunnableProjects\Microsoft.TemplateEngine.Orchestrator.RunnableProjects.csproj" />
+    <ProjectReference Include="..\Microsoft.TemplateEngine.Utils\Microsoft.TemplateEngine.Utils.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftJsonPackageVersion)" />
+  </ItemGroup>
+  
+  <PropertyGroup>
+    <NuspecFile>$(MSBuildProjectDirectory)\dotnet-new-gt.nuspec</NuspecFile>
+  </PropertyGroup>
+
+  </Project>

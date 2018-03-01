@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup Label="Package Versions">
+    <MicrosoftNETCorePlatformsPackageVersion>2.1.0-preview2-26130-01</MicrosoftNETCorePlatformsPackageVersion>
+	<NewtonsoftJsonPackageVersion>9.0.1</NewtonsoftJsonPackageVersion>
+  </PropertyGroup>
+</Project>

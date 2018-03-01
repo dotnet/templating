@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>dotnet-new-gt</id>
+    <tags>dotnet-new-gt</tags>
+    <version>$version$</version>
+    <authors>Microsoft</authors>
+    <owners>Microsoft</owners>
+    <description>dotnet new global tool</description>
+      
+	<!-- TODO: fill these in as appropriate -->
+    <!-- <licenseUrl>$licenseUrl$</licenseUrl> -->
+    <!-- <projectUrl>$projectUrl$</projectUrl> -->
+    <!-- <iconUrl>$iconUrl$</iconUrl> -->
+    <!-- <copyright>$copyright$</copyright> -->
+    <!-- <requireLicenseAcceptance>true</requireLicenseAcceptance> -->
+    <!-- <serviceable>$serviceable$</serviceable> -->
+	<!-- <repository type="git" url="$repositoryUrl$" /> -->
+      
+    <packageTypes>
+      <packageType name="DotnetTool" />
+    </packageTypes>
+
+    <dependencies>
+    <!-- Workaround https://github.com/dotnet/cli/issues/8418 --> 
+      <dependency id="Microsoft.NETCore.Platforms" version="$MicrosoftNETCorePlatformsPackageVersion$" /> 
+    </dependencies>
+
+  </metadata>
+  <files>
+    <file src="$publishdir$" target="tools/any/any" />
+    <file src="DotnetToolSettings.xml" target="tools/any/any/DotnetToolSettings.xml" />
+  </files>
+</package>
