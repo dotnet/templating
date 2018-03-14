@@ -41,10 +41,13 @@
       </Item>
       <Item ItemId=";AddProjToSlnPostActionSucceeded" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Successfully added]A;    project(s): {0}]A;    to solution file: {1}]]></Val>
+          <Val><![CDATA[Successfully added]D;]A;    project(s): {0}]D;]A;    to solution file: {1}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[솔루션 파일 {1}에]A;    프로젝트 {0}을(를)]A;    추가했습니다.]]></Val>
+            <Val><![CDATA[솔루션 파일 {1}에]D;]A;    프로젝트 {0}을(를)]D;]A;    추가했습니다.]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Successfully added]A;    project(s): {0}]A;    to solution file: {1}]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -131,10 +134,13 @@
       </Item>
       <Item ItemId=";AddRefPostActionSucceeded" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Successfully added]A;    reference: {0}]A;    to project file: {1}]]></Val>
+          <Val><![CDATA[Successfully added]D;]A;    reference: {0}]D;]A;    to project file: {1}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0} 참조를]A;    프로젝트 파일 {1}에]A;    추가했습니다.]]></Val>
+            <Val><![CDATA[{0} 참조를]D;]A;    프로젝트 파일 {1}에]D;]A;    추가했습니다.]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Successfully added]A;    reference: {0}]A;    to project file: {1}]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -176,10 +182,13 @@
       </Item>
       <Item ItemId=";AliasCommandAfterExpansion" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[After expanding aliases, the command is:]A;    dotnet {0}]]></Val>
+          <Val><![CDATA[After expanding aliases, the command is:]D;]A;    dotnet {0}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[별칭을 확장한 후 명령:]A;    dotnet {0}]]></Val>
+            <Val><![CDATA[별칭을 확장한 후 명령:]D;]A;    dotnet {0}]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[After expanding aliases, the command is:]A;    dotnet {0}]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -284,10 +293,13 @@
       </Item>
       <Item ItemId=";AliasShowErrorUnknownAlias" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Unknown alias name '{0}'.]A;Run 'dotnet {1} --show-aliases' with no args to show all aliases.]]></Val>
+          <Val><![CDATA[Unknown alias name '{0}'.]D;]A;Run 'dotnet {1} --show-aliases' with no args to show all aliases.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[알 수 없는 별칭 이름 '{0}'입니다.]A;인수 없이 'dotnet {1} --show-aliases'를 실행하면 모든 별칭이 표시됩니다.]]></Val>
+            <Val><![CDATA[알 수 없는 별칭 이름 '{0}'입니다.]D;]A;인수 없이 'dotnet {1} --show-aliases'를 실행하면 모든 별칭이 표시됩니다.]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Unknown alias name '{0}'.]A;Run 'dotnet {1} --show-aliases' with no args to show all aliases.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -408,6 +420,24 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";Authoring_AmbiguousBestPrecedence" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Equal highest precedence values among the best template matches prevented unambiguously choosing a template to invoke.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[가장 적합한 템플릿 일치 항목 중 동일한 최고 우선 순위 값 때문에 호출할 템플릿을 명확하게 선택하지 못했습니다.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";Authoring_AmbiguousChoiceParameterValue" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[An ambiguous choice parameter value prevented unambiguously choosing a template to invoke.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[모호한 choice 매개 변수 값 때문에 호출할 템플릿을 명확하게 선택하지 못했습니다.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";BadLocaleError" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Invalid format for input locale: "{0}". Example valid formats: [en]5D; [en-US]5D;.]]></Val>
@@ -464,10 +494,13 @@
       </Item>
       <Item ItemId=";CommandOutput" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Output from command:]A;{0}]]></Val>
+          <Val><![CDATA[Output from command:]D;]A;{0}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[명령의 출력:]A;{0}]]></Val>
+            <Val><![CDATA[명령의 출력:]D;]A;{0}]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Output from command:]A;{0}]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -545,10 +578,13 @@
       </Item>
       <Item ItemId=";CreateFailed" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Template "{0}" could not be created.]A;{1}]]></Val>
+          <Val><![CDATA[Template "{0}" could not be created.]D;]A;{1}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA["{0}" 템플릿을 만들 수 없습니다.]A;{1}]]></Val>
+            <Val><![CDATA["{0}" 템플릿을 만들 수 없습니다.]D;]A;{1}]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Template "{0}" could not be created.]A;{1}]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -617,10 +653,13 @@
       </Item>
       <Item ItemId=";ExtraArgsCommandAfterExpansion" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[After expanding the extra args files, the command is:]A;    dotnet {0}]]></Val>
+          <Val><![CDATA[After expanding the extra args files, the command is:]D;]A;    dotnet {0}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[추가 인수 파일을 확장한 후 명령:]A;    dotnet {0}]]></Val>
+            <Val><![CDATA[추가 인수 파일을 확장한 후 명령:]D;]A;    dotnet {0}]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[After expanding the extra args files, the command is:]A;    dotnet {0}]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -689,10 +728,13 @@
       </Item>
       <Item ItemId=";InstallFailed" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA["{0}" could not be installed.]A;{1}.]]></Val>
+          <Val><![CDATA["{0}" could not be installed.]D;]A;{1}.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA["{0}"을(를) 설치할 수 없습니다.]A;{1}.]]></Val>
+            <Val><![CDATA["{0}"을(를) 설치할 수 없습니다.]D;]A;{1}.]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA["{0}" could not be installed.]A;{1}.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -743,19 +785,25 @@
       </Item>
       <Item ItemId=";InvalidParameterDefault" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[{0} {1}]A;    The default value '{1}' is not a valid value for {0}.]]></Val>
+          <Val><![CDATA[{0} {1}]D;]A;    The default value '{1}' is not a valid value for {0}.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0} {1}]A;    기본값 '{1}'은(는) {0}에 대한 유효한 값이 아닙니다.]]></Val>
+            <Val><![CDATA[{0} {1}]D;]A;    기본값 '{1}'은(는) {0}에 대한 유효한 값이 아닙니다.]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[{0} {1}]A;    The default value '{1}' is not a valid value for {0}.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
       <Item ItemId=";InvalidParameterDetail" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[{0} {1}]A;    '{1}' is not a valid value for {0} ({2}).]]></Val>
+          <Val><![CDATA[{0} {1}]D;]A;    '{1}' is not a valid value for {0} ({2}).]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0} {1}]A;    '{1}'은(는) {0}({2})에 대한 유효한 값이 아닙니다.]]></Val>
+            <Val><![CDATA[{0} {1}]D;]A;    '{1}'은(는) {0}({2})에 대한 유효한 값이 아닙니다.]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[{0} {1}]A;    '{1}' is not a valid value for {0} ({2}).]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -917,6 +965,15 @@
           <Val><![CDATA[No updates found.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[업데이트를 찾을 수 없습니다.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";NuGetSourceHelp" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Specifies a NuGet source to use during install.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[설치 중 사용할 NuGet 소스를 지정합니다.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1121,12 +1178,12 @@
       </Item>
       <Item ItemId=";RunHelpForInformationAboutAcceptedParameters" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Run dotnet {0} --help for usage information.]A;See https://aka.ms/dotnet-install-templates to learn how to install additional template packs.]]></Val>
+          <Val><![CDATA[Run dotnet {0} --help for usage information.]D;]A;See https://aka.ms/dotnet-install-templates to learn how to install additional template packs.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[사용법 정보를 보려면 dotnet {0} --help를 실행하세요.]A;https://aka.ms/dotnet-install-templates를 참조하여 추가 템플릿 팩 설치 방법에 대해 알아보세요.]]></Val>
+            <Val><![CDATA[사용법 정보를 보려면 dotnet {0} --help를 실행하세요.]D;]A;https://aka.ms/dotnet-install-templates를 참조하여 추가 템플릿 팩 설치 방법에 대해 알아보세요.]]></Val>
           </Tgt>
           <Prev Cat="Text">
-            <Val><![CDATA[Run dotnet {0} --help for usage information.]]></Val>
+            <Val><![CDATA[Run dotnet {0} --help for usage information.]A;See https://aka.ms/dotnet-install-templates to learn how to install additional template packs.]]></Val>
           </Prev>
         </Str>
         <Disp Icon="Str" />
@@ -1407,7 +1464,7 @@
     <Disp Icon="Ver" Disp="true" LocTbl="false" Path=" \ ;Version \ 8 \ 0" />
     <Item ItemId=";AssemblyVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0.312]]></Val>
+        <Val><![CDATA[1.0.1.58305]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1440,7 +1497,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0.312]]></Val>
+        <Val><![CDATA[1.0.1.58305]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1452,10 +1509,13 @@
     </Item>
     <Item ItemId=";LegalCopyright" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text">
-        <Val><![CDATA[Copyright © Microsoft Corporation]]></Val>
+        <Val><![CDATA[© Microsoft Corporation. All rights reserved.]]></Val>
         <Tgt Cat="Text" Stat="Loc" Orig="New">
-          <Val><![CDATA[Copyright (C) Microsoft Corporation]]></Val>
+          <Val><![CDATA[© Microsoft Corporation. All rights reserved.]]></Val>
         </Tgt>
+        <Prev Cat="Text">
+          <Val><![CDATA[Copyright © Microsoft Corporation]]></Val>
+        </Prev>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1476,7 +1536,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0-beta3-20171110-312+312.aebe22d9251cfc16cfeffdbb80942308573764f4]]></Val>
+        <Val><![CDATA[1.0.1-beta3-20180301-1434540+1837.2b7b61fadd1e03efe1ac6507c010c17da1379eb4]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
