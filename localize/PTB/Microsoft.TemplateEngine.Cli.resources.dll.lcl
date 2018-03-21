@@ -618,6 +618,9 @@
       <Item ItemId=";DefaultValuePlusSwitchWithoutValueDefault" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Default: {0} / (*) {1}]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Padrão: {0} / (*) {1}]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -843,8 +846,8 @@
       <Item ItemId=";LanguageParameter" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Filters templates based on language and specifies the language of the template to create.]]></Val>
-          <Tgt Cat="Text" Stat="Update" Orig="New">
-            <Val><![CDATA[Especifica o idioma do modelo que será criado.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Filtra os modelos com base na linguagem e especifica a linguagem do modelo a ser criado.]]></Val>
           </Tgt>
           <Prev Cat="Text">
             <Val><![CDATA[Specifies the language of the template to create.]]></Val>
@@ -1281,6 +1284,9 @@
       <Item ItemId=";SwitchWithoutValueDefaultFootnote" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[* Indicates the value used if the switch is provided without a value.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[* Indica o valor usado se a opção for fornecida sem um valor.]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1479,7 +1485,7 @@
     <Disp Icon="Ver" Disp="true" LocTbl="false" Path=" \ ;Version \ 8 \ 0" />
     <Item ItemId=";AssemblyVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.1.33954]]></Val>
+        <Val><![CDATA[1.0.1.45932]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1512,7 +1518,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.1.33954]]></Val>
+        <Val><![CDATA[1.0.1.45932]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1551,7 +1557,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.1-beta3-20180314-1475724+1861.21b96c809d30d5df20ae95fba36080196c3b6ac9]]></Val>
+        <Val><![CDATA[1.0.1-beta3-20180316-1487702+1868.d7f133f499ef5f3c6550e0d8a8f197fff43a3767]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
