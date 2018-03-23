@@ -846,8 +846,8 @@
       <Item ItemId=";LanguageParameter" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Filters templates based on language and specifies the language of the template to create.]]></Val>
-          <Tgt Cat="Text" Stat="Update" Orig="New">
-            <Val><![CDATA[Oluşturulacak şablonun dilini belirtir.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Şablonları dile göre filtreler ve oluşturulacak şablonun dilini belirtir.]]></Val>
           </Tgt>
           <Prev Cat="Text">
             <Val><![CDATA[Specifies the language of the template to create.]]></Val>
@@ -1284,6 +1284,9 @@
       <Item ItemId=";SwitchWithoutValueDefaultFootnote" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[* Indicates the value used if the switch is provided without a value.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[* Anahtar bir değer olmadan sağlanırsa kullanılan değeri gösterir.]]></Val>
+          </Tgt>
         </Str>
         <Disp Icon="Str" />
       </Item>
