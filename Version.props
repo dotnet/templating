@@ -1,13 +1,13 @@
 <Project ToolsVersion="15.0">
   <PropertyGroup Condition=" '$(PackageVersion)' == '' ">
-    <PackageReleaseVersion>1.0.1</PackageReleaseVersion>
+    <PackageReleaseVersion>1.0.2</PackageReleaseVersion>
     <PackageBuildQuality>$(BUILD_QUALITY)</PackageBuildQuality>
     <PackageBuildQuality Condition=" '$(PackageBuildQuality)' == '' ">beta1</PackageBuildQuality>
     <PackageVersion>$(PackageReleaseVersion)-$(PackageBuildQuality)</PackageVersion>
     <PackageDateTime Condition="'$(PackageDateTime)' == ''">$([System.DateTime]::Now.ToString("yyyyMMdd"))</PackageDateTime>
     <BUILD_NUMBER Condition="'$(BUILD_NUMBER)' == ''">0</BUILD_NUMBER>
     <BUILD_NUMBER Condition="'$(BUILD_NUMBER)' == '0' And '$(BUILD_BUILDNUMBER)' != ''">$(BUILD_BUILDNUMBER)</BUILD_NUMBER>
-    <AssemblyReleaseVersion>$(PackageReleaseVersion).$([MSBuild]::Modulo($(BUILD_NUMBER), 65535))</AssemblyReleaseVersion>
+    <AssemblyReleaseVersion>$(PackageReleaseVersion).0</AssemblyReleaseVersion>
     <PackageVersion Condition="'$(NO_TIMESTAMP)' != 'true'">$(PackageVersion)-$(PackageDateTime)-$(BUILD_NUMBER)</PackageVersion>
   </PropertyGroup>
   <PropertyGroup>
