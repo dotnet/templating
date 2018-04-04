@@ -407,7 +407,7 @@ namespace Microsoft.TemplateEngine.Cli
                 {
                     _settingsLoader.Reload();
                     TemplateListResolutionResult resolutionResult = QueryForTemplateMatches();
-                    HelpForTemplateResolution.CoordinateHelpAndUsageDisplay(resolutionResult, EnvironmentSettings, _commandInput, _hostDataLoader, _telemetryLogger, _templateCreator, _defaultLanguage);
+                    HelpForTemplateResolution.CoordinateHelpAndUsageDisplay(resolutionResult, EnvironmentSettings, _commandInput, _hostDataLoader, _telemetryLogger, _templateCreator, _defaultLanguage, _commandInput.IsShowAllFlagSpecified);
                 }
 
                 return installResult;
@@ -415,7 +415,7 @@ namespace Microsoft.TemplateEngine.Cli
 
             //No other cases specified, we've fallen through to "Usage help + List"
             TemplateListResolutionResult templateResolutionResult = QueryForTemplateMatches();
-            HelpForTemplateResolution.CoordinateHelpAndUsageDisplay(templateResolutionResult, EnvironmentSettings, _commandInput, _hostDataLoader, _telemetryLogger, _templateCreator, _defaultLanguage);
+            HelpForTemplateResolution.CoordinateHelpAndUsageDisplay(templateResolutionResult, EnvironmentSettings, _commandInput, _hostDataLoader, _telemetryLogger, _templateCreator, _defaultLanguage, _commandInput.IsShowAllFlagSpecified);
 
             return CreationResultStatus.Success;
         }
@@ -531,14 +531,20 @@ namespace Microsoft.TemplateEngine.Cli
         private async Task<CreationResultStatus> EnterTemplateManipulationFlowAsync()
         {
             TemplateListResolutionResult templateResolutionResult = QueryForTemplateMatches();
+            bool unambiguousGroupExists = templateResolutionResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousTemplateGroup);
+
+            if (unambiguousGroupExists && !_commandInput.IsShowAllFlagSpecified)
+            {
+                bool filteredOnIntrinsics = IntrinsicsFilter.TryFilterSingularGroupWithIntrinsics(EnvironmentSettings, unambiguousTemplateGroup, out IReadOnlyList<string> specificIdentities, out IReadOnlyList<string> becauseOf);
+            }
 
             if (_commandInput.IsListFlagSpecified || _commandInput.IsHelpFlagSpecified)
             {
-                return HelpForTemplateResolution.CoordinateHelpAndUsageDisplay(templateResolutionResult, EnvironmentSettings, _commandInput, _hostDataLoader, _telemetryLogger, _templateCreator, _defaultLanguage);
+                return HelpForTemplateResolution.CoordinateHelpAndUsageDisplay(templateResolutionResult, EnvironmentSettings, _commandInput, _hostDataLoader, _telemetryLogger, _templateCreator, _defaultLanguage, _commandInput.IsShowAllFlagSpecified);
             }
 
             TemplateListResolutionResult.SingularInvokableMatchCheckStatus singleMatchStatus = TemplateListResolutionResult.SingularInvokableMatchCheckStatus.None;
-            if (templateResolutionResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousTemplateGroup)
+            if (unambiguousGroupExists
                 && templateResolutionResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo templateToInvoke, out singleMatchStatus)
                 && !unambiguousTemplateGroup.Any(x => x.HasParameterMismatch())
                 && !unambiguousTemplateGroup.Any(x => x.HasAmbiguousParameterValueMatch()))
@@ -561,7 +567,7 @@ namespace Microsoft.TemplateEngine.Cli
                     EnvironmentSettings.Host.LogDiagnosticMessage(LocalizableStrings.Authoring_AmbiguousBestPrecedence, "Authoring");
                 }
 
-                return HelpForTemplateResolution.CoordinateHelpAndUsageDisplay(templateResolutionResult, EnvironmentSettings, _commandInput, _hostDataLoader, _telemetryLogger, _templateCreator, _defaultLanguage);
+                return HelpForTemplateResolution.CoordinateHelpAndUsageDisplay(templateResolutionResult, EnvironmentSettings, _commandInput, _hostDataLoader, _telemetryLogger, _templateCreator, _defaultLanguage, _commandInput.IsShowAllFlagSpecified);
             }
         }
 

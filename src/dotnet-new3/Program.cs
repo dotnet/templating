@@ -49,7 +49,9 @@ namespace dotnet_new3
         {
             var preferences = new Dictionary<string, string>
             {
-                { "prefs:language", "C#" }
+                { "prefs:language", "C#" },
+                { "meta:intrinsics-keys", "prop:framework" },
+                { "prop:framework", "netcoreapp2.1" }
             };
 
             try
