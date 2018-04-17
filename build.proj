@@ -193,12 +193,6 @@
              Condition="'$(EngineBuild)' == 'true'"
              Properties="TargetFrameworks=$(SharedTestPackTargetFrameworks);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath);NoBuild=true;IncludeSymbols=true"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
-             
-    <!-- Sign the newly packed files -->
-    <MSBuild Condition="'$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test'"
-             Projects="sign.proj"
-             Targets="PostPackSign"
-             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <MSBuild Projects="src/dotnet-new3/dotnet-new3.csproj" Targets="Publish"
              Condition="'$(EngineBuild)' == 'true'"
@@ -206,8 +200,16 @@
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />			 
 
   </Target>
+ 
+  <Target Name="SignPackages">
+    <!-- Sign the newly packed files -->
+    <MSBuild Condition="'$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test'"
+             Projects="sign.proj"
+             Targets="PostPackSign"
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+  </Target>
   
- <Target Name="Test" Condition="'$(PB_SkipTests)' != 'true'">
+  <Target Name="Test" Condition="'$(PB_SkipTests)' != 'true'">
              
     <!-- Build the test harness -->
     <MSBuild Projects="$(TestUtilities)" Targets="Restore;Build"
@@ -247,12 +249,14 @@
     <MSBuild Projects="$(LocProjects)" Targets="Restore;Build;Pack"
              Properties="Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath)"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
-
+  </Target>
+    
+  <Target Name="SignLocPackages">
+    <!-- Sign the newly packed files -->
     <MSBuild Condition="'$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test'"
              Projects="sign.proj"
              Targets="PostPackLocSign"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
-    
   </Target>
 
   <Target Name="SetLanguages">
