@@ -90,13 +90,13 @@ $TimestampPackageVersion=$NoTimestampPackageVersion + "-" + [System.DateTime]::N
 
 if ($env:UseMSBuildExe -and (Test-Path $env:MSBuildExePath))
 {
-  & $env:MsBuildExePath $RepoRoot\build.proj /p:IsFullFrameworkBuildSupported=$PerformFullFrameworkBuild /p:Configuration=$Configuration /p:CIBuild=$CIBuild /p:SkipTests=$SkipTests /p:TemplatesBuild=$TemplatesBuild /p:EngineBuild=$EngineBuild /v:detailed
+  & $env:MsBuildExePath $RepoRoot\build.proj /p:IsFullFrameworkBuildSupported=$PerformFullFrameworkBuild /p:Configuration=$Configuration /p:CIBuild=$CIBuild /p:SkipTests=$SkipTests /p:TemplatesBuild=$TemplatesBuild /p:EngineBuild=$EngineBuild
 }
 else
 {
-  & dotnet msbuild $RepoRoot\build.proj /p:IsFullFrameworkBuildSupported=$PerformFullFrameworkBuild /p:Configuration=$Configuration /p:CIBuild=$CIBuild /p:SkipTests=$SkipTests /p:TemplatesBuild=$TemplatesBuild /p:EngineBuild=$EngineBuild /v:detailed
+  & dotnet msbuild $RepoRoot\build.proj /p:IsFullFrameworkBuildSupported=$PerformFullFrameworkBuild /p:Configuration=$Configuration /p:CIBuild=$CIBuild /p:SkipTests=$SkipTests /p:TemplatesBuild=$TemplatesBuild /p:EngineBuild=$EngineBuild
 }
 
-& dotnet msbuild $RepoRoot\build.proj /t:Test /p:IsFullFrameworkBuildSupported=$PerformFullFrameworkBuild /p:Configuration=$Configuration /p:CIBuild=$CIBuild /p:SkipTests=$SkipTests /p:TemplatesBuild=$TemplatesBuild /p:EngineBuild=$EngineBuild /v:detailed
+& dotnet msbuild $RepoRoot\build.proj /t:Test /p:IsFullFrameworkBuildSupported=$PerformFullFrameworkBuild /p:Configuration=$Configuration /p:CIBuild=$CIBuild /p:SkipTests=$SkipTests /p:TemplatesBuild=$TemplatesBuild /p:EngineBuild=$EngineBuild
   
 & $RepoRoot\SetPath.ps1 -DevDir "$DevDir"
