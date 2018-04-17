@@ -193,6 +193,12 @@
              Condition="'$(EngineBuild)' == 'true'"
              Properties="TargetFrameworks=$(SharedTestPackTargetFrameworks);Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath);NoBuild=true;IncludeSymbols=true"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+             
+    <!-- Sign the newly packed files -->
+    <MSBuild Condition="'$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test'"
+             Projects="sign.proj"
+             Targets="PostPackSign"
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
     <MSBuild Projects="src/dotnet-new3/dotnet-new3.csproj" Targets="Publish"
              Condition="'$(EngineBuild)' == 'true'"
@@ -242,6 +248,11 @@
              Properties="Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath)"
              RunEachTargetSeparately="true" StopOnFirstFailure="true" />
 
+    <MSBuild Condition="'$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test'"
+             Projects="sign.proj"
+             Targets="PostPackLocSign"
+             RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+    
   </Target>
 
   <Target Name="SetLanguages">
