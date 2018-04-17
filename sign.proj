@@ -78,7 +78,7 @@
   </Target>
   
   <Target Name="PostCompileLocSign" DependsOnTargets="GetPostCompileLocSignFiles;SignFiles" />
-  <Target Name="PostPackageLocSign" DependsOnTargets="GetPostPackageLocSignFiles;SignFiles" />
+  <Target Name="PostPackLocSign" DependsOnTargets="GetPostPackLocSignFiles;SignFiles" />
 
   <Target Name="GetPostCompileLocSignFiles">
     <PropertyGroup>
@@ -88,7 +88,7 @@
       <OutDir>$(MSBuildThisFileDirectory)artifacts\</OutDir>
       <IntermediateOutputPath>$(MSBuildThisFileDirectory)artifacts\scratch</IntermediateOutputPath>
     </PropertyGroup>
-    
+
     <ItemGroup>
       <!-- Adding the loc assemblies to sign. -->
       <FilesToSign Include="$(OutDir)localize\**\Microsoft.TemplateEngine.Cli.resources.dll">
@@ -97,7 +97,7 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="GetPostPackageLocSignFiles">
+  <Target Name="GetPostPackLocSignFiles">
     <PropertyGroup>
 
       <!-- The OutDir and IntermediateOutputPath properties are required by MicroBuild. MicroBuild only
