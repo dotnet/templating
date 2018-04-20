@@ -18,13 +18,23 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
     public class RunnableProjectGenerator : IGenerator
     {
+        public static readonly string TemplateConfigDirectoryName = ".template.config";
+        public static readonly string TemplateConfigFileName = "template.json";
+        private static readonly string AdditionalConfigFilesIndicator = "AdditionalConfigFiles";
         private static readonly Guid GeneratorId = new Guid("0C434DF7-E2CB-4DEE-B216-D7C58C8EB4B3");
         private static readonly string GeneratorVersion = "1.0.1.0";
 
         public Guid Id => GeneratorId;
 
-        public static readonly string TemplateConfigDirectoryName = ".template.config";
-        public static readonly string TemplateConfigFileName = "template.json";
+        //
+        // Converts the raw, string version of a parameter to a strongly typed value.
+        // If the param has a datatype specified, use that. Otherwise attempt to infer the type.
+        // Throws a TemplateParamException if the conversion fails for any reason.
+        //
+        public object ConvertParameterValueToType(IEngineEnvironmentSettings environmentSettings, ITemplateParameter parameter, string untypedValue, out bool valueResolutionError)
+        {
+            return InternalConvertParameterValueToType(environmentSettings, parameter, untypedValue, out valueResolutionError);
+        }
 
         public Task<ICreationResult> CreateAsync(IEngineEnvironmentSettings environmentSettings, ITemplate templateData, IParameterSet parameters, IComponentManager componentManager, string targetDirectory)
         {
@@ -49,63 +59,38 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return Task.FromResult(GetCreationResult(environmentSettings, template, variables));
         }
 
-        private static ICreationResult GetCreationResult(IEngineEnvironmentSettings environmentSettings, RunnableProjectTemplate template, IVariableCollection variables)
+        public ICreationEffects GetCreationEffects(IEngineEnvironmentSettings environmentSettings, ITemplate templateData, IParameterSet parameters, IComponentManager componentManager, string targetDirectory)
         {
-            return new CreationResult()
+            RunnableProjectTemplate template = (RunnableProjectTemplate)templateData;
+            ProcessMacros(environmentSettings, componentManager, template.Config.OperationConfig, parameters);
+
+            IVariableCollection variables = VariableCollection.SetupVariables(environmentSettings, parameters, template.Config.OperationConfig.VariableSetup);
+            template.Config.Evaluate(parameters, variables, template.ConfigFile);
+
+            IOrchestrator basicOrchestrator = new Core.Util.Orchestrator();
+            RunnableProjectOrchestrator orchestrator = new RunnableProjectOrchestrator(basicOrchestrator);
+
+            GlobalRunSpec runSpec = new GlobalRunSpec(template.TemplateSourceRoot, componentManager, parameters, variables, template.Config.OperationConfig, template.Config.SpecialOperationConfig, template.Config.LocalizationOperations, template.Config.IgnoreFileNames);
+            List<IFileChange> changes = new List<IFileChange>();
+
+            foreach (FileSourceMatchInfo source in template.Config.Sources)
             {
-                PostActions = PostAction.ListFromModel(environmentSettings, template.Config.PostActionModel, variables),
-                PrimaryOutputs = CreationPath.ListFromModel(environmentSettings, template.Config.PrimaryOutputs, variables)
+                runSpec.SetupFileSource(source);
+                string target = Path.Combine(targetDirectory, source.Target);
+                changes.AddRange(orchestrator.GetFileChanges(runSpec, template.TemplateSourceRoot.DirectoryInfo(source.Source), target));
+            }
+
+            return new CreationEffects()
+            {
+                FileChanges = changes,
+                CreationResult = GetCreationResult(environmentSettings, template, variables)
             };
-        }
-
-        // Note the deferred-config macros (generated) are part of the runConfig.Macros
-        //      and not in the ComputedMacros.
-        //  Possibly make a separate property for the deferred-config macros
-        private static void ProcessMacros(IEngineEnvironmentSettings environmentSettings, IComponentManager componentManager, IGlobalRunConfig runConfig, IParameterSet parameters)
-        {
-            if (runConfig.Macros != null)
-            {
-                IVariableCollection varsForMacros = VariableCollection.SetupVariables(environmentSettings, parameters, runConfig.VariableSetup);
-                MacrosOperationConfig macroProcessor = new MacrosOperationConfig();
-                macroProcessor.ProcessMacros(environmentSettings, componentManager, runConfig.Macros, varsForMacros, parameters);
-            }
-
-            if (runConfig.ComputedMacros != null)
-            {
-                IVariableCollection varsForMacros = VariableCollection.SetupVariables(environmentSettings, parameters, runConfig.VariableSetup);
-                MacrosOperationConfig macroProcessor = new MacrosOperationConfig();
-                macroProcessor.ProcessMacros(environmentSettings, componentManager, runConfig.ComputedMacros, varsForMacros, parameters);
-            }
         }
 
         public IParameterSet GetParametersForTemplate(IEngineEnvironmentSettings environmentSettings, ITemplate template)
         {
             RunnableProjectTemplate tmplt = (RunnableProjectTemplate)template;
             return new ParameterSet(tmplt.Config);
-        }
-
-        private bool TryGetLangPackFromFile(IFile file, out ILocalizationModel locModel)
-        {
-            if (file == null)
-            {
-                locModel = null;
-                return false;
-            }
-
-            try
-            {
-                JObject srcObject = ReadJObjectFromIFile(file);
-                locModel = SimpleConfigModel.LocalizationFromJObject(srcObject);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                ITemplateEngineHost host = file.MountPoint.EnvironmentSettings.Host;
-                host.LogMessage($"Error reading Langpack from file: {file.FullPath} | Error = {ex.ToString()}");
-            }
-
-            locModel = null;
-            return false;
         }
 
         public IList<ITemplate> GetTemplatesAndLangpacksFromDir(IMountPoint source, out IList<ILocalizationLocator> localizations)
@@ -166,65 +151,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
 
             return templateList;
-        }
-
-        // TODO: localize the diagnostic strings
-        // checks that all the template sources are under the template root, and they exist.
-        internal bool AreAllTemplatePathsValid(IRunnableProjectConfig templateConfig, RunnableProjectTemplate runnableTemplate)
-        {
-            ITemplateEngineHost host = runnableTemplate.Source.EnvironmentSettings.Host;
-
-            if (runnableTemplate.TemplateSourceRoot == null)
-            {
-                host.LogDiagnosticMessage(string.Empty, "Authoring");
-                host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateRootOutsideInstallSource, runnableTemplate.Name), "Authoring");
-                return false;
-            }
-
-            // check if any sources get out of the mount point
-            bool allSourcesValid = true;
-            foreach (FileSourceMatchInfo source in templateConfig.Sources)
-            {
-                try
-                {
-                    IFile file = runnableTemplate.TemplateSourceRoot.FileInfo(source.Source);
-
-                    if (file?.Exists ?? false)
-                    {
-                        allSourcesValid = false;
-                        host.LogDiagnosticMessage(string.Empty, "Authoring");
-                        host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateNameDisplay, runnableTemplate.Name), "Authoring");
-                        host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateSourceRoot, runnableTemplate.TemplateSourceRoot.FullPath), "Authoring");
-                        host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_SourceMustBeDirectory, source.Source), "Authoring");
-                    }
-                    else
-                    {
-                        IDirectory sourceRoot = runnableTemplate.TemplateSourceRoot.DirectoryInfo(source.Source);
-
-                        if (!(sourceRoot?.Exists ?? false))
-                        {
-                            // non-existant directory
-                            allSourcesValid = false;
-                            host.LogDiagnosticMessage(string.Empty, "Authoring");
-                            host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateNameDisplay, runnableTemplate.Name), "Authoring");
-                            host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateSourceRoot, runnableTemplate.TemplateSourceRoot.FullPath), "Authoring");
-                            host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_SourceDoesNotExist, source.Source), "Authoring");
-                            host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_SourceIsOutsideInstallSource, sourceRoot.FullPath), "Authoring");
-                        }
-                    }
-                }
-                catch
-                {   // outside the mount point root
-                    // TODO: after the null ref exception in DirectoryInfo is fixed, change how this check works.
-                    allSourcesValid = false;
-                    host.LogDiagnosticMessage(string.Empty, "Authoring");
-                    host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateNameDisplay, runnableTemplate.Name), "Authoring");
-                    host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateSourceRoot, runnableTemplate.TemplateSourceRoot.FullPath), "Authoring");
-                    host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateRootOutsideInstallSource, source.Source), "Authoring");
-                }
-            }
-
-            return allSourcesValid;
         }
 
         public bool TryGetTemplateFromConfigInfo(IFileSystemInfo templateFileConfig, out ITemplate template, IFileSystemInfo localeFileConfig = null, IFile hostTemplateConfigFile = null, string baselineName = null)
@@ -288,174 +214,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return false;
         }
 
-        private bool PerformTemplateValidation(SimpleConfigModel templateModel, IFile templateFile, ITemplateEngineHost host)
-        {
-            //Do some basic checks...
-            List<string> errorMessages = new List<string>();
-            List<string> warningMessages = new List<string>();
-            if (string.IsNullOrEmpty(templateModel.Identity))
-            {
-                errorMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "identity", templateFile.FullPath));
-            }
-
-            if (string.IsNullOrEmpty(templateModel.Name))
-            {
-                errorMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "name", templateFile.FullPath));
-            }
-
-            if ((templateModel.ShortNameList?.Count ?? 0) == 0)
-            {
-                errorMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "shortName", templateFile.FullPath));
-            }
-
-            if (string.IsNullOrEmpty(templateModel.SourceName))
-            {
-                warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "sourceName", templateFile.FullPath));
-            }
-
-            if (string.IsNullOrEmpty(templateModel.Author))
-            {
-                warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "author", templateFile.FullPath));
-            }
-
-            if (string.IsNullOrEmpty(templateModel.GroupIdentity))
-            {
-                warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "groupIdentity", templateFile.FullPath));
-            }
-
-            if (string.IsNullOrEmpty(templateModel.GeneratorVersions))
-            {
-                warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "generatorVersions", templateFile.FullPath));
-            }
-
-            if (templateModel.Precedence == 0)
-            {
-                warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "precedence", templateFile.FullPath));
-            }
-
-            if ((templateModel.Classifications?.Count ?? 0) == 0)
-            {
-                warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "classifications", templateFile.FullPath));
-            }
-
-            if (warningMessages.Count > 0)
-            {
-                host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateMissingCommonInformation, templateFile.FullPath), "Authoring");
-
-                foreach (string message in warningMessages)
-                {
-                    host.LogDiagnosticMessage("    " + message, "Authoring");
-                }
-            }
-
-            if (errorMessages.Count > 0)
-            {
-                host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateNotInstalled, templateFile.FullPath), "Authoring");
-
-                foreach (string message in errorMessages)
-                {
-                    host.LogDiagnosticMessage("    " + message, "Authoring");
-                }
-
-                return false;
-            }
-
-            return true;
-        }
-
-        private bool CheckGeneratorVersionRequiredByTemplate(string generatorVersionsAllowed)
-        {
-            if (string.IsNullOrEmpty(generatorVersionsAllowed))
-            {
-                return true;
-            }
-
-            if (!VersionStringHelpers.TryParseVersionSpecification(generatorVersionsAllowed, out IVersionSpecification versionChecker))
-            {
-                return false;
-            }
-
-            return versionChecker.CheckIfVersionIsValid(GeneratorVersion) || versionChecker.CheckIfVersionIsValid(GitInfo.PackageVersion);
-        }
-
-        private static readonly string AdditionalConfigFilesIndicator = "AdditionalConfigFiles";
-
-        // Checks the primarySource for additional configuration files.
-        // If found, merges them all together.
-        // Returns the merged JObject (or the original if there was nothing to merge).
-        // Additional files must be in the same dir as the template file.
-        private JObject MergeAdditionalConfiguration(JObject primarySource, IFileSystemInfo primarySourceConfig)
-        {
-            IReadOnlyList<string> otherFiles = primarySource.ArrayAsStrings(AdditionalConfigFilesIndicator);
-
-            if (!otherFiles.Any())
-            {
-                return primarySource;
-            }
-
-            JObject combinedSource = (JObject)primarySource.DeepClone();
-
-            foreach (string partialConfigFileName in otherFiles)
-            {
-                if (!partialConfigFileName.EndsWith("." + TemplateConfigFileName))
-                {
-                    throw new TemplateAuthoringException($"Split configuration error with file [{partialConfigFileName}]. Additional configuration file names must end with '.{TemplateConfigFileName}'.", partialConfigFileName);
-                }
-
-                IFile partialConfigFile = primarySourceConfig.Parent.EnumerateFiles(partialConfigFileName, SearchOption.TopDirectoryOnly).FirstOrDefault(x => string.Equals(x.Name, partialConfigFileName));
-
-                if (partialConfigFile == null)
-                {
-                    throw new TemplateAuthoringException($"Split configuration file [{partialConfigFileName}] could not be found.", partialConfigFileName);
-                }
-
-                JObject partialConfigJson = ReadJObjectFromIFile(partialConfigFile);
-                combinedSource.Merge(partialConfigJson);
-            }
-
-            return combinedSource;
-        }
-
-        internal JObject ReadJObjectFromIFile(IFile file)
-        {
-            using (Stream s = file.OpenRead())
-            using (TextReader tr = new StreamReader(s, true))
-            using (JsonReader r = new JsonTextReader(tr))
-            {
-                return JObject.Load(r);
-            }
-        }
-
-        //
-        // Converts the raw, string version of a parameter to a strongly typed value.
-        // If the param has a datatype specified, use that. Otherwise attempt to infer the type.
-        // Throws a TemplateParamException if the conversion fails for any reason.
-        //
-        public object ConvertParameterValueToType(IEngineEnvironmentSettings environmentSettings, ITemplateParameter parameter, string untypedValue, out bool valueResolutionError)
-        {
-            return InternalConvertParameterValueToType(environmentSettings, parameter, untypedValue, out valueResolutionError);
-        }
-
-        internal static object InternalConvertParameterValueToType(IEngineEnvironmentSettings environmentSettings, ITemplateParameter parameter, string untypedValue, out bool valueResolutionError)
-        {
-            if (untypedValue == null)
-            {
-                valueResolutionError = false;
-                return null;
-            }
-
-            if (!string.IsNullOrEmpty(parameter.DataType))
-            {
-                object convertedValue = DataTypeSpecifiedConvertLiteral(environmentSettings, parameter, untypedValue, out valueResolutionError);
-                return convertedValue;
-            }
-            else
-            {
-                valueResolutionError = false;
-                return InferTypeAndConvertLiteral(untypedValue);
-            }
-        }
-
         // For explicitly data-typed variables, attempt to convert the variable value to the specified type.
         // Data type names:
         //     - choice
@@ -488,6 +246,146 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 case "STRING":
                 default:
                     return ConvertToString(environmentSettings, param, literal, out valueResolutionError);
+            }
+        }
+
+        internal static object InferTypeAndConvertLiteral(string literal)
+        {
+            if (literal == null)
+            {
+                return null;
+            }
+
+            if (!literal.Contains("\""))
+            {
+                if (string.Equals(literal, "true", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+
+                if (string.Equals(literal, "false", StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+
+                if (string.Equals(literal, "null", StringComparison.OrdinalIgnoreCase))
+                {
+                    return null;
+                }
+
+                if (literal.Contains(".") && double.TryParse(literal, out double literalDouble))
+                {
+                    return literalDouble;
+                }
+
+                if (long.TryParse(literal, out long literalLong))
+                {
+                    return literalLong;
+                }
+
+                if (literal.StartsWith("0x", StringComparison.OrdinalIgnoreCase)
+                    && long.TryParse(literal.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out literalLong))
+                {
+                    return literalLong;
+                }
+
+                if (string.Equals("null", literal, StringComparison.OrdinalIgnoreCase))
+                {
+                    return null;
+                }
+
+                return literal;
+            }
+
+            return literal.Substring(1, literal.Length - 2);
+        }
+
+        internal static object InternalConvertParameterValueToType(IEngineEnvironmentSettings environmentSettings, ITemplateParameter parameter, string untypedValue, out bool valueResolutionError)
+        {
+            if (untypedValue == null)
+            {
+                valueResolutionError = false;
+                return null;
+            }
+
+            if (!string.IsNullOrEmpty(parameter.DataType))
+            {
+                object convertedValue = DataTypeSpecifiedConvertLiteral(environmentSettings, parameter, untypedValue, out valueResolutionError);
+                return convertedValue;
+            }
+            else
+            {
+                valueResolutionError = false;
+                return InferTypeAndConvertLiteral(untypedValue);
+            }
+        }
+
+        // TODO: localize the diagnostic strings
+        // checks that all the template sources are under the template root, and they exist.
+        internal bool AreAllTemplatePathsValid(IRunnableProjectConfig templateConfig, RunnableProjectTemplate runnableTemplate)
+        {
+            ITemplateEngineHost host = runnableTemplate.Source.EnvironmentSettings.Host;
+
+            if (runnableTemplate.TemplateSourceRoot == null)
+            {
+                host.LogDiagnosticMessage(string.Empty, "Authoring");
+                host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateRootOutsideInstallSource, runnableTemplate.Name), "Authoring");
+                return false;
+            }
+
+            // check if any sources get out of the mount point
+            bool allSourcesValid = true;
+            foreach (FileSourceMatchInfo source in templateConfig.Sources)
+            {
+                try
+                {
+                    IFile file = runnableTemplate.TemplateSourceRoot.FileInfo(source.Source);
+
+                    if (file?.Exists ?? false)
+                    {
+                        allSourcesValid = false;
+                        host.LogDiagnosticMessage(string.Empty, "Authoring");
+                        host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateNameDisplay, runnableTemplate.Name), "Authoring");
+                        host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateSourceRoot, runnableTemplate.TemplateSourceRoot.FullPath), "Authoring");
+                        host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_SourceMustBeDirectory, source.Source), "Authoring");
+                    }
+                    else
+                    {
+                        IDirectory sourceRoot = runnableTemplate.TemplateSourceRoot.DirectoryInfo(source.Source);
+
+                        if (!(sourceRoot?.Exists ?? false))
+                        {
+                            // non-existant directory
+                            allSourcesValid = false;
+                            host.LogDiagnosticMessage(string.Empty, "Authoring");
+                            host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateNameDisplay, runnableTemplate.Name), "Authoring");
+                            host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateSourceRoot, runnableTemplate.TemplateSourceRoot.FullPath), "Authoring");
+                            host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_SourceDoesNotExist, source.Source), "Authoring");
+                            host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_SourceIsOutsideInstallSource, sourceRoot.FullPath), "Authoring");
+                        }
+                    }
+                }
+                catch
+                {   // outside the mount point root
+                    // TODO: after the null ref exception in DirectoryInfo is fixed, change how this check works.
+                    allSourcesValid = false;
+                    host.LogDiagnosticMessage(string.Empty, "Authoring");
+                    host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateNameDisplay, runnableTemplate.Name), "Authoring");
+                    host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateSourceRoot, runnableTemplate.TemplateSourceRoot.FullPath), "Authoring");
+                    host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateRootOutsideInstallSource, source.Source), "Authoring");
+                }
+            }
+
+            return allSourcesValid;
+        }
+
+        internal JObject ReadJObjectFromIFile(IFile file)
+        {
+            using (Stream s = file.OpenRead())
+            using (TextReader tr = new StreamReader(s, true))
+            using (JsonReader r = new JsonTextReader(tr))
+            {
+                return JObject.Load(r);
             }
         }
 
@@ -609,6 +507,35 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return literal;
         }
 
+        private static ICreationResult GetCreationResult(IEngineEnvironmentSettings environmentSettings, RunnableProjectTemplate template, IVariableCollection variables)
+        {
+            return new CreationResult()
+            {
+                PostActions = PostAction.ListFromModel(environmentSettings, template.Config.PostActionModel, variables),
+                PrimaryOutputs = CreationPath.ListFromModel(environmentSettings, template.Config.PrimaryOutputs, variables)
+            };
+        }
+
+        // Note the deferred-config macros (generated) are part of the runConfig.Macros
+        //      and not in the ComputedMacros.
+        //  Possibly make a separate property for the deferred-config macros
+        private static void ProcessMacros(IEngineEnvironmentSettings environmentSettings, IComponentManager componentManager, IGlobalRunConfig runConfig, IParameterSet parameters)
+        {
+            if (runConfig.Macros != null)
+            {
+                IVariableCollection varsForMacros = VariableCollection.SetupVariables(environmentSettings, parameters, runConfig.VariableSetup);
+                MacrosOperationConfig macroProcessor = new MacrosOperationConfig();
+                macroProcessor.ProcessMacros(environmentSettings, componentManager, runConfig.Macros, varsForMacros, parameters);
+            }
+
+            if (runConfig.ComputedMacros != null)
+            {
+                IVariableCollection varsForMacros = VariableCollection.SetupVariables(environmentSettings, parameters, runConfig.VariableSetup);
+                MacrosOperationConfig macroProcessor = new MacrosOperationConfig();
+                macroProcessor.ProcessMacros(environmentSettings, componentManager, runConfig.ComputedMacros, varsForMacros, parameters);
+            }
+        }
+
         private static bool TryResolveChoiceValue(string literal, ITemplateParameter param, out string match)
         {
             if (literal == null)
@@ -644,83 +571,154 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return match != null;
         }
 
-        internal static object InferTypeAndConvertLiteral(string literal)
+        private bool CheckGeneratorVersionRequiredByTemplate(string generatorVersionsAllowed)
         {
-            if (literal == null)
+            if (string.IsNullOrEmpty(generatorVersionsAllowed))
             {
-                return null;
+                return true;
             }
 
-            if (!literal.Contains("\""))
+            if (!VersionStringHelpers.TryParseVersionSpecification(generatorVersionsAllowed, out IVersionSpecification versionChecker))
             {
-                if (string.Equals(literal, "true", StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-
-                if (string.Equals(literal, "false", StringComparison.OrdinalIgnoreCase))
-                {
-                    return false;
-                }
-
-                if (string.Equals(literal, "null", StringComparison.OrdinalIgnoreCase))
-                {
-                    return null;
-                }
-
-                if (literal.Contains(".") && double.TryParse(literal, out double literalDouble))
-                {
-                    return literalDouble;
-                }
-
-                if (long.TryParse(literal, out long literalLong))
-                {
-                    return literalLong;
-                }
-
-                if (literal.StartsWith("0x", StringComparison.OrdinalIgnoreCase)
-                    && long.TryParse(literal.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out literalLong))
-                {
-                    return literalLong;
-                }
-
-                if (string.Equals("null", literal, StringComparison.OrdinalIgnoreCase))
-                {
-                    return null;
-                }
-
-                return literal;
+                return false;
             }
 
-            return literal.Substring(1, literal.Length - 2);
+            return versionChecker.CheckIfVersionIsValid(GeneratorVersion) || versionChecker.CheckIfVersionIsValid(GitInfo.PackageVersion);
         }
 
-        public ICreationEffects GetCreationEffects(IEngineEnvironmentSettings environmentSettings, ITemplate templateData, IParameterSet parameters, IComponentManager componentManager, string targetDirectory)
+        // Checks the primarySource for additional configuration files.
+        // If found, merges them all together.
+        // Returns the merged JObject (or the original if there was nothing to merge).
+        // Additional files must be in the same dir as the template file.
+        private JObject MergeAdditionalConfiguration(JObject primarySource, IFileSystemInfo primarySourceConfig)
         {
-            RunnableProjectTemplate template = (RunnableProjectTemplate)templateData;
-            ProcessMacros(environmentSettings, componentManager, template.Config.OperationConfig, parameters);
+            IReadOnlyList<string> otherFiles = primarySource.ArrayAsStrings(AdditionalConfigFilesIndicator);
 
-            IVariableCollection variables = VariableCollection.SetupVariables(environmentSettings, parameters, template.Config.OperationConfig.VariableSetup);
-            template.Config.Evaluate(parameters, variables, template.ConfigFile);
-
-            IOrchestrator basicOrchestrator = new Core.Util.Orchestrator();
-            RunnableProjectOrchestrator orchestrator = new RunnableProjectOrchestrator(basicOrchestrator);
-
-            GlobalRunSpec runSpec = new GlobalRunSpec(template.TemplateSourceRoot, componentManager, parameters, variables, template.Config.OperationConfig, template.Config.SpecialOperationConfig, template.Config.LocalizationOperations, template.Config.IgnoreFileNames);
-            List<IFileChange> changes = new List<IFileChange>();
-
-            foreach (FileSourceMatchInfo source in template.Config.Sources)
+            if (!otherFiles.Any())
             {
-                runSpec.SetupFileSource(source);
-                string target = Path.Combine(targetDirectory, source.Target);
-                changes.AddRange(orchestrator.GetFileChanges(runSpec, template.TemplateSourceRoot.DirectoryInfo(source.Source), target));
+                return primarySource;
             }
 
-            return new CreationEffects()
+            JObject combinedSource = (JObject)primarySource.DeepClone();
+
+            foreach (string partialConfigFileName in otherFiles)
             {
-                FileChanges = changes,
-                CreationResult = GetCreationResult(environmentSettings, template, variables)
-            };
+                if (!partialConfigFileName.EndsWith("." + TemplateConfigFileName))
+                {
+                    throw new TemplateAuthoringException($"Split configuration error with file [{partialConfigFileName}]. Additional configuration file names must end with '.{TemplateConfigFileName}'.", partialConfigFileName);
+                }
+
+                IFile partialConfigFile = primarySourceConfig.Parent.EnumerateFiles(partialConfigFileName, SearchOption.TopDirectoryOnly).FirstOrDefault(x => string.Equals(x.Name, partialConfigFileName));
+
+                if (partialConfigFile == null)
+                {
+                    throw new TemplateAuthoringException($"Split configuration file [{partialConfigFileName}] could not be found.", partialConfigFileName);
+                }
+
+                JObject partialConfigJson = ReadJObjectFromIFile(partialConfigFile);
+                combinedSource.Merge(partialConfigJson);
+            }
+
+            return combinedSource;
+        }
+
+        private bool PerformTemplateValidation(SimpleConfigModel templateModel, IFile templateFile, ITemplateEngineHost host)
+        {
+            //Do some basic checks...
+            List<string> errorMessages = new List<string>();
+            List<string> warningMessages = new List<string>();
+            if (string.IsNullOrEmpty(templateModel.Identity))
+            {
+                errorMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "identity", templateFile.FullPath));
+            }
+
+            if (string.IsNullOrEmpty(templateModel.Name))
+            {
+                errorMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "name", templateFile.FullPath));
+            }
+
+            if ((templateModel.ShortNameList?.Count ?? 0) == 0)
+            {
+                errorMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "shortName", templateFile.FullPath));
+            }
+
+            if (string.IsNullOrEmpty(templateModel.SourceName))
+            {
+                warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "sourceName", templateFile.FullPath));
+            }
+
+            if (string.IsNullOrEmpty(templateModel.Author))
+            {
+                warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "author", templateFile.FullPath));
+            }
+
+            if (string.IsNullOrEmpty(templateModel.GroupIdentity))
+            {
+                warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "groupIdentity", templateFile.FullPath));
+            }
+
+            if (string.IsNullOrEmpty(templateModel.GeneratorVersions))
+            {
+                warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "generatorVersions", templateFile.FullPath));
+            }
+
+            if (templateModel.Precedence == 0)
+            {
+                warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "precedence", templateFile.FullPath));
+            }
+
+            if ((templateModel.Classifications?.Count ?? 0) == 0)
+            {
+                warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "classifications", templateFile.FullPath));
+            }
+
+            if (warningMessages.Count > 0)
+            {
+                host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateMissingCommonInformation, templateFile.FullPath), "Authoring");
+
+                foreach (string message in warningMessages)
+                {
+                    host.LogDiagnosticMessage("    " + message, "Authoring");
+                }
+            }
+
+            if (errorMessages.Count > 0)
+            {
+                host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateNotInstalled, templateFile.FullPath), "Authoring");
+
+                foreach (string message in errorMessages)
+                {
+                    host.LogDiagnosticMessage("    " + message, "Authoring");
+                }
+
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool TryGetLangPackFromFile(IFile file, out ILocalizationModel locModel)
+        {
+            if (file == null)
+            {
+                locModel = null;
+                return false;
+            }
+
+            try
+            {
+                JObject srcObject = ReadJObjectFromIFile(file);
+                locModel = SimpleConfigModel.LocalizationFromJObject(srcObject);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                ITemplateEngineHost host = file.MountPoint.EnvironmentSettings.Host;
+                host.LogMessage($"Error reading Langpack from file: {file.FullPath} | Error = {ex.ToString()}");
+            }
+
+            locModel = null;
+            return false;
         }
 
         internal class ParameterSet : IParameterSet
@@ -738,9 +736,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             public IEnumerable<ITemplateParameter> ParameterDefinitions => _parameters.Values;
 
-            public IDictionary<ITemplateParameter, object> ResolvedValues { get; } = new Dictionary<ITemplateParameter, object>();
-
             public IEnumerable<string> RequiredBrokerCapabilities => Enumerable.Empty<string>();
+
+            public IDictionary<ITemplateParameter, object> ResolvedValues { get; } = new Dictionary<ITemplateParameter, object>();
 
             public void AddParameter(ITemplateParameter param)
             {
