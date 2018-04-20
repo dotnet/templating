@@ -397,6 +397,15 @@ namespace Microsoft.TemplateEngine.Utils
                 return 0;
             }
 
+            if (PrereleaseInfo == "*")
+            {
+                return 1;
+            }
+            else if (other == "*")
+            {
+                return -1;
+            }
+
             string[] thisPrerelease = PrereleaseInfo.Split('.');
             string[] otherPrerelease = other.Split('.');
 
@@ -537,6 +546,11 @@ namespace Microsoft.TemplateEngine.Utils
 
         private static bool IsValidMetadataSection(string source, int start, int afterEnd)
         {
+            if (source[start] == '*' && start == afterEnd - 1)
+            {
+                return true;
+            }
+
             for (int i = start; i < afterEnd; ++i)
             {
                 if (!IsCharacterValidForMetadataSection(source[i]))
@@ -606,7 +620,7 @@ namespace Microsoft.TemplateEngine.Utils
         {
             if (tail < source.Length && source[tail] == '+')
             {
-                if (tail == source.Length - 1 || !IsValidMetadataSection(source, tail + 1, source.Length))
+                if (tail == source.Length - 1 || !IsValidMetadataSection(source, tail + 1, source.Length) || (tail + 1 == source.Length - 1 && source[tail + 1] == '*'))
                 {
                     metadata = null;
                     return false;

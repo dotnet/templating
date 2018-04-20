@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.TemplateEngine.Abstractions;
 
@@ -35,24 +36,37 @@ namespace Microsoft.TemplateEngine.Utils
             string[] parts = range.Split('-');
             if (parts.Length != 2)
             {
-                specification = null;
-                return false;
+                //If this is a semver range, the first part must end with a space
+                int firstPartEnd = 0;
+                for (; firstPartEnd < parts.Length - 1 && !parts[firstPartEnd].EndsWith(" "); ++firstPartEnd)
+                {
+                }
+
+                if (firstPartEnd < parts.Length - 1)
+                {
+                    parts = new string[] { string.Join("-", parts.Take(firstPartEnd + 1)), string.Join("-", parts.Skip(firstPartEnd + 1)) };
+                }
+                else
+                {
+                    specification = null;
+                    return false;
+                }
             }
 
-            string startVersion = parts[0].Substring(1);
-            string endVersion = parts[1].Substring(0, parts[1].Length - 1);
+            string startVersion = parts[0].Substring(1).Trim();
+            string endVersion = parts[1].Substring(0, parts[1].Length - 1).Trim();
 
             if (IsWildcardVersion(startVersion) && IsWildcardVersion(endVersion))
             {
                 specification = null;
                 return false;
             }
-            else if (!IsWildcardVersion(startVersion) && !VersionStringHelpers.IsVersionWellFormed(startVersion))
+            else if (!IsWildcardVersion(startVersion) && !VersionStringHelpers.IsVersionWellFormed(startVersion) && !SemanticVersion.TryParse(startVersion, out SemanticVersion _))
             {
                 specification = null;
                 return false;
             }
-            else if (!IsWildcardVersion(endVersion) && !VersionStringHelpers.IsVersionWellFormed(endVersion))
+            else if (!IsWildcardVersion(endVersion) && !VersionStringHelpers.IsVersionWellFormed(endVersion) && !SemanticVersion.TryParse(endVersion, out SemanticVersion _))
             {
                 specification = null;
                 return false;
@@ -90,7 +104,16 @@ namespace Microsoft.TemplateEngine.Utils
 
             if (!IsWildcardVersion(MinVersion))
             {
-                int? startComparison = VersionStringHelpers.CompareVersions(MinVersion, versionToCheck);
+                int? startComparison;
+
+                if (!SemanticVersion.TryParse(MinVersion, out SemanticVersion minSemVer) || !SemanticVersion.TryParse(versionToCheck, out SemanticVersion semVerToCheck))
+                {
+                    startComparison = VersionStringHelpers.CompareVersions(MinVersion, versionToCheck);
+                }
+                else
+                {
+                    startComparison = minSemVer.CompareTo(semVerToCheck);
+                }
 
                 if (startComparison == null)
                 {
@@ -113,7 +136,16 @@ namespace Microsoft.TemplateEngine.Utils
 
             if (!IsWildcardVersion(MaxVersion))
             {
-                int? endComparison = VersionStringHelpers.CompareVersions(versionToCheck, MaxVersion);
+                int? endComparison;
+
+                if (!SemanticVersion.TryParse(MaxVersion, out SemanticVersion maxSemVer) || !SemanticVersion.TryParse(versionToCheck, out SemanticVersion semVerToCheck))
+                {
+                    endComparison = VersionStringHelpers.CompareVersions(versionToCheck, MaxVersion);
+                }
+                else
+                {
+                    endComparison = semVerToCheck.CompareTo(maxSemVer);
+                }
 
                 if (endComparison == null)
                 {

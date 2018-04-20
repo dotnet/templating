@@ -1,6 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.TemplateEngine.Abstractions;
 
 namespace Microsoft.TemplateEngine.Utils
@@ -28,7 +25,17 @@ namespace Microsoft.TemplateEngine.Utils
 
         public bool CheckIfVersionIsValid(string versionToCheck)
         {
-            int? result = VersionStringHelpers.CompareVersions(RequiredVersion, versionToCheck);
+            int? result;
+
+            if (!SemanticVersion.TryParse(versionToCheck, out SemanticVersion semVerToCheck) || !SemanticVersion.TryParse(RequiredVersion, out SemanticVersion requiredSemVer))
+            {
+                result = VersionStringHelpers.CompareVersions(RequiredVersion, versionToCheck);
+            }
+            else
+            {
+                result = semVerToCheck.CompareTo(requiredSemVer);
+            }
+
             return result.HasValue && result.Value == 0;
         }
     }

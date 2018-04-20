@@ -19,7 +19,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
     public class RunnableProjectGenerator : IGenerator
     {
         private static readonly Guid GeneratorId = new Guid("0C434DF7-E2CB-4DEE-B216-D7C58C8EB4B3");
-        private static readonly string GeneratorVersion = "1.0.0.0";
+        private static readonly string GeneratorVersion = "1.0.1.0";
 
         public Guid Id => GeneratorId;
 
@@ -375,7 +375,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 return false;
             }
 
-            return versionChecker.CheckIfVersionIsValid(GeneratorVersion);
+            return versionChecker.CheckIfVersionIsValid(GeneratorVersion) || versionChecker.CheckIfVersionIsValid(GitInfo.PackageVersion);
         }
 
         private static readonly string AdditionalConfigFilesIndicator = "AdditionalConfigFiles";
@@ -437,7 +437,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         }
 
         internal static object InternalConvertParameterValueToType(IEngineEnvironmentSettings environmentSettings, ITemplateParameter parameter, string untypedValue, out bool valueResolutionError)
-        { 
+        {
             if (untypedValue == null)
             {
                 valueResolutionError = false;
@@ -470,115 +470,143 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         internal static object DataTypeSpecifiedConvertLiteral(IEngineEnvironmentSettings environmentSettings, ITemplateParameter param, string literal, out bool valueResolutionError)
         {
             valueResolutionError = false;
-
-            if (string.Equals(param.DataType, "bool", StringComparison.OrdinalIgnoreCase))
+            string datatype = param.DataType?.ToUpperInvariant();
+            switch (datatype)
             {
-                if (string.Equals(literal, "true", StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-                else if (string.Equals(literal, "false", StringComparison.OrdinalIgnoreCase))
-                {
-                    return false;
-                }
-                else
-                {
-                    bool boolVal = false;
-                    // Note: if the literal is ever null, it is probably due to a problem in TemplateCreator.Instantiate()
-                    // which takes care of making null bool -> true as appropriate.
-                    // This else can also happen if there is a value but it can't be converted.
-                    string val;
-                    while (environmentSettings.Host.OnParameterError(param, null, "ParameterValueNotSpecified", out val) && !bool.TryParse(val, out boolVal))
-                    {
-                    }
-
-                    valueResolutionError = !bool.TryParse(val, out boolVal);
-                    return boolVal;
-                }
+                case "BOOL":
+                    return ConvertToBool(environmentSettings, param, literal, out valueResolutionError);
+                case "CHOICE":
+                    return ConvertToChoice(environmentSettings, param, literal, out valueResolutionError);
+                case "FLOAT":
+                    return ConvertToFloat(environmentSettings, param, literal, out valueResolutionError);
+                case "INT":
+                case "INTEGER":
+                    return ConvertToInt(environmentSettings, param, literal, out valueResolutionError);
+                case "HEX":
+                    return ConvertToHex(environmentSettings, param, literal, out valueResolutionError);
+                case "TEXT":
+                case "STRING":
+                default:
+                    return ConvertToString(environmentSettings, param, literal, out valueResolutionError);
             }
-            else if (string.Equals(param.DataType, "choice", StringComparison.OrdinalIgnoreCase))
+        }
+
+        private static object ConvertToBool(IEngineEnvironmentSettings environmentSettings, ITemplateParameter param, string literal, out bool valueResolutionError)
+        {
+            valueResolutionError = false;
+
+            if (string.Equals(literal, "true", StringComparison.OrdinalIgnoreCase))
             {
-                if (TryResolveChoiceValue(literal, param, out string match))
-                {
-                    return match;
-                }
-
-                if (literal == null && param.Priority != TemplateParameterPriority.Required)
-                {
-                    return param.DefaultValue;
-                }
-
-                string val;
-                while (environmentSettings.Host.OnParameterError(param, null, "ValueNotValid:" + string.Join(",", param.Choices.Keys), out val) 
-                        && !TryResolveChoiceValue(literal, param, out val))
-                {
-                }
-
-                valueResolutionError = val == null;
-                return val;
+                return true;
             }
-
-            else if (string.Equals(param.DataType, "float", StringComparison.OrdinalIgnoreCase))
+            else if (string.Equals(literal, "false", StringComparison.OrdinalIgnoreCase))
             {
-                if (double.TryParse(literal, out double convertedFloat))
-                {
-                    return convertedFloat;
-                }
-                else
-                {
-                    string val;
-                    while (environmentSettings.Host.OnParameterError(param, null, "ValueNotValidMustBeFloat", out val) && (val == null || !double.TryParse(val, out convertedFloat)))
-                    {
-                    }
-
-                    valueResolutionError = !double.TryParse(val, out convertedFloat);
-                    return convertedFloat;
-                }
-            }
-            else if (string.Equals(param.DataType, "int", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(param.DataType, "integer", StringComparison.OrdinalIgnoreCase))
-            {
-                if (long.TryParse(literal, out long convertedInt))
-                {
-                    return convertedInt;
-                }
-                else
-                {
-                    string val;
-                    while (environmentSettings.Host.OnParameterError(param, null, "ValueNotValidMustBeInteger", out val) && (val == null || !long.TryParse(val, out convertedInt)))
-                    {
-                    }
-
-                    valueResolutionError = !long.TryParse(val, out convertedInt);
-                    return convertedInt;
-                }
-            }
-            else if (string.Equals(param.DataType, "hex", StringComparison.OrdinalIgnoreCase))
-            {
-                if (long.TryParse(literal.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out long convertedHex))
-                {
-                    return convertedHex;
-                }
-                else
-                {
-                    string val;
-                    while (environmentSettings.Host.OnParameterError(param, null, "ValueNotValidMustBeHex", out val) && (val == null || val.Length < 3 || !long.TryParse(val.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out convertedHex)))
-                    {
-                    }
-
-                    valueResolutionError = !long.TryParse(val.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out convertedHex);
-                    return convertedHex;
-                }
-            }
-            else if (string.Equals(param.DataType, "text", StringComparison.OrdinalIgnoreCase)
-                || string.Equals(param.DataType, "string", StringComparison.OrdinalIgnoreCase))
-            {   // "text" is a valid data type, but doesn't need any special handling.
-                return literal;
+                return false;
             }
             else
             {
-                return literal;
+                bool boolVal = false;
+                // Note: if the literal is ever null, it is probably due to a problem in TemplateCreator.Instantiate()
+                // which takes care of making null bool -> true as appropriate.
+                // This else can also happen if there is a value but it can't be converted.
+                string val;
+                while (environmentSettings.Host.OnParameterError(param, null, "ParameterValueNotSpecified", out val) && !bool.TryParse(val, out boolVal))
+                {
+                }
+
+                valueResolutionError = !bool.TryParse(val, out boolVal);
+                return boolVal;
             }
+        }
+
+        private static object ConvertToChoice(IEngineEnvironmentSettings environmentSettings, ITemplateParameter param, string literal, out bool valueResolutionError)
+        {
+            valueResolutionError = false;
+
+            if (TryResolveChoiceValue(literal, param, out string match))
+            {
+                return match;
+            }
+
+            if (literal == null && param.Priority != TemplateParameterPriority.Required)
+            {
+                return param.DefaultValue;
+            }
+
+            string val;
+            while (environmentSettings.Host.OnParameterError(param, null, "ValueNotValid:" + string.Join(",", param.Choices.Keys), out val)
+                    && !TryResolveChoiceValue(literal, param, out val))
+            {
+            }
+
+            valueResolutionError = val == null;
+            return val;
+        }
+
+        private static object ConvertToFloat(IEngineEnvironmentSettings environmentSettings, ITemplateParameter param, string literal, out bool valueResolutionError)
+        {
+            valueResolutionError = false;
+
+            if (double.TryParse(literal, out double convertedFloat))
+            {
+                return convertedFloat;
+            }
+            else
+            {
+                string val;
+                while (environmentSettings.Host.OnParameterError(param, null, "ValueNotValidMustBeFloat", out val) && (val == null || !double.TryParse(val, out convertedFloat)))
+                {
+                }
+
+                valueResolutionError = !double.TryParse(val, out convertedFloat);
+                return convertedFloat;
+            }
+        }
+
+        private static object ConvertToHex(IEngineEnvironmentSettings environmentSettings, ITemplateParameter param, string literal, out bool valueResolutionError)
+        {
+            valueResolutionError = false;
+
+            if (long.TryParse(literal.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out long convertedHex))
+            {
+                return convertedHex;
+            }
+            else
+            {
+                string val;
+                while (environmentSettings.Host.OnParameterError(param, null, "ValueNotValidMustBeHex", out val) && (val == null || val.Length < 3 || !long.TryParse(val.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out convertedHex)))
+                {
+                }
+
+                valueResolutionError = !long.TryParse(val.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out convertedHex);
+                return convertedHex;
+            }
+        }
+
+        private static object ConvertToInt(IEngineEnvironmentSettings environmentSettings, ITemplateParameter param, string literal, out bool valueResolutionError)
+        {
+            valueResolutionError = false;
+
+            if (long.TryParse(literal, out long convertedInt))
+            {
+                return convertedInt;
+            }
+            else
+            {
+                string val;
+                while (environmentSettings.Host.OnParameterError(param, null, "ValueNotValidMustBeInteger", out val) && (val == null || !long.TryParse(val, out convertedInt)))
+                {
+                }
+
+                valueResolutionError = !long.TryParse(val, out convertedInt);
+                return convertedInt;
+            }
+        }
+
+        private static object ConvertToString(IEngineEnvironmentSettings environmentSettings, ITemplateParameter param, string literal, out bool valueResolutionError)
+        {
+            valueResolutionError = false;
+            return literal;
         }
 
         private static bool TryResolveChoiceValue(string literal, ITemplateParameter param, out string match)

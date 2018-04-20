@@ -1,6 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.TemplateEngine.Abstractions;
 
 namespace Microsoft.TemplateEngine.Utils
@@ -14,7 +11,7 @@ namespace Microsoft.TemplateEngine.Utils
                 specification = null;
                 return false;
             }
-            else if (versionString.Contains("-"))
+            else if (versionString.IndexOfAny(new char[] { '[', '(' }) > -1)
             {
                 return RangeVersionSpecification.TryParse(versionString, out specification);
             }

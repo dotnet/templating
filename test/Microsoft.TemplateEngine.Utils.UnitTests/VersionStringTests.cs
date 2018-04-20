@@ -62,6 +62,15 @@ namespace Microsoft.TemplateEngine.Utils.UnitTests
         [InlineData("(1.1.0.0-1.2.0.0)", "1.2.0.0", false)]
         [InlineData("(1.1.0.0-1.2.0.0)", "1.1.1.0", true)]
         [InlineData("(1.1.0.0-1.2.0.0)", "1.1.0.1", true)]
+        [InlineData("(1.0.0.0-1.2.0.0)", "1.0.0-beta3", false)]
+        [InlineData("(1.0.0-beta2 - 1.0.0-beta4)", "1.0.0-beta3", true)]
+        [InlineData("(1.0.0-beta2 - 1.0.0-beta3]", "1.0.0-beta3", true)]
+        [InlineData("(1.0.0-beta2 - 1.0.0-beta3)", "1.0.0-beta3", false)]
+        [InlineData("(1.0.0-beta2 - 1.0.0)", "1.0.0-beta3", true)]
+        [InlineData("(1.0.0-beta2 - 1.0.0-*]", "1.0.0-beta3", true)]
+        [InlineData("(1.0.0-beta2 - 1.0.0-*]", "1.0.0", false)]
+        [InlineData("[1.0.0-* - *)", "1.0.0", true)]
+        [InlineData("[1.0.0-* - 2.0.0-*)", "1.0.0", true)]
         public void VersionParseCompare(string allowed, string proposed, bool expected)
         {
             Assert.True(VersionStringHelpers.TryParseVersionSpecification(allowed, out IVersionSpecification checker));
