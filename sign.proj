@@ -17,6 +17,8 @@
 
 
   <Target Name="PostCompileSign" DependsOnTargets="GetPostCompileSignFiles;SignFiles" />
+  <Target Name="PostPackSign" DependsOnTargets="GetPostPackSignFiles;SignFiles" />
+
   <Target Name="GetPostCompileSignFiles">
     <PropertyGroup>
 
@@ -46,6 +48,25 @@
     </ItemGroup>
   </Target>
 
+  <Target Name="GetPostPackSignFiles">
+    <PropertyGroup>
+
+      <!-- The OutDir and IntermediateOutputPath properties are required by MicroBuild. MicroBuild only
+           signs files that are under these paths. -->
+      <OutDir>$(MSBuildThisFileDirectory)artifacts\</OutDir>
+      <IntermediateOutputPath>$(MSBuildThisFileDirectory)artifacts\scratch</IntermediateOutputPath>
+    </PropertyGroup>
+    
+    <ItemGroup>
+      <FilesToSign Include="$(OutDir)packages\**\*.nupkg" Exclude="$(OutDir)packages\**\*.symbols.nupkg">
+        <Authenticode>NuGet</Authenticode>
+      </FilesToSign>
+      <FilesToSign Include="$(OutDir)templates\**\*.nupkg">
+        <Authenticode>NuGet</Authenticode>
+      </FilesToSign>
+    </ItemGroup>
+  </Target>
+
    <Target Name="SNSignLocResources">
        
     <ItemGroup>
@@ -60,7 +81,26 @@
   </Target>
   
   <Target Name="PostCompileLocSign" DependsOnTargets="GetPostCompileLocSignFiles;SignFiles" />
+  <Target Name="PostPackLocSign" DependsOnTargets="GetPostPackLocSignFiles;SignFiles" />
+
   <Target Name="GetPostCompileLocSignFiles">
+    <PropertyGroup>
+
+      <!-- The OutDir and IntermediateOutputPath properties are required by MicroBuild. MicroBuild only
+           signs files that are under these paths. -->
+      <OutDir>$(MSBuildThisFileDirectory)artifacts\</OutDir>
+      <IntermediateOutputPath>$(MSBuildThisFileDirectory)artifacts\scratch</IntermediateOutputPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <!-- Adding the loc assemblies to sign. -->
+      <FilesToSign Include="$(OutDir)localize\**\Microsoft.TemplateEngine.Cli.resources.dll">
+        <Authenticode>Microsoft400</Authenticode>
+      </FilesToSign>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="GetPostPackLocSignFiles">
     <PropertyGroup>
 
       <!-- The OutDir and IntermediateOutputPath properties are required by MicroBuild. MicroBuild only
@@ -71,8 +111,8 @@
     
     <ItemGroup>
       <!-- Adding the loc assemblies to sign. -->
-      <FilesToSign Include="$(OutDir)localize\**\Microsoft.TemplateEngine.Cli.resources.dll">
-        <Authenticode>Microsoft400</Authenticode>
+      <FilesToSign Include="$(OutDir)packages\Microsoft.TemplateEngine.Cli.Localization*.nupkg">
+        <Authenticode>NuGet</Authenticode>
       </FilesToSign>
     </ItemGroup>
   </Target>

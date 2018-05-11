@@ -41,10 +41,13 @@
       </Item>
       <Item ItemId=";AddProjToSlnPostActionSucceeded" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Successfully added]A;    project(s): {0}]A;    to solution file: {1}]]></Val>
+          <Val><![CDATA[Successfully added]D;]A;    project(s): {0}]D;]A;    to solution file: {1}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[已成功將]A;    專案: {0}]A;    新增到解決方案檔案: {1}]]></Val>
+            <Val><![CDATA[已成功將]D;]A;    專案 {0}]D;]A;    新增到解決方案檔案 {1}]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Successfully added]A;    project(s): {0}]A;    to solution file: {1}]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -131,10 +134,13 @@
       </Item>
       <Item ItemId=";AddRefPostActionSucceeded" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Successfully added]A;    reference: {0}]A;    to project file: {1}]]></Val>
+          <Val><![CDATA[Successfully added]D;]A;    reference: {0}]D;]A;    to project file: {1}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[已成功將參考: {0}]A;    新增到]A;    專案檔: {1}]]></Val>
+            <Val><![CDATA[已成功將參考 {0}]D;]A;    新增到]D;]A;    專案檔 {1}]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Successfully added]A;    reference: {0}]A;    to project file: {1}]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -176,10 +182,13 @@
       </Item>
       <Item ItemId=";AliasCommandAfterExpansion" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[After expanding aliases, the command is:]A;    dotnet {0}]]></Val>
+          <Val><![CDATA[After expanding aliases, the command is:]D;]A;    dotnet {0}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[展開別名之後，命令為:]A;    dotnet {0}]]></Val>
+            <Val><![CDATA[展開別名之後的命令:]D;]A;    dotnet {0}]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[After expanding aliases, the command is:]A;    dotnet {0}]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -284,10 +293,13 @@
       </Item>
       <Item ItemId=";AliasShowErrorUnknownAlias" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Unknown alias name '{0}'.]A;Run 'dotnet {1} --show-aliases' with no args to show all aliases.]]></Val>
+          <Val><![CDATA[Unknown alias name '{0}'.]D;]A;Run 'dotnet {1} --show-aliases' with no args to show all aliases.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[未知的別名名稱 '{0}'。]A;不設定任何引數而單獨執行 'dotnet {1} --show-aliases'，可顯示所有別名。]]></Val>
+            <Val><![CDATA[未知的別名名稱 '{0}'。]D;]A;單獨執行 'dotnet {1} --show-aliases' 而不設定任何引數，可顯示所有的別名。]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Unknown alias name '{0}'.]A;Run 'dotnet {1} --show-aliases' with no args to show all aliases.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -408,6 +420,24 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";Authoring_AmbiguousBestPrecedence" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Equal highest precedence values among the best template matches prevented unambiguously choosing a template to invoke.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[最佳範本符合項目中因有相同最高優先順序的值，導致無法無法明確選擇所要叫用的範本。]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";Authoring_AmbiguousChoiceParameterValue" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[An ambiguous choice parameter value prevented unambiguously choosing a template to invoke.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[模稜兩可選擇的參數值無法明確選擇所要叫用的範本。]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";BadLocaleError" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Invalid format for input locale: "{0}". Example valid formats: [en]5D; [en-US]5D;.]]></Val>
@@ -464,10 +494,13 @@
       </Item>
       <Item ItemId=";CommandOutput" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Output from command:]A;{0}]]></Val>
+          <Val><![CDATA[Output from command:]D;]A;{0}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[命令輸出:]A;{0}]]></Val>
+            <Val><![CDATA[下列命令的輸出:]D;]A;{0}]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Output from command:]A;{0}]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -545,10 +578,13 @@
       </Item>
       <Item ItemId=";CreateFailed" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Template "{0}" could not be created.]A;{1}]]></Val>
+          <Val><![CDATA[Template "{0}" could not be created.]D;]A;{1}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[無法建立範本 "{0}"。]A;{1}]]></Val>
+            <Val><![CDATA[無法建立範本 "{0}"。]D;]A;{1}]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Template "{0}" could not be created.]A;{1}]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -575,6 +611,15 @@
           <Val><![CDATA[Default: {0}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[預設: {0}]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";DefaultValuePlusSwitchWithoutValueDefault" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Default: {0} / (*) {1}]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[預設: {0} / (*) {1}]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -617,10 +662,13 @@
       </Item>
       <Item ItemId=";ExtraArgsCommandAfterExpansion" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[After expanding the extra args files, the command is:]A;    dotnet {0}]]></Val>
+          <Val><![CDATA[After expanding the extra args files, the command is:]D;]A;    dotnet {0}]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[展開額外的引數檔案之後，命令為:]A;    dotnet {0}]]></Val>
+            <Val><![CDATA[展開額外引數檔案之後的命令:]D;]A;    dotnet {0}]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[After expanding the extra args files, the command is:]A;    dotnet {0}]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -689,10 +737,13 @@
       </Item>
       <Item ItemId=";InstallFailed" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA["{0}" could not be installed.]A;{1}.]]></Val>
+          <Val><![CDATA["{0}" could not be installed.]D;]A;{1}.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA["{0}" 無法安裝。]A;{1}。]]></Val>
+            <Val><![CDATA["{0}" 無法安裝。]D;]A;{1}。]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA["{0}" could not be installed.]A;{1}.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -743,19 +794,25 @@
       </Item>
       <Item ItemId=";InvalidParameterDefault" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[{0} {1}]A;    The default value '{1}' is not a valid value for {0}.]]></Val>
+          <Val><![CDATA[{0} {1}]D;]A;    The default value '{1}' is not a valid value for {0}.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0} {1}]A;    預設值 '{1}' 對 {0} 而言不是有效的值。]]></Val>
+            <Val><![CDATA[{0} {1}]D;]A;    預設值 '{1}' 對 {0} 而言不是有效的值。]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[{0} {1}]A;    The default value '{1}' is not a valid value for {0}.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
       <Item ItemId=";InvalidParameterDetail" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[{0} {1}]A;    '{1}' is not a valid value for {0} ({2}).]]></Val>
+          <Val><![CDATA[{0} {1}]D;]A;    '{1}' is not a valid value for {0} ({2}).]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[{0} {1}]A;    '{1}' 對 {0} ({2}) 而言不是有效的值。]]></Val>
+            <Val><![CDATA[{0} {1}]D;]A;    '{1}' 對 {0} ({2}) 而言不是有效的值。]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[{0} {1}]A;    '{1}' is not a valid value for {0} ({2}).]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -788,10 +845,13 @@
       </Item>
       <Item ItemId=";LanguageParameter" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Specifies the language of the template to create.]]></Val>
+          <Val><![CDATA[Filters templates based on language and specifies the language of the template to create.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[指定要建立之範本的語言。]]></Val>
+            <Val><![CDATA[依據語言篩選範本，並指定要建立之範本的語言。]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[Specifies the language of the template to create.]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -917,6 +977,15 @@
           <Val><![CDATA[No updates found.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[找不到任何更新。]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";NuGetSourceHelp" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Specifies a NuGet source to use during install.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[請指定安裝期間所要使用的 NuGet 來源。]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1121,12 +1190,12 @@
       </Item>
       <Item ItemId=";RunHelpForInformationAboutAcceptedParameters" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[Run dotnet {0} --help for usage information.]A;See https://aka.ms/dotnet-install-templates to learn how to install additional template packs.]]></Val>
+          <Val><![CDATA[Run dotnet {0} --help for usage information.]D;]A;See https://aka.ms/dotnet-install-templates to learn how to install additional template packs.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[執行 dotNet {0} --help 查看用法資訊。]A;如需了解如何安裝其他範本套件，請參閱 https://aka.ms/dotnet-install-templates。]]></Val>
+            <Val><![CDATA[執行 dotNet {0} --help 可查看用法資訊。]D;]A;如需了解如何安裝其他範本套件，請參閱 https://aka.ms/dotnet-install-templates。]]></Val>
           </Tgt>
           <Prev Cat="Text">
-            <Val><![CDATA[Run dotnet {0} --help for usage information.]]></Val>
+            <Val><![CDATA[Run dotnet {0} --help for usage information.]A;See https://aka.ms/dotnet-install-templates to learn how to install additional template packs.]]></Val>
           </Prev>
         </Str>
         <Disp Icon="Str" />
@@ -1208,6 +1277,15 @@
           <Val><![CDATA[{0} : update ([Y]5D;es|[N]5D;o)?]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[{0}: 更新 (是[Y]5D;|否[N]5D;)?]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";SwitchWithoutValueDefaultFootnote" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[* Indicates the value used if the switch is provided without a value.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[* 表示當提供的參數不含值時，要使用的值。]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1407,7 +1485,7 @@
     <Disp Icon="Ver" Disp="true" LocTbl="false" Path=" \ ;Version \ 8 \ 0" />
     <Item ItemId=";AssemblyVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0.315]]></Val>
+        <Val><![CDATA[1.0.1.45932]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1440,7 +1518,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0.315]]></Val>
+        <Val><![CDATA[1.0.1.45932]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1452,10 +1530,13 @@
     </Item>
     <Item ItemId=";LegalCopyright" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text">
-        <Val><![CDATA[Copyright © Microsoft Corporation]]></Val>
+        <Val><![CDATA[© Microsoft Corporation. All rights reserved.]]></Val>
         <Tgt Cat="Text" Stat="Loc" Orig="New">
-          <Val><![CDATA[Copyright © Microsoft Corporation]]></Val>
+          <Val><![CDATA[© Microsoft Corporation. 著作權所有，並保留一切權利。]]></Val>
         </Tgt>
+        <Prev Cat="Text">
+          <Val><![CDATA[Copyright © Microsoft Corporation]]></Val>
+        </Prev>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1476,7 +1557,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.0-beta3-20171204-315+315.b1c1851198203f96ce7295f55766e3f414fdc479]]></Val>
+        <Val><![CDATA[1.0.1-beta3-20180316-1487702+1868.d7f133f499ef5f3c6550e0d8a8f197fff43a3767]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
