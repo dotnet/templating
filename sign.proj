@@ -58,7 +58,10 @@
     </PropertyGroup>
     
     <ItemGroup>
-      <FilesToSign Include="$(OutDir)packages\**\*.nupkg" Exclude="$(OutDir)packages\**\*.symbols.nupkg">
+      <FilesToSign Include="$(OutDir)packages\**\*.nupkg">
+        <Authenticode>NuGet</Authenticode>
+      </FilesToSign>
+      <FilesToSign Include="$(OutDir)templates\**\*.nupkg">
         <Authenticode>NuGet</Authenticode>
       </FilesToSign>
     </ItemGroup>
