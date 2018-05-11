@@ -2,15 +2,13 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
-using System.Net.Sockets;
 using System.Text;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Core.Matching;
 
 namespace Microsoft.TemplateEngine.Core.Util
 {
-    public class ProcessorState : IProcessorState
+    public class ProcessorState : IOwnedProcessorState
     {
         private Stream _source;
         private readonly Stream _target;
@@ -42,8 +40,12 @@ namespace Microsoft.TemplateEngine.Core.Util
             }
         }
 
-        public ProcessorState(Stream source, Stream target, int bufferSize, int flushThreshold, IEngineConfig config, IReadOnlyList<IOperationProvider> operationProviders)
+        public IProcessor Processor { get; }
+
+        public ProcessorState(Stream source, Stream target, int bufferSize, int flushThreshold, IEngineConfig config, IReadOnlyList<IOperationProvider> operationProviders, IProcessor processor)
         {
+            Processor = processor;
+
             if (source.CanSeek)
             {
                 try

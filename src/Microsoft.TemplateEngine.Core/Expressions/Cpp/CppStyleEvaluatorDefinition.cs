@@ -24,7 +24,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Cpp
             using (MemoryStream res = new MemoryStream())
             {
                 EngineConfig cfg = new EngineConfig(environmentSettings, variables);
-                IProcessorState state = new ProcessorState(ms, res, (int)ms.Length, (int)ms.Length, cfg, NoOperationProviders);
+                IProcessorState state = new ProcessorState(ms, res, (int)ms.Length, (int)ms.Length, cfg, NoOperationProviders, null);
                 int len = (int)ms.Length;
                 int pos = 0;
                 return Evaluate(state, ref len, ref pos, out bool faulted);

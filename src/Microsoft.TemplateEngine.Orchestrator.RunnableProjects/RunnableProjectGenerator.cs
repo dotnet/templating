@@ -242,6 +242,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     return ConvertToInt(environmentSettings, param, literal, out valueResolutionError);
                 case "HEX":
                     return ConvertToHex(environmentSettings, param, literal, out valueResolutionError);
+                case "STRUCTURED":
+                    return ConvertToStructured(environmentSettings, param, literal, out valueResolutionError);
                 case "TEXT":
                 case "STRING":
                 default:
@@ -505,6 +507,24 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         {
             valueResolutionError = false;
             return literal;
+        }
+
+        private static object ConvertToStructured(IEngineEnvironmentSettings environmentSettings, ITemplateParameter param, string literal, out bool valueResolutionError)
+        {
+            valueResolutionError = false;
+
+            try
+            {
+                JToken data = JToken.Parse(literal);
+                StructuredData d = data.ToObject<StructuredData>();
+                return d;
+            }
+            catch (Exception ex)
+            {
+                environmentSettings.Host.LogDiagnosticMessage("Structured data was not well formed", "Runtime", ex.Message);
+                valueResolutionError = true;
+                return null;
+            }
         }
 
         private static ICreationResult GetCreationResult(IEngineEnvironmentSettings environmentSettings, RunnableProjectTemplate template, IVariableCollection variables)

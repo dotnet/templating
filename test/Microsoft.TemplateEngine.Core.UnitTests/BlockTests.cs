@@ -1,4 +1,6 @@
+using System;
 using System.IO;
+using System.Linq;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Core.Operations;
 using Microsoft.TemplateEngine.Core.Util;
@@ -19,6 +21,29 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
 
                 return operations;
             }
+        }
+
+        private static IOperationProvider[] ExtraReplaceOperations
+        {
+            get
+            {
+                IOperationProvider[] operations =
+                {
+                    new ExtraReplaceOperation("abc123", "#block 1".TokenConfig(), "#endblock 1".TokenConfig(), true),
+                };
+
+                return operations;
+            }
+        }
+
+        private static IOperationProvider[] ForOperations(int iterations)
+        {
+            IOperationProvider[] operations =
+            {
+                    new ForOperation("abc123", "#for".TokenConfig(), "#endfor".TokenConfig(), true, iterations),
+                };
+
+            return operations;
         }
 
         private IProcessor SetupTestProcessor(IOperationProvider[] operations, VariableCollection vc)
@@ -45,6 +70,79 @@ after";
 contents
 
 after";
+
+            RunAndVerify(originalValue, expectedValue, processor, 9999);
+        }
+
+
+        [Fact(DisplayName = nameof(ExtraReplaceOperationEditsOnlyInBlock))]
+        public void ExtraReplaceOperationEditsOnlyInBlock()
+        {
+            VariableCollection vc = new VariableCollection();
+            IProcessor processor = SetupTestProcessor(ExtraReplaceOperations, vc);
+
+            const string originalValue = @"contents
+#block 1
+contents
+
+ #endblock 1
+contents";
+
+            const string expectedValue = @"contents
+Hello there!
+
+contents";
+
+            RunAndVerify(originalValue, expectedValue, processor, 9999);
+        }
+
+        [Theory(DisplayName = nameof(ForOperationWorks))]
+        [InlineData(1)]
+        [InlineData(5)]
+        [InlineData(10)]
+        public void ForOperationWorks(int iterations)
+        {
+            VariableCollection vc = new VariableCollection();
+            IProcessor processor = SetupTestProcessor(ForOperations(iterations), vc);
+
+            const string originalValue = @"contents
+#for
+contents
+
+ #endfor
+contents";
+
+            string expectedValue = @"contents
+" + string.Join(Environment.NewLine, Enumerable.Repeat(@"Hello there!
+", iterations)) + @"
+contents";
+
+            RunAndVerify(originalValue, expectedValue, processor, 9999);
+        }
+
+
+        [Theory(DisplayName = nameof(NestedForOperationWorks))]
+        [InlineData(1)]
+        [InlineData(5)]
+        [InlineData(10)]
+        public void NestedForOperationWorks(int iterations)
+        {
+            VariableCollection vc = new VariableCollection();
+            IProcessor processor = SetupTestProcessor(ForOperations(iterations), vc);
+
+            const string originalValue = @"contents
+#for
+    #for
+contents
+
+    #endfor
+#endfor
+contents";
+
+            string expectedValue = @"contents
+" + string.Join(Environment.NewLine, Enumerable.Repeat(@"Hello there!
+", iterations * iterations)) + @"
+contents";
 
             RunAndVerify(originalValue, expectedValue, processor, 9999);
         }
@@ -77,6 +175,70 @@ after";
                     return (int)blockData.Length;
                 }
             }
+        }
+
+        public class ExtraReplaceOperation : BlockOperationWithCustomProcessorProviderBase
+        {
+            public ExtraReplaceOperation(string id, ITokenConfig startToken, ITokenConfig endToken, bool isInitialStateOn)
+                : base(id, startToken, endToken, isInitialStateOn, s => GenerateExtraReplace(id, s))
+            {
+            }
+
+            private static IProcessor GenerateExtraReplace(string id, IProcessorState outerProcessor)
+            {
+                string variableName = $"ExtraReplace-{id}-RunCount";
+                int runCount;
+                if (!outerProcessor.Config.Variables.TryGetValue($"ExtraReplace-{id}-RunCount", out object runCountObject))
+                {
+                    outerProcessor.Config.Variables[variableName] = runCountObject = runCount = 0;
+                }
+                else
+                {
+                    runCount = (int)runCountObject;
+                }
+
+                if (runCount == 0 && outerProcessor is IOwnedProcessorState ownedState && ownedState.Processor != null)
+                {
+                    outerProcessor.Config.Variables[variableName] = runCount = 1;
+                    return ownedState.Processor.CloneAndAppendOperations(new IOperationProvider[] { new Replacement("contents".TokenConfig(), "Hello there!", null, true) });
+                }
+
+                return null;
+            }
+
+            public override string OperationName => "extrareplace";
+        }
+
+        public class ForOperation : BlockOperationWithCustomProcessorProviderBase
+        {
+            public ForOperation(string id, ITokenConfig startToken, ITokenConfig endToken, bool isInitialStateOn, int iterations)
+                : base(id, startToken, endToken, isInitialStateOn, s => GenerateExtraReplace(id, iterations, s))
+            {
+            }
+
+            private static IProcessor GenerateExtraReplace(string id, int iterations, IProcessorState outerProcessor)
+            {
+                string variableName = $"For-{id}-RunCount";
+                int runCount;
+                if (!outerProcessor.Config.Variables.TryGetValue(variableName, out object runCountObject))
+                {
+                    outerProcessor.Config.Variables[variableName] = runCountObject = runCount = 0;
+                }
+                else
+                {
+                    runCount = (int)runCountObject;
+                }
+
+                if (runCount < iterations && outerProcessor is IOwnedProcessorState ownedState && ownedState.Processor != null)
+                {
+                    outerProcessor.Config.Variables[variableName] = ++runCount;
+                    return ownedState.Processor.CloneAndAppendOperations(new IOperationProvider[] { new Replacement("contents".TokenConfig(), "Hello there!", null, true) });
+                }
+
+                return null;
+            }
+
+            public override string OperationName => "forloop";
         }
     }
 }

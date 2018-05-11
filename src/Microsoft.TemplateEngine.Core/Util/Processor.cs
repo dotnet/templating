@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Utils;
@@ -11,7 +11,7 @@ namespace Microsoft.TemplateEngine.Core.Util
         private const int DefaultFlushThreshold = 8 * 1024 * 1024;
         private readonly IReadOnlyList<IOperationProvider> _operations;
 
-        private Processor(EngineConfig config, IReadOnlyList<IOperationProvider> operations)
+        private Processor(IEngineConfig config, IReadOnlyList<IOperationProvider> operations)
         {
             Config = config;
             _operations = operations;
@@ -22,14 +22,14 @@ namespace Microsoft.TemplateEngine.Core.Util
             return new Processor(Config, new CombinedList<IOperationProvider>(_operations, tempOperations));
         }
 
-        public EngineConfig Config { get; }
+        public IEngineConfig Config { get; }
 
-        public static IProcessor Create(EngineConfig config, params IOperationProvider[] operations)
+        public static IProcessor Create(IEngineConfig config, params IOperationProvider[] operations)
         {
             return new Processor(config, operations);
         }
 
-        public static IProcessor Create(EngineConfig config, IReadOnlyList<IOperationProvider> operations)
+        public static IProcessor Create(IEngineConfig config, IReadOnlyList<IOperationProvider> operations)
         {
             return new Processor(config, operations);
         }
@@ -40,7 +40,7 @@ namespace Microsoft.TemplateEngine.Core.Util
 
         public bool Run(Stream source, Stream target, int bufferSize, int flushThreshold)
         {
-            ProcessorState state = new ProcessorState(source, target, bufferSize, flushThreshold, Config, _operations);
+            ProcessorState state = new ProcessorState(source, target, bufferSize, flushThreshold, Config, _operations, this);
             return state.Run();
         }
     }
