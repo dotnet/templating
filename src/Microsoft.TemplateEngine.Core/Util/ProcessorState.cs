@@ -185,12 +185,14 @@ namespace Microsoft.TemplateEngine.Core.Util
             int nextSequenceNumberThatCouldBeWritten = CurrentSequenceNumber;
             int bytesWrittenSinceLastFlush = 0;
             bool anyOperationsExecuted = false;
+            bool operationExecuted = false;
 
             while (true)
             {
                 //Loop until we run out of data in the buffer
                 while (CurrentBufferPosition < CurrentBufferLength)
                 {
+                    operationExecuted = false;
                     int posedPosition = CurrentSequenceNumber;
                     bool skipAdvanceBuffer = false;
                     if (_trie.Accept(CurrentBuffer[CurrentBufferPosition], ref posedPosition, out TerminalLocation<OperationTerminal> terminal))
@@ -217,6 +219,7 @@ namespace Microsoft.TemplateEngine.Core.Util
                             posedPosition = handoffBufferPosition;
                             int bytesWritten = operation.HandleMatch(this, CurrentBufferLength, ref posedPosition, terminal.Terminal.Token, _target);
                             bytesWrittenSinceLastFlush += bytesWritten;
+                            operationExecuted = true;
 
                             CurrentSequenceNumber += posedPosition - CurrentBufferPosition;
                             CurrentBufferPosition = posedPosition;
@@ -245,6 +248,16 @@ namespace Microsoft.TemplateEngine.Core.Util
                     }
                 }
 
+                //We made it to the end of the buffer...
+                //  We could be here because we've run out of places to look in the current buffer
+                //  or we've been moved to the end of the buffer by an operation in progress
+                //  if it's the latter, the trie hasn't been reset by receiving any more data
+                //  and we'll likely get a non-postive number of uncommitted bytes, causing us
+                //  to skip the branch to write out the head of the buffer, but taking the branch
+                //  to advance the buffer to the end of the start token for the operation that
+                //  was taken, this is often seen as the contents of the nested block operation
+                //  tests being emitted multiple times and with closing tokens emitted
+
                 //Calculate the sequence number at the head of the buffer
                 int headSequenceNumber = CurrentSequenceNumber - CurrentBufferPosition;
                 int bufferPositionToAdvanceTo = _trie.OldestRequiredSequenceNumber - headSequenceNumber;
@@ -268,6 +281,11 @@ namespace Microsoft.TemplateEngine.Core.Util
                     _target.Write(CurrentBuffer, bufferPositionToAdvanceTo - toWrite, toWrite);
                     bytesWrittenSinceLastFlush += toWrite;
                     nextSequenceNumberThatCouldBeWritten = _trie.OldestRequiredSequenceNumber;
+                }
+                //TODO: figure out why the block tests cause this to happen
+                else if (operationExecuted && numberOfUncommittedBytesBeforeThePositionToAdvanceTo < 0)
+                {
+                    bufferPositionToAdvanceTo = CurrentBufferPosition;
                 }
 
                 //We ran out of data in the buffer, so attempt to advance

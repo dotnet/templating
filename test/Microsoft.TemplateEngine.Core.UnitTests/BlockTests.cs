@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.TemplateEngine.Core.Contracts;
@@ -40,8 +41,9 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
         {
             IOperationProvider[] operations =
             {
-                    new ForOperation("abc123", "#for".TokenConfig(), "#endfor".TokenConfig(), true, iterations),
-                };
+                new ForOperation("abc123", "#for".TokenConfig(), "#endfor".TokenConfig(), true, iterations),
+                new ForOperation("abc1234", "#for2".TokenConfig(), "#endfor2".TokenConfig(), true, iterations),
+            };
 
             return operations;
         }
@@ -123,6 +125,7 @@ contents";
 
         [Theory(DisplayName = nameof(NestedForOperationWorks))]
         [InlineData(1)]
+        [InlineData(2)]
         [InlineData(5)]
         [InlineData(10)]
         public void NestedForOperationWorks(int iterations)
@@ -132,10 +135,10 @@ contents";
 
             const string originalValue = @"contents
 #for
-    #for
+    #for2
 contents
 
-    #endfor
+    #endfor2
 #endfor
 contents";
 
@@ -180,7 +183,7 @@ contents";
         public class ExtraReplaceOperation : BlockOperationWithCustomProcessorProviderBase
         {
             public ExtraReplaceOperation(string id, ITokenConfig startToken, ITokenConfig endToken, bool isInitialStateOn)
-                : base(id, startToken, endToken, isInitialStateOn, s => GenerateExtraReplace(id, s))
+                : base(id, startToken, endToken, isInitialStateOn, s => GenerateExtraReplace(id, s), x => null, (x, y) => { })
             {
             }
 
@@ -212,7 +215,26 @@ contents";
         public class ForOperation : BlockOperationWithCustomProcessorProviderBase
         {
             public ForOperation(string id, ITokenConfig startToken, ITokenConfig endToken, bool isInitialStateOn, int iterations)
-                : base(id, startToken, endToken, isInitialStateOn, s => GenerateExtraReplace(id, iterations, s))
+                : base(id, startToken, endToken, isInitialStateOn, s => GenerateExtraReplace(id, iterations, s), x => x.ToDictionary(y => y.Key, y => y.Value), (v, t) =>
+                {
+                    if (!(t is Dictionary<string, object> d))
+                    {
+                        return;
+                    }
+
+                    HashSet<string> keys = new HashSet<string>(v.Keys);
+
+                    foreach (KeyValuePair<string, object> entry in d)
+                    {
+                        keys.Remove(entry.Key);
+                        v[entry.Key] = entry.Value;
+                    }
+
+                    foreach (string key in keys)
+                    {
+                        v.Remove(key);
+                    }
+                })
             {
             }
 

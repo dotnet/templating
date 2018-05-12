@@ -105,21 +105,18 @@ namespace Microsoft.TemplateEngine.Core.Operations
                         }
                     }
 
-                    blockData.WriteByte(processor.CurrentBuffer[currentBufferPosition]);
-                    ++currentBufferPosition;
-
                     if (depth == 0)
                     {
                         processor.SeekForwardThrough(processor.EncodingConfig.LineEndings, ref bufferLength, ref currentBufferPosition);
-                        blockData.SetLength(blockData.Length + sequenceNumber - entrySequenceNumber - 1);
+                        blockData.SetLength(blockData.Length + sequenceNumber - entrySequenceNumber);
                         SeekBackWhile(processor.EncodingConfig.Whitespace, blockData);
                         blockData.Position = 0;
                         return OnBlockIsolated(processor, blockData, target);
                     }
-                    else
-                    {
-                        ++sequenceNumber;
-                    }
+
+                    blockData.WriteByte(processor.CurrentBuffer[currentBufferPosition]);
+                    ++currentBufferPosition;
+                    ++sequenceNumber;
                 }
 
                 return 0;
