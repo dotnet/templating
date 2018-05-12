@@ -217,7 +217,8 @@ contents";
             public ForOperation(string id, ITokenConfig startToken, ITokenConfig endToken, bool isInitialStateOn, int iterations)
                 : base(id, startToken, endToken, isInitialStateOn, s => GenerateExtraReplace(id, iterations, s), x => x.ToDictionary(y => y.Key, y => y.Value), (v, t) =>
                 {
-                    if (!(t is Dictionary<string, object> d))
+                    Dictionary<string, object> d = t as Dictionary<string, object>;
+                    if (d == null)
                     {
                         return;
                     }
