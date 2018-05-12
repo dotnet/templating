@@ -143,7 +143,7 @@ contents
 contents";
 
             string expectedValue = @"contents
-" + string.Join(Environment.NewLine, Enumerable.Repeat(@"Hello there!
+" + string.Join("\r\n", Enumerable.Repeat(@"Hello there!
 ", iterations * iterations)) + @"
 contents";
 
