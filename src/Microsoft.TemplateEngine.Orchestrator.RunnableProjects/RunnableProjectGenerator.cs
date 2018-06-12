@@ -655,11 +655,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 {
                     return literalLong;
                 }
-
-                if (string.Equals("null", literal, StringComparison.OrdinalIgnoreCase))
-                {
-                    return null;
-                }
             }
 
             return literal;
