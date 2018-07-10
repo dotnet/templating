@@ -75,11 +75,13 @@
                  Properties="PackageOutputPath=$(_PackageOutputPath);NoBuild=true;IncludeSymbols=true"
                  Targets="Pack" StopOnFirstFailure="true" Condition="'$(SkipPack)' != 'true'"/>
 
+        <MSBuild Projects="$(SrcDir)dotnet-new3\dotnet-new3.csproj" Properties="PublishDir=$(DevPath);NoBuild=true" Targets="Publish" StopOnFirstFailure="true"/>
+    </Target>
+
+    <Target Name="SignPackages">
         <Message Importance="High" Text="Signing packages..." Condition="('$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test') AND '$(SkipPack)' != 'true'"/>
         <Exec Condition="('$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test') AND '$(SkipPack)' != 'true'"
               Command="msbuild $(BuildDir)sign.proj /t:PostPackSign" />
-
-        <MSBuild Projects="$(SrcDir)dotnet-new3\dotnet-new3.csproj" Properties="PublishDir=$(DevPath);NoBuild=true" Targets="Publish" StopOnFirstFailure="true"/>
     </Target>
 
     <Target Name="RunTests">
