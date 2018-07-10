@@ -15,14 +15,14 @@ echo Building for full framework
 dotnet msbuild %~dp0\build\CoreBuild.proj /t:GetReady;Restore;Build /p:TargetFramework=net46 /p:Configuration=%DN3B% %*
 
 if %ERRORLEVEL% NEQ 0 (
-    echo "BUILD FAILED"
+    echo BUILD FAILED
     exit /B
 )
 
 echo Building for .NET Core
-dotnet msbuild %~dp0\build\CoreBuild.proj /t:GetReady;Restore;Build;Pack;RunTests /p:TargetFramework=netcoreapp1.1 /p:Configuration=%DN3B% %*
+dotnet msbuild %~dp0\build\CoreBuild.proj /t:GetReady;Restore;Build;Pack;RunTests /p:TargetFramework=netcoreapp2.1 /p:Configuration=%DN3B% %*
 
 if %ERRORLEVEL% NEQ 0 (
-    echo "BUILD FAILED"
+    echo BUILD FAILED
     exit /B
 )

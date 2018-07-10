@@ -1,0 +1,25 @@
+<Project ToolsVersion="15.0">
+    <ItemGroup>
+        <PackageReference Update="System.Diagnostics.Process" Version="4.3.0" />
+        <PackageReference Update="System.IO.Compression" Version="4.3.0" />
+        <PackageReference Update="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
+        <PackageReference Update="System.Runtime.Loader" Version="4.3.0" />
+
+        <PackageReference Update="Newtonsoft.Json" Version="9.0.1" Condition="'$(TargetFramework)' != 'net45'" />
+        <PackageReference Update="Newtonsoft.Json" Version="8.0.3" Condition="'$(TargetFramework)' == 'net45'" />
+        <PackageReference Update="Microsoft.DotNet.Cli.CommandLine" Version="0.1.1-alpha-167" />
+        <PackageReference Update="Microsoft.Extensions.CommandLineUtils" Version="1.1.0" />
+        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="15.8.0-preview-20180610-02" />
+        <PackageReference Update="SourceLink.Create.CommandLine" Version="2.8.0" PrivateAssets="All" />
+        <PackageReference Update="xunit" Version="2.3.1" />
+        <PackageReference Update="xunit.runner.visualstudio" Version="2.3.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <DotNetCliToolReference Update="dotnet-sourcelink" Version="2.8.0" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TestProject)' == 'true'">
+        <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+    </ItemGroup>
+</Project>
