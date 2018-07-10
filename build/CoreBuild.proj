@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
 <Project ToolsVersion="15.0" Sdk="Microsoft.NET.Sdk">
-    <Import Project="..\Version.props"/>
     <Import Project="Loc.Settings.targets" />
 
     <PropertyGroup>
