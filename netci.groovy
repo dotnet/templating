@@ -29,10 +29,10 @@ platformList.each { platform ->
 
     // Calculate the build command
     if (os == 'Windows_NT') {
-        buildCommand = ".\\setup-ci.cmd -Configuration ${configuration}"
+        buildCommand = ".\\build.cmd -Configuration ${configuration}"
     }
     else if (os == 'Windows_2016') {
-        buildCommand = ".\\setup-ci.cmd -Configuration ${configuration}"
+        buildCommand = ".\\build.cmd -Configuration ${configuration}"
     }
     else if (os == 'Ubuntu') {
         buildCommand = "./build.sh --configuration ${configuration}"
