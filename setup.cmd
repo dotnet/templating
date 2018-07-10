@@ -1,7 +1,7 @@
 @echo off
 
 doskey setup="%~dp0\setup.cmd"
-doskey build="%~dp0\dn3build.cmd"
+doskey build="%~dp0\build.cmd"
 doskey debug="%~dp0\dn3buildmode-debug.cmd"
 doskey release="%~dp0\dn3buildmode-release.cmd"
 doskey hardreset="%~dp0\hardreset.cmd"
