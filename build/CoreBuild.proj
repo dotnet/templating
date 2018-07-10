@@ -77,8 +77,8 @@
                  Properties="PackageOutputPath=$(_PackageOutputPath);NoBuild=true;IncludeSymbols=true"
                  Targets="Pack" StopOnFirstFailure="true" Condition="'$(SkipPack)' != 'true'"/>
 
-        <Message Importance="High" Text="Signing packages..." Condition="'$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test' AND '$(SkipPack)' != 'true'"/>
-        <MSBuild Condition="'$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test' AND '$(SkipPack)' != 'true'"
+        <Message Importance="High" Text="Signing packages..." Condition="('$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test') AND '$(SkipPack)' != 'true'"/>
+        <MSBuild Condition="('$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test') AND '$(SkipPack)' != 'true'"
                  Projects="$(BuildDir)sign.proj"
                  Targets="PostPackSign"
                  RunEachTargetSeparately="true" StopOnFirstFailure="true" />
