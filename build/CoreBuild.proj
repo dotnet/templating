@@ -65,7 +65,7 @@
                  Projects="$(BuildDir)sign.proj"
                  Targets="PostCompileSign" RunEachTargetSeparately="true" StopOnFirstFailure="true"/>
 
-        <Message Importance="High" Text="Packing artifacts..."/>
+        <Message Importance="High" Text="Packing artifacts..." Condition="'$(SkipPack)' != 'true'"/>
         <MSBuild Projects="$(SrcDir)Microsoft.TemplateEngine.Abstractions\Microsoft.TemplateEngine.Abstractions.csproj;
                            $(SrcDir)Microsoft.TemplateEngine.Cli\Microsoft.TemplateEngine.Cli.csproj;
                            $(SrcDir)Microsoft.TemplateEngine.Core\Microsoft.TemplateEngine.Core.csproj;
@@ -75,10 +75,10 @@
                            $(SrcDir)Microsoft.TemplateEngine.Utils\Microsoft.TemplateEngine.Utils.csproj;
                            $(TestDir)Microsoft.TemplateEngine.Mocks\Microsoft.TemplateEngine.Mocks.csproj"
                  Properties="PackageOutputPath=$(_PackageOutputPath);NoBuild=true;IncludeSymbols=true"
-                 Targets="Pack" StopOnFirstFailure="true"/>
+                 Targets="Pack" StopOnFirstFailure="true" Condition="'$(SkipPack)' != 'true'"/>
 
-        <Message Importance="High" Text="Signing packages..." Condition="'$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test'"/>
-        <MSBuild Condition="'$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test'"
+        <Message Importance="High" Text="Signing packages..." Condition="'$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test' AND '$(SkipPack)' != 'true'"/>
+        <MSBuild Condition="'$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test' AND '$(SkipPack)' != 'true'"
                  Projects="$(BuildDir)sign.proj"
                  Targets="PostPackSign"
                  RunEachTargetSeparately="true" StopOnFirstFailure="true" />
@@ -112,7 +112,7 @@
                  Projects="$(BuildDir)sign.proj"
                  Targets="PostCompileLocSign" RunEachTargetSeparately="true" StopOnFirstFailure="true"/>
 
-        <MSBuild Projects="$(SrcDir)Microsoft.TemplateEngine.Cli.Localization\Microsoft.TemplateEngine.Cli.Localization.csproj" 
+        <MSBuild Projects="$(SrcDir)Microsoft.TemplateEngine.Cli.Localization\Microsoft.TemplateEngine.Cli.Localization.csproj"
                  Targets="Restore;Build;Pack" RunEachTargetSeparately="true" StopOnFirstFailure="true"
                  Properties="Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath)"/>
     </Target>
