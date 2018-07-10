@@ -13,7 +13,7 @@ CALL "%~dp0\harderreset.cmd"
 mkdir %~dp0\dev 1>nul
 
 echo Building for full framework
-%~dp0\.dotnet\dotnet msbuild %~dp0\build\CoreBuild.proj /t:GetReady;Restore;Build /p:TargetFramework=net46 /p:Configuration=Release
+msbuild %~dp0\build\CoreBuild.proj /t:GetReady;Restore;Build /p:TargetFramework=net46 /p:Configuration=Release
 
 if %ERRORLEVEL% NEQ 0 (
     echo BUILD FAILED
@@ -21,7 +21,7 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 echo Building for .NET Core
-%~dp0\.dotnet\dotnet msbuild %~dp0\build\CoreBuild.proj /t:GetReady;Restore;Build;Pack;RunTests /p:TargetFramework=netcoreapp2.1 /p:Configuration=Release
+msbuild %~dp0\build\CoreBuild.proj /t:GetReady;Restore;Build;Pack;RunTests /p:TargetFramework=netcoreapp2.1 /p:Configuration=Release
 
 if %ERRORLEVEL% NEQ 0 (
     echo BUILD FAILED
