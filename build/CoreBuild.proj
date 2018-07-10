@@ -11,7 +11,6 @@
         <TemplatesOutputPath>$(ArtifactsDir)templates\</TemplatesOutputPath>
         <CopyBuildOutputToOutputDirectory>false</CopyBuildOutputToOutputDirectory>
         <IncludeBuildOutput>False</IncludeBuildOutput>
-        <IncludeBuildOutput>False</IncludeBuildOutput>
         <IncludeSource>False</IncludeSource>
         <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
         <EnableDefaultItems>False</EnableDefaultItems>
