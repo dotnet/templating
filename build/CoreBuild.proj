@@ -51,8 +51,9 @@
     <Target Name="CoreCompile"/>
 
     <Target Name="PostCompileSign">
-        <Exec Condition="'$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test'"
-              Command="msbuild $(BuildDir)sign.proj /t:PostCompileSign" />
+        <MSbuild Condition="'$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test'"
+                 Projects="$(BuildDir)sign.proj"
+                 Targets="PostCompileSign" RunEachTargetSeparately="true" StopOnFirstFailure="true" />
     </Target>
 
     <Target Name="PackAll" BeforeTargets="Pack">
