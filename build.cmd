@@ -1,7 +1,7 @@
 @echo off
 SET DN3BASEDIR=%~dp0
 
-PUSHD %~dp0\src
+PUSHD .
 SET DN3B=Release
 echo Using build configuration "%DN3B%"...
 
