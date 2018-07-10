@@ -50,6 +50,11 @@
     <Target Name="CreateManifestResourceNames"/>
     <Target Name="CoreCompile"/>
 
+    <Target Name="PostCompileSign">
+        <Exec Condition="'$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test'"
+              Command="msbuild $(BuildDir)sign.proj /t:PostCompileSign" />
+    </Target>
+
     <Target Name="PackAll" BeforeTargets="Pack">
         <Message Importance="High" Text="Packaging templates..."/>
         <MSBuild Projects="..\template_feed\Template.proj"
@@ -59,10 +64,6 @@
         <MSBuild Condition="'$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test'"
                  Projects="$(BuildDir)Sign.csproj"
                  Targets="Restore" RunEachTargetSeparately="true" StopOnFirstFailure="true"/>
-
-        <Exec Condition="'$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test'"
-              Command="msbuild $(BuildDir)sign.proj /t:PostCompileSign" />
-
         <Message Importance="High" Text="Packing artifacts..." Condition="'$(SkipPack)' != 'true'"/>
         <MSBuild Projects="$(SrcDir)Microsoft.TemplateEngine.Abstractions\Microsoft.TemplateEngine.Abstractions.csproj;
                            $(SrcDir)Microsoft.TemplateEngine.Cli\Microsoft.TemplateEngine.Cli.csproj;
@@ -80,8 +81,9 @@
 
     <Target Name="SignPackages">
         <Message Importance="High" Text="Signing packages..." Condition="('$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test') AND '$(SkipPack)' != 'true'"/>
-        <Exec Condition="('$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test') AND '$(SkipPack)' != 'true'"
-              Command="msbuild $(BuildDir)sign.proj /t:PostPackSign" />
+        <MSBuild Condition="('$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test') AND '$(SkipPack)' != 'true'"
+                 Projects="$(BuildDir)sign.proj"
+                 Targets="PostPackSign" RunEachTargetSeparately="true" StopOnFirstFailure="true" />
     </Target>
 
     <Target Name="RunTests">
@@ -117,8 +119,9 @@
 
     <Target Name="SignLocPackages">
         <!-- Sign the newly packed files -->
-        <Exec Condition="'$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test'"
-              Command="msbuild $(BuildDir)sign.proj /t:PostPackLocSign" />
+        <MSBuild Condition="'$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test'"
+                 Projects="$(BuildDir)sign.proj"
+                 Targets="PostPackLocSign" RunEachTargetSeparately="true" StopOnFirstFailure="true" />
     </Target>
 
     <Target Name="SetLanguages">
