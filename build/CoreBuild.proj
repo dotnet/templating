@@ -81,15 +81,30 @@
 
     <Target Name="RunTests">
         <Message Importance="High" Text="Running tests..." Condition="'$(TargetFramework)' != 'net46' AND '$(PB_SkipTests)' != 'true'"/>
-        <MSBuild Condition="'$(TargetFramework)' != 'net46' AND '$(PB_SkipTests)' != 'true'"
-                 Projects="$(TestDir)Microsoft.TemplateEngine.Core.UnitTests\Microsoft.TemplateEngine.Core.UnitTests.csproj;
-                           $(TestDir)Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests\Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.csproj;
-                           $(TestDir)Microsoft.TemplateEngine.Utils.UnitTests\Microsoft.TemplateEngine.Utils.UnitTests.csproj;
-                           $(TestDir)Microsoft.TemplateEngine.Cli.UnitTests\Microsoft.TemplateEngine.Cli.UnitTests.csproj;
-                           $(TestDir)Microsoft.TemplateEngine.Edge.UnitTests\Microsoft.TemplateEngine.Edge.UnitTests.csproj;
-                           $(TestDir)dotnet-new3.UnitTests\dotnet-new3.UnitTests.csproj"
-                 Targets="VSTest" RunEachTargetSeparately="true" StopOnFirstFailure="true"
-                 Properties="Configuration=$(Configuration);VSTestLogger=trx;VSTestNoBuild=true;VSTestResultsDirectory=$(TestResultsPath)"/>
+        <Exec Condition="'$(TargetFramework)' != 'net46' AND '$(PB_SkipTests)' != 'true'"
+              Command="dotnet msbuild $(TestDir)Microsoft.TemplateEngine.Core.UnitTests\Microsoft.TemplateEngine.Core.UnitTests.csproj /t:VSTest /p:Configuration=$(Configuration);VSTestLogger=trx;VSTestNoBuild=true;VSTestResultsDirectory=$(TestResultsPath)"
+              />
+
+        <Exec Condition="'$(TargetFramework)' != 'net46' AND '$(PB_SkipTests)' != 'true'"
+              Command="dotnet msbuild $(TestDir)Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests\Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.csproj /t:VSTest /p:Configuration=$(Configuration);VSTestLogger=trx;VSTestNoBuild=true;VSTestResultsDirectory=$(TestResultsPath)"
+              />
+
+        <Exec Condition="'$(TargetFramework)' != 'net46' AND '$(PB_SkipTests)' != 'true'"
+              Command="dotnet msbuild $(TestDir)Microsoft.TemplateEngine.Utils.UnitTests\Microsoft.TemplateEngine.Utils.UnitTests.csproj /t:VSTest /p:Configuration=$(Configuration);VSTestLogger=trx;VSTestNoBuild=true;VSTestResultsDirectory=$(TestResultsPath)"
+              />
+
+        <Exec Condition="'$(TargetFramework)' != 'net46' AND '$(PB_SkipTests)' != 'true'"
+              Command="dotnet msbuild $(TestDir)Microsoft.TemplateEngine.Cli.UnitTests\Microsoft.TemplateEngine.Cli.UnitTests.csproj /t:VSTest /p:Configuration=$(Configuration);VSTestLogger=trx;VSTestNoBuild=true;VSTestResultsDirectory=$(TestResultsPath)"
+              />
+
+        <Exec Condition="'$(TargetFramework)' != 'net46' AND '$(PB_SkipTests)' != 'true'"
+              Command="dotnet msbuild $(TestDir)Microsoft.TemplateEngine.Edge.UnitTests\Microsoft.TemplateEngine.Edge.UnitTests.csproj /t:VSTest /p:Configuration=$(Configuration);VSTestLogger=trx;VSTestNoBuild=true;VSTestResultsDirectory=$(TestResultsPath)"
+              />
+
+        <Exec Condition="'$(TargetFramework)' != 'net46' AND '$(PB_SkipTests)' != 'true'"
+              Command="dotnet msbuild $(TestDir)dotnet-new3.UnitTests\dotnet-new3.UnitTests.csproj /t:VSTest /p:Configuration=$(Configuration);VSTestLogger=trx;VSTestNoBuild=true;VSTestResultsDirectory=$(TestResultsPath)"
+              />
+
     </Target>
 
     <Target Name="BuildLocalized" DependsOnTargets="SetLanguages" Condition="Exists('$(ToolsTempDir)loc\loc.proj')">
