@@ -292,6 +292,15 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Alias names can only contain letters, numbers, underscores, and periods..
+        /// </summary>
+        public static string AliasNameContainsInvalidCharacters {
+            get {
+                return ResourceManager.GetString("AliasNameContainsInvalidCharacters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Alias not created. The input was invalid..
         /// </summary>
         public static string AliasNotCreatedInvalidInput {
@@ -934,15 +943,6 @@ namespace Microsoft.TemplateEngine.Cli {
         public static string MultipleValuesSpecifiedForSingleValuedParameter {
             get {
                 return ResourceManager.GetString("MultipleValuesSpecifiedForSingleValuedParameter", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Name cannot contain any of the following characters: {0}.
-        /// </summary>
-        public static string NameContainsInvalidCharacters {
-            get {
-                return ResourceManager.GetString("NameContainsInvalidCharacters", resourceCulture);
             }
         }
         
