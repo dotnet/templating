@@ -42,7 +42,7 @@
 
     <Target Name="GetReady" BeforeTargets="Build">
         <Message Importance="High" Text="Generating Git Info..."/>
-        <MakeDir Directories="$(ArtifactsDir);$(PackageOutputPath);$(TemplatesOutputPath);$(DevPath);$(TestResultsPath)"/>
+        <MakeDir Directories="$(ArtifactsDir);$(_PackageOutputPath);$(TemplatesOutputPath);$(DevPath);$(TestResultsPath)"/>
         <CallTarget Targets="CollectGitInfo"/>
         <Message Importance="High" Text="Git Info Generated."/>
     </Target>
@@ -115,7 +115,7 @@
 
         <MSBuild Projects="$(SrcDir)Microsoft.TemplateEngine.Cli.Localization\Microsoft.TemplateEngine.Cli.Localization.csproj"
                  Targets="Restore;Build;Pack" RunEachTargetSeparately="true" StopOnFirstFailure="true"
-                 Properties="Configuration=$(Configuration);PackageOutputPath=$(PackageOutputPath)"/>
+                 Properties="Configuration=$(Configuration);PackageOutputPath=$(_PackageOutputPath)"/>
     </Target>
 
     <Target Name="SignLocPackages">
