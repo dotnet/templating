@@ -13,14 +13,15 @@ PUSHD %~dp0
 IF "%DN3B%" == "" (SET DN3B=Release)
 echo Using build configuration "%DN3B%"...
 
-IF "%DN3FFB%" == "" (SET DN3FFB=$true)
+powershell -NoProfile -NoLogo -Command "& \"%~dp0tools\AcquireDotnet.ps1\" %*; exit $LastExitCode;"
+if %errorlevel% neq 0 exit /b %errorlevel%
 
 CALL "%~dp0\harderreset.cmd"
 
 mkdir %~dp0\dev 1>nul
 
 echo Building for full framework
-dotnet msbuild %~dp0\build\CoreBuild.proj /t:GetReady;Restore;Build /p:TargetFramework=net46 /p:Configuration=%DN3B% %*
+%~dp0\.dotnet\dotnet msbuild %~dp0\build\CoreBuild.proj /t:GetReady;Restore;Build /p:TargetFramework=net46 /p:Configuration=%DN3B% %*
 
 if %ERRORLEVEL% NEQ 0 (
     echo BUILD FAILED
@@ -28,7 +29,7 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 echo Building for .NET Core
-dotnet msbuild %~dp0\build\CoreBuild.proj /t:GetReady;Restore;Build;Pack;RunTests /p:TargetFramework=netcoreapp2.1 /p:Configuration=%DN3B% %*
+%~dp0\.dotnet\dotnet msbuild %~dp0\build\CoreBuild.proj /t:GetReady;Restore;Build;Pack;RunTests /p:TargetFramework=netcoreapp2.1 /p:Configuration=%DN3B% %*
 
 if %ERRORLEVEL% NEQ 0 (
     echo BUILD FAILED
