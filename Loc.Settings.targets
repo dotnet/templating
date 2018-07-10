@@ -11,7 +11,7 @@
         <SrcLocale>$(Lang)</SrcLocale>
         <LSBuildLang>$(Lang)</LSBuildLang>
         <LocToolsPath>$(MSBuildThisFileDirectory).tools\loc</LocToolsPath>
-        <LocPath>$(MSBuildThisFileDirectory)..\localize</LocPath>
+        <LocPath>$(MSBuildThisFileDirectory)localize</LocPath>
         <LciPath>$(LocPath)\comments</LciPath>
         <LSBuild>$(LocToolsPath)\lsbuild.exe</LSBuild>
         <AllLanguages>ploc;chs;cht;deu;esn;fra;ita;jpn;kor;rus;ptb;plk;csy;trk</AllLanguages>
