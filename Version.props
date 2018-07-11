@@ -9,6 +9,7 @@
     <BUILD_NUMBER Condition="'$(BUILD_NUMBER)' == '0' And '$(BUILD_BUILDNUMBER)' != ''">$(BUILD_BUILDNUMBER)</BUILD_NUMBER>
     <AssemblyReleaseVersion>$(PackageReleaseVersion).0</AssemblyReleaseVersion>
     <PackageVersion Condition="'$(NO_TIMESTAMP)' != 'true'">$(PackageVersion)-$(PackageDateTime)-$(BUILD_NUMBER)</PackageVersion>
+    <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
   </PropertyGroup>
   <PropertyGroup>
     <Authors>Microsoft</Authors>
@@ -18,11 +19,8 @@
     <Tags>template</Tags>
     <Company>Microsoft</Company>
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
-    <ArtifactsFolder>$(MSBuildThisFileDirectory)artifacts\</ArtifactsFolder>
-    <TemplatesFolder>$(ArtifactsFolder)templates\</TemplatesFolder>
-    <TemplatesNoTimestampFolder>$(ArtifactsFolder)templates-notimestamp\</TemplatesNoTimestampFolder>
-    <BuildToolsFolder>$(MSBuildThisFileDirectory).tools\</BuildToolsFolder>
-    <NuGet>&quot;$(BuildToolsFolder)nuget.exe&quot;</NuGet>
+    
+    <NuGet>&quot;$(ToolsTempDir)nuget.exe&quot;</NuGet>
 
     <GenerateAssemblyInfo Condition="'$(BuildingInsideVisualStudio)' != ''">False</GenerateAssemblyInfo>
     <GenerateAssemblyFileVersionAttribute>False</GenerateAssemblyFileVersionAttribute>
@@ -33,8 +31,6 @@
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)Key.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <GitInfoFile>$(MSBuildThisFileDirectory)artifacts\GitInfo.cs</GitInfoFile>
-    <GitInfoProps>$(MSBuildThisFileDirectory)artifacts\GitInfo.props</GitInfoProps>
   </PropertyGroup>
   <Target Name="CollectGitInfo">
     <PropertyGroup>
@@ -101,7 +97,7 @@ namespace Microsoft.TemplateEngine
 
     <ItemGroup>
         <Compile Include="$(GitInfoFile)" Condition="Exists('$(GitInfoFile)')" Link="%(RecursiveDir)%(Filename)%(Extension)" />
-        <Compile Include="$(MSBuildThisFileDirectory)src/GitInfo.cs" Condition="!Exists('$(GitInfoFile)')" Link="%(RecursiveDir)%(Filename)%(Extension)" />
+        <Compile Include="$(SrcDir)GitInfo.cs" Condition="!Exists('$(GitInfoFile)')" Link="%(RecursiveDir)%(Filename)%(Extension)" />
     </ItemGroup>
 
   <Import Project="$(GitInfoProps)" Condition="Exists('$(GitInfoProps)')" />

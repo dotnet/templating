@@ -9,7 +9,7 @@ def project = GithubProject
 def branch = GithubBranchName
 def isPR = true
 
-def platformList = ['Linux:x64:Release', 'Debian8.2:x64:Debug', 'Ubuntu:x64:Release', 'Ubuntu16.04:x64:Debug', 'Ubuntu16.10:x64:Debug', 'Windows_NT:x64:Release', 'Windows_NT:x86:Debug', 'RHEL7.2:x64:Release', 'CentOS7.1:x64:Debug']
+def platformList = []
 //Temporarily removing OSX10.12 from the list of configuratons to build until we can find a way to troubleshoot it
 //  'OSX10.12:x64:Release', 
 
@@ -29,10 +29,10 @@ platformList.each { platform ->
 
     // Calculate the build command
     if (os == 'Windows_NT') {
-        buildCommand = ".\\build.cmd -Configuration ${configuration}"
+        buildCommand = ".\\build.cmd /p:Configuration=${configuration}"
     }
     else if (os == 'Windows_2016') {
-        buildCommand = ".\\build.cmd -Configuration ${configuration}"
+        buildCommand = ".\\build.cmd /p:Configuration=${configuration}"
     }
     else if (os == 'Ubuntu') {
         buildCommand = "./build.sh --configuration ${configuration}"

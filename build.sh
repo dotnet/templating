@@ -29,9 +29,6 @@ while [[ $# > 0 ]]; do
             export CONFIGURATION=$2
             shift
             ;;
-        --skip-tests)
-            export SKIP_TESTS=true
-            ;;
         --pb_skiptests)
             lowerPbSkipTests="$(echo $2 | awk '{print tolower($0)}')"
             if [ -z $2 ]
@@ -46,12 +43,6 @@ while [[ $# > 0 ]]; do
             ;;
         --ci-build)
             export CI_BUILD=true
-            ;;
-        --no-engine-build)
-            export ENGINE_BUILD=false
-            ;;
-        --no-templates-build)
-            export TEMPLATES_BUILD=false
             ;;
         --help)
             echo "Usage: $0 [--configuration <CONFIGURATION>] [--help]"
@@ -81,7 +72,7 @@ rm -rf $REPOROOT/artifacts
 export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 
 DOTNET_INSTALL_SCRIPT_URL="https://raw.githubusercontent.com/dotnet/cli/master/scripts/obtain/dotnet-install.sh"
-curl -sSL "$DOTNET_INSTALL_SCRIPT_URL" | bash /dev/stdin --verbose --version 1.0.4
+curl -sSL "$DOTNET_INSTALL_SCRIPT_URL" | bash /dev/stdin --verbose --version 2.1.400-preview-009063
 
 # Put stage 0 on the PATH (for this shell only)
 PATH="$DOTNET_INSTALL_DIR:$PATH"
@@ -95,4 +86,4 @@ then
 fi
 
 export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
-$DOTNET_INSTALL_DIR/dotnet msbuild "$REPOROOT/build.proj" /t:Build\;Test /p:Configuration=$CONFIGURATION /p:CIBuild=$CI_BUILD /p:EngineBuild=$ENGINE_BUILD /p:TemplatesBuild=$TEMPLATES_BUILD /p:SkipTests=$SKIP_TESTS /p:PB_SkipTests=$PB_SKIPTESTS
+$DOTNET_INSTALL_DIR/dotnet msbuild "$REPOROOT/build/CoreBuild.proj" /t:GetReady\;Restore\;Build\;Pack\;RunTests /p:SkipPack=true /p:TargetFramework=netcoreapp2.1 /p:Configuration=$CONFIGURATION /p:CIBuild=$CI_BUILD /p:PB_SkipTests=$PB_SKIPTESTS
