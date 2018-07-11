@@ -3,7 +3,7 @@
 
   <!-- Core assemblies -->
   <ItemGroup>
-    <Loc Include="$(OutputPath)Microsoft.TemplateEngine.Cli.dll">
+    <Loc Include="$(MSBuildThisFileDirectory)..\src\Microsoft.TemplateEngine.Cli\bin\**\Microsoft.TemplateEngine.Cli.dll">
       <LclFile Condition="Exists('$(LclFileRoot)\Microsoft.TemplateEngine.Cli.resources.dll.lcl')">$(LclFileRoot)\Microsoft.TemplateEngine.Cli.resources.dll.lcl</LclFile>
     </Loc>
   </ItemGroup>

@@ -1,0 +1,140 @@
+<?xml version="1.0"?>
+<Project ToolsVersion="15.0" Sdk="Microsoft.NET.Sdk">
+    <Import Project="..\Loc.Settings.targets" />
+
+    <PropertyGroup>
+        <RepoRoot>$(MSBuildThisFileDirectory)..\</RepoRoot>
+        <ArtifactsDir>$(RepoRoot)artifacts\</ArtifactsDir>
+        <DevPath>$(RepoRoot)dev\</DevPath>
+        <_PackageOutputPath>$(ArtifactsDir)packages\</_PackageOutputPath>
+        <TestResultsPath>$(ArtifactsDir)test_results\</TestResultsPath>
+        <TemplatesOutputPath>$(ArtifactsDir)templates\</TemplatesOutputPath>
+        <CopyBuildOutputToOutputDirectory>false</CopyBuildOutputToOutputDirectory>
+        <IncludeBuildOutput>False</IncludeBuildOutput>
+        <IncludeSource>False</IncludeSource>
+        <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+        <EnableDefaultItems>False</EnableDefaultItems>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="$(SrcDir)dotnet-new3\dotnet-new3.csproj" Condition="'$(TargetFramework)' != 'net46'"/>
+        <ProjectReference Include="$(SrcDir)Microsoft.TemplateEngine.Cli\Microsoft.TemplateEngine.Cli.csproj" Condition="'$(TargetFramework)' != 'net46'"/>
+        <ProjectReference Include="$(SrcDir)Microsoft.TemplateEngine.Abstractions\Microsoft.TemplateEngine.Abstractions.csproj"/>
+        <ProjectReference Include="$(SrcDir)Microsoft.TemplateEngine.Core\Microsoft.TemplateEngine.Core.csproj"/>
+        <ProjectReference Include="$(SrcDir)Microsoft.TemplateEngine.Core.Contracts\Microsoft.TemplateEngine.Core.Contracts.csproj"/>
+        <ProjectReference Include="$(SrcDir)Microsoft.TemplateEngine.Edge\Microsoft.TemplateEngine.Edge.csproj"/>
+        <ProjectReference Include="$(SrcDir)Microsoft.TemplateEngine.Orchestrator.RunnableProjects\Microsoft.TemplateEngine.Orchestrator.RunnableProjects.csproj"/>
+        <ProjectReference Include="$(SrcDir)Microsoft.TemplateEngine.Utils\Microsoft.TemplateEngine.Utils.csproj"/>
+
+        <ProjectReference Include="$(TestDir)Microsoft.TemplateEngine.Mocks\Microsoft.TemplateEngine.Mocks.csproj"/>
+        <ProjectReference Include="$(TestDir)Microsoft.TemplateEngine.TestHelper\Microsoft.TemplateEngine.TestHelper.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' != 'net46' AND '$(PB_SkipTests)' != 'true'">
+        <ProjectReference Include="$(TestDir)dotnet-new3.UnitTests\dotnet-new3.UnitTests.csproj"/>
+        <ProjectReference Include="$(TestDir)Microsoft.TemplateEngine.Cli.UnitTests\Microsoft.TemplateEngine.Cli.UnitTests.csproj"/>
+        <ProjectReference Include="$(TestDir)Microsoft.TemplateEngine.Core.UnitTests\Microsoft.TemplateEngine.Core.UnitTests.csproj"/>
+        <ProjectReference Include="$(TestDir)Microsoft.TemplateEngine.Edge.UnitTests\Microsoft.TemplateEngine.Edge.UnitTests.csproj"/>
+        <ProjectReference Include="$(TestDir)Microsoft.TemplateEngine.EndToEndTestHarness\Microsoft.TemplateEngine.EndToEndTestHarness.csproj"/>
+        <ProjectReference Include="$(TestDir)Microsoft.TemplateEngine.Utils.UnitTests\Microsoft.TemplateEngine.Utils.UnitTests.csproj"/>
+        <ProjectReference Include="$(TestDir)Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests\Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.csproj"/>
+    </ItemGroup>
+
+    <Target Name="GetReady" BeforeTargets="Build">
+        <Message Importance="High" Text="Generating Git Info..."/>
+        <MakeDir Directories="$(ArtifactsDir);$(_PackageOutputPath);$(TemplatesOutputPath);$(DevPath);$(TestResultsPath)"/>
+        <CallTarget Targets="CollectGitInfo"/>
+        <Message Importance="High" Text="Git Info Generated."/>
+    </Target>
+
+    <Target Name="CreateManifestResourceNames"/>
+    <Target Name="CoreCompile"/>
+
+    <Target Name="PostCompileSign">
+        <MSbuild Condition="'$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test'"
+                 Projects="$(BuildDir)sign.proj"
+                 Targets="PostCompileSign" RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+    </Target>
+
+    <Target Name="PackAll" BeforeTargets="Pack">
+        <Message Importance="High" Text="Packaging templates..."/>
+        <MSBuild Projects="..\template_feed\Template.proj"
+                 Targets="Build" RunEachTargetSeparately="true" StopOnFirstFailure="true"/>
+
+        <Message Importance="High" Text="Signing artifacts..." Condition="'$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test'"/>
+        <MSBuild Condition="'$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test'"
+                 Projects="$(BuildDir)Sign.csproj"
+                 Targets="Restore" RunEachTargetSeparately="true" StopOnFirstFailure="true"/>
+        <Message Importance="High" Text="Packing artifacts..." Condition="'$(SkipPack)' != 'true'"/>
+        <MSBuild Projects="$(SrcDir)Microsoft.TemplateEngine.Abstractions\Microsoft.TemplateEngine.Abstractions.csproj;
+                           $(SrcDir)Microsoft.TemplateEngine.Cli\Microsoft.TemplateEngine.Cli.csproj;
+                           $(SrcDir)Microsoft.TemplateEngine.Core\Microsoft.TemplateEngine.Core.csproj;
+                           $(SrcDir)Microsoft.TemplateEngine.Core.Contracts\Microsoft.TemplateEngine.Core.Contracts.csproj;
+                           $(SrcDir)Microsoft.TemplateEngine.Edge\Microsoft.TemplateEngine.Edge.csproj;
+                           $(SrcDir)Microsoft.TemplateEngine.Orchestrator.RunnableProjects\Microsoft.TemplateEngine.Orchestrator.RunnableProjects.csproj;
+                           $(SrcDir)Microsoft.TemplateEngine.Utils\Microsoft.TemplateEngine.Utils.csproj;
+                           $(TestDir)Microsoft.TemplateEngine.Mocks\Microsoft.TemplateEngine.Mocks.csproj"
+                 Properties="PackageOutputPath=$(_PackageOutputPath);NoBuild=true;IncludeSymbols=true"
+                 Targets="Pack" StopOnFirstFailure="true" Condition="'$(SkipPack)' != 'true'"/>
+
+        <MSBuild Projects="$(SrcDir)dotnet-new3\dotnet-new3.csproj" Properties="PublishDir=$(DevPath);NoBuild=true" Targets="Publish" StopOnFirstFailure="true"/>
+    </Target>
+
+    <Target Name="SignPackages">
+        <Message Importance="High" Text="Signing packages..." Condition="('$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test') AND '$(SkipPack)' != 'true'"/>
+        <MSBuild Condition="('$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test') AND '$(SkipPack)' != 'true'"
+                 Projects="$(BuildDir)sign.proj"
+                 Targets="PostPackSign" RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+    </Target>
+
+    <Target Name="RunTests">
+        <Message Importance="High" Text="Running tests..." Condition="'$(TargetFramework)' != 'net46' AND '$(PB_SkipTests)' != 'true'"/>
+        <MSBuild Condition="'$(TargetFramework)' != 'net46' AND '$(PB_SkipTests)' != 'true'"
+                 Projects="$(TestDir)Microsoft.TemplateEngine.Core.UnitTests\Microsoft.TemplateEngine.Core.UnitTests.csproj;
+                           $(TestDir)Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests\Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.csproj;
+                           $(TestDir)Microsoft.TemplateEngine.Utils.UnitTests\Microsoft.TemplateEngine.Utils.UnitTests.csproj;
+                           $(TestDir)Microsoft.TemplateEngine.Cli.UnitTests\Microsoft.TemplateEngine.Cli.UnitTests.csproj;
+                           $(TestDir)Microsoft.TemplateEngine.Edge.UnitTests\Microsoft.TemplateEngine.Edge.UnitTests.csproj;
+                           $(TestDir)dotnet-new3.UnitTests\dotnet-new3.UnitTests.csproj"
+                 Targets="VSTest" RunEachTargetSeparately="true" StopOnFirstFailure="true"
+                 Properties="Configuration=$(Configuration);VSTestLogger=trx;VSTestNoBuild=true;VSTestResultsDirectory=$(TestResultsPath)"/>
+    </Target>
+
+    <Target Name="BuildLocalized" DependsOnTargets="SetLanguages" Condition="Exists('$(ToolsTempDir)loc\loc.proj')">
+        <MSBuild Projects="$(ToolsTempDir)loc\loc.proj"
+                 Targets="Build"
+                 Properties="Lang=%(Languages.Identity)"/>
+
+        <!-- Strong name the localized assemblies-->
+        <MSBuild Projects="$(BuildDir)sign.proj"
+                 Targets="SNSignLocResources" RunEachTargetSeparately="true" StopOnFirstFailure="true"/>
+
+        <MSBuild Condition="'$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test'"
+                 Projects="$(BuildDir)sign.proj"
+                 Targets="PostCompileLocSign" RunEachTargetSeparately="true" StopOnFirstFailure="true"/>
+
+        <MSBuild Projects="$(SrcDir)Microsoft.TemplateEngine.Cli.Localization\Microsoft.TemplateEngine.Cli.Localization.csproj"
+                 Targets="Restore;Build;Pack" RunEachTargetSeparately="true" StopOnFirstFailure="true"
+                 Properties="Configuration=$(Configuration);PackageOutputPath=$(_PackageOutputPath)"/>
+    </Target>
+
+    <Target Name="SignLocPackages">
+        <!-- Sign the newly packed files -->
+        <MSBuild Condition="'$(PB_SignType)' == 'real' or '$(PB_SignType)' == 'test'"
+                 Projects="$(BuildDir)sign.proj"
+                 Targets="PostPackLocSign" RunEachTargetSeparately="true" StopOnFirstFailure="true" />
+    </Target>
+
+    <Target Name="SetLanguages">
+        <ItemGroup>
+            <Languages Remove="@(Languages)"/>
+        </ItemGroup>
+
+        <ItemGroup>
+            <Languages Include="$(AllLanguages)" Condition="'$(Lang)' == 'all'"/>
+            <Languages Include="$(Lang)" Condition="'$(Lang)' != 'all'"/>
+            <Languages Include="ploc" Condition="'$(Lang)' == ''"/>
+        </ItemGroup>
+    </Target>
+
+</Project>

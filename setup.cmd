@@ -1,28 +1,40 @@
 @echo off
 
 doskey setup="%~dp0\setup.cmd"
-doskey build="%~dp0\dn3build.cmd"
+doskey build="%~dp0\build.cmd"
 doskey debug="%~dp0\dn3buildmode-debug.cmd"
 doskey release="%~dp0\dn3buildmode-release.cmd"
 doskey hardreset="%~dp0\hardreset.cmd"
 doskey harderreset="%~dp0\harderreset.cmd"
-doskey bundle="%~dp0\bundle.cmd"
-doskey bin="%~dp0\bin.cmd"
 
 SET DN3BASEDIR=%~dp0
 
-PUSHD %~dp0\src
+PUSHD %~dp0
 IF "%DN3B%" == "" (SET DN3B=Release)
 echo Using build configuration "%DN3B%"...
 
-IF "%DN3FFB%" == "" (SET DN3FFB=$true)
+powershell -NoProfile -NoLogo -Command "& \"%~dp0tools\AcquireDotnet.ps1\" %*; exit $LastExitCode;"
+if %errorlevel% neq 0 exit /b %errorlevel%
 
 CALL "%~dp0\harderreset.cmd"
 
 mkdir %~dp0\dev 1>nul
 
-echo "Calling build.ps1"
-powershell -NoProfile -NoLogo -Command "& \"%~dp0build.ps1\" -Configuration %DN3B% -PerformFullFrameworkBuild %DN3FFB% %*; exit $LastExitCode;"
+echo Building for full framework
+%~dp0\.dotnet\dotnet msbuild %~dp0\build\CoreBuild.proj /t:GetReady;Restore;Build /p:TargetFramework=net46 /p:Configuration=%DN3B% %*
+
+if %ERRORLEVEL% NEQ 0 (
+    echo BUILD FAILED
+    exit /B
+)
+
+echo Building for .NET Core
+%~dp0\.dotnet\dotnet msbuild %~dp0\build\CoreBuild.proj /t:GetReady;Restore;Build;Pack;RunTests /p:TargetFramework=netcoreapp2.1 /p:Configuration=%DN3B% %*
+
+if %ERRORLEVEL% NEQ 0 (
+    echo BUILD FAILED
+    exit /B
+)
 
 echo Artifacts built and placed.
 

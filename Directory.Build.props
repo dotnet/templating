@@ -1,0 +1,23 @@
+<Project ToolsVersion="15.0">
+    <PropertyGroup>
+        <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
+
+        <RepoRoot>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory),Microsoft.TemplateEngine.sln))\</RepoRoot>
+        <BuildDir>$(RepoRoot)build\</BuildDir>
+        <ArtifactsDir>$(RepoRoot)artifacts\</ArtifactsDir>
+        <DevDir>$(RepoRoot)dev\</DevDir>
+        <ToolsDir>$(RepoRoot)tools\</ToolsDir>
+        <ToolsTempDir>$(RepoRoot).tools\</ToolsTempDir>
+        <LocalizeDir>$(RepoRoot)localize\</LocalizeDir>
+        <TemplatesDir>$(ArtifactsDir)templates\</TemplatesDir>
+        <TemplatesNoTimestampDir>$(ArtifactsDir)templates-notimestamp\</TemplatesNoTimestampDir>
+
+        <SrcDir>$(RepoRoot)src\</SrcDir>
+        <TestDir>$(RepoRoot)test\</TestDir>
+
+        <GitInfoFile>$(ArtifactsDir)GitInfo.cs</GitInfoFile>
+        <GitInfoProps>$(ArtifactsDir)GitInfo.props</GitInfoProps>
+    </PropertyGroup>
+
+    <Import Project="Version.props" />
+</Project>
