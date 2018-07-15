@@ -12,6 +12,15 @@
     <Disp Icon="Str" Expand="true" Disp="true" LocTbl="false" Path=" \ ;Managed Resources \ 0 \ 0" />
     <Item ItemId=";Strings" ItemType="0" PsrId="211" Leaf="false">
       <Disp Icon="Str" LocTbl="false" />
+      <Item ItemId=";ActionWouldHaveBeenTakenAutomatically" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Action would have been taken automatically:]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Azione che verrebbe intrapresa automaticamente:]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";AddProjToSlnPostActionFailed" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[Failed to add project(s) {0} to solution file {1}]]></Val>
@@ -515,10 +524,13 @@
       </Item>
       <Item ItemId=";CommitHash" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[ Commit Hash: {0}]]></Val>
+          <Val><![CDATA[Commit Hash:]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[ Hash commit: {0}]]></Val>
+            <Val><![CDATA[Hash commit:]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[ Commit Hash: {0}]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -660,6 +672,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";DryRunDescription" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Displays a summary of what would happen if the given command line were run if it would result in a template creation.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Visualizza un riepilogo di quello che accadrebbe se in seguito all'esecuzione della riga di comando venisse creato un modello.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";ExtraArgsCommandAfterExpansion" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[After expanding the extra args files, the command is:]D;]A;    dotnet {0}]]></Val>
@@ -686,6 +707,15 @@
           <Val><![CDATA[Factory]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Factory]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";FileActionsWouldHaveBeenTaken" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[File actions would have been taken:]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Azioni su file che verrebbero intraprese:]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -878,6 +908,15 @@
           <Val><![CDATA[Mandatory parameter {0} missing for template {1}.]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[Manca il parametro obbligatorio {0} per il modello {1}.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";MissingTemplateContentDetected" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Unable to locate the specified template content, the template cache may be corrupted. Try running 'dotnet {0} --debug:reinit' to fix the issue.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[Non è possibile individuare il contenuto del modello specificato. È possibile che la cache del modello sia danneggiata. Per risolvere il problema, provare a eseguire 'dotnet {0} --debug:reinit'.]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1454,10 +1493,13 @@
       </Item>
       <Item ItemId=";Version" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
-          <Val><![CDATA[ Version:     {0}]]></Val>
+          <Val><![CDATA[Version:]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[ Versione:     {0}]]></Val>
+            <Val><![CDATA[Versione:]]></Val>
           </Tgt>
+          <Prev Cat="Text">
+            <Val><![CDATA[ Version:     {0}]]></Val>
+          </Prev>
         </Str>
         <Disp Icon="Str" />
       </Item>
@@ -1485,7 +1527,7 @@
     <Disp Icon="Ver" Disp="true" LocTbl="false" Path=" \ ;Version \ 8 \ 0" />
     <Item ItemId=";AssemblyVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.1.45932]]></Val>
+        <Val><![CDATA[1.0.2.0]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1518,7 +1560,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.1.45932]]></Val>
+        <Val><![CDATA[1.0.2.0]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -1557,7 +1599,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.1-beta3-20180316-1487702+1868.d7f133f499ef5f3c6550e0d8a8f197fff43a3767]]></Val>
+        <Val><![CDATA[1.0.2-beta3-20180710-1844914+1946.54803cb44965cab97b21e4568b3d14e4130cc02d]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
