@@ -8,7 +8,7 @@
 
         <PackageReference Update="Microsoft.DotNet.Cli.CommandLine" Version="0.1.1-alpha-167" />
         <PackageReference Update="Microsoft.Extensions.CommandLineUtils" Version="1.1.0" />
-        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="15.8.0-preview-20180610-02" />
+        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="15.8.0" />
         <PackageReference Update="Newtonsoft.Json" Version="10.0.3" />
         <PackageReference Update="SourceLink.Create.CommandLine" Version="2.8.0" PrivateAssets="All" />
         <PackageReference Update="xunit" Version="2.3.1" />
