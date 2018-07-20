@@ -822,6 +822,15 @@
         </Str>
         <Disp Icon="Str" />
       </Item>
+      <Item ItemId=";InvalidNameParameter" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Name cannot contain any of the following characters {0} or character codes {1}]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[이름에는 다음 문자 {0} 또는 문자 코드 {1}을(를) 포함할 수 없습니다.]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
       <Item ItemId=";InvalidParameterDefault" ItemType="0" PsrId="211" Leaf="true">
         <Str Cat="Text">
           <Val><![CDATA[{0} {1}]D;]A;    The default value '{1}' is not a valid value for {0}.]]></Val>
@@ -1599,7 +1608,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.2-beta3-20180710-1844914+1946.54803cb44965cab97b21e4568b3d14e4130cc02d]]></Val>
+        <Val><![CDATA[1.0.2-beta3-20180716-1864993+1982.089f64ebc868afb7dc8b3c1fb577d0530f3e2c03]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
