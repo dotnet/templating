@@ -42,15 +42,15 @@ echo Copying configuration for builtins...
 COPY %~dp0\src\dotnet-new3\defaultinstall.*.list %~dp0\dev /Y 1>nul
 
 echo Deleting NuGet caches...
-for /f %%f in ('dir /AD /B "%USERPROFILE%\.nuget\packages\Microsoft.TemplateEngine.*"') do RMDIR "%USERPROFILE%\.nuget\packages\%%f" /S /Q
-for /f %%f in ('dir /AD /B "%USERPROFILE%\.nuget\packages\Microsoft.DotNet.*.Templates.*"') do RMDIR "%USERPROFILE%\.nuget\packages\%%f" /S /Q
+for /f %%f in ('dir /AD /B "%USERPROFILE%\.nuget\packages\Microsoft.TemplateEngine.*"') do RMDIR "%USERPROFILE%\.nuget\packages\%%f" /S /Q 2> nul
+for /f %%f in ('dir /AD /B "%USERPROFILE%\.nuget\packages\Microsoft.DotNet.*.Templates.*"') do RMDIR "%USERPROFILE%\.nuget\packages\%%f" /S /Q 2> nul
 
 echo Done.
 POPD
 
 powershell -NoProfile -NoLogo -Command "& \"%~dp0SetPath.ps1\" -ComputeOnly -DevDir \"%~dp0dev\"; exit $LastExitCode;"
 call "%~dp0\artifacts\NewPath.bat"
-del "%~dp0\artifacts\NewPath.bat"
+del "%~dp0\artifacts\NewPath.bat" 2> nul
 
 echo.
 echo You can now use `setup` from anywhere (in this console session) to run setup again.
