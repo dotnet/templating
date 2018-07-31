@@ -74,7 +74,7 @@
                            $(SrcDir)Microsoft.TemplateEngine.Orchestrator.RunnableProjects\Microsoft.TemplateEngine.Orchestrator.RunnableProjects.csproj;
                            $(SrcDir)Microsoft.TemplateEngine.Utils\Microsoft.TemplateEngine.Utils.csproj;
                            $(TestDir)Microsoft.TemplateEngine.Mocks\Microsoft.TemplateEngine.Mocks.csproj"
-                 Properties="PackageOutputPath=$(_PackageOutputPath);NoBuild=true;IncludeSymbols=true"
+                 Properties="PackageOutputPath=$(_PackageOutputPath);NoBuild=true;IncludeSymbols=true;PackSpecific=$(CoreOnly)"
                  Targets="Pack" StopOnFirstFailure="true" Condition="'$(SkipPack)' != 'true'"/>
 
         <MSBuild Projects="$(SrcDir)dotnet-new3\dotnet-new3.csproj" Properties="PublishDir=$(DevPath);NoBuild=true" Targets="Publish" StopOnFirstFailure="true"/>
