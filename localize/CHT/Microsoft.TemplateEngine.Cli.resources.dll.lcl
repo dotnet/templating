@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <LCX SchemaVersion="6.0" Name="C:\BuildAgent\work\971a9203d238fea8\dev\Microsoft.TemplateEngine.Cli.dll" PsrId="211" FileType="1" SrcCul="en-US" TgtCul="zh-TW" xmlns="http://schemas.microsoft.com/locstudio/2006/6/lcx">
   <OwnedComments>
     <Cmt Name="Dev" />
@@ -557,6 +557,15 @@
           <Val><![CDATA[Couldn't find item to install: "{0}".]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
             <Val><![CDATA[找不到項目可安裝: "{0}"。]]></Val>
+          </Tgt>
+        </Str>
+        <Disp Icon="Str" />
+      </Item>
+      <Item ItemId=";CouldntDetermineFilesToRestore" ItemType="0" PsrId="211" Leaf="true">
+        <Str Cat="Text">
+          <Val><![CDATA[Couldn't determine files to restore.]]></Val>
+          <Tgt Cat="Text" Stat="Loc" Orig="New">
+            <Val><![CDATA[無法判斷要還原的檔案。]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -1608,7 +1617,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.2-beta3-20180716-1864993+1982.089f64ebc868afb7dc8b3c1fb577d0530f3e2c03]]></Val>
+        <Val><![CDATA[1.0.2-beta4-20181001-2078020+2011.830a851868b47b03873e39b909dbcbe3f26dbd16]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
