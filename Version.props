@@ -2,7 +2,7 @@
   <PropertyGroup Condition=" '$(PackageVersion)' == '' ">
     <PackageReleaseVersion>1.0.2</PackageReleaseVersion>
     <PackageBuildQuality>$(BUILD_QUALITY)</PackageBuildQuality>
-    <PackageBuildQuality Condition=" '$(PackageBuildQuality)' == '' ">beta1</PackageBuildQuality>
+    <PackageBuildQuality Condition=" '$(PackageBuildQuality)' == '' ">beta4</PackageBuildQuality>
     <PackageVersion>$(PackageReleaseVersion)-$(PackageBuildQuality)</PackageVersion>
     <PackageDateTime Condition="'$(PackageDateTime)' == ''">$([System.DateTime]::Now.ToString("yyyyMMdd"))</PackageDateTime>
     <BUILD_NUMBER Condition="'$(BUILD_NUMBER)' == ''">0</BUILD_NUMBER>
