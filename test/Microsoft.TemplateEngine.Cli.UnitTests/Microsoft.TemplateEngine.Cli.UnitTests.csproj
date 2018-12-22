@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>    
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <TestProject>true</TestProject>
@@ -10,12 +10,6 @@
 
   <ItemGroup>
     <None Include="TemplateInstallTests/TestTemplates/**/*" CopyToOutputDirectory="Always" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="xunit" />
-    <PackageReference Include="xunit.runner.visualstudio" />
   </ItemGroup>
 
   <ItemGroup>
