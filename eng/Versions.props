@@ -5,6 +5,11 @@
     <UsingToolXliff>false</UsingToolXliff>
   </PropertyGroup>
 
+   <PropertyGroup>
+    <VersionPrefix>1.0.2</VersionPrefix>
+    <PreReleaseVersionLabel>beta4</PreReleaseVersionLabel>
+  </PropertyGroup>
+
   <PropertyGroup>
     <RestoreSources>
       $(RestoreSources);
