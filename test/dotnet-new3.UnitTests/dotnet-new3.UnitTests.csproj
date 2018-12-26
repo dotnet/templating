@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
-  <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
-    <TestProject>true</TestProject>
-  </PropertyGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="$(SrcDir)dotnet-new3\dotnet-new3.csproj" />
-    <ProjectReference Include="$(TestDir)Microsoft.TemplateEngine.Mocks\Microsoft.TemplateEngine.Mocks.csproj" />
-    <ProjectReference Include="$(TestDir)Microsoft.TemplateEngine.TestHelper\Microsoft.TemplateEngine.TestHelper.csproj" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.1</TargetFramework>
+        <TestProject>true</TestProject>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="$(SrcDir)dotnet-new3\dotnet-new3.csproj" />
+        <ProjectReference Include="$(TestDir)Microsoft.TemplateEngine.Mocks\Microsoft.TemplateEngine.Mocks.csproj" />
+        <ProjectReference Include="$(TestDir)Microsoft.TemplateEngine.TestHelper\Microsoft.TemplateEngine.TestHelper.csproj" />
+    </ItemGroup>
 </Project>
