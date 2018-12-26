@@ -1,16 +1,4 @@
 <Project ToolsVersion="15.0">
-  <PropertyGroup Condition=" '$(PackageVersion)' == '' ">
-    <PackageReleaseVersion>1.0.2</PackageReleaseVersion>
-    <PackageBuildQuality>$(BUILD_QUALITY)</PackageBuildQuality>
-    <PackageBuildQuality Condition=" '$(PackageBuildQuality)' == '' ">beta4</PackageBuildQuality>
-    <PackageVersion>$(PackageReleaseVersion)-$(PackageBuildQuality)</PackageVersion>
-    <PackageDateTime Condition="'$(PackageDateTime)' == ''">$([System.DateTime]::Now.ToString("yyyyMMdd"))</PackageDateTime>
-    <BUILD_NUMBER Condition="'$(BUILD_NUMBER)' == ''">0</BUILD_NUMBER>
-    <BUILD_NUMBER Condition="'$(BUILD_NUMBER)' == '0' And '$(BUILD_BUILDNUMBER)' != ''">$(BUILD_BUILDNUMBER)</BUILD_NUMBER>
-    <AssemblyReleaseVersion>$(PackageReleaseVersion).0</AssemblyReleaseVersion>
-    <PackageVersion Condition="'$(NO_TIMESTAMP)' != 'true'">$(PackageVersion)-$(PackageDateTime)-$(BUILD_NUMBER)</PackageVersion>
-    <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
-  </PropertyGroup>
   <PropertyGroup>
     <Authors>Microsoft</Authors>
     <ProjectUrl>https://github.com/dotnet/templating</ProjectUrl>
@@ -21,17 +9,7 @@
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
     
     <NuGet>&quot;$(ToolsTempDir)nuget.exe&quot;</NuGet>
-
-    <GenerateAssemblyInfo Condition="'$(BuildingInsideVisualStudio)' != ''">False</GenerateAssemblyInfo>
-    <GenerateAssemblyFileVersionAttribute>False</GenerateAssemblyFileVersionAttribute>
-    <GenerateAssemblyVersionAttribute>False</GenerateAssemblyVersionAttribute>
-    <GenerateAssemblyInformationalVersionAttribute>False</GenerateAssemblyInformationalVersionAttribute>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)Key.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-  </PropertyGroup>
+    </PropertyGroup>
   <Target Name="CollectGitInfo">
     <PropertyGroup>
       <GitInfoCommitCount Condition="'$(COMMIT_HASH)' != ''">$(COMMIT_COUNT)</GitInfoCommitCount>
