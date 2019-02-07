@@ -6,9 +6,9 @@ Template Engine is a library for manipulating streams, including operations to r
 regions and process `if`, `else if`, `else` and `end if` style statements.
 
 # Content Repositories
-[Class Library/Console App](https://github.com/dotnet/templating/tree/master/template_feed)
-[Test projects](https://github.com/dotnet/test-templates/tree/master/template_feed)
-[ASP.NET project and items](https://github.com/aspnet/AspNetCore/tree/master/src/ProjectTemplates)
+* [Class Library/Console App](https://github.com/dotnet/templating/tree/master/template_feed)
+* [Test projects](https://github.com/dotnet/test-templates/tree/master/template_feed)
+* [ASP.NET project and items](https://github.com/aspnet/AspNetCore/tree/master/src/ProjectTemplates)
 
 # Template Samples
 
