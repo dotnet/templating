@@ -1,8 +1,3 @@
-#!/usr/bin/env bash
-
-# Stop script if unbound variable found (use ${var:-} if intentional)
-set -u
-
 # Initialize variables if they aren't already defined.
 
 # CI mode - set to true on CI server for PR validation build or official build.
@@ -140,12 +135,13 @@ function InitializeDotNetCli {
   # build steps from using anything other than what we've downloaded.
   export PATH="$dotnet_root:$PATH"
 
-  curl --retry 10 -s -SL -f --create-dirs -o $DOTNET_INSTALL_DIR/buildtools.tar.gz https://aspnetcore.blob.core.windows.net/buildtools/netfx/4.6.1/netfx.4.6.1.tar.gz
-  [ -d "$DOTNET_INSTALL_DIR/buildtools/net461" ] || mkdir -p $DOTNET_INSTALL_DIR/buildtools/net461
-  tar -zxf $DOTNET_INSTALL_DIR/buildtools.tar.gz -C $DOTNET_INSTALL_DIR/buildtools/net461
+  if [[ $ci == true ]]; then
+    # Make Sure that our bootstrapped dotnet cli is avaliable in future steps of the Azure Pipelines build
+    echo "##vso[task.prependpath]$dotnet_root"
+    echo "##vso[task.setvariable variable=DOTNET_MULTILEVEL_LOOKUP]0"
+    echo "##vso[task.setvariable variable=DOTNET_SKIP_FIRST_TIME_EXPERIENCE]1"
+  fi
 
-  export ReferenceAssemblyRoot=$DOTNET_INSTALL_DIR/buildtools/net461
-  
   # return value
   _InitializeDotNetCli="$dotnet_root"
 }
@@ -157,13 +153,16 @@ function InstallDotNetSdk {
   GetDotNetInstallScript "$root"
   local install_script=$_GetDotNetInstallScript
 
-  bash "$install_script" --version $version --install-dir "$root"
-  local lastexitcode=$?
-
-  if [[ $lastexitcode != 0 ]]; then
-    echo "Failed to install dotnet SDK (exit code '$lastexitcode')." >&2
-    ExitWithExitCode $lastexitcode
+  local arch_arg=""
+  if [[ $# == 3 ]]; then
+    arch_arg="--architecture $3"
   fi
+
+  bash "$install_script" --version $version --install-dir "$root" $arch_arg || {
+    local exit_code=$?
+    echo "Failed to install dotnet SDK (exit code '$exit_code')." >&2
+    ExitWithExitCode $exit_code
+  }
 }
 
 function GetDotNetInstallScript {
@@ -195,8 +194,9 @@ function InitializeBuildTool {
   
   InitializeDotNetCli $restore
 
-  # return value
+  # return values
   _InitializeBuildTool="$_InitializeDotNetCli/dotnet"  
+  _InitializeBuildToolCommand="msbuild"
 }
 
 function GetNuGetPackageCachePath {
@@ -264,8 +264,8 @@ function ExitWithExitCode {
 
 function StopProcesses {
   echo "Killing running build processes..."
-  pkill -9 "dotnet"
-  pkill -9 "vbcscompiler"
+  pkill -9 "dotnet" || true
+  pkill -9 "vbcscompiler" || true
   return 0
 }
 
@@ -289,13 +289,11 @@ function MSBuild {
     warnaserror_switch="/warnaserror"
   fi
 
-  "$_InitializeBuildTool" msbuild /m /nologo /clp:Summary /v:$verbosity /nr:$node_reuse $warnaserror_switch /p:TreatWarningsAsErrors=$warn_as_error "$@"
-  lastexitcode=$?
-
-  if [[ $lastexitcode != 0 ]]; then
-    echo "Build failed (exit code '$lastexitcode')." >&2
-    ExitWithExitCode $lastexitcode
-  fi
+  "$_InitializeBuildTool" "$_InitializeBuildToolCommand" /m /nologo /clp:Summary /v:$verbosity /nr:$node_reuse $warnaserror_switch /p:TreatWarningsAsErrors=$warn_as_error "$@" || {
+    local exit_code=$?
+    echo "Build failed (exit code '$exit_code')." >&2
+    ExitWithExitCode $exit_code
+  }
 }
 
 ResolvePath "${BASH_SOURCE[0]}"
