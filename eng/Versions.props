@@ -4,10 +4,9 @@
   <PropertyGroup>
     <UsingToolXliff>false</UsingToolXliff>
     <UsingToolNetFrameworkReferenceAssemblies>true</UsingToolNetFrameworkReferenceAssemblies>
-  </PropertyGroup>
-  <PropertyGroup>
     <VersionPrefix>1.0.2</VersionPrefix>
     <PreReleaseVersionLabel>beta5</PreReleaseVersionLabel>
+    <PackSpecific Condition="'$(OS)' != 'Windows_NT'">true</PackSpecific>
   </PropertyGroup>
   <PropertyGroup>
     <RestoreSources>
