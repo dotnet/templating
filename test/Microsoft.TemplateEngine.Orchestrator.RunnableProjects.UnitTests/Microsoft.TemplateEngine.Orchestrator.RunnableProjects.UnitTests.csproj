@@ -1,8 +1,8 @@
-﻿<Project ToolsVersion="15.0" Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <TargetFramework>netcoreapp2.1</TargetFramework>
-        <TestProject>true</TestProject>
-    </PropertyGroup>
+<Project ToolsVersion="15.0" Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TestProject>true</TestProject>
+  </PropertyGroup>
 
     <ItemGroup>
         <Compile Update="ConditionalTests.*.cs" DependentUpon="ConditionalTests.cs" />
