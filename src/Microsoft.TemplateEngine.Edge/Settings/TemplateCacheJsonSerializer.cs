@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
 using Newtonsoft.Json.Linq;
@@ -34,7 +35,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             return true;
         }
 
-        private bool TrySerializeTemplate(TemplateInfo template, out JObject serializedTemplate)
+        private static bool TrySerializeTemplate(TemplateInfo template, out JObject serializedTemplate)
         {
             try
             {
@@ -51,14 +52,26 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 serializedTemplate.Add(nameof(TemplateInfo.Name), template.Name);
                 serializedTemplate.Add(nameof(TemplateInfo.ShortNameList), JArray.FromObject(template.ShortNameList));
 
-                if (TrySerializeCacheTagDictionary(template.Tags, out JObject tagListObject))
+                if (JsonSerializerHelpers.TrySerializeDictionary(template.Tags, JsonSerializerHelpers.StringKeyConverter, SerializeCacheTag, out JObject tagListObject)
+                        && tagListObject != null)
                 {
                     serializedTemplate.Add(nameof(TemplateInfo.Tags), tagListObject);
                 }
+                else
+                {
+                    serializedTemplate = null;
+                    return false;
+                }
 
-                if (TrySerializeCacheParameterDictionary(template.CacheParameters, out JObject cacheParamObject))
+                if (JsonSerializerHelpers.TrySerializeDictionary(template.CacheParameters, JsonSerializerHelpers.StringKeyConverter, SerializeCacheParameter, out JObject cacheParamObject)
+                        && cacheParamObject != null)
                 {
                     serializedTemplate.Add(nameof(TemplateInfo.CacheParameters), cacheParamObject);
+                }
+                else
+                {
+                    serializedTemplate = null;
+                    return false;
                 }
 
                 // Note: Parameters are not serialized. Everything needed from them is in Tags & CacheParameters
@@ -70,9 +83,15 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 serializedTemplate.Add(nameof(TemplateInfo.HostConfigPlace), template.HostConfigPlace);
                 serializedTemplate.Add(nameof(TemplateInfo.ThirdPartyNotices), template.ThirdPartyNotices);
 
-                if (TrySerializeBaselinesDictionary(template.BaselineInfo, out JObject baselineInfoObject))
+                if (JsonSerializerHelpers.TrySerializeDictionary(template.BaselineInfo, JsonSerializerHelpers.StringKeyConverter, SerializeBaseline, out JObject baselineInfoObject)
+                        && baselineInfoObject != null)
                 {
                     serializedTemplate.Add(nameof(TemplateInfo.BaselineInfo), baselineInfoObject);
+                }
+                else
+                {
+                    serializedTemplate = null;
+                    return false;
                 }
 
                 serializedTemplate.Add(nameof(TemplateInfo.HasScriptRunningPostActions), template.HasScriptRunningPostActions);
@@ -87,169 +106,63 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             }
         }
 
-        private bool TrySerializeCacheTagDictionary(IReadOnlyDictionary<string, ICacheTag> tagDict, out JObject tagDictObject)
-        {
-            try
-            {
-                tagDictObject = new JObject();
-
-                foreach (KeyValuePair<string, ICacheTag> cacheTagInfo in tagDict)
-                {
-                    if (TrySerializeCacheTag(cacheTagInfo.Value, out JObject serializedCacheTag))
-                    {
-                        tagDictObject.Add(cacheTagInfo.Key, serializedCacheTag);
-                    }
-                }
-
-                return true;
-            }
-            catch
-            {
-                tagDictObject = null;
-                return false;
-            }
-        }
-
         // TODO: after IAllowDefaultIfOptionWithoutValue is rolled up into ICacheParameter, get rid of the extra check for it.
-        private bool TrySerializeCacheTag(ICacheTag tag, out JObject tagObject)
+        private static Func<ICacheTag, JObject> SerializeCacheTag = tag =>
         {
-            try
+            JObject tagObject = new JObject();
+            tagObject.Add(nameof(ICacheTag.Description), tag.Description);
+
+            if (JsonSerializerHelpers.TrySerializeStringDictionary(tag.ChoicesAndDescriptions, out JObject serializedChoicesAndDescriptions))
             {
-                tagObject = new JObject();
-                tagObject.Add(nameof(ICacheTag.Description), tag.Description);
-
-                if (TrySerializeStringDictionary(tag.ChoicesAndDescriptions, out JObject serializedChoicesAndDescriptions))
-                {
-                    tagObject.Add(nameof(ICacheTag.ChoicesAndDescriptions), serializedChoicesAndDescriptions);
-                }
-
-                tagObject.Add(nameof(ICacheTag.DefaultValue), tag.DefaultValue);
-
-                if (tag is IAllowDefaultIfOptionWithoutValue tagWithNoValueDefault
-                        && !string.IsNullOrEmpty(tagWithNoValueDefault.DefaultIfOptionWithoutValue))
-                {
-                    tagObject.Add(nameof(IAllowDefaultIfOptionWithoutValue.DefaultIfOptionWithoutValue), tagWithNoValueDefault.DefaultIfOptionWithoutValue);
-                }
-
-
-                return true;
+                tagObject.Add(nameof(ICacheTag.ChoicesAndDescriptions), serializedChoicesAndDescriptions);
             }
-            catch
+            else
             {
                 tagObject = null;
-                return false;
             }
-        }
 
-        private bool TrySerializeCacheParameterDictionary(IReadOnlyDictionary<string, ICacheParameter> parameterDict, out JObject paramDictObject)
-        {
-            try
+            tagObject.Add(nameof(ICacheTag.DefaultValue), tag.DefaultValue);
+
+            if (tag is IAllowDefaultIfOptionWithoutValue tagWithNoValueDefault
+                    && !string.IsNullOrEmpty(tagWithNoValueDefault.DefaultIfOptionWithoutValue))
             {
-                paramDictObject = new JObject();
-
-                foreach (KeyValuePair<string, ICacheParameter> paramInfo in parameterDict)
-                {
-                    if (TrySerializeCacheParameter(paramInfo.Value, out JObject serializedCacheParam))
-                    {
-                        paramDictObject.Add(paramInfo.Key, serializedCacheParam);
-                    }
-                }
-
-                return true;
+                tagObject.Add(nameof(IAllowDefaultIfOptionWithoutValue.DefaultIfOptionWithoutValue), tagWithNoValueDefault.DefaultIfOptionWithoutValue);
             }
-            catch
-            {
-                paramDictObject = null;
-                return false;
-            }
-        }
+
+            return tagObject;
+        };
 
         // TODO: after IAllowDefaultIfOptionWithoutValue is rolled up into ICacheParameter, get rid of the extra check for it.
-        private bool TrySerializeCacheParameter(ICacheParameter param, out JObject paramObject)
+        private static Func<ICacheParameter, JObject> SerializeCacheParameter = param =>
         {
-            try
+            JObject paramObject = new JObject();
+            paramObject.Add(nameof(ICacheParameter.DataType), param.DataType);
+            paramObject.Add(nameof(ICacheParameter.DefaultValue), param.DefaultValue);
+            paramObject.Add(nameof(ICacheParameter.Description), param.Description);
+
+            if (param is IAllowDefaultIfOptionWithoutValue paramWithNoValueDefault
+                && !string.IsNullOrEmpty(paramWithNoValueDefault.DefaultIfOptionWithoutValue))
             {
-                paramObject = new JObject();
-                paramObject.Add(nameof(ICacheParameter.DataType), param.DataType);
-                paramObject.Add(nameof(ICacheParameter.DefaultValue), param.DefaultValue);
-                paramObject.Add(nameof(ICacheParameter.Description), param.Description);
-
-                if (param is IAllowDefaultIfOptionWithoutValue paramWithNoValueDefault
-                    && !string.IsNullOrEmpty(paramWithNoValueDefault.DefaultIfOptionWithoutValue))
-                {
-                    paramObject.Add(nameof(IAllowDefaultIfOptionWithoutValue.DefaultIfOptionWithoutValue), paramWithNoValueDefault.DefaultIfOptionWithoutValue);
-                }
-
-                return true;
+                paramObject.Add(nameof(IAllowDefaultIfOptionWithoutValue.DefaultIfOptionWithoutValue), paramWithNoValueDefault.DefaultIfOptionWithoutValue);
             }
-            catch
-            {
-                paramObject = null;
-                return false;
-            }
-        }
 
-        private bool TrySerializeBaselinesDictionary(IReadOnlyDictionary<string, IBaselineInfo> baselineDict, out JObject baselineDictObject)
+            return paramObject;
+        };
+
+        private static Func<IBaselineInfo, JObject> SerializeBaseline = baseline =>
         {
-            try
+            JObject baselineObject = new JObject();
+            baselineObject.Add(nameof(IBaselineInfo.Description), baseline.Description);
+            if (JsonSerializerHelpers.TrySerializeStringDictionary(baseline.DefaultOverrides, out JObject defaultsObject))
             {
-                baselineDictObject = new JObject();
-
-                foreach (KeyValuePair<string, IBaselineInfo> baseline in baselineDict)
-                {
-                    if (TrySerializeBaseline(baseline.Value, out JObject baselineObject))
-                    {
-                        baselineDictObject.Add(baseline.Key, baselineObject);
-                    }
-                }
-
-                return true;
+                baselineObject.Add(nameof(IBaselineInfo.DefaultOverrides), defaultsObject);
             }
-            catch
-            {
-                baselineDictObject = null;
-                return false;
-            }
-        }
-
-        private bool TrySerializeBaseline(IBaselineInfo baseline, out JObject baselineObject)
-        {
-            try
-            {
-                baselineObject = new JObject();
-                baselineObject.Add(nameof(IBaselineInfo.Description), baseline.Description);
-                if (TrySerializeStringDictionary(baseline.DefaultOverrides, out JObject defaultsObject))
-                {
-                    baselineObject.Add(nameof(IBaselineInfo.DefaultOverrides), defaultsObject);
-                }
-
-                return true;
-            }
-            catch
+            else
             {
                 baselineObject = null;
-                return false;
             }
-        }
 
-        private bool TrySerializeStringDictionary(IReadOnlyDictionary<string, string> toSerialize, out JObject serialized)
-        {
-            try
-            {
-                serialized = new JObject();
-
-                foreach (KeyValuePair<string, string> entry in toSerialize)
-                {
-                    serialized.Add(entry.Key, entry.Value);
-                }
-
-                return true;
-            }
-            catch
-            {
-                serialized = null;
-                return false;
-            }
-        }
+            return baselineObject;
+        };
     }
 }

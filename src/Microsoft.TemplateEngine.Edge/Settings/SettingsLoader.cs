@@ -50,14 +50,22 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
             // now it's safe to update the cache version, which is written in the settings file.
             _userSettings.SetVersionToCurrent();
-            JObject serialized = JObject.FromObject(_userSettings);
-            _paths.WriteAllText(_paths.User.SettingsFile, serialized.ToString());
+            WriteSettingsFile();
 
             WriteInstallDescriptorCache();
 
             if (_userTemplateCache != cacheToSave)  // object equals
             {
                 ReloadTemplates();
+            }
+        }
+
+        private void WriteSettingsFile()
+        {
+            SettingsStoreJsonSerializer settingsStoreSerializer = new SettingsStoreJsonSerializer();
+            if (settingsStoreSerializer.TrySerialize(_userSettings, out string serializedStore))
+            {
+                _paths.WriteAllText(_paths.User.SettingsFile, serializedStore.ToString());
             }
         }
 
@@ -101,8 +109,11 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         // Get them from the property to ensure they're loaded. Descriptors are loaded on demand, not at startup.
         private void WriteInstallDescriptorCache()
         {
-            JObject installDescriptorsSerialized = JObject.FromObject(InstallUnitDescriptorCache);
-            _paths.WriteAllText(_paths.User.InstallUnitDescriptorsFile, installDescriptorsSerialized.ToString());
+            InstallDescriptorCacheJsonSerializer serializer = new InstallDescriptorCacheJsonSerializer();
+            if (serializer.TrySerialize(InstallUnitDescriptorCache, out string serialized))
+            {
+                _paths.WriteAllText(_paths.User.InstallUnitDescriptorsFile, serialized);
+            }
         }
 
         private void EnsureLoaded()
@@ -458,11 +469,10 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             {
                 TemplateCache cache = new TemplateCache(_environmentSettings, toCache);
 
-                // New way, using manual serialization
-                TemplateCacheJsonSerializer newSerializer = new TemplateCacheJsonSerializer();
-                if (newSerializer.TrySerialize(cache, out string newSerialization))
+                TemplateCacheJsonSerializer cacheSerializer = new TemplateCacheJsonSerializer();
+                if (cacheSerializer.TrySerialize(cache, out string newSerialization))
                 {
-                    string newPath = _paths.User.ExplicitLocaleTemplateCacheFile(locale) + ".new";
+                    string newPath = _paths.User.ExplicitLocaleTemplateCacheFile(locale);
                     _paths.WriteAllText(newPath, newSerialization);
                 }
                 else
@@ -553,8 +563,8 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
             _mountPoints[mountPoint.Info.MountPointId] = mountPoint.Info;
             _userSettings.MountPoints.Add(mountPoint.Info);
-            JObject serialized = JObject.FromObject(_userSettings);
-            _paths.WriteAllText(_paths.User.SettingsFile, serialized.ToString());
+
+            WriteSettingsFile();
         }
 
         public bool TryGetFileFromIdAndPath(Guid mountPointId, string place, out IFile file, out IMountPoint mountPoint)
