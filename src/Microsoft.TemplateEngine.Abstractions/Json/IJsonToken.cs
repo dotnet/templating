@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 
 namespace Microsoft.TemplateEngine.Abstractions.Json
 {
@@ -7,5 +7,7 @@ namespace Microsoft.TemplateEngine.Abstractions.Json
         JsonTokenType TokenType { get; }
 
         void WriteToStream(Stream s);
+
+        IJsonDocumentObjectModelFactory Factory { get; }
     }
 }

@@ -17,7 +17,7 @@ namespace dotnet_new3
             try
             {
                 JToken token = JToken.Parse(jsonText);
-                root = AdaptToken(token);
+                root = AdaptToken(token, this);
                 return true;
             }
             catch
@@ -27,60 +27,60 @@ namespace dotnet_new3
             }
         }
 
-        private static IJsonToken AdaptToken(JToken token)
+        private static IJsonToken AdaptToken(JToken token, IJsonDocumentObjectModelFactory factory)
         {
             switch (token.Type)
             {
                 case JTokenType.Object:
-                    return new JObjectAdapter(token);
+                    return new JObjectAdapter(token, factory);
                 case JTokenType.Array:
-                    return new JArrayAdapter(token);
+                    return new JArrayAdapter(token, factory);
                 default:
-                    return new JValueAdapter(token);
+                    return new JValueAdapter(token, factory);
             }
         }
 
         public IJsonObject CreateObject()
         {
-            return new JObjectAdapter(new JObject());
+            return new JObjectAdapter(new JObject(), this);
         }
 
         public IJsonArray CreateArray()
         {
-            return new JArrayAdapter(new JArray());
+            return new JArrayAdapter(new JArray(), this);
         }
 
         public IJsonValue CreateValue(int value)
         {
-            return new JValueAdapter(JToken.FromObject(value));
+            return new JValueAdapter(JToken.FromObject(value), this);
         }
 
         public IJsonValue CreateValue(double value)
         {
-            return new JValueAdapter(JToken.FromObject(value));
+            return new JValueAdapter(JToken.FromObject(value), this);
         }
 
         public IJsonValue CreateValue(string value)
         {
-            return new JValueAdapter(JToken.FromObject(value));
+            return new JValueAdapter(JToken.FromObject(value), this);
         }
 
         public IJsonValue CreateValue(bool value)
         {
-            return new JValueAdapter(JToken.FromObject(value));
+            return new JValueAdapter(JToken.FromObject(value), this);
         }
 
         public IJsonValue CreateNull()
         {
-            return new JValueAdapter(JValue.CreateNull());
+            return new JValueAdapter(JValue.CreateNull(), this);
         }
 
         private class JObjectAdapter : JTokenAdapter, IJsonObject
         {
             private readonly JObject _object;
 
-            public JObjectAdapter(JToken token)
-                : base (token)
+            public JObjectAdapter(JToken token, IJsonDocumentObjectModelFactory factory)
+                : base (token, factory)
             {
                 _object = (JObject)token;
             }
@@ -96,7 +96,7 @@ namespace dotnet_new3
                     if (_object.TryGetValue(name, StringComparison.Ordinal, out JToken token))
                     {
                         foundNames.Add(name);
-                        valueExtractor(AdaptToken(token));
+                        valueExtractor(AdaptToken(token, Factory));
                     }
                 }
 
@@ -125,13 +125,13 @@ namespace dotnet_new3
         {
             private readonly JArray _array;
 
-            public JArrayAdapter(JToken token)
-                : base (token)
+            public JArrayAdapter(JToken token, IJsonDocumentObjectModelFactory factory)
+                : base (token, factory)
             {
                 _array = (JArray)token;
             }
 
-            public IJsonToken this[int index] => AdaptToken(_array[index]);
+            public IJsonToken this[int index] => AdaptToken(_array[index], Factory);
 
             public int Count => _array.Count;
 
@@ -146,7 +146,7 @@ namespace dotnet_new3
                 return this;
             }
 
-            public IEnumerator<IJsonToken> GetEnumerator() => _array.Select(AdaptToken).GetEnumerator();
+            public IEnumerator<IJsonToken> GetEnumerator() => _array.Select(x => AdaptToken(x, Factory)).GetEnumerator();
 
             public IJsonArray RemoveAt(int index)
             {
@@ -159,8 +159,8 @@ namespace dotnet_new3
 
         private class JValueAdapter : JTokenAdapter, IJsonValue
         {
-            public JValueAdapter(JToken token)
-                : base (token)
+            public JValueAdapter(JToken token, IJsonDocumentObjectModelFactory factory)
+                : base (token, factory)
             {
             }
 
@@ -169,10 +169,13 @@ namespace dotnet_new3
 
         private class JTokenAdapter : IJsonToken
         {
-            public JTokenAdapter(JToken token)
+            public JTokenAdapter(JToken token, IJsonDocumentObjectModelFactory factory)
             {
                 Token = token;
+                Factory = factory;
             }
+
+            public IJsonDocumentObjectModelFactory Factory { get; }
 
             public JToken Token { get; }
 
