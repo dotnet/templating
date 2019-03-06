@@ -18,7 +18,7 @@ namespace dotnet_new3
             {
                 JsonDocument doc = JsonDocument.Parse(jsonText);
                 JsonElement rootElement = doc.RootElement;
-                root = AdaptElement(rootElement);
+                root = AdaptElement(rootElement, this);
                 return true;
             }
             catch
@@ -28,16 +28,16 @@ namespace dotnet_new3
             }
         }
 
-        private static IJsonToken AdaptElement(JsonElement element)
+        private static IJsonToken AdaptElement(JsonElement element, IJsonDocumentObjectModelFactory factory)
         {
             switch (element.Type)
             {
                 case JsonValueType.Array:
-                    return new JsonArray(element);
+                    return new JsonArray(element, factory);
                 case JsonValueType.Object:
-                    return new JsonObject(element);
+                    return new JsonObject(element, factory);
                 default:
-                    return new JsonValueAdapter(element);
+                    return new JsonValueAdapter(element, factory);
             }
         }
 
@@ -66,42 +66,47 @@ namespace dotnet_new3
             }
         }
 
-        public IJsonObject CreateObject() => new JsonObject();
+        public IJsonObject CreateObject() => new JsonObject(this);
 
-        public IJsonArray CreateArray() => new JsonArray();
+        public IJsonArray CreateArray() => new JsonArray(this);
 
-        public IJsonValue CreateValue(int value) => new WritableJsonValue(value, JsonTokenType.Number);
+        public IJsonValue CreateValue(int value) => new WritableJsonValue(value, JsonTokenType.Number, this);
 
-        public IJsonValue CreateValue(double value) => new WritableJsonValue(value, JsonTokenType.Number);
+        public IJsonValue CreateValue(double value) => new WritableJsonValue(value, JsonTokenType.Number, this);
 
-        public IJsonValue CreateValue(string value) => new WritableJsonValue(value, JsonTokenType.String);
+        public IJsonValue CreateValue(string value) => new WritableJsonValue(value, JsonTokenType.String, this);
 
-        public IJsonValue CreateValue(bool value) => new WritableJsonValue(value, JsonTokenType.Boolean);
+        public IJsonValue CreateValue(bool value) => new WritableJsonValue(value, JsonTokenType.Boolean, this);
 
-        public IJsonValue CreateNull() => new WritableJsonValue(null, JsonTokenType.Null);
+        public IJsonValue CreateNull() => new WritableJsonValue(null, JsonTokenType.Null, this);
 
         private class JsonArray : IJsonArray, IWriteToJsonWriter
         {
             private IJsonArray _basis;
 
-            public JsonArray()
-                : this(new WritableJsonArray())
+            public JsonArray(IJsonDocumentObjectModelFactory factory)
+                : this(new WritableJsonArray(factory))
             {
+                Factory = factory;
             }
 
-            public JsonArray(JsonElement basis)
-                : this(new JsonArrayAdapter(basis))
+            public JsonArray(JsonElement basis, IJsonDocumentObjectModelFactory factory)
+                : this(new JsonArrayAdapter(basis, factory))
             {
+                Factory = factory;
             }
 
             private JsonArray(IJsonArray basis)
             {
                 _basis = basis;
+                Factory = basis.Factory;
             }
 
             public IJsonToken this[int index] => _basis[index];
 
             public int Count => _basis.Count;
+
+            public IJsonDocumentObjectModelFactory Factory { get; }
 
             public JsonTokenType TokenType => JsonTokenType.Array;
 
@@ -132,13 +137,13 @@ namespace dotnet_new3
         {
             private IJsonObject _basis;
 
-            public JsonObject()
-                : this(new WritableJsonObject())
+            public JsonObject(IJsonDocumentObjectModelFactory factory)
+                : this(new WritableJsonObject(factory))
             {
             }
 
-            public JsonObject(JsonElement basis)
-                : this(new JsonObjectAdapter(basis))
+            public JsonObject(JsonElement basis, IJsonDocumentObjectModelFactory factory)
+                : this(new JsonObjectAdapter(basis, factory))
             {
             }
 
@@ -146,6 +151,8 @@ namespace dotnet_new3
             {
                 _basis = basis;
             }
+
+            public IJsonDocumentObjectModelFactory Factory => _basis.Factory;
 
             public JsonTokenType TokenType => _basis.TokenType;
 
@@ -174,10 +181,13 @@ namespace dotnet_new3
 
         private abstract class WritableJsonToken : IJsonToken, IWriteToJsonWriter
         {
-            public WritableJsonToken(JsonTokenType type)
+            public WritableJsonToken(JsonTokenType type, IJsonDocumentObjectModelFactory factory)
             {
                 TokenType = type;
+                Factory = factory;
             }
+
+            public IJsonDocumentObjectModelFactory Factory { get; }
 
             public JsonTokenType TokenType { get; }
 
@@ -202,8 +212,8 @@ namespace dotnet_new3
 
         private class WritableJsonValue : WritableJsonToken, IJsonValue
         {
-            public WritableJsonValue(object value, JsonTokenType type)
-                : base(type)
+            public WritableJsonValue(object value, JsonTokenType type, IJsonDocumentObjectModelFactory factory)
+                : base(type, factory)
             {
                 Value = value;
             }
@@ -280,14 +290,14 @@ namespace dotnet_new3
         {
             private readonly List<IJsonToken> _children;
 
-            public WritableJsonArray()
-                : base(JsonTokenType.Array)
+            public WritableJsonArray(IJsonDocumentObjectModelFactory factory)
+                : base(JsonTokenType.Array, factory)
             {
                 _children = new List<IJsonToken>();
             }
 
-            public WritableJsonArray(JsonElement element)
-                : base(JsonTokenType.Array)
+            public WritableJsonArray(JsonElement element, IJsonDocumentObjectModelFactory factory)
+                : base(JsonTokenType.Array, factory)
             {
                 if (element.Type != JsonValueType.Array)
                 {
@@ -298,7 +308,7 @@ namespace dotnet_new3
 
                 foreach (JsonElement entry in element.EnumerateArray())
                 {
-                    _children.Add(AdaptElement(entry));
+                    _children.Add(AdaptElement(entry, Factory));
                 }
             }
 
@@ -353,14 +363,14 @@ namespace dotnet_new3
         {
             private readonly Dictionary<string, IJsonToken> _properties;
 
-            public WritableJsonObject()
-                : base(JsonTokenType.Object)
+            public WritableJsonObject(IJsonDocumentObjectModelFactory factory)
+                : base(JsonTokenType.Object, factory)
             {
                 _properties = new Dictionary<string, IJsonToken>(StringComparer.Ordinal);
             }
 
-            public WritableJsonObject(JsonElement element)
-                : base(JsonTokenType.Object)
+            public WritableJsonObject(JsonElement element, IJsonDocumentObjectModelFactory factory)
+                : base(JsonTokenType.Object, factory)
             {
                 if (element.Type != JsonValueType.Object)
                 {
@@ -371,7 +381,7 @@ namespace dotnet_new3
 
                 foreach (JsonProperty property in element.EnumerateObject())
                 {
-                    _properties[property.Name] = AdaptElement(property.Value);
+                    _properties[property.Name] = AdaptElement(property.Value, Factory);
                 }
             }
 
@@ -437,11 +447,14 @@ namespace dotnet_new3
         {
             protected readonly JsonElement _element;
 
-            public JsonElementAdapter(JsonElement element)
+            public JsonElementAdapter(JsonElement element, IJsonDocumentObjectModelFactory factory)
             {
                 _element = element;
                 TokenType = AdaptType(_element.Type);
+                Factory = factory;
             }
+
+            public IJsonDocumentObjectModelFactory Factory { get; }
 
             public JsonTokenType TokenType { get; }
 
@@ -465,8 +478,8 @@ namespace dotnet_new3
 
         private class JsonValueAdapter : JsonElementAdapter, IJsonValue
         {
-            public JsonValueAdapter(JsonElement element)
-                : base(element)
+            public JsonValueAdapter(JsonElement element, IJsonDocumentObjectModelFactory factory)
+                : base(element, factory)
             {
             }
 
@@ -557,26 +570,26 @@ namespace dotnet_new3
 
         private class JsonArrayAdapter : JsonElementAdapter, IJsonArray
         {
-            public JsonArrayAdapter(JsonElement element)
-                : base(element)
+            public JsonArrayAdapter(JsonElement element, IJsonDocumentObjectModelFactory factory)
+                : base(element, factory)
             {
             }
 
-            public IJsonToken this[int index] => AdaptElement(_element.EnumerateArray().ElementAt(index));
+            public IJsonToken this[int index] => AdaptElement(_element.EnumerateArray().ElementAt(index), Factory);
 
             public int Count => _element.GetArrayLength();
 
             public IJsonArray Add(IJsonToken value)
             {
-                return new WritableJsonArray(_element)
+                return new WritableJsonArray(_element, Factory)
                     .Add(value);
             }
 
-            public IEnumerator<IJsonToken> GetEnumerator() => _element.EnumerateArray().Select(AdaptElement).GetEnumerator();
+            public IEnumerator<IJsonToken> GetEnumerator() => _element.EnumerateArray().Select(x => AdaptElement(x, Factory)).GetEnumerator();
 
             public IJsonArray RemoveAt(int index)
             {
-                return new WritableJsonArray(_element)
+                return new WritableJsonArray(_element, Factory)
                     .RemoveAt(index);
             }
 
@@ -611,8 +624,8 @@ namespace dotnet_new3
 
         private class JsonObjectAdapter : JsonElementAdapter, IJsonObject
         {
-            public JsonObjectAdapter(JsonElement element)
-                : base(element)
+            public JsonObjectAdapter(JsonElement element, IJsonDocumentObjectModelFactory factory)
+                : base(element, factory)
             {
             }
 
@@ -628,7 +641,7 @@ namespace dotnet_new3
                     if (mapLookup.TryGetValue(property.Name, out Action<IJsonToken> handler))
                     {
                         foundProperties.Add(property.Name);
-                        handler(AdaptElement(property.Value));
+                        handler(AdaptElement(property.Value, Factory));
                     }
 
                     if (foundProperties.Count == mappings.Length)
@@ -642,13 +655,13 @@ namespace dotnet_new3
 
             public IJsonObject RemoveValue(string propertyName)
             {
-                return new WritableJsonObject(_element)
+                return new WritableJsonObject(_element, Factory)
                     .RemoveValue(propertyName);
             }
 
             public IJsonObject SetValue(string propertyName, IJsonToken value)
             {
-                return new WritableJsonObject(_element)
+                return new WritableJsonObject(_element, Factory)
                     .SetValue(propertyName, value);
             }
 
@@ -668,7 +681,7 @@ namespace dotnet_new3
             {
                 foreach (JsonProperty entry in _element.EnumerateObject())
                 {
-                    IJsonToken token = AdaptElement(entry.Value);
+                    IJsonToken token = AdaptElement(entry.Value, Factory);
 
                     if (!(token is IWriteToJsonWriter writable))
                     {
