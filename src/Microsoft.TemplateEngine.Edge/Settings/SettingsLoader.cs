@@ -457,8 +457,18 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             if (hasContentChanges || hasMountPointChanges)
             {
                 TemplateCache cache = new TemplateCache(_environmentSettings, toCache);
-                JObject serialized = JObject.FromObject(cache);
-                _paths.WriteAllText(_paths.User.ExplicitLocaleTemplateCacheFile(locale), serialized.ToString());
+
+                // New way, using manual serialization
+                TemplateCacheJsonSerializer newSerializer = new TemplateCacheJsonSerializer();
+                if (newSerializer.TrySerialize(cache, out string newSerialization))
+                {
+                    string newPath = _paths.User.ExplicitLocaleTemplateCacheFile(locale) + ".new";
+                    _paths.WriteAllText(newPath, newSerialization);
+                }
+                else
+                {
+                    throw new EngineInitializationException("Error saving the template cache.", "Template Cache");
+                }
             }
 
             bool isCurrentLocale = string.IsNullOrEmpty(locale)
