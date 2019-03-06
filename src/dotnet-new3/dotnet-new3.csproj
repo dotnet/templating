@@ -1,9 +1,10 @@
 <Project ToolsVersion="15.0" Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <Description>Template Instantiation Commands for .NET Core CLI.</Description>
-        <TargetFramework>netcoreapp2.1</TargetFramework>
-        <OutputType>Exe</OutputType>
-    </PropertyGroup>
+  <PropertyGroup>
+    <Description>Template Instantiation Commands for .NET Core CLI.</Description>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>dotnet_new3</RootNamespace>
+  </PropertyGroup>
 
     <ItemGroup>
         <None Update="**\*.list" CopyToOutputDirectory="Always" />

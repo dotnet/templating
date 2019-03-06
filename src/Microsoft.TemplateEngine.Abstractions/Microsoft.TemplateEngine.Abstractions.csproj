@@ -1,13 +1,13 @@
 <Project ToolsVersion="15.0" Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <TargetFrameworks Condition="'$(PackSpecific)' != 'true'">netstandard2.0;net45</TargetFrameworks>
-        <TargetFrameworks Condition="'$(PackSpecific)' == 'true'">netstandard2.0</TargetFrameworks>
-        <Description>Contracts for extending Template Engine</Description>
-        <IsPackable>true</IsPackable>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworks Condition="'$(PackSpecific)' != 'true'">netstandard2.0;net45</TargetFrameworks>
+    <TargetFrameworks Condition="'$(PackSpecific)' == 'true'">netstandard2.0</TargetFrameworks>
+    <Description>Contracts for extending Template Engine</Description>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="SourceLink.Create.CommandLine" />
-        <DotNetCliToolReference Include="dotnet-sourcelink" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="SourceLink.Create.CommandLine" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" Condition="'$(TargetFramework)' == 'net45'" />
+    <DotNetCliToolReference Include="dotnet-sourcelink" />
+  </ItemGroup>
 </Project>
