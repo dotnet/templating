@@ -1,9 +1,0 @@
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <ArtifactsDir>$(MSBuildThisFileDirectory)artifacts/</ArtifactsDir>
-    <PackageOutputPath>$(ArtifactsDir)packages/</PackageOutputPath>
-    <TemplatesOutputPath>$(ArtifactsDir)templates/</TemplatesOutputPath>
-    <DevPath>$(MSBuildThisFileDirectory)dev</DevPath>
-    <ToolsPath>$(MSBuildThisFileDirectory).tools</ToolsPath>
-  </PropertyGroup>
-</Project>
