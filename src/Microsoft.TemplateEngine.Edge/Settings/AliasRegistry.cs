@@ -51,8 +51,11 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         private void Save()
         {
-            JObject serialized = JObject.FromObject(_aliases);
-            _environmentSettings.Host.FileSystem.WriteAllText(_paths.User.AliasesFile, serialized.ToString());
+            AliasJsonSerializer serializer = new AliasJsonSerializer();
+            if (serializer.TrySerialize(_aliases, out string serialized))
+            {
+                _environmentSettings.Host.FileSystem.WriteAllText(_paths.User.AliasesFile, serialized);
+            }
         }
 
         public AliasManipulationResult TryCreateOrRemoveAlias(string aliasName, IReadOnlyList<string> aliasTokens)
