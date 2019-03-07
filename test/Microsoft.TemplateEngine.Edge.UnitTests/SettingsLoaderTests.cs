@@ -132,16 +132,30 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 
             userSettings.MountPoints.AddRange(mountPoints ?? new MountPointInfo[0]);
 
-            JObject serialized = JObject.FromObject(userSettings);
-            _fileSystem.Add(Path.Combine(BaseDir, "settings.json"), serialized.ToString());
+            SettingsStoreJsonSerializer serializer = new SettingsStoreJsonSerializer();
+            if (serializer.TrySerialize(userSettings, out string serialized))
+            {
+                _fileSystem.Add(Path.Combine(BaseDir, "settings.json"), serialized.ToString());
+            }
+            else
+            {
+                throw new Exception("Unable to serialized the user settings store");
+            }
         }
 
         private void SetupTemplates(List<TemplateInfo> templates)
         {
             TemplateCache cache = new TemplateCache(_environmentSettings, templates);
 
-            JObject serialized = JObject.FromObject(cache);
-            _fileSystem.Add(Path.Combine(BaseDir, "templatecache.json"), serialized.ToString());
+            TemplateCacheJsonSerializer serializer = new TemplateCacheJsonSerializer();
+            if (serializer.TrySerialize(cache, out string serialized))
+            {
+                _fileSystem.Add(Path.Combine(BaseDir, "templatecache.json"), serialized.ToString());
+            }
+            else
+            {
+                throw new Exception("Unable to serialized the template cache");
+            }
         }
 
         private List<TemplateInfo> TemplatesFromMountPoints(IEnumerable<MountPointInfo> mountPoints)
