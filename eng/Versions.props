@@ -4,12 +4,10 @@
   <PropertyGroup>
     <UsingToolXliff>false</UsingToolXliff>
   </PropertyGroup>
-
-   <PropertyGroup>
+  <PropertyGroup>
     <VersionPrefix>1.0.2</VersionPrefix>
     <PreReleaseVersionLabel>beta5</PreReleaseVersionLabel>
   </PropertyGroup>
-
   <PropertyGroup>
     <RestoreSources>
       $(RestoreSources);
