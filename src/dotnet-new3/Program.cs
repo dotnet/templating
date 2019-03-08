@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Json;
 using Microsoft.TemplateEngine.Cli;
 using Microsoft.TemplateEngine.Cli.PostActionProcessors;
 using Microsoft.TemplateEngine.Edge;
@@ -42,7 +43,9 @@ namespace dotnet_new3
                 AddInstallLogger(host);
             }
 
-            return New3Command.Run(CommandName, host, new TelemetryLogger(null, debugTelemetry), FirstRun, args);
+            IJsonDocumentObjectModelFactory jsonDomFactory = new SystemTextJsonDocumentObjectModel();
+
+            return New3Command.Run(CommandName, host, new TelemetryLogger(null, debugTelemetry), FirstRun, jsonDomFactory, args);
         }
 
         private static DefaultTemplateEngineHost CreateHost(bool emitTimings)

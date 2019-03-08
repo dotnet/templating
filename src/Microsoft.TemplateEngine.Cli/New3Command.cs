@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Json;
 using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Abstractions.TemplateUpdates;
 using Microsoft.TemplateEngine.Cli.CommandParsing;
@@ -31,6 +32,8 @@ namespace Microsoft.TemplateEngine.Cli
         private readonly INewCommandInput _commandInput;    // It's safe to access template agnostic information anytime after the first parse. But there is never a guarantee which template the parse is in the context of.
         private readonly IHostSpecificDataLoader _hostDataLoader;
         private readonly string _defaultLanguage;
+        private readonly IJsonDocumentObjectModelFactory _jsonDomFactory;
+
         private static readonly Regex LocaleFormatRegex = new Regex(@"
                     ^
                         [a-z]{2}
@@ -40,12 +43,12 @@ namespace Microsoft.TemplateEngine.Cli
         private readonly Action<IEngineEnvironmentSettings, IInstaller> _onFirstRun;
         private readonly Func<string> _inputGetter = () => Console.ReadLine();
 
-        public New3Command(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, Action<IEngineEnvironmentSettings, IInstaller> onFirstRun, INewCommandInput commandInput)
-            : this(commandName, host, telemetryLogger, onFirstRun, commandInput, null)
+        public New3Command(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, Action<IEngineEnvironmentSettings, IInstaller> onFirstRun, INewCommandInput commandInput, IJsonDocumentObjectModelFactory jsonDomFactory)
+            : this(commandName, host, telemetryLogger, onFirstRun, commandInput, null, jsonDomFactory)
         {
         }
 
-        public New3Command(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, Action<IEngineEnvironmentSettings, IInstaller> onFirstRun, INewCommandInput commandInput, string hivePath)
+        public New3Command(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, Action<IEngineEnvironmentSettings, IInstaller> onFirstRun, INewCommandInput commandInput, string hivePath, IJsonDocumentObjectModelFactory jsonDomFactory)
         {
             _telemetryLogger = telemetryLogger;
             host = new ExtendedTemplateEngineHost(host, this);
@@ -59,6 +62,7 @@ namespace Microsoft.TemplateEngine.Cli
             _onFirstRun = onFirstRun;
             _hostDataLoader = new HostSpecificDataLoader(EnvironmentSettings.SettingsLoader);
             _commandInput = commandInput;
+            _jsonDomFactory = jsonDomFactory;
 
             if (!EnvironmentSettings.Host.TryGetHostParamDefault("prefs:language", out _defaultLanguage))
             {
@@ -76,9 +80,9 @@ namespace Microsoft.TemplateEngine.Cli
 
         public EngineEnvironmentSettings EnvironmentSettings { get; private set; }
 
-        public static int Run(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, Action<IEngineEnvironmentSettings, IInstaller> onFirstRun, string[] args)
+        public static int Run(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, Action<IEngineEnvironmentSettings, IInstaller> onFirstRun, IJsonDocumentObjectModelFactory jsonDomFactory, string[] args)
         {
-            return Run(commandName, host, telemetryLogger, onFirstRun, args, null);
+            return Run(commandName, host, telemetryLogger, onFirstRun, jsonDomFactory, args, null);
         }
 
         private static readonly Guid _entryMutexGuid = new Guid("5CB26FD1-32DB-4F4C-B3DC-49CFD61633D2");
@@ -106,7 +110,7 @@ namespace Microsoft.TemplateEngine.Cli
             return _entryMutex;
         }
 
-        public static int Run(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, Action<IEngineEnvironmentSettings, IInstaller> onFirstRun, string[] args, string hivePath)
+        public static int Run(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, Action<IEngineEnvironmentSettings, IInstaller> onFirstRun, IJsonDocumentObjectModelFactory jsonDomFactory, string[] args, string hivePath)
         {
             if (!args.Any(x => string.Equals(x, "--debug:ephemeral-hive")))
             {
@@ -120,7 +124,7 @@ namespace Microsoft.TemplateEngine.Cli
 
             try
             {
-                return ActualRun(commandName, host, telemetryLogger, onFirstRun, args, hivePath);
+                return ActualRun(commandName, host, telemetryLogger, onFirstRun, jsonDomFactory, args, hivePath);
             }
             finally
             {
@@ -131,7 +135,7 @@ namespace Microsoft.TemplateEngine.Cli
             }
         }
 
-        private static int ActualRun(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, Action<IEngineEnvironmentSettings, IInstaller> onFirstRun, string[] args, string hivePath)
+        private static int ActualRun(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, Action<IEngineEnvironmentSettings, IInstaller> onFirstRun, IJsonDocumentObjectModelFactory jsonDomFactory, string[] args, string hivePath)
         {
             if (args.Any(x => string.Equals(x, "--debug:version", StringComparison.Ordinal)))
             {
@@ -167,7 +171,7 @@ namespace Microsoft.TemplateEngine.Cli
             }
 
             INewCommandInput commandInput = new NewCommandInputCli(commandName);
-            New3Command instance = new New3Command(commandName, host, telemetryLogger, onFirstRun, commandInput, hivePath);
+            New3Command instance = new New3Command(commandName, host, telemetryLogger, onFirstRun, commandInput, hivePath, jsonDomFactory);
 
             commandInput.OnExecute(instance.ExecuteAsync);
 
@@ -176,7 +180,7 @@ namespace Microsoft.TemplateEngine.Cli
             {
                 using (Timing.Over(host, "Execute"))
                 {
-                    result = commandInput.Execute(args);
+                    result = commandInput.Execute(jsonDomFactory, args);
                 }
             }
             catch (Exception ex)

@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Json;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 using Microsoft.TemplateEngine.Cli;
 using Microsoft.TemplateEngine.Cli.PostActionProcessors;
@@ -61,7 +62,9 @@ namespace Microsoft.TemplateEngine.EndToEndTestHarness
             host.VirtualizeDirectory(hivePath);
             host.VirtualizeDirectory(outputPath);
 
-            int result = New3Command.Run(CommandName, host, new TelemetryLogger(null), FirstRun, passthroughArgs, hivePath);
+            IJsonDocumentObjectModelFactory jsonDomFactory = null;
+
+            int result = New3Command.Run(CommandName, host, new TelemetryLogger(null), FirstRun, jsonDomFactory, passthroughArgs, hivePath);
             bool verificationsPassed = false;
 
             for (int i = 0; i < batteryCount; ++i)

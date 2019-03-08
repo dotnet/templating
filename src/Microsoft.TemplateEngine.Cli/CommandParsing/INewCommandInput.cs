@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Json;
 using Microsoft.TemplateEngine.Edge.Template;
 
 namespace Microsoft.TemplateEngine.Cli.CommandParsing
@@ -82,7 +83,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
         string HelpText { get; }
 
-        int Execute(params string[] args);
+        int Execute(IJsonDocumentObjectModelFactory jsonDomFactory, params string[] args);
 
         void OnExecute(Func<Task<CreationResultStatus>> invoke);
 

@@ -5,16 +5,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using Microsoft.TemplateEngine.Abstractions.Json;
 
 namespace Microsoft.TemplateEngine.Cli
 {
     internal static class AppExtensions
     {
-        public static IReadOnlyList<string> CreateArgListFromAdditionalFiles(IList<string> extraArgFileNames)
+        public static IReadOnlyList<string> CreateArgListFromAdditionalFiles(IList<string> extraArgFileNames, IJsonDocumentObjectModelFactory jsonDomFactory)
         {
-            IReadOnlyDictionary<string, IReadOnlyList<string>> argsDict = ParseArgsFromFile(extraArgFileNames);
+            IReadOnlyDictionary<string, IReadOnlyList<string>> argsDict = ParseArgsFromFile(extraArgFileNames, jsonDomFactory);
 
             List<string> argsFlattened = new List<string>();
             foreach (KeyValuePair<string, IReadOnlyList<string>> oneArg in argsDict)
@@ -29,12 +28,10 @@ namespace Microsoft.TemplateEngine.Cli
             return argsFlattened;
         }
 
-        public static IReadOnlyDictionary<string, IReadOnlyList<string>> ParseArgsFromFile(IList<string> extraArgFileNames)
+        public static IReadOnlyDictionary<string, IReadOnlyList<string>> ParseArgsFromFile(IList<string> extraArgFileNames, IJsonDocumentObjectModelFactory jsonDomFactory)
         {
             Dictionary<string, IReadOnlyList<string>> parameters = new Dictionary<string, IReadOnlyList<string>>();
 
-            // Note: If the same param is specified multiple times across the files, last-in-wins
-            // TODO: consider another course of action.
             if (extraArgFileNames.Count > 0)
             {
                 foreach (string argFile in extraArgFileNames)
@@ -48,25 +45,31 @@ namespace Microsoft.TemplateEngine.Cli
                     {
                         using (Stream s = File.OpenRead(argFile))
                         using (TextReader r = new StreamReader(s, Encoding.UTF8, true, 4096, true))
-                        using (JsonTextReader reader = new JsonTextReader(r))
                         {
-                            JObject obj = JObject.Load(reader);
+                            string text = r.ReadToEnd();
 
-                            foreach (JProperty property in obj.Properties())
+                            if (jsonDomFactory.TryParse(text, out IJsonToken jsonToken) && jsonToken is IJsonObject jsonObj)
                             {
-                                if (property.Value.Type == JTokenType.String)
-                                {
-                                    IReadOnlyList<string> values = new List<string>
-                                    {
-                                        property.Value.ToString()
-                                    };
+                                List<(string, Action<IJsonToken>)> keyValueExtractorMap = new List<(string, Action<IJsonToken>)>();
 
-                                    // adding 2 dashes to the file-based params
-                                    // won't work right if there's a param that should have 1 dash
-                                    //
-                                    // TOOD: come up with a better way to deal with this
-                                    parameters["--" + property.Name] = values;
+                                foreach (string key in jsonObj.PropertyNames)
+                                {
+                                    keyValueExtractorMap.Add((key,
+                                            (token) =>
+                                            {
+                                                if (token is IJsonValue tokenValue)
+                                                {
+                                                    // adding 2 dashes to the file-based params
+                                                    // won't work right if there's a param that should have 1 dash
+                                                    //
+                                                    // TOOD: come up with a better way to deal with this
+                                                    parameters["--" + key] = new List<string>() { tokenValue.Value.ToString() };
+                                                }
+                                            }
+                                        ));
                                 }
+
+                                jsonObj.ExtractValues(keyValueExtractorMap.ToArray());
                             }
                         }
                     }
