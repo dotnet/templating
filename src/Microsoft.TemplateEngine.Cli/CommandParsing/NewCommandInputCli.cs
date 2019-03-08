@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Json;
 using Microsoft.TemplateEngine.Edge.Template;
 using Microsoft.TemplateEngine.Utils;
 
@@ -50,7 +51,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
         public bool ExpandedExtraArgsFiles { get; private set; }
 
-        public int Execute(params string[] args)
+        public int Execute(IJsonDocumentObjectModelFactory jsonDomFactory, params string[] args)
         {
             _args = args;
             ParseArgs();
@@ -59,7 +60,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             if (ExtraArgsFileNames != null && ExtraArgsFileNames.Count > 0)
             {   // add the extra args to the _args and force a reparse
                 // This cannot adjust the template name, so no need to re-check here.
-                IReadOnlyList<string> extraArgs = AppExtensions.CreateArgListFromAdditionalFiles(ExtraArgsFileNames);
+                IReadOnlyList<string> extraArgs = AppExtensions.CreateArgListFromAdditionalFiles(ExtraArgsFileNames, jsonDomFactory);
                 List<string> allArgs = RemoveExtraArgsTokens(_args);
                 allArgs.AddRange(extraArgs);
                 _args = allArgs;

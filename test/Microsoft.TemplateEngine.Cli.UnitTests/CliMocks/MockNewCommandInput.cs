@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Json;
 using Microsoft.TemplateEngine.Cli.CommandParsing;
 using Microsoft.TemplateEngine.Edge.Template;
 
@@ -100,7 +101,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
 
         public bool ExpandedExtraArgsFiles { get; set; }
 
-        public int Execute(params string[] args)
+        public int Execute(IJsonDocumentObjectModelFactory jsonDomFactory, params string[] args)
         {
             throw new NotImplementedException();
         }
