@@ -1,19 +1,22 @@
-using System.IO;
+using System;
+using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Json;
 using Microsoft.TemplateEngine.Abstractions.Mount;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Cli
 {
     public class HostSpecificDataLoader : IHostSpecificDataLoader
     {
-        public HostSpecificDataLoader(ISettingsLoader settingsLoader)
+        public HostSpecificDataLoader(ISettingsLoader settingsLoader, IJsonDocumentObjectModelFactory jsonDomFactory)
         {
             _settingsLoader = settingsLoader;
+            _jsonDomFactory = jsonDomFactory;
         }
 
-        private ISettingsLoader _settingsLoader;
+        private readonly ISettingsLoader _settingsLoader;
+        private readonly IJsonDocumentObjectModelFactory _jsonDomFactory;
 
         public HostSpecificTemplateData ReadHostSpecificTemplateData(ITemplateInfo templateInfo)
         {
@@ -21,18 +24,24 @@ namespace Microsoft.TemplateEngine.Cli
 
             try
             {
+                HostSpecificTemplateData hostData = new HostSpecificTemplateData();
+
                 if (_settingsLoader.TryGetFileFromIdAndPath(templateInfo.HostConfigMountPointId, templateInfo.HostConfigPlace, out IFile file, out mountPoint))
                 {
-                    JObject jsonData;
-                    using (Stream stream = file.OpenRead())
-                    using (TextReader textReader = new StreamReader(stream, true))
-                    using (JsonReader jsonReader = new JsonTextReader(textReader))
+                    if (_jsonDomFactory.TryLoadFromFile(file, out IJsonToken root) && root is IJsonObject rootObject)
                     {
-                        jsonData = JObject.Load(jsonReader);
-                    }
+                        (string, Action<IJsonToken>)[] extractors = new (string, Action<IJsonToken>)[]
+                        {
+                            JsonHelpers.CreateArrayValueExtractor<string>("usageExamples", hostData.UsageExamples),
+                            SetupSymbolInfoExtractor(hostData),
+                            SetupIsHiddenExtractor(hostData)
+                        };
 
-                    return jsonData.ToObject<HostSpecificTemplateData>();
+                        rootObject.ExtractValues(extractors);
+                    }
                 }
+
+                return hostData;
             }
             catch
             {
@@ -47,6 +56,66 @@ namespace Microsoft.TemplateEngine.Cli
             }
 
             return HostSpecificTemplateData.Default;
+        }
+
+        private static (string, Action<IJsonToken>) SetupIsHiddenExtractor(HostSpecificTemplateData hostData)
+        {
+            return ("isHidden",
+                (token) =>
+                {
+                    if (token is IJsonValue tokenValue)
+                    {
+                        hostData.IsHidden = (bool)tokenValue.Value;
+                    }
+                }
+            );
+        }
+
+        private static (string, Action<IJsonToken>) SetupSymbolInfoExtractor(HostSpecificTemplateData hostData)
+        {
+            return ("symbolInfo",
+                (token) =>
+                {
+                    if (token is IJsonObject tokenObject)
+                    {
+                        // get the symbol objects
+                        Dictionary<string, IJsonObject> symbolObjectMap = new Dictionary<string, IJsonObject>();
+
+                        List<(string, Action<IJsonToken>)> symbolExtractorMap = new List<(string, Action<IJsonToken>)>();
+
+                        foreach (string symbolName in tokenObject.PropertyNames)
+                        {
+                            (string, Action<IJsonToken>) symbolExtractor = (symbolName,
+                                (symbolToken) =>
+                                {
+                                    if (symbolToken is IJsonObject symbolTokenObject)
+                                    {
+                                        symbolObjectMap[symbolName] = symbolTokenObject;
+                                    }
+                                }
+                            );
+
+                            symbolExtractorMap.Add(symbolExtractor);
+                        }
+
+                        tokenObject.ExtractValues(symbolExtractorMap.ToArray());
+
+                        // get the symbol details
+                        foreach (KeyValuePair<string, IJsonObject> symbolNameObjectPair in symbolObjectMap)
+                        {
+                            string symbolName = symbolNameObjectPair.Key;
+                            IJsonObject symbolObject = symbolNameObjectPair.Value;
+                            //
+                            Dictionary<string, string> infoForSymbol = new Dictionary<string, string>();
+                            (string, Action<IJsonToken>)[] symbolInfoExtractors = JsonHelpers.CreateStringKeyDictionaryExtractor<string>(symbolObject, infoForSymbol);
+
+                            symbolObject.ExtractValues(symbolInfoExtractors);
+
+                            hostData.SymbolInfo[symbolName] = infoForSymbol;
+                        }
+                    }
+                }
+            );
         }
     }
 }

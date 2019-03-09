@@ -60,7 +60,7 @@ namespace Microsoft.TemplateEngine.Cli
             CommandName = commandName;
             _paths = new Paths(EnvironmentSettings);
             _onFirstRun = onFirstRun;
-            _hostDataLoader = new HostSpecificDataLoader(EnvironmentSettings.SettingsLoader);
+            _hostDataLoader = new HostSpecificDataLoader(EnvironmentSettings.SettingsLoader, jsonDomFactory);
             _commandInput = commandInput;
             _jsonDomFactory = jsonDomFactory;
 

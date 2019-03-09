@@ -18,6 +18,7 @@ namespace Microsoft.TemplateEngine.Cli
 
         public HostSpecificTemplateData()
         {
+            UsageExamples = new List<string>();
             SymbolInfo = new Dictionary<string, Dictionary<string, string>>();
         }
 
