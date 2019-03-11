@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.TemplateEngine.Abstractions.Json;
 
 namespace Microsoft.TemplateEngine.Utils
@@ -24,11 +25,14 @@ namespace Microsoft.TemplateEngine.Utils
 
         public static (string, Action<IJsonToken>)[] CreateStringKeyDictionaryExtractor<TValue>(IJsonObject token, IDictionary<string, TValue> target)
         {
-            List<(string, Action<IJsonToken>)> extractorList = new List<(string, Action<IJsonToken>)>();
+            List<string> propertyNames = token.PropertyNames.ToList();
+            (string, Action<IJsonToken>)[] extractorArray = new (string, Action<IJsonToken>)[propertyNames.Count];
 
-            foreach (string key in token.PropertyNames)
+            for (int i = 0; i < propertyNames.Count; ++i)
             {
-                extractorList.Add((key,
+                string key = propertyNames[i];
+
+                extractorArray[i] = (key,
                     (element) =>
                     {
                         if (element is IJsonValue elementValue)
@@ -36,10 +40,10 @@ namespace Microsoft.TemplateEngine.Utils
                             target[key] = (TValue)elementValue.Value;
                         }
                     }
-                ));
+                );
             }
 
-            return extractorList.ToArray();
+            return extractorArray;
         }
     }
 }

@@ -25,10 +25,10 @@ namespace Microsoft.TemplateEngine.Cli
             try
             {
                 HostSpecificTemplateData hostData = new HostSpecificTemplateData();
-
+                
                 if (_settingsLoader.TryGetFileFromIdAndPath(templateInfo.HostConfigMountPointId, templateInfo.HostConfigPlace, out IFile file, out mountPoint))
                 {
-                    if (_jsonDomFactory.TryLoadFromFile(file, out IJsonToken root) && root is IJsonObject rootObject)
+                    if (_jsonDomFactory.TryLoadFromIFile(file, out IJsonToken root) && root is IJsonObject rootObject)
                     {
                         (string, Action<IJsonToken>)[] extractors = new (string, Action<IJsonToken>)[]
                         {
