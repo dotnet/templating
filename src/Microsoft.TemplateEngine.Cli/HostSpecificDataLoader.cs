@@ -60,7 +60,7 @@ namespace Microsoft.TemplateEngine.Cli
 
         private static (string, Action<IJsonToken>) SetupIsHiddenExtractor(HostSpecificTemplateData hostData)
         {
-            return ("isHidden",
+            return (nameof(hostData.IsHidden),
                 (token) =>
                 {
                     if (token is IJsonValue tokenValue)
@@ -73,13 +73,13 @@ namespace Microsoft.TemplateEngine.Cli
 
         private static (string, Action<IJsonToken>) SetupSymbolInfoExtractor(HostSpecificTemplateData hostData)
         {
-            return ("symbolInfo",
+            return (nameof(hostData.SymbolInfo),
                 (token) =>
                 {
                     if (token is IJsonObject tokenObject)
                     {
                         // get the symbol objects
-                        Dictionary<string, IJsonObject> symbolObjectMap = new Dictionary<string, IJsonObject>();
+                        Dictionary<string, IJsonObject> symbolObjectMap = new Dictionary<string, IJsonObject>(StringComparer.OrdinalIgnoreCase);
 
                         List<(string, Action<IJsonToken>)> symbolExtractorMap = new List<(string, Action<IJsonToken>)>();
 
@@ -105,8 +105,8 @@ namespace Microsoft.TemplateEngine.Cli
                         {
                             string symbolName = symbolNameObjectPair.Key;
                             IJsonObject symbolObject = symbolNameObjectPair.Value;
-                            //
-                            Dictionary<string, string> infoForSymbol = new Dictionary<string, string>();
+
+                            Dictionary<string, string> infoForSymbol = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                             (string, Action<IJsonToken>)[] symbolInfoExtractors = JsonHelpers.CreateStringKeyDictionaryExtractor<string>(symbolObject, infoForSymbol);
 
                             symbolObject.ExtractValues(symbolInfoExtractors);

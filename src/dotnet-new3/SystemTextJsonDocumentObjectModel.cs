@@ -366,7 +366,7 @@ namespace dotnet_new3
             public WritableJsonObject(IJsonDocumentObjectModelFactory factory)
                 : base(JsonTokenType.Object, factory)
             {
-                _properties = new Dictionary<string, IJsonToken>(StringComparer.Ordinal);
+                _properties = new Dictionary<string, IJsonToken>(StringComparer.OrdinalIgnoreCase);
             }
 
             public WritableJsonObject(JsonElement element, IJsonDocumentObjectModelFactory factory)
@@ -377,7 +377,7 @@ namespace dotnet_new3
                     throw new ArgumentException("element is not of type object");
                 }
 
-                _properties = new Dictionary<string, IJsonToken>(StringComparer.Ordinal);
+                _properties = new Dictionary<string, IJsonToken>(StringComparer.OrdinalIgnoreCase);
 
                 foreach (JsonProperty property in element.EnumerateObject())
                 {
@@ -389,8 +389,13 @@ namespace dotnet_new3
 
             public IReadOnlyCollection<string> ExtractValues(params (string propertyName, Action<IJsonToken> valueExtractor)[] mappings)
             {
-                Dictionary<string, Action<IJsonToken>> mapLookup = mappings.ToDictionary(x => x.propertyName, x => x.valueExtractor);
-                HashSet<string> foundProperties = new HashSet<string>(StringComparer.Ordinal);
+                Dictionary<string, Action<IJsonToken>> mapLookup = new Dictionary<string, Action<IJsonToken>>(StringComparer.OrdinalIgnoreCase);
+                foreach ((string propertyName, Action<IJsonToken> valueExtractor) entry in mappings)
+                {
+                    mapLookup.Add(entry.propertyName, entry.valueExtractor);
+                }
+
+                HashSet<string> foundProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
                 foreach (KeyValuePair<string, IJsonToken> entry in _properties)
                 {
@@ -633,8 +638,13 @@ namespace dotnet_new3
 
             public IReadOnlyCollection<string> ExtractValues(params (string propertyName, Action<IJsonToken> valueExtractor)[] mappings)
             {
-                Dictionary<string, Action<IJsonToken>> mapLookup = mappings.ToDictionary(x => x.propertyName, x => x.valueExtractor);
-                HashSet<string> foundProperties = new HashSet<string>(StringComparer.Ordinal);
+                Dictionary<string, Action<IJsonToken>> mapLookup = new Dictionary<string, Action<IJsonToken>>(StringComparer.OrdinalIgnoreCase);
+                foreach ((string propertyName, Action<IJsonToken> valueExtractor) entry in mappings)
+                {
+                    mapLookup.Add(entry.propertyName, entry.valueExtractor);
+                }
+
+                HashSet<string> foundProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
                 foreach (JsonProperty property in _element.EnumerateObject())
                 {

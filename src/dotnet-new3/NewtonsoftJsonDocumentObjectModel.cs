@@ -89,11 +89,11 @@ namespace dotnet_new3
 
             public IReadOnlyCollection<string> ExtractValues(params (string propertyName, Action<IJsonToken> valueExtractor)[] mappings)
             {
-                HashSet<string> foundNames = new HashSet<string>(StringComparer.Ordinal);
+                HashSet<string> foundNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
                 foreach ((string name, Action<IJsonToken> valueExtractor) in mappings)
                 {
-                    if (_object.TryGetValue(name, StringComparison.Ordinal, out JToken token))
+                    if (_object.TryGetValue(name, StringComparison.OrdinalIgnoreCase, out JToken token))
                     {
                         foundNames.Add(name);
                         valueExtractor(AdaptToken(token, Factory));
