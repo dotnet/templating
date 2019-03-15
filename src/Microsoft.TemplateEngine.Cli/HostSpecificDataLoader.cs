@@ -1,8 +1,7 @@
 using System.IO;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Json;
 using Microsoft.TemplateEngine.Abstractions.Mount;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Cli
 {
@@ -23,15 +22,17 @@ namespace Microsoft.TemplateEngine.Cli
             {
                 if (_settingsLoader.TryGetFileFromIdAndPath(templateInfo.HostConfigMountPointId, templateInfo.HostConfigPlace, out IFile file, out mountPoint))
                 {
-                    JObject jsonData;
                     using (Stream stream = file.OpenRead())
                     using (TextReader textReader = new StreamReader(stream, true))
-                    using (JsonReader jsonReader = new JsonTextReader(textReader))
                     {
-                        jsonData = JObject.Load(jsonReader);
-                    }
+                        string jsonText = textReader.ReadToEnd();
+                        if (!_settingsLoader.EnvironmentSettings.JsonDomFactory.TryParse(jsonText, out IJsonToken root))
+                        {
+                            return HostSpecificTemplateData.Default;
+                        }
 
-                    return jsonData.ToObject<HostSpecificTemplateData>();
+                        return HostSpecificTemplateData.DeserializationPlan.Deserialize(root);
+                    }
                 }
             }
             catch

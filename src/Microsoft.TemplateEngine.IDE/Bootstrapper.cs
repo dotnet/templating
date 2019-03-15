@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Json;
 using Microsoft.TemplateEngine.Edge;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Edge.Template;
@@ -24,10 +25,10 @@ namespace Microsoft.TemplateEngine.IDE
 
         private IInstaller Installer { get; }
 
-        public Bootstrapper(ITemplateEngineHost host, Action<IEngineEnvironmentSettings, IInstaller> onFirstRun, bool virtualizeConfiguration)
+        public Bootstrapper(ITemplateEngineHost host, Action<IEngineEnvironmentSettings, IInstaller> onFirstRun, bool virtualizeConfiguration, IJsonDocumentObjectModelFactory domFactory)
         {
             _host = host;
-            EnvironmentSettings = new EngineEnvironmentSettings(host, x => new SettingsLoader(x));
+            EnvironmentSettings = new EngineEnvironmentSettings(host, x => new SettingsLoader(x), domFactory);
             Installer = new Installer(EnvironmentSettings);
             _onFirstRun = onFirstRun;
             _paths = new Paths(EnvironmentSettings);

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Microsoft.TemplateEngine.Abstractions.Json;
+using Microsoft.TemplateEngine.Utils.Json;
 
 namespace Microsoft.TemplateEngine.Cli
 {
@@ -69,7 +70,7 @@ namespace Microsoft.TemplateEngine.Cli
                                         ));
                                 }
 
-                                jsonObj.ExtractValues(keyValueExtractorMap.ToArray());
+                                jsonObj.ExtractValues(keyValueExtractorMap);
                             }
                         }
                     }

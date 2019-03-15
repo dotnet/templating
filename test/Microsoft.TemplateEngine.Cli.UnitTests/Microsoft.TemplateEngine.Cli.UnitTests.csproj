@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>    
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <TestProject>true</TestProject>
@@ -10,6 +10,12 @@
 
     <ItemGroup>
         <None Include="TemplateInstallTests/TestTemplates/**/*" CopyToOutputDirectory="Always" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Include="..\..\src\dotnet-new3\NewtonsoftJsonDocumentObjectModel.cs" Link="NewtonsoftJsonDocumentObjectModel.cs" />
+      <Compile Include="..\..\src\dotnet-new3\StreamBufferWriterImpl.cs" Link="StreamBufferWriterImpl.cs" />
+      <Compile Include="..\..\src\dotnet-new3\SystemTextJsonDocumentObjectModel.cs" Link="SystemTextJsonDocumentObjectModel.cs" />
     </ItemGroup>
 
     <ItemGroup>

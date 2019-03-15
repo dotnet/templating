@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using dotnet_new3;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Json;
 using Microsoft.TemplateEngine.Cli.PostActionProcessors;
@@ -57,7 +58,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateInstallTests
             int firstInstallResult = New3Command.Run(CommandName, host, telemetryLogger, null, jsonDomFactory, installArgs);
             Assert.Equal(0, firstInstallResult);
 
-            EngineEnvironmentSettings environemnt = new EngineEnvironmentSettings(host, x => new SettingsLoader(x));
+            EngineEnvironmentSettings environemnt = new EngineEnvironmentSettings(host, x => new SettingsLoader(x), new SystemTextJsonDocumentObjectModel());
             SettingsLoader settingsLoader = (SettingsLoader)environemnt.SettingsLoader;
             IHostSpecificDataLoader hostDataLoader = new MockHostSpecificDataLoader();
 
