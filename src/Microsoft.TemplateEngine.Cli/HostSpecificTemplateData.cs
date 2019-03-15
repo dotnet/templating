@@ -18,7 +18,7 @@ namespace Microsoft.TemplateEngine.Cli
         private const string AlwaysShowKey = "alwaysShow";
         private const string UsageExamplesKey = "usageExamples";
         private const string ValueKey = "Value";
-        private const string SymbolInfoKey = "symbolInfoKey";
+        private const string SymbolInfoKey = "symbolInfo";
         private const string SymbolInfoEntryKey = "symbolInfoEntry";
 
         internal static readonly DeserializationPlan<HostSpecificTemplateData> DeserializationPlan = Deserializer.CreateDeserializerBuilder()
@@ -57,7 +57,7 @@ namespace Microsoft.TemplateEngine.Cli
             {
                 foreach (KeyValuePair<string, DeserializationContext> entry in symbolInfoData)
                 {
-                    data._symbolInfo[entry.Key] = entry.Value.ToDictionary<string>();
+                    data._symbolInfo[entry.Key] = entry.Value.GetValue<Dictionary<string, DeserializationContext>>(SymbolInfoEntryKey).ToDictionary(x => x.Key, x => x.Value.GetValue<string>(ValueKey));
                 }
             }
 

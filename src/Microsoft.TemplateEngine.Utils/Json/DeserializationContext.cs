@@ -29,8 +29,7 @@ namespace Microsoft.TemplateEngine.Utils.Json
                 throw new InvalidOperationException("Duplicate handler specification");
             }
 
-            _arrayContextName = storeAs;
-            return _arrayBuilder = new TokenBuilder<TokenBuilder<T>>(this);
+            return _arrayBuilder = new TokenBuilder<TokenBuilder<T>>(this) { _arrayContextName = storeAs };
         }
 
         public TokenBuilder<T> IfBool(string storeAs, Func<bool, object> handler = null)
