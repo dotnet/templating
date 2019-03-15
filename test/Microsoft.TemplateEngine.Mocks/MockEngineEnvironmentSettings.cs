@@ -1,7 +1,6 @@
-﻿using Microsoft.TemplateEngine.Abstractions;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Json;
 
 namespace Microsoft.TemplateEngine.Mocks
 {
@@ -14,5 +13,7 @@ namespace Microsoft.TemplateEngine.Mocks
         public IEnvironment Environment { get { throw new NotImplementedException(); } }
 
         public IPathInfo Paths { get { throw new NotImplementedException(); } }
+
+        public IJsonDocumentObjectModelFactory JsonDomFactory { get { throw new NotImplementedException(); } }
     }
 }

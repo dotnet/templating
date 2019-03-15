@@ -4,6 +4,12 @@
         <TargetFrameworks Condition="'$(PackSpecific)' == 'true'">netstandard2.0</TargetFrameworks>
         <IsPackable>true</IsPackable>
     </PropertyGroup>
+    <ItemGroup>
+      <Compile Include="..\..\src\dotnet-new3\JsonDomFactory.cs" Link="JsonDomFactory.cs" />
+      <Compile Include="..\..\src\dotnet-new3\NewtonsoftJsonDocumentObjectModel.cs" Link="NewtonsoftJsonDocumentObjectModel.cs" />
+      <Compile Include="..\..\src\dotnet-new3\StreamBufferWriterImpl.cs" Link="StreamBufferWriterImpl.cs" />
+      <Compile Include="..\..\src\dotnet-new3\SystemTextJsonDocumentObjectModel.cs" Link="SystemTextJsonDocumentObjectModel.cs" />
+    </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="$(SrcDir)Microsoft.TemplateEngine.Abstractions\Microsoft.TemplateEngine.Abstractions.csproj" />

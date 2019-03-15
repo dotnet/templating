@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
+using dotnet_new3;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.TestHelper;
@@ -20,7 +21,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
                 Locale = "en-US"
             };
 
-            EnvironmentSettings = new EngineEnvironmentSettings(host, s => null);
+            EnvironmentSettings = new EngineEnvironmentSettings(host, s => null, new JsonDomFactory());
             string home = "%USERPROFILE%";
 
             if (Path.DirectorySeparatorChar == '/')

@@ -52,7 +52,7 @@ namespace Microsoft.TemplateEngine.Cli
         {
             _telemetryLogger = telemetryLogger;
             host = new ExtendedTemplateEngineHost(host, this);
-            EnvironmentSettings = new EngineEnvironmentSettings(host, x => new SettingsLoader(x), hivePath);
+            EnvironmentSettings = new EngineEnvironmentSettings(host, x => new SettingsLoader(x), hivePath, jsonDomFactory);
             _settingsLoader = (SettingsLoader)EnvironmentSettings.SettingsLoader;
             Installer = new Installer(EnvironmentSettings);
             _templateCreator = new TemplateCreator(EnvironmentSettings);

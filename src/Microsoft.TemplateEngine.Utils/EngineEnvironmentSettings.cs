@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -7,22 +7,24 @@ using System.Linq;
 using System.Runtime.InteropServices;
 #endif
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Json;
 
 namespace Microsoft.TemplateEngine.Utils
 {
     public class EngineEnvironmentSettings : IEngineEnvironmentSettings
     {
-        public EngineEnvironmentSettings(ITemplateEngineHost host, Func<IEngineEnvironmentSettings, ISettingsLoader> settingsLoaderFactory)
-            : this(host, settingsLoaderFactory, null)
+        public EngineEnvironmentSettings(ITemplateEngineHost host, Func<IEngineEnvironmentSettings, ISettingsLoader> settingsLoaderFactory, IJsonDocumentObjectModelFactory domFactory)
+            : this(host, settingsLoaderFactory, null, domFactory)
         {
         }
 
-        public EngineEnvironmentSettings(ITemplateEngineHost host, Func<IEngineEnvironmentSettings, ISettingsLoader> settingsLoaderFactory, string hiveLocation)
+        public EngineEnvironmentSettings(ITemplateEngineHost host, Func<IEngineEnvironmentSettings, ISettingsLoader> settingsLoaderFactory, string hiveLocation, IJsonDocumentObjectModelFactory domFactory)
         {
             Host = host;
             Paths = new DefaultPathInfo(this, hiveLocation);
             Environment = new DefaultEnvironment();
             SettingsLoader = settingsLoaderFactory(this);
+            JsonDomFactory = domFactory;
         }
 
         public ISettingsLoader SettingsLoader { get; }
@@ -32,6 +34,8 @@ namespace Microsoft.TemplateEngine.Utils
         public IEnvironment Environment { get; set; }
 
         public IPathInfo Paths { get; set; }
+
+        public IJsonDocumentObjectModelFactory JsonDomFactory { get; }
 
         private class DefaultPathInfo : IPathInfo
         {

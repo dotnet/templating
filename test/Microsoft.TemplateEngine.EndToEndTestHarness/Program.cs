@@ -11,7 +11,6 @@ using Microsoft.TemplateEngine.Cli.PostActionProcessors;
 using Microsoft.TemplateEngine.Edge;
 using Microsoft.TemplateEngine.Edge.TemplateUpdates;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects;
-using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config;
 using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json.Linq;
 
@@ -222,10 +221,8 @@ namespace Microsoft.TemplateEngine.EndToEndTestHarness
             string asmPath = cb.LocalPath;
             string dir = Path.GetDirectoryName(asmPath);
 
-            string packages = Path.Combine(dir, "..", "..", "..", "..", "..", "artifacts", "packages") + Path.DirectorySeparatorChar + "*";
             string templates = Path.Combine(dir, "..", "..", "..", "..", "..", "template_feed") + Path.DirectorySeparatorChar;
             string testTemplates = Path.Combine(dir, "test_templates") + Path.DirectorySeparatorChar;
-            installer.InstallPackages(new[] { packages });
             installer.InstallPackages(new[] { templates, testTemplates });
         }
     }

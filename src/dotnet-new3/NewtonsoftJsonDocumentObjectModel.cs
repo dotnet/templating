@@ -1,4 +1,7 @@
-//#if NET45
+// Copyright (c) .NET Foundation and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+#if !NETCOREAPP3_0
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -80,27 +83,51 @@ namespace dotnet_new3
             private readonly JObject _object;
 
             public JObjectAdapter(JToken token, IJsonDocumentObjectModelFactory factory)
-                : base (token, factory)
+                : base(token, factory)
             {
                 _object = (JObject)token;
             }
 
             public IEnumerable<string> PropertyNames => _object.Properties().Select(x => x.Name);
 
-            public IReadOnlyCollection<string> ExtractValues(params (string propertyName, Action<IJsonToken> valueExtractor)[] mappings)
+            public ISet<string> ExtractValues(IReadOnlyDictionary<string, Action<IJsonToken>> mappings)
             {
-                HashSet<string> foundNames = new HashSet<string>(StringComparer.Ordinal);
+                HashSet<string> foundNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-                foreach ((string name, Action<IJsonToken> valueExtractor) in mappings)
+                foreach (KeyValuePair<string, Action<IJsonToken>> entry in mappings)
                 {
-                    if (_object.TryGetValue(name, StringComparison.Ordinal, out JToken token))
+                    if (_object.TryGetValue(entry.Key, StringComparison.OrdinalIgnoreCase, out JToken token))
                     {
-                        foundNames.Add(name);
-                        valueExtractor(AdaptToken(token, Factory));
+                        foundNames.Add(entry.Key);
+                        entry.Value(AdaptToken(token, Factory));
                     }
                 }
 
                 return foundNames;
+            }
+
+            public ISet<string> ExtractValues<T>(T context, IReadOnlyDictionary<string, Action<IJsonToken, T>> mappings)
+            {
+                HashSet<string> foundNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                foreach (KeyValuePair<string, Action<IJsonToken, T>> entry in mappings)
+                {
+                    if (_object.TryGetValue(entry.Key, StringComparison.OrdinalIgnoreCase, out JToken token))
+                    {
+                        foundNames.Add(entry.Key);
+                        entry.Value(AdaptToken(token, Factory), context);
+                    }
+                }
+
+                return foundNames;
+            }
+
+            public IEnumerable<KeyValuePair<string, IJsonToken>> Properties()
+            {
+                foreach (JProperty property in _object.Properties())
+                {
+                    yield return new KeyValuePair<string, IJsonToken>(property.Name, AdaptToken(property.Value, Factory));
+                }
             }
 
             public IJsonObject RemoveValue(string propertyName)
@@ -126,7 +153,7 @@ namespace dotnet_new3
             private readonly JArray _array;
 
             public JArrayAdapter(JToken token, IJsonDocumentObjectModelFactory factory)
-                : base (token, factory)
+                : base(token, factory)
             {
                 _array = (JArray)token;
             }
@@ -146,7 +173,7 @@ namespace dotnet_new3
                 return this;
             }
 
-            public IEnumerator<IJsonToken> GetEnumerator() => _array.Select(x => AdaptToken(x, Factory)).GetEnumerator();
+            public IEnumerator<IJsonToken> GetEnumerator() => _array.Select(t => AdaptToken(t, Factory)).GetEnumerator();
 
             public IJsonArray RemoveAt(int index)
             {
@@ -160,11 +187,24 @@ namespace dotnet_new3
         private class JValueAdapter : JTokenAdapter, IJsonValue
         {
             public JValueAdapter(JToken token, IJsonDocumentObjectModelFactory factory)
-                : base (token, factory)
+                : base(token, factory)
             {
             }
 
-            public object Value => Token.Value<object>();
+            public object Value
+            {
+                get
+                {
+                    object val = ((JValue)Token).Value;
+                    switch (Token.Type)
+                    {
+                        case JTokenType.Integer:
+                            return (double)(long)val;
+                        default:
+                            return val;
+                    }
+                }
+            }
         }
 
         private class JTokenAdapter : IJsonToken
@@ -217,4 +257,4 @@ namespace dotnet_new3
         }
     }
 }
-//#endif
+#endif

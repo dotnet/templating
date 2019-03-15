@@ -1,3 +1,7 @@
+// Copyright (c) .NET Foundation and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+#if NETCOREAPP3_0
 using System;
 using System.Buffers;
 using System.Collections;
@@ -158,7 +162,11 @@ namespace dotnet_new3
 
             public IEnumerable<string> PropertyNames => _basis.PropertyNames;
 
-            public IReadOnlyCollection<string> ExtractValues(params (string propertyName, Action<IJsonToken> valueExtractor)[] mappings) => _basis.ExtractValues(mappings);
+            public ISet<string> ExtractValues(IReadOnlyDictionary<string, Action<IJsonToken>> mappings) => _basis.ExtractValues(mappings);
+
+            public ISet<string> ExtractValues<T>(T context, IReadOnlyDictionary<string, Action<IJsonToken, T>> mappings) => _basis.ExtractValues(context, mappings);
+
+            public IEnumerable<KeyValuePair<string, IJsonToken>> Properties() => _basis.Properties();
 
             public IJsonObject RemoveValue(string propertyName)
             {
@@ -366,7 +374,7 @@ namespace dotnet_new3
             public WritableJsonObject(IJsonDocumentObjectModelFactory factory)
                 : base(JsonTokenType.Object, factory)
             {
-                _properties = new Dictionary<string, IJsonToken>(StringComparer.Ordinal);
+                _properties = new Dictionary<string, IJsonToken>(StringComparer.OrdinalIgnoreCase);
             }
 
             public WritableJsonObject(JsonElement element, IJsonDocumentObjectModelFactory factory)
@@ -377,7 +385,7 @@ namespace dotnet_new3
                     throw new ArgumentException("element is not of type object");
                 }
 
-                _properties = new Dictionary<string, IJsonToken>(StringComparer.Ordinal);
+                _properties = new Dictionary<string, IJsonToken>(StringComparer.OrdinalIgnoreCase);
 
                 foreach (JsonProperty property in element.EnumerateObject())
                 {
@@ -387,14 +395,13 @@ namespace dotnet_new3
 
             public IEnumerable<string> PropertyNames => _properties.Keys;
 
-            public IReadOnlyCollection<string> ExtractValues(params (string propertyName, Action<IJsonToken> valueExtractor)[] mappings)
+            public ISet<string> ExtractValues(IReadOnlyDictionary<string, Action<IJsonToken>> mappings)
             {
-                Dictionary<string, Action<IJsonToken>> mapLookup = mappings.ToDictionary(x => x.propertyName, x => x.valueExtractor);
-                HashSet<string> foundProperties = new HashSet<string>(StringComparer.Ordinal);
+                HashSet<string> foundProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
                 foreach (KeyValuePair<string, IJsonToken> entry in _properties)
                 {
-                    if (mapLookup.TryGetValue(entry.Key, out Action<IJsonToken> action))
+                    if (mappings.TryGetValue(entry.Key, out Action<IJsonToken> action))
                     {
                         action(entry.Value);
                         foundProperties.Add(entry.Key);
@@ -403,6 +410,24 @@ namespace dotnet_new3
 
                 return foundProperties;
             }
+
+            public ISet<string> ExtractValues<T>(T context, IReadOnlyDictionary<string, Action<IJsonToken, T>> mappings)
+            {
+                HashSet<string> foundProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                foreach (KeyValuePair<string, IJsonToken> entry in _properties)
+                {
+                    if (mappings.TryGetValue(entry.Key, out Action<IJsonToken, T> action))
+                    {
+                        action(entry.Value, context);
+                        foundProperties.Add(entry.Key);
+                    }
+                }
+
+                return foundProperties;
+            }
+
+            public IEnumerable<KeyValuePair<string, IJsonToken>> Properties() => _properties;
 
             public IJsonObject RemoveValue(string propertyName)
             {
@@ -631,26 +656,54 @@ namespace dotnet_new3
 
             public IEnumerable<string> PropertyNames => _element.EnumerateObject().Select(x => x.Name);
 
-            public IReadOnlyCollection<string> ExtractValues(params (string propertyName, Action<IJsonToken> valueExtractor)[] mappings)
+            public ISet<string> ExtractValues(IReadOnlyDictionary<string, Action<IJsonToken>> mappings)
             {
-                Dictionary<string, Action<IJsonToken>> mapLookup = mappings.ToDictionary(x => x.propertyName, x => x.valueExtractor);
-                HashSet<string> foundProperties = new HashSet<string>(StringComparer.Ordinal);
+                HashSet<string> foundProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
                 foreach (JsonProperty property in _element.EnumerateObject())
                 {
-                    if (mapLookup.TryGetValue(property.Name, out Action<IJsonToken> handler))
+                    if (mappings.TryGetValue(property.Name, out Action<IJsonToken> handler))
                     {
                         foundProperties.Add(property.Name);
                         handler(AdaptElement(property.Value, Factory));
                     }
 
-                    if (foundProperties.Count == mappings.Length)
+                    if (foundProperties.Count == mappings.Count)
                     {
                         break;
                     }
                 }
 
                 return foundProperties;
+            }
+
+            public ISet<string> ExtractValues<T>(T context, IReadOnlyDictionary<string, Action<IJsonToken, T>> mappings)
+            {
+                HashSet<string> foundProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                foreach (JsonProperty property in _element.EnumerateObject())
+                {
+                    if (mappings.TryGetValue(property.Name, out Action<IJsonToken, T> handler))
+                    {
+                        foundProperties.Add(property.Name);
+                        handler(AdaptElement(property.Value, Factory), context);
+                    }
+
+                    if (foundProperties.Count == mappings.Count)
+                    {
+                        break;
+                    }
+                }
+
+                return foundProperties;
+            }
+
+            public IEnumerable<KeyValuePair<string, IJsonToken>> Properties()
+            {
+                foreach(JsonProperty property in _element.EnumerateObject())
+                {
+                    yield return new KeyValuePair<string, IJsonToken>(property.Name, AdaptElement(property.Value, Factory));
+                }
             }
 
             public IJsonObject RemoveValue(string propertyName)
@@ -695,3 +748,4 @@ namespace dotnet_new3
         }
     }
 }
+#endif

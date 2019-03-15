@@ -1,3 +1,5 @@
+using Microsoft.TemplateEngine.Abstractions.Json;
+
 namespace Microsoft.TemplateEngine.Abstractions
 {
     public interface IEngineEnvironmentSettings
@@ -9,5 +11,7 @@ namespace Microsoft.TemplateEngine.Abstractions
         IEnvironment Environment { get; }
 
         IPathInfo Paths { get; }
+
+        IJsonDocumentObjectModelFactory JsonDomFactory { get; }
     }
 }

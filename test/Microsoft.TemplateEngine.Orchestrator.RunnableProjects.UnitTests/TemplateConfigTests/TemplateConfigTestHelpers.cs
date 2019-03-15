@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using dotnet_new3;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Core.Contracts;
@@ -28,7 +29,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             };
 
             host.FileSystem = new PhysicalFileSystem();
-            return new EngineEnvironmentSettings(host, x => null);
+            return new EngineEnvironmentSettings(host, x => null, new JsonDomFactory());
         }
 
         // Note: this does not deal with configs split into multiple files.

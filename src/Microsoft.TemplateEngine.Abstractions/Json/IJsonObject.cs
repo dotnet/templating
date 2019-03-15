@@ -11,6 +11,10 @@ namespace Microsoft.TemplateEngine.Abstractions.Json
 
         IJsonObject SetValue(string propertyName, IJsonToken value);
 
-        IReadOnlyCollection<string> ExtractValues(params (string propertyName, Action<IJsonToken> valueExtractor)[] mappings);
+        ISet<string> ExtractValues(IReadOnlyDictionary<string, Action<IJsonToken>> mappings);
+
+        ISet<string> ExtractValues<T>(T context, IReadOnlyDictionary<string, Action<IJsonToken, T>> mappings);
+
+        IEnumerable<KeyValuePair<string, IJsonToken>> Properties();
     }
 }
