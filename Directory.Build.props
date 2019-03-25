@@ -7,11 +7,7 @@
         <LangVersion>7.3</LangVersion>
         <Product>Microsoft .NET Core</Product>
 
-        <!--
-          Suppress a warning about upcoming deprecation of PackageLicenseUrl. When embedding licenses are supported,
-          replace PackageLicenseUrl with PackageLicenseExpression.
-        -->
-        <NoWarn>$(NoWarn);NU5125</NoWarn>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
 
     <PropertyGroup>
