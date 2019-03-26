@@ -700,7 +700,7 @@ namespace dotnet_new3
 
             public IEnumerable<KeyValuePair<string, IJsonToken>> Properties()
             {
-                foreach(JsonProperty property in _element.EnumerateObject())
+                foreach (JsonProperty property in _element.EnumerateObject())
                 {
                     yield return new KeyValuePair<string, IJsonToken>(property.Name, AdaptElement(property.Value, Factory));
                 }
