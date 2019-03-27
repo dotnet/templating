@@ -4,43 +4,43 @@ using Microsoft.TemplateEngine.Abstractions.Json;
 
 namespace Microsoft.TemplateEngine.Utils.Json
 {
-    internal class JsonBuilder<TResult, TResultConcrete> : IJsonBuilder<TResult>
-        where TResultConcrete : TResult
+    internal class JsonBuilder<T, TConcrete> : IJsonBuilder<T>
+        where TConcrete : T
     {
-        private readonly Func<TResult> _creator;
-        private readonly Dictionary<string, Action<IJsonToken, TResult>> _deserializeSteps = new Dictionary<string, Action<IJsonToken, TResult>>(StringComparer.OrdinalIgnoreCase);
-        private readonly List<Action<TResult, IJsonObject>> _serializeSteps = new List<Action<TResult, IJsonObject>>();
+        private readonly Func<T> _creator;
+        private readonly Dictionary<string, Action<IJsonToken, T>> _deserializeSteps = new Dictionary<string, Action<IJsonToken, T>>(StringComparer.OrdinalIgnoreCase);
+        private readonly List<Action<T, IJsonObject>> _serializeSteps = new List<Action<T, IJsonObject>>();
 
-        public JsonBuilder(Func<TResult> creator)
+        public JsonBuilder(Func<T> creator)
         {
             _creator = creator;
         }
 
-        public TResult Deserialize(IJsonToken source)
+        public T Deserialize(IJsonToken source)
         {
             if (source.TokenType == JsonTokenType.Object)
             {
-                TResult result = _creator();
+                T result = _creator();
                 ((IJsonObject)source).ExtractValues(result, _deserializeSteps);
                 return result;
             }
 
-            return default(TResult);
+            return default(T);
         }
 
-        public JsonBuilder<TResult, TResultConcrete> MapCore<T, TConcrete>(Getter<TResultConcrete, T> getter, Serialize<T> serialize, Deserialize<TConcrete> deserialize, Setter<TResultConcrete, T> setter, Func<TConcrete> itemCreator, string propertyName)
-            where TConcrete : T
+        public JsonBuilder<T, TConcrete> MapCore<TValue, TValueConcrete>(Getter<TConcrete, TValue> getter, Serialize<TValue> serialize, Deserialize<TValueConcrete> deserialize, Setter<TConcrete, TValue> setter, Func<TValueConcrete> itemCreator, string propertyName)
+            where TValueConcrete : TValue
             => MapInternal(getter, serialize, t => deserialize(t, itemCreator), setter, propertyName);
 
-        public JsonBuilder<TResult, TResultConcrete> MapCore<T, TConcrete>(Getter<TResultConcrete, T> getter, Serialize<T> serialize, DirectDeserialize<TConcrete> deserialize, Setter<TResultConcrete, T> setter, string propertyName)
-            where TConcrete : T
+        public JsonBuilder<T, TConcrete> MapCore<TValue, TValueConcrete>(Getter<TConcrete, TValue> getter, Serialize<TValue> serialize, DirectDeserialize<TValueConcrete> deserialize, Setter<TConcrete, TValue> setter, string propertyName)
+            where TValueConcrete : TValue
             => MapInternal(getter, serialize, deserialize, setter, propertyName);
 
-        public IJsonObject Serialize(IJsonDocumentObjectModelFactory domFactory, TResult item)
+        public IJsonObject Serialize(IJsonDocumentObjectModelFactory domFactory, T item)
         {
             IJsonObject obj = domFactory.CreateObject();
 
-            foreach (Action<TResult, IJsonObject> action in _serializeSteps)
+            foreach (Action<T, IJsonObject> action in _serializeSteps)
             {
                 action(item, obj);
             }
@@ -48,17 +48,17 @@ namespace Microsoft.TemplateEngine.Utils.Json
             return obj;
         }
 
-        private JsonBuilder<TResult, TResultConcrete> MapInternal<T, TConcrete>(Getter<TResultConcrete, T> getter, Serialize<T> serialize, DirectDeserialize<TConcrete> deserialize, Setter<TResultConcrete, T> setter, string propertyName)
-                    where TConcrete : T
+        private JsonBuilder<T, TConcrete> MapInternal<TValue, TValueConcrete>(Getter<TConcrete, TValue> getter, Serialize<TValue> serialize, DirectDeserialize<TValueConcrete> deserialize, Setter<TConcrete, TValue> setter, string propertyName)
+            where TValueConcrete : TValue
         {
             _serializeSteps.Add((source, target) =>
             {
-                T value = getter((TResultConcrete)source);
+                TValue value = getter((TConcrete)source);
                 IJsonToken token = serialize(target.Factory, value);
                 target.SetValue(propertyName, token);
             });
 
-            _deserializeSteps[propertyName] = (source, target) => setter((TResultConcrete)target, deserialize(source));
+            _deserializeSteps[propertyName] = (source, target) => setter((TConcrete)target, deserialize(source));
 
             return this;
         }
