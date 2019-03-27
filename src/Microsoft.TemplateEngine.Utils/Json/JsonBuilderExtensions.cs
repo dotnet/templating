@@ -81,133 +81,133 @@ namespace Microsoft.TemplateEngine.Utils.Json
         public static string DeserializeString(IJsonToken token)
             => ((IJsonValue)token).Value?.ToString();
 
-        public static DictionaryOperations<TResult, TResultConcrete, TElement, TElementConcrete> Dictionary<TResult, TResultConcrete, TElement, TElementConcrete>(this JsonBuilder<TResult, TResultConcrete> builder, IWrapper<TElement, TElementConcrete> wrapper)
-            where TResultConcrete : TResult
+        public static DictionaryOperations<T, TConcrete, TElement, TElementConcrete> Dictionary<T, TConcrete, TElement, TElementConcrete>(this JsonBuilder<T, TConcrete> builder, IWrapper<TElement, TElementConcrete> wrapper)
+            where TConcrete : T
             where TElementConcrete : TElement
-            => new DictionaryOperations<TResult, TResultConcrete, TElement, TElementConcrete>(builder, wrapper.Serialize, wrapper.Deserialize);
+            => new DictionaryOperations<T, TConcrete, TElement, TElementConcrete>(builder, wrapper.Serialize, wrapper.Deserialize);
 
-        public static DictionaryOperations<TResult, TResultConcrete, TElement, TElementConcrete> Dictionary<TResult, TResultConcrete, TElement, TElementConcrete>(this JsonBuilder<TResult, TResultConcrete> builder, Serialize<TElement> serializer, DirectDeserialize<TElementConcrete> deserializer)
-            where TResultConcrete : TResult
+        public static DictionaryOperations<T, TConcrete, TElement, TElementConcrete> Dictionary<T, TConcrete, TElement, TElementConcrete>(this JsonBuilder<T, TConcrete> builder, Serialize<TElement> serializer, DirectDeserialize<TElementConcrete> deserializer)
+            where TConcrete : T
             where TElementConcrete : TElement
-            => new DictionaryOperations<TResult, TResultConcrete, TElement, TElementConcrete>(builder, serializer, deserializer);
+            => new DictionaryOperations<T, TConcrete, TElement, TElementConcrete>(builder, serializer, deserializer);
 
-        public static DictionaryOperations<TResult, TResultConcrete, TElement, TElementConcrete> Dictionary<TResult, TResultConcrete, TElement, TElementConcrete>(this JsonBuilder<TResult, TResultConcrete> builder)
-            where TResultConcrete : TResult
+        public static DictionaryOperations<T, TConcrete, TElement, TElementConcrete> Dictionary<T, TConcrete, TElement, TElementConcrete>(this JsonBuilder<T, TConcrete> builder)
+            where TConcrete : T
             where TElement : IJsonSerializable<TElement>
             where TElementConcrete : TElement, new()
-            => new DictionaryOperations<TResult, TResultConcrete, TElement, TElementConcrete>(builder, JsonSerialize<TElement, TElementConcrete>.Serialize, JsonSerialize<TElement, TElementConcrete>.Deserialize);
+            => new DictionaryOperations<T, TConcrete, TElement, TElementConcrete>(builder, JsonSerialize<TElement, TElementConcrete>.Serialize, JsonSerialize<TElement, TElementConcrete>.Deserialize);
 
-        public static DictionaryOperations<TResult, TResultConcrete, TElement, TElement> Dictionary<TResult, TResultConcrete, TElement>(this JsonBuilder<TResult, TResultConcrete> builder, Serialize<TElement> serializer, DirectDeserialize<TElement> deserializer)
-            where TResultConcrete : TResult
-            => builder.Dictionary<TResult, TResultConcrete, TElement, TElement>(serializer, deserializer);
+        public static DictionaryOperations<T, TConcrete, TElement, TElement> Dictionary<T, TConcrete, TElement>(this JsonBuilder<T, TConcrete> builder, Serialize<TElement> serializer, DirectDeserialize<TElement> deserializer)
+            where TConcrete : T
+            => builder.Dictionary<T, TConcrete, TElement, TElement>(serializer, deserializer);
 
-        public static DictionaryOperations<TResult, TResultConcrete, Guid, Guid> DictionaryOfGUid<TResult, TResultConcrete>(this JsonBuilder<TResult, TResultConcrete> builder)
-            where TResultConcrete : TResult
-            => builder.Dictionary<TResult, TResultConcrete, Guid, Guid>(Serialize, DeserializeGuid);
+        public static DictionaryOperations<T, TConcrete, Guid, Guid> DictionaryOfGUid<T, TConcrete>(this JsonBuilder<T, TConcrete> builder)
+            where TConcrete : T
+            => builder.Dictionary<T, TConcrete, Guid, Guid>(Serialize, DeserializeGuid);
 
-        public static DictionaryOperations<TResult, TResultConcrete, int, int> DictionaryOfInt<TResult, TResultConcrete>(this JsonBuilder<TResult, TResultConcrete> builder)
-            where TResultConcrete : TResult
-            => builder.Dictionary<TResult, TResultConcrete, int, int>(Serialize, DeserializeInt);
+        public static DictionaryOperations<T, TConcrete, int, int> DictionaryOfInt<T, TConcrete>(this JsonBuilder<T, TConcrete> builder)
+            where TConcrete : T
+            => builder.Dictionary<T, TConcrete, int, int>(Serialize, DeserializeInt);
 
-        public static DictionaryOperations<TResult, TResultConcrete, string, string> DictionaryOfString<TResult, TResultConcrete>(this JsonBuilder<TResult, TResultConcrete> builder)
-            where TResultConcrete : TResult
-            => builder.Dictionary<TResult, TResultConcrete, string, string>(Serialize, DeserializeString);
+        public static DictionaryOperations<T, TConcrete, string, string> DictionaryOfString<T, TConcrete>(this JsonBuilder<T, TConcrete> builder)
+            where TConcrete : T
+            => builder.Dictionary<T, TConcrete, string, string>(Serialize, DeserializeString);
 
-        public static ListOperations<TResult, TResultConcrete, TElement, TElementConcrete> List<TResult, TResultConcrete, TElement, TElementConcrete>(this JsonBuilder<TResult, TResultConcrete> builder, IWrapper<TElement, TElementConcrete> wrapper)
-            where TResultConcrete : TResult
+        public static ListOperations<T, TConcrete, TElement, TElementConcrete> List<T, TConcrete, TElement, TElementConcrete>(this JsonBuilder<T, TConcrete> builder, IWrapper<TElement, TElementConcrete> wrapper)
+            where TConcrete : T
             where TElementConcrete : TElement
-            => new ListOperations<TResult, TResultConcrete, TElement, TElementConcrete>(builder, wrapper.Serialize, wrapper.Deserialize);
+            => new ListOperations<T, TConcrete, TElement, TElementConcrete>(builder, wrapper.Serialize, wrapper.Deserialize);
 
-        public static ListOperations<TResult, TResultConcrete, TElement, TElementConcrete> List<TResult, TResultConcrete, TElement, TElementConcrete>(this JsonBuilder<TResult, TResultConcrete> builder, Serialize<TElement> serializer, DirectDeserialize<TElementConcrete> deserializer)
-            where TResultConcrete : TResult
+        public static ListOperations<T, TConcrete, TElement, TElementConcrete> List<T, TConcrete, TElement, TElementConcrete>(this JsonBuilder<T, TConcrete> builder, Serialize<TElement> serializer, DirectDeserialize<TElementConcrete> deserializer)
+            where TConcrete : T
             where TElementConcrete : TElement
-            => new ListOperations<TResult, TResultConcrete, TElement, TElementConcrete>(builder, serializer, deserializer);
+            => new ListOperations<T, TConcrete, TElement, TElementConcrete>(builder, serializer, deserializer);
 
-        public static ListOperations<TResult, TResultConcrete, TElement, TElement> List<TResult, TResultConcrete, TElement>(this JsonBuilder<TResult, TResultConcrete> builder)
-            where TResultConcrete : TResult
+        public static ListOperations<T, TConcrete, TElement, TElement> List<T, TConcrete, TElement>(this JsonBuilder<T, TConcrete> builder)
+            where TConcrete : T
             where TElement : IJsonSerializable<TElement>, new()
-            => builder.List<TResult, TResultConcrete, TElement, TElement>(JsonSerialize<TElement, TElement>.Serialize, JsonSerialize<TElement, TElement>.Deserialize);
+            => builder.List<T, TConcrete, TElement, TElement>(JsonSerialize<TElement, TElement>.Serialize, JsonSerialize<TElement, TElement>.Deserialize);
 
-        public static ListOperations<TResult, TResultConcrete, TElement, TElement> List<TResult, TResultConcrete, TElement>(this JsonBuilder<TResult, TResultConcrete> builder, Serialize<TElement> serializer, DirectDeserialize<TElement> deserializer)
-            where TResultConcrete : TResult
-            => builder.List<TResult, TResultConcrete, TElement, TElement>(serializer, deserializer);
+        public static ListOperations<T, TConcrete, TElement, TElement> List<T, TConcrete, TElement>(this JsonBuilder<T, TConcrete> builder, Serialize<TElement> serializer, DirectDeserialize<TElement> deserializer)
+            where TConcrete : T
+            => builder.List<T, TConcrete, TElement, TElement>(serializer, deserializer);
 
-        public static ListOperations<TResult, TResultConcrete, Guid, Guid> ListOfGuid<TResult, TResultConcrete>(this JsonBuilder<TResult, TResultConcrete> builder)
-            where TResultConcrete : TResult
-            => builder.List<TResult, TResultConcrete, Guid, Guid>(Serialize, DeserializeGuid);
+        public static ListOperations<T, TConcrete, Guid, Guid> ListOfGuid<T, TConcrete>(this JsonBuilder<T, TConcrete> builder)
+            where TConcrete : T
+            => builder.List<T, TConcrete, Guid, Guid>(Serialize, DeserializeGuid);
 
-        public static ListOperations<TResult, TResultConcrete, int, int> ListOfInt<TResult, TResultConcrete>(this JsonBuilder<TResult, TResultConcrete> builder)
-            where TResultConcrete : TResult
-            => builder.List<TResult, TResultConcrete, int, int>(Serialize, DeserializeInt);
+        public static ListOperations<T, TConcrete, int, int> ListOfInt<T, TConcrete>(this JsonBuilder<T, TConcrete> builder)
+            where TConcrete : T
+            => builder.List<T, TConcrete, int, int>(Serialize, DeserializeInt);
 
-        public static ListOperations<TResult, TResultConcrete, string, string> ListOfString<TResult, TResultConcrete>(this JsonBuilder<TResult, TResultConcrete> builder)
-            where TResultConcrete : TResult
-            => builder.List<TResult, TResultConcrete, string, string>(Serialize, DeserializeString);
+        public static ListOperations<T, TConcrete, string, string> ListOfString<T, TConcrete>(this JsonBuilder<T, TConcrete> builder)
+            where TConcrete : T
+            => builder.List<T, TConcrete, string, string>(Serialize, DeserializeString);
 
-        public static JsonBuilder<TResult, TResultConcrete> Map<TResult, TResultConcrete, T>(this JsonBuilder<TResult, TResultConcrete> builder, Expression<Getter<TResultConcrete, T>> property, string propertyName = null)
-            where TResultConcrete : TResult
-            where T : IJsonSerializable<T>, new()
-            => builder.Map(property, () => new T(), propertyName);
+        public static JsonBuilder<T, TConcrete> Map<T, TConcrete, TValue>(this JsonBuilder<T, TConcrete> builder, Expression<Getter<TConcrete, TValue>> property, string propertyName = null)
+            where TConcrete : T
+            where TValue : IJsonSerializable<TValue>, new()
+            => builder.Map(property, () => new TValue(), propertyName);
 
-        public static JsonBuilder<TResult, TResultConcrete> Map<TResult, TResultConcrete>(this JsonBuilder<TResult, TResultConcrete> builder, Expression<Getter<TResultConcrete, bool>> parameter, string propertyName = null)
-            where TResultConcrete : TResult
+        public static JsonBuilder<T, TConcrete> Map<T, TConcrete>(this JsonBuilder<T, TConcrete> builder, Expression<Getter<TConcrete, bool>> parameter, string propertyName = null)
+            where TConcrete : T
             => builder.Map(parameter, Serialize, DeserializeBool, propertyName);
 
-        public static JsonBuilder<TResult, TResultConcrete> Map<TResult, TResultConcrete>(this JsonBuilder<TResult, TResultConcrete> builder, Expression<Getter<TResultConcrete, DateTime?>> parameter, string propertyName = null)
-            where TResultConcrete : TResult
+        public static JsonBuilder<T, TConcrete> Map<T, TConcrete>(this JsonBuilder<T, TConcrete> builder, Expression<Getter<TConcrete, DateTime?>> parameter, string propertyName = null)
+            where TConcrete : T
             => builder.Map(parameter, Serialize, DeserializeNullableDateTime, propertyName);
 
-        public static JsonBuilder<TResult, TResultConcrete> Map<TResult, TResultConcrete>(this JsonBuilder<TResult, TResultConcrete> builder, Expression<Getter<TResultConcrete, string>> parameter, string propertyName = null)
-            where TResultConcrete : TResult
+        public static JsonBuilder<T, TConcrete> Map<T, TConcrete>(this JsonBuilder<T, TConcrete> builder, Expression<Getter<TConcrete, string>> parameter, string propertyName = null)
+            where TConcrete : T
             => builder.Map(parameter, Serialize, DeserializeString, propertyName);
 
-        public static JsonBuilder<TResult, TResultConcrete> Map<TResult, TResultConcrete>(this JsonBuilder<TResult, TResultConcrete> builder, Expression<Getter<TResultConcrete, int>> parameter, string propertyName = null)
-            where TResultConcrete : TResult
+        public static JsonBuilder<T, TConcrete> Map<T, TConcrete>(this JsonBuilder<T, TConcrete> builder, Expression<Getter<TConcrete, int>> parameter, string propertyName = null)
+            where TConcrete : T
             => builder.Map(parameter, Serialize, DeserializeInt, propertyName);
 
-        public static JsonBuilder<TResult, TResultConcrete> Map<TResult, TResultConcrete>(this JsonBuilder<TResult, TResultConcrete> builder, Expression<Getter<TResultConcrete, Guid>> parameter, string propertyName = null)
-            where TResultConcrete : TResult
+        public static JsonBuilder<T, TConcrete> Map<T, TConcrete>(this JsonBuilder<T, TConcrete> builder, Expression<Getter<TConcrete, Guid>> parameter, string propertyName = null)
+            where TConcrete : T
             => builder.Map(parameter, Serialize, DeserializeGuid, propertyName);
 
-        public static JsonBuilder<TResult, TResultConcrete> Map<TResult, TResultConcrete, T, TConcrete>(this JsonBuilder<TResult, TResultConcrete> builder, Expression<Getter<TResultConcrete, T>> property, Serialize<T> serialize, Deserialize<TConcrete> deserialize, Func<TConcrete> itemCreator, string propertyName = null)
-            where TResultConcrete : TResult
+        public static JsonBuilder<T, TConcrete> Map<T, TConcrete, TValue, TValueConcrete>(this JsonBuilder<T, TConcrete> builder, Expression<Getter<TConcrete, TValue>> property, Serialize<TValue> serialize, Deserialize<TValueConcrete> deserialize, Func<TValueConcrete> itemCreator, string propertyName = null)
             where TConcrete : T
+            where TValueConcrete : TValue
         {
-            ProcessExpression(property, out Getter<TResultConcrete, T> getter, out Setter<TResultConcrete, T> setter, ref propertyName);
+            ProcessExpression(property, out Getter<TConcrete, TValue> getter, out Setter<TConcrete, TValue> setter, ref propertyName);
             return builder.MapCore(getter, serialize, deserialize, setter, itemCreator, propertyName);
         }
 
-        public static JsonBuilder<TResult, TResultConcrete> Map<TResult, TResultConcrete, T, TConcrete>(this JsonBuilder<TResult, TResultConcrete> builder, Expression<Getter<TResultConcrete, T>> property, Serialize<T> serialize, Deserialize<TConcrete> deserialize, string propertyName = null)
-            where TResultConcrete : TResult
-            where TConcrete : T, new()
-            => builder.Map(property, serialize, deserialize, () => new TConcrete(), propertyName);
+        public static JsonBuilder<T, TConcrete> Map<T, TConcrete, TValue, TValueConcrete>(this JsonBuilder<T, TConcrete> builder, Expression<Getter<TConcrete, TValue>> property, Serialize<TValue> serialize, Deserialize<TValueConcrete> deserialize, string propertyName = null)
+            where TConcrete : T
+            where TValueConcrete : TValue, new()
+            => builder.Map(property, serialize, deserialize, () => new TValueConcrete(), propertyName);
 
-        public static JsonBuilder<TResult, TResultConcrete> Map<TResult, TResultConcrete, T>(this JsonBuilder<TResult, TResultConcrete> builder, Expression<Getter<TResultConcrete, T>> property, Serialize<T> serializer, DirectDeserialize<T> deserializer, string propertyName = null)
-            where TResultConcrete : TResult
+        public static JsonBuilder<T, TConcrete> Map<T, TConcrete, TValue>(this JsonBuilder<T, TConcrete> builder, Expression<Getter<TConcrete, TValue>> property, Serialize<TValue> serializer, DirectDeserialize<TValue> deserializer, string propertyName = null)
+            where TConcrete : T
         {
-            ProcessExpression(property, out Getter<TResultConcrete, T> getter, out Setter<TResultConcrete, T> setter, ref propertyName);
+            ProcessExpression(property, out Getter<TConcrete, TValue> getter, out Setter<TConcrete, TValue> setter, ref propertyName);
             return builder.MapCore(getter, serializer, deserializer, setter, propertyName);
         }
 
-        public static JsonBuilder<TResult, TResultConcrete> Map<TResult, TResultConcrete, T>(this JsonBuilder<TResult, TResultConcrete> builder, Expression<Getter<TResultConcrete, T>> property, Func<T> itemCreator, string propertyName = null)
-            where TResultConcrete : TResult
-            where T : IJsonSerializable<T>
+        public static JsonBuilder<T, TConcrete> Map<T, TConcrete, TValue>(this JsonBuilder<T, TConcrete> builder, Expression<Getter<TConcrete, TValue>> property, Func<TValue> itemCreator, string propertyName = null)
+            where TConcrete : T
+            where TValue : IJsonSerializable<TValue>
         {
-            JsonSerialize<T>.Configure(itemCreator);
-            ProcessExpression(property, out Getter<TResultConcrete, T> getter, out Setter<TResultConcrete, T> setter, ref propertyName);
-            return builder.MapCore(getter, JsonSerialize<T>.Serialize, JsonSerialize<T>.Deserialize, setter, propertyName);
+            JsonSerialize<TValue>.Configure(itemCreator);
+            ProcessExpression(property, out Getter<TConcrete, TValue> getter, out Setter<TConcrete, TValue> setter, ref propertyName);
+            return builder.MapCore(getter, JsonSerialize<TValue>.Serialize, JsonSerialize<TValue>.Deserialize, setter, propertyName);
         }
 
-        public static IJsonToken NullSerializer<T>(IJsonDocumentObjectModelFactory domFactory, T item) => null;
+        public static IJsonToken NullSerializer<TValue>(IJsonDocumentObjectModelFactory domFactory, TValue item) => null;
 
-        public static void ProcessExpression<TResult, T>(Expression<Getter<TResult, T>> property, out Getter<TResult, T> getter, out Setter<TResult, T> setter, ref string propertyName)
+        public static void ProcessExpression<T, TValue>(Expression<Getter<T, TValue>> property, out Getter<T, TValue> getter, out Setter<T, TValue> setter, ref string propertyName)
         {
             MemberExpression memberExpression = (MemberExpression)property.Body;
             ParameterExpression targetExpression = (ParameterExpression)memberExpression.Expression;
-            getter = Expression.Lambda<Getter<TResult, T>>(memberExpression, targetExpression).Compile();
+            getter = Expression.Lambda<Getter<T, TValue>>(memberExpression, targetExpression).Compile();
 
-            ParameterExpression valueExpression = Expression.Parameter(typeof(T), "value");
-            setter = Expression.Lambda<Setter<TResult, T>>(Expression.Assign(memberExpression, valueExpression), targetExpression, valueExpression).Compile();
+            ParameterExpression valueExpression = Expression.Parameter(typeof(TValue), "value");
+            setter = Expression.Lambda<Setter<T, TValue>>(Expression.Assign(memberExpression, valueExpression), targetExpression, valueExpression).Compile();
 
             propertyName = propertyName ?? memberExpression.Member.Name;
         }

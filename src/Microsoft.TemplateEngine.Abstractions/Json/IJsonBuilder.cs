@@ -1,9 +1,9 @@
-﻿namespace Microsoft.TemplateEngine.Abstractions.Json
+namespace Microsoft.TemplateEngine.Abstractions.Json
 {
-    public interface IJsonBuilder<TResult>
+    public interface IJsonBuilder<T>
     {
-        TResult Deserialize(IJsonToken source);
+        T Deserialize(IJsonToken source);
 
-        IJsonObject Serialize(IJsonDocumentObjectModelFactory domFactory, TResult item);
+        IJsonObject Serialize(IJsonDocumentObjectModelFactory domFactory, T item);
     }
 }
