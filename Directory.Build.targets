@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
-
-	    <ItemGroup>
+    <ItemGroup>
         <PackageReference Update="System.Diagnostics.Process" Version="4.3.0" />
         <PackageReference Update="System.IO.Compression" Version="4.3.0" />
         <PackageReference Update="System.Memory" Version="4.4.0-preview1-25305-02" />
@@ -24,7 +23,7 @@
     <ItemGroup Condition="'$(TestProject)' == 'true'">
         <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
     </ItemGroup>
-    
-  <!-- Leave this file here, even if it's empty. It stops chaining imports. -->
-  <Import Project="Sdk.targets" Sdk="Microsoft.DotNet.Arcade.Sdk" />
+
+    <!-- Leave this file here, even if it's empty. It stops chaining imports. -->
+    <Import Project="Sdk.targets" Sdk="Microsoft.DotNet.Arcade.Sdk" />
 </Project>
