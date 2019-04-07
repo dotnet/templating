@@ -149,6 +149,12 @@ while [[ $# > 0 ]]; do
     -dl:*|/dl:*)
       properties="$properties $1"
       ;;
+    /m:*)
+      properties="$properties $1"
+      ;;
+    /bl:*)
+      properties="$properties $1"
+      ;;
     *)
       echo "Invalid argument: $1"
       usage
