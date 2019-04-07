@@ -11,13 +11,8 @@
         <PackageReference Update="Microsoft.Extensions.CommandLineUtils" Version="1.1.0" />
         <PackageReference Update="Microsoft.NET.Test.Sdk" Version="15.8.0" />
         <PackageReference Update="Newtonsoft.Json" Version="10.0.3" />
-        <PackageReference Update="SourceLink.Create.CommandLine" Version="2.8.0" PrivateAssets="All" />
         <PackageReference Update="xunit" Version="2.3.1" />
         <PackageReference Update="xunit.runner.visualstudio" Version="2.3.1" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <DotNetCliToolReference Update="dotnet-sourcelink" Version="2.8.0" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TestProject)' == 'true'">
