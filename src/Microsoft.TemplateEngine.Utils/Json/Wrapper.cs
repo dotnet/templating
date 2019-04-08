@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using Microsoft.TemplateEngine.Abstractions.Json;
 
@@ -6,7 +5,11 @@ namespace Microsoft.TemplateEngine.Utils.Json
 {
     internal class Wrapper
     {
-        public static IWrapper<T, TConcrete> For<T, TConcrete>(Func<JsonBuilder<IWrapper<T, TConcrete>, Wrapper<T, TConcrete>>, JsonBuilder<IWrapper<T, TConcrete>, Wrapper<T, TConcrete>>> builderConfigurer)
+        public static IWrapper<T, T> For<T>(Chain<JsonBuilder<IWrapper<T, T>, Wrapper<T, T>>> builderConfigurer)
+            where T : new()
+            => new Wrapper<T, T>(builderConfigurer);
+
+        public static IWrapper<T, TConcrete> For<T, TConcrete>(Chain<JsonBuilder<IWrapper<T, TConcrete>, Wrapper<T, TConcrete>>> builderConfigurer)
             where TConcrete : T
             => new Wrapper<T, TConcrete>(builderConfigurer);
     }
@@ -16,7 +19,7 @@ namespace Microsoft.TemplateEngine.Utils.Json
     {
         private readonly IJsonBuilder<IWrapper<T, TConcrete>> _builder;
 
-        public Wrapper(Func<JsonBuilder<IWrapper<T, TConcrete>, Wrapper<T, TConcrete>>, JsonBuilder<IWrapper<T, TConcrete>, Wrapper<T, TConcrete>>> builderConfigurer)
+        public Wrapper(Chain<JsonBuilder<IWrapper<T, TConcrete>, Wrapper<T, TConcrete>>> builderConfigurer)
         {
             _builder = builderConfigurer(new JsonBuilder<IWrapper<T, TConcrete>, Wrapper<T, TConcrete>>(() => new Wrapper<T, TConcrete>(builderConfigurer)));
         }

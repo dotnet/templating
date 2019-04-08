@@ -8,9 +8,6 @@ namespace Microsoft.TemplateEngine.Utils.Json
 {
     internal static class JsonBuilderExtensions
     {
-        public static DirectDeserialize<TCollection> Deserialize<TCollection, TElement>(Func<TCollection> collectionCreator, Func<TElement> elementCreator, Deserialize<TElement> elementDeserializer, Action<TCollection, TElement> setter)
-            => Deserialize(collectionCreator, t => elementDeserializer(t, elementCreator), setter);
-
         public static DirectDeserialize<TCollection> Deserialize<TCollection, TElement>(Func<TCollection> collectionCreator, DirectDeserialize<TElement> elementDeserializer, Action<TCollection, TElement> setter)
         {
             return t =>
@@ -36,9 +33,6 @@ namespace Microsoft.TemplateEngine.Utils.Json
                 return result;
             };
         }
-
-        public static DirectDeserialize<TDictionary> Deserialize<TDictionary, TElement>(Func<TDictionary> dictionaryCreator, Func<TElement> elementCreator, Deserialize<TElement> elementDeserializer, Action<TDictionary, string, TElement> setter)
-            => Deserialize(dictionaryCreator, t => elementDeserializer(t, elementCreator), setter);
 
         public static DirectDeserialize<TDictionary> Deserialize<TDictionary, TElement>(Func<TDictionary> dictionaryCreator, DirectDeserialize<TElement> elementDeserializer, Action<TDictionary, string, TElement> setter)
         {
@@ -81,27 +75,24 @@ namespace Microsoft.TemplateEngine.Utils.Json
         public static string DeserializeString(IJsonToken token)
             => ((IJsonValue)token).Value?.ToString();
 
-        public static DictionaryOperations<T, TConcrete, TElement, TElementConcrete> Dictionary<T, TConcrete, TElement, TElementConcrete>(this JsonBuilder<T, TConcrete> builder, IWrapper<TElement, TElementConcrete> wrapper)
-            where TConcrete : T
-            where TElementConcrete : TElement
-            => new DictionaryOperations<T, TConcrete, TElement, TElementConcrete>(builder, wrapper.Serialize, wrapper.Deserialize);
-
         public static DictionaryOperations<T, TConcrete, TElement, TElementConcrete> Dictionary<T, TConcrete, TElement, TElementConcrete>(this JsonBuilder<T, TConcrete> builder, Serialize<TElement> serializer, DirectDeserialize<TElementConcrete> deserializer)
             where TConcrete : T
             where TElementConcrete : TElement
             => new DictionaryOperations<T, TConcrete, TElement, TElementConcrete>(builder, serializer, deserializer);
 
-        public static DictionaryOperations<T, TConcrete, TElement, TElementConcrete> Dictionary<T, TConcrete, TElement, TElementConcrete>(this JsonBuilder<T, TConcrete> builder)
-            where TConcrete : T
-            where TElement : IJsonSerializable<TElement>
-            where TElementConcrete : TElement, new()
-            => new DictionaryOperations<T, TConcrete, TElement, TElementConcrete>(builder, JsonSerialize<TElement, TElementConcrete>.Serialize, JsonSerialize<TElement, TElementConcrete>.Deserialize);
+        public static DictionaryOperations<T, T, TElement, TElement> Dictionary<T, TElement>(this JsonBuilder<T, T> builder, IWrapper<TElement, TElement> wrapper)
+            => new DictionaryOperations<T, T, TElement, TElement>(builder, wrapper.Serialize, wrapper.Deserialize);
 
-        public static DictionaryOperations<T, TConcrete, TElement, TElement> Dictionary<T, TConcrete, TElement>(this JsonBuilder<T, TConcrete> builder, Serialize<TElement> serializer, DirectDeserialize<TElement> deserializer)
-            where TConcrete : T
-            => builder.Dictionary<T, TConcrete, TElement, TElement>(serializer, deserializer);
+        public static DictionaryOperations<T, T, TElement, TElement> Dictionary<T, TElement>(this JsonBuilder<T, T> builder, Chain<JsonBuilder<IWrapper<TElement, TElement>, Wrapper<TElement, TElement>>> wrapperConfigurer)
+        {
+            IWrapper<TElement, TElement> wrapper = Wrapper.For(wrapperConfigurer);
+            return new DictionaryOperations<T, T, TElement, TElement>(builder, wrapper.Serialize, wrapper.Deserialize);
+        }
 
-        public static DictionaryOperations<T, TConcrete, Guid, Guid> DictionaryOfGUid<T, TConcrete>(this JsonBuilder<T, TConcrete> builder)
+        public static DictionaryOperations<T, T, TElement, TElement> Dictionary<T, TElement>(this JsonBuilder<T, T> builder, Serialize<TElement> serializer, DirectDeserialize<TElement> deserializer)
+            => new DictionaryOperations<T, T, TElement, TElement>(builder, serializer, deserializer);
+
+        public static DictionaryOperations<T, TConcrete, Guid, Guid> DictionaryOfGuid<T, TConcrete>(this JsonBuilder<T, TConcrete> builder)
             where TConcrete : T
             => builder.Dictionary<T, TConcrete, Guid, Guid>(Serialize, DeserializeGuid);
 
@@ -123,14 +114,15 @@ namespace Microsoft.TemplateEngine.Utils.Json
             where TElementConcrete : TElement
             => new ListOperations<T, TConcrete, TElement, TElementConcrete>(builder, serializer, deserializer);
 
-        public static ListOperations<T, TConcrete, TElement, TElement> List<T, TConcrete, TElement>(this JsonBuilder<T, TConcrete> builder)
-            where TConcrete : T
-            where TElement : IJsonSerializable<TElement>, new()
-            => builder.List<T, TConcrete, TElement, TElement>(JsonSerialize<TElement, TElement>.Serialize, JsonSerialize<TElement, TElement>.Deserialize);
+        public static ListOperations<T, T, TElement, TElement> List<T, TElement>(this JsonBuilder<T, T> builder, Chain<JsonBuilder<IWrapper<TElement, TElement>, Wrapper<TElement, TElement>>> wrapperConfigurer)
+            => List(builder, Wrapper.For(wrapperConfigurer));
 
-        public static ListOperations<T, TConcrete, TElement, TElement> List<T, TConcrete, TElement>(this JsonBuilder<T, TConcrete> builder, Serialize<TElement> serializer, DirectDeserialize<TElement> deserializer)
-            where TConcrete : T
-            => builder.List<T, TConcrete, TElement, TElement>(serializer, deserializer);
+        public static ListOperations<IWrapper<TList, TList>, Wrapper<TList, TList>, TElement, TElement> List<TList, TElement>(this JsonBuilder<IWrapper<TList, TList>, Wrapper<TList, TList>> builder, Chain<JsonBuilder<IWrapper<TElement, TElement>, Wrapper<TElement, TElement>>> wrapperConfigurer)
+            => List(builder, Wrapper.For(wrapperConfigurer));
+
+        public static ListOperations<IWrapper<TList, TList>, Wrapper<TList, TList>, TElement, TElement> List<TList, TElement>(this JsonBuilder<IWrapper<TList, TList>, Wrapper<TList, TList>> builder)
+            where TElement : IJsonSerializable<TElement>, new()
+            => builder.List<IWrapper<TList, TList>, Wrapper<TList, TList>, TElement, TElement>(JsonSerialize<TElement, TElement>.Serialize, JsonSerialize<TElement, TElement>.Deserialize);
 
         public static ListOperations<T, TConcrete, Guid, Guid> ListOfGuid<T, TConcrete>(this JsonBuilder<T, TConcrete> builder)
             where TConcrete : T
@@ -177,11 +169,6 @@ namespace Microsoft.TemplateEngine.Utils.Json
             return builder.MapCore(getter, serialize, deserialize, setter, itemCreator, propertyName);
         }
 
-        public static JsonBuilder<T, TConcrete> Map<T, TConcrete, TValue, TValueConcrete>(this JsonBuilder<T, TConcrete> builder, Expression<Getter<TConcrete, TValue>> property, Serialize<TValue> serialize, Deserialize<TValueConcrete> deserialize, string propertyName = null)
-            where TConcrete : T
-            where TValueConcrete : TValue, new()
-            => builder.Map(property, serialize, deserialize, () => new TValueConcrete(), propertyName);
-
         public static JsonBuilder<T, TConcrete> Map<T, TConcrete, TValue>(this JsonBuilder<T, TConcrete> builder, Expression<Getter<TConcrete, TValue>> property, Serialize<TValue> serializer, DirectDeserialize<TValue> deserializer, string propertyName = null)
             where TConcrete : T
         {
@@ -227,28 +214,23 @@ namespace Microsoft.TemplateEngine.Utils.Json
         public static IJsonToken Serialize(IJsonDocumentObjectModelFactory domFactory, string item)
             => domFactory.CreateValue(item);
 
-        public static Serialize<TCollection> SerializeCollection<TCollection, TElement>(Serialize<TElement> elementSerializer)
-                                                            where TCollection : IEnumerable<TElement>
-            => SerializeCollection<TCollection, TElement>(x => x, elementSerializer);
-
         public static Serialize<TCollection> SerializeCollection<TCollection, TElement>(Func<TCollection, IEnumerable<TElement>> getEnumerator, Serialize<TElement> elementSerializer)
         {
             return (domFactory, source) =>
             {
                 IJsonArray result = domFactory.CreateArray();
 
-                foreach (TElement entry in getEnumerator(source))
+                if (!(source is null))
                 {
-                    result.Add(elementSerializer(domFactory, entry));
+                    foreach (TElement entry in getEnumerator(source))
+                    {
+                        result.Add(elementSerializer(domFactory, entry));
+                    }
                 }
 
                 return result;
             };
         }
-
-        public static Serialize<TDictionary> SerializeDictionary<TDictionary, TElement>(Serialize<TElement> elementSerializer)
-            where TDictionary : IReadOnlyDictionary<string, TElement>
-            => SerializeDictionary<TDictionary, TElement>(x => x, elementSerializer);
 
         public static Serialize<TDictionary> SerializeDictionary<TDictionary, TElement>(Func<TDictionary, IEnumerable<KeyValuePair<string, TElement>>> getEnumerator, Serialize<TElement> elementSerializer)
         {

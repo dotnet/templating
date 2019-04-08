@@ -11,4 +11,6 @@ namespace Microsoft.TemplateEngine.Abstractions.Json
     public delegate IJsonToken Serialize<T>(IJsonDocumentObjectModelFactory domFactory, T item);
 
     public delegate void Setter<T, TValue>(T source, TValue value);
+
+    public delegate T Chain<T>(T item);
 }

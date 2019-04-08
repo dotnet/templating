@@ -26,4 +26,28 @@
 
     <!-- Leave this file here, even if it's empty. It stops chaining imports. -->
     <Import Project="Sdk.targets" Sdk="Microsoft.DotNet.Arcade.Sdk" />
+
+    <ItemGroup>
+        <_JsonModels Include="**\*.jm" />
+        <Compile Update="@(_JsonModels->'%(RecursiveDir)%(FileName).cs')" DependentUpon="%(RecursiveDir)%(FileName).jm" />
+    </ItemGroup>
+
+    <Target
+        Name="GenerateSerializationModels" BeforeTargets="CoreCompile;CompileDesignTime"
+        Inputs="@(_JsonModels)"
+        Outputs="@(_JsonModels->'%(RecursiveDir)%(FileName).cs')"
+        Condition="'$(OS)' == 'Windows_NT' AND '@(_JsonModels)' != ''">
+        
+        <ItemGroup>
+            <_JsonModelGenerator Include="$(ArtifactsDir)\bin\**\JsonModelGenerator.exe" />
+        </ItemGroup>
+        
+        <PropertyGroup>
+            <_JsonModelGeneratorExe>@(_JsonModelGenerator)</_JsonModelGeneratorExe>
+        </PropertyGroup>
+        
+        <Message Text="Running $(_JsonModelGeneratorExe) on $(MSBuildProjectDirectory)" Condition="Exists('$(_JsonModelGeneratorExe)')" Importance="High" />
+        <Warning Text="JSON model generator was not yet built, please build again to re-generate models" Condition="!Exists('$(_JsonModelGeneratorExe)')" />
+        <Exec Command="$(_JsonModelGeneratorExe) &quot;$(MSBuildProjectDirectory)&quot;" Condition="Exists('$(_JsonModelGeneratorExe)')" />
+    </Target>
 </Project>

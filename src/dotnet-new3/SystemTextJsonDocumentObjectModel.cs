@@ -74,7 +74,7 @@ namespace dotnet_new3
 
         public IJsonArray CreateArray() => new JsonArray(this);
 
-        public IJsonValue CreateValue(int value) => new WritableJsonValue(value, JsonTokenType.Number, this);
+        public IJsonValue CreateValue(int value) => new WritableJsonValue((double)value, JsonTokenType.Number, this);
 
         public IJsonValue CreateValue(double value) => new WritableJsonValue(value, JsonTokenType.Number, this);
 
