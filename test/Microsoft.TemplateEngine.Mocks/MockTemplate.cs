@@ -9,6 +9,11 @@ namespace Microsoft.TemplateEngine.Mocks
         public MockTemplate()
         {
             ShortNameList = new List<string>();
+            Classifications = new List<string>();
+            Tags = new Dictionary<string, ICacheTag>();
+            CacheParameters = new Dictionary<string, ICacheParameter>();
+            Parameters = new List<ITemplateParameter>();
+            BaselineInfo = new Dictionary<string, IBaselineInfo>();
         }
 
         public string Author { get; set; }

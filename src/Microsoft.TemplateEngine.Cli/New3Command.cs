@@ -15,6 +15,7 @@ using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Abstractions.TemplateUpdates;
 using Microsoft.TemplateEngine.Cli.CommandParsing;
 using Microsoft.TemplateEngine.Cli.HelpAndUsage;
+using Microsoft.TemplateEngine.Cli.TemplateSearch;
 using Microsoft.TemplateEngine.Edge;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Edge.Template;
@@ -721,6 +722,13 @@ namespace Microsoft.TemplateEngine.Cli
                 if (string.IsNullOrWhiteSpace(TemplateName))
                 {
                     return EnterMaintenanceFlow();
+                }
+
+                if (_commandInput.HasDebuggingFlag("--debug:search"))
+                {
+                    ITemplateSearchCoordinator searchCoordinator = new DisplayOnlyTemplateSearchCoordinator(EnvironmentSettings, _commandInput, _defaultLanguage);
+                    await searchCoordinator.CoordinateAsync();
+                    return CreationResultStatus.Success;
                 }
 
                 return await EnterTemplateManipulationFlowAsync().ConfigureAwait(false);
