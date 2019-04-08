@@ -6,14 +6,13 @@
         <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)eng\Key.snk</AssemblyOriginatorKeyFile>
         <LangVersion>7.3</LangVersion>
         <Product>Microsoft .NET Core</Product>
-
         <Copyright>$(CopyrightNetFoundation)</Copyright>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <NoWarn>NU5105</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup>
         <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
-
         <BuildDir>$(RepoRoot)build\</BuildDir>
         <ArtifactsDir>$(RepoRoot)artifacts\</ArtifactsDir>
         <DevDir>$(RepoRoot)dev\</DevDir>
@@ -22,10 +21,8 @@
         <LocalizeDir>$(RepoRoot)localize\</LocalizeDir>
         <TemplatesDir>$(ArtifactsDir)templates\</TemplatesDir>
         <TemplatesNoTimestampDir>$(ArtifactsDir)templates-notimestamp\</TemplatesNoTimestampDir>
-
         <SrcDir>$(RepoRoot)src\</SrcDir>
         <TestDir>$(RepoRoot)test\</TestDir>
-
         <GitInfoFile>$(ArtifactsDir)GitInfo.cs</GitInfoFile>
         <GitInfoProps>$(ArtifactsDir)GitInfo.props</GitInfoProps>
     </PropertyGroup>
