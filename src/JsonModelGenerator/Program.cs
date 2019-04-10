@@ -8,6 +8,26 @@ using System.Text.RegularExpressions;
 
 namespace JsonModelGenerator
 {
+    /*
+        Syntax guide:
+        Lines starting with '#' indicate a using directive that should be included
+        Lines starting with '@' indicate a comment that should be ignored during code generation
+        All other lines must be of the form [property name][one or more whitespace characters][type] (ex. "Foo  string")
+        -   Dictionary<string, T> types are indicated with '{}' (ex. "Foo  int{}" results in a property called "Foo" with type Dictionary<string, int>)
+        -   List<T> types are indicated with '[]' (ex. "Foo  int[]" results in a property called "Foo" with type List<int>)
+        -   Dictionary and/or list types can be chained (ex. "Foo  int[]{}" results in a property called "Foo" with type Dictionary<string, List<int>>)
+
+Example.jm:
+#System 
+#System.Collections.Generic
+@This is a comment
+Condition                       string 
+Include                         string[] 
+CopyOnly                        string[] 
+Exclude                         string[] 
+Rename                          string{} 
+
+    */
     class Program
     {
         private static readonly IReadOnlyDictionary<string, string> BuiltInTypes = new Dictionary<string, string>(StringComparer.Ordinal)
@@ -18,6 +38,8 @@ namespace JsonModelGenerator
             { "DateTime?", "NullableDateTime" },
             { "bool", "Bool" }
         };
+
+        private static readonly Regex SystemNamespaceDefinedStructMatcher = new Regex(@"(Guid|DateTime)(\?)?(?=[$[{])", RegexOptions.Compiled);
 
         public static string GenerateCode(string sourceFilePath, string @namespace)
         {
@@ -44,66 +66,40 @@ namespace JsonModelGenerator
                 }
                 else
                 {
-                    lines[i] = lines[i].Trim();
-                    int whitespaceIndex = lines[i].IndexOfAny(" \t".ToCharArray());
-                    string propertyName = lines[i].Substring(0, whitespaceIndex);
-                    string compactifiedType = lines[i].Substring(whitespaceIndex).Trim();
-
-                    if (compactifiedType.EndsWith("{}", StringComparison.Ordinal) || compactifiedType.EndsWith("[]", StringComparison.Ordinal))
-                    {
-                        usings.Add("using System.Collections.Generic;");
-                        (string property, string builderLine) = GeneratePropertyForArrayOrDictionary(className, compactifiedType, propertyName, usings);
-                        properties.Add(property);
-                        builderLines.Add(builderLine);
-                    }
-                    else
-                    {
-                        if (Regex.IsMatch(compactifiedType, @"(Guid|DateTime)(\?)?(?=[$\[\{])"))
-                        {
-                            usings.Add("using System;");
-                        }
-
-                        properties.Add($"public {compactifiedType} {propertyName} {{ get; set; }}");
-                        builderLines.Add($".Map(p => p.{propertyName})");
-                    }
+                    GenerateProperty(lines, i, usings, properties, className, builderLines);
                 }
             }
 
             usings.Add("using Microsoft.TemplateEngine.Utils.Json;");
             usings.Add("using Microsoft.TemplateEngine.Abstractions.Json;");
 
-            StringBuilder result = new StringBuilder();
-            foreach (string @using in usings.OrderBy(x => x, CompareUsings.Default))
+            return GenerateResultFile(usings, @namespace, className, properties, builderLines);
+        }
+
+        private static void GenerateProperty(string[] lines, int i, HashSet<string> usings, List<string> properties, string className, List<string> builderLines)
+        {
+            lines[i] = lines[i].Trim();
+            int whitespaceIndex = lines[i].IndexOfAny(" \t".ToCharArray());
+            string propertyName = lines[i].Substring(0, whitespaceIndex);
+            string compactifiedType = lines[i].Substring(whitespaceIndex).Trim();
+
+            if (compactifiedType.EndsWith("{}", StringComparison.Ordinal) || compactifiedType.EndsWith("[]", StringComparison.Ordinal))
             {
-                result.AppendLine(@using);
+                usings.Add("using System.Collections.Generic;");
+                (string property, string builderLine) = GeneratePropertyForArrayOrDictionary(className, compactifiedType, propertyName, usings);
+                properties.Add(property);
+                builderLines.Add(builderLine);
             }
-
-            result.AppendLine();
-            result.AppendLine($"namespace {@namespace}");
-            result.AppendLine("{");
-
-            result.AppendLine($"    internal class {className} : IJsonSerializable<{className}>");
-            result.AppendLine("    {");
-
-            foreach (string propertyDeclaration in properties)
+            else
             {
-                result.AppendLine($"        {propertyDeclaration}");
-                result.AppendLine();
+                if (SystemNamespaceDefinedStructMatcher.IsMatch(compactifiedType))
+                {
+                    usings.Add("using System;");
+                }
+
+                properties.Add($"public {compactifiedType} {propertyName} {{ get; set; }}");
+                builderLines.Add($".Map(p => p.{propertyName})");
             }
-
-            result.AppendLine($"        public IJsonBuilder<{className}> JsonBuilder {{ get; }} = new JsonBuilder<{className}, {className}>(() => new {className}())");
-
-            foreach (string line in builderLines)
-            {
-                result.AppendLine($"            {line}");
-            }
-
-            result.AppendLine("            ;");
-
-            result.AppendLine("    }");
-            result.AppendLine("}");
-
-            return result.ToString();
         }
 
         private static (string property, string builderLine) GeneratePropertyForArrayOrDictionary(string owningType, string compactifiedType, string propertyName, HashSet<string> usings)
@@ -183,6 +179,42 @@ namespace JsonModelGenerator
             }
 
             return (wholeProperty, line);
+        }
+
+        private static string GenerateResultFile(HashSet<string> usings, string @namespace, string className, IReadOnlyList<string> properties, IReadOnlyList<string> builderLines)
+        {
+            StringBuilder result = new StringBuilder();
+            foreach (string @using in usings.OrderBy(x => x, CompareUsings.Default))
+            {
+                result.AppendLine(@using);
+            }
+
+            result.AppendLine();
+            result.AppendLine($"namespace {@namespace}");
+            result.AppendLine("{");
+
+            result.AppendLine($"    internal class {className} : IJsonSerializable<{className}>");
+            result.AppendLine("    {");
+
+            foreach (string propertyDeclaration in properties)
+            {
+                result.AppendLine($"        {propertyDeclaration}");
+                result.AppendLine();
+            }
+
+            result.AppendLine($"        public IJsonBuilder<{className}> JsonBuilder {{ get; }} = new JsonBuilder<{className}, {className}>(() => new {className}())");
+
+            foreach (string line in builderLines)
+            {
+                result.AppendLine($"            {line}");
+            }
+
+            result.AppendLine("            ;");
+
+            result.AppendLine("    }");
+            result.AppendLine("}");
+
+            return result.ToString();
         }
 
         static void Main(string[] args)
