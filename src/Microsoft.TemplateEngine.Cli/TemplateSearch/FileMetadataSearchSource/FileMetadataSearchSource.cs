@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateSearch.Common;
 
 namespace Microsoft.TemplateEngine.Cli.TemplateSearch.FileMetadataSearchSource
 {
@@ -59,6 +60,18 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch.FileMetadataSearchSource
             }
 
             return Task.FromResult((IReadOnlyList<ITemplateNameSearchResult>)resultList);
+        }
+
+        public Task<IReadOnlyDictionary<string, PackToTemplateEntry>> CheckForTemplatePackMatchesAsync(IReadOnlyList<string> packNameList)
+        {
+            if (_searchCache == null)
+            {
+                throw new Exception("Search Source is not configured");
+            }
+
+            IReadOnlyDictionary<string, PackToTemplateEntry> matchedPacks = _searchCache.GetInfoForNamedPacks(packNameList);
+
+            return Task.FromResult(matchedPacks);
         }
     }
 }

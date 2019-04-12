@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.TemplateUpdates;
 using Microsoft.TemplateEngine.Edge.TemplateUpdates;
 
@@ -15,6 +16,10 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateUpdateTests
         // a mapping from install descriptor identifiers to the update that should be emitted.
         [ThreadStatic]
         private static IReadOnlyDictionary<string, IUpdateUnitDescriptor> _mockUpdates;
+
+        public void Configure(IEngineEnvironmentSettings environmentSettings)
+        {
+        }
 
         // Pass in the update descriptors that should be emitted.
         // The checker matches them based on the IInstallUnitDescriptor.Identifier

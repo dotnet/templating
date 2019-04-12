@@ -13,6 +13,8 @@ namespace Microsoft.TemplateEngine.Cli
     {
         Guid DescriptorFactoryId { get; }
 
+        void Configure(IEngineEnvironmentSettings environmentSettings);
+
         Task<IReadOnlyList<IUpdateUnitDescriptor>> CheckForUpdatesAsync(IReadOnlyList<IInstallUnitDescriptor> installDescriptorsToCheck);
 
         string DisplayIdentifier { get; }

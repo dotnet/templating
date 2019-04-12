@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Cli.TemplateSearch;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateSearch.Common;
 
 namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
 {
@@ -100,6 +101,11 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
 
             IReadOnlyList<ITemplateNameSearchResult> returnResults = matches;
             return Task.FromResult(returnResults);
+        }
+
+        public Task<IReadOnlyDictionary<string, PackToTemplateEntry>> CheckForTemplatePackMatchesAsync(IReadOnlyList<string> packNameList)
+        {
+            throw new NotImplementedException();
         }
     }
 }

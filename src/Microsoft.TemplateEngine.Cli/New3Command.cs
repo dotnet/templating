@@ -710,7 +710,7 @@ namespace Microsoft.TemplateEngine.Cli
                 if (_commandInput.CheckForUpdates)
                 {
                     // Don't return after updating. This way, if someone runs something like:
-                    //      > dotnet new mvc --update-check
+                    //      > dotnet new mvc --update
                     // we'll first check for updates, then try to invoke the template.
                     new TemplateUpdating(EnvironmentSettings, Installer, _inputGetter).Update(_settingsLoader.InstallUnitDescriptorCache.Descriptors.Values.ToList());
                 }

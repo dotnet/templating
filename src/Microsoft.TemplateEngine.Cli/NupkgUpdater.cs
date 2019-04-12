@@ -5,8 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.TemplateUpdates;
 using Microsoft.TemplateEngine.Edge.TemplateUpdates;
+using Microsoft.TemplateEngine.Cli.TemplateSearch.FileMetadataSearchSource;
+using Microsoft.TemplateEngine.Cli.TemplateSearch;
+using Microsoft.TemplateSearch.Common;
 
 namespace Microsoft.TemplateEngine.Cli
 {
@@ -18,11 +22,77 @@ namespace Microsoft.TemplateEngine.Cli
 
         public string DisplayIdentifier { get; } = "Nupkg";
 
-        public Task<IReadOnlyList<IUpdateUnitDescriptor>> CheckForUpdatesAsync(IReadOnlyList<IInstallUnitDescriptor> descriptorsToCheck)
+        private IEngineEnvironmentSettings _environmentSettings;
+        //private readonly ISearchInfoFileProvider _searchInfoFileProvider;
+        private bool _isInitialized = false;
+        private IReadOnlyList<ITemplateSearchSource> _templateSearchSourceList;
+
+        public NupkgUpdater()
         {
-            throw new NotImplementedException();
-            //IReadOnlyList<IUpdateUnitDescriptor> updatesFound = new List<IUpdateUnitDescriptor>();
-            //return Task.FromResult(updatesFound);
+        }
+
+        public void Configure(IEngineEnvironmentSettings environmentSettings)
+        {
+            _environmentSettings = environmentSettings;
+        }
+
+        //public NupkgUpdater(IEngineEnvironmentSettings environmentSettings)
+        //{
+        //    _environmentSettings = environmentSettings;
+        //    //_searchInfoFileProvider = new TEMP_LocalSourceFileProvider();
+
+        //    // This will become the real one once we're done testing / have the blob store automation setup.
+        //    //_searchInfoFileProvider = new BlobStoreSourceFileProvider();
+        //}
+
+        private void EnsureInitialized()
+        {
+            if (_isInitialized)
+            {
+                return;
+            }
+
+            List<ITemplateSearchSource> searchSourceList = new List<ITemplateSearchSource>();
+
+            foreach (ITemplateSearchSource searchSource in _environmentSettings.SettingsLoader.Components.OfType<ITemplateSearchSource>())
+            {
+                if (searchSource.TryConfigure(_environmentSettings))
+                {
+                    searchSourceList.Add(searchSource);
+                }
+            }
+
+            _templateSearchSourceList = searchSourceList;
+
+            _isInitialized = true;
+        }
+
+        public async Task<IReadOnlyList<IUpdateUnitDescriptor>> CheckForUpdatesAsync(IReadOnlyList<IInstallUnitDescriptor> descriptorsToCheck)
+        {
+            EnsureInitialized();
+
+            IReadOnlyDictionary<string, IInstallUnitDescriptor> packToInstallDescriptorMap = descriptorsToCheck.ToDictionary(d => d.Identifier, d => d);
+
+            List<IUpdateUnitDescriptor> updateList = new List<IUpdateUnitDescriptor>();
+
+            foreach (ITemplateSearchSource searchSource in _templateSearchSourceList)
+            {
+                IReadOnlyDictionary<string, PackToTemplateEntry> packMatchList = await searchSource.CheckForTemplatePackMatchesAsync(packToInstallDescriptorMap.Keys.ToList());
+
+                foreach (KeyValuePair<string, PackToTemplateEntry> packMatch in packMatchList)
+                {
+                    string packName = packMatch.Key;
+                    PackToTemplateEntry packToUpdate = packMatch.Value;
+
+                    if (packToInstallDescriptorMap.TryGetValue(packName, out IInstallUnitDescriptor installDescriptor))
+                    {
+                        IUpdateUnitDescriptor updateDescriptor = new UpdateUnitDescriptor(installDescriptor, packName, packName);
+                        updateList.Add(updateDescriptor);
+                    }
+                }
+            }
+
+            return updateList;
         }
 
         public void ApplyUpdates(IInstaller installer, IReadOnlyList<IUpdateUnitDescriptor> updatesToApply)

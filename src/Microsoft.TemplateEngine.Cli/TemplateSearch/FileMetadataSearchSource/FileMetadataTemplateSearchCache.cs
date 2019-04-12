@@ -95,5 +95,22 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch.FileMetadataSearchSource
 
             return map;
         }
+
+        public IReadOnlyDictionary<string, PackToTemplateEntry> GetInfoForNamedPacks(IReadOnlyList<string> packNameList)
+        {
+            EnsureInitialized();
+
+            Dictionary<string, PackToTemplateEntry> packInfo = new Dictionary<string, PackToTemplateEntry>();
+
+            foreach (string packName in packNameList)
+            {
+                if (_templateDiscoveryMetadata.PackToTemplateMap.TryGetValue(packName, out PackToTemplateEntry packToTemplateEntry))
+                {
+                    packInfo[packName] = packToTemplateEntry;
+                }
+            }
+
+            return packInfo;
+        }
     }
 }
