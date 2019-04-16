@@ -1,0 +1,20 @@
+#System 
+#System.Collections.Generic
+#Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms
+Author                                          string 
+Classifications                                 string[] 
+DefaultName                                     string 
+Description                                     string 
+GroupIdentity                                   string 
+Precedence                                      int 
+Guids                                           Guid[] 
+Identity                                        string 
+Name                                            string 
+SourceName                                      string 
+PlaceholderFilename                             string 
+GeneratorVersions                               string 
+ShortName                                       string[] 
+Forms                                           IValueForm-ValueFormRegistry.GetSelectorMappings{}
+Sources                                         ExtendedFileSource[]
+Baselines                                       BaselineInfo{}
+Tags                                            string{}

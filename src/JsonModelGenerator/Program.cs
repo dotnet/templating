@@ -58,7 +58,7 @@ Rename                          string{}
 
                 if (lines[i][0] == '#')
                 {
-                    usings.Add($"using {lines[i].Substring(1)};");
+                    usings.Add($"using {lines[i].Substring(1).Trim()};");
                 }
                 else if (lines[i][0] == '@')
                 {
@@ -97,9 +97,32 @@ Rename                          string{}
                     usings.Add("using System;");
                 }
 
+                if (TryExtractFactoryDataFromCompactifiedType(ref compactifiedType, out string mappingsSelectorFunction))
+                {
+                    builderLines.Add($".Map(p => p.{propertyName}, (p, v) => p.{propertyName} = v, {mappingsSelectorFunction}, \"{propertyName}\")");
+                }
+                else
+                {
+                    builderLines.Add($".Map(p => p.{propertyName}, (p, v) => p.{propertyName} = v, \"{propertyName}\")");
+                }
+
                 properties.Add($"public {compactifiedType} {propertyName} {{ get; set; }}");
-                builderLines.Add($".Map(p => p.{propertyName})");
             }
+        }
+
+        private static bool TryExtractFactoryDataFromCompactifiedType(ref string compactifiedType, out string mappingsSelectorFunction)
+        {
+            int dashIndex = compactifiedType.IndexOf('-');
+
+            if (dashIndex < 0)
+            {
+                mappingsSelectorFunction = null;
+                return false;
+            }
+
+            mappingsSelectorFunction = compactifiedType.Substring(dashIndex + 1);
+            compactifiedType = compactifiedType.Substring(0, dashIndex);
+            return true;
         }
 
         private static (string property, string builderLine) GeneratePropertyForArrayOrDictionary(string owningType, string compactifiedType, string propertyName, HashSet<string> usings)
@@ -134,6 +157,7 @@ Rename                          string{}
                 }
             }
 
+            bool isFactoryBased = TryExtractFactoryDataFromCompactifiedType(ref compactifiedType, out string mappingSelectorFunction);
             string currentTypeName = compactifiedType;
             while (currentTypeStack.Count > 0)
             {
@@ -150,14 +174,30 @@ Rename                          string{}
             string ctor = string.Format(constructors.Dequeue(), compactifiedType);
             string setTerm = dictionaryType ? "Dictionary" : "List";
             string thisPropertyName = isDictionaryType.Count > 0 ? valueProperty : propertyName;
+            string listDirective;
 
-            string listDirective = BuiltInTypes.TryGetValue(compactifiedType, out string listType)
-                ? $".{setTerm}Of{listType}()"
-                : isDictionaryType.Count > 0
-                    ? $".{setTerm}<{type}, {{0}}>(b => b.Map(p => p.{valueProperty}))"
-                    : $".{setTerm}<{owningType}, {compactifiedType}>(b => b.Map(p => p.{valueProperty}))";
+            if (BuiltInTypes.TryGetValue(compactifiedType, out string listType))
+            {
+                listDirective = $".{setTerm}Of{listType}()";
+            }
+            else
+            {
+                string mapValue = isFactoryBased
+                    ? $", {mappingSelectorFunction}"
+                    : string.Empty;
+
+                if (isDictionaryType.Count > 0)
+                {
+                    listDirective = $".{setTerm}<{type}, {{0}}>(b => b.Map(p => p.{valueProperty}, (p, v) => p.{valueProperty} = v{mapValue}, \"{valueProperty}\"))";
+                }
+                else
+                {
+                    listDirective = $".{setTerm}<{owningType}, {compactifiedType}>(b => b.Map(p => p.{valueProperty}, (p, v) => p.{valueProperty} = v{mapValue}, \"{valueProperty}\"))";
+                }
+            }
+
             listDirective = string.Format(listDirective, compactifiedType);
-            string line = $"{listDirective}.Map(p => p.{thisPropertyName}, {ctor})";
+            string line = $"{listDirective}.Map(p => p.{thisPropertyName}, (p, v) => p.{thisPropertyName} = v, {ctor}, \"{propertyName}\")";
             int maxBuilderId = isDictionaryType.Count;
 
             while (isDictionaryType.Count > 0)
@@ -168,6 +208,7 @@ Rename                          string{}
                 ctor = string.Format(constructors.Dequeue(), compactifiedType);
                 string builderReference = $"b{maxBuilderId - isDictionaryType.Count}";
                 string parentReference = $"p{maxBuilderId - isDictionaryType.Count - 1}";
+                string valueReference = $"v{maxBuilderId - isDictionaryType.Count - 1}";
                 setTerm = dictionaryType ? "Dictionary" : "List";
                 thisPropertyName = isDictionaryType.Count > 0 ? valueProperty : propertyName;
 
@@ -175,7 +216,7 @@ Rename                          string{}
                     ? $".{setTerm}<{type}, {previousType}>({builderReference} => {builderReference}{line})"
                     : $".{setTerm}<{owningType}, {previousType}>({builderReference} => {builderReference}{line})";
                 listDirective = string.Format(listDirective, compactifiedType);
-                line = $"{listDirective}.Map({parentReference} => {parentReference}.{thisPropertyName}, {ctor})";
+                line = $"{listDirective}.Map({parentReference} => {parentReference}.{thisPropertyName}, ({parentReference}, {valueReference}) => {parentReference}.{thisPropertyName} = {valueReference}, {ctor}, \"{propertyName}\")";
             }
 
             return (wholeProperty, line);
@@ -243,7 +284,7 @@ Rename                          string{}
             {
                 foreach (string path in Directory.EnumerateFiles(entry.Key, "*.jm", SearchOption.AllDirectories))
                 {
-                    string extNamespace = new FileInfo(path).Directory.FullName.Substring(basePath.Length).Trim(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar).Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar).Replace(Path.DirectorySeparatorChar, '.');
+                    string extNamespace = new FileInfo(path).Directory.FullName.Substring(entry.Key.Length).Trim(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar).Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar).Replace(Path.DirectorySeparatorChar, '.');
                     string ns = string.Join('.', entry.Value, extNamespace).Trim('.');
                     string generated = GenerateCode(path, ns);
                     string targetFile = Path.ChangeExtension(path, ".cs");

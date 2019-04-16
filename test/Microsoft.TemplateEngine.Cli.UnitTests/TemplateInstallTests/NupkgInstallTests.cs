@@ -35,7 +35,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateInstallTests
             Assert.NotNull(host);
 
             ITelemetryLogger telemetryLogger = new TelemetryLogger(null, false);
-            IJsonDocumentObjectModelFactory jsonDomFactory = null;
+            IJsonDocumentObjectModelFactory jsonDomFactory = new JsonDomFactory();
 
             int initializeResult = New3Command.Run(CommandName, host, telemetryLogger, null, jsonDomFactory, new string[] { });
             Assert.Equal(0, initializeResult);

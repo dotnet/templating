@@ -23,8 +23,8 @@ namespace Microsoft.TemplateEngine.Utils
             Host = host;
             Paths = new DefaultPathInfo(this, hiveLocation);
             Environment = new DefaultEnvironment();
-            SettingsLoader = settingsLoaderFactory(this);
             JsonDomFactory = domFactory;
+            SettingsLoader = settingsLoaderFactory(this);
         }
 
         public ISettingsLoader SettingsLoader { get; }

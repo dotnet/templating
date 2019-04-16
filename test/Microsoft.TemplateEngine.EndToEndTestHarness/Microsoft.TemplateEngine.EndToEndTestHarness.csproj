@@ -17,6 +17,13 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Compile Include="$(SrcDir)dotnet-new3\JsonDomFactory.cs" Link="JsonDomFactory.cs" />
+      <Compile Include="$(SrcDir)dotnet-new3\NewtonsoftJsonDocumentObjectModel.cs" Link="NewtonsoftJsonDocumentObjectModel.cs" />
+      <Compile Include="$(SrcDir)dotnet-new3\StreamBufferWriterImpl.cs" Link="StreamBufferWriterImpl.cs" />
+      <Compile Include="$(SrcDir)dotnet-new3\SystemTextJsonDocumentObjectModel.cs" Link="SystemTextJsonDocumentObjectModel.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
         <ProjectReference Include="$(SrcDir)Microsoft.TemplateEngine.Cli\Microsoft.TemplateEngine.Cli.csproj" />
         <ProjectReference Include="$(SrcDir)Microsoft.TemplateEngine.Edge\Microsoft.TemplateEngine.Edge.csproj" />
         <ProjectReference Include="$(SrcDir)Microsoft.TemplateEngine.Orchestrator.RunnableProjects\Microsoft.TemplateEngine.Orchestrator.RunnableProjects.csproj" />

@@ -14,6 +14,7 @@ using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Localization;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms;
 using Microsoft.TemplateEngine.Utils;
+using Microsoft.TemplateEngine.Utils.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
@@ -994,6 +995,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         public static SimpleConfigModel FromJObject(IEngineEnvironmentSettings environmentSettings, JObject source, ISimpleConfigModifiers configModifiers = null, JObject localeSource = null)
         {
+            environmentSettings.JsonDomFactory.TryParse(source.ToString(), out var root);
+            Models.RunnableProjectConfig rpc = JsonSerialize<Models.RunnableProjectConfig>.Deserialize(root);
+
             ILocalizationModel localizationModel = LocalizationFromJObject(localeSource);
 
             SimpleConfigModel config = new SimpleConfigModel()

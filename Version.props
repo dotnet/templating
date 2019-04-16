@@ -69,7 +69,7 @@ namespace Microsoft.TemplateEngine
                       Overwrite="true" />
   </Target>
 
-    <ItemGroup>
+    <ItemGroup Condition="'$(MSBuildProjectFile)' == 'Microsoft.TemplateEngine.Utils.csproj'">
         <Compile Include="$(GitInfoFile)" Condition="Exists('$(GitInfoFile)')" Link="%(RecursiveDir)%(Filename)%(Extension)" />
         <Compile Include="$(SrcDir)GitInfo.cs" Condition="!Exists('$(GitInfoFile)')" Link="%(RecursiveDir)%(Filename)%(Extension)" />
     </ItemGroup>

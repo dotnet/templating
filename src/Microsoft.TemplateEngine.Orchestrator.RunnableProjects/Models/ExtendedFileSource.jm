@@ -1,0 +1,8 @@
+Include                             string[]
+CopyOnly                            string[]
+Exclude                             string[]
+Rename                              string{}
+Source                              string
+Target                              string
+Condition                           string
+Modifiers                           SourceModifier[]

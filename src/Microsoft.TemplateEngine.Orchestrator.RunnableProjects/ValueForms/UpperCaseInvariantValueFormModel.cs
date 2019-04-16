@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using Microsoft.TemplateEngine.Abstractions.Json;
+using Microsoft.TemplateEngine.Utils.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms
@@ -8,6 +10,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms
         public string Identifier => "upperCaseInvariant";
 
         public string Name { get; }
+
+        public IJsonBuilder<IValueForm> JsonBuilder { get; } = new JsonBuilder<IValueForm, UpperCaseInvariantValueFormModel>(() => new UpperCaseInvariantValueFormModel());
 
         public UpperCaseInvariantValueFormModel()
         {

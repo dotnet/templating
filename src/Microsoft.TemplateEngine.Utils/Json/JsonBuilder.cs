@@ -7,11 +7,11 @@ namespace Microsoft.TemplateEngine.Utils.Json
     internal class JsonBuilder<T, TConcrete> : IJsonBuilder<T>
         where TConcrete : T
     {
-        private readonly Func<T> _creator;
-        private readonly Dictionary<string, Action<IJsonToken, T>> _deserializeSteps = new Dictionary<string, Action<IJsonToken, T>>(StringComparer.OrdinalIgnoreCase);
+        private readonly Func<TConcrete> _creator;
+        private readonly Dictionary<string, Action<IJsonToken, TConcrete>> _deserializeSteps = new Dictionary<string, Action<IJsonToken, TConcrete>>(StringComparer.OrdinalIgnoreCase);
         private readonly List<Action<T, IJsonObject>> _serializeSteps = new List<Action<T, IJsonObject>>();
 
-        public JsonBuilder(Func<T> creator)
+        public JsonBuilder(Func<TConcrete> creator)
         {
             _creator = creator;
         }
@@ -20,12 +20,40 @@ namespace Microsoft.TemplateEngine.Utils.Json
         {
             if (source.TokenType == JsonTokenType.Object)
             {
-                T result = _creator();
-                ((IJsonObject)source).ExtractValues(result, _deserializeSteps);
-                return result;
+                using (var enumerator = ((IJsonObject)source).Properties().GetEnumerator())
+                {
+                    return Deserialize(null, enumerator);
+                }
             }
 
-            return default(T);
+            return default;
+        }
+
+        public T Deserialize(IEnumerable<KeyValuePair<string, IJsonToken>> stashedTokens, IEnumerator<KeyValuePair<string, IJsonToken>> remainingProperties)
+        {
+            TConcrete result = _creator();
+
+            if (!(stashedTokens is null))
+            {
+                foreach (KeyValuePair<string, IJsonToken> stashedToken in stashedTokens)
+                {
+                    if (_deserializeSteps.TryGetValue(stashedToken.Key, out Action<IJsonToken, TConcrete> handler))
+                    {
+                        handler(stashedToken.Value, result);
+                    }
+                }
+            }
+
+            while (remainingProperties.MoveNext())
+            {
+                KeyValuePair<string, IJsonToken> current = remainingProperties.Current;
+                if (_deserializeSteps.TryGetValue(current.Key, out Action<IJsonToken, TConcrete> handler))
+                {
+                    handler(current.Value, result);
+                }
+            }
+
+            return result;
         }
 
         public JsonBuilder<T, TConcrete> MapCore<TValue, TValueConcrete>(Getter<TConcrete, TValue> getter, Serialize<TValue> serialize, Deserialize<TValueConcrete> deserialize, Setter<TConcrete, TValue> setter, Func<TValueConcrete> itemCreator, string propertyName)
@@ -58,7 +86,7 @@ namespace Microsoft.TemplateEngine.Utils.Json
                 target.SetValue(propertyName, token);
             });
 
-            _deserializeSteps[propertyName] = (source, target) => setter((TConcrete)target, deserialize(source));
+            _deserializeSteps[propertyName] = (source, target) => setter(target, deserialize(source));
 
             return this;
         }

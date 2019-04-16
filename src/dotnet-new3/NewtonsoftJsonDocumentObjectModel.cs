@@ -90,6 +90,10 @@ namespace dotnet_new3
 
             public IEnumerable<string> PropertyNames => _object.Properties().Select(x => x.Name);
 
+            public new IJsonObject Clone() => new JObjectAdapter(_object.DeepClone(), Factory);
+
+            IJsonToken IJsonToken.Clone() => Clone();
+
             public ISet<string> ExtractValues(IReadOnlyDictionary<string, Action<IJsonToken>> mappings)
             {
                 HashSet<string> foundNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -120,6 +124,11 @@ namespace dotnet_new3
                 }
 
                 return foundNames;
+            }
+
+            public IJsonObject Merge(IJsonObject other)
+            {
+                throw new NotImplementedException();
             }
 
             public IEnumerable<KeyValuePair<string, IJsonToken>> Properties()
@@ -173,6 +182,10 @@ namespace dotnet_new3
                 return this;
             }
 
+            public new IJsonArray Clone() => new JArrayAdapter(_array.DeepClone(), Factory);
+
+            IJsonToken IJsonToken.Clone() => Clone();
+
             public IEnumerator<IJsonToken> GetEnumerator() => _array.Select(t => AdaptToken(t, Factory)).GetEnumerator();
 
             public IJsonArray RemoveAt(int index)
@@ -205,6 +218,10 @@ namespace dotnet_new3
                     }
                 }
             }
+
+            public new IJsonValue Clone() => new JValueAdapter(Token.DeepClone(), Factory);
+
+            IJsonToken IJsonToken.Clone() => Clone();
         }
 
         private class JTokenAdapter : IJsonToken
@@ -247,6 +264,8 @@ namespace dotnet_new3
                         throw new NotSupportedException($"Unkown token type {type}");
                 }
             }
+
+            public virtual IJsonToken Clone() => null;
 
             public void WriteToStream(Stream s)
             {

@@ -16,5 +16,9 @@ namespace Microsoft.TemplateEngine.Abstractions.Json
         ISet<string> ExtractValues<T>(T context, IReadOnlyDictionary<string, Action<IJsonToken, T>> mappings);
 
         IEnumerable<KeyValuePair<string, IJsonToken>> Properties();
+
+        IJsonObject Merge(IJsonObject other);
+
+        new IJsonObject Clone();
     }
 }

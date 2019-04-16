@@ -120,6 +120,10 @@ namespace dotnet_new3
                 return this;
             }
 
+            public IJsonArray Clone() => new JsonArray(_basis.Clone());
+
+            IJsonToken IJsonToken.Clone() => Clone();
+
             public IEnumerator<IJsonToken> GetEnumerator() => _basis.GetEnumerator();
 
             public IJsonArray RemoveAt(int index)
@@ -162,9 +166,15 @@ namespace dotnet_new3
 
             public IEnumerable<string> PropertyNames => _basis.PropertyNames;
 
+            public IJsonObject Clone() => new JsonObject(_basis.Clone());
+
+            IJsonToken IJsonToken.Clone() => Clone();
+
             public ISet<string> ExtractValues(IReadOnlyDictionary<string, Action<IJsonToken>> mappings) => _basis.ExtractValues(mappings);
 
             public ISet<string> ExtractValues<T>(T context, IReadOnlyDictionary<string, Action<IJsonToken, T>> mappings) => _basis.ExtractValues(context, mappings);
+
+            public IJsonObject Merge(IJsonObject other) => _basis.Merge(other);
 
             public IEnumerable<KeyValuePair<string, IJsonToken>> Properties() => _basis.Properties();
 
@@ -216,6 +226,8 @@ namespace dotnet_new3
             public abstract void Write(ref Utf8JsonWriter writer);
 
             public abstract void Write(string propertyName, ref Utf8JsonWriter writer);
+
+            public virtual IJsonToken Clone() => null;
         }
 
         private class WritableJsonValue : WritableJsonToken, IJsonValue
@@ -227,6 +239,10 @@ namespace dotnet_new3
             }
 
             public object Value { get; }
+
+            public new IJsonValue Clone() => new WritableJsonValue(Value, TokenType, Factory);
+
+            IJsonToken IJsonToken.Clone() => Clone();
 
             public override void Write(ref Utf8JsonWriter writer)
             {
@@ -330,6 +346,18 @@ namespace dotnet_new3
                 return this;
             }
 
+            public new IJsonArray Clone()
+            {
+                IJsonArray array = Factory.CreateArray();
+
+                foreach (IJsonToken token in _children)
+                {
+                    array = array.Add(token.Clone());
+                }
+
+                return array;
+            }
+
             public IEnumerator<IJsonToken> GetEnumerator() => _children.GetEnumerator();
 
             public IJsonArray RemoveAt(int index)
@@ -365,6 +393,8 @@ namespace dotnet_new3
             }
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+            IJsonArray IJsonArray.Clone() => Clone();
         }
 
         private class WritableJsonObject : WritableJsonToken, IJsonObject
@@ -427,6 +457,45 @@ namespace dotnet_new3
                 return foundProperties;
             }
 
+            public new IJsonObject Clone()
+            {
+                IJsonObject obj = Factory.CreateObject();
+
+                foreach (KeyValuePair<string, IJsonToken> entry in Properties())
+                {
+                    obj = obj.SetValue(entry.Key, entry.Value.Clone());
+                }
+
+                return obj;
+            }
+
+            IJsonToken IJsonToken.Clone() => Clone();
+
+            public IJsonObject Merge(IJsonObject other)
+            {
+                IJsonObject obj = Factory.CreateObject();
+                Dictionary<string, IJsonToken> map = new Dictionary<string, IJsonToken>(Properties().Select(x => new KeyValuePair<string, IJsonToken>(x.Key, x.Value.Clone())), StringComparer.Ordinal);
+
+                foreach (KeyValuePair<string, IJsonToken> entry in other.Properties())
+                {
+                    if (entry.Value is IJsonObject o2 && map.TryGetValue(entry.Key, out IJsonToken t1) && t1 is IJsonObject o1)
+                    {
+                        map[entry.Key] = o1.Merge(o2);
+                    }
+                    else
+                    {
+                        map[entry.Key] = entry.Value;
+                    }
+                }
+
+                foreach (KeyValuePair<string, IJsonToken> entry in map)
+                {
+                    obj = obj.SetValue(entry.Key, entry.Value);
+                }
+
+                return obj;
+            }
+
             public IEnumerable<KeyValuePair<string, IJsonToken>> Properties() => _properties;
 
             public IJsonObject RemoveValue(string propertyName)
@@ -482,6 +551,8 @@ namespace dotnet_new3
             public IJsonDocumentObjectModelFactory Factory { get; }
 
             public JsonTokenType TokenType { get; }
+
+            public virtual IJsonToken Clone() => null;
 
             public abstract void Write(ref Utf8JsonWriter writer);
 
@@ -591,6 +662,10 @@ namespace dotnet_new3
                         throw new NotSupportedException($"Cannot write type {TokenType}");
                 }
             }
+
+            public new IJsonValue Clone() => new WritableJsonValue(Value, TokenType, Factory);
+
+            IJsonToken IJsonToken.Clone() => Clone();
         }
 
         private class JsonArrayAdapter : JsonElementAdapter, IJsonArray
@@ -609,6 +684,20 @@ namespace dotnet_new3
                 return new WritableJsonArray(_element, Factory)
                     .Add(value);
             }
+
+            public new IJsonArray Clone()
+            {
+                IJsonArray array = Factory.CreateArray();
+
+                foreach (IJsonToken token in this)
+                {
+                    array = array.Add(token.Clone());
+                }
+
+                return array;
+            }
+
+            IJsonToken IJsonToken.Clone() => Clone();
 
             public IEnumerator<IJsonToken> GetEnumerator() => _element.EnumerateArray().Select(x => AdaptElement(x, Factory)).GetEnumerator();
 
@@ -656,6 +745,20 @@ namespace dotnet_new3
 
             public IEnumerable<string> PropertyNames => _element.EnumerateObject().Select(x => x.Name);
 
+            public new IJsonObject Clone()
+            {
+                IJsonObject obj = Factory.CreateObject();
+
+                foreach (KeyValuePair<string, IJsonToken> entry in Properties())
+                {
+                    obj = obj.SetValue(entry.Key, entry.Value.Clone());
+                }
+
+                return obj;
+            }
+
+            IJsonToken IJsonToken.Clone() => Clone();
+
             public ISet<string> ExtractValues(IReadOnlyDictionary<string, Action<IJsonToken>> mappings)
             {
                 HashSet<string> foundProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -696,6 +799,31 @@ namespace dotnet_new3
                 }
 
                 return foundProperties;
+            }
+
+            public IJsonObject Merge(IJsonObject other)
+            {
+                IJsonObject obj = Factory.CreateObject();
+                Dictionary<string, IJsonToken> map = new Dictionary<string, IJsonToken>(Properties().Select(x => new KeyValuePair<string, IJsonToken>(x.Key, x.Value.Clone())), StringComparer.Ordinal);
+
+                foreach (KeyValuePair<string, IJsonToken> entry in other.Properties())
+                {
+                    if (entry.Value is IJsonObject o2 && map.TryGetValue(entry.Key, out IJsonToken t1) && t1 is IJsonObject o1)
+                    {
+                        map[entry.Key] = o1.Merge(o2);
+                    }
+                    else
+                    {
+                        map[entry.Key] = entry.Value;
+                    }
+                }
+
+                foreach (KeyValuePair<string, IJsonToken> entry in map)
+                {
+                    obj = obj.SetValue(entry.Key, entry.Value);
+                }
+
+                return obj;
             }
 
             public IEnumerable<KeyValuePair<string, IJsonToken>> Properties()

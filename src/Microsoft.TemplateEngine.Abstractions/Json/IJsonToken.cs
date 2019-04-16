@@ -9,5 +9,7 @@ namespace Microsoft.TemplateEngine.Abstractions.Json
         void WriteToStream(Stream s);
 
         IJsonDocumentObjectModelFactory Factory { get; }
+
+        IJsonToken Clone();
     }
 }

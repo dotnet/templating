@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Microsoft.TemplateEngine.Abstractions.Json
 {
@@ -13,4 +14,6 @@ namespace Microsoft.TemplateEngine.Abstractions.Json
     public delegate void Setter<T, TValue>(T source, TValue value);
 
     public delegate T Chain<T>(T item);
+
+    public delegate void MappingsSelector<T>(out string selectorPropertyName, out IReadOnlyDictionary<string, IJsonDeserializationBuilder<T>> mappingsSelector, out IJsonDeserializationBuilder<T> defaultMapping);
 }

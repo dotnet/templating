@@ -6,7 +6,7 @@ namespace Microsoft.TemplateEngine.Utils.Json
     internal class JsonSerialize<T>
         where T : IJsonSerializable<T>
     {
-        public static Lazy<T> _instance;
+        public static Lazy<T> _instance = new Lazy<T>(() => (T)Activator.CreateInstance(typeof(T)));
 
         public static void Configure(Func<T> creator) => _instance = _instance ?? new Lazy<T>(creator);
 

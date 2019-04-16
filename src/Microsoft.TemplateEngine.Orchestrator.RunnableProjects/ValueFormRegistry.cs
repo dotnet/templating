@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.TemplateEngine.Abstractions.Json;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms;
 using Newtonsoft.Json.Linq;
 
@@ -7,8 +9,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
     public static class ValueFormRegistry
     {
-        private static readonly IReadOnlyDictionary<string, IValueForm> FormLookup = SetupFormLookup();
-
         private static IReadOnlyDictionary<string, IValueForm> SetupFormLookup()
         {
             Dictionary<string, IValueForm> lookup = new Dictionary<string, IValueForm>(StringComparer.OrdinalIgnoreCase);
@@ -44,24 +44,25 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return lookup;
         }
 
-        public static IReadOnlyDictionary<string, IValueForm> AllForms
-        {
-            get
-            {
-                return FormLookup;
-            }
-        }
+        public static IReadOnlyDictionary<string, IValueForm> AllForms { get; } = SetupFormLookup();
 
         public static IValueForm GetForm(string name, JObject obj)
         {
             string identifier = obj.ToString("identifier");
 
-            if (!FormLookup.TryGetValue(identifier, out IValueForm value))
+            if (!AllForms.TryGetValue(identifier, out IValueForm value))
             {
-                return FormLookup[IdentityValueForm.FormName].FromJObject(name, obj);
+                return AllForms[IdentityValueForm.FormName].FromJObject(name, obj);
             }
 
             return value.FromJObject(name, obj);
+        }
+
+        public static void GetSelectorMappings(out string selectorPropertyName, out IReadOnlyDictionary<string, IJsonDeserializationBuilder<IValueForm>> mappingsSelector, out IJsonDeserializationBuilder<IValueForm> defaultMapping)
+        {
+            selectorPropertyName = "identifier";
+            mappingsSelector = AllForms.ToDictionary(x => x.Key, x => (IJsonDeserializationBuilder<IValueForm>)x.Value.JsonBuilder);
+            defaultMapping = AllForms[IdentityValueForm.FormName].JsonBuilder;
         }
     }
 }

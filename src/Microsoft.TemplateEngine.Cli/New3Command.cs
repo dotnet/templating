@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -145,6 +146,7 @@ namespace Microsoft.TemplateEngine.Cli
 
             if (args.Any(x => string.Equals(x, "--debug:attach", StringComparison.Ordinal)))
             {
+                Console.WriteLine($"PID: {Process.GetCurrentProcess().Id}");
                 Console.ReadLine();
             }
 

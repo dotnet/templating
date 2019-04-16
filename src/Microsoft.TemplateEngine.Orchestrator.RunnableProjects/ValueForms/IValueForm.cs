@@ -1,9 +1,10 @@
 using System.Collections.Generic;
+using Microsoft.TemplateEngine.Abstractions.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms
 {
-    public interface IValueForm
+    public interface IValueForm : IJsonSerializable<IValueForm>
     {
         string Identifier { get; }
 

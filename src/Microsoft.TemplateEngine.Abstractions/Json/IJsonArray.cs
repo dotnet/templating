@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Microsoft.TemplateEngine.Abstractions.Json
 {
@@ -7,5 +7,7 @@ namespace Microsoft.TemplateEngine.Abstractions.Json
         IJsonArray RemoveAt(int index);
 
         IJsonArray Add(IJsonToken value);
+
+        new IJsonArray Clone();
     }
 }

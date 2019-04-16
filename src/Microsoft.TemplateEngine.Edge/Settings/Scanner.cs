@@ -332,6 +332,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 _environmentSettings.SettingsLoader.AddMountPoint(scanMountPoint);
                 // add the MP to the scan result
                 scanResult.AddInstalledMountPointId(scanMountPoint.Info.MountPointId);
+                _environmentSettings.SettingsLoader.ReleaseMountPoint(scanMountPoint);
             }
             else
             {

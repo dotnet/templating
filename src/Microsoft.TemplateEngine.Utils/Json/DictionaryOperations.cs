@@ -21,30 +21,32 @@ namespace Microsoft.TemplateEngine.Utils.Json
         }
 
         public JsonBuilder<TResult, TResultConcrete> Map<TDictionary, TDictionaryConcrete>
-            (Expression<Getter<TResultConcrete, TDictionary>> property,
+            (Getter<TResultConcrete, TDictionary> getter,
+                Setter<TResultConcrete, TDictionary> setter,
                 Func<TDictionaryConcrete> dictionaryCreator,
                 Func<TDictionary, IEnumerable<KeyValuePair<string, TElement>>> getEnumerator,
                 Action<TDictionaryConcrete, string, TElementConcrete> setElement,
-                string propertyName = null)
+                string propertyName)
             where TDictionaryConcrete : TDictionary
         {
-            JsonBuilderExtensions.ProcessExpression(property, out Getter<TResultConcrete, TDictionary> getter, out Setter<TResultConcrete, TDictionary> setter, ref propertyName);
             return _builder.MapCore(getter, JsonBuilderExtensions.SerializeDictionary(getEnumerator, _elementSerializer), JsonBuilderExtensions.Deserialize(dictionaryCreator, _elementDeserializer, setElement), setter, propertyName);
         }
 
         public JsonBuilder<TResult, TResultConcrete> Map<TDictionary, TDictionaryConcrete>
-            (Expression<Getter<TResultConcrete, TDictionary>> property,
+            (Getter<TResultConcrete, TDictionary> getter,
+                Setter<TResultConcrete, TDictionary> setter,
                 Func<TDictionaryConcrete> collectionCreator,
-                string propertyName = null)
+                string propertyName)
             where TDictionary : IEnumerable<KeyValuePair<string, TElement>>
             where TDictionaryConcrete : TDictionary, IDictionary<string, TElement>
-            => Map(property, collectionCreator, x => x, (c, k, v) => c[k] = v, propertyName);
+            => Map(getter, setter, collectionCreator, x => x, (c, k, v) => c[k] = v, propertyName);
 
         public JsonBuilder<TResult, TResultConcrete> Map<TCollection, TCollectionConcrete>
-            (Expression<Getter<TResultConcrete, TCollection>> property,
-                string propertyName = null)
+            (Getter<TResultConcrete, TCollection> getter,
+                Setter<TResultConcrete, TCollection> setter,
+                string propertyName)
             where TCollection : IEnumerable<KeyValuePair<string, TElement>>
             where TCollectionConcrete : TCollection, IDictionary<string, TElement>, new()
-            => Map(property, () => new TCollectionConcrete(), x => x, (c, k, v) => c[k] = v, propertyName);
+            => Map(getter, setter, () => new TCollectionConcrete(), x => x, (c, k, v) => c[k] = v, propertyName);
     }
 }

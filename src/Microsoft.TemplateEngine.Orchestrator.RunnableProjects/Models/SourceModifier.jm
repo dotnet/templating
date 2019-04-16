@@ -1,0 +1,5 @@
+Condition                           string
+Include                             string[]
+CopyOnly                            string[]
+Exclude                             string[]
+Rename                              string{}
