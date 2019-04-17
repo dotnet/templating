@@ -14,17 +14,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         {
             JObject cacheObject = new JObject();
 
-            if (JsonSerializerHelpers.TrySerializeDictionary(descriptorCache.InstalledItems, JsonSerializerHelpers.GuidKeyConverter, JsonSerializerHelpers.StringValueConverter, out JObject installedItemsObject))
-            {
-                cacheObject.Add(nameof(descriptorCache.InstalledItems), installedItemsObject);
-            }
-            else
-            {
-                serialized = null;
-                return false;
-            }
-
-            if (JsonSerializerHelpers.TrySerializeDictionary(descriptorCache.Descriptors, JsonSerializerHelpers.StringKeyConverter, InstallUnitDescriptorToJObjectConverter, out JObject descriptorObject))
+            if (JsonSerializerHelpers.TrySerializeDictionary(descriptorCache.Descriptors, JsonSerializerHelpers.GuidKeyConverter, InstallUnitDescriptorToJObjectConverter, out JObject descriptorObject))
             {
                 cacheObject.Add(nameof(descriptorCache.Descriptors), descriptorObject);
             }
@@ -42,15 +32,13 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         {
             JObject descriptorObject = new JObject();
 
-            descriptorObject.Add(nameof(IInstallUnitDescriptor.FactoryId), descriptor.FactoryId);
+            descriptorObject[nameof(IInstallUnitDescriptor.FactoryId)] = descriptor.FactoryId;
+            descriptorObject[nameof(IInstallUnitDescriptor.Identifier)] = descriptor.Identifier;
+            descriptorObject[nameof(IInstallUnitDescriptor.MountPointId)] = descriptor.MountPointId;
 
             if (JsonSerializerHelpers.TrySerializeStringDictionary(descriptor.Details, out JObject detailsObject))
             {
                 descriptorObject.Add(nameof(IInstallUnitDescriptor.Details), detailsObject);
-            }
-            else
-            {
-                descriptorObject = null;
             }
 
             return descriptorObject;

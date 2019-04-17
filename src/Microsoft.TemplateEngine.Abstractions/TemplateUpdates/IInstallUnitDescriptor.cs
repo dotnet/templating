@@ -8,6 +8,8 @@ namespace Microsoft.TemplateEngine.Abstractions.TemplateUpdates
     // Basically anything which could be a logical unit of templates.
     public interface IInstallUnitDescriptor
     {
+        Guid DescriptorId { get; }
+
         string Identifier { get; }
 
         Guid FactoryId { get; }
@@ -18,5 +20,7 @@ namespace Microsoft.TemplateEngine.Abstractions.TemplateUpdates
 
         // For diagnostic messages.
         string UserReadableIdentifier { get; }
+
+        string UninstallString { get; }
     }
 }

@@ -7,24 +7,25 @@ namespace Microsoft.TemplateEngine.Edge.TemplateUpdates
 {
     public class NupkgInstallUnitDescriptor : IInstallUnitDescriptor
     {
-        public NupkgInstallUnitDescriptor(Guid mountPointId, string packageName, string version)
+        public NupkgInstallUnitDescriptor(Guid descriptorId, Guid mountPointId, string identifier, string version)
         {
+            DescriptorId = descriptorId;
             MountPointId = mountPointId;
-            PackageName = packageName;
+            Identifier = identifier;
             Version = version;
         }
 
+        [JsonProperty]
+        public Guid DescriptorId { get; }
+
         [JsonIgnore]
-        public string Identifier => PackageName;
+        public string Identifier { get; }
 
         [JsonProperty]
         public Guid FactoryId => NupkgInstallUnitDescriptorFactory.FactoryId;
 
-        [JsonIgnore]
+        [JsonProperty]
         public Guid MountPointId { get; }
-
-        [JsonIgnore]
-        public string PackageName { get; }
 
         [JsonIgnore]
         public string Version { get; }
@@ -36,8 +37,6 @@ namespace Microsoft.TemplateEngine.Edge.TemplateUpdates
             {
                 Dictionary<string, string> detailsInfo = new Dictionary<string, string>()
                 {
-                    { nameof(MountPointId), MountPointId.ToString() },
-                    { nameof(PackageName), PackageName.ToString() },
                     { nameof(Version), Version }
                 };
 
@@ -46,6 +45,9 @@ namespace Microsoft.TemplateEngine.Edge.TemplateUpdates
         }
 
         [JsonIgnore]
-        public string UserReadableIdentifier => string.Join(".", PackageName, Version);
+        public string UserReadableIdentifier => string.Join(".", Identifier, Version);
+
+        [JsonIgnore]
+        public string UninstallString => string.Join("::", Identifier, Version);
     }
 }

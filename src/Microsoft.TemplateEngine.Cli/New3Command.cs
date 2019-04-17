@@ -414,60 +414,7 @@ namespace Microsoft.TemplateEngine.Cli
 
             if (_commandInput.ToUninstallList != null)
             {
-                if (_commandInput.ToUninstallList.Count > 0 && _commandInput.ToUninstallList[0] != null)
-                {
-                    IEnumerable<string> failures = Installer.Uninstall(_commandInput.ToUninstallList);
-
-                    foreach (string failure in failures)
-                    {
-                        Console.WriteLine(LocalizableStrings.CouldntUninstall, failure);
-                    }
-                }
-                else
-                {
-                    Console.WriteLine(LocalizableStrings.CommandDescription);
-                    Console.WriteLine();
-                    Console.WriteLine(LocalizableStrings.InstalledItems);
-
-                    foreach (KeyValuePair<Guid, string> entry in _settingsLoader.InstallUnitDescriptorCache.InstalledItems)
-                    {
-                        Console.WriteLine($"  {entry.Value}");
-
-                        if (_settingsLoader.InstallUnitDescriptorCache.Descriptors.TryGetValue(entry.Value, out IInstallUnitDescriptor descriptor))
-                        {
-                            if (descriptor.Details != null && descriptor.Details.TryGetValue("Version", out string versionValue))
-                            {
-                                Console.WriteLine($"    {LocalizableStrings.Version} {versionValue}");
-                            }
-                        }
-
-                        HashSet<string> displayStrings = new HashSet<string>(StringComparer.Ordinal);
-
-                        foreach (TemplateInfo info in _settingsLoader.UserTemplateCache.TemplateInfo.Where(x => x.ConfigMountPointId == entry.Key))
-                        {
-                            string str = $"      {info.Name} ({info.ShortName})";
-
-                            if (info.Tags != null && info.Tags.TryGetValue("language", out ICacheTag languageTag))
-                            {
-                                str += " " + string.Join(", ", languageTag.ChoicesAndDescriptions.Select(x => x.Key));
-                            }
-
-                            displayStrings.Add(str);
-                        }
-
-                        if (displayStrings.Count > 0)
-                        {
-                            Console.WriteLine($"    {LocalizableStrings.Templates}:");
-
-                            foreach (string displayString in displayStrings)
-                            {
-                                Console.WriteLine(displayString);
-                            }
-                        }
-                    }
-
-                    return CreationResultStatus.Success;
-                }
+                return EnterUninstallFlow();
             }
 
             if (_commandInput.ToInstallList != null && _commandInput.ToInstallList.Count > 0 && _commandInput.ToInstallList[0] != null)
@@ -487,6 +434,58 @@ namespace Microsoft.TemplateEngine.Cli
             //No other cases specified, we've fallen through to "Usage help + List"
             TemplateListResolutionResult templateResolutionResult = QueryForTemplateMatches();
             HelpForTemplateResolution.CoordinateHelpAndUsageDisplay(templateResolutionResult, EnvironmentSettings, _commandInput, _hostDataLoader, _telemetryLogger, _templateCreator, _defaultLanguage);
+
+            return CreationResultStatus.Success;
+        }
+
+        private CreationResultStatus EnterUninstallFlow()
+        {
+            if (_commandInput.ToUninstallList.Count > 0 && _commandInput.ToUninstallList[0] != null)
+            {
+                IEnumerable<string> failures = Installer.Uninstall(_commandInput.ToUninstallList);
+
+                foreach (string failure in failures)
+                {
+                    Console.WriteLine(LocalizableStrings.CouldntUninstall, failure);
+                }
+            }
+            else
+            {
+                Console.WriteLine(LocalizableStrings.CommandDescription);
+                Console.WriteLine();
+                Console.WriteLine(LocalizableStrings.InstalledItems);
+
+                foreach (IInstallUnitDescriptor descriptor in _settingsLoader.InstallUnitDescriptorCache.Descriptors.Values)
+                {
+                    Console.WriteLine($"  {descriptor.Identifier}");
+
+                    // TODO details
+
+                    HashSet<string> displayStrings = new HashSet<string>(StringComparer.Ordinal);
+
+                    foreach (TemplateInfo info in _settingsLoader.UserTemplateCache.TemplateInfo.Where(x => x.ConfigMountPointId == descriptor.MountPointId))
+                    {
+                        string str = $"      {info.Name} ({info.ShortName})";
+
+                        if (info.Tags != null && info.Tags.TryGetValue("language", out ICacheTag languageTag))
+                        {
+                            str += " " + string.Join(", ", languageTag.ChoicesAndDescriptions.Select(x => x.Key));
+                        }
+
+                        displayStrings.Add(str);
+                    }
+
+                    if (displayStrings.Count > 0)
+                    {
+                        Console.WriteLine($"    {LocalizableStrings.Templates}:");
+
+                        foreach (string displayString in displayStrings)
+                        {
+                            Console.WriteLine(displayString);
+                        }
+                    }
+                }
+            }
 
             return CreationResultStatus.Success;
         }

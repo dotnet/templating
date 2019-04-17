@@ -29,7 +29,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
             // filter the already installed packs
             if (_environmentSettings.SettingsLoader is SettingsLoader settingsLoader)
             {
-                alreadyInstalledPacks = new HashSet<string>(settingsLoader.InstallUnitDescriptorCache.InstalledItems.Values);
+                alreadyInstalledPacks = new HashSet<string>(settingsLoader.InstallUnitDescriptorCache.Descriptors.Select(d => d.Value.UninstallString));
             }
             else
             {

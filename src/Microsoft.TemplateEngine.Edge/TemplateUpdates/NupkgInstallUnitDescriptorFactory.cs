@@ -14,18 +14,9 @@ namespace Microsoft.TemplateEngine.Edge.TemplateUpdates
 
         public Guid Id => FactoryId;
 
-        public bool TryCreateFromDetails(IReadOnlyDictionary<string, string> details, out IInstallUnitDescriptor descriptor)
+        public bool TryCreateFromDetails(Guid descriptorId, string identifier, Guid mountPointId, IReadOnlyDictionary<string, string> details, out IInstallUnitDescriptor descriptor)
         {
-            if (!details.TryGetValue(nameof(NupkgInstallUnitDescriptor.MountPointId), out string mountPointValue)
-                || string.IsNullOrEmpty(mountPointValue)
-                || !Guid.TryParse(mountPointValue, out Guid mountPointId))
-            {
-                descriptor = null;
-                return false;
-            }
-
-            if (!details.TryGetValue(nameof(NupkgInstallUnitDescriptor.PackageName), out string packageName)
-                || string.IsNullOrEmpty(packageName))
+            if (string.IsNullOrEmpty(identifier) || mountPointId == Guid.Empty)
             {
                 descriptor = null;
                 return false;
@@ -38,7 +29,7 @@ namespace Microsoft.TemplateEngine.Edge.TemplateUpdates
                 return false;
             }
 
-            descriptor = new NupkgInstallUnitDescriptor(mountPointId, packageName, version);
+            descriptor = new NupkgInstallUnitDescriptor(descriptorId, mountPointId, identifier, version);
             return true;
         }
 
@@ -51,7 +42,8 @@ namespace Microsoft.TemplateEngine.Edge.TemplateUpdates
                 && mountPoint.EnvironmentSettings.Host.FileSystem.FileExists(mountPoint.Info.Place)
                 && TryGetPackageInfoFromNuspec(mountPoint, out string packageName, out string version))
             {
-                IInstallUnitDescriptor descriptor = new NupkgInstallUnitDescriptor(mountPoint.Info.MountPointId, packageName, version);
+                Guid descriptorId = Guid.NewGuid();
+                IInstallUnitDescriptor descriptor = new NupkgInstallUnitDescriptor(descriptorId, mountPoint.Info.MountPointId, packageName, version);
                 allDescriptors.Add(descriptor);
                 return true;
             }
