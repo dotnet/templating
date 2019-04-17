@@ -18,9 +18,8 @@ namespace Microsoft.TemplateEngine.Abstractions.TemplateUpdates
 
         IReadOnlyDictionary<string, string> Details { get; }
 
-        // For diagnostic messages.
-        string UserReadableIdentifier { get; }
-
         string UninstallString { get; }
+
+        IReadOnlyList<string> DetailKeysDisplayOrder { get; }
     }
 }

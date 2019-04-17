@@ -23,7 +23,6 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateUpdateTests
                 FactoryId = NupkgInstallUnitDescriptorFactory.FactoryId,
                 Identifier = "MockPackage",
                 MountPointId = new Guid("C5A4D83F-7005-4B38-BF47-DFF5CB5F5881"),
-                UserReadableIdentifier = "Mock Package"
             };
             List<IInstallUnitDescriptor> installsToUpdate = new List<IInstallUnitDescriptor>() { installDescriptor };
 
@@ -54,7 +53,6 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateUpdateTests
                 FactoryId = NupkgInstallUnitDescriptorFactory.FactoryId,
                 Identifier = "MockPackage",
                 MountPointId = new Guid("C5A4D83F-7005-4B38-BF47-DFF5CB5F5881"),
-                UserReadableIdentifier = "Mock Package"
             };
 
             TemplateUpdateCoordinator coordinator = new TemplateUpdateCoordinator(EngineEnvironmentSettings, installer);
@@ -77,7 +75,6 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateUpdateTests
                 FactoryId = NupkgInstallUnitDescriptorFactory.FactoryId,
                 Identifier = "MockPackage",
                 MountPointId = new Guid("C5A4D83F-7005-4B38-BF47-DFF5CB5F5881"),
-                UserReadableIdentifier = "Mock Package"
             };
 
             TemplateUpdateCoordinator coordinator = new TemplateUpdateCoordinator(EngineEnvironmentSettings, installer);

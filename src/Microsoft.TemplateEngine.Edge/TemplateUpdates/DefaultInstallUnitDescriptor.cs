@@ -12,6 +12,7 @@ namespace Microsoft.TemplateEngine.Edge.TemplateUpdates
             MountPointId = mountPointId;
             Identifier = identifier;
             Details = new Dictionary<string, string>();
+            DetailKeysDisplayOrder = new List<string>();
         }
 
         public Guid DescriptorId { get; }
@@ -24,8 +25,8 @@ namespace Microsoft.TemplateEngine.Edge.TemplateUpdates
 
         public IReadOnlyDictionary<string, string> Details { get; }
 
-        public string UserReadableIdentifier => Identifier;
-
         public string UninstallString => Identifier;
+
+        public IReadOnlyList<string> DetailKeysDisplayOrder { get; }
     }
 }

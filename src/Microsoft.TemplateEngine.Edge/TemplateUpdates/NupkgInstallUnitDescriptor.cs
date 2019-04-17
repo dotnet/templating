@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using Microsoft.TemplateEngine.Abstractions.TemplateUpdates;
 using Newtonsoft.Json;
 
@@ -7,13 +8,21 @@ namespace Microsoft.TemplateEngine.Edge.TemplateUpdates
 {
     public class NupkgInstallUnitDescriptor : IInstallUnitDescriptor
     {
-        public NupkgInstallUnitDescriptor(Guid descriptorId, Guid mountPointId, string identifier, string version)
+        public NupkgInstallUnitDescriptor(Guid descriptorId, Guid mountPointId, string identifier, string version, string author)
         {
             DescriptorId = descriptorId;
             MountPointId = mountPointId;
             Identifier = identifier;
             Version = version;
+            Author = author;
         }
+
+        private static readonly IReadOnlyList<string> _detailKeysDisplayOrder = new List<string>()
+        {
+            nameof(NuGetPackageId),
+            nameof(Version),
+            nameof(Author)
+        };
 
         [JsonProperty]
         public Guid DescriptorId { get; }
@@ -24,11 +33,17 @@ namespace Microsoft.TemplateEngine.Edge.TemplateUpdates
         [JsonProperty]
         public Guid FactoryId => NupkgInstallUnitDescriptorFactory.FactoryId;
 
+        [JsonIgnore]
+        public string NuGetPackageId => Identifier;
+
         [JsonProperty]
         public Guid MountPointId { get; }
 
         [JsonIgnore]
         public string Version { get; }
+
+        [JsonIgnore]
+        public string Author { get; }
 
         [JsonProperty]
         public IReadOnlyDictionary<string, string> Details
@@ -37,7 +52,9 @@ namespace Microsoft.TemplateEngine.Edge.TemplateUpdates
             {
                 Dictionary<string, string> detailsInfo = new Dictionary<string, string>()
                 {
-                    { nameof(Version), Version }
+                    { nameof(NuGetPackageId), NuGetPackageId },
+                    { nameof(Version), Version },
+                    { nameof(Author), Author }
                 };
 
                 return detailsInfo;
@@ -45,9 +62,8 @@ namespace Microsoft.TemplateEngine.Edge.TemplateUpdates
         }
 
         [JsonIgnore]
-        public string UserReadableIdentifier => string.Join(".", Identifier, Version);
+        public string UninstallString => Identifier;
 
-        [JsonIgnore]
-        public string UninstallString => string.Join("::", Identifier, Version);
+        public IReadOnlyList<string> DetailKeysDisplayOrder => _detailKeysDisplayOrder;
     }
 }

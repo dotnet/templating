@@ -10,7 +10,6 @@
 
 namespace Microsoft.TemplateEngine.Cli {
     using System;
-    using System.Reflection;
     
     
     /// <summary>
@@ -20,7 +19,7 @@ namespace Microsoft.TemplateEngine.Cli {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class LocalizableStrings {
@@ -40,7 +39,7 @@ namespace Microsoft.TemplateEngine.Cli {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.TemplateEngine.Cli.LocalizableStrings", typeof(LocalizableStrings).GetTypeInfo().Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.TemplateEngine.Cli.LocalizableStrings", typeof(LocalizableStrings).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -1466,6 +1465,24 @@ namespace Microsoft.TemplateEngine.Cli {
         public static string UninstallHelp {
             get {
                 return ResourceManager.GetString("UninstallHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Details:.
+        /// </summary>
+        public static string UninstallListDetailsHeader {
+            get {
+                return ResourceManager.GetString("UninstallListDetailsHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Uninstall Command:.
+        /// </summary>
+        public static string UninstallListUninstallCommand {
+            get {
+                return ResourceManager.GetString("UninstallListUninstallCommand", resourceCulture);
             }
         }
         

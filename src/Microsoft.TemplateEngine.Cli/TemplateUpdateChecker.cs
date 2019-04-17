@@ -83,7 +83,7 @@ namespace Microsoft.TemplateEngine.Cli
                 Reporter.Output.WriteLine(LocalizableStrings.UpdateCheckerNotAvailable.Bold().Red());
                 foreach (IInstallUnitDescriptor descriptor in descriptorsWithoutUpdaters)
                 {
-                    Reporter.Output.WriteLine($"\t{descriptor.UserReadableIdentifier}".Bold().Red());
+                    Reporter.Output.WriteLine($"\t{descriptor.UninstallString}".Bold().Red());
                 }
             }
 

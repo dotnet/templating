@@ -625,4 +625,10 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</value>
   <data name="CouldntDetermineFilesToRestore" xml:space="preserve">
     <value>Couldn't determine files to restore.</value>
   </data>
+  <data name="UninstallListDetailsHeader" xml:space="preserve">
+    <value>Details:</value>
+  </data>
+  <data name="UninstallListUninstallCommand" xml:space="preserve">
+    <value>Uninstall Command:</value>
+  </data>
 </root>

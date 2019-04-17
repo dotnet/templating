@@ -20,14 +20,15 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             Guid mountPointId = new Guid("E0DE1C04-FD83-4BC5-BC4B-A675703F2266");
             string packageName = "TestPackage";
             string version = "1.2.3";
+            string author = "TestAuthor";
 
-            IInstallUnitDescriptor descriptor = new NupkgInstallUnitDescriptor(descriptorId, mountPointId, packageName, version);
+            IInstallUnitDescriptor descriptor = new NupkgInstallUnitDescriptor(descriptorId, mountPointId, packageName, version, author);
             Assert.Equal(descriptorId, descriptor.DescriptorId);
             Assert.Equal(packageName, descriptor.Identifier);
             Assert.Equal(NupkgInstallUnitDescriptorFactory.FactoryId, descriptor.FactoryId);
             Assert.Equal(mountPointId, descriptor.MountPointId);
-
             Assert.Equal(version, descriptor.Details[VersionKey]);
+            Assert.Equal(author, descriptor.Details[nameof(NupkgInstallUnitDescriptor.Author)]);
         }
 
         [Fact(DisplayName = nameof(NupkgDescriptorFactoryCreatesFromDetailsTest))]
@@ -37,10 +38,12 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             Guid mountPointId = new Guid("D1ADBDAF-0382-4EEA-A43C-8356A8BEFAA9");
             string packageName = "TestPackage";
             string version = "1.2.3";
+            string author = "Microsoft";
 
             Dictionary<string, string> details = new Dictionary<string, string>()
             {
-                { VersionKey, version }
+                { VersionKey, version },
+                { nameof(NupkgInstallUnitDescriptor.Author), author }
             };
 
             Assert.True(new NupkgInstallUnitDescriptorFactory().TryCreateFromDetails(descriptorId, packageName, mountPointId, details, out IInstallUnitDescriptor descriptor));
@@ -50,6 +53,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             Assert.Equal(mountPointId, descriptor.MountPointId);
 
             Assert.Equal(version, descriptor.Details[VersionKey]);
+            Assert.Equal(author, descriptor.Details[nameof(NupkgInstallUnitDescriptor.Author)]);
         }
 
         [Fact(DisplayName = nameof(InstallUnitDescriptorFactoryDispatchesToNupkgDescriptorFactoryAndCreatesDescriptorTest))]
@@ -65,7 +69,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         ""MountPointId"": ""D1ADBDAF-0382-4EEA-A43C-8356A8BEFAA9"",
         ""Identifier"": ""TestPackage"",
         ""Details"": {
-            ""Version"": ""1.2.3""
+            ""Version"": ""1.2.3"",
+            ""Author"": ""Microsoft"",
         }
     }
 }";

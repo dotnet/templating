@@ -82,7 +82,7 @@ namespace Microsoft.TemplateEngine.Cli
                     }
                     catch
                     {
-                        Reporter.Error.WriteLine(string.Format(LocalizableStrings.TemplateUpdateError, descriptor.InstallUnitDescriptor.UserReadableIdentifier).Bold().Red());
+                        Reporter.Error.WriteLine(string.Format(LocalizableStrings.TemplateUpdateError, descriptor.InstallUnitDescriptor.Identifier).Bold().Red());
                     }
                 }
             }

@@ -446,22 +446,58 @@ namespace Microsoft.TemplateEngine.Cli
 
                 foreach (string failure in failures)
                 {
-                    Console.WriteLine(LocalizableStrings.CouldntUninstall, failure);
+                    Reporter.Output.WriteLine(string.Format(LocalizableStrings.CouldntUninstall, failure));
                 }
             }
             else
             {
-                Console.WriteLine(LocalizableStrings.CommandDescription);
-                Console.WriteLine();
-                Console.WriteLine(LocalizableStrings.InstalledItems);
+                Reporter.Output.WriteLine(LocalizableStrings.CommandDescription);
+                Reporter.Output.WriteLine();
+                Reporter.Output.WriteLine(LocalizableStrings.InstalledItems);
+
+                Dictionary<Type, List<string>> detailOrderByDescriptorType = new Dictionary<Type, List<string>>();
 
                 foreach (IInstallUnitDescriptor descriptor in _settingsLoader.InstallUnitDescriptorCache.Descriptors.Values)
                 {
-                    Console.WriteLine($"  {descriptor.Identifier}");
+                    Reporter.Output.WriteLine($"  {descriptor.Identifier}");
 
-                    // TODO details
+                    // descriptor-specific details
+                    // first determine the display order
+                    if (!detailOrderByDescriptorType.TryGetValue(descriptor.GetType(), out List<string> detailOrder))
+                    {
+                        detailOrder = descriptor.DetailKeysDisplayOrder.ToList();
+                    }
 
-                    HashSet<string> displayStrings = new HashSet<string>(StringComparer.Ordinal);
+                    HashSet<string> detailKeyLookup = new HashSet<string>(detailOrder);
+
+                    foreach (string detailKey in descriptor.Details.Keys)
+                    {
+                        if (detailKeyLookup.Add(detailKey))
+                        {
+                            detailOrder.Add(detailKey);
+                        }
+                    }
+
+                    // output the details
+                    bool wroteHeader = false;
+                    foreach (string detailKey in detailOrder)
+                    {
+                        // not all descriptors of a type will have all the detail values
+                        if (descriptor.Details.TryGetValue(detailKey, out string detailValue)
+                            && !string.IsNullOrEmpty(detailValue))
+                        {
+                            if (!wroteHeader)
+                            {
+                                Reporter.Output.WriteLine($"    {LocalizableStrings.UninstallListDetailsHeader}");
+                                wroteHeader = true;
+                            }
+
+                            Reporter.Output.WriteLine($"      {detailKey}: {detailValue}");
+                        }
+                    }
+
+                    // template info
+                    HashSet<string> templateDisplayStrings = new HashSet<string>(StringComparer.Ordinal);
 
                     foreach (TemplateInfo info in _settingsLoader.UserTemplateCache.TemplateInfo.Where(x => x.ConfigMountPointId == descriptor.MountPointId))
                     {
@@ -472,18 +508,24 @@ namespace Microsoft.TemplateEngine.Cli
                             str += " " + string.Join(", ", languageTag.ChoicesAndDescriptions.Select(x => x.Key));
                         }
 
-                        displayStrings.Add(str);
+                        templateDisplayStrings.Add(str);
                     }
 
-                    if (displayStrings.Count > 0)
+                    if (templateDisplayStrings.Count > 0)
                     {
-                        Console.WriteLine($"    {LocalizableStrings.Templates}:");
+                        Reporter.Output.WriteLine($"    {LocalizableStrings.Templates}:");
 
-                        foreach (string displayString in displayStrings)
+                        foreach (string displayString in templateDisplayStrings)
                         {
-                            Console.WriteLine(displayString);
+                            Reporter.Output.WriteLine(displayString);
                         }
                     }
+
+                    // uninstall command:
+                    Reporter.Output.WriteLine($"    {LocalizableStrings.UninstallListUninstallCommand}");
+                    Reporter.Output.WriteLine(string.Format("      dotnet {0} -u {1}", _commandInput.CommandName, descriptor.UninstallString));
+
+                    Reporter.Output.WriteLine();
                 }
             }
 

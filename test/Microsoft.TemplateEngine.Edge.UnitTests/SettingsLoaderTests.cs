@@ -88,8 +88,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 .CreateMany()
                 .ToList();
             List<TemplateInfo> templates = TemplatesFromMountPoints(mountPoints);
-            
-            DateTime oldTimestamp = new DateTime(2018,1,1);
+
+            DateTime oldTimestamp = new DateTime(2018, 1, 1);
             DateTime recentTimestamp = new DateTime(2018, 9, 28);
             DateTime moreRecentTimestamp = new DateTime(2018, 9, 29);
             foreach (TemplateInfo templateInfo in templates)
