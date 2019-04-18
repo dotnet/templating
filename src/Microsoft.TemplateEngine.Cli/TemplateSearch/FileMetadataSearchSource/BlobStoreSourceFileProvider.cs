@@ -6,8 +6,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch.FileMetadataSearchSource
 {
     internal class BlobStoreSourceFileProvider : ISearchInfoFileProvider
     {
-        // TODO: get an fwlink for this
-        private static readonly string _searchMetadataUrl = "";
+        private static readonly string _searchMetadataUrl = "https://go.microsoft.com/fwlink/?linkid=2087906&clcid=0x409";
 
         public BlobStoreSourceFileProvider()
         {
@@ -20,8 +19,22 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch.FileMetadataSearchSource
                 return true;
             }
 
-            // an old version of the file may already be setup. If so, fallback to using it.
-            return paths.FileExists(metadataFileTargetLocation);
+            // A previously acquired file may already be setup.
+            // If could either be from online storage, or shipped in-box.
+            // If so, fallback to using it.
+            if (paths.FileExists(metadataFileTargetLocation))
+            {
+                return true;
+            }
+
+            // use the in-box shipped file. It's probably very stale, but better than nothing.
+            if (paths.FileExists(paths.User.NuGetScrapedTemplateSearchFile))
+            {
+                paths.Copy(paths.User.NuGetScrapedTemplateSearchFile, metadataFileTargetLocation);
+                return true;
+            }
+
+            return false;
         }
 
         private bool TryAcquireFileFromCloud(Paths paths, string searchMetadataFileLocation)

@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.TemplateUpdates;
 using Microsoft.TemplateEngine.Edge.TemplateUpdates;
-using Microsoft.TemplateEngine.Cli.TemplateSearch.FileMetadataSearchSource;
 using Microsoft.TemplateEngine.Cli.TemplateSearch;
 using Microsoft.TemplateSearch.Common;
 
@@ -23,7 +22,6 @@ namespace Microsoft.TemplateEngine.Cli
         public string DisplayIdentifier { get; } = "Nupkg";
 
         private IEngineEnvironmentSettings _environmentSettings;
-        //private readonly ISearchInfoFileProvider _searchInfoFileProvider;
         private bool _isInitialized = false;
         private IReadOnlyList<ITemplateSearchSource> _templateSearchSourceList;
 
@@ -35,15 +33,6 @@ namespace Microsoft.TemplateEngine.Cli
         {
             _environmentSettings = environmentSettings;
         }
-
-        //public NupkgUpdater(IEngineEnvironmentSettings environmentSettings)
-        //{
-        //    _environmentSettings = environmentSettings;
-        //    //_searchInfoFileProvider = new TEMP_LocalSourceFileProvider();
-
-        //    // This will become the real one once we're done testing / have the blob store automation setup.
-        //    //_searchInfoFileProvider = new BlobStoreSourceFileProvider();
-        //}
 
         private void EnsureInitialized()
         {

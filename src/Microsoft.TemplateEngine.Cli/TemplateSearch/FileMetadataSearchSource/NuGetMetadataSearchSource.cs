@@ -10,13 +10,9 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch.FileMetadataSearchSource
 
         private readonly ISearchInfoFileProvider _searchInfoFileProvider;
 
-        // TODO: get the ISearchInfoFileProvider finalized
         public NuGetMetadataSearchSource()
         {
-            _searchInfoFileProvider = new TEMP_LocalSourceFileProvider();
-
-            // This will become the real one once we're done testing / have the blob store automation setup.
-            //_searchInfoFileProvider = new BlobStoreSourceFileProvider();
+            _searchInfoFileProvider = new BlobStoreSourceFileProvider();
         }
 
         public override bool TryConfigure(IEngineEnvironmentSettings environmentSettings)

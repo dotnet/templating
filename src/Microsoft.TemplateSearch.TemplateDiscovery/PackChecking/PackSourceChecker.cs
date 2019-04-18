@@ -13,12 +13,14 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
         private readonly PackPreFilterer _packPreFilterer;
         private readonly PackChecker _packChecker;
         private readonly IReadOnlyList<IAdditionalDataProducer> _additionalDataProducers;
+        private readonly bool _saveCandidatePacks;
 
-        public PackSourceChecker(IPackProvider packProvider, PackPreFilterer packPreFilterer, IReadOnlyList<IAdditionalDataProducer> additionalDataProducers)
+        public PackSourceChecker(IPackProvider packProvider, PackPreFilterer packPreFilterer, IReadOnlyList<IAdditionalDataProducer> additionalDataProducers, bool saveCandidatePacks)
         {
             _packProvider = packProvider;
             _packPreFilterer = packPreFilterer;
             _additionalDataProducers = additionalDataProducers;
+            _saveCandidatePacks = saveCandidatePacks;
 
             _packChecker = new PackChecker();
         }
@@ -53,6 +55,11 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
                 {
                     Console.WriteLine($"{count} packs processed");
                 }
+            }
+
+            if (!_saveCandidatePacks)
+            {
+                _packProvider.DeleteDownloadedPacks();
             }
 
             return new PackSourceCheckResult(checkResultList, _additionalDataProducers);

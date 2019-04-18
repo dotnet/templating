@@ -8,6 +8,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
     {
         public string BasePath { get; set; }
         public int PageSize { get; set; }
+        public bool SaveCandidatePacks { get; set; }
         public bool RunOnlyOnePage { get; set; }
         public string PreviousRunBasePath { get; set; }
     }

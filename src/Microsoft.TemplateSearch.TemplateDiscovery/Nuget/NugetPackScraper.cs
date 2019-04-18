@@ -36,7 +36,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
                 new CliHostDataProducer()
             };
 
-            packSourceChecker = new PackSourceChecker(packProvider, preFilterer, additionalDataProducers);
+            packSourceChecker = new PackSourceChecker(packProvider, preFilterer, additionalDataProducers, config.SaveCandidatePacks);
             return true;
         }
 

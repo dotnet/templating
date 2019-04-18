@@ -110,5 +110,10 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
             packageFilePath = outputPackageFileNameFullPath;
             return true;
         }
+
+        public void DeleteDownloadedPacks()
+        {
+            Directory.Delete(_packageTempPath, true);
+        }
     }
 }

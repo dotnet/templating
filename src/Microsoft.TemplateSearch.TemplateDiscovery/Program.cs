@@ -10,9 +10,11 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
     {
         private static readonly bool _defaultRunOnlyOnePage = false;
         private static readonly int _defaultPageSize = 100;
+        private static readonly bool _defaultSaveCandidatePacks = false;
 
         private static readonly string _basePathFlag = "--basePath";
         private static readonly string _pageSizeFlag = "--pageSize";
+        private static readonly string _saveDownloadedPacksFlag = "--savePacks";
         private static readonly string _runOnlyOnePageFlag = "--onePage";
         private static readonly string _previousOutputBasePathFlag = "--previousOutput";
 
@@ -22,7 +24,8 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
             ScraperConfig config = new ScraperConfig()
             {
                 PageSize = _defaultPageSize,
-                RunOnlyOnePage = _defaultRunOnlyOnePage
+                RunOnlyOnePage = _defaultRunOnlyOnePage,
+                SaveCandidatePacks = _defaultSaveCandidatePacks
             };
 
             if (!TryParseArgs(args, config) || string.IsNullOrEmpty(config.BasePath))
@@ -57,10 +60,11 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
             Console.WriteLine("Invalid inputs");
             Console.WriteLine();
             Console.WriteLine("Valid args:");
-            Console.WriteLine($"{_basePathFlag} - the root dir for output for this run.");
-            Console.WriteLine($"{_previousOutputBasePathFlag} - the root dir for output of a previous run. If specified, uses this output to filter packs known to not contain templates.");
-            Console.WriteLine($"{_pageSizeFlag} - (debugging) the chuck size for interactions with the source.");
-            Console.WriteLine($"{_runOnlyOnePageFlag} - (debugging) only process one page of template packs.");
+            Console.WriteLine($"{_basePathFlag} - The root dir for output for this run.");
+            Console.WriteLine($"{_previousOutputBasePathFlag} - The root dir for output of a previous run. If specified, uses this output to filter packs known to not contain templates.");
+            Console.WriteLine($"{_pageSizeFlag} - (debugging) The chunk size for interactions with the source.");
+            Console.WriteLine($"{_runOnlyOnePageFlag} - (debugging) Only process one page of template packs.");
+            Console.WriteLine($"{_saveDownloadedPacksFlag} - Don't delete downloaded candidate packs (by default, they're deleted at the end of a run).");
         }
 
         private static bool TryParseArgs(string[] args, ScraperConfig config)
@@ -108,6 +112,11 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
                 else if (string.Equals(args[index], _runOnlyOnePageFlag, StringComparison.Ordinal))
                 {
                     config.RunOnlyOnePage = true;
+                    ++index;
+                }
+                else if (string.Equals(args[index], _saveDownloadedPacksFlag, StringComparison.Ordinal))
+                {
+                    config.SaveCandidatePacks = true;
                     ++index;
                 }
                 else
