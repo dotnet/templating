@@ -466,6 +466,7 @@ namespace Microsoft.TemplateEngine.Cli
                     if (!detailOrderByDescriptorType.TryGetValue(descriptor.GetType(), out List<string> detailOrder))
                     {
                         detailOrder = descriptor.DetailKeysDisplayOrder.ToList();
+                        detailOrderByDescriptorType[descriptor.GetType()] = detailOrder;
                     }
 
                     HashSet<string> detailKeyLookup = new HashSet<string>(detailOrder);
@@ -768,7 +769,7 @@ namespace Microsoft.TemplateEngine.Cli
                 if (_commandInput.HasDebuggingFlag("--debug:search"))
                 {
                     ITemplateSearchCoordinator searchCoordinator = new DisplayOnlyTemplateSearchCoordinator(EnvironmentSettings, _commandInput, _defaultLanguage);
-                    await searchCoordinator.CoordinateAsync();
+                    await searchCoordinator.CoordinateSearchAsync();
                     return CreationResultStatus.Success;
                 }
 

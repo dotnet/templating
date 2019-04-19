@@ -10,6 +10,7 @@ using Microsoft.TemplateEngine.Abstractions.TemplateUpdates;
 using Microsoft.TemplateEngine.Edge.TemplateUpdates;
 using Microsoft.TemplateEngine.Cli.TemplateSearch;
 using Microsoft.TemplateSearch.Common;
+using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Cli
 {
@@ -60,20 +61,24 @@ namespace Microsoft.TemplateEngine.Cli
         {
             EnsureInitialized();
 
-            IReadOnlyDictionary<string, IInstallUnitDescriptor> packToInstallDescriptorMap = descriptorsToCheck.ToDictionary(d => d.Identifier, d => d);
+            IReadOnlyDictionary<string, IInstallUnitDescriptor> installedPackToInstallDescriptorMap = descriptorsToCheck.ToDictionary(d => d.Identifier, d => d);
 
             List<IUpdateUnitDescriptor> updateList = new List<IUpdateUnitDescriptor>();
 
             foreach (ITemplateSearchSource searchSource in _templateSearchSourceList)
             {
-                IReadOnlyDictionary<string, PackToTemplateEntry> packMatchList = await searchSource.CheckForTemplatePackMatchesAsync(packToInstallDescriptorMap.Keys.ToList());
+                IReadOnlyDictionary<string, PackToTemplateEntry> candidateUpdatePackMatchList = await searchSource.CheckForTemplatePackMatchesAsync(installedPackToInstallDescriptorMap.Keys.ToList());
 
-                foreach (KeyValuePair<string, PackToTemplateEntry> packMatch in packMatchList)
+                foreach (KeyValuePair<string, PackToTemplateEntry> candidateUpdatePackMatch in candidateUpdatePackMatchList)
                 {
-                    string packName = packMatch.Key;
-                    PackToTemplateEntry packToUpdate = packMatch.Value;
+                    string packName = candidateUpdatePackMatch.Key;
+                    PackToTemplateEntry packToUpdate = candidateUpdatePackMatch.Value;
 
-                    if (packToInstallDescriptorMap.TryGetValue(packName, out IInstallUnitDescriptor installDescriptor))
+                    if (installedPackToInstallDescriptorMap.TryGetValue(packName, out IInstallUnitDescriptor installDescriptor)
+                            && (installDescriptor is NupkgInstallUnitDescriptor nupkgInstallDescriptor)
+                            && SemanticVersion.TryParse(nupkgInstallDescriptor.Version, out SemanticVersion nupkgVersion)
+                            && SemanticVersion.TryParse(packToUpdate.Version, out SemanticVersion updateInfoVersion)
+                            && updateInfoVersion > nupkgVersion)
                     {
                         IUpdateUnitDescriptor updateDescriptor = new UpdateUnitDescriptor(installDescriptor, packName, packName);
                         updateList.Add(updateDescriptor);

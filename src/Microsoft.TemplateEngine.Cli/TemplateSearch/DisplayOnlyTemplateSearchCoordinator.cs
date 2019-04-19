@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,7 +22,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
         private readonly INewCommandInput _commandInput;
         private readonly string _defaultLanguage;
 
-        public async Task CoordinateAsync()
+        public async Task CoordinateSearchAsync()
         {
             TemplateSearcher searcher = new TemplateSearcher(_environmentSettings, _commandInput, _defaultLanguage);
             HashSet<string> alreadyInstalledPacks;
@@ -29,11 +30,11 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
             // filter the already installed packs
             if (_environmentSettings.SettingsLoader is SettingsLoader settingsLoader)
             {
-                alreadyInstalledPacks = new HashSet<string>(settingsLoader.InstallUnitDescriptorCache.Descriptors.Select(d => d.Value.UninstallString));
+                alreadyInstalledPacks = new HashSet<string>(settingsLoader.InstallUnitDescriptorCache.Descriptors.Select(d => d.Value.UninstallString), StringComparer.OrdinalIgnoreCase);
             }
             else
             {
-                alreadyInstalledPacks = new HashSet<string>();
+                alreadyInstalledPacks = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             }
 
             IReadOnlyList<TemplateSourceSearchResult> searchResults = await searcher.SearchForTemplatesAsync(alreadyInstalledPacks);

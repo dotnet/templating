@@ -4,7 +4,6 @@ using System.IO;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Edge;
 using Microsoft.TemplateEngine.Edge.Settings;
-using Microsoft.TemplateEngine.Utils;
 using Microsoft.TemplateSearch.Common;
 using Newtonsoft.Json.Linq;
 
