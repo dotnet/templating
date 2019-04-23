@@ -8,6 +8,7 @@ using Microsoft.TemplateEngine.Utils;
 using Microsoft.TemplateSearch.TemplateDiscovery.AdditionalData;
 using Microsoft.TemplateSearch.TemplateDiscovery.PackChecking.Reporting;
 using Microsoft.TemplateSearch.TemplateDiscovery.PackProviders;
+using dotnet_new3;
 
 namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
 {
@@ -22,7 +23,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
         public PackCheckResult TryGetTemplatesInPack(IPackInfo packInfo, IReadOnlyList<IAdditionalDataProducer> additionalDataProducers, HashSet<string> alreadySeenTemplateIdentities, bool persistHive = false)
         {
             ITemplateEngineHost host = CreateHost(packInfo);
-            EngineEnvironmentSettings environment = new EngineEnvironmentSettings(host, x => new SettingsLoader(x), null);
+            EngineEnvironmentSettings environment = new EngineEnvironmentSettings(host, x => new SettingsLoader(x), new JsonDomFactory());
             PackCheckResult checkResult;
 
             try

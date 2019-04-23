@@ -36,7 +36,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
 
             foreach (ITemplateSearchSource searchSource in _environmentSettings.SettingsLoader.Components.OfType<ITemplateSearchSource>())
             {
-                if (!searchSource.TryConfigure(_environmentSettings))
+                if (!await searchSource.TryConfigureAsync(_environmentSettings))
                 {
                     continue;
                 }

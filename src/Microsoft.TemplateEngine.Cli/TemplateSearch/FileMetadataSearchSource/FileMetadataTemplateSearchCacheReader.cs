@@ -90,7 +90,6 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch.FileMetadataSearchSource
                     return false;
                 }
 
-                //packToTemplateMap = packToTemplateMapObject.ToObject<Dictionary<string, PackToTemplateEntry>>();
                 Dictionary<string, PackToTemplateEntry> workingPackToTemplateMap = new Dictionary<string, PackToTemplateEntry>();
 
                 foreach (JProperty packEntry in packToTemplateMapObject.Properties())
@@ -142,7 +141,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch.FileMetadataSearchSource
                 return false;
             }
 
-            Dictionary<string, object> workingAdditionalData = new Dictionary<string, object>();
+            Dictionary<string, object> workingAdditionalData = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
             foreach (KeyValuePair<string, Func<JObject, object>> dataReadInfo in additionalDataReaders)
             {

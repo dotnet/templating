@@ -1,19 +1,22 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions.TemplateUpdates;
+using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Edge.TemplateUpdates
 {
-    public class DefaultInstallUnitDescriptor : IInstallUnitDescriptor
+    public sealed class DefaultInstallUnitDescriptor : IInstallUnitDescriptor
     {
         public DefaultInstallUnitDescriptor(Guid descriptorId, Guid mountPointId, string identifier)
         {
             DescriptorId = descriptorId;
             MountPointId = mountPointId;
             Identifier = identifier;
-            Details = new Dictionary<string, string>();
-            DetailKeysDisplayOrder = new List<string>();
+            Details = _details;
+            DetailKeysDisplayOrder = Empty<string>.List.Value;
         }
+
+        private static readonly IReadOnlyDictionary<string, string> _details = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         public Guid DescriptorId { get; }
 

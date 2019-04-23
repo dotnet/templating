@@ -25,9 +25,7 @@ namespace Microsoft.TemplateEngine.Edge.TemplateUpdates
                 return false;
             }
 
-            JObject descriptorObj = descriptorProperty.Value as JObject;
-
-            if (descriptorObj == null)
+            if (!(descriptorProperty.Value is JObject descriptorObj))
             {
                 parsedDescriptor = null;
                 return false;
@@ -60,7 +58,7 @@ namespace Microsoft.TemplateEngine.Edge.TemplateUpdates
                 return false;
             }
 
-            Dictionary<string, string> details = new Dictionary<string, string>();
+            Dictionary<string, string> details = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (JProperty property in descriptorObj.PropertiesOf(nameof(IInstallUnitDescriptor.Details)))
             {
                 if (property.Value.Type != JTokenType.String)
@@ -101,13 +99,7 @@ namespace Microsoft.TemplateEngine.Edge.TemplateUpdates
                 }
             }
 
-            if (defaultFactory.TryCreateFromMountPoint(mountPoint, out descriptorList))
-            {
-                return true;
-            }
-
-            descriptorList = null;
-            return false;
+            return defaultFactory.TryCreateFromMountPoint(mountPoint, out descriptorList);
         }
     }
 }

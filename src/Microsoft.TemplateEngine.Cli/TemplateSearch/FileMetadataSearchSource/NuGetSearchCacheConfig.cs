@@ -12,7 +12,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch.FileMetadataSearchSource
         {
             TemplateDiscoveryFileName = templateDiscoveryFileName;
 
-            AdditionalDataReaders = new Dictionary<string, Func<JObject, object>>()
+            AdditionalDataReaders = new Dictionary<string, Func<JObject, object>>(StringComparer.OrdinalIgnoreCase)
             {
                 { _cliHostDataName, CliHostDataReader }
             };

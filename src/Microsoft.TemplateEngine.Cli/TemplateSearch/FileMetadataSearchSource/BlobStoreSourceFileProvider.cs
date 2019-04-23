@@ -1,20 +1,23 @@
-using System.IO;
-using System.Net;
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Edge;
 
 namespace Microsoft.TemplateEngine.Cli.TemplateSearch.FileMetadataSearchSource
 {
     internal class BlobStoreSourceFileProvider : ISearchInfoFileProvider
     {
-        private static readonly string _searchMetadataUrl = "https://go.microsoft.com/fwlink/?linkid=2087906&clcid=0x409";
+        private static readonly Uri _searchMetadataUri = new Uri("https://go.microsoft.com/fwlink/?linkid=2087906&clcid=0x409");
 
         public BlobStoreSourceFileProvider()
         {
         }
 
-        public bool TryEnsureSearchFile(Paths paths, string metadataFileTargetLocation)
+        public async Task<bool> TryEnsureSearchFileAsync(Paths paths, string metadataFileTargetLocation)
         {
-            if (TryAcquireFileFromCloud(paths, metadataFileTargetLocation))
+            bool cloudResult = await TryAcquireFileFromCloudAsync(paths, metadataFileTargetLocation);
+
+            if (cloudResult)
             {
                 return true;
             }
@@ -37,24 +40,28 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch.FileMetadataSearchSource
             return false;
         }
 
-        private bool TryAcquireFileFromCloud(Paths paths, string searchMetadataFileLocation)
+        // Attempt to get the search meatadata file from cloud storage and place it in the expected search location.
+        // Return true on success, false on failure.
+        private async Task<bool> TryAcquireFileFromCloudAsync(Paths paths, string searchMetadataFileLocation)
         {
             try
             {
-                WebRequest request = WebRequest.Create(_searchMetadataUrl);
-                request.Method = "GET";
-                WebResponse response = request.GetResponseAsync().Result;
-                Stream responseStream = response.GetResponseStream();
-                StreamReader reader = new StreamReader(responseStream);
-                string searchResultText = reader.ReadToEnd();
+                using (HttpClient client = new HttpClient())
+                using (HttpResponseMessage response = client.GetAsync(_searchMetadataUri).Result)
+                {
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string resultText = await response.Content.ReadAsStringAsync();
+                        paths.WriteAllText(searchMetadataFileLocation, resultText);
 
-                paths.WriteAllText(searchMetadataFileLocation, searchResultText);
+                        return true;
+                    }
 
-                return true;
+                    return false;
+                }
             }
             catch
             {
-                // TODO: consider additional action - alerting the user, etc.
                 return false;
             }
         }

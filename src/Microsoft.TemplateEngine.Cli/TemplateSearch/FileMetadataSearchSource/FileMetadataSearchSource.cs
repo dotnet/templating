@@ -11,7 +11,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch.FileMetadataSearchSource
     {
         private FileMetadataTemplateSearchCache _searchCache;
 
-        public abstract bool TryConfigure(IEngineEnvironmentSettings environmentSettings);
+        public abstract Task<bool> TryConfigureAsync(IEngineEnvironmentSettings environmentSettings);
 
         protected void Configure(FileMetadataTemplateSearchCache searchCache)
         {

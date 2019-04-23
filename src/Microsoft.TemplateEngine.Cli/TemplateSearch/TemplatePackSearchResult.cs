@@ -19,7 +19,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
             _templateMatches.Add(match);
         }
 
-        private List<ITemplateMatchInfo> _templateMatches;
+        private readonly List<ITemplateMatchInfo> _templateMatches;
 
         public IReadOnlyList<ITemplateMatchInfo> TemplateMatches => _templateMatches;
     }

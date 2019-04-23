@@ -10,9 +10,9 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
 {
     public class MockTemplateSearchSource : ITemplateSearchSource
     {
-        public bool TryConfigure(IEngineEnvironmentSettings environment)
+        public Task<bool> TryConfigureAsync(IEngineEnvironmentSettings environment)
         {
-            return true;
+            return Task.FromResult(true);
         }
 
         public static IReadOnlyDictionary<string, Guid> SetupMultipleSources(IEngineEnvironmentSettings environmentSettings, IReadOnlyDictionary<string, IReadOnlyList<ITemplateNameSearchResult>> dataForSources)

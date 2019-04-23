@@ -26,16 +26,12 @@ namespace Microsoft.TemplateEngine.Cli
         private bool _isInitialized = false;
         private IReadOnlyList<ITemplateSearchSource> _templateSearchSourceList;
 
-        public NupkgUpdater()
-        {
-        }
-
         public void Configure(IEngineEnvironmentSettings environmentSettings)
         {
             _environmentSettings = environmentSettings;
         }
 
-        private void EnsureInitialized()
+        private async Task EnsureInitializedAsync()
         {
             if (_isInitialized)
             {
@@ -46,9 +42,16 @@ namespace Microsoft.TemplateEngine.Cli
 
             foreach (ITemplateSearchSource searchSource in _environmentSettings.SettingsLoader.Components.OfType<ITemplateSearchSource>())
             {
-                if (searchSource.TryConfigure(_environmentSettings))
+                try
                 {
-                    searchSourceList.Add(searchSource);
+                    if (await searchSource.TryConfigureAsync(_environmentSettings))
+                    {
+                        searchSourceList.Add(searchSource);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Reporter.Error.WriteLine($"Error configuring search source: {searchSource.DisplayName}.\r\nError = {ex.Message}");
                 }
             }
 
@@ -59,7 +62,7 @@ namespace Microsoft.TemplateEngine.Cli
 
         public async Task<IReadOnlyList<IUpdateUnitDescriptor>> CheckForUpdatesAsync(IReadOnlyList<IInstallUnitDescriptor> descriptorsToCheck)
         {
-            EnsureInitialized();
+            await EnsureInitializedAsync();
 
             IReadOnlyDictionary<string, IInstallUnitDescriptor> installedPackToInstallDescriptorMap = descriptorsToCheck.ToDictionary(d => d.Identifier, d => d);
 

@@ -1,25 +1,8 @@
-using Microsoft.TemplateEngine.Edge.Template;
 using System.Collections.Generic;
+using Microsoft.TemplateEngine.Edge.Template;
 
 namespace Microsoft.TemplateEngine.Cli.TemplateSearch
 {
-    // Indicates the matched-ness of a parameter name.
-    internal enum ParameterNameDisposition
-    {
-        Exact,
-        Invalid,
-    };
-
-    // Indicates the matched-ness of a parameter value.
-    // Choice params are the only type that can be anything except valid.
-    internal enum ParameterValueDisposition
-    {
-        None,   // if the param name is invalid, the value is irrelevant
-        Valid,
-        Ambiguous,
-        Mismatch
-    };
-
     internal class ParameterMatchDisposition
     {
         public string Name { get; private set; }

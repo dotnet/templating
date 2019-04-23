@@ -7,7 +7,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
 {
     public interface ITemplateSearchSource : IIdentifiedComponent
     {
-        bool TryConfigure(IEngineEnvironmentSettings environmentSettings);
+        Task<bool> TryConfigureAsync(IEngineEnvironmentSettings environmentSettings);
 
         Task<IReadOnlyList<ITemplateNameSearchResult>> CheckForTemplateNameMatchesAsync(string templateName);
 

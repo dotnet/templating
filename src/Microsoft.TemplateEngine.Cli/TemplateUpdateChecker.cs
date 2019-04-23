@@ -62,7 +62,7 @@ namespace Microsoft.TemplateEngine.Cli
             // collect the descriptors by their factoryId, ignoring descriptors that don't have corresponding factories or updaters.
             foreach (IInstallUnitDescriptor descriptor in installUnitsToCheck)
             {
-                if (_factoryIdToUpdaterMap.TryGetValue(descriptor.FactoryId, out _))
+                if (_factoryIdToUpdaterMap.ContainsKey(descriptor.FactoryId))
                 {
                     if (!installUnitsToCheckForUpdates.TryGetValue(descriptor.FactoryId, out List<IInstallUnitDescriptor> updateList))
                     {
@@ -83,8 +83,10 @@ namespace Microsoft.TemplateEngine.Cli
                 Reporter.Output.WriteLine(LocalizableStrings.UpdateCheckerNotAvailable.Bold().Red());
                 foreach (IInstallUnitDescriptor descriptor in descriptorsWithoutUpdaters)
                 {
-                    Reporter.Output.WriteLine($"\t{descriptor.UninstallString}".Bold().Red());
+                    Reporter.Output.WriteLine($"  {descriptor.UninstallString}".Bold().Red());
                 }
+
+                Reporter.Output.WriteLine();
             }
 
             return installUnitsToCheckForUpdates;

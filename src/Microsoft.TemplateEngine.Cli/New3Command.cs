@@ -455,46 +455,27 @@ namespace Microsoft.TemplateEngine.Cli
                 Reporter.Output.WriteLine();
                 Reporter.Output.WriteLine(LocalizableStrings.InstalledItems);
 
-                Dictionary<Type, List<string>> detailOrderByDescriptorType = new Dictionary<Type, List<string>>();
-
                 foreach (IInstallUnitDescriptor descriptor in _settingsLoader.InstallUnitDescriptorCache.Descriptors.Values)
                 {
                     Reporter.Output.WriteLine($"  {descriptor.Identifier}");
 
-                    // descriptor-specific details
-                    // first determine the display order
-                    if (!detailOrderByDescriptorType.TryGetValue(descriptor.GetType(), out List<string> detailOrder))
-                    {
-                        detailOrder = descriptor.DetailKeysDisplayOrder.ToList();
-                        detailOrderByDescriptorType[descriptor.GetType()] = detailOrder;
-                    }
-
-                    HashSet<string> detailKeyLookup = new HashSet<string>(detailOrder);
-
-                    foreach (string detailKey in descriptor.Details.Keys)
-                    {
-                        if (detailKeyLookup.Add(detailKey))
-                        {
-                            detailOrder.Add(detailKey);
-                        }
-                    }
-
-                    // output the details
                     bool wroteHeader = false;
-                    foreach (string detailKey in detailOrder)
-                    {
-                        // not all descriptors of a type will have all the detail values
-                        if (descriptor.Details.TryGetValue(detailKey, out string detailValue)
-                            && !string.IsNullOrEmpty(detailValue))
-                        {
-                            if (!wroteHeader)
-                            {
-                                Reporter.Output.WriteLine($"    {LocalizableStrings.UninstallListDetailsHeader}");
-                                wroteHeader = true;
-                            }
 
-                            Reporter.Output.WriteLine($"      {detailKey}: {detailValue}");
+                    foreach (string detailKey in descriptor.DetailKeysDisplayOrder)
+                    {
+                        WriteDescriptorDetail(descriptor, detailKey, ref wroteHeader);
+                    }
+
+                    HashSet<string> standardDetails = new HashSet<string>(descriptor.DetailKeysDisplayOrder, StringComparer.OrdinalIgnoreCase);
+
+                    foreach (string detailKey in descriptor.Details.Keys.OrderBy(x => x))
+                    {
+                        if (standardDetails.Contains(detailKey))
+                        {
+                            continue;
                         }
+
+                        WriteDescriptorDetail(descriptor, detailKey, ref wroteHeader);
                     }
 
                     // template info
@@ -531,6 +512,21 @@ namespace Microsoft.TemplateEngine.Cli
             }
 
             return CreationResultStatus.Success;
+        }
+
+        private void WriteDescriptorDetail(IInstallUnitDescriptor descriptor, string detailKey, ref bool wroteHeader)
+        {
+            if (descriptor.Details.TryGetValue(detailKey, out string detailValue)
+                && !string.IsNullOrEmpty(detailValue))
+            {
+                if (!wroteHeader)
+                {
+                    Reporter.Output.WriteLine($"    {LocalizableStrings.UninstallListDetailsHeader}");
+                    wroteHeader = true;
+                }
+
+                Reporter.Output.WriteLine($"      {detailKey}: {detailValue}");
+            }
         }
 
         private bool CheckForArgsError(ITemplateMatchInfo template, out string commandParseFailureMessage)

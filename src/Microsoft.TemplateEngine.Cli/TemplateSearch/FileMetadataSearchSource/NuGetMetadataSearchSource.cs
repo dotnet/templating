@@ -1,4 +1,5 @@
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Edge;
 
@@ -15,12 +16,12 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch.FileMetadataSearchSource
             _searchInfoFileProvider = new BlobStoreSourceFileProvider();
         }
 
-        public override bool TryConfigure(IEngineEnvironmentSettings environmentSettings)
+        public async override Task<bool> TryConfigureAsync(IEngineEnvironmentSettings environmentSettings)
         {
             Paths paths = new Paths(environmentSettings);
             string searchMetadataFileLocation = Path.Combine(paths.User.BaseDir, _templateDiscoveryMetadataFile);
 
-            if (!_searchInfoFileProvider.TryEnsureSearchFile(paths, searchMetadataFileLocation))
+            if (!await _searchInfoFileProvider.TryEnsureSearchFileAsync(paths, searchMetadataFileLocation))
             {
                 return false;
             }

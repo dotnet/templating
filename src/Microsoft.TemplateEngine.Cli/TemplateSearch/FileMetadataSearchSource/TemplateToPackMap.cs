@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.TemplateSearch.Common;
 
@@ -7,8 +8,8 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch.FileMetadataSearchSource
     {
         public static TemplateToPackMap FromPackToTemplateDictionary(IReadOnlyDictionary<string, PackToTemplateEntry> templateDictionary)
         {
-            Dictionary<string, PackAndVersion> identityToPackMap = new Dictionary<string, PackAndVersion>();
-            Dictionary<string, PackAndVersion> groupIdentityToPackMap = new Dictionary<string, PackAndVersion>();
+            Dictionary<string, PackAndVersion> identityToPackMap = new Dictionary<string, PackAndVersion>(StringComparer.OrdinalIgnoreCase);
+            Dictionary<string, PackAndVersion> groupIdentityToPackMap = new Dictionary<string, PackAndVersion>(StringComparer.OrdinalIgnoreCase);
 
             foreach (KeyValuePair<string, PackToTemplateEntry> entry in templateDictionary)
             {
