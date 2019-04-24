@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -70,7 +71,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Results
                                         r => new PackToTemplateEntry(r.PackInfo.Version, r.FoundTemplates.Select(t => new TemplateIdentificationEntry(t.Identity, t.GroupIdentity))
                                         .ToList()));
 
-            Dictionary<string, object> additionalData = new Dictionary<string, object>();
+            Dictionary<string, object> additionalData = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
             foreach (IAdditionalDataProducer dataProducer in packSourceCheckResults.AdditionalDataProducers)
             {

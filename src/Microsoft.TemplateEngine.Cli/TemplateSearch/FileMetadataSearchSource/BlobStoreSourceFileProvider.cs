@@ -40,7 +40,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch.FileMetadataSearchSource
             return false;
         }
 
-        // Attempt to get the search meatadata file from cloud storage and place it in the expected search location.
+        // Attempt to get the search metadata file from cloud storage and place it in the expected search location.
         // Return true on success, false on failure.
         private async Task<bool> TryAcquireFileFromCloudAsync(Paths paths, string searchMetadataFileLocation)
         {

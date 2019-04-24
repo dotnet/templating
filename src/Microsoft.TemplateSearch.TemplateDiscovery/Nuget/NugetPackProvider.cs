@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
 using System.Net.Http;
 using Microsoft.TemplateSearch.TemplateDiscovery.PackProviders;
 using Newtonsoft.Json;
@@ -11,6 +10,9 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
     public class NugetPackProvider : IPackProvider
     {
         private static readonly string SearchUrlFormat = "https://api-v2v3search-0.nuget.org/query?q=template&skip={0}&take={1}&prerelease=true";
+        private static readonly string DownloadUrlFormat = "https://api.nuget.org/v3-flatcontainer/{0}/{1}/{0}.{1}.nupkg";
+        // {PackageId}.{Version}.nupkg
+        private static readonly string DownloadPackageFileNameFormat = "{0}.{1}.nupkg";
 
         private readonly string _packageTempPath;
         private readonly int _pageSize;
@@ -45,47 +47,50 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
                 do
                 {
                     string queryString = string.Format(SearchUrlFormat, skip, _pageSize);
-                    WebRequest searchRequest = WebRequest.Create(queryString);
-                    searchRequest.Method = "GET";
-                    WebResponse response = searchRequest.GetResponseAsync().Result;
-                    Stream responseStream = response.GetResponseStream();
-                    StreamReader reader = new StreamReader(responseStream);
-                    string searchResultText = reader.ReadToEnd();
-
-                    NugetPackageSearchResult resultsForPage = JsonConvert.DeserializeObject<NugetPackageSearchResult>(searchResultText);
-
-                    if (resultsForPage.Data.Count > 0)
+                    Uri queryUri = new Uri(queryString);
+                    using (HttpClient client = new HttpClient())
+                    using (HttpResponseMessage response = client.GetAsync(queryUri).Result)
                     {
-                        skip += _pageSize;
-                        packCount += resultsForPage.Data.Count;
-
-                        foreach (NugetPackageSourceInfo sourceInfo in resultsForPage.Data)
+                        if (response.IsSuccessStatusCode)
                         {
-                            if (TryDownloadPackage(sourceInfo, out string packageFilePath))
-                            {
-                                NugetPackInfo packInfo = new NugetPackInfo()
-                                {
-                                    VersionedPackageIdentity = sourceInfo.VersionedPackageIdentity,
-                                    Id = sourceInfo.Id,
-                                    Version = sourceInfo.Version,
-                                    Path = packageFilePath
-                                };
+                            string responseText = response.Content.ReadAsStringAsync().Result;
 
-                                yield return packInfo;
+                            NugetPackageSearchResult resultsForPage = JsonConvert.DeserializeObject<NugetPackageSearchResult>(responseText);
+
+                            if (resultsForPage.Data.Count > 0)
+                            {
+                                skip += _pageSize;
+                                packCount += resultsForPage.Data.Count;
+
+                                foreach (NugetPackageSourceInfo sourceInfo in resultsForPage.Data)
+                                {
+                                    if (TryDownloadPackage(sourceInfo, out string packageFilePath))
+                                    {
+                                        NugetPackInfo packInfo = new NugetPackInfo()
+                                        {
+                                            VersionedPackageIdentity = sourceInfo.VersionedPackageIdentity,
+                                            Id = sourceInfo.Id,
+                                            Version = sourceInfo.Version,
+                                            Path = packageFilePath
+                                        };
+
+                                        yield return packInfo;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                done = true;
                             }
                         }
-                    }
-                    else
-                    {
-                        done = true;
+                        else
+                        {
+                            done = true;
+                        }
                     }
                 } while (!done && !_runOnlyOnePage);
             }
         }
-
-        private static readonly string DownloadUrlFormat = "https://api.nuget.org/v3-flatcontainer/{0}/{1}/{0}.{1}.nupkg";
-        // {PackageId}.{Version}.nupkg
-        private static readonly string DownloadPackageFileNameFormat = "{0}.{1}.nupkg";
 
         private bool TryDownloadPackage(NugetPackageSourceInfo packinfo, out string packageFilePath)
         {

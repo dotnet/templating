@@ -82,7 +82,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
 
             foreach (ITemplateMatchInfo templateMatch in matchesForPack.TemplateMatches)
             {
-                Reporter.Output.WriteLine(string.Format("\tTemplate Name: {0}", templateMatch.Info.Name));
+                Reporter.Output.WriteLine(string.Format("\tTemplate Name (short name): {0} ({1})", templateMatch.Info.Name, templateMatch.Info.ShortName));
 
                 IReadOnlyList<ParameterMatchDisposition> parameterMatchDispositions = ParameterMatchDisposition.FromTemplateMatchInfo(templateMatch);
 

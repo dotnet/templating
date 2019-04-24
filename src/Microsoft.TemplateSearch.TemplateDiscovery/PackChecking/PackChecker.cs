@@ -40,11 +40,8 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
                     checkResult = new PackCheckResult(packInfo, foundTemplates);
                 }
             }
-            catch // (Exception ex)
+            catch
             {
-                // TODO: abstract the logging away from the console.
-                //Console.WriteLine($"Error attempting to install template pack {packInfo.Id}.");
-                //Console.WriteLine(ex.Message);
                 IReadOnlyList<ITemplateInfo> foundTemplates = new List<ITemplateInfo>();
                 checkResult = new PackCheckResult(packInfo, foundTemplates);
             }
@@ -104,14 +101,9 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
             {
                 paths.Delete(paths.User.BaseDir);
             }
-            catch // (Exception ex)
+            catch
             {
-                //Console.WriteLine($"Error deleting BaseDir = {paths.User.BaseDir} under the temporary hive. Error: {ex.Message}");
-                //foreach (ITemplateInfo template in installedTemplates)
-                //{
-                //    Console.WriteLine($"\ttemplate id = {template.Identity}");
-                //}
-                //Console.WriteLine();
+                // do nothing.
             }
 
             // remove the temporary hive
@@ -120,14 +112,9 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
             {
                 paths.Delete(hiveDir);
             }
-            catch // (Exception ex)
+            catch
             {
-                //Console.WriteLine($"Error deleting temporary hive {hiveDir}. Error: {ex.Message}");
-                //foreach (ITemplateInfo template in installedTemplates)
-                //{
-                //    Console.WriteLine($"\ttemplate id = {template.Identity}");
-                //}
-                //Console.WriteLine();
+                // do nothing.
             }
         }
     }

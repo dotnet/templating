@@ -35,20 +35,8 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.AdditionalData
             }
         }
 
-        public string Serialized
-        {
-            get
-            {
-                return JsonConvert.SerializeObject(_hostDataForPackByTemplate, Formatting.Indented);
-            }
-        }
+        public string Serialized => JsonConvert.SerializeObject(_hostDataForPackByTemplate, Formatting.Indented);
 
-        public object Data
-        {
-            get
-            {
-                return _hostDataForPackByTemplate;
-            }
-        }
+        public object Data => _hostDataForPackByTemplate;
     }
 }
