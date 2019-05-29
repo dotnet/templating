@@ -2,9 +2,11 @@ trigger:
   batch: true
   branches:
     include:
+    - stabilize
     - master
     - release/3*
 pr:
+- stabilize
 - master
 - release/3*
 
