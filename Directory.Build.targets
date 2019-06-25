@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
+    <Import Project="$(DotNetPackageVersionPropsPath)" Condition="'$(DotNetPackageVersionPropsPath)' != ''" />
+
     <ItemGroup>
         <PackageReference Update="System.Diagnostics.Process" Version="4.3.0" />
         <PackageReference Update="System.IO.Compression" Version="4.3.0" />
@@ -9,7 +11,7 @@
 
         <PackageReference Update="Microsoft.DotNet.Cli.CommandLine" Version="0.1.1-alpha-167" />
         <PackageReference Update="Microsoft.NET.Test.Sdk" Version="15.8.0" />
-        <PackageReference Update="Newtonsoft.Json" Version="10.0.3" />
+        <PackageReference Update="Newtonsoft.Json" Version="$(NewtonsoftJsonPackageVersion)" />
         <PackageReference Update="xunit" Version="2.3.1" />
         <PackageReference Update="xunit.runner.visualstudio" Version="2.3.1" />
     </ItemGroup>
