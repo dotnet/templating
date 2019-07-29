@@ -5,7 +5,7 @@
     <MicrosoftNETCoreAppVersion>3.0.0-preview6-27720-09</MicrosoftNETCoreAppVersion>
     <UsingToolXliff>false</UsingToolXliff>
     <UsingToolNetFrameworkReferenceAssemblies>true</UsingToolNetFrameworkReferenceAssemblies>
-    <VersionPrefix>2.0.0</VersionPrefix>
+    <VersionPrefix>3.0.0</VersionPrefix>
     <PreReleaseVersionLabel>preview8</PreReleaseVersionLabel>
     <PackSpecific Condition="'$(OS)' != 'Windows_NT'">true</PackSpecific>
     <NewtonsoftJsonPackageVersion>10.0.3</NewtonsoftJsonPackageVersion>
