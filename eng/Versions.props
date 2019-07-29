@@ -11,14 +11,4 @@
     <NewtonsoftJsonPackageVersion>10.0.3</NewtonsoftJsonPackageVersion>
     <DotNetCliCommandLineVersion>0.1.1-alpha-167</DotNetCliCommandLineVersion>
   </PropertyGroup>
-  <PropertyGroup>
-    <RestoreSources>
-      $(RestoreSources);
-      https://dotnet.myget.org/F/dotnet-core/api/v3/index.json;
-      https://dotnet.myget.org/F/msbuild/api/v3/index.json;
-      https://www.myget.org/F/nugetbuild/api/v3/index.json;
-      https://dotnet.myget.org/F/dotnet-web/api/v3/index.json;
-      https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json
-    </RestoreSources>
-  </PropertyGroup>
 </Project>
