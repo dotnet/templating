@@ -9,6 +9,6 @@
     <PreReleaseVersionLabel>preview9</PreReleaseVersionLabel>
     <PackSpecific Condition="'$(OS)' != 'Windows_NT'">true</PackSpecific>
     <NewtonsoftJsonPackageVersion>10.0.3</NewtonsoftJsonPackageVersion>
-    <DotNetCliCommandLineVersion>0.1.1-alpha-167</DotNetCliCommandLineVersion>
+    <MicrosoftDotNetCliCommandLinePackageVersion>0.1.1-alpha-167</MicrosoftDotNetCliCommandLinePackageVersion>
   </PropertyGroup>
 </Project>
