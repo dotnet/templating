@@ -6,7 +6,7 @@
     <UsingToolXliff>false</UsingToolXliff>
     <UsingToolNetFrameworkReferenceAssemblies>true</UsingToolNetFrameworkReferenceAssemblies>
     <VersionPrefix>3.0.0</VersionPrefix>
-    <PreReleaseVersionLabel>preview9</PreReleaseVersionLabel>
+    <PreReleaseVersionLabel>rc1</PreReleaseVersionLabel>
     <PackSpecific Condition="'$(OS)' != 'Windows_NT'">true</PackSpecific>
     <NewtonsoftJsonPackageVersion>10.0.3</NewtonsoftJsonPackageVersion>
     <MicrosoftDotNetCliCommandLinePackageVersion>0.1.1-alpha-167</MicrosoftDotNetCliCommandLinePackageVersion>
