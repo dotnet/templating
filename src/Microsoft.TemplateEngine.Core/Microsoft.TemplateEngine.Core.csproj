@@ -4,6 +4,7 @@
         <TargetFrameworks Condition="'$(PackSpecific)' == 'true'">netstandard2.0</TargetFrameworks>
         <Description>Common operations for instantiating templates using forward-only input stream operations</Description>
         <IsPackable>true</IsPackable>
+        <IsShipping>false</IsShipping>
     </PropertyGroup>
 
     <ItemGroup>
