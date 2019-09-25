@@ -4,6 +4,7 @@
         <TargetFrameworks Condition="'$(PackSpecific)' == 'true'">netstandard2.0</TargetFrameworks>
         <Description>Contracts for extending Microsoft.TemplateEngine.Core</Description>
         <IsPackable>true</IsPackable>
+        <IsShipping>false</IsShipping>
     </PropertyGroup>
 
     <ItemGroup>
