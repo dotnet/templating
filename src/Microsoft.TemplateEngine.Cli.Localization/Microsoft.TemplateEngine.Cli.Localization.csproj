@@ -12,6 +12,7 @@
         <NoWarn>2008;NU5105</NoWarn>
         <PackageId>Microsoft.TemplateEngine.Cli.Localization</PackageId>
         <SuppressDependenciesWhenPacking>True</SuppressDependenciesWhenPacking>
+        <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
     </PropertyGroup>
 
     <ItemGroup>
