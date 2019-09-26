@@ -11,7 +11,6 @@
         <IsShipping>false</IsShipping>
         <NoWarn>$(NoWarn);2008;NU5105</NoWarn>
         <PackageId>Microsoft.TemplateEngine.Cli.Localization</PackageId>
-        <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
     </PropertyGroup>
 
     <ItemGroup>
