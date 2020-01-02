@@ -104,7 +104,7 @@ Arguments:
 <truncated>
 ```
 ### Template NuGet Packages
-- The build the that produces the **template NuGet packages** currently has a dependency on **nuget.exe**.
+- The build that produces the **template NuGet packages** currently has a dependency on **nuget.exe**.
   - Because of this, those that wish to `install` using the **template NuGet packages** will need to be on Windows in order to produce the appropriate assets. 
     
 ## Debugging
