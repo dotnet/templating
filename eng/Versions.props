@@ -5,12 +5,12 @@
     <MicrosoftNETCoreAppVersion>3.0.0-preview6-27720-09</MicrosoftNETCoreAppVersion>
     <UsingToolXliff>false</UsingToolXliff>
     <UsingToolNetFrameworkReferenceAssemblies>true</UsingToolNetFrameworkReferenceAssemblies>
-    <VersionPrefix>3.0.2</VersionPrefix>
+    <VersionPrefix>3.0.3</VersionPrefix>
     <PreReleaseVersionLabel>servicing</PreReleaseVersionLabel>
     <!--
         When StabilizePackageVersion is set to 'true', this branch will produce stable outputs for 'Shipping' packages
     -->
-    <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">false</StabilizePackageVersion>
+    <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">true</StabilizePackageVersion>
     <DotNetFinalVersionKind Condition="'$(StabilizePackageVersion)' == 'true'">release</DotNetFinalVersionKind>
     <PackSpecific Condition="'$(OS)' != 'Windows_NT'">true</PackSpecific>
     <NewtonsoftJsonPackageVersion>10.0.3</NewtonsoftJsonPackageVersion>
