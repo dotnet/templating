@@ -5,12 +5,14 @@ trigger:
     - stabilize
     - master
     - release/3*
+    - release/5*
 pr:
   branches:
     include:
     - stabilize
     - master
     - release/3*
+    - release/5*
 
 variables:
   # Cannot use key:value syntax in root defined variables
