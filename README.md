@@ -83,10 +83,10 @@ The steps required are outlined below.
 ## Build & Run
 
 - Open up a command prompt and navigation to the root of your source code.
-- Run the setup script appropriate your environment.
-     - **Windows:** [setup.cmd](https://github.com/dotnet/templating/blob/master/setup.cmd)
-     - **Mac/Linux**: [setup.sh](https://github.com/dotnet/templating/blob/master/setup.sh) 
-- When running the setup script, the existing built-in command `dotnet new` will be preserved. A new command `dotnet new3` will be enabled which allows you to create
+- Run the build script appropriate your environment.
+     - **Windows:** [build.cmd](https://github.com/dotnet/templating/blob/master/build.cmd)
+     - **Mac/Linux**: [build.sh](https://github.com/dotnet/templating/blob/master/build.sh) 
+- When running the build script, the existing built-in command `dotnet new` will be preserved. A new command `dotnet new3` will be enabled which allows you to create
 files with the latest Template Engine.
 - That's it! Now you can run `dotnet new3`.
 
