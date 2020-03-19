@@ -17,7 +17,7 @@ pr:
 variables:
   # Cannot use key:value syntax in root defined variables
   - name: _TeamName
-    value: DotNetCore
+    value: dotnet-core-acquisition
   - name: _PublishUsingPipelines
     value: true
 
@@ -128,7 +128,7 @@ stages:
           displayName: Build
           condition: succeeded()
           
-- ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+#- ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
   - template: eng\common\templates\post-build\post-build.yml
     parameters:
       # Symbol validation isn't being very reliable lately. This should be enabled back
@@ -151,6 +151,6 @@ stages:
         -TsaCodebaseAdmin $(_TsaCodebaseAdmin)
         -TsaBugAreaPath $(_TsaBugAreaPath)
         -TsaIterationPath $(_TsaIterationPath)
-        -TsaRepositoryName "Templating"
-        -TsaCodebaseName "Templating"
+        -TsaRepositoryName "$(TsaRepositoryName)"
+        -TsaCodebaseName "$(TsaCodebaseName)"
         -TsaPublish $True'
