@@ -17,7 +17,7 @@ pr:
 variables:
   # Cannot use key:value syntax in root defined variables
   - name: _TeamName
-    value: NET Dev UX
+    value: NETDevUX
   - name: _PublishUsingPipelines
     value: true
 
