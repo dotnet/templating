@@ -153,6 +153,6 @@ stages:
         -TsaCodebaseAdmin $(_TsaCodebaseAdmin)
         -TsaBugAreaPath $(_TsaBugAreaPath)
         -TsaIterationPath $(_TsaIterationPath)
-        -TsaRepositoryName $(_TsaRepositoryName)
-        -TsaCodebaseName $(_TsaCodebaseName)
+        -TsaRepositoryName "Templating"
+        -TsaCodebaseName "Templating"
         -TsaPublish $True'
