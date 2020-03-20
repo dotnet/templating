@@ -21,6 +21,9 @@ variables:
   - name: _PublishUsingPipelines
     value: true
 
+  - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+    - group: DotNet-Wpf-SDLValidation-Params
+
 resources:
   containers:
   - container: LinuxContainer
