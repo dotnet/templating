@@ -73,7 +73,7 @@ Commands executed against `dotnet new3` won't impact the behavior of `dotnet new
 If you're authoring templates, or interested in contributing to this repo, then you're likely interested in how to use the latest version of this experience.
 The steps required are outlined below.
 
-## Aquire
+## Acquire
 
 - Fork this repository.
 - Clone the forked repository to your local machine.
@@ -104,7 +104,7 @@ Arguments:
 <truncated>
 ```
 ### Template NuGet Packages
-- The build the that produces the **template NuGet packages** currently has a dependency on **nuget.exe**.
+- The build that produces the **template NuGet packages** currently has a dependency on **nuget.exe**.
   - Because of this, those that wish to `install` using the **template NuGet packages** will need to be on Windows in order to produce the appropriate assets. 
     
 ## Debugging
@@ -187,7 +187,7 @@ To install a new template use the command:
 
 # Roadmap
 * Create formal docs
-* Interactive mode (i.e. interactive prompts similar to [`yo aspnet`](https://github.com/omnisharp/generator-aspnet)
+* Interactive mode (i.e. interactive prompts similar to [`yo aspnet`](https://github.com/omnisharp/generator-aspnet))
 * Integration with Visual Studio One ASP.NET dialog
 * Integration with Visual Studio for Mac for .NET Core projects
 * Integration with [`yo aspnet`](https://github.com/omnisharp/generator-aspnet)
