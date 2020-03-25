@@ -83,7 +83,7 @@ The steps required are outlined below.
 ## Build & Run
 
 - Open up a command prompt and navigation to the root of your source code.
-- Run the build script appropriate your environment.
+- Run the build script appropriate for your environment.
      - **Windows:** [build.cmd](https://github.com/dotnet/templating/blob/master/build.cmd)
      - **Mac/Linux**: [build.sh](https://github.com/dotnet/templating/blob/master/build.sh) 
 - When running the build script, the existing built-in command `dotnet new` will be preserved. A new command `dotnet new3` will be enabled which allows you to create
