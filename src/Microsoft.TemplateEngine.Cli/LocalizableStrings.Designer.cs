@@ -1665,5 +1665,14 @@ namespace Microsoft.TemplateEngine.Cli {
                 return ResourceManager.GetString("WillCreateTemplate", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Allow clipping output content to the size of the console..
+        /// </summary>
+        public static string AllowClipDescription {
+            get {
+                return ResourceManager.GetString("AllowClipDescription", resourceCulture);
+            }
+        }
     }
 }

@@ -64,7 +64,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                     unambiguousTemplateGroupForList = new List<ITemplateMatchInfo>();
                 }
 
-                DisplayTemplateList(unambiguousTemplateGroupForList, environmentSettings, commandInput.Language, defaultLanguage);
+                DisplayTemplateList(unambiguousTemplateGroupForList, environmentSettings, commandInput.Language, defaultLanguage, commandInput.IsAllowClipFlagSpecified);
                 // list flag specified, so no usage examples or detailed help
                 return CreationResultStatus.Success;
             }
@@ -134,7 +134,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             }
 
             ShowContextAndTemplateNameMismatchHelp(templateResolutionResult, commandInput.TemplateName, commandInput.TypeFilter);
-            DisplayTemplateList(templatesForDisplay, environmentSettings, commandInput.Language, defaultLanguage);
+            DisplayTemplateList(templatesForDisplay, environmentSettings, commandInput.Language, defaultLanguage, commandInput.IsAllowClipFlagSpecified);
 
             if (!commandInput.IsListFlagSpecified)
             {
@@ -186,7 +186,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
         // - Short Name: displays the first short name from the highest precedence template in the group.
         // - Language: All languages supported by any template in the group are displayed, with the default language in brackets, e.g.: [C#]
         // - Tags
-        private static void DisplayTemplateList(IReadOnlyList<ITemplateMatchInfo> templates, IEngineEnvironmentSettings environmentSettings, string language, string defaultLanguage)
+        private static void DisplayTemplateList(IReadOnlyList<ITemplateMatchInfo> templates, IEngineEnvironmentSettings environmentSettings, string language, string defaultLanguage, bool allowClippingContent)
         {
             IReadOnlyList<TemplateGroupForListDisplay> groupsForDisplay = GetTemplateGroupsForListDisplay(templates, language, defaultLanguage);
 
@@ -198,7 +198,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                         columnPadding: 6,
                         headerSeparator: '-',
                         blankLineBetweenRows: false)
-                    .DefineColumn(t => t.Name, LocalizableStrings.Templates, shrinkIfNeeded: true)
+                    .DefineColumn(t => t.Name, LocalizableStrings.Templates, shrinkIfNeeded: allowClippingContent)
                     .DefineColumn(t => t.ShortName, LocalizableStrings.ShortName)
                     .DefineColumn(t => t.Languages, out object languageColumn, LocalizableStrings.Language)
                     .DefineColumn(t => t.Classifications, out object tagsColumn, LocalizableStrings.Tags)

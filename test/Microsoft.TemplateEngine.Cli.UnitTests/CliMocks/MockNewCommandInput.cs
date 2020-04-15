@@ -64,6 +64,8 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
 
         public bool IsShowAllFlagSpecified { get; set; }
 
+        public bool IsAllowClipFlagSpecified { get; set; }
+
         public string TypeFilter { get; set; }
 
         public string Language { get; set; }
