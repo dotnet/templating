@@ -1,3 +1,5 @@
+[![Build Status](https://dev.azure.com/dnceng/public/_apis/build/status/dotnet/templating/templating-ci?branchName=master)](https://dev.azure.com/dnceng/public/_build/latest?definitionId=302&branchName=master)
+
 # Overview
 
 This repository is the home for the .NET Core Template Engine. It contains the brains for `dotnet new`. 
@@ -185,13 +187,3 @@ To install a new template use the command:
     dotnet new3 MvcWebTemplate --name MyProject --output src --ParameterName1 Value1 --ParameterName2 Value2 ... --ParameterNameN ValueN
     dotnet new3 MvcWebTemplate -n MyProject -o src --ParameterName1 Value1 --ParameterName2 Value2 ... --ParameterNameN ValueN
 
-# Roadmap
-* Create formal docs
-* Interactive mode (i.e. interactive prompts similar to [`yo aspnet`](https://github.com/omnisharp/generator-aspnet))
-* Integration with Visual Studio One ASP.NET dialog
-* Integration with Visual Studio for Mac for .NET Core projects
-* Integration with [`yo aspnet`](https://github.com/omnisharp/generator-aspnet)
-* Template updates (both required and optional)
-* Visual Studio wizard to enable community members to plug into VS as well
-* Maybe: Visual Studio wizard which can display templates given a feed URL
-* Suggestions welcome, please file [an issue](https://github.com/dotnet/templating/issues/new)
