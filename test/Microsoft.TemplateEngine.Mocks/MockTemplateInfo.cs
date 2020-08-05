@@ -82,6 +82,8 @@ namespace Microsoft.TemplateEngine.Mocks
 
         public bool HasScriptRunningPostActions { get; set; }
 
+        public bool IsPartOfAnOptionalWorkload { get; set; }
+
         public DateTime? ConfigTimestampUtc { get; set; }
     }
 }

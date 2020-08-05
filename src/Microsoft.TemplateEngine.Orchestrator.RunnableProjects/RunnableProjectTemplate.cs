@@ -38,6 +38,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             _raw = raw;
             BaselineInfo = config.BaselineInfo;
             HasScriptRunningPostActions = config.HasScriptRunningPostActions;
+            IsPartOfAnOptionalWorkload = config.IsPartOfAnOptionalWorkload;
             if (config is ITemplateWithTimestamp withTimestamp)
             {
                 ConfigTimestampUtc = withTimestamp.ConfigTimestampUtc;
@@ -216,6 +217,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         public IReadOnlyDictionary<string, IBaselineInfo> BaselineInfo { get; set; }
 
         public bool HasScriptRunningPostActions { get; set; }
+
+        public bool IsPartOfAnOptionalWorkload { get; set; }
 
         public DateTime? ConfigTimestampUtc { get; set; }
     }
