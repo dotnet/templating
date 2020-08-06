@@ -319,7 +319,8 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 HostConfigPlace = template.HostConfigPlace,
                 ThirdPartyNotices = template.ThirdPartyNotices,
                 BaselineInfo = template.BaselineInfo,
-                HasScriptRunningPostActions = template.HasScriptRunningPostActions
+                HasScriptRunningPostActions = template.HasScriptRunningPostActions,
+                IsPartOfAnOptionalWorkload = template.IsPartOfAnOptionalWorkload
             };
 
             if (template is IShortNameList templateWithShortNameList)
