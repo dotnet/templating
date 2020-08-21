@@ -323,28 +323,33 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             }
 
             bool anythingReported = false;
-
-            foreach (IReadOnlyList<ITemplateMatchInfo> templateGroup in templateResolutionResult.ContextProblemMatchGroups)
-            {
-                // all templates in a group should have the same context & name
-                if (templateGroup[0].Info.Tags != null && templateGroup[0].Info.Tags.TryGetValue("type", out ICacheTag typeTag))
+            int partialTemplatesMatchCount = templateResolutionResult.ContextProblemMatchGroups.Count(templateGroup =>
                 {
-                    MatchInfo? matchInfo = WellKnownSearchFilters.ContextFilter(context)(templateGroup[0].Info);
-                    if ((matchInfo?.Kind ?? MatchKind.Mismatch) == MatchKind.Mismatch)
+                    // all templates in a group should have the same context & name
+                    if (templateGroup[0].Info.Tags != null && templateGroup[0].Info.Tags.TryGetValue("type", out ICacheTag typeTag))
                     {
-                        // {0} matches the specified name, but has been excluded by the --type parameter. Remove or change the --type parameter to use that template
-                        Reporter.Error.WriteLine(string.Format(LocalizableStrings.TemplateNotValidGivenTheSpecifiedFilter, templateGroup[0].Info.Name).Bold().Red());
+                        MatchInfo? matchInfo = WellKnownSearchFilters.ContextFilter(context)(templateGroup[0].Info);
+                        return ((matchInfo?.Kind ?? MatchKind.Mismatch) == MatchKind.Mismatch);
+                    }
+                    else
+                    {
+                        // this really shouldn't ever happen. But better to have a generic error than quietly ignore the partial match.
+                        //{0} cannot be created in the target location
+                        Reporter.Error.WriteLine(string.Format(LocalizableStrings.GenericPlaceholderTemplateContextError, templateGroup[0].Info.Name).Bold().Red());
                         anythingReported = true;
                     }
-                }
-                else
-                {
-                    // this really shouldn't ever happen. But better to have a generic error than quietly ignore the partial match.
-                    //
-                    //{0} cannot be created in the target location
-                    Reporter.Error.WriteLine(string.Format(LocalizableStrings.GenericPlaceholderTemplateContextError, templateGroup[0].Info.Name).Bold().Red());
-                    anythingReported = true;
-                }
+                    return false;
+                });
+
+            if (partialTemplatesMatchCount > 1)
+            {
+                Reporter.Error.WriteLine(string.Format(LocalizableStrings.TemplatesNotValidGivenTheSpecifiedFilter, partialTemplatesMatchCount).Bold().Red());
+                anythingReported = true;
+            }
+            else if (partialTemplatesMatchCount == 1)
+            {
+                Reporter.Error.WriteLine(string.Format(LocalizableStrings.TemplateNotValidGivenTheSpecifiedFilter, partialTemplatesMatchCount).Bold().Red());
+                anythingReported = true;
             }
 
             if (templateResolutionResult.RemainingPartialMatchGroups.Count > 0)
