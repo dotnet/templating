@@ -347,7 +347,7 @@ See https://aka.ms/dotnet-install-templates to learn how to install additional t
     <value>The following templates partially match the input. Be more specific with the template name and/or language.</value>
   </data>
   <data name="TemplateNotValidGivenTheSpecifiedFilter" xml:space="preserve">
-    <value>{0} template partially matched, but has been excluded by the --type parameter. Remove or change the --type parameter to use that template.</value>
+    <value>1 template partially matched, but has been excluded by the --type parameter. Remove or change the --type parameter to use that template.</value>
   </data>
   <data name="Templates" xml:space="preserve">
     <value>Templates</value>

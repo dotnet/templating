@@ -331,13 +331,11 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                         MatchInfo? matchInfo = WellKnownSearchFilters.ContextFilter(context)(templateGroup[0].Info);
                         return ((matchInfo?.Kind ?? MatchKind.Mismatch) == MatchKind.Mismatch);
                     }
-                    else
-                    {
-                        // this really shouldn't ever happen. But better to have a generic error than quietly ignore the partial match.
-                        //{0} cannot be created in the target location
-                        Reporter.Error.WriteLine(string.Format(LocalizableStrings.GenericPlaceholderTemplateContextError, templateGroup[0].Info.Name).Bold().Red());
-                        anythingReported = true;
-                    }
+
+                    // this really shouldn't ever happen. But better to have a generic error than quietly ignore the partial match.
+                    //{0} cannot be created in the target location
+                    Reporter.Error.WriteLine(string.Format(LocalizableStrings.GenericPlaceholderTemplateContextError, templateGroup[0].Info.Name).Bold().Red());
+                    anythingReported = true;
                     return false;
                 });
 
@@ -348,7 +346,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             }
             else if (partialTemplatesMatchCount == 1)
             {
-                Reporter.Error.WriteLine(string.Format(LocalizableStrings.TemplateNotValidGivenTheSpecifiedFilter, partialTemplatesMatchCount).Bold().Red());
+                Reporter.Error.WriteLine(string.Format(LocalizableStrings.TemplateNotValidGivenTheSpecifiedFilter).Bold().Red());
                 anythingReported = true;
             }
 

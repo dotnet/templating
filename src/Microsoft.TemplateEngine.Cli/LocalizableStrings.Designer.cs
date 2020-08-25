@@ -1478,7 +1478,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} template partially matched, but has been excluded by the --type parameter. Remove or change the --type parameter to use that template..
+        ///   Looks up a localized string similar to 1 template partially matched, but has been excluded by the --type parameter. Remove or change the --type parameter to use that template..
         /// </summary>
         public static string TemplateNotValidGivenTheSpecifiedFilter {
             get {
