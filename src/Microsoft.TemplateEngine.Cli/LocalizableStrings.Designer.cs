@@ -763,7 +763,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} cannot be created in the target location..
+        ///   Looks up a localized string similar to Cannot retrieve the type for {0}..
         /// </summary>
         public static string GenericPlaceholderTemplateContextError {
             get {
@@ -1478,15 +1478,6 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 1 template partially matched, but has been excluded by the --type parameter. Remove or change the --type parameter to use that template..
-        /// </summary>
-        public static string TemplateNotValidGivenTheSpecifiedFilter {
-            get {
-                return ResourceManager.GetString("TemplateNotValidGivenTheSpecifiedFilter", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Templates.
         /// </summary>
         public static string Templates {
@@ -1505,7 +1496,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} templates partially matched, but have been excluded by the --type parameter. Remove or change the --type parameter to use that templates..
+        ///   Looks up a localized string similar to {0} template(s) partially matched, but failed on {1}..
         /// </summary>
         public static string TemplatesNotValidGivenTheSpecifiedFilter {
             get {
