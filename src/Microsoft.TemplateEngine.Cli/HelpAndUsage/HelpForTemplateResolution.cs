@@ -8,12 +8,14 @@ using Microsoft.TemplateEngine.Edge.Template;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Cli.CommandParsing;
 using Microsoft.TemplateEngine.Utils;
+using Microsoft.TemplateEngine.Cli.TemplateResolution;
+using System.Text;
 
 namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
 {
     internal static class HelpForTemplateResolution
     {
-        public static CreationResultStatus CoordinateHelpAndUsageDisplay(TemplateListResolutionResult templateResolutionResult, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, IHostSpecificDataLoader hostDataLoader, ITelemetryLogger telemetryLogger, TemplateCreator templateCreator, string defaultLanguage, bool showUsageHelp = true)
+        public static CreationResultStatus CoordinateHelpAndUsageDisplay(ListOrHelpTemplateListResolutionResult templateResolutionResult, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, IHostSpecificDataLoader hostDataLoader, ITelemetryLogger telemetryLogger, TemplateCreator templateCreator, string defaultLanguage, bool showUsageHelp = true)
         {
             if (showUsageHelp)
             {
@@ -26,8 +28,10 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             // The empty TemplateName check is for when only 1 template (or group) is installed.
             // When that occurs, the group is considered partial matches. But the output should be the ambiguous case - list the templates, not help on the singular group.
             if (!string.IsNullOrEmpty(commandInput.TemplateName)
-                    && templateResolutionResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousTemplateGroup)
-                    && TemplateListResolver.AreAllTemplatesSameLanguage(unambiguousTemplateGroup))
+                //TODO: clarify usage of template groups with Kathleen first
+       //             && templateResolutionResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousTemplateGroup)
+                    && templateResolutionResult.HasUnambigiousTemplateToUse
+                    && TemplateListResolver.AreAllTemplatesSameLanguage(templateResolutionResult.ExactMatchedTemplates))
             {
                 // This will often show detailed help on the template group, which only makes sense if they're all the same language.
                 return DisplayHelpForUnambiguousTemplateGroup(templateResolutionResult, environmentSettings, commandInput, hostDataLoader, templateCreator, defaultLanguage);
@@ -38,18 +42,13 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             }
         }
 
-        private static CreationResultStatus DisplayHelpForUnambiguousTemplateGroup(TemplateListResolutionResult templateResolutionResult, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, IHostSpecificDataLoader hostDataLoader, TemplateCreator templateCreator, string defaultLanguage)
+        private static CreationResultStatus DisplayHelpForUnambiguousTemplateGroup(ListOrHelpTemplateListResolutionResult templateResolutionResult, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, IHostSpecificDataLoader hostDataLoader, TemplateCreator templateCreator, string defaultLanguage)
         {
-            // filter on the default language if needed, the details display should be for a single language group
-            if (!templateResolutionResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousTemplateGroupForDetailDisplay))
-            {
-                // this is really an error
-                unambiguousTemplateGroupForDetailDisplay = new List<ITemplateMatchInfo>();
-            }
-
+            IReadOnlyCollection<ITemplateMatchInfo> unambiguousTemplateGroupForDetailDisplay = templateResolutionResult.ExactMatchedTemplates;
             if (commandInput.IsListFlagSpecified)
             {
-                // because the list flag is present, don't display help for the template group, even though an unambiguous group was resolved.
+                //TODO: clarify usage of template groups with Kathleen first
+                //because the list flag is present, don't display help for the template group, even though an unambiguous group was resolved.
                 if (!AreAllParamsValidForAnyTemplateInList(unambiguousTemplateGroupForDetailDisplay)
                     && TemplateListResolver.FindHighestPrecedenceTemplateIfAllSameGroupIdentity(unambiguousTemplateGroupForDetailDisplay) != null)
                 {
@@ -57,21 +56,8 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                     return CreationResultStatus.InvalidParamValues;
                 }
 
-                // get the group without filtering on default language
-                if (!templateResolutionResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousTemplateGroupForList, true))
-                {
-                    // this is really an error
-                    unambiguousTemplateGroupForList = new List<ITemplateMatchInfo>();
-                }
-
-                if (templateResolutionResult.UsingPartialMatches)
-                {
-                    ShowNoTemplatesFoundMessage(commandInput.TemplateName, commandInput.Language, commandInput.TypeFilter);
-                    return CreationResultStatus.NotFound;
-                }
-
-                ShowTemplatesFoundMessage(commandInput.TemplateName, commandInput.Language, commandInput.TypeFilter);
-                DisplayTemplateList(unambiguousTemplateGroupForList, environmentSettings, commandInput.Language, defaultLanguage);
+                ShowTemplatesFoundMessage(commandInput.TemplateName, commandInput.Language, commandInput.TypeFilter, commandInput.BaselineName);
+                DisplayTemplateList(unambiguousTemplateGroupForDetailDisplay, environmentSettings, commandInput.Language, defaultLanguage);
                 // list flag specified, so no usage examples or detailed help
                 return CreationResultStatus.Success;
             }
@@ -83,7 +69,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             }
         }
 
-        private static CreationResultStatus TemplateDetailedHelpForSingularTemplateGroup(IReadOnlyList<ITemplateMatchInfo> unambiguousTemplateGroup, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, IHostSpecificDataLoader hostDataLoader, TemplateCreator templateCreator)
+        private static CreationResultStatus TemplateDetailedHelpForSingularTemplateGroup(IReadOnlyCollection<ITemplateMatchInfo> unambiguousTemplateGroup, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, IHostSpecificDataLoader hostDataLoader, TemplateCreator templateCreator)
         {
             // (scp 2017-09-06): parse errors probably can't happen in this context.
             foreach (string parseErrorMessage in unambiguousTemplateGroup.Where(x => x.HasParseError()).Select(x => x.GetParseError()).ToList())
@@ -107,7 +93,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                 : CreationResultStatus.Success;
         }
 
-        private static CreationResultStatus DisplayHelpForAmbiguousTemplateGroup(TemplateListResolutionResult templateResolutionResult, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, IHostSpecificDataLoader hostDataLoader, ITelemetryLogger telemetryLogger, string defaultLanguage)
+        private static CreationResultStatus DisplayHelpForAmbiguousTemplateGroup(ListOrHelpTemplateListResolutionResult templateResolutionResult, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, IHostSpecificDataLoader hostDataLoader, ITelemetryLogger telemetryLogger, string defaultLanguage)
         {
             // The following occurs when:
             //      --alias <value> is specifed
@@ -121,7 +107,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             }
 
             bool hasInvalidParameters = false;
-            IReadOnlyList<ITemplateMatchInfo> templatesForDisplay = templateResolutionResult.GetBestTemplateMatchList(true);
+            IReadOnlyCollection<ITemplateMatchInfo> templatesForDisplay = templateResolutionResult.ExactMatchedTemplates;
             GetParametersInvalidForTemplatesInList(templatesForDisplay, out IReadOnlyList<string> invalidForAllTemplates, out IReadOnlyList<string> invalidForSomeTemplates);
             if (invalidForAllTemplates.Any() || invalidForSomeTemplates.Any())
             {
@@ -130,11 +116,14 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                 DisplayParametersInvalidForSomeTemplates(invalidForSomeTemplates, LocalizableStrings.PartialTemplateMatchSwitchesNotValidForAllMatches);
             }
 
-            ShowContextAndTemplateNameMismatchHelp(templateResolutionResult, commandInput.TemplateName, commandInput.Language, commandInput.TypeFilter, out bool shouldShowTemplateList);
-            if (shouldShowTemplateList)
+            if (templateResolutionResult.HasExactMatches)
             {
-                ShowTemplatesFoundMessage(commandInput.TemplateName, commandInput.Language, commandInput.TypeFilter);
+                ShowTemplatesFoundMessage(commandInput.TemplateName, commandInput.Language, commandInput.TypeFilter, commandInput.BaselineName);
                 DisplayTemplateList(templatesForDisplay, environmentSettings, commandInput.Language, defaultLanguage);
+            }
+            else
+            {
+                ShowContextAndTemplateNameMismatchHelp(templateResolutionResult, commandInput.TemplateName, commandInput.Language, commandInput.TypeFilter, commandInput.BaselineName);
             }
 
             if (!commandInput.IsListFlagSpecified)
@@ -148,7 +137,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             }
             else if (commandInput.IsListFlagSpecified || commandInput.IsHelpFlagSpecified)
             {
-                return shouldShowTemplateList ? CreationResultStatus.Success :  CreationResultStatus.NotFound;
+                return templateResolutionResult.HasExactMatches ? CreationResultStatus.Success :  CreationResultStatus.NotFound;
             }
             else
             {
@@ -157,7 +146,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
         }
 
         // Returns true if any of the input templates has a valid parameter parse result.
-        private static bool AreAllParamsValidForAnyTemplateInList(IReadOnlyList<ITemplateMatchInfo> templateList)
+        private static bool AreAllParamsValidForAnyTemplateInList(IReadOnlyCollection<ITemplateMatchInfo> templateList)
         {
             bool anyValidTemplate = false;
 
@@ -187,9 +176,9 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
         // - Short Name: displays the first short name from the highest precedence template in the group.
         // - Language: All languages supported by any template in the group are displayed, with the default language in brackets, e.g.: [C#]
         // - Tags
-        private static void DisplayTemplateList(IReadOnlyList<ITemplateMatchInfo> templates, IEngineEnvironmentSettings environmentSettings, string language, string defaultLanguage)
+        private static void DisplayTemplateList(IReadOnlyCollection<ITemplateMatchInfo> templates, IEngineEnvironmentSettings environmentSettings, string language, string defaultLanguage)
         {
-            IReadOnlyList<TemplateGroupForListDisplay> groupsForDisplay = GetTemplateGroupsForListDisplay(templates, language, defaultLanguage);
+            IReadOnlyCollection<TemplateGroupForListDisplay> groupsForDisplay = GetTemplateGroupsForListDisplay(templates, language, defaultLanguage);
 
             HelpFormatter<TemplateGroupForListDisplay> formatter =
                 HelpFormatter
@@ -216,7 +205,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             public string Classifications { get; set; }
         }
 
-        private static IReadOnlyList<TemplateGroupForListDisplay> GetTemplateGroupsForListDisplay(IReadOnlyList<ITemplateMatchInfo> templateList, string language, string defaultLanguage)
+        private static IReadOnlyList<TemplateGroupForListDisplay> GetTemplateGroupsForListDisplay(IReadOnlyCollection<ITemplateMatchInfo> templateList, string language, string defaultLanguage)
         {
             IEnumerable<IGrouping<string, ITemplateMatchInfo>> grouped = templateList.GroupBy(x => x.Info.GroupIdentity, x => !string.IsNullOrEmpty(x.Info.GroupIdentity));
             List<TemplateGroupForListDisplay> templateGroupsForDisplay = new List<TemplateGroupForListDisplay>();
@@ -302,55 +291,40 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             }
         }
 
-        private static void ShowContextAndTemplateNameMismatchHelp(TemplateListResolutionResult templateResolutionResult, string templateName, string templateLanguage, string context, out bool shouldShowTemplateList)
+        private static void ShowContextAndTemplateNameMismatchHelp(ListOrHelpTemplateListResolutionResult templateResolutionResult, string templateName, string templateLanguage, string context, string baselineName)
         {
-            shouldShowTemplateList = true; // by default, show the list of all templates installed
-            if (string.IsNullOrEmpty(templateName) && string.IsNullOrEmpty(templateLanguage) && string.IsNullOrEmpty(context))
+            if (string.IsNullOrEmpty(templateName) && string.IsNullOrEmpty(templateLanguage) && string.IsNullOrEmpty(context) && string.IsNullOrEmpty(baselineName))
             {
                 return;
             }
-            DisplayPartialNameMatchLanguageAndContextProblems(templateName, templateLanguage, context, templateResolutionResult, out shouldShowTemplateList);
+            DisplayPartialNameMatchLanguageAndContextProblems(templateName, templateLanguage, context, templateResolutionResult, baselineName);
         }
 
-        private static void DisplayPartialNameMatchLanguageAndContextProblems(string templateName, string templateLanguage, string context, TemplateListResolutionResult templateResolutionResult, out bool shouldShowTemplateList)
+        private static void DisplayPartialNameMatchLanguageAndContextProblems(string templateName, string templateLanguage, string context, ListOrHelpTemplateListResolutionResult templateResolutionResult, string baselineName)
         {
-            shouldShowTemplateList = false;
-
-            if (templateResolutionResult.IsNoTemplatesMatchedState || templateResolutionResult.UsingPartialMatches)
+            bool anythingReported = false;
+            if (templateResolutionResult.HasExactMatches)
             {
-                ShowNoTemplatesFoundMessage(templateName, templateLanguage, context);
-                Reporter.Error.WriteLine();
                 return;
             }
-
-            bool anythingReported = false;
-            int partialTemplatesMatchCount = templateResolutionResult.ContextProblemMatchGroups.Count(templateGroup =>
-                {
-                    // all templates in a group should have the same context & name
-                    if (templateGroup[0].Info.Tags != null && templateGroup[0].Info.Tags.TryGetValue("type", out ICacheTag typeTag))
-                    {
-                        MatchInfo? matchInfo = WellKnownSearchFilters.ContextFilter(context)(templateGroup[0].Info);
-                        return ((matchInfo?.Kind ?? MatchKind.Mismatch) == MatchKind.Mismatch);
-                    }
-
-                    // this really shouldn't ever happen. But better to have a generic error than quietly ignore the partial match.
-                    // Cannot retrieve the type for {0}.
-                    Reporter.Error.WriteLine(string.Format(LocalizableStrings.GenericPlaceholderTemplateContextError, templateGroup[0].Info.Name).Bold().Red());
-                    anythingReported = true;
-                    return false;
-                });
-
-            if (partialTemplatesMatchCount > 0)
+            else
             {
-                ShowNoTemplatesFoundMessage(templateName, templateLanguage, context);
-                // {0} template(s) partially matched, but failed on {1}.
-                Reporter.Error.WriteLine(string.Format(LocalizableStrings.TemplatesNotValidGivenTheSpecifiedFilter, partialTemplatesMatchCount, string.Concat("type=", context)).Bold().Red());
+                //
+                ShowNoTemplatesFoundMessage(templateName, templateLanguage, context, baselineName);
                 anythingReported = true;
             }
 
-            if (templateResolutionResult.RemainingPartialMatchGroups.Count > 0)
+            if (templateResolutionResult.HasPartialMatches)
             {
-                shouldShowTemplateList = true;
+                // {0} template(s) partially matched, but failed on {1}.
+                Reporter.Error.WriteLine(
+                    string.Format(
+                        LocalizableStrings.TemplatesNotValidGivenTheSpecifiedFilter,
+                        templateResolutionResult.PartiallyMatchedTemplates.Count,
+                        GetPartialMatchReason(templateResolutionResult, templateLanguage, context, baselineName))
+                    .Bold().Red());
+
+                anythingReported = true;
             }
 
             if (anythingReported)
@@ -360,7 +334,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
         }
 
         // Returns a list of the parameter names that are invalid for every template in the input group.
-        public static void GetParametersInvalidForTemplatesInList(IReadOnlyList<ITemplateMatchInfo> templateList, out IReadOnlyList<string> invalidForAllTemplates, out IReadOnlyList<string> invalidForSomeTemplates)
+        public static void GetParametersInvalidForTemplatesInList(IReadOnlyCollection<ITemplateMatchInfo> templateList, out IReadOnlyList<string> invalidForAllTemplates, out IReadOnlyList<string> invalidForSomeTemplates)
         {
             IDictionary<string, int> invalidCounts = new Dictionary<string, int>();
 
@@ -423,51 +397,68 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             return CreationResultStatus.InvalidParamValues;
         }
 
-        private static string GetLanguageMismatchErrorMessage(INewCommandInput commandInput)
-        {
-            string inputFlagForm;
-            if (commandInput.Tokens.Contains("-lang"))
-            {
-                inputFlagForm = "-lang";
-            }
-            else
-            {
-                inputFlagForm = "--language";
-            }
-
-            string invalidLanguageErrorText = LocalizableStrings.InvalidTemplateParameterValues;
-            invalidLanguageErrorText += Environment.NewLine + string.Format(LocalizableStrings.InvalidParameterDetail, inputFlagForm, commandInput.Language, "language");
-            return invalidLanguageErrorText;
-        }
-
-        private static string GetInputParametersString(string templateName, string templateLanguage, string context)
+        private static string GetInputParametersString(string templateName, string templateLanguage, string context, string baselineName)
         {
             List<string> inputParametersList = new List<string>();
             if (!string.IsNullOrEmpty(templateName)){
                 inputParametersList.Add("'" + templateName + "'");
             }
             if (!string.IsNullOrEmpty(templateLanguage)){
-                inputParametersList.Add("lang=" + templateLanguage);
+                inputParametersList.Add("lang='" + templateLanguage + "'");
             }
             if (!string.IsNullOrEmpty(context)){
-                inputParametersList.Add("type=" + context);
+                inputParametersList.Add("type=" + context + "'");
+            }
+            if (!string.IsNullOrEmpty(baselineName))
+            {
+                inputParametersList.Add("baseline=" + baselineName + "'");
             }
             return String.Join(", ", inputParametersList);
         }
 
-        private static void ShowNoTemplatesFoundMessage(string templateName, string templateLanguage, string context)
+        private static void ShowNoTemplatesFoundMessage(string templateName, string templateLanguage, string context, string baselineName)
         {
             // No templates found matching the following input parameter(s): {0}.
-            Reporter.Error.WriteLine(string.Format(LocalizableStrings.NoTemplatesMatchingInputParameters, GetInputParametersString(templateName, templateLanguage, context)).Bold().Red());
+            Reporter.Error.WriteLine(string.Format(LocalizableStrings.NoTemplatesMatchingInputParameters, GetInputParametersString(templateName, templateLanguage, context, baselineName)).Bold().Red());
         }
 
-        private static void ShowTemplatesFoundMessage(string templateName, string templateLanguage, string context)
+        private static void ShowTemplatesFoundMessage(string templateName, string templateLanguage, string context, string baselineName)
         {
-            if (!string.IsNullOrEmpty(templateName) || !string.IsNullOrEmpty(templateLanguage) || !string.IsNullOrEmpty(context)){
+            if (!string.IsNullOrEmpty(templateName) || !string.IsNullOrEmpty(templateLanguage) || !string.IsNullOrEmpty(context) || !string.IsNullOrEmpty(baselineName))
+            {
                 // Templates found matching the following input parameter(s): {0}
-                Reporter.Output.WriteLine(string.Format(LocalizableStrings.TemplatesFoundMatchingInputParameters, GetInputParametersString(templateName, templateLanguage, context)));
+                Reporter.Output.WriteLine(string.Format(LocalizableStrings.TemplatesFoundMatchingInputParameters, GetInputParametersString(templateName, templateLanguage, context, baselineName)));
                 Reporter.Output.WriteLine();
             }
+        }
+
+        private static string GetPartialMatchReason(ListOrHelpTemplateListResolutionResult templateResolutionResult, string templateLanguage, string context, string baselineName)
+        {
+            StringBuilder reason = new StringBuilder();
+            string separator = ", ";
+
+            if (templateResolutionResult.HasLanguageMismatch)
+            {
+                reason.AppendFormat("language='{0}'", templateLanguage);
+            }
+            if (templateResolutionResult.HasContextMismatch)
+            {
+                if (reason.Length != 0)
+                {
+                    reason.Append(separator);
+                }
+                reason.AppendFormat("type='{0}'", context);
+            }
+            if (templateResolutionResult.HasBaselineMismatch)
+            {
+                if (reason.Length != 0)
+                {
+                    reason.Append(separator);
+                }
+                reason.AppendFormat("baseline='{0}'", baselineName);
+            }
+
+            return reason.ToString();
         }
     }
 }

@@ -763,15 +763,6 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cannot retrieve the type for {0}..
-        /// </summary>
-        public static string GenericPlaceholderTemplateContextError {
-            get {
-                return ResourceManager.GetString("GenericPlaceholderTemplateContextError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Getting ready....
         /// </summary>
         public static string GettingReady {

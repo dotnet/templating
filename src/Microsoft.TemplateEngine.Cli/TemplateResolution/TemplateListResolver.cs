@@ -10,7 +10,7 @@ using Microsoft.TemplateEngine.Edge;
 using Microsoft.TemplateEngine.Edge.Template;
 using Microsoft.TemplateEngine.Utils;
 
-namespace Microsoft.TemplateEngine.Cli
+namespace Microsoft.TemplateEngine.Cli.TemplateResolution
 {
     public static class TemplateListResolver
     {
@@ -102,12 +102,12 @@ namespace Microsoft.TemplateEngine.Cli
 
             return !invalidParams.Any();
         }
-        public static ITemplateMatchInfo FindHighestPrecedenceTemplateIfAllSameGroupIdentity(IReadOnlyList<ITemplateMatchInfo> templateList)
+        public static ITemplateMatchInfo FindHighestPrecedenceTemplateIfAllSameGroupIdentity(IReadOnlyCollection<ITemplateMatchInfo> templateList)
         {
             return FindHighestPrecedenceTemplateIfAllSameGroupIdentity(templateList, out bool throwawayAmbiguousResult);
         }
 
-        public static ITemplateMatchInfo FindHighestPrecedenceTemplateIfAllSameGroupIdentity(IReadOnlyList<ITemplateMatchInfo> templateList, out bool ambiguousResult)
+        public static ITemplateMatchInfo FindHighestPrecedenceTemplateIfAllSameGroupIdentity(IReadOnlyCollection<ITemplateMatchInfo> templateList, out bool ambiguousResult)
         {
             ambiguousResult = false;
 
@@ -180,6 +180,51 @@ namespace Microsoft.TemplateEngine.Cli
             IReadOnlyCollection<ITemplateMatchInfo> allTemplatesInContext = PerformAllTemplatesInContextQuery(templateInfo, hostDataLoader, commandInput.TypeFilter);
             return new TemplateListResolutionResult(commandInput.TemplateName, commandInput.Language, coreMatchedTemplates, allTemplatesInContext);
         }
+
+        public static ListOrHelpTemplateListResolutionResult GetTemplateResolutionResultForListOrHelp(IReadOnlyList<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput, string defaultLanguage)
+        {
+            IReadOnlyCollection<ITemplateMatchInfo> coreMatchedTemplates = PerformCoreTemplateQueryForListOrHelp(templateInfo, hostDataLoader, commandInput, defaultLanguage);
+            return new ListOrHelpTemplateListResolutionResult(commandInput.TemplateName, coreMatchedTemplates);
+        }
+
+        public static IReadOnlyCollection<ITemplateMatchInfo> PerformCoreTemplateQueryForListOrHelp(IReadOnlyList<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput, string defaultLanguage)
+        {
+            IReadOnlyList<FilterableTemplateInfo> filterableTemplateInfo = SetupFilterableTemplateInfoFromTemplateInfo(templateInfo);
+
+            IReadOnlyCollection<ITemplateMatchInfo> templates = TemplateListFilter.GetTemplateMatchInfo
+            (
+                filterableTemplateInfo,
+                TemplateListFilter.PartialMatchFilter,
+                WellKnownSearchFilters.NameFilter(commandInput.TemplateName),
+                //TODO: check with Kathleen if search for Classification is needed
+                //         WellKnownSearchFilters.ClassificationsFilter(commandInput.TemplateName),
+                WellKnownSearchFilters.LanguageFilter(commandInput.Language),
+                WellKnownSearchFilters.ContextFilter(commandInput.TypeFilter),
+                WellKnownSearchFilters.BaselineFilter(commandInput.BaselineName)
+            )
+            .Where(x => !IsTemplateHiddenByHostFile(x.Info, hostDataLoader)).ToList();
+
+            IReadOnlyList<ITemplateMatchInfo> coreMatchedTemplates = templates.Where(x => x.IsMatch).ToList();
+
+            if (coreMatchedTemplates.Count == 0)
+            {
+                // No exact matches, take the partial matches and be done.
+                coreMatchedTemplates = templates.Where(x => x.IsPartialMatch).ToList();
+            }
+
+            //TODO: uncomment if required for determining unambiguous group
+            //if (string.IsNullOrEmpty(commandInput.Language) && !string.IsNullOrEmpty(defaultLanguage))
+            //{
+            //    // default language matching only makes sense if the user didn't specify a language.
+            //    AddDefaultLanguageMatchingToTemplates(coreMatchedTemplates, defaultLanguage);
+            //}
+
+            //TODO: clarify if matching of template specific parameters is required for help or list
+            //AddParameterMatchingToTemplates(coreMatchedTemplates, hostDataLoader, commandInput);
+
+            return coreMatchedTemplates;
+        }
+
 
         // Query for template matches, filtered by everything available: name, language, context, parameters, and the host file.
         public static IReadOnlyCollection<ITemplateMatchInfo> PerformCoreTemplateQuery(IReadOnlyList<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput, string defaultLanguage)
