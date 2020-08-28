@@ -399,21 +399,37 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
 
         private static string GetInputParametersString(string templateName, string templateLanguage, string context, string baselineName)
         {
-            List<string> inputParametersList = new List<string>();
+            StringBuilder inputParametersList = new StringBuilder();
+            string separator = ", ";
+
             if (!string.IsNullOrEmpty(templateName)){
-                inputParametersList.Add("'" + templateName + "'");
+                inputParametersList.AppendFormat("'{0}'", templateName);
             }
-            if (!string.IsNullOrEmpty(templateLanguage)){
-                inputParametersList.Add("lang='" + templateLanguage + "'");
+            if (!string.IsNullOrEmpty(templateLanguage))
+            {
+                if (inputParametersList.Length != 0)
+                {
+                    inputParametersList.Append(separator);
+                }
+                inputParametersList.AppendFormat("language='{0}'", templateLanguage);
             }
-            if (!string.IsNullOrEmpty(context)){
-                inputParametersList.Add("type=" + context + "'");
+            if (!string.IsNullOrEmpty(context))
+            {
+                if (inputParametersList.Length != 0)
+                {
+                    inputParametersList.Append(separator);
+                }
+                inputParametersList.AppendFormat("type='{0}'", context);
             }
             if (!string.IsNullOrEmpty(baselineName))
             {
-                inputParametersList.Add("baseline=" + baselineName + "'");
+                if (inputParametersList.Length != 0)
+                {
+                    inputParametersList.Append(separator);
+                }
+                inputParametersList.AppendFormat("baseline='{0}'", baselineName);
             }
-            return String.Join(", ", inputParametersList);
+            return inputParametersList.ToString();
         }
 
         private static void ShowNoTemplatesFoundMessage(string templateName, string templateLanguage, string context, string baselineName)
