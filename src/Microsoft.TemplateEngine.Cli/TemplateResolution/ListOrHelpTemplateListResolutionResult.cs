@@ -5,6 +5,9 @@ using Microsoft.TemplateEngine.Edge.Template;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.TemplateEngine.Utils;
+using System.Collections.ObjectModel;
+using Microsoft.TemplateEngine.Abstractions;
 
 namespace Microsoft.TemplateEngine.Cli.TemplateResolution
 {
@@ -40,6 +43,17 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         }
 
         /// <summary>
+        /// Returns list of exact or partially matched templates by name and exact match by language, filter, baseline (if specified in command paramaters) grouped by group identity
+        /// </summary>
+        public IReadOnlyCollection<IGrouping<string, ITemplateMatchInfo>> ExactMatchedTemplatesGrouped
+        {
+            get
+            {
+                return ExactMatchedTemplates.GroupBy(x => x.Info.GroupIdentity, x => !string.IsNullOrEmpty(x.Info.GroupIdentity)).ToList();
+            }
+        }
+
+        /// <summary>
         /// Returns list of exact or partially matched templates by name and mismatch in any of the following: language, filter, baseline (if specified in command paramaters)
         /// </summary>
         public IReadOnlyCollection<ITemplateMatchInfo> PartiallyMatchedTemplates
@@ -51,6 +65,37 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                     _partiallyMatchedTemplates = GetCoreMatchedTemplatesWithDisposition(t => t.HasNameMatchOrPartialMatch() && t.HasAnyMismatch());
                 }
                 return _partiallyMatchedTemplates;
+            }
+        }
+
+        /// <summary>
+        ///  Returns list of exact or partially matched templates by name and mismatch in any of the following: language, filter, baseline (if specified in command paramaters); grouped by group identity
+        /// </summary>
+        public IReadOnlyCollection<IGrouping<string, ITemplateMatchInfo>> PartiallyMatchedTemplatesGrouped
+        {
+            get
+            {
+                return PartiallyMatchedTemplates.GroupBy(x => x.Info.GroupIdentity, x => !string.IsNullOrEmpty(x.Info.GroupIdentity)).ToList();
+            }
+        }
+
+        public bool HasUnambigiousTemplatesForDefaultLanguage
+        {
+            get
+            {
+                if (!HasUnambigiousTemplateGroupToUse)
+                {
+                    return false;
+                }
+                return UnambigiousTemplateGroup.Any(t => t.DispositionOfDefaults.Any(y => y.Location == MatchLocation.DefaultLanguage));
+            }
+        }
+
+        public IReadOnlyCollection<ITemplateMatchInfo> UnambigiousTemplatesForDefaultLanguage
+        {
+            get
+            {
+                return UnambigiousTemplateGroup.Where(t => t.DispositionOfDefaults.Any(y => y.Location == MatchLocation.DefaultLanguage)).ToList();
             }
         }
 
@@ -112,16 +157,72 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         /// <summary>
         /// Returns true when one and only one template has exact match
         /// </summary>
-        public bool HasUnambigiousTemplateToUse
+        public bool HasUnambigiousTemplateGroupToUse
         {
             get
             {
-                return ExactMatchedTemplates.Count == 1;
+                return ExactMatchedTemplatesGrouped.Count == 1;
+            }
+        }
+
+        /// <summary>
+        /// Returns list of templates for unambigious template group, otherwise empty list
+        /// </summary>
+        public IReadOnlyCollection<ITemplateMatchInfo> UnambigiousTemplateGroup
+        {
+            get
+            {
+                return HasUnambigiousTemplateGroupToUse ? ExactMatchedTemplates : new List <ITemplateMatchInfo>();
+            }
+        }
+
+        /// <summary>
+        /// Returns true if all the templates in unambigious group have templates in same language
+        /// </summary>
+        public bool AllTemplatesInUnambigiousTemplateGroupAreSameLanguage
+        {
+            get
+            {
+                if (UnambigiousTemplateGroup.Count == 0)
+                {
+                    return false;
+                }
+
+                if (UnambigiousTemplateGroup.Count == 1)
+                {
+                    return true;
+                }
+                    
+                HashSet<string> languagesFound = new HashSet<string>();
+                foreach (ITemplateMatchInfo template in UnambigiousTemplateGroup)
+                {
+                    string language;
+
+                    if (template.Info.Tags != null && template.Info.Tags.TryGetValue("language", out ICacheTag languageTag))
+                    {
+                        language = languageTag.ChoicesAndDescriptions.Keys.FirstOrDefault();
+                    }
+                    else
+                    {
+                        language = string.Empty;
+                    }
+
+                    if (!string.IsNullOrEmpty(language))
+                    {
+                        languagesFound.Add(language);
+                    }
+
+                    if (languagesFound.Count > 1)
+                    {
+                        return false;
+                    }
+                }
+                return true;
             }
         }
 
 
-        private IReadOnlyList<ITemplateMatchInfo> GetCoreMatchedTemplatesWithDisposition(Func<ITemplateMatchInfo, bool> filter)
+        private IReadOnlyCollection<ITemplateMatchInfo> GetCoreMatchedTemplatesWithDisposition(Func<ITemplateMatchInfo, bool> filter)
         {
             return _coreMatchedTemplates.Where(filter).ToList();
         }

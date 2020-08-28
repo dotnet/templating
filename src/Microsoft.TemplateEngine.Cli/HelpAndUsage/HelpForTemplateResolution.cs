@@ -22,52 +22,53 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                 ShowUsageHelp(commandInput, telemetryLogger);
             }
 
-            // this is just checking if there is an unambiguous group.
-            // the called methods decide whether to get the default language filtered lists, based on what they're doing.
-            //
-            // The empty TemplateName check is for when only 1 template (or group) is installed.
-            // When that occurs, the group is considered partial matches. But the output should be the ambiguous case - list the templates, not help on the singular group.
-            if (!string.IsNullOrEmpty(commandInput.TemplateName)
-                //TODO: clarify usage of template groups first
-       //             && templateResolutionResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousTemplateGroup)
-                    && templateResolutionResult.HasUnambigiousTemplateToUse
-                    && TemplateListResolver.AreAllTemplatesSameLanguage(templateResolutionResult.ExactMatchedTemplates))
-            {
-                // This will often show detailed help on the template group, which only makes sense if they're all the same language.
-                return DisplayHelpForUnambiguousTemplateGroup(templateResolutionResult, environmentSettings, commandInput, hostDataLoader, templateCreator, defaultLanguage);
-            }
-            else
-            {
-                return DisplayHelpForAmbiguousTemplateGroup(templateResolutionResult, environmentSettings, commandInput, hostDataLoader, telemetryLogger, defaultLanguage);
-            }
-        }
-
-        private static CreationResultStatus DisplayHelpForUnambiguousTemplateGroup(ListOrHelpTemplateListResolutionResult templateResolutionResult, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, IHostSpecificDataLoader hostDataLoader, TemplateCreator templateCreator, string defaultLanguage)
-        {
-            IReadOnlyCollection<ITemplateMatchInfo> unambiguousTemplateGroupForDetailDisplay = templateResolutionResult.ExactMatchedTemplates;
+            //in case list is specified we always need to list templates 
             if (commandInput.IsListFlagSpecified)
             {
-                //TODO: clarify usage of template groups first
-                //because the list flag is present, don't display help for the template group, even though an unambiguous group was resolved.
-                if (!AreAllParamsValidForAnyTemplateInList(unambiguousTemplateGroupForDetailDisplay)
-                    && TemplateListResolver.FindHighestPrecedenceTemplateIfAllSameGroupIdentity(unambiguousTemplateGroupForDetailDisplay) != null)
+                return DisplayListOrHelpForAmbiguousTemplateGroup(templateResolutionResult, environmentSettings, commandInput, hostDataLoader, telemetryLogger, defaultLanguage);
+            }
+            else //help flag specified or no flag specified
+            {
+                if (!string.IsNullOrEmpty(commandInput.TemplateName)
+                    && templateResolutionResult.HasUnambigiousTemplateGroupToUse)
                 {
-                    DisplayHelpForAcceptedParameters(commandInput.CommandName);
-                    return CreationResultStatus.InvalidParamValues;
+                    // This will show detailed help on the template group, which only makes sense if there is a single template group adn all templates are the same language.
+                    return DisplayHelpForUnambiguousTemplateGroup(templateResolutionResult, environmentSettings, commandInput, hostDataLoader, templateCreator, telemetryLogger, defaultLanguage);
+                }
+                else
+                {
+                    return DisplayListOrHelpForAmbiguousTemplateGroup(templateResolutionResult, environmentSettings, commandInput, hostDataLoader, telemetryLogger, defaultLanguage);
                 }
 
-                ShowTemplatesFoundMessage(commandInput.TemplateName, commandInput.Language, commandInput.TypeFilter, commandInput.BaselineName);
-                DisplayTemplateList(unambiguousTemplateGroupForDetailDisplay, environmentSettings, commandInput.Language, defaultLanguage);
-                // list flag specified, so no usage examples or detailed help
-                return CreationResultStatus.Success;
+            }
+        }
+
+        private static CreationResultStatus DisplayHelpForUnambiguousTemplateGroup(ListOrHelpTemplateListResolutionResult templateResolutionResult, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, IHostSpecificDataLoader hostDataLoader, TemplateCreator templateCreator, ITelemetryLogger telemetryLogger, string defaultLanguage)
+        {
+            // sanity check: should never happen; as condition for unambigious template group is checked above
+            if (templateResolutionResult.UnambigiousTemplateGroup == null)
+            {
+                return DisplayListOrHelpForAmbiguousTemplateGroup(templateResolutionResult, environmentSettings, commandInput, hostDataLoader, telemetryLogger, defaultLanguage);
+            }
+
+            //if language is specified and all templates in unambigiuos group match the language show the help for that template
+            if (!string.IsNullOrEmpty(commandInput.Language) && templateResolutionResult.AllTemplatesInUnambigiousTemplateGroupAreSameLanguage)
+            {
+                IReadOnlyCollection<ITemplateMatchInfo> unambiguousTemplateGroupForDetailDisplay = templateResolutionResult.UnambigiousTemplateGroup;
+                return TemplateDetailedHelpForSingularTemplateGroup(unambiguousTemplateGroupForDetailDisplay, environmentSettings, commandInput, hostDataLoader, templateCreator);
+            }
+            //if language is not specified and group has template that matches the language show the help for that the template that matches the language
+            if (string.IsNullOrEmpty(commandInput.Language) && !string.IsNullOrEmpty(defaultLanguage) && templateResolutionResult.HasUnambigiousTemplatesForDefaultLanguage)
+            {
+                IReadOnlyCollection<ITemplateMatchInfo> unambiguousTemplateGroupForDetailDisplay = templateResolutionResult.UnambigiousTemplatesForDefaultLanguage;
+                return TemplateDetailedHelpForSingularTemplateGroup(unambiguousTemplateGroupForDetailDisplay, environmentSettings, commandInput, hostDataLoader, templateCreator);
             }
             else
             {
-                // not in list context, but Unambiguous
-                // this covers whether or not --help was input, they do the same thing in the unambiguous case
-                return TemplateDetailedHelpForSingularTemplateGroup(unambiguousTemplateGroupForDetailDisplay, environmentSettings, commandInput, hostDataLoader, templateCreator);
+                return DisplayListOrHelpForAmbiguousTemplateGroup(templateResolutionResult, environmentSettings, commandInput, hostDataLoader, telemetryLogger, defaultLanguage);
             }
         }
+       
 
         private static CreationResultStatus TemplateDetailedHelpForSingularTemplateGroup(IReadOnlyCollection<ITemplateMatchInfo> unambiguousTemplateGroup, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, IHostSpecificDataLoader hostDataLoader, TemplateCreator templateCreator)
         {
@@ -93,7 +94,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                 : CreationResultStatus.Success;
         }
 
-        private static CreationResultStatus DisplayHelpForAmbiguousTemplateGroup(ListOrHelpTemplateListResolutionResult templateResolutionResult, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, IHostSpecificDataLoader hostDataLoader, ITelemetryLogger telemetryLogger, string defaultLanguage)
+        private static CreationResultStatus DisplayListOrHelpForAmbiguousTemplateGroup(ListOrHelpTemplateListResolutionResult templateResolutionResult, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, IHostSpecificDataLoader hostDataLoader, ITelemetryLogger telemetryLogger, string defaultLanguage)
         {
             // The following occurs when:
             //      --alias <value> is specifed
@@ -116,10 +117,12 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                 DisplayParametersInvalidForSomeTemplates(invalidForSomeTemplates, LocalizableStrings.PartialTemplateMatchSwitchesNotValidForAllMatches);
             }
 
+
             if (templateResolutionResult.HasExactMatches)
             {
+                IReadOnlyCollection<IGrouping<string, ITemplateMatchInfo>> groupedTemplatesForDisplay = templateResolutionResult.ExactMatchedTemplatesGrouped;
                 ShowTemplatesFoundMessage(commandInput.TemplateName, commandInput.Language, commandInput.TypeFilter, commandInput.BaselineName);
-                DisplayTemplateList(templatesForDisplay, environmentSettings, commandInput.Language, defaultLanguage);
+                DisplayTemplateList(groupedTemplatesForDisplay, environmentSettings, commandInput.Language, defaultLanguage);
             }
             else
             {
@@ -176,7 +179,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
         // - Short Name: displays the first short name from the highest precedence template in the group.
         // - Language: All languages supported by any template in the group are displayed, with the default language in brackets, e.g.: [C#]
         // - Tags
-        private static void DisplayTemplateList(IReadOnlyCollection<ITemplateMatchInfo> templates, IEngineEnvironmentSettings environmentSettings, string language, string defaultLanguage)
+        private static void DisplayTemplateList(IReadOnlyCollection<IGrouping<string, ITemplateMatchInfo>> templates, IEngineEnvironmentSettings environmentSettings, string language, string defaultLanguage)
         {
             IReadOnlyCollection<TemplateGroupForListDisplay> groupsForDisplay = GetTemplateGroupsForListDisplay(templates, language, defaultLanguage);
 
@@ -205,12 +208,11 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             public string Classifications { get; set; }
         }
 
-        private static IReadOnlyList<TemplateGroupForListDisplay> GetTemplateGroupsForListDisplay(IReadOnlyCollection<ITemplateMatchInfo> templateList, string language, string defaultLanguage)
+        private static IReadOnlyList<TemplateGroupForListDisplay> GetTemplateGroupsForListDisplay(IReadOnlyCollection<IGrouping<string, ITemplateMatchInfo>> groupedTemplateList, string language, string defaultLanguage)
         {
-            IEnumerable<IGrouping<string, ITemplateMatchInfo>> grouped = templateList.GroupBy(x => x.Info.GroupIdentity, x => !string.IsNullOrEmpty(x.Info.GroupIdentity));
             List<TemplateGroupForListDisplay> templateGroupsForDisplay = new List<TemplateGroupForListDisplay>();
 
-            foreach (IGrouping<string, ITemplateMatchInfo> grouping in grouped)
+            foreach (IGrouping<string, ITemplateMatchInfo> grouping in groupedTemplateList)
             {
                 List<string> languageForDisplay = new List<string>();
                 HashSet<string> uniqueLanguages = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -320,7 +322,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                 Reporter.Error.WriteLine(
                     string.Format(
                         LocalizableStrings.TemplatesNotValidGivenTheSpecifiedFilter,
-                        templateResolutionResult.PartiallyMatchedTemplates.Count,
+                        templateResolutionResult.PartiallyMatchedTemplatesGrouped.Count,
                         GetPartialMatchReason(templateResolutionResult, templateLanguage, context, baselineName))
                     .Bold().Red());
 

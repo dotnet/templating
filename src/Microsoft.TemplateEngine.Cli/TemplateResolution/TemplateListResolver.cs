@@ -36,39 +36,6 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             return templateList.AllAreTheSame((x) => x.Info.GroupIdentity, StringComparer.OrdinalIgnoreCase);
         }
 
-        public static bool AreAllTemplatesSameLanguage(IEnumerable<ITemplateMatchInfo> templateList)
-        {
-            if (!templateList.Any())
-            {
-                return false;
-            }
-
-            HashSet<string> languagesFound = new HashSet<string>();
-            foreach (ITemplateMatchInfo template in templateList)
-            {
-                string language;
-
-                if (template.Info.Tags != null && template.Info.Tags.TryGetValue("language", out ICacheTag languageTag))
-                {
-                    language = languageTag.ChoicesAndDescriptions.Keys.FirstOrDefault();
-                }
-                else
-                {
-                    language = string.Empty;
-                }
-
-                //add & check
-                languagesFound.Add(language);
-
-                if (languagesFound.Count > 1)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
         private static bool IsTemplateHiddenByHostFile(ITemplateInfo templateInfo, IHostSpecificDataLoader hostDataLoader)
         {
             HostSpecificTemplateData hostData = hostDataLoader.ReadHostSpecificTemplateData(templateInfo);
@@ -183,11 +150,42 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
 
         public static ListOrHelpTemplateListResolutionResult GetTemplateResolutionResultForListOrHelp(IReadOnlyList<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput, string defaultLanguage)
         {
-            IReadOnlyCollection<ITemplateMatchInfo> coreMatchedTemplates = PerformCoreTemplateQueryForListOrHelp(templateInfo, hostDataLoader, commandInput, defaultLanguage);
+            IReadOnlyCollection<ITemplateMatchInfo> coreMatchedTemplates;
+
+            //we need different set of templates for help and list
+            //for list we need to show all exact and partial names by name
+            //for help if there is an exact match by shortname or name we need to show help for that exact template and also apply default language mapping in case language is not specified
+            if (commandInput.IsListFlagSpecified)
+            {
+                coreMatchedTemplates = PerformCoreTemplateQueryForList(templateInfo, hostDataLoader, commandInput, defaultLanguage);
+            }
+            else
+            {
+                coreMatchedTemplates = PerformCoreTemplateQueryForHelp(templateInfo, hostDataLoader, commandInput, defaultLanguage);
+            }
             return new ListOrHelpTemplateListResolutionResult(commandInput.TemplateName, coreMatchedTemplates);
         }
 
-        public static IReadOnlyCollection<ITemplateMatchInfo> PerformCoreTemplateQueryForListOrHelp(IReadOnlyList<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput, string defaultLanguage)
+        public static IReadOnlyCollection<ITemplateMatchInfo> PerformCoreTemplateQueryForList(IReadOnlyList<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput, string defaultLanguage)
+        {
+            IReadOnlyList<FilterableTemplateInfo> filterableTemplateInfo = SetupFilterableTemplateInfoFromTemplateInfo(templateInfo);
+
+            IReadOnlyCollection<ITemplateMatchInfo> coreMatchedTemplates = TemplateListFilter.GetTemplateMatchInfo
+            (
+                filterableTemplateInfo,
+                TemplateListFilter.PartialMatchFilter,
+                WellKnownSearchFilters.NameFilter(commandInput.TemplateName),
+                //TODO: check if search for Classification is needed
+                //         WellKnownSearchFilters.ClassificationsFilter(commandInput.TemplateName),
+                WellKnownSearchFilters.LanguageFilter(commandInput.Language),
+                WellKnownSearchFilters.ContextFilter(commandInput.TypeFilter),
+                WellKnownSearchFilters.BaselineFilter(commandInput.BaselineName)
+            )
+            .Where(x => !IsTemplateHiddenByHostFile(x.Info, hostDataLoader)).ToList();
+            return coreMatchedTemplates;
+        }
+
+        public static IReadOnlyCollection<ITemplateMatchInfo> PerformCoreTemplateQueryForHelp(IReadOnlyList<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput, string defaultLanguage)
         {
             IReadOnlyList<FilterableTemplateInfo> filterableTemplateInfo = SetupFilterableTemplateInfoFromTemplateInfo(templateInfo);
 
@@ -204,13 +202,29 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             )
             .Where(x => !IsTemplateHiddenByHostFile(x.Info, hostDataLoader)).ToList();
 
-            //TODO: uncomment if required for determining unambiguous group
-            //if (string.IsNullOrEmpty(commandInput.Language) && !string.IsNullOrEmpty(defaultLanguage))
-            //{
-            //    // default language matching only makes sense if the user didn't specify a language.
-            //    AddDefaultLanguageMatchingToTemplates(coreMatchedTemplates, defaultLanguage);
-            //}
+            coreMatchedTemplates = coreMatchedTemplates.Where(x => x.IsMatch).ToList();
 
+            if (coreMatchedTemplates.Count == 0)
+            {
+                // No exact matches, take the partial matches and be done.
+                coreMatchedTemplates = coreMatchedTemplates.Where(x => x.IsPartialMatch).ToList();
+            }
+            else
+            {
+                IReadOnlyList<ITemplateMatchInfo> matchesWithExactDispositionsInNameFields = coreMatchedTemplates.Where(x => x.MatchDisposition.Any(y => NameFields.Contains(y.Location) && y.Kind == MatchKind.Exact)).ToList();
+
+                if (matchesWithExactDispositionsInNameFields.Count > 0)
+                {
+                    // Start with the exact name matches, if there are any.
+                    coreMatchedTemplates = matchesWithExactDispositionsInNameFields;
+                }
+            }
+
+            if (string.IsNullOrEmpty(commandInput.Language) && !string.IsNullOrEmpty(defaultLanguage))
+            {
+                // default language matching only makes sense if the user didn't specify a language.
+                AddDefaultLanguageMatchingToTemplates(coreMatchedTemplates, defaultLanguage);
+            }
             return coreMatchedTemplates;
         }
 
@@ -305,7 +319,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             return filterableTemplateList;
         }
 
-        private static void AddDefaultLanguageMatchingToTemplates(IReadOnlyList<ITemplateMatchInfo> listToFilter, string language)
+        private static void AddDefaultLanguageMatchingToTemplates(IReadOnlyCollection<ITemplateMatchInfo> listToFilter, string language)
         {
             if (string.IsNullOrEmpty(language))
             {
