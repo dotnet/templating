@@ -196,7 +196,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
 
         public static bool HasNameMatchOrPartialMatch(this ITemplateMatchInfo templateMatchInfo)
         {
-            return templateMatchInfo.MatchDisposition.Any(x => x.Location == MatchLocation.Name && (x.Kind == MatchKind.Exact || x.Kind == MatchKind.Partial));
+            return templateMatchInfo.MatchDisposition.Any((x => (x.Location == MatchLocation.Name ||x.Location == MatchLocation.ShortName) && (x.Kind == MatchKind.Exact || x.Kind == MatchKind.Partial)));
         }
 
         public static bool HasAnyMismatch(this ITemplateMatchInfo templateMatchInfo)

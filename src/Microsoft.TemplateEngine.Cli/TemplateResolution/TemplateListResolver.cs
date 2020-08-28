@@ -191,12 +191,12 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         {
             IReadOnlyList<FilterableTemplateInfo> filterableTemplateInfo = SetupFilterableTemplateInfoFromTemplateInfo(templateInfo);
 
-            IReadOnlyCollection<ITemplateMatchInfo> templates = TemplateListFilter.GetTemplateMatchInfo
+            IReadOnlyCollection<ITemplateMatchInfo> coreMatchedTemplates = TemplateListFilter.GetTemplateMatchInfo
             (
                 filterableTemplateInfo,
                 TemplateListFilter.PartialMatchFilter,
                 WellKnownSearchFilters.NameFilter(commandInput.TemplateName),
-                //TODO: check with Kathleen if search for Classification is needed
+                //TODO: check if search for Classification is needed
                 //         WellKnownSearchFilters.ClassificationsFilter(commandInput.TemplateName),
                 WellKnownSearchFilters.LanguageFilter(commandInput.Language),
                 WellKnownSearchFilters.ContextFilter(commandInput.TypeFilter),
@@ -204,23 +204,12 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             )
             .Where(x => !IsTemplateHiddenByHostFile(x.Info, hostDataLoader)).ToList();
 
-            IReadOnlyList<ITemplateMatchInfo> coreMatchedTemplates = templates.Where(x => x.IsMatch).ToList();
-
-            if (coreMatchedTemplates.Count == 0)
-            {
-                // No exact matches, take the partial matches and be done.
-                coreMatchedTemplates = templates.Where(x => x.IsPartialMatch).ToList();
-            }
-
             //TODO: uncomment if required for determining unambiguous group
             //if (string.IsNullOrEmpty(commandInput.Language) && !string.IsNullOrEmpty(defaultLanguage))
             //{
             //    // default language matching only makes sense if the user didn't specify a language.
             //    AddDefaultLanguageMatchingToTemplates(coreMatchedTemplates, defaultLanguage);
             //}
-
-            //TODO: clarify if matching of template specific parameters is required for help or list
-            //AddParameterMatchingToTemplates(coreMatchedTemplates, hostDataLoader, commandInput);
 
             return coreMatchedTemplates;
         }

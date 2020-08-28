@@ -28,7 +28,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             // The empty TemplateName check is for when only 1 template (or group) is installed.
             // When that occurs, the group is considered partial matches. But the output should be the ambiguous case - list the templates, not help on the singular group.
             if (!string.IsNullOrEmpty(commandInput.TemplateName)
-                //TODO: clarify usage of template groups with Kathleen first
+                //TODO: clarify usage of template groups first
        //             && templateResolutionResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousTemplateGroup)
                     && templateResolutionResult.HasUnambigiousTemplateToUse
                     && TemplateListResolver.AreAllTemplatesSameLanguage(templateResolutionResult.ExactMatchedTemplates))
@@ -47,7 +47,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             IReadOnlyCollection<ITemplateMatchInfo> unambiguousTemplateGroupForDetailDisplay = templateResolutionResult.ExactMatchedTemplates;
             if (commandInput.IsListFlagSpecified)
             {
-                //TODO: clarify usage of template groups with Kathleen first
+                //TODO: clarify usage of template groups first
                 //because the list flag is present, don't display help for the template group, even though an unambiguous group was resolved.
                 if (!AreAllParamsValidForAnyTemplateInList(unambiguousTemplateGroupForDetailDisplay)
                     && TemplateListResolver.FindHighestPrecedenceTemplateIfAllSameGroupIdentity(unambiguousTemplateGroupForDetailDisplay) != null)
