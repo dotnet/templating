@@ -79,23 +79,30 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             }
         }
 
-        public bool HasUnambigiousTemplatesForDefaultLanguage
+
+        /// <summary>
+        /// Returns true when at least one template in unambiguous matches default language
+        /// </summary>
+        public bool HasUnambiguousTemplateGroupForDefaultLanguage
         {
             get
             {
-                if (!HasUnambigiousTemplateGroup)
+                if (!HasUnambiguousTemplateGroup)
                 {
                     return false;
                 }
-                return UnambigiousTemplateGroup.Any(t => t.DispositionOfDefaults.Any(y => y.Location == MatchLocation.DefaultLanguage && y.Kind == MatchKind.Exact));
+                return UnambiguousTemplatesForDefaultLanguage.Any();
             }
         }
 
-        public IReadOnlyCollection<ITemplateMatchInfo> UnambigiousTemplatesForDefaultLanguage
+        /// <summary>
+        /// Returns collecion of templates from unamgibuous group that matches default language
+        /// </summary>
+        public IReadOnlyCollection<ITemplateMatchInfo> UnambiguousTemplatesForDefaultLanguage
         {
             get
             {
-                return UnambigiousTemplateGroup.Where(t => t.DispositionOfDefaults.Any(y => y.Location == MatchLocation.DefaultLanguage && y.Kind == MatchKind.Exact)).ToList();
+                return UnambiguousTemplateGroup.Where(t => t.HasDefaultLanguageMatch()).ToList();
             }
         }
 
@@ -157,7 +164,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         /// <summary>
         /// Returns true when one and only one template has exact match
         /// </summary>
-        public bool HasUnambigiousTemplateGroup
+        public bool HasUnambiguousTemplateGroup
         {
             get
             {
@@ -166,35 +173,35 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         }
 
         /// <summary>
-        /// Returns list of templates for unambigious template group, otherwise empty list
+        /// Returns list of templates for unambiguous template group, otherwise empty list
         /// </summary>
-        public IReadOnlyCollection<ITemplateMatchInfo> UnambigiousTemplateGroup
+        public IReadOnlyCollection<ITemplateMatchInfo> UnambiguousTemplateGroup
         {
             get
             {
-                return HasUnambigiousTemplateGroup ? ExactMatchedTemplates : new List <ITemplateMatchInfo>();
+                return HasUnambiguousTemplateGroup ? ExactMatchedTemplates : new List <ITemplateMatchInfo>();
             }
         }
 
         /// <summary>
-        /// Returns true if all the templates in unambigious group have templates in same language
+        /// Returns true if all the templates in unambiguous group have templates in same language
         /// </summary>
-        public bool AllTemplatesInUnambigiousTemplateGroupAreSameLanguage
+        public bool AllTemplatesInUnambiguousTemplateGroupAreSameLanguage
         {
             get
             {
-                if (UnambigiousTemplateGroup.Count == 0)
+                if (UnambiguousTemplateGroup.Count == 0)
                 {
                     return false;
                 }
 
-                if (UnambigiousTemplateGroup.Count == 1)
+                if (UnambiguousTemplateGroup.Count == 1)
                 {
                     return true;
                 }
                     
                 HashSet<string> languagesFound = new HashSet<string>();
-                foreach (ITemplateMatchInfo template in UnambigiousTemplateGroup)
+                foreach (ITemplateMatchInfo template in UnambiguousTemplateGroup)
                 {
                     string language;
 

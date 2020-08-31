@@ -45,10 +45,10 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
 
             ListOrHelpTemplateListResolutionResult matchResult = TemplateListResolver.GetTemplateResolutionResultForListOrHelp(templatesToSearch, new MockHostSpecificDataLoader(), userInputs, null);
             Assert.True(matchResult.HasExactMatches);
-            Assert.True(matchResult.HasUnambigiousTemplateGroup);
-            Assert.Equal("console2", matchResult.UnambigiousTemplateGroup.Single().Info.ShortName);
-            Assert.Equal("Console.App2", matchResult.UnambigiousTemplateGroup.Single().Info.Identity);
-            Assert.Equal(1, matchResult.UnambigiousTemplateGroup.Count);
+            Assert.True(matchResult.HasUnambiguousTemplateGroup);
+            Assert.Equal("console2", matchResult.UnambiguousTemplateGroup.Single().Info.ShortName);
+            Assert.Equal("Console.App2", matchResult.UnambiguousTemplateGroup.Single().Info.Identity);
+            Assert.Equal(1, matchResult.UnambiguousTemplateGroup.Count);
         }
 
         [Fact(DisplayName = nameof(TestGetTemplateResolutionResult_ExactMatchOnShortNameMatchesCorrectly))]
@@ -80,14 +80,14 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
 
             ListOrHelpTemplateListResolutionResult matchResult = TemplateListResolver.GetTemplateResolutionResultForListOrHelp(templatesToSearch, new MockHostSpecificDataLoader(), userInputs, null);
             Assert.True(matchResult.HasExactMatches);
-            Assert.True(matchResult.HasUnambigiousTemplateGroup);
-            Assert.Equal("console", matchResult.UnambigiousTemplateGroup.Single().Info.ShortName);
-            Assert.Equal("Console.App", matchResult.UnambigiousTemplateGroup.Single().Info.Identity);
-            Assert.Equal(1, matchResult.UnambigiousTemplateGroup.Count);
+            Assert.True(matchResult.HasUnambiguousTemplateGroup);
+            Assert.Equal("console", matchResult.UnambiguousTemplateGroup.Single().Info.ShortName);
+            Assert.Equal("Console.App", matchResult.UnambiguousTemplateGroup.Single().Info.Identity);
+            Assert.Equal(1, matchResult.UnambiguousTemplateGroup.Count);
         }
 
-        [Fact(DisplayName = nameof(TestGetTemplateResolutionResult_UnambigiousGroupIsFound))]
-        public void TestGetTemplateResolutionResult_UnambigiousGroupIsFound()
+        [Fact(DisplayName = nameof(TestGetTemplateResolutionResult_UnambiguousGroupIsFound))]
+        public void TestGetTemplateResolutionResult_UnambiguousGroupIsFound()
         {
             List<ITemplateInfo> templatesToSearch = new List<ITemplateInfo>();
             templatesToSearch.Add(new TemplateInfo()
@@ -137,8 +137,8 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             Assert.True(matchResult.HasExactMatches);
             Assert.Equal(1, matchResult.ExactMatchedTemplatesGrouped.Count);
             Assert.Equal(3, matchResult.ExactMatchedTemplates.Count);
-            Assert.True(matchResult.HasUnambigiousTemplateGroup);
-            Assert.Equal(3, matchResult.UnambigiousTemplateGroup.Count);
+            Assert.True(matchResult.HasUnambiguousTemplateGroup);
+            Assert.Equal(3, matchResult.UnambiguousTemplateGroup.Count);
         }
 
         [Fact(DisplayName = nameof(TestGetTemplateResolutionResult_MultipleGroupsAreFound))]
@@ -216,7 +216,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             Assert.True(matchResult.HasExactMatches);
             Assert.Equal(2, matchResult.ExactMatchedTemplatesGrouped.Count);
             Assert.Equal(5, matchResult.ExactMatchedTemplates.Count);
-            Assert.False(matchResult.HasUnambigiousTemplateGroup);
+            Assert.False(matchResult.HasUnambiguousTemplateGroup);
         }
 
         [Fact(DisplayName = nameof(TestGetTemplateResolutionResult_DefaultLanguageDisambiguates))]
@@ -256,13 +256,13 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
 
             ListOrHelpTemplateListResolutionResult matchResult = TemplateListResolver.GetTemplateResolutionResultForListOrHelp(templatesToSearch, new MockHostSpecificDataLoader(), userInputs, "L1");
             Assert.True(matchResult.HasExactMatches);
-            Assert.True(matchResult.HasUnambigiousTemplateGroup);
-            Assert.True(matchResult.HasUnambigiousTemplatesForDefaultLanguage);
-            Assert.Equal("console", matchResult.UnambigiousTemplatesForDefaultLanguage.Single().Info.ShortName);
-            Assert.Equal("Console.App.L1", matchResult.UnambigiousTemplatesForDefaultLanguage.Single().Info.Identity);
-            Assert.Equal("L1", matchResult.UnambigiousTemplatesForDefaultLanguage.Single().Info.Tags["language"].ChoicesAndDescriptions.Keys.FirstOrDefault());
-            Assert.Equal(2, matchResult.UnambigiousTemplateGroup.Count);
-            Assert.Equal(1, matchResult.UnambigiousTemplatesForDefaultLanguage.Count);
+            Assert.True(matchResult.HasUnambiguousTemplateGroup);
+            Assert.True(matchResult.HasUnambiguousTemplateGroupForDefaultLanguage);
+            Assert.Equal("console", matchResult.UnambiguousTemplatesForDefaultLanguage.Single().Info.ShortName);
+            Assert.Equal("Console.App.L1", matchResult.UnambiguousTemplatesForDefaultLanguage.Single().Info.Identity);
+            Assert.Equal("L1", matchResult.UnambiguousTemplatesForDefaultLanguage.Single().Info.Tags["language"].ChoicesAndDescriptions.Keys.FirstOrDefault());
+            Assert.Equal(2, matchResult.UnambiguousTemplateGroup.Count);
+            Assert.Equal(1, matchResult.UnambiguousTemplatesForDefaultLanguage.Count);
         }
 
         [Fact(DisplayName = nameof(TestGetTemplateResolutionResult_InputLanguageIsPreferredOverDefault))]
@@ -303,15 +303,15 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
 
             ListOrHelpTemplateListResolutionResult matchResult = TemplateListResolver.GetTemplateResolutionResultForListOrHelp(templatesToSearch, new MockHostSpecificDataLoader(), userInputs, "L1");
             Assert.True(matchResult.HasExactMatches);
-            Assert.True(matchResult.HasUnambigiousTemplateGroup);
-            Assert.Equal("console", matchResult.UnambigiousTemplateGroup.Single().Info.ShortName);
-            Assert.Equal("Console.App.L2", matchResult.UnambigiousTemplateGroup.Single().Info.Identity);
-            Assert.Equal("L2", matchResult.UnambigiousTemplateGroup.Single().Info.Tags["language"].ChoicesAndDescriptions.Keys.FirstOrDefault());
-            Assert.Equal(1, matchResult.UnambigiousTemplateGroup.Count);
+            Assert.True(matchResult.HasUnambiguousTemplateGroup);
+            Assert.Equal("console", matchResult.UnambiguousTemplateGroup.Single().Info.ShortName);
+            Assert.Equal("Console.App.L2", matchResult.UnambiguousTemplateGroup.Single().Info.Identity);
+            Assert.Equal("L2", matchResult.UnambiguousTemplateGroup.Single().Info.Tags["language"].ChoicesAndDescriptions.Keys.FirstOrDefault());
+            Assert.Equal(1, matchResult.UnambiguousTemplateGroup.Count);
         }
 
-        [Fact(DisplayName = nameof(TestGetTemplateResolutionResult_UnambigiousGroup_TemplatesAreNotSameLanguage))]
-        public void TestGetTemplateResolutionResult_UnambigiousGroup_TemplatesAreNotSameLanguage()
+        [Fact(DisplayName = nameof(TestGetTemplateResolutionResult_UnambiguousGroup_TemplatesAreNotSameLanguage))]
+        public void TestGetTemplateResolutionResult_UnambiguousGroup_TemplatesAreNotSameLanguage()
         {
             List<ITemplateInfo> templatesToSearch = new List<ITemplateInfo>();
             templatesToSearch.Add(new TemplateInfo()
@@ -361,13 +361,13 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             Assert.True(matchResult.HasExactMatches);
             Assert.Equal(1, matchResult.ExactMatchedTemplatesGrouped.Count);
             Assert.Equal(3, matchResult.ExactMatchedTemplates.Count);
-            Assert.True(matchResult.HasUnambigiousTemplateGroup);
-            Assert.Equal(3, matchResult.UnambigiousTemplateGroup.Count);
-            Assert.False(matchResult.AllTemplatesInUnambigiousTemplateGroupAreSameLanguage);
+            Assert.True(matchResult.HasUnambiguousTemplateGroup);
+            Assert.Equal(3, matchResult.UnambiguousTemplateGroup.Count);
+            Assert.False(matchResult.AllTemplatesInUnambiguousTemplateGroupAreSameLanguage);
         }
 
-        [Fact(DisplayName = nameof(TestGetTemplateResolutionResult_UnambigiousGroup_TemplatesAreSameLanguage))]
-        public void TestGetTemplateResolutionResult_UnambigiousGroup_TemplatesAreSameLanguage()
+        [Fact(DisplayName = nameof(TestGetTemplateResolutionResult_UnambiguousGroup_TemplatesAreSameLanguage))]
+        public void TestGetTemplateResolutionResult_UnambiguousGroup_TemplatesAreSameLanguage()
         {
             List<ITemplateInfo> templatesToSearch = new List<ITemplateInfo>();
             templatesToSearch.Add(new TemplateInfo()
@@ -417,9 +417,9 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             Assert.True(matchResult.HasExactMatches);
             Assert.Equal(1, matchResult.ExactMatchedTemplatesGrouped.Count);
             Assert.Equal(3, matchResult.ExactMatchedTemplates.Count);
-            Assert.True(matchResult.HasUnambigiousTemplateGroup);
-            Assert.Equal(3, matchResult.UnambigiousTemplateGroup.Count);
-            Assert.True(matchResult.AllTemplatesInUnambigiousTemplateGroupAreSameLanguage);
+            Assert.True(matchResult.HasUnambiguousTemplateGroup);
+            Assert.Equal(3, matchResult.UnambiguousTemplateGroup.Count);
+            Assert.True(matchResult.AllTemplatesInUnambiguousTemplateGroupAreSameLanguage);
         }
 
         [Fact(DisplayName = nameof(TestGetTemplateResolutionResult_PartialMatch_HasLanguageMismatch))]
@@ -461,8 +461,8 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             Assert.True(matchResult.HasLanguageMismatch);
             Assert.False(matchResult.HasContextMismatch);
             Assert.False(matchResult.HasBaselineMismatch);
-            Assert.False(matchResult.HasUnambigiousTemplateGroup);
-            Assert.Equal(0, matchResult.UnambigiousTemplateGroup.Count);
+            Assert.False(matchResult.HasUnambiguousTemplateGroup);
+            Assert.Equal(0, matchResult.UnambiguousTemplateGroup.Count);
         }
 
         [Fact(DisplayName = nameof(TestGetTemplateResolutionResult_PartialMatch_HasContextMismatch))]
@@ -504,8 +504,8 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             Assert.False(matchResult.HasLanguageMismatch);
             Assert.True (matchResult.HasContextMismatch);
             Assert.False(matchResult.HasBaselineMismatch);
-            Assert.False(matchResult.HasUnambigiousTemplateGroup);
-            Assert.Equal(0, matchResult.UnambigiousTemplateGroup.Count);
+            Assert.False(matchResult.HasUnambiguousTemplateGroup);
+            Assert.Equal(0, matchResult.UnambiguousTemplateGroup.Count);
         }
 
         [Fact(DisplayName = nameof(TestGetTemplateResolutionResult_PartialMatch_HasBaselineMismatch))]
@@ -547,8 +547,8 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             Assert.False(matchResult.HasLanguageMismatch);
             Assert.False(matchResult.HasContextMismatch);
             Assert.True(matchResult.HasBaselineMismatch);
-            Assert.False(matchResult.HasUnambigiousTemplateGroup);
-            Assert.Equal(0, matchResult.UnambigiousTemplateGroup.Count);
+            Assert.False(matchResult.HasUnambiguousTemplateGroup);
+            Assert.Equal(0, matchResult.UnambiguousTemplateGroup.Count);
         }
 
         [Fact(DisplayName = nameof(TestGetTemplateResolutionResult_PartialMatch_HasMultipleMismatches))]
@@ -592,8 +592,8 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             Assert.True(matchResult.HasLanguageMismatch);
             Assert.True(matchResult.HasContextMismatch);
             Assert.True(matchResult.HasBaselineMismatch);
-            Assert.False(matchResult.HasUnambigiousTemplateGroup);
-            Assert.Equal(0, matchResult.UnambigiousTemplateGroup.Count);
+            Assert.False(matchResult.HasUnambiguousTemplateGroup);
+            Assert.Equal(0, matchResult.UnambiguousTemplateGroup.Count);
         }
     }
 }

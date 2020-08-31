@@ -29,6 +29,12 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             return templateMatchInfo.MatchDisposition.Any(x => x.Location == MatchLocation.Language && x.Kind == MatchKind.Mismatch);
         }
 
+        public static bool HasDefaultLanguageMatch(this ITemplateMatchInfo templateMatchInfo)
+        {
+            return templateMatchInfo.DispositionOfDefaults.Any(x => x.Location == MatchLocation.DefaultLanguage && x.Kind == MatchKind.Exact);
+        }
+
+
         public static bool HasBaselineMismatch(this ITemplateMatchInfo templateMatchInfo)
         {
             return templateMatchInfo.MatchDisposition.Any(x => x.Location == MatchLocation.Baseline && x.Kind == MatchKind.Mismatch);

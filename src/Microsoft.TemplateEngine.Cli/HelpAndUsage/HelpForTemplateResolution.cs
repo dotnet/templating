@@ -30,7 +30,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             else //help flag specified or no flag specified
             {
                 if (!string.IsNullOrEmpty(commandInput.TemplateName)
-                    && templateResolutionResult.HasUnambigiousTemplateGroup)
+                    && templateResolutionResult.HasUnambiguousTemplateGroup)
                 {
                     // This will show detailed help on the template group, which only makes sense if there is a single template group adn all templates are the same language.
                     return DisplayHelpForUnambiguousTemplateGroup(templateResolutionResult, environmentSettings, commandInput, hostDataLoader, templateCreator, telemetryLogger, defaultLanguage);
@@ -45,22 +45,22 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
 
         private static CreationResultStatus DisplayHelpForUnambiguousTemplateGroup(ListOrHelpTemplateListResolutionResult templateResolutionResult, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, IHostSpecificDataLoader hostDataLoader, TemplateCreator templateCreator, ITelemetryLogger telemetryLogger, string defaultLanguage)
         {
-            // sanity check: should never happen; as condition for unambigious template group is checked above
-            if (templateResolutionResult.UnambigiousTemplateGroup == null)
+            // sanity check: should never happen; as condition for unambiguous template group is checked above
+            if (templateResolutionResult.UnambiguousTemplateGroup == null)
             {
                 return DisplayListOrHelpForAmbiguousTemplateGroup(templateResolutionResult, environmentSettings, commandInput, hostDataLoader, telemetryLogger, defaultLanguage);
             }
 
             //if language is specified and all templates in unambigiuos group match the language show the help for that template
-            if (!string.IsNullOrEmpty(commandInput.Language) && templateResolutionResult.AllTemplatesInUnambigiousTemplateGroupAreSameLanguage)
+            if (!string.IsNullOrEmpty(commandInput.Language) && templateResolutionResult.AllTemplatesInUnambiguousTemplateGroupAreSameLanguage)
             {
-                IReadOnlyCollection<ITemplateMatchInfo> unambiguousTemplateGroupForDetailDisplay = templateResolutionResult.UnambigiousTemplateGroup;
+                IReadOnlyCollection<ITemplateMatchInfo> unambiguousTemplateGroupForDetailDisplay = templateResolutionResult.UnambiguousTemplateGroup;
                 return TemplateDetailedHelpForSingularTemplateGroup(unambiguousTemplateGroupForDetailDisplay, environmentSettings, commandInput, hostDataLoader, templateCreator);
             }
             //if language is not specified and group has template that matches the language show the help for that the template that matches the language
-            if (string.IsNullOrEmpty(commandInput.Language) && !string.IsNullOrEmpty(defaultLanguage) && templateResolutionResult.HasUnambigiousTemplatesForDefaultLanguage)
+            if (string.IsNullOrEmpty(commandInput.Language) && !string.IsNullOrEmpty(defaultLanguage) && templateResolutionResult.HasUnambiguousTemplateGroupForDefaultLanguage)
             {
-                IReadOnlyCollection<ITemplateMatchInfo> unambiguousTemplateGroupForDetailDisplay = templateResolutionResult.UnambigiousTemplatesForDefaultLanguage;
+                IReadOnlyCollection<ITemplateMatchInfo> unambiguousTemplateGroupForDetailDisplay = templateResolutionResult.UnambiguousTemplatesForDefaultLanguage;
                 return TemplateDetailedHelpForSingularTemplateGroup(unambiguousTemplateGroupForDetailDisplay, environmentSettings, commandInput, hostDataLoader, templateCreator);
             }
             else
