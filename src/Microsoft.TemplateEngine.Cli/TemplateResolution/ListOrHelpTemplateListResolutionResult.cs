@@ -87,7 +87,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                 {
                     return false;
                 }
-                return UnambigiousTemplateGroup.Any(t => t.DispositionOfDefaults.Any(y => y.Location == MatchLocation.DefaultLanguage));
+                return UnambigiousTemplateGroup.Any(t => t.DispositionOfDefaults.Any(y => y.Location == MatchLocation.DefaultLanguage && y.Kind == MatchKind.Exact));
             }
         }
 
@@ -95,7 +95,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         {
             get
             {
-                return UnambigiousTemplateGroup.Where(t => t.DispositionOfDefaults.Any(y => y.Location == MatchLocation.DefaultLanguage)).ToList();
+                return UnambigiousTemplateGroup.Where(t => t.DispositionOfDefaults.Any(y => y.Location == MatchLocation.DefaultLanguage && y.Kind == MatchKind.Exact)).ToList();
             }
         }
 
