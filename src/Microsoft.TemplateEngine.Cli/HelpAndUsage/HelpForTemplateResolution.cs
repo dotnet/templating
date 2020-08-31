@@ -52,7 +52,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             }
 
             //if language is specified and all templates in unambigiuos group match the language show the help for that template
-            if (!string.IsNullOrEmpty(commandInput.Language) && templateResolutionResult.AllTemplatesInUnambiguousTemplateGroupAreSameLanguage)
+            if (templateResolutionResult.AllTemplatesInUnambiguousTemplateGroupAreSameLanguage)
             {
                 IReadOnlyCollection<ITemplateMatchInfo> unambiguousTemplateGroupForDetailDisplay = templateResolutionResult.UnambiguousTemplateGroup;
                 return TemplateDetailedHelpForSingularTemplateGroup(unambiguousTemplateGroupForDetailDisplay, environmentSettings, commandInput, hostDataLoader, templateCreator);

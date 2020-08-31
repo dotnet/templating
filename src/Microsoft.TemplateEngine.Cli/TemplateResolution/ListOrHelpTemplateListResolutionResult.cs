@@ -135,7 +135,10 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         {
             get
             {
-                return PartiallyMatchedTemplates.Any(t => t.HasLanguageMismatch());
+                //as we need to count errors per template group: for language we need to check template groups as templates in single group may have different language
+                //and if one of them can match the filter, then the whole group matches the filter
+                //if all templates in the group has language mismatch, then group has language mismatch
+                return PartiallyMatchedTemplatesGrouped.Any(g => g.All(t => t.HasLanguageMismatch()));
             }
         }
 
