@@ -30,7 +30,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             else //help flag specified or no flag specified
             {
                 if (!string.IsNullOrEmpty(commandInput.TemplateName)
-                    && templateResolutionResult.HasUnambigiousTemplateGroupToUse)
+                    && templateResolutionResult.HasUnambigiousTemplateGroup)
                 {
                     // This will show detailed help on the template group, which only makes sense if there is a single template group adn all templates are the same language.
                     return DisplayHelpForUnambiguousTemplateGroup(templateResolutionResult, environmentSettings, commandInput, hostDataLoader, templateCreator, telemetryLogger, defaultLanguage);

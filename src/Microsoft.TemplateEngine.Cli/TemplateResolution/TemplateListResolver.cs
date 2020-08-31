@@ -188,7 +188,6 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         public static IReadOnlyCollection<ITemplateMatchInfo> PerformCoreTemplateQueryForHelp(IReadOnlyList<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput, string defaultLanguage)
         {
             IReadOnlyList<FilterableTemplateInfo> filterableTemplateInfo = SetupFilterableTemplateInfoFromTemplateInfo(templateInfo);
-
             IReadOnlyCollection<ITemplateMatchInfo> coreMatchedTemplates = TemplateListFilter.GetTemplateMatchInfo
             (
                 filterableTemplateInfo,
@@ -202,24 +201,14 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             )
             .Where(x => !IsTemplateHiddenByHostFile(x.Info, hostDataLoader)).ToList();
 
-            coreMatchedTemplates = coreMatchedTemplates.Where(x => x.IsMatch).ToList();
-
-            if (coreMatchedTemplates.Count == 0)
-            {
-                // No exact matches, take the partial matches and be done.
-                coreMatchedTemplates = coreMatchedTemplates.Where(x => x.IsPartialMatch).ToList();
-            }
-            else
-            {
-                IReadOnlyList<ITemplateMatchInfo> matchesWithExactDispositionsInNameFields = coreMatchedTemplates.Where(x => x.MatchDisposition.Any(y => NameFields.Contains(y.Location) && y.Kind == MatchKind.Exact)).ToList();
-
-                if (matchesWithExactDispositionsInNameFields.Count > 0)
-                {
-                    // Start with the exact name matches, if there are any.
-                    coreMatchedTemplates = matchesWithExactDispositionsInNameFields;
-                }
+            //for help if template name from CLI exactly matches the template name we should consider only that template
+            IReadOnlyList<ITemplateMatchInfo> matchesWithExactDispositionsInNameFields = coreMatchedTemplates.Where(x => x.MatchDisposition.Any(y => NameFields.Contains(y.Location) && y.Kind == MatchKind.Exact)).ToList();
+            if (matchesWithExactDispositionsInNameFields.Count > 0)
+            {               
+                coreMatchedTemplates = matchesWithExactDispositionsInNameFields;
             }
 
+            //for help we also need to match on default language if language was not specified as parameter
             if (string.IsNullOrEmpty(commandInput.Language) && !string.IsNullOrEmpty(defaultLanguage))
             {
                 // default language matching only makes sense if the user didn't specify a language.
@@ -230,6 +219,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
 
 
         // Query for template matches, filtered by everything available: name, language, context, parameters, and the host file.
+        // this method is not used for list and help
         public static IReadOnlyCollection<ITemplateMatchInfo> PerformCoreTemplateQuery(IReadOnlyList<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput, string defaultLanguage)
         {
             IReadOnlyList<FilterableTemplateInfo> filterableTemplateInfo = SetupFilterableTemplateInfoFromTemplateInfo(templateInfo);

@@ -83,7 +83,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         {
             get
             {
-                if (!HasUnambigiousTemplateGroupToUse)
+                if (!HasUnambigiousTemplateGroup)
                 {
                     return false;
                 }
@@ -157,7 +157,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         /// <summary>
         /// Returns true when one and only one template has exact match
         /// </summary>
-        public bool HasUnambigiousTemplateGroupToUse
+        public bool HasUnambigiousTemplateGroup
         {
             get
             {
@@ -172,7 +172,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         {
             get
             {
-                return HasUnambigiousTemplateGroupToUse ? ExactMatchedTemplates : new List <ITemplateMatchInfo>();
+                return HasUnambigiousTemplateGroup ? ExactMatchedTemplates : new List <ITemplateMatchInfo>();
             }
         }
 
