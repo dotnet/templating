@@ -22,12 +22,12 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                 ShowUsageHelp(commandInput, telemetryLogger);
             }
 
-            //in case list is specified we always need to list templates 
+            // in case list is specified we always need to list templates 
             if (commandInput.IsListFlagSpecified)
             {
                 return DisplayListOrHelpForAmbiguousTemplateGroup(templateResolutionResult, environmentSettings, commandInput, hostDataLoader, telemetryLogger, defaultLanguage);
             }
-            else //help flag specified or no flag specified
+            else // help flag specified or no flag specified
             {
                 if (!string.IsNullOrEmpty(commandInput.TemplateName)
                     && templateResolutionResult.HasUnambiguousTemplateGroup)
@@ -401,37 +401,38 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
 
         private static string GetInputParametersString(string templateName, string templateLanguage, string context, string baselineName)
         {
-            StringBuilder inputParametersList = new StringBuilder();
+            StringBuilder inputParametersString = new StringBuilder();
             string separator = ", ";
 
-            if (!string.IsNullOrEmpty(templateName)){
-                inputParametersList.AppendFormat("'{0}'", templateName);
+            if (!string.IsNullOrEmpty(templateName))
+            {
+                inputParametersString.AppendFormat($"'{templateName}'");
             }
             if (!string.IsNullOrEmpty(templateLanguage))
             {
-                if (inputParametersList.Length != 0)
+                if (inputParametersString.Length != 0)
                 {
-                    inputParametersList.Append(separator);
+                    inputParametersString.Append(separator);
                 }
-                inputParametersList.AppendFormat("language='{0}'", templateLanguage);
+                inputParametersString.AppendFormat($"language='{templateLanguage}'");
             }
             if (!string.IsNullOrEmpty(context))
             {
-                if (inputParametersList.Length != 0)
+                if (inputParametersString.Length != 0)
                 {
-                    inputParametersList.Append(separator);
+                    inputParametersString.Append(separator);
                 }
-                inputParametersList.AppendFormat("type='{0}'", context);
+                inputParametersString.AppendFormat($"type='{context}'");
             }
             if (!string.IsNullOrEmpty(baselineName))
             {
-                if (inputParametersList.Length != 0)
+                if (inputParametersString.Length != 0)
                 {
-                    inputParametersList.Append(separator);
+                    inputParametersString.Append(separator);
                 }
-                inputParametersList.AppendFormat("baseline='{0}'", baselineName);
+                inputParametersString.AppendFormat($"baseline='{baselineName}'");
             }
-            return inputParametersList.ToString();
+            return inputParametersString.ToString();
         }
 
         private static void ShowNoTemplatesFoundMessage(string templateName, string templateLanguage, string context, string baselineName)
@@ -457,7 +458,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
 
             if (templateResolutionResult.HasLanguageMismatch)
             {
-                reason.AppendFormat("language='{0}'", templateLanguage);
+                reason.AppendFormat($"language='{templateLanguage}'");
             }
             if (templateResolutionResult.HasContextMismatch)
             {
@@ -465,7 +466,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                 {
                     reason.Append(separator);
                 }
-                reason.AppendFormat("type='{0}'", context);
+                reason.AppendFormat($"type='{context}'");
             }
             if (templateResolutionResult.HasBaselineMismatch)
             {
@@ -473,7 +474,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                 {
                     reason.Append(separator);
                 }
-                reason.AppendFormat("baseline='{0}'", baselineName);
+                reason.AppendFormat($"baseline='{baselineName}'");
             }
 
             return reason.ToString();

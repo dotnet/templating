@@ -163,7 +163,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             {
                 coreMatchedTemplates = PerformCoreTemplateQueryForHelp(templateInfo, hostDataLoader, commandInput, defaultLanguage);
             }
-            return new ListOrHelpTemplateListResolutionResult(commandInput.TemplateName, coreMatchedTemplates);
+            return new ListOrHelpTemplateListResolutionResult(coreMatchedTemplates);
         }
 
         public static IReadOnlyCollection<ITemplateMatchInfo> PerformCoreTemplateQueryForList(IReadOnlyList<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput, string defaultLanguage)
