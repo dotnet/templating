@@ -202,6 +202,9 @@
   <data name="Generators" xml:space="preserve">
     <value>Generators</value>
   </data>
+  <data name="GenericPlaceholderTemplateContextError" xml:space="preserve">
+    <value>Cannot retrieve the type for {0}.</value>
+  </data>
   <data name="GettingReady" xml:space="preserve">
     <value>Getting ready...</value>
   </data>
