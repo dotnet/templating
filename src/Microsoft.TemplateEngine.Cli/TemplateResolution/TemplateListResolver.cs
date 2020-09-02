@@ -170,7 +170,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         {
             IReadOnlyList<FilterableTemplateInfo> filterableTemplateInfo = SetupFilterableTemplateInfoFromTemplateInfo(templateInfo);
 
-            IReadOnlyCollection<ITemplateMatchInfo> coreMatchedTemplates = TemplateListFilter.GetTemplateMatchInfo
+            IReadOnlyList<ITemplateMatchInfo> coreMatchedTemplates = TemplateListFilter.GetTemplateMatchInfo
             (
                 filterableTemplateInfo,
                 TemplateListFilter.PartialMatchFilter,
@@ -182,13 +182,15 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                 WellKnownSearchFilters.BaselineFilter(commandInput.BaselineName)
             )
             .Where(x => !IsTemplateHiddenByHostFile(x.Info, hostDataLoader)).ToList();
+
+            AddParameterMatchingToTemplates(coreMatchedTemplates, hostDataLoader, commandInput);
             return coreMatchedTemplates;
         }
 
         public static IReadOnlyCollection<ITemplateMatchInfo> PerformCoreTemplateQueryForHelp(IReadOnlyList<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput, string defaultLanguage)
         {
             IReadOnlyList<FilterableTemplateInfo> filterableTemplateInfo = SetupFilterableTemplateInfoFromTemplateInfo(templateInfo);
-            IReadOnlyCollection<ITemplateMatchInfo> coreMatchedTemplates = TemplateListFilter.GetTemplateMatchInfo
+            IReadOnlyList<ITemplateMatchInfo> coreMatchedTemplates = TemplateListFilter.GetTemplateMatchInfo
             (
                 filterableTemplateInfo,
                 TemplateListFilter.PartialMatchFilter,
@@ -214,6 +216,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                 // default language matching only makes sense if the user didn't specify a language.
                 AddDefaultLanguageMatchingToTemplates(coreMatchedTemplates, defaultLanguage);
             }
+            AddParameterMatchingToTemplates(coreMatchedTemplates, hostDataLoader, commandInput);
             return coreMatchedTemplates;
         }
 

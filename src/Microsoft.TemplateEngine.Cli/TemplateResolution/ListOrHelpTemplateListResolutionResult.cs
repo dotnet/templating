@@ -34,7 +34,16 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             {
                 if (_exactMatchedTemplates == null)
                 {
-                    _exactMatchedTemplates = _coreMatchedTemplates.Where(t => t.IsMatch).ToList();
+                    // condition is required to filter matches on custom parameters
+                    // TODO: when matching on custom parameters is refactored keep IsMatch condition only
+                    if (_coreMatchedTemplates.Where(t => t.IsInvokableMatch()).Any())
+                    {
+                        _exactMatchedTemplates = _coreMatchedTemplates.Where(t => t.IsInvokableMatch()).ToList();
+                    }
+                    else
+                    {
+                        _exactMatchedTemplates = _coreMatchedTemplates.Where(t => t.IsMatch).ToList();
+                    }
                 }
                 return _exactMatchedTemplates;
             }
