@@ -410,29 +410,19 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             }
             if (!string.IsNullOrEmpty(templateLanguage))
             {
-                if (inputParametersString.Length != 0)
-                {
-                    inputParametersString.Append(separator);
-                }
-                inputParametersString.AppendFormat($"language='{templateLanguage}'");
+                inputParametersString.Append(separator).AppendFormat($"language='{templateLanguage}'");
             }
             if (!string.IsNullOrEmpty(context))
             {
-                if (inputParametersString.Length != 0)
-                {
-                    inputParametersString.Append(separator);
-                }
-                inputParametersString.AppendFormat($"type='{context}'");
+                inputParametersString.Append(separator).AppendFormat($"type='{context}'");
             }
             if (!string.IsNullOrEmpty(baselineName))
             {
-                if (inputParametersString.Length != 0)
-                {
-                    inputParametersString.Append(separator);
-                }
-                inputParametersString.AppendFormat($"baseline='{baselineName}'");
+                inputParametersString.Append(separator).AppendFormat($"baseline='{baselineName}'");
             }
-            return inputParametersString.ToString();
+            return string.IsNullOrEmpty(templateName)
+                ? inputParametersString.ToString(separator.Length, inputParametersString.Length - separator.Length)
+                : inputParametersString.ToString();
         }
 
         private static void ShowNoTemplatesFoundMessage(string templateName, string templateLanguage, string context, string baselineName)
@@ -458,26 +448,20 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
 
             if (templateResolutionResult.HasLanguageMismatch)
             {
-                reason.AppendFormat($"language='{templateLanguage}'");
+                reason.Append(separator).AppendFormat($"language='{templateLanguage}'");
             }
             if (templateResolutionResult.HasContextMismatch)
             {
-                if (reason.Length != 0)
-                {
-                    reason.Append(separator);
-                }
-                reason.AppendFormat($"type='{context}'");
+                reason.Append(separator).AppendFormat($"type='{context}'");
             }
             if (templateResolutionResult.HasBaselineMismatch)
             {
-                if (reason.Length != 0)
-                {
-                    reason.Append(separator);
-                }
-                reason.AppendFormat($"baseline='{baselineName}'");
+                reason.Append(separator).AppendFormat($"baseline='{baselineName}'");
             }
 
-            return reason.ToString();
+            return reason.Length != 0
+                ? reason.ToString(separator.Length, reason.Length - separator.Length)
+                : string.Empty;
         }
     }
 }
