@@ -105,7 +105,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             else
             {
                 Reporter.Error.WriteLine(
-                    string.Format(LocalizableStrings.InvalidParameterTemplateHint,  GetTemplateHelpCommand(commandInput, unambiguousTemplateGroup.First().Info)).Bold().Red());
+                    string.Format(LocalizableStrings.InvalidParameterTemplateHint,  GetTemplateHelpCommand(commandInput.CommandName, unambiguousTemplateGroup.First().Info)).Bold().Red());
             }
 
             return invalidForAllTemplates.Count > 0 || invalidForSomeTemplates.Count > 0
@@ -418,9 +418,9 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             return CreationResultStatus.InvalidParamValues;
         }
 
-        public static string GetTemplateHelpCommand(INewCommandInput commandInput, ITemplateInfo template)
+        internal static string GetTemplateHelpCommand(string commandName, ITemplateInfo template)
         {
-            return $"dotnet {commandInput.CommandName} {template.ShortName} --help";
+            return $"dotnet {commandName} {template.ShortName} --help";
         }
 
         private static string GetInputParametersString(string templateName, string templateLanguage, string context, string baselineName)
