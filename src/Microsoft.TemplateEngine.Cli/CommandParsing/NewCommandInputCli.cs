@@ -287,7 +287,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
         {
             foreach (string variant in VariantsForCanonical(canonical))
             {
-                if (_parseResult.Tokens.Contains(variant))
+                if (_parseResult.Tokens.Any(s => s.Contains(variant)))
                 {
                     return variant;
                 }
