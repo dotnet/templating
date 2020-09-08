@@ -30,7 +30,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                 if (!string.IsNullOrEmpty(groupParameterDetails.Value.AdditionalInfo))
                 {
                     Reporter.Error.WriteLine(groupParameterDetails.Value.AdditionalInfo.Bold().Red());
-                    Reporter.Output.WriteLine();
+                    Reporter.Error.WriteLine();
                     return;
                 }
                 // get the input params valid for any param in the group              
