@@ -287,7 +287,17 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
         {
             foreach (string variant in VariantsForCanonical(canonical))
             {
-                if (_parseResult.Tokens.Any(s => s.Contains(variant)))
+                if (_parseResult.Tokens.Contains(variant))
+                {
+                    return variant;
+                }
+            }
+
+            // in case parameter is specified as --aaa=bbb, Tokens collection contains --aaa=bbb as single token
+            // in this case we need to check if token starts with variant=
+            foreach (string variant in VariantsForCanonical(canonical))
+            {
+                if (_parseResult.Tokens.Any(s => s.StartsWith($"{variant}=")))
                 {
                     return variant;
                 }
