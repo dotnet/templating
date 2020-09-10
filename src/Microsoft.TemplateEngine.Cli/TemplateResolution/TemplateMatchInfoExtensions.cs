@@ -200,7 +200,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             return hasOtherThanMismatch && hasContextMismatch;
         }
 
-        public static bool HasNameMatchOrPartialMatch(this ITemplateMatchInfo templateMatchInfo)
+        public static bool HasNameOrClassificationMatchOrPartialMatch(this ITemplateMatchInfo templateMatchInfo)
         {
             return templateMatchInfo.MatchDisposition.Any((x => (x.Location == MatchLocation.Name || x.Location == MatchLocation.ShortName || x.Location == MatchLocation.Classification) && (x.Kind == MatchKind.Exact || x.Kind == MatchKind.Partial)));
         }

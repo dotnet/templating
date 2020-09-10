@@ -72,7 +72,11 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             {
                 if (_partiallyMatchedTemplates == null)
                 {
-                    _partiallyMatchedTemplates = _coreMatchedTemplates.Where(t => t.HasNameMatchOrPartialMatch() && t.HasAnyMismatch()).ToList();
+                    // TODO: clarify if collection should include matching by classification only.
+                    // At the moment defintion of partial match:
+                    // - has exact or partial match by name or short name or classification
+                    // - has mismatch in language, type or baseline
+                    _partiallyMatchedTemplates = _coreMatchedTemplates.Where(t => t.HasNameOrClassificationMatchOrPartialMatch() && t.HasAnyMismatch()).ToList();
                 }
                 return _partiallyMatchedTemplates;
             }
