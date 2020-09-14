@@ -222,9 +222,17 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
 
             foreach (MatchInfo disposition in templateMatchInfo.MatchDisposition)
             {
-                if (disposition.Location == MatchLocation.Name && disposition.Kind == MatchKind.Mismatch)
+                if (disposition.Location == MatchLocation.Name && disposition.Kind != MatchKind.Mismatch)
+                {
+                    return false;
+                }
+                else if (disposition.Location == MatchLocation.Name && disposition.Kind == MatchKind.Mismatch)
                 {
                     hasNameMismatch = true;
+                }
+                else if (disposition.Location == MatchLocation.ShortName && disposition.Kind != MatchKind.Mismatch)
+                {
+                    return false;
                 }
                 else if (disposition.Location == MatchLocation.ShortName && disposition.Kind == MatchKind.Mismatch)
                 {
