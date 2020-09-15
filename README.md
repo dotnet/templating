@@ -15,7 +15,7 @@ regions and process `if`, `else if`, `else` and `end if` style statements.
 # Template Samples
 
 We have created a [dotnet template samples repo](https://github.com/dotnet/dotnet-template-samples), which shows how you can use
-the Template Engine to create new templates. The samples are setup to be stand alone for specific examples. If you are in need of a sample, and it doesn't exist please [create an issue](https://github.com/dotnet/dotnet-template-samples/issues/new) in the samples repo.
+the Template Engine to create new templates. The samples are setup to be stand alone for specific examples. 
 
 # Info for `dotnet new` users
 
@@ -88,26 +88,22 @@ The steps required are outlined below.
 - Run the build script appropriate for your environment.
      - **Windows:** [build.cmd](https://github.com/dotnet/templating/blob/master/build.cmd)
      - **Mac/Linux**: [build.sh](https://github.com/dotnet/templating/blob/master/build.sh) 
-- When running the build script, the existing built-in command `dotnet new` will be preserved. A new command `dotnet new3` will be enabled which allows you to create
-files with the latest Template Engine.
-- That's it! Now you can run `dotnet new3`.
+- When running the build script, the existing built-in command `dotnet new` will be preserved. To run `dotnet new3` run `dotnet <your repo location>\artifacts\bin\dotnet-new3\Debug\netcoreapp2.1\dotnet-new3.dll` (root path to `dotnet-new3.dll` is skipped in all commands below).
 
-For example, here is the result of running `dotnet new3 --help` on a Mac (_truncated to save space here_).
+For example, here is the result of running `dotnet .\dotnet-new3.dll --help` (_truncated to save space here_).
 
 ```bash
-$ dotnet new3 --help
-Template Instantiation Commands for .NET Core CLI.
+$ dotnet .\dotnet-new3.dll --help
+Usage: new3 [options]
 
-Usage: dotnet new3 [arguments] [options]
-
-Arguments:
-  template  The template to instantiate.
-
-<truncated>
+Options:
+  -h, --help          Displays help for this command.
+  -l, --list          Lists templates containing the specified template name. If no name is specified, lists all templates.
+  -n, --name          The name for the output being created. If no name is specified, the name of the output directory is used.
+...
 ```
-### Template NuGet Packages
-- The build that produces the **template NuGet packages** currently has a dependency on **nuget.exe**.
-  - Because of this, those that wish to `install` using the **template NuGet packages** will need to be on Windows in order to produce the appropriate assets. 
+After first installation there is no templates installed. See [Installing templates](#Installing-templates) on how to install the templates and [Available templates](#Available-templates).
+This repository features the templates for Class Library/Console App and they are located in `<your repo location>\artifacts\packages\Debug\Shipping\Microsoft.DotNet.Common.ProjectTemplates.*.nupkg` after build run.
     
 ## Debugging
 Debugging code requires your current `dotnet new3` session to have its active build session configured to DEBUG, and a debugger from your application of choice to be attached to the current running `dotnet new3` process. The steps required to accomplish this are outlined below.
@@ -118,18 +114,14 @@ Debugging code requires your current `dotnet new3` session to have its active bu
 
 ### Setup
 
-- Open the **Microsoft.Templating.sln** solution in the application you will use to attach your debugger.
+- Open the **Microsoft.TemplatingEngine.sln** solution in the application you will use to attach your debugger.
   - This solution contains the projects needed to run, modify & debug the Template Engine.
-- Once your solution is loaded, open up a new command prompt and navigate to the root of your repository.
-- Execute the **dn3buildmode-debug.cmd** script.
-  - This will set your `dotnet new3` build to a DEBUG mode.
-- Run the "setup" script to build a new `dotnet new3` session. 
 
 ### Execution
 
-Once "setup" has completed successfully, run the following command.
+Run the following command.
 ```bash
-dotnet new3 --debug:attach {{additonal args}}
+dotnet .\dotnet-new3.dll --debug:attach {{additonal args}}
 ```
 By supplying the `--debug:attach` argument with any other argument(s) you are running, you are triggering a ` Console.ReadLine();` request which pauses execution of the Template Engine at an early point in its execution.
 
@@ -162,28 +154,30 @@ Now that you have a debug session attached to your properly configured `dotnet n
 Templates can be installed from packages in any NuGet feed, directories on the file system or ZIP type archives (zip, nupkg, vsix, etc.)
 To install a new template use the command:
 
-    dotnet new3 -i {the path to the folder containing the templates}
+    dotnet .\dotnet-new3.dll -i {the path to the folder containing the template or *.nupkg file or nuget package name}
+    dotnet .\dotnet-new3.dll -i "Boxed.Templates::*"
+    dotnet .\dotnet-new3.dll -i <your repo location>\artifacts\packages\Debug\Shipping\Microsoft.DotNet.Common.ProjectTemplates.3.1.6.0.0-dev.nupkg
 
 # Basic Commands
 ## Showing help
 
-    dotnet new3 --help
-    dotnet new3 -h
-    dotnet new3
+    dotnet .\dotnet-new3.dll --help
+    dotnet .\dotnet-new3.dll -h
+    dotnet .\dotnet-new3.dll
 
 ## Listing templates
 
-    dotnet new3 --list
-    dotnet new3 -l
-    dotnet new3 mvc -l            Lists all templates containing the text "mvc"
+    dotnet .\dotnet-new3.dll --list
+    dotnet .\dotnet-new3.dll -l
+    dotnet .\dotnet-new3.dll mvc -l            Lists all templates containing the text "mvc"
 
 ## Template parameter help
 
-    dotnet new3 mvc --help
-    dotnet new3 mvc -h
+    dotnet .\dotnet-new3.dll mvc --help
+    dotnet .\dotnet-new3.dll mvc -h
 
 ## Template creation
 
-    dotnet new3 MvcWebTemplate --name MyProject --output src --ParameterName1 Value1 --ParameterName2 Value2 ... --ParameterNameN ValueN
-    dotnet new3 MvcWebTemplate -n MyProject -o src --ParameterName1 Value1 --ParameterName2 Value2 ... --ParameterNameN ValueN
+    dotnet .\dotnet-new3.dll MvcWebTemplate --name MyProject --output src --ParameterName1 Value1 --ParameterName2 Value2 ... --ParameterNameN ValueN
+    dotnet .\dotnet-new3.dll MvcWebTemplate -n MyProject -o src --ParameterName1 Value1 --ParameterName2 Value2 ... --ParameterNameN ValueN
 
