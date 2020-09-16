@@ -88,7 +88,7 @@ The steps required are outlined below.
 - Run the build script appropriate for your environment.
      - **Windows:** [build.cmd](https://github.com/dotnet/templating/blob/master/build.cmd)
      - **Mac/Linux**: [build.sh](https://github.com/dotnet/templating/blob/master/build.sh) 
-- When running the build script, the existing built-in command `dotnet new` will be preserved. To run `dotnet new3` run `dotnet <your repo location>\artifacts\bin\dotnet-new3\Debug\netcoreapp2.1\dotnet-new3.dll` (root path to `dotnet-new3.dll` is skipped in all commands below).
+- When running the build script, the existing built-in command `dotnet new` will be preserved. To run `dotnet new3`, run `dotnet <your repo location>\artifacts\bin\dotnet-new3\Debug\netcoreapp2.1\dotnet-new3.dll` (root path to `dotnet-new3.dll` is skipped in all commands below).
 
 For example, here is the result of running `dotnet .\dotnet-new3.dll --help` (_truncated to save space here_).
 
@@ -102,7 +102,7 @@ Options:
   -n, --name          The name for the output being created. If no name is specified, the name of the output directory is used.
 ...
 ```
-After first installation there is no templates installed. See [Installing templates](#Installing-templates) on how to install the templates and [Available templates](#Available-templates).
+After first installation there are no templates installed. See [Installing templates](#Installing-templates) on how to install the templates and [Available templates](#Available-templates) for the list of available templates.
 This repository features the templates for Class Library/Console App and they are located in `<your repo location>\artifacts\packages\Debug\Shipping\Microsoft.DotNet.Common.ProjectTemplates.*.nupkg` after build run.
     
 ## Debugging
