@@ -14,6 +14,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         public string Replaces { get; set; }
 
+        public string FileRename { get; set; }
+
         // Refers to the Type property value of a concrete IMacro
         public string Generator { get; set; }
 
@@ -33,6 +35,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 Parameters = jObject.ToJTokenDictionary(StringComparer.Ordinal, nameof(Parameters)),
                 Type = jObject.ToString(nameof(Type)),
                 Replaces = jObject.ToString(nameof(Replaces)),
+                FileRename = jObject.ToString(nameof(FileRename)),
                 ReplacementContexts = SymbolModelConverter.ReadReplacementContexts(jObject)
             };
 

@@ -30,6 +30,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             set { }
         }
 
+        string ISymbolModel.FileRename
+        {
+            get { return null; }
+            set { }
+        }
+
         public static ISymbolModel FromJObject(JObject jObject)
         {
             ComputedSymbol sym = new ComputedSymbol

@@ -38,8 +38,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return !string.IsNullOrEmpty(DefaultIfOptionWithoutValue);
         }
 
-        [JsonProperty]
-        public string FileRename { get; set; }
+        //[JsonProperty]
+        //public string FileRename { get; set; }
 
         [JsonProperty]
         public IReadOnlyDictionary<string, string> Choices { get; set; }

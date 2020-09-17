@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Microsoft.TemplateEngine.Core.Contracts
 {
@@ -15,5 +15,7 @@ namespace Microsoft.TemplateEngine.Core.Contracts
         IReadOnlyList<IReplacementTokens> Replacements { get; }
 
         IReadOnlyList<ICustomOperationModel> CustomOperations { get; }
+
+        IReadOnlyList<IReplacementTokens> FileNameReplacements { get;}
     }
 }

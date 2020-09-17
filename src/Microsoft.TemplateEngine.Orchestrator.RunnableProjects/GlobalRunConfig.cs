@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Microsoft.TemplateEngine.Core.Contracts;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
@@ -16,5 +16,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         public IReadOnlyList<IReplacementTokens> Replacements { get; set; }
 
         public IReadOnlyList<ICustomOperationModel> CustomOperations { get; set; }
+
+        public IReadOnlyList<IReplacementTokens> FileNameReplacements { get; set; }
     }
 }
