@@ -76,7 +76,7 @@ A symbol for which the config provides literal and/or default values.
 |`defaultValue`|The value assigned to the symbol if no value for it is provided by the user or host.|
 |`binding`|The name of the host property to take the value from.|	
 |`replaces`|The text to replace with the value of this symbol.|	 
-|`fileRename`|The fileRename element defines the filenames which will be replaced by symbol value.| 
+|`fileRename`|The element defines the portion of file names which will be replaced by symbol value.| 
 |`description`|Human readable text describing the meaning of the symbol. This has no effect on template generation.|
 |`isRequired`|Indicates if the parameter is required or not.|
 |`choices`|List of available choices. Applicable only when `datatype=choice.` Contains array of the elements: <br />- `choice`: possible value of the symbol.<br />- `description`: human readable text describing the meaning of the choice. This has no effect on template generation. <br /> If not provided, there are no valid choices for the symbol, so it can never be assigned a value.|
@@ -145,7 +145,7 @@ A symbol that defines transformation of another symbol.  The value of this symbo
 |`valueSource`|The name of the other symbol whose value will be used to derive this value.|
 |`valueTransform`|The name of the value form to apply to the source value.|
 |`replaces`|The text to replace with the value of this symbol.|	 
-|`fileRename`|The fileRename element defines the filenames which will be replaced by symbol value.| 
+|`fileRename`|The element defines the portion of file names which will be replaced by symbol value.| 
 |`description`|Human readable text describing the meaning of the symbol. This has no effect on template generation.|
 
 ##### Examples
