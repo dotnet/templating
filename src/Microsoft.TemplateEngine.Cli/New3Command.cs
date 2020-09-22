@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -71,6 +72,9 @@ namespace Microsoft.TemplateEngine.Cli
             {
                 _defaultLanguage = null;
             }
+
+            //currently only invariant culture is supported in templates
+            CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
         }
 
         internal static Installer Installer { get; set; }
