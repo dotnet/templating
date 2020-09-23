@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -7,18 +7,6 @@ using Xunit;
 
 namespace Microsoft.TemplateEngine.Core.UnitTests
 {
-
-    public sealed class SkipOnNonEnUsLocale : FactAttribute
-    {
-        public SkipOnNonEnUsLocale(string displayName, string message) {
-            DisplayName = displayName;
-            if (!CultureInfo.CurrentCulture.Name.Equals("en-US"))
-            {
-                Skip = "Skipped : non en-US locale. " + message;
-            }
-        }
-    }
-
     public partial class ConditionalTests
     {
         [Fact(DisplayName=nameof(VerifyIfEndifTrueCondition))]
@@ -1408,8 +1396,13 @@ There";
             Verify(Encoding.UTF8, output, changed, value, expected);
         }
 
-        [SkipOnNonEnUsLocale(nameof(VerifyIfElseEndifConditionUsesDouble), "The test is temporarily disabled, tracked in issue #2436.")]
-        public void VerifyIfElseEndifConditionUsesDouble()
+
+        [Theory(DisplayName = nameof(VerifyIfElseEndifConditionUsesDouble))]
+        [InlineData("")]
+        [InlineData("invariant")]
+        [InlineData("pl-PL")]
+        [InlineData("ru-RU")]
+        public void VerifyIfElseEndifConditionUsesDouble(string culture)
         {
             string value = @"Hello
     #if (1.2 < 2.5)
@@ -1419,6 +1412,17 @@ There";
             string expected = @"Hello
 value
 There";
+            if (!string.IsNullOrEmpty(culture))
+            {
+                if (culture == "invariant")
+                {
+                    CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+                }
+                else
+                {
+                    CultureInfo.CurrentCulture = new CultureInfo(culture);
+                }
+            }
 
             byte[] valueBytes = Encoding.UTF8.GetBytes(value);
             MemoryStream input = new MemoryStream(valueBytes);
