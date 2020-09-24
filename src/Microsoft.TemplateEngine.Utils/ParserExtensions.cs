@@ -19,7 +19,7 @@ namespace Microsoft.TemplateEngine.Utils
         /// </returns>
         public static bool DoubleTryParseСurrentOrInvariant(string stringValue, out double doubleValue)
         {
-            if (double.TryParse(stringValue, out doubleValue))
+            if (double.TryParse(stringValue, NumberStyles.Float, CultureInfo.CurrentCulture, out doubleValue))
             {
                 return true;
             }
@@ -40,10 +40,18 @@ namespace Microsoft.TemplateEngine.Utils
         {
             try
             {
-                return Convert.ToDouble(value);
+                if (value is string s)
+                {
+                    return double.Parse(s, NumberStyles.Float);
+                }
+                return Convert.ToDouble(value, CultureInfo.CurrentCulture);
             }
             catch (FormatException)
             {
+                if (value is string s)
+                {
+                    return double.Parse(s, NumberStyles.Float, CultureInfo.InvariantCulture);
+                }
                 return Convert.ToDouble(value, CultureInfo.InvariantCulture);
             }
         }
