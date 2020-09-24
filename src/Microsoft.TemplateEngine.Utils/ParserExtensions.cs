@@ -23,7 +23,7 @@ namespace Microsoft.TemplateEngine.Utils
             {
                 return true;
             }
-            else if (double.TryParse(stringValue, NumberStyles.Any, CultureInfo.InvariantCulture, out doubleValue))
+            else if (double.TryParse(stringValue, NumberStyles.Float, CultureInfo.InvariantCulture, out doubleValue))
             {
                 return true;
             }
