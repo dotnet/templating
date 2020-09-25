@@ -11,8 +11,8 @@ namespace Microsoft.TemplateEngine.Utils
         /// <summary>
         /// <see cref="double.TryParse(string, out double)"/> extension that try to parse <paramref name="stringValue"/> first in current culture, then in invariant culture.
         /// </summary>
-        /// <param name="stringValue">value to parse</param>
-        /// <param name="doubleValue">parsed double value if <paramref name="stringValue"/> can be parsed</param>
+        /// <param name="stringValue">The value to parse</param>
+        /// <param name="doubleValue">Parsed double value if <paramref name="stringValue"/> can be parsed</param>
         /// <returns>
         /// true when <paramref name="stringValue"/> can be parsed in current or invariant culture.
         /// false when <paramref name="stringValue"/> cannot be parsed in current or invariant culture.
@@ -23,18 +23,17 @@ namespace Microsoft.TemplateEngine.Utils
             {
                 return true;
             }
-            else if (double.TryParse(stringValue, NumberStyles.Float, CultureInfo.InvariantCulture, out doubleValue))
+            else
             {
-                return true;
+                return double.TryParse(stringValue, NumberStyles.Float, CultureInfo.InvariantCulture, out doubleValue);
             }
-            return false;
         }
 
         /// <summary>
         /// <see cref="Convert.ToDouble(object)"/> extension that try to parse <paramref name="value"/> first in current culture, then in invariant culture.
         /// </summary>
-        /// <param name="value">the value to parse</param>
-        /// <returns>parsed double value if <paramref name="value"/> can be parsed</returns>
+        /// <param name="value">The value to parse</param>
+        /// <returns>Parsed double value if <paramref name="value"/> can be parsed</returns>
         /// <exception cref="FormatException"><paramref name="value"/> is not in an appropriate format for a <see cref="Double"/> type.</exception>
         public static double ConvertToDoubleCurrentOrInvariant(object value)
         {
