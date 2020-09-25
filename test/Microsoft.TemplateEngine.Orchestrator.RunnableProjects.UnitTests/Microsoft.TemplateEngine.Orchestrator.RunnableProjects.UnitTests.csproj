@@ -37,9 +37,11 @@
       </None>
     </ItemGroup>
 
-    <ProjectExtensions><VisualStudio><UserProperties schematests_4postactiontest_1json__JsonSchema="https://json.schemastore.org/template" /></VisualStudio></ProjectExtensions>
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(OS)' == 'Windows_NT' ">
+      <Exec Command="copy $(SolutionDir)src\Microsoft.TemplateEngine.Orchestrator.RunnableProjects\Schemas\JSON\template.json $(TargetDir)SchemaTests" />
+    </Target>
 
-    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-      <Exec Command="copy $(SolutionDir)\src\Microsoft.TemplateEngine.Orchestrator.RunnableProjects\Schemas\JSON\template.json $(TargetDir)\SchemaTests" />
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(OS)' == 'Unix' ">
+        <Exec Command="cp $(SolutionDir)src/Microsoft.TemplateEngine.Orchestrator.RunnableProjects/Schemas/JSON/template.json $(TargetDir)SchemaTests" />
     </Target>
 </Project>
