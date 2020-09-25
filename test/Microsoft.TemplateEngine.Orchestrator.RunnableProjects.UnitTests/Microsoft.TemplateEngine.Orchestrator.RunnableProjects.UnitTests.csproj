@@ -37,11 +37,11 @@
       </None>
     </ItemGroup>
 
-    <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(OS)' == 'Windows_NT' ">
+    <Target Name="PostBuildWin" AfterTargets="PostBuildEvent" Condition="'$(OS)' == 'Windows_NT' ">
       <Exec Command="copy $(SolutionDir)src\Microsoft.TemplateEngine.Orchestrator.RunnableProjects\Schemas\JSON\template.json $(TargetDir)SchemaTests" />
     </Target>
 
-    <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(OS)' == 'Unix' ">
+    <Target Name="PostBuildUnix" AfterTargets="PostBuildEvent" Condition="'$(OS)' == 'Unix' ">
         <Exec Command="cp $(SolutionDir)src/Microsoft.TemplateEngine.Orchestrator.RunnableProjects/Schemas/JSON/template.json $(TargetDir)SchemaTests" />
     </Target>
 </Project>
