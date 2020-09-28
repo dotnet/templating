@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
+namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
 {
-    public class GeneratedSymbol : ISymbolModel
+    public class GeneratedSymbol : ISymbolModel, ISymbolModel2
     {
         internal const string TypeName = "generated";
 

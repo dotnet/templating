@@ -12,6 +12,7 @@ using Microsoft.TemplateEngine.Core.Operations;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Localization;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms;
 using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json.Linq;
@@ -45,6 +46,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         private IGlobalRunConfig _operationConfig;
         private IReadOnlyList<KeyValuePair<string, IGlobalRunConfig>> _specialOperationConfig;
         private Parameter _nameParameter;
+        private IReadOnlyList<IReplacementTokens> _filenameReplacements = new List<IReplacementTokens>();
 
         public IFile SourceFile { get; set; }
 
@@ -232,7 +234,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                                     IsName = isName,
                                     IsVariable = true,
                                     Name = symbol.Key,
-                                    //FileRename = baseSymbol.FileRename,
+                                    FileRename = baseSymbol.FileRename,
                                     Requirement = baseSymbol.IsRequired ? TemplateParameterPriority.Required : isName ? TemplateParameterPriority.Implicit : TemplateParameterPriority.Optional,
                                     Type = baseSymbol.Type,
                                     DataType = baseSymbol.DataType
@@ -552,6 +554,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 foreach (KeyValuePair<string, ISymbolModel> symbol in Symbols)
                 {
+                    ISymbolModel2 symbol2Value = symbol.Value as ISymbolModel2;
                     if (symbol.Value is DerivedSymbol derivedSymbol)
                     {
                         if (generateMacros)
@@ -560,7 +563,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                         }
                     }
 
-                    if ((symbol.Value.Replaces != null) || (symbol.Value.FileRename != null))
+                    if ((symbol.Value.Replaces != null) || (symbol2Value.FileRename != null))
                     {
                         string sourceVariable = null;
 
@@ -597,7 +600,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                                             string processedReplacement = valueForm.Process(Forms, p.Replaces);
                                             GenerateReplacementsForParameter(symbol, processedReplacement, symbolName, macroGeneratedReplacements);
                                         }
-                                        if (!string.IsNullOrEmpty(symbol.Value.FileRename))
+                                        if (!string.IsNullOrEmpty(p.FileRename))
                                         {
                                             string processedFileReplacement = valueForm.Process(Forms, p.FileRename);
                                             GenerateFileReplacementsForSymbol(processedFileReplacement, symbolName, fileNameReplacements);
@@ -620,9 +623,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                                 {
                                     GenerateReplacementsForParameter(symbol, symbol.Value.Replaces, sourceVariable, macroGeneratedReplacements);
                                 }
-                                if (!string.IsNullOrEmpty(symbol.Value.FileRename))
+                                if (!string.IsNullOrEmpty(symbol2Value.FileRename))
                                 {
-                                    GenerateFileReplacementsForSymbol(symbol.Value.FileRename, sourceVariable, fileNameReplacements);
+                                    GenerateFileReplacementsForSymbol(symbol2Value.FileRename, sourceVariable, fileNameReplacements);
                                 }
                             }
                         }
@@ -669,9 +672,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 Macros = macros,
                 ComputedMacros = computedMacros,
                 Replacements = macroGeneratedReplacements,
-                CustomOperations = customOperationConfig,
-                FileNameReplacements = fileNameReplacements
+                CustomOperations = customOperationConfig
             };
+
+            _filenameReplacements = fileNameReplacements;
 
             return config;
         }
@@ -955,7 +959,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         private IReadOnlyDictionary<string, string> AugmentRenames(IFileSystemInfo configFile, string sourceDirectory, ref string targetDirectory, object resolvedNameParamValue, IParameterSet parameters, Dictionary<string, string> fileRenames)
         {
-            return FileRenameGenerator.AugmentFileRenames(EnvironmentSettings, SourceName, configFile, sourceDirectory, ref targetDirectory, resolvedNameParamValue, parameters, fileRenames, (this as IRunnableProjectConfig).OperationConfig.FileNameReplacements);
+            return FileRenameGenerator.AugmentFileRenames(EnvironmentSettings, SourceName, configFile, sourceDirectory, ref targetDirectory, resolvedNameParamValue, parameters, fileRenames, _filenameReplacements);
         }
 
         private static ISymbolModel SetupDefaultNameSymbol(string sourceName)

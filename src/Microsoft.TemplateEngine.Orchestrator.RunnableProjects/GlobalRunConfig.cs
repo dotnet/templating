@@ -16,7 +16,5 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         public IReadOnlyList<IReplacementTokens> Replacements { get; set; }
 
         public IReadOnlyList<ICustomOperationModel> CustomOperations { get; set; }
-
-        public IReadOnlyList<IReplacementTokens> FileNameReplacements { get; set; }
     }
 }

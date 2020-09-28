@@ -4,9 +4,9 @@ using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
+namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
 {
-    public abstract class BaseValueSymbol : ISymbolModel
+    public abstract class BaseValueSymbol : ISymbolModel, ISymbolModel2
     {
         public string Binding { get; set; }
 
@@ -29,7 +29,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         public IReadOnlyList<IReplacementContext> ReplacementContexts { get; set; }
 
         protected static T FromJObject<T>(JObject jObject, IParameterSymbolLocalizationModel localization, string defaultOverride)
-            where T: BaseValueSymbol, new()
+            where T : BaseValueSymbol, new()
         {
             T symbol = new T
             {
