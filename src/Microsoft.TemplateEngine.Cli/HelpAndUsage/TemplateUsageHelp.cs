@@ -7,20 +7,21 @@ using System.Linq;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Cli.CommandParsing;
 using Microsoft.TemplateEngine.Cli.PostActionProcessors;
+using Microsoft.TemplateEngine.Cli.TemplateResolution;
 using Microsoft.TemplateEngine.Edge.Template;
 
 namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
 {
     public static class TemplateUsageHelp
     {
-        public static void ShowInvocationExamples(TemplateListResolutionResult templateResolutionResult, IHostSpecificDataLoader hostDataLoader, string commandName)
+        public static void ShowInvocationExamples(ListOrHelpTemplateListResolutionResult templateResolutionResult, IHostSpecificDataLoader hostDataLoader, string commandName)
         {
             const int ExamplesToShow = 2;
             IReadOnlyList<string> preferredNameList = new List<string>() { "mvc" };
             int numShown = 0;
 
-            IReadOnlyList<ITemplateMatchInfo> bestMatchedTemplates = templateResolutionResult.GetBestTemplateMatchList()
-                                                                        .Where(x => !x.HasNameMismatch()).ToList();
+            IReadOnlyCollection<ITemplateMatchInfo> bestMatchedTemplates = templateResolutionResult.ExactMatchedTemplates;
+
             if (bestMatchedTemplates.Count == 0)
             {
                 return;
@@ -64,6 +65,10 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
 
             // show a help example
             Reporter.Output.WriteLine($"    dotnet {commandName} --help");
+
+            // show a help example for template
+            Reporter.Output.WriteLine($"    {HelpForTemplateResolution.GetTemplateHelpCommand(commandName, bestMatchedTemplates.First().Info)}");
+            
         }
 
         private static bool GenerateUsageForTemplate(ITemplateInfo templateInfo, IHostSpecificDataLoader hostDataLoader, string commandName)
