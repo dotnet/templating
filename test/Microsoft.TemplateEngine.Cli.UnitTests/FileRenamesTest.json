@@ -4,6 +4,10 @@
     "path": "bar.cs"
   },
   {
+    "kind": "file_does_not_exist",
+    "path": "bar/bar.cs"
+  },
+  {
     "kind": "file_exists",
     "path": "baz.cs"
   },
