@@ -233,9 +233,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                                     IsName = isName,
                                     IsVariable = true,
                                     Name = symbol.Key,
-#pragma warning disable 612
+#pragma warning disable 612,618
                                     FileRename = baseSymbol.FileRename,
-#pragma warning restore 612
+#pragma warning restore 612,618
                                     Requirement = baseSymbol.IsRequired ? TemplateParameterPriority.Required : isName ? TemplateParameterPriority.Implicit : TemplateParameterPriority.Optional,
                                     Type = baseSymbol.Type,
                                     DataType = baseSymbol.DataType
@@ -603,7 +603,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                             {
                                 if (Forms.TryGetValue(formName, out IValueForm valueForm))
                                 {
-                                    string symbolName = symbol.Key + "{-VALUE-FORMS-}" + formName;
+                                    string symbolName = sourceVariable + "{-VALUE-FORMS-}" + formName;
                                     if (!string.IsNullOrWhiteSpace(symbol.Value.Replaces))
                                     {
                                         string processedReplacement = valueForm.Process(Forms, p.Replaces);
@@ -611,7 +611,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                                     }
                                     if (generateMacros)
                                     {
-                                        macros.Add(new ProcessValueFormMacroConfig(symbol.Key, symbolName, "string", formName, Forms));
+                                        macros.Add(new ProcessValueFormMacroConfig(sourceVariable, symbolName, "string", formName, Forms));
                                     }
                                 }
                                 else
