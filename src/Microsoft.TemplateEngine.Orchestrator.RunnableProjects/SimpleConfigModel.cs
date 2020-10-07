@@ -233,7 +233,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                                     IsName = isName,
                                     IsVariable = true,
                                     Name = symbol.Key,
+#pragma warning disable 612
                                     FileRename = baseSymbol.FileRename,
+#pragma warning restore 612
                                     Requirement = baseSymbol.IsRequired ? TemplateParameterPriority.Required : isName ? TemplateParameterPriority.Implicit : TemplateParameterPriority.Optional,
                                     Type = baseSymbol.Type,
                                     DataType = baseSymbol.DataType
@@ -349,44 +351,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 if (_symbolFilenameReplacements == null)
                 {
-                    List<IReplacementTokens> filenameReplacements = new List<IReplacementTokens>();
-                    if (Symbols != null)
-                    {
-                        foreach (KeyValuePair<string, ISymbolModel> symbol in Symbols)
-                        {
-                            ISymbolModel2 symbol2Value = symbol.Value as ISymbolModel2;
-                            if (symbol2Value.FileRename != null)
-                            {
-                                if (symbol.Value is BaseValueSymbol p)
-                                {
-                                    foreach (string formName in p.Forms.GlobalForms)
-                                    {
-                                        if (Forms.TryGetValue(formName, out IValueForm valueForm))
-                                        {
-                                            string symbolName = symbol.Key + "{-VALUE-FORMS-}" + formName;
-                                            string processedFileReplacement = valueForm.Process(Forms, p.FileRename);
-                                            GenerateFileReplacementsForSymbol(processedFileReplacement, symbolName, filenameReplacements);
-                                        }
-                                        else
-                                        {
-                                            EnvironmentSettings.Host.LogDiagnosticMessage($"Unable to find a form called '{formName}'", "Authoring");
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    GenerateFileReplacementsForSymbol(symbol2Value.FileRename, symbol.Key, filenameReplacements);
-                                }
-                            }
-
-                        }
-                    }
-                    _symbolFilenameReplacements = filenameReplacements;
+                    _symbolFilenameReplacements = ProduceSymbolFilenameReplacements();
                 }
                 return _symbolFilenameReplacements;
             }
         }
-
 
         private class SpecialOperationConfigParams
         {
@@ -656,7 +625,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                             GenerateReplacementsForParameter(symbol, symbol.Value.Replaces, sourceVariable, macroGeneratedReplacements);
                         }
                     }
-                } 
+                }
             }
 
             foreach (KeyValuePair<Guid, string> map in _guidToGuidPrefixMap)
@@ -701,6 +670,40 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 CustomOperations = customOperationConfig
             };
             return config;
+        }
+
+        private IReadOnlyList<IReplacementTokens> ProduceSymbolFilenameReplacements()
+        {
+            List<IReplacementTokens> filenameReplacements = new List<IReplacementTokens>();
+            if (Symbols == null || !Symbols.Any())
+            {
+                return filenameReplacements;
+            }
+
+            foreach (KeyValuePair<string, ISymbolModel> symbol in Symbols.Where(s => !string.IsNullOrWhiteSpace(s.Value.FileRename)))
+            {
+                if (symbol.Value is BaseValueSymbol p)
+                {
+                    foreach (string formName in p.Forms.GlobalForms)
+                    {
+                        if (Forms.TryGetValue(formName, out IValueForm valueForm))
+                        {
+                            string symbolName = symbol.Key + "{-VALUE-FORMS-}" + formName;
+                            string processedFileReplacement = valueForm.Process(Forms, p.FileRename);
+                            GenerateFileReplacementsForSymbol(processedFileReplacement, symbolName, filenameReplacements);
+                        }
+                        else
+                        {
+                            EnvironmentSettings.Host.LogDiagnosticMessage($"Unable to find a form called '{formName}'", "Authoring");
+                        }
+                    }
+                }
+                else
+                {
+                    GenerateFileReplacementsForSymbol(symbol.Value.FileRename, symbol.Key, filenameReplacements);
+                }
+            }
+            return filenameReplacements;
         }
 
         private void GenerateReplacementsForParameter(KeyValuePair<string, ISymbolModel> symbol, string replaces, string sourceVariable, List<IReplacementTokens> macroGeneratedReplacements)

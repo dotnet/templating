@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
 {
-    public abstract class BaseValueSymbol : ISymbolModel, ISymbolModel2
+    public abstract class BaseValueSymbol : ISymbolModel
     {
         public string Binding { get; set; }
 

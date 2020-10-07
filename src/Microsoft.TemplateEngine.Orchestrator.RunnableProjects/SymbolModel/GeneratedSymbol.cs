@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
 {
-    public class GeneratedSymbol : ISymbolModel, ISymbolModel2
+    public class GeneratedSymbol : ISymbolModel
     {
         internal const string TypeName = "generated";
 

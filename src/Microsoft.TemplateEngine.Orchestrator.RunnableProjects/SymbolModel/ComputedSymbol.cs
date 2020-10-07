@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
 {
-    public class ComputedSymbol : ISymbolModel, ISymbolModel2
+    public class ComputedSymbol : ISymbolModel
     {
         internal const string TypeName = "computed";
 
@@ -30,7 +30,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
             set { }
         }
 
-        string ISymbolModel2.FileRename
+        string ISymbolModel.FileRename
         {
             get { return null; }
             set { }
