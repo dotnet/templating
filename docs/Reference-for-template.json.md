@@ -53,7 +53,7 @@ the `template.json` file. This requires that a few changes have to be done on th
 
 ### Symbols 
 The symbols section defines variables and their values, the values may be the defined in terms of other symbols. When a defined symbol name is encountered anywhere in the template definition, it is replaced by the value defined in this configuration. The symbols configuration is a collection of key-value pairs. The keys are the symbol names, and the value contains key-value-pair configuration information on how to assign the symbol a value.
-There are the following symbol types:
+The supported symbol types are:
 - Parameter
 - Derived
 - Computed
