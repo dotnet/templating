@@ -1412,11 +1412,47 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Couldn&apos;t find an installed template that matches the input, searching online for one that does....
+        ///   Looks up a localized string similar to Defines if the template should be searched online instead of list of locally installed templates.
         /// </summary>
-        public static string SearchingOnlineNotification {
+        public static string SearchOnlineCommandHelp {
             get {
-                return ResourceManager.GetString("SearchingOnlineNotification", resourceCulture);
+                return ResourceManager.GetString("SearchOnlineCommandHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to search for template online: no template name is specified..
+        /// </summary>
+        public static string SearchOnlineErrorNoTemplateName {
+            get {
+                return ResourceManager.GetString("SearchOnlineErrorNoTemplateName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No sources defined for searching template online..
+        /// </summary>
+        public static string SearchOnlineNoSources {
+            get {
+                return ResourceManager.GetString("SearchOnlineNoSources", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Searching online for the template....
+        /// </summary>
+        public static string SearchOnlineNotification {
+            get {
+                return ResourceManager.GetString("SearchOnlineNotification", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Template &quot;{0}&quot; was not found..
+        /// </summary>
+        public static string SearchOnlineTemplateNotFound {
+            get {
+                return ResourceManager.GetString("SearchOnlineTemplateNotFound", resourceCulture);
             }
         }
         

@@ -190,6 +190,8 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             }
         }
 
+        public bool SearchOnline => _parseResult.HasAppliedOption(new[] { _commandName, "search" });
+
         public string ShowAliasesAliasName => _parseResult.GetArgumentValueAtPath(new[] { _commandName, "show-alias" });
 
         public bool ShowAliasesSpecified => _parseResult.HasAppliedOption(new[] { _commandName, "show-alias" });
@@ -247,9 +249,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                 return _templateParamVariantToCanonicalMap;
             }
 
-        }
-
-        public int Execute(params string[] args)
+        public string AllowScriptsToRun
         {
             _args = args;
             ParseArgs();

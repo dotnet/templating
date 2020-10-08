@@ -84,6 +84,14 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
 
         public string OutputPath { get; set; }
 
+        public bool SkipUpdateCheck { get; set; }
+
+        public bool CheckForUpdates { get; set; }
+
+        public bool CheckForUpdatesNoPrompt { get; set; }
+
+        public string AllowScriptsToRun { get; set; }
+
         // When using this mock, set the inputs using constructor input.
         // This property gets assigned based on the constructor input and the template being worked with.
         public List<string> RemainingArguments { get; private set; }
@@ -91,6 +99,8 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
         // When using this mock, set the inputs using constructor input.
         // This property gets assigned based on the constructor input and the template being worked with.
         public IDictionary<string, IList<string>> RemainingParameters { get; private set; }
+
+        public bool SearchOnline { get; set; }
 
         public string ShowAliasesAliasName { get; set; }
 

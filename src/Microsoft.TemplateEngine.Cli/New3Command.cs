@@ -16,11 +16,13 @@ using Microsoft.TemplateEngine.Abstractions.TemplateUpdates;
 using Microsoft.TemplateEngine.Cli.CommandParsing;
 using Microsoft.TemplateEngine.Cli.HelpAndUsage;
 using Microsoft.TemplateEngine.Cli.TemplateResolution;
+using Microsoft.TemplateEngine.Cli.TemplateSearch;
 using Microsoft.TemplateEngine.Cli.TemplateUpdate;
 using Microsoft.TemplateEngine.Edge;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Edge.Template;
 using Microsoft.TemplateEngine.Utils;
+using Microsoft.TemplateSearch.Common;
 
 namespace Microsoft.TemplateEngine.Cli
 {
@@ -486,6 +488,26 @@ namespace Microsoft.TemplateEngine.Cli
                     return updateCheckResult ? CreationResultStatus.Success : CreationResultStatus.CreateFailed;
                 }
 
+                if (_commandInput.SearchOnline)
+                {
+                    if (string.IsNullOrWhiteSpace(TemplateName))
+                    {
+                        Reporter.Error.WriteLine(LocalizableStrings.SearchOnlineErrorNoTemplateName.Bold().Red());
+                        return CreationResultStatus.Cancelled;
+                    }
+
+                    bool anySearchMatches = await SearchForTemplateMatchesAsync();
+                    if (!anySearchMatches)
+                    {
+                        Reporter.Error.WriteLine(string.Format(LocalizableStrings.SearchOnlineTemplateNotFound, _commandInput.TemplateName).Bold().Red());
+                        return CreationResultStatus.NotFound;
+                    }
+                    else
+                    {
+                        return CreationResultStatus.Success;
+                    }
+                }
+
                 if (string.IsNullOrWhiteSpace(TemplateName))
                 {
                     return EnterMaintenanceFlow();
@@ -499,6 +521,57 @@ namespace Microsoft.TemplateEngine.Cli
                 return CreationResultStatus.CreateFailed;
             }
         }
+
+        // Return true if there are any matches, false otherwise.
+        private async Task<bool> SearchForTemplateMatchesAsync()
+        {
+            Reporter.Output.WriteLine(LocalizableStrings.SearchOnlineNotification);
+            TemplateSearchCoordinator searchCoordinator = CliTemplateSearchCoordinatorFactory.CreateCliTemplateSearchCoordinator(EnvironmentSettings, _commandInput, _defaultLanguage);
+            SearchResults searchResults = await searchCoordinator.SearchAsync();
+
+            if (!searchResults.AnySources)
+            {
+                Reporter.Error.WriteLine(LocalizableStrings.SearchOnlineNoSources.Bold().Red());
+                return false;
+            }
+
+            foreach (TemplateSourceSearchResult sourceResult in searchResults.MatchesBySource)
+            {
+                string sourceHeader = string.Format(LocalizableStrings.SearchResultSourceIndicator, sourceResult.SourceDisplayName);
+
+                Reporter.Output.WriteLine(sourceHeader);
+                Reporter.Output.WriteLine(new string('-', sourceHeader.Length));
+
+                foreach (TemplatePackSearchResult matchesForPack in sourceResult.PacksWithMatches.Values)
+                {
+                    DisplayResultsForPack(matchesForPack);
+                    Reporter.Output.WriteLine();
+                }
+            }
+
+            return searchResults.MatchesBySource.Count > 0;
+        }
+
+        private void DisplayResultsForPack(TemplatePackSearchResult matchesForPack)
+        {
+            HashSet<string> seenGroupIdentities = new HashSet<string>();
+
+            foreach (ITemplateMatchInfo templateMatch in matchesForPack.TemplateMatches)
+            {
+                // only display one template in the pack for each group.
+                // if the group identity is blank, we assume it's a new template. 
+                if (string.IsNullOrEmpty(templateMatch.Info.GroupIdentity) || seenGroupIdentities.Add(templateMatch.Info.GroupIdentity))
+                {
+                    // TODO: get the Pack authoring info plumbed through - this will require changes to the scraper output
+                    Reporter.Output.WriteLine(string.Format(LocalizableStrings.SearchResultTemplateInfo, templateMatch.Info.Name, templateMatch.Info.ShortName, templateMatch.Info.Author, matchesForPack.PackInfo.Name));
+                }
+            }
+
+            Reporter.Output.WriteLine(LocalizableStrings.SearchResultInstallHeader);
+            string fullyQualifiedPackName = $"{matchesForPack.PackInfo.Name}::{matchesForPack.PackInfo.Version}";
+            Reporter.Output.WriteLine(string.Format(LocalizableStrings.SearchResultInstallCommand, _commandInput.CommandName, fullyQualifiedPackName));
+        }
+
 
         private bool ConfigureLocale()
         {

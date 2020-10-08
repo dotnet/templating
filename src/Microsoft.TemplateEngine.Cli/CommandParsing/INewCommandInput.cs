@@ -37,6 +37,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
         string OutputPath { get; }
         List<string> RemainingArguments { get; }
         IDictionary<string, IList<string>> RemainingParameters { get; }
+        bool SearchOnline { get; }
         string ShowAliasesAliasName { get; }
         bool ShowAliasesSpecified { get; }
         bool ShowAllColumns { get; }

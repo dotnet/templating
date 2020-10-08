@@ -643,8 +643,8 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</value>
   <data name="UpdateCheck_UnknownError" xml:space="preserve">
     <value>An error occured checking for updates for template pack {0}</value>
   </data>
-  <data name="SearchingOnlineNotification" xml:space="preserve">
-    <value>Couldn't find an installed template that matches the input, searching online for one that does...</value>
+  <data name="SearchOnlineNotification" xml:space="preserve">
+    <value>Searching online for the template...</value>
   </data>
   <data name="SearchResultInstallCommand" xml:space="preserve">
     <value>        dotnet {0} -i {1}</value>
@@ -705,6 +705,18 @@ The default list of columns shown without the option: template name, short name,
   </data>
   <data name="OptionDescriptionColumnsAll" xml:space="preserve">
     <value>Shows all available columns  for --list or -l option, equivalent to --columns=language,tags,author,type.</value>
+  </data>
+  <data name="SearchOnlineCommandHelp" xml:space="preserve">
+    <value>Defines if the template should be searched online instead of list of locally installed templates</value>
+  </data>
+  <data name="SearchOnlineErrorNoTemplateName" xml:space="preserve">
+    <value>Failed to search for template online: no template name is specified.</value>
+  </data>
+  <data name="SearchOnlineNoSources" xml:space="preserve">
+    <value>No sources defined for searching template online.</value>
+  </data>
+  <data name="SearchOnlineTemplateNotFound" xml:space="preserve">
+    <value>Template "{0}" was not found.</value>
   </data>
   <data name="OptionDescriptionAuthorFilter" xml:space="preserve">
     <value>Filters templates based on template author</value>
