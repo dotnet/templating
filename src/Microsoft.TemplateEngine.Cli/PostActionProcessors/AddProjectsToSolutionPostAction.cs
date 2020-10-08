@@ -193,7 +193,7 @@ namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
 
         private string GetSolutionFolder(IPostAction actionConfig)
         {
-            if ((actionConfig.Args != null) && actionConfig.Args.TryGetValue("solutionFolder", out string solutionFolder))
+            if (actionConfig.Args != null && actionConfig.Args.TryGetValue("solutionFolder", out string solutionFolder))
             {
                 return solutionFolder;
             }

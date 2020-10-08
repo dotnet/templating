@@ -17,13 +17,7 @@ namespace Microsoft.TemplateEngine.Cli
         private DataReceivedEventHandler _outputDataReceived;
         private bool _anyNonEmptyStderrWritten;
 
-        public string Command
-        {
-            get
-            {
-                return string.Concat(_info.FileName, " ", _info.Arguments);
-            }
-        }
+        public string Command => string.Concat(_info.FileName, " ", _info.Arguments);
 
 
         public static Dotnet Restore(params string[] args)
@@ -87,7 +81,7 @@ namespace Microsoft.TemplateEngine.Cli
                 "add"
             };
 
-            if (!string.IsNullOrEmpty(solutionFolder))
+            if (!string.IsNullOrWhiteSpace(solutionFolder))
             {
                 allArgs.Add("--solution-folder");
                 allArgs.Add(solutionFolder);
