@@ -675,7 +675,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         private IReadOnlyList<IReplacementTokens> ProduceSymbolFilenameReplacements()
         {
             List<IReplacementTokens> filenameReplacements = new List<IReplacementTokens>();
-            if (Symbols == null || !Symbols.Any())
+            if (Symbols == null || Symbols.Count == 0)
             {
                 return filenameReplacements;
             }
