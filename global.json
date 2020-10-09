@@ -3,8 +3,7 @@
     "dotnet": "5.0.100-rc.1.20452.10",
     "runtimes": {
       "dotnet": [
-        "2.1.7",
-        "$(MicrosoftNETCoreAppVersion)"
+        "2.1.7"
       ]
     }
   },
