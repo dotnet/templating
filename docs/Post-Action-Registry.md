@@ -156,7 +156,7 @@ Opens a file in the editor. For command line cases this post action will be igno
  - **Specific Configuration** :
    - `args`:
      - `primaryOutputIndexes` (string): A semicolon delimited list of indexes to the primary outputs. Note: If primary outputs are conditional, multiple post actions with the same conditions as the primary outputs might be necessary.
-     - `solutionFolder` (string) (optional) (supported in .NET 5.0.200 or later): the destination solution folder path to add the projects to. 
+     - `solutionFolder` (string) (optional) (supported in 5.0.200 or higher): the destination solution folder path to add the projects to. 
  - **Supported in**:
    - `dotnet new3`
    - `dotnet new` (2.0.0 or higher)
