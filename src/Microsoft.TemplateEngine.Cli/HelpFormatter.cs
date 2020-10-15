@@ -315,28 +315,31 @@ namespace Microsoft.TemplateEngine.Cli
                 int position = 0;
                 int realMaxWidth = 0;
 
-                while (position < text.Length)
+                if (!string.IsNullOrWhiteSpace(text))
                 {
-                    int newline = text.IndexOf(environmentSettings.Environment.NewLine, position, StringComparison.Ordinal);
-
-                    if (newline > -1)
+                    while (position < text.Length)
                     {
-                        if (newline - position <= maxWidth)
+                        int newline = text.IndexOf(environmentSettings.Environment.NewLine, position, StringComparison.Ordinal);
+
+                        if (newline > -1)
                         {
-                            lines.Add(text.Substring(position, newline - position).TrimEnd());
-                            position = newline + environmentSettings.Environment.NewLine.Length;
+                            if (newline - position <= maxWidth)
+                            {
+                                lines.Add(text.Substring(position, newline - position).TrimEnd());
+                                position = newline + environmentSettings.Environment.NewLine.Length;
+                            }
+                            else
+                            {
+                                GetLineText(text, lines, maxWidth, newline, ref position);
+                            }
                         }
                         else
                         {
-                            GetLineText(text, lines, maxWidth, newline, ref position);
+                            GetLineText(text, lines, maxWidth, text.Length - 1, ref position);
                         }
-                    }
-                    else
-                    {
-                        GetLineText(text, lines, maxWidth, text.Length - 1, ref position);
-                    }
 
-                    realMaxWidth = Math.Max(realMaxWidth, lines[lines.Count - 1].Length);
+                        realMaxWidth = Math.Max(realMaxWidth, lines[lines.Count - 1].Length);
+                    }
                 }
 
                 _lines = lines;

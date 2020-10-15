@@ -496,16 +496,7 @@ namespace Microsoft.TemplateEngine.Cli
                         return CreationResultStatus.Cancelled;
                     }
 
-                    bool anySearchMatches = await SearchForTemplateMatchesAsync();
-                    if (!anySearchMatches)
-                    {
-                        Reporter.Error.WriteLine(string.Format(LocalizableStrings.SearchOnlineTemplateNotFound, _commandInput.TemplateName).Bold().Red());
-                        return CreationResultStatus.NotFound;
-                    }
-                    else
-                    {
-                        return CreationResultStatus.Success;
-                    }
+                    return await SearchForTemplateMatchesAsync();
                 }
 
                 if (string.IsNullOrWhiteSpace(TemplateName))
@@ -523,7 +514,7 @@ namespace Microsoft.TemplateEngine.Cli
         }
 
         // Return true if there are any matches, false otherwise.
-        private async Task<bool> SearchForTemplateMatchesAsync()
+        private async Task<CreationResultStatus> SearchForTemplateMatchesAsync()
         {
             Reporter.Output.WriteLine(LocalizableStrings.SearchOnlineNotification);
             TemplateSearchCoordinator searchCoordinator = CliTemplateSearchCoordinatorFactory.CreateCliTemplateSearchCoordinator(EnvironmentSettings, _commandInput, _defaultLanguage);
@@ -532,24 +523,51 @@ namespace Microsoft.TemplateEngine.Cli
             if (!searchResults.AnySources)
             {
                 Reporter.Error.WriteLine(LocalizableStrings.SearchOnlineNoSources.Bold().Red());
-                return false;
+                return CreationResultStatus.NotFound;
             }
 
-            foreach (TemplateSourceSearchResult sourceResult in searchResults.MatchesBySource)
+            if (searchResults.MatchesBySource.Count > 0)
             {
-                string sourceHeader = string.Format(LocalizableStrings.SearchResultSourceIndicator, sourceResult.SourceDisplayName);
-
-                Reporter.Output.WriteLine(sourceHeader);
-                Reporter.Output.WriteLine(new string('-', sourceHeader.Length));
-
-                foreach (TemplatePackSearchResult matchesForPack in sourceResult.PacksWithMatches.Values)
+                foreach (TemplateSourceSearchResult sourceResult in searchResults.MatchesBySource)
                 {
-                    DisplayResultsForPack(matchesForPack);
-                    Reporter.Output.WriteLine();
-                }
-            }
+                    string sourceHeader = string.Format(LocalizableStrings.SearchResultSourceIndicator, sourceResult.SourceDisplayName);
 
-            return searchResults.MatchesBySource.Count > 0;
+                    Reporter.Output.WriteLine(sourceHeader);
+                    Reporter.Output.WriteLine();
+
+                    var rows = sourceResult.PacksWithMatches.Values.SelectMany(pack => pack.TemplateMatches.Select(match => new Tuple<PackInfo, ITemplateMatchInfo>(pack.PackInfo, match)));
+
+                    HelpFormatter<Tuple<PackInfo, ITemplateMatchInfo>> formatter =
+                        HelpFormatter
+                            .For(
+                                EnvironmentSettings,
+                                rows,
+                                columnPadding: 2,
+                                headerSeparator: '-',
+                                blankLineBetweenRows: false)
+                            .DefineColumn(r => r.Item2.Info.Name, LocalizableStrings.Templates, shrinkIfNeeded: true)
+                            .DefineColumn(r => r.Item2.Info.ShortName, LocalizableStrings.ShortName)
+                            .DefineColumn(r => string.Join(", ", r.Item2.Info.Tags.Where(kvp => kvp.Key == "language").Select(kvp => kvp.Value.DefaultValue)))
+                            .DefineColumn(r => r.Item2.Info.Author, "Author")
+                            .DefineColumn(r => r.Item1.Name, "Package")
+                            .DefineColumn(r => r.Item1.Version, out object packageColumn, "Version")
+                            .OrderBy(packageColumn);
+                    Reporter.Output.WriteLine(formatter.Layout());
+
+                }
+
+                Reporter.Output.WriteLine();
+                Reporter.Output.WriteLine(string.Format(LocalizableStrings.SearchResultInstallHeader, _commandInput.CommandName));
+                string fullyQualifiedPackName = $"{ searchResults.MatchesBySource.First().PacksWithMatches.First().Key.Name}::";
+                Reporter.Output.WriteLine("Example:");
+                Reporter.Output.WriteLine(string.Format(LocalizableStrings.SearchResultInstallCommand, _commandInput.CommandName, fullyQualifiedPackName));
+                return CreationResultStatus.Success;
+            }
+            else
+            {
+                Reporter.Error.WriteLine(string.Format(LocalizableStrings.SearchOnlineTemplateNotFound, _commandInput.TemplateName).Bold().Red());
+                return CreationResultStatus.NotFound;
+            }
         }
 
         private void DisplayResultsForPack(TemplatePackSearchResult matchesForPack)

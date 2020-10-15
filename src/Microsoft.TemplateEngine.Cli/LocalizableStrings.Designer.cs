@@ -1466,7 +1466,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     To use this template, run the following command and try again:.
+        ///   Looks up a localized string similar to To use these templates, run the following command to install them: dotnet {0} -i &lt;package&gt;.
         /// </summary>
         public static string SearchResultInstallHeader {
             get {
