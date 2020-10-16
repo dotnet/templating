@@ -49,23 +49,23 @@ There are several built in generators for computing generated symbols values:
 | [switch](#switch) | Behaves like a C# `switch` statement. |
 
 ## Casing
-Changes a symbol (like a parameter, generated value, etc) to all upper-case or all lower-case.  It does not affect spaces (i.e. does not do any sort of Camel Casing).
+Changes the case of the text of the source value to all upper-case or all lower-case.  It does not affect spaces (i.e. does not do any sort of Camel Casing).
 
 #### Parameters
 | Name     |Data Type| Description   |
 |----------|------|---------------|
 |source|string|Source of the data| 
-|toLower|bool|Source value is lowercased if true, uppercase otherwise|
+|toLower|bool| applies lower case if true, uppercase otherwise|
 
 ### Samples
 
 In this sample three symbols are defined:     
- - `ownername` - is a parameter which can be set on the command line using `dotnet new` It has a default value of "John Doe", that will be used if the no value is received from the host. The value will be used to replace "John Smith (a)".
- - `nameUpper` and `nameLower` are due symbols that generate the uppprCase and lowerCase version of `ownerName` that are used to replace any instance of "John Smith (U)" and "John Smith (l)". 
+ - `ownerName` is a parameter which can be set on the command line using `dotnet new` It has a default value of "John Doe", that will be used if the no value is received from the host. The value will be used to replace "John Smith (a)".
+ - `nameUpper` and `nameLower` are the symbols that generate the upperCase and lowerCase version of `ownerName` that are used to replace any instance of "John Smith (U)" and "John Smith (l)". 
 
 ```
 "symbols":{
-    "ownername":{
+    "ownerName":{
       "type": "parameter",
       "datatype":"text",
       "replaces": "John Smith (a)",
@@ -76,7 +76,7 @@ In this sample three symbols are defined:
       "type": "generated",
       "generator": "casing",
       "parameters": {
-        "source":"ownername",
+        "source":"ownerName",
         "toLower": false
       },
       "replaces":"John Smith (U)"
@@ -86,7 +86,7 @@ In this sample three symbols are defined:
       "type": "generated",
       "generator": "casing",
       "parameters": {
-        "source":"ownername",
+        "source":"ownerName",
         "toLower": true
       },
       "replaces":"John Smith (l)"
@@ -114,9 +114,8 @@ Behaves like the C# `??` operator.
 
 In this sample three symbols are defined:
  - `MessageYear` - is a parameter set by the user when calling `dotnet new`.   
- - `ThisYear` - use the now generator to calculate the cuyrrent year.
- - `YearReplacer` - ensures that any occurrance of "1234" is replaced. If `MessageYear` was passed in by the user that value will
- be used. Otherwise `ThisYear` will be used.
+ - `ThisYear` - use the now generator to calculate the current year.
+ - `YearReplacer` - ensures that any occurrence of "1234" is replaced. If `MessageYear` was passed in by the user that value will be used. Otherwise `ThisYear` will be used.
 
 ```
   "symbols":{
@@ -159,11 +158,11 @@ Uses constant value.
 
 ### Samples
 
-`myconstant` is a symbol that replaces "1234" with "5001"
+`myConstant` is a symbol that replaces "1234" with "5001"
 
 ```
 "symbols":{
-    "myconstant": {
+    "myConstant": {
     "type": "generated",
     "generator": "constant",
     "parameters": {
@@ -215,7 +214,7 @@ During evaluation looks for a valid free port number trying to create a socket, 
 
 | Name     |Data Type| Description   |
 |----------|------|---------------|
-|fallback|string|fallaback value| 
+|fallback|string|fallback value| 
 
 ### Samples
 In this sample `KestrelPortGenerated` is a symbol that return the number of an available port or 5000.
@@ -305,14 +304,14 @@ Creates a symbol from the current date/time.
 | Name     |Data Type| Description   |
 |----------|------|---------------|
 |format|string|DateTime.ToString format|
-|utc|bool|utc time if true, local time otherwise|    
+|utc|bool|UTC time if true, local time otherwise|    
 
 ### Samples
 In this sample a symbol is created showing the current data, and replacing any instance of "01/01/1999"    
 
 ```
 "symbols":{
-  "createddate": {
+  "createdDate": {
     "type": "generated",
     "generator": "now",
     "parameters": {
@@ -408,7 +407,7 @@ Replacement steps
 
 ## Switch
 
-Defines a set of conditions to be evaluted, and the value to return if the condition is met. The first condition to evaluate to true is used. To include a default case, add a condition that always evaluates to true as the last entry in `cases`.
+Defines a set of conditions to be evaluated, and the value to return if the condition is met. The first condition to evaluate to true is used. To include a default case, add a condition that always evaluates to true as the last entry in `cases`.
 
 #### Parameters
 | Name     |Data Type| Description   |    
