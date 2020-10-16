@@ -1,13 +1,14 @@
 Inside the `template.json` file, you can define custom symbols that will be used inside the template files. 
 The supported symbol types are:
-- Parameter - a symbol which value is typically provided by the user when creating the template. If the value is not provided, then the value is taken from host configuration, otherwise default value is used. 
-- Derived - a symbol that defines transformation of another symbol.  The value of this symbol is derived from the value of another symbol by the application of the form defined in symbol definition.
-- Computed - a symbol which value is evaluated during the processing of the template.
-- Generated - a symbol which value gets computed by a built-in symbol value generator.
-
+- Parameter - the value is typically provided by the user when creating the template. If not provided, the value is taken from host configuration, otherwise default value is used. 
+- Derived - defines transformation of another symbol.  The value of this symbol is derived from the value of another symbol by applying the defined form.
+- Computed - the boolean value is evaluated during the processing of the template based on the other symbol values.
+- Generated - the value is computed by a built-in symbol value generator.
 This article covers available generators for generated symbols.
 
-To use a generated symbol inside your `template.json` you have to add the `"type": "generated"` to the symbol definition, and use the `"generator": ...` parameter to select the generator to use.    
+To use a generated symbol inside your `template.json` file:
+1. Add `"type": "generated"` to the symbol definition
+1. Use the `"generator": ...` parameter to select the generator to use.    
 This is a sample of definition of a generated symbol, the `port` generator, that generates a random number for an http port.    
 
 ```
@@ -33,7 +34,7 @@ Most of the generators need to be configured via parameters that let you select 
 },
 ```
 
-There are several built in generators for computing generated symbols values:
+Available built-in generators for computing generated symbols values are:
 
 | Name     | Description   |
 |----------|---------------|
@@ -207,7 +208,7 @@ In this sample `IndividualAuth` is `true` if the value of `auth`, another symbol
 
 
 ## Port
-Gets the port number for an available port on the machine.   
+Gets an available port number on the machine.   
 During evaluation looks for a valid free port number trying to create a socket, and in case of problems, returns the value defined in the `fallback` parameter.
 
 #### Parameters
