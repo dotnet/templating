@@ -1,10 +1,10 @@
 # Environments using Template Engine
-- `dotnet new`
-- Visual Studio 2019
+- [dotnet new](https://docs.microsoft.com/dotnet/core/tools/dotnet-new) - the command for [the .NET Core command-line interface (CLI)](https://docs.microsoft.com/dotnet/core/tools/), cross-platform toolchain for developing, building, running, and publishing .NET Core applications.
+- [Visual Studio 2019](https://devblogs.microsoft.com/dotnet/net-cli-templates-in-visual-studio) 
 - Visual Studio for Mac
 
 # Community templates
-- See [available templates for dotnet new](https://github.com/dotnet/templating/wiki/Available-templates-for-dotnet-new)
+- [Available templates for dotnet new](https://github.com/dotnet/templating/wiki/Available-templates-for-dotnet-new)
 - [Blog posts](https://github.com/dotnet/templating/wiki/Blog-posts)
 
 # Template authoring
@@ -15,7 +15,7 @@
 - [Supported post actions](https://github.com/dotnet/templating/wiki/Post-Action-Registry)
 - [Supported generators for generated symbols](https://github.com/dotnet/templating/wiki/Available-Symbols-Generators)
 - [Supported value forms for symbols](https://github.com/dotnet/templating/wiki/Runnable-Project-Templates---Value-Forms)
-- [Choosing a good sourceName](https://github.com/dotnet/templating/wiki/Naming-and-default-value-forms)
+- [Choosing a good source name](https://github.com/dotnet/templating/wiki/Naming-and-default-value-forms)
 
 
 # Development and contributing guidelines
