@@ -17,6 +17,7 @@
 |[How to create templates](https://docs.microsoft.com/dotnet/core/tools/custom-templates)|New to template engine authoring? The article gives a tutorial on how to create a basic template|
 |[Samples repository](https://github.com/dotnet/dotnet-template-samples)|These examples are good resource for learning how the templates work, however the repository is archived and no longer maintained. The examples may be out of date and no longer working.|
 |[Reference for template.json configuration](https://github.com/dotnet/templating/wiki/Reference-for-template.json)|In-depth description for `template.json` configuration with detailed description for properties and examples|
+|[template.json schema](http://json.schemastore.org/template)]|JSON schema for `template.json` configuration file, it is highly recommended to use it when creating `template.json` file.|
 |[Conditional syntax in template files](https://github.com/dotnet/templating/wiki/Reference-for-comment-syntax)|Learn how to add dynamic content in template source files based on conditions|
 |[Supported post actions](https://github.com/dotnet/templating/wiki/Post-Action-Registry)|The reference for supported post actions for `dotnet new` CLI and Visual Studio|
 |[Supported generators for generated symbols](https://github.com/dotnet/templating/wiki/Available-Symbols-Generators)|The reference for supported generators for generated symbols with examples|
