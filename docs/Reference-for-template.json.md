@@ -74,7 +74,6 @@ A symbol for which the config provides literal and/or default values.
 |`type`|`parameter`|
 |`dataType`|	Supported values: <br />- `bool`: boolean type, possible values: `true`/`false`. <br />- `choice`: enumeration, possible values are defined in `choices` property.<br />- `float`: double-precision floating format number. Accepts any value that can be parsed by `double.TryParse()`.<br />- `int`/`integer`: 64-bit signed integer. Accepts any value that can be parsed by `long.TryParse()`.<br />- `hex`: hex number. Accepts any value that can be parsed by `long.TryParse(value.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out long convertedHex)`.<br />- `text`/`string`: string type.<br />- `<any other>`: treated as string.
 |`defaultValue`|The value assigned to the symbol if no parameter is provided by the user or host.|
-|`DefaultIfOptionWithoutValue`|The value assigned to the symbol if empty value for parameter is provided by the user or host. Note the difference from `defaultValue`: `defaultValue` is used when no parameter is provided, `DefaultIfOptionWithoutValue` is used when the parameter is provided with empty value. In case `DefaultIfOptionWithoutValue` is not specified, the `defaultValue` is used for all types except `bool`. For `bool` parameters `DefaultIfOptionWithoutValue` is `true` by default.|
 |`binding`|The name of the host property to take the value from.|	
 |`replaces`|The text to replace with the value of this symbol.|	 
 |`fileRename`|The element defines the portion of file names which will be replaced by symbol value.| 
@@ -237,7 +236,7 @@ A symbol for which the config provides a Boolean predicate whose evaluation resu
 |Name|Description|
 |---|---|
 |`type`|`computed`|
-|`value`| Boolean expresion to be computed.|
+|`value`| Boolean expression to be computed.|
 |`evaluator`|Language to be used for evaluation of expression: <br />- `C++2` - default<br />- `C++`<br />- `MSBUILD`<br />- `VB`|
 
 ##### Example
@@ -325,7 +324,7 @@ Values of `OrganizationalAuth`, `WindowsAuth`, `MultiOrgAuth`, `SingleOrgAuth`, 
 ### Output Management
 |Name|Description|Default|
 |---|---|--|
-|sourceName| The name in the source tree to replace with the name the user specifies. The value to be replaced with can be given using the `-n` `--name` options while running a template. The template engine will look for any occurrance of the name present in the config file and replace it in file names and file contents. If no name is specified by the host, the current directory is used. The value of the `sourceName` is available in built-in `name` symbol and can be used as the source for creating other symbols and condition expressions. || 
+|sourceName| The name in the source tree to replace with the name the user specifies. The value to be replaced with can be given using the `-n` `--name` options while running a template. The template engine will look for any occurrence of the name present in the config file and replace it in file names and file contents. If no name is specified by the host, the current directory is used. The value of the `sourceName` is available in built-in `name` symbol and can be used as the source for creating other symbols and condition expressions. || 
 |preferNameDirectory| Boolean value, indicates whether to create a directory for the template if name is specified but an output directory is not set (instead of creating the content directly in the current directory).|If not specified, `false` is used.| 
 |placeholderFilename|A filename that will be completely ignored expect to indicate that its containing directory should be copied. This allows creation of empty directory in the created template, by having a corresponding source directory containing just the placeholder file. Completely empty directories are ignored.|If not specified, a default value of `"-.-"` is used.|
 |primaryOutputs|A list of template files that are used in post actions. The path should contain the relative path to the file prior to the renaming that may happen during template generation. It's defined as an array of [Primary Output](#primary-output-definition)||
