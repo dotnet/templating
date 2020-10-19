@@ -273,7 +273,7 @@ Values of `OrganizationalAuth`, `WindowsAuth`, `MultiOrgAuth`, `SingleOrgAuth`, 
       "defaultValue": "Individual",
       "description": "The type of authentication to use"
     },
- "OrganizationalAuth": {
+    "OrganizationalAuth": {
       "type": "computed",
       "value": "(auth == \"SingleOrg\" || auth == \"MultiOrg\")"
     },
@@ -300,7 +300,8 @@ Values of `OrganizationalAuth`, `WindowsAuth`, `MultiOrgAuth`, `SingleOrgAuth`, 
     "RequiresHttps": {
       "type": "computed",
       "value": "(OrganizationalAuth)"
-    },
+    }
+  }
 ```
 
 #### Bind symbol
@@ -318,7 +319,7 @@ Values of `OrganizationalAuth`, `WindowsAuth`, `MultiOrgAuth`, `SingleOrgAuth`, 
    "HostIdentifier": {
       "type": "bind",
       "binding": "HostIdentifier"
-    },
+    }
 ```  
 
 ### Output Management
