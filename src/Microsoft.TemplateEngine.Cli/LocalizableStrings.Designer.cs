@@ -1412,7 +1412,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Defines if the template should be searched online instead of list of locally installed templates.
+        ///   Looks up a localized string similar to Search for the template in configured remote sources..
         /// </summary>
         public static string SearchOnlineCommandHelp {
             get {
@@ -1421,7 +1421,8 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to search for template online: no template name is specified..
+        ///   Looks up a localized string similar to Search failed: no template name is specified.
+        ///To search for the template run: dotnet new3 &lt;template name&gt; --search..
         /// </summary>
         public static string SearchOnlineErrorNoTemplateName {
             get {
@@ -1430,7 +1431,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No sources defined for searching template online..
+        ///   Looks up a localized string similar to No remoted sources defined to search for the templates..
         /// </summary>
         public static string SearchOnlineNoSources {
             get {
@@ -1439,7 +1440,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Searching online for the template....
+        ///   Looks up a localized string similar to Searching for the templates....
         /// </summary>
         public static string SearchOnlineNotification {
             get {
@@ -1448,7 +1449,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Template &quot;{0}&quot; was not found..
+        ///   Looks up a localized string similar to Template &apos;{0}&apos; was not found..
         /// </summary>
         public static string SearchOnlineTemplateNotFound {
             get {
@@ -1466,7 +1467,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to To use these templates, run the following command to install them: dotnet {0} -i &lt;package&gt;.
+        ///   Looks up a localized string similar to To use the template, run the following command to install the package: dotnet {0} -i &lt;package&gt;.
         /// </summary>
         public static string SearchResultInstallHeader {
             get {
@@ -1475,7 +1476,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ...No matches found.
+        ///   Looks up a localized string similar to No matches found.
         /// </summary>
         public static string SearchResultNoMatches {
             get {

@@ -644,16 +644,16 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</value>
     <value>An error occured checking for updates for template pack {0}</value>
   </data>
   <data name="SearchOnlineNotification" xml:space="preserve">
-    <value>Searching online for the template...</value>
+    <value>Searching for the templates...</value>
   </data>
   <data name="SearchResultInstallCommand" xml:space="preserve">
     <value>        dotnet {0} -i {1}</value>
   </data>
   <data name="SearchResultInstallHeader" xml:space="preserve">
-    <value>To use these templates, run the following command to install them: dotnet {0} -i &lt;package&gt;</value>
+    <value>To use the template, run the following command to install the package: dotnet {0} -i &lt;package&gt;</value>
   </data>
   <data name="SearchResultNoMatches" xml:space="preserve">
-    <value>...No matches found</value>
+    <value>No matches found</value>
   </data>
   <data name="SearchResultTemplateInfo" xml:space="preserve">
     <value>Template name "{0}" ({1}) from author "{2}" in pack {3}</value>
@@ -707,16 +707,17 @@ The default list of columns shown without the option: template name, short name,
     <value>Shows all available columns  for --list or -l option, equivalent to --columns=language,tags,author,type.</value>
   </data>
   <data name="SearchOnlineCommandHelp" xml:space="preserve">
-    <value>Defines if the template should be searched online instead of list of locally installed templates</value>
+    <value>Search for the template in configured remote sources.</value>
   </data>
   <data name="SearchOnlineErrorNoTemplateName" xml:space="preserve">
-    <value>Failed to search for template online: no template name is specified.</value>
+    <value>Search failed: no template name is specified.
+To search for the template run: dotnet new3 &lt;template name&gt; --search.</value>
   </data>
   <data name="SearchOnlineNoSources" xml:space="preserve">
-    <value>No sources defined for searching template online.</value>
+    <value>No remoted sources defined to search for the templates.</value>
   </data>
   <data name="SearchOnlineTemplateNotFound" xml:space="preserve">
-    <value>Template "{0}" was not found.</value>
+    <value>Template '{0}' was not found.</value>
   </data>
   <data name="OptionDescriptionAuthorFilter" xml:space="preserve">
     <value>Filters templates based on template author</value>
