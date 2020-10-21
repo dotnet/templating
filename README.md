@@ -88,7 +88,7 @@ The steps required are outlined below.
 - Run the build script appropriate for your environment.
      - **Windows:** [build.cmd](https://github.com/dotnet/templating/blob/master/build.cmd)
      - **Mac/Linux**: [build.sh](https://github.com/dotnet/templating/blob/master/build.sh) 
-- When running the build script, the existing built-in command `dotnet new` will be preserved. To run `dotnet new3`, run `dotnet <your repo location>\artifacts\bin\dotnet-new3\Debug\netcoreapp2.1\dotnet-new3.dll` (root path to `dotnet-new3.dll` is skipped in all commands below).
+- When running the build script, the existing built-in command `dotnet new` will be preserved. To run `dotnet new3`, run `dotnet <your repo location>\artifacts\bin\dotnet-new3\<configuration>\<target framework>\dotnet-new3.dll` (root path to `dotnet-new3.dll` is skipped in all commands below).
 
 For example, here is the result of running `dotnet .\dotnet-new3.dll --help` (_truncated to save space here_).
 
