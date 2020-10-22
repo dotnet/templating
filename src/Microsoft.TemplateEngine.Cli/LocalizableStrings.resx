@@ -725,4 +725,7 @@ To search for the template run: dotnet new3 &lt;template name&gt; --search.</val
   <data name="PackageFilterHelp" xml:space="preserve">
     <value>Filters templates based on package.</value>
   </data>
+  <data name="SearchOnlineErrorTemplateNameIsTooShort" xml:space="preserve">
+    <value>Search failed: template name is too short, minimum 2 characters required.</value>
+  </data>
 </root>

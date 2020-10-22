@@ -455,6 +455,15 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Filters templates based on author..
+        /// </summary>
+        public static string AuthorFilterHelp {
+            get {
+                return ResourceManager.GetString("AuthorFilterHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Equal highest precedence values among the best template matches prevented unambiguously choosing a template to invoke..
         /// </summary>
         public static string Authoring_AmbiguousBestPrecedence {
@@ -1223,6 +1232,15 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Filters templates based on package..
+        /// </summary>
+        public static string PackageFilterHelp {
+            get {
+                return ResourceManager.GetString("PackageFilterHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Parameter {0} ({1}) must be given a value..
         /// </summary>
         public static string ParameterMissingValue {
@@ -1427,6 +1445,15 @@ namespace Microsoft.TemplateEngine.Cli {
         public static string SearchOnlineErrorNoTemplateName {
             get {
                 return ResourceManager.GetString("SearchOnlineErrorNoTemplateName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search failed: template name is too short, minimum 2 characters required..
+        /// </summary>
+        public static string SearchOnlineErrorTemplateNameIsTooShort {
+            get {
+                return ResourceManager.GetString("SearchOnlineErrorTemplateNameIsTooShort", resourceCulture);
             }
         }
         
@@ -1737,7 +1764,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     install command: dotnet {0} -i {1}.
+        ///   Looks up a localized string similar to Colu.
         /// </summary>
         public static string UpdateCheck_InstallCommand {
             get {
