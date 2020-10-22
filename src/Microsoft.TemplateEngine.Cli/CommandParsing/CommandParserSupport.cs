@@ -124,23 +124,44 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             {
                 return new[]
                 {
-                    Create.Option("-h|--help", LocalizableStrings.DisplaysHelp, Accept.NoArguments()),
-                    Create.Option("-l|--list", LocalizableStrings.ListsTemplates, Accept.NoArguments()),
-                    Create.Option("-n|--name", LocalizableStrings.NameOfOutput, Accept.ExactlyOneArgument()),
-                    Create.Option("-o|--output", LocalizableStrings.OutputPath, Accept.ExactlyOneArgument()),
-                    Create.Option("-i|--install", LocalizableStrings.InstallHelp, Accept.OneOrMoreArguments()),
-                    Create.Option("-u|--uninstall", LocalizableStrings.UninstallHelp, Accept.ZeroOrMoreArguments()),
-                    Create.Option("--interactive", LocalizableStrings.InteractiveHelp, Accept.NoArguments()),
-                    Create.Option("--nuget-source", LocalizableStrings.NuGetSourceHelp, Accept.OneOrMoreArguments()),
-                    Create.Option("--type", LocalizableStrings.ShowsFilteredTemplates, Accept.ExactlyOneArgument()),
-                    Create.Option("--dry-run", LocalizableStrings.DryRunDescription, Accept.NoArguments()),
-                    Create.Option("--force", LocalizableStrings.ForcesTemplateCreation, Accept.NoArguments()),
-                    Create.Option("-lang|--language", LocalizableStrings.LanguageParameter,
-                                    Accept.ExactlyOneArgument()
-                                        .WithSuggestionsFrom("C#", "F#")),
-                                        // don't give this a default, otherwise 'new -lang' is valid and assigns the default. User should have to explicitly give the value.
-                    Create.Option("--update-check", LocalizableStrings.UpdateCheckCommandHelp, Accept.NoArguments()),
-                    Create.Option("--update-apply", LocalizableStrings.UpdateApplyCommandHelp, Accept.NoArguments()),
+                    Create.Option(
+                        "-n|--name",
+                        LocalizableStrings.OptionDescriptionName,
+                        Accept.ExactlyOneArgument().With(LocalizableStrings.OptionDescriptionName, "OUTPUT_NAME")),
+                    Create.Option(
+                        "-o|--output",
+                        LocalizableStrings.OptionDescriptionOutput,
+                        Accept.ExactlyOneArgument().With(LocalizableStrings.OptionDescriptionOutput, "OUTPUT_DIRECTORY")),
+                    Create.Option("--interactive", LocalizableStrings.OptionDescriptionInteractive, Accept.NoArguments()),
+                    Create.Option("--dry-run", LocalizableStrings.OptionDescriptionDryrun, Accept.NoArguments()),
+                    Create.Option("--force", LocalizableStrings.OptionDescriptionForce, Accept.NoArguments()),
+                    Create.Option(
+                        "-lang|--language",
+                        LocalizableStrings.OptionDescriptionLanguage,
+                        Accept
+                            .ExactlyOneArgument()
+                            .WithSuggestionsFrom("C#", "F#", "VB")
+                            .With(LocalizableStrings.OptionDescriptionLanguage, "LANGUAGE")),
+                    Create.Option(
+                        "--type",
+                        LocalizableStrings.OptionDescriptionTypeFilter,
+                        Accept.ExactlyOneArgument().With(LocalizableStrings.OptionDescriptionTypeFilter,"TYPE")),
+                    Create.Option("-h|--help", LocalizableStrings.OptionDescriptionHelp, Accept.NoArguments()),
+                    Create.Option("-l|--list", LocalizableStrings.OptionDescriptionList, Accept.NoArguments()),
+                    Create.Option(
+                        "-i|--install",
+                        LocalizableStrings.OptionDescriptionInstall,
+                        Accept.OneOrMoreArguments().With(LocalizableStrings.OptionDescriptionInstall,"PATH|NUGET_ID")),
+                    Create.Option(
+                        "--nuget-source",
+                        LocalizableStrings.OptionDescriptionNugetSource,
+                        Accept.OneOrMoreArguments().With(LocalizableStrings.OptionDescriptionNugetSource,"SOURCE")),
+                    Create.Option(
+                        "-u|--uninstall",
+                        LocalizableStrings.OptionDescriptionUninstall,
+                        Accept.ZeroOrMoreArguments().With(LocalizableStrings.OptionDescriptionUninstall,"PATH|NUGET_ID")),
+                    Create.Option("--update-check", LocalizableStrings.OptionDescriptionUpdateCheck, Accept.NoArguments()),
+                    Create.Option("--update-apply", LocalizableStrings.OptionDescriptionUpdateApply, Accept.NoArguments()),
                     Create.Option("--columns", LocalizableStrings.OptionDescriptionColumns, Accept.ExactlyOneArgument().With(LocalizableStrings.OptionDescriptionColumns, "COLUMNS_LIST")),
                     Create.Option("--columns-all", LocalizableStrings.OptionDescriptionColumnsAll, Accept.NoArguments()),
                     Create.Option("--author", LocalizableStrings.OptionDescriptionAuthorFilter, Accept.ExactlyOneArgument().With(LocalizableStrings.OptionDescriptionColumns, "AUTHOR"))

@@ -437,6 +437,27 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The template to instantiate when the command is invoked. Each template might have specific options you can pass. 
+        ///When using with dotnet new --list or -l, &lt;{0}&gt; is used to filter the templates which match on the template name.
+        ///When using with dotnet new --help or -h, the information about &lt;{0}&gt; and its template specific options is displayed.
+        ///Should not be used with -i, --install, -u, --uninstall, --update-check, --update-apply..
+        /// </summary>
+        public static string ArgumentDescriptionTemplate {
+            get {
+                return ResourceManager.GetString("ArgumentDescriptionTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Arguments:.
+        /// </summary>
+        public static string ArgumentsSectionTitle {
+            get {
+                return ResourceManager.GetString("ArgumentsSectionTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Assembly.
         /// </summary>
         public static string Assembly {
@@ -569,6 +590,22 @@ namespace Microsoft.TemplateEngine.Cli {
         public static string CommandSucceeded {
             get {
                 return ResourceManager.GetString("CommandSucceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Usage: 
+        ///	dotnet {0} &lt;{1}&gt; [-n|--name &lt;OUTPUT_NAME&gt;] [-o|--output &lt;OUTPUT_DIRECTORY&gt;] [--interactive] [--dry-run] [--force] [--language|-lang &lt;LANGUAGE&gt;] [--type|-t &lt;TYPE&gt;] [template options]
+        ///	dotnet {0} --help|-h
+        ///	dotnet {0} &lt;{1}&gt;  --help|-h [--language|-lang &lt;LANGUAGE&gt;] [--type|-t &lt;TYPE&gt;]
+        ///	dotnet {0} [{1}]  --list|-l [--language|-lang &lt;LANGUAGE&gt;] [--type|-t &lt;TYPE&gt;]
+        ///	dotnet {0} -i|--install &lt;PATH|NUGET_ID&gt; [--nuget-source &lt;SOURCE&gt;]
+        ///	dotnet {0} -u|--uninstall [PATH|NUGET_ID] 
+        ///	dotnet {0} --update-chec [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string CommandUsage {
+            get {
+                return ResourceManager.GetString("CommandUsage", resourceCulture);
             }
         }
         
@@ -727,24 +764,6 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Displays help for this command..
-        /// </summary>
-        public static string DisplaysHelp {
-            get {
-                return ResourceManager.GetString("DisplaysHelp", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Displays a summary of what would happen if the given command line were run if it would result in a template creation..
-        /// </summary>
-        public static string DryRunDescription {
-            get {
-                return ResourceManager.GetString("DryRunDescription", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to After expanding the extra args files, the command is:
         ///    dotnet {0}.
         /// </summary>
@@ -778,15 +797,6 @@ namespace Microsoft.TemplateEngine.Cli {
         public static string FileActionsWouldHaveBeenTaken {
             get {
                 return ResourceManager.GetString("FileActionsWouldHaveBeenTaken", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Forces content to be generated even if it would change existing files..
-        /// </summary>
-        public static string ForcesTemplateCreation {
-            get {
-                return ResourceManager.GetString("ForcesTemplateCreation", resourceCulture);
             }
         }
         
@@ -855,15 +865,6 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Installs a source or a template pack..
-        /// </summary>
-        public static string InstallHelp {
-            get {
-                return ResourceManager.GetString("InstallHelp", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Installing updates....
         /// </summary>
         public static string InstallingUpdates {
@@ -878,15 +879,6 @@ namespace Microsoft.TemplateEngine.Cli {
         public static string InstallSuccessful {
             get {
                 return ResourceManager.GetString("InstallSuccessful", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Allows the internal dotnet restore command to stop and wait for user input or action (for example to complete authentication)..
-        /// </summary>
-        public static string InteractiveHelp {
-            get {
-                return ResourceManager.GetString("InteractiveHelp", resourceCulture);
             }
         }
         
@@ -965,24 +957,6 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Filters templates based on language and specifies the language of the template to create..
-        /// </summary>
-        public static string LanguageParameter {
-            get {
-                return ResourceManager.GetString("LanguageParameter", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Lists templates containing the specified template name. If no name is specified, lists all templates..
-        /// </summary>
-        public static string ListsTemplates {
-            get {
-                return ResourceManager.GetString("ListsTemplates", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to To list installed templates, run &apos;dotnet new --list&apos;..
         /// </summary>
         public static string ListTemplatesCommand {
@@ -1055,15 +1029,6 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The name for the output being created. If no name is specified, the name of the output directory is used..
-        /// </summary>
-        public static string NameOfOutput {
-            get {
-                return ResourceManager.GetString("NameOfOutput", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to (No Items).
         /// </summary>
         public static string NoItems {
@@ -1127,15 +1092,6 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Specifies a NuGet source to use during install..
-        /// </summary>
-        public static string NuGetSourceHelp {
-            get {
-                return ResourceManager.GetString("NuGetSourceHelp", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Error during synchronization with the Optional SDK Workloads..
         /// </summary>
         public static string OptionalWorkloadsSyncFailed {
@@ -1150,6 +1106,141 @@ namespace Microsoft.TemplateEngine.Cli {
         public static string OptionalWorkloadsSynchronized {
             get {
                 return ResourceManager.GetString("OptionalWorkloadsSynchronized", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Displays a summary of what would happen if the given command line were run if it would result in a template creation..
+        /// </summary>
+        public static string OptionDescriptionDryrun {
+            get {
+                return ResourceManager.GetString("OptionDescriptionDryrun", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Forces content to be generated even if it would change existing files..
+        /// </summary>
+        public static string OptionDescriptionForce {
+            get {
+                return ResourceManager.GetString("OptionDescriptionForce", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Prints out help for the command. 
+        ///If template name is specified, shows information about template and template specific options..
+        /// </summary>
+        public static string OptionDescriptionHelp {
+            get {
+                return ResourceManager.GetString("OptionDescriptionHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installs a template pack from the path or using NuGet ID provided. 
+        ///If you want to install a prerelease version of a template package, you need to specify the version in the format of &lt;package-name&gt;::&lt;package-version&gt;. By default, dotnet new passes * for the version, which represents the latest stable package version. 
+        ///If a version of the template was already installed when you run this command, the template will be updated to the specified version, or to the latest stable version if no version was specif [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string OptionDescriptionInstall {
+            get {
+                return ResourceManager.GetString("OptionDescriptionInstall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Allows the internal dotnet restore command to stop and wait for user input or action (for example to complete authentication)..
+        /// </summary>
+        public static string OptionDescriptionInteractive {
+            get {
+                return ResourceManager.GetString("OptionDescriptionInteractive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specifies the template language to use.
+        ///When using with dotnet new --list or -l, filters templates based on language. .
+        /// </summary>
+        public static string OptionDescriptionLanguage {
+            get {
+                return ResourceManager.GetString("OptionDescriptionLanguage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lists templates containing the specified template name. If no name is specified, lists all templates..
+        /// </summary>
+        public static string OptionDescriptionList {
+            get {
+                return ResourceManager.GetString("OptionDescriptionList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The name for the output being created. If no name is specified, the name of the output directory is used..
+        /// </summary>
+        public static string OptionDescriptionName {
+            get {
+                return ResourceManager.GetString("OptionDescriptionName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specifies a NuGet source to use during install.
+        ///Applicable only with -i or --install option..
+        /// </summary>
+        public static string OptionDescriptionNugetSource {
+            get {
+                return ResourceManager.GetString("OptionDescriptionNugetSource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Location to place the generated output. The default is the current directory..
+        /// </summary>
+        public static string OptionDescriptionOutput {
+            get {
+                return ResourceManager.GetString("OptionDescriptionOutput", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specifies the template type to use.
+        ///When using with dotnet new --list or -l, filters templates based on the type.
+        ///Predefined values are &quot;project&quot;, &quot;item&quot; or &quot;other&quot;..
+        /// </summary>
+        public static string OptionDescriptionTypeFilter {
+            get {
+                return ResourceManager.GetString("OptionDescriptionTypeFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Uninstalls a template pack at the path or using NuGet ID provided. 
+        ///When the argument value is not specified, all currently installed template packs and their associated templates are displayed. 
+        ///When specifying NuGet ID, don&apos;t include the version number..
+        /// </summary>
+        public static string OptionDescriptionUninstall {
+            get {
+                return ResourceManager.GetString("OptionDescriptionUninstall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Checks the currently installed template packs for update, and install the updates..
+        /// </summary>
+        public static string OptionDescriptionUpdateApply {
+            get {
+                return ResourceManager.GetString("OptionDescriptionUpdateApply", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Checks the currently installed template packs for updates..
+        /// </summary>
+        public static string OptionDescriptionUpdateCheck {
+            get {
+                return ResourceManager.GetString("OptionDescriptionUpdateCheck", resourceCulture);
             }
         }
         
@@ -1196,20 +1287,20 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Options: .
+        /// </summary>
+        public static string OptionsSectionTitle {
+            get {
+                return ResourceManager.GetString("OptionsSectionTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Option variant {0} for canonical {1} was already defined for canonical {2}..
         /// </summary>
         public static string OptionVariantAlreadyDefined {
             get {
                 return ResourceManager.GetString("OptionVariantAlreadyDefined", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Location to place the generated output..
-        /// </summary>
-        public static string OutputPath {
-            get {
-                return ResourceManager.GetString("OutputPath", resourceCulture);
             }
         }
         
@@ -1502,15 +1593,6 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Filters templates based on available types. Predefined values are &quot;project&quot; and &quot;item&quot;..
-        /// </summary>
-        public static string ShowsFilteredTemplates {
-            get {
-                return ResourceManager.GetString("ShowsFilteredTemplates", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The following parameter(s) or their value(s) are not valid in combination with other supplied parameters or their values:.
         /// </summary>
         public static string SingleTemplateGroupPartialMatchSwitchesNotValidForAllMatches {
@@ -1628,15 +1710,6 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Uninstalls a source or a template pack..
-        /// </summary>
-        public static string UninstallHelp {
-            get {
-                return ResourceManager.GetString("UninstallHelp", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Details:.
         /// </summary>
         public static string UninstallListDetailsHeader {
@@ -1660,15 +1733,6 @@ namespace Microsoft.TemplateEngine.Cli {
         public static string UnknownChangeKind {
             get {
                 return ResourceManager.GetString("UnknownChangeKind", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Check the currently installed template packs for update, and install the updates..
-        /// </summary>
-        public static string UpdateApplyCommandHelp {
-            get {
-                return ResourceManager.GetString("UpdateApplyCommandHelp", resourceCulture);
             }
         }
         
@@ -1714,15 +1778,6 @@ namespace Microsoft.TemplateEngine.Cli {
         public static string UpdateCheck_UnknownError {
             get {
                 return ResourceManager.GetString("UpdateCheck_UnknownError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Check the currently installed template packs for updates..
-        /// </summary>
-        public static string UpdateCheckCommandHelp {
-            get {
-                return ResourceManager.GetString("UpdateCheckCommandHelp", resourceCulture);
             }
         }
         

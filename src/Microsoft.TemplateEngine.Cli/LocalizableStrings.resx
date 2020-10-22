@@ -187,8 +187,9 @@
   <data name="DestructiveChangesNotification" xml:space="preserve">
     <value>Creating this template will make changes to existing files:</value>
   </data>
-  <data name="DisplaysHelp" xml:space="preserve">
-    <value>Displays help for this command.</value>
+  <data name="OptionDescriptionHelp" xml:space="preserve">
+    <value>Prints out help for the command. 
+If template name is specified, shows information about template and template specific options.</value>
   </data>
   <data name="ExtraArgsFileHelp" xml:space="preserve">
     <value>Specifies a file containing additional parameters.</value>
@@ -196,7 +197,7 @@
   <data name="Factory" xml:space="preserve">
     <value>Factory</value>
   </data>
-  <data name="ForcesTemplateCreation" xml:space="preserve">
+  <data name="OptionDescriptionForce" xml:space="preserve">
     <value>Forces content to be generated even if it would change existing files.</value>
   </data>
   <data name="Generators" xml:space="preserve">
@@ -215,8 +216,10 @@
     <value>"{0}" could not be installed.
 {1}.</value>
   </data>
-  <data name="InstallHelp" xml:space="preserve">
-    <value>Installs a source or a template pack.</value>
+  <data name="OptionDescriptionInstall" xml:space="preserve">
+    <value>Installs a template pack from the path or using NuGet ID provided. 
+If you want to install a prerelease version of a template package, you need to specify the version in the format of &lt;package-name&gt;::&lt;package-version&gt;. By default, dotnet new passes * for the version, which represents the latest stable package version. 
+If a version of the template was already installed when you run this command, the template will be updated to the specified version, or to the latest stable version if no version was specified.</value>
   </data>
   <data name="InstallingUpdates" xml:space="preserve">
     <value>Installing updates...</value>
@@ -240,10 +243,11 @@
   <data name="Language" xml:space="preserve">
     <value>Language</value>
   </data>
-  <data name="LanguageParameter" xml:space="preserve">
-    <value>Filters templates based on language and specifies the language of the template to create.</value>
+  <data name="OptionDescriptionLanguage" xml:space="preserve">
+    <value>Specifies the template language to use.
+When using with dotnet new --list or -l, filters templates based on language. </value>
   </data>
-  <data name="ListsTemplates" xml:space="preserve">
+  <data name="OptionDescriptionList" xml:space="preserve">
     <value>Lists templates containing the specified template name. If no name is specified, lists all templates.</value>
   </data>
   <data name="LocaleHelp" xml:space="preserve">
@@ -264,7 +268,7 @@
   <data name="MultipleValuesSpecifiedForSingleValuedParameter" xml:space="preserve">
     <value>Multiple values specified for single value parameter: {0}.</value>
   </data>
-  <data name="NameOfOutput" xml:space="preserve">
+  <data name="OptionDescriptionName" xml:space="preserve">
     <value>The name for the output being created. If no name is specified, the name of the output directory is used.</value>
   </data>
   <data name="NoItems" xml:space="preserve">
@@ -294,8 +298,8 @@
   <data name="OptionVariantAlreadyDefined" xml:space="preserve">
     <value>Option variant {0} for canonical {1} was already defined for canonical {2}.</value>
   </data>
-  <data name="OutputPath" xml:space="preserve">
-    <value>Location to place the generated output.</value>
+  <data name="OptionDescriptionOutput" xml:space="preserve">
+    <value>Location to place the generated output. The default is the current directory.</value>
   </data>
   <data name="Overwrite" xml:space="preserve">
     <value>Overwrite</value>
@@ -330,8 +334,10 @@
   <data name="ShowsAllTemplates" xml:space="preserve">
     <value>Shows all templates.</value>
   </data>
-  <data name="ShowsFilteredTemplates" xml:space="preserve">
-    <value>Filters templates based on available types. Predefined values are "project" and "item".</value>
+  <data name="OptionDescriptionTypeFilter" xml:space="preserve">
+    <value>Specifies the template type to use.
+When using with dotnet new --list or -l, filters templates based on the type.
+Predefined values are "project" and "item".</value>
   </data>
   <data name="Tags" xml:space="preserve">
     <value>Tags</value>
@@ -430,8 +436,10 @@
   <data name="ThirdPartyNotices" xml:space="preserve">
     <value>This template contains technologies from parties other than Microsoft, see {0} for details.</value>
   </data>
-  <data name="UninstallHelp" xml:space="preserve">
-    <value>Uninstalls a source or a template pack.</value>
+  <data name="OptionDescriptionUninstall" xml:space="preserve">
+    <value>Uninstalls a template pack at the path or using NuGet ID provided. 
+When the argument value is not specified, all currently installed template packs and their associated templates are displayed. 
+When specifying NuGet ID, don't include the version number.</value>
   </data>
   <data name="CouldntUninstall" xml:space="preserve">
     <value>Could not find something to uninstall called '{0}'.</value>
@@ -598,8 +606,9 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</value>
   <data name="Authoring_AmbiguousChoiceParameterValue" xml:space="preserve">
     <value>An ambiguous choice parameter value prevented unambiguously choosing a template to invoke.</value>
   </data>
-  <data name="NuGetSourceHelp" xml:space="preserve">
-    <value>Specifies a NuGet source to use during install.</value>
+  <data name="OptionDescriptionNugetSource" xml:space="preserve">
+    <value>Specifies a NuGet source to use during install.
+Applicable only with -i or --install option.</value>
   </data>
   <data name="DefaultValuePlusSwitchWithoutValueDefault" xml:space="preserve">
     <value>Default: {0} / (*) {1}</value>
@@ -610,7 +619,7 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</value>
   <data name="SwitchWithoutValueDefaultFootnote" xml:space="preserve">
     <value>* Indicates the value used if the switch is provided without a value.</value>
   </data>
-  <data name="DryRunDescription" xml:space="preserve">
+  <data name="OptionDescriptionDryrun" xml:space="preserve">
     <value>Displays a summary of what would happen if the given command line were run if it would result in a template creation.</value>
   </data>
   <data name="ActionWouldHaveBeenTakenAutomatically" xml:space="preserve">
@@ -661,8 +670,8 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</value>
   <data name="SearchResultSourceIndicator" xml:space="preserve">
     <value>Matches from template source: {0}</value>
   </data>
-  <data name="UpdateApplyCommandHelp" xml:space="preserve">
-    <value>Check the currently installed template packs for update, and install the updates.</value>
+  <data name="OptionDescriptionUpdateApply" xml:space="preserve">
+    <value>Checks the currently installed template packs for update, and install the updates.</value>
   </data>
   <data name="UpdateApplyStartMessage" xml:space="preserve">
     <value>Updating...</value>
@@ -670,10 +679,10 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</value>
   <data name="UpdateApplySuccessMessage" xml:space="preserve">
     <value>...Update succeeded</value>
   </data>
-  <data name="UpdateCheckCommandHelp" xml:space="preserve">
-    <value>Check the currently installed template packs for updates.</value>
+  <data name="OptionDescriptionUpdateCheck" xml:space="preserve">
+    <value>Checks the currently installed template packs for updates.</value>
   </data>
-  <data name="InteractiveHelp" xml:space="preserve">
+  <data name="OptionDescriptionInteractive" xml:space="preserve">
     <value>Allows the internal dotnet restore command to stop and wait for user input or action (for example to complete authentication).</value>
   </data>
   <data name="TemplatesNotValidGivenTheSpecifiedFilter" xml:space="preserve">
@@ -684,6 +693,29 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</value>
   </data>
   <data name="ListTemplatesCommand" xml:space="preserve">
     <value>To list installed templates, run 'dotnet new --list'.</value>
+  </data>
+  <data name="ArgumentsSectionTitle" xml:space="preserve">
+    <value>Arguments:</value>
+  </data>
+  <data name="CommandUsage" xml:space="preserve">
+    <value>Usage: 
+	dotnet {0} &lt;{1}&gt; [-n|--name &lt;OUTPUT_NAME&gt;] [-o|--output &lt;OUTPUT_DIRECTORY&gt;] [--interactive] [--dry-run] [--force] [--language|-lang &lt;LANGUAGE&gt;] [--type|-t &lt;TYPE&gt;] [template options]
+	dotnet {0} --help|-h
+	dotnet {0} &lt;{1}&gt;  --help|-h [--language|-lang &lt;LANGUAGE&gt;] [--type|-t &lt;TYPE&gt;]
+	dotnet {0} [{1}]  --list|-l [--language|-lang &lt;LANGUAGE&gt;] [--type|-t &lt;TYPE&gt;]
+	dotnet {0} -i|--install &lt;PATH|NUGET_ID&gt; [--nuget-source &lt;SOURCE&gt;]
+	dotnet {0} -u|--uninstall [PATH|NUGET_ID] 
+	dotnet {0} --update-check 
+	dotnet {0} --update-apply</value>
+  </data>
+  <data name="OptionsSectionTitle" xml:space="preserve">
+    <value>Options: </value>
+  </data>
+  <data name="ArgumentDescriptionTemplate" xml:space="preserve">
+    <value>The template to instantiate when the command is invoked. Each template might have specific options you can pass. 
+When using with dotnet new --list or -l, &lt;{0}&gt; is used to filter the templates which match on the template name.
+When using with dotnet new --help or -h, the information about &lt;{0}&gt; and its template specific options is displayed.
+Should not be used with -i, --install, -u, --uninstall, --update-check, --update-apply.</value>
   </data>
   <data name="ColumnNameAuthor" xml:space="preserve">
     <value>Author</value>
