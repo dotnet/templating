@@ -496,6 +496,12 @@ namespace Microsoft.TemplateEngine.Cli
                         return CreationResultStatus.Cancelled;
                     }
 
+                    if (TemplateName.Length < 2)
+                    {
+                        Reporter.Error.WriteLine(LocalizableStrings.SearchOnlineErrorTemplateNameIsTooShort.Bold().Red());
+                        return CreationResultStatus.Cancelled;
+                    }
+
                     return await SearchForTemplateMatchesAsync();
                 }
 
@@ -528,39 +534,26 @@ namespace Microsoft.TemplateEngine.Cli
 
             if (searchResults.MatchesBySource.Count > 0)
             {
+                string packageIdToShow = null;
                 foreach (TemplateSourceSearchResult sourceResult in searchResults.MatchesBySource)
                 {
-                    string sourceHeader = string.Format(LocalizableStrings.SearchResultSourceIndicator, sourceResult.SourceDisplayName);
+                    DisplayResultsForPack(sourceResult);
 
-                    Reporter.Output.WriteLine(sourceHeader);
-                    Reporter.Output.WriteLine();
-
-                    var rows = sourceResult.PacksWithMatches.Values.SelectMany(pack => pack.TemplateMatches.Select(match => new Tuple<PackInfo, ITemplateMatchInfo>(pack.PackInfo, match)));
-
-                    HelpFormatter<Tuple<PackInfo, ITemplateMatchInfo>> formatter =
-                        HelpFormatter
-                            .For(
-                                EnvironmentSettings,
-                                rows,
-                                columnPadding: 2,
-                                headerSeparator: '-',
-                                blankLineBetweenRows: false)
-                            .DefineColumn(r => r.Item2.Info.Name, LocalizableStrings.Templates, shrinkIfNeeded: true)
-                            .DefineColumn(r => r.Item2.Info.ShortName, LocalizableStrings.ShortName)
-                            .DefineColumn(r => string.Join(", ", r.Item2.Info.Tags.Where(kvp => kvp.Key == "language").Select(kvp => kvp.Value.DefaultValue)))
-                            .DefineColumn(r => r.Item2.Info.Author, "Author")
-                            .DefineColumn(r => r.Item1.Name, "Package")
-                            .DefineColumn(r => r.Item1.Version, out object packageColumn, "Version")
-                            .OrderBy(packageColumn);
-                    Reporter.Output.WriteLine(formatter.Layout());
-
+                    var firstMicrosoftAuthoredPack = sourceResult.PacksWithMatches.FirstOrDefault(p => p.Value.TemplateMatches.Any(t => string.Equals(t.Info.Author, "Microsoft")));
+                    if (!firstMicrosoftAuthoredPack.Equals(default(KeyValuePair<PackInfo, TemplatePackSearchResult>)))
+                    {
+                        packageIdToShow = firstMicrosoftAuthoredPack.Key.Name;
+                    }
                 }
 
                 Reporter.Output.WriteLine();
                 Reporter.Output.WriteLine(string.Format(LocalizableStrings.SearchResultInstallHeader, _commandInput.CommandName));
-                string fullyQualifiedPackName = $"{ searchResults.MatchesBySource.First().PacksWithMatches.First().Key.Name}::";
+                if (string.IsNullOrWhiteSpace(packageIdToShow))
+                {
+                    packageIdToShow = searchResults.MatchesBySource.First().PacksWithMatches.First().Key.Name;
+                }
                 Reporter.Output.WriteLine("Example:");
-                Reporter.Output.WriteLine(string.Format(LocalizableStrings.SearchResultInstallCommand, _commandInput.CommandName, fullyQualifiedPackName));
+                Reporter.Output.WriteLine(string.Format(LocalizableStrings.SearchResultInstallCommand, _commandInput.CommandName, packageIdToShow));
                 return CreationResultStatus.Success;
             }
             else
@@ -570,24 +563,30 @@ namespace Microsoft.TemplateEngine.Cli
             }
         }
 
-        private void DisplayResultsForPack(TemplatePackSearchResult matchesForPack)
+        private void DisplayResultsForPack(TemplateSourceSearchResult sourceResult)
         {
-            HashSet<string> seenGroupIdentities = new HashSet<string>();
+            string sourceHeader = string.Format(LocalizableStrings.SearchResultSourceIndicator, sourceResult.SourceDisplayName);
 
-            foreach (ITemplateMatchInfo templateMatch in matchesForPack.TemplateMatches)
-            {
-                // only display one template in the pack for each group.
-                // if the group identity is blank, we assume it's a new template. 
-                if (string.IsNullOrEmpty(templateMatch.Info.GroupIdentity) || seenGroupIdentities.Add(templateMatch.Info.GroupIdentity))
-                {
-                    // TODO: get the Pack authoring info plumbed through - this will require changes to the scraper output
-                    Reporter.Output.WriteLine(string.Format(LocalizableStrings.SearchResultTemplateInfo, templateMatch.Info.Name, templateMatch.Info.ShortName, templateMatch.Info.Author, matchesForPack.PackInfo.Name));
-                }
-            }
+            Reporter.Output.WriteLine(sourceHeader);
+            Reporter.Output.WriteLine();
 
-            Reporter.Output.WriteLine(LocalizableStrings.SearchResultInstallHeader);
-            string fullyQualifiedPackName = $"{matchesForPack.PackInfo.Name}::{matchesForPack.PackInfo.Version}";
-            Reporter.Output.WriteLine(string.Format(LocalizableStrings.SearchResultInstallCommand, _commandInput.CommandName, fullyQualifiedPackName));
+            var rows = sourceResult.PacksWithMatches.Values.SelectMany(pack => pack.TemplateMatches.Select(match => new Tuple<PackInfo, ITemplateMatchInfo>(pack.PackInfo, match)));
+
+            HelpFormatter<Tuple<PackInfo, ITemplateMatchInfo>> formatter =
+                HelpFormatter
+                    .For(
+                        EnvironmentSettings,
+                        rows,
+                        columnPadding: 2,
+                        headerSeparator: '-',
+                        blankLineBetweenRows: false)
+                    .DefineColumn(r => r.Item2.Info.Name, LocalizableStrings.Templates, shrinkIfNeeded: true)
+                    .DefineColumn(r => r.Item2.Info.ShortName, LocalizableStrings.ShortName)
+                    .DefineColumn(r => string.Join(", ", r.Item2.Info.Tags.Where(kvp => kvp.Key == "language").Select(kvp => kvp.Value.DefaultValue)))
+                    .DefineColumn(r => r.Item2.Info.Author, "Author")
+                    .DefineColumn(r => r.Item1.Name, out object packageColumn, "Package")
+                    .OrderBy(packageColumn);
+            Reporter.Output.WriteLine(formatter.Layout());
         }
 
 
