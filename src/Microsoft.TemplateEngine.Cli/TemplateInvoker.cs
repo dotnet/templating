@@ -170,9 +170,8 @@ namespace Microsoft.TemplateEngine.Cli
             {   // DirectoryInfo("/").Name on *nix returns "/", as opposed to null or "".
                 fallbackName = null;
             }
-
             // Name returns <disk letter>:\ for root disk folder on Windows - replace invalid chars
-            if (fallbackName.IndexOfAny(invalidChars) > -1)
+            else if (fallbackName.IndexOfAny(invalidChars) > -1)
             {
                 Regex pattern = new Regex($"[{Regex.Escape(new string(invalidChars))}]");
                 fallbackName = pattern.Replace(fallbackName, "");
