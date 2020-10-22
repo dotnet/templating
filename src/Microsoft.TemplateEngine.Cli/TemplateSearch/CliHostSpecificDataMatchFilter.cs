@@ -21,32 +21,12 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
 
         public Func<IReadOnlyList<ITemplateNameSearchResult>, IReadOnlyList<ITemplateMatchInfo>> MatchFilter => (nameMatches) =>
         {
-            Dictionary<string, HostSpecificTemplateData> hostDataLookup = new Dictionary<string, HostSpecificTemplateData>();
-
-            foreach (ITemplateNameSearchResult result in nameMatches)
+            IEnumerable<ITemplateNameSearchResult> templatesToFilter = nameMatches;
+            if (!string.IsNullOrEmpty(_commandInput.PackageFilter))
             {
-                if (result is CliTemplateNameSearchResult cliResult)
-                {
-                    hostDataLookup[cliResult.Template.Identity] = cliResult.HostSpecificTemplateData;
-                }
-                else
-                {
-                    hostDataLookup[result.Template.Identity] = HostSpecificTemplateData.Default;
-                }
+                templatesToFilter = nameMatches.Where(pack => pack.PackInfo.Name.IndexOf(_commandInput.PackageFilter, StringComparison.OrdinalIgnoreCase) > -1);
             }
-
-            IHostSpecificDataLoader hostSpecificDataLoader = new InMemoryHostSpecificDataLoader(hostDataLookup);
-
-            TemplateListResolutionResult templateResolutionResult = TemplateListResolver.GetTemplateResolutionResult(nameMatches.Select(x => x.Template).ToList(), hostSpecificDataLoader, _commandInput, _defaultLanguage);
-
-            if (templateResolutionResult.TryGetAllInvokableTemplates(out IReadOnlyList<ITemplateMatchInfo> invokableTemplates))
-            {
-                return invokableTemplates;
-            }
-            else
-            {
-                return new List<ITemplateMatchInfo>();
-            }
+            return TemplateListResolver.PerformCoreTemplateQueryForSearch(templatesToFilter.Select(x => x.Template), _commandInput).ToList();
         };
     }
 }
