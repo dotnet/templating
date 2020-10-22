@@ -722,4 +722,7 @@ To search for the template run: dotnet new3 &lt;template name&gt; --search.</val
   <data name="OptionDescriptionAuthorFilter" xml:space="preserve">
     <value>Filters templates based on template author</value>
   </data>
+  <data name="PackageFilterHelp" xml:space="preserve">
+    <value>Filters templates based on package.</value>
+  </data>
 </root>
