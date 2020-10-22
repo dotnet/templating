@@ -123,6 +123,31 @@ namespace Microsoft.TemplateEngine.Edge.Template
             };
         }
 
+        public static Func<ITemplateInfo, MatchInfo?> AuthorFilter(string author)
+        {
+            return (template) =>
+            {
+                if (string.IsNullOrEmpty(author) || string.IsNullOrWhiteSpace(template.Author))
+                {
+                    return null;
+                }
+
+                int authorIndex = template.Author.IndexOf(author, StringComparison.OrdinalIgnoreCase);
+
+                if (authorIndex == 0 && string.Equals(template.Author, author, StringComparison.OrdinalIgnoreCase))
+                {
+                    return new MatchInfo { Location = MatchLocation.Author, Kind = MatchKind.Exact };
+                }
+
+                if (authorIndex > -1)
+                {
+                    return new MatchInfo { Location = MatchLocation.Author, Kind = MatchKind.Partial };
+                }
+
+                return new MatchInfo { Location = MatchLocation.Author, Kind = MatchKind.Mismatch };
+            };
+        }
+
         public static Func<ITemplateInfo, MatchInfo?> BaselineFilter(string baselineName)
         {
             return (template) =>
