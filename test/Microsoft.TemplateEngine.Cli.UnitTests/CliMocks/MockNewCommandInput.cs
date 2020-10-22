@@ -84,11 +84,15 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
 
         public string OutputPath { get; set; }
 
+        public string PackageFilter { get; set; }
+
         public bool SkipUpdateCheck { get; set; }
 
         public bool CheckForUpdates { get; set; }
 
         public bool CheckForUpdatesNoPrompt { get; set; }
+
+        public bool SearchOnline { get; set; }
 
         public string AllowScriptsToRun { get; set; }
 

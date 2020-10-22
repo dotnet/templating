@@ -167,6 +167,8 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
         public string OutputPath => _parseResult.GetArgumentValueAtPath(new[] { _commandName, "output" });
 
+        public string PackageFilter => _parseResult.GetArgumentValueAtPath(new[] { _commandName, "package" });
+
         public List<string> RemainingArguments
         {
             get
@@ -245,9 +247,6 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
                     _templateParamVariantToCanonicalMap = map;
                 }
-
-                return _templateParamVariantToCanonicalMap;
-            }
 
         public string AllowScriptsToRun
         {

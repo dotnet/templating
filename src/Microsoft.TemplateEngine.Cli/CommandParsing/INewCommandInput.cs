@@ -35,6 +35,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
         string Locale { get; }
         string Name { get; }
         string OutputPath { get; }
+        string PackageFilter { get; }
         List<string> RemainingArguments { get; }
         IDictionary<string, IList<string>> RemainingParameters { get; }
         bool SearchOnline { get; }
@@ -66,6 +67,6 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
         bool TryGetCanonicalNameForVariant(string variant, out string canonical);
 
-        IReadOnlyList<string> VariantsForCanonical(string canonical);
+        bool SearchOnline { get;  }
     }
 }
