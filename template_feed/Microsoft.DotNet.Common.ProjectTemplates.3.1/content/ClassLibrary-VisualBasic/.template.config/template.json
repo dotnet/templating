@@ -47,6 +47,10 @@
           "description": "Target netcoreapp3.1"
         },
         {
+          "choice": "netcoreapp2.1",
+          "description": "Target netcoreapp2.1"
+        },
+        {
           "choice": "netstandard2.1",
           "description": "Target netstandard2.1"
         },

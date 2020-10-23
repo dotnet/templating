@@ -31,6 +31,10 @@
         {
           "choice": "netcoreapp3.1",
           "description": "Target netcoreapp3.1"
+        },
+        {
+          "choice": "netcoreapp2.1",
+          "description": "Target netcoreapp2.1"
         }
       ],
       "replaces": "netcoreapp3.1",
