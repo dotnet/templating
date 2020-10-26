@@ -6,37 +6,36 @@ using System.Text;
 
 namespace Microsoft.TemplateEngine.Cli.CommandParsing
 {
-    internal static class CommandLineHelpViewer
+    internal static class CommandLineHelpViewerExtensions
     {
-        private static int columnGutterWidth = 3;
-        private const string templateArgument = "TEMPLATE";
+        private const int ColumnGutterWidth = 3;
+        private const string TemplateArgument = "TEMPLATE";
+
         internal static string HelpView(this Command newCommand)
         {
-            var helpView = new StringBuilder();
+            StringBuilder helpView = new StringBuilder();
             WriteSynopsys(helpView, newCommand);
             WriteArgumentsSection(helpView);
-            WriteOptionsSection(newCommand, helpView);
+            WriteOptionsSection(helpView, newCommand);
             return helpView.ToString();
         }
 
         private static void WriteSynopsys(StringBuilder helpView, Command command)
         {
-            helpView.AppendLine(string.Format(LocalizableStrings.CommandUsage, command.Name, templateArgument));
+            helpView.AppendLine(string.Format(LocalizableStrings.CommandUsage, command.Name, TemplateArgument));
             helpView.AppendLine();
         }
 
         private static void WriteArgumentsSection(StringBuilder helpView)
         {
             helpView.AppendLine(LocalizableStrings.ArgumentsSectionTitle);
-            WriteColumnizedSummary($"  <{templateArgument}>", string.Format(LocalizableStrings.ArgumentDescriptionTemplate, templateArgument), 20, helpView);
+            WriteColumnizedSummary($"  <{TemplateArgument}>", string.Format(LocalizableStrings.ArgumentDescriptionTemplate, TemplateArgument), 20, helpView);
             helpView.AppendLine();
         }
 
-        private static void WriteOptionsSection(
-            Command command,
-            StringBuilder helpView)
+        private static void WriteOptionsSection(StringBuilder helpView, Command command)
         {
-            var options = command
+            Option[] options = command
                 .DefinedOptions
                 .Where(o => !o.IsHidden())
                 .ToArray();
@@ -47,41 +46,30 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             }
 
             helpView.AppendLine(LocalizableStrings.OptionsSectionTitle);
-
             WriteOptionsList(options, helpView);
         }
 
 
-        private static void WriteOptionsList(
-            Option[] options,
-            StringBuilder helpView)
+        private static void WriteOptionsList(Option[] options, StringBuilder helpView)
         {
-            var leftColumnTextFor = options
-                .ToDictionary(o => o, LeftColumnText);
+            Dictionary<Option,string> leftColumnTextFor = options.ToDictionary(o => o, LeftColumnText);
 
-            var leftColumnWidth = leftColumnTextFor
+            int leftColumnWidth = leftColumnTextFor
                                       .Values
                                       .Select(s => s.Length)
                                       .OrderBy(length => length)
-                                      .Last() + columnGutterWidth;
+                                      .Last() + ColumnGutterWidth;
 
-            foreach (var option in options)
+            foreach (Option option in options)
             {
-                WriteColumnizedSummary(leftColumnTextFor[option],
-                                       option.HelpText,
-                                       leftColumnWidth,
-                                       helpView);
+                WriteColumnizedSummary(leftColumnTextFor[option], option.HelpText, leftColumnWidth, helpView);
             }
         }
 
         private static string LeftColumnText(Option option)
         {
-            var leftColumnText = "  " +
-                                 string.Join(", ",
-                                             option.RawAliases
-                                                   .OrderBy(a => a.Length));
-
-            var argumentName = option.ArgumentsRule.Name;
+            string leftColumnText = "  " + string.Join(", ", option.RawAliases.OrderBy(a => a.Length));
+            string argumentName = option.ArgumentsRule.Name;
 
             if (!string.IsNullOrWhiteSpace(argumentName))
             {
@@ -90,11 +78,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             return leftColumnText;
         }
 
-        private static void WriteColumnizedSummary(
-            string leftColumnText,
-            string rightColumnText,
-            int width,
-            StringBuilder helpView)
+        private static void WriteColumnizedSummary(string leftColumnText, string rightColumnText, int width, StringBuilder helpView)
         {
             helpView.Append(leftColumnText);
 
@@ -108,7 +92,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                 helpView.Append(new string(' ', width));
             }
 
-            var descriptionWithLineWraps = string.Join(
+            string descriptionWithLineWraps = string.Join(
                 Environment.NewLine + new string(' ', width),
                 rightColumnText
                     .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
