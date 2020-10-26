@@ -1128,7 +1128,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Prints out help for the command. 
+        ///   Looks up a localized string similar to Shows help information.
         ///If template name is specified, shows information about template and template specific options..
         /// </summary>
         public static string OptionDescriptionHelp {
@@ -1139,8 +1139,8 @@ namespace Microsoft.TemplateEngine.Cli {
         
         /// <summary>
         ///   Looks up a localized string similar to Installs a template pack from the path or using NuGet ID provided. 
-        ///If you want to install a prerelease version of a template package, you need to specify the version in the format of &lt;package-name&gt;::&lt;package-version&gt;. By default, dotnet new passes * for the version, which represents the latest stable package version. 
-        ///If a version of the template was already installed when you run this command, the template will be updated to the specified version, or to the latest stable version if no version was specif [rest of string was truncated]&quot;;.
+        ///To install a template from a NuGet package from the NuGet feed, use the NuGet package identfier. Use &quot;package-identifier::version&quot; to specify the version to install. If a version of the template was already installed when you run this command, the template will be updated to the specified version, or to the latest stable version if no version was specified. 
+        ///To install the package from the file system, specify the path to th NuGet package [rest of string was truncated]&quot;;.
         /// </summary>
         public static string OptionDescriptionInstall {
             get {
@@ -1218,7 +1218,8 @@ namespace Microsoft.TemplateEngine.Cli {
         /// <summary>
         ///   Looks up a localized string similar to Uninstalls a template pack at the path or using NuGet ID provided. 
         ///When the argument value is not specified, all currently installed template packs and their associated templates are displayed. 
-        ///When specifying NuGet ID, don&apos;t include the version number..
+        ///If the package was installed by either a NuGet feed or by a .nupkg file directly, provide the identifier. When specifying NuGet ID, do not include the version number.
+        ///If the package was installed by specifying a path to the .template.config folder, use that absolute path to uninstall the package. You can see the [rest of string was truncated]&quot;;.
         /// </summary>
         public static string OptionDescriptionUninstall {
             get {
