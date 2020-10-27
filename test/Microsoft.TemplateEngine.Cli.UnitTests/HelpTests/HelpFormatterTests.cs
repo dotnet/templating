@@ -24,8 +24,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.HelpTests
                 Host = host,
                 Environment = new MockEnvironment()
                 {
-                    ConsoleBufferWidth = 6 + 2 + 12 + 1,
-                    NewLine = "\r\n"
+                    ConsoleBufferWidth = 6 + 2 + 12 + 1
                 }
             };
 
@@ -35,7 +34,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.HelpTests
                 new Tuple<string, string>("My test data", "My test data")
             };
 
-            string expectedOutput = "Col...  Column 2    \r\n------  ------------\r\nMy ...  My test data\r\nMy ...  My test data\r\n";
+            string expectedOutput = $"Col...  Column 2    {Environment.NewLine}------  ------------{Environment.NewLine}My ...  My test data{Environment.NewLine}My ...  My test data{Environment.NewLine}";
 
             HelpFormatter<Tuple<string, string>> formatter =
              HelpFormatter
@@ -77,7 +76,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.HelpTests
                 new Tuple<string, string>("My test data", "My test data")
             };
 
-            string expectedOutput = "Co...  Colu...\r\n-----  -------\r\nMy...  My t...\r\nMy...  My t...\r\n";
+            string expectedOutput = $"Co...  Colu...{Environment.NewLine}-----  -------{Environment.NewLine}My...  My t...{Environment.NewLine}My...  My t...{Environment.NewLine}";
 
             HelpFormatter<Tuple<string, string>> formatter =
              HelpFormatter
@@ -120,7 +119,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.HelpTests
                 new Tuple<string, string>("My test data", "My test data")
             };
 
-            string expectedOutput = "Column 1      Column 2   \r\n------------  -----------\r\nMy test data  My test ...\r\nMy test data  My test ...\r\n";
+            string expectedOutput = $"Column 1      Column 2   {Environment.NewLine}------------  -----------{Environment.NewLine}My test data  My test ...{Environment.NewLine}My test data  My test ...{Environment.NewLine}";
 
             HelpFormatter<Tuple<string, string>> formatter =
              HelpFormatter
