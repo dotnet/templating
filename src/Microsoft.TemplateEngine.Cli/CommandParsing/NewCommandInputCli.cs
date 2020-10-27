@@ -26,7 +26,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
         private readonly string _commandName;
 
         internal static string[] SupportedFilterableColumnNames = new[]
-{
+        {
             AuthorColumnFilter,
             TypeColumnFilter,
             LanguageColumnFilter,
@@ -287,7 +287,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
         {
             get
             {
-                List<string> invalidColumns = new List<string>();
+                List<string> invalidColumns = new List<string>(Columns.Count);
                 foreach (string columnToShow in Columns)
                 {
                     if (!SupportedFilterableColumnNames.Contains(columnToShow))
