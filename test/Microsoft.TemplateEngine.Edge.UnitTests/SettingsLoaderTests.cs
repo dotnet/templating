@@ -200,7 +200,15 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                     pi.ParameterType == typeof(string) &&
                     pi.Name == "place")
                 {
-                    return Path.Combine(@"C:\", context.Create<string>(), context.Create<string>());
+                    bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+                    if (isWindows)
+                    {
+                        return Path.Combine(@"C:\", context.Create<string>(), context.Create<string>());
+                    }
+                    else
+                    {
+                        return Path.Combine(@"/", context.Create<string>(), context.Create<string>());
+                    }    
                 }
 
                 if (pi.Member.DeclaringType == typeof(MountPointInfo) &&
