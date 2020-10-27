@@ -18,12 +18,9 @@ namespace Microsoft.TemplateEngine.Mocks
 
     public class MockEnvironment : IEnvironment
     {
-        public string NewLine => Environment.NewLine;
+        public string NewLine { get; set; } = Environment.NewLine;
 
-        public int ConsoleBufferWidth
-        {
-            get; set;
-        }
+        public int ConsoleBufferWidth { get; set; } = 160;
 
         public string ExpandEnvironmentVariables(string name)
         {

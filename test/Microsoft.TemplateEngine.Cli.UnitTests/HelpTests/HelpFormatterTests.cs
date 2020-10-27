@@ -25,6 +25,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.HelpTests
                 Environment = new MockEnvironment()
                 {
                     ConsoleBufferWidth = 6 + 2 + 12 + 1,
+                    NewLine = "\r\n"
                 }
             };
 
@@ -34,12 +35,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.HelpTests
                 new Tuple<string, string>("My test data", "My test data")
             };
 
-            string expectedOutput =
-@"Col...  Column 2    
-------  ------------
-My ...  My test data
-My ...  My test data
-";
+            string expectedOutput = "Col...  Column 2    \r\n------  ------------\r\nMy ...  My test data\r\nMy ...  My test data\r\n";
 
             HelpFormatter<Tuple<string, string>> formatter =
              HelpFormatter
@@ -81,12 +77,7 @@ My ...  My test data
                 new Tuple<string, string>("My test data", "My test data")
             };
 
-            string expectedOutput =
-@"Co...  Colu...
------  -------
-My...  My t...
-My...  My t...
-";
+            string expectedOutput = "Co...  Colu...\r\n-----  -------\r\nMy...  My t...\r\nMy...  My t...\r\n";
 
             HelpFormatter<Tuple<string, string>> formatter =
              HelpFormatter
@@ -129,12 +120,7 @@ My...  My t...
                 new Tuple<string, string>("My test data", "My test data")
             };
 
-            string expectedOutput =
-@"Column 1      Column 2   
-------------  -----------
-My test data  My test ...
-My test data  My test ...
-";
+            string expectedOutput = "Column 1      Column 2   \r\n------------  -----------\r\nMy test data  My test ...\r\nMy test data  My test ...\r\n";
 
             HelpFormatter<Tuple<string, string>> formatter =
              HelpFormatter
