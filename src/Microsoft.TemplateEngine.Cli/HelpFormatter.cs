@@ -189,11 +189,11 @@ namespace Microsoft.TemplateEngine.Cli
             return b.ToString();
         }
 
-        private void CalculateColumnWidth(Dictionary<int, int> columnWidthLookup)
+        private void CalculateColumnWidth(IReadOnlyDictionary<int, int> columnWidthLookup)
         {
-            var maxAllowedGridWidth = _environmentSettings.Environment.ConsoleBufferWidth;
-            var totalPaddingWidth = _columnPadding * (_columns.Count - 1);
-            var maxRowWidth = columnWidthLookup.Sum(column => column.Value) + totalPaddingWidth;
+            int maxAllowedGridWidth = _environmentSettings.Environment.ConsoleBufferWidth;
+            int totalPaddingWidth = _columnPadding * (_columns.Count - 1);
+            int maxRowWidth = columnWidthLookup.Sum(column => column.Value) + totalPaddingWidth;
 
             // If there is no columns to shrink or it fits, use maximum length identified when printing
             if (!_columns.Any(col => col.ShrinkIfNeeded) || maxRowWidth < maxAllowedGridWidth)
@@ -239,7 +239,7 @@ namespace Microsoft.TemplateEngine.Cli
             // We need the grid width to be at most 1 less than the buffer width. We don't want exactly
             // the buffer width because that will cause the caret to wrap on the last character, so we
             // stop 1 short of it.
-            var amountForShrinkableColumnToGiveUp = maxRowWidth - maxAllowedGridWidth + 1;
+            int amountForShrinkableColumnToGiveUp = maxRowWidth - maxAllowedGridWidth + 1;
             for (int i = 0; i < _columns.Count; ++i)
             {
                 if (_columns[i].ShrinkIfNeeded)
