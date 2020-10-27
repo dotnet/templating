@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using AutoFixture;
 using AutoFixture.Kernel;
 using FakeItEasy;
@@ -21,7 +22,6 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 {
     public class SettingsLoaderTests : TestBase
     {
-        private const string BaseDir = @"C:\BaseDir";
         private readonly IEngineEnvironmentSettings _environmentSettings;
         private readonly MockFileSystem _fileSystem;
         private readonly IFixture _fixture;
@@ -41,6 +41,19 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 .Returns(_fileSystem);
             A.CallTo(() => _environmentSettings.Paths.BaseDir)
                 .Returns(BaseDir);
+        }
+
+        public string BaseDir
+        {
+            get
+            {
+                bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+                string profileDir = Environment.GetEnvironmentVariable(isWindows
+                    ? "USERPROFILE"
+                    : "HOME");
+
+                return Path.Combine(profileDir, ".tetestrunner");
+            }
         }
 
         [Fact(DisplayName = nameof(RebuildCacheIfNotCurrentScansAll))]
