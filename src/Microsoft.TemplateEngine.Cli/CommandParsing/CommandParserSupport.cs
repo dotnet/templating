@@ -143,7 +143,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                     Create.Option("--update-apply", LocalizableStrings.UpdateApplyCommandHelp, Accept.NoArguments()),
                     Create.Option("--columns", LocalizableStrings.OptionDescriptionColumns, Accept.ExactlyOneArgument().With(LocalizableStrings.OptionDescriptionColumns, "COLUMNS_LIST"))
                 };
-            }           
+            }
         }
 
         private static Option[] NewCommandHiddenArgs
