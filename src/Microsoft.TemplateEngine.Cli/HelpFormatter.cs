@@ -43,7 +43,7 @@ namespace Microsoft.TemplateEngine.Cli
 
         public HelpFormatter<T> DefineColumn(Func<T, string> binder,  string header = null, string columnName = null, bool shrinkIfNeeded = false, int minWidth = 2, bool showAlways = false, bool defaultColumn = true)
         {
-            return DefineColumn(binder, out object c,  header, columnName, minWidth, shrinkIfNeeded, showAlways, defaultColumn);
+            return DefineColumn(binder, out object c,  header, columnName, shrinkIfNeeded, minWidth, showAlways, defaultColumn);
         }
 
         public HelpFormatter<T> DefineColumn(Func<T, string> binder, out object column, string header = null, string columnName = null, bool shrinkIfNeeded = false, int minWidth = 2, bool showAlways = false, bool defaultColumn = true)
