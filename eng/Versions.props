@@ -10,5 +10,6 @@
     <PackSpecific Condition="'$(OS)' != 'Windows_NT'">true</PackSpecific>
     <NewtonsoftJsonPackageVersion>11.0.1</NewtonsoftJsonPackageVersion>
     <MicrosoftDotNetCliCommandLinePackageVersion>1.0.0-preview.19208.1</MicrosoftDotNetCliCommandLinePackageVersion>
+    <MicrosoftDotNetTemplateLocatorPackageVersion>5.0.100-rc.1.20421.19</MicrosoftDotNetTemplateLocatorPackageVersion>
   </PropertyGroup>
 </Project>
