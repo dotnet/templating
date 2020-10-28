@@ -1138,9 +1138,10 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Installs a template pack from the path or using NuGet ID provided. 
-        ///To install a template from a NuGet package from the NuGet feed, use the NuGet package identfier. Use &quot;package-identifier::version&quot; to specify the version to install. If a version of the template was already installed when you run this command, the template will be updated to the specified version, or to the latest stable version if no version was specified. 
-        ///To install the package from the file system, specify the path to th NuGet package [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to Installs a template pack from the path or using NuGet ID provided.
+        ///To install the package from the NuGet feed, use the NuGet package identfier. Use &quot;package-identifier::version&quot; to specify the version to install. If a version of the template was already installed when you run this command, the template will be updated to the specified version, or to the latest stable version if no version was specified.
+        ///To install the package from the file system, specify the path to the NuGet package file.
+        ///To install th [rest of string was truncated]&quot;;.
         /// </summary>
         public static string OptionDescriptionInstall {
             get {

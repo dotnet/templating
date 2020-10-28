@@ -217,9 +217,9 @@ If template name is specified, shows information about template and template spe
 {1}.</value>
   </data>
   <data name="OptionDescriptionInstall" xml:space="preserve">
-    <value>Installs a template pack from the path or using NuGet ID provided. 
-To install a template from a NuGet package from the NuGet feed, use the NuGet package identfier. Use "package-identifier::version" to specify the version to install. If a version of the template was already installed when you run this command, the template will be updated to the specified version, or to the latest stable version if no version was specified. 
-To install the package from the file system, specify the path to th NuGet package file.
+    <value>Installs a template pack from the path or using NuGet ID provided.
+To install the package from the NuGet feed, use the NuGet package identfier. Use "package-identifier::version" to specify the version to install. If a version of the template was already installed when you run this command, the template will be updated to the specified version, or to the latest stable version if no version was specified.
+To install the package from the file system, specify the path to the NuGet package file.
 To install the template from the file system directory, specify the folder path of the .template.config folder. Do not include a final terminating directory slash on your template path.</value>
   </data>
   <data name="InstallingUpdates" xml:space="preserve">
