@@ -527,11 +527,29 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Package.
+        /// </summary>
+        public static string ColumnNamePackage {
+            get {
+                return ResourceManager.GetString("ColumnNamePackage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The column {0} is/are not supported, the supported columns are: {1}..
         /// </summary>
         public static string ColumnNamesAreNotSupported {
             get {
                 return ResourceManager.GetString("ColumnNamesAreNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Template Name.
+        /// </summary>
+        public static string ColumnNameTemplateName {
+            get {
+                return ResourceManager.GetString("ColumnNameTemplateName", resourceCulture);
             }
         }
         
@@ -967,7 +985,7 @@ namespace Microsoft.TemplateEngine.Cli {
         /// <summary>
         ///   Looks up a localized string similar to Language.
         /// </summary>
-        public static string Language {
+        public static string ColumnNameLanguage {
             get {
                 return ResourceManager.GetString("Language", resourceCulture);
             }
@@ -1440,11 +1458,15 @@ namespace Microsoft.TemplateEngine.Cli {
         
         /// <summary>
         ///   Looks up a localized string similar to Search failed: no template name is specified.
-        ///To search for the template run: dotnet new3 &lt;template name&gt; --search..
+        ///To search for the template, specify template name or use one of supported filters: {0}
+        ///Examples:
+        ///        dotnet {1} &lt;template name&gt; --search
+        ///        dotnet {1} --search --author Microsoft
+        ///        dotnet {1} &lt;template name&gt; --search --author Microsoft.
         /// </summary>
-        public static string SearchOnlineErrorNoTemplateName {
+        public static string SearchOnlineErrorNoTemplateNameOrFilter {
             get {
-                return ResourceManager.GetString("SearchOnlineErrorNoTemplateName", resourceCulture);
+                return ResourceManager.GetString("SearchOnlineErrorNoTemplateNameOrFilter", resourceCulture);
             }
         }
         
@@ -1541,7 +1563,7 @@ namespace Microsoft.TemplateEngine.Cli {
         /// <summary>
         ///   Looks up a localized string similar to Short Name.
         /// </summary>
-        public static string ShortName {
+        public static string ColumnNameShortName {
             get {
                 return ResourceManager.GetString("ShortName", resourceCulture);
             }
@@ -1595,7 +1617,7 @@ namespace Microsoft.TemplateEngine.Cli {
         /// <summary>
         ///   Looks up a localized string similar to Tags.
         /// </summary>
-        public static string Tags {
+        public static string ColumnNameTags {
             get {
                 return ResourceManager.GetString("Tags", resourceCulture);
             }
@@ -1764,7 +1786,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Colu.
+        ///   Looks up a localized string similar to     install command: dotnet {0} -i {1}.
         /// </summary>
         public static string UpdateCheck_InstallCommand {
             get {

@@ -709,9 +709,13 @@ The default list of columns shown without the option: template name, short name,
   <data name="SearchOnlineCommandHelp" xml:space="preserve">
     <value>Search for the template in configured remote sources.</value>
   </data>
-  <data name="SearchOnlineErrorNoTemplateName" xml:space="preserve">
+  <data name="SearchOnlineErrorNoTemplateNameOrFilter" xml:space="preserve">
     <value>Search failed: no template name is specified.
-To search for the template run: dotnet new3 &lt;template name&gt; --search.</value>
+To search for the template, specify template name or use one of supported filters: {0}
+Examples:
+        dotnet {1} &lt;template name&gt; --search
+        dotnet {1} --search --author Microsoft
+        dotnet {1} &lt;template name&gt; --search --author Microsoft</value>
   </data>
   <data name="SearchOnlineNoSources" xml:space="preserve">
     <value>No remoted sources defined to search for the templates.</value>
@@ -727,5 +731,11 @@ To search for the template run: dotnet new3 &lt;template name&gt; --search.</val
   </data>
   <data name="SearchOnlineErrorTemplateNameIsTooShort" xml:space="preserve">
     <value>Search failed: template name is too short, minimum 2 characters required.</value>
+  </data>
+  <data name="ColumnNamePackage" xml:space="preserve">
+    <value>Package</value>
+  </data>
+  <data name="ColumnNameTemplateName" xml:space="preserve">
+    <value>Template Name</value>
   </data>
 </root>

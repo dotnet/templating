@@ -10,11 +10,21 @@ using Microsoft.TemplateEngine.Cli.CommandParsing;
 using Microsoft.TemplateEngine.Utils;
 using Microsoft.TemplateEngine.Cli.TemplateResolution;
 using System.Text;
+using Microsoft.TemplateEngine.Cli.TableOutput;
 
 namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
 {
     internal static class HelpForTemplateResolution
     {
+
+        private static readonly Dictionary<string, Func<INewCommandInput, string>> SupportedFilterList = new Dictionary<string, Func<INewCommandInput, string>>()
+        {
+                {"--author", command => command.AuthorFilter },
+                {"--type", command => command.TypeFilter },
+                {"--language", command => command.Language },
+                {"--baseline", command => command.BaselineName }
+        };
+
         public static CreationResultStatus CoordinateHelpAndUsageDisplay(ListOrHelpTemplateListResolutionResult templateResolutionResult, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, IHostSpecificDataLoader hostDataLoader, ITelemetryLogger telemetryLogger, TemplateCreator templateCreator, string defaultLanguage, bool showUsageHelp = true)
         {
             if (showUsageHelp)
@@ -139,9 +149,8 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
 
             if (templateResolutionResult.HasExactMatches)
             {
-                IReadOnlyCollection<IGrouping<string, ITemplateMatchInfo>> groupedTemplatesForDisplay = templateResolutionResult.ExactMatchedTemplatesGrouped;
                 ShowTemplatesFoundMessage(commandInput);
-                DisplayTemplateList(groupedTemplatesForDisplay, environmentSettings, commandInput, defaultLanguage);
+                DisplayTemplateList(templateResolutionResult.ExactMatchedTemplates, environmentSettings, commandInput, defaultLanguage);
             }
             else
             {
@@ -178,9 +187,9 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
         // - Tags
         private static void DisplayTemplateList(IReadOnlyCollection<IGrouping<string, ITemplateMatchInfo>> templates, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, string defaultLanguage)
         {
-            IReadOnlyCollection<TemplateGroupForListDisplay> groupsForDisplay = GetTemplateGroupsForListDisplay(templates, commandInput.Language, defaultLanguage);
+            IReadOnlyCollection<TemplateGroupTableRow> groupsForDisplay = TemplateGroupDisplay.GetTemplateGroupsForListDisplay(templates, commandInput.Language, defaultLanguage);
 
-            HelpFormatter<TemplateGroupForListDisplay> formatter =
+            HelpFormatter<TemplateGroupTableRow> formatter =
                 HelpFormatter
                     .For(
                         environmentSettings,
@@ -189,95 +198,16 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                         columnPadding: 2,
                         headerSeparator: '-',
                         blankLineBetweenRows: false)
-                    .DefineColumn(t => t.Name, LocalizableStrings.Templates, shrinkIfNeeded: true, minWidth:15, showAlways: true)
-                    .DefineColumn(t => t.ShortName, LocalizableStrings.ShortName, showAlways: true)
-                    .DefineColumn(t => t.Languages, out object languageColumn, LocalizableStrings.Language, NewCommandInputCli.LanguageColumnFilter, defaultColumn: true)
+                    .DefineColumn(t => t.Name, LocalizableStrings.ColumnNameTemplateName, shrinkIfNeeded: true, minWidth: 15, showAlways: true)
+                    .DefineColumn(t => t.ShortName, LocalizableStrings.ColumnNameShortName, showAlways: true)
+                    .DefineColumn(t => t.Languages, out object languageColumn,  LocalizableStrings.ColumnNameLanguage, NewCommandInputCli.LanguageColumnFilter, defaultColumn: true)
                     .DefineColumn(t => t.Type, LocalizableStrings.ColumnNameType, NewCommandInputCli.TypeColumnFilter, defaultColumn: false)
                     .DefineColumn(t => t.Author,  LocalizableStrings.ColumnNameAuthor, NewCommandInputCli.AuthorColumnFilter, defaultColumn: false, shrinkIfNeeded: true, minWidth: 10)
-                    .DefineColumn(t => t.Classifications, out object tagsColumn, LocalizableStrings.Tags, NewCommandInputCli.TagsColumnFilter, defaultColumn: true)
+                    .DefineColumn(t => t.Classifications, out object tagsColumn, LocalizableStrings.ColumnNameTags, NewCommandInputCli.TagsColumnFilter, defaultColumn: true)
 
                     .OrderByDescending(languageColumn, new NullOrEmptyIsLastStringComparer())
                     .OrderBy(tagsColumn);
             Reporter.Output.WriteLine(formatter.Layout());
-        }
-
-        private class TemplateGroupForListDisplay
-        {
-            public string Name { get; set; }
-            public string ShortName { get; set; }
-            public string Languages { get; set; }
-            public string Classifications { get; set; }
-            public string Author { get; set; }
-            public string Type { get; set; }
-        }
-
-        private static IReadOnlyList<TemplateGroupForListDisplay> GetTemplateGroupsForListDisplay(IReadOnlyCollection<IGrouping<string, ITemplateMatchInfo>> groupedTemplateList, string language, string defaultLanguage)
-        {
-            List<TemplateGroupForListDisplay> templateGroupsForDisplay = new List<TemplateGroupForListDisplay>();
-
-            foreach (IGrouping<string, ITemplateMatchInfo> grouping in groupedTemplateList)
-            {
-                List<string> languageForDisplay = new List<string>();
-                HashSet<string> uniqueLanguages = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                string defaultLanguageDisplay = string.Empty;
-
-                foreach (ITemplateMatchInfo template in grouping)
-                {
-                    if (template.Info.Tags != null && template.Info.Tags.TryGetValue("language", out ICacheTag languageTag))
-                    {
-                        foreach (string lang in languageTag.ChoicesAndDescriptions.Keys)
-                        {
-                            if (uniqueLanguages.Add(lang))
-                            {
-                                if (string.IsNullOrEmpty(language) && string.Equals(defaultLanguage, lang, StringComparison.OrdinalIgnoreCase))
-                                {
-                                    defaultLanguageDisplay = $"[{lang}]";
-                                }
-                                else
-                                {
-                                    languageForDisplay.Add(lang);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                languageForDisplay.Sort(StringComparer.OrdinalIgnoreCase);
-                if (!string.IsNullOrEmpty(defaultLanguageDisplay))
-                {
-                    languageForDisplay.Insert(0, defaultLanguageDisplay);
-                }
-
-                ITemplateMatchInfo highestPrecedenceTemplate = grouping.OrderByDescending(x => x.Info.Precedence).First();
-                string shortName;
-                if (highestPrecedenceTemplate.Info is IShortNameList highestWithShortNameList)
-                {
-                    shortName = highestWithShortNameList.ShortNameList[0];
-                }
-                else
-                {
-                    shortName = highestPrecedenceTemplate.Info.ShortName;
-                }
-
-                string templateType = string.Empty;
-                if (highestPrecedenceTemplate.Info.Tags != null && highestPrecedenceTemplate.Info.Tags.TryGetValue("type", out ICacheTag typeTag))
-                {
-                    templateType = typeTag.DefaultValue;
-                }
-
-                TemplateGroupForListDisplay groupDisplayInfo = new TemplateGroupForListDisplay()
-                {
-                    Name = highestPrecedenceTemplate.Info.Name,
-                    ShortName = shortName,
-                    Languages = string.Join(",", languageForDisplay),
-                    Classifications = highestPrecedenceTemplate.Info.Classifications != null ? string.Join("/", highestPrecedenceTemplate.Info.Classifications) : null,
-                    Author = highestPrecedenceTemplate.Info.Author,
-                    Type = templateType
-                };
-                templateGroupsForDisplay.Add(groupDisplayInfo);
-            }
-
-            return templateGroupsForDisplay;
         }
 
         public static void DisplayInvalidParameters(IReadOnlyList<string> invalidParams)
@@ -306,7 +236,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
 
         private static void ShowContextAndTemplateNameMismatchHelp(ListOrHelpTemplateListResolutionResult templateResolutionResult, INewCommandInput commandInput)
         {
-            if (string.IsNullOrEmpty(commandInput.TemplateName) && SupportedFilterOptions.SupportedListFilters.All(filter => !filter.IsFilterSet(commandInput)))
+            if (SupportedFilterList.Values.All(filter => string.IsNullOrWhiteSpace(filter(commandInput))))
             {
                 return;
             }
