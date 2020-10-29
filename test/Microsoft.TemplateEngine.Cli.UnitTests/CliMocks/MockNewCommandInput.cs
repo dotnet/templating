@@ -204,6 +204,8 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
 
         public string ColumnsParseError => throw new NotImplementedException();
 
+        public string AuthorFilter { get; set; }
+
         public bool ShowAllColumns { get; set; } = false;
 
     }

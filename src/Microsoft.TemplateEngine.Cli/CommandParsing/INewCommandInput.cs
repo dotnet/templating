@@ -101,5 +101,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
         string ColumnsParseError { get; }
 
         bool ShowAllColumns { get; }
+
+        string AuthorFilter { get; }
     }
 }
