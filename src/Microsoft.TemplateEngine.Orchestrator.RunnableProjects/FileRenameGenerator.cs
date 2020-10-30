@@ -25,9 +25,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             Dictionary<string, string> allRenames = new Dictionary<string, string>(StringComparer.Ordinal);
 
             IProcessor sourceRenameProcessor = SetupRenameProcessor(environmentSettings, fileRenames);
-
-            IReadOnlyDictionary<string, string> symbolBasedRenames = SetupSymbolBasedRenames(environmentSettings, sourceName, ref targetDirectory, resolvedNameParamValue, parameterSet, symbolBasedFileRenames);
-            IProcessor symbolRenameProcessor = SetupRenameProcessor(environmentSettings, symbolBasedRenames);
+            IProcessor symbolRenameProcessor = SetupSymbolBasedRenameProcessor(environmentSettings, sourceName, ref targetDirectory, resolvedNameParamValue, parameterSet, symbolBasedFileRenames);
 
             IDirectory sourceBaseDirectoryInfo = configFile.Parent.Parent.DirectoryInfo(sourceDirectory.TrimEnd('/'));
 
@@ -79,39 +77,30 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return processor;
         }
 
-        // Generates a mapping from source to target substrings in filenames, based on the parameters with FileRename defined.
-        // Also sets up rename concerns for the target directory.
-        private static IReadOnlyDictionary<string, string> SetupSymbolBasedRenames(IEngineEnvironmentSettings environmentSettings, string sourceName, ref string targetDirectory, object resolvedNameParamValue, IParameterSet parameterSet, IReadOnlyList<IReplacementTokens> symbolBasedFileRenames)
+        private static IProcessor SetupSymbolBasedRenameProcessor(IEngineEnvironmentSettings environmentSettings, string sourceName, ref string targetDirectory, object resolvedNameParamValue, IParameterSet parameterSet, IReadOnlyList<IReplacementTokens> symbolBasedFileRenames)
         {
-            Dictionary<string, string> substringRenames = new Dictionary<string, string>(StringComparer.Ordinal);
+            List<IOperationProvider> operations = new List<IOperationProvider>();
 
-            SetupRenameForTargetDirectory(sourceName, resolvedNameParamValue, ref targetDirectory, substringRenames);
-
-            if (symbolBasedFileRenames == null)
+            if (resolvedNameParamValue != null && sourceName != null)
             {
-                return substringRenames;
+                string targetName = ((string)resolvedNameParamValue).Trim();
+                targetDirectory = targetDirectory.Replace(sourceName, targetName);
+                operations.Add(new Replacement(sourceName.TokenConfig(), targetName, null, true));
             }
 
             foreach (IReplacementTokens fileRenameToken in symbolBasedFileRenames)
             {
                 if (parameterSet.TryGetRuntimeValue(environmentSettings, fileRenameToken.VariableName, out object value) && value is string valueString)
                 {
-                    substringRenames.Add(fileRenameToken.OriginalValue.Value, valueString);
+                    IOperationProvider replacementOperation = new Replacement(fileRenameToken.OriginalValue, valueString, null, true);
+                    operations.Add(replacementOperation);
                 }
             }
-            return substringRenames;
-        }
 
-        // Sets up a rename for the target directory based on the "name" parameter.
-        private static void SetupRenameForTargetDirectory(string sourceName, object resolvedNameParamValue, ref string targetDirectory, Dictionary<string, string> substringRenames)
-        {
-            // setup the rename of the base directory to the output "name" param directory
-            if (resolvedNameParamValue != null && sourceName != null)
-            {
-                string targetName = ((string)resolvedNameParamValue).Trim();
-                targetDirectory = targetDirectory.Replace(sourceName, targetName);
-                substringRenames.Add(sourceName, targetName);
-            }
+            IVariableCollection variables = new VariableCollection();
+            EngineConfig config = new EngineConfig(environmentSettings, variables);
+            IProcessor processor = Processor.Create(config, operations);
+            return processor;
         }
     }
 }
