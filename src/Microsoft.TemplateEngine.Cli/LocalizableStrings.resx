@@ -609,8 +609,7 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</value>
     <value>An ambiguous choice parameter value prevented unambiguously choosing a template to invoke.</value>
   </data>
   <data name="OptionDescriptionNugetSource" xml:space="preserve">
-    <value>Specifies a NuGet source to use during install.
-Applicable only with -i or --install option.</value>
+    <value>Specifies a NuGet source to use during install. Applicable only with -i or --install option.</value>
   </data>
   <data name="DefaultValuePlusSwitchWithoutValueDefault" xml:space="preserve">
     <value>Default: {0} / (*) {1}</value>
@@ -699,8 +698,8 @@ Applicable only with -i or --install option.</value>
   <data name="ArgumentsSectionTitle" xml:space="preserve">
     <value>Arguments:</value>
   </data>
-  <data name="CommandUsage" xml:space="preserve">
-    <value>Usage: 
+  <data name="NewCommandExamples" xml:space="preserve">
+    <value>Examples: 
 	dotnet {0} &lt;{1}&gt; [-n|--name &lt;OUTPUT_NAME&gt;] [-o|--output &lt;OUTPUT_DIRECTORY&gt;] [--interactive] [--dry-run] [--force] [--language|-lang &lt;LANGUAGE&gt;] [--type|-t &lt;TYPE&gt;] [template options]
 	dotnet {0} --help|-h
 	dotnet {0} &lt;{1}&gt;  --help|-h [--language|-lang &lt;LANGUAGE&gt;] [--type|-t &lt;TYPE&gt;]
@@ -739,6 +738,9 @@ The default list of columns shown without the option: template name, short name,
   </data>
   <data name="OptionDescriptionColumnsAll" xml:space="preserve">
     <value>Shows all available columns  for --list or -l option, equivalent to --columns=language,tags,author,type.</value>
+  </data>
+  <data name="NewCommandUsage" xml:space="preserve">
+    <value>Usage: dotnet {0} &lt;{1}&gt; [options]</value>
   </data>
   <data name="OptionDescriptionAuthorFilter" xml:space="preserve">
     <value>Filters templates based on template author</value>

@@ -594,22 +594,6 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Usage: 
-        ///	dotnet {0} &lt;{1}&gt; [-n|--name &lt;OUTPUT_NAME&gt;] [-o|--output &lt;OUTPUT_DIRECTORY&gt;] [--interactive] [--dry-run] [--force] [--language|-lang &lt;LANGUAGE&gt;] [--type|-t &lt;TYPE&gt;] [template options]
-        ///	dotnet {0} --help|-h
-        ///	dotnet {0} &lt;{1}&gt;  --help|-h [--language|-lang &lt;LANGUAGE&gt;] [--type|-t &lt;TYPE&gt;]
-        ///	dotnet {0} [{1}]  --list|-l [--language|-lang &lt;LANGUAGE&gt;] [--type|-t &lt;TYPE&gt;]
-        ///	dotnet {0} -i|--install &lt;PATH|NUGET_ID&gt; [--nuget-source &lt;SOURCE&gt;]
-        ///	dotnet {0} -u|--uninstall [PATH|NUGET_ID] 
-        ///	dotnet {0} --update-chec [rest of string was truncated]&quot;;.
-        /// </summary>
-        public static string CommandUsage {
-            get {
-                return ResourceManager.GetString("CommandUsage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Commit Hash:.
         /// </summary>
         public static string CommitHash {
@@ -1029,6 +1013,31 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Examples: 
+        ///	dotnet {0} &lt;{1}&gt; [-n|--name &lt;OUTPUT_NAME&gt;] [-o|--output &lt;OUTPUT_DIRECTORY&gt;] [--interactive] [--dry-run] [--force] [--language|-lang &lt;LANGUAGE&gt;] [--type|-t &lt;TYPE&gt;] [template options]
+        ///	dotnet {0} --help|-h
+        ///	dotnet {0} &lt;{1}&gt;  --help|-h [--language|-lang &lt;LANGUAGE&gt;] [--type|-t &lt;TYPE&gt;]
+        ///	dotnet {0} [{1}]  --list|-l [--language|-lang &lt;LANGUAGE&gt;] [--type|-t &lt;TYPE&gt;]
+        ///	dotnet {0} -i|--install &lt;PATH|NUGET_ID&gt; [--nuget-source &lt;SOURCE&gt;]
+        ///	dotnet {0} -u|--uninstall [PATH|NUGET_ID] 
+        ///	dotnet {0} --update-c [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string NewCommandExamples {
+            get {
+                return ResourceManager.GetString("NewCommandExamples", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Usage: dotnet {0} &lt;{1}&gt; [options].
+        /// </summary>
+        public static string NewCommandUsage {
+            get {
+                return ResourceManager.GetString("NewCommandUsage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to (No Items).
         /// </summary>
         public static string NoItems {
@@ -1187,8 +1196,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Specifies a NuGet source to use during install.
-        ///Applicable only with -i or --install option..
+        ///   Looks up a localized string similar to Specifies a NuGet source to use during install. Applicable only with -i or --install option..
         /// </summary>
         public static string OptionDescriptionNugetSource {
             get {

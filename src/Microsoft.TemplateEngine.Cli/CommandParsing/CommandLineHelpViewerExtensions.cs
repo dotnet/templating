@@ -17,12 +17,13 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             WriteSynopsys(helpView, newCommand);
             WriteArgumentsSection(helpView);
             WriteOptionsSection(helpView, newCommand);
+            WriteExamples(helpView, newCommand);
             return helpView.ToString();
         }
 
         private static void WriteSynopsys(StringBuilder helpView, Command command)
         {
-            helpView.AppendLine(string.Format(LocalizableStrings.CommandUsage, command.Name, TemplateArgument));
+            helpView.AppendLine(string.Format(LocalizableStrings.NewCommandUsage, command.Name, TemplateArgument));
             helpView.AppendLine();
         }
 
@@ -47,6 +48,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
             helpView.AppendLine(LocalizableStrings.OptionsSectionTitle);
             WriteOptionsList(options, helpView);
+            helpView.AppendLine();
         }
 
 
@@ -99,6 +101,11 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                     .Select(s => s.Trim()));
 
             helpView.AppendLine(descriptionWithLineWraps);
+        }
+
+        private static void WriteExamples(StringBuilder helpView, Command command)
+        {
+            helpView.AppendLine(string.Format(LocalizableStrings.NewCommandExamples, command.Name, TemplateArgument));
         }
     }
 }
