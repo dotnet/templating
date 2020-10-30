@@ -673,6 +673,15 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Default if option is provided without a value: {0}.
+        /// </summary>
+        public static string DefaultIfOptionWithoutValue {
+            get {
+                return ResourceManager.GetString("DefaultIfOptionWithoutValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Default: {0}.
         /// </summary>
         public static string DefaultValue {
@@ -680,18 +689,7 @@ namespace Microsoft.TemplateEngine.Cli {
                 return ResourceManager.GetString("DefaultValue", resourceCulture);
             }
         }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Default if option is provided without a value: {0}.
-        /// </summary>
-        public static string DefaultIfOptionWithoutValue
-        {
-            get
-            {
-                return ResourceManager.GetString("DefaultIfOptionWithoutValue", resourceCulture);
-            }
-        }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Default: {0} / (*) {1}.
         /// </summary>
@@ -1167,6 +1165,15 @@ namespace Microsoft.TemplateEngine.Cli {
         public static string OptionDescriptionColumns {
             get {
                 return ResourceManager.GetString("OptionDescriptionColumns", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shows all available columns  for --list or -l option, equivalent to --columns=language,tags,author,type..
+        /// </summary>
+        public static string OptionDescriptionColumnsAll {
+            get {
+                return ResourceManager.GetString("OptionDescriptionColumnsAll", resourceCulture);
             }
         }
         
