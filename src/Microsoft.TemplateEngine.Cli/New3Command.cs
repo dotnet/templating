@@ -22,7 +22,6 @@ using Microsoft.TemplateEngine.Edge;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Edge.Template;
 using Microsoft.TemplateEngine.Utils;
-using Microsoft.TemplateSearch.Common;
 
 namespace Microsoft.TemplateEngine.Cli
 {
