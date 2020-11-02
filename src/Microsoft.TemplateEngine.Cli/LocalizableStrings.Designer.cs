@@ -455,15 +455,6 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Filters templates based on author..
-        /// </summary>
-        public static string AuthorFilterHelp {
-            get {
-                return ResourceManager.GetString("AuthorFilterHelp", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Equal highest precedence values among the best template matches prevented unambiguously choosing a template to invoke..
         /// </summary>
         public static string Authoring_AmbiguousBestPrecedence {
@@ -527,6 +518,15 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Language.
+        /// </summary>
+        public static string ColumnNameLanguage {
+            get {
+                return ResourceManager.GetString("ColumnNameLanguage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Package.
         /// </summary>
         public static string ColumnNamePackage {
@@ -541,6 +541,24 @@ namespace Microsoft.TemplateEngine.Cli {
         public static string ColumnNamesAreNotSupported {
             get {
                 return ResourceManager.GetString("ColumnNamesAreNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Short Name.
+        /// </summary>
+        public static string ColumnNameShortName {
+            get {
+                return ResourceManager.GetString("ColumnNameShortName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tags.
+        /// </summary>
+        public static string ColumnNameTags {
+            get {
+                return ResourceManager.GetString("ColumnNameTags", resourceCulture);
             }
         }
         
@@ -983,15 +1001,6 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Language.
-        /// </summary>
-        public static string ColumnNameLanguage {
-            get {
-                return ResourceManager.GetString("Language", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Filters templates based on language and specifies the language of the template to create..
         /// </summary>
         public static string LanguageParameter {
@@ -1214,6 +1223,24 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Filters templates based on package..
+        /// </summary>
+        public static string OptionDescriptionPackageFilter {
+            get {
+                return ResourceManager.GetString("OptionDescriptionPackageFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search for the template in configured remote sources..
+        /// </summary>
+        public static string OptionDescriptionSearch {
+            get {
+                return ResourceManager.GetString("OptionDescriptionSearch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Options:.
         /// </summary>
         public static string Options {
@@ -1246,15 +1273,6 @@ namespace Microsoft.TemplateEngine.Cli {
         public static string Overwrite {
             get {
                 return ResourceManager.GetString("Overwrite", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Filters templates based on package..
-        /// </summary>
-        public static string PackageFilterHelp {
-            get {
-                return ResourceManager.GetString("PackageFilterHelp", resourceCulture);
             }
         }
         
@@ -1448,15 +1466,6 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Search for the template in configured remote sources..
-        /// </summary>
-        public static string SearchOnlineCommandHelp {
-            get {
-                return ResourceManager.GetString("SearchOnlineCommandHelp", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Search failed: no template name is specified.
         ///To search for the template, specify template name or use one of supported filters: {0}
         ///Examples:
@@ -1561,15 +1570,6 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Short Name.
-        /// </summary>
-        public static string ColumnNameShortName {
-            get {
-                return ResourceManager.GetString("ShortName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Displays the value of the named alias, or all aliases if no name is specified..
         /// </summary>
         public static string ShowAliasesHelp {
@@ -1611,15 +1611,6 @@ namespace Microsoft.TemplateEngine.Cli {
         public static string SwitchWithoutValueDefaultFootnote {
             get {
                 return ResourceManager.GetString("SwitchWithoutValueDefaultFootnote", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Tags.
-        /// </summary>
-        public static string ColumnNameTags {
-            get {
-                return ResourceManager.GetString("Tags", resourceCulture);
             }
         }
         

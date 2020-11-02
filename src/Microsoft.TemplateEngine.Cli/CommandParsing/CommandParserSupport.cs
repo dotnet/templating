@@ -141,9 +141,9 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                                         // don't give this a default, otherwise 'new -lang' is valid and assigns the default. User should have to explicitly give the value.
                     Create.Option("--update-check", LocalizableStrings.UpdateCheckCommandHelp, Accept.NoArguments()),
                     Create.Option("--update-apply", LocalizableStrings.UpdateApplyCommandHelp, Accept.NoArguments()),
-                    Create.Option("--search", LocalizableStrings.SearchOnlineCommandHelp, Accept.NoArguments()),
-                    Create.Option("--author", LocalizableStrings.AuthorFilterHelp, Accept.ExactlyOneArgument()),
-                    Create.Option("--package", LocalizableStrings.PackageFilterHelp, Accept.ExactlyOneArgument()),
+                    Create.Option("--search", LocalizableStrings.OptionDescriptionSearch, Accept.NoArguments()),
+                    Create.Option("--author", LocalizableStrings.OptionDescriptionAuthorFilter, Accept.ExactlyOneArgument()),
+                    Create.Option("--package", LocalizableStrings.OptionDescriptionPackageFilter, Accept.ExactlyOneArgument()),
                     Create.Option("--columns", LocalizableStrings.OptionDescriptionColumns, Accept.ExactlyOneArgument().With(LocalizableStrings.OptionDescriptionColumns, "COLUMNS_LIST")),
                     Create.Option("--columns-all", LocalizableStrings.OptionDescriptionColumnsAll, Accept.NoArguments())
                 };

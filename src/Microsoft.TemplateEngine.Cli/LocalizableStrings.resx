@@ -237,7 +237,7 @@
   <data name="InvalidTemplateParameterValues" xml:space="preserve">
     <value>Error: Invalid parameter(s):</value>
   </data>
-  <data name="Language" xml:space="preserve">
+  <data name="ColumnNameLanguage" xml:space="preserve">
     <value>Language</value>
   </data>
   <data name="LanguageParameter" xml:space="preserve">
@@ -324,7 +324,7 @@
   <data name="RunHelpForInformationAboutAcceptedParameters" xml:space="preserve">
     <value>Run dotnet {0} --help for usage information.</value>
   </data>
-  <data name="ShortName" xml:space="preserve">
+  <data name="ColumnNameShortName" xml:space="preserve">
     <value>Short Name</value>
   </data>
   <data name="ShowsAllTemplates" xml:space="preserve">
@@ -333,7 +333,7 @@
   <data name="ShowsFilteredTemplates" xml:space="preserve">
     <value>Filters templates based on available types. Predefined values are "project" and "item".</value>
   </data>
-  <data name="Tags" xml:space="preserve">
+  <data name="ColumnNameTags" xml:space="preserve">
     <value>Tags</value>
   </data>
   <data name="TemplateArgumentHelp" xml:space="preserve">
@@ -706,7 +706,7 @@ The default list of columns shown without the option: template name, short name,
   <data name="OptionDescriptionColumnsAll" xml:space="preserve">
     <value>Shows all available columns  for --list or -l option, equivalent to --columns=language,tags,author,type.</value>
   </data>
-  <data name="SearchOnlineCommandHelp" xml:space="preserve">
+  <data name="OptionDescriptionSearch" xml:space="preserve">
     <value>Search for the template in configured remote sources.</value>
   </data>
   <data name="SearchOnlineErrorNoTemplateNameOrFilter" xml:space="preserve">
@@ -726,7 +726,7 @@ Examples:
   <data name="OptionDescriptionAuthorFilter" xml:space="preserve">
     <value>Filters templates based on template author</value>
   </data>
-  <data name="PackageFilterHelp" xml:space="preserve">
+  <data name="OptionDescriptionPackageFilter" xml:space="preserve">
     <value>Filters templates based on package.</value>
   </data>
   <data name="SearchOnlineErrorTemplateNameIsTooShort" xml:space="preserve">
