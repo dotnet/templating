@@ -178,7 +178,9 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                 WellKnownSearchFilters.NameFilter(commandInput.TemplateName),
                 WellKnownSearchFilters.ClassificationsFilter(commandInput.TemplateName)
             };
-            listFilters.AddRange(SupportedFilterOptions.SupportedListFilters.Select(filter => filter.TemplateMatchFilter(commandInput)));
+            listFilters.AddRange(SupportedFilterOptions.SupportedListFilters
+                                    .OfType<TemplateFilterOption>()
+                                    .Select(filter => filter.TemplateMatchFilter(commandInput)));
 
 
             IReadOnlyList<ITemplateMatchInfo> coreMatchedTemplates = TemplateListFilter.GetTemplateMatchInfo

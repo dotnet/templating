@@ -1,20 +1,9 @@
-using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Cli.TemplateResolution;
 using Microsoft.TemplateEngine.Edge.Template;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Microsoft.TemplateEngine.Cli.CommandParsing
 {
-    internal class FilterOption
-    {
-        internal string Name { get; set; }
-        internal Func<INewCommandInput, string> FilterValue { get; set; }
-        internal Func<INewCommandInput, bool> IsFilterSet { get; set; }
-        internal Func<INewCommandInput, Func<ITemplateInfo, MatchInfo?>> TemplateMatchFilter { get; set; }
-        internal Func<ListOrHelpTemplateListResolutionResult, bool> MismatchCriteria { get; set; }
-    }
     internal static class SupportedFilterOptions
     {
 
@@ -30,7 +19,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
         {
             get
             {
-                return new FilterOption()
+                return new TemplateFilterOption()
                 {
                     Name = "baseline",
                     FilterValue = command => command.BaselineName,
@@ -45,7 +34,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
         {
             get
             {
-                return new FilterOption()
+                return new TemplateFilterOption()
                 {
                     Name = "author",
                     FilterValue = command => command.AuthorFilter,
@@ -60,7 +49,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
         {
             get
             {
-                return new FilterOption()
+                return new TemplateFilterOption()
                 {
                     Name = "language",
                     FilterValue = command => command.Language,
@@ -75,7 +64,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
         {
             get
             {
-                return new FilterOption()
+                return new TemplateFilterOption ()
                 {
                     Name = "type",
                     FilterValue = command => command.TypeFilter,
