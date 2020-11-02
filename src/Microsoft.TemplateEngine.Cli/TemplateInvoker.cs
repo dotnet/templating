@@ -164,7 +164,11 @@ namespace Microsoft.TemplateEngine.Cli
                 return CreationResultStatus.CreateFailed;
             }
 
-            string fallbackName = new DirectoryInfo(_commandInput.OutputPath ?? Directory.GetCurrentDirectory()).Name;
+            string fallbackName = new DirectoryInfo(
+                !string.IsNullOrWhiteSpace(_commandInput.OutputPath)
+                    ? _commandInput.OutputPath
+                    : Directory.GetCurrentDirectory())
+                .Name;
 
             if (string.IsNullOrEmpty(fallbackName) || string.Equals(fallbackName, "/", StringComparison.Ordinal))
             {   // DirectoryInfo("/").Name on *nix returns "/", as opposed to null or "".
