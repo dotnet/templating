@@ -60,43 +60,51 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
         }
 
-        // Creates and returns the processor used to create the file rename mapping.
+        // Creates and returns the processor used to create the file rename mapping for source based file renames
         private static IProcessor SetupRenameProcessor(IEngineEnvironmentSettings environmentSettings, IReadOnlyDictionary<string, string> substringReplacementMap)
         {
             List<IOperationProvider> operations = new List<IOperationProvider>();
-
             foreach (KeyValuePair<string, string> replacement in substringReplacementMap)
             {
                 IOperationProvider replacementOperation = new Replacement(replacement.Key.TokenConfig(), replacement.Value, null, true);
                 operations.Add(replacementOperation);
             }
-
-            IVariableCollection variables = new VariableCollection();
-            EngineConfig config = new EngineConfig(environmentSettings, variables);
-            IProcessor processor = Processor.Create(config, operations);
-            return processor;
+            return SetupProcessor(environmentSettings, operations);
         }
 
+        // Creates and returns the processor used to create the file rename mapping based on the symbols with fileRename defined.
+        // Also sets up rename for the target directory.
         private static IProcessor SetupSymbolBasedRenameProcessor(IEngineEnvironmentSettings environmentSettings, string sourceName, ref string targetDirectory, object resolvedNameParamValue, IParameterSet parameterSet, IReadOnlyList<IReplacementTokens> symbolBasedFileRenames)
         {
             List<IOperationProvider> operations = new List<IOperationProvider>();
+            SetupRenameForTargetDirectory(sourceName, resolvedNameParamValue, ref targetDirectory, operations);
 
+            if (symbolBasedFileRenames != null)
+            {
+                foreach (IReplacementTokens fileRenameToken in symbolBasedFileRenames)
+                {
+                    if (parameterSet.TryGetRuntimeValue(environmentSettings, fileRenameToken.VariableName, out object value) && value is string valueString)
+                    {
+                        operations.Add(new Replacement(fileRenameToken.OriginalValue, valueString, null, true));
+                    }
+                }
+            }
+            return SetupProcessor(environmentSettings, operations);
+        }
+
+        // Sets up a rename for the target directory based on the "name" parameter.
+        private static void SetupRenameForTargetDirectory(string sourceName, object resolvedNameParamValue, ref string targetDirectory, List<IOperationProvider> operations)
+        {
             if (resolvedNameParamValue != null && sourceName != null)
             {
                 string targetName = ((string)resolvedNameParamValue).Trim();
                 targetDirectory = targetDirectory.Replace(sourceName, targetName);
                 operations.Add(new Replacement(sourceName.TokenConfig(), targetName, null, true));
             }
+        }
 
-            foreach (IReplacementTokens fileRenameToken in symbolBasedFileRenames)
-            {
-                if (parameterSet.TryGetRuntimeValue(environmentSettings, fileRenameToken.VariableName, out object value) && value is string valueString)
-                {
-                    IOperationProvider replacementOperation = new Replacement(fileRenameToken.OriginalValue, valueString, null, true);
-                    operations.Add(replacementOperation);
-                }
-            }
-
+        private static IProcessor SetupProcessor(IEngineEnvironmentSettings environmentSettings, IReadOnlyList<IOperationProvider> operations)
+        {
             IVariableCollection variables = new VariableCollection();
             EngineConfig config = new EngineConfig(environmentSettings, variables);
             IProcessor processor = Processor.Create(config, operations);
