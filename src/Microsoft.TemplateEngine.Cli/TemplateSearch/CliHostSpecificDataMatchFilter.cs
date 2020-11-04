@@ -10,22 +10,22 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
 {
     public class CliHostSpecificDataMatchFilterFactory
     {
-        public CliHostSpecificDataMatchFilterFactory(INewCommandInput commandInput, string defaultLanguage)
+        public CliHostSpecificDataMatchFilterFactory(INewCommandInput commandInput)
         {
             _commandInput = commandInput;
-            _defaultLanguage = defaultLanguage;
         }
 
         private readonly INewCommandInput _commandInput;
-        private readonly string _defaultLanguage;
 
-        public Func<IReadOnlyList<ITemplateNameSearchResult>, IReadOnlyList<ITemplateMatchInfo>> MatchFilter => (nameMatches) =>
+        public Func<IReadOnlyList<ITemplateNameSearchResult>, IReadOnlyList<ITemplateMatchInfo>> MatchFilter => (foundPackages) =>
         {
-            IEnumerable<ITemplateNameSearchResult> templatesToFilter = nameMatches;
-            if (!string.IsNullOrEmpty(_commandInput.PackageFilter))
-            {
-                templatesToFilter = nameMatches.Where(pack => pack.PackInfo.Name.IndexOf(_commandInput.PackageFilter, StringComparison.OrdinalIgnoreCase) > -1);
-            }
+            IEnumerable<Func<INewCommandInput, Func<PackInfo, bool>>> packageFiltersToUse = SupportedFilterOptions.SupportedSearchFilters
+                                    .OfType<PackageFilterOption>()
+                                    .Select(filter => filter.PackageMatchFilter);
+
+            IEnumerable<ITemplateNameSearchResult> templatesToFilter =
+                foundPackages.Where(foundPackage => packageFiltersToUse.All(pf => pf(_commandInput)(foundPackage.PackInfo)));
+
             return TemplateListResolver.PerformCoreTemplateQueryForSearch(templatesToFilter.Select(x => x.Template), _commandInput).ToList();
         };
     }

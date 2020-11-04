@@ -229,19 +229,17 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         public static IReadOnlyCollection<ITemplateMatchInfo> PerformCoreTemplateQueryForSearch(IEnumerable<ITemplateInfo> templateInfo, INewCommandInput commandInput)
         {
             IReadOnlyList<FilterableTemplateInfo> filterableTemplateInfo = SetupFilterableTemplateInfoFromTemplateInfo(templateInfo.ToList());
-            IReadOnlyCollection<ITemplateMatchInfo> templates = TemplateListFilter.GetTemplateMatchInfo
-            (
-                filterableTemplateInfo,
-                TemplateListFilter.PartialMatchFilter,
+            List<Func<ITemplateInfo, MatchInfo?>> searchFilters = new List<Func<ITemplateInfo, MatchInfo?>>()
+            {
                 WellKnownSearchFilters.NameFilter(commandInput.TemplateName),
-                // WellKnownSearchFilters.ClassificationsFilter(commandInput.TemplateName),
-                WellKnownSearchFilters.LanguageFilter(commandInput.Language),
-                WellKnownSearchFilters.ContextFilter(commandInput.TypeFilter),
-                WellKnownSearchFilters.BaselineFilter(commandInput.BaselineName),
-                WellKnownSearchFilters.AuthorFilter(commandInput.AuthorFilter)
-            );
-            IReadOnlyList<ITemplateMatchInfo> coreMatchedTemplates = templates.Where(x => x.IsMatch).ToList();
-            return coreMatchedTemplates;
+            };
+            searchFilters.AddRange(SupportedFilterOptions.SupportedSearchFilters
+                                    .OfType<TemplateFilterOption>()
+                                    .Select(filter => filter.TemplateMatchFilter(commandInput)));
+
+            return TemplateListFilter
+                .GetTemplateMatchInfo (filterableTemplateInfo, TemplateListFilter.ExactMatchFilter, searchFilters.ToArray())
+                .ToList();
         }
 
         // Query for template matches, filtered by everything available: name, language, context, parameters, and the host file.
