@@ -742,54 +742,8 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             Assert.False(matchResult.HasBaselineMismatch);
         }
 
-
-        [Fact(DisplayName = nameof(TestGetTemplateResolutionResult_MatchByAuthor))]
-        public void TestGetTemplateResolutionResult_MatchByAuthor()
-        {
-            List<ITemplateInfo> templatesToSearch = new List<ITemplateInfo>();
-            templatesToSearch.Add(new TemplateInfo()
-            {
-                ShortName = "console",
-                Name = "Long name for Console App",
-                Identity = "Console.App.T1",
-                GroupIdentity = "Console.App.Test",
-                CacheParameters = new Dictionary<string, ICacheParameter>(),
-                Classifications = new List<string> { "Common", "Test" },
-                Author = "TestAuthor",
-                Tags = new Dictionary<string, ICacheTag>(StringComparer.OrdinalIgnoreCase)
-                {
-                    { "language", ResolutionTestHelper.CreateTestCacheTag("L1") },
-                    { "type", ResolutionTestHelper.CreateTestCacheTag("project")}
-                },
-                BaselineInfo = new Dictionary<string, IBaselineInfo>()
-                {
-                    { "app", new BaselineInfo() },
-                    { "standard", new BaselineInfo() }
-                }
-            });
-
-
-            INewCommandInput userInputs = new MockNewCommandInput()
-            {
-                TemplateName = "console",
-                IsListFlagSpecified = true,
-                AuthorFilter = "Test"
-            };
-
-            ListOrHelpTemplateListResolutionResult matchResult = TemplateListResolver.GetTemplateResolutionResultForListOrHelp(templatesToSearch, new MockHostSpecificDataLoader(), userInputs, null);
-            Assert.True(matchResult.HasExactMatches);
-            Assert.Equal(1, matchResult.ExactMatchedTemplatesGrouped.Count);
-            Assert.Equal(1, matchResult.ExactMatchedTemplates.Count);
-            Assert.False(matchResult.HasPartialMatches);
-            Assert.Equal(0, matchResult.PartiallyMatchedTemplates.Count);
-            Assert.Equal(0, matchResult.PartiallyMatchedTemplatesGrouped.Count);
-            Assert.False(matchResult.HasLanguageMismatch);
-            Assert.False(matchResult.HasContextMismatch);
-            Assert.False(matchResult.HasBaselineMismatch);
-            Assert.False(matchResult.HasAuthorMismatch);
-        }
-
         [Theory(DisplayName = nameof(TestGetTemplateResolutionResult_AuthorMatch))]
+        [InlineData("TestAuthor", "Test", true)]
         [InlineData("TestAuthor", "Other", false)]
         [InlineData("TestAuthor", "", true)]
         [InlineData("TestAuthor", null, true)]
