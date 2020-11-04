@@ -41,17 +41,17 @@ namespace Microsoft.TemplateEngine.Cli
             _commandInput = commandInput;
         }
 
-        public HelpFormatter<T> DefineColumn(Func<T, string> binder,  string header = null, string columnName = null, bool shrinkIfNeeded = false, int minWidth = 2, bool showAlways = false, bool defaultColumn = true)
+        public HelpFormatter<T> DefineColumn(Func<T, string> binder,  string header = null, string columnName = null, bool shrinkIfNeeded = false, int minWidth = 2, bool showAlways = false, bool defaultColumn = true, bool rightAlign = false)
         {
-            return DefineColumn(binder, out object c,  header, columnName, shrinkIfNeeded, minWidth, showAlways, defaultColumn);
+            return DefineColumn(binder, out object c,  header, columnName, shrinkIfNeeded, minWidth, showAlways, defaultColumn, rightAlign);
         }
 
-        public HelpFormatter<T> DefineColumn(Func<T, string> binder, out object column, string header = null, string columnName = null, bool shrinkIfNeeded = false, int minWidth = 2, bool showAlways = false, bool defaultColumn = true)
+        public HelpFormatter<T> DefineColumn(Func<T, string> binder, out object column, string header = null, string columnName = null, bool shrinkIfNeeded = false, int minWidth = 2, bool showAlways = false, bool defaultColumn = true, bool rightAlign = false)
         {
             column = null;
             if ((_commandInput.Columns.Count == 0  && defaultColumn) || showAlways || (!string.IsNullOrWhiteSpace(columnName) && _commandInput.Columns.Contains(columnName)) || _commandInput.ShowAllColumns)
             {
-                ColumnDefinition c = new ColumnDefinition(_environmentSettings, header, binder, shrinkIfNeeded: shrinkIfNeeded, minWidth: minWidth);
+                ColumnDefinition c = new ColumnDefinition(_environmentSettings, header, binder, shrinkIfNeeded: shrinkIfNeeded, minWidth: minWidth, rightAlign: rightAlign);
                 _columns.Add(c);
                 column = c;
             }
@@ -113,11 +113,11 @@ namespace Microsoft.TemplateEngine.Cli
                 {
                     for (int i = 0; i < _columns.Count - 1; ++i)
                     {
-                        b.Append(header[i].GetTextWithPadding(j, _columns[i].CalculatedWidth));
+                        b.Append(header[i].GetTextWithPadding(j, _columns[i].CalculatedWidth, _columns[i].RightAlign));
                         b.Append("".PadRight(_columnPadding));
                     }
 
-                    b.AppendLine(header[_columns.Count - 1].GetTextWithPadding(j, _columns[_columns.Count - 1].CalculatedWidth));
+                    b.AppendLine(header[_columns.Count - 1].GetTextWithPadding(j, _columns[_columns.Count - 1].CalculatedWidth, _columns[_columns.Count - 1].RightAlign));
                 }
             }
 
@@ -177,12 +177,12 @@ namespace Microsoft.TemplateEngine.Cli
                     // Render all columns except last column
                     for (int columnIndex = 0; columnIndex < _columns.Count - 1; ++columnIndex)
                     {
-                        b.Append(rowToRender[columnIndex].GetTextWithPadding(lineWithinRow, _columns[columnIndex].CalculatedWidth));
+                        b.Append(rowToRender[columnIndex].GetTextWithPadding(lineWithinRow, _columns[columnIndex].CalculatedWidth, _columns[columnIndex].RightAlign));
                         b.Append("".PadRight(_columnPadding));
                     }
 
                     // Render last column
-                    b.AppendLine(rowToRender[_columns.Count - 1].GetTextWithPadding(lineWithinRow, _columns[_columns.Count - 1].CalculatedWidth));
+                    b.AppendLine(rowToRender[_columns.Count - 1].GetTextWithPadding(lineWithinRow, _columns[_columns.Count - 1].CalculatedWidth, _columns[_columns.Count - 1].RightAlign));
                 }
 
                 if (_blankLineBetweenRows)
@@ -279,7 +279,7 @@ namespace Microsoft.TemplateEngine.Cli
             private readonly Func<T, string> _binder;
             private readonly IEngineEnvironmentSettings _environmentSettings;
 
-            public ColumnDefinition(IEngineEnvironmentSettings environmentSettings, string header, Func<T, string> binder, int minWidth = 2, int maxWidth = -1, bool shrinkIfNeeded = false)
+            public ColumnDefinition(IEngineEnvironmentSettings environmentSettings, string header, Func<T, string> binder, int minWidth = 2, int maxWidth = -1, bool shrinkIfNeeded = false, bool rightAlign = false)
             {
                 Header = header;
                 MaxWidth = maxWidth > 0 ? maxWidth : int.MaxValue;
@@ -287,6 +287,7 @@ namespace Microsoft.TemplateEngine.Cli
                 _environmentSettings = environmentSettings;
                 ShrinkIfNeeded = shrinkIfNeeded;
                 MinWidth = minWidth + ShrinkReplacement.Length; //we need to add required width for shrink replacement
+                RightAlign = rightAlign;
             }
 
             public string Header { get; }
@@ -298,6 +299,8 @@ namespace Microsoft.TemplateEngine.Cli
             public int MaxWidth { get; }
 
             public bool ShrinkIfNeeded { get; }
+
+            public bool RightAlign { get; }
 
             public TextWrapper GetCell(T value)
             {
@@ -351,14 +354,24 @@ namespace Microsoft.TemplateEngine.Cli
 
             public int MaxWidth { get; }
 
-            public string GetTextWithPadding(int line, int maxColumnWidth)
+            public string GetTextWithPadding(int line, int maxColumnWidth, bool rightAlign = false)
             {
                 var text = _lines.Count > line ? _lines[line] : string.Empty;
                 var abbreviatedText = ShrinkTextToLength(text, maxColumnWidth);
 
-                return
-                    abbreviatedText
-                    .PadRight(maxColumnWidth);
+
+                if (rightAlign)
+                {
+                    return
+                        abbreviatedText
+                        .PadLeft(maxColumnWidth);
+                }
+                else
+                {
+                    return
+                        abbreviatedText
+                        .PadRight(maxColumnWidth);
+                }
             }
 
             private static void GetLineText(string text, List<string> lines, int maxLength, int end, ref int position)

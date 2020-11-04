@@ -90,7 +90,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
                     .DefineColumn(r => r.TemplateGroupInfo.Type, LocalizableStrings.ColumnNameType, NewCommandInputCli.TypeColumnFilter, defaultColumn: false)
                     .DefineColumn(r => r.TemplateGroupInfo.Classifications, LocalizableStrings.ColumnNameTags, NewCommandInputCli.TagsColumnFilter, defaultColumn: false, shrinkIfNeeded: true, minWidth: 10)
                     .DefineColumn(r => r.PackageName, out object packageColumn, LocalizableStrings.ColumnNamePackage, showAlways: true)
-                    .DefineColumn(r => r.PrintableTotalDownloads, LocalizableStrings.ColumnNameTotalDownloads, showAlways: true)
+                    .DefineColumn(r => r.PrintableTotalDownloads, LocalizableStrings.ColumnNameTotalDownloads, showAlways: true, rightAlign: true)
                     .OrderBy(packageColumn);
 
             Reporter.Output.WriteLine(formatter.Layout());
@@ -151,7 +151,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
                     }
                     else
                     {
-                        return $"{TotalDownloads / 1000}k";
+                        return $"{(TotalDownloads / 1000):N0}k";
                     }
                 }
             }
