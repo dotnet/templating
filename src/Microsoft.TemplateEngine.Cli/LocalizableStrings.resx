@@ -245,8 +245,7 @@ To install the template from the file system directory, specify the folder path 
     <value>Language</value>
   </data>
   <data name="OptionDescriptionLanguage" xml:space="preserve">
-    <value>Specifies the template language to use.
-When using with dotnet new --list or -l, filters templates based on language. </value>
+    <value>Specifies the template language to use for template selection or filtering.</value>
   </data>
   <data name="OptionDescriptionList" xml:space="preserve">
     <value>Lists templates containing the specified template name. If no name is specified, lists all templates.</value>
@@ -336,9 +335,7 @@ When using with dotnet new --list or -l, filters templates based on language. </
     <value>Shows all templates.</value>
   </data>
   <data name="OptionDescriptionTypeFilter" xml:space="preserve">
-    <value>Specifies the template type to use.
-When using with dotnet new --list or -l, filters templates based on the type.
-Predefined values are "project" and "item".</value>
+    <value>Specifies the template type to use for template selection or filtering. Predefined values are "project" and "item".</value>
   </data>
   <data name="Tags" xml:space="preserve">
     <value>Tags</value>
@@ -438,10 +435,10 @@ Predefined values are "project" and "item".</value>
     <value>This template contains technologies from parties other than Microsoft, see {0} for details.</value>
   </data>
   <data name="OptionDescriptionUninstall" xml:space="preserve">
-    <value>Uninstalls a template pack at the path or using NuGet ID provided. 
-When the argument value is not specified, all currently installed template packs and their associated templates are displayed. 
-If the package was installed by either a NuGet feed or by a .nupkg file directly, provide the identifier. When specifying NuGet ID, do not include the version number.
-If the package was installed by specifying a path to the .template.config folder, use that absolute path to uninstall the package. You can see the absolute path of the template in the output provided by the dotnet new -u command. Do not include a final terminating directory slash on your template path.</value>
+    <value>Uninstalls a template pack at the path or using NuGet ID provided.
+When the argument value is not specified, currently installed template packs and their templates are displayed.
+If the package was installed by either a NuGet feed or by a .nupkg file directly, provide the identifier without the version number.
+If the package was installed by specifying a path to the .template.config folder, use that absolute path to uninstall the package without a terminating slash. You can see this path with the dotnet new -u command.</value>
   </data>
   <data name="CouldntUninstall" xml:space="preserve">
     <value>Could not find something to uninstall called '{0}'.</value>
@@ -684,7 +681,7 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</value>
     <value>Checks the currently installed template packs for updates.</value>
   </data>
   <data name="OptionDescriptionInteractive" xml:space="preserve">
-    <value>Allows the internal dotnet restore command to stop and wait for user input or action (for example to complete authentication).</value>
+    <value>Allows the implicit restore to stop and wait for user input if needed (for example to complete authentication)</value>
   </data>
   <data name="TemplatesNotValidGivenTheSpecifiedFilter" xml:space="preserve">
     <value>{0} template(s) partially matched, but failed on {1}.</value>

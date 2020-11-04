@@ -1159,7 +1159,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Allows the internal dotnet restore command to stop and wait for user input or action (for example to complete authentication)..
+        ///   Looks up a localized string similar to Allows the implicit restore to stop and wait for user input if needed (for example to complete authentication).
         /// </summary>
         public static string OptionDescriptionInteractive {
             get {
@@ -1168,8 +1168,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Specifies the template language to use.
-        ///When using with dotnet new --list or -l, filters templates based on language. .
+        ///   Looks up a localized string similar to Specifies the template language to use for template selection or filtering..
         /// </summary>
         public static string OptionDescriptionLanguage {
             get {
@@ -1214,9 +1213,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Specifies the template type to use.
-        ///When using with dotnet new --list or -l, filters templates based on the type.
-        ///Predefined values are &quot;project&quot;, &quot;item&quot; or &quot;other&quot;..
+        ///   Looks up a localized string similar to Specifies the template type to use for template selection or filtering. Predefined values are &quot;project&quot;, &quot;item&quot; or &quot;other&quot;..
         /// </summary>
         public static string OptionDescriptionTypeFilter {
             get {
@@ -1225,10 +1222,10 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Uninstalls a template pack at the path or using NuGet ID provided. 
-        ///When the argument value is not specified, all currently installed template packs and their associated templates are displayed. 
-        ///If the package was installed by either a NuGet feed or by a .nupkg file directly, provide the identifier. When specifying NuGet ID, do not include the version number.
-        ///If the package was installed by specifying a path to the .template.config folder, use that absolute path to uninstall the package. You can see the [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to Uninstalls a template pack at the path or using NuGet ID provided.
+        ///When the argument value is not specified, currently installed template packs and their templates are displayed.
+        ///If the package was installed by either a NuGet feed or by a .nupkg file directly, provide the identifier without the version number.
+        ///If the package was installed by specifying a path to the .template.config folder, use that absolute path to uninstall the package without a terminating slash. You can see this path with the dotnet  [rest of string was truncated]&quot;;.
         /// </summary>
         public static string OptionDescriptionUninstall {
             get {
