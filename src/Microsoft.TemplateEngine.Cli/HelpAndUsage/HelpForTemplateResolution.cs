@@ -16,15 +16,6 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
 {
     internal static class HelpForTemplateResolution
     {
-
-        private static readonly Dictionary<string, Func<INewCommandInput, string>> SupportedFilterList = new Dictionary<string, Func<INewCommandInput, string>>()
-        {
-                {"--author", command => command.AuthorFilter },
-                {"--type", command => command.TypeFilter },
-                {"--language", command => command.Language },
-                {"--baseline", command => command.BaselineName }
-        };
-
         public static CreationResultStatus CoordinateHelpAndUsageDisplay(ListOrHelpTemplateListResolutionResult templateResolutionResult, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, IHostSpecificDataLoader hostDataLoader, ITelemetryLogger telemetryLogger, TemplateCreator templateCreator, string defaultLanguage, bool showUsageHelp = true)
         {
             if (showUsageHelp)
@@ -236,7 +227,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
 
         private static void ShowContextAndTemplateNameMismatchHelp(ListOrHelpTemplateListResolutionResult templateResolutionResult, INewCommandInput commandInput)
         {
-            if (SupportedFilterList.Values.All(filter => string.IsNullOrWhiteSpace(filter(commandInput))))
+            if (string.IsNullOrEmpty(commandInput.TemplateName) && SupportedFilterOptions.SupportedListFilters.All(filter => !filter.IsFilterSet(commandInput)))
             {
                 return;
             }

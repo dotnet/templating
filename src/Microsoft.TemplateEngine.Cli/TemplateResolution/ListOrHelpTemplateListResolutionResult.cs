@@ -109,15 +109,6 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         /// </summary>
         public bool HasPartialMatches => PartiallyMatchedTemplates.Any();
 
-
-        internal static readonly Dictionary<string, Func<ListOrHelpTemplateListResolutionResult, bool>> PartialMatchCriterias = new Dictionary<string, Func<ListOrHelpTemplateListResolutionResult, bool>>()
-        {
-                {"--author", result => result.HasAuthorMismatch },
-                {"--type", result => result.HasContextMismatch },
-                {"--language", result => result.HasLanguageMismatch },
-                {"--baseline", result => result.HasBaselineMismatch }
-        };
-
         /// <summary>
         /// Returns true when at least one template has mismatch in language
         /// </summary>

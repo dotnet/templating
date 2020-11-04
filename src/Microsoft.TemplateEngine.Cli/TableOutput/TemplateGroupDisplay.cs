@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,16 +8,6 @@ using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Cli.TableOutput
 {
-    internal class TemplateGroupTableRow
-    {
-        public string Name { get; set; }
-        public string ShortName { get; set; }
-        public string Languages { get; set; }
-        public string Classifications { get; set; }
-        public string Author { get; set; }
-        public string Type { get; set; }
-    }
-
     internal static class TemplateGroupDisplay
     {
         /// <summary>
@@ -103,5 +92,15 @@ namespace Microsoft.TemplateEngine.Cli.TableOutput
 
             return templateGroupsForDisplay;
         }
+    }
+
+    internal class TemplateGroupTableRow
+    {
+        public string Author { get; set; }
+        public string Classifications { get; set; }
+        public string Languages { get; set; }
+        public string Name { get; set; }
+        public string ShortName { get; set; }
+        public string Type { get; set; }
     }
 }
