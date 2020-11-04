@@ -700,7 +700,7 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</value>
 	dotnet {0} &lt;{1}&gt; [-n|--name &lt;OUTPUT_NAME&gt;] [-o|--output &lt;OUTPUT_DIRECTORY&gt;] [--interactive] [--dry-run] [--force] [--language|-lang &lt;LANGUAGE&gt;] [--type|-t &lt;TYPE&gt;] [template options]
 	dotnet {0} --help|-h
 	dotnet {0} &lt;{1}&gt;  --help|-h [--language|-lang &lt;LANGUAGE&gt;] [--type|-t &lt;TYPE&gt;]
-	dotnet {0} [{1}]  --list|-l [--language|-lang &lt;LANGUAGE&gt;] [--type|-t &lt;TYPE&gt;]
+	dotnet {0} [{1}]  --list|-l [--language|-lang &lt;LANGUAGE&gt;] [--type|-t &lt;TYPE&gt;] [--columns-all] [--columns &lt;COLUMNS_LIST&gt;]
 	dotnet {0} -i|--install &lt;PATH|NUGET_ID&gt; [--nuget-source &lt;SOURCE&gt;]
 	dotnet {0} -u|--uninstall [PATH|NUGET_ID] 
 	dotnet {0} --update-check 
@@ -726,15 +726,15 @@ Should not be used with -i, --install, -u, --uninstall, --update-check, --update
   </data>
   <data name="OptionDescriptionColumns" xml:space="preserve">
     <value>Comma separated list of columns to show for --list or -l option.  The supported columns are: 
-- language - displays comma separated list of languages supported by the template
-- tags - displays the list of template tags
-- author - displays the template author
-- type - displays the template type: project or item
+- language - comma separated list of languages supported by the template
+- tags - the list of template tags
+- author - the template author
+- type - the template type: project or item
 The template name and short name are shown always.
 The default list of columns shown without the option: template name, short name, language, tags; equivalent to --columns=language,tags.</value>
   </data>
   <data name="OptionDescriptionColumnsAll" xml:space="preserve">
-    <value>Shows all available columns  for --list or -l option, equivalent to --columns=language,tags,author,type.</value>
+    <value>Shows all available columns for --list or -l option, equivalent to --columns=language,tags,author,type.</value>
   </data>
   <data name="NewCommandUsage" xml:space="preserve">
     <value>Usage: dotnet {0} &lt;{1}&gt; [options]</value>

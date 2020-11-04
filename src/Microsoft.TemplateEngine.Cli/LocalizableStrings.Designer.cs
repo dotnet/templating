@@ -1017,10 +1017,9 @@ namespace Microsoft.TemplateEngine.Cli {
         ///	dotnet {0} &lt;{1}&gt; [-n|--name &lt;OUTPUT_NAME&gt;] [-o|--output &lt;OUTPUT_DIRECTORY&gt;] [--interactive] [--dry-run] [--force] [--language|-lang &lt;LANGUAGE&gt;] [--type|-t &lt;TYPE&gt;] [template options]
         ///	dotnet {0} --help|-h
         ///	dotnet {0} &lt;{1}&gt;  --help|-h [--language|-lang &lt;LANGUAGE&gt;] [--type|-t &lt;TYPE&gt;]
-        ///	dotnet {0} [{1}]  --list|-l [--language|-lang &lt;LANGUAGE&gt;] [--type|-t &lt;TYPE&gt;]
+        ///	dotnet {0} [{1}]  --list|-l [--language|-lang &lt;LANGUAGE&gt;] [--type|-t &lt;TYPE&gt;] [--columns-all] [--columns &lt;COLUMNS_LIST&gt;]
         ///	dotnet {0} -i|--install &lt;PATH|NUGET_ID&gt; [--nuget-source &lt;SOURCE&gt;]
-        ///	dotnet {0} -u|--uninstall [PATH|NUGET_ID] 
-        ///	dotnet {0} --update-c [rest of string was truncated]&quot;;.
+        ///	dotnet {0} -u|--uninsta [rest of string was truncated]&quot;;.
         /// </summary>
         public static string NewCommandExamples {
             get {
@@ -1119,6 +1118,30 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Comma separated list of columns to show for --list or -l option.  The supported columns are: 
+        ///- language - comma separated list of languages supported by the template
+        ///- tags - the list of template tags
+        ///- author - the template author
+        ///- type - the template type: project or item
+        ///The template name and short name are shown always.
+        ///The default list of columns shown without the option: template name, short name, language, tags; equivalent to --columns=language,tags..
+        /// </summary>
+        public static string OptionDescriptionColumns {
+            get {
+                return ResourceManager.GetString("OptionDescriptionColumns", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shows all available columns for --list or -l option, equivalent to --columns=language,tags,author,type..
+        /// </summary>
+        public static string OptionDescriptionColumnsAll {
+            get {
+                return ResourceManager.GetString("OptionDescriptionColumnsAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Displays a summary of what would happen if the given command line were run if it would result in a template creation..
         /// </summary>
         public static string OptionDescriptionDryrun {
@@ -1213,7 +1236,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Specifies the template type to use for template selection or filtering. Predefined values are &quot;project&quot;, &quot;item&quot; or &quot;other&quot;..
+        ///   Looks up a localized string similar to Specifies the template type to use for template selection or filtering. Predefined values are &quot;project&quot; and &quot;item&quot;..
         /// </summary>
         public static string OptionDescriptionTypeFilter {
             get {
