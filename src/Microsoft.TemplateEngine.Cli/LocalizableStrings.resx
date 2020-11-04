@@ -738,4 +738,7 @@ Examples:
   <data name="ColumnNameTemplateName" xml:space="preserve">
     <value>Template Name</value>
   </data>
+  <data name="ColumnNameTotalDownloads" xml:space="preserve">
+    <value>Downloads</value>
+  </data>
 </root>

@@ -105,13 +105,33 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
 
         private class SearchResultTableRow
         {
-            internal SearchResultTableRow (TemplateGroupTableRow templateGroupTableRow, string packageName)
+            internal SearchResultTableRow (TemplateGroupTableRow templateGroupTableRow, string packageName, long downloads = 0)
             {
                 TemplateGroupInfo = templateGroupTableRow;
                 PackageName = packageName;
+                TotalDownloads = downloads;
             }
-            internal string PackageName { get; set; }
-            internal TemplateGroupTableRow TemplateGroupInfo { get; set; }
+            internal string PackageName { get; private set; }
+            internal TemplateGroupTableRow TemplateGroupInfo { get; private set; }
+            internal long TotalDownloads { get; private set; }
+            internal string PrintableTotalDownloads
+            {
+                get
+                {
+                    if (TotalDownloads < 1)
+                    {
+                        return string.Empty;
+                    }
+                    else if (TotalDownloads < 1000)
+                    {
+                        return "<1k";
+                    }
+                    else 
+                    {
+                        return $"{TotalDownloads / 1000}k";
+                    }
+                }
+            }
         }
 
         private static IReadOnlyCollection<SearchResultTableRow> GetSearchResultsForDisplay(TemplateSourceSearchResult sourceResult, string language, string defaultLanguage)
@@ -121,7 +141,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
             foreach (TemplatePackSearchResult packSearchResult in sourceResult.PacksWithMatches.Values)
             {
                 var templateGroupsForPack = TemplateGroupDisplay.GetTemplateGroupsForListDisplay(packSearchResult.TemplateMatches, language, defaultLanguage);
-                templateGroupsForDisplay.AddRange(templateGroupsForPack.Select(t => new SearchResultTableRow(t, packSearchResult.PackInfo.Name))); 
+                templateGroupsForDisplay.AddRange(templateGroupsForPack.Select(t => new SearchResultTableRow(t, packSearchResult.PackInfo.Name, packSearchResult.PackInfo.TotalDownloads))); 
             }
 
             return templateGroupsForDisplay;
@@ -145,13 +165,14 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
                         columnPadding: 2,
                         headerSeparator: '-',
                         blankLineBetweenRows: false)
-                    .DefineColumn(r => r.PackageName, out object packageColumn, LocalizableStrings.ColumnNamePackage, showAlways: true)
                     .DefineColumn(r => r.TemplateGroupInfo.Name, LocalizableStrings.ColumnNameTemplateName, showAlways: true, shrinkIfNeeded: true, minWidth:15)
                     .DefineColumn(r => r.TemplateGroupInfo.ShortName, LocalizableStrings.ColumnNameShortName, showAlways: true)
+                    .DefineColumn(r => r.TemplateGroupInfo.Author, LocalizableStrings.ColumnNameAuthor, NewCommandInputCli.AuthorColumnFilter, defaultColumn: true, shrinkIfNeeded: true, minWidth: 10)
                     .DefineColumn(r => r.TemplateGroupInfo.Languages, LocalizableStrings.ColumnNameLanguage, NewCommandInputCli.LanguageColumnFilter, defaultColumn: true)
-                    .DefineColumn(r => r.TemplateGroupInfo.Classifications, LocalizableStrings.ColumnNameTags, NewCommandInputCli.TagsColumnFilter, defaultColumn: true)
-                    .DefineColumn(r => r.TemplateGroupInfo.Author, LocalizableStrings.ColumnNameAuthor, NewCommandInputCli.AuthorColumnFilter, defaultColumn: false, shrinkIfNeeded: true, minWidth: 10)
                     .DefineColumn(r => r.TemplateGroupInfo.Type, LocalizableStrings.ColumnNameType, NewCommandInputCli.TypeColumnFilter, defaultColumn: false)
+                    .DefineColumn(r => r.TemplateGroupInfo.Classifications, LocalizableStrings.ColumnNameTags, NewCommandInputCli.TagsColumnFilter, defaultColumn: false, shrinkIfNeeded: true, minWidth: 10)
+                    .DefineColumn(r => r.PackageName, out object packageColumn, LocalizableStrings.ColumnNamePackage, showAlways: true)
+                    .DefineColumn(r => r.PrintableTotalDownloads, LocalizableStrings.ColumnNameTotalDownloads, showAlways: true)
                     .OrderBy(packageColumn);
 
             Reporter.Output.WriteLine(formatter.Layout());

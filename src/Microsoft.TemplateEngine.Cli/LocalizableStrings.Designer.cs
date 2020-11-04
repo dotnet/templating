@@ -572,6 +572,15 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Downloads.
+        /// </summary>
+        public static string ColumnNameTotalDownloads {
+            get {
+                return ResourceManager.GetString("ColumnNameTotalDownloads", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Type.
         /// </summary>
         public static string ColumnNameType {
