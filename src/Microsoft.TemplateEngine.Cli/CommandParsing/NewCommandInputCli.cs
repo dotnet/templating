@@ -248,7 +248,12 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                     _templateParamVariantToCanonicalMap = map;
                 }
 
-        public string AllowScriptsToRun
+                return _templateParamVariantToCanonicalMap;
+            }
+
+        }
+
+        public int Execute(params string[] args)
         {
             _args = args;
             ParseArgs();

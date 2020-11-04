@@ -67,6 +67,6 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
         bool TryGetCanonicalNameForVariant(string variant, out string canonical);
 
-        bool SearchOnline { get;  }
+        IReadOnlyList<string> VariantsForCanonical(string canonical);
     }
 }

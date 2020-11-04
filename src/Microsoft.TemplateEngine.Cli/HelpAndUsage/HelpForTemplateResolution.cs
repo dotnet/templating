@@ -185,7 +185,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
         // - Short Name: displays the first short name from the highest precedence template in the group.
         // - Language: All languages supported by any template in the group are displayed, with the default language in brackets, e.g.: [C#]
         // - Tags
-        private static void DisplayTemplateList(IReadOnlyCollection<IGrouping<string, ITemplateMatchInfo>> templates, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, string defaultLanguage)
+        private static void DisplayTemplateList(IReadOnlyCollection<ITemplateMatchInfo> templates, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, string defaultLanguage)
         {
             IReadOnlyCollection<TemplateGroupTableRow> groupsForDisplay = TemplateGroupDisplay.GetTemplateGroupsForListDisplay(templates, commandInput.Language, defaultLanguage);
 
