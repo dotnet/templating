@@ -187,9 +187,14 @@ namespace Microsoft.TemplateEngine.Edge.Template
         {
             return (template) =>
             {
-                if (string.IsNullOrEmpty(author) || string.IsNullOrWhiteSpace(template.Author))
+                if (string.IsNullOrWhiteSpace(author))
                 {
                     return null;
+                }
+
+                if (string.IsNullOrWhiteSpace(template.Author))
+                {
+                    return new MatchInfo { Location = MatchLocation.Author, Kind = MatchKind.Mismatch };
                 }
 
                 int authorIndex = template.Author.IndexOf(author, StringComparison.OrdinalIgnoreCase);
