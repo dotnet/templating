@@ -452,8 +452,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             return string.Join(separator,
                 SupportedFilterOptions.SupportedListFilters
                 .OfType<TemplateFilterOption>()
-                .Where(filter => filter.IsFilterSet(commandInput))
-                .Where(filter => filter.MismatchCriteria(templateResolutionResult))
+                .Where(filter => filter.IsFilterSet(commandInput) && filter.MismatchCriteria(templateResolutionResult))
                 .Select(filter => $"{filter.Name}='{filter.FilterValue(commandInput)}'"));
         }
     }

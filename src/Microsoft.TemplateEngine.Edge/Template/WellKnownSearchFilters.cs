@@ -193,7 +193,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
 
                 int authorIndex = template.Author.IndexOf(author, StringComparison.OrdinalIgnoreCase);
 
-                if (authorIndex == 0 && string.Equals(template.Author, author, StringComparison.OrdinalIgnoreCase))
+                if (authorIndex == 0 && template.Author.Length == author.Length)
                 {
                     return new MatchInfo { Location = MatchLocation.Author, Kind = MatchKind.Exact };
                 }
