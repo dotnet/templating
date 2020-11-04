@@ -226,7 +226,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             return coreMatchedTemplates;
         }
 
-        public static IReadOnlyCollection<ITemplateMatchInfo> PerformCoreTemplateQueryForSearch(IEnumerable<ITemplateInfo> templateInfo, INewCommandInput commandInput)
+        public static IReadOnlyCollection<ITemplateMatchInfo> PerformCoreTemplateQueryForSearch(IEnumerable<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput)
         {
             IReadOnlyList<FilterableTemplateInfo> filterableTemplateInfo = SetupFilterableTemplateInfoFromTemplateInfo(templateInfo.ToList());
             List<Func<ITemplateInfo, MatchInfo?>> searchFilters = new List<Func<ITemplateInfo, MatchInfo?>>()
@@ -237,9 +237,10 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                                     .OfType<TemplateFilterOption>()
                                     .Select(filter => filter.TemplateMatchFilter(commandInput)));
 
-            return TemplateListFilter
-                .GetTemplateMatchInfo (filterableTemplateInfo, TemplateListFilter.ExactMatchFilter, searchFilters.ToArray())
-                .ToList();
+            IReadOnlyCollection<ITemplateMatchInfo> matchedTemplates = TemplateListFilter.GetTemplateMatchInfo(filterableTemplateInfo, TemplateListFilter.ExactMatchFilter, searchFilters.ToArray());
+
+            AddParameterMatchingToTemplates(matchedTemplates, hostDataLoader, commandInput);
+            return matchedTemplates.Where(t => t.IsInvokableMatch()).ToList();
         }
 
         // Query for template matches, filtered by everything available: name, language, context, parameters, and the host file.
@@ -369,7 +370,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         }
 
         // adds dispositions to the templates based on matches between the input parameters & the template parameters.
-        private static void AddParameterMatchingToTemplates(IReadOnlyList<ITemplateMatchInfo> templatesToFilter, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput)
+        private static void AddParameterMatchingToTemplates(IReadOnlyCollection<ITemplateMatchInfo> templatesToFilter, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput)
         {
             foreach (ITemplateMatchInfo template in templatesToFilter)
             {

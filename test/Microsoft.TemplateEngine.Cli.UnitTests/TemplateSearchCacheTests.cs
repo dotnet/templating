@@ -44,7 +44,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
         // check that the symbol name-value correctly matches.
         // The _fooOneTemplate is a non-match because of a framework choice param value mismatch.
         // But the _fooTwoTemplate matches because the framework choice is valid for that template.
-        [Fact(DisplayName = nameof(CacheSearchCliSymbolNameFilterTest), Skip = "not valid")]
+        [Fact(DisplayName = nameof(CacheSearchCliSymbolNameFilterTest))]
         public async Task CacheSearchCliSymbolNameFilterTest()
         {
             TemplateDiscoveryMetadata mockTemplateDiscoveryMetadata = SetupDiscoveryMetadata(true);
@@ -89,7 +89,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
         }
 
         // test that an invalid symbol makes the search be a non-match
-        [Fact(DisplayName = nameof(CacheSearchCliSymbolNameMismatchFilterTest), Skip = "not valid test")]
+        [Fact(DisplayName = nameof(CacheSearchCliSymbolNameMismatchFilterTest))]
         public async Task CacheSearchCliSymbolNameMismatchFilterTest()
         {
             TemplateDiscoveryMetadata mockTemplateDiscoveryMetadata = SetupDiscoveryMetadata(true);

@@ -19,6 +19,20 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
 
         public Func<IReadOnlyList<ITemplateNameSearchResult>, IReadOnlyList<ITemplateMatchInfo>> MatchFilter => (foundPackages) =>
         {
+            Dictionary<string, HostSpecificTemplateData> hostDataLookup = new Dictionary<string, HostSpecificTemplateData>();
+            foreach (ITemplateNameSearchResult result in foundPackages)
+            {
+                if (result is CliTemplateNameSearchResult cliResult)
+                {
+                    hostDataLookup[cliResult.Template.Identity] = cliResult.HostSpecificTemplateData;
+                }
+                else
+                {
+                    hostDataLookup[result.Template.Identity] = HostSpecificTemplateData.Default;
+                }
+            }
+            IHostSpecificDataLoader hostSpecificDataLoader = new InMemoryHostSpecificDataLoader(hostDataLookup);
+
             IEnumerable<Func<INewCommandInput, Func<PackInfo, bool>>> packageFiltersToUse = SupportedFilterOptions.SupportedSearchFilters
                                     .OfType<PackageFilterOption>()
                                     .Select(filter => filter.PackageMatchFilter);
@@ -26,7 +40,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
             IEnumerable<ITemplateNameSearchResult> templatesToFilter =
                 foundPackages.Where(foundPackage => packageFiltersToUse.All(pf => pf(_commandInput)(foundPackage.PackInfo)));
 
-            return TemplateListResolver.PerformCoreTemplateQueryForSearch(templatesToFilter.Select(x => x.Template), _commandInput).ToList();
+            return TemplateListResolver.PerformCoreTemplateQueryForSearch(templatesToFilter.Select(x => x.Template), hostSpecificDataLoader, _commandInput).ToList();
         };
     }
 }
