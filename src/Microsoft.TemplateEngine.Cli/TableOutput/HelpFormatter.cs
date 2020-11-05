@@ -202,13 +202,16 @@ namespace Microsoft.TemplateEngine.Cli
             int totalPaddingWidth = _columnPadding * (_columns.Count - 1);
             int maxRowWidth = columnWidthLookup.Sum(column => column.Value) + totalPaddingWidth;
 
-            // If there is no columns to shrink or it fits, use maximum length identified when printing
+            //set identified needed width as the starting point
+            for (int i = 0; i < _columns.Count; ++i)
+            {
+                _columns[i].CalculatedWidth = columnWidthLookup[i];
+            }
+
+            // If there is no columns to shrink or it fits, use identified width
             if (!_columns.Any(col => col.ShrinkIfNeeded) || maxRowWidth < maxAllowedGridWidth)
             {
-                for (int i = 0; i < _columns.Count; ++i)
-                {
-                    _columns[i].CalculatedWidth += columnWidthLookup[i];
-                }
+                return;
             }
 
             //calculate the minimum length we could have after shrinking
@@ -225,7 +228,7 @@ namespace Microsoft.TemplateEngine.Cli
                 }
             }
 
-            //there is not enough space anyway - set all shrinkable columns to minimum width value
+            //there is not enough space anyway - set all shrinkable columns to minimum width or use actual width if it is less than mininum
             if (minimumLengthNeeded >= maxAllowedGridWidth)
             {
                 for (int i = 0; i < _columns.Count; ++i)
@@ -233,10 +236,6 @@ namespace Microsoft.TemplateEngine.Cli
                     if (_columns[i].ShrinkIfNeeded)
                     {
                         _columns[i].CalculatedWidth = Math.Min(_columns[i].MinWidth, columnWidthLookup[i]);
-                    }
-                    else
-                    {
-                        _columns[i].CalculatedWidth = columnWidthLookup[i];
                     }
                 }
                 return;
@@ -247,29 +246,31 @@ namespace Microsoft.TemplateEngine.Cli
             // the buffer width because that will cause the caret to wrap on the last character, so we
             // stop 1 short of it.
             int amountForShrinkableColumnToGiveUp = maxRowWidth - maxAllowedGridWidth + 1;
-            for (int i = 0; i < _columns.Count; ++i)
+            while (amountForShrinkableColumnToGiveUp > 0)
             {
-                if (_columns[i].ShrinkIfNeeded)
+                //picks up the widest column to shrink first
+                ColumnDefinition columnToShrink = _columns.Aggregate<ColumnDefinition, ColumnDefinition>(null, (selectedColumn, currentColumn) =>
                 {
-                    if (amountForShrinkableColumnToGiveUp > 0 && columnWidthLookup[i] > _columns[i].MinWidth)
+                    if (currentColumn.ShrinkIfNeeded && currentColumn.CalculatedWidth > currentColumn.MinWidth)
                     {
-                        int requiredColumnLength = columnWidthLookup[i];
-                        int minimumAllowedColumnLength = _columns[i].MinWidth;
-                        _columns[i].CalculatedWidth = Math.Max(minimumAllowedColumnLength, requiredColumnLength - amountForShrinkableColumnToGiveUp);
-                        int shrinkedSpace = columnWidthLookup[i] - _columns[i].CalculatedWidth;
-                        amountForShrinkableColumnToGiveUp -= shrinkedSpace;
+                        if (selectedColumn == null || currentColumn.CalculatedWidth >= selectedColumn.CalculatedWidth)
+                        {
+                            selectedColumn = currentColumn;
+                        }
                     }
-                    //we don't need to shrink this column as its width is already less or equal than minimum
-                    else
-                    {
-                        _columns[i].CalculatedWidth = columnWidthLookup[i];
-                    }
+                    return selectedColumn;
+                });
+                if (columnToShrink == null)
+                {
+                    //there is no column that can be shrinked
+                    //this should not happen as we already checked if there is enough space to fit the columns with shrinking
+                    break;
                 }
-                //we cannot shrink this column as it is not set up to be shrunken
                 else
                 {
-                    _columns[i].CalculatedWidth = columnWidthLookup[i];
-                }
+                    columnToShrink.CalculatedWidth--;
+                    amountForShrinkableColumnToGiveUp--;
+                }    
             }
 
         }
