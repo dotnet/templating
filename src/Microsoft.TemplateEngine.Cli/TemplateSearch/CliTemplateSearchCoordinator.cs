@@ -12,6 +12,17 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
 {
     internal static class CliTemplateSearchCoordinator
     {
+        /// <summary>
+        /// Executes searching for the templates in configured remote sources.
+        /// Performs validation for the commands, search for the templates in configured remote source, displays the results in table format
+        /// </summary>
+        /// <param name="environmentSettings">environment settings</param>
+        /// <param name="commandInput">new command data</param>
+        /// <param name="defaultLanguage">default language for the host</param>
+        /// <returns><c>CreationResultStatus.Success</c> when the templates were found and displayed;
+        /// <c>CreationResultStatus.Cancelled</c> when the command validation fails;
+        /// <c>CreationResultStatus.NotFound</c> when no templates found based on the filter criteria. 
+        /// </returns>
         internal static async Task<CreationResultStatus> SearchForTemplateMatchesAsync(IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, string defaultLanguage)
         {
             if (!ValidateCommandInput(commandInput))
@@ -128,6 +139,9 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
             return true;
         }
 
+        /// <summary>
+        /// Represents a table row for the template with the package information 
+        /// </summary>
         private class SearchResultTableRow
         {
             internal SearchResultTableRow (TemplateGroupTableRow templateGroupTableRow, string packageName, long downloads = 0)

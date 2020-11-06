@@ -226,6 +226,14 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             return coreMatchedTemplates;
         }
 
+        /// <summary>
+        /// Performs filtering of provided template list for --search option. Filters applied: template name filter, --search option filters, template parameters filter.
+        /// Only templates that exactly match the filters are returned.
+        /// </summary>
+        /// <param name="templateInfo">the list of templates to be filtered</param>
+        /// <param name="hostDataLoader">data of the host</param>
+        /// <param name="commandInput">new command data used in CLI</param>
+        /// <returns>filtered list of templates</returns>
         public static IReadOnlyCollection<ITemplateMatchInfo> PerformCoreTemplateQueryForSearch(IEnumerable<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput)
         {
             IReadOnlyList<FilterableTemplateInfo> filterableTemplateInfo = SetupFilterableTemplateInfoFromTemplateInfo(templateInfo.ToList());
