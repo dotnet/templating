@@ -1199,7 +1199,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Filters templates based on template author.
+        ///   Looks up a localized string similar to Filters the templates based on the template author. Applicable only with --search or --list | -l option..
         /// </summary>
         public static string OptionDescriptionAuthorFilter {
             get {
@@ -1208,13 +1208,14 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Comma separated list of columns to show for --list or -l option.  The supported columns are: 
-        ///- language - displays comma separated list of languages supported by the template
-        ///- tags - displays the list of template tags
-        ///- author - displays the template author
-        ///- type - displays the template type: project or item
-        ///The template name and short name are shown always.
-        ///The default list of columns shown without the option: template name, short name, language, tags; equivalent to --columns=language,tags..
+        ///   Looks up a localized string similar to Comma separated list of columns to show for --list|-l or --search option.  The supported columns are: 
+        ///- language - comma separated list of languages supported by the template
+        ///- tags - the list of template tags
+        ///- author - the template author
+        ///- type - the template type: project or item
+        ///The template name and short name are shown always. 
+        ///For --search option additionally NuGet package ID and total downloads count are shown always.
+        ///The default list of columns shown without the option for --list | -l: tem [rest of string was truncated]&quot;;.
         /// </summary>
         public static string OptionDescriptionColumns {
             get {
@@ -1223,7 +1224,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Shows all available columns  for --list or -l option, equivalent to --columns=language,tags,author,type..
+        ///   Looks up a localized string similar to Shows all available columns for --list | -l or --search option, equivalent to --columns=language,tags,author,type..
         /// </summary>
         public static string OptionDescriptionColumnsAll {
             get {
@@ -1232,7 +1233,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Filters templates based on package..
+        ///   Looks up a localized string similar to Filters the templates based on NuGet package ID. Applicable only with --search option..
         /// </summary>
         public static string OptionDescriptionPackageFilter {
             get {
@@ -1241,7 +1242,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Search for the template in configured remote sources..
+        ///   Looks up a localized string similar to Searches for the templates in configured remote sources..
         /// </summary>
         public static string OptionDescriptionSearch {
             get {
