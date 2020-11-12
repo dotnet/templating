@@ -46,6 +46,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return allRenames;
         }
 
+        public static string ApplyRenameToPrimaryOutput(string primaryOutputPath, IEngineEnvironmentSettings environmentSettings, string sourceName, object resolvedNameParamValue, IParameterSet parameterSet, IReadOnlyList<IReplacementTokens> symbolBasedFileRenames = null)
+        {
+            string targetDirectoryStub = string.Empty;
+            IProcessor symbolRenameProcessor = SetupSymbolBasedRenameProcessor(environmentSettings, sourceName, ref targetDirectoryStub, resolvedNameParamValue, parameterSet, symbolBasedFileRenames);
+            string renameFinalTargetValue = ApplyRenameProcessorToFilename(symbolRenameProcessor, primaryOutputPath);
+
+            return renameFinalTargetValue;
+        }
+
         private static string ApplyRenameProcessorToFilename(IProcessor processor, string sourceFilename)
         {
             using (Stream source = new MemoryStream(Encoding.UTF8.GetBytes(sourceFilename)))
