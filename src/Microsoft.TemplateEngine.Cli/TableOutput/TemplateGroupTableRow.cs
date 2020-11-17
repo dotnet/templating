@@ -4,7 +4,7 @@ namespace Microsoft.TemplateEngine.Cli.TableOutput
     /// <summary>
     /// Represents a table row for template group display
     /// </summary>
-    internal class TemplateGroupTableRow
+    internal struct TemplateGroupTableRow
     {
         internal string Author { get; set; }
         internal string Classifications { get; set; }

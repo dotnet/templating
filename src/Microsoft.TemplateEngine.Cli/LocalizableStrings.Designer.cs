@@ -1490,7 +1490,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Search failed: template name is too short, minimum 2 characters required..
+        ///   Looks up a localized string similar to Search failed: template name is too short, minimum 2 characters are required..
         /// </summary>
         public static string SearchOnlineErrorTemplateNameIsTooShort {
             get {

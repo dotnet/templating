@@ -489,7 +489,7 @@ namespace Microsoft.TemplateEngine.Cli
 
                 if (_commandInput.SearchOnline)
                 {
-                    return await CliTemplateSearchCoordinator.SearchForTemplateMatchesAsync(EnvironmentSettings, _commandInput, _defaultLanguage);
+                    return await CliTemplateSearchCoordinator.SearchForTemplateMatchesAsync(EnvironmentSettings, _commandInput, _defaultLanguage).ConfigureAwait(false);
                 }
 
                 if (string.IsNullOrWhiteSpace(TemplateName))

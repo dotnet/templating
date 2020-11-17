@@ -32,7 +32,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
 
             Reporter.Output.WriteLine(LocalizableStrings.SearchOnlineNotification);
             TemplateSearchCoordinator searchCoordinator = CliTemplateSearchCoordinatorFactory.CreateCliTemplateSearchCoordinator(environmentSettings, commandInput, defaultLanguage);
-            SearchResults searchResults = await searchCoordinator.SearchAsync();
+            SearchResults searchResults = await searchCoordinator.SearchAsync().ConfigureAwait(false);
 
             if (!searchResults.AnySources)
             {

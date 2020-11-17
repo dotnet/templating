@@ -732,7 +732,7 @@ Examples:
     <value>Filters the templates based on NuGet package ID. Applicable only with --search option.</value>
   </data>
   <data name="SearchOnlineErrorTemplateNameIsTooShort" xml:space="preserve">
-    <value>Search failed: template name is too short, minimum 2 characters required.</value>
+    <value>Search failed: template name is too short, minimum 2 characters are required.</value>
   </data>
   <data name="ColumnNamePackage" xml:space="preserve">
     <value>Package</value>

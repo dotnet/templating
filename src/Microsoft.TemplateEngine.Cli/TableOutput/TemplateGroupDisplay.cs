@@ -36,21 +36,24 @@ namespace Microsoft.TemplateEngine.Cli.TableOutput
 
                 foreach (ITemplateMatchInfo template in grouping)
                 {
-                    if (template.Info.Tags != null && template.Info.Tags.TryGetValue("language", out ICacheTag languageTag))
+                    if (template.Info.Tags == null || !template.Info.Tags.TryGetValue("language", out ICacheTag languageTag))
                     {
-                        foreach (string lang in languageTag.ChoicesAndDescriptions.Keys)
+                        continue;
+                    }
+                    foreach (string lang in languageTag.ChoicesAndDescriptions.Keys)
+                    {
+                        if (!uniqueLanguages.Add(lang))
                         {
-                            if (uniqueLanguages.Add(lang))
-                            {
-                                if (string.IsNullOrEmpty(language) && string.Equals(defaultLanguage, lang, StringComparison.OrdinalIgnoreCase))
-                                {
-                                    defaultLanguageDisplay = $"[{lang}]";
-                                }
-                                else
-                                {
-                                    languageForDisplay.Add(lang);
-                                }
-                            }
+                            continue;
+                        }
+
+                        if (string.IsNullOrEmpty(language) && string.Equals(defaultLanguage, lang, StringComparison.OrdinalIgnoreCase))
+                        {
+                            defaultLanguageDisplay = $"[{lang}]";
+                        }
+                        else
+                        {
+                            languageForDisplay.Add(lang);
                         }
                     }
                 }

@@ -323,18 +323,18 @@ namespace Microsoft.TemplateEngine.Cli
                 {
                     while (position < text.Length)
                     {
-                        int newline = text.IndexOf(environmentSettings.Environment.NewLine, position, StringComparison.Ordinal);
+                        int newlineIndex = text.IndexOf(environmentSettings.Environment.NewLine, position, StringComparison.Ordinal);
 
-                        if (newline > -1)
+                        if (newlineIndex > -1)
                         {
-                            if (newline - position <= maxWidth)
+                            if (newlineIndex - position <= maxWidth)
                             {
-                                lines.Add(text.Substring(position, newline - position).TrimEnd());
-                                position = newline + environmentSettings.Environment.NewLine.Length;
+                                lines.Add(text.Substring(position, newlineIndex - position).TrimEnd());
+                                position = newlineIndex + environmentSettings.Environment.NewLine.Length;
                             }
                             else
                             {
-                                GetLineText(text, lines, maxWidth, newline, ref position);
+                                GetLineText(text, lines, maxWidth, newlineIndex, ref position);
                             }
                         }
                         else
@@ -360,18 +360,13 @@ namespace Microsoft.TemplateEngine.Cli
                 var text = _lines.Count > line ? _lines[line] : string.Empty;
                 var abbreviatedText = ShrinkTextToLength(text, maxColumnWidth);
 
-
                 if (rightAlign)
                 {
-                    return
-                        abbreviatedText
-                        .PadLeft(maxColumnWidth);
+                    return abbreviatedText.PadLeft(maxColumnWidth);
                 }
                 else
                 {
-                    return
-                        abbreviatedText
-                        .PadRight(maxColumnWidth);
+                    return abbreviatedText.PadRight(maxColumnWidth);
                 }
             }
 
