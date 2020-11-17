@@ -1118,6 +1118,15 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Filters templates based on template author.
+        /// </summary>
+        public static string OptionDescriptionAuthorFilter {
+            get {
+                return ResourceManager.GetString("OptionDescriptionAuthorFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Comma separated list of columns to show for --list or -l option.  The supported columns are: 
         ///- language - comma separated list of languages supported by the template
         ///- tags - the list of template tags
@@ -1172,8 +1181,8 @@ namespace Microsoft.TemplateEngine.Cli {
         /// <summary>
         ///   Looks up a localized string similar to Installs a template pack from the path or using NuGet ID provided.
         ///To install the package from the NuGet feed, use the NuGet package identfier. Use &quot;package-identifier::version&quot; to specify the version to install. If a version of the template was already installed when you run this command, the template will be updated to the specified version, or to the latest stable version if no version was specified.
-        ///To install the package from the file system, specify the path to the NuGet package file.
-        ///To install th [rest of string was truncated]&quot;;.
+        ///To install the package from the file system, specify the path to the NuGet package file (*.nupkg).
+        ///To  [rest of string was truncated]&quot;;.
         /// </summary>
         public static string OptionDescriptionInstall {
             get {
@@ -1271,15 +1280,6 @@ namespace Microsoft.TemplateEngine.Cli {
         public static string OptionDescriptionUpdateCheck {
             get {
                 return ResourceManager.GetString("OptionDescriptionUpdateCheck", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Filters templates based on template author.
-        /// </summary>
-        public static string OptionDescriptionAuthorFilter {
-            get {
-                return ResourceManager.GetString("OptionDescriptionAuthorFilter", resourceCulture);
             }
         }
         
