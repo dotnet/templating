@@ -1284,30 +1284,6 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Comma separated list of columns to show for --list or -l option.  The supported columns are: 
-        ///- language - displays comma separated list of languages supported by the template
-        ///- tags - displays the list of template tags
-        ///- author - displays the template author
-        ///- type - displays the template type: project or item
-        ///The template name and short name are shown always.
-        ///The default list of columns shown without the option: template name, short name, language, tags; equivalent to --columns=language,tags..
-        /// </summary>
-        public static string OptionDescriptionColumns {
-            get {
-                return ResourceManager.GetString("OptionDescriptionColumns", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Shows all available columns  for --list or -l option, equivalent to --columns=language,tags,author,type..
-        /// </summary>
-        public static string OptionDescriptionColumnsAll {
-            get {
-                return ResourceManager.GetString("OptionDescriptionColumnsAll", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Options:.
         /// </summary>
         public static string Options {
