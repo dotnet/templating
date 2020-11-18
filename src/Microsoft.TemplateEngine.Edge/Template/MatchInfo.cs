@@ -15,5 +15,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
 
         // Stores the exception message if there is an args parse error.
         public string AdditionalInformation;
+
+        public string InputParameterFormat;
     }
 }

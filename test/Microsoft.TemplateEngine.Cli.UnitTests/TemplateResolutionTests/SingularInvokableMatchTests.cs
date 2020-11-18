@@ -7,7 +7,7 @@ using Microsoft.TemplateEngine.Cli.UnitTests.CliMocks;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Edge.Template;
 using Xunit;
-using static Microsoft.TemplateEngine.Cli.TemplateResolution.TemplateListResolutionResult;
+using static Microsoft.TemplateEngine.Cli.TemplateResolution.TemplateResolutionResult;
 
 namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
 {
@@ -55,19 +55,72 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             };
 
             IHostSpecificDataLoader hostSpecificDataLoader = new MockHostSpecificDataLoader();
-            TemplateListResolutionResult matchResult = TemplateListResolver.GetTemplateResolutionResult(templatesToSearch, hostSpecificDataLoader, userInputs, null);
-            // make sure there's an unambiguous group, otherwise the singular match check is meaningless
-            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousGroup));
-            Assert.Equal(2, unambiguousGroup.Count);
-            Assert.Equal(2, matchResult.GetBestTemplateMatchList().Count);
+            TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(templatesToSearch, hostSpecificDataLoader, userInputs, null);
 
-            Assert.False(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo singularInvokableMatch, out SingularInvokableMatchCheckStatus resultStatus));
-            Assert.Equal(SingularInvokableMatchCheckStatus.AmbiguousChoice, resultStatus);
+            // make sure there's an unambiguous group, otherwise the singular match check is meaningless
+            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyCollection<ITemplateMatchInfo> unambiguousGroup));
+            Assert.Equal(2, unambiguousGroup.Count);
+
+            Assert.False(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo singularInvokableMatch, out SingleInvokableMatchStatus resultStatus));
+            Assert.Equal(SingleInvokableMatchStatus.AmbiguousParameterValueChoice, resultStatus);
             Assert.Null(singularInvokableMatch);
         }
 
         [Fact(DisplayName = nameof(MultipleTemplatesInGroupParamPartiaMatch_TheOneHavingSingleStartsWithIsTheSingularInvokableMatch))]
         public void MultipleTemplatesInGroupParamPartiaMatch_TheOneHavingSingleStartsWithIsTheSingularInvokableMatch()
+        {
+            List<ITemplateInfo> templatesToSearch = new List<ITemplateInfo>();
+            templatesToSearch.Add(new TemplateInfo()
+            {
+                ShortName = "foo",
+                Name = "Foo template",
+                Identity = "foo.test_1",
+                GroupIdentity = "foo.test.template",
+                Precedence = 100,
+                Tags = new Dictionary<string, ICacheTag>(StringComparer.OrdinalIgnoreCase)
+                {
+                    { "MyChoice", ResolutionTestHelper.CreateTestCacheTag(new List<string>() { "value_1_example"}) }
+                },
+                CacheParameters = new Dictionary<string, ICacheParameter>(),
+            });
+            templatesToSearch.Add(new TemplateInfo()
+            {
+                ShortName = "foo",
+                Name = "Foo template",
+                Identity = "foo.test_2",
+                GroupIdentity = "foo.test.template",
+                Precedence = 200,
+                Tags = new Dictionary<string, ICacheTag>(StringComparer.OrdinalIgnoreCase)
+                {
+                    { "MyChoice", ResolutionTestHelper.CreateTestCacheTag(new List<string>() { "value_2_example", "value_3_example"}) }
+                },
+                CacheParameters = new Dictionary<string, ICacheParameter>(),
+            });
+
+            INewCommandInput userInputs = new MockNewCommandInput(
+                new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    { "MyChoice", "value_1" }
+                }
+            )
+            {
+                TemplateName = "foo"
+            };
+
+            IHostSpecificDataLoader hostSpecificDataLoader = new MockHostSpecificDataLoader();
+            TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(templatesToSearch, hostSpecificDataLoader, userInputs, null);
+
+            // make sure there's an unambiguous group, otherwise the singular match check is meaningless
+            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyCollection<ITemplateMatchInfo> unambiguousGroup));
+            Assert.Equal(2, unambiguousGroup.Count);
+
+            Assert.True(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo singularInvokableMatch, out SingleInvokableMatchStatus resultStatus));
+            Assert.Equal(SingleInvokableMatchStatus.SingleMatch, resultStatus);
+            Assert.Equal("foo.test_1", singularInvokableMatch.Info.Identity);
+        }
+
+        [Fact(DisplayName = nameof(MultipleTemplatesInGroupParamPartiaMatch_AmbiguousParameterMatchInOneTemplateInTemplateGroupInvalidatesTheMatch))]
+        public void MultipleTemplatesInGroupParamPartiaMatch_AmbiguousParameterMatchInOneTemplateInTemplateGroupInvalidatesTheMatch()
         {
             List<ITemplateInfo> templatesToSearch = new List<ITemplateInfo>();
             templatesToSearch.Add(new TemplateInfo()
@@ -108,15 +161,14 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             };
 
             IHostSpecificDataLoader hostSpecificDataLoader = new MockHostSpecificDataLoader();
-            TemplateListResolutionResult matchResult = TemplateListResolver.GetTemplateResolutionResult(templatesToSearch, hostSpecificDataLoader, userInputs, null);
-            // make sure there's an unambiguous group, otherwise the singular match check is meaningless
-            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousGroup));
-            Assert.Equal(2, unambiguousGroup.Count);
-            Assert.Equal(2, matchResult.GetBestTemplateMatchList().Count);
+            TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(templatesToSearch, hostSpecificDataLoader, userInputs, null);
 
-            Assert.True(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo singularInvokableMatch, out SingularInvokableMatchCheckStatus resultStatus));
-            Assert.Equal(SingularInvokableMatchCheckStatus.SingleMatch, resultStatus);
-            Assert.Equal("foo.test_1", singularInvokableMatch.Info.Identity);
+            // make sure there's an unambiguous group, otherwise the singular match check is meaningless
+            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyCollection<ITemplateMatchInfo> unambiguousGroup));
+            Assert.Equal(2, unambiguousGroup.Count);
+
+            Assert.False(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo singularInvokableMatch, out SingleInvokableMatchStatus resultStatus));
+            Assert.Equal(SingleInvokableMatchStatus.AmbiguousParameterValueChoice, resultStatus);
         }
 
         [Fact(DisplayName = nameof(MultipleTemplatesInGroupHavingAmbiguousParamMatchOnSameParamIsAmbiguous))]
@@ -161,14 +213,12 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             };
 
             IHostSpecificDataLoader hostSpecificDataLoader = new MockHostSpecificDataLoader();
-            TemplateListResolutionResult matchResult = TemplateListResolver.GetTemplateResolutionResult(templatesToSearch, hostSpecificDataLoader, userInputs, null);
+            TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(templatesToSearch, hostSpecificDataLoader, userInputs, null);
             // make sure there's an unambiguous group, otherwise the singular match check is meaningless
-            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousGroup));
+            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyCollection<ITemplateMatchInfo> unambiguousGroup));
             Assert.Equal(2, unambiguousGroup.Count);
-            Assert.Equal(2, matchResult.GetBestTemplateMatchList().Count);
-
-            Assert.False(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo singularInvokableMatch, out SingularInvokableMatchCheckStatus resultStatus));
-            Assert.Equal(SingularInvokableMatchCheckStatus.NoMatch, resultStatus);
+            Assert.False(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo singularInvokableMatch, out SingleInvokableMatchStatus resultStatus));
+            Assert.Equal(SingleInvokableMatchStatus.AmbiguousParameterValueChoice, resultStatus);
             Assert.Null(singularInvokableMatch);
         }
 
@@ -217,14 +267,12 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             };
 
             IHostSpecificDataLoader hostSpecificDataLoader = new MockHostSpecificDataLoader();
-            TemplateListResolutionResult matchResult = TemplateListResolver.GetTemplateResolutionResult(templatesToSearch, hostSpecificDataLoader, userInputs, null);
+            TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(templatesToSearch, hostSpecificDataLoader, userInputs, null);
             // make sure there's an unambiguous group, otherwise the singular match check is meaningless
-            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousGroup));
+            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyCollection<ITemplateMatchInfo> unambiguousGroup));
             Assert.Equal(2, unambiguousGroup.Count);
-            Assert.Equal(2, matchResult.GetBestTemplateMatchList().Count);
-
-            Assert.True(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo singularInvokableMatch, out SingularInvokableMatchCheckStatus resultStatus));
-            Assert.Equal(SingularInvokableMatchCheckStatus.SingleMatch, resultStatus);
+            Assert.True(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo singularInvokableMatch, out SingleInvokableMatchStatus resultStatus));
+            Assert.Equal(SingleInvokableMatchStatus.SingleMatch, resultStatus);
             Assert.Equal("foo.test_2", singularInvokableMatch.Info.Identity);
         }
 
@@ -254,14 +302,12 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             };
 
             IHostSpecificDataLoader hostSpecificDataLoader = new MockHostSpecificDataLoader();
-            TemplateListResolutionResult matchResult = TemplateListResolver.GetTemplateResolutionResult(templatesToSearch, hostSpecificDataLoader, userInputs, null);
+            TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(templatesToSearch, hostSpecificDataLoader, userInputs, null);
             // make sure there's an unambiguous group, otherwise the singular match check is meaningless
-            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousGroup));
+            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyCollection<ITemplateMatchInfo> unambiguousGroup));
             Assert.Equal(1, unambiguousGroup.Count);
-            Assert.Equal(1, matchResult.GetBestTemplateMatchList().Count);
-
-            Assert.True(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo singularInvokableMatch, out SingularInvokableMatchCheckStatus resultStatus));
-            Assert.Equal(SingularInvokableMatchCheckStatus.SingleMatch, resultStatus);
+            Assert.True(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo singularInvokableMatch, out SingleInvokableMatchStatus resultStatus));
+            Assert.Equal(SingleInvokableMatchStatus.SingleMatch, resultStatus);
             Assert.Equal("foo.test_1", singularInvokableMatch.Info.Identity);
         }
 
@@ -305,14 +351,12 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
 
 
             IHostSpecificDataLoader hostSpecificDataLoader = new MockHostSpecificDataLoader();
-            TemplateListResolutionResult matchResult = TemplateListResolver.GetTemplateResolutionResult(templatesToSearch, hostSpecificDataLoader, userInputs, null);
+            TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(templatesToSearch, hostSpecificDataLoader, userInputs, null);
             // make sure there's an unambiguous group, otherwise the singular match check is meaningless
-            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousGroup));
+            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyCollection<ITemplateMatchInfo> unambiguousGroup));
             Assert.Equal(2, unambiguousGroup.Count);
-            Assert.Equal(2, matchResult.GetBestTemplateMatchList().Count);
-
-            Assert.True(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo singularInvokableMatch, out SingularInvokableMatchCheckStatus resultStatus));
-            Assert.Equal(SingularInvokableMatchCheckStatus.SingleMatch, resultStatus);
+            Assert.True(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo singularInvokableMatch, out SingleInvokableMatchStatus resultStatus));
+            Assert.Equal(SingleInvokableMatchStatus.SingleMatch, resultStatus);
             Assert.Equal("foo.test_1.VB", singularInvokableMatch.Info.Identity);
         }
 
@@ -355,15 +399,13 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             };
 
             IHostSpecificDataLoader hostSpecificDataLoader = new MockHostSpecificDataLoader();
-            TemplateListResolutionResult matchResult = TemplateListResolver.GetTemplateResolutionResult(templatesToSearch, hostSpecificDataLoader, userInputs, null);
+            TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(templatesToSearch, hostSpecificDataLoader, userInputs, null);
             // make sure there's an unambiguous group, otherwise the singular match check is meaningless
-            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousGroup));
+            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyCollection<ITemplateMatchInfo> unambiguousGroup));
             Assert.Equal(2, unambiguousGroup.Count);
-            Assert.Equal(2, matchResult.GetBestTemplateMatchList().Count);
-
-            Assert.False(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo singularInvokableMatch, out SingularInvokableMatchCheckStatus resultStatus));
+            Assert.False(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo singularInvokableMatch, out SingleInvokableMatchStatus resultStatus));
             Assert.Null(singularInvokableMatch);
-            Assert.Equal(SingularInvokableMatchCheckStatus.AmbiguousPrecedence, resultStatus);
+            Assert.Equal(SingleInvokableMatchStatus.AmbiguousTemplateChoice, resultStatus);
         }
     }
 }

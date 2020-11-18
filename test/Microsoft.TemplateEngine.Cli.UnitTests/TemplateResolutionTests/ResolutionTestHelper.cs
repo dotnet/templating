@@ -31,27 +31,5 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
 
             return new CacheTag(tagDescription, choicesDict, defaultValue, defaultIfOptionWithoutValue);
         }
-
-        public static string DebugOutputForResolutionResult(TemplateListResolutionResult matchResult, Func<ITemplateMatchInfo, bool> filter)
-        {
-            if (!matchResult.TryGetCoreMatchedTemplatesWithDisposition(filter, out IReadOnlyList<ITemplateMatchInfo> matchingTemplates))
-            {
-                return "No templates matched the filter";
-            }
-
-            StringBuilder builder = new StringBuilder(512);
-            foreach (ITemplateMatchInfo templateMatchInfo in matchingTemplates)
-            {
-                builder.AppendLine($"Identity: {templateMatchInfo.Info.Identity}");
-                foreach (MatchInfo disposition in templateMatchInfo.MatchDisposition)
-                {
-                    builder.AppendLine($"\t{disposition.Location.ToString()} = {disposition.Kind.ToString()}");
-                }
-
-                builder.AppendLine();
-            }
-
-            return builder.ToString();
-        }
     }
 }

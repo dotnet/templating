@@ -182,7 +182,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
 
         public string TemplateParamInputFormat(string canonical)
         {
-            throw new NotImplementedException();
+            return canonical;
         }
 
         public string TemplateParamValue(string paramName)

@@ -6,13 +6,6 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
 {
     public static class TemplateMatchInfoExtensions
     {
-        // True if name is explicitly mismatched.
-        // Partial matches are ok. No disposition on name is also ok.
-        public static bool HasNameMismatch(this ITemplateMatchInfo templateMatchInfo)
-        {
-            return templateMatchInfo.MatchDisposition.Any(x => x.Location == MatchLocation.Name && x.Kind == MatchKind.Mismatch);
-        }
-
         public static bool HasParameterMismatch(this ITemplateMatchInfo templateMatchInfo)
         {
             return templateMatchInfo.MatchDisposition.Any(x => x.Location == MatchLocation.OtherParameter
@@ -34,7 +27,6 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             return templateMatchInfo.DispositionOfDefaults.Any(x => x.Location == MatchLocation.DefaultLanguage && x.Kind == MatchKind.Exact);
         }
 
-
         public static bool HasBaselineMismatch(this ITemplateMatchInfo templateMatchInfo)
         {
             return templateMatchInfo.MatchDisposition.Any(x => x.Location == MatchLocation.Baseline && x.Kind == MatchKind.Mismatch);
@@ -48,6 +40,11 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         public static bool HasAmbiguousParameterValueMatch(this ITemplateMatchInfo templateMatchInfo)
         {
             return templateMatchInfo.MatchDisposition.Any(x => x.Location == MatchLocation.OtherParameter && x.Kind == MatchKind.AmbiguousParameterValue);
+        }
+
+        public static bool HasInvalidParameterName(this ITemplateMatchInfo templateMatchInfo)
+        {
+            return templateMatchInfo.MatchDisposition.Any(x => x.Location == MatchLocation.OtherParameter && x.Kind == MatchKind.InvalidParameterName);
         }
 
         public static bool IsInvokableMatch(this ITemplateMatchInfo templateMatchInfo)
@@ -90,24 +87,6 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                                     .ToDictionary(x => x.InputParameterName, x => x.ParameterValue);
         }
 
-        public static bool IsContextOnlyMatch(this ITemplateMatchInfo templateMatchInfo)
-        {
-            return templateMatchInfo.MatchDisposition.All(x => x.Location == MatchLocation.Context && x.Kind == MatchKind.Exact
-                                                                || x.Kind == MatchKind.Mismatch);
-        }
-
-        public static bool IsNameOnlyMatch(this ITemplateMatchInfo templateMatchInfo)
-        {
-            return templateMatchInfo.MatchDisposition.All(x => x.Location == MatchLocation.Name && x.Kind == MatchKind.Exact
-                                                                || x.Kind == MatchKind.Mismatch);
-        }
-
-        public static bool IsNameOrContextMatch(this ITemplateMatchInfo templateMatchInfo)
-        {
-            return templateMatchInfo.MatchDisposition.Any(x => x.Location == MatchLocation.Name && x.Kind == MatchKind.Exact
-                                                                || x.Location == MatchLocation.Context && x.Kind == MatchKind.Exact);
-        }
-
         public static bool IsMatchExceptContext(this ITemplateMatchInfo templateMatchInfo)
         {
             if (templateMatchInfo.MatchDisposition.Count == 0)
@@ -138,38 +117,6 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
 
             return hasContextMismatch;
         }
-
-        public static bool IsMatchExceptLanguage(this ITemplateMatchInfo templateMatchInfo)
-        {
-            if (templateMatchInfo.MatchDisposition.Count == 0)
-            {
-                return false;
-            }
-
-            bool hasLanguageMismatch = false;
-
-            foreach (MatchInfo disposition in templateMatchInfo.MatchDisposition)
-            {
-                if (disposition.Location == MatchLocation.Language)
-                {
-                    if (disposition.Kind == MatchKind.Exact)
-                    {
-                        return false;
-                    }
-                    else
-                    {
-                        hasLanguageMismatch = true;
-                    }
-                }
-                else if (disposition.Kind == MatchKind.Mismatch)
-                {
-                    return false;
-                }
-            }
-
-            return hasLanguageMismatch;
-        }
-
 
         // Returns true if there is a context mismatch and no other mismatches, false otherwise.
         // Note: there must be at least one disposition that is not mismatch, in addition to the context mismatch.

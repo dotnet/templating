@@ -419,6 +419,16 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} {1}
+        ///   value &apos;{1}&apos; is ambiguous for option {0}..
+        /// </summary>
+        public static string AmbiguousParameterDetail {
+            get {
+                return ResourceManager.GetString("AmbiguousParameterDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The specified extra args file does not exist: {0}..
         /// </summary>
         public static string ArgsFileNotFound {

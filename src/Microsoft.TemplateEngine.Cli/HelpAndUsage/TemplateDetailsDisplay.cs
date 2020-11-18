@@ -17,7 +17,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
     {
         public static void ShowTemplateGroupHelp(IReadOnlyCollection<ITemplateMatchInfo> templateGroup, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, IHostSpecificDataLoader hostDataLoader, TemplateCreator templateCreator, bool showImplicitlyHiddenParams = false)
         {
-            if (templateGroup.Count == 0 || !TemplateListResolver.AreAllTemplatesSameGroupIdentity(templateGroup))
+            if (templateGroup.Count == 0 || !TemplateResolver.AreAllTemplatesSameGroupIdentity(templateGroup))
             {
                 return;
             }
@@ -53,10 +53,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             HashSet<string> languages = new HashSet<string>();
             foreach (ITemplateInfo templateInfo in templateGroup)
             {
-                if (templateInfo.Tags != null && templateInfo.Tags.TryGetValue("language", out ICacheTag languageTag))
-                {
-                    languages.UnionWith(languageTag.ChoicesAndDescriptions.Keys.Where(x => !string.IsNullOrWhiteSpace(x)).ToList());
-                }
+                languages.UnionWith(templateInfo.GetLanguages());
             }
 
             if (languages != null && languages.Any())
