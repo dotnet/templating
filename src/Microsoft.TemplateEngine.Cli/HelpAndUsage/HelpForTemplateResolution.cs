@@ -253,11 +253,11 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             if (!commandInput.IsListFlagSpecified)
             {
                 // To list installed templates, run 'dotnet {0} --list'.
-                // To search for the templates available on Nuget.org, run 'dotnet {0} <template name> --search'.
                 Reporter.Error.WriteLine(string.Format(LocalizableStrings.ListTemplatesCommand, commandInput.CommandName).Bold().Red());
-                Reporter.Error.WriteLine(string.Format(LocalizableStrings.SearchTemplatesCommand, commandInput.CommandName, commandInput.TemplateName).Bold().Red());
             }
 
+            // To search for the templates available on Nuget.org, run 'dotnet {0} <template name> --search'.
+            Reporter.Error.WriteLine(string.Format(LocalizableStrings.SearchTemplatesCommand, commandInput.CommandName, commandInput.TemplateName).Bold().Red());
             Reporter.Error.WriteLine();
         }
 
