@@ -60,7 +60,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
         }
 
-        // Creates and returns the processor used to create the file rename mapping for source based file renames
+        // Creates and returns the processor used to create the file rename mapping for source based file renames.
         private static IProcessor SetupRenameProcessor(IEngineEnvironmentSettings environmentSettings, IReadOnlyDictionary<string, string> substringReplacementMap)
         {
             List<IOperationProvider> operations = new List<IOperationProvider>();
