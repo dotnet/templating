@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.TemplateEngine.Abstractions;
 
 namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
