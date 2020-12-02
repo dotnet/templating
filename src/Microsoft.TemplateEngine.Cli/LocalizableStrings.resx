@@ -744,6 +744,6 @@ Examples:
     <value>Downloads</value>
   </data>
   <data name="SearchTemplatesCommand" xml:space="preserve">
-    <value>To search for the templates available on Nuget.org, run 'dotnet {0} {1} --search'.</value>
+    <value>To search for the templates on NuGet.org, run 'dotnet {0} {1} --search'.</value>
   </data>
 </root>

@@ -256,7 +256,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                 Reporter.Error.WriteLine(string.Format(LocalizableStrings.ListTemplatesCommand, commandInput.CommandName).Bold().Red());
             }
 
-            // To search for the templates available on Nuget.org, run 'dotnet {0} <template name> --search'.
+            // To search for the templates on NuGet.org, run 'dotnet {0} <template name> --search'.
             Reporter.Error.WriteLine(string.Format(LocalizableStrings.SearchTemplatesCommand, commandInput.CommandName, commandInput.TemplateName).Bold().Red());
             Reporter.Error.WriteLine();
         }
