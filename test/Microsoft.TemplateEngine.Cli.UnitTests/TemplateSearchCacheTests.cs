@@ -309,14 +309,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             Description = "Mock Bar CSharp template",
             Name = "MockBarCsharpTemplate",
             ShortName = "barC",
-            Tags = new Dictionary<string, ICacheTag>(StringComparer.Ordinal)
-            {
-                {
-                    "language", ResolutionTestHelper.CreateTestCacheTag(new List<string>() { "C#" })
-                }
-            },
-            CacheParameters = new Dictionary<string, ICacheParameter>()
-        };
+        }.WithTag("language", "C#");
 
         private static readonly ITemplateInfo _barFSharpTemplate = new MockTemplateInfo()
         {
@@ -325,14 +318,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             Description = "Mock Bar FSharp template",
             Name = "MockBarFSharpTemplate",
             ShortName = "barF",
-            Tags = new Dictionary<string, ICacheTag>(StringComparer.Ordinal)
-            {
-                {
-                    "language", ResolutionTestHelper.CreateTestCacheTag(new List<string>() { "F#" })
-                }
-            },
-            CacheParameters = new Dictionary<string, ICacheParameter>()
-        };
+        }.WithTag("language", "F#");
 
         private static TemplateDiscoveryMetadata SetupDiscoveryMetadata(bool includehostData = false)
         {

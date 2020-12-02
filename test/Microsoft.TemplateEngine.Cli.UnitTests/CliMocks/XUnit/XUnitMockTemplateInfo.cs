@@ -1,11 +1,6 @@
-using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests;
 using Microsoft.TemplateEngine.Mocks;
-using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Xunit.Abstractions;
 
 namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
@@ -49,6 +44,8 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
             Precedence = info.GetValue<int>("template_precedence");
             Identity = info.GetValue<string>("template_identity");
             GroupIdentity = info.GetValue<string>("template_group");
+            Description = info.GetValue<string>("template_description");
+
             _tags = JsonConvert.DeserializeObject<Dictionary<string, string[]>>(info.GetValue<string>("template_tags"));
             _cacheParameters = JsonConvert.DeserializeObject<string[]>(info.GetValue<string>("template_params"));
         }
@@ -60,6 +57,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
             info.AddValue("template_precedence", Precedence, typeof(int));
             info.AddValue("template_identity", Identity, typeof(string));
             info.AddValue("template_group", GroupIdentity, typeof(string));
+            info.AddValue("template_description", Description, typeof(string));
 
             info.AddValue("template_tags", JsonConvert.SerializeObject(_tags), typeof(string));
             info.AddValue("template_params", JsonConvert.SerializeObject(_cacheParameters), typeof(string));
@@ -70,35 +68,15 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
             return "Identity: " + Identity + ";Group: " + GroupIdentity + ";ShortName: " + ShortName + ";Precedence: " + Precedence;
         }
 
-        public XUnitMockTemplateInfo WithParameters(params string [] parameters)
+        public new XUnitMockTemplateInfo WithParameters(params string[] parameters)
         {
-            _cacheParameters = parameters;
+            base.WithParameters(parameters);
             return this;
         }
-        public XUnitMockTemplateInfo WithTag(string tagName, params string[] values)
+        public new XUnitMockTemplateInfo WithTag(string tagName, params string[] values)
         {
-            _tags.Add(tagName, values);
+            base.WithTag(tagName, values);
             return this;
-        }
-
-        private string[] _cacheParameters = Array.Empty<string>();
-        private Dictionary<string, string[]> _tags = new Dictionary<string, string[]>();
-
-
-        public override IReadOnlyDictionary<string, ICacheTag> Tags
-        {
-            get
-            {
-                return _tags.ToDictionary(kvp => kvp.Key, kvp => ResolutionTestHelper.CreateTestCacheTag(kvp.Value));
-            }
-        }
-
-        public override IReadOnlyDictionary<string, ICacheParameter> CacheParameters
-        {
-            get
-            {
-                return _cacheParameters.ToDictionary(param => param, kvp => (ICacheParameter) new CacheParameter());
-            }
         }
     }
 }

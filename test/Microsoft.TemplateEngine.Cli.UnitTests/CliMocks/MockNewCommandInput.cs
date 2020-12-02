@@ -45,17 +45,17 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
 
             TemplateName = templateName;
         }
-        public string Alias { get; set; }
+        public string Alias { get; }
 
-        public string AllowScriptsToRun { get; set; }
+        public string AllowScriptsToRun { get; }
 
         public string AuthorFilter { get; set; }
 
         public string BaselineName { get; set; }
 
-        public bool CheckForUpdates { get; set; }
+        public bool CheckForUpdates { get; }
 
-        public bool CheckForUpdatesNoPrompt { get; set; }
+        public bool CheckForUpdatesNoPrompt { get; }
 
         public IReadOnlyCollection<string> Columns { get; set; } = new List<string>();
 
@@ -63,43 +63,43 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
 
         public string CommandName => "MockNew";
 
-        public bool ExpandedExtraArgsFiles { get; set; }
+        public bool ExpandedExtraArgsFiles { get; }
 
-        public IList<string> ExtraArgsFileNames { get; set; }
+        public IList<string> ExtraArgsFileNames { get; }
 
         public bool HasColumnsParseError => throw new NotImplementedException();
 
-        public bool HasParseError { get; set; }
+        public bool HasParseError { get; }
 
-        public string HelpText { get; set; }
+        public string HelpText { get; }
 
         // When using this mock, set the inputs using constructor input.
         // This property gets assigned based on the constructor input and the template being worked with.
         public IReadOnlyDictionary<string, string> InputTemplateParams { get; private set; }
 
-        public IList<string> InstallNuGetSourceList { get; set; }
+        public IList<string> InstallNuGetSourceList { get; }
 
-        public bool IsDryRun { get; set; }
+        public bool IsDryRun { get; }
 
-        public bool IsForceFlagSpecified { get; set; }
+        public bool IsForceFlagSpecified { get; }
 
         public bool IsHelpFlagSpecified { get; set; }
 
-        public bool IsInteractiveFlagSpecified { get; set; }
+        public bool IsInteractiveFlagSpecified { get; }
 
         public bool IsListFlagSpecified { get; set; }
 
-        public bool IsQuietFlagSpecified { get; set; }
+        public bool IsQuietFlagSpecified { get; }
 
-        public bool IsShowAllFlagSpecified { get; set; }
+        public bool IsShowAllFlagSpecified { get; }
 
         public string Language { get; set; }
 
-        public string Locale { get; set; }
+        public string Locale { get; }
 
-        public string Name { get; set; }
+        public string Name { get; }
 
-        public string OutputPath { get; set; }
+        public string OutputPath { get; }
 
         public string PackageFilter { get; set; }
 
@@ -111,23 +111,23 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
         // This property gets assigned based on the constructor input and the template being worked with.
         public IDictionary<string, IList<string>> RemainingParameters { get; private set; }
 
-        public bool SearchOnline { get; set; }
+        public bool SearchOnline { get; }
 
-        public string ShowAliasesAliasName { get; set; }
+        public string ShowAliasesAliasName { get; }
 
-        public bool ShowAliasesSpecified { get; set; }
+        public bool ShowAliasesSpecified { get; }
 
         public bool ShowAllColumns { get; set; } = false;
 
-        public bool SkipUpdateCheck { get; set; }
+        public bool SkipUpdateCheck { get; }
 
         public string TemplateName { get; set; }
 
-        public IList<string> ToInstallList { get; set; }
+        public IList<string> ToInstallList { get; }
 
-        public IReadOnlyList<string> Tokens { get; set; }
+        public IReadOnlyList<string> Tokens { get; }
 
-        public IList<string> ToUninstallList { get; set; }
+        public IList<string> ToUninstallList { get; }
 
         public string TypeFilter { get; set; }
 

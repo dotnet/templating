@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Utils;
 
@@ -11,22 +12,34 @@ namespace Microsoft.TemplateEngine.Mocks
         {
             ShortNameList = new List<string>();
             Classifications = new List<string>();
-            Tags = new Dictionary<string, ICacheTag>(StringComparer.Ordinal);
-            CacheParameters = new Dictionary<string, ICacheParameter>(StringComparer.Ordinal);
             BaselineInfo = new Dictionary<string, IBaselineInfo>(StringComparer.Ordinal);
         }
 
-        public string Author { get; set; }
+        public MockTemplateInfo WithParameters(params string[] parameters)
+        {
+            _cacheParameters = parameters;
+            return this;
+        }
+        public MockTemplateInfo WithTag(string tagName, params string[] values)
+        {
+            _tags.Add(tagName, values);
+            return this;
+        }
+
+        protected string[] _cacheParameters = new string[0];
+        protected Dictionary<string, string[]> _tags = new Dictionary<string, string[]>();
+
+        public string Author { get; }
 
         public string Description { get; set; }
 
-        public IReadOnlyList<string> Classifications { get; set; }
+        public IReadOnlyList<string> Classifications { get; }
 
-        public string DefaultName { get; set; }
+        public string DefaultName { get;  }
 
         public string Identity { get; set; }
 
-        public Guid GeneratorId { get; set; }
+        public Guid GeneratorId { get; }
 
         public string GroupIdentity { get; set; }
 
@@ -56,11 +69,23 @@ namespace Microsoft.TemplateEngine.Mocks
             }
         }
 
-        public IReadOnlyList<string> ShortNameList { get; set; }
+        public IReadOnlyList<string> ShortNameList { get; private set; }
 
-        public virtual IReadOnlyDictionary<string, ICacheTag> Tags { get; set; }
+        public virtual IReadOnlyDictionary<string, ICacheTag> Tags
+        {
+            get
+            {
+                return _tags.ToDictionary(kvp => kvp.Key, kvp => CreateTestCacheTag(kvp.Value));
+            }
+        }
 
-        public virtual IReadOnlyDictionary<string, ICacheParameter> CacheParameters { get; set; }
+        public virtual IReadOnlyDictionary<string, ICacheParameter> CacheParameters
+        {
+            get
+            {
+                return _cacheParameters.ToDictionary(param => param, kvp => (ICacheParameter)new CacheParameter());
+            }
+        }
 
         private IReadOnlyList<ITemplateParameter> _parameters;
         public IReadOnlyList<ITemplateParameter> Parameters
@@ -127,24 +152,35 @@ namespace Microsoft.TemplateEngine.Mocks
             }
         }
 
-        public Guid ConfigMountPointId { get; set; }
+        public Guid ConfigMountPointId { get; }
 
-        public string ConfigPlace { get; set; }
+        public string ConfigPlace { get; }
 
-        public Guid LocaleConfigMountPointId { get; set; }
+        public Guid LocaleConfigMountPointId { get; }
 
-        public string LocaleConfigPlace { get; set; }
+        public string LocaleConfigPlace { get; }
 
-        public Guid HostConfigMountPointId { get; set; }
+        public Guid HostConfigMountPointId { get; }
 
-        public string HostConfigPlace { get; set; }
+        public string HostConfigPlace { get;  }
 
-        public string ThirdPartyNotices { get; set; }
+        public string ThirdPartyNotices { get; }
 
-        public IReadOnlyDictionary<string, IBaselineInfo> BaselineInfo { get; set; }
+        public IReadOnlyDictionary<string, IBaselineInfo> BaselineInfo { get; }
 
-        public bool HasScriptRunningPostActions { get; set; }
+        public bool HasScriptRunningPostActions { get; set;  }
 
-        public DateTime? ConfigTimestampUtc { get; set; }
+        public DateTime? ConfigTimestampUtc { get; }
+
+        private static ICacheTag CreateTestCacheTag(IReadOnlyList<string> choiceList, string tagDescription = null, string defaultValue = null, string defaultIfOptionWithoutValue = null)
+        {
+            Dictionary<string, string> choicesDict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (string choice in choiceList)
+            {
+                choicesDict.Add(choice, null);
+            };
+
+            return new CacheTag(tagDescription, choicesDict, defaultValue, defaultIfOptionWithoutValue);
+        }
     }
 }
