@@ -79,13 +79,13 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                 case TemplateResolutionResult.SingleInvokableMatchStatus.NoMatch:
                     // No templates found matching the following input parameter(s): {0}.
                     Reporter.Error.WriteLine(
-                        string.Format(LocalizableStrings.NoTemplatesMatchingInputParameters, GetInputParametersString(commandInput, includeTemplateParameters: true)).Bold().Red());
+                        string.Format(LocalizableStrings.NoTemplatesMatchingInputParameters, GetInputParametersString(commandInput)).Bold().Red());
                     Reporter.Error.WriteLine(LocalizableStrings.ListTemplatesCommand.Bold().Red());
                     return CreationResultStatus.NotFound;
                 case TemplateResolutionResult.SingleInvokableMatchStatus.AmbiguousTemplateGroupChoice:
-                    Reporter.Error.WriteLine("Unable to resolve the template to instantiate, these templates matched your input:".Bold().Red());
+                    Reporter.Error.WriteLine(LocalizableStrings.AmbiguousTemplateGroupListHeader.Bold().Red());
                     DisplayTemplateList(resolutionResult.TemplateGroups, environmentSettings, commandInput, defaultLanguage);
-                    Reporter.Error.WriteLine("Use exact short name or select the language to use with --language option.".Bold().Red());
+                    Reporter.Error.WriteLine(LocalizableStrings.AmbiguousTemplateGroupListHint.Bold().Red());
                     return CreationResultStatus.NotFound;
                 case TemplateResolutionResult.SingleInvokableMatchStatus.AmbiguousParameterValueChoice:
                     environmentSettings.Host.LogDiagnosticMessage(LocalizableStrings.Authoring_AmbiguousChoiceParameterValue, "Authoring");
@@ -231,7 +231,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             var invalidParameters = unambiguousTemplateGroup.GetInvalidParameterList();
             if (invalidParameters.Any())
             {
-                Reporter.Error.WriteLine(string.Format(InvalidParameterInfo.InvalidParameterListToString(invalidParameters).Bold().Red()));
+                Reporter.Error.WriteLine(string.Format(InvalidParameterInfo.InvalidParameterListToString(invalidParameters, unambiguousTemplateGroup).Bold().Red()));
             }
             Reporter.Error.WriteLine(
                     string.Format(LocalizableStrings.InvalidParameterTemplateHint, GetTemplateHelpCommand(commandInput.CommandName, unambiguousTemplateGroup.ShortName)).Bold().Red());
@@ -268,7 +268,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             _ = unambiguousTemplateGroup ?? throw new ArgumentNullException(nameof(unambiguousTemplateGroup));
             _ = unambiguousTemplateGroup ?? throw new ArgumentNullException(nameof(commandInput));
 
-            Reporter.Error.WriteLine("Unable to resolve the template to instantiate, the following installed templates are conflicting:".Bold().Red());
+            Reporter.Error.WriteLine(LocalizableStrings.AmbiguousTemplatesHeader.Bold().Red());
             List<AmbiguousTemplateDetails> ambiguousTemplateDetails = new List<AmbiguousTemplateDetails>();
             foreach (ITemplateMatchInfo template in unambiguousTemplateGroup.GetHighestPrecedenceInvokableTemplates(true))
             {
@@ -293,25 +293,25 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                         columnPadding: 2,
                         headerSeparator: '-',
                         blankLineBetweenRows: false)
-                    .DefineColumn(t => t.TemplateIdentity, "Identity", showAlways: true)
+                    .DefineColumn(t => t.TemplateIdentity, LocalizableStrings.ColumnNameIdentity, showAlways: true)
                     .DefineColumn(t => t.TemplateName, LocalizableStrings.ColumnNameTemplateName, shrinkIfNeeded: true, minWidth: 15, showAlways: true)
                     .DefineColumn(t => t.TemplateShortName, LocalizableStrings.ColumnNameShortName, showAlways: true)
                     .DefineColumn(t => t.TemplateLanguage, LocalizableStrings.ColumnNameLanguage, showAlways: true)
-                    .DefineColumn(t => t.TemplatePrecedence.ToString(), out object prcedenceColumn, "Precedence", showAlways: true)
+                    .DefineColumn(t => t.TemplatePrecedence.ToString(), out object prcedenceColumn, LocalizableStrings.ColumnNamePrecedence, showAlways: true)
                     .DefineColumn(t => t.TemplateAuthor, LocalizableStrings.ColumnNameAuthor, showAlways: true, shrinkIfNeeded: true, minWidth: 10)
-                    .DefineColumn(t => t.InstallationDescriptor != null ? t.InstallationDescriptor.Identifier : string.Empty, "Package", showAlways: true)
+                    .DefineColumn(t => t.InstallationDescriptor != null ? t.InstallationDescriptor.Identifier : string.Empty, LocalizableStrings.ColumnNamePackage, showAlways: true)
                     .OrderByDescending(prcedenceColumn, new NullOrEmptyIsLastStringComparer());
             Reporter.Output.WriteLine(formatter.Layout().Bold().Red());
 
             if (unambiguousTemplateGroup.Templates.AllAreTheSame(t => t.Info.ConfigMountPointId))
             {
-                Reporter.Error.WriteLine(string.Format("The package {0} is not correct, uninstall it and report the issue to the package author.", installUnitDescriptors?.First(descriptor => descriptor.MountPointId == unambiguousTemplateGroup.Templates.First().Info.ConfigMountPointId).Identifier).Bold().Red());
+                Reporter.Error.WriteLine(string.Format(LocalizableStrings.AmbiguousTemplatesSamePackageHint, installUnitDescriptors?.First(descriptor => descriptor.MountPointId == unambiguousTemplateGroup.Templates.First().Info.ConfigMountPointId).Identifier).Bold().Red());
             }
             else
             {
-                Reporter.Error.WriteLine("Uninstall the templates or the packages to keep only one template from the list.".Bold().Red());
+                Reporter.Error.WriteLine(LocalizableStrings.AmbiguousTemplatesMultiplePackagesHint.Bold().Red());
             }
-            Reporter.Error.WriteLine("To check the uninstallation command for the template, run dotnet new -u".Bold().Red());
+            Reporter.Error.WriteLine(string.Format(LocalizableStrings.AmbiguousTemplatesSamePackageHint, commandInput.CommandName).Bold().Red());
             return CreationResultStatus.CreateFailed;
         }
 
@@ -487,7 +487,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             return GetTemplateHelpCommand(commandName, template.ShortName);
         }
 
-        private static string GetInputParametersString(INewCommandInput commandInput, bool includeTemplateParameters = false)
+        private static string GetInputParametersString(INewCommandInput commandInput)
         {
             string separator = ", ";
             List<string> parameters = new List<string>();
@@ -500,12 +500,6 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                     .Where(filter => filter.IsFilterSet(commandInput))
                     .Select(filter => $"{filter.Name}='{filter.FilterValue(commandInput)}'")); ;
 
-            //TODO: rework
-            //if (includeTemplateParameters)
-            //{
-            //    parameters.AddRange(commandInput.InputTemplateParams.Select(p => $"{commandInput.TemplateParamInputFormat(p.Key)}='{p.Value}'"));
-            //}
-
             return string.Join(separator, parameters.ToArray());
         }
 
@@ -514,7 +508,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             if (!string.IsNullOrWhiteSpace(commandInput.TemplateName) || SupportedFilterOptions.SupportedListFilters.Any(filter => filter.IsFilterSet(commandInput)))
             {
                 // Templates found matching the following input parameter(s): {0}
-                Reporter.Output.WriteLine(string.Format(LocalizableStrings.TemplatesFoundMatchingInputParameters, GetInputParametersString(commandInput, parseTemplateParameters)));
+                Reporter.Output.WriteLine(string.Format(LocalizableStrings.TemplatesFoundMatchingInputParameters, GetInputParametersString(commandInput)));
                 Reporter.Output.WriteLine();
             }
         }

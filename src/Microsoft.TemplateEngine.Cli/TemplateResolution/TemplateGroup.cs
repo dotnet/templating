@@ -1,3 +1,4 @@
+using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Cli.HelpAndUsage;
 using Microsoft.TemplateEngine.Edge.Template;
 using System;
@@ -234,5 +235,50 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             return highestPrecedenceTemplates;
         }
 
+        /// <summary>
+        /// Gets the list of valid choices for <paramref name="parameter"/>
+        /// </summary>
+        /// <param name="parameter">parameter canonical name</param>
+        /// <returns>the dictionary of valid choices and descriptions</returns>
+        internal IDictionary<string, string> GetValidValuesForChoiceParameter (string parameter)
+        {
+            Dictionary<string, string> validChoices = new Dictionary<string, string>();
+            foreach (ITemplateMatchInfo template in Templates)
+            {
+                if (template.Info.Tags.ContainsKey(parameter))
+                {
+                    foreach (var choice in template.Info.Tags[parameter].ChoicesAndDescriptions)
+                    {
+                        validChoices[choice.Key] = choice.Value;
+                    }
+                }
+            }
+            return validChoices;
+        }
+
+        /// <summary>
+        /// Gets the list of ambiguous choices for <paramref name="parameter"/> for value <paramref name="value"/>
+        /// </summary>
+        /// <param name="parameter">parameter canonical name</param>
+        /// <param name="value">ambiguous value for the parameter to return possible choices for</param>
+        /// <returns>the dictionary of possible choices and descriptions that are matching ambiguous input</returns>
+        internal Dictionary<string, string> GetAmbiguousValuesForChoiceParameter(string parameter, string value)
+        {
+            Dictionary<string, string> validChoices = new Dictionary<string, string>();
+            foreach (ITemplateMatchInfo template in Templates)
+            {
+                if (template.Info.Tags.ContainsKey(parameter))
+                {
+                    foreach (var choice in template.Info.Tags[parameter].ChoicesAndDescriptions)
+                    {
+                        if (choice.Key.StartsWith(value, StringComparison.OrdinalIgnoreCase))
+                        {
+                            validChoices[choice.Key] = choice.Value;
+                        }
+                    }
+                }
+            }
+            return validChoices;
+        }
     }
 }
