@@ -97,7 +97,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
         [InlineData("eee", "Y", "Multiname.Test.Only.FSharp")]  // uses a short name from a different template in the group
         public void ChoiceValueDisambiguatesMatchesWithMultipleShortNames(string name, string fooChoice, string expectedIdentity)
         {
-            IReadOnlyDictionary<string, string> userParams = new Dictionary<string, string>()
+            Dictionary<string, string> userParams = new Dictionary<string, string>()
             {
                 {  "foo", fooChoice }
             };
@@ -123,7 +123,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
         [InlineData("eee", "OnlyF", "someValue", "Multiname.Test.Only.FSharp")] // uses a short name from a different template in the group
         public void ParameterExistenceDisambiguatesMatchesWithMultipleShortNames(string name, string paramName, string paramValue, string expectedIdentity)
         {
-            IReadOnlyDictionary<string, string> userParams = new Dictionary<string, string>()
+            Dictionary<string, string> userParams = new Dictionary<string, string>()
             {
                 { paramName, paramValue }
             };

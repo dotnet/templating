@@ -13,13 +13,18 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
         // a list of all the parameters defined by the template
         private IReadOnlyList<string> _allParametersForTemplate;
 
-        private IReadOnlyDictionary<string, string> _rawParameterInputs;
+        protected Dictionary<string, string> _rawParameterInputs;
 
         public MockNewCommandInput() : this(new Dictionary<string, string>())
         {
         }
 
-        public MockNewCommandInput(IReadOnlyDictionary<string, string> rawParameterInputs)
+        public MockNewCommandInput(string templateName, string language = null) : this(templateName, new Dictionary<string, string>())
+        {
+            Language = language;
+        }
+
+        public MockNewCommandInput(Dictionary<string, string> rawParameterInputs)
         {
             _rawParameterInputs = rawParameterInputs;
 
@@ -27,6 +32,18 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
             RemainingParameters = new Dictionary<string, IList<string>>();
             RemainingArguments = new List<string>();
             _allParametersForTemplate = new List<string>();
+        }
+
+        public MockNewCommandInput(string templateName,  Dictionary<string, string> rawParameterInputs)
+        {
+            _rawParameterInputs = rawParameterInputs;
+
+            InputTemplateParams = new Dictionary<string, string>();
+            RemainingParameters = new Dictionary<string, IList<string>>();
+            RemainingArguments = new List<string>();
+            _allParametersForTemplate = new List<string>();
+
+            TemplateName = templateName;
         }
         public string Alias { get; set; }
 

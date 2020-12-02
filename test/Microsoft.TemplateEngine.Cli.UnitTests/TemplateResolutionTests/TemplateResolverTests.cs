@@ -5,130 +5,244 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Cli.CommandParsing;
 using Microsoft.TemplateEngine.Cli.TemplateResolution;
 using Microsoft.TemplateEngine.Cli.UnitTests.CliMocks;
+using Microsoft.TemplateEngine.Cli.UnitTests.CliMocks.XUnit;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Edge.Template;
 using Microsoft.TemplateEngine.Utils;
 using Xunit;
+using static Microsoft.TemplateEngine.Cli.TemplateResolution.TemplateResolutionResult;
 
 namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
 {
-    // Implementation notes:
-    // If a test is going to hit the secondary matching in the resolver, make sure to initialize the Tags & CacheParameters,
-    //  otherwise an exception will be thrown in TemplateInfo.Parameters getter
-    //  (just about every situation will get to the secondary matching)
-    // MockNewCommandInput doesn't support everything in the interface, just enough for this type of testing.
     public class TemplateResolverTests
     {
-        [Fact(DisplayName = nameof(TestTryGetHighestPrecedenceTemplate))]
-        public void TestTryGetHighestPrecedenceTemplate()
+        //data contents:
+        //command
+        //templates to use
+        //default language
+        //unambiguous group status
+        //expected template identities
+        internal class TemplateResolution_UnambiguousGroup_TestData : TheoryData<XUnitMockNewCommandInput, XUnitMockTemplateInfo[], string, int, string[]>
         {
-            List<ITemplateMatchInfo> templatesToCheck = new List<ITemplateMatchInfo>();
-            templatesToCheck.Add(new TemplateMatchInfo(
-                new TemplateInfo()
+            public TemplateResolution_UnambiguousGroup_TestData()
+            {
+                var templates = new XUnitMockTemplateInfo[]
                 {
-                    Precedence = 10,
-                    Name = "Template1",
-                    ShortName = "Template",
-                    Identity = "Template1",
-                    GroupIdentity = "TestGroup"
-                },
-                new List<MatchInfo>
-                {
-                    new MatchInfo
-                    {
-                         Location = MatchLocation.ShortName,
-                         Kind = MatchKind.Exact
-                    }
-                }
-                ));
-            templatesToCheck.Add(new TemplateMatchInfo(
-                new TemplateInfo()
-                {
-                    Precedence = 20,
-                    Name = "Template2",
-                    ShortName = "Template",
-                    Identity = "Template2",
-                    GroupIdentity = "TestGroup"
-                },
-                new List<MatchInfo>
-                {
-                    new MatchInfo
-                    {
-                         Location = MatchLocation.ShortName,
-                         Kind = MatchKind.Exact
-                    }
-                }
-                ));
-            templatesToCheck.Add(new TemplateMatchInfo(
-                new TemplateInfo()
-                {
-                    Precedence = 0,
-                    Name = "Template3",
-                    ShortName = "Template",
-                    Identity = "Template3",
-                    GroupIdentity = "TestGroup"
-                },
-                new List<MatchInfo>
-                {
-                    new MatchInfo
-                    {
-                         Location = MatchLocation.ShortName,
-                         Kind = MatchKind.Exact
-                    }
-                }
-                ));
+                    new XUnitMockTemplateInfo("Template1", identity: "Template1"),
+                    new XUnitMockTemplateInfo("Template2", identity: "Template2")
+                };
+                Add(new XUnitMockNewCommandInput("Template2"), templates, null, (int)UnambiguousTemplateGroupStatus.SingleMatch, new string[] { "Template2" });
 
-            TemplateGroup templateGroup = new TemplateGroup("TestGroup", templatesToCheck);
-            Assert.True(templateGroup.TryGetHighestPrecedenceInvokableTemplate(out ITemplateMatchInfo highestPrecedenceTemplate));
-            Assert.NotNull(highestPrecedenceTemplate);
-            Assert.Equal("Template2", highestPrecedenceTemplate.Info.Identity);
-            Assert.Equal(20, highestPrecedenceTemplate.Info.Precedence);
+                templates = new XUnitMockTemplateInfo[]
+                {
+                    new XUnitMockTemplateInfo("foo", identity: "foo.Perl", groupIdentity: "foo.group").WithTag("language", "Perl"),
+                    new XUnitMockTemplateInfo("foo", identity: "foo.Lisp", groupIdentity: "foo.group").WithTag("language", "LISP")
+                };
+                Add(new XUnitMockNewCommandInput("foo"), templates, "Perl", (int)UnambiguousTemplateGroupStatus.SingleMatch, new string[] { "foo.Perl", "foo.Lisp" });
+                Add(new XUnitMockNewCommandInput("foo", language: "LISP"), templates, null, (int)UnambiguousTemplateGroupStatus.SingleMatch, new string[] { "foo.Lisp" });
+
+                templates = new XUnitMockTemplateInfo[]
+                {
+                    new XUnitMockTemplateInfo("foo", identity: "foo.100", groupIdentity: "foo.group", precedence: 100),
+                    new XUnitMockTemplateInfo("foo", identity: "foo.200", groupIdentity: "foo.group", precedence: 200),
+                    new XUnitMockTemplateInfo("bar", identity: "bar.200", groupIdentity: "bar.group", precedence: 200),
+                };
+
+                Add(new XUnitMockNewCommandInput("foo"), templates, null, (int)UnambiguousTemplateGroupStatus.SingleMatch, new string[] { "foo.100", "foo.200" });
+
+                templates = new XUnitMockTemplateInfo[]
+                {
+                    new XUnitMockTemplateInfo("foo", identity: "foo.bar", groupIdentity: "foo.group").WithParameters("bar"),
+                    new XUnitMockTemplateInfo("foo", identity: "foo.baz", groupIdentity: "foo.group").WithParameters("baz"),
+                };
+                Add(new XUnitMockNewCommandInput("foo").WithOption("baz", "whatever"), templates, null, (int)UnambiguousTemplateGroupStatus.SingleMatch, new string[] { "foo.bar", "foo.baz" });
+
+                Add(new XUnitMockNewCommandInput("foo").WithOption("bat", "whatever"), templates, null, (int)UnambiguousTemplateGroupStatus.SingleMatch, new string[] { "foo.bar", "foo.baz" });
+
+                templates = new XUnitMockTemplateInfo[]
+                {
+                    new XUnitMockTemplateInfo("foo", identity: "foo.1", groupIdentity: "foo.group").WithTag("framework", "netcoreapp2.1", "netcoreapp3.1"),
+                    new XUnitMockTemplateInfo("foo", identity: "foo.2", groupIdentity: "foo.group").WithTag("framework", "net5.0"),
+                };
+
+                Add(new XUnitMockNewCommandInput("foo").WithOption("framework", "net5.0"), templates, null, (int)UnambiguousTemplateGroupStatus.SingleMatch, new string[] { "foo.1", "foo.2" });
+                Add(new XUnitMockNewCommandInput("foo").WithOption("framework", "netcoreapp2.0"), templates, null, (int)UnambiguousTemplateGroupStatus.SingleMatch, new string[] { "foo.1", "foo.2" });
+
+                templates = new XUnitMockTemplateInfo[]
+                {
+                    new XUnitMockTemplateInfo("foo", identity: "foo.1", groupIdentity: "foo.group").WithTag("MyChoice", "value_1_example"),
+                    new XUnitMockTemplateInfo("foo", identity: "foo.2", groupIdentity: "foo.group").WithTag("MyChoice", "value_2_example", "value_3_example"),
+                };
+
+                Add(new XUnitMockNewCommandInput("foo").WithOption("MyChoice", "value_"), templates, null, (int)UnambiguousTemplateGroupStatus.SingleMatch, new string[] { "foo.1", "foo.2" });
+                Add(new XUnitMockNewCommandInput("foo").WithOption("MyChoice", "value_1"), templates, null, (int)UnambiguousTemplateGroupStatus.SingleMatch, new string[] { "foo.1", "foo.2" });
+
+            }
+        }
+        [Theory(DisplayName = nameof(TemplateResolution_UnambiguousGroup_Test))]
+        [ClassData(typeof(TemplateResolution_UnambiguousGroup_TestData))]
+        internal void TemplateResolution_UnambiguousGroup_Test(XUnitMockNewCommandInput command, XUnitMockTemplateInfo[] templateSet, string defaultLanguage,  int expectedStatus, string[] expectedIdentities)
+        {
+            var matchResult = TemplateResolver.GetTemplateResolutionResult(templateSet, new MockHostSpecificDataLoader(), command, defaultLanguage);
+
+            Assert.Equal(expectedStatus, (int) matchResult.UnambigiousTemplateGroupCheckStatus);
+
+            //compatibility with old methods
+            Assert.Equal(expectedStatus ==  (int)UnambiguousTemplateGroupStatus.SingleMatch,
+                matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyCollection<ITemplateMatchInfo> unambiguousGroup));
+
+            if (expectedStatus == (int)UnambiguousTemplateGroupStatus.SingleMatch)
+            {
+                var identities = matchResult.UnambiguousTemplateGroup.Templates.Select(t => t.Info.Identity);
+                Assert.Equal(expectedIdentities.Length, identities.Count());
+                foreach (string identity in expectedIdentities)
+                {
+                    Assert.Single(identities.Where(i => i == identity));
+                }
+            }
+            else
+            {
+                Assert.Null(matchResult.UnambiguousTemplateGroup);
+                Assert.Null(unambiguousGroup);
+            }
         }
 
-        [Fact(DisplayName = nameof(TestTryGetHighestPrecedenceTemplate_ReturnsNullIfPrecedenceIsTheSame))]
-        public void TestTryGetHighestPrecedenceTemplate_ReturnsNullIfPrecedenceIsTheSame()
+        //data contents:
+        //command
+        //templates to use
+        //default language
+        //resolution status
+        //expected template identity
+        internal class TemplateResolution_TemplateToInvoke_TestData : TheoryData<XUnitMockNewCommandInput, XUnitMockTemplateInfo[], string, int, string>
         {
-            List<ITemplateMatchInfo> templatesToCheck = new List<ITemplateMatchInfo>();
-            templatesToCheck.Add(new TemplateMatchInfo(
-                new TemplateInfo()
+            public TemplateResolution_TemplateToInvoke_TestData()
+            {
+                var templates = new XUnitMockTemplateInfo[]
+                       {
+                    new XUnitMockTemplateInfo("Template1", identity: "Template1"),
+                    new XUnitMockTemplateInfo("Template2", identity: "Template2")
+                       };
+                Add(new XUnitMockNewCommandInput("Template2"), templates, null, (int)SingleInvokableMatchStatus.SingleMatch, "Template2");
+
+                templates = new XUnitMockTemplateInfo[]
                 {
-                    Precedence = 10,
-                    Name = "Template1",
-                    Identity = "Template1",
-                    GroupIdentity = "TestGroup"
-                },
-                new List<MatchInfo>
+                    new XUnitMockTemplateInfo("foo", identity: "foo.Perl", groupIdentity: "foo.group").WithTag("language", "Perl"),
+                    new XUnitMockTemplateInfo("foo", identity: "foo.Lisp", groupIdentity: "foo.group").WithTag("language", "LISP")
+                };
+                Add(new XUnitMockNewCommandInput("foo"), templates, "Perl", (int)SingleInvokableMatchStatus.SingleMatch, "foo.Perl");
+                Add(new XUnitMockNewCommandInput("foo", language: "LISP"), templates, null, (int)SingleInvokableMatchStatus.SingleMatch, "foo.Lisp");
+
+                templates = new XUnitMockTemplateInfo[]
                 {
-                    new MatchInfo
-                    {
-                         Location = MatchLocation.ShortName,
-                         Kind = MatchKind.Exact
-                    }
-                }
-                ));
-            templatesToCheck.Add(new TemplateMatchInfo(
-                new TemplateInfo()
+                    new XUnitMockTemplateInfo("foo", identity: "foo.100", groupIdentity: "foo.group", precedence: 100),
+                    new XUnitMockTemplateInfo("foo", identity: "foo.200", groupIdentity: "foo.group", precedence: 200),
+                    new XUnitMockTemplateInfo("bar", identity: "bar.200", groupIdentity: "bar.group", precedence: 200),
+                };
+
+                Add(new XUnitMockNewCommandInput("foo"), templates, null, (int)SingleInvokableMatchStatus.SingleMatch, "foo.200");
+
+                templates = new XUnitMockTemplateInfo[]
                 {
-                    Precedence = 10,
-                    Name = "Template2",
-                    Identity = "Template2",
-                    GroupIdentity = "TestGroup"
-                },
-                new List<MatchInfo>
+                    new XUnitMockTemplateInfo("foo", identity: "foo.bar", groupIdentity: "foo.group").WithParameters("bar"),
+                    new XUnitMockTemplateInfo("foo", identity: "foo.baz", groupIdentity: "foo.group").WithParameters("baz"),
+                };
+                Add(new XUnitMockNewCommandInput("foo").WithOption("baz", "whatever"), templates, null, (int)SingleInvokableMatchStatus.SingleMatch, "foo.baz");
+
+                Add(new XUnitMockNewCommandInput("foo").WithOption("bat", "whatever"), templates, null, (int)SingleInvokableMatchStatus.InvalidParameter, null);
+
+                templates = new XUnitMockTemplateInfo[]
                 {
-                    new MatchInfo
-                    {
-                         Location = MatchLocation.ShortName,
-                         Kind = MatchKind.Exact
-                    }
-                }
-                ));
-            TemplateGroup templateGroup = new TemplateGroup("TestGroup", templatesToCheck);
-            Assert.False(templateGroup.TryGetHighestPrecedenceInvokableTemplate(out ITemplateMatchInfo highestPrecedenceTemplate));
-            Assert.Null(highestPrecedenceTemplate);
+                    new XUnitMockTemplateInfo("foo", identity: "foo.1", groupIdentity: "foo.group").WithTag("framework", "netcoreapp2.1", "netcoreapp3.1"),
+                    new XUnitMockTemplateInfo("foo", identity: "foo.2", groupIdentity: "foo.group").WithTag("framework", "net5.0"),
+                };
+
+                Add(new XUnitMockNewCommandInput("foo").WithOption("framework", "net5.0"), templates, null, (int)SingleInvokableMatchStatus.SingleMatch, "foo.2");
+                Add(new XUnitMockNewCommandInput("foo").WithOption("framework", "netcoreapp2.0"), templates, null, (int)SingleInvokableMatchStatus.InvalidParameter, null);
+
+                templates = new XUnitMockTemplateInfo[]
+                {
+                    new XUnitMockTemplateInfo("foo", identity: "foo.1", groupIdentity: "foo.group", precedence: 100).WithTag("MyChoice", "value_1"),
+                    new XUnitMockTemplateInfo("foo", identity: "foo.2", groupIdentity: "foo.group", precedence: 200).WithTag("MyChoice", "value_2"),
+                };
+
+                Add(new XUnitMockNewCommandInput("foo").WithOption("MyChoice", "value_"), templates, null, (int)SingleInvokableMatchStatus.AmbiguousParameterValueChoice, null);
+                templates = new XUnitMockTemplateInfo[]
+                {
+                    new XUnitMockTemplateInfo("foo", identity: "foo.1", groupIdentity: "foo.group", precedence: 100).WithTag("MyChoice", "value_1"),
+                    new XUnitMockTemplateInfo("foo", identity: "foo.2", groupIdentity: "foo.group", precedence: 200).WithTag("MyChoice", "value_2", "value_3"),
+                };
+                Add(new XUnitMockNewCommandInput("foo").WithOption("MyChoice", "value_"), templates, null, (int)SingleInvokableMatchStatus.AmbiguousParameterValueChoice, null);
+
+                templates = new XUnitMockTemplateInfo[]
+                {
+                    new XUnitMockTemplateInfo("foo", identity: "foo.1", groupIdentity: "foo.group", precedence: 100).WithTag("MyChoice", "value_1", "value_2"),
+                    new XUnitMockTemplateInfo("foo", identity: "foo.2", groupIdentity: "foo.group", precedence: 200).WithTag("MyChoice", "value_3", "value_4"),
+                };
+                Add(new XUnitMockNewCommandInput("foo").WithOption("MyChoice", "value_"), templates, null, (int)SingleInvokableMatchStatus.AmbiguousParameterValueChoice, null);
+
+                templates = new XUnitMockTemplateInfo[]
+                {
+                    new XUnitMockTemplateInfo("foo", identity: "foo.1", groupIdentity: "foo.group", precedence: 100)
+                        .WithTag("MyChoice", "value_1", "other_value")
+                        .WithTag("OtherChoice", "foo_"),
+
+                    new XUnitMockTemplateInfo("foo", identity: "foo.2", groupIdentity: "foo.group", precedence: 200)
+                        .WithTag("MyChoice", "value_")
+                        .WithTag("OtherChoice", "foo_", "bar_1"),
+                };
+                Add(new XUnitMockNewCommandInput("foo").WithOption("MyChoice", "value_").WithOption("OtherChoice", "foo_"), templates, null, (int)SingleInvokableMatchStatus.SingleMatch, "foo.2");
+
+                templates = new XUnitMockTemplateInfo[]
+                {
+                    new XUnitMockTemplateInfo("foo", identity: "foo.1.FSharp", groupIdentity: "foo.group", precedence: 100)
+                        .WithTag("language", "F#")
+                };
+                Add(new XUnitMockNewCommandInput("foo"), templates, null, (int)SingleInvokableMatchStatus.SingleMatch, "foo.1.FSharp");
+                templates = new XUnitMockTemplateInfo[]
+                {
+                    new XUnitMockTemplateInfo("foo", identity: "foo.1.FSharp", groupIdentity: "foo.group", precedence: 100)
+                        .WithTag("language", "F#"),
+                    new XUnitMockTemplateInfo("foo", identity: "foo.1.VB", groupIdentity: "foo.group", precedence: 200)
+                        .WithTag("language", "VB")
+                };
+                Add(new XUnitMockNewCommandInput("foo"), templates, null, (int)SingleInvokableMatchStatus.SingleMatch, "foo.1.VB");
+
+                templates = new XUnitMockTemplateInfo[]
+                {
+                    new XUnitMockTemplateInfo("foo", identity: "foo.1.FSharp", groupIdentity: "foo.group", precedence: 200)
+                        .WithTag("language", "F#"),
+                    new XUnitMockTemplateInfo("foo", identity: "foo.1.VB", groupIdentity: "foo.group", precedence: 200)
+                        .WithTag("language", "VB")
+                };
+                Add(new XUnitMockNewCommandInput("foo"), templates, null, (int)SingleInvokableMatchStatus.AmbiguousTemplateChoice, null);
+            }
+        }
+
+        [Theory(DisplayName = nameof(TemplateResolution_TemplateToInvoke_Test))]
+        [ClassData(typeof(TemplateResolution_TemplateToInvoke_TestData))]
+        internal void TemplateResolution_TemplateToInvoke_Test(XUnitMockNewCommandInput command, XUnitMockTemplateInfo[] templateSet, string defaultLanguage, int expectedStatus, string expectedIdentity)
+        {
+            TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(templateSet, new MockHostSpecificDataLoader(), command, defaultLanguage);
+
+            Assert.Equal(expectedStatus, (int)matchResult.Status);
+
+            //compatibility with old methods
+            Assert.Equal(expectedStatus == (int)SingleInvokableMatchStatus.SingleMatch,
+                matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo templateToInvoke, out SingleInvokableMatchStatus tryStatus));
+            Assert.Equal(expectedStatus, (int)tryStatus);
+
+            if (expectedStatus == (int)SingleInvokableMatchStatus.SingleMatch)
+            {
+                Assert.Equal(expectedIdentity, matchResult.TemplateToInvoke.Info.Identity);
+                Assert.Equal(expectedIdentity, templateToInvoke.Info.Identity);
+            }
+            else
+            {
+                Assert.Null(matchResult.TemplateToInvoke);
+                Assert.Null(templateToInvoke);
+            }
         }
 
         [Fact(DisplayName = nameof(TestPerformAllTemplatesInContextQuery))]
@@ -209,366 +323,6 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             Assert.True(customTypeTemplates.Where(x => string.Equals(x.Info.Identity, "Template3", StringComparison.Ordinal)).Any());
         }
 
-        [Fact(DisplayName = nameof(TestPerformCoreTemplateQuery_UniqueNameMatchesCorrectly))]
-        public void TestPerformCoreTemplateQuery_UniqueNameMatchesCorrectly()
-        {
-            List<ITemplateInfo> templatesToSearch = new List<ITemplateInfo>();
-            templatesToSearch.Add(new TemplateInfo()
-            {
-                ShortName = "Template1",
-                Name = "Long name of Template1",
-                Identity = "Template1",
-                CacheParameters = new Dictionary<string, ICacheParameter>(),
-                Tags = new Dictionary<string, ICacheTag>()
-            });
-            templatesToSearch.Add(new TemplateInfo()
-            {
-                ShortName = "Template2",
-                Name = "Long name of Template2",
-                Identity = "Template2",
-                CacheParameters = new Dictionary<string, ICacheParameter>(),
-                Tags = new Dictionary<string, ICacheTag>()
-            });
 
-            INewCommandInput userInputs = new MockNewCommandInput()
-            {
-                TemplateName = "Template2"
-            };
-
-            TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(templatesToSearch, new MockHostSpecificDataLoader(), userInputs, null);
-            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyCollection<ITemplateMatchInfo> unambiguousGroup));
-            Assert.Equal(1, unambiguousGroup.Count);
-            Assert.Equal("Template2", unambiguousGroup.First().Info.Identity);
-            Assert.True(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo templateToInvoke, out TemplateResolutionResult.SingleInvokableMatchStatus resultStatus));
-            Assert.Equal("Template2", templateToInvoke.Info.Identity);
-            Assert.Equal(TemplateResolutionResult.SingleInvokableMatchStatus.SingleMatch, resultStatus);
-        }
-
-        [Fact(DisplayName = nameof(TestPerformCoreTemplateQuery_DefaultLanguageDisambiguates))]
-        public void TestPerformCoreTemplateQuery_DefaultLanguageDisambiguates()
-        {
-            List<ITemplateInfo> templatesToSearch = new List<ITemplateInfo>();
-            templatesToSearch.Add(new TemplateInfo()
-            {
-                ShortName = "foo",
-                Name = "Description of foo Perl template",
-                Identity = "foo.test.Perl",
-                GroupIdentity = "foo.test.template",
-                Tags = new Dictionary<string, ICacheTag>(StringComparer.OrdinalIgnoreCase)
-                {
-                    { "language", ResolutionTestHelper.CreateTestCacheTag("Perl") }
-                },
-                CacheParameters = new Dictionary<string, ICacheParameter>()
-            });
-            templatesToSearch.Add(new TemplateInfo()
-            {
-                ShortName = "foo",
-                Name = "Description of foo LISP template",
-                Identity = "foo.test.Lisp",
-                GroupIdentity = "foo.test.template",
-                Tags = new Dictionary<string, ICacheTag>(StringComparer.OrdinalIgnoreCase)
-                {
-                    { "language", ResolutionTestHelper.CreateTestCacheTag("LISP") }
-                },
-                CacheParameters = new Dictionary<string, ICacheParameter>()
-            });
-
-            INewCommandInput userInputs = new MockNewCommandInput()
-            {
-                TemplateName = "foo"
-            };
-
-            TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(templatesToSearch, new MockHostSpecificDataLoader(), userInputs, "Perl");
-            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyCollection<ITemplateMatchInfo> unambiguousGroup));
-            Assert.Equal(2, unambiguousGroup.Count);
-            Assert.True(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo templateToInvoke, out TemplateResolutionResult.SingleInvokableMatchStatus resultStatus));
-            Assert.Equal("foo.test.Perl", templateToInvoke.Info.Identity);
-            Assert.Equal(TemplateResolutionResult.SingleInvokableMatchStatus.SingleMatch, resultStatus);
-        }
-
-        [Fact(DisplayName = nameof(TestPerformCoreTemplateQuery_InputLanguageIsPreferredOverDefault))]
-        public void TestPerformCoreTemplateQuery_InputLanguageIsPreferredOverDefault()
-        {
-            List<ITemplateInfo> templatesToSearch = new List<ITemplateInfo>();
-            templatesToSearch.Add(new TemplateInfo()
-            {
-                ShortName = "foo",
-                Name = "Description of foo Perl template",
-                Identity = "foo.test.Perl",
-                GroupIdentity = "foo.test.template",
-                Tags = new Dictionary<string, ICacheTag>(StringComparer.OrdinalIgnoreCase)
-                {
-                    { "language", ResolutionTestHelper.CreateTestCacheTag("Perl") }
-                },
-                CacheParameters = new Dictionary<string, ICacheParameter>()
-            });
-            templatesToSearch.Add(new TemplateInfo()
-            {
-                ShortName = "foo",
-                Name = "Description of foo LISP template",
-                Identity = "foo.test.Lisp",
-                GroupIdentity = "foo.test.template",
-                Tags = new Dictionary<string, ICacheTag>(StringComparer.OrdinalIgnoreCase)
-                {
-                    { "language", ResolutionTestHelper.CreateTestCacheTag("LISP") }
-                },
-                CacheParameters = new Dictionary<string, ICacheParameter>()
-            });
-
-            INewCommandInput userInputs = new MockNewCommandInput()
-            {
-                TemplateName = "foo",
-                Language = "LISP"
-            };
-
-            TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(templatesToSearch, new MockHostSpecificDataLoader(), userInputs, "Perl");
-            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyCollection<ITemplateMatchInfo> unambiguousGroup));
-            Assert.Equal(1, unambiguousGroup.Count);
-            Assert.Equal("foo.test.Lisp", unambiguousGroup.First().Info.Identity);
-            Assert.True(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo templateToInvoke, out TemplateResolutionResult.SingleInvokableMatchStatus resultStatus));
-            Assert.Equal("foo.test.Lisp", templateToInvoke.Info.Identity);
-            Assert.Equal(TemplateResolutionResult.SingleInvokableMatchStatus.SingleMatch, resultStatus);
-        }
-
-        [Fact(DisplayName = nameof(TestPerformCoreTemplateQuery_GroupIsFound))]
-        public void TestPerformCoreTemplateQuery_GroupIsFound()
-        {
-            List<ITemplateInfo> templatesToSearch = new List<ITemplateInfo>();
-            templatesToSearch.Add(new TemplateInfo()
-            {
-                ShortName = "foo",
-                Name = "Foo template old",
-                Identity = "foo.test.old",
-                GroupIdentity = "foo.test.template",
-                Precedence = 100,
-                CacheParameters = new Dictionary<string, ICacheParameter>(),
-                Tags = new Dictionary<string, ICacheTag>()
-            });
-            templatesToSearch.Add(new TemplateInfo()
-            {
-                ShortName = "foo",
-                Name = "Foo template new",
-                Identity = "foo.test.new",
-                GroupIdentity = "foo.test.template",
-                Precedence = 200,
-                CacheParameters = new Dictionary<string, ICacheParameter>(),
-                Tags = new Dictionary<string, ICacheTag>()
-            });
-            templatesToSearch.Add(new TemplateInfo()
-            {
-                ShortName = "bar",
-                Name = "Bar template",
-                Identity = "bar.test",
-                GroupIdentity = "bar.test.template",
-                Precedence = 100,
-                CacheParameters = new Dictionary<string, ICacheParameter>(),
-                Tags = new Dictionary<string, ICacheTag>()
-            });
-
-            INewCommandInput userInputs = new MockNewCommandInput()
-            {
-                TemplateName = "foo"
-            };
-
-            TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(templatesToSearch, new MockHostSpecificDataLoader(), userInputs, null);
-            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyCollection<ITemplateMatchInfo> unambiguousGroup));
-            Assert.Equal(2, unambiguousGroup.Count);
-            Assert.Contains(unambiguousGroup, x => string.Equals(x.Info.Identity, "foo.test.old"));
-            Assert.Contains(unambiguousGroup, x => string.Equals(x.Info.Identity, "foo.test.new"));
-            Assert.True(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo templateToInvoke, out TemplateResolutionResult.SingleInvokableMatchStatus resultStatus));
-            Assert.Equal(TemplateResolutionResult.SingleInvokableMatchStatus.SingleMatch, resultStatus);
-            Assert.Equal("foo.test.new", templateToInvoke.Info.Identity);
-        }
-
-        [Fact(DisplayName = nameof(TestPerformCoreTemplateQuery_ParameterNameDisambiguates))]
-        public void TestPerformCoreTemplateQuery_ParameterNameDisambiguates()
-        {
-            List<ITemplateInfo> templatesToSearch = new List<ITemplateInfo>();
-            templatesToSearch.Add(new TemplateInfo()
-            {
-                ShortName = "foo",
-                Name = "Foo template",
-                Identity = "foo.test.old",
-                GroupIdentity = "foo.test.template",
-                Tags = new Dictionary<string, ICacheTag>(StringComparer.OrdinalIgnoreCase),
-                CacheParameters = new Dictionary<string, ICacheParameter>(StringComparer.OrdinalIgnoreCase)
-                {
-                    { "bar", new CacheParameter() },
-                }
-            });
-            templatesToSearch.Add(new TemplateInfo()
-            {
-                ShortName = "foo",
-                Name = "Foo template",
-                Identity = "foo.test.new",
-                GroupIdentity = "foo.test.template",
-                Tags = new Dictionary<string, ICacheTag>(StringComparer.OrdinalIgnoreCase),
-                CacheParameters = new Dictionary<string, ICacheParameter>(StringComparer.OrdinalIgnoreCase)
-                {
-                    { "baz", new CacheParameter() },
-                }
-            });
-
-            INewCommandInput userInputs = new MockNewCommandInput(
-                new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-                {
-                    { "baz", "whatever" }
-                }
-            )
-            {
-                TemplateName = "foo"
-            };
-
-            TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(templatesToSearch, new MockHostSpecificDataLoader(), userInputs, null);
-            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyCollection<ITemplateMatchInfo> unambiguousGroup));
-            Assert.Equal(2, unambiguousGroup.Count);
-            Assert.True(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo templateToInvoke, out TemplateResolutionResult.SingleInvokableMatchStatus resultStatus));
-            Assert.Equal("foo.test.new", templateToInvoke.Info.Identity);
-            Assert.Equal(TemplateResolutionResult.SingleInvokableMatchStatus.SingleMatch, resultStatus);
-        }
-
-        [Fact(DisplayName = nameof(TestPerformCoreTemplateQuery_ParameterValueDisambiguates))]
-        public void TestPerformCoreTemplateQuery_ParameterValueDisambiguates()
-        {
-            List<ITemplateInfo> templatesToSearch = new List<ITemplateInfo>();
-            templatesToSearch.Add(new TemplateInfo()
-            {
-                ShortName = "foo",
-                Name = "Foo template old",
-                Identity = "foo.test.old",
-                GroupIdentity = "foo.test.template",
-                Precedence = 100,
-                Tags = new Dictionary<string, ICacheTag>(StringComparer.OrdinalIgnoreCase)
-                {
-                    { "framework", ResolutionTestHelper.CreateTestCacheTag(new List<string>() { "netcoreapp1.0", "netcoreapp1.1" }) }
-                },
-                CacheParameters = new Dictionary<string, ICacheParameter>()
-            });
-            templatesToSearch.Add(new TemplateInfo()
-            {
-                ShortName = "foo",
-                Name = "Foo template new",
-                Identity = "foo.test.new",
-                GroupIdentity = "foo.test.template",
-                Precedence = 200,
-                Tags = new Dictionary<string, ICacheTag>(StringComparer.OrdinalIgnoreCase)
-                {
-                    { "framework", ResolutionTestHelper.CreateTestCacheTag(new List<string>() { "netcoreapp2.0" }) }
-                },
-                CacheParameters = new Dictionary<string, ICacheParameter>()
-            });
-
-            INewCommandInput userInputs = new MockNewCommandInput(
-                new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-                {
-                    { "framework", "netcoreapp1.0" }
-                }
-            )
-            {
-                TemplateName = "foo"
-            };
-
-            TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(templatesToSearch, new MockHostSpecificDataLoader(), userInputs, null);
-            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyCollection<ITemplateMatchInfo> unambiguousGroup));
-            Assert.Equal(2, unambiguousGroup.Count);
-            Assert.True(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo templateToInvoke, out TemplateResolutionResult.SingleInvokableMatchStatus resultStatus));
-            Assert.Equal("foo.test.old", templateToInvoke.Info.Identity);
-            Assert.Equal(TemplateResolutionResult.SingleInvokableMatchStatus.SingleMatch, resultStatus);
-        }
-
-        [Fact(DisplayName = nameof(TestPerformCoreTemplateQuery_UnknownParameterNameInvalidatesMatch))]
-        public void TestPerformCoreTemplateQuery_UnknownParameterNameInvalidatesMatch()
-        {
-            List<ITemplateInfo> templatesToSearch = new List<ITemplateInfo>();
-            templatesToSearch.Add(new TemplateInfo()
-            {
-                ShortName = "foo",
-                Name = "Foo template",
-                Identity = "foo.test",
-                GroupIdentity = "foo.test.template",
-                Precedence = 100,
-                Tags = new Dictionary<string, ICacheTag>(StringComparer.OrdinalIgnoreCase),
-                CacheParameters = new Dictionary<string, ICacheParameter>()
-                {
-                    { "bar", new CacheParameter() },
-                }
-            });
-
-            INewCommandInput userInputs = new MockNewCommandInput(
-                new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-                {
-                    { "baz", null }
-                }
-            )
-            {
-                TemplateName = "foo"
-            };
-
-            IHostSpecificDataLoader hostSpecificDataLoader = new MockHostSpecificDataLoader();
-
-            TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(templatesToSearch, hostSpecificDataLoader, userInputs, null);
-            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyCollection<ITemplateMatchInfo> unambiguousGroup));
-            Assert.Equal(1, unambiguousGroup.Count);
-            Assert.False(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo templateToInvoke, out TemplateResolutionResult.SingleInvokableMatchStatus resultStatus));
-            Assert.Null(templateToInvoke);
-            Assert.Equal(TemplateResolutionResult.SingleInvokableMatchStatus.InvalidParameter, resultStatus);
-
-            var invalidParams = unambiguousGroup.First().GetInvalidParameterNames();
-            Assert.Equal(1, invalidParams.Count);
-            Assert.Equal("baz", invalidParams[0]);
-        }
-
-        [Fact(DisplayName = nameof(TestPerformCoreTemplateQuery_InvalidChoiceValueInvalidatesMatch))]
-        public void TestPerformCoreTemplateQuery_InvalidChoiceValueInvalidatesMatch()
-        {
-            List<ITemplateInfo> templatesToSearch = new List<ITemplateInfo>();
-            templatesToSearch.Add(new TemplateInfo()
-            {
-                ShortName = "foo",
-                Name = "Foo template",
-                Identity = "foo.test.1x",
-                GroupIdentity = "foo.test.template",
-                Precedence = 100,
-                Tags = new Dictionary<string, ICacheTag>(StringComparer.OrdinalIgnoreCase)
-                {
-                    { "framework", ResolutionTestHelper.CreateTestCacheTag(new List<string>() { "netcoreapp1.0", "netcoreapp1.1" }) }
-                },
-                CacheParameters = new Dictionary<string, ICacheParameter>()
-            });
-            templatesToSearch.Add(new TemplateInfo()
-            {
-                ShortName = "foo",
-                Name = "Foo template",
-                Identity = "foo.test.2x",
-                GroupIdentity = "foo.test.template",
-                Precedence = 200,
-                Tags = new Dictionary<string, ICacheTag>(StringComparer.OrdinalIgnoreCase)
-                {
-                    { "framework", ResolutionTestHelper.CreateTestCacheTag(new List<string>() { "netcoreapp2.0" }) }
-                },
-                CacheParameters = new Dictionary<string, ICacheParameter>()
-            });
-
-            INewCommandInput userInputs = new MockNewCommandInput(
-                new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-                {
-                    { "framework", "netcoreapp3.0" }
-                }
-            )
-            {
-                TemplateName = "foo"
-            };
-
-            IHostSpecificDataLoader hostSpecificDataLoader = new MockHostSpecificDataLoader();
-            TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(templatesToSearch, hostSpecificDataLoader, userInputs, null);
-            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyCollection<ITemplateMatchInfo> unambiguousGroup));
-            Assert.Equal(2, unambiguousGroup.Count);
-            Assert.False(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo templateToInvoke, out TemplateResolutionResult.SingleInvokableMatchStatus resultStatus));
-            Assert.Null(templateToInvoke);
-            Assert.Equal(TemplateResolutionResult.SingleInvokableMatchStatus.InvalidParameter, resultStatus);
-
-            Assert.Contains(unambiguousGroup.ElementAt(0).MatchDisposition, x => x.Kind == MatchKind.InvalidParameterValue);
-            Assert.Contains(unambiguousGroup.ElementAt(1).MatchDisposition, x => x.Kind == MatchKind.InvalidParameterValue);
-        }
     }
 }

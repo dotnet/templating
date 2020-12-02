@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Mocks
 {
@@ -12,7 +13,6 @@ namespace Microsoft.TemplateEngine.Mocks
             Classifications = new List<string>();
             Tags = new Dictionary<string, ICacheTag>(StringComparer.Ordinal);
             CacheParameters = new Dictionary<string, ICacheParameter>(StringComparer.Ordinal);
-            Parameters = new List<ITemplateParameter>();
             BaselineInfo = new Dictionary<string, IBaselineInfo>(StringComparer.Ordinal);
         }
 
@@ -58,11 +58,74 @@ namespace Microsoft.TemplateEngine.Mocks
 
         public IReadOnlyList<string> ShortNameList { get; set; }
 
-        public IReadOnlyDictionary<string, ICacheTag> Tags { get; set; }
+        public virtual IReadOnlyDictionary<string, ICacheTag> Tags { get; set; }
 
-        public IReadOnlyDictionary<string, ICacheParameter> CacheParameters { get; set; }
+        public virtual IReadOnlyDictionary<string, ICacheParameter> CacheParameters { get; set; }
 
-        public IReadOnlyList<ITemplateParameter> Parameters { get; set; }
+        private IReadOnlyList<ITemplateParameter> _parameters;
+        public IReadOnlyList<ITemplateParameter> Parameters
+        {
+            get
+            {
+                if (_parameters == null)
+                {
+                    List<ITemplateParameter> parameters = new List<ITemplateParameter>();
+
+                    foreach (KeyValuePair<string, ICacheTag> tagInfo in Tags)
+                    {
+                        ITemplateParameter param = new TemplateParameter
+                        {
+                            Name = tagInfo.Key,
+                            Documentation = tagInfo.Value.Description,
+                            DefaultValue = tagInfo.Value.DefaultValue,
+                            Choices = tagInfo.Value.ChoicesAndDescriptions,
+                            DataType = "choice"
+                        };
+
+                        if (param is IAllowDefaultIfOptionWithoutValue paramWithNoValueDefault
+                            && tagInfo.Value is IAllowDefaultIfOptionWithoutValue tagWithNoValueDefault)
+                        {
+                            paramWithNoValueDefault.DefaultIfOptionWithoutValue = tagWithNoValueDefault.DefaultIfOptionWithoutValue;
+                            parameters.Add(paramWithNoValueDefault as TemplateParameter);
+                        }
+                        else
+                        {
+                            parameters.Add(param);
+                        }
+                    }
+
+                    foreach (KeyValuePair<string, ICacheParameter> paramInfo in CacheParameters)
+                    {
+                        ITemplateParameter param = new TemplateParameter
+                        {
+                            Name = paramInfo.Key,
+                            Documentation = paramInfo.Value.Description,
+                            DataType = paramInfo.Value.DataType,
+                            DefaultValue = paramInfo.Value.DefaultValue,
+                        };
+
+                        if (param is IAllowDefaultIfOptionWithoutValue paramWithNoValueDefault
+                            && paramInfo.Value is IAllowDefaultIfOptionWithoutValue infoWithNoValueDefault)
+                        {
+                            paramWithNoValueDefault.DefaultIfOptionWithoutValue = infoWithNoValueDefault.DefaultIfOptionWithoutValue;
+                            parameters.Add(paramWithNoValueDefault as TemplateParameter);
+                        }
+                        else
+                        {
+                            parameters.Add(param);
+                        }
+                    }
+
+                    _parameters = parameters;
+                }
+
+                return _parameters;
+            }
+            set
+            {
+                _parameters = value;
+            }
+        }
 
         public Guid ConfigMountPointId { get; set; }
 
