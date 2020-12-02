@@ -1080,7 +1080,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: Invalid values for parameter(s) {0} for template {1}..
+        ///   Looks up a localized string similar to Error: Invalid values for option(s) {0} for template {1}..
         /// </summary>
         public static string InvalidParameterValues {
             get {
@@ -1134,7 +1134,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Mandatory parameter {0} missing for template {1}..
+        ///   Looks up a localized string similar to Mandatory option {0} missing for template {1}..
         /// </summary>
         public static string MissingRequiredParameter {
             get {
@@ -1175,15 +1175,6 @@ namespace Microsoft.TemplateEngine.Cli {
         public static string MultipleArgsSpecifiedError {
             get {
                 return ResourceManager.GetString("MultipleArgsSpecifiedError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Multiple values specified for single value parameter: {0}..
-        /// </summary>
-        public static string MultipleValuesSpecifiedForSingleValuedParameter {
-            get {
-                return ResourceManager.GetString("MultipleValuesSpecifiedForSingleValuedParameter", resourceCulture);
             }
         }
         
@@ -1371,42 +1362,6 @@ namespace Microsoft.TemplateEngine.Cli {
         public static string Overwrite {
             get {
                 return ResourceManager.GetString("Overwrite", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Parameter {0} ({1}) must be given a value..
-        /// </summary>
-        public static string ParameterMissingValue {
-            get {
-                return ResourceManager.GetString("ParameterMissingValue", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Parameter names must start with -- or -..
-        /// </summary>
-        public static string ParameterNamePrefixError {
-            get {
-                return ResourceManager.GetString("ParameterNamePrefixError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Parameter name {0} cannot be used for multiple purposes..
-        /// </summary>
-        public static string ParameterReuseError {
-            get {
-                return ResourceManager.GetString("ParameterReuseError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Parameter {0} was specified multiple times, including with the flag {1}..
-        /// </summary>
-        public static string ParameterSpecifiedMultipleTimes {
-            get {
-                return ResourceManager.GetString("ParameterSpecifiedMultipleTimes", resourceCulture);
             }
         }
         
@@ -1713,7 +1668,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The following parameter(s) or their value(s) are not valid in combination with other supplied parameters or their values:.
+        ///   Looks up a localized string similar to The following option(s) or their value(s) are not valid in combination with other supplied options or their values:.
         /// </summary>
         public static string SingleTemplateGroupPartialMatchSwitchesNotValidForAllMatches {
             get {
@@ -1736,15 +1691,6 @@ namespace Microsoft.TemplateEngine.Cli {
         public static string TemplateArgumentHelp {
             get {
                 return ResourceManager.GetString("TemplateArgumentHelp", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Template is malformed. The following parameter names are invalid: {0}..
-        /// </summary>
-        public static string TemplateMalformedDueToBadParameters {
-            get {
-                return ResourceManager.GetString("TemplateMalformedDueToBadParameters", resourceCulture);
             }
         }
         
@@ -1952,15 +1898,6 @@ namespace Microsoft.TemplateEngine.Cli {
         public static string UpdatesAvailableListHeader {
             get {
                 return ResourceManager.GetString("UpdatesAvailableListHeader", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Value specified for valueless parameter: {0}..
-        /// </summary>
-        public static string ValueSpecifiedForValuelessParameter {
-            get {
-                return ResourceManager.GetString("ValueSpecifiedForValuelessParameter", resourceCulture);
             }
         }
         

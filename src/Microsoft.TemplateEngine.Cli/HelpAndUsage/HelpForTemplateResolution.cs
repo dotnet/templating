@@ -490,17 +490,16 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
         private static string GetInputParametersString(INewCommandInput commandInput)
         {
             string separator = ", ";
-            List<string> parameters = new List<string>();
-            if (!string.IsNullOrEmpty(commandInput.TemplateName))
-            {
-                parameters.Add($"'{commandInput.TemplateName}'");
-            }
-
-            parameters.AddRange(SupportedFilterOptions.SupportedListFilters
+            string filters = string.Join(
+                separator,
+                SupportedFilterOptions.SupportedListFilters
                     .Where(filter => filter.IsFilterSet(commandInput))
-                    .Select(filter => $"{filter.Name}='{filter.FilterValue(commandInput)}'")); ;
-
-            return string.Join(separator, parameters.ToArray());
+                    .Select(filter => $"{filter.Name}='{filter.FilterValue(commandInput)}'"));
+            return string.IsNullOrEmpty(commandInput.TemplateName)
+                ? filters
+                : string.IsNullOrEmpty(filters)
+                    ? $"'{commandInput.TemplateName}'"
+                    : $"'{commandInput.TemplateName}'" + separator + filters;
         }
 
         private static void ShowTemplatesFoundMessage(INewCommandInput commandInput)
