@@ -10,7 +10,6 @@ using Microsoft.TemplateEngine.Cli.UnitTests.CliMocks;
 using Microsoft.TemplateEngine.Cli.UnitTests.CliMocks.XUnit;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Edge.Template;
-using Microsoft.TemplateEngine.Utils;
 using Xunit;
 using static Microsoft.TemplateEngine.Cli.TemplateResolution.TemplateResolutionResult;
 
@@ -34,6 +33,27 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
                     new XUnitMockTemplateInfo("Template2", identity: "Template2")
                 };
                 Add(new XUnitMockNewCommandInput("Template2"), templates, null, (int)UnambiguousTemplateGroupStatus.SingleMatch, new string[] { "Template2" });
+                Add(new XUnitMockNewCommandInput("Template3"), templates, null, (int)UnambiguousTemplateGroupStatus.NoMatch, new string[] {});
+                Add(new XUnitMockNewCommandInput("Template"), templates, null, (int)UnambiguousTemplateGroupStatus.Ambiguous, new string[] {});
+
+                templates = new XUnitMockTemplateInfo[]
+                {
+                    new XUnitMockTemplateInfo("ShortName1", identity: "Template1", groupIdentity:"Group", precedence:100),
+                    new XUnitMockTemplateInfo("ShortName2", identity: "Template2", groupIdentity:"Group", precedence:200)
+                };
+                Add(new XUnitMockNewCommandInput("ShortName1"), templates, null, (int)UnambiguousTemplateGroupStatus.SingleMatch, new string[] { "Template1", "Template2" });
+                Add(new XUnitMockNewCommandInput("ShortName2"), templates, null, (int)UnambiguousTemplateGroupStatus.SingleMatch, new string[] { "Template1", "Template2" });
+                Add(new XUnitMockNewCommandInput("ShortName"), templates, null, (int)UnambiguousTemplateGroupStatus.SingleMatch,  new string[] { "Template1", "Template2" });
+
+                templates = new XUnitMockTemplateInfo[]
+                {
+                    new XUnitMockTemplateInfo("ShortName1", identity: "Template1", groupIdentity:"Group"),
+                    new XUnitMockTemplateInfo("ShortName2", identity: "Template2", groupIdentity:"Group")
+                };
+                Add(new XUnitMockNewCommandInput("ShortName1"), templates, null, (int)UnambiguousTemplateGroupStatus.SingleMatch, new string[] { "Template1", "Template2" });
+                Add(new XUnitMockNewCommandInput("ShortName2"), templates, null, (int)UnambiguousTemplateGroupStatus.SingleMatch, new string[] { "Template1", "Template2" });
+                Add(new XUnitMockNewCommandInput("ShortName"), templates, null, (int)UnambiguousTemplateGroupStatus.SingleMatch, new string[] { "Template1", "Template2" });
+
 
                 templates = new XUnitMockTemplateInfo[]
                 {
@@ -120,11 +140,38 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             public TemplateResolution_TemplateToInvoke_TestData()
             {
                 var templates = new XUnitMockTemplateInfo[]
-                       {
+                {
                     new XUnitMockTemplateInfo("Template1", identity: "Template1"),
                     new XUnitMockTemplateInfo("Template2", identity: "Template2")
-                       };
+                };
                 Add(new XUnitMockNewCommandInput("Template2"), templates, null, (int)SingleInvokableMatchStatus.SingleMatch, "Template2");
+                Add(new XUnitMockNewCommandInput("Template3"), templates, null, (int)SingleInvokableMatchStatus.NoMatch, null);
+                Add(new XUnitMockNewCommandInput("Template"), templates, null, (int)SingleInvokableMatchStatus.AmbiguousTemplateGroupChoice, null);
+
+                templates = new XUnitMockTemplateInfo[]
+                {
+                    new XUnitMockTemplateInfo("Template", identity: "Template1"),
+                    new XUnitMockTemplateInfo("Template", identity: "Template2")
+                };
+                Add(new XUnitMockNewCommandInput("Template"), templates, null, (int)SingleInvokableMatchStatus.AmbiguousTemplateGroupChoice, null);
+
+                templates = new XUnitMockTemplateInfo[]
+                {
+                    new XUnitMockTemplateInfo("ShortName1", identity: "Template1", groupIdentity:"Group", precedence:100),
+                    new XUnitMockTemplateInfo("ShortName2", identity: "Template2", groupIdentity:"Group", precedence:200)
+                };
+                Add(new XUnitMockNewCommandInput("ShortName1"), templates, null, (int)SingleInvokableMatchStatus.SingleMatch, "Template2");
+                Add(new XUnitMockNewCommandInput("ShortName2"), templates, null, (int)SingleInvokableMatchStatus.SingleMatch, "Template2");
+                Add(new XUnitMockNewCommandInput("ShortName"), templates, null, (int)SingleInvokableMatchStatus.SingleMatch, "Template2");
+
+                templates = new XUnitMockTemplateInfo[]
+                {
+                    new XUnitMockTemplateInfo("ShortName1", identity: "Template1", groupIdentity:"Group"),
+                    new XUnitMockTemplateInfo("ShortName2", identity: "Template2", groupIdentity:"Group")
+                };
+                Add(new XUnitMockNewCommandInput("ShortName1"), templates, null, (int)SingleInvokableMatchStatus.AmbiguousTemplateChoice, null);
+                Add(new XUnitMockNewCommandInput("ShortName2"), templates, null, (int)SingleInvokableMatchStatus.AmbiguousTemplateChoice, null);
+                Add(new XUnitMockNewCommandInput("ShortName"), templates, null, (int)SingleInvokableMatchStatus.AmbiguousTemplateChoice, null);
 
                 templates = new XUnitMockTemplateInfo[]
                 {
