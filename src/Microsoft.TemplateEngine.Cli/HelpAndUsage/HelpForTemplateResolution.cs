@@ -77,11 +77,11 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             switch (resolutionResult.Status)
             {
                 case TemplateResolutionResult.SingleInvokableMatchStatus.NoMatch:
-                    // No templates found matching the following input parameter(s): {0}.
                     Reporter.Error.WriteLine(
                         string.Format(LocalizableStrings.NoTemplatesMatchingInputParameters, GetInputParametersString(commandInput)).Bold().Red());
                     Reporter.Error.WriteLine(LocalizableStrings.ListTemplatesCommand.Bold().Red());
                     return CreationResultStatus.NotFound;
+                case TemplateResolutionResult.SingleInvokableMatchStatus.AmbiguousLanguageChoice:
                 case TemplateResolutionResult.SingleInvokableMatchStatus.AmbiguousTemplateGroupChoice:
                     Reporter.Error.WriteLine(LocalizableStrings.AmbiguousTemplateGroupListHeader.Bold().Red());
                     DisplayTemplateList(resolutionResult.TemplateGroups, environmentSettings, commandInput, defaultLanguage);

@@ -57,7 +57,8 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         /// - <see cref="SingleInvokableMatchStatus.NoMatch"/> - no matched template groups were resolved<br/>
         /// - <see cref="SingleInvokableMatchStatus.AmbiguousTemplateGroupChoice"/> - multiple template groups were resolved; not possible to determing the group to use<br/>
         /// - <see cref="SingleInvokableMatchStatus.AmbiguousParameterValueChoice"/> - single template group was resolved, but it is not possible to resolve choice parameter value to use. <br/>
-        /// - <see cref="SingleInvokableMatchStatus.AmbiguousTemplateChoice"/> - single template group was resolved, but there is an ambiguous choice for template inside the group. Ususlly means that the installed templates are conflicting and the confict should be resolved by uninistalling some of templates.<br/>
+        /// - <see cref="SingleInvokableMatchStatus.AmbiguousLanguageChoice"/> - single template group was resolved, but there is an ambiguous choice for template inside the group with templates having different languages and the language was not selected by user and no default language match. <br/>
+        /// - <see cref="SingleInvokableMatchStatus.AmbiguousTemplateChoice"/> - single template group was resolved, but there is an ambiguous choice for template inside the group and the templates are of same language. Ususlly means that the installed templates are conflicting and the confict should be resolved by uninistalling some of templates.<br/>
         /// - <see cref="SingleInvokableMatchStatus.InvalidParameter"/> - single template group was resolved, but parameters or choice parameter values provided are invalid for all templates in the group.<br/>
         /// </summary>
         public enum SingleInvokableMatchStatus
@@ -68,6 +69,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             AmbiguousTemplateGroupChoice,
             AmbiguousParameterValueChoice,
             AmbiguousTemplateChoice,
+            AmbiguousLanguageChoice,
             InvalidParameter
         }
 
@@ -86,7 +88,8 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         /// - <see cref="SingleInvokableMatchStatus.NoMatch"/> - no matched template groups were resolved. <br/>
         /// - <see cref="SingleInvokableMatchStatus.AmbiguousTemplateGroupChoice"/> - multiple template groups were resolved; not possible to determing the group to use<br/>
         /// - <see cref="SingleInvokableMatchStatus.AmbiguousParameterValueChoice"/> - single template group was resolved, but it is not possible to resolve choice parameter value to use. <br/>
-        /// - <see cref="SingleInvokableMatchStatus.AmbiguousTemplateChoice"/> - single template group was resolved, but there is an ambiguous choice for template inside the group. Ususlly means that the installed templates are conflicting and the confict should be resolved by uninistalling some of templates.<br/>
+        /// - <see cref="SingleInvokableMatchStatus.AmbiguousLanguageChoice"/> - single template group was resolved, but there is an ambiguous choice for template inside the group with templates having different languages and the language was not selected by user and no default language match. <br/>
+        /// - <see cref="SingleInvokableMatchStatus.AmbiguousTemplateChoice"/> - single template group was resolved, but there is an ambiguous choice for template inside the group and the templates are of same language. Ususlly means that the installed templates are conflicting and the confict should be resolved by uninistalling some of templates.<br/>
         /// - <see cref="SingleInvokableMatchStatus.InvalidParameter"/> - single template group was resolved, but parameters or choice parameter values provided are invalid for all templates in the group.<br/>
         /// </summary>
         internal SingleInvokableMatchStatus Status
@@ -255,6 +258,14 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                 return;
             }
 
+            IEnumerable<ITemplateMatchInfo> highestPrecedenceTemplates = UnambiguousTemplateGroup.GetHighestPrecedenceInvokableTemplates(!_hasUserInputLanguage);
+            IEnumerable<string> templateLanguages = highestPrecedenceTemplates.Select(t => string.Join(",", t.Info.GetLanguages().OrderBy(l => l))).Distinct(StringComparer.OrdinalIgnoreCase);
+
+            if (templateLanguages.Count() > 1)
+            {
+                _singularInvokableMatchStatus = SingleInvokableMatchStatus.AmbiguousLanguageChoice;
+                return;
+            }
             _singularInvokableMatchStatus = SingleInvokableMatchStatus.AmbiguousTemplateChoice;
         }
 
@@ -271,7 +282,6 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                 _unambigiousTemplateGroupStatus = UnambiguousTemplateGroupStatus.SingleMatch;
                 return;
             }
-            //TODO: check if it is correct logic
             else if (!_hasUserInputLanguage)
             {
                 // only consider default language match dispositions if the user did not specify a language.

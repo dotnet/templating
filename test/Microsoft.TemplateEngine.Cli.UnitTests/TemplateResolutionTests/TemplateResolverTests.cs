@@ -263,6 +263,39 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
                     new XUnitMockTemplateInfo("foo", identity: "foo.1.VB", groupIdentity: "foo.group", precedence: 200)
                         .WithTag("language", "VB")
                 };
+                Add(new XUnitMockNewCommandInput("foo"), templates, null, (int)SingleInvokableMatchStatus.AmbiguousLanguageChoice, null);
+
+                templates = new XUnitMockTemplateInfo[]
+                {
+                    new XUnitMockTemplateInfo("foo", identity: "foo.1.FSharp", groupIdentity: "foo.group", precedence: 200)
+                        .WithTag("language", "F#"),
+                    new XUnitMockTemplateInfo("foo", identity: "foo.1.VB", groupIdentity: "foo.group", precedence: 200)
+                        .WithTag("language", "")
+                };
+                Add(new XUnitMockNewCommandInput("foo"), templates, null, (int)SingleInvokableMatchStatus.AmbiguousLanguageChoice, null);
+
+                templates = new XUnitMockTemplateInfo[]
+                {
+                    new XUnitMockTemplateInfo("foo", identity: "foo.1.FSharp", groupIdentity: "foo.group", precedence: 200)
+                        .WithTag("language", "F#"),
+                    new XUnitMockTemplateInfo("foo", identity: "foo.1.VB", groupIdentity: "foo.group", precedence: 200)
+                };
+                Add(new XUnitMockNewCommandInput("foo"), templates, null, (int)SingleInvokableMatchStatus.AmbiguousLanguageChoice, null);
+
+                templates = new XUnitMockTemplateInfo[]
+                {
+                    new XUnitMockTemplateInfo("foo", identity: "foo.1.FSharp", groupIdentity: "foo.group", precedence: 200),
+                    new XUnitMockTemplateInfo("foo", identity: "foo.1.VB", groupIdentity: "foo.group", precedence: 200)
+                };
+                Add(new XUnitMockNewCommandInput("foo"), templates, null, (int)SingleInvokableMatchStatus.AmbiguousTemplateChoice, null);
+
+                templates = new XUnitMockTemplateInfo[]
+                {
+                    new XUnitMockTemplateInfo("foo", identity: "foo.1.FSharp", groupIdentity: "foo.group", precedence: 200)
+                        .WithTag("language", "F#"),
+                    new XUnitMockTemplateInfo("foo", identity: "foo.1.VB", groupIdentity: "foo.group", precedence: 200)
+                        .WithTag("language", "F#")
+                };
                 Add(new XUnitMockNewCommandInput("foo"), templates, null, (int)SingleInvokableMatchStatus.AmbiguousTemplateChoice, null);
             }
         }
