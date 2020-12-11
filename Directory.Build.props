@@ -4,7 +4,7 @@
 
     <PropertyGroup>
         <LangVersion>8.0</LangVersion>
-        <NETCoreTargetFramework>netcoreapp3.1</NETCoreTargetFramework>
+        <NETCoreTargetFramework>net5.0</NETCoreTargetFramework>
         <NETStandardTargetFramework>netstandard2.0</NETStandardTargetFramework>
         <NETFullTargetFramework>net472</NETFullTargetFramework>
         <Product>Microsoft .NET Core</Product>
