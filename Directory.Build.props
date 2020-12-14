@@ -3,7 +3,10 @@
     <Import Project="Sdk.props" Sdk="Microsoft.DotNet.Arcade.Sdk" />
 
     <PropertyGroup>
-        <LangVersion>7.3</LangVersion>
+        <LangVersion>8.0</LangVersion>
+        <NETCoreTargetFramework>net5.0</NETCoreTargetFramework>
+        <NETStandardTargetFramework>netstandard2.0</NETStandardTargetFramework>
+        <NETFullTargetFramework>net472</NETFullTargetFramework>
         <Product>Microsoft .NET Core</Product>
         <Copyright>$(CopyrightNetFoundation)</Copyright>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
