@@ -184,7 +184,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             if (templateResolutionResult.HasExactMatches)
             {
                 ShowTemplatesFoundMessage(commandInput);
-                DisplayTemplateList(templateResolutionResult.ExactMatchedTemplates, environmentSettings, commandInput, defaultLanguage);
+                DisplayTemplateList(templateResolutionResult.ExactMatchedTemplateGroups, environmentSettings, commandInput, defaultLanguage);
             }
             else
             {
@@ -389,7 +389,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                 Reporter.Error.WriteLine(
                     string.Format(
                         LocalizableStrings.TemplatesNotValidGivenTheSpecifiedFilter,
-                        templateResolutionResult.PartiallyMatchedTemplatesGrouped.Count,
+                        templateResolutionResult.PartiallyMatchedTemplateGroups.Count,
                         GetPartialMatchReason(templateResolutionResult, commandInput))
                     .Bold().Red());
             }
