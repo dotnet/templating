@@ -30,7 +30,6 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             // make sure there's an unambiguous group, otherwise the singular match check is meaningless
             Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousGroup));
             Assert.Equal(2, unambiguousGroup.Count);
-            Assert.Equal(2, matchResult.GetBestTemplateMatchList().Count);
 
             Assert.False(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo singularInvokableMatch, out Status resultStatus));
             Assert.Equal(Status.AmbiguousChoice, resultStatus);
@@ -53,7 +52,6 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             // make sure there's an unambiguous group, otherwise the singular match check is meaningless
             Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousGroup));
             Assert.Equal(2, unambiguousGroup.Count);
-            Assert.Equal(2, matchResult.GetBestTemplateMatchList().Count);
 
             Assert.True(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo singularInvokableMatch, out Status resultStatus));
             Assert.Equal(Status.SingleMatch, resultStatus);
@@ -76,7 +74,6 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             // make sure there's an unambiguous group, otherwise the singular match check is meaningless
             Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousGroup));
             Assert.Equal(2, unambiguousGroup.Count);
-            Assert.Equal(2, matchResult.GetBestTemplateMatchList().Count);
 
             Assert.False(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo singularInvokableMatch, out Status resultStatus));
             Assert.Equal(Status.NoMatch, resultStatus);
@@ -101,7 +98,6 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             // make sure there's an unambiguous group, otherwise the singular match check is meaningless
             Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousGroup));
             Assert.Equal(2, unambiguousGroup.Count);
-            Assert.Equal(2, matchResult.GetBestTemplateMatchList().Count);
 
             Assert.True(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo singularInvokableMatch, out Status resultStatus));
             Assert.Equal(Status.SingleMatch, resultStatus);
@@ -122,7 +118,6 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             // make sure there's an unambiguous group, otherwise the singular match check is meaningless
             Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousGroup));
             Assert.Equal(1, unambiguousGroup.Count);
-            Assert.Equal(1, matchResult.GetBestTemplateMatchList().Count);
 
             Assert.True(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo singularInvokableMatch, out Status resultStatus));
             Assert.Equal(Status.SingleMatch, resultStatus);
@@ -145,7 +140,6 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             // make sure there's an unambiguous group, otherwise the singular match check is meaningless
             Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousGroup));
             Assert.Equal(2, unambiguousGroup.Count);
-            Assert.Equal(2, matchResult.GetBestTemplateMatchList().Count);
 
             Assert.True(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo singularInvokableMatch, out Status resultStatus));
             Assert.Equal(Status.SingleMatch, resultStatus);
@@ -168,7 +162,6 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             // make sure there's an unambiguous group, otherwise the singular match check is meaningless
             Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousGroup));
             Assert.Equal(2, unambiguousGroup.Count);
-            Assert.Equal(2, matchResult.GetBestTemplateMatchList().Count);
 
             Assert.False(matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo singularInvokableMatch, out Status resultStatus));
             Assert.Null(singularInvokableMatch);

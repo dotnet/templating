@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Cli.CommandParsing;
 using Microsoft.TemplateEngine.Cli.TemplateResolution;
@@ -25,8 +26,9 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
                 INewCommandInput userInputs = new MockNewCommandInput(testShortName);
 
                 TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(MultiShortNameGroupTemplateInfo, new MockHostSpecificDataLoader(), userInputs, "C#");
-                matchResult.TryGetCoreMatchedTemplatesWithDisposition(x => x.IsMatch, out IReadOnlyList<ITemplateMatchInfo> matchedTemplateList);
+                matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> matchedTemplateList);
                 Assert.Equal(3, matchedTemplateList.Count);
+                Assert.True(matchedTemplateList.All(t => t.IsMatch));
 
                 foreach (ITemplateMatchInfo templateMatchInfo in matchedTemplateList)
                 {

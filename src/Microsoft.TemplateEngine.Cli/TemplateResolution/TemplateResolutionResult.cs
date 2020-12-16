@@ -14,26 +14,17 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
     /// </summary>
     public class TemplateResolutionResult
     {
-        public TemplateResolutionResult(string templateName, string userInputLanguage, IReadOnlyCollection<ITemplateMatchInfo> coreMatchedTemplates, IReadOnlyCollection<ITemplateMatchInfo> allTemplatesInContext, bool useForListing = false)
+        public TemplateResolutionResult(string templateName, string userInputLanguage, IReadOnlyCollection<ITemplateMatchInfo> coreMatchedTemplates)
         {
             _templateName = templateName;
             _hasUserInputLanguage = !string.IsNullOrEmpty(userInputLanguage);
             _coreMatchedTemplates = coreMatchedTemplates;
-            _allTemplatesInContext = allTemplatesInContext;
-            _bestTemplateMatchList = null;
         }
 
         private readonly string _templateName;
         private readonly bool _hasUserInputLanguage;
 
         private readonly IReadOnlyCollection<ITemplateMatchInfo> _coreMatchedTemplates;
-        private readonly IReadOnlyCollection<ITemplateMatchInfo> _allTemplatesInContext;
-
-        public bool TryGetCoreMatchedTemplatesWithDisposition(Func<ITemplateMatchInfo, bool> filter, out IReadOnlyList<ITemplateMatchInfo> matchingTemplates)
-        {
-            matchingTemplates = _coreMatchedTemplates.Where(filter).ToList();
-            return matchingTemplates.Count != 0;
-        }
 
         // If a single template group can be resolved, return it.
         // If the user input a language, default language results are not considered.
@@ -90,21 +81,6 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             }
 
             unambiguousTemplateGroup = null;
-            return false;
-        }
-
-        // Note: This method does not consider default language matches / mismatches
-        public bool TryGetAllInvokableTemplates(out IReadOnlyList<ITemplateMatchInfo> invokableTemplates)
-        {
-            IEnumerable<ITemplateMatchInfo> invokableMatches = _coreMatchedTemplates.Where(x => x.IsInvokableMatch());
-
-            if (invokableMatches.Any())
-            {
-                invokableTemplates = invokableMatches.ToList();
-                return true;
-            }
-
-            invokableTemplates = null;
             return false;
         }
 
@@ -183,68 +159,5 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             resultStatus = Status.NoMatch;
             return false;
         }
-
-        private IReadOnlyList<ITemplateMatchInfo> _bestTemplateMatchList;
-        private IReadOnlyList<ITemplateMatchInfo> _bestTemplateMatchListIgnoringDefaultLanguageFiltering;
-
-        public IReadOnlyList<ITemplateMatchInfo> GetBestTemplateMatchList(bool ignoreDefaultLanguageFiltering = false)
-        {
-            if (ignoreDefaultLanguageFiltering)
-            {
-                if (_bestTemplateMatchList == null)
-                {
-                    _bestTemplateMatchList = BaseGetBestTemplateMatchList(ignoreDefaultLanguageFiltering);
-                }
-
-                return _bestTemplateMatchList;
-            }
-            else
-            {
-                if (_bestTemplateMatchListIgnoringDefaultLanguageFiltering == null)
-                {
-                    _bestTemplateMatchListIgnoringDefaultLanguageFiltering = BaseGetBestTemplateMatchList(ignoreDefaultLanguageFiltering);
-                }
-
-                return _bestTemplateMatchListIgnoringDefaultLanguageFiltering;
-            }
-        }
-
-        // The core matched templates should not need additioanl default language filtering.
-        // The default language dispositions are stored in a different place than the other dispositions,
-        // and are not considered for most match filtering.
-        private IReadOnlyList<ITemplateMatchInfo> BaseGetBestTemplateMatchList(bool ignoreDefaultLanguageFiltering)
-        {
-            IReadOnlyList<ITemplateMatchInfo> templateList;
-            if (TryGetUnambiguousTemplateGroupToUse(out templateList, ignoreDefaultLanguageFiltering))
-            {
-                return templateList;
-            }
-            else if (!string.IsNullOrEmpty(_templateName) && TryGetAllInvokableTemplates(out templateList))
-            {
-                return templateList;
-            }
-            else if (TryGetCoreMatchedTemplatesWithDisposition(x => x.IsMatch, out templateList))
-            {
-                return templateList;
-            }
-            else if (TryGetCoreMatchedTemplatesWithDisposition(x => x.IsMatchExceptContext(), out templateList))
-            {
-                return templateList;
-            }
-            else if (TryGetCoreMatchedTemplatesWithDisposition(x => x.IsPartialMatch, out templateList))
-            {
-                return templateList;
-            }
-            else if (TryGetCoreMatchedTemplatesWithDisposition(x => x.IsPartialMatchExceptContext(), out templateList))
-            {
-                return templateList;
-            }
-            else
-            {
-                templateList = _allTemplatesInContext.ToList();
-                return templateList;
-            }
-        }
-
     }
 }
