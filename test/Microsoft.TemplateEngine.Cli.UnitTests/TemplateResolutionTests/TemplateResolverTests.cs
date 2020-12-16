@@ -193,6 +193,119 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
                 true,
                 new string [] { "foo.test.1x", "foo.test.2x" }
             };
+
+            //SingularInvokableMatchTests
+            //MultipleTemplatesInGroupHavingSingleStartsWithOnSameParamIsAmbiguous
+            yield return new object[]
+            {
+                new MockNewCommandInput("foo").WithTemplateOption("MyChoice", "value_"),
+                new MockTemplateInfo[]
+                {
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test_1", groupIdentity: "foo.test.template", precedence: 100)
+                                    .WithTag("MyChoice", "value_1"),
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test_2", groupIdentity: "foo.test.template", precedence: 200)
+                                    .WithTag("MyChoice", "value_2")
+                },
+                null,
+                true,
+                new string [] { "foo.test_1", "foo.test_2" }
+            };
+
+            //MultipleTemplatesInGroupParamPartiaMatch_TheOneHavingSingleStartsWithIsTheSingularInvokableMatch
+            yield return new object[]
+            {
+                new MockNewCommandInput("foo").WithTemplateOption("MyChoice", "value_"),
+                new MockTemplateInfo[]
+                {
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test_1", groupIdentity: "foo.test.template", precedence: 100)
+                                    .WithTag("MyChoice", "value_1"),
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test_2", groupIdentity: "foo.test.template", precedence: 200)
+                                    .WithTag("MyChoice", "value_2", "value_3")
+                },
+                null,
+                true,
+                new string [] { "foo.test_1", "foo.test_2" }
+            };
+
+            //MultipleTemplatesInGroupHavingAmbiguousParamMatchOnSameParamIsAmbiguous
+            yield return new object[]
+            {
+                new MockNewCommandInput("foo").WithTemplateOption("MyChoice", "value_"),
+                new MockTemplateInfo[]
+                {
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test_1", groupIdentity: "foo.test.template", precedence: 100)
+                                    .WithTag("MyChoice", "value_1", "value_2"),
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test_2", groupIdentity: "foo.test.template", precedence: 200)
+                                    .WithTag("MyChoice", "value_3", "value_4")
+                },
+                null,
+                true,
+                new string [] { "foo.test_1", "foo.test_2" }
+            };
+
+            //MultipleTemplatesInGroupHavingSingularStartMatchesOnDifferentParams_HighPrecedenceIsChosen
+            yield return new object[]
+            {
+                new MockNewCommandInput("foo").WithTemplateOption("MyChoice", "value_").WithTemplateOption("OtherChoice", "foo_"),
+                new MockTemplateInfo[]
+                {
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test_1", groupIdentity: "foo.test.template", precedence: 100)
+                                    .WithTag("MyChoice", "value_1", "other_value")
+                                    .WithTag("OtherChoice", "foo_"),
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test_2", groupIdentity: "foo.test.template", precedence: 200)
+                                    .WithTag("MyChoice", "value_")
+                                    .WithTag("OtherChoice", "foo_", "bar_1")
+                },
+                null,
+                true,
+                new string [] { "foo.test_1", "foo.test_2" }
+            };
+
+            //GivenOneInvokableTemplateWithNonDefaultLanguage_ItIsChosen
+            yield return new object[]
+            {
+                new MockNewCommandInput("foo"),
+                new MockTemplateInfo[]
+                {
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test_1", groupIdentity: "foo.test.template", precedence: 100)
+                                    .WithTag("language", "F#")
+                },
+                null,
+                true,
+                new string [] { "foo.test_1" }
+            };
+
+            //GivenTwoInvokableTemplatesNonDefaultLanguage_HighPrecedenceIsChosen
+            yield return new object[]
+            {
+                new MockNewCommandInput("foo"),
+                new MockTemplateInfo[]
+                {
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test_1.FSharp", groupIdentity: "foo.test.template", precedence: 100)
+                                     .WithTag("language", "F#"),
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test_1.VB", groupIdentity: "foo.test.template", precedence: 200)
+                                     .WithTag("language", "VB")
+                },
+                null,
+                true,
+                new string [] { "foo.test_1.FSharp", "foo.test_1.VB" }
+            };
+
+            //GivenMultipleHighestPrecedenceTemplates_ResultIsAmbiguous
+            yield return new object[]
+            {
+                new MockNewCommandInput("foo"),
+                new MockTemplateInfo[]
+                {
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test_1.FSharp", groupIdentity: "foo.test.template", precedence: 100)
+                                     .WithTag("language", "F#"),
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test_1.VB", groupIdentity: "foo.test.template", precedence: 100)
+                                     .WithTag("language", "VB")
+                },
+                null,
+                true,
+                new string [] { "foo.test_1.FSharp", "foo.test_1.VB" }
+            };
         }
 
         [Theory(DisplayName = nameof(TemplateResolution_UnambiguousGroup_Test))]
@@ -216,6 +329,143 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             else
             {
                 Assert.Null(unambiguousGroup);
+            }
+        }
+
+        public static IEnumerable<object[]> Get_TemplateResolution_TemplateToInvoke_TestData()
+        {
+            //SingularInvokableMatchTests
+            //MultipleTemplatesInGroupHavingSingleStartsWithOnSameParamIsAmbiguous
+            yield return new object[]
+            {
+                new MockNewCommandInput("foo").WithTemplateOption("MyChoice", "value_"),
+                new MockTemplateInfo[]
+                {
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test_1", groupIdentity: "foo.test.template", precedence: 100)
+                                    .WithTag("MyChoice", "value_1"),
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test_2", groupIdentity: "foo.test.template", precedence: 200)
+                                    .WithTag("MyChoice", "value_2")
+                },
+                null,
+                TemplateResolutionResult.Status.AmbiguousChoice,
+                null
+            };
+
+            //MultipleTemplatesInGroupParamPartiaMatch_TheOneHavingSingleStartsWithIsTheSingularInvokableMatch
+            yield return new object[]
+            {
+                new MockNewCommandInput("foo").WithTemplateOption("MyChoice", "value_"),
+                new MockTemplateInfo[]
+                {
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test_1", groupIdentity: "foo.test.template", precedence: 100)
+                                    .WithTag("MyChoice", "value_1"),
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test_2", groupIdentity: "foo.test.template", precedence: 200)
+                                    .WithTag("MyChoice", "value_2", "value_3")
+                },
+                null,
+                TemplateResolutionResult.Status.SingleMatch,
+                "foo.test_1"
+            };
+
+            //MultipleTemplatesInGroupHavingAmbiguousParamMatchOnSameParamIsAmbiguous
+            yield return new object[]
+            {
+                new MockNewCommandInput("foo").WithTemplateOption("MyChoice", "value_"),
+                new MockTemplateInfo[]
+                {
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test_1", groupIdentity: "foo.test.template", precedence: 100)
+                                    .WithTag("MyChoice", "value_1", "value_2"),
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test_2", groupIdentity: "foo.test.template", precedence: 200)
+                                    .WithTag("MyChoice", "value_3", "value_4")
+                },
+                null,
+                TemplateResolutionResult.Status.NoMatch,
+                null
+            };
+
+            //MultipleTemplatesInGroupHavingSingularStartMatchesOnDifferentParams_HighPrecedenceIsChosen
+            yield return new object[]
+            {
+                new MockNewCommandInput("foo").WithTemplateOption("MyChoice", "value_").WithTemplateOption("OtherChoice", "foo_"),
+                new MockTemplateInfo[]
+                {
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test_1", groupIdentity: "foo.test.template", precedence: 100)
+                                    .WithTag("MyChoice", "value_1", "other_value")
+                                    .WithTag("OtherChoice", "foo_"),
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test_2", groupIdentity: "foo.test.template", precedence: 200)
+                                    .WithTag("MyChoice", "value_")
+                                    .WithTag("OtherChoice", "foo_", "bar_1")
+                },
+                null,
+                TemplateResolutionResult.Status.SingleMatch,
+                "foo.test_2"
+            };
+
+            //GivenOneInvokableTemplateWithNonDefaultLanguage_ItIsChosen
+            yield return new object[]
+            {
+                new MockNewCommandInput("foo"),
+                new MockTemplateInfo[]
+                {
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test_1", groupIdentity: "foo.test.template", precedence: 100)
+                                    .WithTag("language", "F#")
+                },
+                null,
+                TemplateResolutionResult.Status.SingleMatch,
+                "foo.test_1"
+            };
+
+            //GivenTwoInvokableTemplatesNonDefaultLanguage_HighPrecedenceIsChosen
+            yield return new object[]
+            {
+                new MockNewCommandInput("foo"),
+                new MockTemplateInfo[]
+                {
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test_1.FSharp", groupIdentity: "foo.test.template", precedence: 100)
+                                     .WithTag("language", "F#"),
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test_1.VB", groupIdentity: "foo.test.template", precedence: 200)
+                                     .WithTag("language", "VB")
+                },
+                null,
+                TemplateResolutionResult.Status.SingleMatch,
+                "foo.test_1.VB"
+            };
+
+            //GivenMultipleHighestPrecedenceTemplates_ResultIsAmbiguous
+            yield return new object[]
+            {
+                new MockNewCommandInput("foo"),
+                new MockTemplateInfo[]
+                {
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test_1.FSharp", groupIdentity: "foo.test.template", precedence: 100)
+                                     .WithTag("language", "F#"),
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test_1.VB", groupIdentity: "foo.test.template", precedence: 100)
+                                     .WithTag("language", "VB")
+                },
+                null,
+                TemplateResolutionResult.Status.AmbiguousPrecedence,
+                null
+            };
+        }
+
+        [Theory(DisplayName = nameof(TemplateResolution_TemplateToInvoke_Test))]
+        [MemberData(nameof(Get_TemplateResolution_TemplateToInvoke_TestData))]
+        internal void TemplateResolution_TemplateToInvoke_Test(MockNewCommandInput command, MockTemplateInfo[] templateSet, string defaultLanguage, int expectedStatus, string expectedIdentity)
+        {
+            TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(templateSet, new MockHostSpecificDataLoader(), command, defaultLanguage);
+
+            //compatibility with old methods
+            Assert.Equal(expectedStatus == (int)TemplateResolutionResult.Status.SingleMatch,
+                matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo templateToInvoke, out TemplateResolutionResult.Status tryStatus));
+            Assert.Equal(expectedStatus, (int)tryStatus);
+
+            if (expectedStatus == (int)TemplateResolutionResult.Status.SingleMatch)
+            {
+                Assert.Equal(expectedIdentity, templateToInvoke.Info.Identity);
+            }
+            else
+            {
+                Assert.Null(templateToInvoke);
             }
         }
     }
