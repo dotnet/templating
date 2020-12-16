@@ -92,142 +92,131 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             Assert.True(customTypeTemplates.Where(x => string.Equals(x.Info.Identity, "Template3", StringComparison.Ordinal)).Any());
         }
 
-        [Fact(DisplayName = nameof(TestPerformCoreTemplateQuery_UniqueNameMatchesCorrectly))]
-        public void TestPerformCoreTemplateQuery_UniqueNameMatchesCorrectly()
+        public static IEnumerable<object[]> Get_TemplateResolution_UnambiguousGroup_TestData()
         {
-            List<ITemplateInfo> templatesToSearch = new List<ITemplateInfo>();
-            templatesToSearch.Add(new MockTemplateInfo("Template1", name: "Long name of Template1", identity: "Template1"));
-            templatesToSearch.Add(new MockTemplateInfo("Template2", name: "Long name of Template2", identity: "Template2"));
+            //TestPerformCoreTemplateQuery_UniqueNameMatchesCorrectly
+            yield return new object[]
+            {
+                new MockNewCommandInput("Template2"),
+                new MockTemplateInfo[]
+                {
+                    new MockTemplateInfo("Template1", name: "Long name of Template1", identity: "Template1"),
+                    new MockTemplateInfo("Template2", name: "Long name of Template2", identity: "Template2"),
+                },
+                null,
+                true,
+                new string [] { "Template2" }
+            };
 
-            INewCommandInput userInputs = new MockNewCommandInput("Template2");
+            //TestPerformCoreTemplateQuery_InputLanguageIsPreferredOverDefault
+            yield return new object[]
+            {
+                new MockNewCommandInput("foo", "LISP"),
+                new MockTemplateInfo[]
+                {
+                    new MockTemplateInfo("foo", name: "Description of foo Perl template", identity: "foo.test.Perl", groupIdentity: "foo.test.template")
+                                      .WithTag("language", "Perl"),
+                    new MockTemplateInfo("foo", name: "Description of foo LISP template", identity: "foo.test.Lisp", groupIdentity: "foo.test.template")
+                                      .WithTag("language", "LISP"),
+                },
+                "Perl",
+                true,
+                new string [] { "foo.test.Lisp" }
+            };
 
-            TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(templatesToSearch, new MockHostSpecificDataLoader(), userInputs, null);
+            //TestPerformCoreTemplateQuery_GroupIsFound
+            yield return new object[]
+            {
+                new MockNewCommandInput("foo"),
+                new MockTemplateInfo[]
+                {
+                    new MockTemplateInfo("foo", name: "Foo template old", identity: "foo.test.old", groupIdentity: "foo.test.template", precedence: 100),
+                    new MockTemplateInfo("foo", name: "Foo template new", identity: "foo.test.new", groupIdentity: "foo.test.template", precedence: 200),
+                    new MockTemplateInfo("bar", name: "Bar template", identity: "bar.test", groupIdentity: "bar.test.template", precedence: 100)
+                },
+                null,
+                true,
+                new string [] { "foo.test.old", "foo.test.new" }
+            };
 
-            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousGroup));
-            Assert.Equal(1, unambiguousGroup.Count);
-            Assert.Equal("Template2", unambiguousGroup[0].Info.Identity);
+            //TestPerformCoreTemplateQuery_ParameterNameDisambiguates
+            yield return new object[]
+            {
+                new MockNewCommandInput("foo").WithTemplateOption("baz", "whatever"),
+                new MockTemplateInfo[]
+                {
+                    new MockTemplateInfo("foo", name: "Foo template old", identity: "foo.test.old", groupIdentity: "foo.test.template").WithParameters("bar"),
+                    new MockTemplateInfo("foo", name: "Foo template new", identity: "foo.test.new", groupIdentity: "foo.test.template").WithParameters("baz")
+                },
+                null,
+                true,
+                new string [] { "foo.test.new" }
+            };
+
+            //TestPerformCoreTemplateQuery_ParameterValueDisambiguates
+            yield return new object[]
+            {
+                new MockNewCommandInput("foo").WithTemplateOption("framework", "netcoreapp2.1"),
+                new MockTemplateInfo[]
+                {
+                    new MockTemplateInfo("foo", name: "Foo template old", identity: "foo.test.old", groupIdentity: "foo.test.template", precedence: 100).WithTag("framework", "netcoreapp3.1", "netcoreapp2.1"),
+                    new MockTemplateInfo("foo", name: "Foo template new", identity: "foo.test.new", groupIdentity: "foo.test.template", precedence: 200).WithTag("framework", "net5.0")
+                },
+                null,
+                true,
+                new string [] { "foo.test.old" }
+            };
+
+            //TestPerformCoreTemplateQuery_UnknownParameterNameInvalidatesMatch
+            yield return new object[]
+            {
+                new MockNewCommandInput("foo").WithTemplateOption("baz"),
+                new MockTemplateInfo[]
+                {
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test", groupIdentity: "foo.test.template", precedence: 100).WithParameters("bar"),
+                },
+                null,
+                true,
+                new string [] { "foo.test" }
+            };
+
+            //TestPerformCoreTemplateQuery_InvalidChoiceValueInvalidatesMatch
+            yield return new object[]
+            {
+                new MockNewCommandInput("foo").WithTemplateOption("framework", "netcoreapp3.0"),
+                new MockTemplateInfo[]
+                {
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test.1x", groupIdentity: "foo.test.template", precedence: 100).WithTag("framework", "netcoreapp2.1", "netcoreapp3.1"),
+                    new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test.2x", groupIdentity: "foo.test.template", precedence: 200).WithTag("framework", "net5.0")
+                },
+                null,
+                true,
+                new string [] { "foo.test.1x", "foo.test.2x" }
+            };
         }
 
-        [Fact(DisplayName = nameof(TestPerformCoreTemplateQuery_DefaultLanguageDisambiguates))]
-        public void TestPerformCoreTemplateQuery_DefaultLanguageDisambiguates()
+        [Theory(DisplayName = nameof(TemplateResolution_UnambiguousGroup_Test))]
+        [MemberData(nameof(Get_TemplateResolution_UnambiguousGroup_TestData))]
+        internal void TemplateResolution_UnambiguousGroup_Test(MockNewCommandInput command, MockTemplateInfo[] templateSet, string defaultLanguage, bool expectedStatus, string[] expectedIdentities)
         {
-            List<ITemplateInfo> templatesToSearch = new List<ITemplateInfo>();
-            templatesToSearch.Add(new MockTemplateInfo("foo", name: "Description of foo Perl template", identity: "foo.test.Perl", groupIdentity: "foo.test.template")
-                                      .WithTag("language", "Perl"));
-            templatesToSearch.Add(new MockTemplateInfo("foo", name: "Description of foo LISP template", identity: "foo.test.Lisp", groupIdentity: "foo.test.template")
-                                      .WithTag("language", "LISP"));
+            var matchResult = TemplateResolver.GetTemplateResolutionResult(templateSet, new MockHostSpecificDataLoader(), command, defaultLanguage);
 
-            INewCommandInput userInputs = new MockNewCommandInput("foo");
+            //compatibility with old methods
+            Assert.Equal(expectedStatus, matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousGroup));
 
-            TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(templatesToSearch, new MockHostSpecificDataLoader(), userInputs, "Perl");
-
-            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousGroup));
-            Assert.Equal(1, unambiguousGroup.Count);
-            Assert.Equal("foo.test.Perl", unambiguousGroup[0].Info.Identity);
-        }
-
-        [Fact(DisplayName = nameof(TestPerformCoreTemplateQuery_InputLanguageIsPreferredOverDefault))]
-        public void TestPerformCoreTemplateQuery_InputLanguageIsPreferredOverDefault()
-        {
-            List<ITemplateInfo> templatesToSearch = new List<ITemplateInfo>();
-            templatesToSearch.Add(new MockTemplateInfo("foo", name: "Description of foo Perl template", identity: "foo.test.Perl", groupIdentity: "foo.test.template")
-                                      .WithTag("language", "Perl"));
-            templatesToSearch.Add(new MockTemplateInfo("foo", name: "Description of foo LISP template", identity: "foo.test.Lisp", groupIdentity: "foo.test.template")
-                                      .WithTag("language", "LISP"));
-
-            INewCommandInput userInputs = new MockNewCommandInput("foo", "LISP");
-
-            TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(templatesToSearch, new MockHostSpecificDataLoader(), userInputs, "Perl");
-
-            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousGroup));
-            Assert.Equal(1, unambiguousGroup.Count);
-            Assert.Equal("foo.test.Lisp", unambiguousGroup[0].Info.Identity);
-        }
-
-        [Fact(DisplayName = nameof(TestPerformCoreTemplateQuery_GroupIsFound))]
-        public void TestPerformCoreTemplateQuery_GroupIsFound()
-        {
-            List<ITemplateInfo> templatesToSearch = new List<ITemplateInfo>();
-            templatesToSearch.Add(new MockTemplateInfo("foo", name: "Foo template old", identity: "foo.test.old", groupIdentity: "foo.test.template", precedence: 100));
-            templatesToSearch.Add(new MockTemplateInfo("foo", name: "Foo template new", identity: "foo.test.new", groupIdentity: "foo.test.template", precedence: 200));
-            templatesToSearch.Add(new MockTemplateInfo("bar", name: "Bar template", identity: "bar.test", groupIdentity: "bar.test.template", precedence: 100));
-
-            INewCommandInput userInputs = new MockNewCommandInput("foo");
-
-            TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(templatesToSearch, new MockHostSpecificDataLoader(), userInputs, null);
-
-            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousGroup));
-            Assert.Equal(2, unambiguousGroup.Count);
-            Assert.Contains(unambiguousGroup, x => string.Equals(x.Info.Identity, "foo.test.old"));
-            Assert.Contains(unambiguousGroup, x => string.Equals(x.Info.Identity, "foo.test.new"));
-        }
-
-        [Fact(DisplayName = nameof(TestPerformCoreTemplateQuery_ParameterNameDisambiguates))]
-        public void TestPerformCoreTemplateQuery_ParameterNameDisambiguates()
-        {
-            List<ITemplateInfo> templatesToSearch = new List<ITemplateInfo>();
-            templatesToSearch.Add(new MockTemplateInfo("foo", name: "Foo template old", identity: "foo.test.old", groupIdentity: "foo.test.template").WithParameters("bar"));
-            templatesToSearch.Add(new MockTemplateInfo("foo", name: "Foo template new", identity: "foo.test.new", groupIdentity: "foo.test.template").WithParameters("baz"));
-
-            INewCommandInput userInputs = new MockNewCommandInput("foo").WithTemplateOption("baz", "whatever");
-
-            TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(templatesToSearch, new MockHostSpecificDataLoader(), userInputs, null);
-            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousGroup));
-            Assert.Equal(1, unambiguousGroup.Count);
-            Assert.Equal("foo.test.new", unambiguousGroup[0].Info.Identity);
-        }
-
-        [Fact(DisplayName = nameof(TestPerformCoreTemplateQuery_ParameterValueDisambiguates))]
-        public void TestPerformCoreTemplateQuery_ParameterValueDisambiguates()
-        {
-            List<ITemplateInfo> templatesToSearch = new List<ITemplateInfo>();
-            templatesToSearch.Add(new MockTemplateInfo("foo", name: "Foo template old", identity: "foo.test.old", groupIdentity: "foo.test.template", precedence: 100).WithTag("framework", "netcoreapp1.0", "netcoreapp1.1"));
-            templatesToSearch.Add(new MockTemplateInfo("foo", name: "Foo template new", identity: "foo.test.new", groupIdentity: "foo.test.template", precedence: 200).WithTag("framework", "netcoreapp2.0"));
-
-            INewCommandInput userInputs = new MockNewCommandInput("foo").WithTemplateOption("framework", "netcoreapp1.0");
-
-            TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(templatesToSearch, new MockHostSpecificDataLoader(), userInputs, null);
-            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousGroup));
-            Assert.Equal(1, unambiguousGroup.Count);
-            Assert.Equal("foo.test.old", unambiguousGroup[0].Info.Identity);
-        }
-
-        [Fact(DisplayName = nameof(TestPerformCoreTemplateQuery_UnknownParameterNameInvalidatesMatch))]
-        public void TestPerformCoreTemplateQuery_UnknownParameterNameInvalidatesMatch()
-        {
-            List<ITemplateInfo> templatesToSearch = new List<ITemplateInfo>();
-            templatesToSearch.Add(new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test", groupIdentity: "foo.test.template", precedence: 100).WithParameters("bar"));
-
-            INewCommandInput userInputs = new MockNewCommandInput("foo").WithTemplateOption("baz");
-
-            IHostSpecificDataLoader hostSpecificDataLoader = new MockHostSpecificDataLoader();
-
-            TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(templatesToSearch, hostSpecificDataLoader, userInputs, null);
-            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousGroup));
-            Assert.Equal(1, unambiguousGroup.Count);
-
-            Assert.False(TemplateResolver.ValidateRemainingParameters(unambiguousGroup[0], out IReadOnlyList<string> invalidParams));
-            Assert.Equal(1, invalidParams.Count);
-            Assert.Equal("baz", invalidParams[0]);
-        }
-
-        [Fact(DisplayName = nameof(TestPerformCoreTemplateQuery_InvalidChoiceValueInvalidatesMatch))]
-        public void TestPerformCoreTemplateQuery_InvalidChoiceValueInvalidatesMatch()
-        {
-            List<ITemplateInfo> templatesToSearch = new List<ITemplateInfo>();
-            templatesToSearch.Add(new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test.1x", groupIdentity: "foo.test.template", precedence: 100).WithTag("framework", "netcoreapp1.0", "netcoreapp1.1"));
-            templatesToSearch.Add(new MockTemplateInfo("foo", name: "Foo template", identity: "foo.test.2x", groupIdentity: "foo.test.template", precedence: 200).WithTag("framework", "netcoreapp2.0"));
-
-            INewCommandInput userInputs = new MockNewCommandInput("foo").WithTemplateOption("framework", "netcoreapp3.0");
-
-
-            IHostSpecificDataLoader hostSpecificDataLoader = new MockHostSpecificDataLoader();
-            TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(templatesToSearch, hostSpecificDataLoader, userInputs, null);
-            Assert.True(matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousGroup));
-            Assert.Equal(2, unambiguousGroup.Count);
-
-            Assert.Contains(unambiguousGroup[0].MatchDisposition, x => x.Kind == MatchKind.InvalidParameterValue);
-            Assert.Contains(unambiguousGroup[1].MatchDisposition, x => x.Kind == MatchKind.InvalidParameterValue);
+            if (expectedStatus)
+            {
+                var identities = unambiguousGroup.Select(t => t.Info.Identity);
+                Assert.Equal(expectedIdentities.Length, identities.Count());
+                foreach (string identity in expectedIdentities)
+                {
+                    Assert.Single(identities.Where(i => i == identity));
+                }
+            }
+            else
+            {
+                Assert.Null(unambiguousGroup);
+            }
         }
     }
 }
