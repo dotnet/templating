@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Microsoft.TemplateEngine.Cli.TemplateResolution;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
 {
@@ -60,29 +63,82 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
         /// Provides the error string to use for the invalid parameters collection
         /// </summary>
         /// <param name="invalidParameterList">the invalid parameters collection to prepare output for</param>
+        /// <param name="templateGroup">the template group to use to get more information about parameters. Optional - if not provided the possible value for the parameters won't be included to the output.</param>
         /// <returns>the error string for the output</returns>
-        internal static string InvalidParameterListToString(IReadOnlyList<InvalidParameterInfo> invalidParameterList)
+        public static string InvalidParameterListToString(IEnumerable<InvalidParameterInfo> invalidParameterList, TemplateGroup templateGroup = null)
         {
-            if (invalidParameterList.Count == 0)
+            if (!invalidParameterList.Any())
             {
                 return string.Empty;
             }
 
-            string invalidParamsErrorText = LocalizableStrings.InvalidTemplateParameterValues;
-
+            StringBuilder invalidParamsErrorText = new StringBuilder(LocalizableStrings.InvalidTemplateParameterValues);
+            const int padWidth = 3;
+            invalidParamsErrorText.AppendLine();
             foreach (InvalidParameterInfo invalidParam in invalidParameterList)
             {
-                if (invalidParam.ErrorKind == Kind.InvalidParameterValue)
+                if (invalidParam.ErrorKind == Kind.InvalidParameterName)
                 {
-                    invalidParamsErrorText += Environment.NewLine + string.Format(LocalizableStrings.InvalidParameterDetail, invalidParam.InputFormat, invalidParam.SpecifiedValue, invalidParam.Canonical);
+                    invalidParamsErrorText.AppendLine(string.Format("{0}", invalidParam.InputFormat));
+                    invalidParamsErrorText.Append(' ', padWidth).AppendLine(string.Format(LocalizableStrings.InvalidParameterNameDetail, invalidParam.InputFormat));
+                }
+                else if (invalidParam.ErrorKind == Kind.AmbiguousParameterValue)
+                {
+                    invalidParamsErrorText.AppendLine(string.Format("{0} {1}", invalidParam.InputFormat, invalidParam.SpecifiedValue));
+                    string header = string.Format(LocalizableStrings.AmbiguousParameterDetail, invalidParam.InputFormat, invalidParam.SpecifiedValue);
+                    if (templateGroup != null)
+                    {
+                        DisplayValidValues(invalidParamsErrorText, header, templateGroup.GetAmbiguousValuesForChoiceParameter(invalidParam.Canonical, invalidParam.SpecifiedValue), padWidth);
+                    }
+                    else
+                    {
+                        invalidParamsErrorText.Append(' ', padWidth).AppendLine(header);
+                    }
+                }
+                else if (invalidParam.ErrorKind == Kind.InvalidParameterValue)
+                {
+                    invalidParamsErrorText.AppendLine(string.Format("{0} {1}", invalidParam.InputFormat, invalidParam.SpecifiedValue));
+                    string header = string.Format(LocalizableStrings.InvalidParameterDetail, invalidParam.InputFormat, invalidParam.SpecifiedValue);
+                    if (templateGroup != null)
+                    {
+                        DisplayValidValues(invalidParamsErrorText, header, templateGroup.GetValidValuesForChoiceParameter(invalidParam.Canonical), padWidth);
+                    }
+                    else
+                    {
+                        invalidParamsErrorText.Append(' ', padWidth).AppendLine(header);
+                    }
                 }
                 else
                 {
-                    invalidParamsErrorText += Environment.NewLine + string.Format(LocalizableStrings.InvalidParameterDefault, invalidParam.Canonical, invalidParam.SpecifiedValue);
+                    invalidParamsErrorText.AppendLine(string.Format("{0} {1}", invalidParam.InputFormat, invalidParam.SpecifiedValue));
+                    invalidParamsErrorText.Append(' ', padWidth).AppendLine(string.Format(LocalizableStrings.InvalidParameterDefault, invalidParam.InputFormat, invalidParam.SpecifiedValue));
                 }
             }
+            return invalidParamsErrorText.ToString();
+        }
 
-            return invalidParamsErrorText;
+        private static void DisplayValidValues(StringBuilder text, string header, IDictionary<string, string> possibleValues, int padWidth)
+        {
+            text.Append(' ', padWidth).Append(header);
+
+            if (!possibleValues.Any())
+            {
+                return;
+            }
+
+            text.Append(' ').AppendLine(LocalizableStrings.PossibleValuesHeader);
+            int longestChoiceLength = possibleValues.Keys.Max(x => x.Length);
+            foreach (KeyValuePair<string, string> choiceInfo in possibleValues)
+            {
+                text.Append(' ', padWidth * 2).Append(choiceInfo.Key.PadRight(longestChoiceLength + padWidth));
+
+                if (!string.IsNullOrWhiteSpace(choiceInfo.Value))
+                {
+                    text.Append("- " + choiceInfo.Value);
+                }
+
+                text.AppendLine();
+            }
         }
 
         internal static IDictionary<string, InvalidParameterInfo> IntersectWithExisting(IDictionary<string, InvalidParameterInfo> existing, IReadOnlyList<InvalidParameterInfo> newInfo)
