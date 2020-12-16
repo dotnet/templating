@@ -130,11 +130,11 @@ namespace Microsoft.TemplateEngine.Cli
             {
                 _templateToInvoke = null;
 
-                if (_singleMatchStatus == Status.AmbiguousChoice)
+                if (_singleMatchStatus == Status.AmbiguousParameterValueChoice)
                 {
                     _environment.Host.LogDiagnosticMessage(LocalizableStrings.Authoring_AmbiguousChoiceParameterValue, "Authoring");
                 }
-                else if (_singleMatchStatus == Status.AmbiguousPrecedence)
+                else if (_singleMatchStatus == Status.AmbiguousTemplateChoice)
                 {
                     _environment.Host.LogDiagnosticMessage(LocalizableStrings.Authoring_AmbiguousBestPrecedence, "Authoring");
                 }

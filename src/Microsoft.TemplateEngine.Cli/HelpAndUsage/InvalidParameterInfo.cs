@@ -99,5 +99,24 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
 
             return intersection;
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is InvalidParameterInfo info)
+            {
+                //checking canonical name and kind is enough for invalid parameters to be the same
+                if (Canonical.Equals(info.Canonical, StringComparison.OrdinalIgnoreCase) && ErrorKind == info.ErrorKind)
+                {
+                    return true;
+                }
+                return false;
+            }
+            return base.Equals(obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return new { a = Canonical?.ToLowerInvariant(), ErrorKind }.GetHashCode();
+        }
     }
 }
