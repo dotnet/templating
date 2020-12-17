@@ -155,7 +155,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                 {
                     _templateGroups = _coreMatchedTemplates
                         .GroupBy(x => x.Info.GroupIdentity, x => !string.IsNullOrEmpty(x.Info.GroupIdentity), StringComparer.OrdinalIgnoreCase)
-                        .Select(group => new TemplateGroup(group.Key, group.ToList()))
+                        .Select(group => new TemplateGroup(group.ToList()))
                         .ToList();
                 }
                 return _templateGroups;

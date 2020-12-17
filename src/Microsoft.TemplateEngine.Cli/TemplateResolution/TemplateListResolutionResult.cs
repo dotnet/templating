@@ -71,7 +71,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                 {
                     _exactMatchedTemplateGroups = ExactMatchedTemplates
                         .GroupBy(x => x.Info.GroupIdentity, x => !string.IsNullOrEmpty(x.Info.GroupIdentity), StringComparer.OrdinalIgnoreCase)
-                        .Select(group => new TemplateGroup(group.Key, group.ToList()))
+                        .Select(group => new TemplateGroup(group.ToList()))
                         .ToList();
                 }
                 return _exactMatchedTemplateGroups;
@@ -108,7 +108,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                 {
                     _partiallyMatchedTemplateGroups = PartiallyMatchedTemplates
                         .GroupBy(x => x.Info.GroupIdentity, x => !string.IsNullOrEmpty(x.Info.GroupIdentity), StringComparer.OrdinalIgnoreCase)
-                        .Select(group => new TemplateGroup(group.Key, group.ToList()))
+                        .Select(group => new TemplateGroup(group.ToList()))
                         .ToList();
                 }
                 return _partiallyMatchedTemplateGroups;

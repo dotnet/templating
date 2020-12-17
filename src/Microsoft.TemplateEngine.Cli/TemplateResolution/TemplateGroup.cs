@@ -18,17 +18,30 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
     /// </summary>
     internal sealed class TemplateGroup
     {
-        internal TemplateGroup(string groupIdentity, IEnumerable<ITemplateMatchInfo> templates)
+
+        /// <param name="templates">the templates of the template group</param>
+        /// <exception cref="ArgumentNullException">when <paramref name="templates"/> is <see cref="null"/></exception>
+        /// <exception cref="ArgumentException">when <paramref name="templates"/> is empty or don't have same <see cref="ITemplateInfo.GroupIdentity"/> defined</exception>
+        internal TemplateGroup(IEnumerable<ITemplateMatchInfo> templates)
         {
-            GroupIdentity = groupIdentity;
-            if (templates != null)
+            _ = templates ?? throw new ArgumentNullException(paramName: nameof(templates));
+            if (!templates.Any())
             {
-                Templates = templates.ToList();
+                throw new ArgumentException(paramName: nameof(templates), message: "The templates collection cannot be empty");
             }
-            else
+
+            try
             {
-                Templates = new List<ITemplateMatchInfo>();
+                //all templates in the group should have same group identity
+                GroupIdentity = templates.Select(t => string.IsNullOrWhiteSpace(t.Info.GroupIdentity) ? null : t.Info.GroupIdentity)
+                                            .Distinct(StringComparer.OrdinalIgnoreCase)
+                                            .Single();
             }
+            catch (InvalidOperationException)
+            {
+                throw new ArgumentException(paramName: nameof(templates), message: "The templates should have same group identity");
+            }
+            Templates = templates.ToList();
         }
 
         /// <summary>
