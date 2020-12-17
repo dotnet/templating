@@ -23,75 +23,6 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
     // MockNewCommandInput doesn't support everything in the interface, just enough for this type of testing.
     public class TemplateResolverTests
     {
-        [Fact(DisplayName = nameof(TestFindHighestPrecedenceTemplateIfAllSameGroupIdentity))]
-        public void TestFindHighestPrecedenceTemplateIfAllSameGroupIdentity()
-        {
-            List<ITemplateMatchInfo> templatesToCheck = new List<ITemplateMatchInfo>();
-
-            templatesToCheck.Add(new TemplateMatchInfo(
-                new MockTemplateInfo("Template1", name: "Template1", identity: "Template1", groupIdentity: "TestGroup", precedence: 10), null));
-            templatesToCheck.Add(new TemplateMatchInfo(
-                new MockTemplateInfo("Template2", name: "Template2", identity: "Template2", groupIdentity: "TestGroup", precedence: 20), null));
-            templatesToCheck.Add(new TemplateMatchInfo(
-                new MockTemplateInfo("Template3", name: "Template3", identity: "Template3", groupIdentity: "TestGroup", precedence: 0), null));
-
-            ITemplateMatchInfo highestPrecedenceTemplate = TemplateResolver.FindHighestPrecedenceTemplateIfAllSameGroupIdentity(templatesToCheck);
-            Assert.NotNull(highestPrecedenceTemplate);
-            Assert.Equal("Template2", highestPrecedenceTemplate.Info.Identity);
-            Assert.Equal(20, highestPrecedenceTemplate.Info.Precedence);
-        }
-
-        [Fact(DisplayName = nameof(TestFindHighestPrecedenceTemplateIfAllSameGroupIdentity_ReturnsNullIfGroupsAreDifferent))]
-        public void TestFindHighestPrecedenceTemplateIfAllSameGroupIdentity_ReturnsNullIfGroupsAreDifferent()
-        {
-            List<ITemplateMatchInfo> templatesToCheck = new List<ITemplateMatchInfo>();
-            templatesToCheck.Add(new TemplateMatchInfo(
-                new MockTemplateInfo("Template1", name: "Template1", identity: "Template1", groupIdentity: "TestGroup", precedence: 10), null));
-            templatesToCheck.Add(new TemplateMatchInfo(
-                new MockTemplateInfo("Template2", name: "Template2", identity: "Template2", groupIdentity: "RealGroup", precedence: 20), null));
-
-            ITemplateMatchInfo highestPrecedenceTemplate = TemplateResolver.FindHighestPrecedenceTemplateIfAllSameGroupIdentity(templatesToCheck);
-            Assert.Null(highestPrecedenceTemplate);
-        }
-
-        [Fact(DisplayName = nameof(TestPerformAllTemplatesInContextQuery))]
-        public void TestPerformAllTemplatesInContextQuery()
-        {
-            List<ITemplateInfo> templatesToSearch = new List<ITemplateInfo>();
-            templatesToSearch.Add(new MockTemplateInfo("Template1", name: "Template1", identity: "Template1")
-                                    .WithTag("type", "project"));
-            templatesToSearch.Add(new MockTemplateInfo("Template2", name: "Template2", identity: "Template2")
-                                    .WithTag("type", "item"));
-            templatesToSearch.Add(new MockTemplateInfo("Template3", name: "Template3", identity: "Template3")
-                                    .WithTag("type", "myType"));
-            templatesToSearch.Add(new MockTemplateInfo("Template4", name: "Template4", identity: "Template4")
-                                    .WithTag("type", "project"));
-            templatesToSearch.Add(new MockTemplateInfo("Template5", name: "Template5", identity: "Template5")
-                                     .WithTag("type", "project"));
-
-            IHostSpecificDataLoader hostDataLoader = new MockHostSpecificDataLoader();
-
-            IReadOnlyCollection<ITemplateMatchInfo> projectTemplates = TemplateResolver.PerformAllTemplatesInContextQuery(templatesToSearch, hostDataLoader, "project");
-            Assert.Equal(3, projectTemplates.Count);
-            Assert.True(projectTemplates.Where(x => string.Equals(x.Info.Identity, "Template1", StringComparison.Ordinal)).Any());
-            Assert.True(projectTemplates.Where(x => string.Equals(x.Info.Identity, "Template4", StringComparison.Ordinal)).Any());
-            Assert.True(projectTemplates.Where(x => string.Equals(x.Info.Identity, "Template5", StringComparison.Ordinal)).Any());
-
-            IReadOnlyCollection<ITemplateMatchInfo> itemTemplates = TemplateResolver.PerformAllTemplatesInContextQuery(templatesToSearch, hostDataLoader, "item");
-            Assert.Equal(1, itemTemplates.Count);
-            Assert.True(itemTemplates.Where(x => string.Equals(x.Info.Identity, "Template2", StringComparison.Ordinal)).Any());
-
-            //Visual Studio only supports "project" and "item", so using other types is no longer allowed, therefore "other" handling is removed.
-            //support of match on custom type still remains
-            IReadOnlyCollection<ITemplateMatchInfo> otherTemplates = TemplateResolver.PerformAllTemplatesInContextQuery(templatesToSearch, hostDataLoader, "other");
-            Assert.Equal(0, otherTemplates.Count);
-            Assert.False(otherTemplates.Where(x => string.Equals(x.Info.Identity, "Template3", StringComparison.Ordinal)).Any());
-
-            IReadOnlyCollection<ITemplateMatchInfo> customTypeTemplates = TemplateResolver.PerformAllTemplatesInContextQuery(templatesToSearch, hostDataLoader, "myType");
-            Assert.Equal(1, customTypeTemplates.Count);
-            Assert.True(customTypeTemplates.Where(x => string.Equals(x.Info.Identity, "Template3", StringComparison.Ordinal)).Any());
-        }
-
         public static IEnumerable<object[]> Get_TemplateResolution_UnambiguousGroup_TestData()
         {
             //TestPerformCoreTemplateQuery_UniqueNameMatchesCorrectly
@@ -389,9 +320,6 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
 
             Assert.Equal(expectedStatus, (int)matchResult.GroupResolutionStatus);
 
-            //compatibility with old methods
-            Assert.Equal(expectedStatus == (int)TemplateResolutionResult.UnambiguousTemplateGroupStatus.SingleMatch, matchResult.TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousGroup));
-
             if (expectedStatus == (int)TemplateResolutionResult.UnambiguousTemplateGroupStatus.SingleMatch)
             {
                 var identities = matchResult.UnambiguousTemplateGroup.Templates.Select(t => t.Info.Identity);
@@ -404,7 +332,6 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             else
             {
                 Assert.Null(matchResult.UnambiguousTemplateGroup);
-                Assert.Null(unambiguousGroup);
             }
         }
 
@@ -691,21 +618,13 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(templateSet, new MockHostSpecificDataLoader(), command, defaultLanguage);
 
             Assert.Equal(expectedStatus, (int)matchResult.ResolutionStatus);
-
-            //compatibility with old methods
-            Assert.Equal(expectedStatus == (int)TemplateResolutionResult.Status.SingleMatch,
-                matchResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo templateToInvoke, out TemplateResolutionResult.Status tryStatus));
-            Assert.Equal(expectedStatus, (int)tryStatus);
-
             if (expectedStatus == (int)TemplateResolutionResult.Status.SingleMatch)
             {
                 Assert.Equal(expectedIdentity, matchResult.TemplateToInvoke.Info.Identity);
-                Assert.Equal(expectedIdentity, templateToInvoke.Info.Identity);
             }
             else
             {
                 Assert.Null(matchResult.TemplateToInvoke);
-                Assert.Null(templateToInvoke);
             }
         }
     }

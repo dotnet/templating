@@ -396,10 +396,10 @@ namespace Microsoft.TemplateEngine.Cli
             }
 
             TemplateResolutionResult templateResolutionResult = TemplateResolver.GetTemplateResolutionResult(_settingsLoader.UserTemplateCache.TemplateInfo, _hostDataLoader, _commandInput, _defaultLanguage);
-            if (templateResolutionResult.TryGetSingularInvokableMatch(out ITemplateMatchInfo templateToInvoke, out TemplateResolutionResult.Status resultStatus))
+            if (templateResolutionResult.ResolutionStatus == TemplateResolutionResult.Status.SingleMatch)
             {
-                TemplateInvocationAndAcquisitionCoordinator invocationCoordinator = new TemplateInvocationAndAcquisitionCoordinator(_settingsLoader, _commandInput, _telemetryLogger, CommandName, _inputGetter, _callbacks);
-                return await invocationCoordinator.CoordinateInvocationOrAcquisitionAsync(templateToInvoke);
+                TemplateInvocationCoordinator invocationCoordinator = new TemplateInvocationCoordinator(_settingsLoader, _commandInput, _telemetryLogger, CommandName, _inputGetter, _callbacks);
+                return await invocationCoordinator.CoordinateInvocationOrAcquisitionAsync(templateResolutionResult.TemplateToInvoke).ConfigureAwait(false);
             }
             else
             {

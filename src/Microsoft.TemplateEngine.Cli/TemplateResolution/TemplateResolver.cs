@@ -69,42 +69,6 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
 
             return !invalidParams.Any();
         }
-        public static ITemplateMatchInfo FindHighestPrecedenceTemplateIfAllSameGroupIdentity(IReadOnlyCollection<ITemplateMatchInfo> templateList)
-        {
-            return FindHighestPrecedenceTemplateIfAllSameGroupIdentity(templateList, out bool throwawayAmbiguousResult);
-        }
-
-        public static ITemplateMatchInfo FindHighestPrecedenceTemplateIfAllSameGroupIdentity(IReadOnlyCollection<ITemplateMatchInfo> templateList, out bool ambiguousResult)
-        {
-            ambiguousResult = false;
-
-            if (!AreAllTemplatesSameGroupIdentity(templateList))
-            {
-                return null;
-            }
-
-            ITemplateMatchInfo highestPrecedenceTemplate = null;
-
-            foreach (ITemplateMatchInfo template in templateList)
-            {
-                if (highestPrecedenceTemplate == null)
-                {
-                    highestPrecedenceTemplate = template;
-                }
-                else if (template.Info.Precedence > highestPrecedenceTemplate.Info.Precedence)
-                {
-                    highestPrecedenceTemplate = template;
-                }
-                else if (template.Info.Precedence == highestPrecedenceTemplate.Info.Precedence)
-                {
-                    ambiguousResult = true;
-                    highestPrecedenceTemplate = null;
-                    break;
-                }
-            }
-
-            return highestPrecedenceTemplate;
-        }
 
         // Lists all the templates, unfiltered - except the ones hidden by their host file.
         public static IReadOnlyCollection<ITemplateMatchInfo> PerformAllTemplatesQuery(IReadOnlyList<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader)
@@ -115,25 +79,6 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             (
                 filterableTemplateInfo,
                 TemplateListFilter.PartialMatchFilter,
-                WellKnownSearchFilters.NameFilter(string.Empty)
-            )
-            .Where(x => !IsTemplateHiddenByHostFile(x.Info, hostDataLoader)).ToList();
-
-            return templates;
-        }
-
-        // Lists all the templates, filtered only by the context (item, project, etc) - and the host file.
-        public static IReadOnlyCollection<ITemplateMatchInfo> PerformAllTemplatesInContextQuery(IReadOnlyList<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, string context)
-        {
-            IReadOnlyList<FilterableTemplateInfo> filterableTemplateInfo = SetupFilterableTemplateInfoFromTemplateInfo(templateInfo);
-
-            // If there is a context match, it must be exact. Other dispositions are irrelevant.
-            Func<ITemplateMatchInfo, bool> contextFilter = x => x.MatchDisposition.All(d => d.Location != MatchLocation.Context || d.Kind == MatchKind.Exact);
-            IReadOnlyCollection<ITemplateMatchInfo> templates = TemplateListFilter.GetTemplateMatchInfo
-            (
-                filterableTemplateInfo,
-                contextFilter,
-                WellKnownSearchFilters.ContextFilter(context),
                 WellKnownSearchFilters.NameFilter(string.Empty)
             )
             .Where(x => !IsTemplateHiddenByHostFile(x.Info, hostDataLoader)).ToList();

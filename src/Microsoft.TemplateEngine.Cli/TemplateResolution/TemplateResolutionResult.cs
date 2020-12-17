@@ -193,39 +193,6 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             }
         }
 
-        /// <summary>
-        /// The method evaluates whether the template resolution result contains single template to invoke.
-        /// The methos is deprecated: use <see cref="Status"/> to get the template resolution status and <see cref="TemplateToInvoke"/> to get the template to invoke.
-        /// </summary>
-        /// <param name="template">the single template to invoke; <see cref="null"/> if the template cannot be resolved</param>
-        /// <param name="resultStatus">contains <seealso cref="Status"/></param>
-        /// <returns>
-        /// <see cref="true"/> when the template to invoke is resolved<br/>
-        /// <see cref="false"/> otherwise<br/>
-        /// </returns>
-        public bool TryGetSingularInvokableMatch(out ITemplateMatchInfo template, out Status resultStatus)
-        {
-            template = TemplateToInvoke;
-            resultStatus = ResolutionStatus;
-            return ResolutionStatus == Status.SingleMatch;
-        }
-
-
-        /// <summary>
-        /// The method evaluates whether the template resolution result contains unambiguous template group to use.
-        /// The methos is deprecated: use <see cref="GroupResolutionStatus"/> to get the template resolution status and <see cref="UnambiguousTemplateGroup"/> to get the template to invoke.
-        /// </summary>
-        /// <param name="unambiguousTemplateGroup">the unambiguous template group to use; <see cref="null"/> if the unambiguous template group cannot be resolved</param>
-        /// <returns>
-        /// <see cref="true"/> when the unambiguous template group to use is resolved<br/>
-        /// <see cref="false"/> otherwise<br/>
-        /// </returns>
-        internal bool TryGetUnambiguousTemplateGroupToUse(out IReadOnlyList<ITemplateMatchInfo> unambiguousTemplateGroup)
-        {
-            unambiguousTemplateGroup = UnambiguousTemplateGroup?.Templates.ToList();
-            return unambiguousTemplateGroup != null;
-        }
-
         private void EvaluateTemplateToInvoke()
         {
             //if no template groups were matched - no match

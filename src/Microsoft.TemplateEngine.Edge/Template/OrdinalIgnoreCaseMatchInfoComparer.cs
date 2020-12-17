@@ -7,14 +7,10 @@ namespace Microsoft.TemplateEngine.Edge.Template
     {
         public bool Equals(MatchInfo x, MatchInfo y)
         {
-            if (x.Kind == y.Kind
+            return x.Kind == y.Kind
                 && x.Location == y.Location
                 && string.Equals(x.InputParameterName, y.InputParameterName, StringComparison.OrdinalIgnoreCase)
-                && string.Equals(x.ParameterValue, y.ParameterValue, StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
-            return false;
+                && string.Equals(x.ParameterValue, y.ParameterValue, StringComparison.OrdinalIgnoreCase);
         }
 
         public int GetHashCode(MatchInfo obj)

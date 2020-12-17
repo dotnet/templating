@@ -260,8 +260,8 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             INewCommandInput commandInput,
             IEnumerable<IInstallUnitDescriptor> installUnitDescriptors)
         {
-            _ = unambiguousTemplateGroup ?? throw new ArgumentNullException(nameof(unambiguousTemplateGroup));
-            _ = unambiguousTemplateGroup ?? throw new ArgumentNullException(nameof(commandInput));
+            _ = unambiguousTemplateGroup ?? throw new ArgumentNullException(paramName: nameof(unambiguousTemplateGroup));
+            _ = unambiguousTemplateGroup ?? throw new ArgumentNullException(paramName: nameof(commandInput));
 
             Reporter.Error.WriteLine(LocalizableStrings.AmbiguousTemplatesHeader.Bold().Red());
             List<AmbiguousTemplateDetails> ambiguousTemplateDetails = new List<AmbiguousTemplateDetails>();
