@@ -730,7 +730,7 @@ Examples:
     <value>Unable to resolve the template to instantiate, these templates matched your input:</value>
   </data>
   <data name="AmbiguousTemplateGroupListHint" xml:space="preserve">
-    <value>Use exact short name or select the language to use with --language option.</value>
+    <value>Re-run the command using the template exact short name.</value>
   </data>
   <data name="AmbiguousTemplatesHeader" xml:space="preserve">
     <value>Unable to resolve the template to instantiate, the following installed templates are conflicting:</value>
@@ -755,5 +755,8 @@ Examples:
   </data>
   <data name="PossibleValuesHeader" xml:space="preserve">
     <value>The possible values are:</value>
+  </data>
+  <data name="AmbiguousLanguageHint" xml:space="preserve">
+    <value>Re-run the command specifying the language to use with --language option.</value>
   </data>
 </root>

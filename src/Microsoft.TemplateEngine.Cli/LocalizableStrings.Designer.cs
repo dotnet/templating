@@ -419,6 +419,15 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Re-run the command specifying the language to use with --language option..
+        /// </summary>
+        public static string AmbiguousLanguageHint {
+            get {
+                return ResourceManager.GetString("AmbiguousLanguageHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The value &apos;{1}&apos; is ambiguous for option {0}..
         /// </summary>
         public static string AmbiguousParameterDetail {
@@ -437,7 +446,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Use exact short name or select the language to use with --language option..
+        ///   Looks up a localized string similar to Re-run the command using the template exact short name..
         /// </summary>
         public static string AmbiguousTemplateGroupListHint {
             get {
