@@ -10,7 +10,7 @@ using Microsoft.TemplateSearch.Common.TemplateUpdate;
 
 namespace Microsoft.TemplateEngine.Cli
 {
-    internal class TemplateInvocationAndAcquisitionCoordinator
+    internal class TemplateInvocationCoordinator
     {
         private readonly SettingsLoader _settingsLoader;
         private readonly IEngineEnvironmentSettings _environment;
@@ -20,7 +20,7 @@ namespace Microsoft.TemplateEngine.Cli
         private readonly Func<string> _inputGetter;
         private readonly New3Callbacks _callbacks;
 
-        public TemplateInvocationAndAcquisitionCoordinator(SettingsLoader settingsLoader, INewCommandInput commandInput, ITelemetryLogger telemetryLogger,  string commandName, Func<string> inputGetter, New3Callbacks callbacks)
+        public TemplateInvocationCoordinator(SettingsLoader settingsLoader, INewCommandInput commandInput, ITelemetryLogger telemetryLogger,  string commandName, Func<string> inputGetter, New3Callbacks callbacks)
         {
             _settingsLoader = settingsLoader;
             _environment = _settingsLoader.EnvironmentSettings;

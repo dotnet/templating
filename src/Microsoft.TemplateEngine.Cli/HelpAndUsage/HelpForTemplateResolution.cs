@@ -220,8 +220,8 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
         /// <exception cref="ArgumentNullException">when <paramref name="commandInput"/>is <see cref="null"/></exception>
         private static CreationResultStatus DisplayInvalidParameterError(TemplateGroup unambiguousTemplateGroup, INewCommandInput commandInput)
         {
-            _ = unambiguousTemplateGroup ?? throw new ArgumentNullException(nameof(unambiguousTemplateGroup));
-            _ = unambiguousTemplateGroup ?? throw new ArgumentNullException(nameof(commandInput));
+            _ = unambiguousTemplateGroup ?? throw new ArgumentNullException(paramName: nameof(unambiguousTemplateGroup));
+            _ = unambiguousTemplateGroup ?? throw new ArgumentNullException(paramName: nameof(commandInput));
 
             var invalidParameters = unambiguousTemplateGroup.GetInvalidParameterList();
             if (invalidParameters.Any())

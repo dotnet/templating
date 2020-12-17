@@ -9,7 +9,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
     /// <summary>
     /// The class represents the information about the invalid template parameter used when executing the command
     /// </summary>
-    internal class InvalidParameterInfo
+    internal class InvalidParameterInfo : IEquatable<InvalidParameterInfo>
     {
         /// <summary>
         /// Defines the possible reason for the parameter to be invalid
@@ -161,11 +161,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             if (obj is InvalidParameterInfo info)
             {
                 //checking canonical name and kind is enough for invalid parameters to be the same
-                if (Canonical.Equals(info.Canonical, StringComparison.OrdinalIgnoreCase) && ErrorKind == info.ErrorKind)
-                {
-                    return true;
-                }
-                return false;
+                return Canonical.Equals(info.Canonical, StringComparison.OrdinalIgnoreCase) && ErrorKind == info.ErrorKind;
             }
             return base.Equals(obj);
         }
@@ -173,6 +169,11 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
         public override int GetHashCode()
         {
             return new { a = Canonical?.ToLowerInvariant(), ErrorKind }.GetHashCode();
+        }
+
+        public bool Equals(InvalidParameterInfo other)
+        {
+            return Canonical.Equals(other.Canonical, StringComparison.OrdinalIgnoreCase) && ErrorKind == other.ErrorKind;
         }
     }
 }

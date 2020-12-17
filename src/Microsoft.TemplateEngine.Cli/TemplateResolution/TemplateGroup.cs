@@ -16,7 +16,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
     /// - the templates in the group may have different parameters and different choices for parameter symbols defined<br/>
     /// In case the template does not have group identity defined it represents separate template group with single template.
     /// </summary>
-    internal class TemplateGroup
+    internal sealed class TemplateGroup
     {
         internal TemplateGroup(string groupIdentity, IEnumerable<ITemplateMatchInfo> templates)
         {
@@ -30,6 +30,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                 Templates = new List<ITemplateMatchInfo>();
             }
         }
+
         /// <summary>
         /// Group identity of template group. The value can be empty if the template does not have group identity set
         /// </summary>
@@ -44,35 +45,17 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         /// <summary>
         /// Returns true when <see cref="GroupIdentity"/> is not <see cref="null"/> or emply
         /// </summary>
-        internal bool HasGroupIdentity
-        {
-            get
-            {
-                return !string.IsNullOrWhiteSpace(GroupIdentity);
-            }
-        }
+        internal bool HasGroupIdentity => !string.IsNullOrWhiteSpace(GroupIdentity);
 
         /// <summary>
         /// Returns true when the template group has single template
         /// </summary>
-        internal bool HasSingleTemplate
-        {
-            get
-            {
-                return Templates.Count == 1;
-            }
-        }
+        internal bool HasSingleTemplate => Templates.Count == 1;
 
         /// <summary>
         /// Returns the enumerator to invokable templates in the group
         /// </summary>
-        internal IEnumerable<ITemplateMatchInfo> InvokableTemplates
-        {
-            get
-            {
-                return Templates.Where(templates => templates.IsInvokableMatch());
-            }
-        }
+        internal IEnumerable<ITemplateMatchInfo> InvokableTemplates => Templates.Where(templates => templates.IsInvokableMatch());
 
         /// <summary>
         /// Returns the collection of templates in the group
@@ -113,7 +96,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         /// <returns>The enumerator for invalid parameters in templates in the template group</returns>
         internal IEnumerable<InvalidParameterInfo> GetInvalidParameterList()
         {
-            var invalidParameterList = new List<InvalidParameterInfo>();
+            List <InvalidParameterInfo> invalidParameterList = new List<InvalidParameterInfo>();
 
             //collect the parameters which have ambiguous value match in all templates in the template group
             IEnumerable<MatchInfo> ambiguousParametersForTemplates = Templates.SelectMany(template => template.MatchDisposition.Where(x => x.Location == MatchLocation.OtherParameter
