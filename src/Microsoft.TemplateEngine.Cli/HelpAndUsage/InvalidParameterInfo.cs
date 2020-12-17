@@ -79,12 +79,12 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             {
                 if (invalidParam.ErrorKind == Kind.InvalidParameterName)
                 {
-                    invalidParamsErrorText.AppendLine(string.Format("{0}", invalidParam.InputFormat));
+                    invalidParamsErrorText.AppendLine(invalidParam.InputFormat);
                     invalidParamsErrorText.Append(' ', padWidth).AppendLine(string.Format(LocalizableStrings.InvalidParameterNameDetail, invalidParam.InputFormat));
                 }
                 else if (invalidParam.ErrorKind == Kind.AmbiguousParameterValue)
                 {
-                    invalidParamsErrorText.AppendLine(string.Format("{0} {1}", invalidParam.InputFormat, invalidParam.SpecifiedValue));
+                    invalidParamsErrorText.AppendLine(invalidParam.InputFormat + ' ' + invalidParam.SpecifiedValue);
                     string header = string.Format(LocalizableStrings.AmbiguousParameterDetail, invalidParam.InputFormat, invalidParam.SpecifiedValue);
                     if (templateGroup != null)
                     {
@@ -97,7 +97,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                 }
                 else if (invalidParam.ErrorKind == Kind.InvalidParameterValue)
                 {
-                    invalidParamsErrorText.AppendLine(string.Format("{0} {1}", invalidParam.InputFormat, invalidParam.SpecifiedValue));
+                    invalidParamsErrorText.AppendLine(invalidParam.InputFormat + ' ' + invalidParam.SpecifiedValue);
                     string header = string.Format(LocalizableStrings.InvalidParameterDetail, invalidParam.InputFormat, invalidParam.SpecifiedValue);
                     if (templateGroup != null)
                     {
@@ -110,7 +110,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                 }
                 else
                 {
-                    invalidParamsErrorText.AppendLine(string.Format("{0} {1}", invalidParam.InputFormat, invalidParam.SpecifiedValue));
+                    invalidParamsErrorText.AppendLine(invalidParam.InputFormat + ' ' + invalidParam.SpecifiedValue);
                     invalidParamsErrorText.Append(' ', padWidth).AppendLine(string.Format(LocalizableStrings.InvalidParameterDefault, invalidParam.InputFormat, invalidParam.SpecifiedValue));
                 }
             }
