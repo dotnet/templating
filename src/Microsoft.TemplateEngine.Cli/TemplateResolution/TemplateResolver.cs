@@ -213,9 +213,9 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             IReadOnlyCollection<ITemplateMatchInfo> templates = TemplateListFilter.GetTemplateMatchInfo
             (
                 filterableTemplateInfo,
-                TemplateListFilter.PartialMatchFilter,
+                TemplateListFilter.ExactMatchFilter,
                 WellKnownSearchFilters.NameFilter(commandInput.TemplateName),
-                WellKnownSearchFilters.ClassificationsFilter(commandInput.TemplateName),
+                //WellKnownSearchFilters.ClassificationsFilter(commandInput.TemplateName),
                 WellKnownSearchFilters.LanguageFilter(commandInput.Language),
                 WellKnownSearchFilters.ContextFilter(commandInput.TypeFilter),
                 WellKnownSearchFilters.BaselineFilter(commandInput.BaselineName)
@@ -223,25 +223,24 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             .Where(x => !IsTemplateHiddenByHostFile(x.Info, hostDataLoader)).ToList();
 
             //select only the templates which do not have mismatches
-            IReadOnlyList<ITemplateMatchInfo> coreMatchedTemplates = templates.Where(x => x.IsMatch).ToList();
             //if any template has exact match for name - use those; otherwise partial name matches are also considered when resolving templates
-            IReadOnlyList<ITemplateMatchInfo> matchesWithExactDispositionsInNameFields = coreMatchedTemplates.Where(x => x.MatchDisposition.Any(y => NameFields.Contains(y.Location) && y.Kind == MatchKind.Exact)).ToList();
+            IReadOnlyList<ITemplateMatchInfo> matchesWithExactDispositionsInNameFields = templates.Where(x => x.MatchDisposition.Any(y => NameFields.Contains(y.Location) && y.Kind == MatchKind.Exact)).ToList();
             if (matchesWithExactDispositionsInNameFields.Count > 0)
             {
-                coreMatchedTemplates = matchesWithExactDispositionsInNameFields;
+                templates = matchesWithExactDispositionsInNameFields;
             }
 
             if (string.IsNullOrEmpty(commandInput.Language) && !string.IsNullOrEmpty(defaultLanguage))
             {
                 // add default language matches to the list
                 // default language matching only makes sense if the user didn't specify a language.
-                AddDefaultLanguageMatchingToTemplates(coreMatchedTemplates, defaultLanguage);
+                AddDefaultLanguageMatchingToTemplates(templates, defaultLanguage);
             }
 
             //add specific template parameters matches to the list
-            AddParameterMatchingToTemplates(coreMatchedTemplates, hostDataLoader, commandInput);
+            AddParameterMatchingToTemplates(templates, hostDataLoader, commandInput);
 
-            return coreMatchedTemplates;
+            return templates;
         }
 
         private static IReadOnlyList<FilterableTemplateInfo> SetupFilterableTemplateInfoFromTemplateInfo(IReadOnlyList<ITemplateInfo> templateList)
