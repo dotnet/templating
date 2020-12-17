@@ -73,15 +73,16 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                     Reporter.Error.WriteLine(
                         string.Format(LocalizableStrings.NoTemplatesMatchingInputParameters, GetInputParametersString(commandInput)).Bold().Red());
                     Reporter.Error.WriteLine(string.Format(LocalizableStrings.ListTemplatesCommand, commandInput.CommandName).Bold().Red());
+                    Reporter.Error.WriteLine(string.Format(LocalizableStrings.SearchTemplatesCommand, commandInput.CommandName, commandInput.TemplateName).Bold().Red());
                     return CreationResultStatus.NotFound;
                 case TemplateResolutionResult.Status.AmbiguousLanguageChoice:
                     Reporter.Error.WriteLine(LocalizableStrings.AmbiguousTemplateGroupListHeader.Bold().Red());
-                    DisplayTemplateList(resolutionResult.TemplateGroups, environmentSettings, commandInput, defaultLanguage);
-                    Reporter.Error.WriteLine(LocalizableStrings.AmbiguousTemplateGroupListHint.Bold().Red());
+                    DisplayTemplateList(resolutionResult.TemplateGroups, environmentSettings, commandInput, defaultLanguage, useErrorOutput: true);
+                    Reporter.Error.WriteLine(LocalizableStrings.AmbiguousLanguageHint.Bold().Red());
                     return CreationResultStatus.NotFound;
                 case TemplateResolutionResult.Status.AmbiguousTemplateGroupChoice:
                     Reporter.Error.WriteLine(LocalizableStrings.AmbiguousTemplateGroupListHeader.Bold().Red());
-                    DisplayTemplateList(resolutionResult.TemplateGroups, environmentSettings, commandInput, defaultLanguage);
+                    DisplayTemplateList(resolutionResult.TemplateGroups, environmentSettings, commandInput, defaultLanguage, useErrorOutput: true);
                     Reporter.Error.WriteLine(LocalizableStrings.AmbiguousTemplateGroupListHint.Bold().Red());
                     return CreationResultStatus.NotFound;
                 case TemplateResolutionResult.Status.AmbiguousParameterValueChoice:
@@ -300,18 +301,20 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                     .DefineColumn(t => t.TemplateAuthor, LocalizableStrings.ColumnNameAuthor, showAlways: true, shrinkIfNeeded: true, minWidth: 10)
                     .DefineColumn(t => t.InstallationDescriptor != null ? t.InstallationDescriptor.Identifier : string.Empty, LocalizableStrings.ColumnNamePackage, showAlways: true)
                     .OrderByDescending(prcedenceColumn, new NullOrEmptyIsLastStringComparer());
-            Reporter.Output.WriteLine(formatter.Layout().Bold().Red());
+            Reporter.Error.WriteLine(formatter.Layout().Bold().Red());
 
+            string hintMessage = LocalizableStrings.AmbiguousTemplatesMultiplePackagesHint;
             if (unambiguousTemplateGroup.Templates.AllAreTheSame(t => t.Info.ConfigMountPointId))
             {
-                Reporter.Error.WriteLine(string.Format(LocalizableStrings.AmbiguousTemplatesSamePackageHint, installUnitDescriptors?.First(descriptor => descriptor.MountPointId == unambiguousTemplateGroup.Templates.First().Info.ConfigMountPointId).Identifier).Bold().Red());
+                IInstallUnitDescriptor descriptor = installUnitDescriptors?.First(descriptor => descriptor.MountPointId == unambiguousTemplateGroup.Templates.First().Info.ConfigMountPointId);
+                if (descriptor?.Details?.ContainsKey("NuGetPackageId") ?? false)
+                {
+                    hintMessage = string.Format(LocalizableStrings.AmbiguousTemplatesSamePackageHint, descriptor.Identifier);
+                }
             }
-            else
-            {
-                Reporter.Error.WriteLine(LocalizableStrings.AmbiguousTemplatesMultiplePackagesHint.Bold().Red());
-            }
-            Reporter.Error.WriteLine(string.Format(LocalizableStrings.AmbiguousTemplatesSamePackageHint, commandInput.CommandName).Bold().Red());
-            return CreationResultStatus.CreateFailed;
+   
+            Reporter.Error.WriteLine(hintMessage.Bold().Red());
+            return CreationResultStatus.NotFound;
         }
 
 
@@ -324,7 +327,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
         // - Short Name: displays the first short name from the highest precedence template in the group.
         // - Language: All languages supported by any template in the group are displayed, with the default language in brackets, e.g.: [C#]
         // - Tags
-        private static void DisplayTemplateList(IReadOnlyCollection<TemplateGroup> templateGroups, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, string defaultLanguage)
+        private static void DisplayTemplateList(IReadOnlyCollection<TemplateGroup> templateGroups, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, string defaultLanguage, bool useErrorOutput = false)
         {
             IReadOnlyCollection<TemplateGroupTableRow> groupsForDisplay = TemplateGroupDisplay.GetTemplateGroupsForListDisplay(templateGroups, commandInput.Language, defaultLanguage);
 
@@ -346,7 +349,9 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
 
                     .OrderByDescending(languageColumn, new NullOrEmptyIsLastStringComparer())
                     .OrderBy(tagsColumn);
-            Reporter.Output.WriteLine(formatter.Layout());
+
+            Reporter reporter = useErrorOutput ? Reporter.Error : Reporter.Output;
+            reporter.WriteLine(formatter.Layout());
         }
 
         public static void DisplayInvalidParameters(IReadOnlyList<string> invalidParams)
