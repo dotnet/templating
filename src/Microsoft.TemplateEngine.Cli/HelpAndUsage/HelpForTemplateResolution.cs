@@ -72,7 +72,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                 case TemplateResolutionResult.Status.NoMatch:
                     Reporter.Error.WriteLine(
                         string.Format(LocalizableStrings.NoTemplatesMatchingInputParameters, GetInputParametersString(commandInput)).Bold().Red());
-                    Reporter.Error.WriteLine(LocalizableStrings.ListTemplatesCommand.Bold().Red());
+                    Reporter.Error.WriteLine(string.Format(LocalizableStrings.ListTemplatesCommand, commandInput.CommandName).Bold().Red());
                     return CreationResultStatus.NotFound;
                 case TemplateResolutionResult.Status.AmbiguousLanguageChoice:
                 case TemplateResolutionResult.Status.AmbiguousTemplateGroupChoice:
