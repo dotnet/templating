@@ -387,23 +387,23 @@ namespace Microsoft.TemplateEngine.Cli
             }
         }
 
-        private async Task<CreationResultStatus> EnterTemplateManipulationFlowAsync()
+        private Task<CreationResultStatus> EnterTemplateManipulationFlowAsync()
         {
             if (_commandInput.IsListFlagSpecified || _commandInput.IsHelpFlagSpecified)
             {
                 TemplateListResolutionResult listingTemplateResolutionResult = TemplateResolver.GetTemplateResolutionResultForListOrHelp(_settingsLoader.UserTemplateCache.TemplateInfo, _hostDataLoader, _commandInput, _defaultLanguage);
-                return HelpForTemplateResolution.CoordinateHelpAndUsageDisplay(listingTemplateResolutionResult, EnvironmentSettings, _commandInput, _hostDataLoader, _telemetryLogger, _templateCreator, _defaultLanguage, showUsageHelp: _commandInput.IsHelpFlagSpecified);
+                return Task.FromResult(HelpForTemplateResolution.CoordinateHelpAndUsageDisplay(listingTemplateResolutionResult, EnvironmentSettings, _commandInput, _hostDataLoader, _telemetryLogger, _templateCreator, _defaultLanguage, showUsageHelp: _commandInput.IsHelpFlagSpecified));
             }
 
             TemplateResolutionResult templateResolutionResult = TemplateResolver.GetTemplateResolutionResult(_settingsLoader.UserTemplateCache.TemplateInfo, _hostDataLoader, _commandInput, _defaultLanguage);
             if (templateResolutionResult.ResolutionStatus == TemplateResolutionResult.Status.SingleMatch)
             {
                 TemplateInvocationCoordinator invocationCoordinator = new TemplateInvocationCoordinator(_settingsLoader, _commandInput, _telemetryLogger, CommandName, _inputGetter, _callbacks);
-                return await invocationCoordinator.CoordinateInvocationOrAcquisitionAsync(templateResolutionResult.TemplateToInvoke).ConfigureAwait(false);
+                return invocationCoordinator.CoordinateInvocationOrAcquisitionAsync(templateResolutionResult.TemplateToInvoke);
             }
             else
             {
-                return HelpForTemplateResolution.CoordinateAmbiguousTemplateResolutionDisplay(templateResolutionResult, EnvironmentSettings, _commandInput, _defaultLanguage, _settingsLoader.InstallUnitDescriptorCache.Descriptors.Values);
+                return Task.FromResult(HelpForTemplateResolution.CoordinateAmbiguousTemplateResolutionDisplay(templateResolutionResult, EnvironmentSettings, _commandInput, _defaultLanguage, _settingsLoader.InstallUnitDescriptorCache.Descriptors.Values));
             }
         }
 

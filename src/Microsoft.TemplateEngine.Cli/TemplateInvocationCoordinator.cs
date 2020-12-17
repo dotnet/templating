@@ -40,10 +40,10 @@ namespace Microsoft.TemplateEngine.Cli
             return creationResult;
         }
 
-        private async Task<CreationResultStatus> InvokeTemplateAsync(ITemplateMatchInfo templateToInvoke)
+        private Task<CreationResultStatus> InvokeTemplateAsync(ITemplateMatchInfo templateToInvoke)
         {
             TemplateInvoker invoker = new TemplateInvoker(_environment, _commandInput, _telemetryLogger, _commandName, _inputGetter, _callbacks);
-            return await invoker.InvokeTemplate(templateToInvoke).ConfigureAwait(false);
+            return invoker.InvokeTemplate(templateToInvoke);
         }
 
         // check for updates for the matched template, based on the Identity
