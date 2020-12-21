@@ -50,6 +50,23 @@ namespace dotnet_new3.UnitTests
         }
 
         [Fact]
+        public void CanInstantiateTemplateWithSingleNonDefaultLanguageChoice()
+        {
+            string home = Helpers.CreateTemporaryFolder("Home");
+            string workingDirectory = Helpers.CreateTemporaryFolder();
+            Helpers.InstallTestTemplate("TemplateResolution/DifferentLanguagesGroup/BasicFSharp", log, workingDirectory, home);
+
+            new DotnetNewCommand(log, "basic")
+                .WithWorkingDirectory(workingDirectory)
+                .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And.NotHaveStdErr()
+                .And.HaveStdOutContaining("The template \"Basic FSharp\" was created successfully.");
+        }
+
+        [Fact]
         public void CannotInstantiateTemplateWhenAmbiguousLanguageChoice()
         {
             string home = Helpers.CreateTemporaryFolder("Home");

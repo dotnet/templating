@@ -1,7 +1,7 @@
 {
   "author": "Test Asset",
   "classifications": [ "Test Asset" ],
-  "name": "Basic FSharp ",
+  "name": "Basic FSharp",
   "generatorVersions": "[1.0.0.0-*)",
   "groupIdentity": "TestAssets.DifferentLanguagesGroup",
   "precedence": "100",
