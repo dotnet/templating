@@ -100,7 +100,7 @@ namespace dotnet_new3.UnitTests
                 .Fail()
                 .And.NotHaveStdOut()
                 .And.HaveStdErrContaining("Unable to resolve the template to instantiate, these templates matched your input:")
-                .And.HaveStdErrContaining("Re-run the command using the template exact short name.")
+                .And.HaveStdErrContaining("Re-run the command using the template's exact short name.")
                 .And.HaveStdErrContaining("webconfig").And.HaveStdErrContaining("nugetconfig").And.NotHaveStdErrContaining("classlib");
 
             new DotnetNewCommand(log, "file")
@@ -111,7 +111,7 @@ namespace dotnet_new3.UnitTests
                 .Fail()
                 .And.NotHaveStdOut()
                 .And.HaveStdErrContaining("Unable to resolve the template to instantiate, these templates matched your input:")
-                .And.HaveStdErrContaining("Re-run the command using the template exact short name.")
+                .And.HaveStdErrContaining("Re-run the command using the template's exact short name.")
                 .And.HaveStdErrContaining("tool-manifest").And.HaveStdErrContaining("sln").And.NotHaveStdErrContaining("console");
         }
 

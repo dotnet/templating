@@ -446,7 +446,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Re-run the command using the template exact short name..
+        ///   Looks up a localized string similar to Re-run the command using the template&apos;s exact short name..
         /// </summary>
         public static string AmbiguousTemplateGroupListHint {
             get {
