@@ -225,7 +225,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
 
             if (UnambiguousTemplateGroup.InvokableTemplates.Count() == 1)
             {
-                _templateToInvoke = UnambiguousTemplateGroup.InvokableTemplates.First();
+                _templateToInvoke = UnambiguousTemplateGroup.InvokableTemplates.Single();
                 _singularInvokableMatchStatus = Status.SingleMatch;
                 return;
             }
@@ -266,7 +266,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             }
             if (TemplateGroups.Count == 1)
             {
-                _unambiguousTemplateGroup = TemplateGroups.First();
+                _unambiguousTemplateGroup = TemplateGroups.Single();
                 _unambigiousTemplateGroupStatus = UnambiguousTemplateGroupStatus.SingleMatch;
                 return;
             }
