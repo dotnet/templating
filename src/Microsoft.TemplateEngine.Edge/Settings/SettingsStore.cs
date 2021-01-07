@@ -68,8 +68,18 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                                 continue;
                             }
 
+                            JToken lastScanTimeToken;
+                            DateTime? lastScanTime = null;
+                            if (mp.TryGetValue("LastScanTime", StringComparison.OrdinalIgnoreCase, out lastScanTimeToken))
+                            {
+                                lastScanTime = lastScanTimeToken.Value<DateTime>();
+                            }
+
                             string place = placeToken.ToString();
-                            MountPointInfo mountPoint = new MountPointInfo(parentMountPointId, mountPointFactoryId, mountPointId, place);
+                            MountPointInfo mountPoint = new MountPointInfo(parentMountPointId, mountPointFactoryId, mountPointId, place)
+                            {
+                                LastScanTime = lastScanTime
+                            };
                             MountPoints.Add(mountPoint);
                         }
                     }
