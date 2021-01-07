@@ -33,47 +33,24 @@ namespace Microsoft.TemplateEngine.Utils
 
         private class DefaultPathInfo : IPathInfo
         {
-            private string _userProfileDir;
-            private string _baseDir;
-            private readonly IEngineEnvironmentSettings _parent;
-
             public DefaultPathInfo(IEngineEnvironmentSettings parent, string hiveLocation)
             {
-                _parent = parent;
-                _baseDir = hiveLocation;
+                bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
+                UserProfileDir = parent.Environment.GetEnvironmentVariable(isWindows
+                    ? "USERPROFILE"
+                    : "HOME");
+
+                TemplateEngineRootDir = Path.Combine(UserProfileDir, ".templateengine");
+
+                BaseDir = hiveLocation ?? Path.Combine(TemplateEngineRootDir, parent.Host.HostIdentifier, parent.Host.Version);
             }
 
-            public string UserProfileDir
-            {
-                get
-                {
-                    if (_userProfileDir == null)
-                    {
-                        bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            public string UserProfileDir { get; }
 
-                        string profileDir = _parent.Environment.GetEnvironmentVariable(isWindows
-                            ? "USERPROFILE"
-                            : "HOME");
+            public string BaseDir { get; }
 
-                        _userProfileDir = profileDir;
-                    }
-
-                    return _userProfileDir;
-                }
-            }
-
-            public string BaseDir
-            {
-                get
-                {
-                    if (_baseDir == null)
-                    {
-                        _baseDir = Path.Combine(UserProfileDir, ".templateengine", _parent.Host.HostIdentifier, _parent.Host.Version);
-                    }
-
-                    return _baseDir;
-                }
-            }
+            public string TemplateEngineRootDir { get; }
         }
 
         private class DefaultEnvironment : IEnvironment

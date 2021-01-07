@@ -20,6 +20,6 @@
     <ItemGroup>
         <PackageReference Include="System.IO.Compression" />
         <PackageReference Include="Newtonsoft.Json" />
-        <PackageReference Include="System.Runtime.Loader" Condition="'$(TargetFramework)' != '$(NETFullTargetFramework)'"/>
+        <PackageReference Include="System.Runtime.Loader" Condition="'$(TargetFramework)' != '$(NETFullTargetFramework)'" />
     </ItemGroup>
 </Project>
