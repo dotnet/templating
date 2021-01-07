@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
@@ -41,6 +41,7 @@ namespace Microsoft.TemplateEngine.Utils
             _hostBuiltInComponents = builtIns ?? NoComponents;
             FallbackHostTemplateConfigNames = fallbackHostTemplateConfigNames ?? new List<string>();
             _diagnosticLoggers = new Dictionary<string, Action<string, string[]>>();
+            PackagesProviders.Add(new UserInstalledPackages());
         }
 
         public IPhysicalFileSystem FileSystem { get; private set; }
@@ -134,5 +135,7 @@ namespace Microsoft.TemplateEngine.Utils
         {
             OnLogTiming?.Invoke(label, duration, depth);
         }
+
+        public List<IInstalledPackagesProvider> PackagesProviders = new List<IInstalledPackagesProvider>();
     }
 }
