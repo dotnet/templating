@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions.Mount;
 
 namespace Microsoft.TemplateEngine.Abstractions
@@ -11,6 +12,8 @@ namespace Microsoft.TemplateEngine.Abstractions
         IEngineEnvironmentSettings EnvironmentSettings { get; }
 
         IEnumerable<MountPointInfo> MountPoints { get; }
+
+        IGlobalSettings GlobalSettings { get; }
 
         void AddMountPoint(IMountPoint mountPoint);
 
@@ -39,5 +42,7 @@ namespace Microsoft.TemplateEngine.Abstractions
         void RemoveMountPoints(IEnumerable<Guid> mountPoints);
 
         void RemoveMountPoint(IMountPoint mountPoint);
+
+        Task RebuildCacheFromSettingsIfNotCurrent(bool forceRebuild);
     }
 }

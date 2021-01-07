@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
 
@@ -22,6 +23,8 @@ namespace Microsoft.TemplateEngine.Mocks
 
         public IEnumerable<MountPointInfo> MountPoints => throw new NotImplementedException();
 
+        public IUserSettings UserSettings => throw new NotImplementedException();
+
         public void AddMountPoint(IMountPoint mountPoint)
         {
             throw new NotImplementedException();
@@ -43,6 +46,11 @@ namespace Microsoft.TemplateEngine.Mocks
         }
 
         public ITemplate LoadTemplate(ITemplateInfo info, string baselineName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task RebuildCacheFromSettingsIfNotCurrent(bool forceRebuild)
         {
             throw new NotImplementedException();
         }

@@ -12,6 +12,8 @@ namespace Microsoft.TemplateEngine.Abstractions.Mount
 
         public string Place { get; }
 
+        public DateTime? LastScanTime { get; set; }
+
         public MountPointInfo(Guid parentMountPointId, Guid mountPointFactoryId, Guid mountPointId, string place)
         {
             ParentMountPointId = parentMountPointId;
