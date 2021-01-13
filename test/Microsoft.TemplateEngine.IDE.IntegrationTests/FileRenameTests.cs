@@ -53,7 +53,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             };
 
             //tests are not working due to bugs:
-            // -file changes are not taking into account source modifiers
+            // -file changes are not taking into account source modifiers https://github.com/dotnet/templating/issues/2746
             //yield return new object[]
             //{
             //    "TemplateWithSourceNameAndCustomSourcePath",
