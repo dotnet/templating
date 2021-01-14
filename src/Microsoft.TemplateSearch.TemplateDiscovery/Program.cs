@@ -56,7 +56,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
                 throw new NotImplementedException("no checker for the input options");
             }
 
-            PackSourceCheckResult checkResults = packSourceChecker.CheckPackages();
+            PackSourceCheckResult checkResults = packSourceChecker.CheckPackagesAsync().GetAwaiter().GetResult();
             PackCheckResultReportWriter.TryWriteResults(config.BasePath, checkResults);
         }
 
