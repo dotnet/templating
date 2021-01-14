@@ -144,8 +144,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             foreach (FileSourceMatchInfo source in runnableConfig.Sources)
             {
                 TemplateConfigTestHelpers.SetupFileSourceMatchersOnGlobalRunSpec(runSpec, source);
-                string targetDirForSource = Path.Combine(targetBaseDir, source.Target);
-                IReadOnlyList<IFileChange2> changes = orchestrator.GetFileChanges(runSpec, sourceDir, targetDirForSource);
+                IReadOnlyList<IFileChange2> changes = orchestrator.GetFileChanges(runSpec, sourceDir, targetBaseDir, source.Target);
                 changesByTarget[source.Target] = changes;
             }
 

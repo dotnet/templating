@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -695,8 +695,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             foreach (FileSourceMatchInfo source in template.Config.Sources)
             {
                 runSpec.SetupFileSource(source);
-                string target = Path.Combine(targetDirectory, source.Target);
-                changes.AddRange(orchestrator.GetFileChanges(runSpec, template.TemplateSourceRoot.DirectoryInfo(source.Source), target));
+                changes.AddRange(orchestrator.GetFileChanges(runSpec, template.TemplateSourceRoot.DirectoryInfo(source.Source), targetDirectory, source.Target));
             }
 
             return new CreationEffects2

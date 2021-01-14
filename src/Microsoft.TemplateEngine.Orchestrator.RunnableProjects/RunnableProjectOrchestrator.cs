@@ -16,24 +16,24 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             _basicOrchestrator = basicOrchestrator;
         }
 
-        public IReadOnlyList<IFileChange2> GetFileChanges(string runSpecPath, IDirectory sourceDir, string targetDir)
+        public IReadOnlyList<IFileChange2> GetFileChanges(string runSpecPath, IDirectory sourceDir, string targetRoot, string targetDir)
         {
-            return _basicOrchestrator.GetFileChanges(runSpecPath, sourceDir, targetDir);
+            return _basicOrchestrator.GetFileChanges(runSpecPath, sourceDir, targetRoot, targetDir);
         }
 
-        public IReadOnlyList<IFileChange2> GetFileChanges(IGlobalRunSpec spec, IDirectory sourceDir, string targetDir)
+        public IReadOnlyList<IFileChange2> GetFileChanges(IGlobalRunSpec spec, IDirectory sourceDir, string targetRoot, string targetDir)
         {
-            return _basicOrchestrator.GetFileChanges(spec, sourceDir, targetDir);
+            return _basicOrchestrator.GetFileChanges(spec, sourceDir, targetRoot, targetDir);
         }
 
-        IReadOnlyList<IFileChange> IOrchestrator.GetFileChanges(string runSpecPath, IDirectory sourceDir, string targetDir)
+        IReadOnlyList<IFileChange> IOrchestrator.GetFileChanges(string runSpecPath, IDirectory sourceDir, string targetRoot, string targetDir)
         {
-            return GetFileChanges(runSpecPath, sourceDir, targetDir);
+            return GetFileChanges(runSpecPath, sourceDir, targetRoot, targetDir);
         }
 
-        IReadOnlyList<IFileChange> IOrchestrator.GetFileChanges(IGlobalRunSpec spec, IDirectory sourceDir, string targetDir)
+        IReadOnlyList<IFileChange> IOrchestrator.GetFileChanges(IGlobalRunSpec spec, IDirectory sourceDir, string targetRoot, string targetDir)
         {
-            return GetFileChanges(spec, sourceDir, targetDir);
+            return GetFileChanges(spec, sourceDir, targetRoot, targetDir);
         }
 
         public void Run(string runSpecPath, IDirectory sourceDir, string targetDir)
