@@ -1,5 +1,4 @@
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Abstractions.UserSettings;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,8 +14,6 @@ namespace Microsoft.TemplateEngine.Mocks
         public IEnvironment Environment { get; set; }
 
         public IPathInfo Paths { get { throw new NotImplementedException(); } }
-
-        public List<ITemplatesInstallSourcesProviderFactory> TemplatesInstallSourcesProviderFactories => throw new NotImplementedException();
     }
 
     public class MockEnvironment : IEnvironment

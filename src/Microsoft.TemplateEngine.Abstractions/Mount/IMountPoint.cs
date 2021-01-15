@@ -1,8 +1,10 @@
+using System;
+
 namespace Microsoft.TemplateEngine.Abstractions.Mount
 {
-    public interface IMountPoint
+    public interface IMountPoint : IDisposable
     {
-        MountPointInfo Info { get; }
+        string AbsoluteUri { get; }
 
         IDirectory Root { get; }
 

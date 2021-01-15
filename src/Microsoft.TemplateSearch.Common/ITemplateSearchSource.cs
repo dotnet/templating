@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Abstractions.TemplateUpdates;
+using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
 
 namespace Microsoft.TemplateSearch.Common
 {
     public interface ITemplateSearchSource : IIdentifiedComponent
     {
-        Task<bool> TryConfigure(IEngineEnvironmentSettings environmentSettings, IReadOnlyList<IInstallUnitDescriptor> existingInstallDescriptors);
+        Task<bool> TryConfigure(IEngineEnvironmentSettings environmentSettings, IReadOnlyList<IManagedTemplatesSource> existingInstallDescriptors);
 
         Task<IReadOnlyList<ITemplateNameSearchResult>> CheckForTemplateNameMatchesAsync(string templateName);
 
