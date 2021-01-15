@@ -5,8 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.GlobalSettings;
 using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
+using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
 using Microsoft.TemplateEngine.Edge.Mount.FileSystem;
 using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json;
@@ -24,24 +26,21 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         private IMountPointManager _mountPointManager;
         private IComponentManager _componentManager;
         private bool _isLoaded;
-        private Dictionary<Guid, MountPointInfo> _mountPoints;
         private bool _templatesLoaded;
-        private InstallUnitDescriptorCache _installUnitDescriptorCache;
-        private bool _installUnitDescriptorsLoaded;
         private readonly Paths _paths;
         private readonly IEngineEnvironmentSettings _environmentSettings;
+        private TemplatesSourcesManager _templatesSourcesManager;
 
         public SettingsLoader(IEngineEnvironmentSettings environmentSettings)
         {
             _environmentSettings = environmentSettings;
             _paths = new Paths(environmentSettings);
             _userTemplateCache = new TemplateCache(environmentSettings);
-            _installUnitDescriptorCache = new InstallUnitDescriptorCache(environmentSettings);
+            _templatesSourcesManager = new TemplatesSourcesManager(environmentSettings);
         }
 
-        internal SettingsLoader(IEngineEnvironmentSettings environmentSettings, IMountPointManager mountPointManager) : this(environmentSettings)
+        public SettingsLoader(IEngineEnvironmentSettings environmentSettings, IMountPointManager mockMountPointManager)
         {
-            _mountPointManager = mountPointManager;
         }
 
         public void Save()
@@ -62,8 +61,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             JObject serialized = JObject.FromObject(_userSettings);
             _paths.WriteAllText(_paths.User.SettingsFile, serialized.ToString());
 
-            WriteInstallDescriptorCache();
-
             if (_userTemplateCache != cacheToSave)  // object equals
             {
                 ReloadTemplates();
@@ -77,41 +74,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 EnsureLoaded();
                 return _userTemplateCache;
             }
-        }
-
-        // It's important to note that these are loaded on demand, not at initialization of SettingsLoader.
-        // So the backing field shouldn't be directly accessed except during initialization.
-        public InstallUnitDescriptorCache InstallUnitDescriptorCache
-        {
-            get
-            {
-                EnsureLoaded();
-                EnsureInstallDescriptorsLoaded();
-
-                return _installUnitDescriptorCache;
-            }
-        }
-
-        private void EnsureInstallDescriptorsLoaded()
-        {
-            if (_installUnitDescriptorsLoaded)
-            {
-                return;
-            }
-
-            string descriptorFileContents = _paths.ReadAllText(_paths.User.InstallUnitDescriptorsFile, "{}");
-            JObject parsed = JObject.Parse(descriptorFileContents);
-
-            _installUnitDescriptorCache = InstallUnitDescriptorCache.FromJObject(_environmentSettings, parsed);
-            _installUnitDescriptorsLoaded = true;
-        }
-
-        // Write the install unit descriptors.
-        // Get them from the property to ensure they're loaded. Descriptors are loaded on demand, not at startup.
-        private void WriteInstallDescriptorCache()
-        {
-            JObject installDescriptorsSerialized = JObject.FromObject(InstallUnitDescriptorCache);
-            _paths.WriteAllText(_paths.User.InstallUnitDescriptorsFile, installDescriptorsSerialized.ToString());
         }
 
         private void EnsureLoaded()
@@ -143,7 +105,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             using (Timing.Over(_environmentSettings.Host, "Parse and deserialize global settings"))
                 try
                 {
-                    GlobalSettings = JsonConvert.DeserializeObject<GlobalSettings>(globalSettings);
+                    GlobalSettings = JsonConvert.DeserializeObject<GlobalSettings>(globalSettings) ?? new Settings.GlobalSettings();
                 }
                 catch (Exception ex)
                 {
@@ -188,21 +150,11 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     _userSettings.ProbingPaths.Add(_paths.User.Content);
                 }
 
-            _mountPoints = new Dictionary<Guid, MountPointInfo>();
-            using (Timing.Over(_environmentSettings.Host, "Load mount points"))
-                foreach (MountPointInfo info in _userSettings.MountPoints)
-                {
-                    _mountPoints[info.MountPointId] = info;
-                }
-
             using (Timing.Over(_environmentSettings.Host, "Init Component manager"))
                 _componentManager = new ComponentManager(this, _userSettings);
 
-            if (_mountPointManager == null)
-            {
-                using (Timing.Over(_environmentSettings.Host, "Init Mount Point manager"))
-                    _mountPointManager = new MountPointManager(_environmentSettings, _componentManager);
-            }
+            using (Timing.Over(_environmentSettings.Host, "Init MountPoint manager"))
+                _mountPointManager = new MountPointManager(_environmentSettings, _componentManager);
 
             using (Timing.Over(_environmentSettings.Host, "Demand template load"))
                 EnsureTemplatesLoaded();
@@ -268,45 +220,33 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             EnsureLoaded();
 
             var placesThatNeedScanning = new HashSet<string>();
-            var removedMounts = new Dictionary<string, MountPointInfo>();
-            var mountsPoints = new Dictionary<string, MountPointInfo>();
+            var mountsPoints = new Dictionary<string, DateTime?>();
 
-            var tasks = Components.OfType<ITemplatesInstallSourcesProviderFactory>().Select(p => Task.Run(() =>
+            foreach (var template in _userTemplateCache.TemplateInfo)
             {
-                var provider = p.CreateProvider(EnvironmentSettings);
-                return provider.GetInstalledPackagesAsync(default);
-            })).ToList();
-
-            foreach (var mountPoint in mountsPoints.Values)
-            {
-                var key = mountPoint.MountPointFactoryId + mountPoint.Place;
-                mountsPoints.Add(key, mountPoint);
-                removedMounts.Add(key, mountPoint);
+                if (mountsPoints.TryGetValue(template.MountPointUri, out var existingTime))
+                    if (template.ConfigTimestampUtc < existingTime)
+                        continue;//existing time in dictionary is newer, hence don't replace it
+                mountsPoints[template.MountPointUri] = template.ConfigTimestampUtc;
             }
 
-            while (tasks.Count > 0)
+            var completedTask = await _templatesSourcesManager.GetTemplatesSources(forceRebuild).ConfigureAwait(false);
+            var mountsPointsInUsedNow = new HashSet<string>();
+            foreach (var source in completedTask)
             {
-                var completedTask = await Task.WhenAny(tasks).ConfigureAwait(false);
-                foreach (var source in completedTask.Result)
+                mountsPointsInUsedNow.Add(source.MountPointUri);
+                if (mountsPoints.TryGetValue(source.MountPointUri, out var lastChangeTime))
                 {
-                    var key = source.MountPointFactoryId + source.Place;
-                    removedMounts.Remove(key);
-                    if (mountsPoints.TryGetValue(key, out var mountPoint))
-                    {
-                        if (source.LastWriteTime > mountPoint.LastScanTime)
-                            placesThatNeedScanning.Add(source.Place);
-                    }
-                    else
-                    {
-                        placesThatNeedScanning.Add(source.Place);
-                    }
+                    if (source.LastChangeTime > lastChangeTime)
+                        placesThatNeedScanning.Add(source.MountPointUri);
+                }
+                else
+                {
+                    placesThatNeedScanning.Add(source.MountPointUri);
                 }
             }
 
-            foreach (var removedMount in removedMounts.Values)
-            {
-                _mountPoints.Remove(removedMount.MountPointId);
-            }
+            var removedMountPoints = mountsPoints.Keys.Except(mountsPointsInUsedNow);
 
             TemplateCache workingCache = new TemplateCache(_environmentSettings);
             foreach (var place in placesThatNeedScanning)
@@ -345,7 +285,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             }
 
             IMountPoint mountPoint;
-            if (!_mountPointManager.TryDemandMountPoint(info.ConfigMountPointId, out mountPoint))
+            if (!_mountPointManager.TryDemandMountPoint(info.MountPointUri, out mountPoint))
             {
                 return null;
             }
@@ -353,11 +293,10 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
             IFileSystemInfo localeConfig = null;
             if (!string.IsNullOrEmpty(info.LocaleConfigPlace)
-                    && info.LocaleConfigMountPointId != null
-                    && info.LocaleConfigMountPointId != Guid.Empty)
+                    && !string.IsNullOrEmpty(info.MountPointUri))
             {
                 IMountPoint localeMountPoint;
-                if (!_mountPointManager.TryDemandMountPoint(info.LocaleConfigMountPointId, out localeMountPoint))
+                if (!_mountPointManager.TryDemandMountPoint(info.MountPointUri, out localeMountPoint))
                 {
                     // TODO: decide if we should proceed without loc info, instead of bailing.
                     return null;
@@ -419,18 +358,11 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             }
         }
 
-        public IEnumerable<MountPointInfo> MountPoints
-        {
-            get
-            {
-                EnsureLoaded();
-                return _mountPoints.Values;
-            }
-        }
-
         public IEngineEnvironmentSettings EnvironmentSettings => _environmentSettings;
 
         public IGlobalSettings GlobalSettings { get; private set; }
+
+        public ITemplatesSourcesManager TemplatesSourcesManager => _templatesSourcesManager;
 
         public void GetTemplates(HashSet<ITemplateInfo> templates)
         {
@@ -448,34 +380,8 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         public void WriteTemplateCache(IList<ITemplateInfo> templates, string locale, bool hasContentChanges)
         {
             List<TemplateInfo> toCache = templates.Cast<TemplateInfo>().ToList();
-            bool hasMountPointChanges = false;
 
-            for (int i = 0; i < toCache.Count; ++i)
-            {
-                if (!_mountPoints.ContainsKey(toCache[i].ConfigMountPointId))
-                {
-                    toCache.RemoveAt(i);
-                    --i;
-                    hasMountPointChanges = true;
-                    continue;
-                }
-
-                if (!_mountPoints.ContainsKey(toCache[i].HostConfigMountPointId))
-                {
-                    toCache[i].HostConfigMountPointId = Guid.Empty;
-                    toCache[i].HostConfigPlace = null;
-                    hasMountPointChanges = true;
-                }
-
-                if (!_mountPoints.ContainsKey(toCache[i].LocaleConfigMountPointId))
-                {
-                    toCache[i].LocaleConfigMountPointId = Guid.Empty;
-                    toCache[i].LocaleConfigPlace = null;
-                    hasMountPointChanges = true;
-                }
-            }
-
-            if (hasContentChanges || hasMountPointChanges)
+            if (hasContentChanges)
             {
                 TemplateCache cache = new TemplateCache(_environmentSettings, toCache);
                 JObject serialized = JObject.FromObject(cache);
@@ -520,58 +426,9 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             }
         }
 
-        public bool TryGetMountPointInfo(Guid mountPointId, out MountPointInfo info)
+        public bool TryGetFileFromIdAndPath(string mountPointUri, string place, out IFile file, out IMountPoint mountPoint)
         {
-            EnsureLoaded();
-            using (Timing.Over(_environmentSettings.Host, "Mount point lookup"))
-                return _mountPoints.TryGetValue(mountPointId, out info);
-        }
-
-        public bool TryGetMountPointInfoFromPlace(string mountPointPlace, out MountPointInfo info)
-        {
-            EnsureLoaded();
-            using (Timing.Over(_environmentSettings.Host, "Mount point place lookup"))
-                foreach (MountPointInfo mountInfoToCheck in _mountPoints.Values)
-                {
-                    if (mountPointPlace.Equals(mountInfoToCheck.Place, StringComparison.OrdinalIgnoreCase))
-                    {
-                        info = mountInfoToCheck;
-                        return true;
-                    }
-                }
-
-            info = null;
-            return false;
-        }
-
-        public bool TryGetMountPointFromPlace(string mountPointPlace, out IMountPoint mountPoint)
-        {
-            if (!TryGetMountPointInfoFromPlace(mountPointPlace, out MountPointInfo info))
-            {
-                mountPoint = null;
-                return false;
-            }
-
-            return _mountPointManager.TryDemandMountPoint(info.MountPointId, out mountPoint);
-        }
-
-        public void AddMountPoint(IMountPoint mountPoint)
-        {
-            if (_mountPoints.Values.Any(x => string.Equals(x.Place, mountPoint.Info.Place) && x.ParentMountPointId == mountPoint.Info.ParentMountPointId))
-            {
-                return;
-            }
-
-            _mountPoints[mountPoint.Info.MountPointId] = mountPoint.Info;
-            _userSettings.MountPoints.Add(mountPoint.Info);
-            JObject serialized = JObject.FromObject(_userSettings);
-            _paths.WriteAllText(_paths.User.SettingsFile, serialized.ToString());
-        }
-
-        public bool TryGetFileFromIdAndPath(Guid mountPointId, string place, out IFile file, out IMountPoint mountPoint)
-        {
-            EnsureLoaded();
-            if (!string.IsNullOrEmpty(place) && _mountPointManager.TryDemandMountPoint(mountPointId, out mountPoint))
+            if (!string.IsNullOrEmpty(place) && _mountPointManager.TryDemandMountPoint(mountPointUri, out mountPoint))
             {
                 file = mountPoint.FileInfo(place);
                 return file != null && file.Exists;
@@ -582,32 +439,9 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             return false;
         }
 
-        public bool TryGetMountPointFromId(Guid mountPointId, out IMountPoint mountPoint)
+        public bool TryGetMountPoint(string mountPointUri, out IMountPoint mountPoint)
         {
-            return _mountPointManager.TryDemandMountPoint(mountPointId, out mountPoint);
-        }
-
-        public void RemoveMountPoints(IEnumerable<Guid> mountPoints)
-        {
-            foreach (Guid g in mountPoints)
-            {
-                if (_mountPoints.TryGetValue(g, out MountPointInfo info))
-                {
-                    _userSettings.MountPoints.Remove(info);
-                    _mountPoints.Remove(g);
-                }
-            }
-        }
-
-        public void ReleaseMountPoint(IMountPoint mountPoint)
-        {
-            _mountPointManager.ReleaseMountPoint(mountPoint);
-        }
-
-        public void RemoveMountPoint(IMountPoint mountPoint)
-        {
-            _mountPointManager.ReleaseMountPoint(mountPoint);
-            RemoveMountPoints(new[] { mountPoint.Info.MountPointId });
+            return _mountPointManager.TryDemandMountPoint(mountPointUri, out mountPoint);
         }
     }
 }

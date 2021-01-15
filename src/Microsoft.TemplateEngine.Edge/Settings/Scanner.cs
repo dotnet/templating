@@ -39,7 +39,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             // The source mount points are done being used, release them. The caller will delete the source files if needed.
             foreach (MountPointScanSource source in sourceList)
             {
-                _environmentSettings.SettingsLoader.ReleaseMountPoint(source.MountPoint);
+                source.MountPoint.Dispose();
             }
 
             return scanResult;
@@ -92,36 +92,22 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         private MountPointScanSource GetOrCreateMountPointScanInfoForInstallSource(string sourceLocation)
         {
-            if (_environmentSettings.SettingsLoader.TryGetMountPointFromPlace(sourceLocation, out IMountPoint existingMountPoint))
+            foreach (IMountPointFactory factory in _environmentSettings.SettingsLoader.Components.OfType<IMountPointFactory>().ToList())
             {
-                return new MountPointScanSource()
+                if (factory.TryMount(_environmentSettings, null, sourceLocation, out IMountPoint mountPoint))
                 {
-                    Location = sourceLocation,
-                    MountPoint = existingMountPoint,
-                    FoundTemplates = false,
-                    FoundComponents = false,
-                    ShouldStayInOriginalLocation = true,
-                };
-            }
-            else
-            {
-                foreach (IMountPointFactory factory in _environmentSettings.SettingsLoader.Components.OfType<IMountPointFactory>().ToList())
-                {
-                    if (factory.TryMount(_environmentSettings, null, sourceLocation, out IMountPoint mountPoint))
-                    {
-                        // file-based and not originating in the scratch dir.
-                        bool isLocalFlatFileSource = mountPoint.Info.MountPointFactoryId == FileSystemMountPointFactory.FactoryId
-                                                    && !sourceLocation.StartsWith(_paths.User.ScratchDir);
+                    // file-based and not originating in the scratch dir.
+                    bool isLocalFlatFileSource = mountPoint is FileSystemMountPoint
+                                                && !sourceLocation.StartsWith(_paths.User.ScratchDir);
 
-                        return new MountPointScanSource()
-                        {
-                            Location = sourceLocation,
-                            MountPoint = mountPoint,
-                            ShouldStayInOriginalLocation = isLocalFlatFileSource,
-                            FoundTemplates = false,
-                            FoundComponents = false,
-                        };
-                    }
+                    return new MountPointScanSource()
+                    {
+                        Location = sourceLocation,
+                        MountPoint = mountPoint,
+                        ShouldStayInOriginalLocation = isLocalFlatFileSource,
+                        FoundTemplates = false,
+                        FoundComponents = false,
+                    };
                 }
             }
 
@@ -279,16 +265,12 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     return;
                 }
 
-                // Try get an existing mount point for the scan location
-                if (!_environmentSettings.SettingsLoader.TryGetMountPointFromPlace(actualScanPath, out scanMountPoint))
+                // The mount point didn't exist, try creating a new one
+                foreach (IMountPointFactory factory in _environmentSettings.SettingsLoader.Components.OfType<IMountPointFactory>())
                 {
-                    // The mount point didn't exist, try creating a new one
-                    foreach (IMountPointFactory factory in _environmentSettings.SettingsLoader.Components.OfType<IMountPointFactory>())
+                    if (factory.TryMount(_environmentSettings, null, actualScanPath, out scanMountPoint))
                     {
-                        if (factory.TryMount(_environmentSettings, null, actualScanPath, out scanMountPoint))
-                        {
-                            break;
-                        }
+                        break;
                     }
                 }
 
@@ -328,12 +310,8 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             // finalize the result
             if (source.FoundTemplates)
             {
-                // add the MP
-                _environmentSettings.SettingsLoader.AddMountPoint(scanMountPoint);
                 // add the MP to the scan result
-                scanResult.AddInstalledMountPointId(scanMountPoint.Info.MountPointId);
-                // release the mount point
-                _environmentSettings.SettingsLoader.ReleaseMountPoint(scanMountPoint);
+                scanResult.AddInstalledMountPointId(scanMountPoint.AbsoluteUri);
             }
             else
             {
@@ -344,7 +322,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     {
                         // The source was copied to packages and then scanned for templates.
                         // Nothing was found, and this is a copy that now has no use, so delete it.
-                        _environmentSettings.SettingsLoader.ReleaseMountPoint(scanMountPoint);
+                        scanMountPoint.Dispose();
 
                         // It's always copied as an archive, so it's a file delete, not a directory delete
                         _environmentSettings.Host.FileSystem.FileDelete(actualScanPath);

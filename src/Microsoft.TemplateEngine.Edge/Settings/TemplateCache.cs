@@ -82,20 +82,20 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         public void Scan(string installDir, bool allowDevInstall)
         {
-            Scan(installDir, out IReadOnlyList<Guid> mountPointIdsForNewInstalls, allowDevInstall);
+            Scan(installDir, out IReadOnlyList<string> mountPointUrisForNewInstalls, allowDevInstall);
         }
 
-        public void Scan(string installDir, out IReadOnlyList<Guid> mountPointIdsForNewInstalls)
+        public void Scan(string installDir, out IReadOnlyList<string> mountPointUrisForNewInstalls)
         {
-            Scan(installDir, out mountPointIdsForNewInstalls, false);
+            Scan(installDir, out mountPointUrisForNewInstalls, false);
         }
 
-        public void Scan(string installDir, out IReadOnlyList<Guid> mountPointIdsForNewInstalls, bool allowDevInstall)
+        public void Scan(string installDir, out IReadOnlyList<string> mountPointUrisForNewInstalls, bool allowDevInstall)
         {
             ScanResult scanResult = InstallScanner.Scan(installDir, allowDevInstall);
             AddTemplatesAndLangPacksFromScanResult(scanResult);
 
-            mountPointIdsForNewInstalls = scanResult.InstalledMountPointIds;
+            mountPointUrisForNewInstalls = scanResult.InstalledMountPointUris;
         }
 
         public void Scan(IReadOnlyList<string> installDirectoryList)
@@ -302,7 +302,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             {
                 GeneratorId = template.GeneratorId,
                 ConfigPlace = template.ConfigPlace,
-                ConfigMountPointId = template.ConfigMountPointId,
+                MountPointUri = template.MountPointUri,
                 Name = localizationInfo?.Name ?? template.Name,
                 Tags = LocalizeCacheTags(template, localizationInfo),
                 CacheParameters = LocalizeCacheParameters(template, localizationInfo),
@@ -315,8 +315,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 Identity = template.Identity,
                 DefaultName = template.DefaultName,
                 LocaleConfigPlace = localizationInfo?.ConfigPlace ?? null,
-                LocaleConfigMountPointId = localizationInfo?.MountPointId ?? Guid.Empty,
-                HostConfigMountPointId = template.HostConfigMountPointId,
                 HostConfigPlace = template.HostConfigPlace,
                 ThirdPartyNotices = template.ThirdPartyNotices,
                 BaselineInfo = template.BaselineInfo,
@@ -430,8 +428,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
             foreach (TemplateInfo template in templateList)
             {
-                if (template.LocaleConfigMountPointId == null
-                    || template.LocaleConfigMountPointId == Guid.Empty)
+                if (string.IsNullOrEmpty(template.LocaleConfigPlace))
                 {   // Indicates an unlocalized entry in the locale specific template cache.
                     continue;
                 }
@@ -439,7 +436,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 ILocalizationLocator locator = new LocalizationLocator()
                 {
                     Locale = locale,
-                    MountPointId = template.LocaleConfigMountPointId,
+                    MountPointUri = template.MountPointUri,
                     ConfigPlace = template.LocaleConfigPlace,
                     Identity = template.Identity,
                     Author = template.Author,
