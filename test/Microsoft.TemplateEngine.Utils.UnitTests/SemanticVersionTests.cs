@@ -1,3 +1,4 @@
+using Microsoft.TemplateEngine.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Text;
