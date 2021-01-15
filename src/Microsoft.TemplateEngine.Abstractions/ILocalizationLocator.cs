@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Microsoft.TemplateEngine.Abstractions
@@ -7,7 +7,7 @@ namespace Microsoft.TemplateEngine.Abstractions
     {
         string Locale { get; }
 
-        Guid MountPointId { get; }
+        string MountPointUri { get; }
 
         string ConfigPlace { get; }
 

@@ -1,18 +1,17 @@
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Abstractions.TemplateUpdates;
-using Microsoft.TemplateEngine.Edge.TemplateUpdates;
+using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
 using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateSearch.Common
 {
     public class NupkgHigherVersionInstalledPackFilter : ISearchPackFilter
     {
-        private readonly IReadOnlyList<IInstallUnitDescriptor> _existingInstallDescriptors;
+        private readonly IReadOnlyList<IManagedTemplatesSource> _existingInstallDescriptors;
         private IReadOnlyDictionary<string, SemanticVersion> _existingInstallDescriptorFilterData;
         private bool _isInitialized;
 
-        public NupkgHigherVersionInstalledPackFilter(IReadOnlyList<IInstallUnitDescriptor> existingInstallDecriptors)
+        public NupkgHigherVersionInstalledPackFilter(IReadOnlyList<IManagedTemplatesSource> existingInstallDecriptors)
         {
             _existingInstallDescriptors = existingInstallDecriptors;
             _isInitialized = false;
@@ -27,13 +26,9 @@ namespace Microsoft.TemplateSearch.Common
 
             Dictionary<string, SemanticVersion> filterData = new Dictionary<string, SemanticVersion>();
 
-            foreach (IInstallUnitDescriptor descriptor in _existingInstallDescriptors)
+            foreach (IManagedTemplatesSource descriptor in _existingInstallDescriptors)
             {
-                if (descriptor is NupkgInstallUnitDescriptor nupkgDescriptor
-                    && SemanticVersion.TryParse(nupkgDescriptor.Version, out SemanticVersion descriptorVersion))
-                {
-                    filterData[nupkgDescriptor.UninstallString] = descriptorVersion;
-                }
+                filterData[descriptor.Identifier] = descriptor.Version;
             }
 
             _existingInstallDescriptorFilterData = filterData;

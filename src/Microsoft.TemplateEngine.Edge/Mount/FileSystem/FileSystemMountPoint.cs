@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
@@ -7,16 +8,15 @@ namespace Microsoft.TemplateEngine.Edge.Mount.FileSystem
     public class FileSystemMountPoint : IMountPoint
     {
         private Paths _paths;
+        public string Place { get; }
 
-        public FileSystemMountPoint(IEngineEnvironmentSettings environmentSettings, IMountPoint parent, MountPointInfo info)
+        public FileSystemMountPoint(IEngineEnvironmentSettings environmentSettings, IMountPoint parent, string place)
         {
             EnvironmentSettings = environmentSettings;
             _paths = new Paths(environmentSettings);
-            Info = info;
-            Root = new FileSystemDirectory(this, "/", "", info.Place);
+            Place = place;
+            Root = new FileSystemDirectory(this, "/", "", place);
         }
-
-        public MountPointInfo Info { get; }
 
         public IDirectory Root { get; }
 
@@ -24,7 +24,7 @@ namespace Microsoft.TemplateEngine.Edge.Mount.FileSystem
 
         public IFile FileInfo(string fullPath)
         {
-            string realPath = Path.Combine(Info.Place, fullPath.TrimStart('/'));
+            string realPath = Path.Combine(Place, fullPath.TrimStart('/'));
 
             if (!fullPath.StartsWith("/"))
             {
@@ -36,13 +36,13 @@ namespace Microsoft.TemplateEngine.Edge.Mount.FileSystem
 
         public IDirectory DirectoryInfo(string fullPath)
         {
-            string realPath = Path.Combine(Info.Place, fullPath.TrimStart('/'));
+            string realPath = Path.Combine(Place, fullPath.TrimStart('/'));
             return new FileSystemDirectory(this, fullPath, _paths.Name(realPath), realPath);
         }
 
         public IFileSystemInfo FileSystemInfo(string fullPath)
         {
-            string realPath = Path.Combine(Info.Place, fullPath.TrimStart('/'));
+            string realPath = Path.Combine(Place, fullPath.TrimStart('/'));
 
             if (EnvironmentSettings.Host.FileSystem.DirectoryExists(realPath))
             {
@@ -52,6 +52,15 @@ namespace Microsoft.TemplateEngine.Edge.Mount.FileSystem
             return new FileSystemFile(this, fullPath, _paths.Name(realPath), realPath);
         }
 
+        public void Dispose()
+        {
+
+        }
+
         public IMountPoint Parent { get; }
+
+        public Guid MountPointFactoryId => FileSystemMountPointFactory.FactoryId;
+
+        public string AbsoluteUri => Place;
     }
 }

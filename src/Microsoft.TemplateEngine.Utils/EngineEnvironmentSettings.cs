@@ -18,8 +18,8 @@ namespace Microsoft.TemplateEngine.Utils
         public EngineEnvironmentSettings(ITemplateEngineHost host, Func<IEngineEnvironmentSettings, ISettingsLoader> settingsLoaderFactory, string hiveLocation)
         {
             Host = host;
-            Paths = new DefaultPathInfo(this, hiveLocation);
             Environment = new DefaultEnvironment();
+            Paths = new DefaultPathInfo(this, hiveLocation);
             SettingsLoader = settingsLoaderFactory(this);
         }
 
