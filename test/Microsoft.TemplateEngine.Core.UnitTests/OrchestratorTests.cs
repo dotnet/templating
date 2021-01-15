@@ -223,13 +223,13 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
             MockRoot = new MockDirectory("/", "/", this, null);
         }
 
-        public MountPointInfo Info { get; set; }
-
         public IDirectory Root => MockRoot;
 
         public MockDirectory MockRoot { get; }
 
         public IEngineEnvironmentSettings EnvironmentSettings { get; set; }
+
+        public string AbsoluteUri => "/";
 
         public IFileSystemInfo FileSystemInfo(string fullPath)
         {
@@ -294,6 +294,10 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
             }
 
             return new MockFile(fullPath, this);
+        }
+
+        public void Dispose()
+        {
         }
     }
 

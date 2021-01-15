@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Abstractions.TemplateUpdates;
+using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Edge.Template;
 
@@ -42,15 +42,15 @@ namespace Microsoft.TemplateSearch.Common
             }
 
             TemplateSearcher searcher = new TemplateSearcher(_environmentSettings, _defaultLanguage, _matchFilter);
-            IReadOnlyList<IInstallUnitDescriptor> existingInstallDescriptors;
+            IReadOnlyList<IManagedTemplatesSource> existingInstallDescriptors;
 
             if (_environmentSettings.SettingsLoader is SettingsLoader settingsLoader)
             {
-                existingInstallDescriptors = settingsLoader.InstallUnitDescriptorCache.Descriptors.Values.ToList();
+                existingInstallDescriptors = (await settingsLoader.TemplatesSourcesManager.GetTemplatesSources(false)).OfType<IManagedTemplatesSource>().ToList();
             }
             else
             {
-                existingInstallDescriptors = new List<IInstallUnitDescriptor>();
+                existingInstallDescriptors = new List<IManagedTemplatesSource>();
             }
 
             _searchResults = await searcher.SearchForTemplatesAsync(existingInstallDescriptors, _inputTemplateName);

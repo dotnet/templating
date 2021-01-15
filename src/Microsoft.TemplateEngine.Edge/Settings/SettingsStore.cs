@@ -13,7 +13,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         public SettingsStore()
         {
-            MountPoints = new List<MountPointInfo>();
             ComponentGuidToAssemblyQualifiedName = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             ComponentTypeToGuidList = new Dictionary<string, HashSet<Guid>>();
             ProbingPaths = new HashSet<string>();
@@ -27,63 +26,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             if (obj.TryGetValue(nameof(Version), StringComparison.OrdinalIgnoreCase, out versionToken))
             {
                 Version = versionToken.ToString();
-            }
-
-            JToken mountPointsToken;
-            if (obj.TryGetValue("MountPoints", StringComparison.OrdinalIgnoreCase, out mountPointsToken))
-            {
-                JArray mountPointsArray = mountPointsToken as JArray;
-                if (mountPointsArray != null)
-                {
-                    foreach (JToken entry in mountPointsArray)
-                    {
-                        if (entry != null && entry.Type == JTokenType.Object)
-                        {
-                            Guid parentMountPointId;
-                            Guid mountPointFactoryId;
-                            Guid mountPointId;
-
-                            JObject mp = (JObject) entry;
-                            JToken parentMountPointIdToken;
-                            if (!mp.TryGetValue("ParentMountPointId", StringComparison.OrdinalIgnoreCase, out parentMountPointIdToken) || parentMountPointIdToken == null || parentMountPointIdToken.Type != JTokenType.String || !Guid.TryParse(parentMountPointIdToken.ToString(), out parentMountPointId))
-                            {
-                                continue;
-                            }
-
-                            JToken mountPointFactoryIdToken;
-                            if (!mp.TryGetValue("MountPointFactoryId", StringComparison.OrdinalIgnoreCase, out mountPointFactoryIdToken) || mountPointFactoryIdToken == null || mountPointFactoryIdToken.Type != JTokenType.String || !Guid.TryParse(mountPointFactoryIdToken.ToString(), out mountPointFactoryId))
-                            {
-                                continue;
-                            }
-
-                            JToken mountPointIdToken;
-                            if (!mp.TryGetValue("MountPointId", StringComparison.OrdinalIgnoreCase, out mountPointIdToken) || mountPointIdToken == null || mountPointIdToken.Type != JTokenType.String || !Guid.TryParse(mountPointIdToken.ToString(), out mountPointId))
-                            {
-                                continue;
-                            }
-
-                            JToken placeToken;
-                            if (!mp.TryGetValue("Place", StringComparison.OrdinalIgnoreCase, out placeToken) || placeToken == null || placeToken.Type != JTokenType.String)
-                            {
-                                continue;
-                            }
-
-                            JToken lastScanTimeToken;
-                            DateTime? lastScanTime = null;
-                            if (mp.TryGetValue("LastScanTime", StringComparison.OrdinalIgnoreCase, out lastScanTimeToken))
-                            {
-                                lastScanTime = lastScanTimeToken.Value<DateTime>();
-                            }
-
-                            string place = placeToken.ToString();
-                            MountPointInfo mountPoint = new MountPointInfo(parentMountPointId, mountPointFactoryId, mountPointId, place)
-                            {
-                                LastScanTime = lastScanTime
-                            };
-                            MountPoints.Add(mountPoint);
-                        }
-                    }
-                }
             }
 
             JToken componentGuidToAssemblyQualifiedNameToken;
@@ -157,9 +99,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         [JsonProperty]
         public string Version { get; private set; }
-
-        [JsonProperty]
-        public List<MountPointInfo> MountPoints { get; }
 
         [JsonProperty]
         public Dictionary<string, string> ComponentGuidToAssemblyQualifiedName { get; }

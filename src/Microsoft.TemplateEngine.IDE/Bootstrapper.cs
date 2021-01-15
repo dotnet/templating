@@ -16,19 +16,17 @@ namespace Microsoft.TemplateEngine.IDE
     public class Bootstrapper
     {
         private readonly ITemplateEngineHost _host;
-        private readonly Action<IEngineEnvironmentSettings, IInstaller> _onFirstRun;
+        private readonly Action<IEngineEnvironmentSettings> _onFirstRun;
         private readonly Paths _paths;
         private readonly TemplateCreator _templateCreator;
 
         private EngineEnvironmentSettings EnvironmentSettings { get; }
 
-        private IInstaller Installer { get; }
-
-        public Bootstrapper(ITemplateEngineHost host, Action<IEngineEnvironmentSettings, IInstaller> onFirstRun, bool virtualizeConfiguration)
+        public Bootstrapper(ITemplateEngineHost host, Action<IEngineEnvironmentSettings> onFirstRun, bool virtualizeConfiguration)
         {
             _host = host;
             EnvironmentSettings = new EngineEnvironmentSettings(host, x => new SettingsLoader(x));
-            Installer = new Installer(EnvironmentSettings);
+            //Installer = new Installer(EnvironmentSettings);
             _onFirstRun = onFirstRun;
             _paths = new Paths(EnvironmentSettings);
             _templateCreator = new TemplateCreator(EnvironmentSettings);
@@ -43,7 +41,7 @@ namespace Microsoft.TemplateEngine.IDE
         {
             if (!_paths.Exists(_paths.User.BaseDir) || !_paths.Exists(_paths.User.FirstRunCookie))
             {
-                _onFirstRun?.Invoke(EnvironmentSettings, Installer);
+                _onFirstRun?.Invoke(EnvironmentSettings);
                 _paths.WriteAllText(_paths.User.FirstRunCookie, "");
             }
         }
@@ -61,19 +59,22 @@ namespace Microsoft.TemplateEngine.IDE
         public void Install(string path)
         {
             EnsureInitialized();
-            Installer.InstallPackages(new[] { path });
+            //TODO: Handle this...
+            //Installer.InstallPackages(new[] { path });
         }
 
         public void Install(params string[] paths)
         {
             EnsureInitialized();
-            Installer.InstallPackages(paths);
+            //TODO: Handle this...
+            //Installer.InstallPackages(paths);
         }
 
         public void Install(IEnumerable<string> paths)
         {
             EnsureInitialized();
-            Installer.InstallPackages(paths);
+            //TODO: Handle this...
+            //Installer.InstallPackages(paths);
         }
 
         public IReadOnlyCollection<IFilteredTemplateInfo> ListTemplates(bool exactMatchesOnly, params Func<ITemplateInfo, MatchInfo?>[] filters)
@@ -97,19 +98,28 @@ namespace Microsoft.TemplateEngine.IDE
         public IEnumerable<string> Uninstall(string path)
         {
             EnsureInitialized();
-            return Installer.Uninstall(new[] { path });
+
+            //TODO: Handle this...
+            //return Installer.Uninstall(new[] { path });
+            throw new NotImplementedException();
         }
 
         public IEnumerable<string> Uninstall(params string[] paths)
         {
             EnsureInitialized();
-            return Installer.Uninstall(paths);
+
+            //TODO: Handle this...
+            //return Installer.Uninstall(paths);
+            throw new NotImplementedException();
         }
 
         public IEnumerable<string> Uninstall(IEnumerable<string> paths)
         {
             EnsureInitialized();
-            return Installer.Uninstall(paths);
+
+            //TODO: Handle this...
+            //return Installer.Uninstall(paths);
+            throw new NotImplementedException();
         }
     }
 }

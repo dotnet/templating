@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Abstractions.TemplateUpdates;
+using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
 using Microsoft.TemplateEngine.Edge.Template;
 
 namespace Microsoft.TemplateSearch.Common
@@ -22,7 +22,7 @@ namespace Microsoft.TemplateSearch.Common
         Func<IReadOnlyList<ITemplateNameSearchResult>, IReadOnlyList<ITemplateMatchInfo>> _matchFilter;
 
         // Search all of the registered sources.
-        public async Task<SearchResults> SearchForTemplatesAsync(IReadOnlyList<IInstallUnitDescriptor> existingInstallDescriptors, string inputTemplateName)
+        public async Task<SearchResults> SearchForTemplatesAsync(IReadOnlyList<IManagedTemplatesSource> existingInstallDescriptors, string inputTemplateName)
         {
             List<TemplateSourceSearchResult> matchesForAllSources = new List<TemplateSourceSearchResult>();
             bool anySearchersConfigured = false;
