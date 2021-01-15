@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.GlobalSettings;
 using Microsoft.TemplateEngine.Abstractions.Mount;
+using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
 
 namespace Microsoft.TemplateEngine.Mocks
 {
@@ -21,14 +23,9 @@ namespace Microsoft.TemplateEngine.Mocks
 
         public IEngineEnvironmentSettings EnvironmentSettings => _environmentSettings;
 
-        public IEnumerable<MountPointInfo> MountPoints => throw new NotImplementedException();
+        public IGlobalSettings GlobalSettings => throw new NotImplementedException();
 
-        public IUserSettings UserSettings => throw new NotImplementedException();
-
-        public void AddMountPoint(IMountPoint mountPoint)
-        {
-            throw new NotImplementedException();
-        }
+        public ITemplatesSourcesManager TemplatesSourcesManager => throw new NotImplementedException();
 
         public void AddProbingPath(string probeIn)
         {
@@ -55,37 +52,17 @@ namespace Microsoft.TemplateEngine.Mocks
             throw new NotImplementedException();
         }
 
-        public void ReleaseMountPoint(IMountPoint mountPoint)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void RemoveMountPoint(IMountPoint mountPoint)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void RemoveMountPoints(IEnumerable<Guid> mountPoints)
-        {
-            throw new NotImplementedException();
-        }
-
         public void Save()
         {
             throw new NotImplementedException();
         }
 
-        public bool TryGetFileFromIdAndPath(Guid mountPointId, string place, out IFile file, out IMountPoint mountPoint)
+        public bool TryGetFileFromIdAndPath(string mountPointUri, string filePathInsideMount, out IFile file, out IMountPoint mountPoint)
         {
             throw new NotImplementedException();
         }
 
-        public bool TryGetMountPointFromPlace(string mountPointPlace, out IMountPoint mountPoint)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool TryGetMountPointInfo(Guid mountPointId, out MountPointInfo info)
+        public bool TryGetMountPoint(string mountPointUri, out IMountPoint mountPoint)
         {
             throw new NotImplementedException();
         }

@@ -57,8 +57,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         [Fact(DisplayName = nameof(RebuildCacheIfNotCurrentScansAll))]
         public void RebuildCacheIfNotCurrentScansAll()
         {
-            _fixture.Customizations.Add(new MountPointInfoBuilder());
-            List<MountPointInfo> mountPoints = _fixture.CreateMany<MountPointInfo>().ToList();
+            _fixture.Customizations.Add(new stringBuilder());
+            List<string> mountPoints = _fixture.CreateMany<string>().ToList();
             List<TemplateInfo> templates = TemplatesFromMountPoints(mountPoints);
 
             SetupUserSettings(isCurrentVersion: false, mountPoints: mountPoints);
@@ -76,10 +76,10 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         [Fact(DisplayName = nameof(RebuildCacheSkipsNonAccessibleMounts))]
         public void RebuildCacheSkipsNonAccessibleMounts()
         {
-            _fixture.Customizations.Add(new MountPointInfoBuilder());
-            List<MountPointInfo> availableMountPoints = _fixture.CreateMany<MountPointInfo>().ToList();
-            List<MountPointInfo> unavailableMountPoints = _fixture.CreateMany<MountPointInfo>().ToList();
-            List<MountPointInfo> allMountPoints = availableMountPoints.Concat(unavailableMountPoints).ToList();
+            _fixture.Customizations.Add(new stringBuilder());
+            List<string> availableMountPoints = _fixture.CreateMany<string>().ToList();
+            List<string> unavailableMountPoints = _fixture.CreateMany<string>().ToList();
+            List<string> allMountPoints = availableMountPoints.Concat(unavailableMountPoints).ToList();
 
             List<TemplateInfo> templates = TemplatesFromMountPoints(allMountPoints);
 
@@ -101,8 +101,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         [Fact(DisplayName = nameof(RebuildCacheIfForceRebuildScansAll))]
         public void RebuildCacheIfForceRebuildScansAll()
         {
-            _fixture.Customizations.Add(new MountPointInfoBuilder());
-            List<MountPointInfo> mountPoints = _fixture.CreateMany<MountPointInfo>().ToList();
+            _fixture.Customizations.Add(new stringBuilder());
+            List<string> mountPoints = _fixture.CreateMany<string>().ToList();
             List<TemplateInfo> templates = TemplatesFromMountPoints(mountPoints);
 
             SetupUserSettings(isCurrentVersion: true, mountPoints: mountPoints);
@@ -120,8 +120,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         [Fact(DisplayName = nameof(RebuildCacheFromSettingsOnlyScansOutOfDateFileSystemMountPoints))]
         public void RebuildCacheFromSettingsOnlyScansOutOfDateFileSystemMountPoints()
         {
-            _fixture.Customizations.Add(new MountPointInfoBuilder(FileSystemMountPointFactory.FactoryId));
-            List<MountPointInfo> mountPoints = _fixture.Build<MountPointInfo>()
+            _fixture.Customizations.Add(new stringBuilder(FileSystemMountPointFactory.FactoryId));
+            List<string> mountPoints = _fixture.Build<string>()
                 .CreateMany()
                 .ToList();
             List<TemplateInfo> templates = TemplatesFromMountPoints(mountPoints);
@@ -131,8 +131,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             DateTime moreRecentTimestamp = new DateTime(2018, 9, 29);
             foreach (TemplateInfo templateInfo in templates)
             {
-                MountPointInfo mountPoint =
-                    mountPoints.Single(mp => mp.MountPointId == templateInfo.ConfigMountPointId);
+                string mountPoint =
+                    mountPoints.Single(mp => mp == templateInfo.MountPointUri);
 
                 // The first template has a recent timestamp in the cache, but a more
                 // recent one on disk
@@ -143,7 +143,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                     ? moreRecentTimestamp
                     : oldTimestamp;
 
-                string pathToTemplateFile = Path.Combine(mountPoint.Place, templateInfo.ConfigPlace.TrimStart('/'));
+                string pathToTemplateFile = Path.Combine(mountPoint, templateInfo.ConfigPlace.TrimStart('/'));
                 _fileSystem.Add(pathToTemplateFile, "{}", lastWriteTime: fileTimestamp);
             }
 
@@ -173,8 +173,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             A.CallTo(() => environmentSettings.Host.Locale)
                 .Returns("en-GB");
 
-            _fixture.Customizations.Add(new MountPointInfoBuilder(FileSystemMountPointFactory.FactoryId));
-            List<MountPointInfo> mountPoints = _fixture.Build<MountPointInfo>()
+            _fixture.Customizations.Add(new stringBuilder(FileSystemMountPointFactory.FactoryId));
+            List<string> mountPoints = _fixture.Build<string>()
                 .CreateMany()
                 .ToList();
             List<TemplateInfo> templates = TemplatesFromMountPoints(mountPoints);
@@ -182,12 +182,12 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             DateTime timestamp = new DateTime(2018, 1, 1);
             foreach (TemplateInfo templateInfo in templates)
             {
-                MountPointInfo mountPoint =
-                    mountPoints.Single(mp => mp.MountPointId == templateInfo.ConfigMountPointId);
+                string mountPoint =
+                    mountPoints.Single(mp => mp == templateInfo.MountPointUri);
 
                 templateInfo.ConfigTimestampUtc = timestamp;
 
-                string pathToTemplateFile = Path.Combine(mountPoint.Place, templateInfo.ConfigPlace.TrimStart('/'));
+                string pathToTemplateFile = Path.Combine(mountPoint, templateInfo.ConfigPlace.TrimStart('/'));
                 _fileSystem.Add(pathToTemplateFile, "{}", lastWriteTime: timestamp);
             }
 
@@ -201,10 +201,10 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             subject.RebuildCacheFromSettingsIfNotCurrent(false);
 
             // Only the first mount point should have been scanned
-            AssertMountPointsWereScanned(Enumerable.Empty<MountPointInfo>());
+            AssertMountPointsWereScanned(Enumerable.Empty<string>());
         }
 
-        private void SetupUserSettings(bool isCurrentVersion = true, IEnumerable<MountPointInfo> mountPoints = null)
+        private void SetupUserSettings(bool isCurrentVersion = true, IEnumerable<string> mountPoints = null)
         {
             SettingsStore userSettings = new SettingsStore();
 
@@ -212,8 +212,6 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             {
                 userSettings.SetVersionToCurrent();
             }
-
-            userSettings.MountPoints.AddRange(mountPoints ?? new MountPointInfo[0]);
 
             JObject serialized = JObject.FromObject(userSettings);
             _fileSystem.Add(Path.Combine(BaseDir, "settings.json"), serialized.ToString());
@@ -227,19 +225,19 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             _fileSystem.Add(Path.Combine(BaseDir, "templatecache.json"), serialized.ToString());
         }
 
-        private List<TemplateInfo> TemplatesFromMountPoints(IEnumerable<MountPointInfo> mountPoints)
+        private List<TemplateInfo> TemplatesFromMountPoints(IEnumerable<string> mountPoints)
         {
             return mountPoints.Select(mp => _fixture
                     .Build<TemplateInfo>()
-                    .With(x => x.ConfigMountPointId, mp.MountPointId)
+                    .With(x => x.MountPointUri, mp)
                     .Create())
                 .ToList();
         }
 
-        private void AssertMountPointsWereScanned(IEnumerable<MountPointInfo> mountPoints)
+        private void AssertMountPointsWereScanned(IEnumerable<string> mountPoints)
         {
             string[] expectedScannedDirectories = mountPoints
-                .Select(x => x.Place)
+                .Select(x => x)
                 .OrderBy(x => x)
                 .ToArray();
             string[] actualScannedDirectories = _fileSystem.DirectoriesScanned
@@ -249,18 +247,18 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 
             Assert.Equal(expectedScannedDirectories, actualScannedDirectories);
         }
-        private void AssertMountPointsWereNotScanned(IEnumerable<MountPointInfo> mountPoints)
+        private void AssertMountPointsWereNotScanned(IEnumerable<string> mountPoints)
         {
-            IEnumerable <string> expectedScannedDirectories = mountPoints.Select(x => x.Place);
+            IEnumerable <string> expectedScannedDirectories = mountPoints;
             IEnumerable<string> actualScannedDirectories = _fileSystem.DirectoriesScanned.Select(dir => Path.Combine(dir.DirectoryName, dir.Pattern));
             Assert.Empty(actualScannedDirectories.Intersect(expectedScannedDirectories));
         }
 
-        public class MountPointInfoBuilder : ISpecimenBuilder
+        public class stringBuilder : ISpecimenBuilder
         {
             private readonly Guid? _mountPointFactoryId;
 
-            public MountPointInfoBuilder(Guid? mountPointFactoryId = null)
+            public stringBuilder(Guid? mountPointFactoryId = null)
             {
                 _mountPointFactoryId = mountPointFactoryId;
             }
@@ -272,28 +270,28 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                     return new NoSpecimen();
                 }
 
-                if (pi.Member.DeclaringType == typeof(MountPointInfo) &&
-                    pi.ParameterType == typeof(string) &&
-                    pi.Name == "place")
-                {
-                    bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-                    if (isWindows)
-                    {
-                        return Path.Combine(@"C:\", context.Create<string>(), context.Create<string>());
-                    }
-                    else
-                    {
-                        return Path.Combine(@"/", context.Create<string>(), context.Create<string>());
-                    }    
-                }
+                //if (pi.Member.DeclaringType == typeof(string) &&
+                //    pi.ParameterType == typeof(string) &&
+                //    pi.Name == "place")
+                //{
+                //    bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+                //    if (isWindows)
+                //    {
+                //        return Path.Combine(@"C:\", context.Create<string>(), context.Create<string>());
+                //    }
+                //    else
+                //    {
+                //        return Path.Combine(@"/", context.Create<string>(), context.Create<string>());
+                //    }    
+                //}
 
-                if (pi.Member.DeclaringType == typeof(MountPointInfo) &&
-                    pi.ParameterType == typeof(Guid) &&
-                    pi.Name == "mountPointFactoryId" &&
-                    _mountPointFactoryId.HasValue)
-                {
-                    return _mountPointFactoryId;
-                }
+                //if (pi.Member.DeclaringType == typeof(string) &&
+                //    pi.ParameterType == typeof(Guid) &&
+                //    pi.Name == "mountPointFactoryId" &&
+                //    _mountPointFactoryId.HasValue)
+                //{
+                //    return _mountPointFactoryId;
+                //}
 
                 return new NoSpecimen();
             }

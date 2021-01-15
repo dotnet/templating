@@ -6,4 +6,7 @@
         <IsPackable>true</IsPackable>
         <EnableAnalyzers>true</EnableAnalyzers>
     </PropertyGroup>
+    <ItemGroup>
+      <Folder Include="TemplateUpdates\" />
+    </ItemGroup>
 </Project>

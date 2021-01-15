@@ -51,14 +51,16 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests.Utils
             return new DefaultTemplateEngineHost(HostIdentifier + Guid.NewGuid().ToString(), HostVersion, CultureInfo.CurrentCulture.Name, preferences, builtIns, Array.Empty<string>());
         }
 
-        private static void InstallAllTemplatesOnFirstRun(IEngineEnvironmentSettings environmentSettings, IInstaller installer)
+        private static void InstallAllTemplatesOnFirstRun(IEngineEnvironmentSettings environmentSettings)
         {
             string codebase = typeof(BootstrapperFactory).GetTypeInfo().Assembly.Location;
             string dir = Path.GetDirectoryName(codebase);
 
-            string templates = Path.Combine(dir, "..", "..", "..", "..", "..", "template_feed") + Path.DirectorySeparatorChar;
-            string testTemplates = Path.Combine(dir, "..", "..", "..", "..", "..", "test", "Microsoft.TemplateEngine.TestTemplates", "test_templates") + Path.DirectorySeparatorChar;
-            installer.InstallPackages(new[] { templates, testTemplates });
+            throw new NotImplementedException();
+
+            //string templates = Path.Combine(dir, "..", "..", "..", "..", "..", "template_feed") + Path.DirectorySeparatorChar;
+            //string testTemplates = Path.Combine(dir, "..", "..", "..", "..", "..", "test", "Microsoft.TemplateEngine.TestTemplates", "test_templates") + Path.DirectorySeparatorChar;
+            //installer.InstallPackages(new[] { templates, testTemplates });
         }
     }
 }
