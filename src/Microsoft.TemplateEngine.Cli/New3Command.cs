@@ -11,13 +11,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.TemplateLocator;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Installer;
 using Microsoft.TemplateEngine.Abstractions.Mount;
-using Microsoft.TemplateEngine.Abstractions.TemplateUpdates;
+using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
 using Microsoft.TemplateEngine.Cli.CommandParsing;
 using Microsoft.TemplateEngine.Cli.HelpAndUsage;
 using Microsoft.TemplateEngine.Cli.TemplateResolution;
 using Microsoft.TemplateEngine.Cli.TemplateSearch;
-using Microsoft.TemplateEngine.Cli.TemplateUpdate;
 using Microsoft.TemplateEngine.Edge;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Edge.Template;
@@ -55,7 +55,6 @@ namespace Microsoft.TemplateEngine.Cli
             host = new ExtendedTemplateEngineHost(host, this);
             EnvironmentSettings = new EngineEnvironmentSettings(host, x => new SettingsLoader(x), hivePath);
             _settingsLoader = (SettingsLoader)EnvironmentSettings.SettingsLoader;
-            Installer = new Installer(EnvironmentSettings);
             _templateCreator = new TemplateCreator(EnvironmentSettings);
             _aliasRegistry = new AliasRegistry(EnvironmentSettings);
             CommandName = commandName;
@@ -74,8 +73,6 @@ namespace Microsoft.TemplateEngine.Cli
             }
         }
 
-        internal static Installer Installer { get; set; }
-
         public string CommandName { get; }
 
         public string TemplateName => _commandInput.TemplateName;
@@ -84,7 +81,7 @@ namespace Microsoft.TemplateEngine.Cli
 
         public EngineEnvironmentSettings EnvironmentSettings { get; private set; }
 
-        public static int Run(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, Action<IEngineEnvironmentSettings, IInstaller> onFirstRun, string[] args)
+        public static int Run(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, Action<IEngineEnvironmentSettings> onFirstRun, string[] args)
         {
             return Run(commandName, host, telemetryLogger, new New3Callbacks() { OnFirstRun = onFirstRun }, args, null);
         }
@@ -114,7 +111,7 @@ namespace Microsoft.TemplateEngine.Cli
             return _entryMutex;
         }
 
-        public static int Run(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, Action<IEngineEnvironmentSettings, IInstaller> onFirstRun, string[] args, string hivePath)
+        public static int Run(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, Action<IEngineEnvironmentSettings> onFirstRun, string[] args, string hivePath)
         {
             return Run(commandName, host, telemetryLogger, new New3Callbacks() { OnFirstRun = onFirstRun }, args, hivePath);
         }
@@ -234,24 +231,61 @@ namespace Microsoft.TemplateEngine.Cli
                 _paths.DeleteDirectory(_paths.User.BaseDir);
             }
 
-            _callbacks.OnFirstRun?.Invoke(EnvironmentSettings, Installer);
+            _callbacks.OnFirstRun?.Invoke(EnvironmentSettings);
             EnvironmentSettings.SettingsLoader.Components.RegisterMany(typeof(New3Command).GetTypeInfo().Assembly.GetTypes());
         }
 
-        private CreationResultStatus EnterInstallFlow()
+        private async Task<CreationResultStatus> EnterInstallFlow()
         {
+            CreationResultStatus success = CreationResultStatus.Success;
             _telemetryLogger.TrackEvent(CommandName + TelemetryConstants.InstallEventSuffix, new Dictionary<string, string> { { TelemetryConstants.ToInstallCount, _commandInput.ToInstallList.Count.ToString() } });
 
-            bool allowDevInstall = _commandInput.HasDebuggingFlag("--dev:install");
-            Installer.InstallPackages(_commandInput.ToInstallList, _commandInput.InstallNuGetSourceList, allowDevInstall, _commandInput.IsInteractiveFlagSpecified);
+            var details = new Dictionary<string, string>();
+            if (_commandInput.InstallNuGetSourceList?.Count > 0)
+            {
+                details["NuGetSource"] = string.Join(";", _commandInput.InstallNuGetSourceList);
+            }
+            if (_commandInput.IsInteractiveFlagSpecified)
+            {
+                details["Iteractive"] = "true";
+            }
 
-            //TODO: When an installer that directly calls into NuGet is available,
-            //  return a more accurate representation of the outcome of the operation
-            return CreationResultStatus.Success;
+            // In future we might want give user ability to pick IManagerSourceProvider by Name or GUID
+            var managedSourceProvider = EnvironmentSettings.SettingsLoader.TemplatesSourcesManager.GetManagedProvider(GlobalSettingsTemplatesSourcesProviderFactory.FactoryId);
+            foreach (var identifier in _commandInput.ToInstallList)
+            {
+                var splitByColons = identifier.Split(new[] { "::" }, StringSplitOptions.RemoveEmptyEntries);
+                SemanticVersion version = null;
+                if (splitByColons.Length > 1 && SemanticVersion.TryParse(splitByColons[1], out var parsedVersion))
+                {
+                    version = parsedVersion;
+                }
+
+                var result = await managedSourceProvider.InstallAsync(new InstallRequest()
+                {
+                    Identifier = identifier,
+                    Version = version,
+                    Details = details,
+                    //TODO: Not needed, for now, but in future when we have more installers then just NuGet and Folder
+                    //give user ability to set InstallerName
+                    //InstallerName = _commandInput.InstallerName,
+                });
+                if (!result.Success)
+                {
+                    Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailed, identifier, result.FailureMessage).Bold().Red());
+                    success = CreationResultStatus.CreateFailed;
+                }
+                else
+                {
+                    //TODO: Write list of newly installed templates
+                }
+            }
+
+            return success;
         }
 
         // TODO: make sure help / usage works right in these cases.
-        private CreationResultStatus EnterMaintenanceFlow()
+        private async Task<CreationResultStatus> EnterMaintenanceFlow()
         {
             if (!TemplateResolver.ValidateRemainingParameters(_commandInput, out IReadOnlyList<string> invalidParams))
             {
@@ -271,12 +305,12 @@ namespace Microsoft.TemplateEngine.Cli
 
             if (_commandInput.ToUninstallList != null)
             {
-                return EnterUninstallFlow();
+                return await EnterUninstallFlow();
             }
 
             if (_commandInput.ToInstallList != null && _commandInput.ToInstallList.Count > 0 && _commandInput.ToInstallList[0] != null)
             {
-                CreationResultStatus installResult = EnterInstallFlow();
+                CreationResultStatus installResult = await EnterInstallFlow();
 
                 if (installResult == CreationResultStatus.Success)
                 {
@@ -295,15 +329,21 @@ namespace Microsoft.TemplateEngine.Cli
             return CreationResultStatus.Success;
         }
 
-        private CreationResultStatus EnterUninstallFlow()
+        private async Task<CreationResultStatus> EnterUninstallFlow()
         {
             if (_commandInput.ToUninstallList.Count > 0 && _commandInput.ToUninstallList[0] != null)
             {
-                IEnumerable<string> failures = Installer.Uninstall(_commandInput.ToUninstallList);
-
-                foreach (string failure in failures)
+                var managedSources = await EnvironmentSettings.SettingsLoader.TemplatesSourcesManager.GetManagedTemplatesSources(false);
+                foreach (var managedSource in managedSources)
                 {
-                    Reporter.Output.WriteLine(string.Format(LocalizableStrings.CouldntUninstall, failure));
+                    try
+                    {
+                        await managedSource.ManagedProvider.UninstallAsync(managedSource).ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        Reporter.Output.WriteLine(string.Format(LocalizableStrings.CouldntUninstall, ex.Message));
+                    }
                 }
             }
             else
@@ -312,7 +352,7 @@ namespace Microsoft.TemplateEngine.Cli
                 Reporter.Output.WriteLine();
                 Reporter.Output.WriteLine(LocalizableStrings.InstalledItems);
 
-                foreach (IInstallUnitDescriptor descriptor in _settingsLoader.InstallUnitDescriptorCache.Descriptors.Values)
+                foreach (IManagedTemplatesSource descriptor in await EnvironmentSettings.SettingsLoader.TemplatesSourcesManager.GetManagedTemplatesSources().ConfigureAwait(false))
                 {
                     Reporter.Output.WriteLine($"  {descriptor.Identifier}");
 
@@ -338,7 +378,7 @@ namespace Microsoft.TemplateEngine.Cli
                     // template info
                     HashSet<string> templateDisplayStrings = new HashSet<string>(StringComparer.Ordinal);
 
-                    foreach (TemplateInfo info in _settingsLoader.UserTemplateCache.TemplateInfo.Where(x => x.ConfigMountPointId == descriptor.MountPointId))
+                    foreach (TemplateInfo info in _settingsLoader.UserTemplateCache.TemplateInfo.Where(x => x.MountPointUri == descriptor.MountPointUri))
                     {
                         string str = $"      {info.Name} ({info.ShortName})";
 
@@ -363,7 +403,7 @@ namespace Microsoft.TemplateEngine.Cli
 
                     // uninstall command:
                     Reporter.Output.WriteLine($"    {LocalizableStrings.UninstallListUninstallCommand}");
-                    Reporter.Output.WriteLine(string.Format("      dotnet {0} -u {1}", _commandInput.CommandName, descriptor.UninstallString));
+                    Reporter.Output.WriteLine(string.Format("      dotnet {0} -u {1}", _commandInput.CommandName, descriptor.Identifier));
 
                     Reporter.Output.WriteLine();
                 }
@@ -372,7 +412,7 @@ namespace Microsoft.TemplateEngine.Cli
             return CreationResultStatus.Success;
         }
 
-        private void WriteDescriptorDetail(IInstallUnitDescriptor descriptor, string detailKey, ref bool wroteHeader)
+        private void WriteDescriptorDetail(IManagedTemplatesSource descriptor, string detailKey, ref bool wroteHeader)
         {
             if (descriptor.Details.TryGetValue(detailKey, out string detailValue)
                 && !string.IsNullOrEmpty(detailValue))
@@ -447,19 +487,6 @@ namespace Microsoft.TemplateEngine.Cli
                 return CreationResultStatus.Success;
             }
 
-            try
-            {
-                bool isHiveUpdated = SyncOptionalWorkloads();
-                if (isHiveUpdated)
-                {
-                    Reporter.Output.WriteLine(LocalizableStrings.OptionalWorkloadsSynchronized);
-                }
-            }
-            catch (HiveSynchronizationException hiex)
-            {
-                Reporter.Error.WriteLine(hiex.Message.Bold().Red());
-            }
-
             bool forceCacheRebuild = _commandInput.HasDebuggingFlag("--debug:rebuildcache");
             try
             {
@@ -482,10 +509,36 @@ namespace Microsoft.TemplateEngine.Cli
                 if (_commandInput.CheckForUpdates || _commandInput.CheckForUpdatesNoPrompt)
                 {
                     bool applyUpdates = _commandInput.CheckForUpdatesNoPrompt;
-                    CliTemplateUpdater updater = new CliTemplateUpdater(EnvironmentSettings, Installer, CommandName);
-                    bool updateCheckResult = await updater.CheckForUpdatesAsync(_settingsLoader.InstallUnitDescriptorCache.Descriptors.Values.ToList(), applyUpdates);
-
-                    return updateCheckResult ? CreationResultStatus.Success : CreationResultStatus.CreateFailed;
+                    var managedSourcedGroupedByProvider = await EnvironmentSettings.SettingsLoader.TemplatesSourcesManager.GetManagedSourcesGroupedByProvider().ConfigureAwait(false);
+                    foreach (var (provider, sources) in managedSourcedGroupedByProvider)
+                    {
+                        var updates = await provider.GetLatestVersions(sources);
+                        if (applyUpdates)
+                        {
+                            var results = await provider.UpdateAsync(updates).ConfigureAwait(false);
+                            foreach (var result in results)
+                            {
+                                if (!result.Success)
+                                {
+                                    //TODO: Write failure
+                                }
+                            }
+                        }
+                        else
+                        {
+                            foreach (var updateResult in updates)
+                            {
+                                if (updateResult.Version != updateResult.InstallUnitDescriptor.Version)
+                                {
+                                    string displayString = $"{updateResult.InstallUnitDescriptor.Identifier}::{updateResult.InstallUnitDescriptor.Version}";         // the package::version currently installed
+                                    Reporter.Output.WriteLine(string.Format(LocalizableStrings.UpdateAvailable, displayString));
+                                    string installString = $"{updateResult.InstallUnitDescriptor.Identifier}::{updateResult.Version}"; // the package::version that will be installed
+                                    Reporter.Output.WriteLine(string.Format(LocalizableStrings.UpdateCheck_InstallCommand, CommandName, installString));
+                                }
+                            }
+                        }
+                    }
+                    return CreationResultStatus.Success;
                 }
 
                 if (_commandInput.SearchOnline)
@@ -495,7 +548,7 @@ namespace Microsoft.TemplateEngine.Cli
 
                 if (string.IsNullOrWhiteSpace(TemplateName))
                 {
-                    return EnterMaintenanceFlow();
+                    return await EnterMaintenanceFlow();
                 }
 
                 return await EnterTemplateManipulationFlowAsync().ConfigureAwait(false);
@@ -600,13 +653,6 @@ namespace Microsoft.TemplateEngine.Cli
         {
             Reporter.Output.WriteLine(LocalizableStrings.CurrentConfiguration);
             Reporter.Output.WriteLine(" ");
-            TableFormatter.Print(EnvironmentSettings.SettingsLoader.MountPoints, LocalizableStrings.NoItems, "   ", '-', new Dictionary<string, Func<MountPointInfo, object>>
-            {
-                {LocalizableStrings.MountPoints, x => x.Place},
-                {LocalizableStrings.Id, x => x.MountPointId},
-                {LocalizableStrings.Parent, x => x.ParentMountPointId},
-                {LocalizableStrings.Factory, x => x.MountPointFactoryId}
-            });
 
             TableFormatter.Print(EnvironmentSettings.SettingsLoader.Components.OfType<IMountPointFactory>(), LocalizableStrings.NoItems, "   ", '-', new Dictionary<string, Func<IMountPointFactory, object>>
             {

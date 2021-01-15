@@ -8,11 +8,9 @@ using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 using Microsoft.TemplateEngine.Cli;
 using Microsoft.TemplateEngine.Cli.PostActionProcessors;
 using Microsoft.TemplateEngine.Edge;
-using Microsoft.TemplateEngine.Edge.TemplateUpdates;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config;
 using Microsoft.TemplateEngine.Utils;
-using Microsoft.TemplateSearch.Common.TemplateUpdate;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.EndToEndTestHarness
@@ -206,26 +204,26 @@ namespace Microsoft.TemplateEngine.EndToEndTestHarness
             var builtIns = new AssemblyComponentCatalog(new[]
             {
                 typeof(RunnableProjectGenerator).GetTypeInfo().Assembly,            // for assembly: Microsoft.TemplateEngine.Orchestrator.RunnableProjects
-                typeof(NupkgInstallUnitDescriptorFactory).GetTypeInfo().Assembly,   // for assembly: Microsoft.TemplateEngine.Edge
+                typeof(Microsoft.TemplateEngine.Edge.Paths).GetTypeInfo().Assembly,   // for assembly: Microsoft.TemplateEngine.Edge
                 typeof(DotnetRestorePostActionProcessor).GetTypeInfo().Assembly,    // for assembly: Microsoft.TemplateEngine.Cli
-                typeof(NupkgUpdater).GetTypeInfo().Assembly                         // for assembly: Microsoft.TemplateSearch.Common
+                typeof(Microsoft.TemplateSearch.Common.NuGetSearchCacheConfig).GetTypeInfo().Assembly// for assembly: Microsoft.TemplateSearch.Common
             });
 
             return new DefaultTemplateEngineHost(HostIdentifier, HostVersion, CultureInfo.CurrentCulture.Name, preferences, builtIns, new[] { "dotnetcli" });
         }
 
-        private static void FirstRun(IEngineEnvironmentSettings environmentSettings, IInstaller installer)
+        private static void FirstRun(IEngineEnvironmentSettings environmentSettings)
         {
             string codebase = typeof(Program).GetTypeInfo().Assembly.Location;
             Uri cb = new Uri(codebase);
             string asmPath = cb.LocalPath;
             string dir = Path.GetDirectoryName(asmPath);
-
-            string packages = Path.Combine(dir, "..", "..", "..", "..", "..", "artifacts", "packages") + Path.DirectorySeparatorChar + "*";
-            string templates = Path.Combine(dir, "..", "..", "..", "..", "..", "template_feed") + Path.DirectorySeparatorChar;
-            string testTemplates = Path.Combine(dir, "..", "..", "..", "..", "..", "test", "Microsoft.TemplateEngine.TestTemplates", "test_templates") + Path.DirectorySeparatorChar;
-            installer.InstallPackages(new[] { packages });
-            installer.InstallPackages(new[] { templates, testTemplates });
+            throw new NotImplementedException("Convert this into templatessoruceprovider");
+            //string packages = Path.Combine(dir, "..", "..", "..", "..", "..", "artifacts", "packages") + Path.DirectorySeparatorChar + "*";
+            //string templates = Path.Combine(dir, "..", "..", "..", "..", "..", "template_feed") + Path.DirectorySeparatorChar;
+            //string testTemplates = Path.Combine(dir, "..", "..", "..", "..", "..", "test", "Microsoft.TemplateEngine.TestTemplates", "test_templates") + Path.DirectorySeparatorChar;
+            //installer.InstallPackages(new[] { packages });
+            //installer.InstallPackages(new[] { templates, testTemplates });
         }
     }
 }

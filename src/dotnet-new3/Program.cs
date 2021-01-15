@@ -10,25 +10,23 @@ using Microsoft.TemplateEngine.Cli;
 using Microsoft.TemplateEngine.Edge;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects;
 using Microsoft.TemplateEngine.Utils;
-using Microsoft.TemplateEngine.Edge.TemplateUpdates;
 using Microsoft.TemplateEngine.Cli.PostActionProcessors;
-using Microsoft.TemplateSearch.Common.TemplateUpdate;
 
-[assembly:InternalsVisibleTo("dotnet-new3.UnitTests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100f33a29044fa9d740c9b3213a93e57c84b472c84e0b8a0e1ae48e67a9f8f6de9d5f7f3d52ac23e48ac51801f1dc950abe901da34d2a9e3baadb141a17c77ef3c565dd5ee5054b91cf63bb3c6ab83f72ab3aafe93d0fc3c2348b764fafb0b1c0733de51459aeab46580384bf9d74c4e28164b7cde247f891ba07891c9d872ad2bb")]
+[assembly: InternalsVisibleTo("dotnet-new3.UnitTests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100f33a29044fa9d740c9b3213a93e57c84b472c84e0b8a0e1ae48e67a9f8f6de9d5f7f3d52ac23e48ac51801f1dc950abe901da34d2a9e3baadb141a17c77ef3c565dd5ee5054b91cf63bb3c6ab83f72ab3aafe93d0fc3c2348b764fafb0b1c0733de51459aeab46580384bf9d74c4e28164b7cde247f891ba07891c9d872ad2bb")]
 
 namespace dotnet_new3
 {
     public class Program
     {
         private const string HostIdentifier = "dotnetcli-preview";
-        private const string HostVersion = "v1.0.0";
+        private const string HostVersion = "v2.0.0";
         private const string CommandName = "new3";
 
         public static int Main(string[] args)
         {
             bool emitTimings = args.Any(x => string.Equals(x, "--debug:emit-timings", StringComparison.OrdinalIgnoreCase));
             bool debugTelemetry = args.Any(x => string.Equals(x, "--debug:emit-telemetry", StringComparison.OrdinalIgnoreCase));
-    
+
             DefaultTemplateEngineHost host = CreateHost(emitTimings);
 
             bool debugAuthoring = args.Any(x => string.Equals(x, "--trace:authoring", StringComparison.OrdinalIgnoreCase));
@@ -67,9 +65,10 @@ namespace dotnet_new3
             var builtIns = new AssemblyComponentCatalog(new[]
             {
                 typeof(RunnableProjectGenerator).GetTypeInfo().Assembly,            // for assembly: Microsoft.TemplateEngine.Orchestrator.RunnableProjects
-                typeof(NupkgInstallUnitDescriptorFactory).GetTypeInfo().Assembly,   // for assembly: Microsoft.TemplateEngine.Edge
+                typeof(Microsoft.TemplateEngine.Edge.Settings.TemplateInfo).GetTypeInfo().Assembly,   // for assembly: Microsoft.TemplateEngine.Edge
                 typeof(DotnetRestorePostActionProcessor).GetTypeInfo().Assembly,    // for assembly: Microsoft.TemplateEngine.Cli
-                typeof(NupkgUpdater).GetTypeInfo().Assembly                         // for assembly: Microsoft.TemplateSearch.Common
+                typeof(Microsoft.TemplateSearch.Common.FileMetadataSearchSource).GetTypeInfo().Assembly,                         // for assembly: Microsoft.TemplateSearch.Common
+                typeof(Program).GetTypeInfo().Assembly
             });
 
             DefaultTemplateEngineHost host = new DefaultTemplateEngineHost(HostIdentifier, HostVersion, CultureInfo.CurrentCulture.Name, preferences, builtIns, new[] { "dotnetcli" });
@@ -105,41 +104,11 @@ namespace dotnet_new3
             host.RegisterDiagnosticLogger("Install", installLogger);
         }
 
-        private static void FirstRun(IEngineEnvironmentSettings environmentSettings, IInstaller installer)
+        private static void FirstRun(IEngineEnvironmentSettings environmentSettings)
         {
-            string dn3Path = Environment.GetEnvironmentVariable("DN3");
-            if (string.IsNullOrEmpty(dn3Path))
-            {
-                string path = typeof(Program).Assembly.Location;
-                while (path != null && !File.Exists(Path.Combine(path, "Microsoft.TemplateEngine.sln")))
-                {
-                    path = Path.GetDirectoryName(path);
-                }
-                if (path == null)
-                {
-                    environmentSettings.Host.LogDiagnosticMessage("Couldn't the setup package location, because \"Microsoft.TemplateEngine.sln\" is not in any of parent directories.", "Install");
-                    return;
-                }
-                Environment.SetEnvironmentVariable("DN3", path);
-            }
-
-            List<string> toInstallList = new List<string>();
             Paths paths = new Paths(environmentSettings);
 
-            if (paths.FileExists(paths.Global.DefaultInstallTemplateList))
-            {
-                toInstallList.AddRange(paths.ReadAllText(paths.Global.DefaultInstallTemplateList).Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries));
-            }
-
-            if (toInstallList.Count > 0)
-            {
-                for (int i = 0; i < toInstallList.Count; i++)
-                {
-                    toInstallList[i] = toInstallList[i].Replace('\\', Path.DirectorySeparatorChar);
-                }
-
-                installer.InstallPackages(toInstallList);
-            }
+            environmentSettings.Host.FileSystem.CreateDirectory(paths.User.BaseDir);
 
             // copy the in-box nuget template search metadata file.
             if (paths.FileExists(paths.Global.DefaultInstallTemplateSearchData))
