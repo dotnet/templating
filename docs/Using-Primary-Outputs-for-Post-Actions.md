@@ -98,13 +98,14 @@ template files:
       "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
       "continueOnError": true,
       "args": {
-        "files": [ "MyTestProject.csproj" ]
+        "files": [ "Custom/Path/MyTestProject.csproj" ]
       }
     }
   ]
 }
 ```
 Note that the example above contains primary output with original name in the final location. The actual primary output returned by API, will contain the final file name after renames are applied.
+Post action `files` should contain the original location in template definition.
 Example:
 ```
 dotnet new TestAssets.TemplateWithSourceNameAndCustomSourcePath --name Awesome 
@@ -150,13 +151,14 @@ template files:
       "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
       "continueOnError": true,
       "args": {
-        "files": [ "/Custom/Path/MyTestProject.csproj" ]
+        "files": [ "MyTestProject.csproj" ]
       }
     }
   ]
 }
 ```
 Note that the example above contains primary output with original name in the final location. The actual primary output returned by API, will contain the final file name after renames are applied.
+Post action `files` should contain the original location in template definition.
 Example:
 ```
 dotnet new TestAssets.TemplateWithSourceNameAndCustomTargetPath --name Awesome 
@@ -203,13 +205,14 @@ template files:
       "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
       "continueOnError": true,
       "args": {
-        "files": [ "Target/Output/MyTestProject.csproj" ]
+        "files": [ "Src/Custom/Path/MyTestProject.csproj" ]
       }
     }
   ]
 }
 ```
 Note that the example above contains primary output with original name in the final location. The actual primary output returned by API, will contain the final file name after renames are applied.
+Post action `files` should contain the original location in template definition.
 Example:
 ```
 dotnet new TestAssets.TemplateWithSourceNameAndCustomSourceAndTargetPaths --name Awesome 
@@ -263,13 +266,13 @@ template files:
       "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
       "continueOnError": true,
       "args": {
-        "files": [ "MyFirstTestProject.csproj" ]
+        "files": [ "MyTestProject.csproj" ]
       }
     }
   ]
 }
 ```
-Note that the example above contains primary output with name <b>after source based rename is applied</b>. The actual primary output returned by API, contains the final file name after symbol based renames are applied.
+Note that the example above contains primary output with name <b>after source based rename is applied</b>. The actual primary output returned by API, contains the final file name after symbol based renames are applied. Post action `files` should contain the original location in template definition.
 Example:
 ```
 dotnet new TestAssets.TemplateWithSourceBasedRenames --firstRename Awesome 
