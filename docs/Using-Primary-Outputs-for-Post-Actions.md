@@ -1,5 +1,4 @@
 ## Primary outputs
-
 Primary outputs define the list of template files for further processing. 
 The primary outputs are returned by template engine API after template instantiation (`Microsoft.TemplateEngine.IDE.Bootstrapper.CreateAsync`, `Microsoft.TemplateEngine.Edge.Template.TemplateCreator.InstantiateAsync`) or dry run (`Microsoft.TemplateEngine.IDE.Bootstrapper.GetCreationEffectsAsync`).
 The main use for primary outputs is to provide the list of files to perform post actions implemented by the host. `dotnet CLI` host and Visual Studio host implement the default set of post actions based on primary outputs returned by API, described in [post-action registry](https://github.com/dotnet/templating/wiki/Post-Action-Registry). In case the template files has to be used in post actions, they should be added as the primary outputs in `template.json` definition.
@@ -78,7 +77,7 @@ template files:
   "precedence": "100",
   "identity": "TestAssets.TemplateWithSourceNameAndCustomSourcePath",
   "shortName": "TestAssets.TemplateWithSourceNameAndCustomSourcePath",
-  "sourceName": "foo",
+  "sourceName": "MyTestProject",
   "sources": [
     {
       "source": "./Custom/Path/"
@@ -131,7 +130,7 @@ template files:
   "precedence": "100",
   "identity": "TestAssets.TemplateWithSourceNameAndCustomTargetPath",
   "shortName": "TestAssets.TemplateWithSourceNameAndCustomTargetPath",
-  "sourceName": "foo",
+  "sourceName": "MyTestProject",
   "sources": [
     {
       "target": "./Custom/Path/"
@@ -184,7 +183,7 @@ template files:
   "precedence": "100",
   "identity": "TestAssets.TemplateWithSourceNameAndCustomSourceAndTargetPaths",
   "shortName": "TestAssets.TemplateWithSourceNameAndCustomSourceAndTargetPaths",
-  "sourceName": "foo",
+  "sourceName": "MyTestProject",
   "sources": [
     {
       "source": "./Src/Custom/Path/",
@@ -279,3 +278,117 @@ dotnet new TestAssets.TemplateWithSourceBasedRenames --firstRename Awesome
 ```
 The primary output returned by API is: `MyAwesomeTestProject.csproj`.
 The final location of the files is: `./MyAwesomeTestProject.csproj`.
+
+
+# Examples
+
+## Example 1 - apply post action to all primary outputs
+The following example restores all the projects mentioned in primary outputs:
+`template.json` definition
+```
+{
+  "author": "Test Asset",
+  "classifications": [ "Test Asset" ],
+  "name": "TemplateWithSourceNameAndCustomSourceAndTargetPaths",
+  "generatorVersions": "[1.0.0.0-*)",
+  "groupIdentity": "TestAssets.TemplateWithSourceNameAndCustomSourceAndTargetPaths",
+  "precedence": "100",
+  "identity": "TestAssets.TemplateWithSourceNameAndCustomSourceAndTargetPaths",
+  "shortName": "TestAssets.TemplateWithSourceNameAndCustomSourceAndTargetPaths",
+  "sourceName": "MyTestProject",
+  "sources": [
+    {
+      "source": "./Src/Custom/Path/",
+      "target": "./Target/Output/"
+    }
+  ],
+  "primaryOutputs": [
+    {
+      "path": "Target/Output/MyTestProject.csproj"        
+    }
+  ],
+  "postActions": [
+    {
+      "description": "Restore NuGet packages required by this project.",
+      "manualInstructions": [
+        { "text": "Run 'dotnet restore'" }
+      ],
+      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+      "continueOnError": true,
+    }
+  ]
+}
+```
+
+## Example 2 - reference source files in post action arguments
+The following example restores individual files specified in `files` property. Defining them in primary outputs is optional.
+`template.json` definition
+```
+{
+  "author": "Test Asset",
+  "classifications": [ "Test Asset" ],
+  "name": "TemplateWithSourceNameAndCustomSourceAndTargetPaths",
+  "generatorVersions": "[1.0.0.0-*)",
+  "groupIdentity": "TestAssets.TemplateWithSourceNameAndCustomSourceAndTargetPaths",
+  "precedence": "100",
+  "identity": "TestAssets.TemplateWithSourceNameAndCustomSourceAndTargetPaths",
+  "shortName": "TestAssets.TemplateWithSourceNameAndCustomSourceAndTargetPaths",
+  "sourceName": "MyTestProject",
+  "sources": [
+    {
+      "source": "./Src/Custom/Path/",
+      "target": "./Target/Output/"
+    }
+  ],
+
+  "primaryOutputs": [
+    {
+      "path": "Target/Output/MyTestProject.csproj"           
+    }
+  ],
+
+  "postActions": [
+    {
+      "description": "Restore NuGet packages required by this project.",
+      "manualInstructions": [
+        { "text": "Run 'dotnet restore'" }
+      ],
+      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+      "continueOnError": true,
+      "args": {
+        "files": [ "Src/Custom/Path/MyTestProject.csproj" ]  //source location
+      }
+    }
+  ]
+}
+```
+Supported for:
+- restore NuGet packages (dotnet CLI)
+- add reference to a project file (dotnet CLI)
+
+## Example 3 - using primary output indexes in post action arguments
+
+Opens the file from primary outputs defined by index.
+`template.json` definition
+```
+"primaryOutputs": [
+  { "path": "Company.ClassLibrary1.csproj" },
+  { "path": "Class1.cs" }
+],
+"postActions": [
+  {
+    "description": "Opens Class1.cs in the editor",
+    "manualInstructions": [ ],
+    "actionId": "84C0DA21-51C8-4541-9940-6CA19AF04EE6",
+    "args": {
+      "files": "1"
+    },
+    "continueOnError": true
+  }
+]
+```
+
+Supported for:
+- add projects to a solution file (dotnet CLI)
+- add reference to a project file (Visual Studio)
+- open a file in the editor (Visual Studio)
