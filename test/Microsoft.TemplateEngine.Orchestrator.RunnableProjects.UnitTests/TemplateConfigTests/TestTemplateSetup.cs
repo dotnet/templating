@@ -106,7 +106,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             runSpec.RootVariableCollection = variables;
             IDirectory sourceDir = SourceMountPoint.DirectoryInfo("/");
 
-            IOrchestrator2 basicOrchestrator = new Core.Util.Orchestrator();
+            IOrchestrator basicOrchestrator = new Core.Util.Orchestrator();
             RunnableProjectOrchestrator orchestrator = new RunnableProjectOrchestrator(basicOrchestrator);
 
             foreach (FileSourceMatchInfo source in runnableConfig.Sources)
@@ -136,7 +136,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             MockGlobalRunSpec runSpec = new MockGlobalRunSpec();
             IDirectory sourceDir = SourceMountPoint.DirectoryInfo("/");
 
-            IOrchestrator2 basicOrchestrator = new Core.Util.Orchestrator();
+            IOrchestrator basicOrchestrator = new Core.Util.Orchestrator();
             RunnableProjectOrchestrator orchestrator = new RunnableProjectOrchestrator(basicOrchestrator);
 
             Dictionary<string, IReadOnlyList<IFileChange2>> changesByTarget = new Dictionary<string, IReadOnlyList<IFileChange2>>();

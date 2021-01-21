@@ -9,7 +9,7 @@ using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Core.Util
 {
-    public class Orchestrator : IOrchestrator, IOrchestrator2
+    public class Orchestrator : IOrchestrator 
     {
         public void Run(string runSpecPath, IDirectory sourceDir, string targetDir)
         {
@@ -59,16 +59,6 @@ namespace Microsoft.TemplateEngine.Core.Util
         public IReadOnlyList<IFileChange2> GetFileChanges(IGlobalRunSpec spec, IDirectory sourceDir, string targetRoot, string targetDir)
         {
             return GetFileChangesInternal(sourceDir.MountPoint.EnvironmentSettings, sourceDir, targetRoot, targetDir, spec);
-        }
-
-        IReadOnlyList<IFileChange> IOrchestrator.GetFileChanges(string runSpecPath, IDirectory sourceDir, string targetRoot, string targetDir)
-        {
-            return GetFileChanges(runSpecPath, sourceDir, targetRoot, targetDir);
-        }
-
-        IReadOnlyList<IFileChange> IOrchestrator.GetFileChanges(IGlobalRunSpec spec, IDirectory sourceDir, string targetRoot, string targetDir)
-        {
-            return GetFileChanges(spec, sourceDir, targetRoot, targetDir);
         }
 
         protected virtual IGlobalRunSpec RunSpecLoader(Stream runSpec)
