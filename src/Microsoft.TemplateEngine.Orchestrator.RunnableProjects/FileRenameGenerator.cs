@@ -20,7 +20,16 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         //  - parameters with a FileRename specified
         //  - the source & target names.
         // Any input fileRenames will be applied before the parameter symbol renames.
-        public static IReadOnlyDictionary<string, string> AugmentFileRenames(IEngineEnvironmentSettings environmentSettings, string sourceName, IFileSystemInfo configFile, string sourceDirectory, ref string targetDirectory, object resolvedNameParamValue, IParameterSet parameterSet, Dictionary<string, string> fileRenames, IReadOnlyList<IReplacementTokens> symbolBasedFileRenames = null)
+        public static IReadOnlyDictionary<string, string> AugmentFileRenames(
+            IEngineEnvironmentSettings environmentSettings,
+            string sourceName,
+            IFileSystemInfo configFile,
+            string sourceDirectory,
+            ref string targetDirectory,
+            object resolvedNameParamValue,
+            IParameterSet parameterSet,
+            Dictionary<string, string> fileRenames,
+            IReadOnlyList<IReplacementTokens> symbolBasedFileRenames = null)
         {
             Dictionary<string, string> allRenames = new Dictionary<string, string>(StringComparer.Ordinal);
 
@@ -46,7 +55,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return allRenames;
         }
 
-        public static string ApplyRenameToPrimaryOutput(string primaryOutputPath, IEngineEnvironmentSettings environmentSettings, string sourceName, object resolvedNameParamValue, IParameterSet parameterSet, IReadOnlyList<IReplacementTokens> symbolBasedFileRenames = null)
+        public static string ApplyRenameToPrimaryOutput(
+            string primaryOutputPath,
+            IEngineEnvironmentSettings environmentSettings,
+            string sourceName,
+            object resolvedNameParamValue,
+            IParameterSet parameterSet,
+            IReadOnlyList<IReplacementTokens> symbolBasedFileRenames = null)
         {
             string targetDirectoryStub = string.Empty;
             IProcessor symbolRenameProcessor = SetupSymbolBasedRenameProcessor(environmentSettings, sourceName, ref targetDirectoryStub, resolvedNameParamValue, parameterSet, symbolBasedFileRenames);
@@ -83,7 +98,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         // Creates and returns the processor used to create the file rename mapping based on the symbols with fileRename defined.
         // Also sets up rename for the target directory.
-        private static IProcessor SetupSymbolBasedRenameProcessor(IEngineEnvironmentSettings environmentSettings, string sourceName, ref string targetDirectory, object resolvedNameParamValue, IParameterSet parameterSet, IReadOnlyList<IReplacementTokens> symbolBasedFileRenames)
+        private static IProcessor SetupSymbolBasedRenameProcessor(
+            IEngineEnvironmentSettings environmentSettings,
+            string sourceName,
+            ref string targetDirectory,
+            object resolvedNameParamValue,
+            IParameterSet parameterSet,
+            IReadOnlyList<IReplacementTokens> symbolBasedFileRenames)
         {
             List<IOperationProvider> operations = new List<IOperationProvider>();
             SetupRenameForTargetDirectory(sourceName, resolvedNameParamValue, ref targetDirectory, operations);
@@ -102,7 +123,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         }
 
         // Sets up a rename for the target directory based on the "name" parameter.
-        private static void SetupRenameForTargetDirectory(string sourceName, object resolvedNameParamValue, ref string targetDirectory, List<IOperationProvider> operations)
+        private static void SetupRenameForTargetDirectory(
+            string sourceName,
+            object resolvedNameParamValue,
+            ref string targetDirectory,
+            List<IOperationProvider> operations)
         {
             if (resolvedNameParamValue != null && sourceName != null)
             {
