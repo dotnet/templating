@@ -9,11 +9,11 @@ namespace dotnet_new3.UnitTests
 {
     public class DotnetNewInstantiate
     {
-        private readonly ITestOutputHelper log;
+        private readonly ITestOutputHelper _log;
 
         public DotnetNewInstantiate(ITestOutputHelper log)
         {
-            this.log = log;
+            _log = log;
         }
 
         [Fact]
@@ -22,7 +22,7 @@ namespace dotnet_new3.UnitTests
             string home = Helpers.CreateTemporaryFolder("Home");
             string workingDirectory = Helpers.CreateTemporaryFolder();
 
-            new DotnetNewCommand(log, "console")
+            new DotnetNewCommand(_log, "console")
                 .WithWorkingDirectory(workingDirectory)
                 .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
                 .Execute()
@@ -37,7 +37,7 @@ namespace dotnet_new3.UnitTests
         {
             var home = Helpers.CreateTemporaryFolder("Home");
 
-            new DotnetNewCommand(log, "webapp", "--quiet")
+            new DotnetNewCommand(_log, "webapp", "--quiet")
                 .WithWorkingDirectory(Helpers.CreateTemporaryFolder())
                 .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
                 .Execute()
@@ -54,9 +54,9 @@ namespace dotnet_new3.UnitTests
         {
             string home = Helpers.CreateTemporaryFolder("Home");
             string workingDirectory = Helpers.CreateTemporaryFolder();
-            Helpers.InstallTestTemplate("TemplateResolution/DifferentLanguagesGroup/BasicFSharp", log, workingDirectory, home);
+            Helpers.InstallTestTemplate("TemplateResolution/DifferentLanguagesGroup/BasicFSharp", _log, workingDirectory, home);
 
-            new DotnetNewCommand(log, "basic")
+            new DotnetNewCommand(_log, "basic")
                 .WithWorkingDirectory(workingDirectory)
                 .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
                 .Execute()
@@ -71,10 +71,10 @@ namespace dotnet_new3.UnitTests
         {
             string home = Helpers.CreateTemporaryFolder("Home");
             string workingDirectory = Helpers.CreateTemporaryFolder();
-            Helpers.InstallTestTemplate("TemplateResolution/DifferentLanguagesGroup/BasicFSharp", log, workingDirectory, home);
-            Helpers.InstallTestTemplate("TemplateResolution/DifferentLanguagesGroup/BasicVB", log, workingDirectory, home);
+            Helpers.InstallTestTemplate("TemplateResolution/DifferentLanguagesGroup/BasicFSharp", _log, workingDirectory, home);
+            Helpers.InstallTestTemplate("TemplateResolution/DifferentLanguagesGroup/BasicVB", _log, workingDirectory, home);
 
-            new DotnetNewCommand(log, "basic")
+            new DotnetNewCommand(_log, "basic")
                 .WithWorkingDirectory(workingDirectory)
                 .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
                 .Execute()
@@ -92,7 +92,7 @@ namespace dotnet_new3.UnitTests
             string home = Helpers.CreateTemporaryFolder("Home");
             string workingDirectory = Helpers.CreateTemporaryFolder();
 
-            new DotnetNewCommand(log, "conf", "--quiet")
+            new DotnetNewCommand(_log, "conf", "--quiet")
                 .WithWorkingDirectory(workingDirectory)
                 .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
                 .Execute()
@@ -103,7 +103,7 @@ namespace dotnet_new3.UnitTests
                 .And.HaveStdErrContaining("Re-run the command using the template's exact short name.")
                 .And.HaveStdErrContaining("webconfig").And.HaveStdErrContaining("nugetconfig").And.NotHaveStdErrContaining("classlib");
 
-            new DotnetNewCommand(log, "file")
+            new DotnetNewCommand(_log, "file")
                 .WithWorkingDirectory(workingDirectory)
                 .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
                 .Execute()
@@ -121,7 +121,7 @@ namespace dotnet_new3.UnitTests
             string home = Helpers.CreateTemporaryFolder("Home");
             string workingDirectory = Helpers.CreateTemporaryFolder();
 
-            new DotnetNewCommand(log, "console", "--fake", "--quiet")
+            new DotnetNewCommand(_log, "console", "--fake", "--quiet")
                 .WithWorkingDirectory(workingDirectory)
                 .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
                 .Execute()
@@ -132,7 +132,7 @@ namespace dotnet_new3.UnitTests
                 .And.HaveStdErrContaining("   '--fake' is not a valid option")
                 .And.HaveStdErrContaining("For more information, run 'dotnet new3 console --help'.");
 
-            new DotnetNewCommand(log, "console", "--framework", "fake")
+            new DotnetNewCommand(_log, "console", "--framework", "fake")
                 .WithWorkingDirectory(workingDirectory)
                 .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
                 .Execute()
@@ -145,7 +145,7 @@ namespace dotnet_new3.UnitTests
                 .And.HaveStdErrContaining("      netcoreapp3.1   - Target netcoreapp3.1")
                 .And.HaveStdErrContaining("For more information, run 'dotnet new3 console --help'.");
 
-            new DotnetNewCommand(log, "console", "--framework", "netcoreapp")
+            new DotnetNewCommand(_log, "console", "--framework", "netcoreapp")
                 .WithWorkingDirectory(workingDirectory)
                 .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
                 .Execute()
@@ -158,7 +158,7 @@ namespace dotnet_new3.UnitTests
                 .And.HaveStdErrContaining("      netcoreapp3.1   - Target netcoreapp3.1")
                 .And.HaveStdErrContaining("For more information, run 'dotnet new3 console --help'.");
 
-            new DotnetNewCommand(log, "console", "--framework", "netcoreapp", "--fake")
+            new DotnetNewCommand(_log, "console", "--framework", "netcoreapp", "--fake")
                 .WithWorkingDirectory(workingDirectory)
                 .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
                 .Execute()
@@ -178,10 +178,10 @@ namespace dotnet_new3.UnitTests
         {
             string home = Helpers.CreateTemporaryFolder("Home");
             string workingDirectory = Helpers.CreateTemporaryFolder();
-            Helpers.InstallTestTemplate("TemplateResolution/SamePrecedenceGroup/BasicTemplate1", log, workingDirectory, home);
-            Helpers.InstallTestTemplate("TemplateResolution/SamePrecedenceGroup/BasicTemplate2", log, workingDirectory, home);
+            Helpers.InstallTestTemplate("TemplateResolution/SamePrecedenceGroup/BasicTemplate1", _log, workingDirectory, home);
+            Helpers.InstallTestTemplate("TemplateResolution/SamePrecedenceGroup/BasicTemplate2", _log, workingDirectory, home);
 
-            new DotnetNewCommand(log, "basic")
+            new DotnetNewCommand(_log, "basic")
                 .WithWorkingDirectory(workingDirectory)
                 .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
                 .Execute()
