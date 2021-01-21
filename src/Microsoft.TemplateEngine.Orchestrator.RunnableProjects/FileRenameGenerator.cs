@@ -65,9 +65,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         {
             string targetDirectoryStub = string.Empty;
             IProcessor symbolRenameProcessor = SetupSymbolBasedRenameProcessor(environmentSettings, sourceName, ref targetDirectoryStub, resolvedNameParamValue, parameterSet, symbolBasedFileRenames);
-            string renameFinalTargetValue = ApplyRenameProcessorToFilename(symbolRenameProcessor, primaryOutputPath);
-
-            return renameFinalTargetValue;
+            return ApplyRenameProcessorToFilename(symbolRenameProcessor, primaryOutputPath);
         }
 
         private static string ApplyRenameProcessorToFilename(IProcessor processor, string sourceFilename)
