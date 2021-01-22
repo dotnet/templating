@@ -30,16 +30,31 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
         public async Task<PackSourceCheckResult> CheckPackagesAsync()
         {
             List<PackCheckResult> checkResultList = new List<PackCheckResult>();
+            HashSet<IPackInfo> alreadySeenPacks = new HashSet<IPackInfo>();
             HashSet<string> alreadySeenTemplateIdentities = new HashSet<string>();
 
             foreach (IPackProvider packProvider in _packProviders)
             {
-                Console.WriteLine($"Processing provider pack {packProvider.Name}");
+                Console.WriteLine($"Processing pack provider {packProvider.Name}:");
                 int count = 0;
                 Console.WriteLine($"{await packProvider.GetPackageCountAsync().ConfigureAwait(false)} packs discovered, starting processing");
 
-                await foreach (IInstalledPackInfo packInfo in packProvider.GetCandidatePacksAsync().ConfigureAwait(false))
+                await foreach (IPackInfo sourceInfo in packProvider.GetCandidatePacksAsync().ConfigureAwait(false))
                 {
+                    if (alreadySeenPacks.Contains(sourceInfo))
+                    {
+                        Console.WriteLine($"Package {sourceInfo.Id}::{sourceInfo.Version} is already processed.");
+                        continue;
+                    }
+                    alreadySeenPacks.Add(sourceInfo);
+
+                    IDownloadedPackInfo packInfo = await packProvider.DownloadPackageAsync(sourceInfo).ConfigureAwait(false);
+                    if (packInfo == null)
+                    {
+                        Console.WriteLine($"Package {sourceInfo.Id}::{sourceInfo.Version} is not processed.");
+                        continue;
+                    }
+
                     PackCheckResult preFilterResult = PrefilterPackInfo(packInfo);
                     if (preFilterResult.PreFilterResults.ShouldBeFiltered)
                     {
@@ -79,7 +94,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
                         Console.WriteLine($"{count} packs processed");
                     }
                 }
-                Console.WriteLine($"Processing provider pack {packProvider.Name} finished.");
+                Console.WriteLine($"All packs from pack provider {packProvider.Name} are processed.");
             }
             Console.WriteLine("All packs processed");
 

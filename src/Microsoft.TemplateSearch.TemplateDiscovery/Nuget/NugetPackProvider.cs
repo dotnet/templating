@@ -41,7 +41,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
             }
         }
 
-        public async IAsyncEnumerable<IInstalledPackInfo> GetCandidatePacksAsync()
+        public async IAsyncEnumerable<IPackInfo> GetCandidatePacksAsync()
         {
             int skip = 0;
             bool done = false;
@@ -64,24 +64,9 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
                         {
                             skip += _pageSize;
                             packCount += resultsForPage.Data.Count;
-
                             foreach (NugetPackageSourceInfo sourceInfo in resultsForPage.Data)
                             {
-                                string packageFilePath = await DownloadPackageAsync(sourceInfo).ConfigureAwait(false);
-                                if (!string.IsNullOrEmpty(packageFilePath))
-                                {
-                                    NugetPackInfo packInfo = new NugetPackInfo()
-                                    {
-                                        VersionedPackageIdentity = sourceInfo.VersionedPackageIdentity,
-                                        Id = sourceInfo.Id,
-                                        Version = sourceInfo.Version,
-                                        Path = packageFilePath,
-                                        TotalDownloads = sourceInfo.TotalDownloads
-
-                                    };
-
-                                    yield return packInfo;
-                                }
+                                yield return sourceInfo;
                             }
                         }
                         else
@@ -98,7 +83,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
 
         }
 
-        private async Task<string> DownloadPackageAsync(NugetPackageSourceInfo packinfo)
+        public async Task<IDownloadedPackInfo> DownloadPackageAsync(IPackInfo packinfo)
         {
             string downloadUrl = string.Format(DownloadUrlFormat, packinfo.Id, packinfo.Version);
             string packageFileName = string.Format(DownloadPackageFileNameFormat, packinfo.Id, packinfo.Version);
@@ -110,12 +95,19 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
                 {
                     byte[] packageBytes = await client.GetByteArrayAsync(downloadUrl).ConfigureAwait(false);
                     File.WriteAllBytes(outputPackageFileNameFullPath, packageBytes);
-                    return outputPackageFileNameFullPath;
+                    return new NugetPackInfo()
+                    {
+                        Id = packinfo.Id,
+                        Version = packinfo.Version,
+                        Path = outputPackageFileNameFullPath,
+                        TotalDownloads = packinfo.TotalDownloads
+
+                    };
                 }
             }
-            catch
+            catch (Exception e)
             {
-                Console.WriteLine($"Failed to download package {packinfo.Id} {packinfo.Version}");
+                Console.WriteLine($"Failed to download package {packinfo.Id} {packinfo.Version}, reason: {e.Message}.");
                 return null;
             }
         }

@@ -7,7 +7,9 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackProviders
     {
         string Name { get; }
 
-        IAsyncEnumerable<IInstalledPackInfo> GetCandidatePacksAsync();
+        IAsyncEnumerable<IPackInfo> GetCandidatePacksAsync();
+
+        Task<IDownloadedPackInfo> DownloadPackageAsync(IPackInfo packinfo);
 
         Task<int> GetPackageCountAsync();
 
