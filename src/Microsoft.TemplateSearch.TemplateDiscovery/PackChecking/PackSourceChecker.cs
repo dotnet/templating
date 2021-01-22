@@ -97,7 +97,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
             return new PackSourceCheckResult(checkResultList, _additionalDataProducers);
         }
 
-        private PackCheckResult PrefilterPackInfo(IInstalledPackInfo packInfo)
+        private PackCheckResult PrefilterPackInfo(IDownloadedPackInfo packInfo)
         {
             PreFilterResultList preFilterResult = _packPreFilterer.FilterPack(packInfo);
             return new PackCheckResult(packInfo, preFilterResult);

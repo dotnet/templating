@@ -23,9 +23,9 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Filters
         };
         private static readonly string _FilterId = "Permanent pack blacklist";
 
-        public static Func<IInstalledPackInfo, PreFilterResult> SetupPackFilter()
+        public static Func<IDownloadedPackInfo, PreFilterResult> SetupPackFilter()
         {
-            Func<IInstalledPackInfo, PreFilterResult> filter = (packInfo) =>
+            Func<IDownloadedPackInfo, PreFilterResult> filter = (packInfo) =>
             {
                 foreach (string package in packagesToBeSkipped)
                 {

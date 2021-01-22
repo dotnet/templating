@@ -2,7 +2,7 @@
 
 namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
 {
-    public class NugetPackInfo : IInstalledPackInfo
+    public class NugetPackInfo : IDownloadedPackInfo
     {
         public string VersionedPackageIdentity { get; set; }
 
@@ -12,6 +12,6 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
 
         public string Path { get; set; }
 
-        public long TotalDownloads { get; set; }
+        public int TotalDownloads { get; set; }
     }
 }

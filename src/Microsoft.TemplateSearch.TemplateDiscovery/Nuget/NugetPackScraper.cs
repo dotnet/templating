@@ -18,7 +18,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
                 new NugetPackProvider("query-package-type-template", "packageType=Template",  config.BasePath, config.PageSize, config.RunOnlyOnePage, config.IncludePreviewPacks)
             };
 
-            List<Func<IInstalledPackInfo, PreFilterResult>> preFilterList = new List<Func<IInstalledPackInfo, PreFilterResult>>();
+            List<Func<IDownloadedPackInfo, PreFilterResult>> preFilterList = new List<Func<IDownloadedPackInfo, PreFilterResult>>();
 
             if (!PreviouslyRejectedPackFilter.TryGetPreviouslySkippedPacks(config.PreviousRunBasePath, out HashSet<string> nonTemplatePacks))
             {
