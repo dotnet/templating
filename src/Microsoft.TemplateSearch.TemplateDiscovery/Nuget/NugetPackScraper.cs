@@ -12,7 +12,11 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
     {
         public static bool TryCreateDefaultNugetPackScraper(ScraperConfig config, out PackSourceChecker packSourceChecker)
         {
-            NugetPackProvider packProvider = new NugetPackProvider(config.BasePath, config.PageSize, config.RunOnlyOnePage, config.IncludePreviewPacks);
+            List<IPackProvider> providers = new List<IPackProvider>
+            {
+                new NugetPackProvider("query-template", "q=template", config.BasePath, config.PageSize, config.RunOnlyOnePage, config.IncludePreviewPacks),
+                new NugetPackProvider("query-package-type-template", "packageType=Template",  config.BasePath, config.PageSize, config.RunOnlyOnePage, config.IncludePreviewPacks)
+            };
 
             List<Func<IInstalledPackInfo, PreFilterResult>> preFilterList = new List<Func<IInstalledPackInfo, PreFilterResult>>();
 
@@ -37,7 +41,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
                 new CliHostDataProducer()
             };
 
-            packSourceChecker = new PackSourceChecker(packProvider, preFilterer, additionalDataProducers, config.SaveCandidatePacks);
+            packSourceChecker = new PackSourceChecker(providers, preFilterer, additionalDataProducers, config.SaveCandidatePacks);
             return true;
         }
     }
