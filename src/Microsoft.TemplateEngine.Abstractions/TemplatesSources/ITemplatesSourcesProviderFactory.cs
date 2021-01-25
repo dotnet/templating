@@ -1,5 +1,10 @@
 namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
 {
+    /// <summary>
+    /// Factory resposible for creating <see cref="ITemplatesSourcesProvider"/> or <see cref="IManagedTemplatesSourcesProvider"/>.
+    /// This is registered with <see cref="IComponentManager"/> either via <see cref="IComponentManager.Register(System.Type)"/> or
+    /// <see cref="ITemplateEngineHost.BuiltInComponents"/>.
+    /// </summary>
     public interface ITemplatesSourcesProviderFactory : IIdentifiedComponent
     {
         /// <summary>
