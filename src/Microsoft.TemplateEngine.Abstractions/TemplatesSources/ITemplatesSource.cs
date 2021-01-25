@@ -15,7 +15,7 @@ namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
         DateTime LastChangeTime { get; }
 
         /// <summary>
-        /// This can be file:// or simply
+        /// This can be full Uri like file://, http:// or simply file path
         /// </summary>
         string MountPointUri { get; }
 
