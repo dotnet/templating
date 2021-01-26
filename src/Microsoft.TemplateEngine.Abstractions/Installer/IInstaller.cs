@@ -1,6 +1,7 @@
 using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Microsoft.TemplateEngine.Abstractions.Installer
@@ -38,5 +39,13 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
         Task<IReadOnlyList<IManagedTemplatesSourceUpdate>> GetLatestVersions(IEnumerable<IManagedTemplatesSource> sources);
 
         Task<IReadOnlyList<InstallResult>> UpdateAsync(IEnumerable<IManagedTemplatesSourceUpdate> sources);
+
+        /// <summary>
+        /// Creates list of autocomplete candidates for <see cref="InstallRequest.Identifier"/>.
+        /// </summary>
+        /// <param name="textSoFar">Text that was typed by user so far.</param>
+        /// <param name="token">Calling code might call this on every key press, hence it is good idea to respect <see cref="CancellationToken"/></param>
+        /// <returns>List of valid <see cref="InstallRequest.Identifier"/>s.</returns>
+        Task<IReadOnlyList<string>> GetAutocompleteAsync(string textSoFar, CancellationToken token);
     }
 }

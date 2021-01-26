@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Microsoft.TemplateEngine.Edge.Installers.Folder
@@ -27,6 +28,11 @@ namespace Microsoft.TemplateEngine.Edge.Installers.Folder
         }
 
         public IManagedTemplatesSource Deserialize(IManagedTemplatesSourcesProvider provider, string mountPointUri, object details)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IReadOnlyList<string>> GetAutocompleteAsync(string textSoFar, CancellationToken token)
         {
             throw new NotImplementedException();
         }

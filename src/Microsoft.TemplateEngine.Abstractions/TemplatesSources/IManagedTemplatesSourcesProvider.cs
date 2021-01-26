@@ -1,5 +1,6 @@
 using Microsoft.TemplateEngine.Abstractions.Installer;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
@@ -41,5 +42,14 @@ namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
         /// <param name="installRequest">Contains information needed to perform installation.</param>
         /// <returns><see cref="InstallResult"/> containing <see cref="IManagedTemplatesSource"/>, if <see cref="InstallResult.Success" /> is <c>true</c>.</returns>
         Task<InstallResult> InstallAsync(InstallRequest installRequest);
+
+        /// <summary>
+        /// Creates list of autocomplete candidates for <see cref="InstallRequest.Identifier"/>
+        /// for all <see cref="IInstaller"/>s that are part of this <see cref="IManagedTemplatesSourcesProvider"/>.
+        /// </summary>
+        /// <param name="textSoFar">Text that was typed by user so far.</param>
+        /// <param name="token">Calling code might call this on every key press, hence it is good idea to respect <see cref="CancellationToken"/></param>
+        /// <returns>List of valid <see cref="InstallRequest.Identifier"/>s.</returns>
+        Task<IReadOnlyList<string>> GetAutocompleteAsync(string textSoFar, CancellationToken token);
     }
 }

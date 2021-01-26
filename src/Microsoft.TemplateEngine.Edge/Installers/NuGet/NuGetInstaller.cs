@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
@@ -66,6 +67,11 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         }
 
         public (string mountPointUri, Dictionary<string, string> details) Serialize(IManagedTemplatesSource managedSource)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IReadOnlyList<string>> GetAutocompleteAsync(string textSoFar, CancellationToken token)
         {
             throw new NotImplementedException();
         }

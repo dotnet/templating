@@ -55,6 +55,21 @@ namespace Microsoft.TemplateEngine.Edge
                 return Task.FromResult<IReadOnlyList<ITemplatesSource>>(list);
             }
 
+            public async Task<IReadOnlyList<string>> GetAutocompleteAsync(string textSoFar, CancellationToken token)
+            {
+                var tasks = new List<Task<IReadOnlyList<string>>>();
+                foreach (var installer in installersByGuid.Values)
+                {
+                    tasks.Add(installer.GetAutocompleteAsync(textSoFar, token));
+                }
+                var result = new List<string>();
+                foreach (var task in tasks)
+                {
+                    result.AddRange(await task.ConfigureAwait(false));
+                }
+                return result.Distinct().OrderBy(e => e).ToList();
+            }
+
             public Task<IReadOnlyList<IManagedTemplatesSourceUpdate>> GetLatestVersions(IEnumerable<IManagedTemplatesSource> sources)
             {
                 throw new NotImplementedException();
