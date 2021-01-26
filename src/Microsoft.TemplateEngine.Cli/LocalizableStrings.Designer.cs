@@ -909,6 +909,52 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; could not be installed, download failed..
+        /// </summary>
+        public static string InstallFailedDownloadFailed {
+            get {
+                return ResourceManager.GetString("InstallFailedDownloadFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; could not be installed.
+        ///{1}..
+        /// </summary>
+        public static string InstallFailedGenericError {
+            get {
+                return ResourceManager.GetString("InstallFailedGenericError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; could not be installed, the NuGet feeds specified are invalid..
+        /// </summary>
+        public static string InstallFailedInvalidSource {
+            get {
+                return ResourceManager.GetString("InstallFailedInvalidSource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; could not be installed, the package doesn&apos;t exist..
+        /// </summary>
+        public static string InstallFailedPackageNotFound {
+            get {
+                return ResourceManager.GetString("InstallFailedPackageNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not supported..
+        /// </summary>
+        public static string InstallFailedUnsupportedRequest {
+            get {
+                return ResourceManager.GetString("InstallFailedUnsupportedRequest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Installs a source or a template pack..
         /// </summary>
         public static string InstallHelp {

@@ -4,25 +4,29 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
 {
     public class InstallResult
     {
-        public bool Success { get; private set; }
-        public string FailureMessage { get; private set; }
+        public enum ErrorCode { Success = 0, PackageNotFound = 1, InvalidSource = 2, DownloadFailed = 3, UnsupportedRequest = 4, GenericError = 5 }
+        public ErrorCode Error { get; private set; }
+
+        public bool Success => Error == 0;
+
+        public string ErrorMessage { get; private set; }
         public IManagedTemplatesSource ManagedTemplateSource { get; private set; }
 
         public static InstallResult CreateSuccess(IManagedTemplatesSource source)
         {
             return new InstallResult()
             {
-                Success = true,
+                Error = ErrorCode.Success,
                 ManagedTemplateSource = source
             };
         }
 
-        public static InstallResult CreateFailure(string localizedFailureMessage)
+        public static InstallResult CreateFailure(ErrorCode error, string localizedFailureMessage)
         {
             return new InstallResult()
             {
-                Success = false,
-                FailureMessage = localizedFailureMessage
+                Error = error,
+                ErrorMessage = localizedFailureMessage
             };
         }
     }
