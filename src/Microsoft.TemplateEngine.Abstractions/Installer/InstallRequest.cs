@@ -6,6 +6,10 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
 {
     public class InstallRequest
     {
+        public const string NuGetSourcesKey = "NuGetSources";
+        public const char NuGetSourcesSeparator = ';';
+        public const string InteractiveModeKey = "Interactive";
+
         /// <summary>
         /// This can be null, but if multiple installers return <c>true</c> from <see cref="IInstaller.CanInstallAsync"/>
         /// installation will fail. Application should give user list of <see cref="IInstaller.Name"/> that returned
