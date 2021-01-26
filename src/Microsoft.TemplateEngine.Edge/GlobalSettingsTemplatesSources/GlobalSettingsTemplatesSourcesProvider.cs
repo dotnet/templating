@@ -24,6 +24,10 @@ namespace Microsoft.TemplateEngine.Edge
             {
                 Factory = factory;
                 PackagesFolder = Path.Combine(settings.Paths.TemplateEngineRootDir, "packages");
+                if (!settings.Host.FileSystem.DirectoryExists(PackagesFolder))
+                {
+                    settings.Host.FileSystem.CreateDirectory(PackagesFolder);
+                }
                 this.settings = settings;
                 foreach (var installerFactory in settings.SettingsLoader.Components.OfType<IInstallerFactory>())
                 {
@@ -71,19 +75,22 @@ namespace Microsoft.TemplateEngine.Edge
                     }
                 }
                 if (installersThatCanInstall.Count == 0)
-                    return InstallResult.CreateFailure("");
-                if (installersThatCanInstall.Count > 1)
-                    return InstallResult.CreateFailure("");
+                {
+                    return InstallResult.CreateFailure(InstallResult.ErrorCode.UnsupportedRequest, $"{installRequest.Identifier} cannot be installed");
+                }
+
                 var installer = installersThatCanInstall[0];
                 var installResult = await installer.InstallAsync(installRequest);
 
                 if (!installResult.Success)
+                {
                     return installResult;
+                }
 
                 var data = installer.Serialize(installResult.ManagedTemplateSource);
                 settings.SettingsLoader.GlobalSettings.Add(new Abstractions.GlobalSettings.TemplatesSourceData()
                 {
-                    Details = data.details,
+                    Details = data.details.ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
                     InstallerId = installer.FactoryId,
                     LastChangeTime = DateTime.Now,
                     MountPointUri = data.mountPointUri
