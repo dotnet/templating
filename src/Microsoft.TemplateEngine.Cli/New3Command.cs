@@ -243,11 +243,11 @@ namespace Microsoft.TemplateEngine.Cli
             var details = new Dictionary<string, string>();
             if (_commandInput.InstallNuGetSourceList?.Count > 0)
             {
-                details["NuGetSource"] = string.Join(";", _commandInput.InstallNuGetSourceList);
+                details[InstallRequest.NuGetSourcesKey] = string.Join(InstallRequest.NuGetSourcesSeparator.ToString(), _commandInput.InstallNuGetSourceList);
             }
             if (_commandInput.IsInteractiveFlagSpecified)
             {
-                details["Iteractive"] = "true";
+                details[InstallRequest.InteractiveModeKey] = "true";
             }
 
             // In future we might want give user ability to pick IManagerSourceProvider by Name or GUID
@@ -263,7 +263,7 @@ namespace Microsoft.TemplateEngine.Cli
 
                 var result = await managedSourceProvider.InstallAsync(new InstallRequest()
                 {
-                    Identifier = identifier,
+                    Identifier = splitByColons[0],
                     Version = version,
                     Details = details,
                     //TODO: Not needed, for now, but in future when we have more installers then just NuGet and Folder
@@ -272,7 +272,24 @@ namespace Microsoft.TemplateEngine.Cli
                 });
                 if (!result.Success)
                 {
-                    Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailed, identifier, result.FailureMessage).Bold().Red());
+                    switch (result.Error)
+                    {
+                        case InstallResult.ErrorCode.InvalidSource:
+                            Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedInvalidSource, identifier).Bold().Red());
+                            break;
+                        case InstallResult.ErrorCode.PackageNotFound:
+                            Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedPackageNotFound, identifier).Bold().Red());
+                            break;
+                        case InstallResult.ErrorCode.DownloadFailed:
+                            Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedDownloadFailed, identifier).Bold().Red());
+                            break;
+                        case InstallResult.ErrorCode.UnsupportedRequest:
+                            Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedUnsupportedRequest, identifier).Bold().Red());
+                            break;
+                        case InstallResult.ErrorCode.GenericError:
+                            Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedGenericError, identifier, result.ErrorMessage).Bold().Red());
+                            break;
+                    }
                     success = CreationResultStatus.CreateFailed;
                 }
                 else

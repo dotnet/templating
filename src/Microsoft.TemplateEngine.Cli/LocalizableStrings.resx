@@ -759,4 +759,20 @@ Examples:
   <data name="AmbiguousLanguageHint" xml:space="preserve">
     <value>Re-run the command specifying the language to use with --language option.</value>
   </data>
+  <data name="InstallFailedDownloadFailed" xml:space="preserve">
+    <value>'{0}' could not be installed, download failed.</value>
+  </data>
+  <data name="InstallFailedGenericError" xml:space="preserve">
+    <value>'{0}' could not be installed.
+{1}.</value>
+  </data>
+  <data name="InstallFailedInvalidSource" xml:space="preserve">
+    <value>'{0}' could not be installed, the NuGet feeds specified are invalid.</value>
+  </data>
+  <data name="InstallFailedPackageNotFound" xml:space="preserve">
+    <value>'{0}' could not be installed, the package doesn't exist.</value>
+  </data>
+  <data name="InstallFailedUnsupportedRequest" xml:space="preserve">
+    <value>'{0}' is not supported.</value>
+  </data>
 </root>

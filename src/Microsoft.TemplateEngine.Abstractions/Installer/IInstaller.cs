@@ -33,9 +33,9 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
 
         IManagedTemplatesSource Deserialize(IManagedTemplatesSourcesProvider provider, string mountPointUri, object details);
 
-        (string mountPointUri, Dictionary<string, string> details) Serialize(IManagedTemplatesSource managedSource);
+        (string mountPointUri, IReadOnlyDictionary<string, string> details) Serialize(IManagedTemplatesSource managedSource);
 
-        Task<IReadOnlyList<IManagedTemplatesSourceUpdate>> GetLatestVersions(IEnumerable<IManagedTemplatesSource> sources);
+        Task<IReadOnlyList<IManagedTemplatesSourceUpdate>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources);
 
         Task<IReadOnlyList<InstallResult>> UpdateAsync(IEnumerable<IManagedTemplatesSourceUpdate> sources);
     }
