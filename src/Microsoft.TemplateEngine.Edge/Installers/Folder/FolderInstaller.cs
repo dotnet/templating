@@ -31,7 +31,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.Folder
             throw new NotImplementedException();
         }
 
-        public Task<IReadOnlyList<IManagedTemplatesSourceUpdate>> GetLatestVersions(IEnumerable<IManagedTemplatesSource> sources)
+        public Task<IReadOnlyList<IManagedTemplatesSourceUpdate>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources)
         {
             throw new NotImplementedException();
         }
@@ -41,7 +41,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.Folder
             throw new NotImplementedException();
         }
 
-        public (string mountPointUri, Dictionary<string, string> details) Serialize(IManagedTemplatesSource managedSource)
+        public (string mountPointUri, IReadOnlyDictionary<string, string> details) Serialize(IManagedTemplatesSource managedSource)
         {
             throw new NotImplementedException();
         }
