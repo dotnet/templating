@@ -60,7 +60,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                     sourceDetails[NuGetManagedTemplatesSource.PackageIdKey] = result.PackageIdentifier;
                     sourceDetails[NuGetManagedTemplatesSource.PackageVersionKey] = result.PackageVersion.ToString();
                 }
-                NuGetManagedTemplatesSource source = new NuGetManagedTemplatesSource(provider, packageLocation, installRequest.Details);
+                NuGetManagedTemplatesSource source = new NuGetManagedTemplatesSource(provider, packageLocation, sourceDetails);
                 return InstallResult.CreateSuccess(source);
             }
             catch (DownloadException e)
@@ -99,7 +99,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
         public IManagedTemplatesSource Deserialize(IManagedTemplatesSourcesProvider provider, string mountPointUri, object details)
         {
-            throw new NotImplementedException();
+            return new NuGetManagedTemplatesSource(provider, mountPointUri, details as Dictionary<string,string>);
         }
 
         public (string mountPointUri, IReadOnlyDictionary<string, string> details) Serialize(IManagedTemplatesSource managedSource)
