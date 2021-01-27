@@ -1,12 +1,10 @@
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Abstractions.TemplateUpdates;
 using Microsoft.TemplateEngine.Cli.CommandParsing;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Edge.Template;
-using Microsoft.TemplateSearch.Common.TemplateUpdate;
 
 namespace Microsoft.TemplateEngine.Cli
 {
@@ -49,35 +47,32 @@ namespace Microsoft.TemplateEngine.Cli
         // check for updates for the matched template, based on the Identity
         private async Task CheckForTemplateUpdateAsync(ITemplateMatchInfo templateToInvoke)
         {
-            if(!_settingsLoader.InstallUnitDescriptorCache.TryGetDescriptorForTemplate(templateToInvoke.Info, out IInstallUnitDescriptor descriptor))
+            var getSources = await _settingsLoader.TemplatesSourcesManager.GetManagedTemplatesSources();
+            var sourceOfThisTemplate = getSources.FirstOrDefault(s => s.MountPointUri == templateToInvoke.Info.MountPointUri);
+            if (sourceOfThisTemplate == null)
             {
                 Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallDescriptor_NotFound, templateToInvoke.Info.Identity));
                 return;
             }
 
-            List<IInstallUnitDescriptor> descriptorList = new List<IInstallUnitDescriptor>() { descriptor };
-            TemplateUpdateChecker updateChecker = new TemplateUpdateChecker(_environment);
-            IUpdateCheckResult updateCheckResult = await updateChecker.CheckForUpdatesAsync(descriptorList).ConfigureAwait(false);
+            var versionChecks = await sourceOfThisTemplate.ManagedProvider.GetLatestVersions(new[] { sourceOfThisTemplate });
 
-            if (updateCheckResult.Updates.Count == 0)
+            if (versionChecks.Count == 1)
             {
-                return;
-            }
-            else if (updateCheckResult.Updates.Count == 1)
-            {
-                DisplayUpdateMessage(updateCheckResult.Updates[0]);
+                var updateResult = versionChecks[0];
+
+                if (updateResult.Version != updateResult.InstallUnitDescriptor.Version)
+                {
+                    string displayString = $"{updateResult.InstallUnitDescriptor.Identifier}::{updateResult.InstallUnitDescriptor.Version}";         // the package::version currently installed
+                    Reporter.Output.WriteLine(string.Format(LocalizableStrings.UpdateAvailable, displayString));
+                    string installString = $"{updateResult.InstallUnitDescriptor.Identifier}::{updateResult.Version}"; // the package::version that will be installed
+                    Reporter.Output.WriteLine(string.Format(LocalizableStrings.UpdateCheck_InstallCommand, _commandName, installString));
+                }
             }
             else
             {
-                Reporter.Error.WriteLine(string.Format(LocalizableStrings.UpdateCheck_UnknownError, descriptor.Identifier));
+                Reporter.Error.WriteLine(string.Format(LocalizableStrings.UpdateCheck_UnknownError, sourceOfThisTemplate.Identifier));
             }
-        }
-
-        private void DisplayUpdateMessage(IUpdateUnitDescriptor updateDescriptor)
-        {
-            Reporter.Output.WriteLine();
-            Reporter.Output.WriteLine(string.Format(LocalizableStrings.UpdateAvailable, updateDescriptor.UpdateDisplayInfo));
-            Reporter.Output.WriteLine(string.Format(LocalizableStrings.UpdateCheck_InstallCommand, _commandName, updateDescriptor.InstallString));
         }
     }
 }
