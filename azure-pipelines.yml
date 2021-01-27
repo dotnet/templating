@@ -6,6 +6,7 @@ trigger:
     - master
     - release/3*
     - release/5*
+    - release/6*
     - internal/release/3*
     - internal/release/5*
 pr:
@@ -15,6 +16,7 @@ pr:
     - master
     - release/3*
     - release/5*
+    - release/6*
 
 variables:
   # Cannot use key:value syntax in root defined variables
