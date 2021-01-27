@@ -292,7 +292,9 @@ namespace Microsoft.TemplateEngine.Cli
                 }
                 else
                 {
-                    //TODO: Write list of newly installed templates
+                    await _settingsLoader.RebuildCacheFromSettingsIfNotCurrent(false).ConfigureAwait(false);
+                    IEnumerable<ITemplateInfo> templates = result.ManagedTemplateSource.GetTemplates();
+                    HelpForTemplateResolution.DisplayTemplateList(templates, EnvironmentSettings, _commandInput, _defaultLanguage);
                 }
             }
 
@@ -329,7 +331,7 @@ namespace Microsoft.TemplateEngine.Cli
 
                 if (installResult == CreationResultStatus.Success)
                 {
-                    _settingsLoader.Reload();
+                    //_settingsLoader.Reload();
                     TemplateListResolutionResult resolutionResult = TemplateResolver.GetTemplateResolutionResultForListOrHelp(_settingsLoader.UserTemplateCache.TemplateInfo, _hostDataLoader, _commandInput, _defaultLanguage);
                     HelpForTemplateResolution.CoordinateHelpAndUsageDisplay(resolutionResult, EnvironmentSettings, _commandInput, _hostDataLoader, _telemetryLogger, _templateCreator, _defaultLanguage, showUsageHelp: false);
                 }

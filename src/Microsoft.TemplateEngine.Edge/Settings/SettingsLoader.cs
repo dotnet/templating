@@ -106,6 +106,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 try
                 {
                     GlobalSettings = JsonConvert.DeserializeObject<GlobalSettings>(globalSettings) ?? new Settings.GlobalSettings();
+                    GlobalSettings.SettingsChanged += OnGlobalSettingsChanged;
                 }
                 catch (Exception ex)
                 {
@@ -160,6 +161,11 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 EnsureTemplatesLoaded();
 
             _isLoaded = true;
+        }
+
+        private void OnGlobalSettingsChanged()
+        {
+            _paths.WriteAllText(_paths.User.GlobalSettingsFile, JsonConvert.SerializeObject(GlobalSettings));
         }
 
         // Loads from the template cache
