@@ -5,6 +5,6 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackProviders
     {
         string Id { get; }
         string Version { get; }
-        int TotalDownloads { get; }
+        long TotalDownloads { get; }
     }
 }

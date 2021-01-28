@@ -29,7 +29,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
             _pageSize = pageSize;
             _runOnlyOnePage = runOnlyOnePage;
             _packageTempPath = Path.Combine(packageTempBasePath, DownloadedPacksDir, Name);
-            _searchUriFormat = $"https://api-v2v3search-0.nuget.org/query?{query}" + "&skip={0}&take={1}" + $"&prerelease={includePreviewPacks}";
+            _searchUriFormat = $"https://api-v2v3search-0.nuget.org/query?{query}&skip={{0}}&take={{1}}&prerelease={includePreviewPacks}";
 
             if (Directory.Exists(_packageTempPath))
             {
@@ -107,7 +107,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Failed to download package {packinfo.Id} {packinfo.Version}, reason: {e.Message}.");
+                Console.WriteLine($"Failed to download package {packinfo.Id} {packinfo.Version}, reason: {e.ToString()}.");
                 return null;
             }
         }

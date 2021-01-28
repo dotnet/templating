@@ -43,7 +43,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
                 {
                     if (alreadySeenPacks.Contains(sourceInfo))
                     {
-                        Console.WriteLine($"Package {sourceInfo.Id}::{sourceInfo.Version} is already processed.");
+                        Verbose.WriteLine($"Package {sourceInfo.Id}::{sourceInfo.Version} is already processed.");
                         continue;
                     }
                     alreadySeenPacks.Add(sourceInfo);

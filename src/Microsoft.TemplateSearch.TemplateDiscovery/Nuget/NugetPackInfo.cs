@@ -1,4 +1,4 @@
-﻿using Microsoft.TemplateSearch.TemplateDiscovery.PackProviders;
+using Microsoft.TemplateSearch.TemplateDiscovery.PackProviders;
 
 namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
 {
@@ -12,6 +12,6 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
 
         public string Path { get; set; }
 
-        public int TotalDownloads { get; set; }
+        public long TotalDownloads { get; set; }
     }
 }

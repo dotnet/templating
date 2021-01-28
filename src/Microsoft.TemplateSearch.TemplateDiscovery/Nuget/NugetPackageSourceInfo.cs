@@ -53,7 +53,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
         public List<string> Authors { get; set; }
 
         [JsonProperty]
-        public int TotalDownloads { get; set; }
+        public long TotalDownloads { get; set; }
 
         [JsonProperty]
         public bool Verified { get; set; }
@@ -72,7 +72,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
 
         public override int GetHashCode()
         {
-            return new { Id, Version }.GetHashCode();
+            return (Id, Version).GetHashCode();
         }
 
         public bool Equals(IPackInfo other)
