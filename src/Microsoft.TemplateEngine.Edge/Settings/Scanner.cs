@@ -104,7 +104,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     {
                         Location = sourceLocation,
                         MountPoint = mountPoint,
-                        ShouldStayInOriginalLocation = isLocalFlatFileSource,
+                        ShouldStayInOriginalLocation = true,
                         FoundTemplates = false,
                         FoundComponents = false,
                     };
