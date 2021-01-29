@@ -294,12 +294,14 @@ namespace Microsoft.TemplateEngine.Cli
                 }
                 else
                 {
-                    await _settingsLoader.RebuildCacheFromSettingsIfNotCurrent(false).ConfigureAwait(false);
-                    IEnumerable<ITemplateInfo> templates = result.ManagedTemplateSource.GetTemplates();
+                    await _settingsLoader.RebuildCacheFromSettingsIfNotCurrent(true).ConfigureAwait(false);
+                    Reporter.Output.WriteLine($"Package {result.ManagedTemplateSource.Identifier}::{result.ManagedTemplateSource.Version} was successfully installed");
+                    Reporter.Output.WriteLine($"The following templates were installed:");
+
+                    IEnumerable<ITemplateInfo> templates = result.ManagedTemplateSource.GetTemplates(EnvironmentSettings);
                     HelpForTemplateResolution.DisplayTemplateList(templates, EnvironmentSettings, _commandInput, _defaultLanguage);
                 }
             }
-
             return success;
         }
 
@@ -329,16 +331,7 @@ namespace Microsoft.TemplateEngine.Cli
 
             if (_commandInput.ToInstallList != null && _commandInput.ToInstallList.Count > 0 && _commandInput.ToInstallList[0] != null)
             {
-                CreationResultStatus installResult = await EnterInstallFlow();
-
-                if (installResult == CreationResultStatus.Success)
-                {
-                    //_settingsLoader.Reload();
-                    TemplateListResolutionResult resolutionResult = TemplateResolver.GetTemplateResolutionResultForListOrHelp(_settingsLoader.UserTemplateCache.TemplateInfo, _hostDataLoader, _commandInput, _defaultLanguage);
-                    HelpForTemplateResolution.CoordinateHelpAndUsageDisplay(resolutionResult, EnvironmentSettings, _commandInput, _hostDataLoader, _telemetryLogger, _templateCreator, _defaultLanguage, showUsageHelp: false);
-                }
-
-                return installResult;
+                return await EnterInstallFlow();
             }
 
             // No other cases specified, we've fallen through to "Optional usage help + List"
@@ -462,7 +455,7 @@ namespace Microsoft.TemplateEngine.Cli
             }
             else
             {
-                return Task.FromResult(HelpForTemplateResolution.CoordinateAmbiguousTemplateResolutionDisplay(templateResolutionResult, EnvironmentSettings, _commandInput, _defaultLanguage, _settingsLoader.InstallUnitDescriptorCache.Descriptors.Values));
+                return HelpForTemplateResolution.CoordinateAmbiguousTemplateResolutionDisplay(templateResolutionResult, EnvironmentSettings, _commandInput, _defaultLanguage);
             }
         }
 
