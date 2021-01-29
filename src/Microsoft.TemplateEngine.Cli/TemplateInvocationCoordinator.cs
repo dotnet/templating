@@ -1,10 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
 using Microsoft.TemplateEngine.Cli.CommandParsing;
+using Microsoft.TemplateEngine.Cli.TemplateResolution;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Edge.Template;
+using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Cli
 {
@@ -44,23 +48,31 @@ namespace Microsoft.TemplateEngine.Cli
             return invoker.InvokeTemplate(templateToInvoke);
         }
 
-        // check for updates for the matched template, based on the Identity
+
         private async Task CheckForTemplateUpdateAsync(ITemplateMatchInfo templateToInvoke)
         {
-            var getSources = await _settingsLoader.TemplatesSourcesManager.GetManagedTemplatesSources();
-            var sourceOfThisTemplate = getSources.FirstOrDefault(s => s.MountPointUri == templateToInvoke.Info.MountPointUri);
-            if (sourceOfThisTemplate == null)
+            ITemplatesSource templateSource;
+            try
+            {
+                templateSource = await templateToInvoke.Info.GetTemplateSourceAsync(_environment).ConfigureAwait(false);
+            }
+            catch (Exception)
             {
                 Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallDescriptor_NotFound, templateToInvoke.Info.Identity));
                 return;
             }
 
-            var versionChecks = await sourceOfThisTemplate.ManagedProvider.GetLatestVersions(new[] { sourceOfThisTemplate });
+            IManagedTemplatesSource managedTemplateSource = templateSource as IManagedTemplatesSource;
+            if (managedTemplateSource is null)
+            {
+                //update is not supported - built-in or optional workload source
+                return;
+            }
 
+            IReadOnlyList<IManagedTemplatesSourceUpdate> versionChecks = await managedTemplateSource.ManagedProvider.GetLatestVersions(new[] { managedTemplateSource });
             if (versionChecks.Count == 1)
             {
                 var updateResult = versionChecks[0];
-
                 if (updateResult.Version != updateResult.InstallUnitDescriptor.Version)
                 {
                     string displayString = $"{updateResult.InstallUnitDescriptor.Identifier}::{updateResult.InstallUnitDescriptor.Version}";         // the package::version currently installed
@@ -71,7 +83,7 @@ namespace Microsoft.TemplateEngine.Cli
             }
             else
             {
-                Reporter.Error.WriteLine(string.Format(LocalizableStrings.UpdateCheck_UnknownError, sourceOfThisTemplate.Identifier));
+                Reporter.Error.WriteLine(string.Format(LocalizableStrings.UpdateCheck_UnknownError, managedTemplateSource.Identifier));
             }
         }
     }
