@@ -17,12 +17,14 @@ using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
 using Microsoft.TemplateEngine.Cli.CommandParsing;
 using Microsoft.TemplateEngine.Cli.HelpAndUsage;
+using Microsoft.TemplateEngine.Cli.NuGet;
 using Microsoft.TemplateEngine.Cli.TemplateResolution;
 using Microsoft.TemplateEngine.Cli.TemplateSearch;
 using Microsoft.TemplateEngine.Edge;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Edge.Template;
 using Microsoft.TemplateEngine.Utils;
+using NuGet.Credentials;
 
 namespace Microsoft.TemplateEngine.Cli
 {
@@ -242,11 +244,13 @@ namespace Microsoft.TemplateEngine.Cli
             if (_commandInput.InstallNuGetSourceList?.Count > 0)
             {
                 details[InstallRequest.NuGetSourcesKey] = string.Join(InstallRequest.NuGetSourcesSeparator.ToString(), _commandInput.InstallNuGetSourceList);
+                DefaultCredentialServiceUtility.SetupDefaultCredentialService(new CliNuGetLogger(), !_commandInput.IsInteractiveFlagSpecified);
             }
             if (_commandInput.IsInteractiveFlagSpecified)
             {
                 details[InstallRequest.InteractiveModeKey] = "true";
             }
+
 
             // In future we might want give user ability to pick IManagerSourceProvider by Name or GUID
             var managedSourceProvider = EnvironmentSettings.SettingsLoader.TemplatesSourcesManager.GetManagedProvider(GlobalSettingsTemplatesSourcesProviderFactory.FactoryId);

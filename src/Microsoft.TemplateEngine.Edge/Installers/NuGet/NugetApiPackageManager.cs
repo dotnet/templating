@@ -13,23 +13,17 @@ using SemanticVersion = Microsoft.TemplateEngine.Abstractions.SemanticVersion;
 using NuGetSemanticVersion = NuGet.Versioning.SemanticVersion;
 using System;
 using System.Collections.Concurrent;
-using NuGet.Credentials;
 
 namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
     internal class NuGetApiPackageManager : IDownloader, IUpdateChecker
     {
-        private ILogger _nugetLogger = NullLogger.Instance;
+        private readonly ILogger _nugetLogger = NullLogger.Instance;
         internal const string PublicNuGetFeed = "https://api.nuget.org/v3/index.json";
-        private IEngineEnvironmentSettings _environmentSettings;
+        private readonly IEngineEnvironmentSettings _environmentSettings;
 
         internal NuGetApiPackageManager(IEngineEnvironmentSettings settings)
         {
-            IEnumerable<INuGetLogger> availableLoggers = settings.SettingsLoader.Components.OfType<INuGetLogger>();
-            if (availableLoggers.Any())
-            {
-                _nugetLogger = availableLoggers.First();
-            }
             _environmentSettings = settings;
         }
 
@@ -50,8 +44,6 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             {
                 sources = installRequest.Details[InstallRequest.NuGetSourcesKey].Split(InstallRequest.NuGetSourcesSeparator);
             }
-            bool interactive = installRequest.Details.ContainsKey(InstallRequest.InteractiveModeKey);
-            DefaultCredentialServiceUtility.SetupDefaultCredentialService(_nugetLogger, !interactive);
 
             NuGetVersion packageVersion;
             string source;
