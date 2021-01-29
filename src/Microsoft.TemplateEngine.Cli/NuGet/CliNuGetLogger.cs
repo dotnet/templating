@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace Microsoft.TemplateEngine.Cli.NuGet
 {
-    internal class CliNuGetLogger : ILogger, INuGetLogger
+    internal class CliNuGetLogger : ILogger
     {
-        public Guid Id => new Guid("{502A5256-C5f0-4290-AD7E-11BF05C85505}");
-
         public void Log(LogLevel level, string data)
         {
             switch (level)
@@ -47,17 +45,17 @@ namespace Microsoft.TemplateEngine.Cli.NuGet
 
         public void LogError(string data)
         {
-            Reporter.Error.WriteLine($"[NuGet Manager] {data}");
+            Reporter.Error.WriteLine($"[NuGet Manager] [Error] {data}");
         }
 
         public void LogInformation(string data)
         {
-            Reporter.Output.WriteLine($"[NuGet Manager] {data}");
+            Reporter.Output.WriteLine($"[NuGet Manager] [Info] {data}");
         }
 
         public void LogInformationSummary(string data)
         {
-            Reporter.Output.WriteLine($"[NuGet Manager] {data}");
+            Reporter.Output.WriteLine($"[NuGet Manager] [Info Summary] {data}");
         }
 
         public void LogMinimal(string data)
@@ -67,7 +65,7 @@ namespace Microsoft.TemplateEngine.Cli.NuGet
 
         public void LogVerbose(string data)
         {
-            Reporter.Verbose.WriteLine($"[NuGet Manager] {data}");
+            Reporter.Verbose.WriteLine($"[NuGet Manager] [Verbose] {data}");
         }
 
         public void LogWarning(string data)
