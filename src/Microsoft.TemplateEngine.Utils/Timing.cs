@@ -15,8 +15,6 @@ namespace Microsoft.TemplateEngine.Utils
             return new Timing((x, d) =>
             {
                 host.LogTiming(label, x, d);
-                //string indent = string.Join("", Enumerable.Repeat("  ", d));
-                //Console.WriteLine($"{indent} {label} {x.TotalMilliseconds}");
             });
         }
 

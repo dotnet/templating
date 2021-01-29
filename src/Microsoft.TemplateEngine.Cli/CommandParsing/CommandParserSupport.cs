@@ -195,6 +195,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                     Create.Option("--debug:reset-config", string.Empty, Accept.NoArguments()),
                     Create.Option("--debug:showconfig", string.Empty, Accept.NoArguments()),
                     Create.Option("--debug:emit-timings", string.Empty, Accept.NoArguments()),
+                    Create.Option("--debug:enable-logging", string.Empty, Accept.NoArguments()),
                     Create.Option("--debug:emit-telemetry", string.Empty, Accept.NoArguments()),
                     Create.Option("--debug:custom-hive", string.Empty, Accept.ExactlyOneArgument()),
                     Create.Option("--debug:version", string.Empty, Accept.NoArguments()),

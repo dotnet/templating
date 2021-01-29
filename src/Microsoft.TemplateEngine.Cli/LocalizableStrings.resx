@@ -759,4 +759,7 @@ Examples:
   <data name="AmbiguousLanguageHint" xml:space="preserve">
     <value>Re-run the command specifying the language to use with --language option.</value>
   </data>
+  <data name="GenericErrorMessage" xml:space="preserve">
+    <value>Error: {0}.</value>
+  </data>
 </root>

@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 
 namespace Microsoft.TemplateEngine.Cli
 {
-    internal class ExtendedTemplateEngineHost : ITemplateEngineHost
+    internal class ExtendedTemplateEngineHost : ITemplateEngineHost, ITemplateEngineHost2
     {
         private readonly New3Command _new3Command;
         private readonly ITemplateEngineHost _baseHost;
@@ -32,15 +33,21 @@ namespace Microsoft.TemplateEngine.Cli
 
         public virtual IReadOnlyList<KeyValuePair<Guid, Func<Type>>> BuiltInComponents => _baseHost.BuiltInComponents;
 
-        public virtual void LogMessage(string message) => _baseHost.LogMessage(message);
+        public virtual void LogMessage(string message)
+        {
+            Reporter.Output.WriteLine(message);
+            _baseHost.LogMessage(message);
+        }
 
         public virtual void OnCriticalError(string code, string message, string currentFile, long currentPosition)
         {
+            Reporter.Error.WriteLine(string.Format(LocalizableStrings.GenericErrorMessage, message));
             _baseHost.OnCriticalError(code, message, currentFile, currentPosition);
         }
 
         public virtual bool OnNonCriticalError(string code, string message, string currentFile, long currentPosition)
         {
+            Reporter.Error.WriteLine(string.Format(LocalizableStrings.GenericErrorMessage, message));
             return _baseHost.OnNonCriticalError(code, message, currentFile, currentPosition);
         }
 
@@ -150,5 +157,7 @@ namespace Microsoft.TemplateEngine.Cli
                 return found;
             }
         }
+
+        public ILogger Logger => (_baseHost as ITemplateEngineHost2)?.Logger;
     }
 }

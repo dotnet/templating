@@ -1,14 +1,20 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 
 namespace Microsoft.TemplateEngine.Utils
 {
-    public class DefaultTemplateEngineHost : ITemplateEngineHost
+    public class DefaultTemplateEngineHost : ITemplateEngineHost, ITemplateEngineHost2
     {
+        private readonly Dictionary<string, ILogger> _diagnosticLoggers = new Dictionary<string, ILogger>();
         private readonly IReadOnlyDictionary<string, string> _hostDefaults;
         private readonly IReadOnlyList<KeyValuePair<Guid, Func<Type>>> _hostBuiltInComponents;
+        private ILogger _logger = NullLogger.Instance;
         private static readonly IReadOnlyList<KeyValuePair<Guid, Func<Type>>> NoComponents = new KeyValuePair<Guid, Func<Type>>[0];
 
         public DefaultTemplateEngineHost(string hostIdentifier, string version, string locale)
@@ -31,7 +37,7 @@ namespace Microsoft.TemplateEngine.Utils
         {
         }
 
-        public DefaultTemplateEngineHost(string hostIdentifier, string version, string locale, Dictionary<string, string> defaults, IReadOnlyList<KeyValuePair<Guid, Func<Type>>> builtIns, IReadOnlyList<string> fallbackHostTemplateConfigNames)
+        public DefaultTemplateEngineHost(string hostIdentifier, string version, string locale, Dictionary<string, string> defaults, IReadOnlyList<KeyValuePair<Guid, Func<Type>>> builtIns, IReadOnlyList<string> fallbackHostTemplateConfigNames, ILogger logger = null)
         {
             HostIdentifier = hostIdentifier;
             Version = version;
@@ -40,7 +46,11 @@ namespace Microsoft.TemplateEngine.Utils
             FileSystem = new PhysicalFileSystem();
             _hostBuiltInComponents = builtIns ?? NoComponents;
             FallbackHostTemplateConfigNames = fallbackHostTemplateConfigNames ?? new List<string>();
-            _diagnosticLoggers = new Dictionary<string, Action<string, string[]>>();
+
+            if (logger != null)
+            {
+                _logger = logger;
+            }
         }
 
         public IPhysicalFileSystem FileSystem { get; private set; }
@@ -62,30 +72,71 @@ namespace Microsoft.TemplateEngine.Utils
 
         public virtual IReadOnlyList<KeyValuePair<Guid, Func<Type>>> BuiltInComponents => _hostBuiltInComponents;
 
+        public ILogger Logger => _logger;
+
         public virtual void LogMessage(string message)
         {
-            //Console.WriteLine("LogMessage: {0}", message);
-            Console.WriteLine(message);
+            Logger.LogInformation(message);
         }
 
         public virtual void OnCriticalError(string code, string message, string currentFile, long currentPosition)
         {
+            StringBuilder logMessage = new StringBuilder();
+            logMessage.Append(message);
+            if (!string.IsNullOrWhiteSpace(code))
+            {
+                logMessage.Append($" Error code:{code}.");
+            }
+            if (!string.IsNullOrWhiteSpace(currentFile))
+            {
+                logMessage.Append($" File:{currentFile}, position: {currentPosition}.");
+            }
+            Logger.LogError(logMessage.ToString());
         }
 
         public virtual bool OnNonCriticalError(string code, string message, string currentFile, long currentPosition)
         {
-            LogMessage(string.Format($"Error: {message}"));
+            StringBuilder logMessage = new StringBuilder();
+            logMessage.Append(message);
+            if (!string.IsNullOrWhiteSpace(code))
+            {
+                logMessage.Append($" Error code:{code}.");
+            }
+            if (!string.IsNullOrWhiteSpace(currentFile))
+            {
+                logMessage.Append($" File:{currentFile}, position: {currentPosition}.");
+            }
+            Logger.LogWarning(logMessage.ToString());
             return false;
         }
 
         public virtual bool OnParameterError(ITemplateParameter parameter, string receivedValue, string message, out string newValue)
         {
+            StringBuilder logMessage = new StringBuilder();
+            logMessage.Append(message);
+            if (parameter != null && !string.IsNullOrWhiteSpace(parameter.Name))
+            {
+                logMessage.Append($" Parameter name:{parameter.Name}");
+                if (!string.IsNullOrWhiteSpace(receivedValue))
+                {
+                    logMessage.Append($", received value:{receivedValue}.");
+                }
+                else
+                {
+                    logMessage.Append(".");
+                }    
+            }
+            Logger.LogError(logMessage.ToString());
             newValue = null;
             return false;
         }
 
         public virtual void OnSymbolUsed(string symbol, object value)
         {
+            if (!string.IsNullOrWhiteSpace(symbol))
+            {
+                Logger.LogDebug($"The symbol {symbol} was used with value '{value}'");
+            }
         }
 
         // stub that will be built out soon.
@@ -108,6 +159,12 @@ namespace Microsoft.TemplateEngine.Utils
 
         public bool OnPotentiallyDestructiveChangesDetected(IReadOnlyList<IFileChange> changes, IReadOnlyList<IFileChange> destructiveChanges)
         {
+            if (!destructiveChanges.Any())
+            {
+                return true;
+            }
+            string logMessage = string.Join(";", destructiveChanges.Select(change => $"target path: {change.TargetRelativePath}, change kind: {change.ChangeKind}"));
+            Logger.LogWarning($"Potentially destructive changes detected: {logMessage}.");
             return true;
         }
 
@@ -116,18 +173,34 @@ namespace Microsoft.TemplateEngine.Utils
             return true;
         }
 
-        private Dictionary<string, Action<string, string[]>> _diagnosticLoggers;
-
+        [Obsolete("The method is obsolete. Registering the logger will result in creating console logger with messageHandler ignored. Use void RegisterDiagnosticLogger(string category, ILogger logger = null) instead.")]
         public void RegisterDiagnosticLogger(string category, Action<string, string[]> messageHandler)
         {
-            _diagnosticLoggers[category] = messageHandler;
+            RegisterDiagnosticLogger(category);
+        }
+
+        public void RegisterDiagnosticLogger(string category, ILogger logger = null)
+        {
+            if (logger == null)
+            {
+                using var loggerFactory =
+                    LoggerFactory.Create(builder =>
+                        builder.AddSimpleConsole(options =>
+                        {
+                            options.SingleLine = true;
+                            options.TimestampFormat = "[yyyy-MM-dd HH:mm:ss.fff] ";
+                            options.IncludeScopes = true;
+                        }));
+                logger = loggerFactory.CreateLogger(category);
+            }
+            _diagnosticLoggers[category] = logger;
         }
 
         public void LogDiagnosticMessage(string message, string category, params string[] details)
         {
-            if (_diagnosticLoggers.TryGetValue(category, out Action<string, string[]> messageHandler))
+            if (_diagnosticLoggers.TryGetValue(category, out ILogger logger))
             {
-                messageHandler(message, details);
+                logger?.LogInformation(message, details);
             }
         }
 

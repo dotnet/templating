@@ -13,6 +13,7 @@ using Microsoft.TemplateEngine.Utils;
 using Microsoft.TemplateEngine.Edge.TemplateUpdates;
 using Microsoft.TemplateEngine.Cli.PostActionProcessors;
 using Microsoft.TemplateSearch.Common.TemplateUpdate;
+using Microsoft.Extensions.Logging;
 
 [assembly:InternalsVisibleTo("dotnet-new3.UnitTests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100f33a29044fa9d740c9b3213a93e57c84b472c84e0b8a0e1ae48e67a9f8f6de9d5f7f3d52ac23e48ac51801f1dc950abe901da34d2a9e3baadb141a17c77ef3c565dd5ee5054b91cf63bb3c6ab83f72ab3aafe93d0fc3c2348b764fafb0b1c0733de51459aeab46580384bf9d74c4e28164b7cde247f891ba07891c9d872ad2bb")]
 
@@ -27,9 +28,10 @@ namespace dotnet_new3
         public static int Main(string[] args)
         {
             bool emitTimings = args.Any(x => string.Equals(x, "--debug:emit-timings", StringComparison.OrdinalIgnoreCase));
+            bool enableLogging = args.Any(x => string.Equals(x, "--debug:enable-logging", StringComparison.OrdinalIgnoreCase));
             bool debugTelemetry = args.Any(x => string.Equals(x, "--debug:emit-telemetry", StringComparison.OrdinalIgnoreCase));
     
-            DefaultTemplateEngineHost host = CreateHost(emitTimings);
+            DefaultTemplateEngineHost host = CreateHost(emitTimings, enableLogging);
 
             bool debugAuthoring = args.Any(x => string.Equals(x, "--trace:authoring", StringComparison.OrdinalIgnoreCase));
             bool debugInstall = args.Any(x => string.Equals(x, "--trace:install", StringComparison.OrdinalIgnoreCase));
@@ -46,7 +48,7 @@ namespace dotnet_new3
             return New3Command.Run(CommandName, host, new TelemetryLogger(null, debugTelemetry), FirstRun, args);
         }
 
-        private static DefaultTemplateEngineHost CreateHost(bool emitTimings)
+        private static DefaultTemplateEngineHost CreateHost(bool emitTimings, bool enableLogging)
         {
             var preferences = new Dictionary<string, string>
             {
@@ -72,7 +74,29 @@ namespace dotnet_new3
                 typeof(NupkgUpdater).GetTypeInfo().Assembly                         // for assembly: Microsoft.TemplateSearch.Common
             });
 
-            DefaultTemplateEngineHost host = new DefaultTemplateEngineHost(HostIdentifier, HostVersion, CultureInfo.CurrentCulture.Name, preferences, builtIns, new[] { "dotnetcli" });
+            ILogger logger = null;
+            if (enableLogging)
+            {
+                using var loggerFactory =
+                    LoggerFactory.Create(builder =>
+                        builder.AddSimpleConsole(options =>
+                        {
+                            options.SingleLine = true;
+                            options.TimestampFormat = "[yyyy-MM-dd HH:mm:ss.fff] ";
+                            options.IncludeScopes = true;
+                        }));
+                logger = loggerFactory.CreateLogger("Template Engine");
+            }
+
+
+            DefaultTemplateEngineHost host = new DefaultTemplateEngineHost(
+                HostIdentifier,
+                HostVersion,
+                CultureInfo.CurrentCulture.Name,
+                preferences,
+                builtIns,
+                new[] { "dotnetcli" },
+                logger);
 
             if (emitTimings)
             {
@@ -82,27 +106,17 @@ namespace dotnet_new3
                     Console.WriteLine($"{indent} {label} {duration.TotalMilliseconds}");
                 };
             }
-
-
             return host;
         }
 
         private static void AddAuthoringLogger(DefaultTemplateEngineHost host)
         {
-            Action<string, string[]> authoringLogger = (message, additionalInfo) =>
-            {
-                Console.WriteLine(string.Format("Authoring: {0}", message));
-            };
-            host.RegisterDiagnosticLogger("Authoring", authoringLogger);
+            host.RegisterDiagnosticLogger("Authoring");
         }
 
         private static void AddInstallLogger(DefaultTemplateEngineHost host)
         {
-            Action<string, string[]> installLogger = (message, additionalInfo) =>
-            {
-                Console.WriteLine(string.Format("Install: {0}", message));
-            };
-            host.RegisterDiagnosticLogger("Install", installLogger);
+            host.RegisterDiagnosticLogger("Install");
         }
 
         private static void FirstRun(IEngineEnvironmentSettings environmentSettings, IInstaller installer)

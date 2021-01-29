@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 
 namespace Microsoft.TemplateEngine.Abstractions
@@ -42,5 +43,13 @@ namespace Microsoft.TemplateEngine.Abstractions
         void VirtualizeDirectory(string path);
 
         bool OnConfirmPartialMatch(string name);
+    }
+
+    public interface ITemplateEngineHost2 : ITemplateEngineHost
+    {
+        /// <summary>
+        /// Returns the logger for given template engine host
+        /// </summary>
+        ILogger Logger { get; }
     }
 }
