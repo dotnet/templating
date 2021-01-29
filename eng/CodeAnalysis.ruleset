@@ -62,7 +62,7 @@
     <Rule Id="CA1502" Action="None" />          <!-- Avoid excessive complexity -->
     <Rule Id="CA1505" Action="None" />          <!-- Avoid unmaintainable code -->
     <Rule Id="CA1506" Action="None" />          <!-- Avoid excessive class coupling -->
-    <Rule Id="CA1507" Action="Warning" />       <!-- Use nameof to express symbol names -->
+    <Rule Id="CA1507" Action="Info" TemporarilyDisabled="true" />       <!-- Use nameof to express symbol names -->
     <Rule Id="CA1508" Action="None" />          <!-- Avoid dead conditional code -->
     <Rule Id="CA1509" Action="None" />          <!-- Invalid entry in code metrics rule specification file -->
     <Rule Id="CA1700" Action="None" />          <!-- Do not name enum values 'Reserved' -->
@@ -79,10 +79,10 @@
     <Rule Id="CA1724" Action="None" />          <!-- Type names should not match namespaces -->
     <Rule Id="CA1725" Action="Info" />          <!-- Parameter names should match base declaration -->
     <Rule Id="CA1801" Action="None" />          <!-- Review unused parameters -->
-    <Rule Id="CA1802" Action="Warning" />       <!-- Use literals where appropriate -->
-    <Rule Id="CA1805" Action="Warning" />       <!-- Do not initialize unnecessarily -->
+    <Rule Id="CA1802" Action="Info" TemporarilyDisabled="true" />       <!-- Use literals where appropriate -->
+    <Rule Id="CA1805" Action="Info" TemporarilyDisabled="true" />       <!-- Do not initialize unnecessarily -->
     <Rule Id="CA1806" Action="None" />          <!-- Do not ignore method results -->
-    <Rule Id="CA1810" Action="Warning" />       <!-- Initialize reference type static fields inline -->
+    <Rule Id="CA1810" Action="Info" TemporarilyDisabled="true" />       <!-- Initialize reference type static fields inline -->
     <Rule Id="CA1812" Action="None" />          <!-- Avoid uninstantiated internal classes -->
     <Rule Id="CA1813" Action="None" />          <!-- Avoid unsealed attributes -->
     <Rule Id="CA1814" Action="None" />          <!-- Prefer jagged arrays over multidimensional -->
@@ -94,23 +94,23 @@
     <Rule Id="CA1822" Action="None" />          <!-- Mark members as static -->
     <Rule Id="CA1823" Action="Warning" />       <!-- Avoid unused private fields -->
     <Rule Id="CA1824" Action="Warning" />       <!-- Mark assemblies with NeutralResourcesLanguageAttribute -->
-    <Rule Id="CA1825" Action="Warning" />       <!-- Avoid zero-length array allocations. -->
-    <Rule Id="CA1826" Action="Warning" />       <!-- Do not use Enumerable methods on indexable collections. Instead use the collection directly -->
+    <Rule Id="CA1825" Action="Info" TemporarilyDisabled="true" />       <!-- Avoid zero-length array allocations. -->
+    <Rule Id="CA1826" Action="Info" TemporarilyDisabled="true" />       <!-- Do not use Enumerable methods on indexable collections. Instead use the collection directly -->
     <Rule Id="CA1827" Action="Warning" />       <!-- Do not use Count() or LongCount() when Any() can be used -->
     <Rule Id="CA1828" Action="Warning" />       <!-- Do not use CountAsync() or LongCountAsync() when AnyAsync() can be used -->
-    <Rule Id="CA1829" Action="Warning" />       <!-- Use Length/Count property instead of Count() when available -->
+    <Rule Id="CA1829" Action="Info" TemporarilyDisabled="true" />       <!-- Use Length/Count property instead of Count() when available -->
     <Rule Id="CA1830" Action="Warning" />       <!-- Prefer strongly-typed Append and Insert method overloads on StringBuilder. -->
     <Rule Id="CA1831" Action="Warning" />       <!-- Use AsSpan or AsMemory instead of Range-based indexers when appropriate -->
     <Rule Id="CA1832" Action="Warning" />       <!-- Use AsSpan or AsMemory instead of Range-based indexers when appropriate -->
     <Rule Id="CA1833" Action="Warning" />       <!-- Use AsSpan or AsMemory instead of Range-based indexers when appropriate -->
-    <Rule Id="CA1834" Action="Warning" />       <!-- Consider using 'StringBuilder.Append(char)' when applicable. -->
+    <Rule Id="CA1834" Action="Info" TemporarilyDisabled="true" />       <!-- Consider using 'StringBuilder.Append(char)' when applicable. -->
     <Rule Id="CA1835" Action="Warning" />       <!-- Prefer the 'Memory'-based overloads for 'ReadAsync' and 'WriteAsync' -->
     <Rule Id="CA1836" Action="Warning" />       <!-- Prefer IsEmpty over Count -->
     <Rule Id="CA1837" Action="Warning" />       <!-- Use 'Environment.ProcessId' -->
     <Rule Id="CA1838" Action="Warning" />       <!-- Avoid 'StringBuilder' parameters for P/Invokes -->
     <Rule Id="CA2000" Action="None" />          <!-- Dispose objects before losing scope -->
     <Rule Id="CA2002" Action="None" />          <!-- Do not lock on objects with weak identity -->
-    <Rule Id="CA2007" Action="Warning" />       <!-- Consider calling ConfigureAwait on the awaited task -->
+    <Rule Id="CA2007" Action="Info" TemporarilyDisabled="true" />       <!-- Consider calling ConfigureAwait on the awaited task -->
     <Rule Id="CA2008" Action="Warning" />       <!-- Do not create tasks without passing a TaskScheduler -->
     <Rule Id="CA2009" Action="Warning" />       <!-- Do not call ToImmutableCollection on an ImmutableCollection value -->
     <Rule Id="CA2011" Action="Warning" />       <!-- Avoid infinite recursion -->
@@ -118,7 +118,7 @@
     <Rule Id="CA2013" Action="Warning" />       <!-- Do not use ReferenceEquals with value types -->
     <Rule Id="CA2014" Action="Warning" />       <!-- Do not use stackalloc in loops. -->
     <Rule Id="CA2015" Action="Warning" />       <!-- Do not define finalizers for types derived from MemoryManager<T> -->
-    <Rule Id="CA2016" Action="Warning" />       <!-- Forward the 'CancellationToken' parameter to methods that take one -->
+    <Rule Id="CA2016" Action="Info" TemporarilyDisabled="true" />       <!-- Forward the 'CancellationToken' parameter to methods that take one -->
     <Rule Id="CA2100" Action="None" />          <!-- Review SQL queries for security vulnerabilities -->
     <Rule Id="CA2101" Action="None" />          <!-- Specify marshaling for P/Invoke string arguments -->
     <Rule Id="CA2109" Action="None" />          <!-- Review visible event handlers -->
@@ -127,7 +127,7 @@
     <Rule Id="CA2200" Action="Warning" />       <!-- Rethrow to preserve stack details. -->
     <Rule Id="CA2201" Action="None" />          <!-- Do not raise reserved exception types -->
     <Rule Id="CA2207" Action="Warning" />       <!-- Initialize value type static fields inline -->
-    <Rule Id="CA2208" Action="Warning" />       <!-- Instantiate argument exceptions correctly -->
+    <Rule Id="CA2208" Action="Info" TemporarilyDisabled="true" />       <!-- Instantiate argument exceptions correctly -->
     <Rule Id="CA2211" Action="None" />          <!-- Non-constant fields should not be visible -->
     <Rule Id="CA2213" Action="None" />          <!-- Disposable fields should be disposed -->
     <Rule Id="CA2214" Action="None" />          <!-- Do not call overridable methods in constructors -->
@@ -154,7 +154,7 @@
     <Rule Id="CA2246" Action="None" />          <!-- Assigning symbol and its member in the same statement. -->
     <Rule Id="CA2247" Action="Warning" />       <!-- Argument passed to TaskCompletionSource constructor should be TaskCreationOptions enum instead of TaskContinuationOptions enum. -->
     <Rule Id="CA2248" Action="Warning" />       <!-- Provide correct 'enum' argument to 'Enum.HasFlag' -->
-    <Rule Id="CA2249" Action="Warning" />       <!-- Consider using 'string.Contains' instead of 'string.IndexOf' -->
+    <Rule Id="CA2249" Action="Info" TemporarilyDisabled="true" />       <!-- Consider using 'string.Contains' instead of 'string.IndexOf' -->
     <Rule Id="CA2300" Action="None" />          <!-- Do not use insecure deserializer BinaryFormatter -->
     <Rule Id="CA2301" Action="None" />          <!-- Do not call BinaryFormatter.Deserialize without first setting BinaryFormatter.Binder -->
     <Rule Id="CA2302" Action="None" />          <!-- Ensure BinaryFormatter.Binder is set before calling BinaryFormatter.Deserialize -->
@@ -250,8 +250,8 @@
   <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
     <Rule Id="AD0001" Action="None" />          <!-- Analyzer threw an exception -->
     <Rule Id="SA0001" Action="None" />          <!-- XML comments -->
-    <Rule Id="SA1000" Action="Warning" />       <!-- Spacing around keywords -->
-    <Rule Id="SA1001" Action="Warning" />       <!-- Commas should not be preceded by whitespace -->
+    <Rule Id="SA1000" Action="Info" TemporarilyDisabled="true" />       <!-- Spacing around keywords -->
+    <Rule Id="SA1001" Action="Info" TemporarilyDisabled="true" />       <!-- Commas should not be preceded by whitespace -->
     <Rule Id="SA1002" Action="None" />          <!-- Semicolons should not be preceded by a space -->
     <Rule Id="SA1003" Action="None" />          <!-- Operator should not appear at the end of a line -->
     <Rule Id="SA1004" Action="None" />          <!-- Documentation line should begin with a space -->
@@ -262,7 +262,7 @@
     <Rule Id="SA1011" Action="None" />          <!-- Closing square bracket should be followed by a space -->
     <Rule Id="SA1012" Action="None" />          <!-- Opening brace should be followed by a space -->
     <Rule Id="SA1013" Action="None" />          <!-- Closing brace should be preceded by a space -->
-    <Rule Id="SA1014" Action="Warning" />       <!-- Opening generic brackets should not be preceded by a space -->
+    <Rule Id="SA1014" Action="Info" TemporarilyDisabled="true"  />       <!-- Opening generic brackets should not be preceded by a space -->
     <Rule Id="SA1015" Action="None" />          <!-- Closing generic bracket should not be followed by a space -->
     <Rule Id="SA1018" Action="Warning" />       <!-- Nullable type symbol should not be preceded by a space -->
     <Rule Id="SA1020" Action="Warning" />       <!-- Increment symbol should not be preceded by a space -->
@@ -272,7 +272,7 @@
     <Rule Id="SA1025" Action="None" />          <!-- Code should not contain multiple whitespace characters in a row -->
     <Rule Id="SA1026" Action="Warning" />       <!-- Keyword followed by span or blank line -->
     <Rule Id="SA1027" Action="Warning" />       <!-- Tabs and spaces should be used correctly -->
-    <Rule Id="SA1028" Action="Warning" />       <!-- Code should not contain trailing whitespace -->
+    <Rule Id="SA1028" Action="Info" TemporarilyDisabled="true" />       <!-- Code should not contain trailing whitespace -->
     <Rule Id="SA1100" Action="None" />          <!-- Do not prefix calls with base unless local implementation exists -->
     <Rule Id="SA1101" Action="None" />          <!-- Prefix local calls with this -->
     <Rule Id="SA1102" Action="Warning" />       <!-- Query clause should follow previous clause -->
@@ -282,7 +282,7 @@
     <Rule Id="SA1108" Action="None" />          <!-- Block statements should not contain embedded comments -->
     <Rule Id="SA1110" Action="None" />          <!-- Opening parenthesis or bracket should be on declaration line -->
     <Rule Id="SA1111" Action="None" />          <!-- Closing parenthesis should be on line of last parameter -->
-    <Rule Id="SA1113" Action="Warning" />       <!-- Comma should be on the same line as previous parameter -->
+    <Rule Id="SA1113" Action="Info" TemporarilyDisabled="true" />       <!-- Comma should be on the same line as previous parameter -->
     <Rule Id="SA1114" Action="None" />          <!-- Parameter list should follow declaration -->
     <Rule Id="SA1115" Action="Warning" />       <!-- Parameter should begin on the line after the previous parameter -->
     <Rule Id="SA1116" Action="None" />          <!-- Split parameters should start on line after declaration -->
@@ -290,14 +290,14 @@
     <Rule Id="SA1118" Action="None" />          <!-- Parameter should not span multiple lines -->
     <Rule Id="SA1119" Action="None" />          <!-- Statement should not use unnecessary parenthesis -->
     <Rule Id="SA1120" Action="None" />          <!-- Comments should contain text -->
-    <Rule Id="SA1121" Action="Warning" />       <!-- Use built-in type alias -->
+    <Rule Id="SA1121" Action="Info" TemporarilyDisabled="true" />       <!-- Use built-in type alias -->
     <Rule Id="SA1122" Action="None" />          <!-- Use string.Empty for empty strings -->
     <Rule Id="SA1123" Action="None" />          <!-- Region should not be located within a code element -->
     <Rule Id="SA1124" Action="None" />          <!-- Do not use regions -->
     <Rule Id="SA1125" Action="None" />          <!-- Use shorthand for nullable types -->
     <Rule Id="SA1127" Action="None" />          <!-- Generic type constraints should be on their own line -->
     <Rule Id="SA1128" Action="None" />          <!-- Put constructor initializers on their own line -->
-    <Rule Id="SA1129" Action="Warning" />       <!-- Do not use default value type constructor -->
+    <Rule Id="SA1129" Action="Info" TemporarilyDisabled="true" />       <!-- Do not use default value type constructor -->
     <Rule Id="SA1130" Action="None" />          <!-- Use lambda syntax -->
     <Rule Id="SA1131" Action="None" />          <!-- Constant values should appear on the right-hand side of comparisons -->
     <Rule Id="SA1132" Action="None" />          <!-- Do not combine fields -->
@@ -315,7 +315,7 @@
     <Rule Id="SA1203" Action="None" />          <!-- Constants should appear before fields -->
     <Rule Id="SA1204" Action="None" />          <!-- Static elements should appear before instance elements -->
     <Rule Id="SA1205" Action="Warning" />       <!-- Partial elements should declare an access modifier -->
-    <Rule Id="SA1206" Action="Warning" />       <!-- Keyword ordering -->
+    <Rule Id="SA1206" Action="Info" TemporarilyDisabled="true" />       <!-- Keyword ordering -->
     <Rule Id="SA1208" Action="None" />          <!-- Using directive ordering -->
     <Rule Id="SA1209" Action="None" />          <!-- Using alias directives should be placed after all using namespace directives -->
     <Rule Id="SA1210" Action="None" />          <!-- Using directives should be ordered alphabetically by the namespaces -->
@@ -337,7 +337,7 @@
     <Rule Id="SA1313" Action="None" />          <!-- Parameter should begin with lower-case letter -->
     <Rule Id="SA1314" Action="None" />          <!-- Type parameter names should begin with T -->
     <Rule Id="SA1316" Action="None" />          <!-- Tuple element names should use correct casing -->
-    <Rule Id="SA1400" Action="Warning" />       <!-- Member should declare an access modifer -->
+    <Rule Id="SA1400" Action="Info" TemporarilyDisabled="true" />       <!-- Member should declare an access modifer -->
     <Rule Id="SA1401" Action="None" />          <!-- Fields should be private -->
     <Rule Id="SA1402" Action="None" />          <!-- File may only contain a single type -->
     <Rule Id="SA1403" Action="None" />          <!-- File may only contain a single namespace -->
@@ -365,8 +365,8 @@
     <Rule Id="SA1514" Action="None" />          <!-- Element documentation header should be preceded by blank line -->
     <Rule Id="SA1515" Action="None" />          <!-- Single-line comment should be preceded by blank line -->
     <Rule Id="SA1516" Action="None" />          <!-- Elements should be separated by blank line -->
-    <Rule Id="SA1517" Action="Warning" />       <!-- Code should not contain blank lines at start of file -->
-    <Rule Id="SA1518" Action="Warning" />       <!-- Code should not contain blank lines at the end of the file -->
+    <Rule Id="SA1517" Action="Info" TemporarilyDisabled="true" />       <!-- Code should not contain blank lines at start of file -->
+    <Rule Id="SA1518" Action="Info" TemporarilyDisabled="true" />       <!-- Code should not contain blank lines at the end of the file -->
     <Rule Id="SA1519" Action="None" />          <!-- Braces should not be omitted from multi-line child statement -->
     <Rule Id="SA1520" Action="None" />          <!-- Use braces consistently -->
     <Rule Id="SA1600" Action="None" />          <!-- Elements should be documented -->
@@ -465,7 +465,7 @@
     <Rule Id="IDE0070" Action="Hidden" />       <!-- UseSystemHashCode -->
     <Rule Id="IDE0071" Action="Hidden" />       <!-- SimplifyInterpolation -->
     <Rule Id="IDE0072" Action="Hidden" />       <!-- PopulateSwitchExpression -->
-    <Rule Id="IDE0073" Action="Warning" />      <!-- FileHeaderMismatch -->
+    <Rule Id="IDE0073" Action="Info" TemporarilyDisabled="true" />      <!-- FileHeaderMismatch -->
     <Rule Id="IDE0074" Action="Hidden" />       <!-- UseCoalesceCompoundAssignment -->
     <Rule Id="IDE0075" Action="Hidden" />       <!-- SimplifyConditionalExpression -->
     <Rule Id="IDE0076" Action="Hidden" />       <!-- InvalidSuppressMessageAttribute -->
