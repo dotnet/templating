@@ -60,7 +60,7 @@ namespace Microsoft.TemplateEngine.EndToEndTestHarness
             host.VirtualizeDirectory(hivePath);
             host.VirtualizeDirectory(outputPath);
 
-            int result = New3Command.Run(CommandName, host, new TelemetryLogger(null), FirstRun, passthroughArgs, hivePath);
+            int result = New3Command.Run(CommandName, host, new TelemetryLogger(null), new Action<IEngineEnvironmentSettings>((x) => {}), passthroughArgs, hivePath);
             bool verificationsPassed = false;
 
             for (int i = 0; i < batteryCount; ++i)
@@ -206,24 +206,11 @@ namespace Microsoft.TemplateEngine.EndToEndTestHarness
                 typeof(RunnableProjectGenerator).GetTypeInfo().Assembly,            // for assembly: Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 typeof(Microsoft.TemplateEngine.Edge.Paths).GetTypeInfo().Assembly,   // for assembly: Microsoft.TemplateEngine.Edge
                 typeof(DotnetRestorePostActionProcessor).GetTypeInfo().Assembly,    // for assembly: Microsoft.TemplateEngine.Cli
-                typeof(Microsoft.TemplateSearch.Common.NuGetSearchCacheConfig).GetTypeInfo().Assembly// for assembly: Microsoft.TemplateSearch.Common
+                typeof(Microsoft.TemplateSearch.Common.NuGetSearchCacheConfig).GetTypeInfo().Assembly,// for assembly: Microsoft.TemplateSearch.Common
+                typeof(Program).GetTypeInfo().Assembly
             });
 
             return new DefaultTemplateEngineHost(HostIdentifier, HostVersion, CultureInfo.CurrentCulture.Name, preferences, builtIns, new[] { "dotnetcli" });
-        }
-
-        private static void FirstRun(IEngineEnvironmentSettings environmentSettings)
-        {
-            string codebase = typeof(Program).GetTypeInfo().Assembly.Location;
-            Uri cb = new Uri(codebase);
-            string asmPath = cb.LocalPath;
-            string dir = Path.GetDirectoryName(asmPath);
-            throw new NotImplementedException("Convert this into templatessoruceprovider");
-            //string packages = Path.Combine(dir, "..", "..", "..", "..", "..", "artifacts", "packages") + Path.DirectorySeparatorChar + "*";
-            //string templates = Path.Combine(dir, "..", "..", "..", "..", "..", "template_feed") + Path.DirectorySeparatorChar;
-            //string testTemplates = Path.Combine(dir, "..", "..", "..", "..", "..", "test", "Microsoft.TemplateEngine.TestTemplates", "test_templates") + Path.DirectorySeparatorChar;
-            //installer.InstallPackages(new[] { packages });
-            //installer.InstallPackages(new[] { templates, testTemplates });
         }
     }
 }
