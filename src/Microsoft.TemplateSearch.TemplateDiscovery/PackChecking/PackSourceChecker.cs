@@ -67,7 +67,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
                         checkResultList.Add(packCheckResult);
 
 
-                        Verbose.WriteLine($"{packCheckResult.PackInfo.Id}::{packCheckResult.PackInfo.Version} was processed");
+                        Verbose.WriteLine($"{packCheckResult.PackInfo.Id}::{packCheckResult.PackInfo.Version} is processed");
                         if (packCheckResult.FoundTemplates.Any())
                         {
                             Verbose.WriteLine("Found templates:");
@@ -91,12 +91,12 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
                     ++count;
                     if ((count % 10) == 0)
                     {
-                        Console.WriteLine($"{count} packs processed");
+                        Console.WriteLine($"{count} packs are processed");
                     }
                 }
-                Console.WriteLine($"All packs from pack provider {packProvider.Name} are processed.");
+                Console.WriteLine($"All packs from pack provider {packProvider.Name} are processed");
             }
-            Console.WriteLine("All packs processed");
+            Console.WriteLine("All packs are processed");
 
             if (!_saveCandidatePacks)
             {
