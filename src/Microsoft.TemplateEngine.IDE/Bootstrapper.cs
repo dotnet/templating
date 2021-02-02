@@ -77,9 +77,10 @@ namespace Microsoft.TemplateEngine.IDE
             //Installer.InstallPackages(paths);
         }
 
-        public IReadOnlyCollection<IFilteredTemplateInfo> ListTemplates(bool exactMatchesOnly, params Func<ITemplateInfo, MatchInfo?>[] filters)
+        public async Task<IReadOnlyCollection<IFilteredTemplateInfo>> ListTemplates(bool exactMatchesOnly, params Func<ITemplateInfo, MatchInfo?>[] filters)
         {
             EnsureInitialized();
+            await EnvironmentSettings.SettingsLoader.RebuildCacheFromSettingsIfNotCurrent(false).ConfigureAwait(false);
             return TemplateListFilter.FilterTemplates(((SettingsLoader)EnvironmentSettings.SettingsLoader).UserTemplateCache.TemplateInfo, exactMatchesOnly, filters);
         }
 

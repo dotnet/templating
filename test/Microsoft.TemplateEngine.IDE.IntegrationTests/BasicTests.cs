@@ -19,7 +19,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             var bootstrapper = BootstrapperFactory.GetBootstrapper();
             bootstrapper.InstallTestTemplate("TemplateWithSourceName");
 
-            var template = bootstrapper.ListTemplates(true, WellKnownSearchFilters.NameFilter("TestAssets.TemplateWithSourceName"));
+            var template = await bootstrapper.ListTemplates(true, WellKnownSearchFilters.NameFilter("TestAssets.TemplateWithSourceName")).ConfigureAwait(false);
             var result = await bootstrapper.GetCreationEffectsAsync(template.First().Info, "test", "test", new Dictionary<string, string>(), "").ConfigureAwait(false);
             Assert.Equal(2, result.CreationResult.PrimaryOutputs.Count);
             Assert.Equal(0, result.CreationResult.PostActions.Count);
@@ -34,7 +34,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
         {
             var bootstrapper = BootstrapperFactory.GetBootstrapper(additionalVirtualLocations: new string[] { "test" });
             bootstrapper.InstallTestTemplate("TemplateWithSourceName");
-            var template = bootstrapper.ListTemplates(true, WellKnownSearchFilters.NameFilter("TestAssets.TemplateWithSourceName"));
+            var template = await bootstrapper.ListTemplates(true, WellKnownSearchFilters.NameFilter("TestAssets.TemplateWithSourceName")).ConfigureAwait(false);
 
             var result = await bootstrapper.CreateAsync(template.First().Info, "test", "test", new Dictionary<string, string>(), false, "").ConfigureAwait(false);
 
