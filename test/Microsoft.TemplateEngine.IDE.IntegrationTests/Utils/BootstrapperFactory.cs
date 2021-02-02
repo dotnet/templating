@@ -18,7 +18,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests.Utils
         private const string HostIdentifier = "IDE.IntegrationTests";
         private const string HostVersion = "v1.0.0";
 
-        internal static Bootstrapper GetBootstrapper(bool installAllTemplates = false, IEnumerable<string> additionalVirtualLocations = null)
+        internal static Bootstrapper GetBootstrapper(IEnumerable<string> additionalVirtualLocations = null)
         {
             ITemplateEngineHost host = CreateHost();
             if (additionalVirtualLocations != null)
@@ -27,11 +27,6 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests.Utils
                 {
                     host.VirtualizeDirectory(virtualLocation);
                 }
-            }
-
-            if (installAllTemplates)
-            {
-                return new Bootstrapper(host, InstallAllTemplatesOnFirstRun, true);
             }
             return new Bootstrapper(host, null, true);
         }
@@ -47,20 +42,9 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests.Utils
             {
                 typeof(RunnableProjectGenerator).GetTypeInfo().Assembly,            // for assembly: Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 typeof(AssemblyComponentCatalog).GetTypeInfo().Assembly,            // for assembly: Microsoft.TemplateEngine.Edge
+                typeof(BootstrapperFactory).GetTypeInfo().Assembly,                 // for this assembly to load the test assemblies
             });
             return new DefaultTemplateEngineHost(HostIdentifier + Guid.NewGuid().ToString(), HostVersion, preferences, builtIns, Array.Empty<string>());
-        }
-
-        private static void InstallAllTemplatesOnFirstRun(IEngineEnvironmentSettings environmentSettings)
-        {
-            string codebase = typeof(BootstrapperFactory).GetTypeInfo().Assembly.Location;
-            string dir = Path.GetDirectoryName(codebase);
-
-            throw new NotImplementedException();
-
-            //string templates = Path.Combine(dir, "..", "..", "..", "..", "..", "template_feed") + Path.DirectorySeparatorChar;
-            //string testTemplates = Path.Combine(dir, "..", "..", "..", "..", "..", "test", "Microsoft.TemplateEngine.TestTemplates", "test_templates") + Path.DirectorySeparatorChar;
-            //installer.InstallPackages(new[] { templates, testTemplates });
         }
     }
 }
