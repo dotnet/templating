@@ -13,7 +13,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             throw new NotImplementedException();
         }
 
-        public Task<SemanticVersion> GetLatestVersionAsync(NuGetManagedTemplatesSource source)
+        public Task<string> GetLatestVersionAsync(NuGetManagedTemplatesSource source)
         {
             throw new NotImplementedException();
         }

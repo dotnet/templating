@@ -5,7 +5,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
     internal interface IUpdateChecker
     {
-        Task<SemanticVersion> GetLatestVersionAsync(NuGetManagedTemplatesSource source);
+        Task<string> GetLatestVersionAsync(NuGetManagedTemplatesSource source);
 
         bool CanCheckForUpdate(NuGetManagedTemplatesSource source);
     }

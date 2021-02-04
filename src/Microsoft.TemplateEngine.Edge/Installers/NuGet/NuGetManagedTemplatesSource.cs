@@ -1,7 +1,6 @@
 using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
 using System;
 using System.Collections.Generic;
-using SemanticVersion = Microsoft.TemplateEngine.Abstractions.SemanticVersion;
 
 namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
@@ -24,7 +23,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
         public string Identifier => Details.TryGetValue(PackageIdKey, out string identifier) ? identifier : null;
 
-        public SemanticVersion Version => Details.TryGetValue(PackageVersionKey, out string version) && SemanticVersion.TryParse(version, out SemanticVersion parsedVersion) ? parsedVersion : null;
+        public string Version => Details.TryGetValue(PackageVersionKey, out string version) ? version : null;
 
         public IReadOnlyDictionary<string, string> Details { get; }
 
