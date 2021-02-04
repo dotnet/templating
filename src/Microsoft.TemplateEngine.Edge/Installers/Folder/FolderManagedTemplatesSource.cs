@@ -19,7 +19,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.Folder
 
         public string Identifier { get; }
 
-        public SemanticVersion Version => null;
+        public string Version => null;
 
         public IReadOnlyDictionary<string, string> Details => null;
 
