@@ -9,8 +9,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using SemanticVersion = Microsoft.TemplateEngine.Abstractions.SemanticVersion;
-using NuGetSemanticVersion = NuGet.Versioning.SemanticVersion;
 using System;
 using System.Collections.Concurrent;
 
@@ -92,7 +90,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                         NuGetSource = source,
                         FullPath = filePath,
                         PackageIdentifier = packageMetadata.Identity.Id,
-                        PackageVersion = packageMetadata.Identity.Version.ToSemanticVersion(),
+                        PackageVersion = packageMetadata.Identity.Version.ToNormalizedString(),
                         Author = packageMetadata.Authors
                     };
                 }
@@ -110,15 +108,15 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             }
         }
 
-        public async Task<SemanticVersion> GetLatestVersionAsync(NuGetManagedTemplatesSource source)
+        public async Task<string> GetLatestVersionAsync(NuGetManagedTemplatesSource source)
         {
             return await GetLatestVersionAsync(source.Identifier).ConfigureAwait(false);
         }
 
-        private async Task<SemanticVersion> GetLatestVersionAsync(string packageIdentifier)
+        private async Task<string> GetLatestVersionAsync(string packageIdentifier)
         {
             var (_, package) = await GetLatestVersionInternalAsync(packageIdentifier).ConfigureAwait(false);
-            return package.Identity.Version.ToSemanticVersion();
+            return package.Identity.Version.ToNormalizedString();
         }
 
         private async Task<(string, IPackageSearchMetadata)> GetLatestVersionInternalAsync(string packageIdentifier, IEnumerable<string> sources = null)
