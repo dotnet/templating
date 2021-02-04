@@ -23,7 +23,7 @@ namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
         /// <summary>
         /// Version of templates source.
         /// </summary>
-        SemanticVersion Version { get; }
+        string Version { get; }
 
         /// <summary>
         /// This is list of details that we show to user about this templates source like, author and other information
