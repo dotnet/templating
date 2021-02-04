@@ -15,7 +15,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
     {
         internal string NuGetSource;
         internal string PackageIdentifier;
-        internal SemanticVersion PackageVersion;
+        internal string PackageVersion;
         internal string Author;
         internal string FullPath;
     }

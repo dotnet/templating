@@ -13,6 +13,6 @@ namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
         /// <summary>
         /// Version which this update should install
         /// </summary>
-        SemanticVersion Version { get; }
+        string Version { get; }
     }
 }

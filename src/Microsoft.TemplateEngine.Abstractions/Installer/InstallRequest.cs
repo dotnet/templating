@@ -25,7 +25,7 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
         /// <summary>
         /// Specific version to be installed or null to install latest.
         /// </summary>
-        public SemanticVersion Version { get; set; }
+        public string Version { get; set; }
 
         /// <summary>
         /// Additional details, like NuGet Server(Source), that specific installer uses.
