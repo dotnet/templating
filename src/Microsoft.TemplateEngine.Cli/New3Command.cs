@@ -254,54 +254,58 @@ namespace Microsoft.TemplateEngine.Cli
 
             // In future we might want give user ability to pick IManagerSourceProvider by Name or GUID
             var managedSourceProvider = EnvironmentSettings.SettingsLoader.TemplatesSourcesManager.GetManagedProvider(GlobalSettingsTemplatesSourcesProviderFactory.FactoryId);
-            foreach (var identifier in _commandInput.ToInstallList)
+            foreach (var unexpandedInstallRequest in _commandInput.ToInstallList)
             {
-                var splitByColons = identifier.Split(new[] { "::" }, StringSplitOptions.RemoveEmptyEntries);
-                SemanticVersion version = null;
-                if (splitByColons.Length > 1 && SemanticVersion.TryParse(splitByColons[1], out var parsedVersion))
+                foreach (var expandedInstallRequest in InstallRequestPathResolution.Expand(unexpandedInstallRequest, EnvironmentSettings))
                 {
-                    version = parsedVersion;
-                }
-
-                var result = await managedSourceProvider.InstallAsync(new InstallRequest()
-                {
-                    Identifier = splitByColons[0],
-                    Version = version,
-                    Details = details,
-                    //TODO: Not needed, for now, but in future when we have more installers then just NuGet and Folder
-                    //give user ability to set InstallerName
-                    //InstallerName = _commandInput.InstallerName,
-                });
-                if (!result.Success)
-                {
-                    switch (result.Error)
+                    var splitByColons = expandedInstallRequest.Split(new[] { "::" }, StringSplitOptions.RemoveEmptyEntries);
+                    string identifier = splitByColons[0];
+                    string version = null;
+                    if (splitByColons.Length > 1)
                     {
-                        case InstallResult.ErrorCode.InvalidSource:
-                            Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedInvalidSource, identifier).Bold().Red());
-                            break;
-                        case InstallResult.ErrorCode.PackageNotFound:
-                            Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedPackageNotFound, identifier).Bold().Red());
-                            break;
-                        case InstallResult.ErrorCode.DownloadFailed:
-                            Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedDownloadFailed, identifier).Bold().Red());
-                            break;
-                        case InstallResult.ErrorCode.UnsupportedRequest:
-                            Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedUnsupportedRequest, identifier).Bold().Red());
-                            break;
-                        case InstallResult.ErrorCode.GenericError:
-                            Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedGenericError, identifier, result.ErrorMessage).Bold().Red());
-                            break;
+                        version = splitByColons[1];
                     }
-                    success = CreationResultStatus.CreateFailed;
-                }
-                else
-                {
-                    await _settingsLoader.RebuildCacheFromSettingsIfNotCurrent(true).ConfigureAwait(false);
-                    Reporter.Output.WriteLine($"Package {result.ManagedTemplateSource.Identifier}::{result.ManagedTemplateSource.Version} was successfully installed");
-                    Reporter.Output.WriteLine($"The following templates were installed:");
 
-                    IEnumerable<ITemplateInfo> templates = result.ManagedTemplateSource.GetTemplates(EnvironmentSettings);
-                    HelpForTemplateResolution.DisplayTemplateList(templates, EnvironmentSettings, _commandInput, _defaultLanguage);
+                    var result = await managedSourceProvider.InstallAsync(new InstallRequest()
+                    {
+                        Identifier = identifier,
+                        Version = version,
+                        Details = details,
+                        //TODO: Not needed, for now, but in future when we have more installers then just NuGet and Folder
+                        //give user ability to set InstallerName
+                        //InstallerName = _commandInput.InstallerName,
+                    });
+                    if (!result.Success)
+                    {
+                        switch (result.Error)
+                        {
+                            case InstallResult.ErrorCode.InvalidSource:
+                                Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedInvalidSource, unexpandedInstallRequest).Bold().Red());
+                                break;
+                            case InstallResult.ErrorCode.PackageNotFound:
+                                Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedPackageNotFound, unexpandedInstallRequest).Bold().Red());
+                                break;
+                            case InstallResult.ErrorCode.DownloadFailed:
+                                Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedDownloadFailed, unexpandedInstallRequest).Bold().Red());
+                                break;
+                            case InstallResult.ErrorCode.UnsupportedRequest:
+                                Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedUnsupportedRequest, unexpandedInstallRequest).Bold().Red());
+                                break;
+                            case InstallResult.ErrorCode.GenericError:
+                                Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedGenericError, unexpandedInstallRequest, result.ErrorMessage).Bold().Red());
+                                break;
+                        }
+                        success = CreationResultStatus.CreateFailed;
+                    }
+                    else
+                    {
+                        await _settingsLoader.RebuildCacheFromSettingsIfNotCurrent(true).ConfigureAwait(false);
+                        Reporter.Output.WriteLine($"Package {result.ManagedTemplateSource.Identifier}::{result.ManagedTemplateSource.Version} was successfully installed");
+                        Reporter.Output.WriteLine($"The following templates were installed:");
+
+                        IEnumerable<ITemplateInfo> templates = result.ManagedTemplateSource.GetTemplates(EnvironmentSettings);
+                        HelpForTemplateResolution.DisplayTemplateList(templates, EnvironmentSettings, _commandInput, _defaultLanguage);
+                    }
                 }
             }
             return success;
@@ -352,7 +356,7 @@ namespace Microsoft.TemplateEngine.Cli
                 {
                     try
                     {
-                        await managedSource.ManagedProvider.UninstallAsync(managedSource).ConfigureAwait(false);
+                        await managedSource.Installer.Provider.UninstallAsync(managedSource).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
