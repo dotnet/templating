@@ -80,14 +80,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             AddTemplatesAndLangPacksFromScanResult(scanResult);
         }
 
-        public void Scan(IReadOnlyList<string> installDirectoryList)
-        {
-            foreach (string installDir in installDirectoryList)
-            {
-                Scan(installDir);
-            }
-        }
-
         // returns a list of the templates with the specified localization.
         // does not change which locale is cached in this TemplateCache instance.
         public IReadOnlyList<TemplateInfo> GetTemplatesForLocale(string locale, string existingCacheVersion)
