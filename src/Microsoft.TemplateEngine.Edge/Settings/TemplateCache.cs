@@ -77,37 +77,15 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         public void Scan(string installDir)
         {
-            Scan(installDir, false);
-        }
-
-        public void Scan(string installDir, bool allowDevInstall)
-        {
-            Scan(installDir, out IReadOnlyList<string> mountPointUrisForNewInstalls, allowDevInstall);
-        }
-
-        public void Scan(string installDir, out IReadOnlyList<string> mountPointUrisForNewInstalls)
-        {
-            Scan(installDir, out mountPointUrisForNewInstalls, false);
-        }
-
-        public void Scan(string installDir, out IReadOnlyList<string> mountPointUrisForNewInstalls, bool allowDevInstall)
-        {
-            ScanResult scanResult = InstallScanner.Scan(installDir, allowDevInstall);
+            ScanResult scanResult = InstallScanner.Scan(installDir);
             AddTemplatesAndLangPacksFromScanResult(scanResult);
-
-            mountPointUrisForNewInstalls = scanResult.InstalledMountPointUris;
         }
 
         public void Scan(IReadOnlyList<string> installDirectoryList)
         {
-            Scan(installDirectoryList, false);
-        }
-
-        public void Scan(IReadOnlyList<string> installDirectoryList, bool allowDevInstall)
-        {
             foreach (string installDir in installDirectoryList)
             {
-                Scan(installDir, allowDevInstall);
+                Scan(installDir);
             }
         }
 
