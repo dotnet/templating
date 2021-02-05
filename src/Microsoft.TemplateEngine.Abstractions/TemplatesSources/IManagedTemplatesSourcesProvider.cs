@@ -11,12 +11,12 @@ namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
     {
         /// <summary>
         /// Takes list of <see cref="IManagedTemplatesSource"/> as input so it can check for latest versions in batch.
-        /// And returns list of <see cref="IManagedTemplatesSourceUpdate"/> which contains original <see cref="IManagedTemplatesSource"/>
-        /// so caller can compare <see cref="IManagedTemplatesSourceUpdate.Version"/> with <see cref="IManagedTemplatesSource.Version"/>
+        /// And returns list of <see cref="ManagedTemplatesSourceUpdate"/> which contains original <see cref="IManagedTemplatesSource"/>
+        /// so caller can compare <see cref="ManagedTemplatesSourceUpdate.Version"/> with <see cref="IManagedTemplatesSource.Version"/>
         /// </summary>
         /// <param name="sources">List of <see cref="IManagedTemplatesSource"/> to get latest version for.</param>
-        /// <returns>List of <see cref="IManagedTemplatesSourceUpdate"/></returns>
-        Task<IReadOnlyList<IManagedTemplatesSourceUpdate>> GetLatestVersions(IEnumerable<IManagedTemplatesSource> sources);
+        /// <returns>List of <see cref="ManagedTemplatesSourceUpdate"/></returns>
+        Task<IReadOnlyList<ManagedTemplatesSourceUpdate>> GetLatestVersions(IEnumerable<IManagedTemplatesSource> sources);
 
         /// <summary>
         /// Updates specified <see cref="IManagedTemplatesSource"/>s and returns <see cref="InstallResult"/>s which contain
@@ -24,7 +24,7 @@ namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
         /// </summary>
         /// <param name="sources">List of <see cref="IManagedTemplatesSource"/> to be updated.</param>
         /// <returns>List of <see cref="InstallResult"/> with install information.</returns>
-        Task<IReadOnlyList<InstallResult>> UpdateAsync(IEnumerable<IManagedTemplatesSourceUpdate> sources);
+        Task<IReadOnlyList<InstallResult>> UpdateAsync(IEnumerable<ManagedTemplatesSourceUpdate> sources);
 
         /// <summary>
         /// Uninstalls specified <see cref="IManagedTemplatesSource"/>.
