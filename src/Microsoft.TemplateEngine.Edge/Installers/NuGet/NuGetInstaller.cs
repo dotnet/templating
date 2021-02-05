@@ -87,12 +87,12 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             throw new NotImplementedException();
         }
 
-        public Task<IReadOnlyList<IManagedTemplatesSourceUpdate>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources)
+        public Task<IReadOnlyList<ManagedTemplatesSourceUpdate>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IReadOnlyList<InstallResult>> UpdateAsync(IEnumerable<IManagedTemplatesSourceUpdate> sources)
+        public Task<IReadOnlyList<InstallResult>> UpdateAsync(IEnumerable<ManagedTemplatesSourceUpdate> sources)
         {
             throw new NotImplementedException();
         }
