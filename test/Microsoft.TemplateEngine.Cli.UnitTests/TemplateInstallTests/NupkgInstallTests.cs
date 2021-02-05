@@ -92,7 +92,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateInstallTests
                 return null;
             }
 
-            string hivePath = Path.Combine(profileDir, ".templateengine", hostIdentifier);
+            string hivePath = Path.Combine(profileDir, ".templateengine");
             host.VirtualizeDirectory(hivePath);
 
             return host;

@@ -48,7 +48,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 Dictionary<string, string> sourceDetails = new Dictionary<string, string>();
                 if (IsLocalPackage(installRequest))
                 {
-                    packageLocation = Path.GetFileName(installRequest.Identifier);
+                    packageLocation = Path.Combine(installPath, Path.GetFileName(installRequest.Identifier));
                     _environmentSettings.Host.FileSystem.FileCopy(installRequest.Identifier, packageLocation, overwrite: true);
                     sourceDetails[NuGetManagedTemplatesSource.LocalPackageKey] = true.ToString();
                 }
