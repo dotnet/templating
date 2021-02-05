@@ -27,13 +27,13 @@ namespace dotnet_new3.UnitTests
                 .And.HaveStdOutContaining("Getting ready")
                 .And.NotHaveStdOutContaining("Error");
 
-            new DotnetNewCommand(_log, "-u")
+            new DotnetNewCommand(_log, "--list")
                 .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
                 .Execute()
                 .Should()
                 .ExitWith(0)
                 .And.NotHaveStdErr()
-                .And.HaveStdOutContaining("template_feed");
+                .And.HaveStdOutContaining("classlib");
         }
     }
 }
