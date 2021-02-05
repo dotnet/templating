@@ -59,16 +59,16 @@ namespace Microsoft.TemplateEngine.Edge
                 return Task.FromResult<IReadOnlyList<ITemplatesSource>>(list);
             }
 
-            public async Task<IReadOnlyList<IManagedTemplatesSourceUpdate>> GetLatestVersions(IEnumerable<IManagedTemplatesSource> sources)
+            public async Task<IReadOnlyList<ManagedTemplatesSourceUpdate>> GetLatestVersions(IEnumerable<IManagedTemplatesSource> sources)
             {
-                var tasks = new List<Task<IReadOnlyList<IManagedTemplatesSourceUpdate>>>();
+                var tasks = new List<Task<IReadOnlyList<ManagedTemplatesSourceUpdate>>>();
                 foreach (var sourcesGroupedByInstaller in sources.GroupBy(s => s.Installer))
                 {
                     tasks.Add(sourcesGroupedByInstaller.Key.GetLatestVersionAsync(sourcesGroupedByInstaller));
                 }
                 await Task.WhenAll(tasks);
 
-                var result = new List<IManagedTemplatesSourceUpdate>();
+                var result = new List<ManagedTemplatesSourceUpdate>();
                 foreach (var task in tasks)
                 {
                     result.AddRange(task.Result);
@@ -115,7 +115,7 @@ namespace Microsoft.TemplateEngine.Edge
                 throw new NotImplementedException();
             }
 
-            public Task<IReadOnlyList<InstallResult>> UpdateAsync(IEnumerable<IManagedTemplatesSourceUpdate> sources)
+            public Task<IReadOnlyList<InstallResult>> UpdateAsync(IEnumerable<ManagedTemplatesSourceUpdate> sources)
             {
                 throw new NotImplementedException();
             }

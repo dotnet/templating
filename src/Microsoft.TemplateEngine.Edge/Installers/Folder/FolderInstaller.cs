@@ -38,9 +38,9 @@ namespace Microsoft.TemplateEngine.Edge.Installers.Folder
             return new FolderManagedTemplatesSource(settings, this, mountPointUri);
         }
 
-        public Task<IReadOnlyList<IManagedTemplatesSourceUpdate>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources)
+        public Task<IReadOnlyList<ManagedTemplatesSourceUpdate>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources)
         {
-            return Task.FromResult<IReadOnlyList<IManagedTemplatesSourceUpdate>>(sources.Select(s => new IManagedTemplatesSourceUpdate(s, null)).ToList());
+            return Task.FromResult<IReadOnlyList<ManagedTemplatesSourceUpdate>>(sources.Select(s => new ManagedTemplatesSourceUpdate(s, null)).ToList());
         }
 
         public Task<InstallResult> InstallAsync(InstallRequest installRequest)
@@ -61,7 +61,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.Folder
             return Task.FromResult(UninstallResult.CreateSuccess());
         }
 
-        public Task<IReadOnlyList<InstallResult>> UpdateAsync(IEnumerable<IManagedTemplatesSourceUpdate> sources)
+        public Task<IReadOnlyList<InstallResult>> UpdateAsync(IEnumerable<ManagedTemplatesSourceUpdate> sources)
         {
             return Task.FromResult<IReadOnlyList<InstallResult>>(new List<InstallResult>(0));
         }

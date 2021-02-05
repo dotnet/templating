@@ -3,16 +3,22 @@
 
 namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
 {
-    public interface IManagedTemplatesSourceUpdate
+    public class ManagedTemplatesSourceUpdate
     {
+        public ManagedTemplatesSourceUpdate(IManagedTemplatesSource source, string version)
+        {
+            InstallUnitDescriptor = source;
+            Version = version;
+        }
+
         /// <summary>
         ///  The existing install unit that this update descriptor is for.
         /// </summary>
-        IManagedTemplatesSource InstallUnitDescriptor { get; }
+        public IManagedTemplatesSource InstallUnitDescriptor { get; }
 
         /// <summary>
         /// Version which this update should install
         /// </summary>
-        string Version { get; }
+        public string Version { get; }
     }
 }
