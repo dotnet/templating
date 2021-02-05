@@ -21,9 +21,13 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         private readonly IEngineEnvironmentSettings _environmentSettings;
         private readonly Paths _paths;
 
-        public ScanResult Scan(string baseDir)
+        public ScanResult Scan(string sourceLocation)
         {
-            MountPointScanSource source = GetOrCreateMountPointScanInfoForInstallSource(baseDir);
+            if (string.IsNullOrWhiteSpace(sourceLocation))
+            {
+                throw new ArgumentException($"{nameof(sourceLocation)} should not be null or empty");
+            }
+            MountPointScanSource source = GetOrCreateMountPointScanInfoForInstallSource(sourceLocation);
 
             ScanResult scanResult = new ScanResult();
             ScanForComponents(source);
@@ -54,12 +58,13 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     };
                 }
             }
-
-            return null;
+            throw new Exception($"source location {sourceLocation} is not supported, or doesn't exist.");
         }
 
         private void ScanForComponents(MountPointScanSource source)
         {
+            _ = source ?? throw new ArgumentNullException(nameof(source));
+
             bool isCopiedIntoContentDirectory;
 
             if (!source.MountPoint.Root.EnumerateFiles("*.dll", SearchOption.AllDirectories).Any())
@@ -151,6 +156,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         private void ScanMountPointForTemplatesAndLangpacks(MountPointScanSource source, ScanResult scanResult)
         {
+            _ = source ?? throw new ArgumentNullException(nameof(source));
             // look for things to install
             foreach (IGenerator generator in _environmentSettings.SettingsLoader.Components.OfType<IGenerator>())
             {
