@@ -49,7 +49,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         private void Save(TemplateCache cacheToSave)
         {
-            _paths.WriteAllText(_paths.User.GlobalSettingsFile, JsonConvert.SerializeObject(GlobalSettings));
+            _paths.WriteAllText(_paths.User.GlobalSettingsFile, JsonConvert.SerializeObject(GlobalSettings, Formatting.Indented));
 
             // When writing the template caches, we need the existing cache version to read the existing caches for before updating.
             // so don't update it until after the template caches are written.
