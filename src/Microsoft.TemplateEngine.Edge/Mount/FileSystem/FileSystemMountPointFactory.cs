@@ -33,7 +33,7 @@ namespace Microsoft.TemplateEngine.Edge.Mount.FileSystem
                 return false;
             }
 
-            mountPoint = new FileSystemMountPoint(environmentSettings, parent, mountPointUri);
+            mountPoint = new FileSystemMountPoint(environmentSettings, parent, uri.LocalPath);
             return true;
         }
     }
