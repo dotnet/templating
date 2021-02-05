@@ -1,3 +1,4 @@
+using Microsoft.TemplateEngine.Abstractions.Installer;
 using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
 using System;
 using System.Collections.Generic;
@@ -14,9 +15,9 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
         static List<string> detailKeysDisplayOrder = new List<string>() { AuthorKey, NuGetSourceKey };
 
-        public NuGetManagedTemplatesSource(IManagedTemplatesSourcesProvider provider, string mountPoint, Dictionary<string, string> details)
-        {          
-            ManagedProvider = provider;
+        public NuGetManagedTemplatesSource(IInstaller installer, string mountPoint, Dictionary<string, string> details)
+        {
+            Installer = installer;
             MountPointUri = mountPoint;
             Details = details;
         }
@@ -37,13 +38,13 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
         public string Author => Details.TryGetValue(AuthorKey, out string author) ? author : null;
 
-        public ITemplatesSourcesProvider Provider => ManagedProvider;
-
-        public IManagedTemplatesSourcesProvider ManagedProvider { get; }
+        public ITemplatesSourcesProvider Provider => Installer.Provider;
 
         public bool LocalPackage => Details.TryGetValue(LocalPackageKey, out string isLocalPackage) && Boolean.TryParse(isLocalPackage, out bool result) ? result : false;
 
         public bool PrivateFeed => NuGetSource != NuGetApiPackageManager.PublicNuGetFeed;
+
+        public IInstaller Installer { get; }
     }
 
 }
