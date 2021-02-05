@@ -1,3 +1,4 @@
+using Microsoft.TemplateEngine.Abstractions.Installer;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -37,10 +38,10 @@ namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
         IReadOnlyList<string> DetailKeysDisplayOrder { get; }
 
         /// <summary>
-        /// ManagedProvider that created this source.
-        /// This serves as helper for grouping sources by provider
-        /// so caller doesn't need to keep track of provider->source relation.
+        /// Installer that created this source.
+        /// This serves as helper for grouping sources by installer
+        /// so caller doesn't need to keep track of installer->source relation.
         /// </summary>
-        IManagedTemplatesSourcesProvider ManagedProvider { get; }
+        IInstaller Installer { get; }
     }
 }

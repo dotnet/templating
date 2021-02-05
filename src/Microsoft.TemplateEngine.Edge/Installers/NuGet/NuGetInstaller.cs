@@ -12,7 +12,6 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
     class NuGetInstaller : IInstaller
     {
         private readonly IInstallerFactory factory;
-        private readonly IManagedTemplatesSourcesProvider provider;
         private readonly string installPath;
         private readonly IDownloader _packageDownloader;
         private readonly IUpdateChecker _updateChecker;
@@ -21,7 +20,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         public NuGetInstaller(IInstallerFactory factory, IManagedTemplatesSourcesProvider provider, IEngineEnvironmentSettings settings, string installPath)
         {
             this.factory = factory;
-            this.provider = provider;
+            this.Provider = provider;
             this.installPath = installPath;
             NuGetApiPackageManager packageManager = new NuGetApiPackageManager(settings);
             _packageDownloader = packageManager;
@@ -32,6 +31,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         public string Name => factory.Name;
 
         public Guid FactoryId => factory.Id;
+        public IManagedTemplatesSourcesProvider Provider { get; }
 
         public Task<bool> CanInstallAsync(InstallRequest installationRequest)
         {
@@ -60,7 +60,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                     sourceDetails[NuGetManagedTemplatesSource.PackageIdKey] = result.PackageIdentifier;
                     sourceDetails[NuGetManagedTemplatesSource.PackageVersionKey] = result.PackageVersion.ToString();
                 }
-                NuGetManagedTemplatesSource source = new NuGetManagedTemplatesSource(provider, packageLocation, sourceDetails);
+                NuGetManagedTemplatesSource source = new NuGetManagedTemplatesSource(this, packageLocation, sourceDetails);
                 return InstallResult.CreateSuccess(source);
             }
             catch (DownloadException e)
@@ -99,7 +99,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
         public IManagedTemplatesSource Deserialize(IManagedTemplatesSourcesProvider provider, string mountPointUri, object details)
         {
-            return new NuGetManagedTemplatesSource(provider, mountPointUri, details as Dictionary<string,string>);
+            return new NuGetManagedTemplatesSource(this, mountPointUri, details as Dictionary<string,string>);
         }
 
         public (string mountPointUri, IReadOnlyDictionary<string, string> details) Serialize(IManagedTemplatesSource managedSource)
