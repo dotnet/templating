@@ -85,7 +85,7 @@ namespace Microsoft.TemplateEngine.Edge.Mount.FileSystem
         {
             return _paths.EnumerateFiles(_physicalPath, pattern, searchOption).Select(x =>
             {
-                string baseName = x.Substring(new DirectoryInfo(((FileSystemMountPoint)MountPoint).Place).FullName.Length).Replace(Path.DirectorySeparatorChar, '/');
+                string baseName = x.Substring(((FileSystemMountPoint)MountPoint).Place.Length).Replace(Path.DirectorySeparatorChar, '/');
 
                 if (baseName.Length == 0)
                 {
