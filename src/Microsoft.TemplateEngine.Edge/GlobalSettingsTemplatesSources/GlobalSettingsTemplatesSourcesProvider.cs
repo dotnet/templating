@@ -90,7 +90,7 @@ namespace Microsoft.TemplateEngine.Edge
                 var data = installer.Serialize(installResult.ManagedTemplateSource);
                 settings.SettingsLoader.GlobalSettings.Add(new Abstractions.GlobalSettings.TemplatesSourceData()
                 {
-                    Details = data.details.ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
+                    Details = data.details?.ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
                     InstallerId = installer.FactoryId,
                     LastChangeTime = DateTime.Now,
                     MountPointUri = data.mountPointUri
