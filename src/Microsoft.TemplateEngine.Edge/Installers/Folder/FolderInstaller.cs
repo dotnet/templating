@@ -4,6 +4,7 @@ using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -34,32 +35,35 @@ namespace Microsoft.TemplateEngine.Edge.Installers.Folder
 
         public IManagedTemplatesSource Deserialize(IManagedTemplatesSourcesProvider provider, string mountPointUri, object details)
         {
-            throw new NotImplementedException();
+            return new FolderManagedTemplatesSource(settings, this, mountPointUri);
         }
 
         public Task<IReadOnlyList<IManagedTemplatesSourceUpdate>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources)
         {
-            throw new NotImplementedException();
+            return Task.FromResult<IReadOnlyList<IManagedTemplatesSourceUpdate>>(sources.Select(s => new IManagedTemplatesSourceUpdate(s, null)).ToList());
         }
 
         public Task<InstallResult> InstallAsync(InstallRequest installRequest)
         {
-            throw new NotImplementedException();
+            if (Directory.Exists(installRequest.Identifier))
+                return Task.FromResult(InstallResult.CreateSuccess(new FolderManagedTemplatesSource(settings, this, installRequest.Identifier)));
+            else
+                return Task.FromResult(InstallResult.CreateFailure(InstallResult.ErrorCode.GenericError, null));
         }
 
         public (string mountPointUri, IReadOnlyDictionary<string, string> details) Serialize(IManagedTemplatesSource managedSource)
         {
-            throw new NotImplementedException();
+            return (managedSource.MountPointUri, null);
         }
 
         public Task<UninstallResult> UninstallAsync(IManagedTemplatesSource managedSource)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(UninstallResult.CreateSuccess());
         }
 
         public Task<IReadOnlyList<InstallResult>> UpdateAsync(IEnumerable<IManagedTemplatesSourceUpdate> sources)
         {
-            throw new NotImplementedException();
+            return Task.FromResult<IReadOnlyList<InstallResult>>(new List<InstallResult>(0));
         }
     }
 }
