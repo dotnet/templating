@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "dotnet-new3": {
-      "commandName": "Project",
-      "commandLineArgs": "-i MSBuildExtensionTemplate",
-      "workingDirectory": "C:\\tmp\\b839fb8a-cdb4-42a0-a78b-01e936fad3b5"
-    }
-  }
-}
