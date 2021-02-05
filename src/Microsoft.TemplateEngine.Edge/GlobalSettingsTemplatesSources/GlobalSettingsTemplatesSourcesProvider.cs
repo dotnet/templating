@@ -48,9 +48,9 @@ namespace Microsoft.TemplateEngine.Edge
                 var userSettings = settings.SettingsLoader.GlobalSettings;
                 foreach (var entry in userSettings.UserInstalledTemplatesSources)
                 {
-                    if(installersByGuid.TryGetValue(entry.InstallerId, out var installer))
+                    if (installersByGuid.TryGetValue(entry.InstallerId, out var installer))
                     {
-                        if(installer.Deserialize (this, entry.MountPointUri, entry.Details) is IManagedTemplatesSource managedSource)
+                        if (installer.Deserialize(this, entry.MountPointUri, entry.Details) is IManagedTemplatesSource managedSource)
                         {
                             list.Add(managedSource);
                         }
@@ -59,9 +59,21 @@ namespace Microsoft.TemplateEngine.Edge
                 return Task.FromResult<IReadOnlyList<ITemplatesSource>>(list);
             }
 
-            public Task<IReadOnlyList<IManagedTemplatesSourceUpdate>> GetLatestVersions(IEnumerable<IManagedTemplatesSource> sources)
+            public async Task<IReadOnlyList<IManagedTemplatesSourceUpdate>> GetLatestVersions(IEnumerable<IManagedTemplatesSource> sources)
             {
-                throw new NotImplementedException();
+                var tasks = new List<Task<IReadOnlyList<IManagedTemplatesSourceUpdate>>>();
+                foreach (var sourcesGroupedByInstaller in sources.GroupBy(s => s.Installer))
+                {
+                    tasks.Add(sourcesGroupedByInstaller.Key.GetLatestVersionAsync(sourcesGroupedByInstaller));
+                }
+                await Task.WhenAll(tasks);
+
+                var result = new List<IManagedTemplatesSourceUpdate>();
+                foreach (var task in tasks)
+                {
+                    result.AddRange(task.Result);
+                }
+                return result;
             }
 
             public async Task<InstallResult> InstallAsync(InstallRequest installRequest)
