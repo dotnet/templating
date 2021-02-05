@@ -4,6 +4,7 @@ using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -87,9 +88,9 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             throw new NotImplementedException();
         }
 
-        public Task<IReadOnlyList<ManagedTemplatesSourceUpdate>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources)
+        public async Task<IReadOnlyList<ManagedTemplatesSourceUpdate>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources)
         {
-            throw new NotImplementedException();
+            return sources.Select(s => new ManagedTemplatesSourceUpdate(s, s.Version)).ToList();
         }
 
         public Task<IReadOnlyList<InstallResult>> UpdateAsync(IEnumerable<ManagedTemplatesSourceUpdate> sources)
