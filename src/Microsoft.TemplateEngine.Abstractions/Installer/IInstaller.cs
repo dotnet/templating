@@ -38,5 +38,7 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
         Task<IReadOnlyList<IManagedTemplatesSourceUpdate>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources);
 
         Task<IReadOnlyList<InstallResult>> UpdateAsync(IEnumerable<IManagedTemplatesSourceUpdate> sources);
+
+        IManagedTemplatesSourcesProvider Provider { get; }
     }
 }
