@@ -11,15 +11,21 @@ namespace Microsoft.TemplateEngine.Edge.Installers.Folder
 {
     class FolderInstaller : IInstaller
     {
-        public FolderInstaller(FolderInstallerFactory factory, IManagedTemplatesSourcesProvider provider)
+        private readonly IEngineEnvironmentSettings settings;
+
+        public FolderInstaller(IEngineEnvironmentSettings settings, FolderInstallerFactory factory, IManagedTemplatesSourcesProvider provider)
         {
             Name = factory.Name;
             FactoryId = factory.Id;
+            this.settings = settings;
+            this.Provider = provider;
         }
 
         public string Name { get; }
 
         public Guid FactoryId { get; }
+
+        public IManagedTemplatesSourcesProvider Provider { get; }
 
         public Task<bool> CanInstallAsync(InstallRequest installationRequest)
         {
