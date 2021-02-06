@@ -19,7 +19,7 @@ namespace Microsoft.TemplateEngine.Mocks
 
         public IEngineEnvironmentSettings EnvironmentSettings { get; set; }
 
-        public string AbsoluteUri => "/";
+        public string MountPointUri { get; }
 
         public IFileSystemInfo FileSystemInfo(string fullPath)
         {

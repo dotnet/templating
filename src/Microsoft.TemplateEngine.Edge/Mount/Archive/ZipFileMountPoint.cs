@@ -6,13 +6,17 @@ using Microsoft.TemplateEngine.Abstractions.Mount;
 
 namespace Microsoft.TemplateEngine.Edge.Mount.Archive
 {
+    /// <summary>
+    /// Mount point implementation for zip file.
+    /// NuGet packages are zip files, so they are handled by this mount point.
+    /// </summary>
     internal class ZipFileMountPoint : IMountPoint
     {
         private IReadOnlyDictionary<string, IFileSystemInfo> _universe;
 
-        public ZipFileMountPoint(IEngineEnvironmentSettings environmentSettings,  IMountPoint parent, string uri, ZipArchive archive)
+        public ZipFileMountPoint(IEngineEnvironmentSettings environmentSettings, IMountPoint parent, string mountPointUri, ZipArchive archive)
         {
-            AbsoluteUri = uri;
+            MountPointUri = mountPointUri;
             Parent = parent;
             EnvironmentSettings = environmentSettings;
             Archive = archive;
@@ -23,35 +27,35 @@ namespace Microsoft.TemplateEngine.Edge.Mount.Archive
 
         public IDirectory Root { get; }
 
-        public IFile FileInfo(string fullPath)
+        public IFile FileInfo(string path)
         {
-            return new ZipFileFile(this, fullPath, fullPath.Substring(fullPath.LastIndexOf('/') + 1), null);
+            return new ZipFileFile(this, path, path.Substring(path.LastIndexOf('/') + 1), null);
         }
 
-        public IDirectory DirectoryInfo(string fullPath)
+        public IDirectory DirectoryInfo(string path)
         {
-            if(Universe.TryGetValue(fullPath, out IFileSystemInfo info))
+            if (Universe.TryGetValue(path, out IFileSystemInfo info))
             {
                 return info as IDirectory;
             }
-            else if (Universe.TryGetValue(fullPath + "/", out info))
+            else if (Universe.TryGetValue(path + "/", out info))
             {
                 return info as IDirectory;
             }
 
-            return new ZipFileDirectory(this, fullPath, fullPath.Substring(fullPath.LastIndexOf('/') + 1));
+            return new ZipFileDirectory(this, path, path.Substring(path.LastIndexOf('/') + 1));
         }
 
-        public IFileSystemInfo FileSystemInfo(string fullPath)
+        public IFileSystemInfo FileSystemInfo(string path)
         {
-            IFile file = FileInfo(fullPath);
+            IFile file = FileInfo(path);
 
             if (file.Exists)
             {
                 return file;
             }
 
-            return DirectoryInfo(fullPath);
+            return DirectoryInfo(path);
         }
 
         public void Dispose()
@@ -116,6 +120,6 @@ namespace Microsoft.TemplateEngine.Edge.Mount.Archive
 
         public Guid MountPointFactoryId => ZipFileMountPointFactory.FactoryId;
 
-        public string AbsoluteUri { get; }
+        public string MountPointUri { get; } 
     }
 }

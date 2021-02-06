@@ -192,7 +192,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         public IFileSystemInfo Configuration => ConfigFile;
 
-        public string MountPointUri => Configuration.MountPoint.AbsoluteUri;
+        public string MountPointUri => Configuration.MountPoint.MountPointUri;
 
         public string ConfigPlace => Configuration.FullPath;
 
