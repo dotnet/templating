@@ -41,7 +41,6 @@ namespace Microsoft.TemplateEngine.Utils
 
         public static IEnumerable<string> Expand(string unexpandedInstallRequest, IEngineEnvironmentSettings environmentSettings)
         {
-            // Handle cases like PackageId::Version
             if (unexpandedInstallRequest.IndexOfAny(Path.GetInvalidPathChars()) != -1)
             {
                 yield return unexpandedInstallRequest;
