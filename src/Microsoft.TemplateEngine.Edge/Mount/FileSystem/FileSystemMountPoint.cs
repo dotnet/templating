@@ -5,51 +5,59 @@ using Microsoft.TemplateEngine.Abstractions.Mount;
 
 namespace Microsoft.TemplateEngine.Edge.Mount.FileSystem
 {
+    /// <summary>
+    /// Mount point implementation for file system directory
+    /// </summary>
     public class FileSystemMountPoint : IMountPoint
     {
         private Paths _paths;
-        public string Place { get; }
 
-        public FileSystemMountPoint(IEngineEnvironmentSettings environmentSettings, IMountPoint parent, string place)
+        /// <summary>
+        /// Returns full path of the mounted directory
+        /// </summary>
+        internal string MountPointRootPath { get; } 
+
+        public FileSystemMountPoint(IEngineEnvironmentSettings environmentSettings, IMountPoint parent, string mountPointUri, string mountPointRootPath)
         {
+            MountPointUri = mountPointUri;
+            MountPointRootPath = mountPointRootPath;
             EnvironmentSettings = environmentSettings;
             _paths = new Paths(environmentSettings);
-            Place = place;
-            Root = new FileSystemDirectory(this, "/", "", place);
+            Root = new FileSystemDirectory(this, "/", "", MountPointRootPath);
         }
 
         public IDirectory Root { get; }
 
         public IEngineEnvironmentSettings EnvironmentSettings { get; }
 
-        public IFile FileInfo(string fullPath)
+        public IFile FileInfo(string path)
         {
-            string realPath = Path.Combine(Place, fullPath.TrimStart('/'));
+            string fullPath = Path.Combine(MountPointRootPath, path.TrimStart('/'));
 
-            if (!fullPath.StartsWith("/"))
+            if (!path.StartsWith("/"))
             {
-                fullPath = "/" + fullPath;
+                path = "/" + path;
             }
 
-            return new FileSystemFile(this, fullPath, _paths.Name(realPath), realPath);
+            return new FileSystemFile(this, path, _paths.Name(fullPath), fullPath);
         }
 
-        public IDirectory DirectoryInfo(string fullPath)
+        public IDirectory DirectoryInfo(string path)
         {
-            string realPath = Path.Combine(Place, fullPath.TrimStart('/'));
-            return new FileSystemDirectory(this, fullPath, _paths.Name(realPath), realPath);
+            string fullPath = Path.Combine(MountPointRootPath, path.TrimStart('/'));
+            return new FileSystemDirectory(this, path, _paths.Name(fullPath), fullPath);
         }
 
-        public IFileSystemInfo FileSystemInfo(string fullPath)
+        public IFileSystemInfo FileSystemInfo(string path)
         {
-            string realPath = Path.Combine(Place, fullPath.TrimStart('/'));
+            string fullPath = Path.Combine(MountPointRootPath, path.TrimStart('/'));
 
-            if (EnvironmentSettings.Host.FileSystem.DirectoryExists(realPath))
+            if (EnvironmentSettings.Host.FileSystem.DirectoryExists(fullPath))
             {
-                return new FileSystemDirectory(this, fullPath, _paths.Name(realPath), realPath);
+                return new FileSystemDirectory(this, path, _paths.Name(fullPath), fullPath);
             }
 
-            return new FileSystemFile(this, fullPath, _paths.Name(realPath), realPath);
+            return new FileSystemFile(this, path, _paths.Name(fullPath), fullPath);
         }
 
         public void Dispose()
@@ -61,6 +69,6 @@ namespace Microsoft.TemplateEngine.Edge.Mount.FileSystem
 
         public Guid MountPointFactoryId => FileSystemMountPointFactory.FactoryId;
 
-        public string AbsoluteUri => Place;
+        public string MountPointUri { get; }
     }
 }
