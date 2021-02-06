@@ -155,7 +155,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                         ILocalizationLocator locator = new LocalizationLocator()
                         {
                             Locale = locale,
-                            MountPointUri = source.AbsoluteUri,
+                            MountPointUri = source.MountPointUri,
                             ConfigPlace = file.FullPath,
                             Identity = locModel.Identity,
                             Author = locModel.Author,
@@ -224,7 +224,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
                 // Record the timestamp of the template file so we
                 // know to reload it if it changes
-                if (Uri.TryCreate(templateFile.MountPoint.AbsoluteUri, UriKind.Absolute, out var uri) &&
+                if (Uri.TryCreate(templateFile.MountPoint.MountPointUri, UriKind.Absolute, out var uri) &&
                     host.FileSystem.DirectoryExists(uri.LocalPath) &&
                     host.FileSystem is IFileLastWriteTimeSource timeSource)
                 {
