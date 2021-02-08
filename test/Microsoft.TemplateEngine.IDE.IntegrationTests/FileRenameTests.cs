@@ -205,8 +205,9 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             Dictionary<string, string> parametersDict = BasicParametersParser.ParseParameterString(parameters);
 
 
-            IEnumerable<IFilteredTemplateInfo> template = await bootstrapper.ListTemplates(true, WellKnownSearchFilters.NameFilter(templateName)).ConfigureAwait(false);
-            ICreationEffects result = await bootstrapper.GetCreationEffectsAsync(template.First().Info, name, output, parametersDict, "").ConfigureAwait(false);
+            var foundTemplates = await bootstrapper.ListTemplates(true, WellKnownSearchFilters.NameFilter(templateName)).ConfigureAwait(false);
+            ITemplateInfo template = foundTemplates.Single(template => template.Info.ShortName == $"TestAssets.{templateName}").Info;
+            ICreationEffects result = await bootstrapper.GetCreationEffectsAsync(template, name, output, parametersDict, "").ConfigureAwait(false);
 
             Assert.Equal(expectedResult.CreationResult.PrimaryOutputs.Count, result.CreationResult.PrimaryOutputs.Count);
             Assert.Equal(
@@ -234,8 +235,9 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             string output = BasicParametersParser.GetOutputFromParameterString(parameters);
             Dictionary<string, string> parametersDict = BasicParametersParser.ParseParameterString(parameters);
 
-            IEnumerable<IFilteredTemplateInfo> template = await bootstrapper.ListTemplates(true, WellKnownSearchFilters.NameFilter(templateName)).ConfigureAwait(false);
-            var result = await bootstrapper.CreateAsync(template.First().Info, name, output, parametersDict, false, "").ConfigureAwait(false);
+            var foundTemplates = await bootstrapper.ListTemplates(true, WellKnownSearchFilters.NameFilter(templateName)).ConfigureAwait(false);
+            ITemplateInfo template = foundTemplates.Single(template => template.Info.ShortName == $"TestAssets.{templateName}").Info;
+            var result = await bootstrapper.CreateAsync(template, name, output, parametersDict, false, "").ConfigureAwait(false);
 
             Assert.Equal(expectedResult.CreationResult.PrimaryOutputs.Count, result.PrimaryOutputs.Count);
             Assert.Equal(
@@ -279,8 +281,8 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             string output = BasicParametersParser.GetOutputFromParameterString(parameters);
             Dictionary<string, string> parametersDict = BasicParametersParser.ParseParameterString(parameters);
 
-
-            ITemplateInfo template = bootstrapper.ListTemplates(true, WellKnownSearchFilters.NameFilter(templateName)).Single(template => template.Info.ShortName == $"TestAssets.{templateName}").Info;
+            var foundTemplates = await bootstrapper.ListTemplates(true, WellKnownSearchFilters.NameFilter(templateName)).ConfigureAwait(false);
+            ITemplateInfo template = foundTemplates.Single(template => template.Info.ShortName == $"TestAssets.{templateName}").Info;
             ICreationEffects result = await bootstrapper.GetCreationEffectsAsync(template, name, output, parametersDict, "").ConfigureAwait(false);
 
             Assert.Equal(expectedResult.CreationResult.PrimaryOutputs.Count, result.CreationResult.PrimaryOutputs.Count);
@@ -310,7 +312,8 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             string output = BasicParametersParser.GetOutputFromParameterString(parameters);
             Dictionary<string, string> parametersDict = BasicParametersParser.ParseParameterString(parameters);
 
-            ITemplateInfo template = bootstrapper.ListTemplates(true, WellKnownSearchFilters.NameFilter(templateName)).Single(template => template.Info.ShortName == $"TestAssets.{templateName}").Info;
+            var foundTemplates = await bootstrapper.ListTemplates(true, WellKnownSearchFilters.NameFilter(templateName)).ConfigureAwait(false);
+            ITemplateInfo template = foundTemplates.Single(template => template.Info.ShortName == $"TestAssets.{templateName}").Info;
             var result = await bootstrapper.CreateAsync(template, name, output, parametersDict, false, "").ConfigureAwait(false);
 
             Assert.Equal(expectedResult.CreationResult.PrimaryOutputs.Count, result.PrimaryOutputs.Count);
