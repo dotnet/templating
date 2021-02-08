@@ -30,20 +30,7 @@ namespace dotnet_new3
             bool emitTimings = args.Any(x => string.Equals(x, "--debug:emit-timings", StringComparison.OrdinalIgnoreCase));
             bool enableLogging = args.Any(x => string.Equals(x, "--debug:enable-logging", StringComparison.OrdinalIgnoreCase));
             bool debugTelemetry = args.Any(x => string.Equals(x, "--debug:emit-telemetry", StringComparison.OrdinalIgnoreCase));
-    
             DefaultTemplateEngineHost host = CreateHost(emitTimings, enableLogging);
-
-            bool debugAuthoring = args.Any(x => string.Equals(x, "--trace:authoring", StringComparison.OrdinalIgnoreCase));
-            bool debugInstall = args.Any(x => string.Equals(x, "--trace:install", StringComparison.OrdinalIgnoreCase));
-            if (debugAuthoring)
-            {
-                AddAuthoringLogger(host);
-                AddInstallLogger(host);
-            }
-            else if (debugInstall)
-            {
-                AddInstallLogger(host);
-            }
 
             return New3Command.Run(CommandName, host, new TelemetryLogger(null, debugTelemetry), FirstRun, args);
         }
@@ -75,19 +62,17 @@ namespace dotnet_new3
             });
 
             ILogger logger = null;
-            if (enableLogging)
-            {
-                using var loggerFactory =
-                    LoggerFactory.Create(builder =>
-                        builder.AddSimpleConsole(options =>
+            using var loggerFactory =
+                LoggerFactory.Create(builder =>
+                    builder
+                        .SetMinimumLevel(enableLogging ? LogLevel.Trace : LogLevel.None)
+                        .AddSimpleConsole(options =>
                         {
                             options.SingleLine = true;
                             options.TimestampFormat = "[yyyy-MM-dd HH:mm:ss.fff] ";
                             options.IncludeScopes = true;
                         }));
-                logger = loggerFactory.CreateLogger("Template Engine");
-            }
-
+            logger = loggerFactory.CreateLogger("Template Engine");
 
             DefaultTemplateEngineHost host = new DefaultTemplateEngineHost(
                 HostIdentifier,
@@ -103,20 +88,10 @@ namespace dotnet_new3
                 host.OnLogTiming = (label, duration, depth) =>
                 {
                     string indent = string.Join("", Enumerable.Repeat("  ", depth));
-                    Console.WriteLine($"{indent} {label} {duration.TotalMilliseconds}");
+                    host.Logger.LogInformation($"{indent} {label} {duration.TotalMilliseconds}");
                 };
             }
             return host;
-        }
-
-        private static void AddAuthoringLogger(DefaultTemplateEngineHost host)
-        {
-            host.RegisterDiagnosticLogger("Authoring");
-        }
-
-        private static void AddInstallLogger(DefaultTemplateEngineHost host)
-        {
-            host.RegisterDiagnosticLogger("Install");
         }
 
         private static void FirstRun(IEngineEnvironmentSettings environmentSettings, IInstaller installer)

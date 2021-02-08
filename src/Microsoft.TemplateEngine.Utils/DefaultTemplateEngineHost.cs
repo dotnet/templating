@@ -11,11 +11,10 @@ namespace Microsoft.TemplateEngine.Utils
 {
     public class DefaultTemplateEngineHost : ITemplateEngineHost, ITemplateEngineHost2
     {
-        private readonly Dictionary<string, ILogger> _diagnosticLoggers = new Dictionary<string, ILogger>();
         private readonly IReadOnlyDictionary<string, string> _hostDefaults;
         private readonly IReadOnlyList<KeyValuePair<Guid, Func<Type>>> _hostBuiltInComponents;
         private ILogger _logger = NullLogger.Instance;
-        private static readonly IReadOnlyList<KeyValuePair<Guid, Func<Type>>> NoComponents = new KeyValuePair<Guid, Func<Type>>[0];
+        private static readonly IReadOnlyList<KeyValuePair<Guid, Func<Type>>> NoComponents = Array.Empty<KeyValuePair<Guid, Func<Type>>>();
 
         public DefaultTemplateEngineHost(string hostIdentifier, string version, string locale)
             : this(hostIdentifier, version, locale, null)
@@ -123,8 +122,8 @@ namespace Microsoft.TemplateEngine.Utils
                 }
                 else
                 {
-                    logMessage.Append(".");
-                }    
+                    _ = logMessage.Append('.');
+                }
             }
             Logger.LogError(logMessage.ToString());
             newValue = null;
@@ -173,35 +172,15 @@ namespace Microsoft.TemplateEngine.Utils
             return true;
         }
 
-        [Obsolete("The method is obsolete. Registering the logger will result in creating console logger with messageHandler ignored. Use void RegisterDiagnosticLogger(string category, ILogger logger = null) instead.")]
+        [Obsolete("The method is obsolete. All diagnostic messages will be logged using Logger using Debug level.")]
         public void RegisterDiagnosticLogger(string category, Action<string, string[]> messageHandler)
         {
-            RegisterDiagnosticLogger(category);
-        }
-
-        public void RegisterDiagnosticLogger(string category, ILogger logger = null)
-        {
-            if (logger == null)
-            {
-                using var loggerFactory =
-                    LoggerFactory.Create(builder =>
-                        builder.AddSimpleConsole(options =>
-                        {
-                            options.SingleLine = true;
-                            options.TimestampFormat = "[yyyy-MM-dd HH:mm:ss.fff] ";
-                            options.IncludeScopes = true;
-                        }));
-                logger = loggerFactory.CreateLogger(category);
-            }
-            _diagnosticLoggers[category] = logger;
+            //do nothing
         }
 
         public void LogDiagnosticMessage(string message, string category, params string[] details)
         {
-            if (_diagnosticLoggers.TryGetValue(category, out ILogger logger))
-            {
-                logger?.LogInformation(message, details);
-            }
+            Logger.LogDebug($"[{category}] {message}", details);
         }
 
         public void LogTiming(string label, TimeSpan duration, int depth)
