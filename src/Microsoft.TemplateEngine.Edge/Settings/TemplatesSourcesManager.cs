@@ -29,7 +29,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             var providers = environmentSettings.SettingsLoader.Components.OfType<ITemplatesSourcesProviderFactory>().Select(f => f.CreateProvider(environmentSettings));
             foreach (var provider in providers)
             {
-                provider.SourcesChanged += async () =>
+                provider.SourcesChanged += () =>
                 {
                     cachedSources[provider] = provider.GetAllSourcesAsync(default);
                     SourcesChanged?.Invoke();

@@ -88,9 +88,9 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             throw new NotImplementedException();
         }
 
-        public async Task<IReadOnlyList<ManagedTemplatesSourceUpdate>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources)
+        public Task<IReadOnlyList<ManagedTemplatesSourceUpdate>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources)
         {
-            return sources.Select(s => new ManagedTemplatesSourceUpdate(s, s.Version)).ToList();
+            return Task.FromResult((IReadOnlyList<ManagedTemplatesSourceUpdate>)sources.Select(s => new ManagedTemplatesSourceUpdate(s, s.Version)).ToList());
         }
 
         public Task<IReadOnlyList<InstallResult>> UpdateAsync(IEnumerable<ManagedTemplatesSourceUpdate> sources)
