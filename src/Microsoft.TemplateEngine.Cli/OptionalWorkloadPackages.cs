@@ -38,7 +38,11 @@ namespace Microsoft.TemplateEngine.Utils
 
             public ITemplatesSourcesProviderFactory Factory { get; }
 
-            public event Action SourcesChanged;
+            event Action ITemplatesSourcesProvider.SourcesChanged
+            {
+                add { }
+                remove { }
+            }
 
             public Task<IReadOnlyList<ITemplatesSource>> GetAllSourcesAsync(CancellationToken cancellationToken)
             {

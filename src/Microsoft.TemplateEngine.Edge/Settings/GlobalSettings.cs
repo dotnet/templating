@@ -33,8 +33,8 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         // What this does, if older TemplateEngine loads this file and save it back
         // it will include new settings that new TemplateEngine depends on
         // without this field, data would be lost in process of loading and saving
-        [JsonExtensionData]
-        private IDictionary<string, JToken> _additionalData;
+        //[JsonExtensionData]
+        //private IDictionary<string, JToken> _additionalData;
 
         public event Action SettingsChanged;
 
