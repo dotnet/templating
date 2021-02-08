@@ -68,7 +68,7 @@ namespace dotnet_new3
                     IFileLastWriteTimeSource fileSystem = _settings.Host.FileSystem as IFileLastWriteTimeSource;
                     foreach (string sourceLocation in paths.ReadAllText(paths.Global.DefaultInstallTemplateList).Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries))
                     {
-                        string expandedPath = Environment.ExpandEnvironmentVariables(sourceLocation);
+                        string expandedPath = Environment.ExpandEnvironmentVariables(sourceLocation).Replace('\\', Path.DirectorySeparatorChar);
                         IEnumerable<string> expandedPaths = InstallRequestPathResolution.Expand(expandedPath, _settings);
                         templatesSources.AddRange(expandedPaths.Select(path => new TemplatesSource(this, path, fileSystem?.GetLastWriteTimeUtc(path) ?? File.GetLastWriteTime(path))));
                     }
