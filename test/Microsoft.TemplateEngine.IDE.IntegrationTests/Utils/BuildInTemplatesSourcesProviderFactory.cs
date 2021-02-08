@@ -32,7 +32,11 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests.Utils
 
             public ITemplatesSourcesProviderFactory Factory { get; }
 
-            public event Action SourcesChanged;
+            event Action ITemplatesSourcesProvider.SourcesChanged
+            {
+                add { }
+                remove { }
+            }
 
             public Task<IReadOnlyList<ITemplatesSource>> GetAllSourcesAsync(CancellationToken cancellationToken)
             {
@@ -42,7 +46,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests.Utils
                 Uri cb = new Uri(codebase);
                 string asmPath = cb.LocalPath;
                 string dir = Path.GetDirectoryName(asmPath);
-                string[] locations = new []
+                string[] locations = new[]
                 {
                     Path.Combine(dir, "..", "..", "..", "..", "..", "template_feed"),
                     Path.Combine(dir, "..", "..", "..", "..", "..", "test", "Microsoft.TemplateEngine.TestTemplates", "test_templates"),
