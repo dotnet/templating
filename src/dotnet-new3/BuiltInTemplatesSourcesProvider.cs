@@ -2,11 +2,11 @@ using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
 using Microsoft.TemplateEngine.Edge;
+using Microsoft.TemplateEngine.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,23 +25,23 @@ namespace dotnet_new3
 
         class BuiltInTemplatesSourcesProvider : ITemplatesSourcesProvider
         {
-            private readonly IEngineEnvironmentSettings settings;
+            private readonly IEngineEnvironmentSettings _settings;
 
             public BuiltInTemplatesSourcesProvider(BuiltInTemplatesSourcesProviderFactory factory, IEngineEnvironmentSettings settings)
             {
-                this.settings = settings;
-                this.Factory = factory;
+                _settings = settings;
+                Factory = factory;
             }
 
             public ITemplatesSourcesProviderFactory Factory { get; }
 
             public event Action SourcesChanged;
 
-            public async Task<IReadOnlyList<ITemplatesSource>> GetAllSourcesAsync(CancellationToken cancellationToken)
+            public Task<IReadOnlyList<ITemplatesSource>> GetAllSourcesAsync(CancellationToken cancellationToken)
             {
-                List<ITemplatesSource> toInstallList = new List<ITemplatesSource>();
+                List<ITemplatesSource> templatesSources = new List<ITemplatesSource>();
 
-                string dn3Path = settings.Environment.GetEnvironmentVariable("DN3");
+                string dn3Path = _settings.Environment.GetEnvironmentVariable("DN3");
                 if (string.IsNullOrEmpty(dn3Path))
                 {
                     string path = typeof(Program).Assembly.Location;
@@ -51,25 +51,26 @@ namespace dotnet_new3
                     }
                     if (path == null)
                     {
-                        settings.Host.LogDiagnosticMessage("Couldn't the setup package location, because \"Microsoft.TemplateEngine.sln\" is not in any of parent directories.", "Install");
-                        return toInstallList;
+                        _settings.Host.LogDiagnosticMessage("Couldn't the setup package location, because \"Microsoft.TemplateEngine.sln\" is not in any of parent directories.", "Install");
+                        return Task.FromResult((IReadOnlyList<ITemplatesSource>)templatesSources);
                     }
                     Environment.SetEnvironmentVariable("DN3", path);
                 }
 
-                Paths paths = new Paths(settings);
+                Paths paths = new Paths(_settings);
 
                 if (paths.FileExists(paths.Global.DefaultInstallTemplateList))
                 {
-                    var fileSystem = settings.Host.FileSystem as IFileLastWriteTimeSource;
-                    foreach (var nupkg in paths.ReadAllText(paths.Global.DefaultInstallTemplateList).Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries))
+                    IFileLastWriteTimeSource fileSystem = _settings.Host.FileSystem as IFileLastWriteTimeSource;
+                    foreach (string sourceLocation in paths.ReadAllText(paths.Global.DefaultInstallTemplateList).Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries))
                     {
-                        var expandedPath = Environment.ExpandEnvironmentVariables(nupkg); /*.TrimEnd('\\').TrimEnd('/')*/
-                        toInstallList.Add(new TemplatesSource(this, Path.GetFullPath(expandedPath), fileSystem?.GetLastWriteTimeUtc(expandedPath) ?? File.GetLastWriteTime(expandedPath)));
+                        string expandedPath = Environment.ExpandEnvironmentVariables(sourceLocation);
+                        IEnumerable<string> expandedPaths = InstallRequestPathResolution.Expand(expandedPath, _settings);
+                        templatesSources.AddRange(expandedPaths.Select(path => new TemplatesSource(this, path, fileSystem?.GetLastWriteTimeUtc(path) ?? File.GetLastWriteTime(path))));
                     }
                 }
 
-                return toInstallList;
+                return Task.FromResult((IReadOnlyList<ITemplatesSource>)templatesSources);
             }
         }
     }
