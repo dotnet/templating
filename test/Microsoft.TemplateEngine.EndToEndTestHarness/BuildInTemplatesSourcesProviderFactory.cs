@@ -1,8 +1,11 @@
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using Microsoft.TemplateEngine.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,12 +25,12 @@ namespace Microsoft.TemplateEngine.EndToEndTestHarness
 
         class BuiltInTemplatesSourcesProvider : ITemplatesSourcesProvider
         {
-            private readonly IEngineEnvironmentSettings settings;
+            private readonly IEngineEnvironmentSettings _settings;
 
             public BuiltInTemplatesSourcesProvider(BuiltInTemplatesSourcesProviderFactory factory, IEngineEnvironmentSettings settings)
             {
-                this.settings = settings;
-                this.Factory = factory;
+                _settings = settings;
+                Factory = factory;
             }
 
             public ITemplatesSourcesProviderFactory Factory { get; }
@@ -36,7 +39,7 @@ namespace Microsoft.TemplateEngine.EndToEndTestHarness
 
             public Task<IReadOnlyList<ITemplatesSource>> GetAllSourcesAsync(CancellationToken cancellationToken)
             {
-                List<ITemplatesSource> toInstallList = new List<ITemplatesSource>();
+                List<ITemplatesSource> templatesSources = new List<ITemplatesSource>();
 
                 string codebase = typeof(Program).GetTypeInfo().Assembly.Location;
                 Uri cb = new Uri(codebase);
@@ -45,20 +48,17 @@ namespace Microsoft.TemplateEngine.EndToEndTestHarness
                 string[] locations = new []
                 {
                     Path.Combine(dir, "..", "..", "..", "..", "..", "template_feed"),
-                    Path.Combine(dir, "..", "..", "..", "..", "..", "test", "Microsoft.TemplateEngine.TestTemplates", "test_templates"),
                     Path.Combine(dir, "..", "..", "..", "..", "..", "test", "Microsoft.TemplateEngine.TestTemplates", "test_templates")
                 };
 
-
-
                 foreach (string location in locations)
                 {
-                    if (Directory.Exists(location))
-                    {
-                        toInstallList.Add(new TemplatesSource(this, new DirectoryInfo(location).FullName, File.GetLastWriteTime(location)));
-                    }
+                    IFileLastWriteTimeSource fileSystem = _settings.Host.FileSystem as IFileLastWriteTimeSource;
+                    IEnumerable<string> expandedPaths = InstallRequestPathResolution.Expand(location, _settings);
+                    templatesSources.AddRange(expandedPaths.Select(path => new TemplatesSource(this, path, fileSystem?.GetLastWriteTimeUtc(path) ?? File.GetLastWriteTime(path))));
                 }
-                return Task.FromResult((IReadOnlyList<ITemplatesSource>)toInstallList);
+
+                return Task.FromResult((IReadOnlyList<ITemplatesSource>)templatesSources);
             }
         }
     }
