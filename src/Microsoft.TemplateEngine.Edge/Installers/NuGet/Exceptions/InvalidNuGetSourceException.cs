@@ -1,6 +1,8 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 
 namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
@@ -10,6 +12,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         {
             SourcesList = sources;
         }
+
         public InvalidNuGetSourceException(string message, IEnumerable<string> sources, Exception inner) : base(message, inner)
         {
             SourcesList = sources;
