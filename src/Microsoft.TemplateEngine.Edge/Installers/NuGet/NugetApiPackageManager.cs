@@ -1,24 +1,28 @@
-using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Abstractions.Installer;
-using NuGet.Common;
-using NuGet.Protocol;
-using NuGet.Protocol.Core.Types;
-using NuGet.Versioning;
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System;
-using System.Collections.Concurrent;
+using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Installer;
+using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using NuGet.Common;
+using NuGet.Protocol;
+using NuGet.Protocol.Core.Types;
+using NuGet.Versioning;
 
 namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
     internal class NuGetApiPackageManager : IDownloader, IUpdateChecker
     {
-        private readonly ILogger _nugetLogger = NullLogger.Instance;
         internal const string PublicNuGetFeed = "https://api.nuget.org/v3/index.json";
         private readonly IEngineEnvironmentSettings _environmentSettings;
+        private readonly ILogger _nugetLogger = NullLogger.Instance;
 
         internal NuGetApiPackageManager(IEngineEnvironmentSettings settings)
         {
@@ -61,15 +65,14 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             SourceRepository repository = Repository.Factory.GetCoreV3(source);
             try
             {
-                resource = await repository.GetResourceAsync<FindPackageByIdResource>();
+                resource = await repository.GetResourceAsync<FindPackageByIdResource>().ConfigureAwait(false);
             }
             catch (Exception e)
             {
                 _nugetLogger.LogError($"Failed to load the NuGet source {source}");
                 _nugetLogger.LogDebug($"Reason: {e.Message}");
                 throw new InvalidNuGetSourceException("Failed to load NuGet source", new[] { source }, e);
-            } 
- 
+            }
 
             CancellationToken cancellationToken = CancellationToken.None;
             SourceCacheContext cache = new SourceCacheContext();
@@ -108,9 +111,10 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             }
         }
 
-        public async Task<string> GetLatestVersionAsync(NuGetManagedTemplatesSource source)
+        public async Task<ManagedTemplatesSourceUpdate> GetLatestVersionAsync(NuGetManagedTemplatesSource source)
         {
-            return await GetLatestVersionAsync(source.Identifier).ConfigureAwait(false);
+            string latestVersion = await GetLatestVersionAsync(source.Identifier).ConfigureAwait(false);
+            return new ManagedTemplatesSourceUpdate(source, latestVersion);
         }
 
         private async Task<string> GetLatestVersionAsync(string packageIdentifier)
@@ -131,7 +135,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 SourceRepository repository = Repository.Factory.GetCoreV3(source);
                 try
                 {
-                    PackageMetadataResource resource = await repository.GetResourceAsync<PackageMetadataResource>();
+                    PackageMetadataResource resource = await repository.GetResourceAsync<PackageMetadataResource>().ConfigureAwait(false);
                     resources[source] = resource;
                 }
                 catch (Exception e)
@@ -140,7 +144,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                     _nugetLogger.LogDebug($"Reason: {e.Message}");
                 }
             }
-        
+
             if (!resources.Any())
             {
                 throw new InvalidNuGetSourceException("Failed to load NuGet sources", attemptedSources);
@@ -148,7 +152,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
             ConcurrentDictionary<string, IEnumerable<IPackageSearchMetadata>> searchResults = new ConcurrentDictionary<string, IEnumerable<IPackageSearchMetadata>>();
             foreach (KeyValuePair<string, PackageMetadataResource> resource in resources)
-            {   
+            {
                 IEnumerable<IPackageSearchMetadata> foundPackages = await resource.Value.GetMetadataAsync(
                     packageIdentifier,
                     includePrerelease: false,
@@ -168,7 +172,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             }
 
             var accumulativeSearchResults = searchResults
-                .SelectMany(result => result.Value.Select(p => new { source = result.Key, package = p}));
+                .SelectMany(result => result.Value.Select(p => new { source = result.Key, package = p }));
 
             if (!accumulativeSearchResults.Any())
             {
@@ -196,7 +200,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 SourceRepository repository = Repository.Factory.GetCoreV3(source);
                 try
                 {
-                    PackageMetadataResource resource = await repository.GetResourceAsync<PackageMetadataResource>();
+                    PackageMetadataResource resource = await repository.GetResourceAsync<PackageMetadataResource>().ConfigureAwait(false);
                     resources[source] = resource;
                 }
                 catch (Exception e)
@@ -236,6 +240,5 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
             throw new PackageNotFoundException(packageIdentifier, packageVersion, attemptedSources);
         }
-
     }
 }
