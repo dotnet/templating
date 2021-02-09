@@ -15,7 +15,6 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         public const string NuGetSourceKey = "NuGetSource";
         public const string PackageIdKey = "PackageId";
         public const string PackageVersionKey = "Version";
-        private static List<string> detailKeysDisplayOrder = new List<string>() { AuthorKey, NuGetSourceKey };
 
         public NuGetManagedTemplatesSource(IInstaller installer, string mountPoint, Dictionary<string, string> details)
         {
@@ -25,10 +24,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         }
 
         public string Author => Details.TryGetValue(AuthorKey, out string author) ? author : null;
-        public IReadOnlyList<string> DetailKeysDisplayOrder => detailKeysDisplayOrder;
-        public IReadOnlyDictionary<string, string> Details { get; }
         public string Identifier => Details.TryGetValue(PackageIdKey, out string identifier) ? identifier : null;
-
         public IInstaller Installer { get; }
         public DateTime LastChangeTime { get; }
         public bool LocalPackage => Details.TryGetValue(LocalPackageKey, out string isLocalPackage) && bool.TryParse(isLocalPackage, out bool result) ? result : false;
@@ -37,5 +33,15 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         public bool PrivateFeed => NuGetSource != NuGetApiPackageManager.PublicNuGetFeed;
         public ITemplatesSourcesProvider Provider => Installer.Provider;
         public string Version => Details.TryGetValue(PackageVersionKey, out string version) ? version : null;
+        internal IReadOnlyDictionary<string, string> Details { get; }
+        public IReadOnlyDictionary<string, string> GetDisplayDetails()
+        {
+            Dictionary<string, string> details = new Dictionary<string, string>();
+            if (!string.IsNullOrWhiteSpace(Author))
+            {
+                details[AuthorKey] = Author;
+            }
+            return details;
+        }
     }
 }

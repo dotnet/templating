@@ -274,7 +274,7 @@ namespace Microsoft.TemplateEngine.Cli
                         //TODO: Not needed, for now, but in future when we have more installers then just NuGet and Folder
                         //give user ability to set InstallerName
                         //InstallerName = _commandInput.InstallerName,
-                    });
+                    }).ConfigureAwait(false);
                     if (!result.Success)
                     {
                         switch (result.Error)
@@ -332,12 +332,12 @@ namespace Microsoft.TemplateEngine.Cli
 
             if (_commandInput.ToUninstallList != null)
             {
-                return await EnterUninstallFlow();
+                return await EnterUninstallFlow().ConfigureAwait(false);
             }
 
             if (_commandInput.ToInstallList != null && _commandInput.ToInstallList.Count > 0 && _commandInput.ToInstallList[0] != null)
             {
-                return await EnterInstallFlow();
+                return await EnterInstallFlow().ConfigureAwait(false);
             }
 
             // No other cases specified, we've fallen through to "Optional usage help + List"
@@ -351,7 +351,7 @@ namespace Microsoft.TemplateEngine.Cli
         {
             if (_commandInput.ToUninstallList.Count > 0 && _commandInput.ToUninstallList[0] != null)
             {
-                var managedSources = await EnvironmentSettings.SettingsLoader.TemplatesSourcesManager.GetManagedTemplatesSources(false);
+                var managedSources = await EnvironmentSettings.SettingsLoader.TemplatesSourcesManager.GetManagedTemplatesSources(false).ConfigureAwait(false);
                 foreach (var managedSource in managedSources)
                 {
                     try
@@ -366,82 +366,66 @@ namespace Microsoft.TemplateEngine.Cli
             }
             else
             {
-                Reporter.Output.WriteLine(LocalizableStrings.CommandDescription);
-                Reporter.Output.WriteLine();
-                Reporter.Output.WriteLine(LocalizableStrings.InstalledItems);
-
-                foreach (IManagedTemplatesSource descriptor in await EnvironmentSettings.SettingsLoader.TemplatesSourcesManager.GetManagedTemplatesSources().ConfigureAwait(false))
-                {
-                    Reporter.Output.WriteLine($"  {descriptor.Identifier}");
-
-                    bool wroteHeader = false;
-
-                    foreach (string detailKey in descriptor.DetailKeysDisplayOrder)
-                    {
-                        WriteDescriptorDetail(descriptor, detailKey, ref wroteHeader);
-                    }
-
-                    HashSet<string> standardDetails = new HashSet<string>(descriptor.DetailKeysDisplayOrder, StringComparer.OrdinalIgnoreCase);
-
-                    foreach (string detailKey in descriptor.Details.Keys.OrderBy(x => x))
-                    {
-                        if (standardDetails.Contains(detailKey))
-                        {
-                            continue;
-                        }
-
-                        WriteDescriptorDetail(descriptor, detailKey, ref wroteHeader);
-                    }
-
-                    // template info
-                    HashSet<string> templateDisplayStrings = new HashSet<string>(StringComparer.Ordinal);
-
-                    foreach (TemplateInfo info in _settingsLoader.UserTemplateCache.TemplateInfo.Where(x => x.MountPointUri == descriptor.MountPointUri))
-                    {
-                        string str = $"      {info.Name} ({info.ShortName})";
-
-                        string templateLanguage = info.GetLanguage();
-                        if (!string.IsNullOrWhiteSpace(templateLanguage))
-                        {
-                            str += " " + templateLanguage;
-                        }
-
-                        templateDisplayStrings.Add(str);
-                    }
-
-                    if (templateDisplayStrings.Count > 0)
-                    {
-                        Reporter.Output.WriteLine($"    {LocalizableStrings.Templates}:");
-
-                        foreach (string displayString in templateDisplayStrings)
-                        {
-                            Reporter.Output.WriteLine(displayString);
-                        }
-                    }
-
-                    // uninstall command:
-                    Reporter.Output.WriteLine($"    {LocalizableStrings.UninstallListUninstallCommand}");
-                    Reporter.Output.WriteLine(string.Format("      dotnet {0} -u {1}", _commandInput.CommandName, descriptor.Identifier));
-
-                    Reporter.Output.WriteLine();
-                }
+                await DisplayInstalledTemplatesSources().ConfigureAwait(false);
             }
 
             return CreationResultStatus.Success;
         }
 
-        private void WriteDescriptorDetail(IManagedTemplatesSource descriptor, string detailKey, ref bool wroteHeader)
+        private async Task DisplayInstalledTemplatesSources()
         {
-            if (descriptor.Details.TryGetValue(detailKey, out string detailValue)
-                && !string.IsNullOrEmpty(detailValue))
+            IEnumerable<IManagedTemplatesSource> managedTemplatesSources = await EnvironmentSettings.SettingsLoader.TemplatesSourcesManager.GetManagedTemplatesSources().ConfigureAwait(false);
+
+            Reporter.Output.WriteLine(LocalizableStrings.InstalledItems);
+
+            if (!managedTemplatesSources.Any())
             {
-                if (!wroteHeader)
+                Reporter.Output.WriteLine(LocalizableStrings.NoItems);
+                return;
+            }
+
+            foreach (IManagedTemplatesSource managedSource in managedTemplatesSources)
+            {
+                Reporter.Output.WriteLine($"  {managedSource.Identifier}");
+                if (!string.IsNullOrWhiteSpace(managedSource.Version))
                 {
-                    Reporter.Output.WriteLine($"    {LocalizableStrings.UninstallListDetailsHeader}");
-                    wroteHeader = true;
+                    Reporter.Output.WriteLine($"    {LocalizableStrings.Version} {managedSource.Version}");
                 }
 
-                Reporter.Output.WriteLine($"      {detailKey}: {detailValue}");
+                IReadOnlyDictionary<string, string> displayDetails = managedSource.GetDisplayDetails();
+                //TODO: localize keys
+                if (displayDetails?.Any() ?? false)
+                {
+                    Reporter.Output.WriteLine($"    {LocalizableStrings.UninstallListDetailsHeader}");
+                    foreach (KeyValuePair<string, string> detail in displayDetails)
+                    {
+                        Reporter.Output.WriteLine($"      {detail.Key}: {detail.Value}");
+                    }
+                }
+
+                IEnumerable<ITemplateInfo> templates = managedSource.GetTemplates(EnvironmentSettings);
+                if (templates.Any())
+                {
+                    Reporter.Output.WriteLine($"    {LocalizableStrings.Templates}:");
+                    foreach (TemplateInfo info in templates)
+                    {
+                        string templateLanguage = info.GetLanguage();
+                        if (!string.IsNullOrWhiteSpace(templateLanguage))
+                        {
+                            Reporter.Output.WriteLine($"      {info.Name} ({info.ShortName}) {templateLanguage}");
+                        }
+                        else
+                        {
+                            Reporter.Output.WriteLine($"      {info.Name} ({info.ShortName})");
+                        }
+                    }
+                }
+
+                // uninstall command:
+                Reporter.Output.WriteLine($"    {LocalizableStrings.UninstallListUninstallCommand}");
+                Reporter.Output.WriteLine(string.Format("      dotnet {0} -u {1}", _commandInput.CommandName, managedSource.Identifier));
+
+                Reporter.Output.WriteLine();
             }
         }
 
@@ -532,7 +516,7 @@ namespace Microsoft.TemplateEngine.Cli
                     var managedSourcedGroupedByProvider = await EnvironmentSettings.SettingsLoader.TemplatesSourcesManager.GetManagedSourcesGroupedByProvider().ConfigureAwait(false);
                     foreach (var (provider, sources) in managedSourcedGroupedByProvider)
                     {
-                        var updates = await provider.GetLatestVersions(sources);
+                        var updates = await provider.GetLatestVersions(sources).ConfigureAwait(false);
                         if (applyUpdates)
                         {
                             var results = await provider.UpdateAsync(updates).ConfigureAwait(false);
@@ -568,7 +552,7 @@ namespace Microsoft.TemplateEngine.Cli
 
                 if (string.IsNullOrWhiteSpace(TemplateName))
                 {
-                    return await EnterMaintenanceFlow();
+                    return await EnterMaintenanceFlow().ConfigureAwait(false);
                 }
 
                 return await EnterTemplateManipulationFlowAsync().ConfigureAwait(false);
