@@ -1,23 +1,24 @@
-using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Abstractions.Installer;
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Installer;
+using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
 
 namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
-    class NuGetInstaller : IInstaller
+    internal class NuGetInstaller : IInstaller
     {
-        private readonly IInstallerFactory factory;
-        private readonly string installPath;
+        private readonly IEngineEnvironmentSettings _environmentSettings;
         private readonly IDownloader _packageDownloader;
         private readonly IUpdateChecker _updateChecker;
-        private readonly IEngineEnvironmentSettings _environmentSettings;
-
+        private readonly IInstallerFactory factory;
+        private readonly string installPath;
         public NuGetInstaller(IInstallerFactory factory, IManagedTemplatesSourcesProvider provider, IEngineEnvironmentSettings settings, string installPath)
         {
             this.factory = factory;
@@ -29,9 +30,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             _environmentSettings = settings;
         }
 
-        public string Name => factory.Name;
-
         public Guid FactoryId => factory.Id;
+        public string Name => factory.Name;
         public IManagedTemplatesSourcesProvider Provider { get; }
 
         public Task<bool> CanInstallAsync(InstallRequest installationRequest)
@@ -40,8 +40,31 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             return Task.FromResult(!string.IsNullOrWhiteSpace(installationRequest.Identifier) && !Directory.Exists(installationRequest.Identifier));
         }
 
+        public IManagedTemplatesSource Deserialize(IManagedTemplatesSourcesProvider provider, string mountPointUri, object details)
+        {
+            return new NuGetManagedTemplatesSource(this, mountPointUri, details as Dictionary<string, string>);
+        }
+
+        public async Task<IReadOnlyList<ManagedTemplatesSourceUpdate>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources)
+        {
+            _ = sources ?? throw new ArgumentNullException(nameof(sources));
+            return await Task.WhenAll(sources.Select(source =>
+                {
+                    if (source is NuGetManagedTemplatesSource nugetSource && !nugetSource.LocalPackage)
+                    {
+                        return _updateChecker.GetLatestVersionAsync(nugetSource);
+                    }
+                    else
+                    {
+                        return Task.FromResult(new ManagedTemplatesSourceUpdate(source, source.Version));
+                    }
+                })).ConfigureAwait(false);
+        }
+
         public async Task<InstallResult> InstallAsync(InstallRequest installRequest)
         {
+            _ = installRequest ?? throw new ArgumentNullException(nameof(installRequest));
+
             try
             {
                 string packageLocation;
@@ -82,33 +105,35 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             }
         }
 
-        public Task<UninstallResult> UninstallAsync(IManagedTemplatesSource managedSource)
-        {
-            //Remove managedSource.MountPointUri
-            throw new NotImplementedException();
-        }
-
-        public Task<IReadOnlyList<ManagedTemplatesSourceUpdate>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources)
-        {
-            return Task.FromResult((IReadOnlyList<ManagedTemplatesSourceUpdate>)sources.Select(s => new ManagedTemplatesSourceUpdate(s, s.Version)).ToList());
-        }
-
-        public Task<IReadOnlyList<InstallResult>> UpdateAsync(IEnumerable<ManagedTemplatesSourceUpdate> sources)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IManagedTemplatesSource Deserialize(IManagedTemplatesSourcesProvider provider, string mountPointUri, object details)
-        {
-            return new NuGetManagedTemplatesSource(this, mountPointUri, details as Dictionary<string,string>);
-        }
-
         public (string mountPointUri, IReadOnlyDictionary<string, string> details) Serialize(IManagedTemplatesSource managedSource)
         {
             return (managedSource.MountPointUri, managedSource.Details);
         }
 
-        private bool IsLocalPackage (InstallRequest installRequest)
+        public Task<UninstallResult> UninstallAsync(IManagedTemplatesSource managedSource)
+        {
+            _ = managedSource ?? throw new ArgumentNullException(nameof(managedSource));
+            if (!(managedSource is NuGetManagedTemplatesSource))
+            {
+                return Task.FromResult(UninstallResult.CreateFailure($"{managedSource.Identifier} is not supported by {Name}"));
+            }
+            try
+            {
+                _environmentSettings.Host.FileSystem.FileDelete(managedSource.MountPointUri);
+                return Task.FromResult(UninstallResult.CreateSuccess());
+            }
+            catch (Exception ex)
+            {
+                //TODO: log issue when logger is available
+                return Task.FromResult(UninstallResult.CreateFailure($"Failed to uninstall {managedSource.Identifier}, reason: {ex.Message}"));
+            }
+        }
+        public Task<IReadOnlyList<InstallResult>> UpdateAsync(IEnumerable<ManagedTemplatesSourceUpdate> sources)
+        {
+            _ = sources ?? throw new ArgumentNullException(nameof(sources));
+            throw new NotImplementedException();
+        }
+        private bool IsLocalPackage(InstallRequest installRequest)
         {
             return File.Exists(installRequest.Identifier);
         }
