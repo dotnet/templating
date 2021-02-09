@@ -1,9 +1,8 @@
-using Microsoft.TemplateEngine.Abstractions.Installer;
-using System;
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using Microsoft.TemplateEngine.Abstractions.Installer;
 
 namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
 {
@@ -22,6 +21,13 @@ namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
         string Identifier { get; }
 
         /// <summary>
+        /// Installer that created this source.
+        /// This serves as helper for grouping sources by installer
+        /// so caller doesn't need to keep track of installer->source relation.
+        /// </summary>
+        IInstaller Installer { get; }
+
+        /// <summary>
         /// Version of templates source.
         /// </summary>
         string Version { get; }
@@ -30,18 +36,6 @@ namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
         /// This is list of details that we show to user about this templates source like, author and other information
         /// that might be important to user.
         /// </summary>
-        IReadOnlyDictionary<string, string> Details { get; }
-
-        /// <summary>
-        /// Allows ordering of <see cref="Details"/> when shown to user.
-        /// </summary>
-        IReadOnlyList<string> DetailKeysDisplayOrder { get; }
-
-        /// <summary>
-        /// Installer that created this source.
-        /// This serves as helper for grouping sources by installer
-        /// so caller doesn't need to keep track of installer->source relation.
-        /// </summary>
-        IInstaller Installer { get; }
+        IReadOnlyDictionary<string, string> GetDisplayDetails();
     }
 }
