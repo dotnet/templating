@@ -19,6 +19,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         private readonly IUpdateChecker _updateChecker;
         private readonly IInstallerFactory factory;
         private readonly string installPath;
+
         public NuGetInstaller(IInstallerFactory factory, IManagedTemplatesSourcesProvider provider, IEngineEnvironmentSettings settings, string installPath)
         {
             this.factory = factory;
@@ -107,7 +108,13 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
         public (string mountPointUri, IReadOnlyDictionary<string, string> details) Serialize(IManagedTemplatesSource managedSource)
         {
-            return (managedSource.MountPointUri, managedSource.Details);
+            _ = managedSource ?? throw new ArgumentNullException(nameof(managedSource));
+            if (!(managedSource is NuGetManagedTemplatesSource nuGetManagedTemplates))
+            {
+                return (managedSource.MountPointUri, new Dictionary<string, string>());
+            }
+
+            return (managedSource.MountPointUri, nuGetManagedTemplates.Details);
         }
 
         public Task<UninstallResult> UninstallAsync(IManagedTemplatesSource managedSource)
@@ -128,11 +135,13 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 return Task.FromResult(UninstallResult.CreateFailure($"Failed to uninstall {managedSource.Identifier}, reason: {ex.Message}"));
             }
         }
+
         public Task<IReadOnlyList<InstallResult>> UpdateAsync(IEnumerable<ManagedTemplatesSourceUpdate> sources)
         {
             _ = sources ?? throw new ArgumentNullException(nameof(sources));
             throw new NotImplementedException();
         }
+
         private bool IsLocalPackage(InstallRequest installRequest)
         {
             return File.Exists(installRequest.Identifier);
