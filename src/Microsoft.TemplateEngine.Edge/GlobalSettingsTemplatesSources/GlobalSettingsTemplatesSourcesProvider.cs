@@ -20,7 +20,7 @@ namespace Microsoft.TemplateEngine.Edge
             private IEngineEnvironmentSettings _environmentSettings;
             private Dictionary<Guid, IInstaller> _installersByGuid = new Dictionary<Guid, IInstaller>();
             private Dictionary<string, IInstaller> _installersByName = new Dictionary<string, IInstaller>();
-            private List<TemplatesSourceData> _notSupportedSources = new List<TemplatesSourceData>();
+            private List<ITemplatesSource> _notSupportedSources = new List<ITemplatesSource>();
             private Dictionary<IInstaller, Dictionary<string, IManagedTemplatesSource>> _templatesSources = new Dictionary<IInstaller, Dictionary<string, IManagedTemplatesSource>>();
 
             public GlobalSettingsTemplatesSourcesProvider
@@ -59,7 +59,7 @@ namespace Microsoft.TemplateEngine.Edge
                 {
                     templatesSources.AddRange(sourcesByInstaller.Values);
                 }
-                templatesSources.AddRange(_notSupportedSources.Select(source => new TemplatesSource(this, source.MountPointUri, source.LastChangeTime)));
+                templatesSources.AddRange(_notSupportedSources);
                 return Task.FromResult((IReadOnlyList<ITemplatesSource>)templatesSources);
             }
 
@@ -110,7 +110,6 @@ namespace Microsoft.TemplateEngine.Edge
                 UninstallResult result = await source.Installer.UninstallAsync(source).ConfigureAwait(false);
                 if (result.Success)
                 {
-                    _templatesSources[source.Installer].Remove(source.Identifier);
                     _environmentSettings.SettingsLoader.GlobalSettings.Remove(source.Installer.Serialize(source));
                 }
                 return result;
@@ -130,15 +129,24 @@ namespace Microsoft.TemplateEngine.Edge
                 _ = installRequest ?? throw new ArgumentNullException(nameof(installRequest));
                 _ = installer ?? throw new ArgumentNullException(nameof(installer));
 
+                if (_templatesSources[installer].TryGetValue(installRequest.Identifier, out IManagedTemplatesSource sourceToBeUpdated))
+                {
+                    if (sourceToBeUpdated.Version == installRequest.Version)
+                    {
+                        return InstallResult.CreateFailure(InstallerErrorCode.AlreadyInstalled, $"The template source is already installed.");
+                    }
+                    UninstallResult uninstallResult = await UninstallAsync(sourceToBeUpdated).ConfigureAwait(false);
+                    if (!uninstallResult.Success)
+                    {
+                        return InstallResult.CreateFailure(InstallerErrorCode.UpdateUninstallFailed, uninstallResult.ErrorMessage);
+                    }
+                }
                 InstallResult installResult = await installer.InstallAsync(installRequest).ConfigureAwait(false);
                 if (!installResult.Success)
                 {
                     return installResult;
                 }
-
-                _templatesSources[installer][installResult.Source.Identifier] = installResult.Source;
                 _environmentSettings.SettingsLoader.GlobalSettings.Add(installer.Serialize(installResult.Source));
-
                 return installResult;
             }
 
@@ -178,7 +186,7 @@ namespace Microsoft.TemplateEngine.Edge
                     }
                     else
                     {
-                        _notSupportedSources.Add(entry);
+                        _notSupportedSources.Add(new TemplatesSource(this, entry.MountPointUri, entry.LastChangeTime));
                     }
                 }
                 SourcesChanged?.Invoke();

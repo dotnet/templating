@@ -10,7 +10,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 {
     public class GlobalSettings : IGlobalSettings
     {
-        [JsonProperty]
+        [JsonProperty("UserInstalledTemplatesSources")]
         private List<TemplatesSourceData> _userInstalledTemplatesSources = new List<TemplatesSourceData>();
 
         public event Action SettingsChanged;
