@@ -108,23 +108,23 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                     sourceDetails[NuGetManagedTemplatesSource.PackageVersionKey] = result.PackageVersion.ToString();
                 }
                 NuGetManagedTemplatesSource source = new NuGetManagedTemplatesSource(_environmentSettings, this, packageLocation, sourceDetails);
-                return InstallResult.CreateSuccess(source);
+                return InstallResult.CreateSuccess(installRequest, source);
             }
             catch (DownloadException e)
             {
-                return InstallResult.CreateFailure(InstallerErrorCode.DownloadFailed, e.Message);
+                return InstallResult.CreateFailure(installRequest, InstallerErrorCode.DownloadFailed, e.Message);
             }
             catch (PackageNotFoundException e)
             {
-                return InstallResult.CreateFailure(InstallerErrorCode.PackageNotFound, e.Message);
+                return InstallResult.CreateFailure(installRequest, InstallerErrorCode.PackageNotFound, e.Message);
             }
             catch (InvalidNuGetSourceException e)
             {
-                return InstallResult.CreateFailure(InstallerErrorCode.InvalidSource, e.Message);
+                return InstallResult.CreateFailure(installRequest, InstallerErrorCode.InvalidSource, e.Message);
             }
             catch (Exception e)
             {
-                return InstallResult.CreateFailure(InstallerErrorCode.GenericError, $"Failed to install the package {installRequest.Identifier}, reason: {e.Message}");
+                return InstallResult.CreateFailure(installRequest, InstallerErrorCode.GenericError, $"Failed to install the package {installRequest.Identifier}, reason: {e.Message}");
             }
         }
 
@@ -155,16 +155,16 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             _ = managedSource ?? throw new ArgumentNullException(nameof(managedSource));
             if (!(managedSource is NuGetManagedTemplatesSource))
             {
-                return Task.FromResult(UninstallResult.CreateFailure(InstallerErrorCode.UnsupportedRequest, $"{managedSource.Identifier} is not supported by {Name}"));
+                return Task.FromResult(UninstallResult.CreateFailure(managedSource, InstallerErrorCode.UnsupportedRequest, $"{managedSource.Identifier} is not supported by {Name}"));
             }
             try
             {
                 _environmentSettings.Host.FileSystem.FileDelete(managedSource.MountPointUri);
-                return Task.FromResult(UninstallResult.CreateSuccess());
+                return Task.FromResult(UninstallResult.CreateSuccess(managedSource));
             }
             catch (Exception ex)
             {
-                return Task.FromResult(UninstallResult.CreateFailure(InstallerErrorCode.GenericError, $"Failed to uninstall {managedSource.Identifier}, reason: {ex.Message}"));
+                return Task.FromResult(UninstallResult.CreateFailure(managedSource, InstallerErrorCode.GenericError, $"Failed to uninstall {managedSource.Identifier}, reason: {ex.Message}"));
             }
         }
 

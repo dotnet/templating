@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.Kernel;
 using FakeItEasy;
@@ -56,7 +57,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         }
 
         [Fact(DisplayName = nameof(RebuildCacheIfNotCurrentScansAll), Skip = "Rewrite to make sense again")]
-        public void RebuildCacheIfNotCurrentScansAll()
+        public async Task RebuildCacheIfNotCurrentScansAll()
         {
             _fixture.Customizations.Add(new stringBuilder());
             List<string> mountPoints = _fixture.CreateMany<string>().ToList();
@@ -68,14 +69,14 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             MockMountPointManager mockMountPointManager = new MockMountPointManager(_environmentSettings);
             SettingsLoader subject = new SettingsLoader(_environmentSettings, mockMountPointManager);
 
-            subject.RebuildCacheFromSettingsIfNotCurrent(false);
+            await subject.RebuildCacheFromSettingsIfNotCurrent(false);
 
             // All mount points should have been scanned
             AssertMountPointsWereScanned(mountPoints);
         }
 
         [Fact(DisplayName = nameof(RebuildCacheSkipsNonAccessibleMounts), Skip = "Rewrite to make sense again")]
-        public void RebuildCacheSkipsNonAccessibleMounts()
+        public async Task RebuildCacheSkipsNonAccessibleMounts()
         {
             _fixture.Customizations.Add(new stringBuilder());
             List<string> availableMountPoints = _fixture.CreateMany<string>().ToList();
@@ -91,7 +92,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             mockMountPointManager.UnavailableMountPoints.AddRange(unavailableMountPoints);
             SettingsLoader subject = new SettingsLoader(_environmentSettings, mockMountPointManager);
 
-            subject.RebuildCacheFromSettingsIfNotCurrent(false);
+            await subject.RebuildCacheFromSettingsIfNotCurrent(false);
 
             // All mount points should have been scanned
             AssertMountPointsWereScanned(availableMountPoints);
@@ -100,7 +101,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 
 
         [Fact(DisplayName = nameof(RebuildCacheIfForceRebuildScansAll), Skip = "Rewrite to make sense again")]
-        public void RebuildCacheIfForceRebuildScansAll()
+        public async Task RebuildCacheIfForceRebuildScansAll()
         {
             _fixture.Customizations.Add(new stringBuilder());
             List<string> mountPoints = _fixture.CreateMany<string>().ToList();
@@ -112,14 +113,14 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             MockMountPointManager mockMountPointManager = new MockMountPointManager(_environmentSettings);
             SettingsLoader subject = new SettingsLoader(_environmentSettings, mockMountPointManager);
 
-            subject.RebuildCacheFromSettingsIfNotCurrent(true);
+            await subject.RebuildCacheFromSettingsIfNotCurrent(true);
 
             // All mount points should have been scanned
             AssertMountPointsWereScanned(mountPoints);
         }
 
         [Fact(DisplayName = nameof(RebuildCacheFromSettingsOnlyScansOutOfDateFileSystemMountPoints), Skip = "Rewrite to make sense again")]
-        public void RebuildCacheFromSettingsOnlyScansOutOfDateFileSystemMountPoints()
+        public async Task RebuildCacheFromSettingsOnlyScansOutOfDateFileSystemMountPoints()
         {
             _fixture.Customizations.Add(new stringBuilder(FileSystemMountPointFactory.FactoryId));
             List<string> mountPoints = _fixture.Build<string>()
@@ -154,7 +155,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             MockMountPointManager mockMountPointManager = new MockMountPointManager(_environmentSettings);
             SettingsLoader subject = new SettingsLoader(_environmentSettings, mockMountPointManager);
 
-            subject.RebuildCacheFromSettingsIfNotCurrent(false);
+            await subject.RebuildCacheFromSettingsIfNotCurrent(false);
 
             // Only the first mount point should have been scanned
             AssertMountPointsWereScanned(mountPoints.Take(1));
@@ -163,7 +164,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 
 
         [Fact(DisplayName = nameof(EnsureCacheRoundtripPerservesTemplateWithLocaleTimestamp))]
-        public void EnsureCacheRoundtripPerservesTemplateWithLocaleTimestamp()
+        public async Task EnsureCacheRoundtripPerservesTemplateWithLocaleTimestamp()
         {
             var environmentSettings = A.Fake<IEngineEnvironmentSettings>();
 
@@ -198,7 +199,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 .Returns(subject);
             subject.Reload();
             subject.Save();
-            subject.RebuildCacheFromSettingsIfNotCurrent(false);
+            await subject.RebuildCacheFromSettingsIfNotCurrent(false);
 
             // Only the first mount point should have been scanned
             AssertMountPointsWereScanned(Enumerable.Empty<string>());
