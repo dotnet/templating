@@ -1,19 +1,18 @@
-using FluentAssertions;
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit.Abstractions;
+using FluentAssertions;
 using Microsoft.NET.TestFramework.Assertions;
+using Xunit.Abstractions;
 
 namespace dotnet_new3.UnitTests
 {
-    static class Helpers
+    internal static class Helpers
     {
         public static string CreateTemporaryFolder([CallerMemberName] string name = "")
         {
@@ -24,13 +23,13 @@ namespace dotnet_new3.UnitTests
 
         public static string HomeEnvironmentVariableName { get; } = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "USERPROFILE" : "HOME";
 
-        internal static void InstallTestTemplate(string templateName, ITestOutputHelper log, string workingDirectory, string homeDirectory)
+        internal static string InstallTestTemplate(string templateName, ITestOutputHelper log, string workingDirectory, string homeDirectory)
         {
             string codebase = typeof(Program).GetTypeInfo().Assembly.Location;
             Uri cb = new Uri(codebase);
             string asmPath = cb.LocalPath;
             string dir = Path.GetDirectoryName(asmPath);
-            string testTemplate = Path.Combine(dir, "..", "..", "..", "..", "..", "test", "Microsoft.TemplateEngine.TestTemplates", "test_templates", templateName) + Path.DirectorySeparatorChar;
+            string testTemplate = Path.Combine(dir, "..", "..", "..", "..", "..", "test", "Microsoft.TemplateEngine.TestTemplates", "test_templates", templateName);
 
             new DotnetNewCommand(log, "-i", testTemplate)
                   .WithWorkingDirectory(workingDirectory)
@@ -40,6 +39,7 @@ namespace dotnet_new3.UnitTests
                   .ExitWith(0)
                   .And
                   .NotHaveStdErr();
+            return Path.GetFullPath(testTemplate);
         }
 
         internal static void InstallNuGetTemplate(string packageName, ITestOutputHelper log, string workingDirectory, string homeDirectory)

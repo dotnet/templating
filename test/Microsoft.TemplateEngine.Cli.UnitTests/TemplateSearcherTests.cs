@@ -68,7 +68,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
         private static readonly PackInfo _bluePackInfo = new PackInfo("bluePack", "2.1");
         private static readonly PackInfo _greenPackInfo = new PackInfo("greenPack", "3.0.0");
 
-        private static readonly IManagedTemplatesSource _fooPackInstallDescriptor = new NuGetManagedTemplatesSource(null, string.Empty, null);
+        private static readonly IManagedTemplatesSource _fooPackInstallDescriptor = new NuGetManagedTemplatesSource(null, null, string.Empty, null);
 
         private static IReadOnlyDictionary<string, IReadOnlyList<ITemplateNameSearchResult>> GetMockNameSearchResults()
         {

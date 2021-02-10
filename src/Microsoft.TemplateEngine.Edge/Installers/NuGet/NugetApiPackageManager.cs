@@ -10,7 +10,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Installer;
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
 using NuGet.Common;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
@@ -42,7 +41,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         public async Task<DownloadResult> DownloadPackageAsync(InstallRequest installRequest, string downloadPath)
         {
             IEnumerable<string> sources = null;
-            if (installRequest.Details.ContainsKey(InstallRequest.NuGetSourcesKey))
+            if (installRequest.Details?.ContainsKey(InstallRequest.NuGetSourcesKey) ?? false)
             {
                 sources = installRequest.Details[InstallRequest.NuGetSourcesKey].Split(InstallRequest.NuGetSourcesSeparator);
             }
@@ -111,10 +110,10 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             }
         }
 
-        public async Task<ManagedTemplatesSourceUpdate> GetLatestVersionAsync(NuGetManagedTemplatesSource source)
+        public async Task<CheckUpdateResult> GetLatestVersionAsync(NuGetManagedTemplatesSource source)
         {
             string latestVersion = await GetLatestVersionAsync(source.Identifier).ConfigureAwait(false);
-            return new ManagedTemplatesSourceUpdate(source, latestVersion);
+            return CheckUpdateResult.CreateSuccess(source, latestVersion);
         }
 
         private async Task<string> GetLatestVersionAsync(string packageIdentifier)

@@ -3,7 +3,7 @@
 
 using System;
 using System.Threading.Tasks;
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using Microsoft.TemplateEngine.Abstractions.Installer;
 
 namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
@@ -14,6 +14,6 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             throw new NotImplementedException();
         }
 
-        public Task<ManagedTemplatesSourceUpdate> GetLatestVersionAsync(NuGetManagedTemplatesSource source) => throw new NotImplementedException();
+        public Task<CheckUpdateResult> GetLatestVersionAsync(NuGetManagedTemplatesSource source) => throw new NotImplementedException();
     }
 }

@@ -237,7 +237,7 @@ namespace Microsoft.TemplateEngine.Cli
             EnvironmentSettings.SettingsLoader.Components.RegisterMany(typeof(New3Command).GetTypeInfo().Assembly.GetTypes());
         }
 
-        private async Task<CreationResultStatus> EnterInstallFlow()
+        private async Task<CreationResultStatus> EnterInstallFlowAsync()
         {
             CreationResultStatus success = CreationResultStatus.Success;
             _telemetryLogger.TrackEvent(CommandName + TelemetryConstants.InstallEventSuffix, new Dictionary<string, string> { { TelemetryConstants.ToInstallCount, _commandInput.ToInstallList.Count.ToString() } });
@@ -253,10 +253,9 @@ namespace Microsoft.TemplateEngine.Cli
                 details[InstallRequest.InteractiveModeKey] = "true";
             }
 
-
             // In future we might want give user ability to pick IManagerSourceProvider by Name or GUID
             var managedSourceProvider = EnvironmentSettings.SettingsLoader.TemplatesSourcesManager.GetManagedProvider(GlobalSettingsTemplatesSourcesProviderFactory.FactoryId);
-            foreach (var unexpandedInstallRequest in _commandInput.ToInstallList)
+            foreach (string unexpandedInstallRequest in _commandInput.ToInstallList)
             {
                 foreach (var expandedInstallRequest in InstallRequestPathResolution.Expand(unexpandedInstallRequest, EnvironmentSettings))
                 {
@@ -268,7 +267,7 @@ namespace Microsoft.TemplateEngine.Cli
                         version = splitByColons[1];
                     }
 
-                    var result = await managedSourceProvider.InstallAsync(new InstallRequest()
+                    InstallResult result = await managedSourceProvider.InstallAsync(new InstallRequest()
                     {
                         Identifier = identifier,
                         Version = version,
@@ -277,40 +276,52 @@ namespace Microsoft.TemplateEngine.Cli
                         //give user ability to set InstallerName
                         //InstallerName = _commandInput.InstallerName,
                     }).ConfigureAwait(false);
-                    if (!result.Success)
+
+                    if (result.Success)
                     {
-                        switch (result.Error)
-                        {
-                            case InstallResult.ErrorCode.InvalidSource:
-                                Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedInvalidSource, unexpandedInstallRequest).Bold().Red());
-                                break;
-                            case InstallResult.ErrorCode.PackageNotFound:
-                                Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedPackageNotFound, unexpandedInstallRequest).Bold().Red());
-                                break;
-                            case InstallResult.ErrorCode.DownloadFailed:
-                                Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedDownloadFailed, unexpandedInstallRequest).Bold().Red());
-                                break;
-                            case InstallResult.ErrorCode.UnsupportedRequest:
-                                Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedUnsupportedRequest, unexpandedInstallRequest).Bold().Red());
-                                break;
-                            case InstallResult.ErrorCode.GenericError:
-                                Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedGenericError, unexpandedInstallRequest, result.ErrorMessage).Bold().Red());
-                                break;
-                        }
-                        success = CreationResultStatus.CreateFailed;
+                        await _settingsLoader.RebuildCacheFromSettingsIfNotCurrent(true).ConfigureAwait(false);
                     }
                     else
                     {
-                        await _settingsLoader.RebuildCacheFromSettingsIfNotCurrent(true).ConfigureAwait(false);
-                        Reporter.Output.WriteLine($"Package {result.ManagedTemplateSource.Identifier}::{result.ManagedTemplateSource.Version} was successfully installed");
-                        Reporter.Output.WriteLine($"The following templates were installed:");
-
-                        IEnumerable<ITemplateInfo> templates = result.ManagedTemplateSource.GetTemplates(EnvironmentSettings);
-                        HelpForTemplateResolution.DisplayTemplateList(templates, EnvironmentSettings, _commandInput, _defaultLanguage);
+                        success = CreationResultStatus.CreateFailed;
                     }
+                    DisplayInstallResult(unexpandedInstallRequest, result);
                 }
             }
             return success;
+        }
+
+        private void DisplayInstallResult(string packageToInstall, Result result)
+        {
+            if (result.Success)
+            {
+                Reporter.Output.WriteLine($"The template source {result.Source.DisplayName} was successfully installed.");
+                Reporter.Output.WriteLine($"The following templates were installed:");
+
+                IEnumerable<ITemplateInfo> templates = result.Source.GetTemplates(EnvironmentSettings);
+                HelpForTemplateResolution.DisplayTemplateList(templates, EnvironmentSettings, _commandInput, _defaultLanguage);
+            }
+            else
+            {
+                switch (result.Error)
+                {
+                    case InstallerErrorCode.InvalidSource:
+                        Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedInvalidSource, packageToInstall).Bold().Red());
+                        break;
+                    case InstallerErrorCode.PackageNotFound:
+                        Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedPackageNotFound, packageToInstall).Bold().Red());
+                        break;
+                    case InstallerErrorCode.DownloadFailed:
+                        Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedDownloadFailed, packageToInstall).Bold().Red());
+                        break;
+                    case InstallerErrorCode.UnsupportedRequest:
+                        Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedUnsupportedRequest, packageToInstall).Bold().Red());
+                        break;
+                    case InstallerErrorCode.GenericError:
+                        Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedGenericError, packageToInstall, result.ErrorMessage).Bold().Red());
+                        break;
+                }
+            }
         }
 
         // TODO: make sure help / usage works right in these cases.
@@ -334,12 +345,12 @@ namespace Microsoft.TemplateEngine.Cli
 
             if (_commandInput.ToUninstallList != null)
             {
-                return await EnterUninstallFlow().ConfigureAwait(false);
+                return await EnterUninstallFlowAsync().ConfigureAwait(false);
             }
 
             if (_commandInput.ToInstallList != null && _commandInput.ToInstallList.Count > 0 && _commandInput.ToInstallList[0] != null)
             {
-                return await EnterInstallFlow().ConfigureAwait(false);
+                return await EnterInstallFlowAsync().ConfigureAwait(false);
             }
 
             // No other cases specified, we've fallen through to "Optional usage help + List"
@@ -349,20 +360,21 @@ namespace Microsoft.TemplateEngine.Cli
             return CreationResultStatus.Success;
         }
 
-        private async Task<CreationResultStatus> EnterUninstallFlow()
+        private async Task<CreationResultStatus> EnterUninstallFlowAsync()
         {
             if (_commandInput.ToUninstallList.Count > 0 && _commandInput.ToUninstallList[0] != null)
             {
                 var managedSources = await EnvironmentSettings.SettingsLoader.TemplatesSourcesManager.GetManagedTemplatesSources(false).ConfigureAwait(false);
                 foreach (var managedSource in managedSources)
                 {
-                    try
+                    UninstallResult result = await managedSource.Installer.Provider.UninstallAsync(managedSource).ConfigureAwait(false);
+                    if (result.Success)
                     {
-                        await managedSource.Installer.Provider.UninstallAsync(managedSource).ConfigureAwait(false);
+                        Reporter.Output.WriteLine($"The template source {managedSource.DisplayName} was successfully uninstalled.");
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        Reporter.Output.WriteLine(string.Format(LocalizableStrings.CouldntUninstall, ex.Message));
+                        Reporter.Output.WriteLine(string.Format(LocalizableStrings.CouldntUninstall, managedSource.DisplayName, result.ErrorMessage));
                     }
                 }
             }
@@ -517,39 +529,9 @@ namespace Microsoft.TemplateEngine.Cli
                     return AliasSupport.ManipulateAliasIfValid(_aliasRegistry, _commandInput.Alias, _commandInput.Tokens.ToList(), AllTemplateShortNames);
                 }
 
-                if (_commandInput.CheckForUpdates || _commandInput.CheckForUpdatesNoPrompt)
+                if (_commandInput.CheckForUpdates || _commandInput.ApplyUpdates)
                 {
-                    bool applyUpdates = _commandInput.CheckForUpdatesNoPrompt;
-                    var managedSourcedGroupedByProvider = await EnvironmentSettings.SettingsLoader.TemplatesSourcesManager.GetManagedSourcesGroupedByProvider().ConfigureAwait(false);
-                    foreach (var (provider, sources) in managedSourcedGroupedByProvider)
-                    {
-                        var updates = await provider.GetLatestVersions(sources).ConfigureAwait(false);
-                        if (applyUpdates)
-                        {
-                            var results = await provider.UpdateAsync(updates).ConfigureAwait(false);
-                            foreach (var result in results)
-                            {
-                                if (!result.Success)
-                                {
-                                    //TODO: Write failure
-                                }
-                            }
-                        }
-                        else
-                        {
-                            foreach (var updateResult in updates)
-                            {
-                                if (updateResult.Version != updateResult.InstallUnitDescriptor.Version)
-                                {
-                                    string displayString = $"{updateResult.InstallUnitDescriptor.Identifier}::{updateResult.InstallUnitDescriptor.Version}";         // the package::version currently installed
-                                    Reporter.Output.WriteLine(string.Format(LocalizableStrings.UpdateAvailable, displayString));
-                                    string installString = $"{updateResult.InstallUnitDescriptor.Identifier}::{updateResult.Version}"; // the package::version that will be installed
-                                    Reporter.Output.WriteLine(string.Format(LocalizableStrings.UpdateCheck_InstallCommand, CommandName, installString));
-                                }
-                            }
-                        }
-                    }
-                    return CreationResultStatus.Success;
+                    return await EnterUpdateFlowAsync().ConfigureAwait(false);
                 }
 
                 if (_commandInput.SearchOnline)
@@ -571,6 +553,50 @@ namespace Microsoft.TemplateEngine.Cli
             }
         }
 
+        private async Task<CreationResultStatus> EnterUpdateFlowAsync()
+        {
+            bool applyUpdates = _commandInput.ApplyUpdates;
+            CreationResultStatus success = CreationResultStatus.Success;
+            var managedSourcedGroupedByProvider = await EnvironmentSettings.SettingsLoader.TemplatesSourcesManager.GetManagedSourcesGroupedByProvider().ConfigureAwait(false);
+            foreach (var (provider, sources) in managedSourcedGroupedByProvider)
+            {
+                IReadOnlyList<CheckUpdateResult> checkUpdateResults = await provider.GetLatestVersions(sources).ConfigureAwait(false);
+                IEnumerable<CheckUpdateResult> updatesToApply = checkUpdateResults.Where(update => !update.IsLatestVersion && !string.IsNullOrWhiteSpace(update.Version));
+                if (!updatesToApply.Any())
+                {
+                    Reporter.Output.WriteLine("All template sources are up-to-date.");
+                    return CreationResultStatus.Success;
+                }
+
+                if (applyUpdates)
+                {
+                    IReadOnlyList<UpdateResult> updateResults = await provider.UpdateAsync(updatesToApply.Select(update => UpdateRequest.FromCheckUpdateResult(update))).ConfigureAwait(false);
+                    foreach (var updateResult in updateResults)
+                    {
+                        if (updateResult.Success)
+                        {
+                            await _settingsLoader.RebuildCacheFromSettingsIfNotCurrent(true).ConfigureAwait(false);
+                        }
+                        else
+                        {
+                            success = CreationResultStatus.CreateFailed;
+                        }
+                        DisplayInstallResult(updateResult.Source?.DisplayName, updateResult);
+                    }
+                }
+                else
+                {
+                    foreach (var updateResult in updatesToApply)
+                    {
+                        string displayString = $"{updateResult.Source.Identifier}::{updateResult.Source.Version}";         // the package::version currently installed
+                        Reporter.Output.WriteLine(string.Format(LocalizableStrings.UpdateAvailable, displayString));
+                        string installString = $"{updateResult.Source.Identifier}::{updateResult.Version}"; // the package::version that will be installed
+                        Reporter.Output.WriteLine(string.Format(LocalizableStrings.UpdateCheck_InstallCommand, CommandName, installString));
+                    }
+                }
+            }
+            return success;
+        }
         private bool ConfigureLocale()
         {
             if (!string.IsNullOrEmpty(_commandInput.Locale))
