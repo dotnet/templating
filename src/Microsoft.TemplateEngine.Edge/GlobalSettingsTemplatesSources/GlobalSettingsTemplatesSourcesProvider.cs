@@ -1,3 +1,6 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -82,37 +85,52 @@ namespace Microsoft.TemplateEngine.Edge
                 return result;
             }
 
-            public async Task<InstallResult> InstallAsync(InstallRequest installRequest)
+            public async Task<IReadOnlyList<InstallResult>> InstallAsync(IEnumerable<InstallRequest> installRequests)
             {
-                _ = installRequest ?? throw new ArgumentNullException(nameof(installRequest));
-
-                var installersThatCanInstall = new List<IInstaller>();
-                foreach (var install in _installersByName.Values)
+                _ = installRequests ?? throw new ArgumentNullException(nameof(installRequests));
+                if (!installRequests.Any())
                 {
-                    if (await install.CanInstallAsync(installRequest).ConfigureAwait(false))
+                    return new List<InstallResult>();
+                }
+
+                return await Task.WhenAll(installRequests.Select(async installRequest =>
+                {
+                    var installersThatCanInstall = new List<IInstaller>();
+                    foreach (var install in _installersByName.Values)
                     {
-                        installersThatCanInstall.Add(install);
+                        if (await install.CanInstallAsync(installRequest).ConfigureAwait(false))
+                        {
+                            installersThatCanInstall.Add(install);
+                        }
                     }
-                }
-                if (installersThatCanInstall.Count == 0)
-                {
-                    return InstallResult.CreateFailure(InstallerErrorCode.UnsupportedRequest, $"{installRequest.Identifier} cannot be installed");
-                }
+                    if (installersThatCanInstall.Count == 0)
+                    {
+                        return InstallResult.CreateFailure(installRequest, InstallerErrorCode.UnsupportedRequest, $"{installRequest.Identifier} cannot be installed");
+                    }
 
-                IInstaller installer = installersThatCanInstall[0];
-                return await InstallAsync(installRequest, installer).ConfigureAwait(false);
+                    IInstaller installer = installersThatCanInstall[0];
+                    return await InstallAsync(installRequest, installer).ConfigureAwait(false);
+                })).ConfigureAwait(false);
             }
 
-            public async Task<UninstallResult> UninstallAsync(IManagedTemplatesSource source)
+            public async Task<IReadOnlyList<UninstallResult>> UninstallAsync(IEnumerable<IManagedTemplatesSource> sources)
             {
-                _ = source ?? throw new ArgumentNullException(nameof(source));
-
-                UninstallResult result = await source.Installer.UninstallAsync(source).ConfigureAwait(false);
-                if (result.Success)
+                _ = sources ?? throw new ArgumentNullException(nameof(sources));
+                if (!sources.Any())
                 {
-                    _environmentSettings.SettingsLoader.GlobalSettings.Remove(source.Installer.Serialize(source));
+                    return new List<UninstallResult>();
                 }
-                return result;
+
+                return await Task.WhenAll(sources.Select(async source =>
+                {
+                    UninstallResult result = await source.Installer.UninstallAsync(source).ConfigureAwait(false);
+                    if (result.Success)
+                    {
+                        _templatesSources[source.Installer].Remove(source.Identifier);
+                        _environmentSettings.SettingsLoader.GlobalSettings.Remove(source.Installer.Serialize(source));
+                    }
+                    return result;
+                })).ConfigureAwait(false);
             }
 
             public async Task<IReadOnlyList<UpdateResult>> UpdateAsync(IEnumerable<UpdateRequest> updateRequests)
@@ -121,7 +139,8 @@ namespace Microsoft.TemplateEngine.Edge
 
                 IEnumerable<UpdateRequest> updatesToApply = updateRequests.Where(request => request.Version != request.Source.Version);
 
-                return await Task.WhenAll(updatesToApply.Select(async updateRequest => UpdateResult.FromInstallResult(updateRequest, await InstallAsync(updateRequest.Source, updateRequest.Version).ConfigureAwait(false)))).ConfigureAwait(false);
+                return await Task.WhenAll(updatesToApply.Select(
+                    async updateRequest => UpdateResult.FromInstallResult(updateRequest, await InstallAsync(updateRequest.Source, updateRequest.Version).ConfigureAwait(false)))).ConfigureAwait(false);
             }
 
             private async Task<InstallResult> InstallAsync(InstallRequest installRequest, IInstaller installer)
@@ -129,17 +148,22 @@ namespace Microsoft.TemplateEngine.Edge
                 _ = installRequest ?? throw new ArgumentNullException(nameof(installRequest));
                 _ = installer ?? throw new ArgumentNullException(nameof(installer));
 
+                //check if the source with same identifier is already installed
                 if (_templatesSources[installer].TryGetValue(installRequest.Identifier, out IManagedTemplatesSource sourceToBeUpdated))
                 {
+                    //if same version is already installed - return
                     if (sourceToBeUpdated.Version == installRequest.Version)
                     {
-                        return InstallResult.CreateFailure(InstallerErrorCode.AlreadyInstalled, $"The template source is already installed.");
+                        return InstallResult.CreateFailure(installRequest, InstallerErrorCode.AlreadyInstalled, $"The template source is already installed.");
                     }
-                    UninstallResult uninstallResult = await UninstallAsync(sourceToBeUpdated).ConfigureAwait(false);
+
+                    //if different version is installed - uninstall previous version first
+                    UninstallResult uninstallResult = await installer.UninstallAsync(sourceToBeUpdated).ConfigureAwait(false);
                     if (!uninstallResult.Success)
                     {
-                        return InstallResult.CreateFailure(InstallerErrorCode.UpdateUninstallFailed, uninstallResult.ErrorMessage);
+                        return InstallResult.CreateFailure(installRequest, InstallerErrorCode.UpdateUninstallFailed, uninstallResult.ErrorMessage);
                     }
+                    _environmentSettings.SettingsLoader.GlobalSettings.Remove(installer.Serialize(sourceToBeUpdated));
                 }
                 InstallResult installResult = await installer.InstallAsync(installRequest).ConfigureAwait(false);
                 if (!installResult.Success)

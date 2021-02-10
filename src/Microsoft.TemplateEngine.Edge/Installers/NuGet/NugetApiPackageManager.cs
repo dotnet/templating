@@ -41,9 +41,9 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         public async Task<DownloadResult> DownloadPackageAsync(InstallRequest installRequest, string downloadPath)
         {
             IEnumerable<string> sources = null;
-            if (installRequest.Details?.ContainsKey(InstallRequest.NuGetSourcesKey) ?? false)
+            if (installRequest.Details?.ContainsKey(InstallerConstants.NuGetSourcesKey) ?? false)
             {
-                sources = installRequest.Details[InstallRequest.NuGetSourcesKey].Split(InstallRequest.NuGetSourcesSeparator);
+                sources = installRequest.Details[InstallerConstants.NuGetSourcesKey].Split(InstallerConstants.NuGetSourcesSeparator);
             }
 
             NuGetVersion packageVersion;
