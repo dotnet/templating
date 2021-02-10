@@ -320,6 +320,12 @@ namespace Microsoft.TemplateEngine.Cli
                     case InstallerErrorCode.GenericError:
                         Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedGenericError, packageToInstall, result.ErrorMessage).Bold().Red());
                         break;
+                    case InstallerErrorCode.AlreadyInstalled:
+                        Reporter.Output.WriteLine($"The template source {packageToInstall} is already installed.");
+                        break;
+                    case InstallerErrorCode.UpdateUninstallFailed:
+                        Reporter.Error.WriteLine($"Failed to install {packageToInstall}, failed to uninstall previous version of the template source.");
+                        break;
                 }
             }
         }

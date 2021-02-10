@@ -3,5 +3,15 @@
 
 namespace Microsoft.TemplateEngine.Abstractions.Installer
 {
-    public enum InstallerErrorCode { Success = 0, PackageNotFound = 1, InvalidSource = 2, DownloadFailed = 3, UnsupportedRequest = 4, GenericError = 5 }
+    public enum InstallerErrorCode
+    {
+        Success = 0,
+        PackageNotFound = 1,
+        InvalidSource = 2,
+        DownloadFailed = 3,
+        UnsupportedRequest = 4,
+        GenericError = 5,
+        AlreadyInstalled = 6,
+        UpdateUninstallFailed = 7
+    }
 }
