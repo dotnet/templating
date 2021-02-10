@@ -412,7 +412,7 @@
     <value>Uninstalls a source or a template pack.</value>
   </data>
   <data name="CouldntUninstall" xml:space="preserve">
-    <value>Could not find something to uninstall called '{0}'.</value>
+    <value>Failed to uninstall '{0}', reason: {1}.</value>
   </data>
   <data name="InvalidParameterDefault" xml:space="preserve">
     <value>The default value '{1}' is not a valid value for {0}.</value>

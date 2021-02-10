@@ -8,17 +8,17 @@ using Xunit.Abstractions;
 
 namespace dotnet_new3.UnitTests
 {
-    public class DotnetNewUpdateCheck
+    public class DotnetNewUpdateApply
     {
         private readonly ITestOutputHelper _log;
 
-        public DotnetNewUpdateCheck(ITestOutputHelper log)
+        public DotnetNewUpdateApply(ITestOutputHelper log)
         {
             _log = log;
         }
 
         [Fact]
-        public void CanCheckForUpdate()
+        public void CanApplyUpdates()
         {
             var home = Helpers.CreateTemporaryFolder("Home");
             new DotnetNewCommand(_log, "-i", "Microsoft.DotNet.Common.ProjectTemplates.5.0::5.0.0", "--quiet")
@@ -42,15 +42,27 @@ namespace dotnet_new3.UnitTests
                 .And
                 .NotHaveStdErr()
                 .And.HaveStdOutContaining("An update for template pack Microsoft.DotNet.Common.ProjectTemplates.5.0::5.0.0 is available.");
+
+            new DotnetNewCommand(_log, "--update-apply")
+                .WithWorkingDirectory(Helpers.CreateTemporaryFolder())
+                .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And
+                .NotHaveStdErr()
+                .And.HaveStdOutMatching($"^The template source Microsoft\\.DotNet\\.Common\\.ProjectTemplates\\.5\\.0::([\\d\\.a-z-])+ was successfully installed\\.\\s*$", System.Text.RegularExpressions.RegexOptions.Multiline)
+                .And.HaveStdOutContaining("console")
+                .And.HaveStdOutContaining("Console Application");
         }
 
         [Fact]
-        public void DoesNotShowUpdatesWhenAllTemplatesAreUpToDate()
+        public void DoesNotApplyUpdatesWhenAllTemplatesAreUpToDate()
         {
             var home = Helpers.CreateTemporaryFolder("Home");
             string workingDirectory = Helpers.CreateTemporaryFolder();
             string templateLocation = Helpers.InstallTestTemplate("TemplateResolution/DifferentLanguagesGroup/BasicFSharp", _log, workingDirectory, home);
-            new DotnetNewCommand(_log, "-i", "Microsoft.DotNet.Common.ProjectTemplates.5.0")
+            new DotnetNewCommand(_log, "-i", "Microsoft.DotNet.Common.ProjectTemplates.5.0", "--quiet")
                 .WithWorkingDirectory(Helpers.CreateTemporaryFolder())
                 .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
                 .Execute()
@@ -62,7 +74,7 @@ namespace dotnet_new3.UnitTests
                 .And.HaveStdOutContaining("console")
                 .And.HaveStdOutContaining("classlib");
 
-            new DotnetNewCommand(_log, "--update-check")
+            new DotnetNewCommand(_log, "--update-apply")
                 .WithWorkingDirectory(Helpers.CreateTemporaryFolder())
                 .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
                 .Execute()

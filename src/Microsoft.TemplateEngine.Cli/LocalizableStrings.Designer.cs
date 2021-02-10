@@ -762,7 +762,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not find something to uninstall called &apos;{0}&apos;..
+        ///   Looks up a localized string similar to Failed to uninstall &apos;{0}&apos;, reason: {1}..
         /// </summary>
         public static string CouldntUninstall {
             get {
