@@ -1,24 +1,21 @@
 namespace Microsoft.TemplateEngine.Abstractions.Installer
 {
-    public class UninstallResult
+    public class UninstallResult : Result
     {
-        public bool Success { get; private set; }
-        public string FailureMessage { get; private set; }
-
         public static UninstallResult CreateSuccess()
         {
             return new UninstallResult()
             {
-                Success = true,
+                Error = InstallerErrorCode.Success
             };
         }
 
-        public static UninstallResult CreateFailure(string localizedFailureMessage)
+        public static UninstallResult CreateFailure(InstallerErrorCode code, string localizedFailureMessage)
         {
             return new UninstallResult()
             {
-                Success = false,
-                FailureMessage = localizedFailureMessage
+                Error = code,
+                ErrorMessage = localizedFailureMessage
             };
         }
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Installer;
 using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
 using Microsoft.TemplateEngine.Cli.CommandParsing;
 using Microsoft.TemplateEngine.Cli.TemplateResolution;
@@ -69,15 +70,15 @@ namespace Microsoft.TemplateEngine.Cli
                 return;
             }
 
-            IReadOnlyList<ManagedTemplatesSourceUpdate> versionChecks = await managedTemplateSource.Installer.Provider.GetLatestVersions(new[] { managedTemplateSource });
+            IReadOnlyList<CheckUpdateResult> versionChecks = await managedTemplateSource.Installer.Provider.GetLatestVersions(new[] { managedTemplateSource }).ConfigureAwait(false);
             if (versionChecks.Count == 1)
             {
                 var updateResult = versionChecks[0];
-                if (updateResult.Version != updateResult.InstallUnitDescriptor.Version)
+                if (!updateResult.IsLatestVersion)
                 {
-                    string displayString = $"{updateResult.InstallUnitDescriptor.Identifier}::{updateResult.InstallUnitDescriptor.Version}";         // the package::version currently installed
+                    string displayString = $"{updateResult.Source.Identifier}::{updateResult.Source.Version}";         // the package::version currently installed
                     Reporter.Output.WriteLine(string.Format(LocalizableStrings.UpdateAvailable, displayString));
-                    string installString = $"{updateResult.InstallUnitDescriptor.Identifier}::{updateResult.Version}"; // the package::version that will be installed
+                    string installString = $"{updateResult.Source.Identifier}::{updateResult.Version}"; // the package::version that will be installed
                     Reporter.Output.WriteLine(string.Format(LocalizableStrings.UpdateCheck_InstallCommand, _commandName, installString));
                 }
             }

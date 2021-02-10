@@ -2,7 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Threading.Tasks;
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using Microsoft.TemplateEngine.Abstractions.Installer;
 
 namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
@@ -10,6 +10,6 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
     {
         bool CanCheckForUpdate(NuGetManagedTemplatesSource source);
 
-        Task<ManagedTemplatesSourceUpdate> GetLatestVersionAsync(NuGetManagedTemplatesSource source);
+        Task<CheckUpdateResult> GetLatestVersionAsync(NuGetManagedTemplatesSource source);
     }
 }
