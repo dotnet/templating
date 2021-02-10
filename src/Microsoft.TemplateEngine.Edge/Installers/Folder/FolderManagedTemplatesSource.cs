@@ -20,8 +20,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.Folder
             LastChangeTime = (settings.Host.FileSystem as IFileLastWriteTimeSource)?.GetLastWriteTimeUtc(mountPointUri) ?? File.GetLastWriteTime(mountPointUri);
         }
 
+        public string DisplayName => Identifier;
         public string Identifier => MountPointUri;
-
         public IInstaller Installer { get; }
         public DateTime LastChangeTime { get; }
         public string MountPointUri { get; }

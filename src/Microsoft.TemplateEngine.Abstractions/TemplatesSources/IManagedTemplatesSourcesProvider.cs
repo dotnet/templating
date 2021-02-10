@@ -16,7 +16,7 @@ namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
         /// </summary>
         /// <param name="sources">List of <see cref="IManagedTemplatesSource"/> to get latest version for.</param>
         /// <returns>List of <see cref="ManagedTemplatesSourceUpdate"/></returns>
-        Task<IReadOnlyList<ManagedTemplatesSourceUpdate>> GetLatestVersions(IEnumerable<IManagedTemplatesSource> sources);
+        Task<IReadOnlyList<CheckUpdateResult>> GetLatestVersions(IEnumerable<IManagedTemplatesSource> sources);
 
         /// <summary>
         /// Updates specified <see cref="IManagedTemplatesSource"/>s and returns <see cref="InstallResult"/>s which contain
@@ -24,7 +24,7 @@ namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
         /// </summary>
         /// <param name="sources">List of <see cref="IManagedTemplatesSource"/> to be updated.</param>
         /// <returns>List of <see cref="InstallResult"/> with install information.</returns>
-        Task<IReadOnlyList<InstallResult>> UpdateAsync(IEnumerable<ManagedTemplatesSourceUpdate> sources);
+        Task<IReadOnlyList<UpdateResult>> UpdateAsync(IEnumerable<UpdateRequest> sources);
 
         /// <summary>
         /// Uninstalls specified <see cref="IManagedTemplatesSource"/>.

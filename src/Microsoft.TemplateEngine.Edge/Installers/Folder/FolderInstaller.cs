@@ -1,31 +1,32 @@
-using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Abstractions.Installer;
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.GlobalSettings;
+using Microsoft.TemplateEngine.Abstractions.Installer;
+using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
 
 namespace Microsoft.TemplateEngine.Edge.Installers.Folder
 {
-    class FolderInstaller : IInstaller
+    internal class FolderInstaller : IInstaller
     {
-        private readonly IEngineEnvironmentSettings settings;
+        private readonly IEngineEnvironmentSettings _settings;
 
         public FolderInstaller(IEngineEnvironmentSettings settings, FolderInstallerFactory factory, IManagedTemplatesSourcesProvider provider)
         {
             Name = factory.Name;
             FactoryId = factory.Id;
-            this.settings = settings;
-            this.Provider = provider;
+            _settings = settings;
+            Provider = provider;
         }
 
-        public string Name { get; }
-
         public Guid FactoryId { get; }
-
+        public string Name { get; }
         public IManagedTemplatesSourcesProvider Provider { get; }
 
         public Task<bool> CanInstallAsync(InstallRequest installationRequest)
@@ -33,37 +34,37 @@ namespace Microsoft.TemplateEngine.Edge.Installers.Folder
             return Task.FromResult(Directory.Exists(installationRequest.Identifier));
         }
 
-        public IManagedTemplatesSource Deserialize(IManagedTemplatesSourcesProvider provider, string mountPointUri, object details)
+        public IManagedTemplatesSource Deserialize(IManagedTemplatesSourcesProvider provider, TemplatesSourceData data)
         {
-            return new FolderManagedTemplatesSource(settings, this, mountPointUri);
+            return new FolderManagedTemplatesSource(_settings, this, data.MountPointUri);
         }
 
-        public Task<IReadOnlyList<ManagedTemplatesSourceUpdate>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources)
+        public Task<IReadOnlyList<CheckUpdateResult>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources)
         {
-            return Task.FromResult<IReadOnlyList<ManagedTemplatesSourceUpdate>>(sources.Select(s => new ManagedTemplatesSourceUpdate(s, null)).ToList());
+            return Task.FromResult<IReadOnlyList<CheckUpdateResult>>(sources.Select(s => CheckUpdateResult.CreateSuccess(s, null)).ToList());
         }
 
         public Task<InstallResult> InstallAsync(InstallRequest installRequest)
         {
             if (Directory.Exists(installRequest.Identifier))
-                return Task.FromResult(InstallResult.CreateSuccess(new FolderManagedTemplatesSource(settings, this, installRequest.Identifier)));
+                return Task.FromResult(InstallResult.CreateSuccess(new FolderManagedTemplatesSource(_settings, this, installRequest.Identifier)));
             else
-                return Task.FromResult(InstallResult.CreateFailure(InstallResult.ErrorCode.GenericError, null));
+                return Task.FromResult(InstallResult.CreateFailure(InstallerErrorCode.GenericError, null));
         }
 
-        public (string mountPointUri, IReadOnlyDictionary<string, string> details) Serialize(IManagedTemplatesSource managedSource)
+        public TemplatesSourceData Serialize(IManagedTemplatesSource managedSource)
         {
-            return (managedSource.MountPointUri, null);
+            return new TemplatesSourceData
+            {
+                MountPointUri = managedSource.MountPointUri,
+                LastChangeTime = managedSource.LastChangeTime,
+                InstallerId = FactoryId
+            };
         }
 
         public Task<UninstallResult> UninstallAsync(IManagedTemplatesSource managedSource)
         {
             return Task.FromResult(UninstallResult.CreateSuccess());
-        }
-
-        public Task<IReadOnlyList<InstallResult>> UpdateAsync(IEnumerable<ManagedTemplatesSourceUpdate> sources)
-        {
-            return Task.FromResult<IReadOnlyList<InstallResult>>(new List<InstallResult>(0));
         }
     }
 }

@@ -15,6 +15,11 @@ namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
     public interface IManagedTemplatesSource : ITemplatesSource
     {
         /// <summary>
+        /// The name to be used when displaying source in UI.
+        /// </summary>
+        string DisplayName { get; }
+
+        /// <summary>
         /// This can be NuGet PackageId, path to .nupkg, folder name, or something similar that
         /// identifies this templates source to user.
         /// </summary>

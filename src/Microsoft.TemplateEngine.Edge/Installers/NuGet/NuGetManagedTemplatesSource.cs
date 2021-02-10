@@ -3,7 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Installer;
+using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
 
 namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
@@ -16,17 +18,21 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         public const string PackageIdKey = "PackageId";
         public const string PackageVersionKey = "Version";
 
-        public NuGetManagedTemplatesSource(IInstaller installer, string mountPoint, Dictionary<string, string> details)
+        private IEngineEnvironmentSettings _settings;
+
+        public NuGetManagedTemplatesSource(IEngineEnvironmentSettings settings, IInstaller installer, string mountPoint, IReadOnlyDictionary<string, string> details)
         {
             Installer = installer;
             MountPointUri = mountPoint;
             Details = details;
+            _settings = settings;
         }
 
         public string Author => Details.TryGetValue(AuthorKey, out string author) ? author : null;
+        public string DisplayName => string.IsNullOrWhiteSpace(Version) ? Identifier : $"{Identifier}::{Version}";
         public string Identifier => Details.TryGetValue(PackageIdKey, out string identifier) ? identifier : null;
         public IInstaller Installer { get; }
-        public DateTime LastChangeTime { get; }
+        public DateTime LastChangeTime => (_settings.Host.FileSystem as IFileLastWriteTimeSource)?.GetLastWriteTimeUtc(MountPointUri) ?? default;
         public bool LocalPackage => Details.TryGetValue(LocalPackageKey, out string isLocalPackage) && bool.TryParse(isLocalPackage, out bool result) ? result : false;
         public string MountPointUri { get; }
         public string NuGetSource => Details.TryGetValue(NuGetSourceKey, out string nugetSource) ? nugetSource : null;
@@ -34,6 +40,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         public ITemplatesSourcesProvider Provider => Installer.Provider;
         public string Version => Details.TryGetValue(PackageVersionKey, out string version) ? version : null;
         internal IReadOnlyDictionary<string, string> Details { get; }
+
         public IReadOnlyDictionary<string, string> GetDisplayDetails()
         {
             Dictionary<string, string> details = new Dictionary<string, string>();
