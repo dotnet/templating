@@ -239,22 +239,23 @@ namespace Microsoft.TemplateEngine.Cli
 
         private async Task<CreationResultStatus> EnterInstallFlowAsync()
         {
-            CreationResultStatus success = CreationResultStatus.Success;
+            CreationResultStatus resultStatus = CreationResultStatus.Success;
             _telemetryLogger.TrackEvent(CommandName + TelemetryConstants.InstallEventSuffix, new Dictionary<string, string> { { TelemetryConstants.ToInstallCount, _commandInput.ToInstallList.Count.ToString() } });
 
             var details = new Dictionary<string, string>();
             if (_commandInput.InstallNuGetSourceList?.Count > 0)
             {
-                details[InstallRequest.NuGetSourcesKey] = string.Join(InstallRequest.NuGetSourcesSeparator.ToString(), _commandInput.InstallNuGetSourceList);
+                details[InstallerConstants.NuGetSourcesKey] = string.Join(InstallerConstants.NuGetSourcesSeparator.ToString(), _commandInput.InstallNuGetSourceList);
                 DefaultCredentialServiceUtility.SetupDefaultCredentialService(new CliNuGetLogger(), !_commandInput.IsInteractiveFlagSpecified);
             }
             if (_commandInput.IsInteractiveFlagSpecified)
             {
-                details[InstallRequest.InteractiveModeKey] = "true";
+                details[InstallerConstants.InteractiveModeKey] = "true";
             }
 
             // In future we might want give user ability to pick IManagerSourceProvider by Name or GUID
             var managedSourceProvider = EnvironmentSettings.SettingsLoader.TemplatesSourcesManager.GetManagedProvider(GlobalSettingsTemplatesSourcesProviderFactory.FactoryId);
+            List<InstallRequest> installRequests = new List<InstallRequest>();
             foreach (string unexpandedInstallRequest in _commandInput.ToInstallList)
             {
                 foreach (var expandedInstallRequest in InstallRequestPathResolution.Expand(unexpandedInstallRequest, EnvironmentSettings))
@@ -267,28 +268,29 @@ namespace Microsoft.TemplateEngine.Cli
                         version = splitByColons[1];
                     }
 
-                    InstallResult result = await managedSourceProvider.InstallAsync(new InstallRequest()
-                    {
-                        Identifier = identifier,
-                        Version = version,
-                        Details = details,
-                        //TODO: Not needed, for now, but in future when we have more installers then just NuGet and Folder
-                        //give user ability to set InstallerName
-                        //InstallerName = _commandInput.InstallerName,
-                    }).ConfigureAwait(false);
-
-                    if (result.Success)
-                    {
-                        await _settingsLoader.RebuildCacheFromSettingsIfNotCurrent(true).ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        success = CreationResultStatus.CreateFailed;
-                    }
-                    DisplayInstallResult(unexpandedInstallRequest, result);
+                    installRequests.Add(new InstallRequest()
+                        {
+                            Identifier = identifier,
+                            Version = version,
+                            Details = details,
+                            //TODO: Not needed, for now, but in future when we have more installers then just NuGet and Folder
+                            //give user ability to set InstallerName
+                            //InstallerName = _commandInput.InstallerName,
+                        });
                 }
             }
-            return success;
+
+            var installResults = await managedSourceProvider.InstallAsync(installRequests).ConfigureAwait(false);
+            await _settingsLoader.RebuildCacheFromSettingsIfNotCurrent(true).ConfigureAwait(false);
+            foreach (InstallResult result in installResults)
+            {
+                DisplayInstallResult(result.InstallRequest.DisplayName, result);
+                if (!result.Success)
+                {
+                    resultStatus = CreationResultStatus.CreateFailed;
+                }
+            }
+            return resultStatus;
         }
 
         private void DisplayInstallResult(string packageToInstall, Result result)
@@ -321,10 +323,10 @@ namespace Microsoft.TemplateEngine.Cli
                         Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedGenericError, packageToInstall, result.ErrorMessage).Bold().Red());
                         break;
                     case InstallerErrorCode.AlreadyInstalled:
-                        Reporter.Output.WriteLine($"The template source {packageToInstall} is already installed.");
+                        Reporter.Error.WriteLine($"The template source {packageToInstall} is already installed.".Bold().Red());
                         break;
                     case InstallerErrorCode.UpdateUninstallFailed:
-                        Reporter.Error.WriteLine($"Failed to install {packageToInstall}, failed to uninstall previous version of the template source.");
+                        Reporter.Error.WriteLine($"Failed to install {packageToInstall}, failed to uninstall previous version of the template source.".Bold().Red());
                         break;
                 }
             }
@@ -368,20 +370,37 @@ namespace Microsoft.TemplateEngine.Cli
 
         private async Task<CreationResultStatus> EnterUninstallFlowAsync()
         {
+            CreationResultStatus result = CreationResultStatus.Success;
             if (_commandInput.ToUninstallList.Count > 0 && _commandInput.ToUninstallList[0] != null)
             {
-                var managedSources = await EnvironmentSettings.SettingsLoader.TemplatesSourcesManager.GetManagedTemplatesSources(false).ConfigureAwait(false);
-                foreach (var managedSource in managedSources)
+                var managedSourcedGroupedByProvider = await EnvironmentSettings.SettingsLoader.TemplatesSourcesManager.GetManagedSourcesGroupedByProvider().ConfigureAwait(false);
+                bool sourceToUninstallFound = false;
+                foreach (var (provider, sources) in managedSourcedGroupedByProvider)
                 {
-                    UninstallResult result = await managedSource.Installer.Provider.UninstallAsync(managedSource).ConfigureAwait(false);
-                    if (result.Success)
+                    var sourcesToUninstall = sources.Where(source => _commandInput.ToUninstallList.Contains(source.Identifier, StringComparer.OrdinalIgnoreCase));
+                    if (!sourcesToUninstall.Any())
                     {
-                        Reporter.Output.WriteLine($"The template source {managedSource.DisplayName} was successfully uninstalled.");
+                        continue;
                     }
-                    else
+                    sourceToUninstallFound = true;
+                    var uninstallResults = await provider.UninstallAsync(sourcesToUninstall).ConfigureAwait(false);
+                    foreach (UninstallResult uninstallResult in uninstallResults)
                     {
-                        Reporter.Output.WriteLine(string.Format(LocalizableStrings.CouldntUninstall, managedSource.DisplayName, result.ErrorMessage));
+                        if (uninstallResult.Success)
+                        {
+                            Reporter.Output.WriteLine($"The template source {uninstallResult.Source.DisplayName} was successfully uninstalled.");
+                        }
+                        else
+                        {
+                            Reporter.Error.WriteLine(string.Format(LocalizableStrings.CouldntUninstall, uninstallResult.Source.DisplayName, uninstallResult.ErrorMessage));
+                            result = CreationResultStatus.CreateFailed;
+                        }
                     }
+                }
+                if (!sourceToUninstallFound)
+                {
+                    Reporter.Error.WriteLine("The template source is not found, check installed sources and the uninstallation commands from the list below.");
+                    result = CreationResultStatus.NotFound;
                 }
             }
             else
@@ -389,7 +408,7 @@ namespace Microsoft.TemplateEngine.Cli
                 await DisplayInstalledTemplatesSources().ConfigureAwait(false);
             }
 
-            return CreationResultStatus.Success;
+            return result;
         }
 
         private async Task DisplayInstalledTemplatesSources()

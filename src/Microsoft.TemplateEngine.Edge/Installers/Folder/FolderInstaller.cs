@@ -47,9 +47,9 @@ namespace Microsoft.TemplateEngine.Edge.Installers.Folder
         public Task<InstallResult> InstallAsync(InstallRequest installRequest)
         {
             if (Directory.Exists(installRequest.Identifier))
-                return Task.FromResult(InstallResult.CreateSuccess(new FolderManagedTemplatesSource(_settings, this, installRequest.Identifier)));
+                return Task.FromResult(InstallResult.CreateSuccess(installRequest, new FolderManagedTemplatesSource(_settings, this, installRequest.Identifier)));
             else
-                return Task.FromResult(InstallResult.CreateFailure(InstallerErrorCode.GenericError, null));
+                return Task.FromResult(InstallResult.CreateFailure(installRequest, InstallerErrorCode.GenericError, null));
         }
 
         public TemplatesSourceData Serialize(IManagedTemplatesSource managedSource)
@@ -64,7 +64,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.Folder
 
         public Task<UninstallResult> UninstallAsync(IManagedTemplatesSource managedSource)
         {
-            return Task.FromResult(UninstallResult.CreateSuccess());
+            return Task.FromResult(UninstallResult.CreateSuccess(managedSource));
         }
     }
 }
