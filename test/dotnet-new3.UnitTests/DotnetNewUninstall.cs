@@ -178,5 +178,53 @@ namespace dotnet_new3.UnitTests
 
             Assert.False(File.Exists(Path.Combine(home, ".templateengine", "packages", "Microsoft.DotNet.Web.ProjectTemplates.5.0.5.0.0.nupkg")));
         }
+
+        [Fact]
+        public void CanUninstallSeveralSources()
+        {
+            var home = Helpers.CreateTemporaryFolder("Home");
+            string workingDirectory = Helpers.CreateTemporaryFolder();
+            string basicFSharp = Helpers.InstallTestTemplate("TemplateResolution/DifferentLanguagesGroup/BasicFSharp", _log, workingDirectory, home);
+            string basicVB = Helpers.InstallTestTemplate("TemplateResolution/DifferentLanguagesGroup/BasicVB", _log, workingDirectory, home);
+
+            new DotnetNewCommand(_log, "-i", "Microsoft.DotNet.Web.ProjectTemplates.5.0", "-i", "Microsoft.DotNet.Common.ProjectTemplates.5.0", "--quiet")
+                .WithWorkingDirectory(Helpers.CreateTemporaryFolder())
+                .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And
+                .NotHaveStdErr()
+                .And.HaveStdOutContaining("web")
+                .And.HaveStdOutContaining("blazorwasm")
+                .And.HaveStdOutContaining("console")
+                .And.HaveStdOutContaining("classlib");
+
+            new DotnetNewCommand(_log, "-u", "Microsoft.DotNet.Common.ProjectTemplates.5.0", "-u", basicFSharp)
+                .WithWorkingDirectory(Helpers.CreateTemporaryFolder())
+                .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And
+                .NotHaveStdErr()
+                .And.HaveStdOutMatching($"^The template source Microsoft\\.DotNet\\.Common\\.ProjectTemplates\\.5\\.0::([\\d\\.a-z-])+ was successfully uninstalled\\.\\s*$", RegexOptions.Multiline)
+                .And.HaveStdOutContaining($"The template source {basicFSharp} was successfully uninstalled.");
+
+            new DotnetNewCommand(_log, "-u")
+                .WithWorkingDirectory(Helpers.CreateTemporaryFolder())
+                .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And
+                .NotHaveStdErr()
+                .And.HaveStdOutContaining("Microsoft.DotNet.Web.ProjectTemplates.5.0")
+                .And.HaveStdOutContaining(basicVB)
+                .And.NotHaveStdOutContaining("Microsoft.DotNet.Common.ProjectTemplates.5.0")
+                .And.NotHaveStdOutContaining(basicFSharp);
+
+
+        }
     }
 }

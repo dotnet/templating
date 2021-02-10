@@ -23,14 +23,19 @@ namespace dotnet_new3.UnitTests
 
         public static string HomeEnvironmentVariableName { get; } = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "USERPROFILE" : "HOME";
 
-        internal static string InstallTestTemplate(string templateName, ITestOutputHelper log, string workingDirectory, string homeDirectory)
+        internal static string GetTestTemplateLocation(string templateName)
         {
             string codebase = typeof(Program).GetTypeInfo().Assembly.Location;
             Uri cb = new Uri(codebase);
             string asmPath = cb.LocalPath;
             string dir = Path.GetDirectoryName(asmPath);
             string testTemplate = Path.Combine(dir, "..", "..", "..", "..", "..", "test", "Microsoft.TemplateEngine.TestTemplates", "test_templates", templateName);
+            return Path.GetFullPath(testTemplate);
+        }
 
+        internal static string InstallTestTemplate(string templateName, ITestOutputHelper log, string workingDirectory, string homeDirectory)
+        {
+            string testTemplate = GetTestTemplateLocation(templateName);
             new DotnetNewCommand(log, "-i", testTemplate)
                   .WithWorkingDirectory(workingDirectory)
                   .WithEnvironmentVariable(HomeEnvironmentVariableName, homeDirectory)

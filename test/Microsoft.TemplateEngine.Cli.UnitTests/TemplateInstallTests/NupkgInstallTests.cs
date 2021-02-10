@@ -64,7 +64,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateInstallTests
 
             // install the same test pack again
             int secondInstallResult = New3Command.Run(CommandName, host, telemetryLogger, null, installArgs);
-            Assert.Equal(0, secondInstallResult);
+            Assert.NotEqual(0, secondInstallResult);
 
             settingsLoader.Reload();
 
