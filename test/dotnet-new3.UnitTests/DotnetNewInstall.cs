@@ -91,7 +91,7 @@ namespace dotnet_new3.UnitTests
                .And.HaveStdErrContaining("'Microsoft.DotNet.Web.ProjectTemplates.5.0::16.0.0' could not be installed, the package doesn't exist.");
         }
 
-        [Fact]
+        [Fact(Skip = "https://github.com/dotnet/templating/issues/2857")]
         public void CanInstallSeveralSources()
         {
             var home = Helpers.CreateTemporaryFolder("Home");
@@ -165,7 +165,7 @@ namespace dotnet_new3.UnitTests
                  .And.NotHaveStdOut();
         }
 
-        [Fact]
+        [Fact(Skip = "https://github.com/dotnet/templating/issues/2857")]
         public void CanUpdateSameSource_NuGet()
         {
             var home = Helpers.CreateTemporaryFolder("Home");
