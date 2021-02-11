@@ -17,7 +17,7 @@ namespace dotnet_new3.UnitTests
             _log = log;
         }
 
-        [Fact]
+        [Fact(Skip = "https://github.com/dotnet/templating/issues/2857")]
         public void CanApplyUpdates()
         {
             var home = Helpers.CreateTemporaryFolder("Home");
