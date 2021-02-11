@@ -179,7 +179,7 @@ namespace dotnet_new3.UnitTests
             Assert.False(File.Exists(Path.Combine(home, ".templateengine", "packages", "Microsoft.DotNet.Web.ProjectTemplates.5.0.5.0.0.nupkg")));
         }
 
-        [Fact]
+        [Fact(Skip = "https://github.com/dotnet/templating/issues/2857")]
         public void CanUninstallSeveralSources()
         {
             var home = Helpers.CreateTemporaryFolder("Home");
