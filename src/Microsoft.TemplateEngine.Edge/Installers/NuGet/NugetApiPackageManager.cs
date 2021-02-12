@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Installer;
 using NuGet.Common;
+using NuGet.Configuration;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
@@ -19,63 +20,69 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
     internal class NuGetApiPackageManager : IDownloader, IUpdateChecker
     {
-        internal const string PublicNuGetFeed = "https://api.nuget.org/v3/index.json";
         private readonly IEngineEnvironmentSettings _environmentSettings;
-        private readonly ILogger _nugetLogger = NullLogger.Instance;
+        private readonly ILogger _nugetLogger;
 
         internal NuGetApiPackageManager(IEngineEnvironmentSettings settings)
         {
             _environmentSettings = settings;
+            _nugetLogger = new NuGetLogger(settings);
         }
 
-        public bool CanCheckForUpdate(NuGetManagedTemplatesSource source)
+        /// <summary>
+        /// Downloads the package from configured NuGet package feeds. NuGet feeds to use are read for current directory, if additional feeds are specified in installation request, they are checked as well.
+        /// </summary>
+        /// <param name="installRequest"><see cref="InstallRequest"/> that defines the package to download</param>
+        /// <param name="downloadPath">path to download to</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns><see cref="NuGetPackageInfo"/>containing full path to downloaded package and package details</returns>
+        /// <exception cref="InvalidNuGetSourceException">when sources passed to install request are not valid NuGet sources or failed to read default NuGet configuration</exception>
+        /// <exception cref="DownloadException">when the download of the package failed</exception>
+        /// <exception cref="PackageNotFoundException">when the package cannot be find in default or passed to install request NuGet feeds</exception>
+        public async Task<NuGetPackageInfo> DownloadPackageAsync(InstallRequest installRequest, string downloadPath, CancellationToken cancellationToken)
         {
-            return true;
-        }
-
-        public bool CanDownloadPackage(InstallRequest installRequest)
-        {
-            return true;
-        }
-
-        public async Task<NuGetPackageInfo> DownloadPackageAsync(InstallRequest installRequest, string downloadPath)
-        {
-            IEnumerable<string> sources = null;
+            string[] sources = Array.Empty<string>();
             if (installRequest.Details?.ContainsKey(InstallerConstants.NuGetSourcesKey) ?? false)
             {
                 sources = installRequest.Details[InstallerConstants.NuGetSourcesKey].Split(InstallerConstants.NuGetSourcesSeparator);
             }
 
+            IEnumerable<PackageSource> packagesSources = LoadNuGetSources(sources);
+
             NuGetVersion packageVersion;
-            string source;
+            PackageSource source;
             IPackageSearchMetadata packageMetadata;
 
-            if (installRequest.Version is null)
+            if (string.IsNullOrWhiteSpace(installRequest.Version))
             {
-                (source, packageMetadata) = await GetLatestVersionInternalAsync(installRequest.Identifier, sources).ConfigureAwait(false);
+                (source, packageMetadata) = await GetLatestVersionInternalAsync(installRequest.Identifier, packagesSources, cancellationToken).ConfigureAwait(false);
             }
             else
             {
                 packageVersion = new NuGetVersion(installRequest.Version.ToString());
-                (source, packageMetadata) = await GetPackageMetadataAsync(installRequest.Identifier, packageVersion, sources).ConfigureAwait(false);
+                (source, packageMetadata) = await GetPackageMetadataAsync(installRequest.Identifier, packageVersion, packagesSources, cancellationToken).ConfigureAwait(false);
             }
 
             FindPackageByIdResource resource;
             SourceRepository repository = Repository.Factory.GetCoreV3(source);
             try
             {
-                resource = await repository.GetResourceAsync<FindPackageByIdResource>().ConfigureAwait(false);
+                resource = await repository.GetResourceAsync<FindPackageByIdResource>(cancellationToken).ConfigureAwait(false);
             }
             catch (Exception e)
             {
-                _nugetLogger.LogError($"Failed to load the NuGet source {source}");
-                _nugetLogger.LogDebug($"Reason: {e.Message}");
-                throw new InvalidNuGetSourceException("Failed to load NuGet source", new[] { source }, e);
+                _nugetLogger.LogError($"Failed to load the NuGet source {source.Source}.");
+                _nugetLogger.LogDebug($"Reason: {e.Message}.");
+                throw new InvalidNuGetSourceException("Failed to load NuGet source", new[] { source.Source }, e);
             }
 
-            CancellationToken cancellationToken = CancellationToken.None;
             SourceCacheContext cache = new SourceCacheContext();
             string filePath = Path.Combine(downloadPath, packageMetadata.Identity.Id + "." + packageMetadata.Identity.Version + ".nupkg");
+            if (_environmentSettings.Host.FileSystem.FileExists(filePath))
+            {
+                _nugetLogger.LogError($"File {filePath} already exists.");
+                throw new DownloadException(packageMetadata.Identity.Id, packageMetadata.Identity.Version.ToNormalizedString(), new[] { source.Source });
+            }
             try
             {
                 using Stream packageStream = _environmentSettings.Host.FileSystem.CreateFile(filePath);
@@ -89,7 +96,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 {
                     return new NuGetPackageInfo
                     {
-                        NuGetSource = source,
+                        NuGetSource = source.Source,
                         FullPath = filePath,
                         PackageIdentifier = packageMetadata.Identity.Id,
                         PackageVersion = packageMetadata.Identity.Version.ToNormalizedString(),
@@ -98,76 +105,80 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 }
                 else
                 {
-                    _nugetLogger.LogWarning($"Failed to download {packageMetadata.Identity.Id}::{packageMetadata.Identity.Version} from NuGet feed {source}");
-                    throw new DownloadException(packageMetadata.Identity.Id, packageMetadata.Identity.Version.ToNormalizedString(), new[] { source });
+                    _nugetLogger.LogWarning($"Failed to download {packageMetadata.Identity.Id}::{packageMetadata.Identity.Version} from NuGet feed {source.Source}");
+                    try
+                    {
+                        _environmentSettings.Host.FileSystem.FileDelete(filePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        _nugetLogger.LogWarning($"Failed to remove {filePath} after failed download. Remove the file manually if it exists.");
+                        _nugetLogger.LogDebug($"Reason: {ex.Message}.");
+                    }
+                    throw new DownloadException(packageMetadata.Identity.Id, packageMetadata.Identity.Version.ToNormalizedString(), new[] { source.Source });
                 }
             }
             catch (Exception e)
             {
-                _nugetLogger.LogWarning($"Failed to download {packageMetadata.Identity.Id}::{packageMetadata.Identity.Version} from NuGet feed {source}");
-                _nugetLogger.LogDebug($"Reason: {e.Message}");
-                throw new DownloadException(packageMetadata.Identity.Id, packageMetadata.Identity.Version.ToNormalizedString(), new[] { source }, e.InnerException);
+                _nugetLogger.LogWarning($"Failed to download {packageMetadata.Identity.Id}::{packageMetadata.Identity.Version} from NuGet feed {source.Source}.");
+                _nugetLogger.LogDebug($"Reason: {e.Message}.");
+                try
+                {
+                    _environmentSettings.Host.FileSystem.FileDelete(filePath);
+                }
+                catch (Exception ex)
+                {
+                    _nugetLogger.LogWarning($"Failed to remove {filePath} after failed download. Remove the file manually if it exists.");
+                    _nugetLogger.LogDebug($"Reason: {ex.Message}.");
+                }
+                throw new DownloadException(packageMetadata.Identity.Id, packageMetadata.Identity.Version.ToNormalizedString(), new[] { source.Source }, e.InnerException);
             }
         }
 
-        public async Task<CheckUpdateResult> GetLatestVersionAsync(NuGetManagedTemplatesSource source)
+        /// <summary>
+        /// Gets the latest version for the package. Uses NuGet feeds configured for current directory and the source if specified from <paramref name="source"/>.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns><see cref="CheckUpdateResult"/> containing the latest version for the <paramref name="source"/>.</returns>
+        /// <exception cref="InvalidNuGetSourceException">when sources passed to install request are not valid NuGet feeds or failed to read default NuGet configuration</exception>
+        /// <exception cref="PackageNotFoundException">when the package cannot be find in default or source NuGet feeds</exception>
+        public async Task<CheckUpdateResult> GetLatestVersionAsync(NuGetManagedTemplatesSource source, CancellationToken cancellationToken)
         {
-            string latestVersion = await GetLatestVersionAsync(source.Identifier).ConfigureAwait(false);
+            IEnumerable<PackageSource> packageSources = LoadNuGetSources(source.NuGetSource);
+            string latestVersion = await GetLatestVersionAsync(source.Identifier, packageSources, cancellationToken).ConfigureAwait(false);
             return CheckUpdateResult.CreateSuccess(source, latestVersion);
         }
 
-        private async Task<string> GetLatestVersionAsync(string packageIdentifier)
+        private async Task<string> GetLatestVersionAsync(string packageIdentifier, IEnumerable<PackageSource> packageSources, CancellationToken cancellationToken)
         {
-            var (_, package) = await GetLatestVersionInternalAsync(packageIdentifier).ConfigureAwait(false);
+            var (_, package) = await GetLatestVersionInternalAsync(packageIdentifier, packageSources, cancellationToken).ConfigureAwait(false);
             return package.Identity.Version.ToNormalizedString();
         }
 
-        private async Task<(string, IPackageSearchMetadata)> GetLatestVersionInternalAsync(string packageIdentifier, IEnumerable<string> sources = null)
+        private async Task<(PackageSource, IPackageSearchMetadata)> GetLatestVersionInternalAsync(string packageIdentifier, IEnumerable<PackageSource> packageSources, CancellationToken cancellationToken)
         {
-            CancellationToken cancellationToken = CancellationToken.None;
+            if (string.IsNullOrWhiteSpace(packageIdentifier))
+            {
+                throw new ArgumentException($"{nameof(packageIdentifier)} cannot be null or empty", nameof(packageIdentifier));
+            }
+            _ = packageSources ?? throw new ArgumentNullException(nameof(packageSources));
+
             SourceCacheContext cache = new SourceCacheContext();
+            ConcurrentDictionary<PackageSource, IEnumerable<IPackageSearchMetadata>> searchResults = new ConcurrentDictionary<PackageSource, IEnumerable<IPackageSearchMetadata>>();
+            await Task.WhenAll(packageSources.Select(async source =>
+                {
+                    IEnumerable<IPackageSearchMetadata> foundPackages = await GetPackageMetadataAsync(cache, source, packageIdentifier, cancellationToken).ConfigureAwait(false);
+                    if (foundPackages == null)
+                    {
+                        return;
+                    }
+                    searchResults[source] = foundPackages;
+                })).ConfigureAwait(false);
 
-            ConcurrentDictionary<string, PackageMetadataResource> resources = new ConcurrentDictionary<string, PackageMetadataResource>();
-            IEnumerable<string> attemptedSources = sources != null ? sources : new[] { PublicNuGetFeed };
-            foreach (string source in attemptedSources)
+            if (!searchResults.Any())
             {
-                SourceRepository repository = Repository.Factory.GetCoreV3(source);
-                try
-                {
-                    PackageMetadataResource resource = await repository.GetResourceAsync<PackageMetadataResource>().ConfigureAwait(false);
-                    resources[source] = resource;
-                }
-                catch (Exception e)
-                {
-                    _nugetLogger.LogError($"Failed to load the NuGet source {source}");
-                    _nugetLogger.LogDebug($"Reason: {e.Message}");
-                }
-            }
-
-            if (!resources.Any())
-            {
-                throw new InvalidNuGetSourceException("Failed to load NuGet sources", attemptedSources);
-            }
-
-            ConcurrentDictionary<string, IEnumerable<IPackageSearchMetadata>> searchResults = new ConcurrentDictionary<string, IEnumerable<IPackageSearchMetadata>>();
-            foreach (KeyValuePair<string, PackageMetadataResource> resource in resources)
-            {
-                IEnumerable<IPackageSearchMetadata> foundPackages = await resource.Value.GetMetadataAsync(
-                    packageIdentifier,
-                    includePrerelease: false,
-                    includeUnlisted: false,
-                    cache,
-                    _nugetLogger,
-                    cancellationToken).ConfigureAwait(false);
-                if (foundPackages.Any())
-                {
-                    _nugetLogger.LogVerbose($"Found {foundPackages.Count()} {packageIdentifier} packages in NuGet feed {resource.Key}");
-                    searchResults[resource.Key] = foundPackages;
-                }
-                else
-                {
-                    _nugetLogger.LogWarning($"{packageIdentifier} is not found in NuGet feed {resource.Key}");
-                }
+                throw new InvalidNuGetSourceException("Failed to load NuGet sources", packageSources.Select(source => source.Source));
             }
 
             var accumulativeSearchResults = searchResults
@@ -175,7 +186,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
             if (!accumulativeSearchResults.Any())
             {
-                throw new PackageNotFoundException(packageIdentifier, attemptedSources);
+                _nugetLogger.LogWarning($"{packageIdentifier} is not found in NuGet feeds {string.Join(", ", packageSources.Select(source => source.Source))}.");
+                throw new PackageNotFoundException(packageIdentifier, packageSources.Select(source => source.Source));
             }
 
             var latestVersion = accumulativeSearchResults.Aggregate(
@@ -187,37 +199,56 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             return (latestVersion.source, latestVersion.package);
         }
 
-        private async Task<(string, IPackageSearchMetadata)> GetPackageMetadataAsync(string packageIdentifier, NuGetVersion packageVersion, IEnumerable<string> sources = null)
+        private async Task<(PackageSource, IPackageSearchMetadata)> GetPackageMetadataAsync(string packageIdentifier, NuGetVersion packageVersion, IEnumerable<PackageSource> sources, CancellationToken cancellationToken)
         {
-            CancellationToken cancellationToken = CancellationToken.None;
+            if (string.IsNullOrWhiteSpace(packageIdentifier))
+            {
+                throw new ArgumentException($"{nameof(packageIdentifier)} cannot be null or empty", nameof(packageIdentifier));
+            }
+            _ = packageVersion ?? throw new ArgumentNullException(nameof(packageVersion));
+            _ = sources ?? throw new ArgumentNullException(nameof(sources));
+
             SourceCacheContext cache = new SourceCacheContext();
 
-            ConcurrentDictionary<string, PackageMetadataResource> resources = new ConcurrentDictionary<string, PackageMetadataResource>();
-            IEnumerable<string> attemptedSources = sources != null ? sources : new[] { PublicNuGetFeed };
-            foreach (string source in attemptedSources)
+            bool atLeastOneSourceValid = false;
+            foreach (PackageSource source in sources)
+            {
+                _nugetLogger.LogDebug($"Searching {packageIdentifier}::{packageVersion} in {source.Source}.");
+                IEnumerable<IPackageSearchMetadata> foundPackages = await GetPackageMetadataAsync(cache, source, packageIdentifier, cancellationToken).ConfigureAwait(false);
+                if (foundPackages == null)
+                {
+                    continue;
+                }
+                atLeastOneSourceValid = true;
+                IPackageSearchMetadata matchedVersion = foundPackages.FirstOrDefault(package => package.Identity.Version == packageVersion);
+                if (matchedVersion != null)
+                {
+                    _nugetLogger.LogDebug($"{packageIdentifier}::{packageVersion} was found in {source.Source}.");
+                    return (source, matchedVersion);
+                }
+                else
+                {
+                    _nugetLogger.LogDebug($"{packageIdentifier}::{packageVersion} is not found in NuGet feed {source.Source}.");
+                }
+            }
+
+            if (!atLeastOneSourceValid)
+            {
+                throw new InvalidNuGetSourceException("Failed to load NuGet sources", sources.Select(s => s.Source));
+            }
+
+            _nugetLogger.LogWarning($"{packageIdentifier}::{packageVersion} is not found in NuGet feeds {string.Join(", ", sources.Select(source => source.Source))}.");
+            throw new PackageNotFoundException(packageIdentifier, packageVersion, sources.Select(source => source.Source));
+        }
+
+        private async Task<IEnumerable<IPackageSearchMetadata>> GetPackageMetadataAsync(SourceCacheContext cache, PackageSource source, string packageIdentifier, CancellationToken cancellationToken)
+        {
+            _nugetLogger.LogDebug($"Searching for {packageIdentifier} in {source.Source}.");
+            try
             {
                 SourceRepository repository = Repository.Factory.GetCoreV3(source);
-                try
-                {
-                    PackageMetadataResource resource = await repository.GetResourceAsync<PackageMetadataResource>().ConfigureAwait(false);
-                    resources[source] = resource;
-                }
-                catch (Exception e)
-                {
-                    _nugetLogger.LogError($"Failed to load the NuGet source {source}");
-                    _nugetLogger.LogDebug($"Reason: {e.Message}");
-                }
-            }
-
-            if (!resources.Any())
-            {
-                throw new InvalidNuGetSourceException("Failed to load NuGet sources", attemptedSources);
-            }
-
-            ConcurrentDictionary<string, IEnumerable<IPackageSearchMetadata>> searchResults = new ConcurrentDictionary<string, IEnumerable<IPackageSearchMetadata>>();
-            foreach (KeyValuePair<string, PackageMetadataResource> resource in resources)
-            {
-                IEnumerable<IPackageSearchMetadata> foundPackages = await resource.Value.GetMetadataAsync(
+                PackageMetadataResource resource = await repository.GetResourceAsync<PackageMetadataResource>(cancellationToken).ConfigureAwait(false);
+                IEnumerable<IPackageSearchMetadata> foundPackages = await resource.GetMetadataAsync(
                     packageIdentifier,
                     includePrerelease: false,
                     includeUnlisted: false,
@@ -225,19 +256,80 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                     _nugetLogger,
                     cancellationToken).ConfigureAwait(false);
 
-                var matchedVersion = foundPackages.FirstOrDefault(package => package.Identity.Version == packageVersion);
-
-                if (matchedVersion != null)
+                if (foundPackages.Any())
                 {
-                    return (resource.Key, matchedVersion);
+                    _nugetLogger.LogDebug($"Found {foundPackages.Count()} versions for {packageIdentifier} in NuGet feed {source.Source}.");
                 }
                 else
                 {
-                    _nugetLogger.LogWarning($"{packageIdentifier}::{packageVersion} is not found in NuGet feed {resource.Key}");
+                    _nugetLogger.LogDebug($"{packageIdentifier} is not found in NuGet feed {source.Source}.");
                 }
+                return foundPackages;
+            }
+            catch (Exception ex)
+            {
+                _nugetLogger.LogError($"Failed to read package information from NuGet source {source.Source}.");
+                _nugetLogger.LogDebug($"Reason: {ex.Message}.");
+            }
+            return null;
+        }
+
+        private IEnumerable<PackageSource> LoadNuGetSources(params string[] additionalSources)
+        {
+            IEnumerable<PackageSource> defaultSources;
+            string currentDirectory = string.Empty;
+            try
+            {
+                currentDirectory = Directory.GetCurrentDirectory();
+                ISettings settings = global::NuGet.Configuration.Settings.LoadDefaultSettings(currentDirectory);
+                PackageSourceProvider packageSourceProvider = new PackageSourceProvider(settings);
+                defaultSources = packageSourceProvider.LoadPackageSources().Where(source => source.IsEnabled);
+            }
+            catch (Exception ex)
+            {
+                _nugetLogger.LogError($"Failed to load NuGet sources configured for the folder {currentDirectory}.");
+                _nugetLogger.LogDebug($"Reason: {ex.Message}.");
+                throw new InvalidNuGetSourceException($"Failed to load NuGet sources configured for the folder {currentDirectory}", ex);
             }
 
-            throw new PackageNotFoundException(packageIdentifier, packageVersion, attemptedSources);
+            if (!additionalSources?.Any() ?? true)
+            {
+                if (!defaultSources.Any())
+                {
+                    _nugetLogger.LogError($"No NuGet sources are defined or enabled.");
+                    throw new InvalidNuGetSourceException("No NuGet sources are defined or enabled");
+                }
+                return defaultSources;
+            }
+
+            List<PackageSource> customSources = new List<PackageSource>();
+            foreach (string source in additionalSources)
+            {
+                if (string.IsNullOrWhiteSpace(source))
+                {
+                    continue;
+                }
+                if (defaultSources.Any(s => s.Source.Equals(source, StringComparison.OrdinalIgnoreCase)))
+                {
+                    _nugetLogger.LogDebug($"Custom source {source} is already loaded from default configuration.");
+                    continue;
+                }
+                PackageSource packageSource = new PackageSource(source);
+                if (packageSource.TrySourceAsUri == null)
+                {
+                    _nugetLogger.LogWarning($"Failed to load NuGet source {source}: the source is not valid. It will be skipped in further processing.");
+                    continue;
+                }
+                customSources.Add(packageSource);
+            }
+
+            IEnumerable<PackageSource> retrievedSources = defaultSources.Concat(customSources);
+            if (!retrievedSources.Any())
+            {
+                _nugetLogger.LogError($"No NuGet sources are defined or enabled.");
+                throw new InvalidNuGetSourceException("No NuGet sources are defined or enabled");
+            }
+            return retrievedSources;
         }
     }
 }

@@ -278,6 +278,26 @@ namespace Microsoft.TemplateEngine.Cli
                 }
             }
 
+            if (!installRequests.Any())
+            {
+                Reporter.Error.WriteLine($"Found no template sources to install");
+                return CreationResultStatus.NotFound;
+            }
+
+            Reporter.Output.WriteLine("The following template sources will be installed:");
+            foreach (InstallRequest installRequest in installRequests)
+            {
+                if (string.IsNullOrWhiteSpace(installRequest.Version))
+                {
+                    Reporter.Output.WriteLine($"  {installRequest.Identifier}");
+                }
+                else
+                {
+                    Reporter.Output.WriteLine($"  {installRequest.Identifier}, version: {installRequest.Version}");
+                }
+            }
+            Reporter.Output.WriteLine();
+
             var installResults = await managedSourceProvider.InstallAsync(installRequests).ConfigureAwait(false);
             await _settingsLoader.RebuildCacheFromSettingsIfNotCurrent(true).ConfigureAwait(false);
             foreach (InstallResult result in installResults)
@@ -306,7 +326,7 @@ namespace Microsoft.TemplateEngine.Cli
                 switch (result.Error)
                 {
                     case InstallerErrorCode.InvalidSource:
-                        Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedInvalidSource, packageToInstall).Bold().Red());
+                        Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedInvalidSource, packageToInstall, result.ErrorMessage).Bold().Red());
                         break;
                     case InstallerErrorCode.PackageNotFound:
                         Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedPackageNotFound, packageToInstall).Bold().Red());

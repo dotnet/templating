@@ -1036,7 +1036,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; could not be installed, the NuGet feeds specified are invalid..
+        ///   Looks up a localized string similar to &apos;{0}&apos; could not be installed, no NuGet feeds are configured or they are invalid..
         /// </summary>
         public static string InstallFailedInvalidSource {
             get {
@@ -1045,7 +1045,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; could not be installed, the package doesn&apos;t exist..
+        ///   Looks up a localized string similar to &apos;{0}&apos; could not be installed, the package does not exist..
         /// </summary>
         public static string InstallFailedPackageNotFound {
             get {

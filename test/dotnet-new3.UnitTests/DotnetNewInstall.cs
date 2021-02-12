@@ -72,9 +72,8 @@ namespace dotnet_new3.UnitTests
                .WithWorkingDirectory(Helpers.CreateTemporaryFolder())
                .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
                .Execute()
-               .Should()
-               .NotHaveStdOut()
-               .And.HaveStdErrContaining("'BlaBlaBla' could not be installed, the package doesn't exist.");
+               .Should().Fail()
+               .And.HaveStdErrContaining("'BlaBlaBla' could not be installed, the package does not exist.");
         }
 
         [Fact]
@@ -86,9 +85,8 @@ namespace dotnet_new3.UnitTests
                .WithWorkingDirectory(Helpers.CreateTemporaryFolder())
                .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
                .Execute()
-               .Should()
-               .NotHaveStdOut()
-               .And.HaveStdErrContaining("'Microsoft.DotNet.Web.ProjectTemplates.5.0::16.0.0' could not be installed, the package doesn't exist.");
+               .Should().Fail()
+               .And.HaveStdErrContaining("'Microsoft.DotNet.Web.ProjectTemplates.5.0::16.0.0' could not be installed, the package does not exist.");
         }
 
         [Fact(Skip = "https://github.com/dotnet/templating/issues/2857")]
@@ -134,10 +132,8 @@ namespace dotnet_new3.UnitTests
                  .WithWorkingDirectory(Helpers.CreateTemporaryFolder())
                  .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
                  .Execute()
-                 .Should()
-                 .Fail()
-                 .And.HaveStdErrContaining("The template source Microsoft.DotNet.Common.ProjectTemplates.5.0::5.0.0 is already installed.")
-                 .And.NotHaveStdOut();
+                 .Should().Fail()
+                 .And.HaveStdErrContaining("The template source Microsoft.DotNet.Common.ProjectTemplates.5.0::5.0.0 is already installed.");
         }
 
         [Fact]
@@ -159,10 +155,8 @@ namespace dotnet_new3.UnitTests
                  .WithWorkingDirectory(Helpers.CreateTemporaryFolder())
                  .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
                  .Execute()
-                 .Should()
-                 .Fail()
-                 .And.HaveStdErrContaining($"The template source {basicFSharp} is already installed.")
-                 .And.NotHaveStdOut();
+                 .Should().Fail()
+                 .And.HaveStdErrContaining($"The template source {basicFSharp} is already installed.");
         }
 
         [Fact(Skip = "https://github.com/dotnet/templating/issues/2857")]
