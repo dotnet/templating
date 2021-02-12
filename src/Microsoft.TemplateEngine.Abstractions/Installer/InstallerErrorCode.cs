@@ -12,6 +12,7 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
         UnsupportedRequest = 4,
         GenericError = 5,
         AlreadyInstalled = 6,
-        UpdateUninstallFailed = 7
+        UpdateUninstallFailed = 7,
+        InvalidPackage = 8
     }
 }

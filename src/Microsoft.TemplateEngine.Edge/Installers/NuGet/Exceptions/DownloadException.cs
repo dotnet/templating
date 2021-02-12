@@ -9,14 +9,21 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
     internal class DownloadException : Exception
     {
-        public DownloadException(string packageIdentifier, NuGetVersion packageVersion, IEnumerable<string> attemptedSources) : base($"Failed to download {packageIdentifier}::{packageVersion} from NuGet feeds {string.Join(";", attemptedSources)}")
+        public DownloadException(string packageIdentifier, string packageVersion, string filePath) : base($"Failed to download {packageIdentifier}::{packageVersion} from {filePath}")
+        {
+            PackageIdentifier = packageIdentifier;
+            PackageVersion = packageVersion;
+            PackageLocation = filePath;
+        }
+
+        public DownloadException(string packageIdentifier, string packageVersion, IEnumerable<string> attemptedSources) : base($"Failed to download {packageIdentifier}::{packageVersion} from NuGet feeds {string.Join(";", attemptedSources)}")
         {
             PackageIdentifier = packageIdentifier;
             PackageVersion = packageVersion;
             SourcesList = attemptedSources;
         }
 
-        public DownloadException(string packageIdentifier, NuGetVersion packageVersion, IEnumerable<string> attemptedSources, Exception inner) : base($"Failed to download{packageIdentifier}::{packageVersion} from NuGet feeds {string.Join(";", attemptedSources)}", inner)
+        public DownloadException(string packageIdentifier, string packageVersion, IEnumerable<string> attemptedSources, Exception inner) : base($"Failed to download{packageIdentifier}::{packageVersion} from NuGet feeds {string.Join(";", attemptedSources)}", inner)
         {
             PackageIdentifier = packageIdentifier;
             PackageVersion = packageVersion;
@@ -24,7 +31,9 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         }
 
         public string PackageIdentifier { get; private set; }
-        public NuGetVersion PackageVersion { get; private set; }
+        public string PackageLocation { get; private set; }
+        public string PackageVersion { get; private set; }
         public IEnumerable<string> SourcesList { get; private set; }
+
     }
 }
