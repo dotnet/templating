@@ -10,6 +10,7 @@ using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.GlobalSettings;
 using Microsoft.TemplateEngine.Abstractions.Installer;
 using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using NuGet.Packaging;
 
 namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
@@ -89,25 +90,23 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
             try
             {
-                string packageLocation;
                 Dictionary<string, string> sourceDetails = new Dictionary<string, string>();
+                NuGetPackageInfo nuGetPackageInfo;
                 if (IsLocalPackage(installRequest))
                 {
-                    packageLocation = Path.Combine(_installPath, Path.GetFileName(installRequest.Identifier));
-                    _environmentSettings.Host.FileSystem.FileCopy(installRequest.Identifier, packageLocation, overwrite: true);
                     sourceDetails[NuGetManagedTemplatesSource.LocalPackageKey] = true.ToString();
-                    sourceDetails[NuGetManagedTemplatesSource.PackageIdKey] = installRequest.Identifier;
+                    nuGetPackageInfo = InstallLocalPackage(installRequest);
                 }
                 else
                 {
-                    DownloadResult result = await _packageDownloader.DownloadPackageAsync(installRequest, _installPath).ConfigureAwait(false);
-                    packageLocation = result.FullPath;
-                    sourceDetails[NuGetManagedTemplatesSource.AuthorKey] = result.Author;
-                    sourceDetails[NuGetManagedTemplatesSource.NuGetSourceKey] = result.NuGetSource;
-                    sourceDetails[NuGetManagedTemplatesSource.PackageIdKey] = result.PackageIdentifier;
-                    sourceDetails[NuGetManagedTemplatesSource.PackageVersionKey] = result.PackageVersion.ToString();
+                    nuGetPackageInfo = await _packageDownloader.DownloadPackageAsync(installRequest, _installPath).ConfigureAwait(false);
                 }
-                NuGetManagedTemplatesSource source = new NuGetManagedTemplatesSource(_environmentSettings, this, packageLocation, sourceDetails);
+
+                sourceDetails[NuGetManagedTemplatesSource.AuthorKey] = nuGetPackageInfo.Author;
+                sourceDetails[NuGetManagedTemplatesSource.NuGetSourceKey] = nuGetPackageInfo.NuGetSource;
+                sourceDetails[NuGetManagedTemplatesSource.PackageIdKey] = nuGetPackageInfo.PackageIdentifier;
+                sourceDetails[NuGetManagedTemplatesSource.PackageVersionKey] = nuGetPackageInfo.PackageVersion.ToString();
+                NuGetManagedTemplatesSource source = new NuGetManagedTemplatesSource(_environmentSettings, this, nuGetPackageInfo.FullPath, sourceDetails);
                 return InstallResult.CreateSuccess(installRequest, source);
             }
             catch (DownloadException e)
@@ -121,6 +120,10 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             catch (InvalidNuGetSourceException e)
             {
                 return InstallResult.CreateFailure(installRequest, InstallerErrorCode.InvalidSource, e.Message);
+            }
+            catch (InvalidNuGetPackageException e)
+            {
+                return InstallResult.CreateFailure(installRequest, InstallerErrorCode.InvalidPackage, e.Message);
             }
             catch (Exception e)
             {
@@ -170,7 +173,58 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
         private bool IsLocalPackage(InstallRequest installRequest)
         {
-            return File.Exists(installRequest.Identifier);
+            return _environmentSettings.Host.FileSystem.FileExists(installRequest.Identifier);
+        }
+
+        private NuGetPackageInfo InstallLocalPackage(InstallRequest installRequest)
+        {
+            _ = installRequest ?? throw new ArgumentNullException(nameof(installRequest));
+
+            NuGetPackageInfo packageInfo;
+            try
+            {
+                packageInfo = ReadPackageInformation(installRequest.Identifier);
+            }
+            catch (Exception ex)
+            {
+                _environmentSettings.Host.OnCriticalError(null, $"Failed to read content of package {installRequest.Identifier}.", null, 0);
+                _environmentSettings.Host.LogDiagnosticMessage("Installer", $"Reason: {ex.Message}.");
+                throw new InvalidNuGetPackageException(installRequest.Identifier, ex);
+            }
+            string targetPackageLocation = Path.Combine(_installPath, packageInfo.PackageIdentifier + "." + packageInfo.PackageVersion + ".nupkg");
+            if (_environmentSettings.Host.FileSystem.FileExists(targetPackageLocation))
+            {
+                _environmentSettings.Host.OnCriticalError(null, $"File {targetPackageLocation} already exists.", null, 0);
+                throw new DownloadException(packageInfo.PackageIdentifier, packageInfo.PackageVersion, installRequest.Identifier);
+            }
+
+            try
+            {
+                _environmentSettings.Host.FileSystem.FileCopy(installRequest.Identifier, targetPackageLocation, overwrite: false);
+            }
+            catch (Exception ex)
+            {
+                _environmentSettings.Host.OnCriticalError(null, $"Failed to copy package {installRequest.Identifier} to {targetPackageLocation}.", null, 0);
+                _environmentSettings.Host.LogDiagnosticMessage("Installer", $"Reason: {ex.Message}.");
+                throw new DownloadException(packageInfo.PackageIdentifier, packageInfo.PackageVersion, installRequest.Identifier);
+            }
+            return packageInfo;
+        }
+
+        private NuGetPackageInfo ReadPackageInformation(string packageLocation)
+        {
+            using Stream inputStream = _environmentSettings.Host.FileSystem.OpenRead(packageLocation);
+            using PackageArchiveReader reader = new PackageArchiveReader(inputStream);
+
+            NuspecReader nuspec = reader.NuspecReader;
+
+            return new NuGetPackageInfo
+            {
+                FullPath = packageLocation,
+                Author = nuspec.GetAuthors(),
+                PackageIdentifier = nuspec.GetId(),
+                PackageVersion = nuspec.GetVersion().ToNormalizedString()
+            };
         }
     }
 }

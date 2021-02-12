@@ -215,5 +215,76 @@ namespace dotnet_new3.UnitTests
             Assert.False(File.Exists(Path.Combine(home, ".templateengine", "packages", "Microsoft.DotNet.Common.ProjectTemplates.5.0.5.0.0.nupkg")));
             Assert.True(File.Exists(Path.Combine(home, ".templateengine", "packages", "Microsoft.DotNet.Common.ProjectTemplates.5.0.5.0.1.nupkg")));
         }
+
+        [Fact]
+        public void CanInstallLocalNuGetPackage()
+        {
+            var home = Helpers.CreateTemporaryFolder("Home");
+            var outputFolder = Helpers.CreateTemporaryFolder();
+
+            var packageLocation = Helpers.PackTestTemplatesNuGetPackage(outputFolder);
+
+            new DotnetNewCommand(_log, "-i", packageLocation)
+                .WithWorkingDirectory(Helpers.CreateTemporaryFolder())
+                .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
+                .Execute()
+                .Should().ExitWith(0)
+                .And.NotHaveStdErr()
+                .And.HaveStdOutMatching($"The template source Microsoft\\.TemplateEngine\\.TestTemplates::([\\d\\.a-z-])+ was successfully installed\\.")
+                .And.HaveStdOutContaining("TestAssets.TemplateWithTags")
+                .And.HaveStdOutContaining("TestAssets.ConfigurationKitchenSink");
+        }
+
+        [Fact(Skip = "https://github.com/dotnet/templating/issues/2857")]
+        public void InstallingSamePackageFromRemoteUpdatesLocal()
+        {
+            var home = Helpers.CreateTemporaryFolder("Home");
+            var outputFolder = Helpers.CreateTemporaryFolder();
+
+            var packageLocation = Helpers.PackProjectTemplatesNuGetPackage("Microsoft.DotNet.Common.ProjectTemplates.5.0", outputFolder);
+
+            new DotnetNewCommand(_log, "-i", packageLocation)
+                .WithWorkingDirectory(Helpers.CreateTemporaryFolder())
+                .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
+                .Execute()
+                .Should().ExitWith(0)
+                .And.NotHaveStdErr()
+                .And.HaveStdOutMatching($"The template source Microsoft\\.DotNet\\.Common\\.ProjectTemplates\\.5\\.0::([\\d\\.a-z-])+ was successfully installed\\.")
+                .And.HaveStdOutContaining("console")
+                .And.HaveStdOutContaining("classlib");
+
+            new DotnetNewCommand(_log, "-u")
+                 .WithWorkingDirectory(Helpers.CreateTemporaryFolder())
+                 .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
+                 .Execute()
+                 .Should().ExitWith(0)
+                 .And.NotHaveStdErr()
+                 .And.HaveStdOutContaining("Microsoft.DotNet.Common.ProjectTemplates.5.0")
+                 .And.HaveStdOutContaining("Author: Microsoft")
+                 .And.HaveStdOutContaining("Version:")
+                 .And.NotHaveStdOutContaining("Version: 5.0.0");
+
+            new DotnetNewCommand(_log, "-i", "Microsoft.DotNet.Common.ProjectTemplates.5.0::5.0.0")
+                .WithWorkingDirectory(Helpers.CreateTemporaryFolder())
+                .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
+                .Execute()
+                .Should().ExitWith(0)
+                .And.NotHaveStdErr()
+                .And.HaveStdOutContaining($"The template source Microsoft.DotNet.Common.ProjectTemplates.5.0::5.0.0 was successfully installed.")
+                .And.HaveStdOutContaining("console")
+                .And.HaveStdOutContaining("classlib");
+
+            new DotnetNewCommand(_log, "-u")
+                .WithWorkingDirectory(Helpers.CreateTemporaryFolder())
+                .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
+                .Execute()
+                .Should().ExitWith(0)
+                .And.NotHaveStdErr()
+                .And.HaveStdOutContaining("Microsoft.DotNet.Common.ProjectTemplates.5.0")
+                .And.HaveStdOutContaining("Author: Microsoft")
+                .And.HaveStdOutContaining("Version: 5.0.0");
+        }
+
+
     }
 }

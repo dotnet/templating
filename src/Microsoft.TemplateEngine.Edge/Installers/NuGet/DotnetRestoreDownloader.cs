@@ -14,7 +14,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             throw new NotImplementedException();
         }
 
-        public Task<DownloadResult> DownloadPackageAsync(InstallRequest installRequest, string downloadPath)
+        public Task<NuGetPackageInfo> DownloadPackageAsync(InstallRequest installRequest, string downloadPath)
         {
             throw new NotImplementedException();
         }

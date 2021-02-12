@@ -10,10 +10,10 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
     {
         bool CanDownloadPackage(InstallRequest installRequest);
 
-        Task<DownloadResult> DownloadPackageAsync(InstallRequest installRequest, string downloadPath);
+        Task<NuGetPackageInfo> DownloadPackageAsync(InstallRequest installRequest, string downloadPath);
     }
 
-    internal struct DownloadResult
+    internal struct NuGetPackageInfo
     {
         internal string Author;
         internal string FullPath;

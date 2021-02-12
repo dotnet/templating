@@ -38,7 +38,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             return true;
         }
 
-        public async Task<DownloadResult> DownloadPackageAsync(InstallRequest installRequest, string downloadPath)
+        public async Task<NuGetPackageInfo> DownloadPackageAsync(InstallRequest installRequest, string downloadPath)
         {
             IEnumerable<string> sources = null;
             if (installRequest.Details?.ContainsKey(InstallerConstants.NuGetSourcesKey) ?? false)
@@ -87,7 +87,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                     _nugetLogger,
                     cancellationToken).ConfigureAwait(false))
                 {
-                    return new DownloadResult
+                    return new NuGetPackageInfo
                     {
                         NuGetSource = source,
                         FullPath = filePath,
@@ -99,14 +99,14 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 else
                 {
                     _nugetLogger.LogWarning($"Failed to download {packageMetadata.Identity.Id}::{packageMetadata.Identity.Version} from NuGet feed {source}");
-                    throw new DownloadException(packageMetadata.Identity.Id, packageMetadata.Identity.Version, new[] { source });
+                    throw new DownloadException(packageMetadata.Identity.Id, packageMetadata.Identity.Version.ToNormalizedString(), new[] { source });
                 }
             }
             catch (Exception e)
             {
                 _nugetLogger.LogWarning($"Failed to download {packageMetadata.Identity.Id}::{packageMetadata.Identity.Version} from NuGet feed {source}");
                 _nugetLogger.LogDebug($"Reason: {e.Message}");
-                throw new DownloadException(packageMetadata.Identity.Id, packageMetadata.Identity.Version, new[] { source }, e.InnerException);
+                throw new DownloadException(packageMetadata.Identity.Id, packageMetadata.Identity.Version.ToNormalizedString(), new[] { source }, e.InnerException);
             }
         }
 
