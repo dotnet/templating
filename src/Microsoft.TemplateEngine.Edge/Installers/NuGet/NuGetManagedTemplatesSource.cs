@@ -36,7 +36,6 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         public bool LocalPackage => Details.TryGetValue(LocalPackageKey, out string isLocalPackage) && bool.TryParse(isLocalPackage, out bool result) ? result : false;
         public string MountPointUri { get; }
         public string NuGetSource => Details.TryGetValue(NuGetSourceKey, out string nugetSource) ? nugetSource : null;
-        public bool PrivateFeed => NuGetSource != NuGetApiPackageManager.PublicNuGetFeed;
         public ITemplatesSourcesProvider Provider => Installer.Provider;
         public string Version => Details.TryGetValue(PackageVersionKey, out string version) ? version : null;
         internal IReadOnlyDictionary<string, string> Details { get; }
