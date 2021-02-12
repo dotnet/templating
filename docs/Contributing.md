@@ -42,18 +42,20 @@ The location `dotnet-new3.exe` gets built to will be placed at the start of the 
 
 # Coding Style #
 
-* All block statements _must_ use braces (if/else, for, foreach, using, etc.)
-  * Immediately nested usings do not need braces at the outer layers
-* We use four spaces of indentation (no tabs).
+Most of the styling is enforced by analyzers and the rules covered by the analyzers are not listed in this section. Therefore, it is highly recommended to use an IDE with Roslyn analyzers support (such as Visual Studio or Visual Studio Code).
+
 * We use explicit types (no usages of `var`)
-* We always specify the visibility, even if it's the default (i.e. private string _foo not string _foo). Visibility should be the first modifier (i.e. public abstract not abstract public).
-* We avoid this. unless absolutely necessary.
-* We use `_camelCase` for private fields and use readonly where possible. When used on static fields, readonly should come after static (i.e. static readonly not readonly static).
-* Namespace imports should be specified at the top of the file, outside of namespace declarations and should be sorted alphabetically with the exception of `System.*` namespaces, which are placed first.
-* We use language keywords instead of BCL types (i.e. `int`, `string`, `float` instead of `Int32`, `String`, `Single`, etc) for both type references as well as method calls (i.e. `int.Parse` instead of `Int32.Parse`).
+* We avoid this, unless absolutely necessary.
+* We use `_camelCase` for private fields.
+* Use readonly where possible.
 * We use PascalCasing to name all our methods, properties, constant local variables, and static readonly fields.
 * We use `nameof(...)` instead of `"..."` whenever possible and relevant.
-* Fields should be specified at the top within type declarations.
+* We use [nullable reference types](https://docs.microsoft.com/en-us/dotnet/csharp/nullable-references) to make conscious decisions on the nullability of references, be more clear with our intent and reduce `NullReferenceException`s. Add `#nullable enabled` to the top of all the modified files unless:
+  * Nullable reference types are already enabled for the file
+  * The changes you are introducing to a file is negligable in size compared to the size of the whole file,
+  * You don't have enough context on the code to make decisions on nullability of types.
+
+Some of the analyzer rules are currently being treated as "info/suggestion"s instead of "warning"s, because we have not yet done a solution wide refactoring to comply with the rules. Although it would be most welcome, you are not required to fix any of the existing suggestions. However, any code that you introduce should be free of suggestions.
 
 [Top](#top)
 
