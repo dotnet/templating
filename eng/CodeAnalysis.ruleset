@@ -24,9 +24,9 @@
     <Rule Id="CA1034" Action="None" />          <!-- Nested types should not be visible -->
     <Rule Id="CA1036" Action="None" />          <!-- Override methods on comparable types -->
     <Rule Id="CA1040" Action="None" />          <!-- Avoid empty interfaces -->
-    <Rule Id="CA1041" Action="None" />          <!-- Provide ObsoleteAttribute message -->
+    <Rule Id="CA1041" Action="Info" TemporarilyDisabled="true" />          <!-- Provide ObsoleteAttribute message -->
     <Rule Id="CA1043" Action="None" />          <!-- Use Integral Or String Argument For Indexers -->
-    <Rule Id="CA1044" Action="None" />          <!-- Properties should not be write only -->
+    <Rule Id="CA1044" Action="Info" TemporarilyDisabled="true" />          <!-- Properties should not be write only -->
     <Rule Id="CA1045" Action="None" />          <!-- Do not pass types by reference -->
     <Rule Id="CA1046" Action="None" />          <!-- Do not overload equality operator on reference types -->
     <Rule Id="CA1047" Action="Warning" />       <!-- Do not declare protected member in sealed type -->
@@ -250,26 +250,26 @@
   <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
     <Rule Id="AD0001" Action="None" />          <!-- Analyzer threw an exception -->
     <Rule Id="SA0001" Action="None" />          <!-- XML comments -->
-    <Rule Id="SA1000" Action="Info" TemporarilyDisabled="true" />       <!-- Spacing around keywords -->
-    <Rule Id="SA1001" Action="Info" TemporarilyDisabled="true" />       <!-- Commas should not be preceded by whitespace -->
-    <Rule Id="SA1002" Action="None" />          <!-- Semicolons should not be preceded by a space -->
-    <Rule Id="SA1003" Action="None" />          <!-- Operator should not appear at the end of a line -->
-    <Rule Id="SA1004" Action="None" />          <!-- Documentation line should begin with a space -->
+    <Rule Id="SA1000" Action="Info" TemporarilyDisabled="true" />          <!-- Spacing around keywords -->
+    <Rule Id="SA1001" Action="Info" TemporarilyDisabled="true" />          <!-- Commas must be spaced correctly -->
+    <Rule Id="SA1002" Action="Info" TemporarilyDisabled="true" />          <!-- Semicolons must be spaced correctly -->
+    <Rule Id="SA1003" Action="Info" TemporarilyDisabled="true" />          <!-- Symbols must be spaced correctly -->
+    <Rule Id="SA1004" Action="Info" TemporarilyDisabled="true" />          <!-- Documentation line should begin with a space -->
     <Rule Id="SA1005" Action="None" />          <!-- Single line comment should begin with a space -->
     <Rule Id="SA1008" Action="None" />          <!-- Opening parenthesis should not be preceded by a space -->
     <Rule Id="SA1009" Action="None" />          <!-- Closing parenthesis should not be followed by a space -->
-    <Rule Id="SA1010" Action="None" />          <!-- Opening square brackets should not be preceded by a space -->
-    <Rule Id="SA1011" Action="None" />          <!-- Closing square bracket should be followed by a space -->
-    <Rule Id="SA1012" Action="None" />          <!-- Opening brace should be followed by a space -->
-    <Rule Id="SA1013" Action="None" />          <!-- Closing brace should be preceded by a space -->
+    <Rule Id="SA1010" Action="Info" TemporarilyDisabled="true" />          <!-- Opening square brackets should not be preceded by a space -->
+    <Rule Id="SA1011" Action="Info" TemporarilyDisabled="true" />          <!-- Closing square bracket should be followed by a space -->
+    <Rule Id="SA1012" Action="Info" TemporarilyDisabled="true" />          <!-- Opening brace should be followed by a space -->
+    <Rule Id="SA1013" Action="Info" TemporarilyDisabled="true" />          <!-- Closing brace should be preceded by a space -->
     <Rule Id="SA1014" Action="Info" TemporarilyDisabled="true"  />       <!-- Opening generic brackets should not be preceded by a space -->
-    <Rule Id="SA1015" Action="None" />          <!-- Closing generic bracket should not be followed by a space -->
+    <Rule Id="SA1015" Action="Info" TemporarilyDisabled="true" />          <!-- Closing generic bracket should not be followed by a space -->
     <Rule Id="SA1018" Action="Warning" />       <!-- Nullable type symbol should not be preceded by a space -->
     <Rule Id="SA1020" Action="Warning" />       <!-- Increment symbol should not be preceded by a space -->
     <Rule Id="SA1021" Action="None" />          <!-- Negative sign should be preceded by a space -->
     <Rule Id="SA1023" Action="None" />          <!-- Dereference symbol '*' should not be preceded by a space." -->
-    <Rule Id="SA1024" Action="None" />          <!-- Colon should be followed by a space -->
-    <Rule Id="SA1025" Action="None" />          <!-- Code should not contain multiple whitespace characters in a row -->
+    <Rule Id="SA1024" Action="Info" TemporarilyDisabled="true" />          <!-- Colon should be followed by a space -->
+    <Rule Id="SA1025" Action="Info" TemporarilyDisabled="true" />          <!-- Code should not contain multiple whitespace characters in a row -->
     <Rule Id="SA1026" Action="Warning" />       <!-- Keyword followed by span or blank line -->
     <Rule Id="SA1027" Action="Warning" />       <!-- Tabs and spaces should be used correctly -->
     <Rule Id="SA1028" Action="Info" TemporarilyDisabled="true" />       <!-- Code should not contain trailing whitespace -->
@@ -277,16 +277,16 @@
     <Rule Id="SA1101" Action="None" />          <!-- Prefix local calls with this -->
     <Rule Id="SA1102" Action="Warning" />       <!-- Query clause should follow previous clause -->
     <Rule Id="SA1105" Action="Warning" />       <!-- Query clauses spanning multiple lines should begin on own line -->
-    <Rule Id="SA1106" Action="None" />          <!-- Code should not contain empty statements -->
-    <Rule Id="SA1107" Action="None" />          <!-- Code should not contain multiple statements on one line -->
+    <Rule Id="SA1106" Action="Info" TemporarilyDisabled="true" />          <!-- Code should not contain empty statements -->
+    <Rule Id="SA1107" Action="Info" TemporarilyDisabled="true" />          <!-- Code should not contain multiple statements on one line -->
     <Rule Id="SA1108" Action="None" />          <!-- Block statements should not contain embedded comments -->
-    <Rule Id="SA1110" Action="None" />          <!-- Opening parenthesis or bracket should be on declaration line -->
+    <Rule Id="SA1110" Action="Info" TemporarilyDisabled="true" />          <!-- Opening parenthesis or bracket should be on declaration line -->
     <Rule Id="SA1111" Action="None" />          <!-- Closing parenthesis should be on line of last parameter -->
     <Rule Id="SA1113" Action="Info" TemporarilyDisabled="true" />       <!-- Comma should be on the same line as previous parameter -->
-    <Rule Id="SA1114" Action="None" />          <!-- Parameter list should follow declaration -->
+    <Rule Id="SA1114" Action="Info" TemporarilyDisabled="true"/>          <!-- Parameter list should follow declaration -->
     <Rule Id="SA1115" Action="Warning" />       <!-- Parameter should begin on the line after the previous parameter -->
-    <Rule Id="SA1116" Action="None" />          <!-- Split parameters should start on line after declaration -->
-    <Rule Id="SA1117" Action="None" />          <!-- Parameters should be on same line or separate lines -->
+    <Rule Id="SA1116" Action="Info" TemporarilyDisabled="true" />          <!-- Split parameters should start on line after declaration -->
+    <Rule Id="SA1117" Action="Info" TemporarilyDisabled="true"/>          <!-- Parameters should be on same line or separate lines -->
     <Rule Id="SA1118" Action="None" />          <!-- Parameter should not span multiple lines -->
     <Rule Id="SA1119" Action="None" />          <!-- Statement should not use unnecessary parenthesis -->
     <Rule Id="SA1120" Action="None" />          <!-- Comments should contain text -->
@@ -310,35 +310,35 @@
     <Rule Id="SA1141" Action="Warning" />       <!-- Use tuple syntax -->
     <Rule Id="SA1142" Action="Warning" />       <!-- Refer to tuple elements by name -->
     <Rule Id="SA1200" Action="None" />          <!-- Using directive should appear within a namespace declaration -->
-    <Rule Id="SA1201" Action="None" />          <!-- Elements should appear in the correct order -->
-    <Rule Id="SA1202" Action="None" />          <!-- Elements should be ordered by access -->
-    <Rule Id="SA1203" Action="None" />          <!-- Constants should appear before fields -->
-    <Rule Id="SA1204" Action="None" />          <!-- Static elements should appear before instance elements -->
+    <Rule Id="SA1201" Action="Info" TemporarilyDisabled="true" />          <!-- Elements should appear in the correct order -->
+    <Rule Id="SA1202" Action="Info" TemporarilyDisabled="true" />          <!-- Elements should be ordered by access -->
+    <Rule Id="SA1203" Action="Info" TemporarilyDisabled="true" />          <!-- Constants should appear before fields -->
+    <Rule Id="SA1204" Action="Info" TemporarilyDisabled="true" />          <!-- Static elements should appear before instance elements -->
     <Rule Id="SA1205" Action="Warning" />       <!-- Partial elements should declare an access modifier -->
     <Rule Id="SA1206" Action="Info" TemporarilyDisabled="true" />       <!-- Keyword ordering -->
-    <Rule Id="SA1208" Action="None" />          <!-- Using directive ordering -->
-    <Rule Id="SA1209" Action="None" />          <!-- Using alias directives should be placed after all using namespace directives -->
-    <Rule Id="SA1210" Action="None" />          <!-- Using directives should be ordered alphabetically by the namespaces -->
-    <Rule Id="SA1211" Action="None" />          <!-- Using alias directive ordering -->
+    <Rule Id="SA1208" Action="Info" TemporarilyDisabled="true" />          <!-- Using directive ordering -->
+    <Rule Id="SA1209" Action="Info" TemporarilyDisabled="true" />          <!-- Using alias directives should be placed after all using namespace directives -->
+    <Rule Id="SA1210" Action="Info" TemporarilyDisabled="true" />          <!-- Using directives should be ordered alphabetically by the namespaces -->
+    <Rule Id="SA1211" Action="Info" TemporarilyDisabled="true" />          <!-- Using alias directive ordering -->
     <Rule Id="SA1212" Action="Info" TemporarilyDisabled="true" />       <!-- A get accessor appears after a set accessor within a property or indexer -->
-    <Rule Id="SA1214" Action="None" />          <!-- Readonly fields should appear before non-readonly fields -->
+    <Rule Id="SA1214" Action="Info" TemporarilyDisabled="true" />          <!-- Readonly fields should appear before non-readonly fields -->
     <Rule Id="SA1216" Action="None" />          <!-- Using static directives should be placed at the correct location -->
-    <Rule Id="SA1300" Action="None" />          <!-- Element should begin with an uppercase letter -->
+    <Rule Id="SA1300" Action="Info" TemporarilyDisabled="true" />          <!-- Element should begin with an uppercase letter -->
     <Rule Id="SA1302" Action="Warning" />       <!-- Interface names should begin with I -->
-    <Rule Id="SA1303" Action="None" />          <!-- Const field names should begin with upper-case letter -->
-    <Rule Id="SA1304" Action="None" />          <!-- Non-private readonly fields should begin with upper-case letter -->
-    <Rule Id="SA1306" Action="None" />          <!-- Field should begin with lower-case letter -->
-    <Rule Id="SA1307" Action="None" />          <!-- Field should begin with upper-case letter -->
+    <Rule Id="SA1303" Action="Info" TemporarilyDisabled="true" />          <!-- Const field names should begin with upper-case letter -->
+    <Rule Id="SA1304" Action="Info" TemporarilyDisabled="true" />          <!-- Non-private readonly fields should begin with upper-case letter -->
+    <Rule Id="SA1306" Action="Info" TemporarilyDisabled="true" />          <!-- Field should begin with lower-case letter -->
+    <Rule Id="SA1307" Action="Info" TemporarilyDisabled="true" />          <!-- Field should begin with upper-case letter -->
     <Rule Id="SA1308" Action="None" />          <!-- Field should not begin with the prefix 's_' -->
     <Rule Id="SA1309" Action="None" />          <!-- Field names should not begin with underscore -->
-    <Rule Id="SA1310" Action="None" />          <!-- Field should not contain an underscore -->
-    <Rule Id="SA1311" Action="None" />          <!-- Static readonly fields should begin with upper-case letter -->
-    <Rule Id="SA1312" Action="None" />          <!-- Variable should begin with lower-case letter -->
-    <Rule Id="SA1313" Action="None" />          <!-- Parameter should begin with lower-case letter -->
+    <Rule Id="SA1310" Action="Info" TemporarilyDisabled="true" />          <!-- Field should not contain an underscore -->
+    <Rule Id="SA1311" Action="Info" TemporarilyDisabled="true" />          <!-- Static readonly fields should begin with upper-case letter -->
+    <Rule Id="SA1312" Action="Info" TemporarilyDisabled="true" />          <!-- Variable should begin with lower-case letter -->
+    <Rule Id="SA1313" Action="Info" TemporarilyDisabled="true" />          <!-- Parameter should begin with lower-case letter -->
     <Rule Id="SA1314" Action="None" />          <!-- Type parameter names should begin with T -->
-    <Rule Id="SA1316" Action="None" />          <!-- Tuple element names should use correct casing -->
+    <Rule Id="SA1316" Action="Info" TemporarilyDisabled="true" />          <!-- Tuple element names should use correct casing -->
     <Rule Id="SA1400" Action="Info" TemporarilyDisabled="true" />       <!-- Member should declare an access modifer -->
-    <Rule Id="SA1401" Action="None" />          <!-- Fields should be private -->
+    <Rule Id="SA1401" Action="Info" TemporarilyDisabled="true" />          <!-- Fields should be private -->
     <Rule Id="SA1402" Action="None" />          <!-- File may only contain a single type -->
     <Rule Id="SA1403" Action="None" />          <!-- File may only contain a single namespace -->
     <Rule Id="SA1404" Action="Warning" />       <!-- Code analysis suppression should have justification -->
@@ -349,24 +349,24 @@
     <Rule Id="SA1411" Action="Warning" />       <!-- Attribute constructor shouldn't use unnecessary parenthesis -->
     <Rule Id="SA1413" Action="None" />          <!-- Use trailing comma in multi-line initializers -->
     <Rule Id="SA1414" Action="None" />          <!-- Tuple types in signatures should have element names -->
-    <Rule Id="SA1500" Action="None" />          <!-- Braces for multi-line statements should not share line -->
+    <Rule Id="SA1500" Action="Info" TemporarilyDisabled="true" />          <!-- Braces for multi-line statements should not share line -->
     <Rule Id="SA1501" Action="None" />          <!-- Statement should not be on a single line -->
     <Rule Id="SA1502" Action="None" />          <!-- Element should not be on a single line -->
-    <Rule Id="SA1503" Action="None" />          <!-- Braces should not be omitted -->
+    <Rule Id="SA1503" Action="Info" TemporarilyDisabled="true" />          <!-- Braces should not be omitted -->
     <Rule Id="SA1504" Action="None" />          <!-- All accessors should be single-line or multi-line -->
-    <Rule Id="SA1505" Action="None" />          <!-- An opening brace should not be followed by a blank line -->
+    <Rule Id="SA1505" Action="Info" TemporarilyDisabled="true" />          <!-- An opening brace should not be followed by a blank line -->
     <Rule Id="SA1506" Action="None" />          <!-- Element documentation headers should not be followed by blank line -->
-    <Rule Id="SA1507" Action="None" />          <!-- Code should not contain multiple blank lines in a row -->
+    <Rule Id="SA1507" Action="Info" TemporarilyDisabled="true" />          <!-- Code should not contain multiple blank lines in a row -->
     <Rule Id="SA1508" Action="None" />          <!-- A closing brace should not be preceded by a blank line -->
     <Rule Id="SA1509" Action="None" />          <!-- Opening braces should not be preceded by blank line -->
     <Rule Id="SA1510" Action="None" />          <!-- 'else' statement should not be preceded by a blank line -->
     <Rule Id="SA1512" Action="None" />          <!-- Single-line comments should not be followed by blank line -->
     <Rule Id="SA1513" Action="None" />          <!-- Closing brace should be followed by blank line -->
-    <Rule Id="SA1514" Action="None" />          <!-- Element documentation header should be preceded by blank line -->
+    <Rule Id="SA1514" Action="Info" TemporarilyDisabled="true" />          <!-- Element documentation header should be preceded by blank line -->
     <Rule Id="SA1515" Action="None" />          <!-- Single-line comment should be preceded by blank line -->
     <Rule Id="SA1516" Action="None" />          <!-- Elements should be separated by blank line -->
     <Rule Id="SA1517" Action="Info" TemporarilyDisabled="true" />       <!-- Code should not contain blank lines at start of file -->
-    <Rule Id="SA1518" Action="Info" TemporarilyDisabled="true" />       <!-- Code should not contain blank lines at the end of the file -->
+    <Rule Id="SA1518" Action="None" />          <!-- Code should not contain blank lines at the end of the file -->
     <Rule Id="SA1519" Action="None" />          <!-- Braces should not be omitted from multi-line child statement -->
     <Rule Id="SA1520" Action="None" />          <!-- Use braces consistently -->
     <Rule Id="SA1600" Action="None" />          <!-- Elements should be documented -->
@@ -388,9 +388,9 @@
     <Rule Id="SA1623" Action="None" />          <!-- Property documentation text -->
     <Rule Id="SA1624" Action="None" />          <!-- Because the property only contains a visible get accessor, the documentation summary text should begin with 'Gets' -->
     <Rule Id="SA1625" Action="None" />          <!-- Element documentation should not be copied and pasted -->
-    <Rule Id="SA1626" Action="None" />          <!-- Single-line comments should not use documentation style slashes -->
+    <Rule Id="SA1626" Action="Info" TemporarilyDisabled="true" />          <!-- Single-line comments should not use documentation style slashes -->
     <Rule Id="SA1627" Action="None" />          <!-- The documentation text within the \'exception\' tag should not be empty -->
-    <Rule Id="SA1629" Action="None" />          <!-- Documentation text should end with a period -->
+    <Rule Id="SA1629" Action="Info" TemporarilyDisabled="true" />          <!-- Documentation text should end with a period -->
     <Rule Id="SA1633" Action="None" />          <!-- File should have header -->
     <Rule Id="SA1642" Action="None" />          <!-- Constructor summary documentation should begin with standard text -->
     <Rule Id="SA1643" Action="None" />          <!-- Destructor summary documentation should begin with standard text -->
