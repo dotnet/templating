@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.GlobalSettings;
@@ -62,7 +63,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                         }
                         try
                         {
-                            return _updateChecker.GetLatestVersionAsync(nugetSource);
+                            return _updateChecker.GetLatestVersionAsync(nugetSource, CancellationToken.None);
                         }
                         catch (PackageNotFoundException e)
                         {
@@ -99,7 +100,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 }
                 else
                 {
-                    nuGetPackageInfo = await _packageDownloader.DownloadPackageAsync(installRequest, _installPath).ConfigureAwait(false);
+                    nuGetPackageInfo = await _packageDownloader.DownloadPackageAsync(installRequest, _installPath, CancellationToken.None).ConfigureAwait(false);
                 }
 
                 sourceDetails[NuGetManagedTemplatesSource.AuthorKey] = nuGetPackageInfo.Author;
