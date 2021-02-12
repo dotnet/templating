@@ -326,6 +326,9 @@ namespace Microsoft.TemplateEngine.Cli
                     case InstallerErrorCode.UpdateUninstallFailed:
                         Reporter.Error.WriteLine($"Failed to install {packageToInstall}, failed to uninstall previous version of the template source.".Bold().Red());
                         break;
+                    case InstallerErrorCode.InvalidPackage:
+                        Reporter.Error.WriteLine($"Failed to install {packageToInstall}, the package is invalid.".Bold().Red());
+                        break;
                 }
             }
         }
