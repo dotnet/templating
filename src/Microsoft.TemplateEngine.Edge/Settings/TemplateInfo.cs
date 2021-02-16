@@ -10,6 +10,8 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 {
     public class TemplateInfo : ITemplateInfo, IShortNameList, ITemplateWithTimestamp
     {
+        public static readonly string CurrentVersion = "1.0.0.3";
+
         public TemplateInfo()
         {
             ShortNameList = new List<string>();
