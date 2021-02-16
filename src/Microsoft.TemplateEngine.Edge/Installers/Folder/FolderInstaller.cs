@@ -66,5 +66,10 @@ namespace Microsoft.TemplateEngine.Edge.Installers.Folder
         {
             return Task.FromResult(UninstallResult.CreateSuccess(managedSource));
         }
+
+        public Task<UpdateResult> UpdateAsync(UpdateRequest updateRequest)
+        {
+            return Task.FromResult(UpdateResult.CreateSuccess(updateRequest, updateRequest.Source));
+        }
     }
 }

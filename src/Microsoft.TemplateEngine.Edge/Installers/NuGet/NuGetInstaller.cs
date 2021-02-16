@@ -201,6 +201,31 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             }
         }
 
+        public async Task<UpdateResult> UpdateAsync(UpdateRequest updateRequest)
+        {
+            _ = updateRequest ?? throw new ArgumentNullException(nameof(updateRequest));
+            if (string.IsNullOrWhiteSpace(updateRequest.Version))
+            {
+                throw new ArgumentException("Version cannot be null or empty", nameof(updateRequest.Version));
+            }
+
+            InstallRequest installRequest = new InstallRequest
+            {
+                Identifier = updateRequest.Source.Identifier,
+                Version = updateRequest.Version
+            };
+
+            var nuGetManagedSource = updateRequest.Source as NuGetManagedTemplatesSource;
+            if (nuGetManagedSource != null && !string.IsNullOrWhiteSpace(nuGetManagedSource.NuGetSource))
+            {
+                installRequest.Details = new Dictionary<string, string>()
+                {
+                    { InstallerConstants.NuGetSourcesKey, nuGetManagedSource.NuGetSource }
+                };
+            }
+            return UpdateResult.FromInstallResult(updateRequest, await InstallAsync(installRequest).ConfigureAwait(false));
+        }
+
         private bool IsLocalPackage(InstallRequest installRequest)
         {
             return _environmentSettings.Host.FileSystem.FileExists(installRequest.Identifier);
