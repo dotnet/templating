@@ -301,10 +301,9 @@ namespace Microsoft.TemplateEngine.Cli
             Reporter.Output.WriteLine();
 
             var installResults = await managedSourceProvider.InstallAsync(installRequests).ConfigureAwait(false);
-            await _settingsLoader.RebuildCacheFromSettingsIfNotCurrent(true).ConfigureAwait(false);
             foreach (InstallResult result in installResults)
             {
-                DisplayInstallResult(result.InstallRequest.DisplayName, result);
+                await DisplayInstallResultAsync(result.InstallRequest.DisplayName, result);
                 if (!result.Success)
                 {
                     resultStatus = CreationResultStatus.CreateFailed;
@@ -313,14 +312,14 @@ namespace Microsoft.TemplateEngine.Cli
             return resultStatus;
         }
 
-        private void DisplayInstallResult(string packageToInstall, Result result)
+        private async Task DisplayInstallResultAsync(string packageToInstall, Result result)
         {
             if (result.Success)
             {
                 Reporter.Output.WriteLine($"The template source {result.Source.DisplayName} was successfully installed.");
                 Reporter.Output.WriteLine($"The following templates were installed:");
 
-                IEnumerable<ITemplateInfo> templates = result.Source.GetTemplates(EnvironmentSettings);
+                IEnumerable<ITemplateInfo> templates = await result.Source.GetTemplates(EnvironmentSettings).ConfigureAwait(false);
                 HelpForTemplateResolution.DisplayTemplateList(templates, EnvironmentSettings, _commandInput, _defaultLanguage);
             }
             else
@@ -385,7 +384,7 @@ namespace Microsoft.TemplateEngine.Cli
             }
 
             // No other cases specified, we've fallen through to "Optional usage help + List"
-            TemplateListResolutionResult templateResolutionResult = TemplateResolver.GetTemplateResolutionResultForListOrHelp(_settingsLoader.UserTemplateCache.TemplateInfo, _hostDataLoader, _commandInput, _defaultLanguage);
+            TemplateListResolutionResult templateResolutionResult = TemplateResolver.GetTemplateResolutionResultForListOrHelp(await _settingsLoader.GetTemplatesAsync(default), _hostDataLoader, _commandInput, _defaultLanguage);
             HelpForTemplateResolution.CoordinateHelpAndUsageDisplay(templateResolutionResult, EnvironmentSettings, _commandInput, _hostDataLoader, _telemetryLogger, _templateCreator, _defaultLanguage, showUsageHelp: _commandInput.IsHelpFlagSpecified);
 
             return CreationResultStatus.Success;
@@ -465,7 +464,7 @@ namespace Microsoft.TemplateEngine.Cli
                     }
                 }
 
-                IEnumerable<ITemplateInfo> templates = managedSource.GetTemplates(EnvironmentSettings);
+                IEnumerable<ITemplateInfo> templates = await managedSource.GetTemplates(EnvironmentSettings);
                 if (templates.Any())
                 {
                     Reporter.Output.WriteLine($"    {LocalizableStrings.Templates}:");
@@ -491,23 +490,23 @@ namespace Microsoft.TemplateEngine.Cli
             }
         }
 
-        private Task<CreationResultStatus> EnterTemplateManipulationFlowAsync()
+        private async Task<CreationResultStatus> EnterTemplateManipulationFlowAsync()
         {
             if (_commandInput.IsListFlagSpecified || _commandInput.IsHelpFlagSpecified)
             {
-                TemplateListResolutionResult listingTemplateResolutionResult = TemplateResolver.GetTemplateResolutionResultForListOrHelp(_settingsLoader.UserTemplateCache.TemplateInfo, _hostDataLoader, _commandInput, _defaultLanguage);
-                return Task.FromResult(HelpForTemplateResolution.CoordinateHelpAndUsageDisplay(listingTemplateResolutionResult, EnvironmentSettings, _commandInput, _hostDataLoader, _telemetryLogger, _templateCreator, _defaultLanguage, showUsageHelp: _commandInput.IsHelpFlagSpecified));
+                TemplateListResolutionResult listingTemplateResolutionResult = TemplateResolver.GetTemplateResolutionResultForListOrHelp(await _settingsLoader.GetTemplatesAsync(default), _hostDataLoader, _commandInput, _defaultLanguage);
+                return HelpForTemplateResolution.CoordinateHelpAndUsageDisplay(listingTemplateResolutionResult, EnvironmentSettings, _commandInput, _hostDataLoader, _telemetryLogger, _templateCreator, _defaultLanguage, showUsageHelp: _commandInput.IsHelpFlagSpecified);
             }
 
-            TemplateResolutionResult templateResolutionResult = TemplateResolver.GetTemplateResolutionResult(_settingsLoader.UserTemplateCache.TemplateInfo, _hostDataLoader, _commandInput, _defaultLanguage);
+            TemplateResolutionResult templateResolutionResult = TemplateResolver.GetTemplateResolutionResult(await _settingsLoader.GetTemplatesAsync(default), _hostDataLoader, _commandInput, _defaultLanguage);
             if (templateResolutionResult.ResolutionStatus == TemplateResolutionResult.Status.SingleMatch)
             {
                 TemplateInvocationCoordinator invocationCoordinator = new TemplateInvocationCoordinator(_settingsLoader, _commandInput, _telemetryLogger, CommandName, _inputGetter, _callbacks);
-                return invocationCoordinator.CoordinateInvocationOrAcquisitionAsync(templateResolutionResult.TemplateToInvoke);
+                return await invocationCoordinator.CoordinateInvocationOrAcquisitionAsync(templateResolutionResult.TemplateToInvoke);
             }
             else
             {
-                return HelpForTemplateResolution.CoordinateAmbiguousTemplateResolutionDisplay(templateResolutionResult, EnvironmentSettings, _commandInput, _defaultLanguage);
+                return await HelpForTemplateResolution.CoordinateAmbiguousTemplateResolutionDisplay(templateResolutionResult, EnvironmentSettings, _commandInput, _defaultLanguage);
             }
         }
 
@@ -574,7 +573,7 @@ namespace Microsoft.TemplateEngine.Cli
             {
                 if (!string.IsNullOrEmpty(_commandInput.Alias) && !_commandInput.IsHelpFlagSpecified)
                 {
-                    return AliasSupport.ManipulateAliasIfValid(_aliasRegistry, _commandInput.Alias, _commandInput.Tokens.ToList(), AllTemplateShortNames);
+                    return AliasSupport.ManipulateAliasIfValid(_aliasRegistry, _commandInput.Alias, _commandInput.Tokens.ToList(), await GetAllTemplateShortNamesAsync());
                 }
 
                 if (_commandInput.CheckForUpdates || _commandInput.ApplyUpdates)
@@ -629,7 +628,7 @@ namespace Microsoft.TemplateEngine.Cli
                         {
                             success = CreationResultStatus.CreateFailed;
                         }
-                        DisplayInstallResult(updateResult.Source?.DisplayName, updateResult);
+                        await DisplayInstallResultAsync(updateResult.Source?.DisplayName, updateResult).ConfigureAwait(false);
                     }
                 }
                 else
@@ -657,8 +656,6 @@ namespace Microsoft.TemplateEngine.Cli
                 }
 
                 EnvironmentSettings.Host.UpdateLocale(newLocale);
-                // cache the templates for the new locale
-                _settingsLoader.Reload();
             }
 
             return true;
@@ -710,28 +707,25 @@ namespace Microsoft.TemplateEngine.Cli
             return true;
         }
 
-        private HashSet<string> AllTemplateShortNames
+        private async Task<HashSet<string>> GetAllTemplateShortNamesAsync()
         {
-            get
+            IReadOnlyCollection<ITemplateMatchInfo> allTemplates = TemplateResolver.PerformAllTemplatesQuery(await _settingsLoader.GetTemplatesAsync(default), _hostDataLoader);
+
+            HashSet<string> allShortNames = new HashSet<string>(StringComparer.Ordinal);
+
+            foreach (ITemplateMatchInfo templateMatchInfo in allTemplates)
             {
-                IReadOnlyCollection<ITemplateMatchInfo> allTemplates = TemplateResolver.PerformAllTemplatesQuery(_settingsLoader.UserTemplateCache.TemplateInfo, _hostDataLoader);
-
-                HashSet<string> allShortNames = new HashSet<string>(StringComparer.Ordinal);
-
-                foreach (ITemplateMatchInfo templateMatchInfo in allTemplates)
+                if (templateMatchInfo.Info is IShortNameList templateWithShortNameList)
                 {
-                    if (templateMatchInfo.Info is IShortNameList templateWithShortNameList)
-                    {
-                        allShortNames.UnionWith(templateWithShortNameList.ShortNameList);
-                    }
-                    else
-                    {
-                        allShortNames.Add(templateMatchInfo.Info.ShortName);
-                    }
+                    allShortNames.UnionWith(templateWithShortNameList.ShortNameList);
                 }
-
-                return allShortNames;
+                else
+                {
+                    allShortNames.Add(templateMatchInfo.Info.ShortName);
+                }
             }
+
+            return allShortNames;
         }
 
         private void ShowConfig()
