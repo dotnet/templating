@@ -11,6 +11,7 @@
         <NoWarn>$(NoWarn);NU5128</NoWarn>
         <IsPackable>true</IsPackable>
         <IsShipping>false</IsShipping>
+        <NoDefaultExcludes>true</NoDefaultExcludes>
     </PropertyGroup>
     <ItemGroup>
         <Compile Remove="**\*"  />

@@ -49,9 +49,9 @@ namespace Microsoft.TemplateEngine.Utils
             {
                 list.Add(new TemplatesSource(this, nupkg, GetLastWriteTimeUtc(nupkg)));
             }
-            foreach (var nupkg in expandedFolders)
+            foreach (var folder in expandedFolders)
             {
-                list.Add(new TemplatesSource(this, nupkg, GetLastWriteTimeUtc(nupkg)));
+                list.Add(new TemplatesSource(this, folder, GetLastWriteTimeUtc(folder)));
             }
             return Task.FromResult<IReadOnlyList<ITemplatesSource>>(list);
         }
