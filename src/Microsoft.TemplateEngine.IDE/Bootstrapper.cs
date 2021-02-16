@@ -80,8 +80,7 @@ namespace Microsoft.TemplateEngine.IDE
         public async Task<IReadOnlyCollection<IFilteredTemplateInfo>> ListTemplates(bool exactMatchesOnly, params Func<ITemplateInfo, MatchInfo?>[] filters)
         {
             EnsureInitialized();
-            await EnvironmentSettings.SettingsLoader.RebuildCacheFromSettingsIfNotCurrent(false).ConfigureAwait(false);
-            return TemplateListFilter.FilterTemplates(((SettingsLoader)EnvironmentSettings.SettingsLoader).UserTemplateCache.TemplateInfo, exactMatchesOnly, filters);
+            return TemplateListFilter.FilterTemplates(await EnvironmentSettings.SettingsLoader.GetTemplatesAsync(default).ConfigureAwait(false), exactMatchesOnly, filters);
         }
 
         public async Task<ICreationResult> CreateAsync(ITemplateInfo info, string name, string outputPath, IReadOnlyDictionary<string, string> parameters, bool skipUpdateCheck, string baselineName)
