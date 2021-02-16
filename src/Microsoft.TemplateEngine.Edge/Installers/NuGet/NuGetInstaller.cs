@@ -12,6 +12,7 @@ using Microsoft.TemplateEngine.Abstractions.GlobalSettings;
 using Microsoft.TemplateEngine.Abstractions.Installer;
 using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
 using NuGet.Packaging;
+using NuGet.Versioning;
 
 namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
@@ -40,8 +41,36 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
         public Task<bool> CanInstallAsync(InstallRequest installationRequest)
         {
-            //TODO: Do better than this? This should be good enough as long as we only have Folder and NuGet installers...
-            return Task.FromResult(!string.IsNullOrWhiteSpace(installationRequest.Identifier) && !Directory.Exists(installationRequest.Identifier));
+            try
+            {
+                ReadPackageInformation(installationRequest.Identifier);
+            }
+            catch (Exception)
+            {
+                _environmentSettings.Host.LogDiagnosticMessage($"{installationRequest.Identifier} is not a local NuGet package.", "Installer");
+
+                //check if identifier is a valid package ID
+                bool validPackageId = PackageIdValidator.IsValidPackageId(installationRequest.Identifier);
+                //check if version is specified it is correct version
+                bool hasValidVersion = string.IsNullOrWhiteSpace(installationRequest.Version) || NuGetVersion.TryParse(installationRequest.Version, out _);
+                if (!validPackageId)
+                {
+                    _environmentSettings.Host.LogDiagnosticMessage($"{installationRequest.Identifier} is not a valid NuGet package ID.", "Installer");
+                }
+                if (!hasValidVersion)
+                {
+                    _environmentSettings.Host.LogDiagnosticMessage($"{installationRequest.Version} is not a valid NuGet package version.", "Installer");
+                }
+                if (validPackageId && hasValidVersion)
+                {
+                    _environmentSettings.Host.LogDiagnosticMessage($"{installationRequest.Version} is identified as the downloadable NuGet package.", "Installer");
+                }
+
+                //not a local package file
+                return Task.FromResult(validPackageId && hasValidVersion);
+            }
+            _environmentSettings.Host.LogDiagnosticMessage($"{installationRequest.Identifier} is identified as the local NuGet package.", "Installer");
+            return Task.FromResult(true);
         }
 
         public IManagedTemplatesSource Deserialize(IManagedTemplatesSourcesProvider provider, TemplatesSourceData data)
