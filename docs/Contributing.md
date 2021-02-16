@@ -28,16 +28,13 @@ To contribute, please fork the repo and develop in a feature branch off the curr
 ## Running ##
 1. Run `dotnet new3` at the command line
 
-### Note for Windows users ###
-The location `dotnet-new3.exe` gets built to will be placed at the start of the `PATH` environment variable, so it won't become available in console windows (other than the one you've built in) that are already open. To run in already open windows, you can add the `dev` directory (created during the build) to the `PATH` environment variable, or run `dotnet-new3.exe` from that directory.
-
 [Top](#top)
 
 # Coding Style #
 
 Most of the styling is enforced by analyzers and the rules covered by the analyzers are not listed in this section. Therefore, it is highly recommended to use an IDE with Roslyn analyzers support (such as Visual Studio or Visual Studio Code).
 
-* We use explicit types (no usages of `var`)
+* We only use var when the variable type is obvious.
 * We avoid this, unless absolutely necessary.
 * We use `_camelCase` for private fields.
 * Use readonly where possible.
@@ -57,11 +54,11 @@ Some of the analyzer rules are currently being treated as "info/suggestion"s ins
 
 We do development in *master* branch. After a release branch is created, any new changes that should be included in that release are cherry-picked from *master*.
 
-We follow the same versioning as https://github.com/dotnet/sdk and release branches are named after the version numbers. For instance, `release/5.0.2xx` branch ships with .Net SDK 5.0.102.
+We follow the same versioning as https://github.com/dotnet/sdk and release branches are named after the version numbers. For instance, `release/5.0.2xx` branch ships with .Net SDK 5.0.202.
 
 | Topic | Branch |
 |-------|-------|
 | Development | *master* |
-| Current Release | *release/6.0.1xx-preview1* |
+| Release | *release/** |
 
 [Top](#top)

@@ -1,8 +1,9 @@
-Fixes dotnet/templating#<issue_number>
+### Problem
+Add the issue number if exists. Describe the problem otherwise.
 
-This PR contains the following changes:
-- <briefly_explain_changes>
-- 
+### Solution
+Describe the solution.
 
-Checks:
+### Checks:
+- [ ] Added unit tests
 - [ ] Added `#nullable enable` to all the modified files [?](https://github.com/dotnet/templating/wiki/Contributing#coding-style)
