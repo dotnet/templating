@@ -4,16 +4,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Microsoft.TemplateEngine.Utils
 {
     public static class TemplatesSourceExtensions
     {
-        public static IEnumerable<ITemplateInfo> GetTemplates (this ITemplatesSource templateSource, IEngineEnvironmentSettings settings)
+        public static async Task<IEnumerable<ITemplateInfo>> GetTemplates (this ITemplatesSource templateSource, IEngineEnvironmentSettings settings)
         {
-            HashSet<ITemplateInfo> templateCache = new HashSet<ITemplateInfo>();
-            settings.SettingsLoader.GetTemplates(templateCache);
-            return templateCache.Where(t => t.MountPointUri == templateSource.MountPointUri);
+            var allTemplates = await settings.SettingsLoader.GetTemplatesAsync(default);
+            return allTemplates.Where(t => t.MountPointUri == templateSource.MountPointUri);
         }
     }
 }

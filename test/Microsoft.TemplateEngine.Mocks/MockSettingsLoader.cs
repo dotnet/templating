@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.GlobalSettings;
@@ -41,6 +42,8 @@ namespace Microsoft.TemplateEngine.Mocks
         {
             throw new NotImplementedException();
         }
+
+        public Task<IReadOnlyList<ITemplateInfo>> GetTemplatesAsync(CancellationToken token) => throw new NotImplementedException();
 
         public ITemplate LoadTemplate(ITemplateInfo info, string baselineName)
         {

@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Cli.PostActionProcessors;
 using Microsoft.TemplateEngine.Cli.TemplateResolution;
@@ -24,7 +25,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateInstallTests
         private static readonly string CommandName = "new3";
 
         [Fact(DisplayName = nameof(NupkgReinstallDoesntRemoveTemplates))]
-        public void NupkgReinstallDoesntRemoveTemplates()
+        public async Task NupkgReinstallDoesntRemoveTemplates()
         {
             const string nupkgToInstallName = "TestNupkgInstallTemplate.0.0.1.nupkg";
             const string checkTemplateName = "nupkginstall";    // this is the short name of the template in the nupkg that gets installed.
@@ -59,17 +60,15 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateInstallTests
             IHostSpecificDataLoader hostDataLoader = new MockHostSpecificDataLoader();
 
             // check that the template was installed from the first install.
-            IReadOnlyCollection<ITemplateMatchInfo> allTemplates = TemplateResolver.PerformAllTemplatesQuery(settingsLoader.UserTemplateCache.TemplateInfo, hostDataLoader);
+            IReadOnlyCollection<ITemplateMatchInfo> allTemplates = TemplateResolver.PerformAllTemplatesQuery(await settingsLoader.GetTemplatesAsync(default), hostDataLoader);
             Assert.Contains(checkTemplateName, allTemplates.Select(t => t.Info.ShortName));
 
             // install the same test pack again
             int secondInstallResult = New3Command.Run(CommandName, host, telemetryLogger, null, installArgs);
             Assert.NotEqual(0, secondInstallResult);
 
-            settingsLoader.Reload();
-
             // check that the template is still installed after the second install.
-            IReadOnlyCollection<ITemplateMatchInfo> allTemplatesAfterSecondInstall = TemplateResolver.PerformAllTemplatesQuery(settingsLoader.UserTemplateCache.TemplateInfo, hostDataLoader);
+            IReadOnlyCollection<ITemplateMatchInfo> allTemplatesAfterSecondInstall = TemplateResolver.PerformAllTemplatesQuery(await settingsLoader.GetTemplatesAsync(default), hostDataLoader);
             Assert.Contains(checkTemplateName, allTemplatesAfterSecondInstall.Select(t => t.Info.ShortName));
         }
 
