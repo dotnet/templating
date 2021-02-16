@@ -291,6 +291,9 @@ namespace Microsoft.TemplateEngine.Edge
             private string _contentDir;
             private string _packagesDir;
             private string _nugetScrapedTemplatesFile;
+            private string _templatesCacheFile;
+
+            private readonly Paths _parent;
 
             public UserPaths(Paths parent)
             {
@@ -319,43 +322,9 @@ namespace Microsoft.TemplateEngine.Edge
 
             public string NuGetScrapedTemplateSearchFile => _parent.GetOrComputePath(ref _nugetScrapedTemplatesFile, BaseDir, "inBoxNugetScrapedTemplateSearchFile.json");
 
-            public string CultureNeutralTemplateCacheFile
-            {
-                get
-                {
-                    return ExplicitLocaleTemplateCacheFile(null);
-                }
-            }
-
-            public string CurrentLocaleTemplateCacheFile
-            {
-                get
-                {
-                    return ExplicitLocaleTemplateCacheFile(_parent._environmentSettings.Host.Locale);
-                }
-            }
-
-            public readonly string TemplateCacheFileBaseName = "templatecache.json";
-            private readonly Paths _parent;
-
-            public string ExplicitLocaleTemplateCacheFile(string locale)
-            {
-                string filename;
-
-                if (string.IsNullOrEmpty(locale))
-                {
-                    filename = TemplateCacheFileBaseName;
-                }
-                else
-                {
-                    filename = locale + "." + TemplateCacheFileBaseName;
-                }
-
-                string tempCache = null;    // don't cache, the locale could change
-                return _parent.GetOrComputePath(ref tempCache, BaseDir, filename);
-            }
+            public string TemplateCacheFile => _parent.GetOrComputePath(ref _templatesCacheFile, BaseDir, "templatecache.json");
 
             public string NuGetConfig => _parent.GetOrComputePath(ref _nuGetConfig, BaseDir, "NuGet.config");
         }
-    }
+    } 
 }

@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Edge.Settings
 {
-    public class TemplateCache
+    internal class TemplateCache
     {
         private IDictionary<string, ITemplate> _templateMemoryCache = new Dictionary<string, ITemplate>();
 
@@ -23,19 +23,20 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             _environmentSettings = environmentSettings;
             _paths = new Paths(environmentSettings);
             TemplateInfo = new List<TemplateInfo>();
+            Locale = environmentSettings.Host?.Locale;
         }
 
-        public TemplateCache(IEngineEnvironmentSettings environmentSettings, List<TemplateInfo> templatesInCache)
-            :this(environmentSettings)
-        {
-            TemplateInfo = templatesInCache;
-        }
-
-        public TemplateCache(IEngineEnvironmentSettings environmentSettings, JObject parsed, string cacheVersion)
+        public TemplateCache(IEngineEnvironmentSettings environmentSettings, JObject parsed)
             : this(environmentSettings)
         {
-            TemplateInfo = ParseCacheContent(parsed, cacheVersion);
+            ParseCacheContent(parsed);
         }
+
+        [JsonProperty]
+        public string Version { get; private set; }
+
+        [JsonProperty]
+        public string Locale { get; private set; }
 
         [JsonProperty]
         public IReadOnlyList<TemplateInfo> TemplateInfo { get; set; }
@@ -80,28 +81,25 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             AddTemplatesAndLangPacksFromScanResult(scanResult);
         }
 
-        // returns a list of the templates with the specified localization.
-        // does not change which locale is cached in this TemplateCache instance.
-        public IReadOnlyList<TemplateInfo> GetTemplatesForLocale(string locale, string existingCacheVersion)
+        private void ParseCacheContent(JObject contentJobject)
         {
-            string cacheContent = _paths.ReadAllText(_paths.User.ExplicitLocaleTemplateCacheFile(locale), "{}");
-
-            try
+            if (contentJobject.TryGetValue(nameof(Version), StringComparison.OrdinalIgnoreCase, out JToken versionToken))
             {
-                JObject parsed = JObject.Parse(cacheContent);
-                return ParseCacheContent(parsed, existingCacheVersion);
+                Version = versionToken.ToString();
             }
-            catch
+            else
             {
-                return Empty<TemplateInfo>.List.Value;
+                Version = string.Empty;
             }
-        }
 
-        private static IReadOnlyList<TemplateInfo> ParseCacheContent(JObject contentJobject, string cacheVersion)
-        {
+            if (contentJobject.TryGetValue(nameof(Locale), StringComparison.OrdinalIgnoreCase, out JToken localeToken))
+            {
+                Locale = localeToken.ToString();
+            }
+
             List<TemplateInfo> templateList = new List<TemplateInfo>();
 
-            if (contentJobject.TryGetValue("TemplateInfo", StringComparison.OrdinalIgnoreCase, out JToken templateInfoToken))
+            if (contentJobject.TryGetValue(nameof(TemplateInfo), StringComparison.OrdinalIgnoreCase, out JToken templateInfoToken))
             {
                 if (templateInfoToken is JArray arr)
                 {
@@ -109,119 +107,30 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     {
                         if (entry != null && entry.Type == JTokenType.Object)
                         {
-                            templateList.Add(Settings.TemplateInfo.FromJObject((JObject)entry, cacheVersion));
+                            templateList.Add(Settings.TemplateInfo.FromJObject((JObject)entry, Version));
                         }
                     }
                 }
             }
 
-            return templateList;
-        }
-
-        // Writes template caches for each of the following:
-        //  - current locale
-        //  - cultures for which new langpacks are installed
-        //  - other locales with existing caches are regenerated.
-        //  - neutral locale
-        internal void WriteTemplateCaches(string existingCacheVersion)
-        {
-            string currentLocale = _environmentSettings.Host.Locale;
-            HashSet<string> localesWritten = new HashSet<string>();
-
-            // If the current locale exists, always write it.
-            if (! string.IsNullOrEmpty(currentLocale))
-            {
-                WriteTemplateCacheForLocale(currentLocale, existingCacheVersion);
-                localesWritten.Add(currentLocale);
-            }
-
-            // write caches for any locales which had new langpacks installed
-            foreach (string langpackLocale in _localizationMemoryCache.Keys)
-            {
-                WriteTemplateCacheForLocale(langpackLocale, existingCacheVersion);
-                localesWritten.Add(langpackLocale);
-            }
-
-            // read the cache dir for other locale caches, and re-write them.
-            // there may be new templates to add to them.
-            foreach (string locale in AllLocalesWithCacheFiles)
-            {
-                if (!localesWritten.Contains(locale))
-                {
-                    WriteTemplateCacheForLocale(locale, existingCacheVersion);
-                    localesWritten.Add(locale);
-                }
-            }
-
-            // always write the culture neutral cache
-            // It must be written last because when a cache for a culture is first created, it's based on the
-            // culture neutral cache, plus newly registered templates.
-            // If the culture neutral cache is updated before the new cache is first written,
-            // the new cache will have duplicate values.
-            //
-            // being last may not matter anymore due to changes after the comment was written.
-            WriteTemplateCacheForLocale(null, existingCacheVersion);
-        }
-
-        [JsonIgnore]
-        public IReadOnlyList<string> AllLocalesWithCacheFiles
-        {
-            get
-            {
-                List<string> locales = new List<string>();
-
-                string fileSearchPattern = "*." + _paths.User.TemplateCacheFileBaseName;
-                foreach (string fullFilename in _paths.EnumerateFiles(_paths.User.BaseDir, fileSearchPattern, SearchOption.TopDirectoryOnly))
-                {
-                    string filename = Path.GetFileName(fullFilename);
-                    string[] fileParts = filename.Split(new[] { '.' }, 2);
-                    string fileLocale = fileParts[0];
-
-                    if (!string.IsNullOrEmpty(fileLocale) &&
-                        (fileParts[1] == _paths.User.TemplateCacheFileBaseName))
-                    {
-                        locales.Add(fileLocale);
-                    }
-                }
-
-                return locales;
-            }
+            TemplateInfo = templateList;
         }
 
         public void DeleteAllLocaleCacheFiles()
         {
-            foreach (string locale in AllLocalesWithCacheFiles)
-            {
-                string fullFilename = _paths.User.ExplicitLocaleTemplateCacheFile(locale);
-                _paths.Delete(fullFilename);
-            }
-
-            _paths.Delete(_paths.User.CultureNeutralTemplateCacheFile);
+            _paths.Delete(_paths.User.TemplateCacheFile);
         }
 
-        private void WriteTemplateCacheForLocale(string locale, string existingCacheVersion)
+        public void WriteTemplateCaches(HashSet<string> mountPoints)
         {
-            IReadOnlyList<TemplateInfo> existingTemplatesForLocale = GetTemplatesForLocale(locale, existingCacheVersion);
-            IDictionary<string, ILocalizationLocator> existingLocatorsForLocale;
             bool hasContentChanges = false;
 
-            if (existingTemplatesForLocale.Count == 0)
-            {   // the cache for this locale didn't exist previously. Start with the neutral locale as if it were the existing (no locales)
-                existingTemplatesForLocale = GetTemplatesForLocale(null, existingCacheVersion);
-                existingLocatorsForLocale = new Dictionary<string, ILocalizationLocator>();
-                hasContentChanges = true;
-            }
-            else
-            {
-                existingLocatorsForLocale = GetLocalizationsFromTemplates(existingTemplatesForLocale, locale);
-            }
-
             HashSet<string> foundTemplates = new HashSet<string>();
-            List<ITemplateInfo> mergedTemplateList = new List<ITemplateInfo>();
+            List<TemplateInfo> mergedTemplateList = new List<TemplateInfo>();
 
             // These are from langpacks being installed... identity -> locator
-            if (string.IsNullOrEmpty(locale)
-                || !_localizationMemoryCache.TryGetValue(locale, out IDictionary<string, ILocalizationLocator> newLocatorsForLocale))
+            if (string.IsNullOrEmpty(Locale)
+                || !_localizationMemoryCache.TryGetValue(Locale, out IDictionary<string, ILocalizationLocator> newLocatorsForLocale))
             {
                 newLocatorsForLocale = new Dictionary<string, ILocalizationLocator>();
             }
@@ -232,7 +141,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
             foreach (ITemplate newTemplate in _templateMemoryCache.Values)
             {
-                ILocalizationLocator locatorForTemplate = GetPreferredLocatorForTemplate(newTemplate.Identity, existingLocatorsForLocale, newLocatorsForLocale);
+                ILocalizationLocator locatorForTemplate = GetPreferredLocatorForTemplate(newTemplate.Identity, newLocatorsForLocale);
                 TemplateInfo localizedTemplate = LocalizeTemplate(newTemplate, locatorForTemplate);
                 mergedTemplateList.Add(localizedTemplate);
                 foundTemplates.Add(newTemplate.Identity);
@@ -240,29 +149,49 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 hasContentChanges = true;   // new template
             }
 
-            foreach (TemplateInfo existingTemplate in existingTemplatesForLocale)
+            foreach (TemplateInfo existingTemplate in TemplateInfo)
             {
                 if (!foundTemplates.Contains(existingTemplate.Identity))
                 {
-                    ILocalizationLocator locatorForTemplate = GetPreferredLocatorForTemplate(existingTemplate.Identity, existingLocatorsForLocale, newLocatorsForLocale);
-                    TemplateInfo localizedTemplate = LocalizeTemplate(existingTemplate, locatorForTemplate);
-                    mergedTemplateList.Add(localizedTemplate);
+                    mergedTemplateList.Add(existingTemplate);
                     foundTemplates.Add(existingTemplate.Identity);
                 }
             }
-
-            _environmentSettings.SettingsLoader.WriteTemplateCache(mergedTemplateList, locale, hasContentChanges);
+            WriteTemplateCache(mountPoints, mergedTemplateList, hasContentChanges);
         }
 
-        // find the best locator (if any). New is preferred over old
-        private ILocalizationLocator GetPreferredLocatorForTemplate(string identity, IDictionary<string, ILocalizationLocator> existingLocatorsForLocale, IDictionary<string, ILocalizationLocator> newLocatorsForLocale)
+        private void WriteTemplateCache(HashSet<string> mountPoints, List<TemplateInfo> templates, bool hasContentChanges)
         {
-            if (!newLocatorsForLocale.TryGetValue(identity, out ILocalizationLocator locatorForTemplate))
+            bool hasMountPointChanges = false;
+
+            for (int i = 0; i < templates.Count; ++i)
             {
-                existingLocatorsForLocale.TryGetValue(identity, out locatorForTemplate);
+                if (!mountPoints.Contains(templates[i].MountPointUri))
+                {
+                    templates.RemoveAt(i);
+                    --i;
+                    hasMountPointChanges = true;
+                    continue;
+                }
             }
 
-            return locatorForTemplate;
+            this.Version = Settings.TemplateInfo.CurrentVersion;
+            this.TemplateInfo = templates;
+
+            if (hasContentChanges || hasMountPointChanges)
+            {
+                JObject serialized = JObject.FromObject(this);
+                _paths.WriteAllText(_paths.User.TemplateCacheFile, serialized.ToString());
+            }
+        }
+
+        private ILocalizationLocator GetPreferredLocatorForTemplate(string identity, IDictionary<string, ILocalizationLocator> newLocatorsForLocale)
+        {
+            if (newLocatorsForLocale.TryGetValue(identity, out ILocalizationLocator locatorForTemplate))
+            {
+                return locatorForTemplate;
+            }
+            return null;
         }
 
         private TemplateInfo LocalizeTemplate(ITemplateInfo template, ILocalizationLocator localizationInfo)
