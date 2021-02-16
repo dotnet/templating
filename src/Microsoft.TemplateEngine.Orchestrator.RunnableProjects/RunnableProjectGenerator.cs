@@ -221,15 +221,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     return false;
                 }
 
-                // Record the timestamp of the template file so we
-                // know to reload it if it changes
-                if (Uri.TryCreate(templateFile.MountPoint.MountPointUri, UriKind.Absolute, out var uri) &&
-                    host.FileSystem.DirectoryExists(uri.LocalPath) &&
-                    host.FileSystem is IFileLastWriteTimeSource timeSource)
-                {
-                    var physicalPath = Path.Combine(uri.LocalPath, templateFile.FullPath.TrimStart('/'));
-                    runnableProjectTemplate.ConfigTimestampUtc = timeSource.GetLastWriteTimeUtc(physicalPath);
-                }
+                runnableProjectTemplate.ConfigTimestampUtc = DateTime.UtcNow;
 
                 template = runnableProjectTemplate;
                 return true;
