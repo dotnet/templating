@@ -72,7 +72,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             catch (Exception e)
             {
                 _nugetLogger.LogError($"Failed to load the NuGet source {source.Source}.");
-                _nugetLogger.LogDebug($"Reason: {e.Message}.");
+                _nugetLogger.LogDebug($"Details: {e.ToString()}.");
                 throw new InvalidNuGetSourceException("Failed to load NuGet source", new[] { source.Source }, e);
             }
 
@@ -113,7 +113,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                     catch (Exception ex)
                     {
                         _nugetLogger.LogWarning($"Failed to remove {filePath} after failed download. Remove the file manually if it exists.");
-                        _nugetLogger.LogDebug($"Reason: {ex.Message}.");
+                        _nugetLogger.LogDebug($"Details: {ex.ToString()}.");
                     }
                     throw new DownloadException(packageMetadata.Identity.Id, packageMetadata.Identity.Version.ToNormalizedString(), new[] { source.Source });
                 }
@@ -121,7 +121,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             catch (Exception e)
             {
                 _nugetLogger.LogWarning($"Failed to download {packageMetadata.Identity.Id}::{packageMetadata.Identity.Version} from NuGet feed {source.Source}.");
-                _nugetLogger.LogDebug($"Reason: {e.Message}.");
+                _nugetLogger.LogDebug($"Details: {e.ToString()}.");
                 try
                 {
                     _environmentSettings.Host.FileSystem.FileDelete(filePath);
@@ -129,7 +129,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 catch (Exception ex)
                 {
                     _nugetLogger.LogWarning($"Failed to remove {filePath} after failed download. Remove the file manually if it exists.");
-                    _nugetLogger.LogDebug($"Reason: {ex.Message}.");
+                    _nugetLogger.LogDebug($"Details: {ex.ToString()}.");
                 }
                 throw new DownloadException(packageMetadata.Identity.Id, packageMetadata.Identity.Version.ToNormalizedString(), new[] { source.Source }, e.InnerException);
             }
@@ -269,7 +269,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             catch (Exception ex)
             {
                 _nugetLogger.LogError($"Failed to read package information from NuGet source {source.Source}.");
-                _nugetLogger.LogDebug($"Reason: {ex.Message}.");
+                _nugetLogger.LogDebug($"Details: {ex.ToString()}.");
             }
             return null;
         }
@@ -288,7 +288,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             catch (Exception ex)
             {
                 _nugetLogger.LogError($"Failed to load NuGet sources configured for the folder {currentDirectory}.");
-                _nugetLogger.LogDebug($"Reason: {ex.Message}.");
+                _nugetLogger.LogDebug($"Details: {ex.ToString()}.");
                 throw new InvalidNuGetSourceException($"Failed to load NuGet sources configured for the folder {currentDirectory}", ex);
             }
 
