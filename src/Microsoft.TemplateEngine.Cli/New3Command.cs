@@ -610,18 +610,22 @@ namespace Microsoft.TemplateEngine.Cli
 
                 if (applyUpdates)
                 {
+                    Reporter.Output.WriteLine("The following template sources will be installed:");
+                    foreach (CheckUpdateResult update in updatesToApply)
+                    {
+                        Reporter.Output.WriteLine($"  {update.Source.Identifier}, version: {update.Version}");
+                    }
+                    Reporter.Output.WriteLine();
+
                     IReadOnlyList<UpdateResult> updateResults = await provider.UpdateAsync(updatesToApply.Select(update => UpdateRequest.FromCheckUpdateResult(update))).ConfigureAwait(false);
+                    await _settingsLoader.RebuildCacheFromSettingsIfNotCurrent(true).ConfigureAwait(false);
                     foreach (var updateResult in updateResults)
                     {
-                        if (updateResult.Success)
-                        {
-                            await _settingsLoader.RebuildCacheFromSettingsIfNotCurrent(true).ConfigureAwait(false);
-                        }
-                        else
+                        if (!updateResult.Success)
                         {
                             success = CreationResultStatus.CreateFailed;
                         }
-                        await DisplayInstallResultAsync(updateResult.Source?.DisplayName, updateResult).ConfigureAwait(false);
+                        await DisplayInstallResultAsync(updateResult.UpdateRequest.Source?.DisplayName, updateResult).ConfigureAwait(false);
                     }
                 }
                 else
