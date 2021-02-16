@@ -143,35 +143,50 @@ namespace Microsoft.TemplateEngine.Edge
                     async updateRequest => UpdateResult.FromInstallResult(updateRequest, await InstallAsync(updateRequest.Source, updateRequest.Version).ConfigureAwait(false)))).ConfigureAwait(false);
             }
 
-            private async Task<InstallResult> InstallAsync(InstallRequest installRequest, IInstaller installer)
+            private async Task<(bool, InstallResult)> EnsureInstallPrerequisites (InstallRequest installRequest, IInstaller installer, bool update = false)
             {
-                _ = installRequest ?? throw new ArgumentNullException(nameof(installRequest));
-                _ = installer ?? throw new ArgumentNullException(nameof(installer));
-
                 //check if the source with same identifier is already installed
                 if (_templatesSources[installer].TryGetValue(installRequest.Identifier, out IManagedTemplatesSource sourceToBeUpdated))
                 {
                     //if same version is already installed - return
                     if (sourceToBeUpdated.Version == installRequest.Version)
                     {
-                        return InstallResult.CreateFailure(installRequest, InstallerErrorCode.AlreadyInstalled, $"The template source is already installed.");
+                        return (false, InstallResult.CreateFailure(installRequest, InstallerErrorCode.AlreadyInstalled, $"The template source {sourceToBeUpdated.DisplayName} is already installed."));
                     }
-
+                    if (!update)
+                    {
+                        _environmentSettings.Host.LogMessage($"The template source {sourceToBeUpdated.Identifier} is already installed, version: {sourceToBeUpdated.Version}, it will be uninstalled and replaced with version {installRequest.Version}.");
+                    }
                     //if different version is installed - uninstall previous version first
                     UninstallResult uninstallResult = await installer.UninstallAsync(sourceToBeUpdated).ConfigureAwait(false);
                     if (!uninstallResult.Success)
                     {
-                        return InstallResult.CreateFailure(installRequest, InstallerErrorCode.UpdateUninstallFailed, uninstallResult.ErrorMessage);
+                        return (false, InstallResult.CreateFailure(installRequest, InstallerErrorCode.UpdateUninstallFailed, uninstallResult.ErrorMessage));
                     }
+                    _environmentSettings.Host.LogMessage($"The template source {sourceToBeUpdated.DisplayName} was successfully uninstalled.");
                     _environmentSettings.SettingsLoader.GlobalSettings.Remove(installer.Serialize(sourceToBeUpdated));
                 }
-                InstallResult installResult = await installer.InstallAsync(installRequest).ConfigureAwait(false);
-                if (!installResult.Success)
+                return (true, null);
+            }
+
+            private async Task<InstallResult> InstallAsync(InstallRequest installRequest, IInstaller installer, bool update = false)
+            {
+                _ = installRequest ?? throw new ArgumentNullException(nameof(installRequest));
+                _ = installer ?? throw new ArgumentNullException(nameof(installer));
+
+                (bool success, InstallResult result) = await EnsureInstallPrerequisites(installRequest, installer, update: update).ConfigureAwait(false);
+                if (!success)
                 {
-                    return installResult;
+                    return result;
                 }
-                _environmentSettings.SettingsLoader.GlobalSettings.Add(installer.Serialize(installResult.Source));
-                return installResult;
+
+                result = await installer.InstallAsync(installRequest).ConfigureAwait(false);
+                if (!result.Success)
+                {
+                    return result;
+                }
+                _environmentSettings.SettingsLoader.GlobalSettings.Add(installer.Serialize(result.Source));
+                return result;
             }
 
             private Task<InstallResult> InstallAsync(IManagedTemplatesSource managedSource, string version)
@@ -187,7 +202,7 @@ namespace Microsoft.TemplateEngine.Edge
                     Identifier = managedSource.Identifier,
                     Version = version
                 };
-                return InstallAsync(installRequest, managedSource.Installer);
+                return InstallAsync(installRequest, managedSource.Installer, update: true);
             }
 
             private void ReloadCache()
