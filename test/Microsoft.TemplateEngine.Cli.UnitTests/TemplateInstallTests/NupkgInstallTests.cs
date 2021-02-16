@@ -41,7 +41,8 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateInstallTests
             Uri cb = new Uri(codebase);
             string asmPath = cb.LocalPath;
             string dir = Path.GetDirectoryName(asmPath);
-            string pathToInstall = Path.Combine(dir, "TemplateInstallTests", "TestTemplates", nupkgToInstallName);
+
+            string pathToInstall = Path.Combine(dir, "..", "..", "..", "..", "..", "test", "Microsoft.TemplateEngine.TestTemplates", "nupkg_templates", nupkgToInstallName);
 
             Assert.True(File.Exists(pathToInstall), $"directory didnt exist: {pathToInstall}");
 
