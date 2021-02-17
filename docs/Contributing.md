@@ -118,7 +118,7 @@ Some of the analyzer rules are currently being treated as "info/suggestion"s ins
 
 We do development in *master* branch. After a release branch is created, any new changes that should be included in that release are cherry-picked from *master*.
 
-We follow the same versioning as https://github.com/dotnet/sdk and release branches are named after the version numbers. For instance, `release/5.0.2xx` branch ships with .Net SDK 5.0.2xx.
+We follow the same versioning as https://github.com/dotnet/sdk and release branches are named after the version numbers. For instance, `release/5.0.2xx` branch ships with .NET SDK 5.0.2xx.
 
 | Topic | Branch |
 |-------|-------|
