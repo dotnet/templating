@@ -110,7 +110,7 @@ namespace dotnet_new3.UnitTests
                 .ExitWith(0)
                 .And
                 .NotHaveStdErr()
-                .And.HaveStdOut($"The template source {templateLocation} was successfully uninstalled.");
+                .And.HaveStdOut($"Success: {templateLocation} was uninstalled.");
 
             new DotnetNewCommand(_log, "-u")
                 .WithWorkingDirectory(Helpers.CreateTemporaryFolder())
@@ -164,7 +164,7 @@ namespace dotnet_new3.UnitTests
                 .ExitWith(0)
                 .And
                 .NotHaveStdErr()
-                .And.HaveStdOut($"The template source Microsoft.DotNet.Web.ProjectTemplates.5.0::5.0.0 was successfully uninstalled.");
+                .And.HaveStdOut($"Success: Microsoft.DotNet.Web.ProjectTemplates.5.0::5.0.0 was uninstalled.");
 
             new DotnetNewCommand(_log, "-u")
                 .WithWorkingDirectory(Helpers.CreateTemporaryFolder())
@@ -208,8 +208,8 @@ namespace dotnet_new3.UnitTests
                 .ExitWith(0)
                 .And
                 .NotHaveStdErr()
-                .And.HaveStdOutMatching($"^The template source Microsoft\\.DotNet\\.Common\\.ProjectTemplates\\.5\\.0::([\\d\\.a-z-])+ was successfully uninstalled\\.\\s*$", RegexOptions.Multiline)
-                .And.HaveStdOutContaining($"The template source {basicFSharp} was successfully uninstalled.");
+                .And.HaveStdOutMatching($"^Success: Microsoft\\.DotNet\\.Common\\.ProjectTemplates\\.5\\.0::([\\d\\.a-z-])+ was uninstalled\\.\\s*$", RegexOptions.Multiline)
+                .And.HaveStdOutContaining($"Success: {basicFSharp} was uninstalled.");
 
             new DotnetNewCommand(_log, "-u")
                 .WithWorkingDirectory(Helpers.CreateTemporaryFolder())
@@ -223,7 +223,32 @@ namespace dotnet_new3.UnitTests
                 .And.HaveStdOutContaining(basicVB)
                 .And.NotHaveStdOutContaining("Microsoft.DotNet.Common.ProjectTemplates.5.0")
                 .And.NotHaveStdOutContaining(basicFSharp);
+        }
 
+        [Fact]
+        public void CannotUninstallUnknownPackage()
+        {
+            var home = Helpers.CreateTemporaryFolder("Home");
+            new DotnetNewCommand(_log, "-i", "Microsoft.DotNet.Web.ProjectTemplates.5.0::5.0.0", "--quiet")
+                .WithWorkingDirectory(Helpers.CreateTemporaryFolder())
+                .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And
+                .NotHaveStdErr()
+                .And.NotHaveStdOutContaining("Determining projects to restore...")
+                .And.HaveStdOutContaining("web")
+                .And.HaveStdOutContaining("blazorwasm");
+
+            new DotnetNewCommand(_log, "-u", "Microsoft.DotNet.Common.ProjectTemplates.5.0")
+                .WithWorkingDirectory(Helpers.CreateTemporaryFolder())
+                .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
+                .Execute()
+                .Should().Fail()
+                .And.HaveStdErrContaining("The template package is not found, check installed sources and the uninstallation commands from the list below.")
+                .And.HaveStdOutContaining("Currently installed items")
+                .And.HaveStdOutContaining("Microsoft.DotNet.Web.ProjectTemplates.5.0");
 
         }
     }
