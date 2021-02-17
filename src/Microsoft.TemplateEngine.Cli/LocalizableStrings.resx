@@ -216,7 +216,7 @@
 {1}.</value>
   </data>
   <data name="InstallHelp" xml:space="preserve">
-    <value>Installs a source or a template pack.</value>
+    <value>Installs a source or a template package.</value>
   </data>
   <data name="InstallingUpdates" xml:space="preserve">
     <value>Installing updates...</value>
@@ -339,7 +339,7 @@
     <value>Unknown Change</value>
   </data>
   <data name="UpdateAvailable" xml:space="preserve">
-    <value>An update for template pack {0} is available.</value>
+    <value>An update for template package {0} is available.</value>
   </data>
   <data name="UpdateHelp" xml:space="preserve">
     <value>Update matching templates.</value>
@@ -409,7 +409,7 @@
     <value>This template contains technologies from parties other than Microsoft, see {0} for details.</value>
   </data>
   <data name="UninstallHelp" xml:space="preserve">
-    <value>Uninstalls a source or a template pack.</value>
+    <value>Uninstalls a source or a template package.</value>
   </data>
   <data name="CouldntUninstall" xml:space="preserve">
     <value>Failed to uninstall '{0}', reason: {1}.</value>
@@ -618,7 +618,7 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</value>
     <value>    install command: dotnet {0} -i {1}</value>
   </data>
   <data name="UpdateCheck_UnknownError" xml:space="preserve">
-    <value>An error occured checking for updates for template pack {0}</value>
+    <value>An error occured checking for updates for template package {0}</value>
   </data>
   <data name="SearchOnlineNotification" xml:space="preserve">
     <value>Searching for the templates...</value>
@@ -639,7 +639,7 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</value>
     <value>Matches from template source: {0}</value>
   </data>
   <data name="UpdateApplyCommandHelp" xml:space="preserve">
-    <value>Check the currently installed template packs for update, and install the updates.</value>
+    <value>Check the currently installed template packages for update, and install the updates.</value>
   </data>
   <data name="UpdateApplyStartMessage" xml:space="preserve">
     <value>Updating...</value>
@@ -648,7 +648,7 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</value>
     <value>...Update succeeded</value>
   </data>
   <data name="UpdateCheckCommandHelp" xml:space="preserve">
-    <value>Check the currently installed template packs for updates.</value>
+    <value>Check the currently installed template packages for updates.</value>
   </data>
   <data name="InteractiveHelp" xml:space="preserve">
     <value>Allows the internal dotnet restore command to stop and wait for user input or action (for example to complete authentication).</value>

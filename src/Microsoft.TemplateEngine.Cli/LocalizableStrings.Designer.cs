@@ -1054,7 +1054,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Installs a source or a template pack..
+        ///   Looks up a localized string similar to Installs a source or a template package..
         /// </summary>
         public static string InstallHelp {
             get {
@@ -1840,7 +1840,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Uninstalls a source or a template pack..
+        ///   Looks up a localized string similar to Uninstalls a source or a template package..
         /// </summary>
         public static string UninstallHelp {
             get {
@@ -1876,7 +1876,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Check the currently installed template packs for update, and install the updates..
+        ///   Looks up a localized string similar to Check the currently installed template packages for update, and install the updates..
         /// </summary>
         public static string UpdateApplyCommandHelp {
             get {
@@ -1903,7 +1903,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An update for template pack {0} is available..
+        ///   Looks up a localized string similar to An update for template package {0} is available..
         /// </summary>
         public static string UpdateAvailable {
             get {
@@ -1921,7 +1921,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An error occured checking for updates for template pack {0}.
+        ///   Looks up a localized string similar to An error occured checking for updates for template package {0}.
         /// </summary>
         public static string UpdateCheck_UnknownError {
             get {
@@ -1930,7 +1930,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Check the currently installed template packs for updates..
+        ///   Looks up a localized string similar to Check the currently installed template packages for updates..
         /// </summary>
         public static string UpdateCheckCommandHelp {
             get {

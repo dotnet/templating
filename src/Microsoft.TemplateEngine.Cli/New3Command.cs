@@ -282,11 +282,11 @@ namespace Microsoft.TemplateEngine.Cli
 
             if (!installRequests.Any())
             {
-                Reporter.Error.WriteLine($"Found no template sources to install");
+                Reporter.Error.WriteLine($"Found no template packages to install");
                 return CreationResultStatus.NotFound;
             }
 
-            Reporter.Output.WriteLine("The following template sources will be installed:");
+            Reporter.Output.WriteLine("The following template packages will be installed:");
             foreach (InstallRequest installRequest in installRequests)
             {
                 if (string.IsNullOrWhiteSpace(installRequest.Version))
@@ -316,8 +316,7 @@ namespace Microsoft.TemplateEngine.Cli
         {
             if (result.Success)
             {
-                Reporter.Output.WriteLine($"The template source {result.Source.DisplayName} was successfully installed.");
-                Reporter.Output.WriteLine($"The following templates were installed:");
+                Reporter.Output.WriteLine($"Success: {result.Source.DisplayName} installed the following templates:");
 
                 IEnumerable<ITemplateInfo> templates = await result.Source.GetTemplates(EnvironmentSettings).ConfigureAwait(false);
                 HelpForTemplateResolution.DisplayTemplateList(templates, EnvironmentSettings, _commandInput, _defaultLanguage);
@@ -342,13 +341,13 @@ namespace Microsoft.TemplateEngine.Cli
                         Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedGenericError, packageToInstall, result.ErrorMessage).Bold().Red());
                         break;
                     case InstallerErrorCode.AlreadyInstalled:
-                        Reporter.Error.WriteLine($"The template source {packageToInstall} is already installed.".Bold().Red());
+                        Reporter.Error.WriteLine($"{packageToInstall} is already installed.".Bold().Red());
                         break;
                     case InstallerErrorCode.UpdateUninstallFailed:
-                        Reporter.Error.WriteLine($"Failed to install {packageToInstall}, failed to uninstall previous version of the template source.".Bold().Red());
+                        Reporter.Error.WriteLine($"Failed to install {packageToInstall}, failed to uninstall previous version of the template package.".Bold().Red());
                         break;
                     case InstallerErrorCode.InvalidPackage:
-                        Reporter.Error.WriteLine($"Failed to install {packageToInstall}, the package is invalid.".Bold().Red());
+                        Reporter.Error.WriteLine($"Failed to install {packageToInstall}, the template package is invalid.".Bold().Red());
                         break;
                 }
             }
@@ -410,7 +409,7 @@ namespace Microsoft.TemplateEngine.Cli
                     {
                         if (uninstallResult.Success)
                         {
-                            Reporter.Output.WriteLine($"The template source {uninstallResult.Source.DisplayName} was successfully uninstalled.");
+                            Reporter.Output.WriteLine($"Success: {uninstallResult.Source.DisplayName} was uninstalled.");
                         }
                         else
                         {
@@ -611,13 +610,13 @@ namespace Microsoft.TemplateEngine.Cli
                 IEnumerable<CheckUpdateResult> updatesToApply = checkUpdateResults.Where(update => !update.IsLatestVersion && !string.IsNullOrWhiteSpace(update.Version));
                 if (!updatesToApply.Any())
                 {
-                    Reporter.Output.WriteLine("All template sources are up-to-date.");
+                    Reporter.Output.WriteLine("All template packages are up-to-date.");
                     return CreationResultStatus.Success;
                 }
 
                 if (applyUpdates)
                 {
-                    Reporter.Output.WriteLine("The following template sources will be installed:");
+                    Reporter.Output.WriteLine("The following template packages will be updated:");
                     foreach (CheckUpdateResult update in updatesToApply)
                     {
                         Reporter.Output.WriteLine($"  {update.Source.Identifier}, version: {update.Version}");
@@ -639,8 +638,7 @@ namespace Microsoft.TemplateEngine.Cli
                 {
                     foreach (var updateResult in updatesToApply)
                     {
-                        string displayString = $"{updateResult.Source.Identifier}::{updateResult.Source.Version}";         // the package::version currently installed
-                        Reporter.Output.WriteLine(string.Format(LocalizableStrings.UpdateAvailable, displayString));
+                        Reporter.Output.WriteLine(string.Format(LocalizableStrings.UpdateAvailable, updateResult.Source.DisplayName));
                         string installString = $"{updateResult.Source.Identifier}::{updateResult.Version}"; // the package::version that will be installed
                         Reporter.Output.WriteLine(string.Format(LocalizableStrings.UpdateCheck_InstallCommand, CommandName, installString));
                     }
