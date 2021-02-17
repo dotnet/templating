@@ -50,7 +50,7 @@ namespace Microsoft.TemplateEngine.Utils
 
         public string ReadAllText(string path)
         {
-            using (Stream file = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (Stream file = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             using (StreamReader reader = new StreamReader(file, Encoding.UTF8, true, 8192, true))
             {
                 return reader.ReadToEnd();
@@ -100,6 +100,19 @@ namespace Microsoft.TemplateEngine.Utils
         public void SetLastWriteTimeUtc(string file, DateTime lastWriteTimeUtc)
         {
             File.SetLastWriteTimeUtc(file, lastWriteTimeUtc);
+        }
+
+        public IDisposable WatchFileChanges(string filepath, FileSystemEventHandler fileChanged)
+        {
+            var watcher = new FileSystemWatcher(Path.GetDirectoryName(filepath), Path.GetFileName(filepath));
+            watcher.Changed += fileChanged;
+            watcher.EnableRaisingEvents = true;
+            return watcher;
+        }
+
+        public Stream CreateFileStream(string path, FileMode mode, FileAccess access, FileShare share)
+        {
+            return new FileStream(path, mode, access, share);
         }
     }
 }

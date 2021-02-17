@@ -16,7 +16,7 @@ namespace Microsoft.TemplateEngine.Cli
 {
     internal class TemplateInvocationCoordinator
     {
-        private readonly SettingsLoader _settingsLoader;
+        private readonly ISettingsLoader _settingsLoader;
         private readonly IEngineEnvironmentSettings _environment;
         private readonly INewCommandInput _commandInput;
         private readonly ITelemetryLogger _telemetryLogger;
@@ -24,7 +24,7 @@ namespace Microsoft.TemplateEngine.Cli
         private readonly Func<string> _inputGetter;
         private readonly New3Callbacks _callbacks;
 
-        public TemplateInvocationCoordinator(SettingsLoader settingsLoader, INewCommandInput commandInput, ITelemetryLogger telemetryLogger,  string commandName, Func<string> inputGetter, New3Callbacks callbacks)
+        public TemplateInvocationCoordinator(ISettingsLoader settingsLoader, INewCommandInput commandInput, ITelemetryLogger telemetryLogger,  string commandName, Func<string> inputGetter, New3Callbacks callbacks)
         {
             _settingsLoader = settingsLoader;
             _environment = _settingsLoader.EnvironmentSettings;

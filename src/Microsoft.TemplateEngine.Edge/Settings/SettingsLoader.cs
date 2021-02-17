@@ -45,8 +45,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         public void Save()
         {
-            _paths.WriteAllText(_paths.User.GlobalSettingsFile, JsonConvert.SerializeObject(GlobalSettings, Formatting.Indented));
-
             JObject serialized = JObject.FromObject(_userSettings);
             _paths.WriteAllText(_paths.User.SettingsFile, serialized.ToString());
         }
@@ -58,30 +56,10 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 return;
             }
 
-            string globalSettings = null;
-            using (Timing.Over(_environmentSettings.Host, "Read global settings"))
-                for (int i = 0; i < MaxLoadAttempts; ++i)
-                {
-                    try
-                    {
-                        globalSettings = _paths.ReadAllText(_paths.User.GlobalSettingsFile, "{}");
-                        break;
-                    }
-                    catch (IOException)
-                    {
-                        if (i == MaxLoadAttempts - 1)
-                        {
-                            throw;
-                        }
-
-                        Task.Delay(2).Wait();
-                    }
-                }
             using (Timing.Over(_environmentSettings.Host, "Parse and deserialize global settings"))
                 try
                 {
-                    GlobalSettings = JsonConvert.DeserializeObject<GlobalSettings>(globalSettings) ?? new Settings.GlobalSettings();
-                    GlobalSettings.SettingsChanged += OnGlobalSettingsChanged;
+                    GlobalSettings = new GlobalSettings(EnvironmentSettings, _paths.User.GlobalSettingsFile);
                 }
                 catch (Exception ex)
                 {
@@ -136,11 +114,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 EnsureTemplatesLoaded();
 
             _isLoaded = true;
-        }
-
-        private void OnGlobalSettingsChanged()
-        {
-            _paths.WriteAllText(_paths.User.GlobalSettingsFile, JsonConvert.SerializeObject(GlobalSettings));
         }
 
         // Loads from the template cache

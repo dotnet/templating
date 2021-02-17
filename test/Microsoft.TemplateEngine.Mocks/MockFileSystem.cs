@@ -8,8 +8,6 @@ using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Mocks
 {
-
-
     public class MockFileSystem : IPhysicalFileSystem, IFileLastWriteTimeSource
     {
         private class FileSystemFile
@@ -247,5 +245,8 @@ namespace Microsoft.TemplateEngine.Mocks
 
             _files[file].LastWriteTimeUtc = lastWriteTimeUtc;
         }
+
+        public IDisposable WatchFileChanges(string filepath, FileSystemEventHandler fileChanged) => throw new NotImplementedException();
+        public Stream CreateFileStream(string path, FileMode mode, FileAccess access, FileShare share) => throw new NotImplementedException();
     }
 }
