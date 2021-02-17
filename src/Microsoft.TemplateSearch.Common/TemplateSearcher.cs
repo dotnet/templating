@@ -22,14 +22,14 @@ namespace Microsoft.TemplateSearch.Common
         Func<IReadOnlyList<ITemplateNameSearchResult>, IReadOnlyList<ITemplateMatchInfo>> _matchFilter;
 
         // Search all of the registered sources.
-        public async Task<SearchResults> SearchForTemplatesAsync(IReadOnlyList<IManagedTemplatesSource> existingInstallDescriptors, string inputTemplateName)
+        public async Task<SearchResults> SearchForTemplatesAsync(IReadOnlyList<IManagedTemplatesSource> existingTemplatesSources, string inputTemplateName)
         {
             List<TemplateSourceSearchResult> matchesForAllSources = new List<TemplateSourceSearchResult>();
             bool anySearchersConfigured = false;
 
             foreach (ITemplateSearchSource searchSource in _environmentSettings.SettingsLoader.Components.OfType<ITemplateSearchSource>())
             {
-                if (!await searchSource.TryConfigure(_environmentSettings, existingInstallDescriptors))
+                if (!await searchSource.TryConfigure(_environmentSettings, existingTemplatesSources))
                 {
                     continue;
                 }

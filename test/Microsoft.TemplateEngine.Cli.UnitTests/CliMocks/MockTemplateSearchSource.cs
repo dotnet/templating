@@ -75,9 +75,9 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
             DisplayName = string.Format("Mock Search Source {0}", _id);
         }
 
-        public Task<bool> TryConfigure(IEngineEnvironmentSettings environment, IReadOnlyList<IManagedTemplatesSource> existingInstallDescriptors)
+        public Task<bool> TryConfigure(IEngineEnvironmentSettings environment, IReadOnlyList<IManagedTemplatesSource> existingTemplatesSource)
         {
-            _packFilter = new NupkgHigherVersionInstalledPackFilter(existingInstallDescriptors);
+            _packFilter = new NupkgHigherVersionInstalledPackFilter(existingTemplatesSource);
 
             return Task.FromResult(true);
         }

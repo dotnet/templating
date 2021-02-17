@@ -989,15 +989,6 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not find install descriptor for template: {0}.
-        /// </summary>
-        public static string InstallDescriptor_NotFound {
-            get {
-                return ResourceManager.GetString("InstallDescriptor_NotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Currently installed items:.
         /// </summary>
         public static string InstalledItems {
@@ -1800,6 +1791,15 @@ namespace Microsoft.TemplateEngine.Cli {
         public static string TemplatesNotValidGivenTheSpecifiedFilter {
             get {
                 return ResourceManager.GetString("TemplatesNotValidGivenTheSpecifiedFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find templates package for template: {0}.
+        /// </summary>
+        public static string TemplatesPackage_NotFound {
+            get {
+                return ResourceManager.GetString("TemplatesPackage_NotFound", resourceCulture);
             }
         }
         

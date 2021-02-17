@@ -42,18 +42,18 @@ namespace Microsoft.TemplateSearch.Common
             }
 
             TemplateSearcher searcher = new TemplateSearcher(_environmentSettings, _defaultLanguage, _matchFilter);
-            IReadOnlyList<IManagedTemplatesSource> existingInstallDescriptors;
+            IReadOnlyList<IManagedTemplatesSource> existingTemplatesSource;
 
             if (_environmentSettings.SettingsLoader is SettingsLoader settingsLoader)
             {
-                existingInstallDescriptors = (await settingsLoader.TemplatesSourcesManager.GetTemplatesSources(false)).OfType<IManagedTemplatesSource>().ToList();
+                existingTemplatesSource = (await settingsLoader.TemplatesSourcesManager.GetTemplatesSources(false)).OfType<IManagedTemplatesSource>().ToList();
             }
             else
             {
-                existingInstallDescriptors = new List<IManagedTemplatesSource>();
+                existingTemplatesSource = new List<IManagedTemplatesSource>();
             }
 
-            _searchResults = await searcher.SearchForTemplatesAsync(existingInstallDescriptors, _inputTemplateName);
+            _searchResults = await searcher.SearchForTemplatesAsync(existingTemplatesSource, _inputTemplateName);
 
             _isSearchPerformed = true;
         }
