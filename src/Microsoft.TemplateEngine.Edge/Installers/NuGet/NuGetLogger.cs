@@ -12,6 +12,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
     /// </summary>
     internal class NuGetLogger : ILogger
     {
+        private const string DebugLogCategory = "Installer";
         private ITemplateEngineHost _host;
         internal NuGetLogger (IEngineEnvironmentSettings settings)
         {
@@ -50,7 +51,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
         public void LogDebug(string data)
         {
-            _host.LogDiagnosticMessage(data, "NuGet");
+            _host.LogDiagnosticMessage(data, DebugLogCategory);
         }
 
         public void LogError(string data)
@@ -61,7 +62,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         public void LogInformation(string data)
         {
             //TODO: NuGet is putting too much logs to info level, check if we want this data
-            _host.LogDiagnosticMessage(data, "NuGet");
+            _host.LogDiagnosticMessage(data, DebugLogCategory);
         }
 
         public void LogInformationSummary(string data)
@@ -76,7 +77,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
         public void LogVerbose(string data)
         {
-            _host.LogDiagnosticMessage(data, "NuGet");
+            _host.LogDiagnosticMessage(data, DebugLogCategory);
         }
 
         public void LogWarning(string data)
