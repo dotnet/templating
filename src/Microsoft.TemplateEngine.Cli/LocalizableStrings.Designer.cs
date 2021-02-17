@@ -998,17 +998,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &quot;{0}&quot; could not be installed.
-        ///{1}..
-        /// </summary>
-        public static string InstallFailed {
-            get {
-                return ResourceManager.GetString("InstallFailed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; could not be installed, download failed..
+        ///   Looks up a localized string similar to {0} could not be installed, download failed..
         /// </summary>
         public static string InstallFailedDownloadFailed {
             get {
@@ -1017,8 +1007,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; could not be installed.
-        ///{1}..
+        ///   Looks up a localized string similar to {0} could not be installed..
         /// </summary>
         public static string InstallFailedGenericError {
             get {
@@ -1027,7 +1016,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; could not be installed, no NuGet feeds are configured or they are invalid..
+        ///   Looks up a localized string similar to {0} could not be installed, no NuGet feeds are configured or they are invalid..
         /// </summary>
         public static string InstallFailedInvalidSource {
             get {
@@ -1036,7 +1025,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; could not be installed, the package does not exist..
+        ///   Looks up a localized string similar to {0} could not be installed, the package does not exist..
         /// </summary>
         public static string InstallFailedPackageNotFound {
             get {
@@ -1045,7 +1034,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; is not supported..
+        ///   Looks up a localized string similar to {0} is not supported..
         /// </summary>
         public static string InstallFailedUnsupportedRequest {
             get {

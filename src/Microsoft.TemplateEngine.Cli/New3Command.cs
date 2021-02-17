@@ -338,7 +338,7 @@ namespace Microsoft.TemplateEngine.Cli
                         Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedUnsupportedRequest, packageToInstall).Bold().Red());
                         break;
                     case InstallerErrorCode.GenericError:
-                        Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedGenericError, packageToInstall, result.ErrorMessage).Bold().Red());
+                        Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedGenericError, packageToInstall).Bold().Red());
                         break;
                     case InstallerErrorCode.AlreadyInstalled:
                         Reporter.Error.WriteLine($"{packageToInstall} is already installed.".Bold().Red());
@@ -420,8 +420,9 @@ namespace Microsoft.TemplateEngine.Cli
                 }
                 if (!sourceToUninstallFound)
                 {
-                    Reporter.Error.WriteLine("The template source is not found, check installed sources and the uninstallation commands from the list below.");
+                    Reporter.Error.WriteLine("The template package is not found, check installed sources and the uninstallation commands from the list below.");
                     result = CreationResultStatus.NotFound;
+                    await DisplayInstalledTemplatesSources().ConfigureAwait(false);
                 }
             }
             else
