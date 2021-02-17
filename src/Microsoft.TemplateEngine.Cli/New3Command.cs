@@ -31,7 +31,7 @@ namespace Microsoft.TemplateEngine.Cli
     {
         private readonly ITelemetryLogger _telemetryLogger;
         private readonly TemplateCreator _templateCreator;
-        private readonly SettingsLoader _settingsLoader;
+        private readonly ISettingsLoader _settingsLoader;
         private readonly AliasRegistry _aliasRegistry;
         private readonly Paths _paths;
         private readonly INewCommandInput _commandInput;    // It's safe to access template agnostic information anytime after the first parse. But there is never a guarantee which template the parse is in the context of.
@@ -56,7 +56,7 @@ namespace Microsoft.TemplateEngine.Cli
             _telemetryLogger = telemetryLogger;
             host = new ExtendedTemplateEngineHost(host, this);
             EnvironmentSettings = new EngineEnvironmentSettings(host, x => new SettingsLoader(x), hivePath);
-            _settingsLoader = (SettingsLoader)EnvironmentSettings.SettingsLoader;
+            _settingsLoader = EnvironmentSettings.SettingsLoader;
             _templateCreator = new TemplateCreator(EnvironmentSettings);
             _aliasRegistry = new AliasRegistry(EnvironmentSettings);
             CommandName = commandName;

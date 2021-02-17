@@ -71,5 +71,7 @@ namespace Microsoft.TemplateEngine.TestHelper
         public string ReadAllText(string path) => _baseFileSystem.ReadAllText(path);
         public void SetFileAttributes(string file, FileAttributes attributes) => _baseFileSystem.SetFileAttributes(file, attributes);
         public void WriteAllText(string path, string value) => _baseFileSystem.WriteAllText(path, value);
+        public IDisposable WatchFileChanges(string filepath, FileSystemEventHandler fileChanged) => _baseFileSystem.WatchFileChanges(filepath, fileChanged);
+        public Stream CreateFileStream(string path, FileMode mode, FileAccess access, FileShare share) => _baseFileSystem.CreateFileStream(path, mode, access, share);
     }
 }
