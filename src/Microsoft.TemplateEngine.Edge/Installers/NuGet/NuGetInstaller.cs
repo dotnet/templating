@@ -18,6 +18,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
     internal class NuGetInstaller : IInstaller
     {
+        private const string DebugLogCategory = "Installer";
         private readonly IEngineEnvironmentSettings _environmentSettings;
         private readonly IInstallerFactory _factory;
         private readonly string _installPath;
@@ -47,7 +48,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             }
             catch (Exception)
             {
-                _environmentSettings.Host.LogDiagnosticMessage($"{installationRequest.Identifier} is not a local NuGet package.", "Installer");
+                _environmentSettings.Host.LogDiagnosticMessage($"{installationRequest.Identifier} is not a local NuGet package.", DebugLogCategory);
 
                 //check if identifier is a valid package ID
                 bool validPackageId = PackageIdValidator.IsValidPackageId(installationRequest.Identifier);
@@ -55,21 +56,21 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 bool hasValidVersion = string.IsNullOrWhiteSpace(installationRequest.Version) || NuGetVersion.TryParse(installationRequest.Version, out _);
                 if (!validPackageId)
                 {
-                    _environmentSettings.Host.LogDiagnosticMessage($"{installationRequest.Identifier} is not a valid NuGet package ID.", "Installer");
+                    _environmentSettings.Host.LogDiagnosticMessage($"{installationRequest.Identifier} is not a valid NuGet package ID.", DebugLogCategory);
                 }
                 if (!hasValidVersion)
                 {
-                    _environmentSettings.Host.LogDiagnosticMessage($"{installationRequest.Version} is not a valid NuGet package version.", "Installer");
+                    _environmentSettings.Host.LogDiagnosticMessage($"{installationRequest.Version} is not a valid NuGet package version.", DebugLogCategory);
                 }
                 if (validPackageId && hasValidVersion)
                 {
-                    _environmentSettings.Host.LogDiagnosticMessage($"{installationRequest.Version} is identified as the downloadable NuGet package.", "Installer");
+                    _environmentSettings.Host.LogDiagnosticMessage($"{installationRequest.Version} is identified as the downloadable NuGet package.", DebugLogCategory);
                 }
 
                 //not a local package file
                 return Task.FromResult(validPackageId && hasValidVersion);
             }
-            _environmentSettings.Host.LogDiagnosticMessage($"{installationRequest.Identifier} is identified as the local NuGet package.", "Installer");
+            _environmentSettings.Host.LogDiagnosticMessage($"{installationRequest.Identifier} is identified as the local NuGet package.", DebugLogCategory);
             return Task.FromResult(true);
         }
 
@@ -104,6 +105,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                         }
                         catch (Exception e)
                         {
+                            _environmentSettings.Host.LogDiagnosticMessage($"Retreving latest version for package {source.DisplayName} failed.", DebugLogCategory);
+                            _environmentSettings.Host.LogDiagnosticMessage($"Details:{e.ToString()}", DebugLogCategory);
                             return Task.FromResult(CheckUpdateResult.CreateFailure(source, InstallerErrorCode.GenericError, $"Failed to check the update for the package {source.Identifier}, reason: {e.Message}"));
                         }
                     }
@@ -157,7 +160,9 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             }
             catch (Exception e)
             {
-                return InstallResult.CreateFailure(installRequest, InstallerErrorCode.GenericError, $"Failed to install the package {installRequest.Identifier}, reason: {e.Message}");
+                _environmentSettings.Host.LogDiagnosticMessage($"Installing {installRequest.DisplayName} failed.", DebugLogCategory);
+                _environmentSettings.Host.LogDiagnosticMessage($"Details:{e.ToString()}", DebugLogCategory);
+                return InstallResult.CreateFailure(installRequest, InstallerErrorCode.GenericError, $"Failed to install the package {installRequest.DisplayName}, reason: {e.Message}");
             }
         }
 
@@ -197,7 +202,9 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             }
             catch (Exception ex)
             {
-                return Task.FromResult(UninstallResult.CreateFailure(managedSource, InstallerErrorCode.GenericError, $"Failed to uninstall {managedSource.Identifier}, reason: {ex.Message}"));
+                _environmentSettings.Host.LogDiagnosticMessage($"Uninstalling {managedSource.DisplayName} failed.", DebugLogCategory);
+                _environmentSettings.Host.LogDiagnosticMessage($"Details:{ex.ToString()}", DebugLogCategory);
+                return Task.FromResult(UninstallResult.CreateFailure(managedSource, InstallerErrorCode.GenericError, $"Failed to uninstall {managedSource.DisplayName}, reason: {ex.Message}"));
             }
         }
 
@@ -243,7 +250,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             catch (Exception ex)
             {
                 _environmentSettings.Host.OnCriticalError(null, $"Failed to read content of package {installRequest.Identifier}.", null, 0);
-                _environmentSettings.Host.LogDiagnosticMessage("Installer", $"Reason: {ex.Message}.");
+                _environmentSettings.Host.LogDiagnosticMessage(DebugLogCategory, $"Details: {ex.ToString()}.");
                 throw new InvalidNuGetPackageException(installRequest.Identifier, ex);
             }
             string targetPackageLocation = Path.Combine(_installPath, packageInfo.PackageIdentifier + "." + packageInfo.PackageVersion + ".nupkg");
@@ -260,7 +267,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             catch (Exception ex)
             {
                 _environmentSettings.Host.OnCriticalError(null, $"Failed to copy package {installRequest.Identifier} to {targetPackageLocation}.", null, 0);
-                _environmentSettings.Host.LogDiagnosticMessage("Installer", $"Reason: {ex.Message}.");
+                _environmentSettings.Host.LogDiagnosticMessage(DebugLogCategory, $"Details: {ex.ToString()}.");
                 throw new DownloadException(packageInfo.PackageIdentifier, packageInfo.PackageVersion, installRequest.Identifier);
             }
             return packageInfo;
