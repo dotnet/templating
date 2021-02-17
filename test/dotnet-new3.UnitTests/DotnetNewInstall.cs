@@ -197,7 +197,7 @@ namespace dotnet_new3.UnitTests
                .And.HaveStdErrContaining("Microsoft.DotNet.Web.ProjectTemplates.5.0::16.0.0 could not be installed, the package does not exist.");
         }
 
-        [Fact(Skip = "https://github.com/dotnet/templating/issues/2857")]
+        [Fact]
         public void CanInstallSeveralSources()
         {
             var home = Helpers.CreateTemporaryFolder("Home");
@@ -267,7 +267,7 @@ namespace dotnet_new3.UnitTests
                  .And.HaveStdErrContaining($"{basicFSharp} is already installed.");
         }
 
-        [Fact(Skip = "https://github.com/dotnet/templating/issues/2857")]
+        [Fact]
         public void CanUpdateSameSource_NuGet()
         {
             var home = Helpers.CreateTemporaryFolder("Home");
@@ -323,7 +323,7 @@ namespace dotnet_new3.UnitTests
             Assert.True(File.Exists(Path.Combine(home, ".templateengine", "packages", "Microsoft.DotNet.Common.ProjectTemplates.5.0.5.0.1.nupkg")));
         }
 
-        [Fact(Skip = "https://github.com/dotnet/templating/issues/2857")]
+        [Fact]
         public void InstallingSamePackageFromRemoteUpdatesLocal()
         {
             var home = Helpers.CreateTemporaryFolder("Home");
