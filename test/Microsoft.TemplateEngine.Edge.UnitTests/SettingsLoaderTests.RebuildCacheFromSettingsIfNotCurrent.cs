@@ -53,47 +53,18 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             }
         }
 
-        List<string> foldersToCleanup = new List<string>(0);
-
-        private IEngineEnvironmentSettings CreateEnvironment(string locale = "en-US")
-        {
-            Environment.SetEnvironmentVariable(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "USERPROFILE" : "HOME", CreateTemporaryFolder());
-            ITemplateEngineHost host = new TestHost
-            {
-                HostIdentifier = "TestRunner",
-                Version = "1.0.0.0",
-                Locale = locale,
-                BuiltInComponents = new AssemblyComponentCatalog(new List<Assembly>()
-                {
-                    typeof(RunnableProjectGenerator).Assembly,//RunnableProject
-                    typeof(SettingsLoader).Assembly//Edge
-                }),
-                FileSystem = new MonitoredFileSystem(new PhysicalFileSystem()),
-                FallbackHostTemplateConfigNames = new[] { "dotnetcli" }
-            };
-
-            return new EngineEnvironmentSettings(host, (x) => new SettingsLoader(x));
-        }
-
-        private string CreateTemporaryFolder()
-        {
-            var folder = Path.Combine(Path.GetTempPath(), "DotnetNew3_Tests", Guid.NewGuid().ToString(), nameof(SettingsLoaderTests));
-            foldersToCleanup.Add(folder);
-            Directory.CreateDirectory(folder);
-            return folder;
-        }
+        EnvironmentSettingsHelper helper = new EnvironmentSettingsHelper();
 
         private static string GetNupkgsFolder()
         {
             var thisDir = Path.GetDirectoryName(typeof(SettingsLoaderTests).Assembly.Location);
-            var nupkgFolder = Path.Combine(thisDir, "..", "..", "..", "..", "..", "test", "Microsoft.TemplateEngine.TestTemplates", "nupkg_templates");
-            return nupkgFolder;
+            return Path.Combine(thisDir, "..", "..", "..", "..", "..", "test", "Microsoft.TemplateEngine.TestTemplates", "nupkg_templates");
         }
 
         [Fact]
         public async Task RebuildCacheIfNotCurrentScansAll()
         {
-            var engineEnvironmentSettings = CreateEnvironment();
+            var engineEnvironmentSettings = helper.CreateEnvironment();
 
             var nupkgFolder = GetNupkgsFolder();
             var nupkgsWildcard = new[] { Path.Combine(nupkgFolder, "*.nupkg") };
@@ -110,7 +81,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         [Fact]
         public async Task RebuildCacheSkipsNonAccessibleMounts()
         {
-            var engineEnvironmentSettings = CreateEnvironment();
+            var engineEnvironmentSettings = helper.CreateEnvironment();
             string nupkgFolder = GetNupkgsFolder();
             var validAndInvalidNuPkg = new[] { Directory.GetFiles(nupkgFolder, "*.nupkg")[0], Path.Combine(nupkgFolder, $"{new Guid()}.nupkg") };
 
@@ -126,7 +97,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         [Fact]
         public async Task RebuildCacheIfForceRebuildScansAll()
         {
-            var engineEnvironmentSettings = CreateEnvironment();
+            var engineEnvironmentSettings = helper.CreateEnvironment();
 
             var nupkgFolder = GetNupkgsFolder();
             var nupkgsWildcard = new[] { Path.Combine(nupkgFolder, "*.nupkg") };
@@ -155,9 +126,9 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         [Fact]
         public async Task RebuildCacheFromSettingsOnlyScansOutOfDateFileSystemMountPoints()
         {
-            var engineEnvironmentSettings = CreateEnvironment();
+            var engineEnvironmentSettings = helper.CreateEnvironment();
 
-            var tmpFolder = CreateTemporaryFolder();
+            var tmpFolder = helper.CreateTemporaryFolder();
             foreach (var item in Directory.GetFiles(GetNupkgsFolder()))
             {
                 File.Copy(item, Path.Combine(tmpFolder, Path.GetFileName(item)));
@@ -195,7 +166,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         [Fact]
         public async Task EnsureCacheRoundtripPreservesTemplateWithLocaleTimestamp()
         {
-            var engineEnvironmentSettings = CreateEnvironment("en-GB");
+            var engineEnvironmentSettings = helper.CreateEnvironment("en-GB");
 
             var nupkgFolder = GetNupkgsFolder();
             var nupkgsWildcard = new[] { Path.Combine(nupkgFolder, "*.nupkg") };
@@ -224,7 +195,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         [Fact]
         public async Task RemoveMountpointRemovesTemplates()
         {
-            var engineEnvironmentSettings = CreateEnvironment();
+            var engineEnvironmentSettings = helper.CreateEnvironment();
 
             var nupkgFolder = GetNupkgsFolder();
             var allNupkgs = Directory.GetFiles(nupkgFolder).Select(Path.GetFullPath).ToList();
@@ -290,6 +261,6 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             Assert.Empty(actualScannedDirectories.Intersect(expectedScannedDirectories));
         }
 
-        public void Dispose() => foldersToCleanup.ForEach(f => Directory.Delete(f, true));
+        public void Dispose() => helper.Dispose();
     }
 }

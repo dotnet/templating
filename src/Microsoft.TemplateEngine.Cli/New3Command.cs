@@ -32,7 +32,7 @@ namespace Microsoft.TemplateEngine.Cli
     {
         private readonly ITelemetryLogger _telemetryLogger;
         private readonly TemplateCreator _templateCreator;
-        private readonly SettingsLoader _settingsLoader;
+        private readonly ISettingsLoader _settingsLoader;
         private readonly AliasRegistry _aliasRegistry;
         private readonly Paths _paths;
 
@@ -54,7 +54,7 @@ namespace Microsoft.TemplateEngine.Cli
             _telemetryLogger = telemetryLogger;
             host = new ExtendedTemplateEngineHost(host, this);
             EnvironmentSettings = new EngineEnvironmentSettings(host, x => new SettingsLoader(x), hivePath);
-            _settingsLoader = (SettingsLoader)EnvironmentSettings.SettingsLoader;
+            _settingsLoader = EnvironmentSettings.SettingsLoader;
             _templateCreator = new TemplateCreator(EnvironmentSettings);
             _aliasRegistry = new AliasRegistry(EnvironmentSettings);
             CommandName = commandName;

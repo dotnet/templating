@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Microsoft.TemplateEngine.Abstractions.GlobalSettings
 {
@@ -10,11 +12,12 @@ namespace Microsoft.TemplateEngine.Abstractions.GlobalSettings
     {
         event Action SettingsChanged;
 
-        string DefaultLanguage { get; set; }
         IReadOnlyList<TemplatesSourceData> UserInstalledTemplatesSources { get; }
 
         void Add(TemplatesSourceData userInstalledTemplate);
 
         void Remove(TemplatesSourceData userInstalledTemplate);
+
+        Task<IDisposable> LockAsync(CancellationToken token);
     }
 }
