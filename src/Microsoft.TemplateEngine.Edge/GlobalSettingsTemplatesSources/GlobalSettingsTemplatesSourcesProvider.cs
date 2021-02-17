@@ -169,11 +169,11 @@ namespace Microsoft.TemplateEngine.Edge
                     //if same version is already installed - return
                     if (sourceToBeUpdated.Version == version)
                     {
-                        return (InstallerErrorCode.AlreadyInstalled, $"The template source {sourceToBeUpdated.DisplayName} is already installed.");
+                        return (InstallerErrorCode.AlreadyInstalled, $"{sourceToBeUpdated.DisplayName} is already installed.");
                     }
                     if (!update)
                     {
-                        _environmentSettings.Host.LogMessage($"The template source {sourceToBeUpdated.Identifier} is already installed, version: {sourceToBeUpdated.Version}, it will be uninstalled and replaced with {(string.IsNullOrWhiteSpace(identifier) ? "latest version" : $"version {version}")}.");
+                        _environmentSettings.Host.LogMessage($"{sourceToBeUpdated.Identifier} is already installed, version: {sourceToBeUpdated.Version}, it will be replaced with {(string.IsNullOrWhiteSpace(identifier) ? "latest version" : $"version {version}")}.");
                     }
                     //if different version is installed - uninstall previous version first
                     UninstallResult uninstallResult = await installer.UninstallAsync(sourceToBeUpdated).ConfigureAwait(false);
@@ -181,7 +181,7 @@ namespace Microsoft.TemplateEngine.Edge
                     {
                         return (InstallerErrorCode.UpdateUninstallFailed, uninstallResult.ErrorMessage);
                     }
-                    _environmentSettings.Host.LogMessage($"The template source {sourceToBeUpdated.DisplayName} was successfully uninstalled.");
+                    _environmentSettings.Host.LogMessage($"{sourceToBeUpdated.DisplayName} was successfully uninstalled.");
                     _environmentSettings.SettingsLoader.GlobalSettings.Remove(installer.Serialize(sourceToBeUpdated));
                 }
                 return (InstallerErrorCode.Success, string.Empty);
