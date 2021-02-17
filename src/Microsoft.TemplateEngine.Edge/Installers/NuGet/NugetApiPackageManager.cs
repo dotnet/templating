@@ -168,7 +168,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             ConcurrentDictionary<PackageSource, IEnumerable<IPackageSearchMetadata>> searchResults = new ConcurrentDictionary<PackageSource, IEnumerable<IPackageSearchMetadata>>();
             await Task.WhenAll(packageSources.Select(async source =>
                 {
-                    IEnumerable<IPackageSearchMetadata> foundPackages = await GetPackageMetadataAsync(cache, source, packageIdentifier, cancellationToken).ConfigureAwait(false);
+                    IEnumerable<IPackageSearchMetadata> foundPackages = await GetPackageMetadataAsync(cache, source, packageIdentifier, includePrerelease: false, cancellationToken).ConfigureAwait(false);
                     if (foundPackages == null)
                     {
                         return;
@@ -214,7 +214,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             foreach (PackageSource source in sources)
             {
                 _nugetLogger.LogDebug($"Searching {packageIdentifier}::{packageVersion} in {source.Source}.");
-                IEnumerable<IPackageSearchMetadata> foundPackages = await GetPackageMetadataAsync(cache, source, packageIdentifier, cancellationToken).ConfigureAwait(false);
+                IEnumerable<IPackageSearchMetadata> foundPackages = await GetPackageMetadataAsync(cache, source, packageIdentifier, includePrerelease:true, cancellationToken).ConfigureAwait(false);
                 if (foundPackages == null)
                 {
                     continue;
@@ -241,7 +241,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             throw new PackageNotFoundException(packageIdentifier, packageVersion, sources.Select(source => source.Source));
         }
 
-        private async Task<IEnumerable<IPackageSearchMetadata>> GetPackageMetadataAsync(SourceCacheContext cache, PackageSource source, string packageIdentifier, CancellationToken cancellationToken)
+        private async Task<IEnumerable<IPackageSearchMetadata>> GetPackageMetadataAsync(SourceCacheContext cache, PackageSource source, string packageIdentifier, bool includePrerelease = false, CancellationToken cancellationToken = default)
         {
             _nugetLogger.LogDebug($"Searching for {packageIdentifier} in {source.Source}.");
             try
@@ -250,7 +250,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 PackageMetadataResource resource = await repository.GetResourceAsync<PackageMetadataResource>(cancellationToken).ConfigureAwait(false);
                 IEnumerable<IPackageSearchMetadata> foundPackages = await resource.GetMetadataAsync(
                     packageIdentifier,
-                    includePrerelease: false,
+                    includePrerelease: includePrerelease,
                     includeUnlisted: false,
                     cache,
                     _nugetLogger,
