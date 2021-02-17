@@ -59,7 +59,7 @@ namespace Microsoft.TemplateEngine.Cli
             }
             catch (Exception)
             {
-                Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallDescriptor_NotFound, templateToInvoke.Info.Identity));
+                Reporter.Error.WriteLine(string.Format(LocalizableStrings.TemplatesPackage_NotFound, templateToInvoke.Info.Identity));
                 return;
             }
 

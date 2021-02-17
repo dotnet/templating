@@ -287,7 +287,6 @@ namespace Microsoft.TemplateEngine.Edge
             private string _scratchDir;
             private string _settingsFile;
             private string _userSettingsFile;
-            private string _installUnitDescriptorsFile;
             private string _contentDir;
             private string _packagesDir;
             private string _nugetScrapedTemplatesFile;
@@ -317,8 +316,6 @@ namespace Microsoft.TemplateEngine.Edge
             public string SettingsFile => _parent.GetOrComputePath(ref _settingsFile, BaseDir, "settings.json");
 
             public string GlobalSettingsFile => _parent.GetOrComputePath(ref _userSettingsFile, _parent._environmentSettings.Paths.TemplateEngineRootDir, "settings.json");
-
-            public string InstallUnitDescriptorsFile => _parent.GetOrComputePath(ref _installUnitDescriptorsFile, BaseDir, "installUnitDescriptors.json");
 
             public string NuGetScrapedTemplateSearchFile => _parent.GetOrComputePath(ref _nugetScrapedTemplatesFile, BaseDir, "inBoxNugetScrapedTemplateSearchFile.json");
 

@@ -23,10 +23,10 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
             _templateDiscoveryMetadata = templateDiscoveryMetadata;
         }
 
-        public override Task<bool> TryConfigure(IEngineEnvironmentSettings environmentSettings, IReadOnlyList<IManagedTemplatesSource> existingInstallDescriptors)
+        public override Task<bool> TryConfigure(IEngineEnvironmentSettings environmentSettings, IReadOnlyList<IManagedTemplatesSource> existingTemplatesSource)
         {
             IFileMetadataTemplateSearchCache searchCache = CreateSearchCache(environmentSettings);
-            NupkgHigherVersionInstalledPackFilter packFilter = new NupkgHigherVersionInstalledPackFilter(existingInstallDescriptors);
+            NupkgHigherVersionInstalledPackFilter packFilter = new NupkgHigherVersionInstalledPackFilter(existingTemplatesSource);
             Configure(searchCache, packFilter);
 
             return Task.FromResult(true);

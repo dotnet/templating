@@ -14,7 +14,7 @@ namespace Microsoft.TemplateSearch.Common
         protected IFileMetadataTemplateSearchCache _searchCache;
         private ISearchPackFilter _packFilter;
 
-        public abstract Task<bool> TryConfigure(IEngineEnvironmentSettings environmentSettings, IReadOnlyList<IManagedTemplatesSource> existingInstallDescriptors);
+        public abstract Task<bool> TryConfigure(IEngineEnvironmentSettings environmentSettings, IReadOnlyList<IManagedTemplatesSource> existingTemplatesSource);
 
         protected void Configure(IFileMetadataTemplateSearchCache searchCache, ISearchPackFilter packFilter)
         {

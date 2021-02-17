@@ -58,7 +58,6 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
         /// <param name="environmentSettings"></param>
         /// <param name="commandInput">command input used in CLI</param>
         /// <param name="defaultLanguage">default language for the host</param>
-        /// <param name="installUnitDescriptors">the collection of install unit descriptors</param>
         /// <returns></returns>
         internal static Task<CreationResultStatus> CoordinateAmbiguousTemplateResolutionDisplay(
             TemplateResolutionResult resolutionResult,
@@ -255,7 +254,6 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
         /// <param name="unambiguousTemplateGroup">resolved unambiguous template group to use based on the command input</param>
         /// <param name="environmentSettings"></param>
         /// <param name="commandInput">the command input</param>
-        /// <param name="installUnitDescriptors">the list of install unit descriptors</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException">when <paramref name="unambiguousTemplateGroup"/>is <see cref="null"/></exception>
         /// <exception cref="ArgumentNullException">when <paramref name="commandInput"/>is <see cref="null"/></exception>

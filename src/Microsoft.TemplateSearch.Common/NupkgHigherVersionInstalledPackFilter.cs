@@ -7,13 +7,13 @@ namespace Microsoft.TemplateSearch.Common
 {
     public class NupkgHigherVersionInstalledPackFilter : ISearchPackFilter
     {
-        private readonly IReadOnlyList<IManagedTemplatesSource> _existingInstallDescriptors;
-        private IReadOnlyDictionary<string, string> _existingInstallDescriptorFilterData;
+        private readonly IReadOnlyList<IManagedTemplatesSource> _existingTemplatesSource;
+        private IReadOnlyDictionary<string, string> _existingTemplatesSourceFilterData;
         private bool _isInitialized;
 
         public NupkgHigherVersionInstalledPackFilter(IReadOnlyList<IManagedTemplatesSource> existingInstallDecriptors)
         {
-            _existingInstallDescriptors = existingInstallDecriptors;
+            _existingTemplatesSource = existingInstallDecriptors;
             _isInitialized = false;
         }
 
@@ -26,12 +26,12 @@ namespace Microsoft.TemplateSearch.Common
 
             Dictionary<string, string> filterData = new Dictionary<string, string>();
 
-            foreach (IManagedTemplatesSource descriptor in _existingInstallDescriptors)
+            foreach (IManagedTemplatesSource descriptor in _existingTemplatesSource)
             {
                 filterData[descriptor.Identifier] = descriptor.Version;
             }
 
-            _existingInstallDescriptorFilterData = filterData;
+            _existingTemplatesSourceFilterData = filterData;
 
             _isInitialized = true;
         }
@@ -40,7 +40,7 @@ namespace Microsoft.TemplateSearch.Common
         {
             EnsureInitialized();
 
-            if (!_existingInstallDescriptorFilterData.TryGetValue(candidatePackName, out string existingPackVersion))
+            if (!_existingTemplatesSourceFilterData.TryGetValue(candidatePackName, out string existingPackVersion))
             {
                 // no existing install of this pack - don't filter it
                 return false;

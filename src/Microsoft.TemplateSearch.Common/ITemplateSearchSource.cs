@@ -7,7 +7,7 @@ namespace Microsoft.TemplateSearch.Common
 {
     public interface ITemplateSearchSource : IIdentifiedComponent
     {
-        Task<bool> TryConfigure(IEngineEnvironmentSettings environmentSettings, IReadOnlyList<IManagedTemplatesSource> existingInstallDescriptors);
+        Task<bool> TryConfigure(IEngineEnvironmentSettings environmentSettings, IReadOnlyList<IManagedTemplatesSource> existingTemplatesSource);
 
         Task<IReadOnlyList<ITemplateNameSearchResult>> CheckForTemplateNameMatchesAsync(string templateName);
 

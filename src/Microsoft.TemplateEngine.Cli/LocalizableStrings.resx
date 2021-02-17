@@ -611,8 +611,8 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</value>
   <data name="UninstallListUninstallCommand" xml:space="preserve">
     <value>Uninstall Command:</value>
   </data>
-  <data name="InstallDescriptor_NotFound" xml:space="preserve">
-    <value>Could not find install descriptor for template: {0}</value>
+  <data name="TemplatesPackage_NotFound" xml:space="preserve">
+    <value>Could not find templates package for template: {0}</value>
   </data>
   <data name="UpdateCheck_InstallCommand" xml:space="preserve">
     <value>    install command: dotnet {0} -i {1}</value>
