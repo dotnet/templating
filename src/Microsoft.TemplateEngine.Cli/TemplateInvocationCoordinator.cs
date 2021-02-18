@@ -79,7 +79,7 @@ namespace Microsoft.TemplateEngine.Cli
                 {
                     string displayString = $"{updateResult.Source.Identifier}::{updateResult.Source.Version}";         // the package::version currently installed
                     Reporter.Output.WriteLine(string.Format(LocalizableStrings.UpdateAvailable, displayString));
-                    string installString = $"{updateResult.Source.Identifier}::{updateResult.Version}"; // the package::version that will be installed
+                    string installString = $"{updateResult.Source.Identifier}::{updateResult.LatestVersion}"; // the package::version that will be installed
                     Reporter.Output.WriteLine(string.Format(LocalizableStrings.UpdateCheck_InstallCommand, _commandName, installString));
                 }
             }

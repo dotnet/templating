@@ -42,7 +42,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.Folder
 
         public Task<IReadOnlyList<CheckUpdateResult>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources, CancellationToken cancellationToken)
         {
-            return Task.FromResult<IReadOnlyList<CheckUpdateResult>>(sources.Select(s => CheckUpdateResult.CreateSuccess(s, null)).ToList());
+            return Task.FromResult<IReadOnlyList<CheckUpdateResult>>(sources.Select(s => CheckUpdateResult.CreateSuccess(s, null, true)).ToList());
         }
 
         public Task<InstallResult> InstallAsync(InstallRequest installRequest, CancellationToken cancellationToken)

@@ -59,6 +59,23 @@ namespace dotnet_new3.UnitTests
         }
 
         [Fact]
+        public void CanInstallRemoteNuGetPackageWithPrereleaseVersion()
+        {
+            var home = Helpers.CreateTemporaryFolder("Home");
+            new DotnetNewCommand(_log, "-i", "Take.Blip.Client.Templates::0.6.37-beta", "--quiet", "--nuget-source", "https://api.nuget.org/v3/index.json")
+                .WithWorkingDirectory(Helpers.CreateTemporaryFolder())
+                .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And
+                .NotHaveStdErr()
+                .And.HaveStdOutContaining("The following template packages will be installed:")
+                .And.HaveStdOutMatching($"Success: Take.Blip.Client.Templates::0.6.37-beta installed the following templates:")
+                .And.HaveStdOutContaining("blip-console");
+        }
+
+        [Fact]
         public void CanInstallRemoteNuGetPackageWithNuGetSource()
         {
             var home = Helpers.CreateTemporaryFolder("Home");
