@@ -22,6 +22,11 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
     {
         private readonly IEngineEnvironmentSettings _environmentSettings;
         private readonly ILogger _nugetLogger;
+        private readonly SourceCacheContext _cacheSettings = new SourceCacheContext()
+        {
+            NoCache = true,
+            DirectDownload = true
+        };
 
         internal NuGetApiPackageManager(IEngineEnvironmentSettings settings)
         {
@@ -76,7 +81,6 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 throw new InvalidNuGetSourceException("Failed to load NuGet source", new[] { source.Source }, e);
             }
 
-            SourceCacheContext cache = new SourceCacheContext();
             string filePath = Path.Combine(downloadPath, packageMetadata.Identity.Id + "." + packageMetadata.Identity.Version + ".nupkg");
             if (_environmentSettings.Host.FileSystem.FileExists(filePath))
             {
@@ -90,7 +94,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                     packageMetadata.Identity.Id,
                     packageMetadata.Identity.Version,
                     packageStream,
-                    cache,
+                    _cacheSettings,
                     _nugetLogger,
                     cancellationToken).ConfigureAwait(false))
                 {
@@ -164,11 +168,11 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             }
             _ = packageSources ?? throw new ArgumentNullException(nameof(packageSources));
 
-            SourceCacheContext cache = new SourceCacheContext();
+
             ConcurrentDictionary<PackageSource, IEnumerable<IPackageSearchMetadata>> searchResults = new ConcurrentDictionary<PackageSource, IEnumerable<IPackageSearchMetadata>>();
             await Task.WhenAll(packageSources.Select(async source =>
                 {
-                    IEnumerable<IPackageSearchMetadata> foundPackages = await GetPackageMetadataAsync(cache, source, packageIdentifier, includePrerelease: false, cancellationToken).ConfigureAwait(false);
+                    IEnumerable<IPackageSearchMetadata> foundPackages = await GetPackageMetadataAsync(source, packageIdentifier, includePrerelease: false, cancellationToken).ConfigureAwait(false);
                     if (foundPackages == null)
                     {
                         return;
@@ -208,13 +212,11 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             _ = packageVersion ?? throw new ArgumentNullException(nameof(packageVersion));
             _ = sources ?? throw new ArgumentNullException(nameof(sources));
 
-            SourceCacheContext cache = new SourceCacheContext();
-
             bool atLeastOneSourceValid = false;
             foreach (PackageSource source in sources)
             {
                 _nugetLogger.LogDebug($"Searching {packageIdentifier}::{packageVersion} in {source.Source}.");
-                IEnumerable<IPackageSearchMetadata> foundPackages = await GetPackageMetadataAsync(cache, source, packageIdentifier, includePrerelease:true, cancellationToken).ConfigureAwait(false);
+                IEnumerable<IPackageSearchMetadata> foundPackages = await GetPackageMetadataAsync(source, packageIdentifier, includePrerelease:true, cancellationToken).ConfigureAwait(false);
                 if (foundPackages == null)
                 {
                     continue;
@@ -241,7 +243,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             throw new PackageNotFoundException(packageIdentifier, packageVersion, sources.Select(source => source.Source));
         }
 
-        private async Task<IEnumerable<IPackageSearchMetadata>> GetPackageMetadataAsync(SourceCacheContext cache, PackageSource source, string packageIdentifier, bool includePrerelease = false, CancellationToken cancellationToken = default)
+        private async Task<IEnumerable<IPackageSearchMetadata>> GetPackageMetadataAsync(PackageSource source, string packageIdentifier, bool includePrerelease = false, CancellationToken cancellationToken = default)
         {
             _nugetLogger.LogDebug($"Searching for {packageIdentifier} in {source.Source}.");
             try
@@ -252,7 +254,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                     packageIdentifier,
                     includePrerelease: includePrerelease,
                     includeUnlisted: false,
-                    cache,
+                    _cacheSettings,
                     _nugetLogger,
                     cancellationToken).ConfigureAwait(false);
 
