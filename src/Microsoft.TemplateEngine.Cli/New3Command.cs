@@ -242,11 +242,11 @@ namespace Microsoft.TemplateEngine.Cli
             CreationResultStatus resultStatus = CreationResultStatus.Success;
             _telemetryLogger.TrackEvent(CommandName + TelemetryConstants.InstallEventSuffix, new Dictionary<string, string> { { TelemetryConstants.ToInstallCount, _commandInput.ToInstallList.Count.ToString() } });
 
+            DefaultCredentialServiceUtility.SetupDefaultCredentialService(new CliNuGetLogger(), !_commandInput.IsInteractiveFlagSpecified);
             var details = new Dictionary<string, string>();
             if (_commandInput.InstallNuGetSourceList?.Count > 0)
             {
                 details[InstallerConstants.NuGetSourcesKey] = string.Join(InstallerConstants.NuGetSourcesSeparator.ToString(), _commandInput.InstallNuGetSourceList);
-                DefaultCredentialServiceUtility.SetupDefaultCredentialService(new CliNuGetLogger(), !_commandInput.IsInteractiveFlagSpecified);
             }
             if (_commandInput.IsInteractiveFlagSpecified)
             {
