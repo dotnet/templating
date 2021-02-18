@@ -618,7 +618,6 @@ namespace Microsoft.TemplateEngine.Cli
                     Reporter.Output.WriteLine();
 
                     IReadOnlyList<UpdateResult> updateResults = await provider.UpdateAsync(updatesToApply.Select(update => UpdateRequest.FromCheckUpdateResult(update))).ConfigureAwait(false);
-                    await _settingsLoader.RebuildCacheFromSettingsIfNotCurrent(true).ConfigureAwait(false);
                     foreach (var updateResult in updateResults)
                     {
                         if (!updateResult.Success)
