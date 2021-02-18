@@ -7,10 +7,12 @@ using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Installer;
 using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
 using Microsoft.TemplateEngine.Cli.CommandParsing;
+using Microsoft.TemplateEngine.Cli.NuGet;
 using Microsoft.TemplateEngine.Cli.TemplateResolution;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Edge.Template;
 using Microsoft.TemplateEngine.Utils;
+using NuGet.Credentials;
 
 namespace Microsoft.TemplateEngine.Cli
 {
@@ -71,8 +73,9 @@ namespace Microsoft.TemplateEngine.Cli
                 return;
             }
 
-            IReadOnlyList<CheckUpdateResult> versionChecks = await managedTemplateSource.ManagedProvider.GetLatestVersionsAsync(new[] { managedTemplateSource }, cancellationToken).ConfigureAwait(false);
-            if (versionChecks.Count == 1)
+            DefaultCredentialServiceUtility.SetupDefaultCredentialService(new CliNuGetLogger(), nonInteractive: !_commandInput.IsInteractiveFlagSpecified);
+            IReadOnlyList<CheckUpdateResult> versionChecks = await managedTemplateSource.Installer.Provider.GetLatestVersionsAsync(new[] { managedTemplateSource }, cancellationToken).ConfigureAwait(false);
+            if (versionChecks.Count == 1 && versionChecks[0].Success)
             {
                 var updateResult = versionChecks[0];
                 if (!updateResult.IsLatestVersion)
@@ -85,7 +88,22 @@ namespace Microsoft.TemplateEngine.Cli
             }
             else
             {
-                Reporter.Error.WriteLine(string.Format(LocalizableStrings.UpdateCheck_UnknownError, managedTemplateSource.Identifier));
+                switch (versionChecks[0]?.Error)
+                {
+                    case InstallerErrorCode.InvalidSource:
+                        Reporter.Error.WriteLine($"Failed to check update for {managedTemplateSource.DisplayName}: no NuGet feeds are configured or they are invalid.".Bold().Red());
+                        break;
+                    case InstallerErrorCode.PackageNotFound:
+                        Reporter.Error.WriteLine($"Failed to check update for {managedTemplateSource.DisplayName}: the package is not available in configured NuGet feed.".Bold().Red());
+                        break;
+                    case InstallerErrorCode.UnsupportedRequest:
+                        Reporter.Error.WriteLine($"Failed to check update for {managedTemplateSource.DisplayName}: the package is not supported.".Bold().Red());
+                        break;
+                    case InstallerErrorCode.GenericError:
+                    default:
+                        Reporter.Error.WriteLine($"Failed to check update for {managedTemplateSource.DisplayName}: {versionChecks[0]?.ErrorMessage}.".Bold().Red());
+                        break;
+                }
             }
         }
     }

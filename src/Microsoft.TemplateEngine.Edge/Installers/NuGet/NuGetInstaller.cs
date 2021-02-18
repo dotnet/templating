@@ -82,32 +82,32 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         public async Task<IReadOnlyList<CheckUpdateResult>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources, CancellationToken cancellationToken)
         {
             _ = sources ?? throw new ArgumentNullException(nameof(sources));
-            return await Task.WhenAll(sources.Select(source =>
+            return await Task.WhenAll(sources.Select(async source =>
                 {
                     if (source is NuGetManagedTemplatesSource nugetSource)
                     {
                         try
                         {
-                            return _updateChecker.GetLatestVersionAsync(nugetSource, CancellationToken.None);
+                            return await _updateChecker.GetLatestVersionAsync(nugetSource, CancellationToken.None).ConfigureAwait(false);
                         }
                         catch (PackageNotFoundException e)
                         {
-                            return Task.FromResult(CheckUpdateResult.CreateFailure(source, InstallerErrorCode.PackageNotFound, e.Message));
+                            return CheckUpdateResult.CreateFailure(source, InstallerErrorCode.PackageNotFound, e.Message);
                         }
                         catch (InvalidNuGetSourceException e)
                         {
-                            return Task.FromResult(CheckUpdateResult.CreateFailure(source, InstallerErrorCode.InvalidSource, e.Message));
+                            return CheckUpdateResult.CreateFailure(source, InstallerErrorCode.InvalidSource, e.Message);
                         }
                         catch (Exception e)
                         {
                             _environmentSettings.Host.LogDiagnosticMessage($"Retreving latest version for package {source.DisplayName} failed.", DebugLogCategory);
                             _environmentSettings.Host.LogDiagnosticMessage($"Details:{e.ToString()}", DebugLogCategory);
-                            return Task.FromResult(CheckUpdateResult.CreateFailure(source, InstallerErrorCode.GenericError, $"Failed to check the update for the package {source.Identifier}, reason: {e.Message}"));
+                            return CheckUpdateResult.CreateFailure(source, InstallerErrorCode.GenericError, $"Failed to check the update for the package {source.Identifier}, reason: {e.Message}");
                         }
                     }
                     else
                     {
-                        return Task.FromResult(CheckUpdateResult.CreateFailure(source, InstallerErrorCode.UnsupportedRequest, $"source {source.Identifier} is not supported by installer {Name}"));
+                        return CheckUpdateResult.CreateFailure(source, InstallerErrorCode.UnsupportedRequest, $"source {source.Identifier} is not supported by installer {Name}");
                     }
                 })).ConfigureAwait(false);
         }
