@@ -136,11 +136,8 @@ namespace Microsoft.TemplateEngine.Edge
             public async Task<IReadOnlyList<UpdateResult>> UpdateAsync(IEnumerable<UpdateRequest> updateRequests)
             {
                 _ = updateRequests ?? throw new ArgumentNullException(nameof(updateRequests));
-
                 IEnumerable<UpdateRequest> updatesToApply = updateRequests.Where(request => request.Version != request.Source.Version);
-
-                return await Task.WhenAll(updatesToApply.Select(
-                    async updateRequest => await UpdateAsync(updateRequest).ConfigureAwait(false))).ConfigureAwait(false);
+                return await Task.WhenAll(updatesToApply.Select(updateRequest => UpdateAsync(updateRequest))).ConfigureAwait(false);
             }
 
             private async Task<UpdateResult> UpdateAsync(UpdateRequest updateRequest)
