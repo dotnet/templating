@@ -15,7 +15,7 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
         public static UpdateRequest FromCheckUpdateResult (CheckUpdateResult request)
         {
             _ = request ?? throw new ArgumentNullException(nameof(request));
-            if (string.IsNullOrWhiteSpace(request.Version))
+            if (string.IsNullOrWhiteSpace(request.LatestVersion))
             {
                 throw new ArgumentException("Version cannot be null or empty", nameof(request));
             }
@@ -23,7 +23,7 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
             return new UpdateRequest()
             {
                 Source = request.Source,
-                Version = request.Version
+                Version = request.LatestVersion
             };
         }
     }

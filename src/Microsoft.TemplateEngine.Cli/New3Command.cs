@@ -601,7 +601,7 @@ namespace Microsoft.TemplateEngine.Cli
             foreach (var (provider, sources) in managedSourcedGroupedByProvider)
             {
                 IReadOnlyList<CheckUpdateResult> checkUpdateResults = await provider.GetLatestVersionsAsync(sources, CancellationToken.None).ConfigureAwait(false);
-                IEnumerable<CheckUpdateResult> updatesToApply = checkUpdateResults.Where(update => !update.IsLatestVersion && !string.IsNullOrWhiteSpace(update.Version));
+                IEnumerable<CheckUpdateResult> updatesToApply = checkUpdateResults.Where(update => !update.IsLatestVersion && !string.IsNullOrWhiteSpace(update.LatestVersion));
                 if (!updatesToApply.Any())
                 {
                     Reporter.Output.WriteLine("All template packages are up-to-date.");
@@ -613,7 +613,7 @@ namespace Microsoft.TemplateEngine.Cli
                     Reporter.Output.WriteLine("The following template packages will be updated:");
                     foreach (CheckUpdateResult update in updatesToApply)
                     {
-                        Reporter.Output.WriteLine($"  {update.Source.Identifier}, version: {update.Version}");
+                        Reporter.Output.WriteLine($"  {update.Source.Identifier}, version: {update.LatestVersion}");
                     }
                     Reporter.Output.WriteLine();
 
@@ -632,7 +632,7 @@ namespace Microsoft.TemplateEngine.Cli
                     foreach (var updateResult in updatesToApply)
                     {
                         Reporter.Output.WriteLine(string.Format(LocalizableStrings.UpdateAvailable, updateResult.Source.DisplayName));
-                        string installString = $"{updateResult.Source.Identifier}::{updateResult.Version}"; // the package::version that will be installed
+                        string installString = $"{updateResult.Source.Identifier}::{updateResult.LatestVersion}"; // the package::version that will be installed
                         Reporter.Output.WriteLine(string.Format(LocalizableStrings.UpdateCheck_InstallCommand, CommandName, installString));
                     }
                 }

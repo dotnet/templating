@@ -7,9 +7,9 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
 {
     public class CheckUpdateResult : Result
     {
-        public string Version { get; private set; }
+        public string LatestVersion { get; private set; }
 
-        public bool IsLatestVersion => Source.Version == Version;
+        public bool IsLatestVersion { get; private set; }
 
         public static CheckUpdateResult CreateSuccessNoUpdate(IManagedTemplatesSource source)
         {
@@ -17,17 +17,18 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
             {
                 Error = InstallerErrorCode.Success,
                 Source = source,
-                Version = source.Version
+                LatestVersion = source.Version
             };
         }
 
-        public static CheckUpdateResult CreateSuccess(IManagedTemplatesSource source, string version)
+        public static CheckUpdateResult CreateSuccess(IManagedTemplatesSource source, string version, bool isLatest)
         {
             return new CheckUpdateResult()
             {
                 Error = InstallerErrorCode.Success,
                 Source = source,
-                Version = version
+                LatestVersion = version,
+                IsLatestVersion = isLatest,
             };
         }
 

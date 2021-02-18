@@ -13,7 +13,7 @@ namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
         /// <summary>
         /// Takes list of <see cref="IManagedTemplatesSource"/> as input so it can check for latest versions in batch.
         /// And returns list of <see cref="CheckUpdateResult"/> which contains original <see cref="IManagedTemplatesSource"/>
-        /// so caller can compare <see cref="CheckUpdateResult.Version"/> with <see cref="IManagedTemplatesSource.Version"/>
+        /// so caller can compare <see cref="CheckUpdateResult.LatestVersion"/> with <see cref="IManagedTemplatesSource.Version"/>
         /// </summary>
         /// <param name="managedSources">List of <see cref="IManagedTemplatesSource"/> to get latest version for.</param>
         /// <returns>List of <see cref="ManagedTemplatesSourceUpdate"/></returns>

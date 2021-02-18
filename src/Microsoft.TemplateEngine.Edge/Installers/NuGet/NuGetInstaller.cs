@@ -86,11 +86,6 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 {
                     if (source is NuGetManagedTemplatesSource nugetSource)
                     {
-                        if (nugetSource.LocalPackage)
-                        {
-                            //updates for locally installed packages are not supported
-                            return Task.FromResult(CheckUpdateResult.CreateSuccessNoUpdate(source));
-                        }
                         try
                         {
                             return _updateChecker.GetLatestVersionAsync(nugetSource, CancellationToken.None);
