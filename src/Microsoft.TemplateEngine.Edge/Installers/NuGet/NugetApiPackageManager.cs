@@ -60,7 +60,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
             if (string.IsNullOrWhiteSpace(installRequest.Version))
             {
-                (source, packageMetadata) = await GetLatestVersionInternalAsync(installRequest.Identifier, packagesSources, cancellationToken).ConfigureAwait(false);
+                (source, packageMetadata) = await GetLatestVersionInternalAsync(installRequest.Identifier, packagesSources, includePreview: false, cancellationToken).ConfigureAwait(false);
             }
             else
             {
@@ -140,7 +140,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         }
 
         /// <summary>
-        /// Gets the latest version for the package. Uses NuGet feeds configured for current directory and the source if specified from <paramref name="source"/>.
+        /// Gets the latest stable version for the package. If the package has preview version installed, returns the latest preview.
+        /// Uses NuGet feeds configured for current directory and the source if specified from <paramref name="source"/>.
         /// </summary>
         /// <param name="source"></param>
         /// <param name="cancellationToken"></param>
@@ -149,18 +150,22 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         /// <exception cref="PackageNotFoundException">when the package cannot be find in default or source NuGet feeds</exception>
         public async Task<CheckUpdateResult> GetLatestVersionAsync(NuGetManagedTemplatesSource source, CancellationToken cancellationToken)
         {
+            _ = source ?? throw new ArgumentNullException(nameof(source));
+
+            //if preview version is installed, check for the latest preview version, otherwise for latest stable
+            bool previewVersionInstalled = false;
+            if (NuGetVersion.TryParse(source.Version, out NuGetVersion currentVersion))
+            {
+                previewVersionInstalled = currentVersion.IsPrerelease;
+            }
+
             IEnumerable<PackageSource> packageSources = LoadNuGetSources(source.NuGetSource);
-            string latestVersion = await GetLatestVersionAsync(source.Identifier, packageSources, cancellationToken).ConfigureAwait(false);
-            return CheckUpdateResult.CreateSuccess(source, latestVersion);
+            var (_, package) = await GetLatestVersionInternalAsync(source.Identifier, packageSources, previewVersionInstalled, cancellationToken).ConfigureAwait(false);
+            bool isLatestVersion = currentVersion != null ? currentVersion >= package.Identity.Version : false;
+            return CheckUpdateResult.CreateSuccess(source, package.Identity.Version.ToNormalizedString(), isLatestVersion);
         }
 
-        private async Task<string> GetLatestVersionAsync(string packageIdentifier, IEnumerable<PackageSource> packageSources, CancellationToken cancellationToken)
-        {
-            var (_, package) = await GetLatestVersionInternalAsync(packageIdentifier, packageSources, cancellationToken).ConfigureAwait(false);
-            return package.Identity.Version.ToNormalizedString();
-        }
-
-        private async Task<(PackageSource, IPackageSearchMetadata)> GetLatestVersionInternalAsync(string packageIdentifier, IEnumerable<PackageSource> packageSources, CancellationToken cancellationToken)
+        private async Task<(PackageSource, IPackageSearchMetadata)> GetLatestVersionInternalAsync(string packageIdentifier, IEnumerable<PackageSource> packageSources, bool includePreview, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(packageIdentifier))
             {
@@ -172,7 +177,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             ConcurrentDictionary<PackageSource, IEnumerable<IPackageSearchMetadata>> searchResults = new ConcurrentDictionary<PackageSource, IEnumerable<IPackageSearchMetadata>>();
             await Task.WhenAll(packageSources.Select(async source =>
                 {
-                    IEnumerable<IPackageSearchMetadata> foundPackages = await GetPackageMetadataAsync(source, packageIdentifier, includePrerelease: false, cancellationToken).ConfigureAwait(false);
+                    IEnumerable<IPackageSearchMetadata> foundPackages = await GetPackageMetadataAsync(source, packageIdentifier, includePrerelease: true, cancellationToken).ConfigureAwait(false);
                     if (foundPackages == null)
                     {
                         return;
@@ -195,12 +200,28 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             }
 
             var latestVersion = accumulativeSearchResults.Aggregate(
-                (current, max) =>
+                (max, current) =>
                 {
                     if (max == null) return current;
                     return current.package.Identity.Version > max.package.Identity.Version ? current : max;
                 });
-            return (latestVersion.source, latestVersion.package);
+
+            var latestStableVersion = accumulativeSearchResults.Aggregate(
+                (max, current) =>
+                {
+                    if (current.package.Identity.Version.IsPrerelease) return max;
+                    if (max == null) return current;
+                    return current.package.Identity.Version > max.package.Identity.Version ? current : max;
+                });
+
+            if (latestStableVersion != null && !includePreview)
+            {
+                return (latestStableVersion.source, latestStableVersion.package);
+            }
+            else
+            {
+                return (latestVersion.source, latestVersion.package);
+            }
         }
 
         private async Task<(PackageSource, IPackageSearchMetadata)> GetPackageMetadataAsync(string packageIdentifier, NuGetVersion packageVersion, IEnumerable<PackageSource> sources, CancellationToken cancellationToken)
