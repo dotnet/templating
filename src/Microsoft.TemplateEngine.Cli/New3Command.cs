@@ -254,7 +254,6 @@ namespace Microsoft.TemplateEngine.Cli
             if (_commandInput.InstallNuGetSourceList?.Count > 0)
             {
                 details[InstallerConstants.NuGetSourcesKey] = string.Join(InstallerConstants.NuGetSourcesSeparator.ToString(), _commandInput.InstallNuGetSourceList);
-                DefaultCredentialServiceUtility.SetupDefaultCredentialService(new CliNuGetLogger(), !_commandInput.IsInteractiveFlagSpecified);
             }
             if (_commandInput.IsInteractiveFlagSpecified)
             {
@@ -308,10 +307,11 @@ namespace Microsoft.TemplateEngine.Cli
             }
             Reporter.Output.WriteLine();
 
+            DefaultCredentialServiceUtility.SetupDefaultCredentialService(new CliNuGetLogger(), !_commandInput.IsInteractiveFlagSpecified);
             var installResults = await managedSourceProvider.InstallAsync(installRequests, CancellationToken.None).ConfigureAwait(false);
             foreach (InstallResult result in installResults)
             {
-                await DisplayInstallResultAsync(result.InstallRequest.DisplayName, result);
+                await DisplayInstallResultAsync(result.InstallRequest.DisplayName, result).ConfigureAwait(false);
                 if (!result.Success)
                 {
                     resultStatus = CreationResultStatus.CreateFailed;
@@ -325,7 +325,6 @@ namespace Microsoft.TemplateEngine.Cli
             if (result.Success)
             {
                 Reporter.Output.WriteLine($"Success: {result.Source.DisplayName} installed the following templates:");
-
                 IEnumerable<ITemplateInfo> templates = await result.Source.GetTemplates(EnvironmentSettings).ConfigureAwait(false);
                 HelpForTemplateResolution.DisplayTemplateList(templates, EnvironmentSettings, _commandInput, _defaultLanguage);
             }
@@ -345,9 +344,6 @@ namespace Microsoft.TemplateEngine.Cli
                     case InstallerErrorCode.UnsupportedRequest:
                         Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedUnsupportedRequest, packageToInstall).Bold().Red());
                         break;
-                    case InstallerErrorCode.GenericError:
-                        Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedGenericError, packageToInstall).Bold().Red());
-                        break;
                     case InstallerErrorCode.AlreadyInstalled:
                         Reporter.Error.WriteLine($"{packageToInstall} is already installed.".Bold().Red());
                         break;
@@ -356,6 +352,10 @@ namespace Microsoft.TemplateEngine.Cli
                         break;
                     case InstallerErrorCode.InvalidPackage:
                         Reporter.Error.WriteLine($"Failed to install {packageToInstall}, the template package is invalid.".Bold().Red());
+                        break;
+                    case InstallerErrorCode.GenericError:
+                    default:
+                        Reporter.Error.WriteLine(string.Format(LocalizableStrings.InstallFailedGenericError, packageToInstall).Bold().Red());
                         break;
                 }
             }
@@ -613,10 +613,32 @@ namespace Microsoft.TemplateEngine.Cli
             bool applyUpdates = _commandInput.ApplyUpdates;
             CreationResultStatus success = CreationResultStatus.Success;
             var managedSourcedGroupedByProvider = await EnvironmentSettings.SettingsLoader.TemplatesSourcesManager.GetManagedSourcesGroupedByProvider().ConfigureAwait(false);
+            DefaultCredentialServiceUtility.SetupDefaultCredentialService(new CliNuGetLogger(), !_commandInput.IsInteractiveFlagSpecified);
             foreach (var (provider, sources) in managedSourcedGroupedByProvider)
             {
                 IReadOnlyList<CheckUpdateResult> checkUpdateResults = await provider.GetLatestVersionsAsync(sources, CancellationToken.None).ConfigureAwait(false);
-                IEnumerable<CheckUpdateResult> updatesToApply = checkUpdateResults.Where(update => !update.IsLatestVersion && !string.IsNullOrWhiteSpace(update.LatestVersion));
+                //handle errors
+                foreach (CheckUpdateResult result in checkUpdateResults.Where(result => !result.Success))
+                {
+                    switch (result.Error)
+                    {
+                        case InstallerErrorCode.InvalidSource:
+                            Reporter.Error.WriteLine($"Failed to check update for {result.Source.DisplayName}: no NuGet feeds are configured or they are invalid.".Bold().Red());
+                            break;
+                        case InstallerErrorCode.PackageNotFound:
+                            Reporter.Error.WriteLine($"Failed to check update for {result.Source.DisplayName}: the package is not available in configured NuGet feed.".Bold().Red());
+                            break;
+                        case InstallerErrorCode.UnsupportedRequest:
+                            Reporter.Error.WriteLine($"Failed to check update for {result.Source.DisplayName}: the package is not supported.".Bold().Red());
+                            break;
+                        case InstallerErrorCode.GenericError:
+                        default:
+                            Reporter.Error.WriteLine($"Failed to check update for {result.Source.DisplayName}: {result.ErrorMessage}.".Bold().Red());
+                            break;
+                    }
+                }
+
+                IEnumerable<CheckUpdateResult> updatesToApply = checkUpdateResults.Where(update => update.Success && !update.IsLatestVersion && !string.IsNullOrWhiteSpace(update.LatestVersion));
                 if (!updatesToApply.Any())
                 {
                     Reporter.Output.WriteLine("All template packages are up-to-date.");
