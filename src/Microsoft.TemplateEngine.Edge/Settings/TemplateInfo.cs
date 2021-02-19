@@ -59,7 +59,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                             Name = tagInfo.Key,
                             Documentation = tagInfo.Value.Description,
                             DefaultValue = tagInfo.Value.DefaultValue,
-                            Choices = tagInfo.Value.ChoicesAndDescriptions,
+                            Choices = tagInfo.Value.Choices,
                             DataType = "choice"
                         };
 

@@ -1,11 +1,33 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+#nullable enable
+
 namespace Microsoft.TemplateEngine.Abstractions
 {
+    /// <summary>
+    /// Defines the representation of a parameter in template cache.
+    /// </summary>
     public interface ICacheParameter
     {
-        string DataType { get; }
+        /// <summary>
+        /// Gets the type of the parameter.
+        /// </summary>
+        string? DataType { get; }
 
-        string DefaultValue { get; }
+        /// <summary>
+        /// Gets the default value to be used if the user did not provide a value.
+        /// </summary>
+        string? DefaultValue { get; }
 
-        string Description { get; }
+        /// <summary>
+        /// Gets the friendly name of the parameter to be displayed to the user.
+        /// </summary>
+        string? DisplayName { get; }
+
+        /// <summary>
+        /// Gets the detailed description of the parameter to be displayed to the user.
+        /// </summary>
+        string? Description { get; }
     }
 }
