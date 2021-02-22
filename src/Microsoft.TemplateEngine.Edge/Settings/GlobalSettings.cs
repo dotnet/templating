@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.GlobalSettings;
 using Newtonsoft.Json;
+using NuGet.Common;
 
 namespace Microsoft.TemplateEngine.Edge.Settings
 {
@@ -106,13 +107,56 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             SettingsChanged?.Invoke();
         }
 
+        class MyMutex
+        {
+            TaskCompletionSource<bool> _taskCompletionSource;
+            CancellationToken _token;
+            ManualResetEvent _mre = new ManualResetEvent(false);
+
+            public MyMutex(CancellationToken token)
+            {
+                _token = token;
+                _taskCompletionSource = new TaskCompletionSource<bool>();
+                var thread = new Thread(new ThreadStart(WaitLoop));
+                thread.IsBackground = true;
+                thread.Start();
+            }
+
+            public Task WaitAsync()
+            {
+                return _taskCompletionSource.Task;
+            }
+
+            private void WaitLoop()
+            {
+                var mutex = new Mutex(false, "{01B5E8B0-EF76-48ED-BE95-A0458D7DA2C2}");
+                while (true)
+                {
+                    if (_token.IsCancellationRequested)
+                    {
+                        _taskCompletionSource.SetCanceled();
+                        return;
+                    }
+                    if (mutex.WaitOne(20))
+                        break;
+                }
+                _taskCompletionSource.SetResult(true);
+                _mre.WaitOne();
+                mutex.ReleaseMutex();
+            }
+            public void Release()
+            {
+                _mre.Set();
+            }
+        }
+
         class DisposableCallback : IDisposable
         {
-            private Action<Stream, Mutex>? _disposeCalled;
+            private Action<Stream, MyMutex?>? _disposeCalled;
             private Stream _fileStream;
-            private Mutex _mutex;
+            private MyMutex? _mutex;
 
-            public DisposableCallback(Action<Stream, Mutex> disposeCalled, Stream fileStream, Mutex mutex)
+            public DisposableCallback(Action<Stream, MyMutex?> disposeCalled, Stream fileStream, MyMutex? mutex)
             {
                 _disposeCalled = disposeCalled;
                 _fileStream = fileStream;
@@ -135,20 +179,13 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
                 try
                 {
-                    var stream = _environmentSettings.Host.FileSystem.CreateFileStream(_globalSettingsFile, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
-                    var mutex = new Mutex(false, "{DEAEF4B4-4B59-4A80-A488-9D85CC18818A}");
+                    MyMutex? mutex = null;
                     if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                     {
-                        while (!token.IsCancellationRequested)
-                        {
-                            if (await Task.Run(() => mutex.WaitOne(20)))
-                            {
-                                break;
-                            }
-                        }
-                        if (token.IsCancellationRequested)
-                            throw new TaskCanceledException();
+                        mutex = new MyMutex(token);
+                        await mutex.WaitAsync();
                     }
+                    var stream = _environmentSettings.Host.FileSystem.CreateFileStream(_globalSettingsFile, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
                     _locked = true;
                     ReloadSettings(true, stream);
                     return new DisposableCallback(Unlock, stream, mutex);
@@ -164,7 +201,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             }
         }
 
-        private void Unlock(Stream stream, Mutex mutex)
+        private void Unlock(Stream stream, MyMutex? mutex)
         {
             try
             {
@@ -181,10 +218,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             finally
             {
                 stream.Dispose();
-                if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    mutex.ReleaseMutex();
-                }
+                mutex?.Release();
             }
         }
 
