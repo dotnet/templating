@@ -149,39 +149,26 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         public async Task RebuildCacheFromSettingsIfNotCurrent(bool forceRebuild)
         {
             EnsureLoaded();
-            var placesThatNeedScanning = new HashSet<string>();
-            var mountsPointsInUseNow = new HashSet<string>();
+            forceRebuild |= _userTemplateCache.Locale != CultureInfo.CurrentUICulture.Name;
 
-            if (forceRebuild ||
-                _userTemplateCache.Locale != CultureInfo.CurrentUICulture.Name)
+            var placesThatNeedScanning = new HashSet<string>();
+            var allTemplatesSources = await _templatesSourcesManager.GetTemplatesSources(forceRebuild).ConfigureAwait(false);
+
+            if (forceRebuild)
             {
                 _userTemplateCache = new TemplateCache(_environmentSettings);
-                var completedTask = await _templatesSourcesManager.GetTemplatesSources(forceRebuild).ConfigureAwait(false);
-                foreach (var source in completedTask)
+                foreach (var source in allTemplatesSources)
                 {
                     placesThatNeedScanning.Add(source.MountPointUri);
-                    mountsPointsInUseNow.Add(source.MountPointUri);
                 }
             }
             else
             {
-                var existingMountPoints = new Dictionary<string, DateTime?>();
-
-                foreach (var template in _userTemplateCache.TemplateInfo)
+                foreach (var source in allTemplatesSources)
                 {
-                    if (existingMountPoints.TryGetValue(template.MountPointUri, out var existingTime))
-                        if (template.ConfigTimestampUtc < existingTime)
-                            continue;//existing time in dictionary is newer, hence don't replace it
-                    existingMountPoints[template.MountPointUri] = template.ConfigTimestampUtc;
-                }
-
-                var completedTask = await _templatesSourcesManager.GetTemplatesSources(forceRebuild).ConfigureAwait(false);
-                foreach (var source in completedTask)
-                {
-                    mountsPointsInUseNow.Add(source.MountPointUri);
-                    if (existingMountPoints.TryGetValue(source.MountPointUri, out var lastScanTime))
+                    if (_userTemplateCache.MountPointsInfo.TryGetValue(source.MountPointUri, out var cachedLastChangeTime))
                     {
-                        if (source.LastChangeTime > lastScanTime)
+                        if (source.LastChangeTime > cachedLastChangeTime)
                             placesThatNeedScanning.Add(source.MountPointUri);
                     }
                     else
@@ -205,7 +192,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
             // When writing the template caches, we need the existing cache version to read the existing caches for before updating.
             // so don't update it until after the template caches are written.
-            _userTemplateCache.WriteTemplateCaches(mountsPointsInUseNow);
+            _userTemplateCache.WriteTemplateCaches(allTemplatesSources.ToDictionary(x => x.MountPointUri, x => x.LastChangeTime));
         }
 
         public ITemplate LoadTemplate(ITemplateInfo info, string baselineName)

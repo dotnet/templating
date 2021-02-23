@@ -221,8 +221,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     return false;
                 }
 
-                runnableProjectTemplate.ConfigTimestampUtc = DateTime.UtcNow;
-
                 template = runnableProjectTemplate;
                 return true;
             }
