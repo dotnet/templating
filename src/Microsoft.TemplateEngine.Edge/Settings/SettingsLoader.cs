@@ -152,12 +152,14 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
             var placesThatNeedScanning = new HashSet<string>();
             var allTemplatesSources = await _templatesSourcesManager.GetTemplatesSources(forceRebuild).ConfigureAwait(false);
+            var mountPoints = new Dictionary<string, DateTime>();
 
             if (forceRebuild)
             {
                 _userTemplateCache = new TemplateCache(_environmentSettings);
                 foreach (var source in allTemplatesSources)
                 {
+                    mountPoints[source.MountPointUri] = source.LastChangeTime;
                     placesThatNeedScanning.Add(source.MountPointUri);
                 }
             }
@@ -165,6 +167,8 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             {
                 foreach (var source in allTemplatesSources)
                 {
+                    mountPoints[source.MountPointUri] = source.LastChangeTime;
+
                     if (_userTemplateCache.MountPointsInfo.TryGetValue(source.MountPointUri, out var cachedLastChangeTime))
                     {
                         if (source.LastChangeTime > cachedLastChangeTime)
@@ -191,7 +195,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
             // When writing the template caches, we need the existing cache version to read the existing caches for before updating.
             // so don't update it until after the template caches are written.
-            _userTemplateCache.WriteTemplateCaches(allTemplatesSources.ToDictionary(x => x.MountPointUri, x => x.LastChangeTime));
+            _userTemplateCache.WriteTemplateCaches(mountPoints);
         }
 
         public ITemplate LoadTemplate(ITemplateInfo info, string baselineName)
