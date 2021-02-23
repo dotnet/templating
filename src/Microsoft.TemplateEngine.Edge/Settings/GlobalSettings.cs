@@ -34,6 +34,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             environmentSettings.Host.FileSystem.CreateDirectory(Path.GetDirectoryName(_globalSettingsFile));
             _watcher = environmentSettings.Host.FileSystem.WatchFileChanges(_globalSettingsFile, FileChanged);
             ReloadSettings(false, null);
+            UserInstalledTemplatesSources = _userInstalledTemplatesSources.ToArray();
         }
 
         void ReloadSettings(bool triggerEvent, Stream? existingStream)
@@ -73,6 +74,8 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 settingsChanged = true;
             }
 
+            UserInstalledTemplatesSources = _userInstalledTemplatesSources.ToArray();
+
             if (triggerEvent && settingsChanged)
                 SettingsChanged?.Invoke();
         }
@@ -88,7 +91,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         private List<TemplatesSourceData> _userInstalledTemplatesSources = new List<TemplatesSourceData>();
 
-        public IReadOnlyList<TemplatesSourceData> UserInstalledTemplatesSources => _userInstalledTemplatesSources;
+        public IReadOnlyList<TemplatesSourceData> UserInstalledTemplatesSources { get; private set; }
 
         public void Add(TemplatesSourceData userInstalledTemplate)
         {
@@ -96,7 +99,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 throw new InvalidOperationException($"Call {nameof(LockAsync)} before calling this method");
             _userInstalledTemplatesSources.RemoveAll(data => data.MountPointUri == userInstalledTemplate.MountPointUri);
             _userInstalledTemplatesSources.Add(userInstalledTemplate);
-            SettingsChanged?.Invoke();
         }
 
         public void Remove(TemplatesSourceData userInstalledTemplate)
@@ -104,7 +106,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             if (!_locked)
                 throw new InvalidOperationException($"Call {nameof(LockAsync)} before calling this method");
             _userInstalledTemplatesSources.RemoveAll(data => data.MountPointUri == userInstalledTemplate.MountPointUri);
-            SettingsChanged?.Invoke();
         }
 
         class MyMutex
@@ -205,6 +206,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         {
             try
             {
+                UserInstalledTemplatesSources = _userInstalledTemplatesSources.ToArray();
                 stream.SetLength(0);//Delete existing content
                 using (var streamWriter = new StreamWriter(stream))
                 {
@@ -219,6 +221,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             {
                 stream.Dispose();
                 mutex?.Release();
+                SettingsChanged?.Invoke();
             }
         }
 
