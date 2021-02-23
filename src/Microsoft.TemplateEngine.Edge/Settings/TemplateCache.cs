@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
 using Microsoft.TemplateEngine.Edge.Template;
 using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json;
@@ -23,6 +24,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             _environmentSettings = environmentSettings;
             _paths = new Paths(environmentSettings);
             TemplateInfo = new List<TemplateInfo>();
+            MountPointsInfo = new Dictionary<string, DateTime>();
             Locale = environmentSettings.Host?.Locale;
         }
 
@@ -40,6 +42,9 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         [JsonProperty]
         public IReadOnlyList<TemplateInfo> TemplateInfo { get; set; }
+
+        [JsonProperty]
+        public Dictionary<string, DateTime> MountPointsInfo { get; set; }
 
         // This method is getting obsolted soon. It's getting replaced by TemplateListFilter.FilterTemplates, which does the same thing,
         // except that the template list to act on is passed in.
@@ -97,6 +102,22 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 Locale = localeToken.ToString();
             }
 
+
+            var mountPointInfo = new Dictionary<string, DateTime>();
+
+            if (contentJobject.TryGetValue(nameof(MountPointsInfo), StringComparison.OrdinalIgnoreCase, out JToken mountPointInfoToken))
+            {
+                if (mountPointInfoToken is IDictionary<string, JToken> dict)
+                {
+                    foreach (var entry in dict)
+                    {
+                        mountPointInfo.Add(entry.Key, entry.Value.ToObject<DateTime>());
+                    }
+                }
+            }
+
+            MountPointsInfo = mountPointInfo;
+
             List<TemplateInfo> templateList = new List<TemplateInfo>();
 
             if (contentJobject.TryGetValue(nameof(TemplateInfo), StringComparison.OrdinalIgnoreCase, out JToken templateInfoToken))
@@ -121,7 +142,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             _paths.Delete(_paths.User.TemplateCacheFile);
         }
 
-        public void WriteTemplateCaches(HashSet<string> mountPoints)
+        public void WriteTemplateCaches(Dictionary<string, DateTime> mountPoints)
         {
             bool hasContentChanges = false;
 
@@ -160,13 +181,13 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             WriteTemplateCache(mountPoints, mergedTemplateList, hasContentChanges);
         }
 
-        private void WriteTemplateCache(HashSet<string> mountPoints, List<TemplateInfo> templates, bool hasContentChanges)
+        private void WriteTemplateCache(Dictionary<string, DateTime> mountPoints, List<TemplateInfo> templates, bool hasContentChanges)
         {
             bool hasMountPointChanges = false;
 
             for (int i = 0; i < templates.Count; ++i)
             {
-                if (!mountPoints.Contains(templates[i].MountPointUri))
+                if (!mountPoints.ContainsKey(templates[i].MountPointUri))
                 {
                     templates.RemoveAt(i);
                     --i;
@@ -177,6 +198,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
             this.Version = Settings.TemplateInfo.CurrentVersion;
             this.TemplateInfo = templates;
+            this.MountPointsInfo = mountPoints;
 
             if (hasContentChanges || hasMountPointChanges)
             {
@@ -222,11 +244,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             if (template is IShortNameList templateWithShortNameList)
             {
                 localizedTemplate.ShortNameList = templateWithShortNameList.ShortNameList;
-            }
-
-            if (template is ITemplateWithTimestamp templateWithTimestamp)
-            {
-                localizedTemplate.ConfigTimestampUtc = templateWithTimestamp.ConfigTimestampUtc;
             }
 
             return localizedTemplate;
