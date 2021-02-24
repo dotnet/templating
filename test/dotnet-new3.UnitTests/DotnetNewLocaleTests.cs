@@ -30,8 +30,17 @@ namespace dotnet_new3.UnitTests
 
             var home = Helpers.CreateTemporaryFolder("Home");
             var thisDir = Path.GetDirectoryName(typeof(DotnetNewLocaleTests).Assembly.Location);
-            var testTemplatesFolder = Path.Combine(thisDir ?? string.Empty, "..", "..", "..", "..", "..",
-                "test", "Microsoft.TemplateEngine.TestTemplates", "test_templates", "TemplateWithLocalization");
+            var testTemplatesFolder = Path.Combine(
+                thisDir ?? string.Empty,
+                "..",
+                "..",
+                "..",
+                "..",
+                "..",
+                "test",
+                "Microsoft.TemplateEngine.TestTemplates",
+                "test_templates",
+                "TemplateWithLocalization");
 
             var commandResult = new DotnetNewCommand(_log, "-i", testTemplatesFolder, "--quiet")
                 .WithWorkingDirectory(Helpers.CreateTemporaryFolder())
@@ -55,8 +64,17 @@ namespace dotnet_new3.UnitTests
         {
             var home = Helpers.CreateTemporaryFolder("Home");
             var thisDir = Path.GetDirectoryName(typeof(DotnetNewLocaleTests).Assembly.Location);
-            var testTemplatesFolder = Path.Combine(thisDir ?? string.Empty, "..", "..", "..", "..", "..",
-                "test", "Microsoft.TemplateEngine.TestTemplates", "test_templates", "TemplateWithLocalization");
+            var testTemplatesFolder = Path.Combine(
+                thisDir ?? string.Empty,
+                "..",
+                "..",
+                "..",
+                "..",
+                "..",
+                "test",
+                "Microsoft.TemplateEngine.TestTemplates",
+                "test_templates",
+                "TemplateWithLocalization");
 
             var commandResult = new DotnetNewCommand(_log, "-i", testTemplatesFolder, "--quiet")
                 .WithWorkingDirectory(Helpers.CreateTemporaryFolder())

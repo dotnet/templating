@@ -28,6 +28,9 @@ namespace Microsoft.TemplateEngine.Cli
 {
     public class New3Command
     {
+        private static readonly Guid _entryMutexGuid = new Guid("5CB26FD1-32DB-4F4C-B3DC-49CFD61633D2");
+        private static Mutex? _entryMutex;
+
         private readonly ITelemetryLogger _telemetryLogger;
         private readonly TemplateCreator _templateCreator;
         private readonly SettingsLoader _settingsLoader;
@@ -72,8 +75,6 @@ namespace Microsoft.TemplateEngine.Cli
             }
         }
 
-        internal static Installer? Installer { get; set; }
-
         public string CommandName { get; }
 
         public string TemplateName => _commandInput.TemplateName;
@@ -82,34 +83,35 @@ namespace Microsoft.TemplateEngine.Cli
 
         public EngineEnvironmentSettings EnvironmentSettings { get; private set; }
 
+        private Installer Installer { get; set; }
+
+        private HashSet<string> AllTemplateShortNames
+        {
+            get
+            {
+                IReadOnlyCollection<ITemplateMatchInfo> allTemplates = TemplateResolver.PerformAllTemplatesQuery(_settingsLoader.UserTemplateCache.TemplateInfo, _hostDataLoader);
+
+                HashSet<string> allShortNames = new HashSet<string>(StringComparer.Ordinal);
+
+                foreach (ITemplateMatchInfo templateMatchInfo in allTemplates)
+                {
+                    if (templateMatchInfo.Info is IShortNameList templateWithShortNameList)
+                    {
+                        allShortNames.UnionWith(templateWithShortNameList.ShortNameList);
+                    }
+                    else
+                    {
+                        allShortNames.Add(templateMatchInfo.Info.ShortName);
+                    }
+                }
+
+                return allShortNames;
+            }
+        }
+
         public static int Run(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, Action<IEngineEnvironmentSettings, IInstaller> onFirstRun, string[] args)
         {
             return Run(commandName, host, telemetryLogger, new New3Callbacks() { OnFirstRun = onFirstRun }, args, null);
-        }
-
-        private static readonly Guid _entryMutexGuid = new Guid("5CB26FD1-32DB-4F4C-B3DC-49CFD61633D2");
-        private static Mutex? _entryMutex;
-
-        private static Mutex EnsureEntryMutex(string hivePath, ITemplateEngineHost host)
-        {
-            if (_entryMutex == null)
-            {
-                string _entryMutexIdentity;
-
-                // this effectively mimics EngineEnvironmentSettings.BaseDir, which is not initialized when this is needed.
-                if (!string.IsNullOrEmpty(hivePath))
-                {
-                    _entryMutexIdentity = $"{_entryMutexGuid.ToString()}-{hivePath}".Replace("\\", "_").Replace("/", "_");
-                }
-                else
-                {
-                    _entryMutexIdentity = $"{_entryMutexGuid.ToString()}-{host.HostIdentifier}-{host.Version}".Replace("\\", "_").Replace("/", "_");
-                }
-
-                _entryMutex = new Mutex(false, _entryMutexIdentity);
-            }
-
-            return _entryMutex;
         }
 
         public static int Run(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, Action<IEngineEnvironmentSettings, IInstaller> onFirstRun, string[] args, string hivePath)
@@ -117,13 +119,13 @@ namespace Microsoft.TemplateEngine.Cli
             return Run(commandName, host, telemetryLogger, new New3Callbacks() { OnFirstRun = onFirstRun }, args, hivePath);
         }
 
-        public static int Run(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, New3Callbacks callbacks, string[] args, string hivePath)
+        public static int Run(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, New3Callbacks callbacks, string[] args, string? hivePath)
         {
             if (!args.Any(x => string.Equals(x, "--debug:ephemeral-hive")))
             {
                 EnsureEntryMutex(hivePath, host);
 
-                if (!_entryMutex.WaitOne())
+                if (!_entryMutex!.WaitOne())
                 {
                     return -1;
                 }
@@ -142,7 +144,7 @@ namespace Microsoft.TemplateEngine.Cli
             }
         }
 
-        private static int ActualRun(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, New3Callbacks callbacks, string[] args, string hivePath)
+        private static int ActualRun(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, New3Callbacks callbacks, string[] args, string? hivePath)
         {
             if (args.Any(x => string.Equals(x, "--debug:version", StringComparison.Ordinal)))
             {
@@ -192,7 +194,7 @@ namespace Microsoft.TemplateEngine.Cli
             }
             catch (Exception ex)
             {
-                AggregateException ax = ex as AggregateException;
+                AggregateException? ax = ex as AggregateException;
 
                 while (ax != null && ax.InnerExceptions.Count == 1)
                 {
@@ -221,6 +223,37 @@ namespace Microsoft.TemplateEngine.Cli
             }
 
             return result;
+        }
+
+        private static void ShowVersion()
+        {
+            Reporter.Output.WriteLine(LocalizableStrings.CommandDescription);
+            Reporter.Output.WriteLine();
+            int targetLength = Math.Max(LocalizableStrings.Version.Length, LocalizableStrings.CommitHash.Length);
+            Reporter.Output.WriteLine($" {LocalizableStrings.Version.PadRight(targetLength)} {GitInfo.PackageVersion}");
+            Reporter.Output.WriteLine($" {LocalizableStrings.CommitHash.PadRight(targetLength)} {GitInfo.CommitHash}");
+        }
+
+        private static Mutex EnsureEntryMutex(string? hivePath, ITemplateEngineHost host)
+        {
+            if (_entryMutex == null)
+            {
+                string entryMutexIdentity;
+
+                // this effectively mimics EngineEnvironmentSettings.BaseDir, which is not initialized when this is needed.
+                if (!string.IsNullOrEmpty(hivePath))
+                {
+                    entryMutexIdentity = $"{_entryMutexGuid.ToString()}-{hivePath}".Replace("\\", "_").Replace("/", "_");
+                }
+                else
+                {
+                    entryMutexIdentity = $"{_entryMutexGuid.ToString()}-{host.HostIdentifier}-{host.Version}".Replace("\\", "_").Replace("/", "_");
+                }
+
+                _entryMutex = new Mutex(false, entryMutexIdentity);
+            }
+
+            return _entryMutex;
         }
 
         private void ConfigureEnvironment()
@@ -405,7 +438,6 @@ namespace Microsoft.TemplateEngine.Cli
             }
         }
 
-
         private async Task<CreationResultStatus> ExecuteAsync()
         {
             // this is checking the initial parse, which is template agnostic.
@@ -425,7 +457,8 @@ namespace Microsoft.TemplateEngine.Cli
             }
 
             if (_commandInput.ExpandedExtraArgsFiles && string.IsNullOrEmpty(_commandInput.Alias))
-            {   // Only show this if there was no alias expansion.
+            {
+                // Only show this if there was no alias expansion.
                 // ExpandedExtraArgsFiles must be checked before alias expansion - it'll get reset if there's an alias.
                 Reporter.Output.WriteLine(string.Format(LocalizableStrings.ExtraArgsCommandAfterExpansion, string.Join(" ", _commandInput.Tokens)));
             }
@@ -483,7 +516,9 @@ namespace Microsoft.TemplateEngine.Cli
                 {
                     bool applyUpdates = _commandInput.CheckForUpdatesNoPrompt;
                     CliTemplateUpdater updater = new CliTemplateUpdater(EnvironmentSettings, Installer, CommandName);
-                    bool updateCheckResult = await updater.CheckForUpdatesAsync(_settingsLoader.InstallUnitDescriptorCache.Descriptors.Values.ToList(), applyUpdates);
+                    bool updateCheckResult = await updater
+                        .CheckForUpdatesAsync(_settingsLoader.InstallUnitDescriptorCache.Descriptors.Values.ToList(), applyUpdates)
+                        .ConfigureAwait(false);
 
                     return updateCheckResult ? CreationResultStatus.Success : CreationResultStatus.CreateFailed;
                 }
@@ -630,64 +665,31 @@ namespace Microsoft.TemplateEngine.Cli
             return true;
         }
 
-        private HashSet<string> AllTemplateShortNames
-        {
-            get
-            {
-                IReadOnlyCollection<ITemplateMatchInfo> allTemplates = TemplateResolver.PerformAllTemplatesQuery(_settingsLoader.UserTemplateCache.TemplateInfo, _hostDataLoader);
-
-                HashSet<string> allShortNames = new HashSet<string>(StringComparer.Ordinal);
-
-                foreach (ITemplateMatchInfo templateMatchInfo in allTemplates)
-                {
-                    if (templateMatchInfo.Info is IShortNameList templateWithShortNameList)
-                    {
-                        allShortNames.UnionWith(templateWithShortNameList.ShortNameList);
-                    }
-                    else
-                    {
-                        allShortNames.Add(templateMatchInfo.Info.ShortName);
-                    }
-                }
-
-                return allShortNames;
-            }
-        }
-
         private void ShowConfig()
         {
             Reporter.Output.WriteLine(LocalizableStrings.CurrentConfiguration);
             Reporter.Output.WriteLine(" ");
             TableFormatter.Print(EnvironmentSettings.SettingsLoader.MountPoints, LocalizableStrings.NoItems, "   ", '-', new Dictionary<string, Func<MountPointInfo, object>>
             {
-                {LocalizableStrings.MountPoints, x => x.Place},
-                {LocalizableStrings.Id, x => x.MountPointId},
-                {LocalizableStrings.Parent, x => x.ParentMountPointId},
-                {LocalizableStrings.Factory, x => x.MountPointFactoryId}
+                { LocalizableStrings.MountPoints, x => x.Place },
+                { LocalizableStrings.Id, x => x.MountPointId },
+                { LocalizableStrings.Parent, x => x.ParentMountPointId },
+                { LocalizableStrings.Factory, x => x.MountPointFactoryId }
             });
 
             TableFormatter.Print(EnvironmentSettings.SettingsLoader.Components.OfType<IMountPointFactory>(), LocalizableStrings.NoItems, "   ", '-', new Dictionary<string, Func<IMountPointFactory, object>>
             {
-                {LocalizableStrings.MountPointFactories, x => x.Id},
-                {LocalizableStrings.Type, x => x.GetType().FullName},
-                {LocalizableStrings.Assembly, x => x.GetType().GetTypeInfo().Assembly.FullName}
+                { LocalizableStrings.MountPointFactories, x => x.Id },
+                { LocalizableStrings.Type, x => x.GetType().FullName },
+                { LocalizableStrings.Assembly, x => x.GetType().GetTypeInfo().Assembly.FullName }
             });
 
             TableFormatter.Print(EnvironmentSettings.SettingsLoader.Components.OfType<IGenerator>(), LocalizableStrings.NoItems, "   ", '-', new Dictionary<string, Func<IGenerator, object>>
             {
-                {LocalizableStrings.Generators, x => x.Id},
-                {LocalizableStrings.Type, x => x.GetType().FullName},
-                {LocalizableStrings.Assembly, x => x.GetType().GetTypeInfo().Assembly.FullName}
+                { LocalizableStrings.Generators, x => x.Id },
+                { LocalizableStrings.Type, x => x.GetType().FullName },
+                { LocalizableStrings.Assembly, x => x.GetType().GetTypeInfo().Assembly.FullName }
             });
-        }
-
-        private static void ShowVersion()
-        {
-            Reporter.Output.WriteLine(LocalizableStrings.CommandDescription);
-            Reporter.Output.WriteLine();
-            int targetLength = Math.Max(LocalizableStrings.Version.Length, LocalizableStrings.CommitHash.Length);
-            Reporter.Output.WriteLine($" {LocalizableStrings.Version.PadRight(targetLength)} {GitInfo.PackageVersion}");
-            Reporter.Output.WriteLine($" {LocalizableStrings.CommitHash.PadRight(targetLength)} {GitInfo.CommitHash}");
         }
     }
 }

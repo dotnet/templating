@@ -1,3 +1,8 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -7,11 +12,11 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Cli;
+using Microsoft.TemplateEngine.Cli.PostActionProcessors;
 using Microsoft.TemplateEngine.Edge;
+using Microsoft.TemplateEngine.Edge.TemplateUpdates;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects;
 using Microsoft.TemplateEngine.Utils;
-using Microsoft.TemplateEngine.Edge.TemplateUpdates;
-using Microsoft.TemplateEngine.Cli.PostActionProcessors;
 using Microsoft.TemplateSearch.Common.TemplateUpdate;
 
 [assembly: InternalsVisibleTo("dotnet-new3.UnitTests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100f33a29044fa9d740c9b3213a93e57c84b472c84e0b8a0e1ae48e67a9f8f6de9d5f7f3d52ac23e48ac51801f1dc950abe901da34d2a9e3baadb141a17c77ef3c565dd5ee5054b91cf63bb3c6ab83f72ab3aafe93d0fc3c2348b764fafb0b1c0733de51459aeab46580384bf9d74c4e28164b7cde247f891ba07891c9d872ad2bb")]
@@ -23,8 +28,8 @@ namespace dotnet_new3
         private const string HostIdentifier = "dotnetcli-preview";
         private const string HostVersion = "v1.0.0";
         private const string CommandName = "new3";
-        private const string DOTNET_CLI_UI_LANGUAGE = nameof(DOTNET_CLI_UI_LANGUAGE);
-        private const string VSLANG = nameof(VSLANG);
+        private const string LanguageOverrideEnvironmentVar = "DOTNET_CLI_UI_LANGUAGE";
+        private const string VsLanguageOverrideEnvironmentVar = "VSLANG";
 
         public static int Main(string[] args)
         {
@@ -68,10 +73,14 @@ namespace dotnet_new3
 
             var builtIns = new AssemblyComponentCatalog(new[]
             {
-                typeof(RunnableProjectGenerator).GetTypeInfo().Assembly,            // for assembly: Microsoft.TemplateEngine.Orchestrator.RunnableProjects
-                typeof(NupkgInstallUnitDescriptorFactory).GetTypeInfo().Assembly,   // for assembly: Microsoft.TemplateEngine.Edge
-                typeof(DotnetRestorePostActionProcessor).GetTypeInfo().Assembly,    // for assembly: Microsoft.TemplateEngine.Cli
-                typeof(NupkgUpdater).GetTypeInfo().Assembly                         // for assembly: Microsoft.TemplateSearch.Common
+                // for assembly: Microsoft.TemplateEngine.Orchestrator.RunnableProjects
+                typeof(RunnableProjectGenerator).GetTypeInfo().Assembly,
+                // for assembly: Microsoft.TemplateEngine.Edge
+                typeof(NupkgInstallUnitDescriptorFactory).GetTypeInfo().Assembly,
+                // for assembly: Microsoft.TemplateEngine.Cli
+                typeof(DotnetRestorePostActionProcessor).GetTypeInfo().Assembly,
+                // for assembly: Microsoft.TemplateSearch.Common
+                typeof(NupkgUpdater).GetTypeInfo().Assembly
             });
 
             ConfigureLocale();
@@ -110,10 +119,10 @@ namespace dotnet_new3
 
         private static void FirstRun(IEngineEnvironmentSettings environmentSettings, IInstaller installer)
         {
-            string dn3Path = Environment.GetEnvironmentVariable("DN3");
+            string? dn3Path = Environment.GetEnvironmentVariable("DN3");
             if (string.IsNullOrEmpty(dn3Path))
             {
-                string path = typeof(Program).Assembly.Location;
+                string? path = typeof(Program).Assembly.Location;
                 while (path != null && !File.Exists(Path.Combine(path, "Microsoft.TemplateEngine.sln")))
                 {
                     path = Path.GetDirectoryName(path);
@@ -153,11 +162,11 @@ namespace dotnet_new3
 
         private static void ConfigureLocale()
         {
-            CultureInfo selectedCulture = null;
+            CultureInfo? selectedCulture = null;
 
             // VSLANG=<lcid> is set by VS and we respect that as well so that we will respect the VS
             // language preference if we're invoked by VS.
-            string vsLang = Environment.GetEnvironmentVariable(VSLANG);
+            string? vsLang = Environment.GetEnvironmentVariable(VsLanguageOverrideEnvironmentVar);
             if (vsLang != null && int.TryParse(vsLang, out int vsLcid))
             {
                 try
@@ -170,8 +179,8 @@ namespace dotnet_new3
 
             // DOTNET_CLI_UI_LANGUAGE=<culture name> is the main way for users to customize the CLI's UI language.
             // This overrides the locale set by VS.
-            string dotnetCliLanguage = Environment.GetEnvironmentVariable(DOTNET_CLI_UI_LANGUAGE);
-            if (dotnetCliLanguage != null)
+            string? dotnetCliLanguage = Environment.GetEnvironmentVariable(LanguageOverrideEnvironmentVar);
+            if (!string.IsNullOrWhiteSpace(dotnetCliLanguage))
             {
                 try
                 {
@@ -179,7 +188,7 @@ namespace dotnet_new3
                 }
                 catch (CultureNotFoundException)
                 {
-                    Console.WriteLine("Environment variable \"" + DOTNET_CLI_UI_LANGUAGE + "\" does not correspond to a valid culture." +
+                    Console.WriteLine("Environment variable \"" + LanguageOverrideEnvironmentVar + "\" does not correspond to a valid culture." +
                         " Value is: \"" + dotnetCliLanguage + "\"");
                 }
             }
