@@ -1,22 +1,30 @@
 ﻿// Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable enable
+
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 using Microsoft.DotNet.Cli.Utils;
 
 namespace Microsoft.NET.TestFramework.Commands
 {
     public class SdkCommandSpec
     {
-        public string FileName { get; set; }
+        public string FileName { get; set; } = string.Empty;
+
         public List<string> Arguments { get; set; } = new List<string>();
 
         public Dictionary<string, string> Environment { get; set; } = new Dictionary<string, string>();
 
         public List<string> EnvironmentToRemove { get; } = new List<string>();
 
-        public string WorkingDirectory { get; set; }
+        public string? WorkingDirectory { get; set; }
+
+        public Encoding? StandardOutputEncodingOverride;
+
+        public Encoding? StandardErrorEncodingOverride;
 
         private string EscapeArgs()
         {
@@ -31,6 +39,7 @@ namespace Microsoft.NET.TestFramework.Commands
             {
                 StartInfo = ToProcessStartInfo()
             };
+
             var ret = new Command(process, trimtrailingNewlines: true);
             return ret;
         }
@@ -41,6 +50,9 @@ namespace Microsoft.NET.TestFramework.Commands
             ret.FileName = FileName;
             ret.Arguments = EscapeArgs();
             ret.UseShellExecute = false;
+            ret.StandardOutputEncoding = StandardOutputEncodingOverride;
+            ret.StandardErrorEncoding = StandardErrorEncodingOverride;
+
             foreach (var kvp in Environment)
             {
                 ret.Environment[kvp.Key] = kvp.Value;

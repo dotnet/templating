@@ -30,7 +30,7 @@ namespace Microsoft.NET.TestFramework.Commands
                 Arguments = args.ToList(),
                 WorkingDirectory = WorkingDirectory
             };
-            if (!_environment.ContainsKey(Helpers.HomeEnvironmentVariableName))
+            if (!EnvironmentVariables.ContainsKey(Helpers.HomeEnvironmentVariableName))
             {
                 throw new Exception($"{nameof(Helpers.HomeEnvironmentVariableName)} is not set, call {nameof(DotnetNewCommand)}{nameof(WithEnvironmentVariable)} to set it.");
             }
