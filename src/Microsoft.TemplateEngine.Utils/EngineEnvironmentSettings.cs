@@ -8,7 +8,7 @@ using Microsoft.TemplateEngine.Abstractions;
 
 namespace Microsoft.TemplateEngine.Utils
 {
-    public class EngineEnvironmentSettings : IEngineEnvironmentSettings
+    public class EngineEnvironmentSettings : IEngineEnvironmentSettings, IDisposable
     {
         public EngineEnvironmentSettings(ITemplateEngineHost host, Func<IEngineEnvironmentSettings, ISettingsLoader> settingsLoaderFactory)
             : this(host, settingsLoaderFactory, null)
@@ -30,6 +30,11 @@ namespace Microsoft.TemplateEngine.Utils
         public IEnvironment Environment { get; set; }
 
         public IPathInfo Paths { get; set; }
+
+        public void Dispose()
+        {
+            (SettingsLoader as IDisposable)?.Dispose();
+        }
 
         private class DefaultPathInfo : IPathInfo
         {

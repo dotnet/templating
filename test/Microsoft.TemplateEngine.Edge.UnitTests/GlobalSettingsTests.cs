@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Castle.Core.Internal;
 using Microsoft.TemplateEngine.Abstractions.GlobalSettings;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.TestHelper;
@@ -26,7 +27,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             var settingsFile = Path.Combine(_helper.CreateTemporaryFolder(), "settings.json");
             using var globalSettings1 = new GlobalSettings(envSettings, settingsFile);
             using var globalSettings2 = new GlobalSettings(envSettings, settingsFile);
-            var lock1 = await globalSettings1.LockAsync(default);
+            await globalSettings1.LockAsync(default);
             bool exceptionThrown = false;
             try
             {
@@ -37,10 +38,10 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 exceptionThrown = true;
             }
             Assert.True(exceptionThrown, nameof(globalSettings2) + " was able to get lock on when it shouldn't");
-            lock1.Dispose();
-            var lock2 = await globalSettings2.LockAsync(new CancellationTokenSource(100).Token);
-            Assert.NotNull(lock2);
-            lock2.Dispose();
+            await globalSettings1.UnlockAsync(default);
+            //Check that we don't time out
+            await globalSettings2.LockAsync(new CancellationTokenSource(1000).Token);
+            await globalSettings2.UnlockAsync(default);
         }
 
 
@@ -50,10 +51,12 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             var envSettings = _helper.CreateEnvironment();
             var settingsFile = Path.Combine(_helper.CreateTemporaryFolder(), "settings.json");
             using var globalSettings1 = new GlobalSettings(envSettings, settingsFile);
+            await globalSettings1.ReloadSettings(false, default);
             using var globalSettings2 = new GlobalSettings(envSettings, settingsFile);
+            await globalSettings2.ReloadSettings(false, default);
             var taskSource = new TaskCompletionSource<TemplatesSourceData>();
             globalSettings2.SettingsChanged += () => taskSource.SetResult(globalSettings2.UserInstalledTemplatesSources.Single());
-            var lock1 = await globalSettings1.LockAsync(default);
+            await globalSettings1.LockAsync(default);
             var newData = new TemplatesSourceData()
             {
                 InstallerId = Guid.NewGuid(),
@@ -62,10 +65,10 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 LastChangeTime = DateTime.UtcNow
             };
             globalSettings1.Add(newData);
-            lock1.Dispose();
-            var timeoutTask = Task.Delay(100);
+            await globalSettings1.UnlockAsync(default);
+            var timeoutTask = Task.Delay(1000);
             var firstFinishedTask = await Task.WhenAny(timeoutTask, taskSource.Task);
-            Assert.Equal(firstFinishedTask, taskSource.Task);
+            Assert.Equal(taskSource.Task, firstFinishedTask);
 
             var newData2 = taskSource.Task.Result;
             Assert.Equal(newData.InstallerId, newData2.InstallerId);
@@ -83,7 +86,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             using var globalSettings1 = new GlobalSettings(envSettings, settingsFile);
 
             #region Open1AndPopulateAndSave
-            var lock1 = await globalSettings1.LockAsync(default);
+            await globalSettings1.LockAsync(default);
             var newData = new TemplatesSourceData()
             {
                 InstallerId = Guid.NewGuid(),
@@ -92,21 +95,23 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 LastChangeTime = DateTime.UtcNow
             };
             globalSettings1.Add(newData);
-            lock1.Dispose();
+            await globalSettings1.UnlockAsync(default);
             #endregion
 
             #region Open2LoadAndLock
             using var globalSettings2 = new GlobalSettings(envSettings, settingsFile);
+            await globalSettings2.ReloadSettings(false, default);
             Assert.Equal(globalSettings1.UserInstalledTemplatesSources[0].InstallerId, globalSettings2.UserInstalledTemplatesSources[0].InstallerId);
-            var lock2 = await globalSettings2.LockAsync(default);
+            await globalSettings2.LockAsync(default);
             #endregion
 
             #region Open3Load
             using var globalSettings3 = new GlobalSettings(envSettings, settingsFile);
+            await globalSettings3.ReloadSettings(false, default);
             Assert.Equal(globalSettings1.UserInstalledTemplatesSources[0].InstallerId, globalSettings3.UserInstalledTemplatesSources[0].InstallerId);
             #endregion
 
-            lock2.Dispose();
+            await globalSettings2.UnlockAsync(default);
         }
 
         public void Dispose()

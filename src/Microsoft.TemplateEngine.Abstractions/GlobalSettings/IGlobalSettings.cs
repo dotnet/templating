@@ -18,6 +18,8 @@ namespace Microsoft.TemplateEngine.Abstractions.GlobalSettings
 
         void Remove(TemplatesSourceData userInstalledTemplate);
 
-        Task<IDisposable> LockAsync(CancellationToken token);
+        Task LockAsync(CancellationToken token);
+
+        Task UnlockAsync(CancellationToken token);
     }
 }
