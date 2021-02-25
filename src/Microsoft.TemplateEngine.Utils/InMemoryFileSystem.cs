@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 
 namespace Microsoft.TemplateEngine.Utils
@@ -894,10 +895,10 @@ namespace Microsoft.TemplateEngine.Utils
 
         public Stream CreateFileStream(string path, FileMode mode, FileAccess access, FileShare share)
         {
-            if (FileExists(path))
-                return OpenRead(path);
-            else
+            if (mode == FileMode.Create)
                 return CreateFile(path);
+            else
+                return OpenRead(path);
         }
     }
 }

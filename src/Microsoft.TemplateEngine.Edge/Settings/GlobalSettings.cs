@@ -14,58 +14,40 @@ using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.GlobalSettings;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NuGet.Common;
 
 namespace Microsoft.TemplateEngine.Edge.Settings
 {
-    class GlobalSettings : IGlobalSettings, IDisposable
+    internal class GlobalSettings : IGlobalSettings, IDisposable
     {
         private readonly Paths _paths;
         private readonly IEngineEnvironmentSettings _environmentSettings;
         private readonly string _globalSettingsFile;
-        private bool _locked;
         private IDisposable _watcher;
+        private AsyncMutex? _mutex;
 
         public GlobalSettings(IEngineEnvironmentSettings environmentSettings, string globalSettingsFile)
         {
             _environmentSettings = environmentSettings;
-            _paths = new Paths(environmentSettings);
             _globalSettingsFile = globalSettingsFile;
+            _paths = new Paths(environmentSettings);
             environmentSettings.Host.FileSystem.CreateDirectory(Path.GetDirectoryName(_globalSettingsFile));
             _watcher = environmentSettings.Host.FileSystem.WatchFileChanges(_globalSettingsFile, FileChanged);
-            ReloadSettings(false, null);
-            UserInstalledTemplatesSources = _userInstalledTemplatesSources.ToArray();
         }
 
-        void ReloadSettings(bool triggerEvent, Stream? existingStream)
+        public async Task ReloadSettings(bool triggerEvent, CancellationToken token)
         {
-            GlobalSettingsData? loaded;
-            try
-            {
-                string textFileContent;
-                if (existingStream == null)
-                {
-                    textFileContent = _paths.ReadAllText(_globalSettingsFile);
-                }
-                else
-                {
-                    using (var reader = new StreamReader(existingStream, Encoding.UTF8, true, 4096, true))
-                        textFileContent = reader.ReadToEnd();
-                }
-                loaded = JsonConvert.DeserializeObject<GlobalSettingsData>(textFileContent);
-            }
-            catch (Exception ex)
-            {
-                _environmentSettings.Host.OnNonCriticalError(null, ex.ToString(), null, 0);
-                loaded = null;
-            }
+            var loaded = await LoadDataAsync(token).ConfigureAwait(false);
 
             bool settingsChanged = false;
             if (loaded == null)
             {
                 if (_userInstalledTemplatesSources.Count > 0)
+                {
                     settingsChanged = true;
-                _userInstalledTemplatesSources.Clear();
+                }
+                _userInstalledTemplatesSources = new List<TemplatesSourceData>();
             }
             else
             {
@@ -77,157 +59,151 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             UserInstalledTemplatesSources = _userInstalledTemplatesSources.ToArray();
 
             if (triggerEvent && settingsChanged)
+            {
                 SettingsChanged?.Invoke();
+            }
         }
 
-        private void FileChanged(object sender, FileSystemEventArgs e)
+        private async Task<GlobalSettingsData?> LoadDataAsync(CancellationToken token)
+        {
+            if (!_environmentSettings.Host.FileSystem.FileExists(_globalSettingsFile))
+                return null;
+            string textFileContent;
+
+            while (true)
+            {
+                try
+                {
+                    using (var fileStream = _environmentSettings.Host.FileSystem.CreateFileStream(_globalSettingsFile, FileMode.Open, FileAccess.Read, FileShare.Read))
+                    using (var reader = new StreamReader(fileStream))
+                        textFileContent = await reader.ReadToEndAsync().ConfigureAwait(false);
+                    return JsonConvert.DeserializeObject<GlobalSettingsData>(textFileContent);
+                }
+                catch (Exception)
+                {
+                    if (token.IsCancellationRequested)
+                    {
+                        throw;
+                    }
+                }
+                await Task.Delay(20).ConfigureAwait(false);
+            }
+        }
+
+        private async Task SaveDataAsync(CancellationToken token)
+        {
+            var serializedText = JsonConvert.SerializeObject(new GlobalSettingsData()
+            {
+                UserInstalledTemplatesSources = _userInstalledTemplatesSources
+            });
+
+            while (true)
+            {
+                try
+                {
+                    using var fileStream = _environmentSettings.Host.FileSystem.CreateFileStream(_globalSettingsFile, FileMode.Create, FileAccess.Write, FileShare.None);
+                    using var writer = new StreamWriter(fileStream);
+                    await writer.WriteAsync(serializedText).ConfigureAwait(false);
+                    return;
+                }
+                catch (Exception)
+                {
+                    if (token.IsCancellationRequested)
+                    {
+                        throw;
+                    }
+                    await Task.Delay(20).ConfigureAwait(false);
+                }
+            }
+        }
+
+        private async void FileChanged(object sender, FileSystemEventArgs e)
         {
             //We are in process of modifying settings, ignore file watcher
-            if (!_locked)
-                ReloadSettings(true, null);
+            if (_mutex == null)
+            {
+                try
+                {
+                    using var cancellationTokenSource = new CancellationTokenSource(1000);
+                    await ReloadSettings(true, cancellationTokenSource.Token).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    _environmentSettings.Host.OnCriticalError(null, $"Error while reloading \"{_globalSettingsFile}\" triggered by filewatcher.{ex}", null, 0);
+                }
+            }
         }
 
         public event Action? SettingsChanged;
 
         private List<TemplatesSourceData> _userInstalledTemplatesSources = new List<TemplatesSourceData>();
 
-        public IReadOnlyList<TemplatesSourceData> UserInstalledTemplatesSources { get; private set; }
+        public IReadOnlyList<TemplatesSourceData> UserInstalledTemplatesSources { get; private set; } = new TemplatesSourceData[0];
 
         public void Add(TemplatesSourceData userInstalledTemplate)
         {
-            if (!_locked)
+            if (_mutex == null)
+            {
                 throw new InvalidOperationException($"Call {nameof(LockAsync)} before calling this method");
+            }
             _userInstalledTemplatesSources.RemoveAll(data => data.MountPointUri == userInstalledTemplate.MountPointUri);
             _userInstalledTemplatesSources.Add(userInstalledTemplate);
         }
 
         public void Remove(TemplatesSourceData userInstalledTemplate)
         {
-            if (!_locked)
+            if (_mutex == null)
+            {
                 throw new InvalidOperationException($"Call {nameof(LockAsync)} before calling this method");
+            }
             _userInstalledTemplatesSources.RemoveAll(data => data.MountPointUri == userInstalledTemplate.MountPointUri);
         }
 
-        class MyMutex
+        public async Task LockAsync(CancellationToken token)
         {
-            TaskCompletionSource<bool> _taskCompletionSource;
-            CancellationToken _token;
-            ManualResetEvent _mre = new ManualResetEvent(false);
-
-            public MyMutex(CancellationToken token)
+            if (_mutex is AsyncMutex)
             {
-                _token = token;
-                _taskCompletionSource = new TaskCompletionSource<bool>();
-                var thread = new Thread(new ThreadStart(WaitLoop));
-                thread.IsBackground = true;
-                thread.Start();
+                throw new InvalidOperationException($"{nameof(LockAsync)} called while already locked.");
+            }
+            if (token.IsCancellationRequested) {
+                throw new TaskCanceledException();
             }
 
-            public Task WaitAsync()
-            {
-                return _taskCompletionSource.Task;
-            }
-
-            private void WaitLoop()
-            {
-                var mutex = new Mutex(false, "{01B5E8B0-EF76-48ED-BE95-A0458D7DA2C2}");
-                while (true)
-                {
-                    if (_token.IsCancellationRequested)
-                    {
-                        _taskCompletionSource.SetCanceled();
-                        return;
-                    }
-                    if (mutex.WaitOne(20))
-                        break;
-                }
-                _taskCompletionSource.SetResult(true);
-                _mre.WaitOne();
-                mutex.ReleaseMutex();
-            }
-            public void Release()
-            {
-                _mre.Set();
-            }
-        }
-
-        class DisposableCallback : IDisposable
-        {
-            private Action<Stream, MyMutex?>? _disposeCalled;
-            private Stream _fileStream;
-            private MyMutex? _mutex;
-
-            public DisposableCallback(Action<Stream, MyMutex?> disposeCalled, Stream fileStream, MyMutex? mutex)
-            {
-                _disposeCalled = disposeCalled;
-                _fileStream = fileStream;
-                _mutex = mutex;
-            }
-
-            public void Dispose()
-            {
-                var disposeCalled = Interlocked.Exchange(ref _disposeCalled, null);
-                disposeCalled?.Invoke(_fileStream, _mutex);
-            }
-        }
-
-        public async Task<IDisposable> LockAsync(CancellationToken token)
-        {
-            while (true)
-            {
-                if (token.IsCancellationRequested)
-                    throw new TaskCanceledException();
-
-                try
-                {
-                    MyMutex? mutex = null;
-                    if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                    {
-                        mutex = new MyMutex(token);
-                        await mutex.WaitAsync();
-                    }
-                    var stream = _environmentSettings.Host.FileSystem.CreateFileStream(_globalSettingsFile, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
-                    _locked = true;
-                    ReloadSettings(true, stream);
-                    return new DisposableCallback(Unlock, stream, mutex);
-                }
-                catch (IOException)
-                {
-                }
-                catch (UnauthorizedAccessException)
-                {
-                }
-
-                await Task.Delay(20, token).ConfigureAwait(false);
-            }
-        }
-
-        private void Unlock(Stream stream, MyMutex? mutex)
-        {
+            _mutex = await AsyncMutex.WaitAsync($"812CA7F3-7CD8-44B4-B3F0-0159355C0BD5{_globalSettingsFile}".Replace("\\", "_").Replace("/", "_"), token, null);
             try
             {
-                UserInstalledTemplatesSources = _userInstalledTemplatesSources.ToArray();
-                stream.SetLength(0);//Delete existing content
-                using (var streamWriter = new StreamWriter(stream))
-                {
-                    streamWriter.Write(JsonConvert.SerializeObject(new GlobalSettingsData()
-                    {
-                        UserInstalledTemplatesSources = _userInstalledTemplatesSources
-                    }, Formatting.Indented));
-                }
-                _locked = false;
+                await ReloadSettings(false, token).ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                await _mutex.ReleaseMutexAsync(token);
+                _mutex = null;
+                throw;
+            }
+        }
+
+        public async Task UnlockAsync(CancellationToken token)
+        {
+            if(!(_mutex is AsyncMutex mutex))
+            {
+                throw new InvalidOperationException($"{nameof(UnlockAsync)} called while already unlocked.");
+            }
+
+            try
+            {
+                await SaveDataAsync(token).ConfigureAwait(false);
+                await ReloadSettings(true, token).ConfigureAwait(false);
             }
             finally
             {
-                stream.Dispose();
-                mutex?.Release();
-                SettingsChanged?.Invoke();
+                await _mutex!.ReleaseMutexAsync(token).ConfigureAwait(false);
+                _mutex = null;
             }
         }
 
         public void Dispose()
         {
-            if (_locked)
+            if (_mutex != null)
                 throw new Exception("Locked during dispose");
             _watcher.Dispose();
         }
