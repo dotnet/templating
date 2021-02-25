@@ -218,6 +218,10 @@ namespace Microsoft.TemplateEngine.Cli
                 Reporter.Error.WriteLine(ex.StackTrace.Bold().Red());
                 result = 1;
             }
+            finally
+            {
+                instance.EnvironmentSettings.Dispose();
+            }
 
             return result;
         }

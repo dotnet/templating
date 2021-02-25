@@ -17,7 +17,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Edge.Settings
 {
-    public class SettingsLoader : ISettingsLoader
+    public class SettingsLoader : ISettingsLoader, IDisposable
     {
         private const int MaxLoadAttempts = 20;
         public static readonly string HostTemplateFileConfigBaseName = ".host.json";
@@ -40,10 +40,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             _templatesSourcesManager = new TemplatesSourcesManager(environmentSettings);
         }
 
-        public SettingsLoader(IEngineEnvironmentSettings environmentSettings, IMountPointManager mockMountPointManager)
-        {
-        }
-
         public void Save()
         {
             JObject serialized = JObject.FromObject(_userSettings);
@@ -60,7 +56,9 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             using (Timing.Over(_environmentSettings.Host, "Parse and deserialize global settings"))
                 try
                 {
-                    GlobalSettings = new GlobalSettings(EnvironmentSettings, _paths.User.GlobalSettingsFile);
+                    var globalSettings = new GlobalSettings(EnvironmentSettings, _paths.User.GlobalSettingsFile);
+                    globalSettings.ReloadSettings(false, default).Wait();
+                    GlobalSettings = globalSettings;
                 }
                 catch (Exception ex)
                 {
@@ -289,7 +287,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         public async Task<IReadOnlyList<ITemplateInfo>> GetTemplatesAsync(CancellationToken token)
         {
-            EnsureLoaded();
             await RebuildCacheFromSettingsIfNotCurrent(false).ConfigureAwait(false);
             return _userTemplateCache.TemplateInfo;
         }
@@ -336,6 +333,11 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         public bool TryGetMountPoint(string mountPointUri, out IMountPoint mountPoint)
         {
             return _mountPointManager.TryDemandMountPoint(mountPointUri, out mountPoint);
+        }
+
+        public void Dispose()
+        {
+            ((GlobalSettings)GlobalSettings).Dispose();
         }
     }
 }
