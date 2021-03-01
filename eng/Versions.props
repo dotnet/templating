@@ -5,7 +5,7 @@
     <MicrosoftNETCoreAppVersion>3.0.0-preview6-27720-09</MicrosoftNETCoreAppVersion>
     <UsingToolXliff>false</UsingToolXliff>
     <UsingToolNetFrameworkReferenceAssemblies>true</UsingToolNetFrameworkReferenceAssemblies>
-    <VersionPrefix>3.1.13</VersionPrefix>
+    <VersionPrefix>3.1.14</VersionPrefix>
     <PreReleaseVersionLabel>servicing</PreReleaseVersionLabel>
     <!--
         When StabilizePackageVersion is set to 'true', this branch will produce stable outputs for 'Shipping' packages
