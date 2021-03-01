@@ -1,0 +1,8 @@
+<Project>
+
+  <PropertyGroup>
+    <GitHubRepositoryName>templating</GitHubRepositoryName>
+    <SourceBuildManagedOnly>true</SourceBuildManagedOnly>
+  </PropertyGroup>
+
+</Project>
