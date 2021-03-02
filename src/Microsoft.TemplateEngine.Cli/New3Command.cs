@@ -300,7 +300,7 @@ namespace Microsoft.TemplateEngine.Cli
             }
             Reporter.Output.WriteLine();
 
-            var installResults = await managedSourceProvider.InstallAsync(installRequests).ConfigureAwait(false);
+            var installResults = await managedSourceProvider.InstallAsync(installRequests, CancellationToken.None).ConfigureAwait(false);
             foreach (InstallResult result in installResults)
             {
                 await DisplayInstallResultAsync(result.InstallRequest.DisplayName, result);
@@ -404,7 +404,7 @@ namespace Microsoft.TemplateEngine.Cli
                         continue;
                     }
                     sourceToUninstallFound = true;
-                    var uninstallResults = await provider.UninstallAsync(sourcesToUninstall).ConfigureAwait(false);
+                    var uninstallResults = await provider.UninstallAsync(sourcesToUninstall, CancellationToken.None).ConfigureAwait(false);
                     foreach (UninstallResult uninstallResult in uninstallResults)
                     {
                         if (uninstallResult.Success)
@@ -502,7 +502,7 @@ namespace Microsoft.TemplateEngine.Cli
             if (templateResolutionResult.ResolutionStatus == TemplateResolutionResult.Status.SingleMatch)
             {
                 TemplateInvocationCoordinator invocationCoordinator = new TemplateInvocationCoordinator(_settingsLoader, _commandInput, _telemetryLogger, CommandName, _inputGetter, _callbacks);
-                return await invocationCoordinator.CoordinateInvocationOrAcquisitionAsync(templateResolutionResult.TemplateToInvoke);
+                return await invocationCoordinator.CoordinateInvocationOrAcquisitionAsync(templateResolutionResult.TemplateToInvoke, CancellationToken.None);
             }
             else
             {
@@ -607,7 +607,7 @@ namespace Microsoft.TemplateEngine.Cli
             var managedSourcedGroupedByProvider = await EnvironmentSettings.SettingsLoader.TemplatesSourcesManager.GetManagedSourcesGroupedByProvider().ConfigureAwait(false);
             foreach (var (provider, sources) in managedSourcedGroupedByProvider)
             {
-                IReadOnlyList<CheckUpdateResult> checkUpdateResults = await provider.GetLatestVersions(sources).ConfigureAwait(false);
+                IReadOnlyList<CheckUpdateResult> checkUpdateResults = await provider.GetLatestVersionsAsync(sources, CancellationToken.None).ConfigureAwait(false);
                 IEnumerable<CheckUpdateResult> updatesToApply = checkUpdateResults.Where(update => !update.IsLatestVersion && !string.IsNullOrWhiteSpace(update.Version));
                 if (!updatesToApply.Any())
                 {
@@ -624,7 +624,7 @@ namespace Microsoft.TemplateEngine.Cli
                     }
                     Reporter.Output.WriteLine();
 
-                    IReadOnlyList<UpdateResult> updateResults = await provider.UpdateAsync(updatesToApply.Select(update => UpdateRequest.FromCheckUpdateResult(update))).ConfigureAwait(false);
+                    IReadOnlyList<UpdateResult> updateResults = await provider.UpdateAsync(updatesToApply.Select(update => UpdateRequest.FromCheckUpdateResult(update)), CancellationToken.None).ConfigureAwait(false);
                     foreach (var updateResult in updateResults)
                     {
                         if (!updateResult.Success)

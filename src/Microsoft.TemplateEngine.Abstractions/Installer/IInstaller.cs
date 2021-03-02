@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions.GlobalSettings;
 using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
@@ -31,7 +32,7 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
         /// Installer should determine if it can install specific <see cref="InstallRequest"/>.
         /// Ideally it should as far as calling backend server to determine if such identifier exists.
         /// </summary>
-        Task<bool> CanInstallAsync(InstallRequest installationRequest);
+        Task<bool> CanInstallAsync(InstallRequest installationRequest, CancellationToken cancellationToken);
 
         /// <summary>
         /// Deserializes <see cref="TemplatesSourceData"/> to <see cref="IManagedTemplatesSource"/>
@@ -46,14 +47,16 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
         /// </summary>
         /// <param name="sources">sources to get latest versions for</param>
         /// <returns>list of <see cref="CheckUpdateResult"/> containing latest versions for the sources</returns>
-        Task<IReadOnlyList<CheckUpdateResult>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources);
+        /// <param name="cancellationToken"></param>
+        Task<IReadOnlyList<CheckUpdateResult>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources, CancellationToken cancellationToken);
 
         /// <summary>
         /// Installs the template source
         /// </summary>
         /// <param name="installRequest">details for installation</param>
         /// <returns><see cref="InstallResult"/> containing installation results and <see cref="IManagedTemplatesSource"/> if installation was successful</returns>
-        Task<InstallResult> InstallAsync(InstallRequest installRequest);
+        /// <param name="cancellationToken"></param>
+        Task<InstallResult> InstallAsync(InstallRequest installRequest, CancellationToken cancellationToken);
 
         /// <summary>
         /// Serializes <see cref="IManagedTemplatesSource"/> to <see cref="TemplatesSourceData"/>
@@ -67,13 +70,15 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
         /// </summary>
         /// <param name="managedSource">source to uninstall</param>
         /// <returns><see cref="UninstallResult"/> containing uninstallation result</returns>
-        Task<UninstallResult> UninstallAsync(IManagedTemplatesSource managedSource);
+        /// <param name="cancellationToken"></param>
+        Task<UninstallResult> UninstallAsync(IManagedTemplatesSource managedSource, CancellationToken cancellationToken);
 
         /// <summary>
         /// Updates the template source
         /// </summary>
         /// <param name="updateRequest"><see cref="UpdateRequest"/> defining source to update and target version</param>
         /// <returns><see cref="UpdateResult"/> containing update results and <see cref="IManagedTemplatesSource"/> if update was successful</returns>
-        Task<UpdateResult> UpdateAsync(UpdateRequest updateRequest);
+        /// <param name="cancellationToken"></param>
+        Task<UpdateResult> UpdateAsync(UpdateRequest updateRequest, CancellationToken cancellationToken);
     }
 }

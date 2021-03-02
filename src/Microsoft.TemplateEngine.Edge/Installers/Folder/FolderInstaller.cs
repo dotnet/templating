@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.GlobalSettings;
@@ -29,7 +30,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.Folder
         public string Name { get; }
         public IManagedTemplatesSourcesProvider Provider { get; }
 
-        public Task<bool> CanInstallAsync(InstallRequest installationRequest)
+        public Task<bool> CanInstallAsync(InstallRequest installationRequest, CancellationToken cancellationToken)
         {
             return Task.FromResult(Directory.Exists(installationRequest.Identifier));
         }
@@ -39,12 +40,12 @@ namespace Microsoft.TemplateEngine.Edge.Installers.Folder
             return new FolderManagedTemplatesSource(_settings, provider, data.MountPointUri);
         }
 
-        public Task<IReadOnlyList<CheckUpdateResult>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources)
+        public Task<IReadOnlyList<CheckUpdateResult>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources, CancellationToken cancellationToken)
         {
             return Task.FromResult<IReadOnlyList<CheckUpdateResult>>(sources.Select(s => CheckUpdateResult.CreateSuccess(s, null)).ToList());
         }
 
-        public Task<InstallResult> InstallAsync(InstallRequest installRequest)
+        public Task<InstallResult> InstallAsync(InstallRequest installRequest, CancellationToken cancellationToken)
         {
             if (Directory.Exists(installRequest.Identifier))
                 return Task.FromResult(InstallResult.CreateSuccess(installRequest, new FolderManagedTemplatesSource(_settings, Provider, installRequest.Identifier)));
@@ -62,12 +63,12 @@ namespace Microsoft.TemplateEngine.Edge.Installers.Folder
             };
         }
 
-        public Task<UninstallResult> UninstallAsync(IManagedTemplatesSource managedSource)
+        public Task<UninstallResult> UninstallAsync(IManagedTemplatesSource managedSource, CancellationToken cancellationToken)
         {
             return Task.FromResult(UninstallResult.CreateSuccess(managedSource));
         }
 
-        public Task<UpdateResult> UpdateAsync(UpdateRequest updateRequest)
+        public Task<UpdateResult> UpdateAsync(UpdateRequest updateRequest, CancellationToken cancellationToken)
         {
             return Task.FromResult(UpdateResult.CreateSuccess(updateRequest, updateRequest.Source));
         }

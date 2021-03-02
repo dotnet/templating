@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Installer;
@@ -34,12 +35,12 @@ namespace Microsoft.TemplateEngine.Cli
             _callbacks = callbacks;
         }
 
-        public async Task<CreationResultStatus> CoordinateInvocationOrAcquisitionAsync(ITemplateMatchInfo templateToInvoke)
+        public async Task<CreationResultStatus> CoordinateInvocationOrAcquisitionAsync(ITemplateMatchInfo templateToInvoke, CancellationToken cancellationToken)
         {
             // invoke and then check for updates
             CreationResultStatus creationResult = await InvokeTemplateAsync(templateToInvoke).ConfigureAwait(false);
             // check for updates on this template (pack)
-            await CheckForTemplateUpdateAsync(templateToInvoke).ConfigureAwait(false);
+            await CheckForTemplateUpdateAsync(templateToInvoke, cancellationToken).ConfigureAwait(false);
             return creationResult;
         }
 
@@ -50,7 +51,7 @@ namespace Microsoft.TemplateEngine.Cli
         }
 
 
-        private async Task CheckForTemplateUpdateAsync(ITemplateMatchInfo templateToInvoke)
+        private async Task CheckForTemplateUpdateAsync(ITemplateMatchInfo templateToInvoke, CancellationToken cancellationToken)
         {
             ITemplatesSource templateSource;
             try
@@ -70,7 +71,7 @@ namespace Microsoft.TemplateEngine.Cli
                 return;
             }
 
-            IReadOnlyList<CheckUpdateResult> versionChecks = await managedTemplateSource.ManagedProvider.GetLatestVersions(new[] { managedTemplateSource }).ConfigureAwait(false);
+            IReadOnlyList<CheckUpdateResult> versionChecks = await managedTemplateSource.ManagedProvider.GetLatestVersionsAsync(new[] { managedTemplateSource }, cancellationToken).ConfigureAwait(false);
             if (versionChecks.Count == 1)
             {
                 var updateResult = versionChecks[0];

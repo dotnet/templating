@@ -68,14 +68,14 @@ namespace Microsoft.TemplateEngine.Edge
                 return Task.FromResult((IReadOnlyList<ITemplatesSource>)templatesSources);
             }
 
-            public async Task<IReadOnlyList<CheckUpdateResult>> GetLatestVersions(IEnumerable<IManagedTemplatesSource> sources)
+            public async Task<IReadOnlyList<CheckUpdateResult>> GetLatestVersionsAsync(IEnumerable<IManagedTemplatesSource> sources, CancellationToken cancellationToken)
             {
                 _ = sources ?? throw new ArgumentNullException(nameof(sources));
 
                 var tasks = new List<Task<IReadOnlyList<CheckUpdateResult>>>();
                 foreach (var sourcesGroupedByInstaller in sources.GroupBy(s => GetInstaller(s)))
                 {
-                    tasks.Add(sourcesGroupedByInstaller.Key.GetLatestVersionAsync(sourcesGroupedByInstaller));
+                    tasks.Add(sourcesGroupedByInstaller.Key.GetLatestVersionAsync(sourcesGroupedByInstaller, cancellationToken));
                 }
                 await Task.WhenAll(tasks).ConfigureAwait(false);
 
@@ -87,7 +87,7 @@ namespace Microsoft.TemplateEngine.Edge
                 return result;
             }
 
-            public async Task<IReadOnlyList<InstallResult>> InstallAsync(IEnumerable<InstallRequest> installRequests)
+            public async Task<IReadOnlyList<InstallResult>> InstallAsync(IEnumerable<InstallRequest> installRequests, CancellationToken cancellationToken)
             {
                 _ = installRequests ?? throw new ArgumentNullException(nameof(installRequests));
                 if (!installRequests.Any())
@@ -100,7 +100,7 @@ namespace Microsoft.TemplateEngine.Edge
                     var installersThatCanInstall = new List<IInstaller>();
                     foreach (var install in _installersByName.Values)
                     {
-                        if (await install.CanInstallAsync(installRequest).ConfigureAwait(false))
+                        if (await install.CanInstallAsync(installRequest, cancellationToken).ConfigureAwait(false))
                         {
                             installersThatCanInstall.Add(install);
                         }
@@ -111,11 +111,11 @@ namespace Microsoft.TemplateEngine.Edge
                     }
 
                     IInstaller installer = installersThatCanInstall[0];
-                    return await InstallAsync(installRequest, installer).ConfigureAwait(false);
+                    return await InstallAsync(installRequest, installer, cancellationToken).ConfigureAwait(false);
                 })).ConfigureAwait(false);
             }
 
-            public async Task<IReadOnlyList<UninstallResult>> UninstallAsync(IEnumerable<IManagedTemplatesSource> sources)
+            public async Task<IReadOnlyList<UninstallResult>> UninstallAsync(IEnumerable<IManagedTemplatesSource> sources, CancellationToken cancellationToken)
             {
                 _ = sources ?? throw new ArgumentNullException(nameof(sources));
                 if (!sources.Any())
@@ -126,7 +126,7 @@ namespace Microsoft.TemplateEngine.Edge
                 return await Task.WhenAll(sources.Select(async source =>
                 {
                     IInstaller installer = GetInstaller(source);
-                    UninstallResult result = await installer.UninstallAsync(source).ConfigureAwait(false);
+                    UninstallResult result = await installer.UninstallAsync(source, cancellationToken).ConfigureAwait(false);
                     if (result.Success)
                     {
                         _templatesSources[installer].Remove(source.Identifier);
@@ -138,23 +138,23 @@ namespace Microsoft.TemplateEngine.Edge
 
             private IInstaller GetInstaller(IManagedTemplatesSource source) => _sourceToInstaller.TryGetValue(source, out var installer) ? installer : throw new InvalidOperationException();
 
-            public async Task<IReadOnlyList<UpdateResult>> UpdateAsync(IEnumerable<UpdateRequest> updateRequests)
+            public async Task<IReadOnlyList<UpdateResult>> UpdateAsync(IEnumerable<UpdateRequest> updateRequests, CancellationToken cancellationToken)
             {
                 _ = updateRequests ?? throw new ArgumentNullException(nameof(updateRequests));
                 IEnumerable<UpdateRequest> updatesToApply = updateRequests.Where(request => request.Version != request.Source.Version);
-                return await Task.WhenAll(updatesToApply.Select(updateRequest => UpdateAsync(updateRequest))).ConfigureAwait(false);
+                return await Task.WhenAll(updatesToApply.Select(updateRequest => UpdateAsync(updateRequest, cancellationToken))).ConfigureAwait(false);
             }
 
-            private async Task<UpdateResult> UpdateAsync(UpdateRequest updateRequest)
+            private async Task<UpdateResult> UpdateAsync(UpdateRequest updateRequest, CancellationToken cancellationToken)
             {
                 IInstaller installer = GetInstaller(updateRequest.Source);
-                (InstallerErrorCode result, string message) = await EnsureInstallPrerequisites(updateRequest.Source.Identifier, updateRequest.Version, installer, update: true).ConfigureAwait(false);
+                (InstallerErrorCode result, string message) = await EnsureInstallPrerequisites(updateRequest.Source.Identifier, updateRequest.Version, installer, cancellationToken, update: true).ConfigureAwait(false);
                 if (result != InstallerErrorCode.Success)
                 {
                     return UpdateResult.CreateFailure(updateRequest, result, message);
                 }
 
-                UpdateResult updateResult = await installer.UpdateAsync(updateRequest).ConfigureAwait(false);
+                UpdateResult updateResult = await installer.UpdateAsync(updateRequest, cancellationToken).ConfigureAwait(false);
                 if (!updateResult.Success)
                 {
                     return updateResult;
@@ -163,7 +163,7 @@ namespace Microsoft.TemplateEngine.Edge
                 return updateResult;
             }
 
-            private async Task<(InstallerErrorCode, string)> EnsureInstallPrerequisites (string identifier, string version, IInstaller installer, bool update = false)
+            private async Task<(InstallerErrorCode, string)> EnsureInstallPrerequisites (string identifier, string version, IInstaller installer, CancellationToken cancellationToken, bool update = false)
             {
                 //check if the source with same identifier is already installed
                 if (_templatesSources[installer].TryGetValue(identifier, out IManagedTemplatesSource sourceToBeUpdated))
@@ -178,7 +178,7 @@ namespace Microsoft.TemplateEngine.Edge
                         _environmentSettings.Host.LogMessage($"{sourceToBeUpdated.Identifier} is already installed, version: {sourceToBeUpdated.Version}, it will be replaced with {(string.IsNullOrWhiteSpace(identifier) ? "latest version" : $"version {version}")}.");
                     }
                     //if different version is installed - uninstall previous version first
-                    UninstallResult uninstallResult = await installer.UninstallAsync(sourceToBeUpdated).ConfigureAwait(false);
+                    UninstallResult uninstallResult = await installer.UninstallAsync(sourceToBeUpdated, cancellationToken).ConfigureAwait(false);
                     if (!uninstallResult.Success)
                     {
                         return (InstallerErrorCode.UpdateUninstallFailed, uninstallResult.ErrorMessage);
@@ -189,18 +189,18 @@ namespace Microsoft.TemplateEngine.Edge
                 return (InstallerErrorCode.Success, string.Empty);
             }
 
-            private async Task<InstallResult> InstallAsync(InstallRequest installRequest, IInstaller installer)
+            private async Task<InstallResult> InstallAsync(InstallRequest installRequest, IInstaller installer, CancellationToken cancellationToken)
             {
                 _ = installRequest ?? throw new ArgumentNullException(nameof(installRequest));
                 _ = installer ?? throw new ArgumentNullException(nameof(installer));
 
-                (InstallerErrorCode result, string message) = await EnsureInstallPrerequisites(installRequest.Identifier, installRequest.Version, installer).ConfigureAwait(false);
+                (InstallerErrorCode result, string message) = await EnsureInstallPrerequisites(installRequest.Identifier, installRequest.Version, installer, cancellationToken).ConfigureAwait(false);
                 if (result != InstallerErrorCode.Success)
                 {
                     return InstallResult.CreateFailure(installRequest, result, message);
                 }
 
-                InstallResult installResult = await installer.InstallAsync(installRequest).ConfigureAwait(false);
+                InstallResult installResult = await installer.InstallAsync(installRequest, cancellationToken).ConfigureAwait(false);
                 if (!installResult.Success)
                 {
                     return installResult;

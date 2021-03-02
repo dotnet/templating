@@ -8,7 +8,7 @@ namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
     /// <summary>
     /// This is more advanced <see cref="ITemplatesSource"/>. Managed means that this templates source can be:<br/>
     /// Uninstalled via <see cref="ManagedProvider"/>.<see cref="IManagedTemplatesSourcesProvider.UninstallAsync(IManagedTemplatesSource)"/><br/>
-    /// Check for latest version via <see cref="ManagedProvider"/>.<see cref="IManagedTemplatesSourcesProvider.GetLatestVersions(IEnumerable{IManagedTemplatesSource})"/><br/>
+    /// Check for latest version via <see cref="ManagedProvider"/>.<see cref="IManagedTemplatesSourcesProvider.GetLatestVersionsAsync(IEnumerable{IManagedTemplatesSource}, System.Threading.CancellationToken)"/><br/>
     /// Updated  via <see cref="ManagedProvider"/>.<see cref="IManagedTemplatesSourcesProvider.UpdateAsync(IEnumerable{ManagedTemplatesSourceUpdate})"/>
     /// </summary>
     public interface IManagedTemplatesSource : ITemplatesSource
