@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
+using Microsoft.TemplateEngine.Abstractions.Installer;
 
 namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
 {
@@ -23,6 +24,13 @@ namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
         /// identifies this templates source to user.
         /// </summary>
         string Identifier { get; }
+
+        /// <summary>
+        /// Installer that created this source.
+        /// This serves as helper for grouping sources by installer
+        /// so caller doesn't need to keep track of installer->source relation.
+        /// </summary>
+        IInstaller Installer { get; }
 
         /// <summary>
         /// Installer that created this source.
