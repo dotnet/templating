@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
-using Microsoft.TemplateEngine.Abstractions.Installer;
 
 namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
 {
@@ -27,10 +26,10 @@ namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
 
         /// <summary>
         /// Installer that created this source.
-        /// This serves as helper for grouping sources by installer
-        /// so caller doesn't need to keep track of installer->source relation.
+        /// This serves as helper for grouping sources by <see cref="IManagedTemplatesSourcesProvider"/>
+        /// so caller doesn't need to keep track of "managed provider"->"source" relation.
         /// </summary>
-        IInstaller Installer { get; }
+        IManagedTemplatesSourcesProvider ManagedProvider { get; }
 
         /// <summary>
         /// Version of templates source.

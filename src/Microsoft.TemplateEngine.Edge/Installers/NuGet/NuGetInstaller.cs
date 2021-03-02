@@ -76,7 +76,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
         public IManagedTemplatesSource Deserialize(IManagedTemplatesSourcesProvider provider, TemplatesSourceData data)
         {
-            return new NuGetManagedTemplatesSource(_environmentSettings, this, data.MountPointUri, data.Details);
+            return new NuGetManagedTemplatesSource(_environmentSettings, provider, data.MountPointUri, data.Details);
         }
 
         public async Task<IReadOnlyList<CheckUpdateResult>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources)
@@ -139,7 +139,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 sourceDetails[NuGetManagedTemplatesSource.NuGetSourceKey] = nuGetPackageInfo.NuGetSource;
                 sourceDetails[NuGetManagedTemplatesSource.PackageIdKey] = nuGetPackageInfo.PackageIdentifier;
                 sourceDetails[NuGetManagedTemplatesSource.PackageVersionKey] = nuGetPackageInfo.PackageVersion.ToString();
-                NuGetManagedTemplatesSource source = new NuGetManagedTemplatesSource(_environmentSettings, this, nuGetPackageInfo.FullPath, sourceDetails);
+                NuGetManagedTemplatesSource source = new NuGetManagedTemplatesSource(_environmentSettings, Provider, nuGetPackageInfo.FullPath, sourceDetails);
                 return InstallResult.CreateSuccess(installRequest, source);
             }
             catch (DownloadException e)

@@ -21,7 +21,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
             var environmentSettings = new EngineEnvironmentSettings(host, x => null);
             MockMountPoint mnt = new MockMountPoint(environmentSettings);
             mnt.MockRoot.AddDirectory("subdir").AddFile("test.file", new byte[0]);
-            Orchestrator orchestrator = new Orchestrator();
+            Util.Orchestrator orchestrator = new Util.Orchestrator();
             orchestrator.Run(new MockGlobalRunSpec(), mnt.Root, @"c:\temp");
         }
     }

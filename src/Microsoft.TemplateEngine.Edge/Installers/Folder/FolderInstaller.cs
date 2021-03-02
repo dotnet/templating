@@ -36,7 +36,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.Folder
 
         public IManagedTemplatesSource Deserialize(IManagedTemplatesSourcesProvider provider, TemplatesSourceData data)
         {
-            return new FolderManagedTemplatesSource(_settings, this, data.MountPointUri);
+            return new FolderManagedTemplatesSource(_settings, provider, data.MountPointUri);
         }
 
         public Task<IReadOnlyList<CheckUpdateResult>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources)
@@ -47,7 +47,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.Folder
         public Task<InstallResult> InstallAsync(InstallRequest installRequest)
         {
             if (Directory.Exists(installRequest.Identifier))
-                return Task.FromResult(InstallResult.CreateSuccess(installRequest, new FolderManagedTemplatesSource(_settings, this, installRequest.Identifier)));
+                return Task.FromResult(InstallResult.CreateSuccess(installRequest, new FolderManagedTemplatesSource(_settings, Provider, installRequest.Identifier)));
             else
                 return Task.FromResult(InstallResult.CreateFailure(installRequest, InstallerErrorCode.GenericError, null));
         }

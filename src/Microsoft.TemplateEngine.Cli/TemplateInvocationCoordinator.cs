@@ -70,7 +70,7 @@ namespace Microsoft.TemplateEngine.Cli
                 return;
             }
 
-            IReadOnlyList<CheckUpdateResult> versionChecks = await managedTemplateSource.Installer.Provider.GetLatestVersions(new[] { managedTemplateSource }).ConfigureAwait(false);
+            IReadOnlyList<CheckUpdateResult> versionChecks = await managedTemplateSource.ManagedProvider.GetLatestVersions(new[] { managedTemplateSource }).ConfigureAwait(false);
             if (versionChecks.Count == 1)
             {
                 var updateResult = versionChecks[0];
