@@ -13,19 +13,19 @@ namespace Microsoft.TemplateEngine.Edge.Installers.Folder
 {
     internal class FolderManagedTemplatesSource : IManagedTemplatesSource
     {
-        public FolderManagedTemplatesSource(IEngineEnvironmentSettings settings, IInstaller installer, string mountPointUri)
+        public FolderManagedTemplatesSource(IEngineEnvironmentSettings settings, IManagedTemplatesSourcesProvider managedProvider, string mountPointUri)
         {
             MountPointUri = mountPointUri;
-            Installer = installer;
+            ManagedProvider = managedProvider;
             LastChangeTime = (settings.Host.FileSystem as IFileLastWriteTimeSource)?.GetLastWriteTimeUtc(mountPointUri) ?? File.GetLastWriteTime(mountPointUri);
         }
 
         public string DisplayName => Identifier;
         public string Identifier => MountPointUri;
-        public IInstaller Installer { get; }
+        public ITemplatesSourcesProvider Provider => ManagedProvider;
+        public IManagedTemplatesSourcesProvider ManagedProvider { get; }
         public DateTime LastChangeTime { get; }
         public string MountPointUri { get; }
-        public ITemplatesSourcesProvider Provider => Installer.Provider;
         public string Version => null;
         public IReadOnlyDictionary<string, string> GetDisplayDetails() => new Dictionary<string, string>();
     }

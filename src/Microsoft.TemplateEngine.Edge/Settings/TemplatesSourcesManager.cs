@@ -57,7 +57,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             EnsureLoaded();
             var sources = await GetManagedTemplatesSources(force).ConfigureAwait(false);
             var list = new List<(IManagedTemplatesSourcesProvider Provider, IReadOnlyList<IManagedTemplatesSource> ManagedSources)>();
-            foreach (var source in sources.GroupBy(s => s.Installer.Provider))
+            foreach (var source in sources.GroupBy(s => s.ManagedProvider))
             {
                 list.Add((source.Key, source.ToList()));
             }

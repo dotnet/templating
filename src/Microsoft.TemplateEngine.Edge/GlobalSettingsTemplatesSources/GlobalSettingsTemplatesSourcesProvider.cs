@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
@@ -23,6 +24,7 @@ namespace Microsoft.TemplateEngine.Edge
             private IEngineEnvironmentSettings _environmentSettings;
             private Dictionary<Guid, IInstaller> _installersByGuid = new Dictionary<Guid, IInstaller>();
             private Dictionary<string, IInstaller> _installersByName = new Dictionary<string, IInstaller>();
+            private ConditionalWeakTable<IManagedTemplatesSource, IInstaller> _sourceToInstaller = new ConditionalWeakTable<IManagedTemplatesSource, IInstaller>();
             private List<ITemplatesSource> _notSupportedSources = new List<ITemplatesSource>();
             private Dictionary<IInstaller, Dictionary<string, IManagedTemplatesSource>> _templatesSources = new Dictionary<IInstaller, Dictionary<string, IManagedTemplatesSource>>();
 
@@ -71,7 +73,7 @@ namespace Microsoft.TemplateEngine.Edge
                 _ = sources ?? throw new ArgumentNullException(nameof(sources));
 
                 var tasks = new List<Task<IReadOnlyList<CheckUpdateResult>>>();
-                foreach (var sourcesGroupedByInstaller in sources.GroupBy(s => s.Installer))
+                foreach (var sourcesGroupedByInstaller in sources.GroupBy(s => GetInstaller(s)))
                 {
                     tasks.Add(sourcesGroupedByInstaller.Key.GetLatestVersionAsync(sourcesGroupedByInstaller));
                 }
@@ -123,15 +125,18 @@ namespace Microsoft.TemplateEngine.Edge
 
                 return await Task.WhenAll(sources.Select(async source =>
                 {
-                    UninstallResult result = await source.Installer.UninstallAsync(source).ConfigureAwait(false);
+                    IInstaller installer = GetInstaller(source);
+                    UninstallResult result = await installer.UninstallAsync(source).ConfigureAwait(false);
                     if (result.Success)
                     {
-                        _templatesSources[source.Installer].Remove(source.Identifier);
-                        _environmentSettings.SettingsLoader.GlobalSettings.Remove(source.Installer.Serialize(source));
+                        _templatesSources[installer].Remove(source.Identifier);
+                        _environmentSettings.SettingsLoader.GlobalSettings.Remove(installer.Serialize(source));
                     }
                     return result;
                 })).ConfigureAwait(false);
             }
+
+            private IInstaller GetInstaller(IManagedTemplatesSource source) => _sourceToInstaller.TryGetValue(source, out var installer) ? installer : throw new InvalidOperationException();
 
             public async Task<IReadOnlyList<UpdateResult>> UpdateAsync(IEnumerable<UpdateRequest> updateRequests)
             {
@@ -142,7 +147,7 @@ namespace Microsoft.TemplateEngine.Edge
 
             private async Task<UpdateResult> UpdateAsync(UpdateRequest updateRequest)
             {
-                IInstaller installer = updateRequest.Source.Installer;
+                IInstaller installer = GetInstaller(updateRequest.Source);
                 (InstallerErrorCode result, string message) = await EnsureInstallPrerequisites(updateRequest.Source.Identifier, updateRequest.Version, installer, update: true).ConfigureAwait(false);
                 if (result != InstallerErrorCode.Success)
                 {
@@ -217,6 +222,8 @@ namespace Microsoft.TemplateEngine.Edge
                     if (_installersByGuid.TryGetValue(entry.InstallerId, out var installer))
                     {
                         IManagedTemplatesSource managedTemplatesSource = installer.Deserialize(this, entry);
+                        if (!_sourceToInstaller.TryGetValue(managedTemplatesSource, out _))
+                            _sourceToInstaller.Add(managedTemplatesSource, installer);
                         if (_templatesSources.TryGetValue(installer, out Dictionary<string, IManagedTemplatesSource> installerSources))
                         {
                             installerSources[managedTemplatesSource.Identifier] = managedTemplatesSource;
