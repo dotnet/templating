@@ -40,7 +40,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         public string Name => _factory.Name;
         public IManagedTemplatesSourcesProvider Provider { get; }
 
-        public Task<bool> CanInstallAsync(InstallRequest installationRequest)
+        public Task<bool> CanInstallAsync(InstallRequest installationRequest, CancellationToken cancellationToken)
         {
             try
             {
@@ -79,7 +79,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             return new NuGetManagedTemplatesSource(_environmentSettings, provider, data.MountPointUri, data.Details);
         }
 
-        public async Task<IReadOnlyList<CheckUpdateResult>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources)
+        public async Task<IReadOnlyList<CheckUpdateResult>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources, CancellationToken cancellationToken)
         {
             _ = sources ?? throw new ArgumentNullException(nameof(sources));
             return await Task.WhenAll(sources.Select(source =>
@@ -117,7 +117,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 })).ConfigureAwait(false);
         }
 
-        public async Task<InstallResult> InstallAsync(InstallRequest installRequest)
+        public async Task<InstallResult> InstallAsync(InstallRequest installRequest, CancellationToken cancellationToken)
         {
             _ = installRequest ?? throw new ArgumentNullException(nameof(installRequest));
 
@@ -188,7 +188,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             };
         }
 
-        public Task<UninstallResult> UninstallAsync(IManagedTemplatesSource managedSource)
+        public Task<UninstallResult> UninstallAsync(IManagedTemplatesSource managedSource, CancellationToken cancellationToken)
         {
             _ = managedSource ?? throw new ArgumentNullException(nameof(managedSource));
             if (!(managedSource is NuGetManagedTemplatesSource))
@@ -208,7 +208,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             }
         }
 
-        public async Task<UpdateResult> UpdateAsync(UpdateRequest updateRequest)
+        public async Task<UpdateResult> UpdateAsync(UpdateRequest updateRequest, CancellationToken cancellationToken)
         {
             _ = updateRequest ?? throw new ArgumentNullException(nameof(updateRequest));
             if (string.IsNullOrWhiteSpace(updateRequest.Version))
@@ -230,7 +230,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                     { InstallerConstants.NuGetSourcesKey, nuGetManagedSource.NuGetSource }
                 };
             }
-            return UpdateResult.FromInstallResult(updateRequest, await InstallAsync(installRequest).ConfigureAwait(false));
+            return UpdateResult.FromInstallResult(updateRequest, await InstallAsync(installRequest, cancellationToken).ConfigureAwait(false));
         }
 
         private bool IsLocalPackage(InstallRequest installRequest)
