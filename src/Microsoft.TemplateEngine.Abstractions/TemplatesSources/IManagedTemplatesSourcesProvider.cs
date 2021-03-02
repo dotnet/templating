@@ -25,7 +25,7 @@ namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
         /// new <see cref="IManagedTemplatesSource"/>, if update failed <see cref="UpdateResult.Success"/> will be <c>false</c>.
         /// </summary>
         /// <param name="updateRequests">List of <see cref="IManagedTemplatesSource"/> to be updated.</param>
-        /// <returns>List of <see cref="InstallResult"/> with install information.</returns>
+        /// <returns>List of <see cref="UpdateResult"/> with install information.</returns>
         /// <param name="cancellationToken"></param>
         Task<IReadOnlyList<UpdateResult>> UpdateAsync(IEnumerable<UpdateRequest> updateRequests, CancellationToken cancellationToken);
 

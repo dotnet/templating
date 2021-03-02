@@ -20,9 +20,9 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
         private IEngineEnvironmentSettings _settings;
 
-        public NuGetManagedTemplatesSource(IEngineEnvironmentSettings settings, IManagedTemplatesSourcesProvider managedProvider, string mountPoint, IReadOnlyDictionary<string, string> details)
+        public NuGetManagedTemplatesSource(IEngineEnvironmentSettings settings, IInstaller installer, string mountPoint, IReadOnlyDictionary<string, string> details)
         {
-            ManagedProvider = managedProvider;
+            Installer = installer;
             MountPointUri = mountPoint;
             Details = details;
             _settings = settings;
@@ -31,12 +31,13 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         public string Author => Details.TryGetValue(AuthorKey, out string author) ? author : null;
         public string DisplayName => string.IsNullOrWhiteSpace(Version) ? Identifier : $"{Identifier}::{Version}";
         public string Identifier => Details.TryGetValue(PackageIdKey, out string identifier) ? identifier : null;
+        public IInstaller Installer { get; }
         public DateTime LastChangeTime => (_settings.Host.FileSystem as IFileLastWriteTimeSource)?.GetLastWriteTimeUtc(MountPointUri) ?? default;
         public bool LocalPackage => Details.TryGetValue(LocalPackageKey, out string isLocalPackage) && bool.TryParse(isLocalPackage, out bool result) ? result : false;
         public string MountPointUri { get; }
         public string NuGetSource => Details.TryGetValue(NuGetSourceKey, out string nugetSource) ? nugetSource : null;
-        public ITemplatesSourcesProvider Provider => ManagedProvider;
-        public IManagedTemplatesSourcesProvider ManagedProvider { get; }
+        public ITemplatesSourcesProvider Provider => Installer.Provider;
+        public IManagedTemplatesSourcesProvider ManagedProvider => Installer.Provider;
         public string Version => Details.TryGetValue(PackageVersionKey, out string version) ? version : null;
         internal IReadOnlyDictionary<string, string> Details { get; }
 
