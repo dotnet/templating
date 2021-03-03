@@ -46,8 +46,8 @@ namespace Microsoft.TemplateEngine.Edge
                     _installersByGuid[installerFactory.Id] = installer;
                 }
 
+                // We can't just add "SettingsChanged+=SourcesChanged", because SourcesChanged is null at this time.
                 settings.SettingsLoader.GlobalSettings.SettingsChanged += () => SourcesChanged?.Invoke();
-
             }
 
             public event Action SourcesChanged;
@@ -100,24 +100,32 @@ namespace Microsoft.TemplateEngine.Edge
                     return new List<InstallResult>();
                 }
 
-                return await Task.WhenAll(installRequests.Select(async installRequest =>
+                await _environmentSettings.SettingsLoader.GlobalSettings.LockAsync(cancellationToken).ConfigureAwait(false);
+                try
                 {
-                    var installersThatCanInstall = new List<IInstaller>();
-                    foreach (var install in _installersByName.Values)
+                    return await Task.WhenAll(installRequests.Select(async installRequest =>
                     {
-                        if (await install.CanInstallAsync(installRequest, cancellationToken).ConfigureAwait(false))
+                        var installersThatCanInstall = new List<IInstaller>();
+                        foreach (var install in _installersByName.Values)
                         {
-                            installersThatCanInstall.Add(install);
+                            if (await install.CanInstallAsync(installRequest, cancellationToken).ConfigureAwait(false))
+                            {
+                                installersThatCanInstall.Add(install);
+                            }
                         }
-                    }
-                    if (installersThatCanInstall.Count == 0)
-                    {
-                        return InstallResult.CreateFailure(installRequest, InstallerErrorCode.UnsupportedRequest, $"{installRequest.Identifier} cannot be installed");
-                    }
+                        if (installersThatCanInstall.Count == 0)
+                        {
+                            return InstallResult.CreateFailure(installRequest, InstallerErrorCode.UnsupportedRequest, $"{installRequest.Identifier} cannot be installed");
+                        }
 
-                    IInstaller installer = installersThatCanInstall[0];
-                    return await InstallAsync(installRequest, installer, cancellationToken).ConfigureAwait(false);
-                })).ConfigureAwait(false);
+                        IInstaller installer = installersThatCanInstall[0];
+                        return await InstallAsync(installRequest, installer, cancellationToken).ConfigureAwait(false);
+                    })).ConfigureAwait(false);
+                }
+                finally
+                {
+                    await _environmentSettings.SettingsLoader.GlobalSettings.UnlockAsync(cancellationToken).ConfigureAwait(false);
+                }
             }
 
             public async Task<IReadOnlyList<UninstallResult>> UninstallAsync(IEnumerable<IManagedTemplatesSource> sources, CancellationToken cancellationToken)
@@ -128,22 +136,39 @@ namespace Microsoft.TemplateEngine.Edge
                     return new List<UninstallResult>();
                 }
 
-                return await Task.WhenAll(sources.Select(async source =>
+                await _environmentSettings.SettingsLoader.GlobalSettings.LockAsync(cancellationToken).ConfigureAwait(false);
+                try
                 {
-                    UninstallResult result = await source.Installer.UninstallAsync(source, cancellationToken).ConfigureAwait(false);
-                    if (result.Success)
+                    return await Task.WhenAll(sources.Select(async source =>
                     {
-                        _environmentSettings.SettingsLoader.GlobalSettings.Remove(source.Installer.Serialize(source));
-                    }
-                    return result;
-                })).ConfigureAwait(false);
+                        UninstallResult result = await source.Installer.UninstallAsync(source, cancellationToken).ConfigureAwait(false);
+                        if (result.Success)
+                        {
+                            _environmentSettings.SettingsLoader.GlobalSettings.Remove(source.Installer.Serialize(source));
+                        }
+                        return result;
+                    })).ConfigureAwait(false);
+                }
+                finally
+                {
+                    await _environmentSettings.SettingsLoader.GlobalSettings.UnlockAsync(cancellationToken).ConfigureAwait(false);
+                }
             }
 
             public async Task<IReadOnlyList<UpdateResult>> UpdateAsync(IEnumerable<UpdateRequest> updateRequests, CancellationToken cancellationToken)
             {
                 _ = updateRequests ?? throw new ArgumentNullException(nameof(updateRequests));
                 IEnumerable<UpdateRequest> updatesToApply = updateRequests.Where(request => request.Version != request.Source.Version);
-                return await Task.WhenAll(updatesToApply.Select(updateRequest => UpdateAsync(updateRequest, cancellationToken))).ConfigureAwait(false);
+
+                await _environmentSettings.SettingsLoader.GlobalSettings.LockAsync(cancellationToken).ConfigureAwait(false);
+                try
+                {
+                    return await Task.WhenAll(updatesToApply.Select(updateRequest => UpdateAsync(updateRequest, cancellationToken))).ConfigureAwait(false);
+                }
+                finally
+                {
+                    await _environmentSettings.SettingsLoader.GlobalSettings.UnlockAsync(cancellationToken).ConfigureAwait(false);
+                }
             }
 
             private async Task<UpdateResult> UpdateAsync(UpdateRequest updateRequest, CancellationToken cancellationToken)
