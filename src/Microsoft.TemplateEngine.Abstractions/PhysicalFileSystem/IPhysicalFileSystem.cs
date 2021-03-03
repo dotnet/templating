@@ -39,7 +39,5 @@ namespace Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem
         void SetFileAttributes(string file, FileAttributes attributes);
 
         IDisposable WatchFileChanges(string filepath, FileSystemEventHandler fileChanged);
-
-        Stream CreateFileStream(string path, FileMode mode, FileAccess access, FileShare share);
     }
 }
