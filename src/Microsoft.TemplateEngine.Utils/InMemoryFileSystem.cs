@@ -892,13 +892,5 @@ namespace Microsoft.TemplateEngine.Utils
         {
             return new MemoryStream();//Just some disposable dummy
         }
-
-        public Stream CreateFileStream(string path, FileMode mode, FileAccess access, FileShare share)
-        {
-            if (mode == FileMode.Create)
-                return CreateFile(path);
-            else
-                return OpenRead(path);
-        }
     }
 }

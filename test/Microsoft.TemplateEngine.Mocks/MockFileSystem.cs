@@ -247,6 +247,5 @@ namespace Microsoft.TemplateEngine.Mocks
         }
 
         public IDisposable WatchFileChanges(string filepath, FileSystemEventHandler fileChanged) => throw new NotImplementedException();
-        public Stream CreateFileStream(string path, FileMode mode, FileAccess access, FileShare share) => throw new NotImplementedException();
     }
 }

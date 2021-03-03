@@ -109,10 +109,5 @@ namespace Microsoft.TemplateEngine.Utils
             watcher.EnableRaisingEvents = true;
             return watcher;
         }
-
-        public Stream CreateFileStream(string path, FileMode mode, FileAccess access, FileShare share)
-        {
-            return new FileStream(path, mode, access, share);
-        }
     }
 }
