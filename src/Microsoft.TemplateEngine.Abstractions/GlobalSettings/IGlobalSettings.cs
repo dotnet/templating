@@ -12,14 +12,10 @@ namespace Microsoft.TemplateEngine.Abstractions.GlobalSettings
     {
         event Action SettingsChanged;
 
-        IReadOnlyList<TemplatesSourceData> UserInstalledTemplatesSources { get; }
+        Task<IReadOnlyList<TemplatesSourceData>> GetInstalledTemplatesPackagesAsync(CancellationToken cancellationToken);
 
-        void Add(TemplatesSourceData userInstalledTemplate);
+        Task SetInstalledTemplatesPackagesAsync(IReadOnlyList<TemplatesSourceData> packages, CancellationToken cancellationToken);
 
-        void Remove(TemplatesSourceData userInstalledTemplate);
-
-        Task LockAsync(CancellationToken token);
-
-        Task UnlockAsync(CancellationToken token);
+        Task<IDisposable> LockAsync(CancellationToken token);
     }
 }
