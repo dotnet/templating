@@ -9,20 +9,18 @@ using System.Threading.Tasks;
 
 namespace Microsoft.TemplateEngine.Edge.Settings
 {
-    internal class AsyncMutex
+    internal class AsyncMutex : IDisposable
     {
-        private readonly TaskCompletionSource<AsyncMutex> _taskCompletionSource;
+        private readonly TaskCompletionSource<IDisposable> _taskCompletionSource;
         private readonly ManualResetEvent _blockReleasingMutex = new ManualResetEvent(false);
         private readonly string _mutexName;
         private readonly CancellationToken _token;
-        private readonly Func<CancellationToken, Task>? _unlockCallback;
 
-        private AsyncMutex(string mutexName, CancellationToken token, Func<CancellationToken, Task>? unlockCallback)
+        private AsyncMutex(string mutexName, CancellationToken token)
         {
             _mutexName = mutexName;
             _token = token;
-            _unlockCallback = unlockCallback;
-            _taskCompletionSource = new TaskCompletionSource<AsyncMutex>();
+            _taskCompletionSource = new TaskCompletionSource<IDisposable>();
 
             var thread = new Thread(new ThreadStart(WaitLoop));
             thread.IsBackground = true;
@@ -30,9 +28,9 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             thread.Name = "TemplateEngine AsyncMutex";
         }
 
-        public static Task<AsyncMutex> WaitAsync(string mutexName, CancellationToken token, Func<CancellationToken, Task>? unlockCallback)
+        public static Task<IDisposable> WaitAsync(string mutexName, CancellationToken token)
         {
-            var mutex = new AsyncMutex(mutexName, token, unlockCallback);
+            var mutex = new AsyncMutex(mutexName, token);
             return mutex._taskCompletionSource.Task;
         }
 
@@ -64,13 +62,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             mutex.ReleaseMutex();
         }
 
-        public async Task ReleaseMutexAsync(CancellationToken token)
-        {
-            if (_unlockCallback != null)
-            {
-                await _unlockCallback(token).ConfigureAwait(false);
-            }
-            _blockReleasingMutex.Set();
-        }
+        public void Dispose() => _blockReleasingMutex.Set();
     }
 }
