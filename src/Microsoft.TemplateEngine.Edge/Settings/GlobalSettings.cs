@@ -68,26 +68,24 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         {
             if (!_environmentSettings.Host.FileSystem.FileExists(_globalSettingsFile))
                 return null;
-            string textFileContent;
 
-            while (true)
+            for (int i = 0; i < 5; i++)
             {
+                if (token.IsCancellationRequested)
+                    throw new TaskCanceledException();
                 try
                 {
-                    using (var fileStream = _environmentSettings.Host.FileSystem.CreateFileStream(_globalSettingsFile, FileMode.Open, FileAccess.Read, FileShare.Read))
-                    using (var reader = new StreamReader(fileStream))
-                        textFileContent = await reader.ReadToEndAsync().ConfigureAwait(false);
+                    var textFileContent = _paths.ReadAllText(_globalSettingsFile, "{}");
                     return JsonConvert.DeserializeObject<GlobalSettingsData>(textFileContent);
                 }
                 catch (Exception)
                 {
-                    if (token.IsCancellationRequested)
-                    {
+                    if (i == 4)
                         throw;
-                    }
                 }
                 await Task.Delay(20).ConfigureAwait(false);
             }
+            throw new InvalidOperationException();
         }
 
         private async Task SaveDataAsync(CancellationToken token)
@@ -97,24 +95,23 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 UserInstalledTemplatesSources = _userInstalledTemplatesSources
             });
 
-            while (true)
+            for (int i = 0; i < 5; i++)
             {
+                if (token.IsCancellationRequested)
+                    throw new TaskCanceledException();
                 try
                 {
-                    using var fileStream = _environmentSettings.Host.FileSystem.CreateFileStream(_globalSettingsFile, FileMode.Create, FileAccess.Write, FileShare.None);
-                    using var writer = new StreamWriter(fileStream);
-                    await writer.WriteAsync(serializedText).ConfigureAwait(false);
+                    _paths.WriteAllText(_globalSettingsFile, serializedText);
                     return;
                 }
                 catch (Exception)
                 {
-                    if (token.IsCancellationRequested)
-                    {
+                    if (i == 4)
                         throw;
-                    }
-                    await Task.Delay(20).ConfigureAwait(false);
                 }
+                await Task.Delay(20).ConfigureAwait(false);
             }
+            throw new InvalidOperationException();
         }
 
         private async void FileChanged(object sender, FileSystemEventArgs e)
