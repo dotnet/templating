@@ -1,54 +1,41 @@
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
+// Copyright (c) .NET Foundation and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#nullable enable
-
-using System;
+using Microsoft.DotNet.Cli.Utils;
 using System.Collections.Generic;
+using Xunit.Abstractions;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using Microsoft.DotNet.Cli.Utils;
-using Xunit.Abstractions;
+using System;
 
 namespace Microsoft.NET.TestFramework.Commands
 {
     public abstract class TestCommand
     {
+        protected Dictionary<string, string> _environment = new Dictionary<string, string>();
+
+        public ITestOutputHelper Log { get; }
+
+        public string WorkingDirectory { get; set; }
+
+        public List<string> Arguments { get; set; } = new List<string>();
+
+        public List<string> EnvironmentToRemove { get; } = new List<string>();
+
+        //  These only work via Execute(), not when using GetProcessStartInfo()
+        public Action<string> CommandOutputHandler { get; set; }
+        public Action<Process> ProcessStartedHandler { get; set; }
+
         protected TestCommand(ITestOutputHelper log)
         {
             Log = log;
         }
 
-        public ITestOutputHelper Log { get; }
-
-        public string? WorkingDirectory { get; set; }
-
-        public List<string> Arguments { get; set; } = new List<string>();
-
-        public Dictionary<string, string> EnvironmentVariables { get; set; } = new Dictionary<string, string>();
-
-        public List<string> EnvironmentToRemove { get; } = new List<string>();
-
-        public Encoding? StandardOutputEncoding { get; set; }
-
-        public Encoding? StandardErrorEncoding { get; set; }
-
-        /// <summary>
-        /// Only triggers during the execution of <see cref="Execute()"/>
-        /// and not during <see cref="GetProcessStartInfo(string[])"/>.
-        /// </summary>
-        public Action<string>? CommandOutputHandler { get; set; }
-
-        /// <summary>
-        /// Only triggers during the execution of <see cref="Execute()"/>
-        /// and not during <see cref="GetProcessStartInfo(string[])"/>.
-        /// </summary>
-        public Action<Process>? ProcessStartedHandler { get; set; }
+        protected abstract SdkCommandSpec CreateCommand(IEnumerable<string> args);
 
         public TestCommand WithEnvironmentVariable(string name, string value)
         {
-            EnvironmentVariables[name] = value;
+            _environment[name] = value;
             return this;
         }
 
@@ -58,16 +45,30 @@ namespace Microsoft.NET.TestFramework.Commands
             return this;
         }
 
-        public TestCommand WithStandardOutputEncoding(Encoding encoding)
+        private SdkCommandSpec CreateCommandSpec(IEnumerable<string> args)
         {
-            StandardOutputEncoding = encoding;
-            return this;
-        }
+            var commandSpec = CreateCommand(args);
+            foreach (var kvp in _environment)
+            {
+                commandSpec.Environment[kvp.Key] = kvp.Value;
+            }
 
-        public TestCommand WithStandardErrorEncoding(Encoding encoding)
-        {
-            StandardErrorEncoding = encoding;
-            return this;
+            foreach (var envToRemove in EnvironmentToRemove)
+            {
+                commandSpec.EnvironmentToRemove.Add(envToRemove);
+            }
+
+            if (WorkingDirectory != null)
+            {
+                commandSpec.WorkingDirectory = WorkingDirectory;
+            }
+
+            if (Arguments.Any())
+            {
+                commandSpec.Arguments = Arguments.Concat(commandSpec.Arguments).ToList();
+            }
+
+            return commandSpec;
         }
 
         public ProcessStartInfo GetProcessStartInfo(params string[] args)
@@ -86,7 +87,7 @@ namespace Microsoft.NET.TestFramework.Commands
         }
 
         public virtual CommandResult Execute(IEnumerable<string> args)
-        {
+        { 
             var command = CreateCommandSpec(args)
                 .ToCommand()
                 .CaptureStdOut()
@@ -115,37 +116,6 @@ namespace Microsoft.NET.TestFramework.Commands
             }
 
             return result;
-        }
-
-        protected abstract SdkCommandSpec CreateCommand(IEnumerable<string> args);
-
-        private SdkCommandSpec CreateCommandSpec(IEnumerable<string> args)
-        {
-            var commandSpec = CreateCommand(args);
-            foreach (var kvp in EnvironmentVariables)
-            {
-                commandSpec.Environment[kvp.Key] = kvp.Value;
-            }
-
-            foreach (var envToRemove in EnvironmentToRemove)
-            {
-                commandSpec.EnvironmentToRemove.Add(envToRemove);
-            }
-
-            if (WorkingDirectory != null)
-            {
-                commandSpec.WorkingDirectory = WorkingDirectory;
-            }
-
-            if (Arguments.Any())
-            {
-                commandSpec.Arguments = Arguments.Concat(commandSpec.Arguments).ToList();
-            }
-
-            commandSpec.StandardOutputEncodingOverride = StandardOutputEncoding ?? commandSpec.StandardOutputEncodingOverride;
-            commandSpec.StandardErrorEncodingOverride = StandardErrorEncoding ?? commandSpec.StandardErrorEncodingOverride;
-
-            return commandSpec;
         }
     }
 }

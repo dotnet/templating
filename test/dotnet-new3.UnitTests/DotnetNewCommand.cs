@@ -27,7 +27,7 @@ namespace dotnet_new3.UnitTests
                 Arguments = args.ToList(),
                 WorkingDirectory = WorkingDirectory
             };
-            if (!EnvironmentVariables.ContainsKey(Helpers.HomeEnvironmentVariableName))
+            if (!_environment.ContainsKey(Helpers.HomeEnvironmentVariableName))
             {
                 throw new Exception($"{nameof(Helpers.HomeEnvironmentVariableName)} is not set, call {nameof(DotnetNewCommand)}{nameof(WithEnvironmentVariable)} to set it.");
             }
