@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
@@ -57,12 +56,11 @@ namespace Microsoft.TemplateEngine.Edge
             public Task<IReadOnlyList<ITemplatesSource>> GetAllSourcesAsync(CancellationToken cancellationToken)
             {
                 var list = new List<ITemplatesSource>();
-                foreach (TemplatesSourceData entry in _environmentSettings.SettingsLoader.GlobalSettings.UserInstalledTemplatesSources)
+                foreach (TemplatesSourceData entry in await _environmentSettings.SettingsLoader.GlobalSettings.GetInstalledTemplatesPackagesAsync(cancellationToken).ConfigureAwait(false))
                 {
                     if (_installersByGuid.TryGetValue(entry.InstallerId, out var installer))
                     {
-                        IManagedTemplatesSource managedTemplatesSource = installer.Deserialize(this, entry);
-                        list.Add(managedTemplatesSource);
+                        list.Add(installer.Deserialize(this, entry));
 
                     }
                     else
@@ -100,32 +98,28 @@ namespace Microsoft.TemplateEngine.Edge
                     return new List<InstallResult>();
                 }
 
-                await _environmentSettings.SettingsLoader.GlobalSettings.LockAsync(cancellationToken).ConfigureAwait(false);
-                try
+                using var disposable = await _environmentSettings.SettingsLoader.GlobalSettings.LockAsync(cancellationToken).ConfigureAwait(false);
+                var packages = new List<TemplatesSourceData>(await _environmentSettings.SettingsLoader.GlobalSettings.GetInstalledTemplatesPackagesAsync(cancellationToken).ConfigureAwait(false));
+                var results = await Task.WhenAll(installRequests.Select(async installRequest =>
                 {
-                    return await Task.WhenAll(installRequests.Select(async installRequest =>
+                    var installersThatCanInstall = new List<IInstaller>();
+                    foreach (var install in _installersByName.Values)
                     {
-                        var installersThatCanInstall = new List<IInstaller>();
-                        foreach (var install in _installersByName.Values)
+                        if (await install.CanInstallAsync(installRequest, cancellationToken).ConfigureAwait(false))
                         {
-                            if (await install.CanInstallAsync(installRequest, cancellationToken).ConfigureAwait(false))
-                            {
-                                installersThatCanInstall.Add(install);
-                            }
+                            installersThatCanInstall.Add(install);
                         }
-                        if (installersThatCanInstall.Count == 0)
-                        {
-                            return InstallResult.CreateFailure(installRequest, InstallerErrorCode.UnsupportedRequest, $"{installRequest.Identifier} cannot be installed");
-                        }
+                    }
+                    if (installersThatCanInstall.Count == 0)
+                    {
+                        return InstallResult.CreateFailure(installRequest, InstallerErrorCode.UnsupportedRequest, $"{installRequest.Identifier} cannot be installed");
+                    }
 
-                        IInstaller installer = installersThatCanInstall[0];
-                        return await InstallAsync(installRequest, installer, cancellationToken).ConfigureAwait(false);
-                    })).ConfigureAwait(false);
-                }
-                finally
-                {
-                    await _environmentSettings.SettingsLoader.GlobalSettings.UnlockAsync(cancellationToken).ConfigureAwait(false);
-                }
+                    IInstaller installer = installersThatCanInstall[0];
+                    return await InstallAsync(packages, installRequest, installer, cancellationToken).ConfigureAwait(false);
+                })).ConfigureAwait(false);
+                await _environmentSettings.SettingsLoader.GlobalSettings.SetInstalledTemplatesPackagesAsync(packages, cancellationToken).ConfigureAwait(false);
+                return results;
             }
 
             public async Task<IReadOnlyList<UninstallResult>> UninstallAsync(IEnumerable<IManagedTemplatesSource> sources, CancellationToken cancellationToken)
@@ -136,23 +130,24 @@ namespace Microsoft.TemplateEngine.Edge
                     return new List<UninstallResult>();
                 }
 
-                await _environmentSettings.SettingsLoader.GlobalSettings.LockAsync(cancellationToken).ConfigureAwait(false);
-                try
-                {
-                    return await Task.WhenAll(sources.Select(async source =>
-                    {
-                        UninstallResult result = await source.Installer.UninstallAsync(source, cancellationToken).ConfigureAwait(false);
-                        if (result.Success)
-                        {
-                            _environmentSettings.SettingsLoader.GlobalSettings.Remove(source.Installer.Serialize(source));
-                        }
-                        return result;
-                    })).ConfigureAwait(false);
-                }
-                finally
-                {
-                    await _environmentSettings.SettingsLoader.GlobalSettings.UnlockAsync(cancellationToken).ConfigureAwait(false);
-                }
+                using var disposable = await _environmentSettings.SettingsLoader.GlobalSettings.LockAsync(cancellationToken).ConfigureAwait(false);
+
+                var packages = new List<TemplatesSourceData>(await _environmentSettings.SettingsLoader.GlobalSettings.GetInstalledTemplatesPackagesAsync(cancellationToken).ConfigureAwait(false));
+                var results = await Task.WhenAll(sources.Select(async source =>
+                 {
+                     UninstallResult result = await source.Installer.UninstallAsync(source, cancellationToken).ConfigureAwait(false);
+                     if (result.Success)
+                     {
+                         lock (packages)
+                         {
+                             packages.RemoveAll(p => p.MountPointUri == source.MountPointUri);
+                         }
+                     }
+                     return result;
+                 })).ConfigureAwait(false);
+                await _environmentSettings.SettingsLoader.GlobalSettings.SetInstalledTemplatesPackagesAsync(packages, cancellationToken).ConfigureAwait(false);
+                return results;
+
             }
 
             public async Task<IReadOnlyList<UpdateResult>> UpdateAsync(IEnumerable<UpdateRequest> updateRequests, CancellationToken cancellationToken)
@@ -160,20 +155,18 @@ namespace Microsoft.TemplateEngine.Edge
                 _ = updateRequests ?? throw new ArgumentNullException(nameof(updateRequests));
                 IEnumerable<UpdateRequest> updatesToApply = updateRequests.Where(request => request.Version != request.Source.Version);
 
-                await _environmentSettings.SettingsLoader.GlobalSettings.LockAsync(cancellationToken).ConfigureAwait(false);
-                try
-                {
-                    return await Task.WhenAll(updatesToApply.Select(updateRequest => UpdateAsync(updateRequest, cancellationToken))).ConfigureAwait(false);
-                }
-                finally
-                {
-                    await _environmentSettings.SettingsLoader.GlobalSettings.UnlockAsync(cancellationToken).ConfigureAwait(false);
-                }
+                using var disposable = await _environmentSettings.SettingsLoader.GlobalSettings.LockAsync(cancellationToken).ConfigureAwait(false);
+
+                var packages = new List<TemplatesSourceData>(await _environmentSettings.SettingsLoader.GlobalSettings.GetInstalledTemplatesPackagesAsync(cancellationToken).ConfigureAwait(false));
+                var results = await Task.WhenAll(updatesToApply.Select(updateRequest => UpdateAsync(packages, updateRequest, cancellationToken))).ConfigureAwait(false);
+                await _environmentSettings.SettingsLoader.GlobalSettings.SetInstalledTemplatesPackagesAsync(packages, cancellationToken).ConfigureAwait(false);
+                return results;
+
             }
 
-            private async Task<UpdateResult> UpdateAsync(UpdateRequest updateRequest, CancellationToken cancellationToken)
+            private async Task<UpdateResult> UpdateAsync(List<TemplatesSourceData> packages, UpdateRequest updateRequest, CancellationToken cancellationToken)
             {
-                (InstallerErrorCode result, string message) = await EnsureInstallPrerequisites(updateRequest.Source.Identifier, updateRequest.Version, updateRequest.Source.Installer, cancellationToken, update: true).ConfigureAwait(false);
+                (InstallerErrorCode result, string message) = await EnsureInstallPrerequisites(packages, updateRequest.Source.Identifier, updateRequest.Version, updateRequest.Source.Installer, cancellationToken, update: true).ConfigureAwait(false);
                 if (result != InstallerErrorCode.Success)
                 {
                     return UpdateResult.CreateFailure(updateRequest, result, message);
@@ -184,11 +177,14 @@ namespace Microsoft.TemplateEngine.Edge
                 {
                     return updateResult;
                 }
-                _environmentSettings.SettingsLoader.GlobalSettings.Add(updateRequest.Source.Installer.Serialize(updateResult.Source));
+                lock (packages)
+                {
+                    packages.Add(updateRequest.Source.Installer.Serialize(updateResult.Source));
+                }
                 return updateResult;
             }
 
-            private async Task<(InstallerErrorCode, string)> EnsureInstallPrerequisites(string identifier, string version, IInstaller installer, CancellationToken cancellationToken, bool update = false)
+            private async Task<(InstallerErrorCode, string)> EnsureInstallPrerequisites(List<TemplatesSourceData> packages, string identifier, string version, IInstaller installer, CancellationToken cancellationToken, bool update = false)
             {
                 var sources = await GetAllSourcesAsync(cancellationToken).ConfigureAwait(false);
 
@@ -211,17 +207,20 @@ namespace Microsoft.TemplateEngine.Edge
                         return (InstallerErrorCode.UpdateUninstallFailed, uninstallResult.ErrorMessage);
                     }
                     _environmentSettings.Host.LogMessage($"{sourceToBeUpdated.DisplayName} was successfully uninstalled.");
-                    _environmentSettings.SettingsLoader.GlobalSettings.Remove(installer.Serialize(sourceToBeUpdated));
+                    lock (packages)
+                    {
+                        packages.RemoveAll(p => p.MountPointUri == sourceToBeUpdated.MountPointUri);
+                    }
                 }
                 return (InstallerErrorCode.Success, string.Empty);
             }
 
-            private async Task<InstallResult> InstallAsync(InstallRequest installRequest, IInstaller installer, CancellationToken cancellationToken)
+            private async Task<InstallResult> InstallAsync(List<TemplatesSourceData> packages, InstallRequest installRequest, IInstaller installer, CancellationToken cancellationToken)
             {
                 _ = installRequest ?? throw new ArgumentNullException(nameof(installRequest));
                 _ = installer ?? throw new ArgumentNullException(nameof(installer));
 
-                (InstallerErrorCode result, string message) = await EnsureInstallPrerequisites(installRequest.Identifier, installRequest.Version, installer, cancellationToken).ConfigureAwait(false);
+                (InstallerErrorCode result, string message) = await EnsureInstallPrerequisites(packages, installRequest.Identifier, installRequest.Version, installer, cancellationToken).ConfigureAwait(false);
                 if (result != InstallerErrorCode.Success)
                 {
                     return InstallResult.CreateFailure(installRequest, result, message);
@@ -232,7 +231,10 @@ namespace Microsoft.TemplateEngine.Edge
                 {
                     return installResult;
                 }
-                _environmentSettings.SettingsLoader.GlobalSettings.Add(installer.Serialize(installResult.Source));
+                lock (packages)
+                {
+                    packages.Add(installer.Serialize(installResult.Source));
+                }
                 return installResult;
             }
         }

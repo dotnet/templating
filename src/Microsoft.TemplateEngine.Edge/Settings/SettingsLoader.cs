@@ -56,7 +56,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 try
                 {
                     var globalSettings = new GlobalSettings(EnvironmentSettings, _paths.User.GlobalSettingsFile);
-                    globalSettings.ReloadSettings(false, default).Wait();
                     GlobalSettings = globalSettings;
                 }
                 catch (Exception ex)
