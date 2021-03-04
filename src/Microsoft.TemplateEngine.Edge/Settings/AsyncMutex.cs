@@ -14,12 +14,13 @@ namespace Microsoft.TemplateEngine.Edge.Settings
     /// can switch to different thread and <see cref="Mutex.ReleaseMutex"/> must be called from same thread.
     /// Hence this helper class.
     /// </summary>
-    internal class AsyncMutex : IDisposable
+    internal sealed class AsyncMutex : IDisposable
     {
         private readonly TaskCompletionSource<IDisposable> _taskCompletionSource;
         private readonly ManualResetEvent _blockReleasingMutex = new ManualResetEvent(false);
         private readonly string _mutexName;
         private readonly CancellationToken _token;
+        private bool _disposed;
 
         private AsyncMutex(string mutexName, CancellationToken token)
         {
@@ -47,6 +48,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 if (_token.IsCancellationRequested)
                 {
                     _taskCompletionSource.SetCanceled();
+                    _blockReleasingMutex.Dispose();
                     return;
                 }
                 if (mutex.WaitOne(100))
@@ -56,6 +58,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     {
                         mutex.ReleaseMutex();
                         _taskCompletionSource.SetCanceled();
+                        _blockReleasingMutex.Dispose();
                         return;
                     }
                     break;
@@ -67,6 +70,15 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             mutex.ReleaseMutex();
         }
 
-        public void Dispose() => _blockReleasingMutex.Set();
+        public void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+            _disposed = true;
+
+            _blockReleasingMutex.Set();
+        }
     }
 }

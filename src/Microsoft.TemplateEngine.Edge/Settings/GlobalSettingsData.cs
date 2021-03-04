@@ -13,13 +13,15 @@ namespace Microsoft.TemplateEngine.Edge.Settings
     /// <summary>
     /// Used just to serialize/deserilize data to/from settings.json file.
     /// </summary>
-    internal class GlobalSettingsData
+    internal sealed class GlobalSettingsData
     {
         public IReadOnlyList<TemplatesSourceData> Packages { get; set; }
 
-        // If older TemplateEngine loads this file and save it back
-        // it will include new settings that new TemplateEngine depends on
-        // without this field, data would be lost in process of loading and saving
+        /// <summary>
+        /// If older TemplateEngine loads this file and save it back
+        /// it will include new settings that new TemplateEngine depends on
+        /// without this field, data would be lost in process of loading and saving
+        /// </summary>
         [JsonExtensionData]
         public IDictionary<string, Newtonsoft.Json.Linq.JToken> _additionalData { get; set;  }
     }

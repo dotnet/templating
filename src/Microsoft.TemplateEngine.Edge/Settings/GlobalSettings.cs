@@ -19,17 +19,17 @@ using NuGet.Common;
 
 namespace Microsoft.TemplateEngine.Edge.Settings
 {
-    internal class GlobalSettings : IGlobalSettings, IDisposable
+    internal sealed class GlobalSettings : IGlobalSettings, IDisposable
     {
         private readonly Paths _paths;
         private readonly IEngineEnvironmentSettings _environmentSettings;
         private readonly string _globalSettingsFile;
-        private IDisposable _watcher;
+        private IDisposable? _watcher;
 
         public GlobalSettings(IEngineEnvironmentSettings environmentSettings, string globalSettingsFile)
         {
-            _environmentSettings = environmentSettings;
-            _globalSettingsFile = globalSettingsFile;
+            _environmentSettings = environmentSettings ?? throw new ArgumentNullException(nameof(environmentSettings));
+            _globalSettingsFile = globalSettingsFile ?? throw new ArgumentNullException(nameof(globalSettingsFile));
             _paths = new Paths(environmentSettings);
             environmentSettings.Host.FileSystem.CreateDirectory(Path.GetDirectoryName(_globalSettingsFile));
             _watcher = environmentSettings.Host.FileSystem.WatchFileChanges(_globalSettingsFile, FileChanged);
@@ -44,38 +44,40 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         public Task<IDisposable> LockAsync(CancellationToken token)
         {
-            if (token.IsCancellationRequested)
-            {
-                throw new TaskCanceledException();
-            }
-
+            token.ThrowIfCancellationRequested();
+            // We must use Mutex because we want to lock across different processes that might want to modify this settings file
             return AsyncMutex.WaitAsync($"812CA7F3-7CD8-44B4-B3F0-0159355C0BD5{_globalSettingsFile}".Replace("\\", "_").Replace("/", "_"), token);
         }
 
         public void Dispose()
         {
-            _watcher.Dispose();
+            _watcher?.Dispose();
+            _watcher = null;
         }
 
         public async Task<IReadOnlyList<TemplatesSourceData>> GetInstalledTemplatesPackagesAsync(CancellationToken cancellationToken)
         {
             if (!_environmentSettings.Host.FileSystem.FileExists(_globalSettingsFile))
+            {
                 return Array.Empty<TemplatesSourceData>();
+            }
 
             for (int i = 0; i < 5; i++)
             {
-                if (cancellationToken.IsCancellationRequested)
-                    throw new TaskCanceledException();
+                cancellationToken.ThrowIfCancellationRequested();
+
                 try
                 {
-                    var textFileContent = _paths.ReadAllText(_globalSettingsFile, "{}");
-                    var data = JsonConvert.DeserializeObject<GlobalSettingsData>(textFileContent);
+                    string? textFileContent = _paths.ReadAllText(_globalSettingsFile, "{}");
+                    GlobalSettingsData? data = JsonConvert.DeserializeObject<GlobalSettingsData>(textFileContent);
                     return data.Packages ?? Array.Empty<TemplatesSourceData>();
                 }
                 catch (Exception)
                 {
                     if (i == 4)
+                    {
                         throw;
+                    }
                 }
                 await Task.Delay(20).ConfigureAwait(false);
             }
@@ -84,15 +86,15 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         public async Task SetInstalledTemplatesPackagesAsync(IReadOnlyList<TemplatesSourceData> packages, CancellationToken cancellationToken)
         {
-            var serializedText = JsonConvert.SerializeObject(new GlobalSettingsData()
+            string? serializedText = JsonConvert.SerializeObject(new GlobalSettingsData()
             {
                 Packages = packages
             });
 
             for (int i = 0; i < 5; i++)
             {
-                if (cancellationToken.IsCancellationRequested)
-                    throw new TaskCanceledException();
+                cancellationToken.ThrowIfCancellationRequested();
+
                 try
                 {
                     _paths.WriteAllText(_globalSettingsFile, serializedText);
@@ -102,7 +104,9 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 catch (Exception)
                 {
                     if (i == 4)
+                    {
                         throw;
+                    }
                 }
                 await Task.Delay(20).ConfigureAwait(false);
             }
