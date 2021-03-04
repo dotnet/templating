@@ -9,6 +9,11 @@ using System.Threading.Tasks;
 
 namespace Microsoft.TemplateEngine.Edge.Settings
 {
+    /// <summary>
+    /// Helper class to work with <see cref="Mutex"/> in <c>async</c> method, since <c>await</c>
+    /// can switch to different thread and <see cref="Mutex.ReleaseMutex"/> must be called from same thread.
+    /// Hence this helper class.
+    /// </summary>
     internal class AsyncMutex : IDisposable
     {
         private readonly TaskCompletionSource<IDisposable> _taskCompletionSource;
