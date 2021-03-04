@@ -18,7 +18,8 @@ namespace Microsoft.TemplateEngine.TestHelper
 {
     public class EnvironmentSettingsHelper : IDisposable
     {
-        List<string> foldersToCleanup = new List<string>(0);
+        List<string> foldersToCleanup = new List<string>();
+        List<EngineEnvironmentSettings> engineEnvironmentToDispose = new List<EngineEnvironmentSettings>();
 
         public IEngineEnvironmentSettings CreateEnvironment(string locale = "en-US")
         {
@@ -37,7 +38,9 @@ namespace Microsoft.TemplateEngine.TestHelper
                 FallbackHostTemplateConfigNames = new[] { "dotnetcli" }
             };
 
-            return new EngineEnvironmentSettings(host, (x) => new SettingsLoader(x));
+            var engineEnvironmentSettings = new EngineEnvironmentSettings(host, (x) => new SettingsLoader(x));
+            engineEnvironmentToDispose.Add(engineEnvironmentSettings);
+            return engineEnvironmentSettings;
         }
 
         public string CreateTemporaryFolder()
@@ -52,6 +55,7 @@ namespace Microsoft.TemplateEngine.TestHelper
         {
             try
             {
+                engineEnvironmentToDispose.ForEach(e => e.Dispose());
                 foldersToCleanup.ForEach(f => Directory.Delete(f, true));
             }
             catch (Exception)
