@@ -50,7 +50,7 @@ namespace Microsoft.TemplateEngine.Utils
 
         public string ReadAllText(string path)
         {
-            using (Stream file = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (Stream file = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read))
             using (StreamReader reader = new StreamReader(file, Encoding.UTF8, true, 8192, true))
             {
                 return reader.ReadToEnd();
@@ -104,7 +104,7 @@ namespace Microsoft.TemplateEngine.Utils
 
         public IDisposable WatchFileChanges(string filepath, FileSystemEventHandler fileChanged)
         {
-            var watcher = new FileSystemWatcher(Path.GetDirectoryName(filepath), Path.GetFileName(filepath));
+            FileSystemWatcher watcher = new FileSystemWatcher(Path.GetDirectoryName(filepath), Path.GetFileName(filepath));
             watcher.Changed += fileChanged;
             watcher.EnableRaisingEvents = true;
             return watcher;

@@ -34,7 +34,11 @@ namespace Microsoft.TemplateEngine.Cli
         private readonly ISettingsLoader _settingsLoader;
         private readonly AliasRegistry _aliasRegistry;
         private readonly Paths _paths;
-        private readonly INewCommandInput _commandInput;    // It's safe to access template agnostic information anytime after the first parse. But there is never a guarantee which template the parse is in the context of.
+        /// <summary>
+        /// It's safe to access template agnostic information anytime after the first parse.
+        /// But there is never a guarantee which template the parse is in the context of.
+        /// </summary>
+        private readonly INewCommandInput _commandInput;
         private readonly IHostSpecificDataLoader _hostDataLoader;
         private readonly string _defaultLanguage;
         private static readonly Regex LocaleFormatRegex = new Regex(@"
