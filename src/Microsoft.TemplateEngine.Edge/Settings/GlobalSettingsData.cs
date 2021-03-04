@@ -10,6 +10,9 @@ using Newtonsoft.Json;
 
 namespace Microsoft.TemplateEngine.Edge.Settings
 {
+    /// <summary>
+    /// Used just to serialize/deserilize data to/from settings.json file.
+    /// </summary>
     internal class GlobalSettingsData
     {
         public IReadOnlyList<TemplatesSourceData> Packages { get; set; }
