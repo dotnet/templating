@@ -27,11 +27,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             _mutexName = mutexName;
             _token = token;
             _taskCompletionSource = new TaskCompletionSource<IDisposable>();
-
-            var thread = new Thread(new ThreadStart(WaitLoop));
-            thread.IsBackground = true;
-            thread.Start();
-            thread.Name = "TemplateEngine AsyncMutex";
+            ThreadPool.QueueUserWorkItem(WaitLoop);
         }
 
         public static Task<IDisposable> WaitAsync(string mutexName, CancellationToken token)
@@ -40,7 +36,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             return mutex._taskCompletionSource.Task;
         }
 
-        private void WaitLoop()
+        private void WaitLoop(object state)
         {
             var mutex = new Mutex(false, _mutexName);
             while (true)
