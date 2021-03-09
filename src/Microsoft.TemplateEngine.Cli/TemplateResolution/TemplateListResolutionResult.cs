@@ -12,11 +12,12 @@ using Microsoft.TemplateEngine.Abstractions;
 namespace Microsoft.TemplateEngine.Cli.TemplateResolution
 {
     /// <summary>
-    /// Class represents the template list resolution result to be used for listing or displaying help purposes
+    /// The class represents the template resolution result for listing purposes.
+    /// The resolution result is the list of templates to use
     /// </summary>
-    public sealed class ListOrHelpTemplateListResolutionResult
+    public sealed class TemplateListResolutionResult
     {
-        public ListOrHelpTemplateListResolutionResult(IReadOnlyCollection<ITemplateMatchInfo> coreMatchedTemplates)
+        public TemplateListResolutionResult(IReadOnlyCollection<ITemplateMatchInfo> coreMatchedTemplates)
         {
             _coreMatchedTemplates = coreMatchedTemplates;
         }
@@ -24,6 +25,8 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         private readonly IReadOnlyCollection<ITemplateMatchInfo> _coreMatchedTemplates;
         private IReadOnlyCollection<ITemplateMatchInfo> _exactMatchedTemplates;
         private IReadOnlyCollection<ITemplateMatchInfo> _partiallyMatchedTemplates;
+        private IReadOnlyCollection<TemplateGroup> _exactMatchedTemplateGroups;
+        private IReadOnlyCollection<TemplateGroup> _partiallyMatchedTemplateGroups;
 
         /// <summary>
         /// Returns list of exact or partially matched templates by name and exact match by language, filter, baseline (if specified in command paramaters)
@@ -58,10 +61,22 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         }
 
         /// <summary>
-        /// Returns list of exact or partially matched templates by name and exact match by language, filter, baseline (if specified in command paramaters) grouped by group identity
+        /// Returns list of exact or partially matched template groups by name and exact match by language, filter, baseline (if specified in command paramaters) 
         /// </summary>
-        public IReadOnlyCollection<IGrouping<string, ITemplateMatchInfo>> ExactMatchedTemplatesGrouped =>
-            ExactMatchedTemplates.GroupBy(x => x.Info.GroupIdentity, x => !string.IsNullOrEmpty(x.Info.GroupIdentity)).ToList();
+        internal IReadOnlyCollection<TemplateGroup> ExactMatchedTemplateGroups
+        {
+            get
+            {
+                if (_exactMatchedTemplateGroups == null)
+                {
+                    _exactMatchedTemplateGroups = ExactMatchedTemplates
+                        .GroupBy(x => x.Info.GroupIdentity, x => !string.IsNullOrEmpty(x.Info.GroupIdentity), StringComparer.OrdinalIgnoreCase)
+                        .Select(group => new TemplateGroup(group.ToList()))
+                        .ToList();
+                }
+                return _exactMatchedTemplateGroups;
+            }
+        }
 
         /// <summary>
         /// Returns list of exact or partially matched templates by name and mismatch in any of the following: language, filter, baseline (if specified in command paramaters)
@@ -83,12 +98,22 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         }
 
         /// <summary>
-        ///  Returns list of exact or partially matched templates by name and mismatch in any of the following: language, filter, baseline (if specified in command paramaters); grouped by group identity
+        ///  Returns list of exact or partially matched template groups by name and mismatch in any of the following: language, filter, baseline (if specified in command paramaters
         /// </summary>
-        public IReadOnlyCollection<IGrouping<string, ITemplateMatchInfo>> PartiallyMatchedTemplatesGrouped =>
-            PartiallyMatchedTemplates.GroupBy(x => x.Info.GroupIdentity, x => !string.IsNullOrEmpty(x.Info.GroupIdentity)).ToList();
-
-
+        internal IReadOnlyCollection<TemplateGroup> PartiallyMatchedTemplateGroups
+        {
+            get
+            {
+                if (_partiallyMatchedTemplateGroups == null)
+                {
+                    _partiallyMatchedTemplateGroups = PartiallyMatchedTemplates
+                        .GroupBy(x => x.Info.GroupIdentity, x => !string.IsNullOrEmpty(x.Info.GroupIdentity), StringComparer.OrdinalIgnoreCase)
+                        .Select(group => new TemplateGroup(group.ToList()))
+                        .ToList();
+                }
+                return _partiallyMatchedTemplateGroups;
+            }
+        }
         /// <summary>
         /// Returns true when at least one template in unambiguous matches default language
         /// </summary>
@@ -115,7 +140,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         // as we need to count errors per template group: for language we need to check template groups as templates in single group may have different language
         // and if one of them can match the filter, then the whole group matches the filter
         // if all templates in the group has language mismatch, then group has language mismatch
-        public bool HasLanguageMismatch => PartiallyMatchedTemplatesGrouped.Any(g => g.All(t => t.HasLanguageMismatch()));
+        public bool HasLanguageMismatch => PartiallyMatchedTemplateGroups.Any(g => g.Templates.All(t => t.HasLanguageMismatch()));
 
         /// <summary>
         /// Returns true when at least one template has mismatch in context (type)
@@ -128,9 +153,14 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         public bool HasBaselineMismatch => PartiallyMatchedTemplates.Any(t => t.HasBaselineMismatch());
 
         /// <summary>
+        /// Returns true when at least one template has mismatch in author
+        /// </summary>
+        public bool HasAuthorMismatch => PartiallyMatchedTemplates.Any(t => t.HasAuthorMismatch());
+
+        /// <summary>
         /// Returns true when one and only one template has exact match
         /// </summary>
-        public bool HasUnambiguousTemplateGroup => ExactMatchedTemplatesGrouped.Count == 1;
+        public bool HasUnambiguousTemplateGroup => ExactMatchedTemplateGroups.Count == 1;
 
         /// <summary>
         /// Returns list of templates for unambiguous template group, otherwise empty list
@@ -157,17 +187,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                 HashSet<string> languagesFound = new HashSet<string>();
                 foreach (ITemplateMatchInfo template in UnambiguousTemplateGroup)
                 {
-                    string language;
-
-                    if (template.Info.Tags != null && template.Info.Tags.TryGetValue("language", out ICacheTag languageTag))
-                    {
-                        language = languageTag.ChoicesAndDescriptions.Keys.FirstOrDefault();
-                    }
-                    else
-                    {
-                        language = string.Empty;
-                    }
-
+                    string language = template.Info.GetLanguage();
                     if (!string.IsNullOrEmpty(language))
                     {
                         languagesFound.Add(language);

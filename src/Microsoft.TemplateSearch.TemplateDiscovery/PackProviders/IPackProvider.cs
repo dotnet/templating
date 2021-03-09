@@ -13,8 +13,6 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackProviders
 
         Task<int> GetPackageCountAsync();
 
-        int CandidatePacksCount { get; }
-
         void DeleteDownloadedPacks();
     }
 }

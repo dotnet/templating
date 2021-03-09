@@ -65,9 +65,6 @@ artifacts/
 # Tye
 .tye/
 
-# Tye
-.tye/
-
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
 
@@ -313,9 +310,6 @@ paket-files/
 
 # FAKE - F# Make
 .fake/
-
-# Ionide - VsCode extension for F# Support
-.ionide/
 
 # CodeRush personal settings
 .cr/personal

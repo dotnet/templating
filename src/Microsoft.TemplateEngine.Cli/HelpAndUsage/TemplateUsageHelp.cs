@@ -14,7 +14,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
 {
     public static class TemplateUsageHelp
     {
-        public static void ShowInvocationExamples(ListOrHelpTemplateListResolutionResult templateResolutionResult, IHostSpecificDataLoader hostDataLoader, string commandName)
+        public static void ShowInvocationExamples(TemplateListResolutionResult templateResolutionResult, IHostSpecificDataLoader hostDataLoader, string commandName)
         {
             const int ExamplesToShow = 2;
             IReadOnlyList<string> preferredNameList = new List<string>() { "mvc" };
