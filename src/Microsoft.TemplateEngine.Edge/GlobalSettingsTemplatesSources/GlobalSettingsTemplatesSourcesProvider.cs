@@ -46,14 +46,15 @@ namespace Microsoft.TemplateEngine.Edge
                     _installersByGuid[installerFactory.Id] = installer;
                 }
 
-                settings.SettingsLoader.GlobalSettings.SettingsChanged += SourcesChanged;
+                settings.SettingsLoader.GlobalSettings.SettingsChanged += () => SourcesChanged?.Invoke();
+
             }
 
             public event Action SourcesChanged;
 
             public ITemplatesSourcesProviderFactory Factory { get; }
 
-            public async Task<IReadOnlyList<ITemplatesSource>> GetAllSourcesAsync(CancellationToken cancellationToken)
+            public Task<IReadOnlyList<ITemplatesSource>> GetAllSourcesAsync(CancellationToken cancellationToken)
             {
                 var list = new List<ITemplatesSource>();
                 foreach (TemplatesSourceData entry in _environmentSettings.SettingsLoader.GlobalSettings.UserInstalledTemplatesSources)
@@ -69,7 +70,7 @@ namespace Microsoft.TemplateEngine.Edge
                         list.Add(new TemplatesSource(this, entry.MountPointUri, entry.LastChangeTime));
                     }
                 }
-                return list;
+                return Task.FromResult((IReadOnlyList<ITemplatesSource>)list);
             }
 
             public async Task<IReadOnlyList<CheckUpdateResult>> GetLatestVersionsAsync(IEnumerable<IManagedTemplatesSource> sources, CancellationToken cancellationToken)
