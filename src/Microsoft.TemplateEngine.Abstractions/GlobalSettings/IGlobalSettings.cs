@@ -15,7 +15,7 @@ namespace Microsoft.TemplateEngine.Abstractions.GlobalSettings
     public interface IGlobalSettings
     {
         /// <summary>
-        /// Triggered every time when settigns change.
+        /// Triggered every time when settings change.
         /// </summary>
         event Action SettingsChanged;
 
