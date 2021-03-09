@@ -55,8 +55,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             using (Timing.Over(_environmentSettings.Host, "Parse and deserialize global settings"))
                 try
                 {
-                    var globalSettings = new GlobalSettings(EnvironmentSettings, _paths.User.GlobalSettingsFile);
-                    GlobalSettings = globalSettings;
+                    GlobalSettings = new GlobalSettings(EnvironmentSettings, _paths.User.GlobalSettingsFile);
                 }
                 catch (Exception ex)
                 {

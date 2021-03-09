@@ -25,6 +25,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         private readonly IEngineEnvironmentSettings _environmentSettings;
         private readonly string _globalSettingsFile;
         private IDisposable? _watcher;
+        private bool _locked;
 
         public GlobalSettings(IEngineEnvironmentSettings environmentSettings, string globalSettingsFile)
         {
@@ -42,11 +43,18 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         public event Action? SettingsChanged;
 
-        public Task<IDisposable> LockAsync(CancellationToken token)
+        public async Task<IDisposable> LockAsync(CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
             // We must use Mutex because we want to lock across different processes that might want to modify this settings file
-            return AsyncMutex.WaitAsync($"812CA7F3-7CD8-44B4-B3F0-0159355C0BD5{_globalSettingsFile}".Replace("\\", "_").Replace("/", "_"), token);
+            var mutex = AsyncMutex.WaitAsync($"812CA7F3-7CD8-44B4-B3F0-0159355C0BD5{_globalSettingsFile}".Replace("\\", "_").Replace("/", "_"), token, Unlocked);
+            _locked = true;
+            return mutex;
+        }
+
+        private void Unlocked()
+        {
+            _locked = false;
         }
 
         public void Dispose()
@@ -86,6 +94,11 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         public async Task SetInstalledTemplatesPackagesAsync(IReadOnlyList<TemplatesSourceData> packages, CancellationToken cancellationToken)
         {
+            if (!_locked)
+            {
+                throw new InvalidOperationException($"Before calling {nameof(SetInstalledTemplatesPackagesAsync)}, {nameof(LockAsync)} must be called.");
+            }
+
             string? serializedText = JsonConvert.SerializeObject(new GlobalSettingsData()
             {
                 Packages = packages

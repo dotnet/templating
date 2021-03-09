@@ -20,19 +20,21 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         private readonly ManualResetEvent _blockReleasingMutex = new ManualResetEvent(false);
         private readonly string _mutexName;
         private readonly CancellationToken _token;
+        private readonly Action _unlockCallback;
         private bool _disposed;
 
-        private AsyncMutex(string mutexName, CancellationToken token)
+        private AsyncMutex(string mutexName, CancellationToken token, Action unlockCallback)
         {
             _mutexName = mutexName;
             _token = token;
+            _unlockCallback = unlockCallback;
             _taskCompletionSource = new TaskCompletionSource<IDisposable>();
             ThreadPool.QueueUserWorkItem(WaitLoop);
         }
 
-        public static Task<IDisposable> WaitAsync(string mutexName, CancellationToken token)
+        public static Task<IDisposable> WaitAsync(string mutexName, CancellationToken token, Action unlockCallback)
         {
-            var mutex = new AsyncMutex(mutexName, token);
+            var mutex = new AsyncMutex(mutexName, token, unlockCallback);
             return mutex._taskCompletionSource.Task;
         }
 
@@ -63,6 +65,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             _taskCompletionSource.SetResult(this);
             _blockReleasingMutex.WaitOne();
             _blockReleasingMutex.Dispose();
+            _unlockCallback();
             mutex.ReleaseMutex();
         }
 
