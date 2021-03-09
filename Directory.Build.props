@@ -3,11 +3,14 @@
     <Import Project="Sdk.props" Sdk="Microsoft.DotNet.Arcade.Sdk" />
 
     <PropertyGroup>
-        <LangVersion>7.3</LangVersion>
+        <LangVersion>8.0</LangVersion>
+        <NETCoreTargetFramework>net5.0</NETCoreTargetFramework>
+        <NETStandardTargetFramework>netstandard2.0</NETStandardTargetFramework>
+        <NETFullTargetFramework>net472</NETFullTargetFramework>
         <Product>Microsoft .NET Core</Product>
         <Copyright>$(CopyrightNetFoundation)</Copyright>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <NoWarn>NU5105;NU5128</NoWarn>
+        <NoWarn>NU5105;NU5128;0419,0649</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -28,4 +31,5 @@
     </PropertyGroup>
 
     <Import Project="Version.props" />
+    <Import Project="$(RepositoryEngineeringDir)Analyzers.props" />
 </Project>

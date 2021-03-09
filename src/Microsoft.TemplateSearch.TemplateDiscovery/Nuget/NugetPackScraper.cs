@@ -1,40 +1,55 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
 using Microsoft.TemplateSearch.TemplateDiscovery.AdditionalData;
+using Microsoft.TemplateSearch.TemplateDiscovery.Filters;
 using Microsoft.TemplateSearch.TemplateDiscovery.PackChecking;
 using Microsoft.TemplateSearch.TemplateDiscovery.PackChecking.Reporting;
 using Microsoft.TemplateSearch.TemplateDiscovery.PackProviders;
-using Microsoft.TemplateSearch.TemplateDiscovery.Results;
-using Newtonsoft.Json;
 
 namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
 {
     public class NugetPackScraper
     {
-        private static readonly string PreviouslySeenPrefilterId = "Previously Seen";
+        static readonly Dictionary<string, string> SupportedProviders = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            {  "query-package-type-template", "packageType=Template" },
+            {  "query-template", "q=template" }
+        };
+
+        public static IEnumerable<string> SupportedProvidersList => SupportedProviders.Keys;
 
         public static bool TryCreateDefaultNugetPackScraper(ScraperConfig config, out PackSourceChecker packSourceChecker)
         {
-            NugetPackProvider packProvider = new NugetPackProvider(config.BasePath, config.PageSize, config.RunOnlyOnePage, config.IncludePreviewPacks);
+            List<IPackProvider> providers = new List<IPackProvider>();
 
-            List<Func<IInstalledPackInfo, PreFilterResult>> preFilterList = new List<Func<IInstalledPackInfo, PreFilterResult>>();
+            if (!config.Providers.Any())
+            {
+                providers.AddRange(SupportedProviders.Select(kvp => new NugetPackProvider(kvp.Key, kvp.Value, config.BasePath, config.PageSize, config.RunOnlyOnePage, config.IncludePreviewPacks)));
+            }
+            else
+            {
+                foreach (string provider in config.Providers.Distinct(StringComparer.OrdinalIgnoreCase))
+                {
+                    providers.Add(new NugetPackProvider(provider, SupportedProviders[provider], config.BasePath, config.PageSize, config.RunOnlyOnePage, config.IncludePreviewPacks));
+                }
+            }
 
-            if (!TryGetPreviouslySkippedPacks(config.PreviousRunBasePath, out HashSet<string> nonTemplatePacks))
+            List<Func<IDownloadedPackInfo, PreFilterResult>> preFilterList = new List<Func<IDownloadedPackInfo, PreFilterResult>>();
+
+            if (!PreviouslyRejectedPackFilter.TryGetPreviouslySkippedPacks(config.PreviousRunBasePath, out HashSet<string> nonTemplatePacks))
             {
                 Console.WriteLine("Unable to read results from the previous run.");
                 packSourceChecker = null;
                 return false;
             }
-            else
-            {
-                preFilterList.Add(SetupPreviouslyRejectedPackFilter(nonTemplatePacks));
-            }
 
+            preFilterList.Add(PreviouslyRejectedPackFilter.SetupPackFilter(nonTemplatePacks));
             if (!config.DontFilterOnTemplateJson)
             {
                 preFilterList.Add(TemplateJsonExistencePackFilter.SetupPackFilter());
             }
+            preFilterList.Add(SkipTemplatePacksFilter.SetupPackFilter());
 
             PackPreFilterer preFilterer = new PackPreFilterer(preFilterList);
 
@@ -43,52 +58,8 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
                 new CliHostDataProducer()
             };
 
-            packSourceChecker = new PackSourceChecker(packProvider, preFilterer, additionalDataProducers, config.SaveCandidatePacks);
+            packSourceChecker = new PackSourceChecker(providers, preFilterer, additionalDataProducers, config.SaveCandidatePacks);
             return true;
-        }
-
-        private static bool TryGetPreviouslySkippedPacks(string previousRunBasePath, out HashSet<string> nonTemplatePacks)
-        {
-            if (string.IsNullOrEmpty(previousRunBasePath))
-            {
-                nonTemplatePacks = new HashSet<string>();
-                return true;
-            }
-            else if (Directory.Exists(previousRunBasePath))
-            {
-                string nonTemplatePackDataFile = Path.Combine(previousRunBasePath, PackCheckResultReportWriter.CacheContentDirectory, PackCheckResultReportWriter.NonTemplatePacksFileName);
-                string fileContents = File.ReadAllText(nonTemplatePackDataFile);
-                nonTemplatePacks = JsonConvert.DeserializeObject<HashSet<string>>(fileContents);
-                return true;
-            }
-
-            nonTemplatePacks = null;
-            return false;
-        }
-
-        private static Func<IInstalledPackInfo, PreFilterResult> SetupPreviouslyRejectedPackFilter(HashSet<string> nonTemplatePacks)
-        {
-            Func<IInstalledPackInfo, PreFilterResult> previouslyRejectedPackFilter = (packInfo) =>
-            {
-                if (nonTemplatePacks.Contains(packInfo.Id))
-                {
-                    return new PreFilterResult()
-                    {
-                        FilterId = PreviouslySeenPrefilterId,
-                        IsFiltered = true,
-                        Reason = "Package was previously examined, and does not contain templates."
-                    };
-                }
-
-                return new PreFilterResult()
-                {
-                    FilterId = PreviouslySeenPrefilterId,
-                    IsFiltered = false,
-                    Reason = string.Empty
-                };
-            };
-
-            return previouslyRejectedPackFilter;
         }
     }
 }

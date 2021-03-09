@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Edge.Template
 {
@@ -75,20 +76,14 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 {
                     return null;
                 }
-
-                if (template.Tags != null && template.Tags.TryGetValue("type", out ICacheTag typeTag))
+                if (template.GetTemplateType()?.Equals(context, StringComparison.OrdinalIgnoreCase) ?? false)
                 {
-                    if (typeTag.ChoicesAndDescriptions.ContainsKey(context))
-                    {
-                        return new MatchInfo { Location = MatchLocation.Context, Kind = MatchKind.Exact };
-                    }
-                    else
-                    {
-                        return new MatchInfo { Location = MatchLocation.Context, Kind = MatchKind.Mismatch };
-                    }
+                    return new MatchInfo { Location = MatchLocation.Context, Kind = MatchKind.Exact };
                 }
-
-                return null;
+                else
+                {
+                    return new MatchInfo { Location = MatchLocation.Context, Kind = MatchKind.Mismatch };
+                }
             };
         }
 
@@ -104,19 +99,12 @@ namespace Microsoft.TemplateEngine.Edge.Template
                     return null;
                 }
 
-                if (template.Tags != null && template.Tags.TryGetValue("language", out ICacheTag languageTag))
+                if (template.GetLanguage()?.Equals(language, StringComparison.OrdinalIgnoreCase) ?? false)
                 {
-                    if (languageTag.ChoicesAndDescriptions.ContainsKey(language))
-                    {
-                        return new MatchInfo { Location = MatchLocation.Language, Kind = MatchKind.Exact };
-                    }
-                    else
-                    {
-                        return new MatchInfo { Location = MatchLocation.Language, Kind = MatchKind.Mismatch };
-                    }
+                    return new MatchInfo { Location = MatchLocation.Language, Kind = MatchKind.Exact };
                 }
                 else
-                {   // user specified a language, but the template didnt.
+                {
                     return new MatchInfo { Location = MatchLocation.Language, Kind = MatchKind.Mismatch };
                 }
             };
@@ -181,5 +169,41 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 return null;
             };
         }
+
+        /// <summary>
+        /// Creates predicate for matching the template and given author value
+        /// </summary>
+        /// <param name="author">author to use for match</param>
+        /// <returns>A predicate that returns if the given template matches defined author</returns>
+        public static Func<ITemplateInfo, MatchInfo?> AuthorFilter(string author)
+        {
+            return (template) =>
+            {
+                if (string.IsNullOrWhiteSpace(author))
+                {
+                    return null;
+                }
+
+                if (string.IsNullOrWhiteSpace(template.Author))
+                {
+                    return new MatchInfo { Location = MatchLocation.Author, Kind = MatchKind.Mismatch };
+                }
+
+                int authorIndex = template.Author.IndexOf(author, StringComparison.OrdinalIgnoreCase);
+
+                if (authorIndex == 0 && template.Author.Length == author.Length)
+                {
+                    return new MatchInfo { Location = MatchLocation.Author, Kind = MatchKind.Exact };
+                }
+
+                if (authorIndex > -1)
+                {
+                    return new MatchInfo { Location = MatchLocation.Author, Kind = MatchKind.Partial };
+                }
+
+                return new MatchInfo { Location = MatchLocation.Author, Kind = MatchKind.Mismatch };
+            };
+        }
+
     }
 }

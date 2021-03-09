@@ -16,6 +16,7 @@ using Microsoft.TemplateEngine.Abstractions.TemplateUpdates;
 using Microsoft.TemplateEngine.Cli.CommandParsing;
 using Microsoft.TemplateEngine.Cli.HelpAndUsage;
 using Microsoft.TemplateEngine.Cli.TemplateResolution;
+using Microsoft.TemplateEngine.Cli.TemplateSearch;
 using Microsoft.TemplateEngine.Cli.TemplateUpdate;
 using Microsoft.TemplateEngine.Edge;
 using Microsoft.TemplateEngine.Edge.Settings;
@@ -252,7 +253,7 @@ namespace Microsoft.TemplateEngine.Cli
         // TODO: make sure help / usage works right in these cases.
         private CreationResultStatus EnterMaintenanceFlow()
         {
-            if (!TemplateListResolver.ValidateRemainingParameters(_commandInput, out IReadOnlyList<string> invalidParams))
+            if (!TemplateResolver.ValidateRemainingParameters(_commandInput, out IReadOnlyList<string> invalidParams))
             {
                 HelpForTemplateResolution.DisplayInvalidParameters(invalidParams);
                 if (_commandInput.IsHelpFlagSpecified)
@@ -280,7 +281,7 @@ namespace Microsoft.TemplateEngine.Cli
                 if (installResult == CreationResultStatus.Success)
                 {
                     _settingsLoader.Reload();
-                    ListOrHelpTemplateListResolutionResult resolutionResult = TemplateListResolver.GetTemplateResolutionResultForListOrHelp(_settingsLoader.UserTemplateCache.TemplateInfo, _hostDataLoader, _commandInput, _defaultLanguage);
+                    TemplateListResolutionResult resolutionResult = TemplateResolver.GetTemplateResolutionResultForListOrHelp(_settingsLoader.UserTemplateCache.TemplateInfo, _hostDataLoader, _commandInput, _defaultLanguage);
                     HelpForTemplateResolution.CoordinateHelpAndUsageDisplay(resolutionResult, EnvironmentSettings, _commandInput, _hostDataLoader, _telemetryLogger, _templateCreator, _defaultLanguage, showUsageHelp: false);
                 }
 
@@ -288,7 +289,7 @@ namespace Microsoft.TemplateEngine.Cli
             }
 
             // No other cases specified, we've fallen through to "Optional usage help + List"
-            ListOrHelpTemplateListResolutionResult templateResolutionResult = TemplateListResolver.GetTemplateResolutionResultForListOrHelp(_settingsLoader.UserTemplateCache.TemplateInfo, _hostDataLoader, _commandInput, _defaultLanguage);
+            TemplateListResolutionResult templateResolutionResult = TemplateResolver.GetTemplateResolutionResultForListOrHelp(_settingsLoader.UserTemplateCache.TemplateInfo, _hostDataLoader, _commandInput, _defaultLanguage);
             HelpForTemplateResolution.CoordinateHelpAndUsageDisplay(templateResolutionResult, EnvironmentSettings, _commandInput, _hostDataLoader, _telemetryLogger, _templateCreator, _defaultLanguage, showUsageHelp: _commandInput.IsHelpFlagSpecified);
 
             return CreationResultStatus.Success;
@@ -341,9 +342,10 @@ namespace Microsoft.TemplateEngine.Cli
                     {
                         string str = $"      {info.Name} ({info.ShortName})";
 
-                        if (info.Tags != null && info.Tags.TryGetValue("language", out ICacheTag languageTag))
+                        string templateLanguage = info.GetLanguage();
+                        if (!string.IsNullOrWhiteSpace(templateLanguage))
                         {
-                            str += " " + string.Join(", ", languageTag.ChoicesAndDescriptions.Select(x => x.Key));
+                            str += " " + templateLanguage;
                         }
 
                         templateDisplayStrings.Add(str);
@@ -385,17 +387,24 @@ namespace Microsoft.TemplateEngine.Cli
             }
         }
 
-        private async Task<CreationResultStatus> EnterTemplateManipulationFlowAsync()
+        private Task<CreationResultStatus> EnterTemplateManipulationFlowAsync()
         {
             if (_commandInput.IsListFlagSpecified || _commandInput.IsHelpFlagSpecified)
             {
-                ListOrHelpTemplateListResolutionResult listingTemplateResolutionResult = TemplateListResolver.GetTemplateResolutionResultForListOrHelp(_settingsLoader.UserTemplateCache.TemplateInfo, _hostDataLoader, _commandInput, _defaultLanguage);
-                return HelpForTemplateResolution.CoordinateHelpAndUsageDisplay(listingTemplateResolutionResult, EnvironmentSettings, _commandInput, _hostDataLoader, _telemetryLogger, _templateCreator, _defaultLanguage, showUsageHelp: _commandInput.IsHelpFlagSpecified);
+                TemplateListResolutionResult listingTemplateResolutionResult = TemplateResolver.GetTemplateResolutionResultForListOrHelp(_settingsLoader.UserTemplateCache.TemplateInfo, _hostDataLoader, _commandInput, _defaultLanguage);
+                return Task.FromResult(HelpForTemplateResolution.CoordinateHelpAndUsageDisplay(listingTemplateResolutionResult, EnvironmentSettings, _commandInput, _hostDataLoader, _telemetryLogger, _templateCreator, _defaultLanguage, showUsageHelp: _commandInput.IsHelpFlagSpecified));
             }
 
-            TemplateListResolutionResult templateResolutionResult = TemplateListResolver.GetTemplateResolutionResult(_settingsLoader.UserTemplateCache.TemplateInfo, _hostDataLoader, _commandInput, _defaultLanguage);
-            TemplateInvocationAndAcquisitionCoordinator invocationCoordinator = new TemplateInvocationAndAcquisitionCoordinator(_settingsLoader, _commandInput, _templateCreator, _hostDataLoader, _telemetryLogger, _defaultLanguage, CommandName, _inputGetter, _callbacks);
-            return await invocationCoordinator.CoordinateInvocationOrAcquisitionAsync();
+            TemplateResolutionResult templateResolutionResult = TemplateResolver.GetTemplateResolutionResult(_settingsLoader.UserTemplateCache.TemplateInfo, _hostDataLoader, _commandInput, _defaultLanguage);
+            if (templateResolutionResult.ResolutionStatus == TemplateResolutionResult.Status.SingleMatch)
+            {
+                TemplateInvocationCoordinator invocationCoordinator = new TemplateInvocationCoordinator(_settingsLoader, _commandInput, _telemetryLogger, CommandName, _inputGetter, _callbacks);
+                return invocationCoordinator.CoordinateInvocationOrAcquisitionAsync(templateResolutionResult.TemplateToInvoke);
+            }
+            else
+            {
+                return Task.FromResult(HelpForTemplateResolution.CoordinateAmbiguousTemplateResolutionDisplay(templateResolutionResult, EnvironmentSettings, _commandInput, _defaultLanguage, _settingsLoader.InstallUnitDescriptorCache.Descriptors.Values));
+            }
         }
 
 
@@ -484,6 +493,11 @@ namespace Microsoft.TemplateEngine.Cli
                     bool updateCheckResult = await updater.CheckForUpdatesAsync(_settingsLoader.InstallUnitDescriptorCache.Descriptors.Values.ToList(), applyUpdates);
 
                     return updateCheckResult ? CreationResultStatus.Success : CreationResultStatus.CreateFailed;
+                }
+
+                if (_commandInput.SearchOnline)
+                {
+                    return await CliTemplateSearchCoordinator.SearchForTemplateMatchesAsync(EnvironmentSettings, _commandInput, _defaultLanguage).ConfigureAwait(false);
                 }
 
                 if (string.IsNullOrWhiteSpace(TemplateName))
@@ -646,7 +660,7 @@ namespace Microsoft.TemplateEngine.Cli
         {
             get
             {
-                IReadOnlyCollection<ITemplateMatchInfo> allTemplates = TemplateListResolver.PerformAllTemplatesQuery(_settingsLoader.UserTemplateCache.TemplateInfo, _hostDataLoader);
+                IReadOnlyCollection<ITemplateMatchInfo> allTemplates = TemplateResolver.PerformAllTemplatesQuery(_settingsLoader.UserTemplateCache.TemplateInfo, _hostDataLoader);
 
                 HashSet<string> allShortNames = new HashSet<string>(StringComparer.Ordinal);
 

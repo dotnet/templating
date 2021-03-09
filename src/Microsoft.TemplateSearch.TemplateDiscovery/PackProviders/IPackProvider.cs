@@ -1,10 +1,17 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Microsoft.TemplateSearch.TemplateDiscovery.PackProviders
 {
     public interface IPackProvider
     {
-        IEnumerable<IInstalledPackInfo> CandidatePacks { get; }
+        string Name { get; }
+
+        IAsyncEnumerable<IPackInfo> GetCandidatePacksAsync();
+
+        Task<IDownloadedPackInfo> DownloadPackageAsync(IPackInfo packinfo);
+
+        Task<int> GetPackageCountAsync();
 
         int CandidatePacksCount { get; }
 
