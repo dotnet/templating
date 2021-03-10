@@ -1,8 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <TargetFramework>$(NETCoreTargetFramework)</TargetFramework>
         <TestProject>true</TestProject>
     </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="FluentAssertions" Version="5.10.3" />
+        <PackageReference Include="Microsoft.DotNet.Cli.Utils" Version="5.0.200-preview.20609.15" />
+    </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="$(SrcDir)dotnet-new3\dotnet-new3.csproj" />

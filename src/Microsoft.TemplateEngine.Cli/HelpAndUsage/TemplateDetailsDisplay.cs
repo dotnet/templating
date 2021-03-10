@@ -17,7 +17,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
     {
         public static void ShowTemplateGroupHelp(IReadOnlyCollection<ITemplateMatchInfo> templateGroup, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, IHostSpecificDataLoader hostDataLoader, TemplateCreator templateCreator, bool showImplicitlyHiddenParams = false)
         {
-            if (templateGroup.Count == 0 || !TemplateListResolver.AreAllTemplatesSameGroupIdentity(templateGroup))
+            if (templateGroup.Count == 0 || !TemplateResolver.AreAllTemplatesSameGroupIdentity(templateGroup))
             {
                 return;
             }
@@ -36,7 +36,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                 // get the input params valid for any param in the group              
                 IReadOnlyDictionary<string, string> inputTemplateParams = CoalesceInputParameterValuesFromTemplateGroup(templateGroup);
                 ShowTemplateDetailHeaders(templateInfoList);
-                ShowParameterHelp(inputTemplateParams, showImplicitlyHiddenParams, groupParameterDetails.Value, environmentSettings);
+                ShowParameterHelp(inputTemplateParams, showImplicitlyHiddenParams, groupParameterDetails.Value, environmentSettings, commandInput);
             }
             else
             {
@@ -53,9 +53,10 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             HashSet<string> languages = new HashSet<string>();
             foreach (ITemplateInfo templateInfo in templateGroup)
             {
-                if (templateInfo.Tags != null && templateInfo.Tags.TryGetValue("language", out ICacheTag languageTag))
+                string templateLanguage = templateInfo.GetLanguage();
+                if (!string.IsNullOrWhiteSpace(templateLanguage))
                 {
-                    languages.UnionWith(languageTag.ChoicesAndDescriptions.Keys.Where(x => !string.IsNullOrWhiteSpace(x)).ToList());
+                    languages.Add(templateLanguage);
                 }
             }
 
@@ -84,7 +85,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             }
         }
 
-        private static void ShowParameterHelp(IReadOnlyDictionary<string, string> inputParams, bool showImplicitlyHiddenParams, TemplateGroupParameterDetails parameterDetails, IEngineEnvironmentSettings environmentSettings)
+        private static void ShowParameterHelp(IReadOnlyDictionary<string, string> inputParams, bool showImplicitlyHiddenParams, TemplateGroupParameterDetails parameterDetails, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput)
         {
 
             IEnumerable<ITemplateParameter> filteredParams = TemplateParameterHelpBase.FilterParamsForHelp(parameterDetails.AllParams.ParameterDefinitions, parameterDetails.ExplicitlyHiddenParams,
@@ -92,7 +93,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
 
             if (filteredParams.Any())
             {
-                HelpFormatter<ITemplateParameter> formatter = new HelpFormatter<ITemplateParameter>(environmentSettings, filteredParams, 2, null, true);
+                HelpFormatter<ITemplateParameter> formatter = new HelpFormatter<ITemplateParameter>(environmentSettings, commandInput, filteredParams, 2, null, true);
 
                 formatter.DefineColumn(
                     param =>

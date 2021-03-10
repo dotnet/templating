@@ -34,10 +34,19 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             return templateMatchInfo.DispositionOfDefaults.Any(x => x.Location == MatchLocation.DefaultLanguage && x.Kind == MatchKind.Exact);
         }
 
+        public static bool HasInvalidParameterName(this ITemplateMatchInfo templateMatchInfo)
+        {
+            return templateMatchInfo.MatchDisposition.Any(x => x.Location == MatchLocation.OtherParameter && x.Kind == MatchKind.InvalidParameterName);
+        }
 
         public static bool HasBaselineMismatch(this ITemplateMatchInfo templateMatchInfo)
         {
             return templateMatchInfo.MatchDisposition.Any(x => x.Location == MatchLocation.Baseline && x.Kind == MatchKind.Mismatch);
+        }
+
+        public static bool HasAuthorMismatch(this ITemplateMatchInfo templateMatchInfo)
+        {
+            return templateMatchInfo.MatchDisposition.Any(x => x.Location == MatchLocation.Author && x.Kind == MatchKind.Mismatch);
         }
 
         public static bool HasAmbiguousParameterValueMatch(this ITemplateMatchInfo templateMatchInfo)
@@ -53,7 +62,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                                 ||
                                     // these locations can have partial or exact matches.
                                     x.Kind == MatchKind.Partial
-                                    && (x.Location == MatchLocation.Name || x.Location == MatchLocation.ShortName || x.Location == MatchLocation.Classification)
+                                    && (x.Location == MatchLocation.Name || x.Location == MatchLocation.ShortName || x.Location == MatchLocation.Classification || x.Location == MatchLocation.Author)
 
                                 ||
 

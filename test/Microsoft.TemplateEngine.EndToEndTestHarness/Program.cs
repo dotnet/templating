@@ -20,7 +20,7 @@ namespace Microsoft.TemplateEngine.EndToEndTestHarness
     class Program
     {
         private const string HostIdentifier = "endtoendtestharness";
-        private const string HostVersion = "1.0.0";
+        private const string HostVersion = "v1.0.0";
         private const string CommandName = "test-test";
         private static readonly Dictionary<string, Func<IPhysicalFileSystem, JObject, string, bool>> VerificationLookup = new Dictionary<string, Func<IPhysicalFileSystem, JObject, string, bool>>(StringComparer.OrdinalIgnoreCase);
 
@@ -216,14 +216,14 @@ namespace Microsoft.TemplateEngine.EndToEndTestHarness
 
         private static void FirstRun(IEngineEnvironmentSettings environmentSettings, IInstaller installer)
         {
-            string codebase = typeof(Program).GetTypeInfo().Assembly.CodeBase;
+            string codebase = typeof(Program).GetTypeInfo().Assembly.Location;
             Uri cb = new Uri(codebase);
             string asmPath = cb.LocalPath;
             string dir = Path.GetDirectoryName(asmPath);
 
             string packages = Path.Combine(dir, "..", "..", "..", "..", "..", "artifacts", "packages") + Path.DirectorySeparatorChar + "*";
             string templates = Path.Combine(dir, "..", "..", "..", "..", "..", "template_feed") + Path.DirectorySeparatorChar;
-            string testTemplates = Path.Combine(dir, "test_templates") + Path.DirectorySeparatorChar;
+            string testTemplates = Path.Combine(dir, "..", "..", "..", "..", "..", "test", "Microsoft.TemplateEngine.TestTemplates", "test_templates") + Path.DirectorySeparatorChar;
             installer.InstallPackages(new[] { packages });
             installer.InstallPackages(new[] { templates, testTemplates });
         }

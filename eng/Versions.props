@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!-- Opt out of certain Arcade features -->
   <PropertyGroup>
-    <UsingToolXliff>false</UsingToolXliff>
+    <UsingToolXliff>true</UsingToolXliff>
     <UsingToolNetFrameworkReferenceAssemblies>true</UsingToolNetFrameworkReferenceAssemblies>
     <VersionPrefix>5.0.300</VersionPrefix>
     <PreReleaseVersionLabel>preview</PreReleaseVersionLabel>

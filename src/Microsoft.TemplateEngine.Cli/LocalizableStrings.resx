@@ -228,16 +228,15 @@
     <value>Invalid input switch:</value>
   </data>
   <data name="InvalidParameterDetail" xml:space="preserve">
-    <value>{0} {1}
-    '{1}' is not a valid value for {0} ({2}).</value>
+    <value>'{1}' is not a valid value for {0}.</value>
   </data>
   <data name="InvalidParameterValues" xml:space="preserve">
-    <value>Error: Invalid values for parameter(s) {0} for template {1}.</value>
+    <value>Error: Invalid values for option(s) {0} for template {1}.</value>
   </data>
   <data name="InvalidTemplateParameterValues" xml:space="preserve">
-    <value>Error: Invalid parameter(s):</value>
+    <value>Error: Invalid option(s):</value>
   </data>
-  <data name="Language" xml:space="preserve">
+  <data name="ColumnNameLanguage" xml:space="preserve">
     <value>Language</value>
   </data>
   <data name="LanguageParameter" xml:space="preserve">
@@ -250,7 +249,7 @@
     <value>The locale to use.</value>
   </data>
   <data name="MissingRequiredParameter" xml:space="preserve">
-    <value>Mandatory parameter {0} missing for template {1}.</value>
+    <value>Mandatory option {0} missing for template {1}.</value>
   </data>
   <data name="MountPointFactories" xml:space="preserve">
     <value>Mount Point Factories</value>
@@ -260,9 +259,6 @@
   </data>
   <data name="MultipleArgsSpecifiedError" xml:space="preserve">
     <value>Template name is the only allowed argument. Invalid argument: {0}.</value>
-  </data>
-  <data name="MultipleValuesSpecifiedForSingleValuedParameter" xml:space="preserve">
-    <value>Multiple values specified for single value parameter: {0}.</value>
   </data>
   <data name="NameOfOutput" xml:space="preserve">
     <value>The name for the output being created. If no name is specified, the name of the output directory is used.</value>
@@ -300,18 +296,6 @@
   <data name="Overwrite" xml:space="preserve">
     <value>Overwrite</value>
   </data>
-  <data name="ParameterMissingValue" xml:space="preserve">
-    <value>Parameter {0} ({1}) must be given a value.</value>
-  </data>
-  <data name="ParameterNamePrefixError" xml:space="preserve">
-    <value>Parameter names must start with -- or -.</value>
-  </data>
-  <data name="ParameterReuseError" xml:space="preserve">
-    <value>Parameter name {0} cannot be used for multiple purposes.</value>
-  </data>
-  <data name="ParameterSpecifiedMultipleTimes" xml:space="preserve">
-    <value>Parameter {0} was specified multiple times, including with the flag {1}.</value>
-  </data>
   <data name="Parent" xml:space="preserve">
     <value>Parent</value>
   </data>
@@ -324,7 +308,7 @@
   <data name="RunHelpForInformationAboutAcceptedParameters" xml:space="preserve">
     <value>Run dotnet {0} --help for usage information.</value>
   </data>
-  <data name="ShortName" xml:space="preserve">
+  <data name="ColumnNameShortName" xml:space="preserve">
     <value>Short Name</value>
   </data>
   <data name="ShowsAllTemplates" xml:space="preserve">
@@ -333,14 +317,11 @@
   <data name="ShowsFilteredTemplates" xml:space="preserve">
     <value>Filters templates based on available types. Predefined values are "project" and "item".</value>
   </data>
-  <data name="Tags" xml:space="preserve">
+  <data name="ColumnNameTags" xml:space="preserve">
     <value>Tags</value>
   </data>
   <data name="TemplateArgumentHelp" xml:space="preserve">
     <value>The template to instantiate.</value>
-  </data>
-  <data name="TemplateMalformedDueToBadParameters" xml:space="preserve">
-    <value>Template is malformed. The following parameter names are invalid: {0}.</value>
   </data>
   <data name="TemplateMultiplePartialNameMatches" xml:space="preserve">
     <value>The following templates partially match the input. Be more specific with the template name and/or language.</value>
@@ -362,9 +343,6 @@
   </data>
   <data name="UpdateHelp" xml:space="preserve">
     <value>Update matching templates.</value>
-  </data>
-  <data name="ValueSpecifiedForValuelessParameter" xml:space="preserve">
-    <value>Value specified for valueless parameter: {0}.</value>
   </data>
   <data name="WillCreateTemplate" xml:space="preserve">
     <value>About to create: </value>
@@ -437,8 +415,7 @@
     <value>Could not find something to uninstall called '{0}'.</value>
   </data>
   <data name="InvalidParameterDefault" xml:space="preserve">
-    <value>{0} {1}
-    The default value '{1}' is not a valid value for {0}.</value>
+    <value>The default value '{1}' is not a valid value for {0}.</value>
   </data>
   <data name="AddRefPostActionFailed" xml:space="preserve">
     <value>Failed to add reference {0} to project file {1}</value>
@@ -590,7 +567,7 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</value>
     <value>Error reading the installed configuration, file may be corrupted. If this problem persists, try resetting with the `--debug:reinit' flag</value>
   </data>
   <data name="SingleTemplateGroupPartialMatchSwitchesNotValidForAllMatches" xml:space="preserve">
-    <value>The following parameter(s) or their value(s) are not valid in combination with other supplied parameters or their values:</value>
+    <value>The following option(s) or their value(s) are not valid in combination with other supplied options or their values:</value>
   </data>
   <data name="Authoring_AmbiguousBestPrecedence" xml:space="preserve">
     <value>Equal highest precedence values among the best template matches prevented unambiguously choosing a template to invoke.</value>
@@ -643,17 +620,17 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</value>
   <data name="UpdateCheck_UnknownError" xml:space="preserve">
     <value>An error occured checking for updates for template pack {0}</value>
   </data>
-  <data name="SearchingOnlineNotification" xml:space="preserve">
-    <value>Couldn't find an installed template that matches the input, searching online for one that does...</value>
+  <data name="SearchOnlineNotification" xml:space="preserve">
+    <value>Searching for the templates...</value>
   </data>
   <data name="SearchResultInstallCommand" xml:space="preserve">
     <value>        dotnet {0} -i {1}</value>
   </data>
   <data name="SearchResultInstallHeader" xml:space="preserve">
-    <value>    To use this template, run the following command and try again:</value>
+    <value>To use the template, run the following command to install the package: dotnet {0} -i &lt;package&gt;</value>
   </data>
   <data name="SearchResultNoMatches" xml:space="preserve">
-    <value>...No matches found</value>
+    <value>No matches found</value>
   </data>
   <data name="SearchResultTemplateInfo" xml:space="preserve">
     <value>Template name "{0}" ({1}) from author "{2}" in pack {3}</value>
@@ -680,9 +657,112 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</value>
     <value>{0} template(s) partially matched, but failed on {1}.</value>
   </data>
   <data name="InvalidParameterTemplateHint" xml:space="preserve">
-    <value>For a list of valid options, run '{0}'.</value>
+    <value>For more information, run '{0}'.</value>
   </data>
   <data name="ListTemplatesCommand" xml:space="preserve">
-    <value>To list installed templates, run 'dotnet new --list'.</value>
+    <value>To list installed templates, run 'dotnet {0} --list'.</value>
+  </data>
+  <data name="ColumnNameAuthor" xml:space="preserve">
+    <value>Author</value>
+  </data>
+  <data name="ColumnNamesAreNotSupported" xml:space="preserve">
+    <value>The column {0} is/are not supported, the supported columns are: {1}.</value>
+  </data>
+  <data name="ColumnNameType" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="OptionDescriptionColumns" xml:space="preserve">
+    <value>Comma separated list of columns to show for --list|-l or --search option.  The supported columns are: 
+- language - comma separated list of languages supported by the template
+- tags - the list of template tags
+- author - the template author
+- type - the template type: project or item
+The template name and short name are shown always. 
+For --search option additionally NuGet package ID and total downloads count are shown always.
+The default list of columns shown without the option for --list | -l: template name, short name, language, tags; equivalent to --columns=language,tags.
+The default list of columns shown without the option for --search: template name, short name, author, language, package, total downloads; equivalent to --columns=author,language.</value>
+  </data>
+  <data name="OptionDescriptionColumnsAll" xml:space="preserve">
+    <value>Shows all available columns for --list | -l or --search option, equivalent to --columns=language,tags,author,type.</value>
+  </data>
+  <data name="OptionDescriptionSearch" xml:space="preserve">
+    <value>Searches for the templates in configured remote sources.</value>
+  </data>
+  <data name="SearchOnlineErrorNoTemplateNameOrFilter" xml:space="preserve">
+    <value>Search failed: no template name is specified.
+To search for the template, specify template name or use one of supported filters: {0}.
+Examples:
+        dotnet {1} &lt;template name&gt; --search
+        dotnet {1} --search --author Microsoft
+        dotnet {1} &lt;template name&gt; --search --author Microsoft</value>
+  </data>
+  <data name="SearchOnlineNoSources" xml:space="preserve">
+    <value>No remoted sources defined to search for the templates.</value>
+  </data>
+  <data name="SearchOnlineTemplateNotFound" xml:space="preserve">
+    <value>Template '{0}' was not found.</value>
+  </data>
+  <data name="OptionDescriptionAuthorFilter" xml:space="preserve">
+    <value>Filters the templates based on the template author. Applicable only with --search or --list | -l option.</value>
+  </data>
+  <data name="OptionDescriptionPackageFilter" xml:space="preserve">
+    <value>Filters the templates based on NuGet package ID. Applicable only with --search option.</value>
+  </data>
+  <data name="SearchOnlineErrorTemplateNameIsTooShort" xml:space="preserve">
+    <value>Search failed: template name is too short, minimum 2 characters are required.</value>
+  </data>
+  <data name="ColumnNamePackage" xml:space="preserve">
+    <value>Package</value>
+  </data>
+  <data name="ColumnNameTemplateName" xml:space="preserve">
+    <value>Template Name</value>
+  </data>
+  <data name="ColumnNameTotalDownloads" xml:space="preserve">
+    <value>Downloads</value>
+  </data>
+  <data name="SearchTemplatesCommand" xml:space="preserve">
+    <value>To search for the templates on NuGet.org, run 'dotnet {0} {1} --search'.</value>
+  </data>
+  <data name="AmbiguousParameterDetail" xml:space="preserve">
+    <value>The value '{1}' is ambiguous for option {0}.</value>
+  </data>
+  <data name="AmbiguousTemplateGroupListHeader" xml:space="preserve">
+    <value>Unable to resolve the template to instantiate, these templates matched your input:</value>
+  </data>
+  <data name="AmbiguousTemplateGroupListHint" xml:space="preserve">
+    <value>Re-run the command using the template's exact short name.</value>
+  </data>
+  <data name="AmbiguousTemplatesHeader" xml:space="preserve">
+    <value>Unable to resolve the template to instantiate, the following installed templates are conflicting:</value>
+  </data>
+  <data name="AmbiguousTemplatesMultiplePackagesHint" xml:space="preserve">
+    <value>Uninstall the templates or the packages to keep only one template from the list.</value>
+  </data>
+  <data name="AmbiguousTemplatesSamePackageHint" xml:space="preserve">
+    <value>The package {0} is not correct, uninstall it and report the issue to the package author.</value>
+  </data>
+  <data name="AmbiguousTemplatesUninstallationHint" xml:space="preserve">
+    <value>To check the uninstallation command for the template, run dotnet {0} -u.</value>
+  </data>
+  <data name="ColumnNameIdentity" xml:space="preserve">
+    <value>Identity</value>
+  </data>
+  <data name="ColumnNamePrecedence" xml:space="preserve">
+    <value>Precedence</value>
+  </data>
+  <data name="InvalidParameterNameDetail" xml:space="preserve">
+    <value>'{0}' is not a valid option</value>
+  </data>
+  <data name="PossibleValuesHeader" xml:space="preserve">
+    <value>The possible values are:</value>
+  </data>
+  <data name="AmbiguousLanguageHint" xml:space="preserve">
+    <value>Re-run the command specifying the language to use with --language option.</value>
+  </data>
+  <data name="GenericError" xml:space="preserve">
+    <value>Error: {0}</value>
+  </data>
+  <data name="GenericWarning" xml:space="preserve">
+    <value>Warning: {0}</value>
   </data>
 </root>

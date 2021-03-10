@@ -10,12 +10,14 @@ using Microsoft.TemplateEngine.Cli.CommandParsing;
 using Microsoft.TemplateEngine.Utils;
 using Microsoft.TemplateEngine.Cli.TemplateResolution;
 using System.Text;
+using Microsoft.TemplateEngine.Cli.TableOutput;
+using Microsoft.TemplateEngine.Abstractions.TemplateUpdates;
 
 namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
 {
     internal static class HelpForTemplateResolution
     {
-        public static CreationResultStatus CoordinateHelpAndUsageDisplay(ListOrHelpTemplateListResolutionResult templateResolutionResult, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, IHostSpecificDataLoader hostDataLoader, ITelemetryLogger telemetryLogger, TemplateCreator templateCreator, string defaultLanguage, bool showUsageHelp = true)
+        public static CreationResultStatus CoordinateHelpAndUsageDisplay(TemplateListResolutionResult templateResolutionResult, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, IHostSpecificDataLoader hostDataLoader, ITelemetryLogger telemetryLogger, TemplateCreator templateCreator, string defaultLanguage, bool showUsageHelp = true)
         {
             if (showUsageHelp)
             {
@@ -49,7 +51,54 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             }
         }
 
-        private static CreationResultStatus DisplayHelpForUnambiguousTemplateGroup(ListOrHelpTemplateListResolutionResult templateResolutionResult, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, IHostSpecificDataLoader hostDataLoader, TemplateCreator templateCreator, ITelemetryLogger telemetryLogger, string defaultLanguage)
+        /// <summary>
+        /// Displays the help in case it is not possible to resolve template to use based on user input on template instantiation.
+        /// </summary>
+        /// <param name="resolutionResult">template resolution result</param>
+        /// <param name="environmentSettings"></param>
+        /// <param name="commandInput">command input used in CLI</param>
+        /// <param name="defaultLanguage">default language for the host</param>
+        /// <param name="installUnitDescriptors">the collection of install unit descriptors</param>
+        /// <returns></returns>
+        internal static CreationResultStatus CoordinateAmbiguousTemplateResolutionDisplay(
+            TemplateResolutionResult resolutionResult,
+            IEngineEnvironmentSettings environmentSettings,
+            INewCommandInput commandInput,
+            string defaultLanguage,
+            IEnumerable<IInstallUnitDescriptor> installUnitDescriptors)
+        {
+            switch (resolutionResult.ResolutionStatus)
+            {
+                case TemplateResolutionResult.Status.NoMatch:
+                    Reporter.Error.WriteLine(
+                        string.Format(LocalizableStrings.NoTemplatesMatchingInputParameters, GetInputParametersString(commandInput)).Bold().Red());
+                    Reporter.Error.WriteLine(string.Format(LocalizableStrings.ListTemplatesCommand, commandInput.CommandName).Bold().Red());
+                    Reporter.Error.WriteLine(string.Format(LocalizableStrings.SearchTemplatesCommand, commandInput.CommandName, commandInput.TemplateName).Bold().Red());
+                    return CreationResultStatus.NotFound;
+                case TemplateResolutionResult.Status.AmbiguousLanguageChoice:
+                    Reporter.Error.WriteLine(LocalizableStrings.AmbiguousTemplateGroupListHeader.Bold().Red());
+                    DisplayTemplateList(resolutionResult.TemplateGroups, environmentSettings, commandInput, defaultLanguage, useErrorOutput: true);
+                    Reporter.Error.WriteLine(LocalizableStrings.AmbiguousLanguageHint.Bold().Red());
+                    return CreationResultStatus.NotFound;
+                case TemplateResolutionResult.Status.AmbiguousTemplateGroupChoice:
+                    Reporter.Error.WriteLine(LocalizableStrings.AmbiguousTemplateGroupListHeader.Bold().Red());
+                    DisplayTemplateList(resolutionResult.TemplateGroups, environmentSettings, commandInput, defaultLanguage, useErrorOutput: true);
+                    Reporter.Error.WriteLine(LocalizableStrings.AmbiguousTemplateGroupListHint.Bold().Red());
+                    return CreationResultStatus.NotFound;
+                case TemplateResolutionResult.Status.AmbiguousParameterValueChoice:
+                    environmentSettings.Host.LogDiagnosticMessage(LocalizableStrings.Authoring_AmbiguousChoiceParameterValue, "Authoring");
+                    return DisplayInvalidParameterError(resolutionResult.UnambiguousTemplateGroup, commandInput);
+                case TemplateResolutionResult.Status.AmbiguousTemplateChoice:
+                    environmentSettings.Host.LogDiagnosticMessage(LocalizableStrings.Authoring_AmbiguousBestPrecedence, "Authoring");
+                    return DisplayAmbiguousPrecedenceError(resolutionResult.UnambiguousTemplateGroup, environmentSettings, commandInput, installUnitDescriptors);
+                case TemplateResolutionResult.Status.InvalidParameter:
+                    return DisplayInvalidParameterError(resolutionResult.UnambiguousTemplateGroup, commandInput);
+            }
+
+            return CreationResultStatus.CreateFailed;
+        }
+
+        private static CreationResultStatus DisplayHelpForUnambiguousTemplateGroup(TemplateListResolutionResult templateResolutionResult, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, IHostSpecificDataLoader hostDataLoader, TemplateCreator templateCreator, ITelemetryLogger telemetryLogger, string defaultLanguage)
         {
             // sanity check: should never happen; as condition for unambiguous template group is checked above
             if (!templateResolutionResult.UnambiguousTemplateGroup.Any())
@@ -105,7 +154,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             else
             {
                 Reporter.Error.WriteLine(
-                    string.Format(LocalizableStrings.InvalidParameterTemplateHint,  GetTemplateHelpCommand(commandInput.CommandName, unambiguousTemplateGroup.First().Info)).Bold().Red());
+                    string.Format(LocalizableStrings.InvalidParameterTemplateHint, GetTemplateHelpCommand(commandInput.CommandName, unambiguousTemplateGroup.First().Info)).Bold().Red());
             }
 
             return invalidForAllTemplates.Count > 0 || invalidForSomeTemplates.Count > 0
@@ -113,7 +162,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                 : CreationResultStatus.Success;
         }
 
-        private static CreationResultStatus DisplayListOrHelpForAmbiguousTemplateGroup(ListOrHelpTemplateListResolutionResult templateResolutionResult, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, IHostSpecificDataLoader hostDataLoader, ITelemetryLogger telemetryLogger, string defaultLanguage)
+        private static CreationResultStatus DisplayListOrHelpForAmbiguousTemplateGroup(TemplateListResolutionResult templateResolutionResult, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, IHostSpecificDataLoader hostDataLoader, ITelemetryLogger telemetryLogger, string defaultLanguage)
         {
             // The following occurs when:
             //      --alias <value> is specifed
@@ -139,13 +188,12 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
 
             if (templateResolutionResult.HasExactMatches)
             {
-                IReadOnlyCollection<IGrouping<string, ITemplateMatchInfo>> groupedTemplatesForDisplay = templateResolutionResult.ExactMatchedTemplatesGrouped;
-                ShowTemplatesFoundMessage(commandInput.TemplateName, commandInput.Language, commandInput.TypeFilter, commandInput.BaselineName);
-                DisplayTemplateList(groupedTemplatesForDisplay, environmentSettings, commandInput.Language, defaultLanguage);
+                ShowTemplatesFoundMessage(commandInput);
+                DisplayTemplateList(templateResolutionResult.ExactMatchedTemplateGroups, environmentSettings, commandInput, defaultLanguage);
             }
             else
             {
-                ShowContextAndTemplateNameMismatchHelp(templateResolutionResult, commandInput.TemplateName, commandInput.Language, commandInput.TypeFilter, commandInput.BaselineName);
+                ShowContextAndTemplateNameMismatchHelp(templateResolutionResult, commandInput);
             }
 
             if (!commandInput.IsListFlagSpecified)
@@ -159,7 +207,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             }
             else if (commandInput.IsListFlagSpecified || commandInput.IsHelpFlagSpecified)
             {
-                return templateResolutionResult.HasExactMatches ? CreationResultStatus.Success :  CreationResultStatus.NotFound;
+                return templateResolutionResult.HasExactMatches ? CreationResultStatus.Success : CreationResultStatus.NotFound;
             }
             else
             {
@@ -167,27 +215,108 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             }
         }
 
-        // Returns true if any of the input templates has a valid parameter parse result.
-        private static bool AreAllParamsValidForAnyTemplateInList(IReadOnlyCollection<ITemplateMatchInfo> templateList)
+        /// <summary>
+        /// Displays the help in case <paramref name="commandInput"/> contains invalid parameters for resolved <paramref name="unambiguousTemplateGroup"/>
+        /// </summary>
+        /// <param name="unambiguousTemplateGroup">the unambigious template group to use based on the command input</param>
+        /// <param name="commandInput">the command input</param>
+        /// <returns><see cref="CreationResultStatus.InvalidParamValues"/></returns>
+        /// <exception cref="ArgumentNullException">when <paramref name="unambiguousTemplateGroup"/>is <see cref="null"/></exception>
+        /// <exception cref="ArgumentNullException">when <paramref name="commandInput"/>is <see cref="null"/></exception>
+        private static CreationResultStatus DisplayInvalidParameterError(TemplateGroup unambiguousTemplateGroup, INewCommandInput commandInput)
         {
-            bool anyValidTemplate = false;
+            _ = unambiguousTemplateGroup ?? throw new ArgumentNullException(paramName: nameof(unambiguousTemplateGroup));
+            _ = unambiguousTemplateGroup ?? throw new ArgumentNullException(paramName: nameof(commandInput));
 
-            foreach (ITemplateMatchInfo templateInfo in templateList)
+            var invalidParameters = unambiguousTemplateGroup.GetInvalidParameterList();
+            if (invalidParameters.Any())
             {
-                if (templateInfo.GetInvalidParameterNames().Count == 0)
+                Reporter.Error.WriteLine(string.Format(InvalidParameterInfo.InvalidParameterListToString(invalidParameters, unambiguousTemplateGroup).Bold().Red()));
+            }
+            Reporter.Error.WriteLine(
+                    string.Format(LocalizableStrings.InvalidParameterTemplateHint, GetTemplateHelpCommand(commandInput.CommandName, unambiguousTemplateGroup.ShortName)).Bold().Red());
+            return CreationResultStatus.InvalidParamValues;
+        }
+
+        private struct AmbiguousTemplateDetails
+        {
+            internal string TemplateIdentity;
+            internal string TemplateName;
+            internal string TemplateShortName;
+            internal string TemplateLanguage;
+            internal int TemplatePrecedence;
+            internal string TemplateAuthor;
+            internal IInstallUnitDescriptor InstallationDescriptor;
+        }
+
+        /// <summary>
+        /// Displays the help when <paramref name="unambiguousTemplateGroup"/> contains the invokable templates with ambiguous precedence.
+        /// </summary>
+        /// <param name="unambiguousTemplateGroup">resolved unambiguous template group to use based on the command input</param>
+        /// <param name="environmentSettings"></param>
+        /// <param name="commandInput">the command input</param>
+        /// <param name="installUnitDescriptors">the list of install unit descriptors</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">when <paramref name="unambiguousTemplateGroup"/>is <see cref="null"/></exception>
+        /// <exception cref="ArgumentNullException">when <paramref name="commandInput"/>is <see cref="null"/></exception>
+        private static CreationResultStatus DisplayAmbiguousPrecedenceError(
+            TemplateGroup unambiguousTemplateGroup,
+            IEngineEnvironmentSettings environmentSettings,
+            INewCommandInput commandInput,
+            IEnumerable<IInstallUnitDescriptor> installUnitDescriptors)
+        {
+            _ = unambiguousTemplateGroup ?? throw new ArgumentNullException(paramName: nameof(unambiguousTemplateGroup));
+            _ = unambiguousTemplateGroup ?? throw new ArgumentNullException(paramName: nameof(commandInput));
+
+            Reporter.Error.WriteLine(LocalizableStrings.AmbiguousTemplatesHeader.Bold().Red());
+            List<AmbiguousTemplateDetails> ambiguousTemplateDetails = new List<AmbiguousTemplateDetails>();
+            foreach (ITemplateMatchInfo template in unambiguousTemplateGroup.GetHighestPrecedenceInvokableTemplates(true))
+            {
+                ambiguousTemplateDetails.Add(new AmbiguousTemplateDetails
                 {
-                    anyValidTemplate = true;
-                    break;
-                }
+                    TemplateIdentity = template.Info.Identity,
+                    TemplateName = template.Info.Name,
+                    TemplateShortName = template.Info.ShortName,
+                    TemplateLanguage = template.Info.GetLanguage(),
+                    TemplatePrecedence = template.Info.Precedence,
+                    TemplateAuthor = template.Info.Author,
+                    InstallationDescriptor = installUnitDescriptors?.FirstOrDefault(descriptor => descriptor.MountPointId == template.Info.ConfigMountPointId)
+                });
             }
 
-            return anyValidTemplate;
+            HelpFormatter<AmbiguousTemplateDetails> formatter =
+                HelpFormatter
+                    .For(
+                        environmentSettings,
+                        commandInput,
+                        ambiguousTemplateDetails,
+                        columnPadding: 2,
+                        headerSeparator: '-',
+                        blankLineBetweenRows: false)
+                    .DefineColumn(t => t.TemplateIdentity, LocalizableStrings.ColumnNameIdentity, showAlways: true)
+                    .DefineColumn(t => t.TemplateName, LocalizableStrings.ColumnNameTemplateName, shrinkIfNeeded: true, minWidth: 15, showAlways: true)
+                    .DefineColumn(t => t.TemplateShortName, LocalizableStrings.ColumnNameShortName, showAlways: true)
+                    .DefineColumn(t => t.TemplateLanguage, LocalizableStrings.ColumnNameLanguage, showAlways: true)
+                    .DefineColumn(t => t.TemplatePrecedence.ToString(), out object prcedenceColumn, LocalizableStrings.ColumnNamePrecedence, showAlways: true)
+                    .DefineColumn(t => t.TemplateAuthor, LocalizableStrings.ColumnNameAuthor, showAlways: true, shrinkIfNeeded: true, minWidth: 10)
+                    .DefineColumn(t => t.InstallationDescriptor != null ? t.InstallationDescriptor.Identifier : string.Empty, LocalizableStrings.ColumnNamePackage, showAlways: true)
+                    .OrderByDescending(prcedenceColumn, new NullOrEmptyIsLastStringComparer());
+            Reporter.Error.WriteLine(formatter.Layout().Bold().Red());
+
+            string hintMessage = LocalizableStrings.AmbiguousTemplatesMultiplePackagesHint;
+            if (unambiguousTemplateGroup.Templates.AllAreTheSame(t => t.Info.ConfigMountPointId))
+            {
+                IInstallUnitDescriptor descriptor = installUnitDescriptors?.First(descriptor => descriptor.MountPointId == unambiguousTemplateGroup.Templates.First().Info.ConfigMountPointId);
+                if (descriptor?.Details?.ContainsKey("NuGetPackageId") ?? false)
+                {
+                    hintMessage = string.Format(LocalizableStrings.AmbiguousTemplatesSamePackageHint, descriptor.Identifier);
+                }
+            }
+   
+            Reporter.Error.WriteLine(hintMessage.Bold().Red());
+            return CreationResultStatus.NotFound;
         }
 
-        private static void DisplayHelpForAcceptedParameters(string commandName)
-        {
-            Reporter.Error.WriteLine(string.Format(LocalizableStrings.RunHelpForInformationAboutAcceptedParameters, commandName).Bold().Red());
-        }
 
         // Displays the list of templates in a table, one row per template group.
         //
@@ -198,94 +327,31 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
         // - Short Name: displays the first short name from the highest precedence template in the group.
         // - Language: All languages supported by any template in the group are displayed, with the default language in brackets, e.g.: [C#]
         // - Tags
-        private static void DisplayTemplateList(IReadOnlyCollection<IGrouping<string, ITemplateMatchInfo>> templates, IEngineEnvironmentSettings environmentSettings, string language, string defaultLanguage)
+        private static void DisplayTemplateList(IReadOnlyCollection<TemplateGroup> templateGroups, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, string defaultLanguage, bool useErrorOutput = false)
         {
-            IReadOnlyCollection<TemplateGroupForListDisplay> groupsForDisplay = GetTemplateGroupsForListDisplay(templates, language, defaultLanguage);
+            IReadOnlyCollection<TemplateGroupTableRow> groupsForDisplay = TemplateGroupDisplay.GetTemplateGroupsForListDisplay(templateGroups, commandInput.Language, defaultLanguage);
 
-            HelpFormatter<TemplateGroupForListDisplay> formatter =
+            HelpFormatter<TemplateGroupTableRow> formatter =
                 HelpFormatter
                     .For(
                         environmentSettings,
+                        commandInput,
                         groupsForDisplay,
                         columnPadding: 2,
                         headerSeparator: '-',
                         blankLineBetweenRows: false)
-                    .DefineColumn(t => t.Name, LocalizableStrings.Templates, shrinkIfNeeded: true, minWidth: 25)
-                    .DefineColumn(t => t.ShortName, LocalizableStrings.ShortName)
-                    .DefineColumn(t => t.Languages, out object languageColumn, LocalizableStrings.Language)
-                    .DefineColumn(t => t.Classifications, out object tagsColumn, LocalizableStrings.Tags)
+                    .DefineColumn(t => t.Name, LocalizableStrings.ColumnNameTemplateName, shrinkIfNeeded: true, minWidth: 15, showAlways: true)
+                    .DefineColumn(t => t.ShortName, LocalizableStrings.ColumnNameShortName, showAlways: true)
+                    .DefineColumn(t => t.Languages, out object languageColumn, LocalizableStrings.ColumnNameLanguage, NewCommandInputCli.LanguageColumnFilter, defaultColumn: true)
+                    .DefineColumn(t => t.Type, LocalizableStrings.ColumnNameType, NewCommandInputCli.TypeColumnFilter, defaultColumn: false)
+                    .DefineColumn(t => t.Author, LocalizableStrings.ColumnNameAuthor, NewCommandInputCli.AuthorColumnFilter, defaultColumn: false, shrinkIfNeeded: true, minWidth: 10)
+                    .DefineColumn(t => t.Classifications, out object tagsColumn, LocalizableStrings.ColumnNameTags, NewCommandInputCli.TagsColumnFilter, defaultColumn: true)
+
                     .OrderByDescending(languageColumn, new NullOrEmptyIsLastStringComparer())
                     .OrderBy(tagsColumn);
-            Reporter.Output.WriteLine(formatter.Layout());
-        }
 
-        private class TemplateGroupForListDisplay
-        {
-            public string Name { get; set; }
-            public string ShortName { get; set; }
-            public string Languages { get; set; }
-            public string Classifications { get; set; }
-        }
-
-        private static IReadOnlyList<TemplateGroupForListDisplay> GetTemplateGroupsForListDisplay(IReadOnlyCollection<IGrouping<string, ITemplateMatchInfo>> groupedTemplateList, string language, string defaultLanguage)
-        {
-            List<TemplateGroupForListDisplay> templateGroupsForDisplay = new List<TemplateGroupForListDisplay>();
-
-            foreach (IGrouping<string, ITemplateMatchInfo> grouping in groupedTemplateList)
-            {
-                List<string> languageForDisplay = new List<string>();
-                HashSet<string> uniqueLanguages = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                string defaultLanguageDisplay = string.Empty;
-
-                foreach (ITemplateMatchInfo template in grouping)
-                {
-                    if (template.Info.Tags != null && template.Info.Tags.TryGetValue("language", out ICacheTag languageTag))
-                    {
-                        foreach (string lang in languageTag.ChoicesAndDescriptions.Keys)
-                        {
-                            if (uniqueLanguages.Add(lang))
-                            {
-                                if (string.IsNullOrEmpty(language) && string.Equals(defaultLanguage, lang, StringComparison.OrdinalIgnoreCase))
-                                {
-                                    defaultLanguageDisplay = $"[{lang}]";
-                                }
-                                else
-                                {
-                                    languageForDisplay.Add(lang);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                languageForDisplay.Sort(StringComparer.OrdinalIgnoreCase);
-                if (!string.IsNullOrEmpty(defaultLanguageDisplay))
-                {
-                    languageForDisplay.Insert(0, defaultLanguageDisplay);
-                }
-
-                ITemplateMatchInfo highestPrecedenceTemplate = grouping.OrderByDescending(x => x.Info.Precedence).First();
-                string shortName;
-                if (highestPrecedenceTemplate.Info is IShortNameList highestWithShortNameList)
-                {
-                    shortName = highestWithShortNameList.ShortNameList[0];
-                }
-                else
-                {
-                    shortName = highestPrecedenceTemplate.Info.ShortName;
-                }
-
-                TemplateGroupForListDisplay groupDisplayInfo = new TemplateGroupForListDisplay()
-                {
-                    Name = highestPrecedenceTemplate.Info.Name,
-                    ShortName = shortName,
-                    Languages = string.Join(",", languageForDisplay),
-                    Classifications = highestPrecedenceTemplate.Info.Classifications != null ? string.Join("/", highestPrecedenceTemplate.Info.Classifications) : null
-                };
-                templateGroupsForDisplay.Add(groupDisplayInfo);
-            }
-
-            return templateGroupsForDisplay;
+            Reporter reporter = useErrorOutput ? Reporter.Error : Reporter.Output;
+            reporter.WriteLine(formatter.Layout());
         }
 
         public static void DisplayInvalidParameters(IReadOnlyList<string> invalidParams)
@@ -312,28 +378,19 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             }
         }
 
-        private static void ShowContextAndTemplateNameMismatchHelp(ListOrHelpTemplateListResolutionResult templateResolutionResult, string templateName, string templateLanguage, string context, string baselineName)
+        private static void ShowContextAndTemplateNameMismatchHelp(TemplateListResolutionResult templateResolutionResult, INewCommandInput commandInput)
         {
-            if (string.IsNullOrEmpty(templateName) && string.IsNullOrEmpty(templateLanguage) && string.IsNullOrEmpty(context) && string.IsNullOrEmpty(baselineName))
+            if (string.IsNullOrEmpty(commandInput.TemplateName) && SupportedFilterOptions.SupportedListFilters.All(filter => !filter.IsFilterSet(commandInput)))
             {
                 return;
             }
-            DisplayPartialNameMatchLanguageAndContextProblems(templateName, templateLanguage, context, templateResolutionResult, baselineName);
-        }
-
-        private static void DisplayPartialNameMatchLanguageAndContextProblems(string templateName, string templateLanguage, string context, ListOrHelpTemplateListResolutionResult templateResolutionResult, string baselineName)
-        {
-            bool anythingReported = false;
             if (templateResolutionResult.HasExactMatches)
             {
                 return;
             }
-            else
-            {
-                //
-                ShowNoTemplatesFoundMessage(templateName, templateLanguage, context, baselineName);
-                anythingReported = true;
-            }
+
+            // No templates found matching the following input parameter(s): {0}.
+            Reporter.Error.WriteLine(string.Format(LocalizableStrings.NoTemplatesMatchingInputParameters, GetInputParametersString(commandInput)).Bold().Red());
 
             if (templateResolutionResult.HasPartialMatches)
             {
@@ -341,17 +398,20 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                 Reporter.Error.WriteLine(
                     string.Format(
                         LocalizableStrings.TemplatesNotValidGivenTheSpecifiedFilter,
-                        templateResolutionResult.PartiallyMatchedTemplatesGrouped.Count,
-                        GetPartialMatchReason(templateResolutionResult, templateLanguage, context, baselineName))
+                        templateResolutionResult.PartiallyMatchedTemplateGroups.Count,
+                        GetPartialMatchReason(templateResolutionResult, commandInput))
                     .Bold().Red());
-
-                anythingReported = true;
             }
 
-            if (anythingReported)
+            if (!commandInput.IsListFlagSpecified)
             {
-                Reporter.Error.WriteLine();
+                // To list installed templates, run 'dotnet {0} --list'.
+                Reporter.Error.WriteLine(string.Format(LocalizableStrings.ListTemplatesCommand, commandInput.CommandName).Bold().Red());
             }
+
+            // To search for the templates on NuGet.org, run 'dotnet {0} <template name> --search'.
+            Reporter.Error.WriteLine(string.Format(LocalizableStrings.SearchTemplatesCommand, commandInput.CommandName, commandInput.TemplateName).Bold().Red());
+            Reporter.Error.WriteLine();
         }
 
         // Returns a list of the parameter names that are invalid for every template in the input group.
@@ -401,7 +461,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
 
         public static CreationResultStatus HandleParseError(INewCommandInput commandInput, ITelemetryLogger telemetryLogger)
         {
-            TemplateListResolver.ValidateRemainingParameters(commandInput, out IReadOnlyList<string> invalidParams);
+            TemplateResolver.ValidateRemainingParameters(commandInput, out IReadOnlyList<string> invalidParams);
             DisplayInvalidParameters(invalidParams);
 
             // TODO: get a meaningful error message from the parser
@@ -410,9 +470,13 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                 // this code path doesn't go through the full help & usage stack, so needs it's own call to ShowUsageHelp().
                 ShowUsageHelp(commandInput, telemetryLogger);
             }
-            else
+            else if (invalidParams.Count > 0)
             {
                 Reporter.Error.WriteLine(string.Format(LocalizableStrings.RunHelpForInformationAboutAcceptedParameters, commandInput.CommandName).Bold().Red());
+            }
+            if (commandInput.HasColumnsParseError)
+            {
+                Reporter.Error.WriteLine(commandInput.ColumnsParseError.Bold().Red());
             }
 
             return CreationResultStatus.InvalidParamValues;
@@ -420,74 +484,47 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
 
         internal static string GetTemplateHelpCommand(string commandName, ITemplateInfo template)
         {
-            return $"dotnet {commandName} {template.ShortName} --help";
+            return GetTemplateHelpCommand(commandName, template.ShortName);
         }
 
-        private static string GetInputParametersString(string templateName, string templateLanguage, string context, string baselineName)
+        internal static string GetTemplateHelpCommand(string commandName, string shortName)
         {
-            StringBuilder inputParametersString = new StringBuilder();
+            return $"dotnet {commandName} {shortName} --help";
+        }
+
+        private static string GetInputParametersString(INewCommandInput commandInput)
+        {
             string separator = ", ";
-
-            if (!string.IsNullOrEmpty(templateName))
-            {
-                inputParametersString.AppendFormat($"'{templateName}'");
-            }
-            if (!string.IsNullOrEmpty(templateLanguage))
-            {
-                inputParametersString.Append(separator).AppendFormat($"language='{templateLanguage}'");
-            }
-            if (!string.IsNullOrEmpty(context))
-            {
-                inputParametersString.Append(separator).AppendFormat($"type='{context}'");
-            }
-            if (!string.IsNullOrEmpty(baselineName))
-            {
-                inputParametersString.Append(separator).AppendFormat($"baseline='{baselineName}'");
-            }
-            return string.IsNullOrEmpty(templateName)
-                ? inputParametersString.ToString(separator.Length, inputParametersString.Length - separator.Length)
-                : inputParametersString.ToString();
+            string filters = string.Join(
+                separator,
+                SupportedFilterOptions.SupportedListFilters
+                    .Where(filter => filter.IsFilterSet(commandInput))
+                    .Select(filter => $"{filter.Name}='{filter.FilterValue(commandInput)}'"));
+            return string.IsNullOrEmpty(commandInput.TemplateName)
+                ? filters
+                : string.IsNullOrEmpty(filters)
+                    ? $"'{commandInput.TemplateName}'"
+                    : $"'{commandInput.TemplateName}'" + separator + filters;
         }
 
-        private static void ShowNoTemplatesFoundMessage(string templateName, string templateLanguage, string context, string baselineName)
+        private static void ShowTemplatesFoundMessage(INewCommandInput commandInput)
         {
-            // No templates found matching the following input parameter(s): {0}.
-            // To list installed templates: dotnet new --list.
-            Reporter.Error.WriteLine(string.Format(LocalizableStrings.NoTemplatesMatchingInputParameters, GetInputParametersString(templateName, templateLanguage, context, baselineName)).Bold().Red());
-            Reporter.Error.WriteLine(LocalizableStrings.ListTemplatesCommand.Bold().Red());
-        }
-
-        private static void ShowTemplatesFoundMessage(string templateName, string templateLanguage, string context, string baselineName)
-        {
-            if (!string.IsNullOrEmpty(templateName) || !string.IsNullOrEmpty(templateLanguage) || !string.IsNullOrEmpty(context) || !string.IsNullOrEmpty(baselineName))
+            if (!string.IsNullOrWhiteSpace(commandInput.TemplateName) || SupportedFilterOptions.SupportedListFilters.Any(filter => filter.IsFilterSet(commandInput)))
             {
                 // Templates found matching the following input parameter(s): {0}
-                Reporter.Output.WriteLine(string.Format(LocalizableStrings.TemplatesFoundMatchingInputParameters, GetInputParametersString(templateName, templateLanguage, context, baselineName)));
+                Reporter.Output.WriteLine(string.Format(LocalizableStrings.TemplatesFoundMatchingInputParameters, GetInputParametersString(commandInput)));
                 Reporter.Output.WriteLine();
             }
         }
 
-        private static string GetPartialMatchReason(ListOrHelpTemplateListResolutionResult templateResolutionResult, string templateLanguage, string context, string baselineName)
+        private static string GetPartialMatchReason(TemplateListResolutionResult templateResolutionResult, INewCommandInput commandInput)
         {
-            StringBuilder reason = new StringBuilder();
             string separator = ", ";
-
-            if (templateResolutionResult.HasLanguageMismatch)
-            {
-                reason.Append(separator).AppendFormat($"language='{templateLanguage}'");
-            }
-            if (templateResolutionResult.HasContextMismatch)
-            {
-                reason.Append(separator).AppendFormat($"type='{context}'");
-            }
-            if (templateResolutionResult.HasBaselineMismatch)
-            {
-                reason.Append(separator).AppendFormat($"baseline='{baselineName}'");
-            }
-
-            return reason.Length != 0
-                ? reason.ToString(separator.Length, reason.Length - separator.Length)
-                : string.Empty;
+            return string.Join(separator,
+                SupportedFilterOptions.SupportedListFilters
+                .OfType<TemplateFilterOption>()
+                .Where(filter => filter.IsFilterSet(commandInput) && filter.MismatchCriteria(templateResolutionResult))
+                .Select(filter => $"{filter.Name}='{filter.FilterValue(commandInput)}'"));
         }
     }
 }
