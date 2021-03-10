@@ -42,7 +42,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         {
             using var mutex = new Mutex(false, _mutexName);
             using var _ = _blockReleasingMutex;
-            while (!_disposed)
+            while (true)
             {
                 if (_token.IsCancellationRequested)
                 {
@@ -54,6 +54,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     //Check if we were cancalled while waiting for mutex...
                     if (_token.IsCancellationRequested)
                     {
+                        mutex.ReleaseMutex();
                         _taskCompletionSource.SetCanceled();
                         return;
                     }
@@ -63,6 +64,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             _taskCompletionSource.SetResult(this);
             _blockReleasingMutex.WaitOne();
             _unlockCallback();
+            mutex.ReleaseMutex();
         }
 
         public void Dispose()
