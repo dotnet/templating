@@ -40,12 +40,12 @@ namespace Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders
             foreach (JProperty item in tagsObject.Properties())
             {
                 string tagName = item.Value.ToString();
-                var choicesAndDescriptions = new Dictionary<string, ParameterChoice>(StringComparer.OrdinalIgnoreCase);
-                choicesAndDescriptions.Add(tagName, new ParameterChoice(string.Empty, string.Empty));
+                var choices = new Dictionary<string, ParameterChoice>(StringComparer.OrdinalIgnoreCase);
+                choices.Add(tagName, new ParameterChoice(string.Empty, string.Empty));
                 ICacheTag cacheTag = new CacheTag(
                     displayName: string.Empty,
                     description: string.Empty,
-                    choicesAndDescriptions,
+                    choices,
                     tagName);
 
                 tags.Add(item.Name.ToString(), cacheTag);

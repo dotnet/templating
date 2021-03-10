@@ -10,12 +10,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Localization
 {
     public class ParameterSymbolLocalizationModel : IParameterSymbolLocalizationModel
     {
-        public ParameterSymbolLocalizationModel(string name, string? displayName, string? description, IReadOnlyDictionary<string, ParameterChoiceLocalizationModel> choicesAndDescriptions)
+        public ParameterSymbolLocalizationModel(string name, string? displayName, string? description, IReadOnlyDictionary<string, ParameterChoiceLocalizationModel> choices)
         {
             Name = name;
             DisplayName = displayName;
             Description = description;
-            Choices = choicesAndDescriptions;
+            Choices = choices;
         }
 
         public string Name { get; }
