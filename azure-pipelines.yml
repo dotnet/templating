@@ -56,7 +56,7 @@ stages:
           ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
             name: NetCoreInternal-Int-Pool
             queue: buildpool.windows.10.amd64.vs2017
-          
+
         variables:
         - _InternalBuildArgs: ''
 
@@ -70,7 +70,7 @@ stages:
           - _InternalBuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
               /p:DotNetPublishUsingPipelines=$(_PublishUsingPipelines)
               /p:OfficialBuildId=$(BUILD.BUILDNUMBER)
-        
+
         strategy:
           matrix:
             Build_Release:
@@ -86,13 +86,13 @@ stages:
               Build_Debug:
                 _BuildConfig: Debug
                 _SignType: test
-              
+
         steps:
         - checkout: self
           clean: true
         # Use utility script to run script command dependent on agent OS.
         - script: eng/common/cibuild.cmd
-            -configuration $(_BuildConfig) 
+            -configuration $(_BuildConfig)
             -prepareMachine
             $(_InternalBuildArgs)
           displayName: Windows Build / Publish
@@ -134,10 +134,11 @@ stages:
           name: Build
           displayName: Build
           condition: succeeded()
-          
+
 - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
   - template: eng\common\templates\post-build\post-build.yml
     parameters:
+      publishingInfraVersion: 3
       # Symbol validation isn't being very reliable lately. This should be enabled back
       # once this issue is resolved: https://github.com/dotnet/arcade/issues/2871
       enableSymbolValidation: false
