@@ -72,7 +72,7 @@ namespace Microsoft.TemplateEngine.Cli
             }
         }
 
-        internal static Installer? Installer { get; set; }
+        internal static Installer Installer { get; set; } = null!;
 
         public string CommandName { get; }
 
@@ -90,7 +90,7 @@ namespace Microsoft.TemplateEngine.Cli
         private static readonly Guid _entryMutexGuid = new Guid("5CB26FD1-32DB-4F4C-B3DC-49CFD61633D2");
         private static Mutex? _entryMutex;
 
-        private static Mutex EnsureEntryMutex(string hivePath, ITemplateEngineHost host)
+        private static Mutex EnsureEntryMutex(string? hivePath, ITemplateEngineHost host)
         {
             if (_entryMutex == null)
             {
@@ -112,18 +112,18 @@ namespace Microsoft.TemplateEngine.Cli
             return _entryMutex;
         }
 
-        public static int Run(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, Action<IEngineEnvironmentSettings, IInstaller> onFirstRun, string[] args, string hivePath)
+        public static int Run(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, Action<IEngineEnvironmentSettings, IInstaller> onFirstRun, string[] args, string? hivePath)
         {
             return Run(commandName, host, telemetryLogger, new New3Callbacks() { OnFirstRun = onFirstRun }, args, hivePath);
         }
 
-        public static int Run(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, New3Callbacks callbacks, string[] args, string hivePath)
+        public static int Run(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, New3Callbacks callbacks, string[] args, string? hivePath)
         {
             if (!args.Any(x => string.Equals(x, "--debug:ephemeral-hive")))
             {
                 EnsureEntryMutex(hivePath, host);
 
-                if (!_entryMutex.WaitOne())
+                if (!_entryMutex!.WaitOne())
                 {
                     return -1;
                 }
@@ -142,7 +142,7 @@ namespace Microsoft.TemplateEngine.Cli
             }
         }
 
-        private static int ActualRun(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, New3Callbacks callbacks, string[] args, string hivePath)
+        private static int ActualRun(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, New3Callbacks callbacks, string[] args, string? hivePath)
         {
             if (args.Any(x => string.Equals(x, "--debug:version", StringComparison.Ordinal)))
             {
@@ -192,7 +192,7 @@ namespace Microsoft.TemplateEngine.Cli
             }
             catch (Exception ex)
             {
-                AggregateException ax = ex as AggregateException;
+                AggregateException? ax = ex as AggregateException;
 
                 while (ax != null && ax.InnerExceptions.Count == 1)
                 {

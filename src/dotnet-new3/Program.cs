@@ -84,7 +84,7 @@ namespace dotnet_new3
 
             ConfigureLocale();
 
-            DefaultTemplateEngineHost host = new DefaultTemplateEngineHost(HostIdentifier, HostVersion, CultureInfo.CurrentUICulture.Name, preferences, builtIns, new[] { "dotnetcli" });
+            DefaultTemplateEngineHost host = new DefaultTemplateEngineHost(HostIdentifier, HostVersion, preferences, builtIns, new[] { "dotnetcli" });
 
             if (emitTimings)
             {
