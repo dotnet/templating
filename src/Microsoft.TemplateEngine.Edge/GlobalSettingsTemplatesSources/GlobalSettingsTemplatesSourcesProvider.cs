@@ -53,7 +53,7 @@ namespace Microsoft.TemplateEngine.Edge
 
             public ITemplatesSourcesProviderFactory Factory { get; }
 
-            public Task<IReadOnlyList<ITemplatesSource>> GetAllSourcesAsync(CancellationToken cancellationToken)
+            public async Task<IReadOnlyList<ITemplatesSource>> GetAllSourcesAsync(CancellationToken cancellationToken)
             {
                 var list = new List<ITemplatesSource>();
                 foreach (TemplatesSourceData entry in await _environmentSettings.SettingsLoader.GlobalSettings.GetInstalledTemplatesPackagesAsync(cancellationToken).ConfigureAwait(false))
@@ -68,7 +68,7 @@ namespace Microsoft.TemplateEngine.Edge
                         list.Add(new TemplatesSource(this, entry.MountPointUri, entry.LastChangeTime));
                     }
                 }
-                return Task.FromResult((IReadOnlyList<ITemplatesSource>)list);
+                return list;
             }
 
             public async Task<IReadOnlyList<CheckUpdateResult>> GetLatestVersionsAsync(IEnumerable<IManagedTemplatesSource> sources, CancellationToken cancellationToken)
