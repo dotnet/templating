@@ -26,6 +26,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         private readonly string _globalSettingsFile;
         private IDisposable? _watcher;
         private bool _locked;
+        private bool _disposed;
 
         public GlobalSettings(IEngineEnvironmentSettings environmentSettings, string globalSettingsFile)
         {
@@ -45,9 +46,13 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         public async Task<IDisposable> LockAsync(CancellationToken token)
         {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(nameof(GlobalSettings));
+            }
             token.ThrowIfCancellationRequested();
             // We must use Mutex because we want to lock across different processes that might want to modify this settings file
-            var mutex = AsyncMutex.WaitAsync($"812CA7F3-7CD8-44B4-B3F0-0159355C0BD5{_globalSettingsFile}".Replace("\\", "_").Replace("/", "_"), token, Unlocked);
+            var mutex = await AsyncMutex.WaitAsync($"812CA7F3-7CD8-44B4-B3F0-0159355C0BD5{_globalSettingsFile}".Replace("\\", "_").Replace("/", "_"), token, Unlocked).ConfigureAwait(false);
             _locked = true;
             return mutex;
         }
@@ -59,12 +64,23 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         public void Dispose()
         {
+            if (_disposed)
+            {
+                return;
+            }
+            _disposed = true;
+
             _watcher?.Dispose();
             _watcher = null;
         }
 
         public async Task<IReadOnlyList<TemplatesSourceData>> GetInstalledTemplatesPackagesAsync(CancellationToken cancellationToken)
         {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(nameof(GlobalSettings));
+            }
+
             if (!_environmentSettings.Host.FileSystem.FileExists(_globalSettingsFile))
             {
                 return Array.Empty<TemplatesSourceData>();
@@ -94,6 +110,11 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         public async Task SetInstalledTemplatesPackagesAsync(IReadOnlyList<TemplatesSourceData> packages, CancellationToken cancellationToken)
         {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(nameof(GlobalSettings));
+            }
+
             if (!_locked)
             {
                 throw new InvalidOperationException($"Before calling {nameof(SetInstalledTemplatesPackagesAsync)}, {nameof(LockAsync)} must be called.");
