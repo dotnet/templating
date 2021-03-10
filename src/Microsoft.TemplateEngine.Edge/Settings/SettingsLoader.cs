@@ -334,7 +334,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         public void Dispose()
         {
-            ((GlobalSettings)GlobalSettings).Dispose();
+            (GlobalSettings as GlobalSettings)?.Dispose();
         }
     }
 }

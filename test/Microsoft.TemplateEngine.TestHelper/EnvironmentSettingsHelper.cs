@@ -53,15 +53,8 @@ namespace Microsoft.TemplateEngine.TestHelper
 
         public void Dispose()
         {
-            try
-            {
-                engineEnvironmentToDispose.ForEach(e => e.Dispose());
-                foldersToCleanup.ForEach(f => Directory.Delete(f, true));
-            }
-            catch (Exception)
-            {
-                //Sometimes randomly fails :(
-            }
+            engineEnvironmentToDispose.ForEach(e => e.Dispose());
+            foldersToCleanup.ForEach(f => Directory.Delete(f, true));
         }
     }
 }
