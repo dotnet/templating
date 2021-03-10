@@ -30,6 +30,7 @@ namespace dotnet_new3
         private const string CommandName = "new3";
         private const string LanguageOverrideEnvironmentVar = "DOTNET_CLI_UI_LANGUAGE";
         private const string VsLanguageOverrideEnvironmentVar = "VSLANG";
+        private const string CompilerLanguageEnvironmentVar = "PreferredUILang";
 
         public static int Main(string[] args)
         {
@@ -196,7 +197,20 @@ namespace dotnet_new3
             if (selectedCulture != null)
             {
                 CultureInfo.DefaultThreadCurrentUICulture = selectedCulture;
+                ConfigureLocaleForChildProcesses(selectedCulture);
             }
+        }
+
+        private static void ConfigureLocaleForChildProcesses(CultureInfo language)
+        {
+            // Set language for child dotnetcli processes.
+            Environment.SetEnvironmentVariable(LanguageOverrideEnvironmentVar, language.Name);
+
+            // Set language for tools following VS guidelines to just work in CLI.
+            Environment.SetEnvironmentVariable(VsLanguageOverrideEnvironmentVar, language.LCID.ToString());
+
+            // Set languatefor C#/VB targets that pass $(PreferredUILang) to compiler.
+            Environment.SetEnvironmentVariable(CompilerLanguageEnvironmentVar, language.Name);
         }
     }
 }
