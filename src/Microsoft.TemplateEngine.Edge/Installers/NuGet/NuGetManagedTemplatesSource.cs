@@ -48,6 +48,10 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             {
                 details[AuthorKey] = Author;
             }
+            if (!string.IsNullOrWhiteSpace(NuGetSource))
+            {
+                details[NuGetSourceKey] = NuGetSource;
+            }
             return details;
         }
     }

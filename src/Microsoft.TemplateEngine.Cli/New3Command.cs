@@ -346,7 +346,7 @@ namespace Microsoft.TemplateEngine.Cli
                 if (TemplatePackageCoordinator.IsTemplatePackageManipulationFlow(_commandInput))
                 {
                     TemplatePackageCoordinator packageCoordinator = new TemplatePackageCoordinator(_telemetryLogger, EnvironmentSettings, _defaultLanguage);
-                    return await packageCoordinator.Process(_commandInput).ConfigureAwait(false);
+                    return await packageCoordinator.ProcessAsync(_commandInput).ConfigureAwait(false);
                 }
 
                 if (_commandInput.SearchOnline)
