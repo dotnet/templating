@@ -97,20 +97,17 @@ namespace Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders
 
         protected virtual ICacheTag ReadOneTag(JProperty item)
         {
-            var choices = new Dictionary<string, ParameterChoice>(StringComparer.OrdinalIgnoreCase);
-            JObject cdToken = item.Value.Get<JObject>(nameof(ICacheTag.Choices));
+            Dictionary<string, ParameterChoice> choicesAndDescriptions = new Dictionary<string, ParameterChoice>(StringComparer.OrdinalIgnoreCase);
+            JObject cdToken = item.Value.Get<JObject>("ChoicesAndDescriptions");
             foreach (JProperty cdPair in cdToken.Properties())
             {
-                string choiceName = cdPair.Name.ToString();
-                string displayName = cdPair.Value.ToString("displayName");
-                string description = cdPair.Value.ToString("description");
-                choices.Add(choiceName, new ParameterChoice(displayName, description));
+                choicesAndDescriptions.Add(cdPair.Name.ToString(), new ParameterChoice(null, cdPair.Value.ToString()));
             }
 
             return new CacheTag(
-                item.Value.ToString(nameof(ICacheTag.DisplayName)),
-                item.Value.ToString(nameof(ICacheTag.Description)),
-                choices,
+                displayName: null,
+                description: item.Value.ToString(nameof(ICacheTag.Description)),
+                choicesAndDescriptions,
                 item.Value.ToString(nameof(ICacheTag.DefaultValue)));
         }
 
@@ -136,7 +133,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders
             {
                 DataType = item.Value.ToString(nameof(ICacheParameter.DataType)),
                 DefaultValue = item.Value.ToString(nameof(ICacheParameter.DefaultValue)),
-                DisplayName = item.Value.ToString(nameof(ICacheParameter.DisplayName)),
                 Description = item.Value.ToString(nameof(ICacheParameter.Description))
             };
         }

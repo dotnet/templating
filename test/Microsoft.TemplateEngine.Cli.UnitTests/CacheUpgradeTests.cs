@@ -49,8 +49,8 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
       ""Tags"": {
                 ""type"": {
                     ""Description"": null,
-          ""Choices"": {
-                        ""item"": {}
+          ""ChoicesAndDescriptions"": {
+                        ""item"": """"
           },
           ""DefaultValue"": ""item""
                 }
@@ -80,30 +80,30 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
       ""Tags"": {
         ""language"": {
           ""Description"": null,
-          ""Choices"": {
-            ""C#"": {}
+          ""ChoicesAndDescriptions"": {
+            ""C#"": """"
           },
           ""DefaultValue"": ""C#""
         },
         ""type"": {
           ""Description"": null,
-          ""Choices"": {
-            ""project"": {}
+          ""ChoicesAndDescriptions"": {
+            ""project"": """"
           },
           ""DefaultValue"": ""project""
         },
         ""Framework"": {
           ""Description"": """",
-          ""Choices"": {
-            ""netcoreapp1.0"": { ""description"" : ""Target netcoreapp1.0"" },
-            ""netcoreapp1.1"": { ""description"" : ""Target netcoreapp1.1"" },
-            ""netstandard1.0"": { ""description"" : ""Target netstandard1.0"" },
-            ""netstandard1.1"": { ""description"" : ""Target netstandard1.1"" },
-            ""netstandard1.2"": { ""description"" : ""Target netstandard1.2"" },
-            ""netstandard1.3"": { ""description"" : ""Target netstandard1.3"" },
-            ""netstandard1.4"": { ""description"" : ""Target netstandard1.4"" },
-            ""netstandard1.5"": { ""description"" : ""Target netstandard1.5"" },
-            ""netstandard1.6"": { ""description"" : ""Target netstandard1.6"" }
+          ""ChoicesAndDescriptions"": {
+            ""netcoreapp1.0"": ""Target netcoreapp1.0"",
+            ""netcoreapp1.1"": ""Target netcoreapp1.1"",
+            ""netstandard1.0"": ""Target netstandard1.0"",
+            ""netstandard1.1"": ""Target netstandard1.1"",
+            ""netstandard1.2"": ""Target netstandard1.2"",
+            ""netstandard1.3"": ""Target netstandard1.3"",
+            ""netstandard1.4"": ""Target netstandard1.4"",
+            ""netstandard1.5"": ""Target netstandard1.5"",
+            ""netstandard1.6"": ""Target netstandard1.6""
           },
           ""DefaultValue"": ""netstandard1.4""
         }
@@ -133,15 +133,15 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
       ""Tags"": {
         ""language"": {
           ""Description"": null,
-          ""Choices"": {
-            ""F#"": {}
+          ""ChoicesAndDescriptions"": {
+            ""F#"": """"
           },
           ""DefaultValue"": ""F#""
         },
         ""type"": {
           ""Description"": null,
-          ""Choices"": {
-            ""project"": {}
+          ""ChoicesAndDescriptions"": {
+            ""project"": """"
           },
           ""DefaultValue"": ""project""
         }

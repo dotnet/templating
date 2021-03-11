@@ -26,6 +26,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             versionReaders.Add("1.0.0.1", TemplateInfoReaderVersion1_0_0_1.FromJObject);
             versionReaders.Add("1.0.0.2", TemplateInfoReaderVersion1_0_0_2.FromJObject);
             versionReaders.Add("1.0.0.3", TemplateInfoReaderVersion1_0_0_3.FromJObject);
+            versionReaders.Add("1.0.0.4", TemplateInfoReaderVersion1_0_0_4.FromJObject);
             _infoVersionReaders = versionReaders;
 
             _defaultReader = TemplateInfoReaderInitialVersion.FromJObject;
