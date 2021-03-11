@@ -1,18 +1,13 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Abstractions.Installer;
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
 using Microsoft.TemplateEngine.Cli.CommandParsing;
-using Microsoft.TemplateEngine.Cli.NuGet;
-using Microsoft.TemplateEngine.Cli.TemplateResolution;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Edge.Template;
-using Microsoft.TemplateEngine.Utils;
-using NuGet.Credentials;
 
 namespace Microsoft.TemplateEngine.Cli
 {
@@ -52,59 +47,10 @@ namespace Microsoft.TemplateEngine.Cli
             return invoker.InvokeTemplate(templateToInvoke);
         }
 
-
         private async Task CheckForTemplateUpdateAsync(ITemplateMatchInfo templateToInvoke, CancellationToken cancellationToken)
         {
-            ITemplatesSource templateSource;
-            try
-            {
-                templateSource = await templateToInvoke.Info.GetTemplateSourceAsync(_environment).ConfigureAwait(false);
-            }
-            catch (Exception)
-            {
-                Reporter.Error.WriteLine(string.Format(LocalizableStrings.TemplatesPackage_NotFound, templateToInvoke.Info.Identity));
-                return;
-            }
-
-            IManagedTemplatesSource managedTemplateSource = templateSource as IManagedTemplatesSource;
-            if (managedTemplateSource is null)
-            {
-                //update is not supported - built-in or optional workload source
-                return;
-            }
-
-            DefaultCredentialServiceUtility.SetupDefaultCredentialService(new CliNuGetLogger(), nonInteractive: !_commandInput.IsInteractiveFlagSpecified);
-            IReadOnlyList<CheckUpdateResult> versionChecks = await managedTemplateSource.Installer.Provider.GetLatestVersionsAsync(new[] { managedTemplateSource }, cancellationToken).ConfigureAwait(false);
-            if (versionChecks.Count == 1 && versionChecks[0].Success)
-            {
-                var updateResult = versionChecks[0];
-                if (!updateResult.IsLatestVersion)
-                {
-                    string displayString = $"{updateResult.Source.Identifier}::{updateResult.Source.Version}";         // the package::version currently installed
-                    Reporter.Output.WriteLine(string.Format(LocalizableStrings.UpdateAvailable, displayString));
-                    string installString = $"{updateResult.Source.Identifier}::{updateResult.LatestVersion}"; // the package::version that will be installed
-                    Reporter.Output.WriteLine(string.Format(LocalizableStrings.UpdateCheck_InstallCommand, _commandName, installString));
-                }
-            }
-            else
-            {
-                switch (versionChecks[0]?.Error)
-                {
-                    case InstallerErrorCode.InvalidSource:
-                        Reporter.Error.WriteLine($"Failed to check update for {managedTemplateSource.DisplayName}: no NuGet feeds are configured or they are invalid.".Bold().Red());
-                        break;
-                    case InstallerErrorCode.PackageNotFound:
-                        Reporter.Error.WriteLine($"Failed to check update for {managedTemplateSource.DisplayName}: the package is not available in configured NuGet feed.".Bold().Red());
-                        break;
-                    case InstallerErrorCode.UnsupportedRequest:
-                        Reporter.Error.WriteLine($"Failed to check update for {managedTemplateSource.DisplayName}: the package is not supported.".Bold().Red());
-                        break;
-                    case InstallerErrorCode.GenericError:
-                    default:
-                        Reporter.Error.WriteLine($"Failed to check update for {managedTemplateSource.DisplayName}: {versionChecks[0]?.ErrorMessage}.".Bold().Red());
-                        break;
-                }
-            }
+            TemplatePackageCoordinator packageCoordinator = new TemplatePackageCoordinator(_telemetryLogger, _environment);
+            await packageCoordinator.CheckUpdateForTemplate(templateToInvoke.Info, _commandInput, cancellationToken).ConfigureAwait(false);
         }
     }
 }
