@@ -32,8 +32,15 @@ namespace Microsoft.TemplateEngine.Cli
         internal TemplatePackageCoordinator(
             ITelemetryLogger telemetryLogger,
             IEngineEnvironmentSettings environmentSettings,
-            string defaultLanguage = "")
+            string defaultLanguage = null)
         {
+            _ = telemetryLogger ?? throw new ArgumentNullException(nameof(telemetryLogger));
+            _ = environmentSettings ?? throw new ArgumentNullException(nameof(environmentSettings));
+            if (string.IsNullOrWhiteSpace(defaultLanguage))
+            {
+                defaultLanguage = string.Empty;
+            }
+
             _telemetryLogger = telemetryLogger;
             _engineEnvironmentSettings = environmentSettings;
             _defaultLanguage = defaultLanguage;
@@ -44,22 +51,25 @@ namespace Microsoft.TemplateEngine.Cli
         /// </summary>
         /// <param name="commandInput">the command input with instructions to process</param>
         /// <returns></returns>
-        internal Task<CreationResultStatus> Process(INewCommandInput commandInput)
+        internal Task<CreationResultStatus> ProcessAsync (INewCommandInput commandInput, CancellationToken cancellationToken = default)
         {
+            _ = commandInput ?? throw new ArgumentNullException(nameof(commandInput));
+            cancellationToken.ThrowIfCancellationRequested();
+
             if (commandInput.ToUninstallList != null)
             {
-                return EnterUninstallFlowAsync(commandInput);
+                return EnterUninstallFlowAsync(commandInput, cancellationToken);
             }
 
             if (commandInput.CheckForUpdates || commandInput.ApplyUpdates)
             {
                 InitializeNuGetCredentialService(commandInput);
-                return EnterUpdateFlowAsync(commandInput);
+                return EnterUpdateFlowAsync(commandInput, cancellationToken);
             }
             if (commandInput.ToInstallList != null && commandInput.ToInstallList.Count > 0 && commandInput.ToInstallList[0] != null)
             {
                 InitializeNuGetCredentialService(commandInput);
-                return EnterInstallFlowAsync(commandInput);
+                return EnterInstallFlowAsync(commandInput, cancellationToken);
             }
             throw new NotSupportedException($"The operation is not supported, command: {commandInput}.");
         }
@@ -71,6 +81,8 @@ namespace Microsoft.TemplateEngine.Cli
         /// <returns></returns>
         internal static bool IsTemplatePackageManipulationFlow(INewCommandInput commandInput)
         {
+            _ = commandInput ?? throw new ArgumentNullException(nameof(commandInput));
+
             if (commandInput.CheckForUpdates || commandInput.ApplyUpdates)
             {
                 return true;
@@ -93,8 +105,12 @@ namespace Microsoft.TemplateEngine.Cli
         /// <param name="commandInput"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        internal async Task CheckUpdateForTemplate(ITemplateInfo template, INewCommandInput commandInput, CancellationToken cancellationToken)
+        internal async Task CheckUpdateForTemplate(ITemplateInfo template, INewCommandInput commandInput, CancellationToken cancellationToken = default)
         {
+            _ = template ?? throw new ArgumentNullException(nameof(template));
+            _ = commandInput ?? throw new ArgumentNullException(nameof(commandInput));
+            cancellationToken.ThrowIfCancellationRequested();
+
             ITemplatesSource templateSource;
             try
             {
@@ -121,8 +137,11 @@ namespace Microsoft.TemplateEngine.Cli
         /// <summary>
         /// Install the template package(s) flow (--install, -i)
         /// </summary>
-        private async Task<CreationResultStatus> EnterInstallFlowAsync(INewCommandInput commandInput)
+        private async Task<CreationResultStatus> EnterInstallFlowAsync(INewCommandInput commandInput, CancellationToken cancellationToken)
         {
+            _ = commandInput ?? throw new ArgumentNullException(nameof(commandInput));
+            cancellationToken.ThrowIfCancellationRequested();
+
             CreationResultStatus resultStatus = CreationResultStatus.Success;
             _telemetryLogger.TrackEvent(commandInput.CommandName + TelemetryConstants.InstallEventSuffix, new Dictionary<string, string> { { TelemetryConstants.ToInstallCount, commandInput.ToInstallList.Count.ToString() } });
 
@@ -183,10 +202,10 @@ namespace Microsoft.TemplateEngine.Cli
             }
             Reporter.Output.WriteLine();
 
-            var installResults = await managedSourceProvider.InstallAsync(installRequests, CancellationToken.None).ConfigureAwait(false);
+            var installResults = await managedSourceProvider.InstallAsync(installRequests, cancellationToken).ConfigureAwait(false);
             foreach (InstallResult result in installResults)
             {
-                await DisplayInstallResultAsync(commandInput, result.InstallRequest.DisplayName, result).ConfigureAwait(false);
+                await DisplayInstallResultAsync(commandInput, result.InstallRequest.DisplayName, result, cancellationToken).ConfigureAwait(false);
                 if (!result.Success)
                 {
                     resultStatus = CreationResultStatus.CreateFailed;
@@ -198,8 +217,11 @@ namespace Microsoft.TemplateEngine.Cli
         /// <summary>
         /// Update the template package(s) flow (--update-check and --update-apply)
         /// </summary>
-        private async Task<CreationResultStatus> EnterUpdateFlowAsync(INewCommandInput commandInput)
+        private async Task<CreationResultStatus> EnterUpdateFlowAsync(INewCommandInput commandInput, CancellationToken cancellationToken)
         {
+            _ = commandInput ?? throw new ArgumentNullException(nameof(commandInput));
+            cancellationToken.ThrowIfCancellationRequested();
+
             bool applyUpdates = commandInput.ApplyUpdates;
             bool allTemplatesUpToDate = true;
             CreationResultStatus success = CreationResultStatus.Success;
@@ -207,7 +229,7 @@ namespace Microsoft.TemplateEngine.Cli
 
             foreach (var (provider, sources) in managedSourcedGroupedByProvider)
             {
-                IReadOnlyList<CheckUpdateResult> checkUpdateResults = await provider.GetLatestVersionsAsync(sources, CancellationToken.None).ConfigureAwait(false);
+                IReadOnlyList<CheckUpdateResult> checkUpdateResults = await provider.GetLatestVersionsAsync(sources, cancellationToken).ConfigureAwait(false);
                 DisplayUpdateCheckResults(checkUpdateResults, commandInput, showUpdates: !applyUpdates);
                 if (checkUpdateResults.Any(result => !result.Success))
                 {
@@ -230,14 +252,14 @@ namespace Microsoft.TemplateEngine.Cli
                     }
                     Reporter.Output.WriteLine();
 
-                    IReadOnlyList<UpdateResult> updateResults = await provider.UpdateAsync(updatesToApply.Select(update => UpdateRequest.FromCheckUpdateResult(update)), CancellationToken.None).ConfigureAwait(false);
+                    IReadOnlyList<UpdateResult> updateResults = await provider.UpdateAsync(updatesToApply.Select(update => UpdateRequest.FromCheckUpdateResult(update)), cancellationToken).ConfigureAwait(false);
                     foreach (var updateResult in updateResults)
                     {
                         if (!updateResult.Success)
                         {
                             success = CreationResultStatus.CreateFailed;
                         }
-                        await DisplayInstallResultAsync(commandInput, updateResult.UpdateRequest.Source?.DisplayName, updateResult).ConfigureAwait(false);
+                        await DisplayInstallResultAsync(commandInput, updateResult.UpdateRequest.Source?.DisplayName, updateResult, cancellationToken).ConfigureAwait(false);
                     }
                 }
             }
@@ -253,53 +275,163 @@ namespace Microsoft.TemplateEngine.Cli
         /// <summary>
         /// Uninstall the template package(s) flow (--uninstall, -u)
         /// </summary>
-        private async Task<CreationResultStatus> EnterUninstallFlowAsync(INewCommandInput commandInput)
+        private async Task<CreationResultStatus> EnterUninstallFlowAsync(INewCommandInput commandInput, CancellationToken cancellationToken)
         {
+            _ = commandInput ?? throw new ArgumentNullException(nameof(commandInput));
+            cancellationToken.ThrowIfCancellationRequested();
+
             CreationResultStatus result = CreationResultStatus.Success;
-            if (commandInput.ToUninstallList.Count > 0 && commandInput.ToUninstallList[0] != null)
+            if (commandInput.ToUninstallList.Count <= 0 || commandInput.ToUninstallList[0] == null)
             {
-                var managedSourcedGroupedByProvider = await _engineEnvironmentSettings.SettingsLoader.TemplatesSourcesManager.GetManagedSourcesGroupedByProvider().ConfigureAwait(false);
-                bool sourceToUninstallFound = false;
-                foreach (var (provider, sources) in managedSourcedGroupedByProvider)
+                //display all installed template packages
+                await DisplayInstalledTemplatesSources(commandInput, cancellationToken).ConfigureAwait(false);
+                return result;
+            }
+
+            Dictionary<IManagedTemplatesSourcesProvider, List<IManagedTemplatesSource>> sourcesToUninstall;
+            (result, sourcesToUninstall) = await DetermineSourcesToUninstall(commandInput, cancellationToken).ConfigureAwait(false);
+
+            foreach (KeyValuePair<IManagedTemplatesSourcesProvider, List<IManagedTemplatesSource>> providerSourcesToUninstall in sourcesToUninstall)
+            {
+                IReadOnlyList<UninstallResult> uninstallResults = await providerSourcesToUninstall.Key.UninstallAsync(providerSourcesToUninstall.Value, cancellationToken).ConfigureAwait(false);
+                foreach (UninstallResult uninstallResult in uninstallResults)
                 {
-                    var sourcesToUninstall = sources.Where(source => commandInput.ToUninstallList.Contains(source.Identifier, StringComparer.OrdinalIgnoreCase));
-                    if (!sourcesToUninstall.Any())
+                    if (uninstallResult.Success)
                     {
-                        continue;
+                        Reporter.Output.WriteLine($"Success: {uninstallResult.Source.DisplayName} was uninstalled.");
                     }
-                    sourceToUninstallFound = true;
-                    var uninstallResults = await provider.UninstallAsync(sourcesToUninstall, CancellationToken.None).ConfigureAwait(false);
-                    foreach (UninstallResult uninstallResult in uninstallResults)
+                    else
                     {
-                        if (uninstallResult.Success)
+                        Reporter.Error.WriteLine(string.Format(LocalizableStrings.CouldntUninstall, uninstallResult.Source.DisplayName, uninstallResult.ErrorMessage));
+                        result = CreationResultStatus.CreateFailed;
+                    }
+                }
+            }
+            return result;
+        }
+
+        private async Task<(CreationResultStatus, Dictionary<IManagedTemplatesSourcesProvider, List<IManagedTemplatesSource>>)> DetermineSourcesToUninstall(INewCommandInput commandInput, CancellationToken cancellationToken)
+        {
+            _ = commandInput ?? throw new ArgumentNullException(nameof(commandInput));
+            cancellationToken.ThrowIfCancellationRequested();
+
+            CreationResultStatus result = CreationResultStatus.Success;
+            IReadOnlyList<(IManagedTemplatesSourcesProvider provider, IReadOnlyList<IManagedTemplatesSource> sources)> managedSourcedGroupedByProvider = await _engineEnvironmentSettings.SettingsLoader.TemplatesSourcesManager.GetManagedSourcesGroupedByProvider().ConfigureAwait(false);
+
+            var sourcesToUninstall = new Dictionary<IManagedTemplatesSourcesProvider, List<IManagedTemplatesSource>>();
+            foreach (string sourceIdentifier in commandInput.ToUninstallList)
+            {
+                bool sourceIdentified = false;
+                foreach (var providerSources in managedSourcedGroupedByProvider)
+                {
+                    foreach (var source in providerSources.sources)
+                    {
+                        if (source.Identifier.Equals(sourceIdentifier, StringComparison.OrdinalIgnoreCase))
                         {
-                            Reporter.Output.WriteLine($"Success: {uninstallResult.Source.DisplayName} was uninstalled.");
+                            sourceIdentified = true;
+
+                            if (sourcesToUninstall.TryGetValue(providerSources.provider, out List<IManagedTemplatesSource> sources))
+                            {
+                                sources.Add(source);
+                            }
+                            else
+                            {
+                                sourcesToUninstall[providerSources.provider] = new List<IManagedTemplatesSource>() { source };
+                            }
+                        }
+                    }
+                }
+
+                if (!sourceIdentified)
+                {
+                    result = CreationResultStatus.NotFound;
+                    Reporter.Error.WriteLine($"The template package '{sourceIdentifier}' is not found.");
+                    if (await IsTemplateShortNameAsync(sourceIdentifier, cancellationToken).ConfigureAwait(false))
+                    {
+                        var packages = await GetTemplatePackagesByShortNameAsync(sourceIdentifier, cancellationToken).ConfigureAwait(false);
+                        var managedPackages = packages.OfType<IManagedTemplatesSource>();
+                        if (managedPackages.Any())
+                        {
+                            Reporter.Error.WriteLine($"The template '{sourceIdentifier}' is included to the packages:");
+                            foreach (IManagedTemplatesSource managedPackage in managedPackages)
+                            {
+                                IEnumerable<ITemplateInfo> templates = await managedPackage.GetTemplates(_engineEnvironmentSettings).ConfigureAwait(false);
+                                Reporter.Error.WriteLine($"  {managedPackage.DisplayName} (contains {templates.Count()} templates)");
+                            }
+                            Reporter.Error.WriteLine($"To uninstall the template package, use dotnet {commandInput.CommandName} -u {managedPackages?.First().Identifier}");
+                            //TODO:
+                            //Reporter.Error.WriteLine($"To list the templates installed in a package, use dotnet new3 <new option> <package name>.");
                         }
                         else
                         {
-                            Reporter.Error.WriteLine(string.Format(LocalizableStrings.CouldntUninstall, uninstallResult.Source.DisplayName, uninstallResult.ErrorMessage));
-                            result = CreationResultStatus.CreateFailed;
+                            Reporter.Error.WriteLine($"To list installed template packages, use dotnet {commandInput.CommandName} -u");
                         }
                     }
-                }
-                if (!sourceToUninstallFound)
-                {
-                    Reporter.Error.WriteLine("The template package is not found, check installed sources and the uninstallation commands from the list below.");
-                    result = CreationResultStatus.NotFound;
-                    await DisplayInstalledTemplatesSources(commandInput).ConfigureAwait(false);
-                }
-            }
-            else
-            {
-                await DisplayInstalledTemplatesSources(commandInput).ConfigureAwait(false);
-            }
+                    else
+                    {
+                        Reporter.Error.WriteLine($"To list installed template packages, use dotnet {commandInput.CommandName} -u");
+                    }
 
-            return result;
+                }
+            }
+            return (result, sourcesToUninstall);
+        }
+
+        private async Task<IEnumerable<ITemplatesSource>> GetTemplatePackagesByShortNameAsync (string sourceIdentifier, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(sourceIdentifier))
+            {
+                throw new ArgumentException(nameof(sourceIdentifier));
+            }
+            cancellationToken.ThrowIfCancellationRequested();
+
+            IReadOnlyList<ITemplateInfo> templates = await _engineEnvironmentSettings.SettingsLoader.GetTemplatesAsync(cancellationToken).ConfigureAwait(false);
+            var templatesWithMatchedShortName = templates.Where(template =>
+            {
+                if (template is IShortNameList t1)
+                {
+                    return t1.ShortNameList.Contains(sourceIdentifier, StringComparer.OrdinalIgnoreCase);
+                }
+                else
+                {
+                    return template.ShortName.Equals(sourceIdentifier, StringComparison.OrdinalIgnoreCase);
+                }
+            });
+
+            var templatePackages = await Task.WhenAll(
+                templatesWithMatchedShortName.Select(
+                    t => t.GetTemplateSourceAsync(_engineEnvironmentSettings)))
+                .ConfigureAwait(false);
+
+            return templatePackages.Distinct();
+        }
+
+        private async Task<bool> IsTemplateShortNameAsync(string sourceIdentifier, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(sourceIdentifier))
+            {
+                throw new ArgumentException(nameof(sourceIdentifier));
+            }
+            cancellationToken.ThrowIfCancellationRequested();
+
+            IReadOnlyList<ITemplateInfo> templates = await _engineEnvironmentSettings.SettingsLoader.GetTemplatesAsync(cancellationToken).ConfigureAwait(false);
+            return templates.Any(template =>
+            {
+                if (template is IShortNameList t1)
+                {
+                    return t1.ShortNameList.Contains(sourceIdentifier, StringComparer.OrdinalIgnoreCase);
+                }
+                else
+                {
+                    return template.ShortName.Equals(sourceIdentifier, StringComparison.OrdinalIgnoreCase);
+                }
+            });
         }
 
         private void DisplayUpdateCheckResults(IEnumerable<CheckUpdateResult> versionCheckResults, INewCommandInput commandInput, bool showUpdates = true)
         {
             _ = versionCheckResults ?? throw new ArgumentNullException(nameof(versionCheckResults));
+            _ = commandInput ?? throw new ArgumentNullException(nameof(commandInput));
 
             foreach (CheckUpdateResult result in versionCheckResults)
             {
@@ -335,8 +467,11 @@ namespace Microsoft.TemplateEngine.Cli
             }
         }
 
-        private async Task DisplayInstalledTemplatesSources(INewCommandInput commandInput)
+        private async Task DisplayInstalledTemplatesSources(INewCommandInput commandInput, CancellationToken cancellationToken)
         {
+            _ = commandInput ?? throw new ArgumentNullException(nameof(commandInput));
+            cancellationToken.ThrowIfCancellationRequested();
+
             IEnumerable<IManagedTemplatesSource> managedTemplatesSources = await _engineEnvironmentSettings.SettingsLoader.TemplatesSourcesManager.GetManagedTemplatesSources().ConfigureAwait(false);
 
             Reporter.Output.WriteLine(LocalizableStrings.InstalledItems);
@@ -392,8 +527,16 @@ namespace Microsoft.TemplateEngine.Cli
             }
         }
 
-        private async Task DisplayInstallResultAsync(INewCommandInput commandInput, string packageToInstall, Result result)
+        private async Task DisplayInstallResultAsync(INewCommandInput commandInput, string packageToInstall, Result result, CancellationToken cancellationToken)
         {
+            _ = commandInput ?? throw new ArgumentNullException(nameof(commandInput));
+            if (string.IsNullOrWhiteSpace(packageToInstall))
+            {
+                throw new ArgumentException(nameof(packageToInstall));
+            }
+            _ = result ?? throw new ArgumentNullException(nameof(result));
+            cancellationToken.ThrowIfCancellationRequested();
+
             if (result.Success)
             {
                 Reporter.Output.WriteLine($"Success: {result.Source.DisplayName} installed the following templates:");
@@ -435,6 +578,8 @@ namespace Microsoft.TemplateEngine.Cli
 
         private static void InitializeNuGetCredentialService(INewCommandInput commandInput)
         {
+            _ = commandInput ?? throw new ArgumentNullException(nameof(commandInput));
+
             try
             {
                 DefaultCredentialServiceUtility.SetupDefaultCredentialService(new CliNuGetLogger(), !commandInput.IsInteractiveFlagSpecified);
