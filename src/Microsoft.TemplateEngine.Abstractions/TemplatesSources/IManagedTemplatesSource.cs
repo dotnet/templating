@@ -45,7 +45,7 @@ namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
         string Version { get; }
 
         /// <summary>
-        /// This is list of details that we show to user about this templates source like, author and other information
+        /// This is list of details that we show to user about this templates source like author and other information
         /// that might be important to user.
         /// </summary>
         IReadOnlyDictionary<string, string> GetDisplayDetails();
