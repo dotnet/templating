@@ -192,29 +192,28 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 throw new PackageNotFoundException(packageIdentifier, packageSources.Select(source => source.Source));
             }
 
+            if (!includePreview)
+            {
+                (PackageSource, IPackageSearchMetadata) latestStableVersion = accumulativeSearchResults.Aggregate(
+                    (max, current) =>
+                    {
+                        if (current.package.Identity.Version.IsPrerelease) return max;
+                        if (max == default) return current;
+                        return current.package.Identity.Version > max.package.Identity.Version ? current : max;
+                    });
+                if (latestStableVersion != default)
+                {
+                    return latestStableVersion;
+                }
+            }
+
             (PackageSource, IPackageSearchMetadata) latestVersion = accumulativeSearchResults.Aggregate(
                 (max, current) =>
                 {
                     if (max == default) return current;
                     return current.package.Identity.Version > max.package.Identity.Version ? current : max;
                 });
-
-            (PackageSource, IPackageSearchMetadata) latestStableVersion = accumulativeSearchResults.Aggregate(
-                (max, current) =>
-                {
-                    if (current.package.Identity.Version.IsPrerelease) return max;
-                    if (max == default) return current;
-                    return current.package.Identity.Version > max.package.Identity.Version ? current : max;
-                });
-
-            if (latestStableVersion != default && !includePreview)
-            {
-                return latestStableVersion;
-            }
-            else
-            {
-                return latestVersion;
-            }
+            return latestVersion;
         }
 
         private async Task<(PackageSource, IPackageSearchMetadata)> GetPackageMetadataAsync(string packageIdentifier, NuGetVersion packageVersion, IEnumerable<PackageSource> sources, CancellationToken cancellationToken)
@@ -227,12 +226,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             _ = sources ?? throw new ArgumentNullException(nameof(sources));
 
             bool atLeastOneSourceValid = false;
-
-            //internal cancellation token to cancel other tasks if matc
-            CancellationTokenSource internalCancelToken = new CancellationTokenSource();
             using CancellationTokenSource linkedCts =
-                      CancellationTokenSource.CreateLinkedTokenSource(internalCancelToken.Token, cancellationToken);
-
+                      CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             var tasks = sources.Select(source => GetPackageMetadataAsync(source, packageIdentifier, includePrerelease: true, linkedCts.Token)).ToList();
             while (tasks.Any())
             {
@@ -248,7 +243,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 if (matchedVersion != null)
                 {
                     _nugetLogger.LogDebug($"{packageIdentifier}::{packageVersion} was found in {result.source.Source}.");
-                    internalCancelToken.Cancel();
+                    linkedCts.Cancel();
                     return (result.source, matchedVersion);
                 }
                 else
