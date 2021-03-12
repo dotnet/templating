@@ -41,7 +41,6 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests.Utils
             public Task<IReadOnlyList<ITemplatesSource>> GetAllSourcesAsync(CancellationToken cancellationToken)
             {
                 List<ITemplatesSource> toInstallList = new List<ITemplatesSource>();
-
                 string codebase = typeof(BootstrapperFactory).GetTypeInfo().Assembly.Location;
                 Uri cb = new Uri(codebase);
                 string asmPath = cb.LocalPath;
@@ -49,7 +48,6 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests.Utils
                 string[] locations = new[]
                 {
                     Path.Combine(dir, "..", "..", "..", "..", "..", "template_feed"),
-                    Path.Combine(dir, "..", "..", "..", "..", "..", "test", "Microsoft.TemplateEngine.TestTemplates", "test_templates"),
                     Path.Combine(dir, "..", "..", "..", "..", "..", "test", "Microsoft.TemplateEngine.TestTemplates", "test_templates")
                 };
 

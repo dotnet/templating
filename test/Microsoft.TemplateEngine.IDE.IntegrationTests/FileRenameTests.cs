@@ -198,7 +198,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
         internal async Task GetCreationEffectsTest(string templateName, string parameters, MockCreationEffects expectedResult)
         {
             Bootstrapper bootstrapper = BootstrapperFactory.GetBootstrapper();
-            bootstrapper.InstallTestTemplate(templateName);
+            await bootstrapper.InstallTestTemplateAsync(templateName).ConfigureAwait(false);
 
             string name = BasicParametersParser.GetNameFromParameterString(parameters);
             string output = BasicParametersParser.GetOutputFromParameterString(parameters);
@@ -229,7 +229,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
         internal async Task CreateTest(string templateName, string parameters, MockCreationEffects expectedResult)
         {
             Bootstrapper bootstrapper = BootstrapperFactory.GetBootstrapper();
-            bootstrapper.InstallTestTemplate(templateName);
+            await bootstrapper.InstallTestTemplateAsync(templateName).ConfigureAwait(false);
 
             string name = BasicParametersParser.GetNameFromParameterString(parameters);
             string output = BasicParametersParser.GetOutputFromParameterString(parameters);
@@ -275,7 +275,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
         {
             Bootstrapper bootstrapper = BootstrapperFactory.GetBootstrapper();
             string packageLocation = _packageManager.PackTestTemplatesNuGetPackage();
-            bootstrapper.InstallTemplate(packageLocation);
+            await bootstrapper.InstallTemplateAsync(packageLocation).ConfigureAwait(false);
 
             string name = BasicParametersParser.GetNameFromParameterString(parameters);
             string output = BasicParametersParser.GetOutputFromParameterString(parameters);
@@ -306,7 +306,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
         {
             Bootstrapper bootstrapper = BootstrapperFactory.GetBootstrapper();
             string packageLocation = _packageManager.PackTestTemplatesNuGetPackage();
-            bootstrapper.InstallTemplate(packageLocation);
+            await bootstrapper.InstallTemplateAsync(packageLocation).ConfigureAwait(false);
 
             string name = BasicParametersParser.GetNameFromParameterString(parameters);
             string output = BasicParametersParser.GetOutputFromParameterString(parameters);

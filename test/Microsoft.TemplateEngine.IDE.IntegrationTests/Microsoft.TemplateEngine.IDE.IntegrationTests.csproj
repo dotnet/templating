@@ -4,6 +4,9 @@
         <TestProject>true</TestProject>
         <EnableAnalyzers>true</EnableAnalyzers>
     </PropertyGroup>
+    <ItemGroup>
+      <PackageReference Include="FluentAssertions" Version="5.10.3" />
+    </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="$(SrcDir)Microsoft.TemplateEngine.Edge\Microsoft.TemplateEngine.Edge.csproj" />

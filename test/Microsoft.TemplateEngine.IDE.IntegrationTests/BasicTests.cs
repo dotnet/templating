@@ -24,7 +24,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
         internal async Task GetCreationEffects_BasicTest_Folder()
         {
             var bootstrapper = BootstrapperFactory.GetBootstrapper();
-            bootstrapper.InstallTestTemplate("TemplateWithSourceName");
+            await bootstrapper.InstallTestTemplateAsync("TemplateWithSourceName").ConfigureAwait(false);
 
             string output = TestHelper.CreateTemporaryFolder();
             var foundTemplates = await bootstrapper.ListTemplates(true, WellKnownSearchFilters.NameFilter("TestAssets.TemplateWithSourceName")).ConfigureAwait(false);
@@ -51,7 +51,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
         internal async Task Create_BasicTest_Folder()
         {
             var bootstrapper = BootstrapperFactory.GetBootstrapper(additionalVirtualLocations: new string[] { "test" });
-            bootstrapper.InstallTestTemplate("TemplateWithSourceName");
+            await bootstrapper.InstallTestTemplateAsync("TemplateWithSourceName").ConfigureAwait(false);
 
             string output = TestHelper.CreateTemporaryFolder();
             var foundTemplates = await bootstrapper.ListTemplates(true, WellKnownSearchFilters.NameFilter("TestAssets.TemplateWithSourceName")).ConfigureAwait(false);
@@ -69,7 +69,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
         {
             var bootstrapper = BootstrapperFactory.GetBootstrapper();
             string packageLocation = _packageManager.PackProjectTemplatesNuGetPackage("microsoft.dotnet.common.projecttemplates.5.0");
-            bootstrapper.InstallTemplate(packageLocation);
+            await bootstrapper.InstallTemplateAsync(packageLocation).ConfigureAwait(false);
 
             string output = TestHelper.CreateTemporaryFolder();
 
@@ -96,7 +96,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
         {
             var bootstrapper = BootstrapperFactory.GetBootstrapper();
             string packageLocation = _packageManager.PackProjectTemplatesNuGetPackage("microsoft.dotnet.common.projecttemplates.5.0");
-            bootstrapper.InstallTemplate(packageLocation);
+            await bootstrapper.InstallTemplateAsync(packageLocation).ConfigureAwait(false);
 
             string output = TestHelper.CreateTemporaryFolder();
             var foundTemplates = await bootstrapper.ListTemplates(true, WellKnownSearchFilters.NameFilter("console")).ConfigureAwait(false);
