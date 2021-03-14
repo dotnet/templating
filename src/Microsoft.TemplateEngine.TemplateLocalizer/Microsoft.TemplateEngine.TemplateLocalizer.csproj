@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>$(NETCoreTargetFramework)</TargetFramework>
+    <Description>A tool that can be used to localize template.json files.</Description>
+    <IsPackable>true</IsPackable>
+    <Nullable>enable</Nullable>
+
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>dotnet-template-localizer</ToolCommandName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.21109.1" />
+  </ItemGroup>
+</Project>
