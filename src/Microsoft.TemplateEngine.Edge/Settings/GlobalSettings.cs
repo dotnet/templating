@@ -26,7 +26,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         private readonly string _globalSettingsFile;
         private IDisposable? _watcher;
         private bool _locked;
-        private bool _disposed;
+        private volatile bool _disposed;
 
         public GlobalSettings(IEngineEnvironmentSettings environmentSettings, string globalSettingsFile)
         {
