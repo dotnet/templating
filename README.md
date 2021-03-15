@@ -1,4 +1,4 @@
-[![Build Status](https://dev.azure.com/dnceng/public/_apis/build/status/dotnet/templating/templating-ci?branchName=master)](https://dev.azure.com/dnceng/public/_build/latest?definitionId=302&branchName=master) [![Join the chat at https://gitter.im/dotnet/templating](https://badges.gitter.im/dotnet/templating.svg)](https://gitter.im/dotnet/templating?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://dev.azure.com/dnceng/public/_apis/build/status/dotnet/templating/templating-ci?branchName=main)](https://dev.azure.com/dnceng/public/_build/latest?definitionId=302&branchName=main) [![Join the chat at https://gitter.im/dotnet/templating](https://badges.gitter.im/dotnet/templating.svg)](https://gitter.im/dotnet/templating?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # Overview
 
@@ -8,9 +8,9 @@ Template Engine is a library for manipulating streams, including operations to r
 regions and process `if`, `else if`, `else` and `end if` style statements.
 
 # Content Repositories
-* [Class Library/Console App](https://github.com/dotnet/templating/tree/master/template_feed)
+* [Class Library/Console App](https://github.com/dotnet/templating/tree/main/template_feed)
 * [Test projects](https://github.com/dotnet/test-templates/tree/master/template_feed)
-* [ASP.NET project and items](https://github.com/aspnet/AspNetCore/tree/master/src/ProjectTemplates)
+* [ASP.NET project and items](https://github.com/aspnet/AspNetCore/tree/main/src/ProjectTemplates)
 
 # Template Samples
 

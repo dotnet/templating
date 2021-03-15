@@ -3,7 +3,7 @@ trigger:
   branches:
     include:
     - stabilize
-    - master
+    - main
     - release/3*
     - release/5*
     - internal/release/3*
@@ -13,7 +13,7 @@ pr:
   branches:
     include:
     - stabilize
-    - master
+    - main
     - release/3*
     - release/5*
     - feature/*
