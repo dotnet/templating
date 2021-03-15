@@ -8,8 +8,10 @@ using Microsoft.TemplateEngine.Abstractions;
 
 namespace Microsoft.TemplateEngine.Utils
 {
-    public class EngineEnvironmentSettings : IEngineEnvironmentSettings, IDisposable
+    public sealed class EngineEnvironmentSettings : IEngineEnvironmentSettings, IDisposable
     {
+        private volatile bool _disposed;
+
         public EngineEnvironmentSettings(ITemplateEngineHost host, Func<IEngineEnvironmentSettings, ISettingsLoader> settingsLoaderFactory)
             : this(host, settingsLoaderFactory, null)
         {
@@ -33,6 +35,11 @@ namespace Microsoft.TemplateEngine.Utils
 
         public void Dispose()
         {
+            if (_disposed)
+            {
+                return;
+            }
+            _disposed = true;
             (SettingsLoader as IDisposable)?.Dispose();
         }
 
