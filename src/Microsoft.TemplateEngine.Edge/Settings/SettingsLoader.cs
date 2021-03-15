@@ -17,7 +17,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Edge.Settings
 {
-    public class SettingsLoader : ISettingsLoader, IDisposable
+    public sealed class SettingsLoader : ISettingsLoader, IDisposable
     {
         private const int MaxLoadAttempts = 20;
         public static readonly string HostTemplateFileConfigBaseName = ".host.json";
@@ -31,6 +31,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         private readonly Paths _paths;
         private readonly IEngineEnvironmentSettings _environmentSettings;
         private TemplatesSourcesManager _templatesSourcesManager;
+        private volatile bool _disposed;
 
         public SettingsLoader(IEngineEnvironmentSettings environmentSettings)
         {
@@ -42,6 +43,11 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         public void Save()
         {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(nameof(SettingsLoader));
+            }
+
             JObject serialized = JObject.FromObject(_userSettings);
             _paths.WriteAllText(_paths.User.SettingsFile, serialized.ToString());
         }
@@ -144,6 +150,11 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         public async Task RebuildCacheFromSettingsIfNotCurrent(bool forceRebuild)
         {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(nameof(SettingsLoader));
+            }
+
             EnsureLoaded();
             forceRebuild |= _userTemplateCache.Locale != CultureInfo.CurrentUICulture.Name;
 
@@ -197,6 +208,11 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         public ITemplate LoadTemplate(ITemplateInfo info, string baselineName)
         {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(nameof(SettingsLoader));
+            }
+
             IGenerator generator;
             if (!Components.TryGetComponent(info.GeneratorId, out generator))
             {
@@ -242,6 +258,11 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         public IFile FindBestHostTemplateConfigFile(IFileSystemInfo config)
         {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(nameof(SettingsLoader));
+            }
+
             IDictionary<string, IFile> allHostFilesForTemplate = new Dictionary<string, IFile>();
 
             foreach (IFile hostFile in config.Parent.EnumerateFiles($"*{HostTemplateFileConfigBaseName}", SearchOption.TopDirectoryOnly))
@@ -285,12 +306,22 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         public async Task<IReadOnlyList<ITemplateInfo>> GetTemplatesAsync(CancellationToken token)
         {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(nameof(SettingsLoader));
+            }
+
             await RebuildCacheFromSettingsIfNotCurrent(false).ConfigureAwait(false);
             return _userTemplateCache.TemplateInfo;
         }
 
         public void AddProbingPath(string probeIn)
         {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(nameof(SettingsLoader));
+            }
+
             const int maxAttempts = 10;
             int attemptCount = 0;
             bool successfulWrite = false;
@@ -317,6 +348,11 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         public bool TryGetFileFromIdAndPath(string mountPointUri, string place, out IFile file, out IMountPoint mountPoint)
         {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(nameof(SettingsLoader));
+            }
+
             if (!string.IsNullOrEmpty(place) && _mountPointManager.TryDemandMountPoint(mountPointUri, out mountPoint))
             {
                 file = mountPoint.FileInfo(place);
@@ -330,11 +366,20 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         public bool TryGetMountPoint(string mountPointUri, out IMountPoint mountPoint)
         {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(nameof(SettingsLoader));
+            }
             return _mountPointManager.TryDemandMountPoint(mountPointUri, out mountPoint);
         }
 
         public void Dispose()
         {
+            if (_disposed)
+            {
+                return;
+            }
+            _disposed = true;
             (GlobalSettings as GlobalSettings)?.Dispose();
         }
     }

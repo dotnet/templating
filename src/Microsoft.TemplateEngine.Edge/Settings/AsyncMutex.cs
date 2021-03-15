@@ -21,7 +21,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         private readonly string _mutexName;
         private readonly CancellationToken _token;
         private readonly Action _unlockCallback;
-        private bool _disposed;
+        private volatile bool _disposed;
 
         private AsyncMutex(string mutexName, CancellationToken token, Action unlockCallback)
         {
