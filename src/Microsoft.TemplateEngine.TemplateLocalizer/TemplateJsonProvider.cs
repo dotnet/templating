@@ -25,11 +25,11 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer
         /// <summary>
         /// Using the <see cref="Path"/>, finds and returns all the template.json files.
         /// </summary>
-        /// <param name="searchSubfolders">Indicates weather the subdirectories should be searched
+        /// <param name="searchSubdirectories">Indicates weather the subdirectories should be searched
         /// in the case that <see cref="Path"/> points to a directory. This parameter has no effect
         /// if <see cref="Path"/> points to a file.</param>
         /// <returns></returns>
-        public IEnumerable<FileInfo> GetTemplateJsonFiles(bool searchSubfolders)
+        public IEnumerable<FileInfo> GetTemplateJsonFiles(bool searchSubdirectories)
         {
             if (File.Exists(Path))
             {
@@ -43,7 +43,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer
                 yield break;
             }
 
-            if (!searchSubfolders)
+            if (!searchSubdirectories)
             {
                 string filePath = System.IO.Path.Combine(Path, "template.json");
                 if (File.Exists(filePath))
