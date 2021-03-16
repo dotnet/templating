@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Microsoft.TemplateEngine.TemplateLocalizer": {
+      "commandName": "Project",
+      "commandLineArgs": "--help export"
+    }
+  }
+}

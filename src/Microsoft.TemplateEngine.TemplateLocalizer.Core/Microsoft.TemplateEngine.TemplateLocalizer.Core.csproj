@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>$(NETStandardTargetFramework)</TargetFramework>
+    <Description>The core API for Template Localizer tool.</Description>
+    <IsPackable>true</IsPackable>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0-preview.3.21164.3" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0-preview.3.21164.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+</Project>
