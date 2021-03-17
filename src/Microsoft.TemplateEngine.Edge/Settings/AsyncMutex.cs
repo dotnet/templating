@@ -40,31 +40,43 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         private void WaitLoop(object state)
         {
-            using var mutex = new Mutex(false, _mutexName);
-            using var _ = _blockReleasingMutex;
-            while (true)
+            var mutex = new Mutex(false, _mutexName);
+            bool mutexTaken = false;
+            try
             {
-                if (_token.IsCancellationRequested)
+                while (true)
                 {
-                    _taskCompletionSource.SetCanceled();
-                    return;
-                }
-                if (mutex.WaitOne(100))
-                {
-                    //Check if we were cancalled while waiting for mutex...
                     if (_token.IsCancellationRequested)
                     {
-                        mutex.ReleaseMutex();
                         _taskCompletionSource.SetCanceled();
                         return;
                     }
-                    break;
+                    if (mutex.WaitOne(100))
+                    {
+                        mutexTaken = true;
+                        //Check if we were cancalled while waiting for mutex...
+                        if (_token.IsCancellationRequested)
+                        {
+                            _taskCompletionSource.SetCanceled();
+                            return;
+                        }
+                        break;
+                    }
                 }
+                _taskCompletionSource.SetResult(this);
+                _blockReleasingMutex.WaitOne();
+                _unlockCallback();
             }
-            _taskCompletionSource.SetResult(this);
-            _blockReleasingMutex.WaitOne();
-            _unlockCallback();
-            mutex.ReleaseMutex();
+            finally
+            {
+                if (mutexTaken)
+                {
+                    mutex.ReleaseMutex();
+                }
+
+                mutex.Dispose();
+                _blockReleasingMutex.Dispose();
+            }
         }
 
         public void Dispose()
