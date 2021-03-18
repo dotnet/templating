@@ -24,8 +24,9 @@ if (Test-Path -Path $exclusionsFilePath)
 Push-Location "$SourcesDirectory" # push location for Resolve-Path -Relative to work
 
 # Template files
-$jsonTemplateFiles = Get-ChildItem -Recurse -Path "$SourcesDirectory" | Where-Object { $_.FullName -Match "\.template\.config\\localize\\en\..+\.json" } # .NET templating pattern
-$wfJsonTemplateFiles = Get-ChildItem -Recurse -Path "$SourcesDirectory" | Where-Object { $_.FullName -Match "en\\strings\.json" } # current winforms pattern
+$jsonFiles = @()
+$jsonFiles += Get-ChildItem -Recurse -Path "$SourcesDirectory" | Where-Object { $_.FullName -Match "\.template\.config\\localize\\en\..+\.json" } # .NET templating pattern
+$jsonFiles += Get-ChildItem -Recurse -Path "$SourcesDirectory" | Where-Object { $_.FullName -Match "en\\strings\.json" } # current winforms pattern
 
 $xlfFiles = @()
 
@@ -59,17 +60,17 @@ $locJson = @{
                             $continue = $false
                         }
                     }
+                    $sourceFile = ($_.FullName | Resolve-Path -Relative)
+                    if (!$CreateNeutralXlfs -and $_.Extension -eq '.xlf') {
+                        Remove-Item -Path $sourceFile
+                    }
                     if ($continue)
                     {
-                        $sourceFile = ($_.FullName | Resolve-Path -Relative)
                         return @{
                             SourceFile = $sourceFile
                             CopyOption = "LangIDOnName"
                             OutputPath = $outputPath
                         }
-                    }
-                    if (!$CreateNeutralXlfs -and $_.Extension -eq '.xlf') {
-                        Remove-Item -Path $sourceFile
                     }
                 }
             )
@@ -78,17 +79,19 @@ $locJson = @{
 }
 
 $json = ConvertTo-Json $locJson -Depth 5
-Write-Host "(NETCORE_ENGINEERING_TELEMETRY=Build) LocProject.json generated:`n`n$json`n`n"
+Write-Host "LocProject.json generated:`n`n$json`n`n"
 Pop-Location
 
 if (!$UseCheckedInLocProjectJson) {
+    New-Item "$SourcesDirectory\Localize\LocProject.json" -Force # Need this to make sure the Localize directory is created
     Set-Content "$SourcesDirectory\Localize\LocProject.json" $json
 }
 else {
+    New-Item "$SourcesDirectory\Localize\LocProject-generated.json" -Force # Need this to make sure the Localize directory is created
     Set-Content "$SourcesDirectory\Localize\LocProject-generated.json" $json
 
     if ((Get-FileHash "$SourcesDirectory\Localize\LocProject-generated.json").Hash -ne (Get-FileHash "$SourcesDirectory\Localize\LocProject.json").Hash) {
-        Write-PipelineTaskError -Type "warning" -Message "Existing LocProject.json differs from generated LocProject.json. Download LocProject-generated.json and compare them."
+        Write-PipelineTelemetryError -Category "OneLocBuild" -Message "Existing LocProject.json differs from generated LocProject.json. Download LocProject-generated.json and compare them."
         
         exit 1
     }
