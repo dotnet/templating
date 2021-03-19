@@ -5,8 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -26,7 +24,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
         }
 
         [Fact]
-        internal async Task CanInstallLocalNuGetPackage()
+        internal async Task CanInstall_LocalNuGetPackage()
         {
             Bootstrapper bootstrapper = BootstrapperFactory.GetBootstrapper();
             string packageLocation = _packageManager.PackProjectTemplatesNuGetPackage("microsoft.dotnet.common.projecttemplates.5.0");
@@ -64,16 +62,16 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
         }
 
         [Fact]
-        internal async Task CanInstallRemoteNuGetPackage()
+        internal async Task CanInstall_RemoteNuGetPackage()
         {
             Bootstrapper bootstrapper = BootstrapperFactory.GetBootstrapper();
             InstallRequest installRequest = new InstallRequest
             {
-                Identifier = "Microsoft.DotNet.Common.ProjectTemplates.5.0",
-                Version = "5.0.0",
+                Identifier = "Take.Blip.Client.Templates",
+                Version = "0.5.135",
                 Details = new Dictionary<string, string>
                 {
-                    { "NuGetSource", "https://api.nuget.org/v3/index.json" }
+                    { InstallerConstants.NuGetSourcesKey, "https://api.nuget.org/v3/index.json" }
                 }
             };
 
@@ -86,13 +84,12 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             Assert.Equal(installRequest, result.First().InstallRequest);
 
             IManagedTemplatesSource source = result.First().Source;
-            Assert.Equal("Microsoft.DotNet.Common.ProjectTemplates.5.0", source.Identifier);
+            Assert.Equal("Take.Blip.Client.Templates", source.Identifier);
             Assert.Equal("Global Settings", source.Provider.Factory.Name);
             Assert.Equal("NuGet", source.Installer.Name);
-            Assert.Equal("Microsoft", source.GetDisplayDetails()["Author"]);
-            //TODO: enable when UX improvements are merged
-            //Assert.Equal("https://api.nuget.org/v3/index.json", source.GetDisplayDetails()["NuGetSource"]);
-            Assert.Equal("5.0.0", source.Version);
+            source.GetDisplayDetails()["Author"].Should().NotBeNullOrEmpty();
+            Assert.Equal("https://api.nuget.org/v3/index.json", source.GetDisplayDetails()["NuGetSource"]);
+            Assert.Equal("0.5.135", source.Version);
 
             IReadOnlyList<IManagedTemplatesSource> managedTemplatesPackages = await bootstrapper.GetManagedTemplatesSources(CancellationToken.None).ConfigureAwait(false);
 
@@ -107,7 +104,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
         }
 
         [Fact]
-        internal async Task CanInstallTemplateFromFolder()
+        internal async Task CanInstall_Folder()
         {
             Bootstrapper bootstrapper = BootstrapperFactory.GetBootstrapper();
             string templateLocation = TestHelper.GetTestTemplateLocation("TemplateWithSourceName");
@@ -141,6 +138,179 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             Assert.Equal(1, templatePackages.Count);
             Assert.IsAssignableFrom<IManagedTemplatesSource>(templatePackages.First());
             templatePackages.First().Should().BeEquivalentTo((ITemplatesSource)source);
+        }
+
+        [Fact]
+        internal async Task CanCheckForLatestVersion_NuGetPackage()
+        {
+            Bootstrapper bootstrapper = BootstrapperFactory.GetBootstrapper();
+            InstallRequest installRequest = new InstallRequest
+            {
+                Identifier = "Microsoft.DotNet.Common.ProjectTemplates.5.0",
+                Version = "5.0.0",
+            };
+
+            IReadOnlyList<InstallResult> result = await bootstrapper.InstallAsync(new[] { installRequest }, InstallationScope.Global, CancellationToken.None).ConfigureAwait(false);
+
+            Assert.Equal(1, result.Count);
+            Assert.True(result.First().Success);
+            IManagedTemplatesSource source = result.First().Source;
+
+            IReadOnlyList<CheckUpdateResult> checkUpdateResults = await bootstrapper.GetLatestVersionsAsync(new[] { source }, CancellationToken.None).ConfigureAwait(false);
+
+            Assert.Equal(1, checkUpdateResults.Count);
+            Assert.True(checkUpdateResults.First().Success);
+            Assert.Equal(InstallerErrorCode.Success, checkUpdateResults.First().Error);
+            Assert.True(string.IsNullOrEmpty(checkUpdateResults.First().ErrorMessage));
+            Assert.Equal(source, checkUpdateResults.First().Source);
+            Assert.False(checkUpdateResults.First().IsLatestVersion);
+            Assert.NotEqual("5.0.0", checkUpdateResults.First().LatestVersion);
+        }
+
+        [Fact]
+        internal async Task CanCheckForLatestVersion_Folder()
+        {
+            Bootstrapper bootstrapper = BootstrapperFactory.GetBootstrapper();
+            string templateLocation = TestHelper.GetTestTemplateLocation("TemplateWithSourceName");
+
+            InstallRequest installRequest = new InstallRequest
+            {
+                Identifier = Path.GetFullPath(templateLocation)
+            };
+
+            IReadOnlyList<InstallResult> result = await bootstrapper.InstallAsync(new[] { installRequest }, InstallationScope.Global, CancellationToken.None).ConfigureAwait(false);
+
+            Assert.Equal(1, result.Count);
+            Assert.True(result.First().Success);
+            IManagedTemplatesSource source = result.First().Source;
+
+            IReadOnlyList<CheckUpdateResult> checkUpdateResults = await bootstrapper.GetLatestVersionsAsync(new[] { source }, CancellationToken.None).ConfigureAwait(false);
+
+            Assert.Equal(1, checkUpdateResults.Count);
+            Assert.True(checkUpdateResults.First().Success);
+            Assert.Equal(InstallerErrorCode.Success, checkUpdateResults.First().Error);
+            Assert.True(string.IsNullOrEmpty(checkUpdateResults.First().ErrorMessage));
+            Assert.Equal(source, checkUpdateResults.First().Source);
+            Assert.True(checkUpdateResults.First().IsLatestVersion);
+        }
+
+        [Fact]
+        internal async Task CanUpdate_NuGetPackage()
+        {
+            Bootstrapper bootstrapper = BootstrapperFactory.GetBootstrapper();
+            InstallRequest installRequest = new InstallRequest
+            {
+                Identifier = "Microsoft.DotNet.Common.ProjectTemplates.5.0",
+                Version = "5.0.0",
+            };
+
+            IReadOnlyList<InstallResult> result = await bootstrapper.InstallAsync(new[] { installRequest }, InstallationScope.Global, CancellationToken.None).ConfigureAwait(false);
+
+            Assert.Equal(1, result.Count);
+            Assert.True(result.First().Success);
+            IManagedTemplatesSource source = result.First().Source;
+
+            UpdateRequest updateRequest = new UpdateRequest()
+            {
+                Source = source,
+                Version = "5.0.1"
+            };
+
+            IReadOnlyList<UpdateResult> updateResults = await bootstrapper.UpdateAsync(new[] { updateRequest }, CancellationToken.None).ConfigureAwait(false);
+
+            Assert.Equal(1, updateResults.Count);
+            Assert.True(updateResults.First().Success);
+            Assert.Equal(InstallerErrorCode.Success, updateResults.First().Error);
+            Assert.True(string.IsNullOrEmpty(updateResults.First().ErrorMessage));
+            Assert.Equal(updateRequest, updateResults.First().UpdateRequest);
+
+            IManagedTemplatesSource updatedSource = updateResults.First().Source;
+            Assert.Equal("Global Settings", updatedSource.Provider.Factory.Name);
+            Assert.Equal("NuGet", updatedSource.Installer.Name);
+            Assert.Equal("5.0.1", updatedSource.Version);
+
+            IReadOnlyList<IManagedTemplatesSource> managedTemplatesPackages = await bootstrapper.GetManagedTemplatesSources(CancellationToken.None).ConfigureAwait(false);
+
+            Assert.Equal(1, managedTemplatesPackages.Count);
+            managedTemplatesPackages.First().Should().BeEquivalentTo(updatedSource);
+
+            IReadOnlyList<ITemplatesSource> templatePackages = await bootstrapper.GetTemplatesSources(CancellationToken.None).ConfigureAwait(false);
+
+            Assert.Equal(1, templatePackages.Count);
+            Assert.IsAssignableFrom<IManagedTemplatesSource>(templatePackages.First());
+            templatePackages.First().Should().BeEquivalentTo((ITemplatesSource)updatedSource);
+        }
+
+        [Fact]
+        internal async Task CanUninstall_NuGetPackage()
+        {
+            Bootstrapper bootstrapper = BootstrapperFactory.GetBootstrapper();
+            InstallRequest installRequest = new InstallRequest
+            {
+                Identifier = "Microsoft.DotNet.Common.ProjectTemplates.5.0",
+                Version = "5.0.0",
+            };
+
+            IReadOnlyList<InstallResult> result = await bootstrapper.InstallAsync(new[] { installRequest }, InstallationScope.Global, CancellationToken.None).ConfigureAwait(false);
+
+            Assert.Equal(1, result.Count);
+            Assert.True(result.First().Success);
+            IManagedTemplatesSource source = result.First().Source;
+
+            IReadOnlyList<IManagedTemplatesSource> managedTemplatesPackages = await bootstrapper.GetManagedTemplatesSources(CancellationToken.None).ConfigureAwait(false);
+
+            Assert.Equal(1, managedTemplatesPackages.Count);
+            managedTemplatesPackages.First().Should().BeEquivalentTo(source);
+
+            IReadOnlyList<UninstallResult> uninstallResults = await bootstrapper.UninstallAsync(new[] { source }, CancellationToken.None).ConfigureAwait(false);
+
+            Assert.Equal(1, uninstallResults.Count);
+            Assert.True(uninstallResults.First().Success);
+            Assert.Equal(InstallerErrorCode.Success, uninstallResults.First().Error);
+            uninstallResults.First().ErrorMessage.Should().BeNullOrEmpty();
+            Assert.Equal(source, uninstallResults.First().Source);
+
+            IReadOnlyList<ITemplatesSource> templatePackages = await bootstrapper.GetTemplatesSources(CancellationToken.None).ConfigureAwait(false);
+
+            Assert.Equal(0, templatePackages.Count);
+        }
+
+        [Fact]
+        internal async Task CanUninstall_Folder()
+        {
+            Bootstrapper bootstrapper = BootstrapperFactory.GetBootstrapper();
+            string templateLocation = TestHelper.GetTestTemplateLocation("TemplateWithSourceName");
+
+            InstallRequest installRequest = new InstallRequest
+            {
+                Identifier = Path.GetFullPath(templateLocation)
+            };
+
+            IReadOnlyList<InstallResult> result = await bootstrapper.InstallAsync(new[] { installRequest }, InstallationScope.Global, CancellationToken.None).ConfigureAwait(false);
+
+            Assert.Equal(1, result.Count);
+            Assert.True(result.First().Success);
+            IManagedTemplatesSource source = result.First().Source;
+            Assert.Equal(templateLocation, source.MountPointUri);
+
+            IReadOnlyList<IManagedTemplatesSource> managedTemplatesPackages = await bootstrapper.GetManagedTemplatesSources(CancellationToken.None).ConfigureAwait(false);
+
+            Assert.Equal(1, managedTemplatesPackages.Count);
+            managedTemplatesPackages.First().Should().BeEquivalentTo(source);
+
+            IReadOnlyList<UninstallResult> uninstallResults = await bootstrapper.UninstallAsync(new[] { source }, CancellationToken.None).ConfigureAwait(false);
+
+            Assert.Equal(1, uninstallResults.Count);
+            Assert.True(uninstallResults.First().Success);
+            Assert.Equal(InstallerErrorCode.Success, uninstallResults.First().Error);
+            uninstallResults.First().ErrorMessage.Should().BeNullOrEmpty();
+            Assert.Equal(source, uninstallResults.First().Source);
+
+            IReadOnlyList<ITemplatesSource> templatePackages = await bootstrapper.GetTemplatesSources(CancellationToken.None).ConfigureAwait(false);
+
+            Assert.Equal(0, templatePackages.Count);
+
+            Directory.Exists(templateLocation);
         }
     }
 }
