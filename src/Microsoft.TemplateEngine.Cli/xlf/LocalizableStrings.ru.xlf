@@ -404,8 +404,8 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</target>
         <note />
       </trans-unit>
       <trans-unit id="CouldntUninstall">
-        <source>Could not find something to uninstall called '{0}'.</source>
-        <target state="new">Could not find something to uninstall called '{0}'.</target>
+        <source>Failed to uninstall '{0}', reason: {1}.</source>
+        <target state="new">Failed to uninstall '{0}', reason: {1}.</target>
         <note />
       </trans-unit>
       <trans-unit id="CreateAliasHelp">
@@ -532,21 +532,34 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</target>
         <target state="new">Id</target>
         <note />
       </trans-unit>
-      <trans-unit id="InstallDescriptor_NotFound">
-        <source>Could not find install descriptor for template: {0}</source>
-        <target state="new">Could not find install descriptor for template: {0}</target>
+      <trans-unit id="InstallFailedDownloadFailed">
+        <source>{0} could not be installed, download failed.</source>
+        <target state="new">{0} could not be installed, download failed.</target>
         <note />
       </trans-unit>
-      <trans-unit id="InstallFailed">
-        <source>"{0}" could not be installed.
-{1}.</source>
-        <target state="new">"{0}" could not be installed.
-{1}.</target>
+      <trans-unit id="InstallFailedGenericError">
+        <source>{0} could not be installed.</source>
+        <target state="new">{0} could not be installed.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="InstallFailedInvalidSource">
+        <source>{0} could not be installed, no NuGet feeds are configured or they are invalid.</source>
+        <target state="new">{0} could not be installed, no NuGet feeds are configured or they are invalid.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="InstallFailedPackageNotFound">
+        <source>{0} could not be installed, the package does not exist.</source>
+        <target state="new">{0} could not be installed, the package does not exist.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="InstallFailedUnsupportedRequest">
+        <source>{0} is not supported.</source>
+        <target state="new">{0} is not supported.</target>
         <note />
       </trans-unit>
       <trans-unit id="InstallHelp">
-        <source>Installs a source or a template pack.</source>
-        <target state="new">Installs a source or a template pack.</target>
+        <source>Installs a source or a template package.</source>
+        <target state="new">Installs a source or a template package.</target>
         <note />
       </trans-unit>
       <trans-unit id="InstallSuccessful">
@@ -985,6 +998,11 @@ Examples:
         <target state="new">{0} template(s) partially matched, but failed on {1}.</target>
         <note />
       </trans-unit>
+      <trans-unit id="TemplatesPackage_NotFound">
+        <source>Could not find templates package for template: {0}</source>
+        <target state="new">Could not find templates package for template: {0}</target>
+        <note />
+      </trans-unit>
       <trans-unit id="ThirdPartyNotices">
         <source>This template contains technologies from parties other than Microsoft, see {0} for details.</source>
         <target state="new">This template contains technologies from parties other than Microsoft, see {0} for details.</target>
@@ -1001,8 +1019,8 @@ Examples:
         <note />
       </trans-unit>
       <trans-unit id="UninstallHelp">
-        <source>Uninstalls a source or a template pack.</source>
-        <target state="new">Uninstalls a source or a template pack.</target>
+        <source>Uninstalls a source or a template package.</source>
+        <target state="new">Uninstalls a source or a template package.</target>
         <note />
       </trans-unit>
       <trans-unit id="UninstallListDetailsHeader">
@@ -1021,8 +1039,8 @@ Examples:
         <note />
       </trans-unit>
       <trans-unit id="UpdateApplyCommandHelp">
-        <source>Check the currently installed template packs for update, and install the updates.</source>
-        <target state="new">Check the currently installed template packs for update, and install the updates.</target>
+        <source>Check the currently installed template packages for update, and install the updates.</source>
+        <target state="new">Check the currently installed template packages for update, and install the updates.</target>
         <note />
       </trans-unit>
       <trans-unit id="UpdateApplyStartMessage">
@@ -1036,13 +1054,13 @@ Examples:
         <note />
       </trans-unit>
       <trans-unit id="UpdateAvailable">
-        <source>An update for template pack {0} is available.</source>
-        <target state="new">An update for template pack {0} is available.</target>
+        <source>An update for template package {0} is available.</source>
+        <target state="new">An update for template package {0} is available.</target>
         <note />
       </trans-unit>
       <trans-unit id="UpdateCheckCommandHelp">
-        <source>Check the currently installed template packs for updates.</source>
-        <target state="new">Check the currently installed template packs for updates.</target>
+        <source>Check the currently installed template packages for updates.</source>
+        <target state="new">Check the currently installed template packages for updates.</target>
         <note />
       </trans-unit>
       <trans-unit id="UpdateCheckError">
@@ -1056,8 +1074,8 @@ Examples:
         <note />
       </trans-unit>
       <trans-unit id="UpdateCheck_UnknownError">
-        <source>An error occured checking for updates for template pack {0}</source>
-        <target state="new">An error occured checking for updates for template pack {0}</target>
+        <source>An error occured checking for updates for template package {0}</source>
+        <target state="new">An error occured checking for updates for template package {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="UpdateCheckerNotAvailable">

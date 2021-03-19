@@ -26,7 +26,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             _paths = new Paths(environmentSettings);
             TemplateInfo = new List<TemplateInfo>();
             MountPointsInfo = new Dictionary<string, DateTime>();
-            Locale = environmentSettings.Host?.Locale;
+            Locale = CultureInfo.CurrentUICulture.Name;
         }
 
         public TemplateCache(IEngineEnvironmentSettings environmentSettings, JObject parsed)
