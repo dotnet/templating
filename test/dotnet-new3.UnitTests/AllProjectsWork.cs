@@ -79,6 +79,7 @@ namespace dotnet_new3.UnitTests
                 .NotHaveStdErr();
 
             Directory.Delete(workingDir, true);
+            Assert.True(false);
         }
     }
 }
