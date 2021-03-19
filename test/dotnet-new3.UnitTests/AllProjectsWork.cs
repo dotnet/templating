@@ -44,6 +44,15 @@ namespace dotnet_new3.UnitTests
         {
             string workingDir = Helpers.CreateTemporaryFolder(testName);
 
+            new DotnetCommand(_log, "nuget", "list", "source")
+                .WithWorkingDirectory(workingDir)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And
+                .NotHaveStdErr();
+
+
             new DotnetNewCommand(_log, args)
                 .WithWorkingDirectory(workingDir)
                 .WithEnvironmentVariable(_sharedHome.HomeVariable, _sharedHome.HomeDirectory)
