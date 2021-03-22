@@ -148,7 +148,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         /// <returns><see cref="CheckUpdateResult"/> containing the latest version for the <paramref name="source"/>.</returns>
         /// <exception cref="InvalidNuGetSourceException">when sources passed to install request are not valid NuGet feeds or failed to read default NuGet configuration</exception>
         /// <exception cref="PackageNotFoundException">when the package cannot be find in default or source NuGet feeds</exception>
-        public async Task<CheckUpdateResult> GetLatestVersionAsync(NuGetManagedTemplatesSource source, CancellationToken cancellationToken)
+        public async Task<CheckUpdateResult> GetLatestVersionAsync(NuGetManagedTemplatesPackage source, CancellationToken cancellationToken)
         {
             _ = source ?? throw new ArgumentNullException(nameof(source));
 

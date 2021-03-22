@@ -1,11 +1,11 @@
-namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
+namespace Microsoft.TemplateEngine.Abstractions.TemplatesPackages
 {
     /// <summary>
-    /// Factory resposible for creating <see cref="ITemplatesSourcesProvider"/> or <see cref="IManagedTemplatesSourcesProvider"/>.
+    /// Factory resposible for creating <see cref="ITemplatesPackagesProvider"/> or <see cref="IManagedTemplatesPackagesProvider"/>.
     /// This is registered with <see cref="IComponentManager"/> either via <see cref="IComponentManager.Register(System.Type)"/> or
     /// <see cref="ITemplateEngineHost.BuiltInComponents"/>.
     /// </summary>
-    public interface ITemplatesSourcesProviderFactory : IIdentifiedComponent
+    public interface ITemplatesPackagesProviderFactory : IIdentifiedComponent
     {
         /// <summary>
         /// This is used for two reasons:
@@ -15,8 +15,8 @@ namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
         string Name { get; }
 
         /// <summary>
-        /// Creates new provider with specified enviroment, provider can also implement <see cref="IManagedTemplatesSourcesProvider"/>.
+        /// Creates new provider with specified enviroment, provider can also implement <see cref="IManagedTemplatesPackagesProvider"/>.
         /// </summary>
-        ITemplatesSourcesProvider CreateProvider(IEngineEnvironmentSettings settings);
+        ITemplatesPackagesProvider CreateProvider(IEngineEnvironmentSettings settings);
     }
 }

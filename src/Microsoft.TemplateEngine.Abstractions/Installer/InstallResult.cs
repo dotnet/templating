@@ -1,4 +1,4 @@
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using Microsoft.TemplateEngine.Abstractions.TemplatesPackages;
 
 namespace Microsoft.TemplateEngine.Abstractions.Installer
 {
@@ -6,7 +6,7 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
     {
         public InstallRequest InstallRequest { get; private set; }
 
-        public static InstallResult CreateSuccess(InstallRequest request, IManagedTemplatesSource source)
+        public static InstallResult CreateSuccess(InstallRequest request, IManagedTemplatesPackage source)
         {
             return new InstallResult()
             {

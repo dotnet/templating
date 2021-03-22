@@ -10,7 +10,7 @@ using Microsoft.TemplateEngine.Cli.CommandParsing;
 using Microsoft.TemplateEngine.Utils;
 using Microsoft.TemplateEngine.Cli.TemplateResolution;
 using Microsoft.TemplateEngine.Cli.TableOutput;
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using Microsoft.TemplateEngine.Abstractions.TemplatesPackages;
 using System.Threading.Tasks;
 
 namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
@@ -245,7 +245,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             internal string TemplateLanguage;
             internal int TemplatePrecedence;
             internal string TemplateAuthor;
-            internal IManagedTemplatesSource TemplateSource;
+            internal IManagedTemplatesPackage TemplatePackage;
         }
 
         /// <summary>
@@ -277,7 +277,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                     TemplateLanguage = template.Info.GetLanguage(),
                     TemplatePrecedence = template.Info.Precedence,
                     TemplateAuthor = template.Info.Author,
-                    TemplateSource = await template.Info.GetTemplateSourceAsync(environmentSettings).ConfigureAwait(false) as IManagedTemplatesSource
+                    TemplatePackage = await template.Info.GetTemplatePackageAsync(environmentSettings).ConfigureAwait(false) as IManagedTemplatesPackage
                 });
             }
 
@@ -296,17 +296,17 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                     .DefineColumn(t => t.TemplateLanguage, LocalizableStrings.ColumnNameLanguage, showAlways: true)
                     .DefineColumn(t => t.TemplatePrecedence.ToString(), out object prcedenceColumn, LocalizableStrings.ColumnNamePrecedence, showAlways: true)
                     .DefineColumn(t => t.TemplateAuthor, LocalizableStrings.ColumnNameAuthor, showAlways: true, shrinkIfNeeded: true, minWidth: 10)
-                    .DefineColumn(t => t.TemplateSource != null ? t.TemplateSource.Identifier : string.Empty, LocalizableStrings.ColumnNamePackage, showAlways: true)
+                    .DefineColumn(t => t.TemplatePackage != null ? t.TemplatePackage.Identifier : string.Empty, LocalizableStrings.ColumnNamePackage, showAlways: true)
                     .OrderByDescending(prcedenceColumn, new NullOrEmptyIsLastStringComparer());
             Reporter.Error.WriteLine(formatter.Layout().Bold().Red());
 
             string hintMessage = LocalizableStrings.AmbiguousTemplatesMultiplePackagesHint;
             if (unambiguousTemplateGroup.Templates.AllAreTheSame(t => t.Info.MountPointUri))
             {
-                IManagedTemplatesSource templateSource = await unambiguousTemplateGroup.Templates.First().Info.GetTemplateSourceAsync(environmentSettings).ConfigureAwait(false) as IManagedTemplatesSource;
-                if (templateSource != null)
+                IManagedTemplatesPackage templatePackage = await unambiguousTemplateGroup.Templates.First().Info.GetTemplatePackageAsync(environmentSettings).ConfigureAwait(false) as IManagedTemplatesPackage;
+                if (templatePackage != null)
                 {
-                    hintMessage = string.Format(LocalizableStrings.AmbiguousTemplatesSamePackageHint, templateSource.Identifier);
+                    hintMessage = string.Format(LocalizableStrings.AmbiguousTemplatesSamePackageHint, templatePackage.Identifier);
                 }
             }
             Reporter.Error.WriteLine(hintMessage.Bold().Red());

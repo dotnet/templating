@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.GlobalSettings;
 using Microsoft.TemplateEngine.Abstractions.Installer;
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using Microsoft.TemplateEngine.Abstractions.TemplatesPackages;
 using NuGet.Packaging;
 using NuGet.Versioning;
 
@@ -25,7 +25,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         private readonly IDownloader _packageDownloader;
         private readonly IUpdateChecker _updateChecker;
 
-        public NuGetInstaller(IInstallerFactory factory, IManagedTemplatesSourcesProvider provider, IEngineEnvironmentSettings settings, string installPath)
+        public NuGetInstaller(IInstallerFactory factory, IManagedTemplatesPackagesProvider provider, IEngineEnvironmentSettings settings, string installPath)
         {
             _factory = factory;
             Provider = provider;
@@ -38,7 +38,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
         public Guid FactoryId => _factory.Id;
         public string Name => _factory.Name;
-        public IManagedTemplatesSourcesProvider Provider { get; }
+        public IManagedTemplatesPackagesProvider Provider { get; }
 
         public Task<bool> CanInstallAsync(InstallRequest installationRequest, CancellationToken cancellationToken)
         {
@@ -74,17 +74,17 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             return Task.FromResult(true);
         }
 
-        public IManagedTemplatesSource Deserialize(IManagedTemplatesSourcesProvider provider, TemplatesSourceData data)
+        public IManagedTemplatesPackage Deserialize(IManagedTemplatesPackagesProvider provider, TemplatesPackageData data)
         {
-            return new NuGetManagedTemplatesSource(_environmentSettings, this, data.MountPointUri, data.Details);
+            return new NuGetManagedTemplatesPackage(_environmentSettings, this, data.MountPointUri, data.Details);
         }
 
-        public async Task<IReadOnlyList<CheckUpdateResult>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources, CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<CheckUpdateResult>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesPackage> sources, CancellationToken cancellationToken)
         {
             _ = sources ?? throw new ArgumentNullException(nameof(sources));
             return await Task.WhenAll(sources.Select(async source =>
                 {
-                    if (source is NuGetManagedTemplatesSource nugetSource)
+                    if (source is NuGetManagedTemplatesPackage nugetSource)
                     {
                         try
                         {
@@ -122,7 +122,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 NuGetPackageInfo nuGetPackageInfo;
                 if (IsLocalPackage(installRequest))
                 {
-                    sourceDetails[NuGetManagedTemplatesSource.LocalPackageKey] = true.ToString();
+                    sourceDetails[NuGetManagedTemplatesPackage.LocalPackageKey] = true.ToString();
                     nuGetPackageInfo = InstallLocalPackage(installRequest);
                 }
                 else
@@ -130,11 +130,11 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                     nuGetPackageInfo = await _packageDownloader.DownloadPackageAsync(installRequest, _installPath, CancellationToken.None).ConfigureAwait(false);
                 }
 
-                sourceDetails[NuGetManagedTemplatesSource.AuthorKey] = nuGetPackageInfo.Author;
-                sourceDetails[NuGetManagedTemplatesSource.NuGetSourceKey] = nuGetPackageInfo.NuGetSource;
-                sourceDetails[NuGetManagedTemplatesSource.PackageIdKey] = nuGetPackageInfo.PackageIdentifier;
-                sourceDetails[NuGetManagedTemplatesSource.PackageVersionKey] = nuGetPackageInfo.PackageVersion.ToString();
-                NuGetManagedTemplatesSource source = new NuGetManagedTemplatesSource(_environmentSettings, this, nuGetPackageInfo.FullPath, sourceDetails);
+                sourceDetails[NuGetManagedTemplatesPackage.AuthorKey] = nuGetPackageInfo.Author;
+                sourceDetails[NuGetManagedTemplatesPackage.NuGetSourceKey] = nuGetPackageInfo.NuGetSource;
+                sourceDetails[NuGetManagedTemplatesPackage.PackageIdKey] = nuGetPackageInfo.PackageIdentifier;
+                sourceDetails[NuGetManagedTemplatesPackage.PackageVersionKey] = nuGetPackageInfo.PackageVersion.ToString();
+                NuGetManagedTemplatesPackage source = new NuGetManagedTemplatesPackage(_environmentSettings, this, nuGetPackageInfo.FullPath, sourceDetails);
                 return InstallResult.CreateSuccess(installRequest, source);
             }
             catch (DownloadException e)
@@ -161,12 +161,12 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             }
         }
 
-        public TemplatesSourceData Serialize(IManagedTemplatesSource managedSource)
+        public TemplatesPackageData Serialize(IManagedTemplatesPackage managedSource)
         {
             _ = managedSource ?? throw new ArgumentNullException(nameof(managedSource));
-            if (!(managedSource is NuGetManagedTemplatesSource nuGetTemplatesSource))
+            if (!(managedSource is NuGetManagedTemplatesPackage nuGetTemplatesPackage))
             {
-                return new TemplatesSourceData()
+                return new TemplatesPackageData()
                 {
                     InstallerId = FactoryId,
                     MountPointUri = managedSource.MountPointUri,
@@ -174,19 +174,19 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 };
             }
 
-            return new TemplatesSourceData()
+            return new TemplatesPackageData()
             {
                 InstallerId = FactoryId,
-                MountPointUri = nuGetTemplatesSource.MountPointUri,
-                LastChangeTime = nuGetTemplatesSource.LastChangeTime,
-                Details = nuGetTemplatesSource.Details
+                MountPointUri = nuGetTemplatesPackage.MountPointUri,
+                LastChangeTime = nuGetTemplatesPackage.LastChangeTime,
+                Details = nuGetTemplatesPackage.Details
             };
         }
 
-        public Task<UninstallResult> UninstallAsync(IManagedTemplatesSource managedSource, CancellationToken cancellationToken)
+        public Task<UninstallResult> UninstallAsync(IManagedTemplatesPackage managedSource, CancellationToken cancellationToken)
         {
             _ = managedSource ?? throw new ArgumentNullException(nameof(managedSource));
-            if (!(managedSource is NuGetManagedTemplatesSource))
+            if (!(managedSource is NuGetManagedTemplatesPackage))
             {
                 return Task.FromResult(UninstallResult.CreateFailure(managedSource, InstallerErrorCode.UnsupportedRequest, $"{managedSource.Identifier} is not supported by {Name}"));
             }
@@ -217,7 +217,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 Version = updateRequest.Version
             };
 
-            var nuGetManagedSource = updateRequest.Source as NuGetManagedTemplatesSource;
+            var nuGetManagedSource = updateRequest.Source as NuGetManagedTemplatesPackage;
             if (nuGetManagedSource != null && !string.IsNullOrWhiteSpace(nuGetManagedSource.NuGetSource))
             {
                 installRequest.Details = new Dictionary<string, string>()

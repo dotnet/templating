@@ -1,4 +1,4 @@
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using Microsoft.TemplateEngine.Abstractions.TemplatesPackages;
 
 namespace Microsoft.TemplateEngine.Abstractions.Installer
 {
@@ -11,6 +11,6 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
         /// </summary>
         string Name { get; }
 
-        IInstaller CreateInstaller(IManagedTemplatesSourcesProvider provider, IEngineEnvironmentSettings settings, string installPath);
+        IInstaller CreateInstaller(IManagedTemplatesPackagesProvider provider, IEngineEnvironmentSettings settings, string installPath);
     }
 }

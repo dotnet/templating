@@ -1,6 +1,6 @@
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using Microsoft.TemplateEngine.Abstractions.TemplatesPackages;
 using Microsoft.TemplateEngine.Utils;
 using System;
 using System.Collections.Generic;
@@ -12,38 +12,38 @@ using System.Threading.Tasks;
 
 namespace Microsoft.TemplateEngine.EndToEndTestHarness
 {
-    class BuiltInTemplatesSourcesProviderFactory : ITemplatesSourcesProviderFactory
+    class BuiltInTemplatesPackagesProviderFactory : ITemplatesPackagesProviderFactory
     {
         public string Name => "E2E Harness BuiltIn";
 
         public Guid Id { get; } = new Guid("{3227D09D-C1EA-48F1-A33B-1F132BFD9F00}");
 
-        public ITemplatesSourcesProvider CreateProvider(IEngineEnvironmentSettings settings)
+        public ITemplatesPackagesProvider CreateProvider(IEngineEnvironmentSettings settings)
         {
-            return new BuiltInTemplatesSourcesProvider(this, settings);
+            return new BuiltInTemplatesPackagesProvider(this, settings);
         }
 
-        class BuiltInTemplatesSourcesProvider : ITemplatesSourcesProvider
+        class BuiltInTemplatesPackagesProvider : ITemplatesPackagesProvider
         {
             private readonly IEngineEnvironmentSettings _settings;
 
-            public BuiltInTemplatesSourcesProvider(BuiltInTemplatesSourcesProviderFactory factory, IEngineEnvironmentSettings settings)
+            public BuiltInTemplatesPackagesProvider(BuiltInTemplatesPackagesProviderFactory factory, IEngineEnvironmentSettings settings)
             {
                 _settings = settings;
                 Factory = factory;
             }
 
-            public ITemplatesSourcesProviderFactory Factory { get; }
+            public ITemplatesPackagesProviderFactory Factory { get; }
 
-            event Action ITemplatesSourcesProvider.SourcesChanged
+            event Action ITemplatesPackagesProvider.SourcesChanged
             {
                 add { }
                 remove { }
             }
 
-            public Task<IReadOnlyList<ITemplatesSource>> GetAllSourcesAsync(CancellationToken cancellationToken)
+            public Task<IReadOnlyList<ITemplatesPackage>> GetAllSourcesAsync(CancellationToken cancellationToken)
             {
-                List<ITemplatesSource> templatesSources = new List<ITemplatesSource>();
+                List<ITemplatesPackage> templatesPackages = new List<ITemplatesPackage>();
 
                 string codebase = typeof(Program).GetTypeInfo().Assembly.Location;
                 Uri cb = new Uri(codebase);
@@ -59,10 +59,10 @@ namespace Microsoft.TemplateEngine.EndToEndTestHarness
                 {
                     IFileLastWriteTimeSource fileSystem = _settings.Host.FileSystem as IFileLastWriteTimeSource;
                     IEnumerable<string> expandedPaths = InstallRequestPathResolution.Expand(location, _settings);
-                    templatesSources.AddRange(expandedPaths.Select(path => new TemplatesSource(this, path, fileSystem?.GetLastWriteTimeUtc(path) ?? File.GetLastWriteTime(path))));
+                    templatesPackages.AddRange(expandedPaths.Select(path => new TemplatesPackage(this, path, fileSystem?.GetLastWriteTimeUtc(path) ?? File.GetLastWriteTime(path))));
                 }
 
-                return Task.FromResult((IReadOnlyList<ITemplatesSource>)templatesSources);
+                return Task.FromResult((IReadOnlyList<ITemplatesPackage>)templatesPackages);
             }
         }
     }

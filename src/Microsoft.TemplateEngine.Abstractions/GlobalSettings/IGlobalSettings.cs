@@ -22,12 +22,12 @@ namespace Microsoft.TemplateEngine.Abstractions.GlobalSettings
         /// <summary>
         /// Returns uncached list of installer template packages.
         /// </summary>
-        Task<IReadOnlyList<TemplatesSourceData>> GetInstalledTemplatesPackagesAsync(CancellationToken cancellationToken);
+        Task<IReadOnlyList<TemplatesPackageData>> GetInstalledTemplatesPackagesAsync(CancellationToken cancellationToken);
 
         /// <summary>
         /// Stores list of installer template packages.
         /// </summary>
-        Task SetInstalledTemplatesPackagesAsync(IReadOnlyList<TemplatesSourceData> packages, CancellationToken cancellationToken);
+        Task SetInstalledTemplatesPackagesAsync(IReadOnlyList<TemplatesPackageData> packages, CancellationToken cancellationToken);
 
         /// <summary>
         /// This method must be called before making any modifications to settings to ensure other processes on system

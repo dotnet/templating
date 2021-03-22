@@ -6,11 +6,11 @@ using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Installer;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using Microsoft.TemplateEngine.Abstractions.TemplatesPackages;
 
 namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
-    internal class NuGetManagedTemplatesSource : IManagedTemplatesSource
+    internal class NuGetManagedTemplatesPackage : IManagedTemplatesPackage
     {
         public const string AuthorKey = "Author";
         public const string LocalPackageKey = "LocalPackage";
@@ -20,7 +20,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
         private IEngineEnvironmentSettings _settings;
 
-        public NuGetManagedTemplatesSource(IEngineEnvironmentSettings settings, IInstaller installer, string mountPoint, IReadOnlyDictionary<string, string> details)
+        public NuGetManagedTemplatesPackage(IEngineEnvironmentSettings settings, IInstaller installer, string mountPoint, IReadOnlyDictionary<string, string> details)
         {
             Installer = installer;
             MountPointUri = mountPoint;
@@ -36,8 +36,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         public bool LocalPackage => Details.TryGetValue(LocalPackageKey, out string isLocalPackage) && bool.TryParse(isLocalPackage, out bool result) ? result : false;
         public string MountPointUri { get; }
         public string NuGetSource => Details.TryGetValue(NuGetSourceKey, out string nugetSource) ? nugetSource : null;
-        public ITemplatesSourcesProvider Provider => Installer.Provider;
-        public IManagedTemplatesSourcesProvider ManagedProvider => Installer.Provider;
+        public ITemplatesPackagesProvider Provider => Installer.Provider;
+        public IManagedTemplatesPackagesProvider ManagedProvider => Installer.Provider;
         public string Version => Details.TryGetValue(PackageVersionKey, out string version) ? version : null;
         internal IReadOnlyDictionary<string, string> Details { get; }
 

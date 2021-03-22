@@ -53,10 +53,10 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             var settingsFile = Path.Combine(_helper.CreateTemporaryFolder(), "settings.json");
             using var globalSettings1 = new GlobalSettings(envSettings, settingsFile);
             using var globalSettings2 = new GlobalSettings(envSettings, settingsFile);
-            var taskSource = new TaskCompletionSource<TemplatesSourceData>();
+            var taskSource = new TaskCompletionSource<TemplatesPackageData>();
             globalSettings2.SettingsChanged += async () => taskSource.TrySetResult((await globalSettings2.GetInstalledTemplatesPackagesAsync(default).ConfigureAwait(false)).Single());
             var mutex = await globalSettings1.LockAsync(default).ConfigureAwait(false);
-            var newData = new TemplatesSourceData()
+            var newData = new TemplatesPackageData()
             {
                 InstallerId = Guid.NewGuid(),
                 MountPointUri = "Hi",
@@ -87,7 +87,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             #region Open1AndPopulateAndSave
             using (await globalSettings1.LockAsync(default).ConfigureAwait(false))
             {
-                var newData = new TemplatesSourceData()
+                var newData = new TemplatesPackageData()
                 {
                     InstallerId = Guid.NewGuid(),
                     MountPointUri = "Hi",

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using Microsoft.TemplateEngine.Abstractions.TemplatesPackages;
 using Microsoft.TemplateEngine.Edge;
 
 namespace Microsoft.TemplateSearch.Common
@@ -22,7 +22,7 @@ namespace Microsoft.TemplateSearch.Common
 
         public override string DisplayName => "NuGet.org";
 
-        public async override Task<bool> TryConfigure(IEngineEnvironmentSettings environmentSettings, IReadOnlyList<IManagedTemplatesSource> existingTemplatesSources)
+        public async override Task<bool> TryConfigure(IEngineEnvironmentSettings environmentSettings, IReadOnlyList<IManagedTemplatesPackage> existingTemplatesPackages)
         {
             Paths paths = new Paths(environmentSettings);
             string searchMetadataFileLocation = Path.Combine(paths.User.BaseDir, _templateDiscoveryMetadataFile);
@@ -33,7 +33,7 @@ namespace Microsoft.TemplateSearch.Common
             }
 
             IFileMetadataTemplateSearchCache searchCache = CreateSearchCache(environmentSettings);
-            NupkgHigherVersionInstalledPackFilter packFilter = new NupkgHigherVersionInstalledPackFilter(existingTemplatesSources);
+            NupkgHigherVersionInstalledPackFilter packFilter = new NupkgHigherVersionInstalledPackFilter(existingTemplatesPackages);
             Configure(searchCache, packFilter);
 
             return true;

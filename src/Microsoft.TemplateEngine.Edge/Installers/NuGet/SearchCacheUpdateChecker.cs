@@ -10,6 +10,6 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
     internal class SearchCacheUpdateChecker : IUpdateChecker
     {
-        public Task<CheckUpdateResult> GetLatestVersionAsync(NuGetManagedTemplatesSource source, CancellationToken cancellationToken) => throw new NotImplementedException();
+        public Task<CheckUpdateResult> GetLatestVersionAsync(NuGetManagedTemplatesPackage source, CancellationToken cancellationToken) => throw new NotImplementedException();
     }
 }

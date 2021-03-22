@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using Microsoft.TemplateEngine.Abstractions.TemplatesPackages;
 using Microsoft.TemplateEngine.Cli.TemplateSearch;
 using Microsoft.TemplateSearch.Common;
 
@@ -23,10 +23,10 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
             _templateDiscoveryMetadata = templateDiscoveryMetadata;
         }
 
-        public override Task<bool> TryConfigure(IEngineEnvironmentSettings environmentSettings, IReadOnlyList<IManagedTemplatesSource> existingTemplatesSource)
+        public override Task<bool> TryConfigure(IEngineEnvironmentSettings environmentSettings, IReadOnlyList<IManagedTemplatesPackage> existingTemplatesPackage)
         {
             IFileMetadataTemplateSearchCache searchCache = CreateSearchCache(environmentSettings);
-            NupkgHigherVersionInstalledPackFilter packFilter = new NupkgHigherVersionInstalledPackFilter(existingTemplatesSource);
+            NupkgHigherVersionInstalledPackFilter packFilter = new NupkgHigherVersionInstalledPackFilter(existingTemplatesPackage);
             Configure(searchCache, packFilter);
 
             return Task.FromResult(true);

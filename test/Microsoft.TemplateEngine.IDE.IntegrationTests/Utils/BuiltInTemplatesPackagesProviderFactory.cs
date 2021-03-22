@@ -1,5 +1,5 @@
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using Microsoft.TemplateEngine.Abstractions.TemplatesPackages;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,38 +9,38 @@ using System.Threading.Tasks;
 
 namespace Microsoft.TemplateEngine.IDE.IntegrationTests.Utils
 {
-    class BuiltInTemplatesSourcesProviderFactory : ITemplatesSourcesProviderFactory
+    class BuiltInTemplatesPackagesProviderFactory : ITemplatesPackagesProviderFactory
     {
         public string Name => "IDE.IntegrationTests BuiltIn";
 
         public Guid Id { get; } = new Guid("{3227D09D-C1EA-48F1-A33B-1F132BFD9F01}");
 
-        public ITemplatesSourcesProvider CreateProvider(IEngineEnvironmentSettings settings)
+        public ITemplatesPackagesProvider CreateProvider(IEngineEnvironmentSettings settings)
         {
-            return new BuiltInTemplatesSourcesProvider(this, settings);
+            return new BuiltInTemplatesPackagesProvider(this, settings);
         }
 
-        class BuiltInTemplatesSourcesProvider : ITemplatesSourcesProvider
+        class BuiltInTemplatesPackagesProvider : ITemplatesPackagesProvider
         {
             private readonly IEngineEnvironmentSettings settings;
 
-            public BuiltInTemplatesSourcesProvider(BuiltInTemplatesSourcesProviderFactory factory, IEngineEnvironmentSettings settings)
+            public BuiltInTemplatesPackagesProvider(BuiltInTemplatesPackagesProviderFactory factory, IEngineEnvironmentSettings settings)
             {
                 this.settings = settings;
                 this.Factory = factory;
             }
 
-            public ITemplatesSourcesProviderFactory Factory { get; }
+            public ITemplatesPackagesProviderFactory Factory { get; }
 
-            event Action ITemplatesSourcesProvider.SourcesChanged
+            event Action ITemplatesPackagesProvider.SourcesChanged
             {
                 add { }
                 remove { }
             }
 
-            public Task<IReadOnlyList<ITemplatesSource>> GetAllSourcesAsync(CancellationToken cancellationToken)
+            public Task<IReadOnlyList<ITemplatesPackage>> GetAllSourcesAsync(CancellationToken cancellationToken)
             {
-                List<ITemplatesSource> toInstallList = new List<ITemplatesSource>();
+                List<ITemplatesPackage> toInstallList = new List<ITemplatesPackage>();
                 string codebase = typeof(BootstrapperFactory).GetTypeInfo().Assembly.Location;
                 Uri cb = new Uri(codebase);
                 string asmPath = cb.LocalPath;
@@ -55,10 +55,10 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests.Utils
                 {
                     if (Directory.Exists(location))
                     {
-                        toInstallList.Add(new TemplatesSource(this, new DirectoryInfo(location).FullName, File.GetLastWriteTime(location)));
+                        toInstallList.Add(new TemplatesPackage(this, new DirectoryInfo(location).FullName, File.GetLastWriteTime(location)));
                     }
                 }
-                return Task.FromResult((IReadOnlyList<ITemplatesSource>)toInstallList);
+                return Task.FromResult((IReadOnlyList<ITemplatesPackage>)toInstallList);
             }
         }
     }

@@ -11,7 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.TemplateEngine.Abstractions.Installer;
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using Microsoft.TemplateEngine.Abstractions.TemplatesPackages;
 using Microsoft.TemplateEngine.IDE.IntegrationTests.Utils;
 using Xunit;
 
@@ -44,23 +44,23 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             result.First().ErrorMessage.Should().BeNullOrEmpty();
             Assert.Equal(installRequest, result.First().InstallRequest);
 
-            IManagedTemplatesSource source = result.First().Source;
+            IManagedTemplatesPackage source = result.First().Source;
             Assert.Equal("Microsoft.DotNet.Common.ProjectTemplates.5.0", source.Identifier);
             Assert.Equal("Global Settings", source.Provider.Factory.Name);
             Assert.Equal("NuGet", source.Installer.Name);
             Assert.Equal("Microsoft", source.GetDisplayDetails()["Author"]);
             source.Version.Should().NotBeNullOrEmpty();
 
-            IReadOnlyList<IManagedTemplatesSource> managedTemplatesPackages = await bootstrapper.GetManagedTemplatesSources(CancellationToken.None).ConfigureAwait(false);
+            IReadOnlyList<IManagedTemplatesPackage> managedTemplatesPackages = await bootstrapper.GetManagedTemplatesPackages(CancellationToken.None).ConfigureAwait(false);
 
             Assert.Equal(1, managedTemplatesPackages.Count);
             managedTemplatesPackages.First().Should().BeEquivalentTo(source);
 
-            IReadOnlyList<ITemplatesSource> templatePackages = await bootstrapper.GetTemplatesSources(CancellationToken.None).ConfigureAwait(false);
+            IReadOnlyList<ITemplatesPackage> templatePackages = await bootstrapper.GetTemplatesPackages(CancellationToken.None).ConfigureAwait(false);
 
             Assert.Equal(1, templatePackages.Count);
-            Assert.IsAssignableFrom<IManagedTemplatesSource>(templatePackages.First());
-            templatePackages.First().Should().BeEquivalentTo((ITemplatesSource)source);
+            Assert.IsAssignableFrom<IManagedTemplatesPackage>(templatePackages.First());
+            templatePackages.First().Should().BeEquivalentTo((ITemplatesPackage)source);
         }
 
         [Fact]
@@ -85,7 +85,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             Assert.True(string.IsNullOrEmpty(result.First().ErrorMessage));
             Assert.Equal(installRequest, result.First().InstallRequest);
 
-            IManagedTemplatesSource source = result.First().Source;
+            IManagedTemplatesPackage source = result.First().Source;
             Assert.Equal("Microsoft.DotNet.Common.ProjectTemplates.5.0", source.Identifier);
             Assert.Equal("Global Settings", source.Provider.Factory.Name);
             Assert.Equal("NuGet", source.Installer.Name);
@@ -94,16 +94,16 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             //Assert.Equal("https://api.nuget.org/v3/index.json", source.GetDisplayDetails()["NuGetSource"]);
             Assert.Equal("5.0.0", source.Version);
 
-            IReadOnlyList<IManagedTemplatesSource> managedTemplatesPackages = await bootstrapper.GetManagedTemplatesSources(CancellationToken.None).ConfigureAwait(false);
+            IReadOnlyList<IManagedTemplatesPackage> managedTemplatesPackages = await bootstrapper.GetManagedTemplatesPackages(CancellationToken.None).ConfigureAwait(false);
 
             Assert.Equal(1, managedTemplatesPackages.Count);
             managedTemplatesPackages.First().Should().BeEquivalentTo(source);
 
-            IReadOnlyList<ITemplatesSource> templatePackages = await bootstrapper.GetTemplatesSources(CancellationToken.None).ConfigureAwait(false);
+            IReadOnlyList<ITemplatesPackage> templatePackages = await bootstrapper.GetTemplatesPackages(CancellationToken.None).ConfigureAwait(false);
 
             Assert.Equal(1, templatePackages.Count);
-            Assert.IsAssignableFrom<IManagedTemplatesSource>(templatePackages.First());
-            templatePackages.First().Should().BeEquivalentTo((ITemplatesSource)source);
+            Assert.IsAssignableFrom<IManagedTemplatesPackage>(templatePackages.First());
+            templatePackages.First().Should().BeEquivalentTo((ITemplatesPackage)source);
         }
 
         [Fact]
@@ -125,22 +125,22 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             result.First().ErrorMessage.Should().BeNullOrEmpty();
             Assert.Equal(installRequest, result.First().InstallRequest);
 
-            IManagedTemplatesSource source = result.First().Source;
+            IManagedTemplatesPackage source = result.First().Source;
             Assert.Equal(Path.GetFullPath(templateLocation), source.Identifier);
             Assert.Equal("Global Settings", source.Provider.Factory.Name);
             Assert.Equal("Folder", source.Installer.Name);
             source.Version.Should().BeNullOrEmpty();
 
-            IReadOnlyList<IManagedTemplatesSource> managedTemplatesPackages = await bootstrapper.GetManagedTemplatesSources(CancellationToken.None).ConfigureAwait(false);
+            IReadOnlyList<IManagedTemplatesPackage> managedTemplatesPackages = await bootstrapper.GetManagedTemplatesPackages(CancellationToken.None).ConfigureAwait(false);
 
             Assert.Equal(1, managedTemplatesPackages.Count);
             managedTemplatesPackages.First().Should().BeEquivalentTo(source);
 
-            IReadOnlyList<ITemplatesSource> templatePackages = await bootstrapper.GetTemplatesSources(CancellationToken.None).ConfigureAwait(false);
+            IReadOnlyList<ITemplatesPackage> templatePackages = await bootstrapper.GetTemplatesPackages(CancellationToken.None).ConfigureAwait(false);
 
             Assert.Equal(1, templatePackages.Count);
-            Assert.IsAssignableFrom<IManagedTemplatesSource>(templatePackages.First());
-            templatePackages.First().Should().BeEquivalentTo((ITemplatesSource)source);
+            Assert.IsAssignableFrom<IManagedTemplatesPackage>(templatePackages.First());
+            templatePackages.First().Should().BeEquivalentTo((ITemplatesPackage)source);
         }
     }
 }

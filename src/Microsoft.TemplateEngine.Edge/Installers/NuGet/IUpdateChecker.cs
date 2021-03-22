@@ -9,6 +9,6 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
     internal interface IUpdateChecker
     {
-        Task<CheckUpdateResult> GetLatestVersionAsync(NuGetManagedTemplatesSource source, CancellationToken cancellationToken);
+        Task<CheckUpdateResult> GetLatestVersionAsync(NuGetManagedTemplatesPackage source, CancellationToken cancellationToken);
     }
 }

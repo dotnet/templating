@@ -1,19 +1,19 @@
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using Microsoft.TemplateEngine.Abstractions.TemplatesPackages;
 using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateSearch.Common
 {
     public class NupkgHigherVersionInstalledPackFilter : ISearchPackFilter
     {
-        private readonly IReadOnlyList<IManagedTemplatesSource> _existingTemplatesSource;
-        private IReadOnlyDictionary<string, string> _existingTemplatesSourceFilterData;
+        private readonly IReadOnlyList<IManagedTemplatesPackage> _existingTemplatesPackage;
+        private IReadOnlyDictionary<string, string> _existingTemplatesPackageFilterData;
         private bool _isInitialized;
 
-        public NupkgHigherVersionInstalledPackFilter(IReadOnlyList<IManagedTemplatesSource> existingInstallDecriptors)
+        public NupkgHigherVersionInstalledPackFilter(IReadOnlyList<IManagedTemplatesPackage> existingInstallDecriptors)
         {
-            _existingTemplatesSource = existingInstallDecriptors;
+            _existingTemplatesPackage = existingInstallDecriptors;
             _isInitialized = false;
         }
 
@@ -26,12 +26,12 @@ namespace Microsoft.TemplateSearch.Common
 
             Dictionary<string, string> filterData = new Dictionary<string, string>();
 
-            foreach (IManagedTemplatesSource descriptor in _existingTemplatesSource)
+            foreach (IManagedTemplatesPackage descriptor in _existingTemplatesPackage)
             {
                 filterData[descriptor.Identifier] = descriptor.Version;
             }
 
-            _existingTemplatesSourceFilterData = filterData;
+            _existingTemplatesPackageFilterData = filterData;
 
             _isInitialized = true;
         }
@@ -40,7 +40,7 @@ namespace Microsoft.TemplateSearch.Common
         {
             EnsureInitialized();
 
-            if (!_existingTemplatesSourceFilterData.TryGetValue(candidatePackName, out string existingPackVersion))
+            if (!_existingTemplatesPackageFilterData.TryGetValue(candidatePackName, out string existingPackVersion))
             {
                 // no existing install of this pack - don't filter it
                 return false;

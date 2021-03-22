@@ -74,7 +74,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             _watcher = null;
         }
 
-        public async Task<IReadOnlyList<TemplatesSourceData>> GetInstalledTemplatesPackagesAsync(CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<TemplatesPackageData>> GetInstalledTemplatesPackagesAsync(CancellationToken cancellationToken)
         {
             if (_disposed)
             {
@@ -83,7 +83,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
             if (!_environmentSettings.Host.FileSystem.FileExists(_globalSettingsFile))
             {
-                return Array.Empty<TemplatesSourceData>();
+                return Array.Empty<TemplatesPackageData>();
             }
 
             for (int i = 0; i < 5; i++)
@@ -94,7 +94,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 {
                     string? textFileContent = _paths.ReadAllText(_globalSettingsFile, "{}");
                     GlobalSettingsData? data = JsonConvert.DeserializeObject<GlobalSettingsData>(textFileContent);
-                    return data.Packages ?? Array.Empty<TemplatesSourceData>();
+                    return data.Packages ?? Array.Empty<TemplatesPackageData>();
                 }
                 catch (Exception)
                 {
@@ -108,7 +108,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             throw new InvalidOperationException();
         }
 
-        public async Task SetInstalledTemplatesPackagesAsync(IReadOnlyList<TemplatesSourceData> packages, CancellationToken cancellationToken)
+        public async Task SetInstalledTemplatesPackagesAsync(IReadOnlyList<TemplatesPackageData> packages, CancellationToken cancellationToken)
         {
             if (_disposed)
             {

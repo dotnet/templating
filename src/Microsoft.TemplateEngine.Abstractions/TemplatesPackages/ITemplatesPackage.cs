@@ -1,12 +1,12 @@
 using System;
 
-namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
+namespace Microsoft.TemplateEngine.Abstractions.TemplatesPackages
 {
     /// <summary>
     /// Templates source is folder, .nupkg or other container that can contain single or multiple templates.
-    /// <seealso cref="ITemplatesSourcesProvider"/> for more information.
+    /// <seealso cref="ITemplatesPackagesProvider"/> for more information.
     /// </summary>
-    public interface ITemplatesSource
+    public interface ITemplatesPackage
     {
         /// <summary>
         /// To avoid scanning for changes every time. TemplateEngine is caching templates from
@@ -24,6 +24,6 @@ namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
         /// This is mostly helper for grouping sources by provider
         /// so caller doesn't need to keep track of provider->source relation.
         /// </summary>
-        ITemplatesSourcesProvider Provider { get; }
+        ITemplatesPackagesProvider Provider { get; }
     }
 }

@@ -1,6 +1,6 @@
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using Microsoft.TemplateEngine.Abstractions.TemplatesPackages;
 using Microsoft.TemplateEngine.Edge;
 using Microsoft.TemplateEngine.Utils;
 using System;
@@ -12,38 +12,38 @@ using System.Threading.Tasks;
 
 namespace dotnet_new3
 {
-    class BuiltInTemplatesSourcesProviderFactory : ITemplatesSourcesProviderFactory
+    class BuiltInTemplatesPackagesProviderFactory : ITemplatesPackagesProviderFactory
     {
         public string Name => "new3 BuiltIn";
 
         public Guid Id { get; } = new Guid("{3227D09D-C1EA-48F1-A33B-1F132BFD9F06}");
 
-        public ITemplatesSourcesProvider CreateProvider(IEngineEnvironmentSettings settings)
+        public ITemplatesPackagesProvider CreateProvider(IEngineEnvironmentSettings settings)
         {
-            return new BuiltInTemplatesSourcesProvider(this, settings);
+            return new BuiltInTemplatesPackagesProvider(this, settings);
         }
 
-        class BuiltInTemplatesSourcesProvider : ITemplatesSourcesProvider
+        class BuiltInTemplatesPackagesProvider : ITemplatesPackagesProvider
         {
             private readonly IEngineEnvironmentSettings _settings;
 
-            public BuiltInTemplatesSourcesProvider(BuiltInTemplatesSourcesProviderFactory factory, IEngineEnvironmentSettings settings)
+            public BuiltInTemplatesPackagesProvider(BuiltInTemplatesPackagesProviderFactory factory, IEngineEnvironmentSettings settings)
             {
                 _settings = settings;
                 Factory = factory;
             }
 
-            public ITemplatesSourcesProviderFactory Factory { get; }
+            public ITemplatesPackagesProviderFactory Factory { get; }
 
-            event Action ITemplatesSourcesProvider.SourcesChanged
+            event Action ITemplatesPackagesProvider.SourcesChanged
             {
                 add { }
                 remove { }
             }
 
-            public Task<IReadOnlyList<ITemplatesSource>> GetAllSourcesAsync(CancellationToken cancellationToken)
+            public Task<IReadOnlyList<ITemplatesPackage>> GetAllSourcesAsync(CancellationToken cancellationToken)
             {
-                List<ITemplatesSource> templatesSources = new List<ITemplatesSource>();
+                List<ITemplatesPackage> templatesPackages = new List<ITemplatesPackage>();
 
                 string dn3Path = _settings.Environment.GetEnvironmentVariable("DN3");
                 if (string.IsNullOrEmpty(dn3Path))
@@ -56,7 +56,7 @@ namespace dotnet_new3
                     if (path == null)
                     {
                         _settings.Host.LogDiagnosticMessage("Couldn't the setup package location, because \"Microsoft.TemplateEngine.sln\" is not in any of parent directories.", "Install");
-                        return Task.FromResult((IReadOnlyList<ITemplatesSource>)templatesSources);
+                        return Task.FromResult((IReadOnlyList<ITemplatesPackage>)templatesPackages);
                     }
                     Environment.SetEnvironmentVariable("DN3", path);
                 }
@@ -70,11 +70,11 @@ namespace dotnet_new3
                     {
                         string expandedPath = Environment.ExpandEnvironmentVariables(sourceLocation).Replace('\\', Path.DirectorySeparatorChar);
                         IEnumerable<string> expandedPaths = InstallRequestPathResolution.Expand(expandedPath, _settings);
-                        templatesSources.AddRange(expandedPaths.Select(path => new TemplatesSource(this, path, fileSystem?.GetLastWriteTimeUtc(path) ?? File.GetLastWriteTime(path))));
+                        templatesPackages.AddRange(expandedPaths.Select(path => new TemplatesPackage(this, path, fileSystem?.GetLastWriteTimeUtc(path) ?? File.GetLastWriteTime(path))));
                     }
                 }
 
-                return Task.FromResult((IReadOnlyList<ITemplatesSource>)templatesSources);
+                return Task.FromResult((IReadOnlyList<ITemplatesPackage>)templatesPackages);
             }
         }
     }

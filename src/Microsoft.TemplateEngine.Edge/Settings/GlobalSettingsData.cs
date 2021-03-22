@@ -15,7 +15,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
     /// </summary>
     internal sealed class GlobalSettingsData
     {
-        public IReadOnlyList<TemplatesSourceData> Packages { get; set; }
+        public IReadOnlyList<TemplatesPackageData> Packages { get; set; }
 
         /// <summary>
         /// If older TemplateEngine loads this file and save it back

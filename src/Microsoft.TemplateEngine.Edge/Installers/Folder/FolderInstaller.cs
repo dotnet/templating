@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.GlobalSettings;
 using Microsoft.TemplateEngine.Abstractions.Installer;
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using Microsoft.TemplateEngine.Abstractions.TemplatesPackages;
 
 namespace Microsoft.TemplateEngine.Edge.Installers.Folder
 {
@@ -18,7 +18,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.Folder
     {
         private readonly IEngineEnvironmentSettings _settings;
 
-        public FolderInstaller(IEngineEnvironmentSettings settings, FolderInstallerFactory factory, IManagedTemplatesSourcesProvider provider)
+        public FolderInstaller(IEngineEnvironmentSettings settings, FolderInstallerFactory factory, IManagedTemplatesPackagesProvider provider)
         {
             Name = factory.Name;
             FactoryId = factory.Id;
@@ -28,19 +28,19 @@ namespace Microsoft.TemplateEngine.Edge.Installers.Folder
 
         public Guid FactoryId { get; }
         public string Name { get; }
-        public IManagedTemplatesSourcesProvider Provider { get; }
+        public IManagedTemplatesPackagesProvider Provider { get; }
 
         public Task<bool> CanInstallAsync(InstallRequest installationRequest, CancellationToken cancellationToken)
         {
             return Task.FromResult(Directory.Exists(installationRequest.Identifier));
         }
 
-        public IManagedTemplatesSource Deserialize(IManagedTemplatesSourcesProvider provider, TemplatesSourceData data)
+        public IManagedTemplatesPackage Deserialize(IManagedTemplatesPackagesProvider provider, TemplatesPackageData data)
         {
-            return new FolderManagedTemplatesSource(_settings, this, data.MountPointUri);
+            return new FolderManagedTemplatesPackage(_settings, this, data.MountPointUri);
         }
 
-        public Task<IReadOnlyList<CheckUpdateResult>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesSource> sources, CancellationToken cancellationToken)
+        public Task<IReadOnlyList<CheckUpdateResult>> GetLatestVersionAsync(IEnumerable<IManagedTemplatesPackage> sources, CancellationToken cancellationToken)
         {
             return Task.FromResult<IReadOnlyList<CheckUpdateResult>>(sources.Select(s => CheckUpdateResult.CreateSuccess(s, null, true)).ToList());
         }
@@ -48,14 +48,14 @@ namespace Microsoft.TemplateEngine.Edge.Installers.Folder
         public Task<InstallResult> InstallAsync(InstallRequest installRequest, CancellationToken cancellationToken)
         {
             if (Directory.Exists(installRequest.Identifier))
-                return Task.FromResult(InstallResult.CreateSuccess(installRequest, new FolderManagedTemplatesSource(_settings, this, installRequest.Identifier)));
+                return Task.FromResult(InstallResult.CreateSuccess(installRequest, new FolderManagedTemplatesPackage(_settings, this, installRequest.Identifier)));
             else
                 return Task.FromResult(InstallResult.CreateFailure(installRequest, InstallerErrorCode.GenericError, null));
         }
 
-        public TemplatesSourceData Serialize(IManagedTemplatesSource managedSource)
+        public TemplatesPackageData Serialize(IManagedTemplatesPackage managedSource)
         {
-            return new TemplatesSourceData
+            return new TemplatesPackageData
             {
                 MountPointUri = managedSource.MountPointUri,
                 LastChangeTime = managedSource.LastChangeTime,
@@ -63,7 +63,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.Folder
             };
         }
 
-        public Task<UninstallResult> UninstallAsync(IManagedTemplatesSource managedSource, CancellationToken cancellationToken)
+        public Task<UninstallResult> UninstallAsync(IManagedTemplatesPackage managedSource, CancellationToken cancellationToken)
         {
             return Task.FromResult(UninstallResult.CreateSuccess(managedSource));
         }

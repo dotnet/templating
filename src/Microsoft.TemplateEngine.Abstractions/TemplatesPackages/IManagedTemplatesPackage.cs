@@ -4,15 +4,15 @@
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions.Installer;
 
-namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
+namespace Microsoft.TemplateEngine.Abstractions.TemplatesPackages
 {
     /// <summary>
-    /// This is more advanced <see cref="ITemplatesSource"/>. Managed means that this templates source can be:<br/>
-    /// Uninstalled via <see cref="ManagedProvider"/>.<see cref="IManagedTemplatesSourcesProvider.UninstallAsync(IManagedTemplatesSource)"/><br/>
-    /// Check for latest version via <see cref="ManagedProvider"/>.<see cref="IManagedTemplatesSourcesProvider.GetLatestVersionsAsync(IEnumerable{IManagedTemplatesSource}, System.Threading.CancellationToken)"/><br/>
-    /// Updated  via <see cref="ManagedProvider"/>.<see cref="IManagedTemplatesSourcesProvider.UpdateAsync(IEnumerable{ManagedTemplatesSourceUpdate})"/>
+    /// This is more advanced <see cref="ITemplatesPackage"/>. Managed means that this templates source can be:<br/>
+    /// Uninstalled via <see cref="ManagedProvider"/>.<see cref="IManagedTemplatesPackagesProvider.UninstallAsync(IManagedTemplatesPackage)"/><br/>
+    /// Check for latest version via <see cref="ManagedProvider"/>.<see cref="IManagedTemplatesPackagesProvider.GetLatestVersionsAsync(IEnumerable{IManagedTemplatesPackage}, System.Threading.CancellationToken)"/><br/>
+    /// Updated  via <see cref="ManagedProvider"/>.<see cref="IManagedTemplatesPackagesProvider.UpdateAsync(IEnumerable{ManagedTemplatesPackageUpdate})"/>
     /// </summary>
-    public interface IManagedTemplatesSource : ITemplatesSource
+    public interface IManagedTemplatesPackage : ITemplatesPackage
     {
         /// <summary>
         /// The name to be used when displaying source in UI.
@@ -34,10 +34,10 @@ namespace Microsoft.TemplateEngine.Abstractions.TemplatesSources
 
         /// <summary>
         /// Installer that created this source.
-        /// This serves as helper for grouping sources by <see cref="IManagedTemplatesSourcesProvider"/>
+        /// This serves as helper for grouping sources by <see cref="IManagedTemplatesPackagesProvider"/>
         /// so caller doesn't need to keep track of "managed provider"->"source" relation.
         /// </summary>
-        IManagedTemplatesSourcesProvider ManagedProvider { get; }
+        IManagedTemplatesPackagesProvider ManagedProvider { get; }
 
         /// <summary>
         /// Version of templates source.

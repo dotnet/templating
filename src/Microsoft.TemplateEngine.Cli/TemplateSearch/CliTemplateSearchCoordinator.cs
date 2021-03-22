@@ -43,7 +43,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
             if (searchResults.MatchesBySource.Count > 0)
             {
                 string packageIdToShow = null;
-                foreach (TemplateSourceSearchResult sourceResult in searchResults.MatchesBySource)
+                foreach (TemplatePackageSearchResult sourceResult in searchResults.MatchesBySource)
                 {
                     DisplayResultsForPack(sourceResult, environmentSettings, commandInput, defaultLanguage);
 
@@ -76,7 +76,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
             }
         }
 
-        private static void DisplayResultsForPack(TemplateSourceSearchResult sourceResult, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, string defaultLanguage)
+        private static void DisplayResultsForPack(TemplatePackageSearchResult sourceResult, IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, string defaultLanguage)
         {
             string sourceHeader = string.Format(LocalizableStrings.SearchResultSourceIndicator, sourceResult.SourceDisplayName);
 
@@ -107,7 +107,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
             Reporter.Output.WriteLine(formatter.Layout());
         }
 
-        private static IReadOnlyCollection<SearchResultTableRow> GetSearchResultsForDisplay(TemplateSourceSearchResult sourceResult, string language, string defaultLanguage)
+        private static IReadOnlyCollection<SearchResultTableRow> GetSearchResultsForDisplay(TemplatePackageSearchResult sourceResult, string language, string defaultLanguage)
         {
             List<SearchResultTableRow> templateGroupsForDisplay = new List<SearchResultTableRow>();
 

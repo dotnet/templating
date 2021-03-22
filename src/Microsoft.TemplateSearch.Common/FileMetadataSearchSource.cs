@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using Microsoft.TemplateEngine.Abstractions.TemplatesPackages;
 
 namespace Microsoft.TemplateSearch.Common
 {
@@ -14,7 +14,7 @@ namespace Microsoft.TemplateSearch.Common
         protected IFileMetadataTemplateSearchCache _searchCache;
         private ISearchPackFilter _packFilter;
 
-        public abstract Task<bool> TryConfigure(IEngineEnvironmentSettings environmentSettings, IReadOnlyList<IManagedTemplatesSource> existingTemplatesSource);
+        public abstract Task<bool> TryConfigure(IEngineEnvironmentSettings environmentSettings, IReadOnlyList<IManagedTemplatesPackage> existingTemplatesPackage);
 
         protected void Configure(IFileMetadataTemplateSearchCache searchCache, ISearchPackFilter packFilter)
         {

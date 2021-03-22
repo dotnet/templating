@@ -3,9 +3,9 @@ using Microsoft.TemplateEngine.Edge.Template;
 
 namespace Microsoft.TemplateSearch.Common
 {
-    public class TemplateSourceSearchResult
+    public class TemplatePackageSearchResult
     {
-        public TemplateSourceSearchResult(string sourceDisplayName)
+        public TemplatePackageSearchResult(string sourceDisplayName)
         {
             SourceDisplayName = sourceDisplayName;
             _packsWithMatches = new Dictionary<PackInfo, TemplatePackSearchResult>(new PackInfoEqualityComparer());

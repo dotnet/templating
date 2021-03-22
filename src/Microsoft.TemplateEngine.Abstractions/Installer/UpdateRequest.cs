@@ -2,13 +2,13 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using Microsoft.TemplateEngine.Abstractions.TemplatesPackages;
 
 namespace Microsoft.TemplateEngine.Abstractions.Installer
 {
     public class UpdateRequest
     {
-        public IManagedTemplatesSource Source { get; set; }
+        public IManagedTemplatesPackage Source { get; set; }
 
         public string Version { get; set; }
 

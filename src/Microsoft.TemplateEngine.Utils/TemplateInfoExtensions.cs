@@ -1,5 +1,5 @@
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using Microsoft.TemplateEngine.Abstractions.TemplatesPackages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,10 +34,10 @@ namespace Microsoft.TemplateEngine.Utils
             return template.GetTagValues("type")?.Single();
         }
 
-        public async static Task<ITemplatesSource> GetTemplateSourceAsync (this ITemplateInfo template, IEngineEnvironmentSettings settings)
+        public async static Task<ITemplatesPackage> GetTemplatePackageAsync (this ITemplateInfo template, IEngineEnvironmentSettings settings)
         {
-            IReadOnlyList<ITemplatesSource> templateSources = await settings.SettingsLoader.TemplatesSourcesManager.GetTemplatesSources().ConfigureAwait(false);
-            return templateSources.Single(s => s.MountPointUri == template.MountPointUri);
+            IReadOnlyList<ITemplatesPackage> templatePackages = await settings.SettingsLoader.TemplatesPackagesManager.GetTemplatesPackages().ConfigureAwait(false);
+            return templatePackages.Single(s => s.MountPointUri == template.MountPointUri);
         }
 
         /// <summary>

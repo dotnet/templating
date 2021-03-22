@@ -4,7 +4,7 @@
 using System;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Installer;
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using Microsoft.TemplateEngine.Abstractions.TemplatesPackages;
 
 namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
@@ -16,7 +16,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
         public string Name => "NuGet";
 
-        public IInstaller CreateInstaller(IManagedTemplatesSourcesProvider provider, IEngineEnvironmentSettings settings, string installPath)
+        public IInstaller CreateInstaller(IManagedTemplatesPackagesProvider provider, IEngineEnvironmentSettings settings, string installPath)
         {
             return new NuGetInstaller(this, provider, settings, installPath);
         }

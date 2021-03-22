@@ -7,13 +7,13 @@ using System.IO;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Installer;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using Microsoft.TemplateEngine.Abstractions.TemplatesPackages;
 
 namespace Microsoft.TemplateEngine.Edge.Installers.Folder
 {
-    internal class FolderManagedTemplatesSource : IManagedTemplatesSource
+    internal class FolderManagedTemplatesPackage : IManagedTemplatesPackage
     {
-        public FolderManagedTemplatesSource(IEngineEnvironmentSettings settings, IInstaller installer, string mountPointUri)
+        public FolderManagedTemplatesPackage(IEngineEnvironmentSettings settings, IInstaller installer, string mountPointUri)
         {
             MountPointUri = mountPointUri;
             Installer = installer;
@@ -25,8 +25,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.Folder
         public IInstaller Installer { get; }
         public DateTime LastChangeTime { get; }
         public string MountPointUri { get; }
-        public ITemplatesSourcesProvider Provider => Installer.Provider;
-        public IManagedTemplatesSourcesProvider ManagedProvider => Installer.Provider;
+        public ITemplatesPackagesProvider Provider => Installer.Provider;
+        public IManagedTemplatesPackagesProvider ManagedProvider => Installer.Provider;
         public string Version => null;
 
         public IReadOnlyDictionary<string, string> GetDisplayDetails() => new Dictionary<string, string>();

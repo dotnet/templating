@@ -1,7 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using Microsoft.TemplateEngine.Abstractions.TemplatesPackages;
 
 namespace Microsoft.TemplateEngine.Abstractions.Installer
 {
@@ -9,7 +9,7 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
     {
         public UpdateRequest UpdateRequest { get; private set; }
 
-        public static UpdateResult CreateSuccess(UpdateRequest request, IManagedTemplatesSource source)
+        public static UpdateResult CreateSuccess(UpdateRequest request, IManagedTemplatesPackage source)
         {
             return new UpdateResult()
             {

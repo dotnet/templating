@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.TemplateEngine.Abstractions.GlobalSettings
 {
-    public class TemplatesSourceData
+    public class TemplatesPackageData
     {
         public IReadOnlyDictionary<string, string> Details { get; set; }
 

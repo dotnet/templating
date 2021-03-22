@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using Microsoft.TemplateEngine.Abstractions.TemplatesPackages;
 using Microsoft.TemplateSearch.Common;
 
 namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
@@ -75,9 +75,9 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
             DisplayName = string.Format("Mock Search Source {0}", _id);
         }
 
-        public Task<bool> TryConfigure(IEngineEnvironmentSettings environment, IReadOnlyList<IManagedTemplatesSource> existingTemplatesSource)
+        public Task<bool> TryConfigure(IEngineEnvironmentSettings environment, IReadOnlyList<IManagedTemplatesPackage> existingTemplatesPackage)
         {
-            _packFilter = new NupkgHigherVersionInstalledPackFilter(existingTemplatesSource);
+            _packFilter = new NupkgHigherVersionInstalledPackFilter(existingTemplatesPackage);
 
             return Task.FromResult(true);
         }

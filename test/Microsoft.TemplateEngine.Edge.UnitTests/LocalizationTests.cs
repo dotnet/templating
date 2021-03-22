@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using Microsoft.TemplateEngine.Abstractions.TemplatesPackages;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Mocks;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects;
@@ -145,14 +145,14 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             Assert.Equal(expectedManualInstructions, effects.CreationResult.PostActions[postActionIndex].ManualInstructions);
         }
 
-        class TemplatesFactory : ITemplatesSourcesProviderFactory
+        class TemplatesFactory : ITemplatesPackagesProviderFactory
         {
             public string Name => nameof(LocalizationTests);
 
             public Guid Id => new Guid("{3DB0E733-6411-4898-B500-65B122309A9B}");
 
-            public ITemplatesSourcesProvider CreateProvider(IEngineEnvironmentSettings settings) =>
-                new DefaultTemplatesSourceProvider(this, settings, null, new[] {
+            public ITemplatesPackagesProvider CreateProvider(IEngineEnvironmentSettings settings) =>
+                new DefaultTemplatesPackageProvider(this, settings, null, new[] {
                     Path.Combine(Path.GetDirectoryName(typeof(LocalizationTests).Assembly.Location), "..", "..", "..", "..", "..",
                 "test", "Microsoft.TemplateEngine.TestTemplates", "test_templates", "TemplateWithLocalization") });
         }

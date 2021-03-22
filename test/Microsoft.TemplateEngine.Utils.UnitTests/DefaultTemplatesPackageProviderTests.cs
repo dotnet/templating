@@ -7,24 +7,24 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using Microsoft.TemplateEngine.Abstractions.TemplatesPackages;
 using Microsoft.TemplateEngine.TestHelper;
 using Xunit;
 
 namespace Microsoft.TemplateEngine.Utils.UnitTests
 {
-    public class DefaultTemplatesSourceProviderTests : TestBase
+    public class DefaultTemplatesPackageProviderTests : TestBase
     {
         [Fact]
         public async Task ReturnsFoldersAndNuPkgs()
         {
-            var thisDir = Path.GetDirectoryName(typeof(DefaultTemplatesSourceProviderTests).Assembly.Location);
+            var thisDir = Path.GetDirectoryName(typeof(DefaultTemplatesPackageProviderTests).Assembly.Location);
             //Pass in 5 folders
             var folders = Directory.GetDirectories(Path.Combine(thisDir, "..", "..", "..", "..", "..", "test", "Microsoft.TemplateEngine.TestTemplates", "test_templates")).Take(5);
             //And one *.nupkg, but that folder contains 2 .nupkg files
             var nupkgs = new[] { Path.Combine(thisDir, "..", "..", "..", "..", "..", "test", "Microsoft.TemplateEngine.TestTemplates", "nupkg_templates", "*.nupkg") };
 
-            var provider = new DefaultTemplatesSourceProvider(null, EngineEnvironmentSettings, nupkgs, folders);
+            var provider = new DefaultTemplatesPackageProvider(null, EngineEnvironmentSettings, nupkgs, folders);
             var sources = await provider.GetAllSourcesAsync(default);
 
             //Total should be 7

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Abstractions.TemplatesSources;
+using Microsoft.TemplateEngine.Abstractions.TemplatesPackages;
 using Microsoft.TemplateEngine.Cli.UnitTests.CliMocks;
 using Microsoft.TemplateEngine.Edge.Installers.NuGet;
 using Microsoft.TemplateEngine.Mocks;
@@ -34,7 +34,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             const string templateName = "foo";
 
             TemplateSearcher searcher = new TemplateSearcher(EngineEnvironmentSettings, "C#", MockTemplateSearchHelpers.DefaultMatchFilter);
-            List<IManagedTemplatesSource> existingInstalls = new List<IManagedTemplatesSource>();
+            List<IManagedTemplatesPackage> existingInstalls = new List<IManagedTemplatesPackage>();
             SearchResults searchResults = searcher.SearchForTemplatesAsync(existingInstalls, templateName).Result;
             Assert.True(searchResults.AnySources);
             Assert.Equal(1, searchResults.MatchesBySource.Count);
@@ -53,9 +53,9 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
 
             TemplateSearcher searcher = new TemplateSearcher(EngineEnvironmentSettings, "C#", MockTemplateSearchHelpers.DefaultMatchFilter);
 
-            IReadOnlyList<IManagedTemplatesSource> packsToIgnore = new List<IManagedTemplatesSource>()
+            IReadOnlyList<IManagedTemplatesPackage> packsToIgnore = new List<IManagedTemplatesPackage>()
             {
-                _fooPackTemplatesSource
+                _fooPackTemplatesPackage
             };
 
             SearchResults searchResults = searcher.SearchForTemplatesAsync(packsToIgnore, templateName).Result;
@@ -68,7 +68,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
         private static readonly PackInfo _bluePackInfo = new PackInfo("bluePack", "2.1");
         private static readonly PackInfo _greenPackInfo = new PackInfo("greenPack", "3.0.0");
 
-        private static readonly IManagedTemplatesSource _fooPackTemplatesSource = new NuGetManagedTemplatesSource(null, null, string.Empty, null);
+        private static readonly IManagedTemplatesPackage _fooPackTemplatesPackage = new NuGetManagedTemplatesPackage(null, null, string.Empty, null);
 
         private static IReadOnlyDictionary<string, IReadOnlyList<ITemplateNameSearchResult>> GetMockNameSearchResults()
         {

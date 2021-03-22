@@ -6,17 +6,17 @@ namespace Microsoft.TemplateSearch.Common
     {
         public SearchResults()
         {
-            MatchesBySource = new List<TemplateSourceSearchResult>();
+            MatchesBySource = new List<TemplatePackageSearchResult>();
             AnySources = false;
         }
 
-        public SearchResults(IReadOnlyList<TemplateSourceSearchResult> matchesBySource, bool anySources)
+        public SearchResults(IReadOnlyList<TemplatePackageSearchResult> matchesBySource, bool anySources)
         {
             MatchesBySource = matchesBySource;
             AnySources = anySources;
         }
 
-        public IReadOnlyList<TemplateSourceSearchResult> MatchesBySource { get; }
+        public IReadOnlyList<TemplatePackageSearchResult> MatchesBySource { get; }
 
         public bool AnySources { get; }
     }
