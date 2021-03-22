@@ -36,6 +36,16 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             _environmentSettings = settings;
         }
 
+        public NuGetInstaller(IInstallerFactory factory, IManagedTemplatesSourcesProvider provider, IEngineEnvironmentSettings settings, string installPath, IDownloader packageDownloader, IUpdateChecker updateChecker)
+        {
+            _factory = factory;
+            Provider = provider;
+            _installPath = installPath;
+            _packageDownloader = packageDownloader;
+            _updateChecker = updateChecker;
+            _environmentSettings = settings;
+        }
+
         public Guid FactoryId => _factory.Id;
         public string Name => _factory.Name;
         public IManagedTemplatesSourcesProvider Provider { get; }
@@ -115,6 +125,11 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         public async Task<InstallResult> InstallAsync(InstallRequest installRequest, CancellationToken cancellationToken)
         {
             _ = installRequest ?? throw new ArgumentNullException(nameof(installRequest));
+
+            if (!await CanInstallAsync(installRequest, cancellationToken).ConfigureAwait(false))
+            {
+                return InstallResult.CreateFailure(installRequest, InstallerErrorCode.UnsupportedRequest, $"The install request {installRequest} cannot be processed by installer {Name}");
+            }
 
             try
             {
@@ -211,6 +226,13 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 throw new ArgumentException("Version cannot be null or empty", nameof(updateRequest.Version));
             }
 
+            //ensure uninstall is performed
+            UninstallResult uninstallResult = await UninstallAsync(updateRequest.Source, cancellationToken).ConfigureAwait(false);
+            if (!uninstallResult.Success)
+            {
+                return UpdateResult.CreateFailure(updateRequest, uninstallResult.Error, uninstallResult.ErrorMessage);
+            }
+
             InstallRequest installRequest = new InstallRequest
             {
                 Identifier = updateRequest.Source.Identifier,
@@ -258,6 +280,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             try
             {
                 _environmentSettings.Host.FileSystem.FileCopy(installRequest.Identifier, targetPackageLocation, overwrite: false);
+                packageInfo.FullPath = targetPackageLocation;
             }
             catch (Exception ex)
             {

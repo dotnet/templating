@@ -29,5 +29,7 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
         /// Additional details, like NuGet Server(Source), that specific installer uses.
         /// </summary>
         public Dictionary<string, string> Details { get; set; }
+
+        public override string ToString() => DisplayName;
     }
 }
