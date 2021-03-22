@@ -12,6 +12,7 @@
         <ProjectReference Include="$(SrcDir)Microsoft.TemplateEngine.IDE\Microsoft.TemplateEngine.IDE.csproj" />
         <ProjectReference Include="$(SrcDir)Microsoft.TemplateEngine.Orchestrator.RunnableProjects\Microsoft.TemplateEngine.Orchestrator.RunnableProjects.csproj" />
         <ProjectReference Include="$(TestDir)Microsoft.TemplateEngine.Mocks\Microsoft.TemplateEngine.Mocks.csproj" />
+        <ProjectReference Include="..\Microsoft.TemplateEngine.TestHelper\Microsoft.TemplateEngine.TestHelper.csproj" />
 
     </ItemGroup>
 </Project>

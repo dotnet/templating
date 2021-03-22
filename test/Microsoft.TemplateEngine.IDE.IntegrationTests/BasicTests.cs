@@ -1,13 +1,15 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Edge.Template;
 using Microsoft.TemplateEngine.IDE.IntegrationTests.Utils;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.TemplateEngine.TestHelper;
 using Xunit;
 
 namespace Microsoft.TemplateEngine.IDE.IntegrationTests
@@ -26,7 +28,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             var bootstrapper = BootstrapperFactory.GetBootstrapper();
             await bootstrapper.InstallTestTemplateAsync("TemplateWithSourceName").ConfigureAwait(false);
 
-            string output = TestHelper.CreateTemporaryFolder();
+            string output = TestUtils.CreateTemporaryFolder();
             var foundTemplates = await bootstrapper.ListTemplates(true, WellKnownSearchFilters.NameFilter("TestAssets.TemplateWithSourceName")).ConfigureAwait(false);
             var result = await bootstrapper.GetCreationEffectsAsync(foundTemplates.First().Info, "test", output, new Dictionary<string, string>(), "").ConfigureAwait(false);
             Assert.Equal(2, result.CreationResult.PrimaryOutputs.Count);
@@ -53,7 +55,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             var bootstrapper = BootstrapperFactory.GetBootstrapper(additionalVirtualLocations: new string[] { "test" });
             await bootstrapper.InstallTestTemplateAsync("TemplateWithSourceName").ConfigureAwait(false);
 
-            string output = TestHelper.CreateTemporaryFolder();
+            string output = TestUtils.CreateTemporaryFolder();
             var foundTemplates = await bootstrapper.ListTemplates(true, WellKnownSearchFilters.NameFilter("TestAssets.TemplateWithSourceName")).ConfigureAwait(false);
 
             var result = await bootstrapper.CreateAsync(foundTemplates.First().Info, "test", output, new Dictionary<string, string>(), false, "").ConfigureAwait(false);
@@ -71,7 +73,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             string packageLocation = _packageManager.PackProjectTemplatesNuGetPackage("microsoft.dotnet.common.projecttemplates.5.0");
             await bootstrapper.InstallTemplateAsync(packageLocation).ConfigureAwait(false);
 
-            string output = TestHelper.CreateTemporaryFolder();
+            string output = TestUtils.CreateTemporaryFolder();
 
             var foundTemplates = await bootstrapper.ListTemplates(true, WellKnownSearchFilters.NameFilter("console")).ConfigureAwait(false);
             var result = await bootstrapper.GetCreationEffectsAsync(foundTemplates.First().Info, "test", output, new Dictionary<string, string>(), "").ConfigureAwait(false);
@@ -98,7 +100,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             string packageLocation = _packageManager.PackProjectTemplatesNuGetPackage("microsoft.dotnet.common.projecttemplates.5.0");
             await bootstrapper.InstallTemplateAsync(packageLocation).ConfigureAwait(false);
 
-            string output = TestHelper.CreateTemporaryFolder();
+            string output = TestUtils.CreateTemporaryFolder();
             var foundTemplates = await bootstrapper.ListTemplates(true, WellKnownSearchFilters.NameFilter("console")).ConfigureAwait(false);
             var result = await bootstrapper.CreateAsync(foundTemplates.First().Info, "test", output, new Dictionary<string, string>(), false, "").ConfigureAwait(false);
             Assert.Equal(2, result.PrimaryOutputs.Count);

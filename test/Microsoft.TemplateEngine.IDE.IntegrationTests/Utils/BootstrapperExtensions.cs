@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions.Installer;
+using Microsoft.TemplateEngine.TestHelper;
 
 namespace Microsoft.TemplateEngine.IDE.IntegrationTests.Utils
 {
@@ -16,7 +17,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests.Utils
 
             foreach (string template in templates)
             {
-                string path = TestHelper.GetTestTemplateLocation(template);
+                string path = TestUtils.GetTestTemplateLocation(template);
                 installRequests.Add(new InstallRequest()
                 {
                     Identifier = Path.GetFullPath(path)

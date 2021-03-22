@@ -3,6 +3,7 @@
 
 using FluentAssertions;
 using Microsoft.NET.TestFramework.Assertions;
+using Microsoft.TemplateEngine.TestHelper;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -20,10 +21,10 @@ namespace dotnet_new3.UnitTests
         [Fact]
         public void CanCheckForUpdate()
         {
-            var home = Helpers.CreateTemporaryFolder("Home");
+            var home = TestUtils.CreateTemporaryFolder("Home");
             new DotnetNewCommand(_log, "-i", "Microsoft.DotNet.Common.ProjectTemplates.5.0::5.0.0", "--quiet")
-                .WithWorkingDirectory(Helpers.CreateTemporaryFolder())
-                .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
+                .WithWorkingDirectory(TestUtils.CreateTemporaryFolder())
+                .WithEnvironmentVariable(TestUtils.HomeEnvironmentVariableName, home)
                 .Execute()
                 .Should()
                 .ExitWith(0)
@@ -34,8 +35,8 @@ namespace dotnet_new3.UnitTests
                 .And.HaveStdOutContaining("classlib");
 
             new DotnetNewCommand(_log, "--update-check")
-                .WithWorkingDirectory(Helpers.CreateTemporaryFolder())
-                .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
+                .WithWorkingDirectory(TestUtils.CreateTemporaryFolder())
+                .WithEnvironmentVariable(TestUtils.HomeEnvironmentVariableName, home)
                 .Execute()
                 .Should()
                 .ExitWith(0)
@@ -47,12 +48,12 @@ namespace dotnet_new3.UnitTests
         [Fact]
         public void DoesNotShowUpdatesWhenAllTemplatesAreUpToDate()
         {
-            var home = Helpers.CreateTemporaryFolder("Home");
-            string workingDirectory = Helpers.CreateTemporaryFolder();
+            var home = TestUtils.CreateTemporaryFolder("Home");
+            string workingDirectory = TestUtils.CreateTemporaryFolder();
             string templateLocation = Helpers.InstallTestTemplate("TemplateResolution/DifferentLanguagesGroup/BasicFSharp", _log, workingDirectory, home);
             new DotnetNewCommand(_log, "-i", "Microsoft.DotNet.Common.ProjectTemplates.5.0")
-                .WithWorkingDirectory(Helpers.CreateTemporaryFolder())
-                .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
+                .WithWorkingDirectory(TestUtils.CreateTemporaryFolder())
+                .WithEnvironmentVariable(TestUtils.HomeEnvironmentVariableName, home)
                 .Execute()
                 .Should()
                 .ExitWith(0)
@@ -63,8 +64,8 @@ namespace dotnet_new3.UnitTests
                 .And.HaveStdOutContaining("classlib");
 
             new DotnetNewCommand(_log, "--update-check")
-                .WithWorkingDirectory(Helpers.CreateTemporaryFolder())
-                .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
+                .WithWorkingDirectory(TestUtils.CreateTemporaryFolder())
+                .WithEnvironmentVariable(TestUtils.HomeEnvironmentVariableName, home)
                 .Execute()
                 .Should()
                 .ExitWith(0)

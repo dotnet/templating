@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Microsoft.NET.TestFramework.Assertions;
+using Microsoft.TemplateEngine.TestHelper;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -17,9 +18,9 @@ namespace dotnet_new3.UnitTests
         [Fact]
         public void FirstRunSuccess()
         {
-            var home = Helpers.CreateTemporaryFolder("Home");
+            var home = TestUtils.CreateTemporaryFolder("Home");
             new DotnetNewCommand(_log)
-                .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
+                .WithEnvironmentVariable(TestUtils.HomeEnvironmentVariableName, home)
                 .Execute()
                 .Should()
                 .ExitWith(0)
@@ -28,7 +29,7 @@ namespace dotnet_new3.UnitTests
                 .And.NotHaveStdOutContaining("Error");
 
             new DotnetNewCommand(_log, "--list")
-                .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
+                .WithEnvironmentVariable(TestUtils.HomeEnvironmentVariableName, home)
                 .Execute()
                 .Should()
                 .ExitWith(0)

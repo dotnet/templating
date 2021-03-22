@@ -42,7 +42,7 @@ namespace dotnet_new3.UnitTests
         [InlineData("library_cs-50", "classlib", "-f", "net5.0")]
         public void AllWebProjectsRestoreAndBuild(string testName, params string[] args)
         {
-            string workingDir = Helpers.CreateTemporaryFolder(testName);
+            string workingDir = TestUtils.CreateTemporaryFolder(testName);
 
             new DotnetNewCommand(_log, args)
                 .WithWorkingDirectory(workingDir)

@@ -1,11 +1,12 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using Microsoft.NET.TestFramework.Assertions;
-using Microsoft.NET.TestFramework.Commands;
+using Microsoft.TemplateEngine.TestHelper;
 using Xunit.Abstractions;
-using Xunit.Sdk;
 
 namespace dotnet_new3.UnitTests
 {
@@ -18,8 +19,8 @@ namespace dotnet_new3.UnitTests
     {
         private readonly ITestOutputHelper log;
 
-        public string HomeDirectory { get; } = Helpers.CreateTemporaryFolder("Home");
-        public string HomeVariable { get; } = Helpers.HomeEnvironmentVariableName;
+        public string HomeDirectory { get; } = TestUtils.CreateTemporaryFolder("Home");
+        public string HomeVariable { get; } = TestUtils.HomeEnvironmentVariableName;
 
         public SharedHomeDirectory(IMessageSink messageSink)
         {

@@ -3,17 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Edge;
-using Microsoft.TemplateEngine.Utils;
+using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects;
-using System.Threading;
-using System.Globalization;
+using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.TestHelper
 {
@@ -22,9 +19,10 @@ namespace Microsoft.TemplateEngine.TestHelper
         List<string> foldersToCleanup = new List<string>();
         List<EngineEnvironmentSettings> engineEnvironmentToDispose = new List<EngineEnvironmentSettings>();
 
-        public IEngineEnvironmentSettings CreateEnvironment(string locale = null)
+        public IEngineEnvironmentSettings CreateEnvironment(string locale = null, bool virtualize = false)
         {
             if (string.IsNullOrEmpty(locale))
+            {
                 locale = "en-US";
 
             ITemplateEngineHost host = new TestHost
@@ -40,17 +38,25 @@ namespace Microsoft.TemplateEngine.TestHelper
                 FallbackHostTemplateConfigNames = new[] { "dotnetcli" }
             };
             CultureInfo.CurrentUICulture = new CultureInfo(locale);
-            var tempateEngineRoot = Path.Combine(CreateTemporaryFolder(), ".templateengine");
-            var engineEnvironmentSettings = new EngineEnvironmentSettings(host, (x) => new SettingsLoader(x), null, tempateEngineRoot);
+            EngineEnvironmentSettings engineEnvironmentSettings;
+            if (virtualize)
+            {
+                engineEnvironmentSettings = new EngineEnvironmentSettings(host, (x) => new SettingsLoader(x));
+                host.VirtualizeDirectory(engineEnvironmentSettings.Paths.TemplateEngineRootDir);
+            }
+            else
+            {
+            	var tempateEngineRoot = Path.Combine(CreateTemporaryFolder(), ".templateengine");
+            	var engineEnvironmentSettings = new EngineEnvironmentSettings(host, (x) => new SettingsLoader(x), null, tempateEngineRoot);
+            }
             engineEnvironmentToDispose.Add(engineEnvironmentSettings);
             return engineEnvironmentSettings;
         }
 
         public string CreateTemporaryFolder()
         {
-            var folder = Path.Combine(Path.GetTempPath(), "DotnetNew3_Tests", Guid.NewGuid().ToString(), nameof(EnvironmentSettingsHelper));
+            string folder = TestUtils.CreateTemporaryFolder(nameof(EnvironmentSettingsHelper));
             foldersToCleanup.Add(folder);
-            Directory.CreateDirectory(folder);
             return folder;
         }
 
