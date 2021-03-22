@@ -2,10 +2,10 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.TemplateEngine.Abstractions.Installer;
 using Microsoft.TemplateEngine.Edge.Installers.NuGet;
 using Microsoft.TemplateEngine.TestHelper;
 
@@ -16,60 +16,60 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests.Mocks
         internal const string DefaultFeed = "test_feed";
         private PackageManager _packageManager;
 
-        internal MockPackageManager ()
+        internal MockPackageManager()
         {
 
         }
 
-        internal MockPackageManager (PackageManager packageManager)
+        internal MockPackageManager(PackageManager packageManager)
         {
             _packageManager = packageManager;
         }
 
-        public Task<NuGetPackageInfo> DownloadPackageAsync(InstallRequest installRequest, string downloadPath, CancellationToken cancellationToken)
+        public Task<NuGetPackageInfo> DownloadPackageAsync(string downloadPath, string identifier, string version = null, IEnumerable<string> additionalSources = null, CancellationToken cancellationToken = default)
         {
             // names of exceptions throw them for test purposes
-            switch (installRequest.Identifier)
+            switch (identifier)
             {
                 case nameof(InvalidNuGetSourceException): throw new InvalidNuGetSourceException("test message");
-                case nameof(DownloadException): throw new DownloadException(installRequest.Identifier, installRequest.Version, new[] { DefaultFeed });
-                case nameof(PackageNotFoundException): throw new PackageNotFoundException(installRequest.Identifier, new[] { DefaultFeed });
+                case nameof(DownloadException): throw new DownloadException(identifier, version, new[] { DefaultFeed });
+                case nameof(PackageNotFoundException): throw new PackageNotFoundException(identifier, new[] { DefaultFeed });
                 case nameof(Exception): throw new Exception("Generic error");
             }
 
             string testPackageLocation = _packageManager.PackTestTemplatesNuGetPackage();
             string targetFileName;
-            if (string.IsNullOrWhiteSpace(installRequest.Version))
+            if (string.IsNullOrWhiteSpace(version))
             {
                 targetFileName = Path.GetFileName(testPackageLocation);
             }
             else
             {
-                targetFileName = $"{Path.GetFileNameWithoutExtension(testPackageLocation)}.{installRequest.Version}.nupkg";
+                targetFileName = $"{Path.GetFileNameWithoutExtension(testPackageLocation)}.{version}.nupkg";
             }
             File.Copy(testPackageLocation, Path.Combine(downloadPath, targetFileName));
             return Task.FromResult(new NuGetPackageInfo
             {
                 Author = "Microsoft",
                 FullPath = Path.Combine(downloadPath, targetFileName),
-                PackageIdentifier = installRequest.Identifier,
-                PackageVersion = installRequest.Version,
-                NuGetSource = installRequest.Details?.ContainsKey(InstallerConstants.NuGetSourcesKey) ?? false ? installRequest.Details[InstallerConstants.NuGetSourcesKey] : DefaultFeed
+                PackageIdentifier = identifier,
+                PackageVersion = version,
+                NuGetSource = DefaultFeed
             });
         }
 
-        public Task<CheckUpdateResult> GetLatestVersionAsync(NuGetManagedTemplatesSource source, CancellationToken cancellationToken)
+        public Task<(string latestVersion, bool isLatestVersion)> GetLatestVersionAsync(string identifier, string version = null, string additionalNuGetSource = null, CancellationToken cancellationToken = default)
         {
             // names of exceptions throw them for test purposes
-            switch (source.Identifier)
+            switch (identifier)
             {
                 case nameof(InvalidNuGetSourceException): throw new InvalidNuGetSourceException("test message");
-                case nameof(DownloadException): throw new DownloadException(source.Identifier, source.Version, new[] { DefaultFeed });
-                case nameof(PackageNotFoundException): throw new PackageNotFoundException(source.Identifier, new[] { DefaultFeed });
+                case nameof(DownloadException): throw new DownloadException(identifier, version, new[] { DefaultFeed });
+                case nameof(PackageNotFoundException): throw new PackageNotFoundException(identifier, new[] { DefaultFeed });
                 case nameof(Exception): throw new Exception("Generic error");
             }
 
-            return Task.FromResult(CheckUpdateResult.CreateSuccess(source, "1.0.0", source.Version != "1.0.0"));
+            return Task.FromResult(("1.0.0", version != "1.0.0"));
         }
     }
 }

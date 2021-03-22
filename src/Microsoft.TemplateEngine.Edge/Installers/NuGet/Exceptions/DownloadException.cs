@@ -23,7 +23,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             SourcesList = attemptedSources;
         }
 
-        public DownloadException(string packageIdentifier, string packageVersion, IEnumerable<string> attemptedSources, Exception inner) : base($"Failed to download{packageIdentifier}::{packageVersion} from NuGet feeds {string.Join(";", attemptedSources)}", inner)
+        public DownloadException(string packageIdentifier, string packageVersion, IEnumerable<string> attemptedSources, Exception inner) : base($"Failed to download {packageIdentifier}::{packageVersion} from NuGet feeds {string.Join(";", attemptedSources)}", inner)
         {
             PackageIdentifier = packageIdentifier;
             PackageVersion = packageVersion;

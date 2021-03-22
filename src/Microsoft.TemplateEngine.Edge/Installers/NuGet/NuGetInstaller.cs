@@ -98,7 +98,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                     {
                         try
                         {
-                            return await _updateChecker.GetLatestVersionAsync(nugetSource, CancellationToken.None).ConfigureAwait(false);
+                            (string latestVersion, bool isLatestVersion) = await _updateChecker.GetLatestVersionAsync(nugetSource.Identifier, nugetSource.Version, nugetSource.NuGetSource, cancellationToken).ConfigureAwait(false);
+                            return CheckUpdateResult.CreateSuccess(source, latestVersion, isLatestVersion);
                         }
                         catch (PackageNotFoundException e)
                         {
@@ -142,7 +143,19 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 }
                 else
                 {
-                    nuGetPackageInfo = await _packageDownloader.DownloadPackageAsync(installRequest, _installPath, CancellationToken.None).ConfigureAwait(false);
+                    string[] sources = Array.Empty<string>();
+                    if (installRequest.Details?.ContainsKey(InstallerConstants.NuGetSourcesKey) ?? false)
+                    {
+                        sources = installRequest.Details[InstallerConstants.NuGetSourcesKey].Split(InstallerConstants.NuGetSourcesSeparator);
+                    }
+
+                    nuGetPackageInfo = await _packageDownloader.DownloadPackageAsync(
+                        _installPath,
+                        installRequest.Identifier,
+                        installRequest.Version,
+                        sources,
+                        cancellationToken)
+                        .ConfigureAwait(false);
                 }
 
                 sourceDetails[NuGetManagedTemplatesSource.AuthorKey] = nuGetPackageInfo.Author;
