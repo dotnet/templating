@@ -88,11 +88,11 @@ namespace Microsoft.TemplateEngine.IDE
         #region Template Package Management
 
         /// <summary>
-        /// Get the list of available template packages
+        /// Gets the list of available template packages.
         /// </summary>
         /// <param name="cancellationToken"></param>
-        /// <returns>the list of the template packages</returns>
-        public Task<IReadOnlyList<ITemplatesSource>> GetTemplatesSources(CancellationToken cancellationToken = default)
+        /// <returns>the list of the template packages.</returns>
+        public Task<IReadOnlyList<ITemplatesSource>> GetTemplatePackages(CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             EnsureInitialized();
@@ -100,11 +100,11 @@ namespace Microsoft.TemplateEngine.IDE
         }
 
         /// <summary>
-        /// Get the list of available managed template packages
+        /// Gets the list of available managed template packages.
         /// </summary>
         /// <param name="cancellationToken"></param>
-        /// <returns>the list of managed template packages</returns>
-        public Task<IReadOnlyList<IManagedTemplatesSource>> GetManagedTemplatesSources(CancellationToken cancellationToken = default)
+        /// <returns>the list of managed template packages.</returns>
+        public Task<IReadOnlyList<IManagedTemplatesSource>> GetManagedTemplatePackages(CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             EnsureInitialized();
@@ -113,16 +113,16 @@ namespace Microsoft.TemplateEngine.IDE
 
         /// <summary>
         /// Installs the template packages
-        /// The following templates packages are supported by default:
+        /// The following template packages are supported by default:
         /// - the NuGet package from NuGet feed
         /// - the NuGet package available at the path
-        /// - the folder containing the template
+        /// - the folder containing the template.
         /// </summary>
-        /// <param name="installRequests">the list of <see cref="InstallRequest"/> to install</param>
-        /// <param name="scope"><see cref="InstallationScope"/> to use</param>
+        /// <param name="installRequests">the list of <see cref="InstallRequest"/> to install.</param>
+        /// <param name="scope"><see cref="InstallationScope"/> to use.</param>
         /// <param name="cancellationToken"></param>
-        /// <returns>the list of <see cref="InstallResult"/> containing installation result for each <see cref="InstallRequest"/></returns>
-        public Task<IReadOnlyList<InstallResult>> InstallAsync(IEnumerable<InstallRequest> installRequests, InstallationScope scope = InstallationScope.Global, CancellationToken cancellationToken = default)
+        /// <returns>the list of <see cref="InstallResult"/> containing installation result for each <see cref="InstallRequest"/>.</returns>
+        public Task<IReadOnlyList<InstallResult>> InstallTemplatePackagesAsync(IEnumerable<InstallRequest> installRequests, InstallationScope scope = InstallationScope.Global, CancellationToken cancellationToken = default)
         {
             _ = installRequests ?? throw new ArgumentNullException(nameof(installRequests));
             cancellationToken.ThrowIfCancellationRequested();
@@ -148,11 +148,11 @@ namespace Microsoft.TemplateEngine.IDE
         }
 
         /// <summary>
-        /// Gets the latest template package version for <paramref name="managedSources"/>
+        /// Gets the latest template package version for <paramref name="managedSources"/>.
         /// </summary>
-        /// <param name="managedSources">the template packages to check the version for</param>
+        /// <param name="managedSources">the template packages to check the version for.</param>
         /// <param name="cancellationToken"></param>
-        /// <returns>the list of <see cref="CheckUpdateResult"/> containing the result for each <see cref="IManagedTemplatesSource"/></returns>
+        /// <returns>the list of <see cref="CheckUpdateResult"/> containing the result for each <see cref="IManagedTemplatesSource"/>.</returns>
         public async Task<IReadOnlyList<CheckUpdateResult>> GetLatestVersionsAsync(IEnumerable<IManagedTemplatesSource> managedSources, CancellationToken cancellationToken = default)
         {
             _ = managedSources ?? throw new ArgumentNullException(nameof(managedSources));
@@ -171,12 +171,12 @@ namespace Microsoft.TemplateEngine.IDE
         }
 
         /// <summary>
-        /// Updates the template packages to version specified in <see cref="UpdateRequest"/>
+        /// Updates the template packages to version specified in <see cref="UpdateRequest"/>.
         /// </summary>
-        /// <param name="updateRequests">the list of <see cref="UpdateRequest"/> to perform</param>
+        /// <param name="updateRequests">the list of <see cref="UpdateRequest"/> to perform.</param>
         /// <param name="cancellationToken"></param>
-        /// <returns>the list of <see cref="UpdateResult"/> containing the result for each <see cref="UpdateRequest"/></returns>
-        public async Task<IReadOnlyList<UpdateResult>> UpdateAsync(IEnumerable<UpdateRequest> updateRequests, CancellationToken cancellationToken = default)
+        /// <returns>the list of <see cref="UpdateResult"/> containing the result for each <see cref="UpdateRequest"/>.</returns>
+        public async Task<IReadOnlyList<UpdateResult>> UpdateTemplatePackagesAsync(IEnumerable<UpdateRequest> updateRequests, CancellationToken cancellationToken = default)
         {
             _ = updateRequests ?? throw new ArgumentNullException(nameof(updateRequests));
             cancellationToken.ThrowIfCancellationRequested();
@@ -194,12 +194,12 @@ namespace Microsoft.TemplateEngine.IDE
         }
 
         /// <summary>
-        /// Uninstalls the <paramref name="managedSources"/>
+        /// Uninstalls the template packages.
         /// </summary>
-        /// <param name="managedSources">the list of <see cref="IManagedTemplatesSource"/> to uninstall</param>
+        /// <param name="managedSources">the list of <see cref="IManagedTemplatesSource"/> to uninstall.</param>
         /// <param name="cancellationToken"></param>
-        /// <returns>the list of <see cref="UninstallResult"/> containing the result for each <see cref="IManagedTemplatesSource"/></returns>
-        public async Task<IReadOnlyList<UninstallResult>> UninstallAsync(IEnumerable<IManagedTemplatesSource> managedSources, CancellationToken cancellationToken = default)
+        /// <returns>the list of <see cref="UninstallResult"/> containing the result for each <see cref="IManagedTemplatesSource"/>.</returns>
+        public async Task<IReadOnlyList<UninstallResult>> UninstallTemplatePackagesAsync(IEnumerable<IManagedTemplatesSource> managedSources, CancellationToken cancellationToken = default)
         {
             _ = managedSources ?? throw new ArgumentNullException(nameof(managedSources));
             cancellationToken.ThrowIfCancellationRequested();
@@ -219,19 +219,19 @@ namespace Microsoft.TemplateEngine.IDE
         #endregion
 
         #region Obsolete
-        [Obsolete("use Task<IReadOnlyList<InstallResult>> InstallAsync(IEnumerable<InstallRequest> installRequests, InstallationScope scope = InstallationScope.Global, CancellationToken cancellationToken = default) instead")]
+        [Obsolete("use Task<IReadOnlyList<InstallResult>> InstallTemplatePackagesAsync(IEnumerable<InstallRequest> installRequests, InstallationScope scope = InstallationScope.Global, CancellationToken cancellationToken = default) instead")]
         public void Install(string path)
         {
             Install(new[] { path });
         }
 
-        [Obsolete("use Task<IReadOnlyList<InstallResult>> InstallAsync(IEnumerable<InstallRequest> installRequests, InstallationScope scope = InstallationScope.Global, CancellationToken cancellationToken = default) instead")]
+        [Obsolete("use Task<IReadOnlyList<InstallResult>> InstallTemplatePackagesAsync(IEnumerable<InstallRequest> installRequests, InstallationScope scope = InstallationScope.Global, CancellationToken cancellationToken = default) instead")]
         public void Install(params string[] paths)
         {
             Install((IEnumerable<string>)paths);
         }
 
-        [Obsolete("use Task<IReadOnlyList<InstallResult>> InstallAsync(IEnumerable<InstallRequest> installRequests, InstallationScope scope = InstallationScope.Global, CancellationToken cancellationToken = default) instead")]
+        [Obsolete("use Task<IReadOnlyList<InstallResult>> InstallTemplatePackagesAsync(IEnumerable<InstallRequest> installRequests, InstallationScope scope = InstallationScope.Global, CancellationToken cancellationToken = default) instead")]
         public void Install(IEnumerable<string> paths)
         {
             _ = paths ?? throw new ArgumentNullException(nameof(paths));
@@ -243,23 +243,23 @@ namespace Microsoft.TemplateEngine.IDE
             }
 
             var installRequests = paths.Select(path => new InstallRequest() { Identifier = path }).ToList();
-            Task<IReadOnlyList<InstallResult>> t = InstallAsync(installRequests);
+            Task<IReadOnlyList<InstallResult>> t = InstallTemplatePackagesAsync(installRequests);
             t.Wait();
         }
 
-        [Obsolete("use Task<IReadOnlyList<UninstallResult>> UninstallAsync(IEnumerable<IManagedTemplatesSource> managedSources, CancellationToken cancellationToken = default) instead")]
+        [Obsolete("use Task<IReadOnlyList<UninstallResult>> UninstallTemplatePackagesAsync(IEnumerable<IManagedTemplatesSource> managedSources, CancellationToken cancellationToken = default) instead")]
         public IEnumerable<string> Uninstall(string path)
         {
             return Uninstall(new[] { path });
         }
 
-        [Obsolete("use Task<IReadOnlyList<UninstallResult>> UninstallAsync(IEnumerable<IManagedTemplatesSource> managedSources, CancellationToken cancellationToken = default) instead")]
+        [Obsolete("use Task<IReadOnlyList<UninstallResult>> UninstallTemplatePackagesAsync(IEnumerable<IManagedTemplatesSource> managedSources, CancellationToken cancellationToken = default) instead")]
         public IEnumerable<string> Uninstall(params string[] paths)
         {
             return Uninstall((IEnumerable<string>)paths);
         }
 
-        [Obsolete("use Task<IReadOnlyList<UninstallResult>> UninstallAsync(IEnumerable<IManagedTemplatesSource> managedSources, CancellationToken cancellationToken = default) instead")]
+        [Obsolete("use Task<IReadOnlyList<UninstallResult>> UninstallTemplatePackagesAsync(IEnumerable<IManagedTemplatesSource> managedSources, CancellationToken cancellationToken = default) instead")]
         public IEnumerable<string> Uninstall(IEnumerable<string> paths)
         {
             _ = paths ?? throw new ArgumentNullException(nameof(paths));
@@ -270,7 +270,7 @@ namespace Microsoft.TemplateEngine.IDE
                 return Array.Empty<string>();
             }
 
-            var task = GetManagedTemplatesSources();
+            var task = GetManagedTemplatePackages();
             task.Wait();
             var templateSources = task.Result;
 
@@ -280,7 +280,7 @@ namespace Microsoft.TemplateEngine.IDE
                 sourcesToUninstall.AddRange(templateSources.Where(source => source.Identifier.Equals(path, StringComparison.OrdinalIgnoreCase)));
             }
 
-            Task<IReadOnlyList<UninstallResult>> uninstallTask = UninstallAsync(sourcesToUninstall);
+            Task<IReadOnlyList<UninstallResult>> uninstallTask = UninstallTemplatePackagesAsync(sourcesToUninstall);
             uninstallTask.Wait();
             return uninstallTask.Result.Select(result => result.Source.Identifier);
         }
