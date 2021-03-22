@@ -13,6 +13,7 @@ using Microsoft.TemplateEngine.Edge;
 using Microsoft.TemplateEngine.Utils;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects;
 using System.Threading;
+using System.Globalization;
 
 namespace Microsoft.TemplateEngine.TestHelper
 {
@@ -21,14 +22,15 @@ namespace Microsoft.TemplateEngine.TestHelper
         List<string> foldersToCleanup = new List<string>();
         List<EngineEnvironmentSettings> engineEnvironmentToDispose = new List<EngineEnvironmentSettings>();
 
-        public IEngineEnvironmentSettings CreateEnvironment(string locale = "en-US")
+        public IEngineEnvironmentSettings CreateEnvironment(string locale = null)
         {
+            if (string.IsNullOrEmpty(locale))
+                locale = "en-US";
             Environment.SetEnvironmentVariable(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "USERPROFILE" : "HOME", CreateTemporaryFolder());
             ITemplateEngineHost host = new TestHost
             {
                 HostIdentifier = "TestRunner",
                 Version = "1.0.0.0",
-                Locale = locale,
                 BuiltInComponents = new AssemblyComponentCatalog(new List<Assembly>()
                 {
                     typeof(RunnableProjectGenerator).Assembly,//RunnableProject
@@ -37,7 +39,7 @@ namespace Microsoft.TemplateEngine.TestHelper
                 FileSystem = new MonitoredFileSystem(new PhysicalFileSystem()),
                 FallbackHostTemplateConfigNames = new[] { "dotnetcli" }
             };
-
+            CultureInfo.CurrentUICulture = new CultureInfo(locale);
             var engineEnvironmentSettings = new EngineEnvironmentSettings(host, (x) => new SettingsLoader(x));
             engineEnvironmentToDispose.Add(engineEnvironmentSettings);
             return engineEnvironmentSettings;

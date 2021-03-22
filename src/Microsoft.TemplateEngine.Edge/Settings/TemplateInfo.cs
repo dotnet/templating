@@ -10,7 +10,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 {
     public class TemplateInfo : ITemplateInfo, IShortNameList
     {
-        public static readonly string CurrentVersion = "1.0.0.3";
+        public static readonly string CurrentVersion = "1.0.0.4";
 
         public TemplateInfo()
         {
