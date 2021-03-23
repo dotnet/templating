@@ -26,7 +26,7 @@ namespace Microsoft.TemplateEngine.TestHelper
         {
             if (string.IsNullOrEmpty(locale))
                 locale = "en-US";
-            Environment.SetEnvironmentVariable(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "USERPROFILE" : "HOME", CreateTemporaryFolder());
+
             ITemplateEngineHost host = new TestHost
             {
                 HostIdentifier = "TestRunner",
@@ -40,7 +40,8 @@ namespace Microsoft.TemplateEngine.TestHelper
                 FallbackHostTemplateConfigNames = new[] { "dotnetcli" }
             };
             CultureInfo.CurrentUICulture = new CultureInfo(locale);
-            var engineEnvironmentSettings = new EngineEnvironmentSettings(host, (x) => new SettingsLoader(x));
+            var tempateEngineRoot = Path.Combine(CreateTemporaryFolder(), ".templateengine");
+            var engineEnvironmentSettings = new EngineEnvironmentSettings(host, (x) => new SettingsLoader(x), null, tempateEngineRoot);
             engineEnvironmentToDispose.Add(engineEnvironmentSettings);
             return engineEnvironmentSettings;
         }
