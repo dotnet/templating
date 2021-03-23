@@ -28,9 +28,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
         internal NuGetApiPackageManager(IEngineEnvironmentSettings settings)
         {
-            _ = settings ?? throw new ArgumentNullException(nameof(settings));
-
-            _environmentSettings = settings;
+            _environmentSettings = settings ?? throw new ArgumentNullException(nameof(settings));
             _nugetLogger = new NuGetLogger(settings);
         }
 

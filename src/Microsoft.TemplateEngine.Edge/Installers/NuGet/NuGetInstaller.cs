@@ -143,17 +143,17 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 }
                 else
                 {
-                    string[] sources = Array.Empty<string>();
-                    if (installRequest.Details?.ContainsKey(InstallerConstants.NuGetSourcesKey) ?? false)
+                    string[] additionalNuGetSources = Array.Empty<string>();
+                    if (installRequest.Details != null && installRequest.Details.TryGetValue(InstallerConstants.NuGetSourcesKey, out string nugetSources))
                     {
-                        sources = installRequest.Details[InstallerConstants.NuGetSourcesKey].Split(InstallerConstants.NuGetSourcesSeparator);
+                        additionalNuGetSources = nugetSources.Split(InstallerConstants.NuGetSourcesSeparator);
                     }
 
                     nuGetPackageInfo = await _packageDownloader.DownloadPackageAsync(
                         _installPath,
                         installRequest.Identifier,
                         installRequest.Version,
-                        sources,
+                        additionalNuGetSources,
                         cancellationToken)
                         .ConfigureAwait(false);
                 }

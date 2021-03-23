@@ -24,6 +24,7 @@ namespace Microsoft.TemplateEngine.TestHelper
             if (string.IsNullOrEmpty(locale))
             {
                 locale = "en-US";
+            }
 
             ITemplateEngineHost host = new TestHost
             {
@@ -46,16 +47,16 @@ namespace Microsoft.TemplateEngine.TestHelper
             }
             else
             {
-            	var tempateEngineRoot = Path.Combine(CreateTemporaryFolder(), ".templateengine");
-            	var engineEnvironmentSettings = new EngineEnvironmentSettings(host, (x) => new SettingsLoader(x), null, tempateEngineRoot);
+                var tempateEngineRoot = Path.Combine(CreateTemporaryFolder(), ".templateengine");
+                engineEnvironmentSettings = new EngineEnvironmentSettings(host, (x) => new SettingsLoader(x), null, tempateEngineRoot);
             }
             engineEnvironmentToDispose.Add(engineEnvironmentSettings);
             return engineEnvironmentSettings;
         }
 
-        public string CreateTemporaryFolder()
+        public string CreateTemporaryFolder(string name = "")
         {
-            string folder = TestUtils.CreateTemporaryFolder(nameof(EnvironmentSettingsHelper));
+            string folder = TestUtils.CreateTemporaryFolder(name);
             foldersToCleanup.Add(folder);
             return folder;
         }

@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -11,14 +12,20 @@ using Xunit;
 
 namespace Microsoft.TemplateEngine.Edge.UnitTests
 {
-    public class NuGetApiPackageManagerTests
+    public class NuGetApiPackageManagerTests : IClassFixture<EnvironmentSettingsHelper>
     {
+        private EnvironmentSettingsHelper _environmentSettingsHelper;
+
+        public NuGetApiPackageManagerTests (EnvironmentSettingsHelper environmentSettingsHelper)
+        {
+            _environmentSettingsHelper = environmentSettingsHelper;
+        }
+
         [Fact]
         public async Task DownloadPackage_Latest()
         {
-            string installPath = TestUtils.CreateTemporaryFolder();
-            EnvironmentSettingsHelper helper = new EnvironmentSettingsHelper();
-            IEngineEnvironmentSettings engineEnvironmentSettings = helper.CreateEnvironment(virtualize: true);
+            string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
 
             NuGetApiPackageManager packageManager = new NuGetApiPackageManager(engineEnvironmentSettings);
             var result = await packageManager.DownloadPackageAsync(installPath, "Microsoft.DotNet.Common.ProjectTemplates.5.0").ConfigureAwait(false);
@@ -34,9 +41,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         [Fact]
         public async Task DownloadPackage_SpecificVersion()
         {
-            string installPath = TestUtils.CreateTemporaryFolder();
-            EnvironmentSettingsHelper helper = new EnvironmentSettingsHelper();
-            IEngineEnvironmentSettings engineEnvironmentSettings = helper.CreateEnvironment(virtualize: true);
+            string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
 
             NuGetApiPackageManager packageManager = new NuGetApiPackageManager(engineEnvironmentSettings);
             var result = await packageManager.DownloadPackageAsync (installPath, "Microsoft.DotNet.Common.ProjectTemplates.5.0", "5.0.0").ConfigureAwait(false);
@@ -52,9 +58,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         [Fact]
         public async Task DownloadPackage_UnknownPackage()
         {
-            string installPath = TestUtils.CreateTemporaryFolder();
-            EnvironmentSettingsHelper helper = new EnvironmentSettingsHelper();
-            IEngineEnvironmentSettings engineEnvironmentSettings = helper.CreateEnvironment(virtualize: true);
+            string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
 
             NuGetApiPackageManager packageManager = new NuGetApiPackageManager(engineEnvironmentSettings);
             var exception = await Assert.ThrowsAsync<PackageNotFoundException>(() => packageManager.DownloadPackageAsync(installPath, "Microsoft.DotNet.NotCommon.ProjectTemplates.5.0", "5.0.0")).ConfigureAwait(false);
@@ -68,8 +73,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         public async Task DownloadPackage_InvalidPath()
         {
             string installPath = ":/?";
-            EnvironmentSettingsHelper helper = new EnvironmentSettingsHelper();
-            IEngineEnvironmentSettings engineEnvironmentSettings = helper.CreateEnvironment(virtualize: true);
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
 
             NuGetApiPackageManager packageManager = new NuGetApiPackageManager(engineEnvironmentSettings);
             var exception = await Assert.ThrowsAsync<DownloadException>(() => packageManager.DownloadPackageAsync(installPath, "Microsoft.DotNet.Common.ProjectTemplates.5.0", "5.0.0")).ConfigureAwait(false);
@@ -82,9 +86,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         [Fact]
         public async Task DownloadPackage_CannotOverwritePackage()
         {
-            string installPath = TestUtils.CreateTemporaryFolder();
-            EnvironmentSettingsHelper helper = new EnvironmentSettingsHelper();
-            IEngineEnvironmentSettings engineEnvironmentSettings = helper.CreateEnvironment(virtualize: true);
+            string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
 
             NuGetApiPackageManager packageManager = new NuGetApiPackageManager(engineEnvironmentSettings);
             await packageManager.DownloadPackageAsync(installPath, "Microsoft.DotNet.Common.ProjectTemplates.5.0", "5.0.0").ConfigureAwait(false);
@@ -98,8 +101,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         [Fact]
         public async Task GetLatestVersion_Success()
         {
-            EnvironmentSettingsHelper helper = new EnvironmentSettingsHelper();
-            IEngineEnvironmentSettings engineEnvironmentSettings = helper.CreateEnvironment(virtualize: true);
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
 
             NuGetApiPackageManager packageManager = new NuGetApiPackageManager(engineEnvironmentSettings);
             (string latestVersion, bool isLatestVersion) = await packageManager.GetLatestVersionAsync("Microsoft.DotNet.Common.ProjectTemplates.5.0").ConfigureAwait(false);
@@ -111,8 +113,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         [Fact]
         public async Task GetLatestVersion_SpecificVersion()
         {
-            EnvironmentSettingsHelper helper = new EnvironmentSettingsHelper();
-            IEngineEnvironmentSettings engineEnvironmentSettings = helper.CreateEnvironment(virtualize: true);
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
 
             NuGetApiPackageManager packageManager = new NuGetApiPackageManager(engineEnvironmentSettings);
             (string latestVersion, bool isLatestVersion) = await packageManager.GetLatestVersionAsync("Microsoft.DotNet.Common.ProjectTemplates.5.0", "5.0.0").ConfigureAwait(false);
@@ -124,8 +125,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         [Fact]
         public async Task GetLatestVersion_UnknownPackage()
         {
-            EnvironmentSettingsHelper helper = new EnvironmentSettingsHelper();
-            IEngineEnvironmentSettings engineEnvironmentSettings = helper.CreateEnvironment(virtualize: true);
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
 
             NuGetApiPackageManager packageManager = new NuGetApiPackageManager(engineEnvironmentSettings);
             var exception = await Assert.ThrowsAsync<PackageNotFoundException>(() => packageManager.GetLatestVersionAsync("Microsoft.DotNet.NotCommon.ProjectTemplates.5.0", "5.0.0")).ConfigureAwait(false);

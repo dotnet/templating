@@ -20,12 +20,15 @@ using Xunit;
 
 namespace Microsoft.TemplateEngine.Edge.UnitTests
 {
-    public class NuGetInstallerTests : IClassFixture<PackageManager>
+    public class NuGetInstallerTests : IClassFixture<PackageManager>, IClassFixture<EnvironmentSettingsHelper>
     {
         private PackageManager _packageManager;
-        public NuGetInstallerTests(PackageManager packageManager)
+        private EnvironmentSettingsHelper _environmentSettingsHelper;
+
+        public NuGetInstallerTests(PackageManager packageManager, EnvironmentSettingsHelper environmentSettingsHelper)
         {
             _packageManager = packageManager;
+            _environmentSettingsHelper = environmentSettingsHelper;
         }
 
         [Fact]
@@ -33,9 +36,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         {
             MockInstallerFactory factory = new MockInstallerFactory();
             MockManagedTemplatesPackageProvider provider = new MockManagedTemplatesPackageProvider();
-            string installPath = TestUtils.CreateTemporaryFolder();
-            EnvironmentSettingsHelper helper = new EnvironmentSettingsHelper();
-            IEngineEnvironmentSettings engineEnvironmentSettings = helper.CreateEnvironment(virtualize: true);
+            string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
             MockPackageManager mockPackageManager = new MockPackageManager();
 
             NuGetInstaller installer = new NuGetInstaller(factory, provider, engineEnvironmentSettings, installPath, mockPackageManager, mockPackageManager);
@@ -53,9 +55,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         {
             MockInstallerFactory factory = new MockInstallerFactory();
             MockManagedTemplatesPackageProvider provider = new MockManagedTemplatesPackageProvider();
-            string installPath = TestUtils.CreateTemporaryFolder();
-            EnvironmentSettingsHelper helper = new EnvironmentSettingsHelper();
-            IEngineEnvironmentSettings engineEnvironmentSettings = helper.CreateEnvironment(virtualize: true);
+            string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
             MockPackageManager mockPackageManager = new MockPackageManager();
 
             NuGetInstaller installer = new NuGetInstaller(factory, provider, engineEnvironmentSettings, installPath, mockPackageManager, mockPackageManager);
@@ -73,9 +74,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         {
             MockInstallerFactory factory = new MockInstallerFactory();
             MockManagedTemplatesPackageProvider provider = new MockManagedTemplatesPackageProvider();
-            string installPath = TestUtils.CreateTemporaryFolder();
-            EnvironmentSettingsHelper helper = new EnvironmentSettingsHelper();
-            IEngineEnvironmentSettings engineEnvironmentSettings = helper.CreateEnvironment(virtualize: true);
+            string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
             MockPackageManager mockPackageManager = new MockPackageManager();
 
             NuGetInstaller installer = new NuGetInstaller(factory, provider, engineEnvironmentSettings, installPath, mockPackageManager, mockPackageManager);
@@ -99,9 +99,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         {
             MockInstallerFactory factory = new MockInstallerFactory();
             MockManagedTemplatesPackageProvider provider = new MockManagedTemplatesPackageProvider();
-            string installPath = TestUtils.CreateTemporaryFolder();
-            EnvironmentSettingsHelper helper = new EnvironmentSettingsHelper();
-            IEngineEnvironmentSettings engineEnvironmentSettings = helper.CreateEnvironment(virtualize: true);
+            string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
             MockPackageManager mockPackageManager = new MockPackageManager();
 
             NuGetInstaller installer = new NuGetInstaller(factory, provider, engineEnvironmentSettings, installPath, mockPackageManager, mockPackageManager);
@@ -118,9 +117,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         {
             MockInstallerFactory factory = new MockInstallerFactory();
             MockManagedTemplatesPackageProvider provider = new MockManagedTemplatesPackageProvider();
-            string installPath = TestUtils.CreateTemporaryFolder();
-            EnvironmentSettingsHelper helper = new EnvironmentSettingsHelper();
-            IEngineEnvironmentSettings engineEnvironmentSettings = helper.CreateEnvironment(virtualize: true);
+            string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
             MockPackageManager mockPackageManager = new MockPackageManager();
 
             NuGetInstaller installer = new NuGetInstaller(factory, provider, engineEnvironmentSettings, installPath, mockPackageManager, mockPackageManager);
@@ -154,9 +152,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         {
             MockInstallerFactory factory = new MockInstallerFactory();
             MockManagedTemplatesPackageProvider provider = new MockManagedTemplatesPackageProvider();
-            string installPath = TestUtils.CreateTemporaryFolder();
-            EnvironmentSettingsHelper helper = new EnvironmentSettingsHelper();
-            IEngineEnvironmentSettings engineEnvironmentSettings = helper.CreateEnvironment(virtualize: true);
+            string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
             MockPackageManager mockPackageManager = new MockPackageManager();
 
             NuGetInstaller installer = new NuGetInstaller(factory, provider, engineEnvironmentSettings, installPath, mockPackageManager, mockPackageManager);
@@ -180,9 +177,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         {
             MockInstallerFactory factory = new MockInstallerFactory();
             MockManagedTemplatesPackageProvider provider = new MockManagedTemplatesPackageProvider();
-            string installPath = TestUtils.CreateTemporaryFolder();
-            EnvironmentSettingsHelper helper = new EnvironmentSettingsHelper();
-            IEngineEnvironmentSettings engineEnvironmentSettings = helper.CreateEnvironment(virtualize: true);
+            string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
             MockPackageManager mockPackageManager = new MockPackageManager();
 
             NuGetInstaller installer = new NuGetInstaller(factory, provider, engineEnvironmentSettings, installPath, mockPackageManager, mockPackageManager);
@@ -212,9 +208,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         {
             MockInstallerFactory factory = new MockInstallerFactory();
             MockManagedTemplatesPackageProvider provider = new MockManagedTemplatesPackageProvider();
-            string installPath = TestUtils.CreateTemporaryFolder();
-            EnvironmentSettingsHelper helper = new EnvironmentSettingsHelper();
-            IEngineEnvironmentSettings engineEnvironmentSettings = helper.CreateEnvironment(virtualize: true);
+            string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
             MockPackageManager mockPackageManager = new MockPackageManager(_packageManager);
 
             NuGetInstaller installer = new NuGetInstaller(factory, provider, engineEnvironmentSettings, installPath, mockPackageManager, mockPackageManager);
@@ -252,9 +247,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         {
             MockInstallerFactory factory = new MockInstallerFactory();
             MockManagedTemplatesPackageProvider provider = new MockManagedTemplatesPackageProvider();
-            string installPath = TestUtils.CreateTemporaryFolder();
-            EnvironmentSettingsHelper helper = new EnvironmentSettingsHelper();
-            IEngineEnvironmentSettings engineEnvironmentSettings = helper.CreateEnvironment(virtualize: true);
+            string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
             MockPackageManager mockPackageManager = new MockPackageManager();
 
             NuGetInstaller installer = new NuGetInstaller(factory, provider, engineEnvironmentSettings, installPath, mockPackageManager, mockPackageManager);
@@ -277,9 +271,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         {
             MockInstallerFactory factory = new MockInstallerFactory();
             MockManagedTemplatesPackageProvider provider = new MockManagedTemplatesPackageProvider();
-            string installPath = TestUtils.CreateTemporaryFolder();
-            EnvironmentSettingsHelper helper = new EnvironmentSettingsHelper();
-            IEngineEnvironmentSettings engineEnvironmentSettings = helper.CreateEnvironment(virtualize: true);
+            string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
             MockPackageManager mockPackageManager = new MockPackageManager(_packageManager);
 
             NuGetInstaller installer = new NuGetInstaller(factory, provider, engineEnvironmentSettings, installPath, mockPackageManager, mockPackageManager);
@@ -316,9 +309,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         {
             MockInstallerFactory factory = new MockInstallerFactory();
             MockManagedTemplatesPackageProvider provider = new MockManagedTemplatesPackageProvider();
-            string installPath = TestUtils.CreateTemporaryFolder();
-            EnvironmentSettingsHelper helper = new EnvironmentSettingsHelper();
-            IEngineEnvironmentSettings engineEnvironmentSettings = helper.CreateEnvironment(virtualize: true);
+            string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
             MockPackageManager mockPackageManager = new MockPackageManager();
 
             NuGetInstaller installer = new NuGetInstaller(factory, provider, engineEnvironmentSettings, installPath, mockPackageManager, mockPackageManager);
@@ -342,9 +334,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         {
             MockInstallerFactory factory = new MockInstallerFactory();
             MockManagedTemplatesPackageProvider provider = new MockManagedTemplatesPackageProvider();
-            string installPath = TestUtils.CreateTemporaryFolder();
-            EnvironmentSettingsHelper helper = new EnvironmentSettingsHelper();
-            IEngineEnvironmentSettings engineEnvironmentSettings = helper.CreateEnvironment(virtualize: true);
+            string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
             MockPackageManager mockPackageManager = new MockPackageManager(_packageManager);
 
             NuGetInstaller installer = new NuGetInstaller(factory, provider, engineEnvironmentSettings, installPath, mockPackageManager, mockPackageManager);
@@ -377,9 +368,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         {
             MockInstallerFactory factory = new MockInstallerFactory();
             MockManagedTemplatesPackageProvider provider = new MockManagedTemplatesPackageProvider();
-            string installPath = TestUtils.CreateTemporaryFolder();
-            EnvironmentSettingsHelper helper = new EnvironmentSettingsHelper();
-            IEngineEnvironmentSettings engineEnvironmentSettings = helper.CreateEnvironment(virtualize: true);
+            string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
             MockPackageManager mockPackageManager = new MockPackageManager(_packageManager);
 
             NuGetInstaller installer = new NuGetInstaller(factory, provider, engineEnvironmentSettings, installPath, mockPackageManager, mockPackageManager);
@@ -466,9 +456,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         {
             MockInstallerFactory factory = new MockInstallerFactory();
             MockManagedTemplatesPackageProvider provider = new MockManagedTemplatesPackageProvider();
-            string installPath = TestUtils.CreateTemporaryFolder();
-            EnvironmentSettingsHelper helper = new EnvironmentSettingsHelper();
-            IEngineEnvironmentSettings engineEnvironmentSettings = helper.CreateEnvironment(virtualize: true);
+            string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
             MockPackageManager mockPackageManager = new MockPackageManager();
             NuGetInstaller installer = new NuGetInstaller(factory, provider, engineEnvironmentSettings, installPath, mockPackageManager, mockPackageManager);
 
