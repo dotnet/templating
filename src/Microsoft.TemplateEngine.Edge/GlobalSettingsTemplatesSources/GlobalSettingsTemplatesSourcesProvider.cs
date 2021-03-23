@@ -198,7 +198,14 @@ namespace Microsoft.TemplateEngine.Edge
                     }
                     if (!update)
                     {
-                        _environmentSettings.Host.LogMessage($"{sourceToBeUpdated.Identifier} is already installed, version: {sourceToBeUpdated.Version}, it will be replaced with {(string.IsNullOrWhiteSpace(identifier) ? "latest version" : $"version {version}")}.");
+                        _environmentSettings.Host.LogMessage(
+                            string.Format(
+                                LocalizableStrings.GlobalSettingsTemplatesSourcesProvider_Info_PackageAlreadyInstalled,
+                                sourceToBeUpdated.Identifier,
+                                sourceToBeUpdated.Version,
+                                string.IsNullOrWhiteSpace(identifier) ?
+                                    LocalizableStrings.Generic_LatestVersion :
+                                    string.Format(LocalizableStrings.Generic_Version, version)));
                     }
                     //if different version is installed - uninstall previous version first
                     UninstallResult uninstallResult = await installer.UninstallAsync(sourceToBeUpdated, cancellationToken).ConfigureAwait(false);
@@ -206,7 +213,11 @@ namespace Microsoft.TemplateEngine.Edge
                     {
                         return (InstallerErrorCode.UpdateUninstallFailed, uninstallResult.ErrorMessage);
                     }
-                    _environmentSettings.Host.LogMessage($"{sourceToBeUpdated.DisplayName} was successfully uninstalled.");
+                    _environmentSettings.Host.LogMessage(
+                        string.Format(
+                            LocalizableStrings.GlobalSettingsTemplatesSourcesProvider_Info_PackageUninstalled,
+                            sourceToBeUpdated.DisplayName));
+
                     lock (packages)
                     {
                         packages.RemoveAll(p => p.MountPointUri == sourceToBeUpdated.MountPointUri);

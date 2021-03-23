@@ -244,14 +244,15 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             }
             catch (Exception ex)
             {
-                _environmentSettings.Host.OnCriticalError(null, $"Failed to read content of package {installRequest.Identifier}.", null, 0);
+                _environmentSettings.Host.OnCriticalError(null, string.Format(LocalizableStrings.NuGetInstaller_Error_FailedToReadPackage, installRequest.Identifier), null, 0);
                 _environmentSettings.Host.LogDiagnosticMessage(DebugLogCategory, $"Details: {ex.ToString()}.");
                 throw new InvalidNuGetPackageException(installRequest.Identifier, ex);
             }
             string targetPackageLocation = Path.Combine(_installPath, packageInfo.PackageIdentifier + "." + packageInfo.PackageVersion + ".nupkg");
             if (_environmentSettings.Host.FileSystem.FileExists(targetPackageLocation))
             {
-                _environmentSettings.Host.OnCriticalError(null, $"File {targetPackageLocation} already exists.", null, 0);
+                _environmentSettings.Host.OnCriticalError(null, string.Format(LocalizableStrings.NuGetInstaller_Error_CopyFailed, installRequest.Identifier, targetPackageLocation), null, 0);
+                _environmentSettings.Host.OnCriticalError(null, string.Format(LocalizableStrings.NuGetInstaller_Error_FileAlreadyExists, targetPackageLocation), null, 0);
                 throw new DownloadException(packageInfo.PackageIdentifier, packageInfo.PackageVersion, installRequest.Identifier);
             }
 
@@ -261,7 +262,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             }
             catch (Exception ex)
             {
-                _environmentSettings.Host.OnCriticalError(null, $"Failed to copy package {installRequest.Identifier} to {targetPackageLocation}.", null, 0);
+                _environmentSettings.Host.OnCriticalError(null, string.Format(LocalizableStrings.NuGetInstaller_Error_CopyFailed, installRequest.Identifier, targetPackageLocation), null, 0);
                 _environmentSettings.Host.LogDiagnosticMessage(DebugLogCategory, $"Details: {ex.ToString()}.");
                 throw new DownloadException(packageInfo.PackageIdentifier, packageInfo.PackageVersion, installRequest.Identifier);
             }
