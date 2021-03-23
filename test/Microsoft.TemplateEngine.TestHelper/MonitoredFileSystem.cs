@@ -9,7 +9,7 @@ using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 
 namespace Microsoft.TemplateEngine.TestHelper
 {
-    public class MonitoredFileSystem : IPhysicalFileSystem
+    public class MonitoredFileSystem : IPhysicalFileSystem, IFileLastWriteTimeSource
     {
         private List<DirectoryScanParameters> _directoriesScanned = new List<DirectoryScanParameters>();
         private List<string> _filesOpened = new List<string>();
@@ -72,5 +72,7 @@ namespace Microsoft.TemplateEngine.TestHelper
         public void SetFileAttributes(string file, FileAttributes attributes) => _baseFileSystem.SetFileAttributes(file, attributes);
         public void WriteAllText(string path, string value) => _baseFileSystem.WriteAllText(path, value);
         public IDisposable WatchFileChanges(string filepath, FileSystemEventHandler fileChanged) => _baseFileSystem.WatchFileChanges(filepath, fileChanged);
+        public DateTime GetLastWriteTimeUtc(string file) => (_baseFileSystem as IFileLastWriteTimeSource)?.GetLastWriteTimeUtc(file) ?? throw new NotImplementedException();
+        public void SetLastWriteTimeUtc(string file, DateTime lastWriteTimeUtc) => (_baseFileSystem as IFileLastWriteTimeSource)?.SetLastWriteTimeUtc(file, lastWriteTimeUtc);
     }
 }
