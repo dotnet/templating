@@ -18,10 +18,15 @@ namespace Microsoft.TemplateEngine.Utils
         }
 
         public EngineEnvironmentSettings(ITemplateEngineHost host, Func<IEngineEnvironmentSettings, ISettingsLoader> settingsLoaderFactory, string hiveLocation)
+            :this(host, settingsLoaderFactory, hiveLocation, null)
+        {
+        }
+
+        public EngineEnvironmentSettings(ITemplateEngineHost host, Func<IEngineEnvironmentSettings, ISettingsLoader> settingsLoaderFactory, string hiveLocation, string engineRoot)
         {
             Host = host;
             Environment = new DefaultEnvironment();
-            Paths = new DefaultPathInfo(this, hiveLocation);
+            Paths = new DefaultPathInfo(this, engineRoot, hiveLocation);
             SettingsLoader = settingsLoaderFactory(this);
         }
 
@@ -45,7 +50,7 @@ namespace Microsoft.TemplateEngine.Utils
 
         private class DefaultPathInfo : IPathInfo
         {
-            public DefaultPathInfo(IEngineEnvironmentSettings parent, string hiveLocation)
+            public DefaultPathInfo(IEngineEnvironmentSettings parent, string hiveLocation, string engineRoot)
             {
                 bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
@@ -53,7 +58,7 @@ namespace Microsoft.TemplateEngine.Utils
                     ? "USERPROFILE"
                     : "HOME");
 
-                TemplateEngineRootDir = Path.Combine(UserProfileDir, ".templateengine");
+                TemplateEngineRootDir = engineRoot ?? Path.Combine(UserProfileDir, ".templateengine");
 
                 BaseDir = hiveLocation ?? Path.Combine(TemplateEngineRootDir, parent.Host.HostIdentifier, parent.Host.Version);
             }
