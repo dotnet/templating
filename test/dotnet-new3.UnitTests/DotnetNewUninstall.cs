@@ -247,7 +247,7 @@ namespace dotnet_new3.UnitTests
                 .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
                 .Execute()
                 .Should().Fail()
-                .And.HaveStdErrContaining("The template package 'Microsoft.DotNet.Common.ProjectTemplates.5.0' is not found.")
+                .And.HaveStdErrContaining("The template package 'Microsoft.DotNet.Common.ProjectTemplates.5.0' is not found")
                 .And.HaveStdErrContaining("To list installed template packages, use dotnet new3 -u");
 
         }
@@ -270,7 +270,7 @@ namespace dotnet_new3.UnitTests
                 .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
                 .Execute()
                 .Should().Fail()
-                .And.HaveStdErrContaining("The template package 'console' is not found.")
+                .And.HaveStdErrContaining("The template package 'console' is not found")
                 .And.HaveStdErrContaining("The template 'console' is included to the packages:")
                 .And.HaveStdErrContaining("Microsoft.DotNet.Common.ProjectTemplates.5.0::5.0.0 (contains 6 templates)")
                 //                .And.HaveStdErrContaining("To list the templates installed in a package, use dotnet new3 <new option> <package name>")
@@ -304,7 +304,7 @@ namespace dotnet_new3.UnitTests
                 .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
                 .Execute()
                 .Should().Fail()
-                .And.HaveStdErrContaining("The template package 'console' is not found.")
+                .And.HaveStdErrContaining("The template package 'console' is not found")
                 .And.HaveStdErrContaining("The template 'console' is included to the packages:")
                 .And.HaveStdErrContaining("Microsoft.DotNet.Common.ProjectTemplates.5.0::5.0.0 (contains 6 templates)")
                 .And.HaveStdErrContaining("Microsoft.DotNet.Common.ProjectTemplates.3.1::5.0.0 (contains 6 templates)");

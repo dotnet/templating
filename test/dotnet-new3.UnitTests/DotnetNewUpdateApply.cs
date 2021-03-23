@@ -41,7 +41,7 @@ namespace dotnet_new3.UnitTests
                 .ExitWith(0)
                 .And
                 .NotHaveStdErr()
-                .And.HaveStdOutContaining("An update for template package Microsoft.DotNet.Common.ProjectTemplates.5.0::5.0.0 is available.");
+                .And.HaveStdOutContaining("An update for template package 'Microsoft.DotNet.Common.ProjectTemplates.5.0::5.0.0' is available.");
 
             new DotnetNewCommand(_log, "--update-apply")
                 .WithWorkingDirectory(Helpers.CreateTemporaryFolder())

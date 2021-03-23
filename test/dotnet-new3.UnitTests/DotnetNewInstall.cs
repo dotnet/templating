@@ -181,7 +181,7 @@ namespace dotnet_new3.UnitTests
                .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
                .Execute()
                .Should().Fail()
-               .And.HaveStdErrContaining("BlaBlaBla could not be installed, the package does not exist.");
+               .And.HaveStdErrContaining("BlaBlaBla could not be installed, the package does not exist");
         }
 
         [Fact]
@@ -194,7 +194,7 @@ namespace dotnet_new3.UnitTests
                .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
                .Execute()
                .Should().Fail()
-               .And.HaveStdErrContaining("Microsoft.DotNet.Web.ProjectTemplates.5.0::16.0.0 could not be installed, the package does not exist.");
+               .And.HaveStdErrContaining("Microsoft.DotNet.Web.ProjectTemplates.5.0::16.0.0 could not be installed, the package does not exist");
         }
 
         [Fact]
@@ -241,7 +241,7 @@ namespace dotnet_new3.UnitTests
                  .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
                  .Execute()
                  .Should().Fail()
-                 .And.HaveStdErrContaining("Microsoft.DotNet.Common.ProjectTemplates.5.0::5.0.0 is already installed.");
+                 .And.HaveStdErrContaining("Microsoft.DotNet.Common.ProjectTemplates.5.0::5.0.0 is already installed");
         }
 
         [Fact]
@@ -264,7 +264,7 @@ namespace dotnet_new3.UnitTests
                  .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
                  .Execute()
                  .Should().Fail()
-                 .And.HaveStdErrContaining($"{basicFSharp} is already installed.");
+                 .And.HaveStdErrContaining($"{basicFSharp} is already installed");
         }
 
         [Fact]
@@ -419,7 +419,7 @@ namespace dotnet_new3.UnitTests
                 .WithEnvironmentVariable(Helpers.HomeEnvironmentVariableName, home)
                 .Execute()
                 .Should().Fail()
-                .And.HaveStdErrContaining($"{codebase} is not supported.");
+                .And.HaveStdErrContaining($"{codebase} is not supported");
         }
 
 
