@@ -37,6 +37,12 @@ stages:
 - stage: build
   displayName: Build
   jobs:
+  - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+    - template: /eng/common/templates/job/onelocbuild.yml
+      parameters:
+        CreatePr: false
+        LclSource: lclFilesfromPackage
+        LclPackageId: 'LCL-JUNO-PROD-TEMPLATING'
   - template: /eng/common/templates/jobs/jobs.yml
     parameters:
       enableMicrobuild: true
