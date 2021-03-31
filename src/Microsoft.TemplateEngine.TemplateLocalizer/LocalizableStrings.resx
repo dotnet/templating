@@ -136,8 +136,8 @@
     <comment>Do not localize: "template.json", "--recursive"</comment>
   </data>
   <data name="command_export_log_cancelled" xml:space="preserve">
-    <value>Export command for a template.json file was cancelled.</value>
-    <comment>Do not localize: "template.json", "export"</comment>
+    <value>Export command for the following file was cancelled: "{0}".</value>
+    <comment>Do not localize: "export"</comment>
   </data>
   <data name="command_export_log_executionEnded" xml:space="preserve">
     <value>Execution of export command has completed. {0} files were processed.</value>

@@ -9,7 +9,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
     {
         public string? TemplateJsonPath { get; set; }
 
-        public bool Succeeded => ErrorMessage == null;
+        public bool Succeeded => ErrorMessage == null && InnerException == null;
 
         public string? ErrorMessage { get; set; }
 

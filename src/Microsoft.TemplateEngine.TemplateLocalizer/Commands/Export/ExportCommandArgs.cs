@@ -10,34 +10,34 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Commands.Export
     /// </summary>
     internal sealed class ExportCommandArgs
     {
-        public ExportCommandArgs(IEnumerable<TemplateJsonProvider> templatePath, IEnumerable<string>? language, bool recursive, bool dryRun)
+        public ExportCommandArgs(IEnumerable<string>? templatePath, IEnumerable<string>? language, bool recursive, bool dryRun)
         {
-            TemplateJsonProviders = templatePath;
+            TemplatePaths = templatePath;
             Languages = language;
             SearchSubdirectories = recursive;
             DryRun = dryRun;
         }
 
         /// <summary>
-        /// Gets or sets the template.json file providers.
+        /// Gets the paths to template.json files or containing directories.
         /// </summary>
-        public IEnumerable<TemplateJsonProvider> TemplateJsonProviders { get; set; }
+        public IEnumerable<string>? TemplatePaths { get; init; }
 
         /// <summary>
-        /// Gets or sets the languages for which the localization files should be created.
+        /// Gets the languages for which the localization files should be created.
         /// If null, the default language set supported by dotnet will be used.
         /// </summary>
-        public IEnumerable<string>? Languages { get; set; }
+        public IEnumerable<string>? Languages { get; init; }
 
         /// <summary>
-        /// Gets or sets if subdirectories should be searched by <see cref="TemplateJsonProviders"/>.
+        /// Gets if subdirectories should be searched by <see cref="TemplateJsonProviders"/>.
         /// </summary>
-        public bool SearchSubdirectories { get; set; }
+        public bool SearchSubdirectories { get; init; }
 
         /// <summary>
-        /// Gets or sets the value indicating whether the export process should skip
+        /// Gets the value indicating whether the export process should skip
         /// flushing the file changes to file system.
         /// </summary>
-        public bool DryRun { get; set; }
+        public bool DryRun { get; init; }
     }
 }

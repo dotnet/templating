@@ -106,7 +106,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Export command for a template.json file was cancelled..
+        ///   Looks up a localized string similar to Export command for the following file was cancelled: &quot;{0}&quot;..
         /// </summary>
         internal static string command_export_log_cancelled {
             get {

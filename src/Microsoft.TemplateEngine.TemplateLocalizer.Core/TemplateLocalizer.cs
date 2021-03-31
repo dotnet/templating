@@ -16,22 +16,18 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
     {
         private readonly ILogger _logger;
 
-        public TemplateLocalizer() : this(NullLogger.Instance) { }
+        public TemplateLocalizer() : this(null) { }
 
-        public TemplateLocalizer(ILogger logger)
+        public TemplateLocalizer(ILoggerFactory? loggerFactory)
         {
-            _logger = logger;
+            _logger = (ILogger?)loggerFactory?.CreateLogger<TemplateLocalizer>() ?? NullLogger.Instance;
         }
 
-        public async Task<ExportResult> ExportLocalizationFiles(string templateJsonPath, ExportOptions options, CancellationToken cancellationToken)
+        public async Task<ExportResult> ExportLocalizationFilesAsync(string templateJsonPath, ExportOptions options, CancellationToken cancellationToken = default)
         {
             ExportResult result = new ExportResult();
             result.TemplateJsonPath = templateJsonPath;
             result.ErrorMessage = "Operation failed.";
-
-
-
-
             return result;
         }
     }

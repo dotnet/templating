@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.CommandLine;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -18,9 +19,11 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Commands.Export
 
         private const int ConcurrencyLevel = 16;
 
+        public ExportCommand(ILoggerFactory loggerFactory) : base(loggerFactory) { }
+
         public override Command CreateCommand()
         {
-            var exportCommand = new Command(CommandName, LocalizableStrings.command_export_help_description);
+            Command exportCommand = new (CommandName, LocalizableStrings.command_export_help_description);
             exportCommand.AddArgument(new Argument("template-path")
             {
                 Arity = ArgumentArity.OneOrMore,
@@ -52,24 +55,27 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Commands.Export
             return exportCommand;
         }
 
-        protected override async Task<int> Execute(ExportCommandArgs args, CancellationToken cancellationToken)
+        protected override async Task<int> ExecuteAsync(ExportCommandArgs args, CancellationToken cancellationToken = default)
         {
-            // Upgrade the cancellation token to allow also cancelling within this method.
-            using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            cancellationToken = cts.Token;
-
             bool failed = false;
-            List<FileInfo> templateJsonFiles = new List<FileInfo>();
+            List<string> templateJsonFiles = new ();
 
-            foreach (TemplateJsonProvider templateJsonProvider in args.TemplateJsonProviders)
+            if (args.TemplatePaths == null || !args.TemplatePaths.Any())
+            {
+                // This shouldn't happen since command line parser will ensure that there is at least one path.
+                Logger.LogError(LocalizableStrings.generic_log_commandExecutionFailed, CommandName);
+                return 1;
+            }
+
+            foreach (string templatePath in args.TemplatePaths)
             {
                 int filesBeforeAdd = templateJsonFiles.Count;
-                templateJsonFiles.AddRange(templateJsonProvider.GetTemplateJsonFiles(args.SearchSubdirectories));
+                templateJsonFiles.AddRange(GetTemplateJsonFiles(templatePath, args.SearchSubdirectories));
 
                 if (filesBeforeAdd == templateJsonFiles.Count)
                 {
-                    // No new files has been added by this provider. This is an indication of a bad input.
-                    Logger.LogError(LocalizableStrings.command_export_log_templateJsonNotFound, templateJsonProvider.Path);
+                    // No new files has been added by this path. This is an indication of a bad input.
+                    Logger.LogError(LocalizableStrings.command_export_log_templateJsonNotFound, templatePath);
                     failed = true;
                 }
             }
@@ -80,97 +86,133 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Commands.Export
                 return 1;
             }
 
-            ExportOptions exportOptions = new ExportOptions()
-            {
-                Languages = args.Languages,
-                DryRun = args.DryRun,
-            };
+            // We will do this in batches to limit concurrency.
+            int batchSize = ConcurrencyLevel;
+            int totalBatchCount = templateJsonFiles.Count / batchSize + (templateJsonFiles.Count % batchSize == 0 ? 0 : 1);
+            List<ExportResult> exportResults = new ();
+            List<(string templateJsonPath, Task<ExportResult> task)> runningExportTasks = new (templateJsonFiles.Count);
 
-            List<ExportResult> exportResults = new List<ExportResult>();
-            List<Task<ExportResult>> runningExportTasks = new List<Task<ExportResult>>(templateJsonFiles.Count);
-            foreach (FileInfo templateJsonFile in templateJsonFiles)
+            for (int batchIndex = 0; batchIndex < totalBatchCount; batchIndex++)
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
                     break;
                 }
 
-                string templateDirectory = Path.GetDirectoryName(templateJsonFile.FullName) ?? string.Empty;
-                exportOptions.TargetDirectory = Path.Combine(templateDirectory, "localize");
-
-                runningExportTasks.Add(new Core.TemplateLocalizer(Logger).ExportLocalizationFiles(templateJsonFile.FullName, exportOptions, cancellationToken));
-
-                if (runningExportTasks.Count == ConcurrencyLevel)
+                int batchOffset = batchSize * batchIndex;
+                for (int taskIndex = 0; taskIndex < batchSize && batchOffset + taskIndex < templateJsonFiles.Count; taskIndex++)
                 {
-                    // We have reached the concurrency limit. Wait for one of the tasks to finish before issuing new ones.
-                    Task<ExportResult>? completedTask = null;
+                    string templateJsonPath = templateJsonFiles[batchOffset + taskIndex];
+                    string templateDirectory = Path.GetDirectoryName(templateJsonPath) ?? string.Empty;
+                    string targetDirectory = Path.Combine(templateDirectory, "localize");
 
-                    try
+                    ExportOptions exportOptions = new (args.DryRun, targetDirectory, args.Languages);
+                    runningExportTasks.Add(
+                        (templateJsonPath,
+                        new Core.TemplateLocalizer(LoggerFactory).ExportLocalizationFilesAsync(templateJsonPath, exportOptions, cancellationToken))
+                    );
+                }
+
+                try
+                {
+                    await Task.WhenAll(runningExportTasks.Select(t => t.Item2)).ConfigureAwait(false);
+                }
+                catch (Exception)
+                {
+                    // Task.WhenAll will only throw one of the exceptions. We need to log them all. Handle this outside of catch block.
+                }
+
+                foreach ((string templateJsonPath, Task<ExportResult> task) pathTaskPair in runningExportTasks)
+                {
+                    if (pathTaskPair.task.IsCanceled)
                     {
-                        completedTask = await Task.WhenAny(runningExportTasks).ConfigureAwait(false);
-                        ExportResult taskResult = await completedTask.ConfigureAwait(false);
-                        exportResults.Add(taskResult);
+                        Logger.LogWarning(LocalizableStrings.command_export_log_cancelled, pathTaskPair.templateJsonPath);
+                        continue;
                     }
-                    catch (OperationCanceledException)
+                    else if (pathTaskPair.task.IsFaulted)
                     {
-                        // Task was intentionally cancelled.
-                        Logger.LogInformation(LocalizableStrings.command_export_log_cancelled);
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.LogError(LocalizableStrings.generic_log_commandExecutionFailedWithErrorMessage, e.Message);
-                        // Fatal error. Stop processing the rest of the files.
-                        cts.Cancel();
                         failed = true;
-                        break;
+                        Logger.LogError(pathTaskPair.task.Exception, LocalizableStrings.command_export_log_templateExportFailedWithException, pathTaskPair.templateJsonPath);
                     }
-
-                    if (completedTask != null)
+                    else
                     {
-                        runningExportTasks.Remove(completedTask);
+                        // Tasks is known to have already completed. We can get the result without await.
+                        exportResults.Add(pathTaskPair.task.Result);
                     }
                 }
-            }
 
-            try
-            {
-                // Await all the remaining work.
-                await Task.WhenAll(runningExportTasks).ConfigureAwait(false);
-            }
-            catch (Exception)
-            {
-                // Task.WhenAll will only throw one of the exceptions. We need to log them all. Handle this outside of catch block.
-            }
-
-            foreach (Task<ExportResult> completedTask in runningExportTasks)
-            {
-                if (completedTask.IsCanceled)
-                {
-                    continue;
-                }
-                else if (completedTask.IsFaulted)
-                {
-                    Logger.LogError(LocalizableStrings.generic_log_commandExecutionFailedWithErrorMessage, completedTask.Exception?.Flatten().InnerException?.Message);
-                }
-                else
-                {
-                    // Tasks is known to have already completed. We can get the result without await.
-                    exportResults.Add(completedTask.Result);
-                }
-            }
-
-            if (failed)
-            {
-                Logger.LogError(LocalizableStrings.generic_log_commandExecutionFailed, CommandName);
-                return 1;
+                runningExportTasks.Clear();
             }
 
             PrintResults(exportResults);
-            return cts.IsCancellationRequested ? 1 : 0;
+            return (failed || cancellationToken.IsCancellationRequested) ? 1 : 0;
+        }
+
+        /// <summary>
+        /// Given a <paramref name="path"/>, finds and returns all the template.json files. The search rules are executed in the following order:
+        /// <list type="bullet">
+        /// <item>If path points to a template.json file, it is directly returned.</item>
+        /// <item>If path points to a template directory, path to the "&lt;directory&gt;/.template.config/template.json" file is returned.</item>
+        /// <item>If path points to a "template.config" directory, path to the "&lt;directory&gt;/template.json" file is returned.</item>
+        /// <item>If path points to any other directory and <paramref name="searchSubdirectories"/> is <see langword="true"/>, path to all the
+        /// ".template.config/template.json" files under the given directory is returned.</item>
+        /// </list>
+        /// </summary>
+        /// <param name="searchSubdirectories">Indicates weather the subdirectories should be searched
+        /// in the case that <paramref name="path"/> points to a directory. This parameter has no effect
+        /// if <paramref name="path"/> points to a file.</param>
+        /// <returns>A path for each of the found "template.json" files.</returns>
+        private IEnumerable<string> GetTemplateJsonFiles(string path, bool searchSubdirectories)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                yield break;
+            }
+
+            if (File.Exists(path))
+            {
+                yield return path;
+                yield break;
+            }
+
+            if (!Directory.Exists(path))
+            {
+                // This path neither points to a file nor to a directory.
+                yield break;
+            }
+
+            if (!searchSubdirectories)
+            {
+                string filePath = Path.Combine(path, ".template.config", "template.json");
+                if (File.Exists(filePath))
+                {
+                    yield return filePath;
+                }
+                else
+                {
+                    filePath = Path.Combine(path, "template.json");
+                    if (File.Exists(filePath))
+                    {
+                        yield return filePath;
+                    }
+                }
+
+                yield break;
+            }
+
+            foreach (string filePath in Directory.EnumerateFiles(path, "template.json", SearchOption.AllDirectories))
+            {
+                string? directoryName = Path.GetFileName(Path.GetDirectoryName(filePath));
+                if (directoryName == ".template.config")
+                {
+                    yield return filePath;
+                }
+            }
         }
 
         private void PrintResults(IReadOnlyList<ExportResult> results)
         {
+            using IDisposable scope = Logger.BeginScope("Results");
             Logger.LogInformation(LocalizableStrings.command_export_log_executionEnded, results.Count);
 
             foreach (ExportResult result in results)
