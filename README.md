@@ -1,4 +1,4 @@
-[![Build Status](https://dev.azure.com/dnceng/public/_apis/build/status/dotnet/templating/templating-ci?branchName=main)](https://dev.azure.com/dnceng/public/_build/latest?definitionId=302&branchName=main) [![Join the chat at https://gitter.im/dotnet/templating](https://badges.gitter.im/dotnet/templating.svg)](https://gitter.im/dotnet/templating?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://dev.azure.com/dnceng/public/_apis/build/status/dotnet/templating/templating-ci?branchName=main)](https://dev.azure.com/dnceng/public/_build/latest?definitionId=302&branchName=main) 
 
 # Overview
 
