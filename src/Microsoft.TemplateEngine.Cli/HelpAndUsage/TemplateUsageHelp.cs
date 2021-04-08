@@ -33,7 +33,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
 
             foreach (string preferredName in preferredNameList)
             {
-                ITemplateInfo template = templateList.FirstOrDefault(x => string.Equals(x.ShortName, preferredName, StringComparison.OrdinalIgnoreCase));
+                ITemplateInfo template = templateList.FirstOrDefault(x => x.ShortNameList.Contains(preferredName, StringComparer.OrdinalIgnoreCase));
 
                 if (template != null)
                 {
@@ -82,11 +82,11 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                     return false;
                 }
 
-                Reporter.Output.WriteLine($"    dotnet {commandName} {templateInfo.ShortName} {hostTemplateData.UsageExamples[0]}");
+                Reporter.Output.WriteLine($"    dotnet {commandName} {templateInfo.ShortNameList.First()} {hostTemplateData.UsageExamples[0]}");
                 return true;
             }
 
-            Reporter.Output.Write($"    dotnet {commandName} {templateInfo.ShortName}");
+            Reporter.Output.Write($"    dotnet {commandName} {templateInfo.ShortNameList.First()}");
             IReadOnlyList<ITemplateParameter> allParameterDefinitions = templateInfo.Parameters;
             IEnumerable<ITemplateParameter> filteredParams = TemplateParameterHelpBase.FilterParamsForHelp(allParameterDefinitions, hostTemplateData.HiddenParameterNames, parametersToAlwaysShow: hostTemplateData.ParametersToAlwaysShow);
 

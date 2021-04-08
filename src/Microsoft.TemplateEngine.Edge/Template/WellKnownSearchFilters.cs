@@ -34,7 +34,17 @@ namespace Microsoft.TemplateEngine.Edge.Template
 
                 if (shortNameIndex == 0 && string.Equals(template.ShortName, name, StringComparison.OrdinalIgnoreCase))
                 {
-                    return new MatchInfo { Location = MatchLocation.ShortName, Kind = MatchKind.Exact };
+                    foreach (string shortName in template.ShortNameList)
+                    {
+                        int shortNameIndex = shortName.IndexOf(name, StringComparison.OrdinalIgnoreCase);
+
+                        if (shortNameIndex == 0 && string.Equals(shortName, name, StringComparison.OrdinalIgnoreCase))
+                        {
+                            return new MatchInfo { Location = MatchLocation.ShortName, Kind = MatchKind.Exact };
+                        }
+
+                        hasShortNamePartialMatch |= shortNameIndex > -1;
+                    }
                 }
 
                 hasShortNamePartialMatch = shortNameIndex > -1;

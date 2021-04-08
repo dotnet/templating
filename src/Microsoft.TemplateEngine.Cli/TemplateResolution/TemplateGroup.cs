@@ -54,7 +54,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         /// Default shortname.
         /// In theory, template group templates can have different short names but they are treated equally
         /// </summary>
-        internal string ShortName => Templates.First().Info.ShortName;
+        internal IReadOnlyList<string> ShortName => Templates.First().Info.ShortNameList;
 
         /// <summary>
         /// Returns true when <see cref="GroupIdentity"/> is not <see cref="null"/> or emply

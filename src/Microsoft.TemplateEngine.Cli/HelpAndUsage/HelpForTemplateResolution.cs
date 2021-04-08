@@ -233,7 +233,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                 Reporter.Error.WriteLine(string.Format(InvalidParameterInfo.InvalidParameterListToString(invalidParameters, unambiguousTemplateGroup).Bold().Red()));
             }
             Reporter.Error.WriteLine(
-                    string.Format(LocalizableStrings.InvalidParameterTemplateHint, GetTemplateHelpCommand(commandInput.CommandName, unambiguousTemplateGroup.ShortName)).Bold().Red());
+                    string.Format(LocalizableStrings.InvalidParameterTemplateHint, GetTemplateHelpCommand(commandInput.CommandName, unambiguousTemplateGroup.ShortName.First())).Bold().Red());
             return CreationResultStatus.InvalidParamValues;
         }
 
@@ -241,7 +241,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
         {
             internal string TemplateIdentity;
             internal string TemplateName;
-            internal string TemplateShortName;
+            internal IReadOnlyList<string> TemplateShortNames;
             internal string TemplateLanguage;
             internal int TemplatePrecedence;
             internal string TemplateAuthor;
@@ -273,7 +273,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                 {
                     TemplateIdentity = template.Info.Identity,
                     TemplateName = template.Info.Name,
-                    TemplateShortName = template.Info.ShortName,
+                    TemplateShortNames = template.Info.ShortNameList,
                     TemplateLanguage = template.Info.GetLanguage(),
                     TemplatePrecedence = template.Info.Precedence,
                     TemplateAuthor = template.Info.Author,
@@ -292,7 +292,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                         blankLineBetweenRows: false)
                     .DefineColumn(t => t.TemplateIdentity, LocalizableStrings.ColumnNameIdentity, showAlways: true)
                     .DefineColumn(t => t.TemplateName, LocalizableStrings.ColumnNameTemplateName, shrinkIfNeeded: true, minWidth: 15, showAlways: true)
-                    .DefineColumn(t => t.TemplateShortName, LocalizableStrings.ColumnNameShortName, showAlways: true)
+                    .DefineColumn(t => string.Join(",", t.TemplateShortNames), LocalizableStrings.ColumnNameShortName, showAlways: true)
                     .DefineColumn(t => t.TemplateLanguage, LocalizableStrings.ColumnNameLanguage, showAlways: true)
                     .DefineColumn(t => t.TemplatePrecedence.ToString(), out object prcedenceColumn, LocalizableStrings.ColumnNamePrecedence, showAlways: true)
                     .DefineColumn(t => t.TemplateAuthor, LocalizableStrings.ColumnNameAuthor, showAlways: true, shrinkIfNeeded: true, minWidth: 10)
@@ -494,7 +494,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
 
         internal static string GetTemplateHelpCommand(string commandName, ITemplateInfo template)
         {
-            return GetTemplateHelpCommand(commandName, template.ShortName);
+            return GetTemplateHelpCommand(commandName, template.ShortNameList.First());
         }
 
         internal static string GetTemplateHelpCommand(string commandName, string shortName)
