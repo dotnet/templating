@@ -129,11 +129,6 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             {
                 return CreationResultStatus.NotFound;
             }
-            // (scp 2017-09-06): parse errors probably can't happen in this context.
-            foreach (string parseErrorMessage in unambiguousTemplateGroup.Where(x => x.HasParseError()).Select(x => x.GetParseError()).ToList())
-            {
-                Reporter.Error.WriteLine(parseErrorMessage.Bold().Red());
-            }
 
             GetParametersInvalidForTemplatesInList(unambiguousTemplateGroup, out IReadOnlyList<string> invalidForAllTemplates, out IReadOnlyList<string> invalidForSomeTemplates);
 

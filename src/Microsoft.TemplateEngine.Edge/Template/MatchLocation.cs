@@ -1,6 +1,9 @@
+using System;
+
 namespace Microsoft.TemplateEngine.Edge.Template
 {
 
+    [Obsolete("MatchLocation is deprecated, use MatchInfo.ParameterName instead")]
     public enum MatchLocation
     {
         Unspecified,

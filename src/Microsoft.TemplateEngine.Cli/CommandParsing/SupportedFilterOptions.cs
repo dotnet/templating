@@ -94,7 +94,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             Name = "type",
             FilterValue = command => command.TypeFilter,
             IsFilterSet = command => !string.IsNullOrWhiteSpace(command.TypeFilter),
-            TemplateMatchFilter = command => WellKnownSearchFilters.ContextFilter(command.TypeFilter),
+            TemplateMatchFilter = command => WellKnownSearchFilters.TypeFilter(command.TypeFilter),
             MismatchCriteria = resolutionResult => resolutionResult.HasContextMismatch
         };
 

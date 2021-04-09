@@ -1,3 +1,8 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -42,8 +47,8 @@ namespace Microsoft.TemplateEngine.Cli
         {
             templateToInvoke.Info.Tags.TryGetValue("language", out ICacheTag language);
             bool isMicrosoftAuthored = string.Equals(templateToInvoke.Info.Author, "Microsoft", StringComparison.OrdinalIgnoreCase);
-            string framework = null;
-            string auth = null;
+            string? framework = null;
+            string? auth = null;
             string templateName = TelemetryHelper.HashWithNormalizedCasing(templateToInvoke.Info.Identity);
 
             if (isMicrosoftAuthored)
@@ -55,10 +60,10 @@ namespace Microsoft.TemplateEngine.Cli
                 auth = TelemetryHelper.HashWithNormalizedCasing(TelemetryHelper.GetCanonicalValueForChoiceParamOrDefault(templateToInvoke.Info, "auth", inputAuthValue));
             }
 
-            bool argsError = CheckForArgsError(templateToInvoke, out string commandParseFailureMessage);
+            bool argsError = CheckForArgsError(templateToInvoke, out string? commandParseFailureMessage);
             if (argsError)
             {
-                _telemetryLogger.TrackEvent(_commandName + TelemetryConstants.CreateEventSuffix, new Dictionary<string, string>
+                _telemetryLogger.TrackEvent(_commandName + TelemetryConstants.CreateEventSuffix, new Dictionary<string, string?>
                 {
                     { TelemetryConstants.Language, language?.Choices.Keys.FirstOrDefault() },
                     { TelemetryConstants.ArgError, "True" },
@@ -102,7 +107,7 @@ namespace Microsoft.TemplateEngine.Cli
                 }
                 finally
                 {
-                    _telemetryLogger.TrackEvent(_commandName + TelemetryConstants.CreateEventSuffix, new Dictionary<string, string>
+                    _telemetryLogger.TrackEvent(_commandName + TelemetryConstants.CreateEventSuffix, new Dictionary<string, string?>
                     {
                         { TelemetryConstants.Language, language?.Choices.Keys.FirstOrDefault() },
                         { TelemetryConstants.ArgError, "False" },
@@ -118,29 +123,21 @@ namespace Microsoft.TemplateEngine.Cli
             }
         }
 
-        public static bool CheckForArgsError(ITemplateMatchInfo template, out string commandParseFailureMessage)
+        public static bool CheckForArgsError(ITemplateMatchInfo template, out string? commandParseFailureMessage)
         {
             bool argsError;
 
-            if (template.HasParseError())
+            commandParseFailureMessage = null;
+            IReadOnlyList<string> invalidParams = template.GetInvalidParameterNames();
+
+            if (invalidParams.Count > 0)
             {
-                commandParseFailureMessage = template.GetParseError();
+                HelpForTemplateResolution.DisplayInvalidParameters(invalidParams);
                 argsError = true;
             }
             else
             {
-                commandParseFailureMessage = null;
-                IReadOnlyList<string> invalidParams = template.GetInvalidParameterNames();
-
-                if (invalidParams.Count > 0)
-                {
-                    HelpForTemplateResolution.DisplayInvalidParameters(invalidParams);
-                    argsError = true;
-                }
-                else
-                {
-                    argsError = false;
-                }
+                argsError = false;
             }
 
             return argsError;
@@ -156,7 +153,7 @@ namespace Microsoft.TemplateEngine.Cli
 
             char[] invalidChars = Path.GetInvalidFileNameChars();
 
-            if (_commandInput?.Name != null && _commandInput.Name.IndexOfAny(invalidChars) > -1)
+            if (_commandInput.Name != null && _commandInput.Name.IndexOfAny(invalidChars) > -1)
             {
                 string printableChars = string.Join(", ", invalidChars.Where(x => !char.IsControl(x)).Select(x => $"'{x}'"));
                 string nonPrintableChars = string.Join(", ", invalidChars.Where(char.IsControl).Select(x => $"char({(int)x})"));
@@ -164,14 +161,15 @@ namespace Microsoft.TemplateEngine.Cli
                 return CreationResultStatus.CreateFailed;
             }
 
-            string fallbackName = new DirectoryInfo(
+            string? fallbackName = new DirectoryInfo(
                 !string.IsNullOrWhiteSpace(_commandInput.OutputPath)
                     ? _commandInput.OutputPath
                     : Directory.GetCurrentDirectory())
                 .Name;
 
             if (string.IsNullOrEmpty(fallbackName) || string.Equals(fallbackName, "/", StringComparison.Ordinal))
-            {   // DirectoryInfo("/").Name on *nix returns "/", as opposed to null or "".
+            {
+                // DirectoryInfo("/").Name on *nix returns "/", as opposed to null or "".
                 fallbackName = null;
             }
             // Name returns <disk letter>:\ for root disk folder on Windows - replace invalid chars
@@ -189,10 +187,16 @@ namespace Microsoft.TemplateEngine.Cli
 
             try
             {
-                instantiateResult = await _templateCreator.InstantiateAsync(template, _commandInput.Name, fallbackName, _commandInput.OutputPath,
-                            templateMatchDetails.GetValidTemplateParameters(), _commandInput.SkipUpdateCheck, _commandInput.IsForceFlagSpecified,
-                            _commandInput.BaselineName, _commandInput.IsDryRun)
-                    .ConfigureAwait(false);
+                instantiateResult = await _templateCreator.InstantiateAsync(
+                    template,
+                    _commandInput.Name,
+                    fallbackName,
+                    _commandInput.OutputPath,
+                    templateMatchDetails.GetValidTemplateParameters(),
+                    _commandInput.SkipUpdateCheck,
+                    _commandInput.IsForceFlagSpecified,
+                    _commandInput.BaselineName,
+                    _commandInput.IsDryRun).ConfigureAwait(false);
             }
             catch (ContentGenerationException cx)
             {

@@ -1,6 +1,7 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.TemplateEngine.Abstractions;
@@ -25,6 +26,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         // There is any criteria that is not Mismatch
         // allowing context misses again
         public bool IsPartialMatch => MatchDisposition.Any(x => x.Kind != MatchKind.Mismatch)
+#pragma warning disable CS0618 // Type or member is obsolete
             && MatchDisposition.All(x => x.Location != MatchLocation.Context
                                 || (x.Location == MatchLocation.Context && x.Kind == MatchKind.Exact));
 
@@ -36,5 +38,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         public bool HasInvalidParameterValue => MatchDisposition.Any(x => x.Location == MatchLocation.OtherParameter && x.Kind == MatchKind.InvalidParameterValue);
 
         public bool HasAmbiguousParameterMatch => !HasInvalidParameterValue && MatchDisposition.Any(x => x.Location == MatchLocation.OtherParameter && x.Kind == MatchKind.AmbiguousParameterValue);
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

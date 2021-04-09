@@ -1,6 +1,8 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,19 +17,19 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
     /// </summary>
     public sealed class TemplateListResolutionResult
     {
+        private readonly IReadOnlyCollection<ITemplateMatchInfo> _coreMatchedTemplates;
+        private IReadOnlyCollection<ITemplateMatchInfo>? _exactMatchedTemplates;
+        private IReadOnlyCollection<ITemplateMatchInfo>? _partiallyMatchedTemplates;
+        private IReadOnlyCollection<TemplateGroup>? _exactMatchedTemplateGroups;
+        private IReadOnlyCollection<TemplateGroup>? _partiallyMatchedTemplateGroups;
+
         public TemplateListResolutionResult(IReadOnlyCollection<ITemplateMatchInfo> coreMatchedTemplates)
         {
             _coreMatchedTemplates = coreMatchedTemplates;
         }
 
-        private readonly IReadOnlyCollection<ITemplateMatchInfo> _coreMatchedTemplates;
-        private IReadOnlyCollection<ITemplateMatchInfo> _exactMatchedTemplates;
-        private IReadOnlyCollection<ITemplateMatchInfo> _partiallyMatchedTemplates;
-        private IReadOnlyCollection<TemplateGroup> _exactMatchedTemplateGroups;
-        private IReadOnlyCollection<TemplateGroup> _partiallyMatchedTemplateGroups;
-
         /// <summary>
-        /// Returns list of exact or partially matched templates by name and exact match by language, filter, baseline (if specified in command paramaters).
+        /// Returns list of exact or partially matched templates by name and exact match by language, filter, baseline (if specified in command parameters).
         /// </summary>
         public IReadOnlyCollection<ITemplateMatchInfo> ExactMatchedTemplates
         {
@@ -51,7 +53,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         }
 
         /// <summary>
-        /// Returns list of exact or partially matched template groups by name and exact match by language, filter, baseline (if specified in command paramaters).
+        /// Returns list of exact or partially matched template groups by name and exact match by language, filter, baseline, tags (if specified in command parameters).
         /// </summary>
         internal IReadOnlyCollection<TemplateGroup> ExactMatchedTemplateGroups
         {
@@ -69,7 +71,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         }
 
         /// <summary>
-        /// Returns list of exact or partially matched templates by name and mismatch in any of the following: language, filter, baseline (if specified in command paramaters).
+        /// Returns list of exact or partially matched templates by name and mismatch in any of the following: language, filter, baseline, tags (if specified in command parameters).
         /// </summary>
         public IReadOnlyCollection<ITemplateMatchInfo> PartiallyMatchedTemplates
         {
@@ -77,18 +79,14 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             {
                 if (_partiallyMatchedTemplates == null)
                 {
-                    // TODO: clarify if collection should include matching by classification only.
-                    // At the moment defintion of partial match:
-                    // - has exact or partial match by name or short name or classification
-                    // - has mismatch in language, type or baseline
-                    _partiallyMatchedTemplates = _coreMatchedTemplates.Where(t => t.HasNameOrClassificationMatchOrPartialMatch() && t.HasAnyMismatch()).ToList();
+                    _partiallyMatchedTemplates = _coreMatchedTemplates.Where(t => t.HasNameMatchOrPartialMatch() && t.HasAnyMismatch()).ToList();
                 }
                 return _partiallyMatchedTemplates;
             }
         }
 
         /// <summary>
-        ///  Returns list of exact or partially matched template groups by name and mismatch in any of the following: language, filter, baseline (if specified in command paramaters.
+        ///  Returns list of exact or partially matched template groups by name and mismatch in any of the following: language, filter, baseline, tags (if specified in command parameters.
         /// </summary>
         internal IReadOnlyCollection<TemplateGroup> PartiallyMatchedTemplateGroups
         {
@@ -116,12 +114,12 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         public IReadOnlyCollection<ITemplateMatchInfo> UnambiguousTemplatesForDefaultLanguage => UnambiguousTemplateGroup.Where(t => t.HasDefaultLanguageMatch()).ToList();
 
         /// <summary>
-        /// Returns true when at least one template exactly or partially matched templates by name and exactly matched language, filter, baseline (if specified in command paramaters).
+        /// Returns true when at least one template exactly or partially matched templates by name and exactly matched language, filter, baseline (if specified in command parameters).
         /// </summary>
         public bool HasExactMatches => ExactMatchedTemplates.Any();
 
         /// <summary>
-        /// Returns true when at least one template exactly or partially matched templates by name but has mismatch in any of the following: language, filter, baseline (if specified in command paramaters).
+        /// Returns true when at least one template exactly or partially matched templates by name but has mismatch in any of the following: language, filter, baseline (if specified in command parameters).
         /// </summary>
         public bool HasPartialMatches => PartiallyMatchedTemplates.Any();
 
@@ -136,7 +134,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         /// <summary>
         /// Returns true when at least one template has mismatch in context (type).
         /// </summary>
-        public bool HasContextMismatch => PartiallyMatchedTemplates.Any(t => t.HasContextMismatch());
+        public bool HasContextMismatch => PartiallyMatchedTemplates.Any(t => t.HasTypeMismatch());
 
         /// <summary>
         /// Returns true when at least one template has mismatch in baseline.
@@ -151,7 +149,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         /// <summary>
         /// Returns true when at least one template has mismatch in tags.
         /// </summary>
-        public bool HasTagsMismatch => PartiallyMatchedTemplates.Any(t => t.HasTagsMismatch());
+        public bool HasTagsMismatch => PartiallyMatchedTemplates.Any(t => t.HasClassificationMismatch());
 
         /// <summary>
         /// Returns true when one and only one template has exact match.

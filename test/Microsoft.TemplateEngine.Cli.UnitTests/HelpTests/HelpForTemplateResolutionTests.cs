@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Edge.Template;
 using Microsoft.TemplateEngine.Cli.HelpAndUsage;
 using Xunit;
@@ -16,21 +15,22 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.HelpTests
 
             // template one
             List<MatchInfo> templateOneDispositions = new List<MatchInfo>();
-            templateOneDispositions.Add(new MatchInfo() { Location = MatchLocation.OtherParameter, Kind = MatchKind.InvalidParameterName, InputParameterName = "foo" });
-            templateOneDispositions.Add(new MatchInfo() { Location = MatchLocation.OtherParameter, Kind = MatchKind.InvalidParameterName, InputParameterName = "bar" });
+            templateOneDispositions.Add(new MatchInfo("foo", null, MatchKind.InvalidParameterName));
+            templateOneDispositions.Add(new MatchInfo("bar", null, MatchKind.InvalidParameterName));
             ITemplateMatchInfo templateOneMatchInfo = new TemplateMatchInfo(new MockTemplateInfo(), templateOneDispositions);
             matchInfo.Add(templateOneMatchInfo);
 
             // template two
             List<MatchInfo> templateTwoDispositions = new List<MatchInfo>();
-            templateTwoDispositions.Add(new MatchInfo() { Location = MatchLocation.OtherParameter, Kind = MatchKind.InvalidParameterName, InputParameterName = "foo" });
+            templateTwoDispositions.Add(new MatchInfo("foo", null, MatchKind.InvalidParameterName));
+
             ITemplateMatchInfo templateTwoMatchInfo = new TemplateMatchInfo(new MockTemplateInfo(), templateTwoDispositions);
             matchInfo.Add(templateTwoMatchInfo);
 
             // template three
             List<MatchInfo> templateThreeDispositions = new List<MatchInfo>();
-            templateThreeDispositions.Add(new MatchInfo() { Location = MatchLocation.OtherParameter, Kind = MatchKind.InvalidParameterName, InputParameterName = "foo" });
-            templateThreeDispositions.Add(new MatchInfo() { Location = MatchLocation.OtherParameter, Kind = MatchKind.InvalidParameterName, InputParameterName = "baz" });
+            templateThreeDispositions.Add(new MatchInfo("foo", null, MatchKind.InvalidParameterName));
+            templateThreeDispositions.Add(new MatchInfo("baz", null, MatchKind.InvalidParameterName));
             ITemplateMatchInfo templateThreeMatchInfo = new TemplateMatchInfo(new MockTemplateInfo(), templateThreeDispositions);
             matchInfo.Add(templateThreeMatchInfo);
 
@@ -51,8 +51,8 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.HelpTests
 
             // template one
             List<MatchInfo> templateOneDispositions = new List<MatchInfo>();
-            templateOneDispositions.Add(new MatchInfo() { Location = MatchLocation.OtherParameter, Kind = MatchKind.InvalidParameterName, InputParameterName = "foo" });
-            templateOneDispositions.Add(new MatchInfo() { Location = MatchLocation.OtherParameter, Kind = MatchKind.InvalidParameterName, InputParameterName = "bar" });
+            templateOneDispositions.Add(new MatchInfo("foo", null, MatchKind.InvalidParameterName));
+            templateOneDispositions.Add(new MatchInfo("bar", null, MatchKind.InvalidParameterName));
             ITemplateMatchInfo templateOneMatchInfo = new TemplateMatchInfo(new MockTemplateInfo(), templateOneDispositions);
             matchInfo.Add(templateOneMatchInfo);
 
@@ -77,13 +77,13 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.HelpTests
 
             // template one
             List<MatchInfo> templateOneDispositions = new List<MatchInfo>();
-            templateOneDispositions.Add(new MatchInfo() { Location = MatchLocation.OtherParameter, Kind = MatchKind.InvalidParameterName, InputParameterName = "foo" });
+            templateOneDispositions.Add(new MatchInfo("foo", null, MatchKind.InvalidParameterName));
             ITemplateMatchInfo templateOneMatchInfo = new TemplateMatchInfo(new MockTemplateInfo(), templateOneDispositions);
             matchInfo.Add(templateOneMatchInfo);
 
             // template two
             List<MatchInfo> templateTwoDispositions = new List<MatchInfo>();
-            templateTwoDispositions.Add(new MatchInfo() { Location = MatchLocation.OtherParameter, Kind = MatchKind.InvalidParameterName, InputParameterName = "foo" });
+            templateTwoDispositions.Add(new MatchInfo("foo", null, MatchKind.InvalidParameterName));
             ITemplateMatchInfo templateTwoMatchInfo = new TemplateMatchInfo(new MockTemplateInfo(), templateTwoDispositions);
             matchInfo.Add(templateTwoMatchInfo);
 

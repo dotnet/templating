@@ -1,8 +1,9 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Utils;
@@ -17,14 +18,14 @@ namespace Microsoft.TemplateEngine.Edge.Template
             {
                 if (string.IsNullOrEmpty(name))
                 {
-                    return new MatchInfo { Location = MatchLocation.Name, Kind = MatchKind.Partial };
+                    return new MatchInfo(MatchInfo.DefaultParameter.Name, name, MatchKind.Partial);
                 }
 
                 int nameIndex = template.Name.IndexOf(name, StringComparison.OrdinalIgnoreCase);
 
                 if (nameIndex == 0 && string.Equals(template.Name, name, StringComparison.OrdinalIgnoreCase))
                 {
-                    return new MatchInfo { Location = MatchLocation.Name, Kind = MatchKind.Exact };
+                    return new MatchInfo(MatchInfo.DefaultParameter.Name, name, MatchKind.Exact);
                 }
 
                 bool hasShortNamePartialMatch = false;
@@ -37,7 +38,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
 
                         if (shortNameIndex == 0 && string.Equals(shortName, name, StringComparison.OrdinalIgnoreCase))
                         {
-                            return new MatchInfo { Location = MatchLocation.ShortName, Kind = MatchKind.Exact };
+                            return new MatchInfo(MatchInfo.DefaultParameter.ShortName, name, MatchKind.Exact);
                         }
 
                         hasShortNamePartialMatch |= shortNameIndex > -1;
@@ -49,7 +50,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
 
                     if (shortNameIndex == 0 && string.Equals(template.ShortName, name, StringComparison.OrdinalIgnoreCase))
                     {
-                        return new MatchInfo { Location = MatchLocation.ShortName, Kind = MatchKind.Exact };
+                        return new MatchInfo(MatchInfo.DefaultParameter.ShortName, name, MatchKind.Exact);
                     }
 
                     hasShortNamePartialMatch = shortNameIndex > -1;
@@ -57,22 +58,22 @@ namespace Microsoft.TemplateEngine.Edge.Template
 
                 if (nameIndex > -1)
                 {
-                    return new MatchInfo { Location = MatchLocation.Name, Kind = MatchKind.Partial };
+                    return new MatchInfo(MatchInfo.DefaultParameter.Name, name, MatchKind.Partial);
                 }
 
                 if (hasShortNamePartialMatch)
                 {
-                    return new MatchInfo { Location = MatchLocation.ShortName, Kind = MatchKind.Partial };
+                    return new MatchInfo(MatchInfo.DefaultParameter.ShortName, name, MatchKind.Partial);
                 }
-
-                return new MatchInfo { Location = MatchLocation.Name, Kind = MatchKind.Mismatch };
+                return new MatchInfo(MatchInfo.DefaultParameter.Name, name, MatchKind.Mismatch);
             };
         }
 
+        [Obsolete("Use TypeFilter instead")]
         // This being case-insensitive depends on the dictionaries on the cache tags being declared as case-insensitive
         public static Func<ITemplateInfo, MatchInfo?> ContextFilter(string inputContext)
         {
-            string context = inputContext?.ToLowerInvariant();
+            string? context = inputContext?.ToLowerInvariant();
 
             return (template) =>
             {
@@ -87,6 +88,28 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 else
                 {
                     return new MatchInfo { Location = MatchLocation.Context, Kind = MatchKind.Mismatch };
+                }
+            };
+        }
+
+        // This being case-insensitive depends on the dictionaries on the cache tags being declared as case-insensitive
+        public static Func<ITemplateInfo, MatchInfo?> TypeFilter(string? inputType)
+        {
+            string? type = inputType?.ToLowerInvariant();
+
+            return (template) =>
+            {
+                if (string.IsNullOrEmpty(type))
+                {
+                    return null;
+                }
+                if (template.GetTemplateType()?.Equals(type, StringComparison.OrdinalIgnoreCase) ?? false)
+                {
+                    return new MatchInfo(MatchInfo.DefaultParameter.Type, type, MatchKind.Exact);
+                }
+                else
+                {
+                    return new MatchInfo(MatchInfo.DefaultParameter.Type, type, MatchKind.Mismatch);
                 }
             };
         }
@@ -109,9 +132,9 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 }
                 if (template.Classifications?.Contains(tagFilter, StringComparer.OrdinalIgnoreCase) ?? false)
                 {
-                    return new MatchInfo { Location = MatchLocation.Classification, Kind = MatchKind.Exact };
+                    return new MatchInfo(MatchInfo.DefaultParameter.Classification, tagFilter, MatchKind.Exact);
                 }
-                return new MatchInfo { Location = MatchLocation.Classification, Kind = MatchKind.Mismatch };
+                return new MatchInfo(MatchInfo.DefaultParameter.Classification, tagFilter, MatchKind.Mismatch);
             };
         }
 
@@ -129,11 +152,11 @@ namespace Microsoft.TemplateEngine.Edge.Template
 
                 if (template.GetLanguage()?.Equals(language, StringComparison.OrdinalIgnoreCase) ?? false)
                 {
-                    return new MatchInfo { Location = MatchLocation.Language, Kind = MatchKind.Exact };
+                    return new MatchInfo(MatchInfo.DefaultParameter.Language, language, MatchKind.Exact);
                 }
                 else
                 {
-                    return new MatchInfo { Location = MatchLocation.Language, Kind = MatchKind.Mismatch };
+                    return new MatchInfo(MatchInfo.DefaultParameter.Language, language, MatchKind.Mismatch);
                 }
             };
         }
@@ -149,11 +172,11 @@ namespace Microsoft.TemplateEngine.Edge.Template
 
                 if (template.BaselineInfo != null && template.BaselineInfo.ContainsKey(baselineName))
                 {
-                    return new MatchInfo { Location = MatchLocation.Baseline, Kind = MatchKind.Exact };
+                    return new MatchInfo(MatchInfo.DefaultParameter.Baseline, baselineName, MatchKind.Exact);
                 }
                 else
                 {
-                    return new MatchInfo { Location = MatchLocation.Baseline, Kind = MatchKind.Mismatch };
+                    return new MatchInfo(MatchInfo.DefaultParameter.Baseline, baselineName, MatchKind.Mismatch);
                 }
             };
         }
@@ -215,22 +238,21 @@ namespace Microsoft.TemplateEngine.Edge.Template
 
                 if (string.IsNullOrWhiteSpace(template.Author))
                 {
-                    return new MatchInfo { Location = MatchLocation.Author, Kind = MatchKind.Mismatch };
+                    return new MatchInfo(MatchInfo.DefaultParameter.Author, author, MatchKind.Mismatch);
                 }
 
                 int authorIndex = template.Author.IndexOf(author, StringComparison.OrdinalIgnoreCase);
 
                 if (authorIndex == 0 && template.Author.Length == author.Length)
                 {
-                    return new MatchInfo { Location = MatchLocation.Author, Kind = MatchKind.Exact };
+                    return new MatchInfo(MatchInfo.DefaultParameter.Author, author, MatchKind.Exact);
                 }
 
                 if (authorIndex > -1)
                 {
-                    return new MatchInfo { Location = MatchLocation.Author, Kind = MatchKind.Partial };
+                    return new MatchInfo(MatchInfo.DefaultParameter.Author, author, MatchKind.Partial);
                 }
-
-                return new MatchInfo { Location = MatchLocation.Author, Kind = MatchKind.Mismatch };
+                return new MatchInfo(MatchInfo.DefaultParameter.Author, author, MatchKind.Mismatch);
             };
         }
 

@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 #endif
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Edge.Template;
 
 namespace Microsoft.TemplateEngine.Edge
@@ -33,7 +32,7 @@ namespace Microsoft.TemplateEngine.Edge
                     }
                 }
 
-                FilteredTemplateInfo info = new FilteredTemplateInfo(template, matchInformation);
+                Settings.FilteredTemplateInfo info = new Settings.FilteredTemplateInfo(template, matchInformation);
 
                 if (info.IsMatch || (!exactMatchesOnly && info.IsPartialMatch))
                 {
