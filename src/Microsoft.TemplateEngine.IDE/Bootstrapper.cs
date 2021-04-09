@@ -59,10 +59,27 @@ namespace Microsoft.TemplateEngine.IDE
             EnvironmentSettings.SettingsLoader.Components.RegisterMany(assembly.GetTypes());
         }
 
+        [Obsolete("Use GetTemplates instead")]
         public async Task<IReadOnlyCollection<IFilteredTemplateInfo>> ListTemplates(bool exactMatchesOnly, params Func<ITemplateInfo, MatchInfo?>[] filters)
         {
             EnsureInitialized();
             return TemplateListFilter.FilterTemplates(await EnvironmentSettings.SettingsLoader.GetTemplatesAsync(default).ConfigureAwait(false), exactMatchesOnly, filters);
+        }
+
+        /// <summary>
+        /// Gets list of available templates, if <paramref name="filters"/> are provided returns only matching templates.
+        /// </summary>
+        /// <param name="exactMatchesOnly">
+        /// true: templates should match all filters;
+        /// false:  templates should match any filter.
+        /// </param>
+        /// <param name="filters">List of filters to apply. See <see cref="WellKnownSearchFilters"/> for predefined filters.</param>
+        /// <returns>Filtered list of available templates with details on the applied filters matches.</returns>
+        public async Task<IReadOnlyCollection<ITemplateMatchInfo>> GetTemplates(bool exactMatchesOnly = true, params Func<ITemplateInfo, MatchInfo?>[] filters)
+        {
+            var criteria = exactMatchesOnly ? TemplateListFilter.ExactMatchFilter : TemplateListFilter.PartialMatchFilter;
+            EnsureInitialized();
+            return TemplateListFilter.GetTemplateMatchInfo(await EnvironmentSettings.SettingsLoader.GetTemplatesAsync(default).ConfigureAwait(false), criteria, filters);
         }
 
         public async Task<ICreationResult> CreateAsync(ITemplateInfo info, string name, string outputPath, IReadOnlyDictionary<string, string> parameters, bool skipUpdateCheck, string baselineName)
