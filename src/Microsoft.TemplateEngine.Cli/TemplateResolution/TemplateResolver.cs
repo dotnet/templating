@@ -83,13 +83,13 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             return templates;
         }
 
-        public static TemplateResolutionResult GetTemplateResolutionResult(IReadOnlyList<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput, string defaultLanguage)
+        public static TemplateResolutionResult GetTemplateResolutionResult(IReadOnlyList<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput, string? defaultLanguage)
         {
             IReadOnlyCollection<ITemplateMatchInfo> coreMatchedTemplates = PerformCoreTemplateQuery(templateInfo, hostDataLoader, commandInput, defaultLanguage);
             return new TemplateResolutionResult(commandInput.Language, coreMatchedTemplates);
         }
 
-        public static TemplateListResolutionResult GetTemplateResolutionResultForListOrHelp(IReadOnlyList<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput, string defaultLanguage)
+        public static TemplateListResolutionResult GetTemplateResolutionResultForListOrHelp(IReadOnlyList<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput, string? defaultLanguage)
         {
             IEnumerable<ITemplateMatchInfo> coreMatchedTemplates;
 
@@ -107,7 +107,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             return new TemplateListResolutionResult(coreMatchedTemplates.ToList());
         }
 
-        public static IEnumerable<ITemplateMatchInfo> PerformCoreTemplateQueryForList(IEnumerable<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput, string defaultLanguage)
+        public static IEnumerable<ITemplateMatchInfo> PerformCoreTemplateQueryForList(IEnumerable<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput, string? defaultLanguage)
         {
             IReadOnlyList<FilterableTemplateInfo> filterableTemplateInfo = SetupFilterableTemplateInfoFromTemplateInfo(templateInfo);
 
@@ -133,7 +133,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             return coreMatchedTemplates;
         }
 
-        public static IReadOnlyCollection<ITemplateMatchInfo> PerformCoreTemplateQueryForHelp(IReadOnlyList<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput, string defaultLanguage)
+        public static IReadOnlyCollection<ITemplateMatchInfo> PerformCoreTemplateQueryForHelp(IReadOnlyList<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput, string? defaultLanguage)
         {
             IReadOnlyList<FilterableTemplateInfo> filterableTemplateInfo = SetupFilterableTemplateInfoFromTemplateInfo(templateInfo);
             IReadOnlyList<ITemplateMatchInfo> coreMatchedTemplates = TemplateListFilter.GetTemplateMatchInfo(
@@ -142,7 +142,8 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                 WellKnownSearchFilters.NameFilter(commandInput.TemplateName),
                 WellKnownSearchFilters.LanguageFilter(commandInput.Language),
                 WellKnownSearchFilters.TypeFilter(commandInput.TypeFilter),
-                WellKnownSearchFilters.BaselineFilter(commandInput.BaselineName)
+                WellKnownSearchFilters.BaselineFilter(commandInput.BaselineName),
+                CliDefaultLanguageFilter(defaultLanguage)
             )
             .Where(x => !IsTemplateHiddenByHostFile(x.Info, hostDataLoader)).ToList();
 
@@ -157,13 +158,6 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             if (matchesWithExactDispositionsInNameFields.Count > 0)
             {
                 coreMatchedTemplates = matchesWithExactDispositionsInNameFields;
-            }
-
-            //for help we also need to match on default language if language was not specified as parameter
-            if (string.IsNullOrEmpty(commandInput.Language) && !string.IsNullOrEmpty(defaultLanguage))
-            {
-                // default language matching only makes sense if the user didn't specify a language.
-                AddDefaultLanguageMatchingToTemplates(coreMatchedTemplates, defaultLanguage);
             }
             AddParameterMatchingToTemplates(coreMatchedTemplates, hostDataLoader, commandInput);
             return coreMatchedTemplates;
@@ -205,7 +199,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         /// <param name="commandInput">new command data used in CLI.</param>
         /// <param name="defaultLanguage"></param>
         /// <returns>the collection of the templates with their match dispositions (<seealso cref="ITemplateMatchInfo"/>). The templates that do not match are not added to the collection.</returns>
-        public static IReadOnlyCollection<ITemplateMatchInfo> PerformCoreTemplateQuery(IReadOnlyList<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput, string defaultLanguage)
+        public static IReadOnlyCollection<ITemplateMatchInfo> PerformCoreTemplateQuery(IReadOnlyList<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput, string? defaultLanguage)
         {
             IReadOnlyList<FilterableTemplateInfo> filterableTemplateInfo = SetupFilterableTemplateInfoFromTemplateInfo(templateInfo);
 
@@ -215,7 +209,8 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                 WellKnownSearchFilters.NameFilter(commandInput.TemplateName),
                 WellKnownSearchFilters.LanguageFilter(commandInput.Language),
                 WellKnownSearchFilters.TypeFilter(commandInput.TypeFilter),
-                WellKnownSearchFilters.BaselineFilter(commandInput.BaselineName)
+                WellKnownSearchFilters.BaselineFilter(commandInput.BaselineName),
+                CliDefaultLanguageFilter(defaultLanguage)
             )
             .Where(x => !IsTemplateHiddenByHostFile(x.Info, hostDataLoader)).ToList();
 
@@ -232,14 +227,6 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             {
                 templates = matchesWithExactDispositionsInNameFields;
             }
-
-            if (string.IsNullOrEmpty(commandInput.Language) && !string.IsNullOrEmpty(defaultLanguage))
-            {
-                // add default language matches to the list
-                // default language matching only makes sense if the user didn't specify a language.
-                AddDefaultLanguageMatchingToTemplates(templates, defaultLanguage);
-            }
-
             //add specific template parameters matches to the list
             AddParameterMatchingToTemplates(templates, hostDataLoader, commandInput);
 
@@ -291,33 +278,31 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         }
 
         /// <summary>
-        /// Adds match dispositions to the templates based on matches between the default language and the language defined in template.
+        /// <see cref="TemplateListFilter.GetTemplateMatchInfo"/> filter for default language. The disposition is set only for <see cref="MatchKind.Exact"/> ; otherwise ignored - the disposition for <see cref="MatchKind.Mismatch"/> is not set.
         /// </summary>
-        /// <param name="listToFilter">the templates to match.</param>
-        /// <param name="language">default language.</param>
-        private static void AddDefaultLanguageMatchingToTemplates(IReadOnlyCollection<ITemplateMatchInfo> listToFilter, string language)
+        /// <param name="defaultLanguage"></param>
+        /// <returns></returns>
+        private static Func<ITemplateInfo, MatchInfo?> CliDefaultLanguageFilter(string? defaultLanguage)
         {
-            if (string.IsNullOrEmpty(language))
+            return (template) =>
             {
-                return;
-            }
-
-            foreach (ITemplateMatchInfo template in listToFilter)
-            {
-                MatchKind matchKind;
-
-                string templateLanguage = template.Info.GetLanguage();
+                if (string.IsNullOrWhiteSpace(defaultLanguage))
+                {
+                    return null;
+                }
+                string templateLanguage = template.GetLanguage();
                 // only add default language disposition when there is a language specified for the template.
                 if (string.IsNullOrWhiteSpace(templateLanguage))
                 {
-                    continue;
+                    return null;
                 }
 
-                if (templateLanguage.Equals(language, StringComparison.OrdinalIgnoreCase))
+                if (templateLanguage.Equals(defaultLanguage, StringComparison.OrdinalIgnoreCase))
                 {
                     return new MatchInfo(DefaultLanguageMatchParameterName, defaultLanguage, MatchKind.Exact);
                 }
-            }
+                return null;
+            };
         }
 
         /// <summary>
