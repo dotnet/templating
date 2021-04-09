@@ -7,12 +7,19 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
 {
     public sealed class ExportResult
     {
-        public string? TemplateJsonPath { get; set; }
+        public ExportResult(string? templateJsonPath, string? errorMessage, Exception? innerException)
+        {
+            TemplateJsonPath = templateJsonPath;
+            ErrorMessage = errorMessage;
+            InnerException = innerException;
+        }
+
+        public string? TemplateJsonPath { get; }
 
         public bool Succeeded => ErrorMessage == null && InnerException == null;
 
-        public string? ErrorMessage { get; set; }
+        public string? ErrorMessage { get; }
 
-        public Exception? InnerException { get; set; }
+        public Exception? InnerException { get; }
     }
 }
