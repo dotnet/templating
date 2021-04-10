@@ -23,7 +23,7 @@ namespace Microsoft.TemplateEngine.Edge
         public static Func<ITemplateMatchInfo, bool> ExactMatchFilter => x => x.IsMatch;
 
         /// <summary>
-        /// Partial match criteria - the templates should match one of the filters.
+        /// Partial match criteria - the templates should match at least one of the filters.
         /// </summary>
         /// <seealso cref="GetTemplateMatchInfo"/>
         public static Func<ITemplateMatchInfo, bool> PartialMatchFilter => x => x.IsPartialMatch;
@@ -69,11 +69,10 @@ namespace Microsoft.TemplateEngine.Edge
         /// <param name="matchFilter">The criteria of template to be filtered.</param>
         /// <param name="filters">The list of filters to be applied.</param>
         /// <returns>The filtered list of templates with matches information.</returns>
-        /// <remarks>
-        /// Usage examples:<br/>
+        /// <example>
         /// <c>GetTemplateMatchInfo(templates, TemplateListFilter.ExactMatchFilter, WellKnownSearchFilters.NameFilter("myname")</c> - returns the templates which name or short name contains "myname". <br/>
         /// <c>GetTemplateMatchInfo(templates, TemplateListFilter.PartialMatchFilter, WellKnownSearchFilters.NameFilter("myname"), WellKnownSearchFilters.NameFilter("othername")</c> - returns the templates which name or short name contains "myname" or "othername".<br/>
-        /// </remarks>
+        /// </example>
         public static IReadOnlyCollection<ITemplateMatchInfo> GetTemplateMatchInfo(IReadOnlyList<ITemplateInfo> templateList, Func<ITemplateMatchInfo, bool> matchFilter, params Func<ITemplateInfo, MatchInfo?>[] filters)
         {
             HashSet<ITemplateMatchInfo> matchingTemplates = new HashSet<ITemplateMatchInfo>(TemplateMatchInfoEqualityComparer.Default);
