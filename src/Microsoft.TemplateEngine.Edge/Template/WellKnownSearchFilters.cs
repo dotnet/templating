@@ -23,7 +23,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
 
                 int nameIndex = template.Name.IndexOf(name, StringComparison.OrdinalIgnoreCase);
 
-                if (nameIndex == 0 && string.Equals(template.Name, name, StringComparison.OrdinalIgnoreCase))
+                if (nameIndex == 0 && template.Name.Length == name.Length)
                 {
                     return new MatchInfo { Location = MatchLocation.Name, Kind = MatchKind.Exact };
                 }
@@ -38,7 +38,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                     {
                         int shortNameIndex = shortName.IndexOf(name, StringComparison.OrdinalIgnoreCase);
 
-                        if (shortNameIndex == 0 && string.Equals(shortName, name, StringComparison.OrdinalIgnoreCase))
+                        if (shortNameIndex == 0 && shortName.Length == name.Length)
                         {
                             return new MatchInfo { Location = MatchLocation.ShortName, Kind = MatchKind.Exact };
                         }
