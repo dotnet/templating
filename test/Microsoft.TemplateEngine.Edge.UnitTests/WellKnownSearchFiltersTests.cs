@@ -25,7 +25,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                     .WithBaselineInfo("app", "standard")
                     .WithClassifications(templateTagsArray);
 
-            var filter = WellKnownSearchFilters.TagFilter(testTag);
+            var filter = WellKnownSearchFilters.ClassificationFilter(testTag);
             MatchInfo? result = filter(template);
             Assert.Equal(kind, result?.Kind);
         }
@@ -40,7 +40,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                     .WithTag("type", "project")
                     .WithBaselineInfo("app", "standard");
 
-            var filter = WellKnownSearchFilters.TagFilter(testTag);
+            var filter = WellKnownSearchFilters.ClassificationFilter(testTag);
             MatchInfo? result = filter(template);
             Assert.Equal(kind, result?.Kind);
         }

@@ -85,7 +85,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             Name = "tag",
             FilterValue = command => command.TagFilter,
             IsFilterSet = command => !string.IsNullOrWhiteSpace(command.TagFilter),
-            TemplateMatchFilter = command => WellKnownSearchFilters.TagFilter(command.TagFilter),
+            TemplateMatchFilter = command => WellKnownSearchFilters.ClassificationFilter(command.TagFilter),
             MismatchCriteria = resolutionResult => resolutionResult.HasTagsMismatch
         };
 

@@ -10,8 +10,22 @@ using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Edge.Template
 {
+    /// <summary>
+    /// Collection of default filters to be used with <see cref="TemplateListFilter.GetTemplateMatchInfo(System.Collections.Generic.IReadOnlyList{ITemplateInfo}, Func{ITemplateMatchInfo, bool}, Func{ITemplateInfo, MatchInfo?}[])"/>.
+    /// </summary>
     public static class WellKnownSearchFilters
     {
+        /// <summary>
+        /// Filter to be used with <see cref="TemplateListFilter.GetTemplateMatchInfo(System.Collections.Generic.IReadOnlyList{ITemplateInfo}, Func{ITemplateMatchInfo, bool}, Func{ITemplateInfo, MatchInfo?}[])"/>.
+        /// Matches <paramref name="name"/> on the following criteria: <br/>
+        /// - if <paramref name="name"/> is null or empty, adds match disposition <see cref="MatchInfo.DefaultParameter.Name"/> with <see cref="MatchKind.Partial"/>;<br/>
+        /// - if <paramref name="name"/> is equal to <see cref="ITemplateInfo.Name"/> (case insensitive), adds match disposition <see cref="MatchInfo.DefaultParameter.Name"/> with <see cref="MatchKind.Exact"/>;<br/>
+        /// - if <paramref name="name"/> is equal to one of the short names in <see cref="ITemplateInfo.ShortNameList"/> (case insensitive), adds match disposition <see cref="MatchInfo.DefaultParameter.ShortName"/> with <see cref="MatchKind.Exact"/>;<br/>
+        /// - if <see cref="ITemplateInfo.Name"/> contains <paramref name="name"/> (case insensitive), adds match disposition <see cref="MatchInfo.DefaultParameter.Name"/> with <see cref="MatchKind.Partial"/>;<br/>
+        /// - if one of the short names in <see cref="ITemplateInfo.ShortNameList"/> contains <paramref name="name"/> (case insensitive), adds match disposition <see cref="MatchInfo.DefaultParameter.ShortName"/> with <see cref="MatchKind.Partial"/>;<br/>
+        /// - adds match disposition <see cref="MatchInfo.DefaultParameter.Name"/> with <see cref="MatchKind.Mismatch"/> otherwise.<br/>
+        /// </summary>
+        /// <returns> the predicate to be used with <see cref="TemplateListFilter.GetTemplateMatchInfo(System.Collections.Generic.IReadOnlyList{ITemplateInfo}, Func{ITemplateMatchInfo, bool}, Func{ITemplateInfo, MatchInfo?}[])"/> as the filter.</returns>
         public static Func<ITemplateInfo, MatchInfo?> NameFilter(string name)
         {
             return (template) =>
@@ -92,7 +106,14 @@ namespace Microsoft.TemplateEngine.Edge.Template
             };
         }
 
-        // This being case-insensitive depends on the dictionaries on the cache tags being declared as case-insensitive
+        /// <summary>
+        /// Filter to be used with <see cref="TemplateListFilter.GetTemplateMatchInfo(System.Collections.Generic.IReadOnlyList{ITemplateInfo}, Func{ITemplateMatchInfo, bool}, Func{ITemplateInfo, MatchInfo?}[])"/>.
+        /// Matches <paramref name="inputType"/> on the following criteria: <br/>
+        /// - if <paramref name="inputType"/> is null or empty, does not add match disposition;<br/>
+        /// - if <paramref name="inputType"/> is equal to tag named 'type' from <see cref="ITemplateInfo.Tags"/> (case insensitive), adds match disposition <see cref="MatchInfo.DefaultParameter.Type"/> with <see cref="MatchKind.Exact"/>;<br/>
+        /// - adds match disposition <see cref="MatchInfo.DefaultParameter.Type"/> with <see cref="MatchKind.Mismatch"/> otherwise.<br/>
+        /// </summary>
+        /// <returns> the predicate to be used with <see cref="TemplateListFilter.GetTemplateMatchInfo(System.Collections.Generic.IReadOnlyList{ITemplateInfo}, Func{ITemplateMatchInfo, bool}, Func{ITemplateInfo, MatchInfo?}[])"/> as the filter.</returns>
         public static Func<ITemplateInfo, MatchInfo?> TypeFilter(string? inputType)
         {
             string? type = inputType?.ToLowerInvariant();
@@ -115,32 +136,37 @@ namespace Microsoft.TemplateEngine.Edge.Template
         }
 
         /// <summary>
-        /// Creates predicate for matching the template and given tag value.
-        /// If the template contains the tag <paramref name="tagFilter"/>, it is exact match, otherwise mismatch.
-        /// If the template has no tags defined, it is a mismatch.
-        /// If <paramref name="tagFilter"/> is <see cref="null"/> or empty the method returns <see cref="null"/>.
+        /// Filter to be used with <see cref="TemplateListFilter.GetTemplateMatchInfo(System.Collections.Generic.IReadOnlyList{ITemplateInfo}, Func{ITemplateMatchInfo, bool}, Func{ITemplateInfo, MatchInfo?}[])"/>.
+        /// Matches <paramref name="classification"/> on the following criteria: <br/>
+        /// - if <paramref name="classification"/> is null or empty, does not add match disposition;<br/>
+        /// - if <paramref name="classification"/> is equal to any entry from <see cref="ITemplateInfo.Classification"/> (case insensitive), adds match disposition <see cref="MatchInfo.DefaultParameter.Classification"/> with <see cref="MatchKind.Exact"/>;<br/>
+        /// - adds match disposition <see cref="MatchInfo.DefaultParameter.Classification"/> with <see cref="MatchKind.Mismatch"/> otherwise.<br/>
         /// </summary>
-        /// <param name="tagFilter">tag to filter by.</param>
-        /// <returns>A predicate that returns if the given template matches <paramref name="tagFilter"/>.</returns>
-        public static Func<ITemplateInfo, MatchInfo?> TagFilter(string tagFilter)
+        /// <returns> the predicate to be used with <see cref="TemplateListFilter.GetTemplateMatchInfo(System.Collections.Generic.IReadOnlyList{ITemplateInfo}, Func{ITemplateMatchInfo, bool}, Func{ITemplateInfo, MatchInfo?}[])"/> as the filter.</returns>
+        public static Func<ITemplateInfo, MatchInfo?> ClassificationFilter(string classification)
         {
             return (template) =>
             {
-                if (string.IsNullOrWhiteSpace(tagFilter))
+                if (string.IsNullOrWhiteSpace(classification))
                 {
                     return null;
                 }
-                if (template.Classifications?.Contains(tagFilter, StringComparer.OrdinalIgnoreCase) ?? false)
+                if (template.Classifications?.Contains(classification, StringComparer.OrdinalIgnoreCase) ?? false)
                 {
-                    return new MatchInfo(MatchInfo.DefaultParameter.Classification, tagFilter, MatchKind.Exact);
+                    return new MatchInfo(MatchInfo.DefaultParameter.Classification, classification, MatchKind.Exact);
                 }
-                return new MatchInfo(MatchInfo.DefaultParameter.Classification, tagFilter, MatchKind.Mismatch);
+                return new MatchInfo(MatchInfo.DefaultParameter.Classification, classification, MatchKind.Mismatch);
             };
         }
 
-        // This being case-insensitive depends on the dictionaries on the cache tags being declared as case-insensitive
-        // Note: This is specifically designed to provide match info against a user-input language.
-        //      All dealings with the host-default language should be separate from this.
+        /// <summary>
+        /// Filter to be used with <see cref="TemplateListFilter.GetTemplateMatchInfo(System.Collections.Generic.IReadOnlyList{ITemplateInfo}, Func{ITemplateMatchInfo, bool}, Func{ITemplateInfo, MatchInfo?}[])"/>.
+        /// Matches <paramref name="language"/> on the following criteria: <br/>
+        /// - if <paramref name="language"/> is null or empty, does not add match disposition;<br/>
+        /// - if <paramref name="language"/> is equal to tag named 'language' from <see cref="ITemplateInfo.Tags"/> (case insensitive), adds match disposition <see cref="MatchInfo.DefaultParameter.Language"/> with <see cref="MatchKind.Exact"/>;<br/>
+        /// - adds match disposition <see cref="MatchInfo.DefaultParameter.Language"/> with <see cref="MatchKind.Mismatch"/> otherwise.<br/>
+        /// </summary>
+        /// <returns> the predicate to be used with <see cref="TemplateListFilter.GetTemplateMatchInfo(System.Collections.Generic.IReadOnlyList{ITemplateInfo}, Func{ITemplateMatchInfo, bool}, Func{ITemplateInfo, MatchInfo?}[])"/> as the filter.</returns>
         public static Func<ITemplateInfo, MatchInfo?> LanguageFilter(string language)
         {
             return (template) =>
@@ -161,6 +187,14 @@ namespace Microsoft.TemplateEngine.Edge.Template
             };
         }
 
+        /// <summary>
+        /// Filter to be used with <see cref="TemplateListFilter.GetTemplateMatchInfo(System.Collections.Generic.IReadOnlyList{ITemplateInfo}, Func{ITemplateMatchInfo, bool}, Func{ITemplateInfo, MatchInfo?}[])"/>.
+        /// Matches <paramref name="baselineName"/> on the following criteria: <br/>
+        /// - if <paramref name="baselineName"/> is null or empty, does not add match disposition;<br/>
+        /// - if <paramref name="baselineName"/> is equal to key from <see cref="ITemplateInfo.BaselineInfo"/> (case insensitive), adds match disposition <see cref="MatchInfo.DefaultParameter.Baseline"/> with <see cref="MatchKind.Exact"/>;<br/>
+        /// - adds match disposition <see cref="MatchInfo.DefaultParameter.Baseline"/> with <see cref="MatchKind.Mismatch"/> otherwise.<br/>
+        /// </summary>
+        /// <returns> the predicate to be used with <see cref="TemplateListFilter.GetTemplateMatchInfo(System.Collections.Generic.IReadOnlyList{ITemplateInfo}, Func{ITemplateMatchInfo, bool}, Func{ITemplateInfo, MatchInfo?}[])"/> as the filter.</returns>
         public static Func<ITemplateInfo, MatchInfo?> BaselineFilter(string baselineName)
         {
             return (template) =>
@@ -181,7 +215,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
             };
         }
 
-        [Obsolete("Use TagsFilter instead")]
+        [Obsolete("Use ClassificationFilter instead")]
         public static Func<ITemplateInfo, MatchInfo?> ClassificationsFilter(string name)
         {
             return (template) =>
@@ -223,10 +257,15 @@ namespace Microsoft.TemplateEngine.Edge.Template
         }
 
         /// <summary>
-        /// Creates predicate for matching the template and given author value.
+        /// Filter to be used with <see cref="TemplateListFilter.GetTemplateMatchInfo(System.Collections.Generic.IReadOnlyList{ITemplateInfo}, Func{ITemplateMatchInfo, bool}, Func{ITemplateInfo, MatchInfo?}[])"/>.
+        /// Matches <paramref name="author"/> on the following criteria: <br/>
+        /// - if <paramref name="author"/> is null or empty, does not add match disposition;<br/>
+        /// - if <see cref="ITemplateInfo.Author"/> is null or empty, adds match disposition <see cref="MatchInfo.DefaultParameter.Author"/> with <see cref="MatchKind.Mismatch"/>;<br/>
+        /// - if <paramref name="author"/> is equal to <see cref="ITemplateInfo.Author"/> (case insensitive), adds match disposition <see cref="MatchInfo.DefaultParameter.Author"/> with <see cref="MatchKind.Exact"/>;<br/>
+        /// - if <see cref="ITemplateInfo.Author"/> contains <paramref name="author"/> (case insensitive), adds match disposition <see cref="MatchInfo.DefaultParameter.Author"/> with <see cref="MatchKind.Partial"/>;<br/>
+        /// - <see cref="MatchInfo.DefaultParameter.Author"/> with <see cref="MatchKind.Mismatch"/> otherwise.<br/>
         /// </summary>
-        /// <param name="author">author to use for match.</param>
-        /// <returns>A predicate that returns if the given template matches defined author.</returns>
+        /// <returns> the predicate to be used with <see cref="TemplateListFilter.GetTemplateMatchInfo(System.Collections.Generic.IReadOnlyList{ITemplateInfo}, Func{ITemplateMatchInfo, bool}, Func{ITemplateInfo, MatchInfo?}[])"/> as the filter.</returns>
         public static Func<ITemplateInfo, MatchInfo?> AuthorFilter(string author)
         {
             return (template) =>
