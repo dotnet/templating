@@ -75,7 +75,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         // Lists all the templates, unfiltered - except the ones hidden by their host file.
         internal static IReadOnlyCollection<ITemplateMatchInfo> PerformAllTemplatesQuery(IReadOnlyList<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader)
         {
-            IReadOnlyList<ITemplateInfo> filterableTemplateInfo = SetupFilterableTemplateInfoFromTemplateInfo(templateInfo);
+            IReadOnlyList<ITemplateInfo> filterableTemplateInfo = SetupTemplateInfoWithGroupShortNames(templateInfo);
 
             IReadOnlyCollection<ITemplateMatchInfo> templates = TemplateListFilter.GetTemplateMatchInfo(
                 filterableTemplateInfo,
@@ -113,7 +113,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
 
         internal static IReadOnlyCollection<ITemplateMatchInfo> PerformCoreTemplateQueryForList(IReadOnlyList<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput)
         {
-            IReadOnlyList<ITemplateInfo> filterableTemplateInfo = SetupFilterableTemplateInfoFromTemplateInfo(templateInfo);
+            IReadOnlyList<ITemplateInfo> filterableTemplateInfo = SetupTemplateInfoWithGroupShortNames(templateInfo);
 
             // for list we also try to get match on template name in classification (tags). These matches only will be used if short name and name has a mismatch.
             // filter below only sets the exact or partial match if name matches the tag. If name doesn't match the tag, no match disposition is added to collection.
@@ -139,7 +139,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
 
         internal static IReadOnlyCollection<ITemplateMatchInfo> PerformCoreTemplateQueryForHelp(IReadOnlyList<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput, string? defaultLanguage)
         {
-            IReadOnlyList<ITemplateInfo> filterableTemplateInfo = SetupFilterableTemplateInfoFromTemplateInfo(templateInfo);
+            IReadOnlyList<ITemplateInfo> filterableTemplateInfo = SetupTemplateInfoWithGroupShortNames(templateInfo);
             IReadOnlyList<ITemplateMatchInfo> coreMatchedTemplates = TemplateListFilter.GetTemplateMatchInfo(
                 filterableTemplateInfo,
                 TemplateListFilter.PartialMatchFilter,
@@ -177,7 +177,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         /// <returns>filtered list of templates.</returns>
         internal static IReadOnlyCollection<ITemplateMatchInfo> PerformCoreTemplateQueryForSearch(IEnumerable<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput)
         {
-            IReadOnlyList<ITemplateInfo> filterableTemplateInfo = SetupFilterableTemplateInfoFromTemplateInfo(templateInfo.ToList());
+            IReadOnlyList<ITemplateInfo> filterableTemplateInfo = SetupTemplateInfoWithGroupShortNames(templateInfo.ToList());
             List<Func<ITemplateInfo, MatchInfo?>> searchFilters = new List<Func<ITemplateInfo, MatchInfo?>>()
             {
                 CliNameFilter(commandInput.TemplateName),
@@ -205,7 +205,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         /// <returns>the collection of the templates with their match dispositions (<seealso cref="ITemplateMatchInfo"/>). The templates that do not match are not added to the collection.</returns>
         internal static IReadOnlyCollection<ITemplateMatchInfo> PerformCoreTemplateQuery(IReadOnlyList<ITemplateInfo> templateInfo, IHostSpecificDataLoader hostDataLoader, INewCommandInput commandInput, string? defaultLanguage)
         {
-            IReadOnlyList<ITemplateInfo> filterableTemplateInfo = SetupFilterableTemplateInfoFromTemplateInfo(templateInfo);
+            IReadOnlyList<ITemplateInfo> filterableTemplateInfo = SetupTemplateInfoWithGroupShortNames(templateInfo);
 
             IReadOnlyCollection<ITemplateMatchInfo> templates = TemplateListFilter.GetTemplateMatchInfo(
                 filterableTemplateInfo,
@@ -453,7 +453,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         /// </summary>
         /// <param name="templateList">the list of <see cref="ITemplateInfo"/> to process.</param>
         /// <returns></returns>
-        private static IReadOnlyList<ITemplateInfo> SetupFilterableTemplateInfoFromTemplateInfo(IReadOnlyList<ITemplateInfo> templateList)
+        private static IReadOnlyList<ITemplateInfo> SetupTemplateInfoWithGroupShortNames(IReadOnlyList<ITemplateInfo> templateList)
         {
             Dictionary<string, HashSet<string>> shortNamesByGroup = new Dictionary<string, HashSet<string>>();
 
@@ -481,7 +481,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             }
 
             // create the TemplateInfoWithGroupShortNames with the group short names
-            List<TemplateInfoWithGroupShortNames> filterableTemplateList = new List<TemplateInfoWithGroupShortNames>();
+            List<TemplateInfoWithGroupShortNames> templateListWithGroupNames = new List<TemplateInfoWithGroupShortNames>();
 
             foreach (ITemplateInfo template in templateList)
             {
@@ -489,18 +489,19 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                     ? template.GroupIdentity
                     : template.Identity;
 
-                TemplateInfoWithGroupShortNames filterableTemplate = TemplateInfoWithGroupShortNames.FromITemplateInfo(template);
-                filterableTemplate.GroupShortNameList = shortNamesByGroup[effectiveGroupIdentity].ToList();
-                filterableTemplateList.Add(filterableTemplate);
+                templateListWithGroupNames.Add(new TemplateInfoWithGroupShortNames(template, shortNamesByGroup[effectiveGroupIdentity]));
             }
 
-            return filterableTemplateList;
+            return templateListWithGroupNames;
         }
 
         /// <summary>
+        /// Filter for <see cref="TemplateListFilter.GetTemplateMatchInfo"></see>.
+        /// Filters <see cref="ITemplateInfo"/> by name. Requires <see cref="TemplateInfoWithGroupShortNames"/> implementation.
+        /// The fields to be compared are <see cref="ITemplateInfo.Name"/> and <see cref="TemplateInfoWithGroupShortNames.GroupShortNameList"/>.
         /// Unlike <see cref="WellKnownSearchFilters.NameFilter(string)"/> the filter also matches other template group short names the template belongs to.
         /// </summary>
-        /// <param name="name">the name to match with template name or short name</param>
+        /// <param name="name">the name to match with template name or short name.</param>
         /// <returns></returns>
         private static Func<ITemplateInfo, MatchInfo?> CliNameFilter(string name)
         {
@@ -515,7 +516,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
 
                 int nameIndex = groupAwareTemplate.Name.IndexOf(name, StringComparison.OrdinalIgnoreCase);
 
-                if (nameIndex == 0 && string.Equals(groupAwareTemplate.Name, name, StringComparison.OrdinalIgnoreCase))
+                if (nameIndex == 0 && groupAwareTemplate.Name.Length == name.Length)
                 {
                     return new MatchInfo { Location = MatchLocation.Name, Kind = MatchKind.Exact };
                 }
@@ -526,7 +527,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                 {
                     int shortNameIndex = shortName.IndexOf(name, StringComparison.OrdinalIgnoreCase);
 
-                    if (shortNameIndex == 0 && string.Equals(shortName, name, StringComparison.OrdinalIgnoreCase))
+                    if (shortNameIndex == 0 && shortName.Length == name.Length)
                     {
                         return new MatchInfo { Location = MatchLocation.ShortName, Kind = MatchKind.Exact };
                     }
@@ -554,86 +555,77 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         /// </summary>
         private class TemplateInfoWithGroupShortNames : ITemplateInfo, IShortNameList
         {
-            private TemplateInfoWithGroupShortNames (ITemplateInfo source)
+            private ITemplateInfo _parent;
+            internal TemplateInfoWithGroupShortNames (ITemplateInfo source, IEnumerable<string> groupShortNameList)
             {
-                Author = source.Author;
-                Description = source.Description;
-                Classifications = source.Classifications;
-                DefaultName = source.DefaultName;
-                Identity = source.Identity;
-                GeneratorId = source.GeneratorId;
-                GroupIdentity = source.GroupIdentity;
-                Precedence = source.Precedence;
-                Name = source.Name;
-                ShortName = source.ShortName;
-                Tags = source.Tags;
-                CacheParameters = source.CacheParameters;
-                Parameters = source.Parameters;
-                MountPointUri = source.MountPointUri;
-                ConfigPlace = source.ConfigPlace;
-                LocaleConfigPlace = source.LocaleConfigPlace;
-                HostConfigPlace = source.HostConfigPlace;
-                ThirdPartyNotices = source.ThirdPartyNotices;
-                BaselineInfo = source.BaselineInfo;
-                HasScriptRunningPostActions = source.HasScriptRunningPostActions;
+                _parent = source;
+                GroupShortNameList = groupShortNameList.ToList();
             }
 
-            internal static TemplateInfoWithGroupShortNames FromITemplateInfo(ITemplateInfo source)
-            {
-                TemplateInfoWithGroupShortNames filterableTemplate = new TemplateInfoWithGroupShortNames(source);
+            public string Author => _parent.Author;
 
-                if (source is IShortNameList sourceWithShortNameList)
+            public string Description => _parent.Description;
+
+            public IReadOnlyList<string> Classifications => _parent.Classifications;
+
+            public string DefaultName => _parent.DefaultName;
+
+            public string Identity => _parent.Identity;
+
+            public Guid GeneratorId => _parent.GeneratorId;
+
+            public string GroupIdentity => _parent.GroupIdentity;
+
+            public int Precedence => _parent.Precedence;
+
+            public string Name => _parent.Name;
+
+            public string ShortName => _parent.ShortName;
+
+            public IReadOnlyList<string> ShortNameList
+            {
+                get
                 {
-                    filterableTemplate.ShortNameList = sourceWithShortNameList.ShortNameList;
+                    if (_parent is IShortNameList sourceWithShortNameList)
+                    {
+                        return sourceWithShortNameList.ShortNameList;
+                    }
+                    return new List<string>();
                 }
-                return filterableTemplate;
             }
 
-            public string Author { get; private set; }
+            public IReadOnlyList<string> GroupShortNameList { get; } = new List<string>();
 
-            public string Description { get; private set; }
+            public IReadOnlyDictionary<string, ICacheTag> Tags => _parent.Tags;
 
-            public IReadOnlyList<string> Classifications { get; private set; }
+            public IReadOnlyDictionary<string, ICacheParameter> CacheParameters => _parent.CacheParameters;
 
-            public string DefaultName { get; private set; }
+            public IReadOnlyList<ITemplateParameter> Parameters => _parent.Parameters;
 
-            public string Identity { get; private set; }
+            public string MountPointUri => _parent.MountPointUri;
 
-            public Guid GeneratorId { get; private set; }
+            public string ConfigPlace => _parent.ConfigPlace;
 
-            public string GroupIdentity { get; private set; }
+            public string LocaleConfigPlace => _parent.LocaleConfigPlace;
 
-            public int Precedence { get; private set; }
+            public string HostConfigPlace => _parent.HostConfigPlace;
 
-            public string Name { get; private set; }
+            public string ThirdPartyNotices => _parent.ThirdPartyNotices;
 
-            public string ShortName { get; private set; }
+            public IReadOnlyDictionary<string, IBaselineInfo> BaselineInfo => _parent.BaselineInfo;
 
-            public IReadOnlyList<string> ShortNameList { get; private set; } = new List<string>();
+            public bool HasScriptRunningPostActions
+            {
+                get
+                {
+                    return _parent.HasScriptRunningPostActions;
+                }
+                set
+                {
+                    _parent.HasScriptRunningPostActions = value;
+                }
 
-            public IReadOnlyList<string> GroupShortNameList { get; set; } = new List<string>();
-
-            public IReadOnlyDictionary<string, ICacheTag> Tags { get; private set; }
-
-            public IReadOnlyDictionary<string, ICacheParameter> CacheParameters { get; private set; }
-
-            public IReadOnlyList<ITemplateParameter> Parameters { get; private set; }
-
-            public string MountPointUri { get; private set; }
-
-            public string ConfigPlace { get; private set; }
-
-            public string LocaleConfigPlace { get; private set; }
-
-            public string HostConfigPlace { get; private set; }
-
-            public string ThirdPartyNotices { get; private set; }
-
-            public IReadOnlyDictionary<string, IBaselineInfo> BaselineInfo { get; private set; }
-
-            public bool HasScriptRunningPostActions { get; set; }
-
-            public DateTime? ConfigTimestampUtc { get; set; }
+            }
         }
     }
 }
