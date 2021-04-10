@@ -11,44 +11,9 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
 {
     public static class TemplateMatchInfoExtensions
     {
-        public static bool HasTypeMismatch(this ITemplateMatchInfo templateMatchInfo)
-        {
-            return templateMatchInfo.MatchDisposition.Any(x => x.ParameterName == MatchInfo.DefaultParameter.Type && x.Kind == MatchKind.Mismatch);
-        }
-
-        public static bool HasLanguageMismatch(this ITemplateMatchInfo templateMatchInfo)
-        {
-            return templateMatchInfo.MatchDisposition.Any(x => x.ParameterName == MatchInfo.DefaultParameter.Language && x.Kind == MatchKind.Mismatch);
-        }
-
-        public static bool HasLanguageExactMatch(this ITemplateMatchInfo templateMatchInfo)
-        {
-            return templateMatchInfo.MatchDisposition.Any(x => x.ParameterName == MatchInfo.DefaultParameter.Language && x.Kind == MatchKind.Exact);
-        }
-
         public static bool HasDefaultLanguageMatch(this ITemplateMatchInfo templateMatchInfo)
         {
             return templateMatchInfo.MatchDisposition.Any(x => x.ParameterName == TemplateResolver.DefaultLanguageMatchParameterName && x.Kind == MatchKind.Exact);
-        }
-
-        public static bool HasInvalidParameterName(this ITemplateMatchInfo templateMatchInfo)
-        {
-            return templateMatchInfo.MatchDisposition.Any(x => x.Kind == MatchKind.InvalidParameterName);
-        }
-
-        public static bool HasBaselineMismatch(this ITemplateMatchInfo templateMatchInfo)
-        {
-            return templateMatchInfo.MatchDisposition.Any(x => x.ParameterName == MatchInfo.DefaultParameter.Baseline && x.Kind == MatchKind.Mismatch);
-        }
-
-        public static bool HasAuthorMismatch(this ITemplateMatchInfo templateMatchInfo)
-        {
-            return templateMatchInfo.MatchDisposition.Any(x => x.ParameterName == MatchInfo.DefaultParameter.Author && x.Kind == MatchKind.Mismatch);
-        }
-
-        public static bool HasClassificationMismatch(this ITemplateMatchInfo templateMatchInfo)
-        {
-            return templateMatchInfo.MatchDisposition.Any(x => x.ParameterName == MatchInfo.DefaultParameter.Classification && x.Kind == MatchKind.Mismatch);
         }
 
         public static bool HasAmbiguousParameterValueMatch(this ITemplateMatchInfo templateMatchInfo)
@@ -73,12 +38,6 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
 #pragma warning disable CS0618 // Type or member is obsolete
                                 || x.Kind == MatchKind.SingleStartsWith);
 #pragma warning restore CS0618 // Type or member is obsolete
-        }
-
-        public static IReadOnlyList<string> GetInvalidParameterNames(this ITemplateMatchInfo templateMatchInfo)
-        {
-            return templateMatchInfo.MatchDisposition.Where(x => x.Kind == MatchKind.InvalidParameterName)
-                                                   .Select(x => x.ParameterName).ToList();
         }
 
         // This is analogous to INewCommandInput.InputTemplateParams
