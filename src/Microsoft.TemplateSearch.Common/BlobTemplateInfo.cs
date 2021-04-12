@@ -17,11 +17,9 @@ namespace Microsoft.TemplateSearch.Common
         {
             Identity = jObject.Value<string>(nameof(Identity));
             Name = jObject.Value<string>(nameof(Name));
-            ShortNameList = jObject.Value<JArray>("ShortNameList").ToObject<string[]>();
+            ShortNameList = jObject.Value<JArray>(nameof(ShortNameList)).ToObject<string[]>();
             Author = jObject.Value<string>(nameof(Author));
             GroupIdentity = jObject.Value<string>(nameof(GroupIdentity));
-            //TODO: Check if this is actually needed for --search, or could it be just hard coded 0
-            Precedence = jObject.Value<int>(nameof(Precedence));
 
             var tags = new Dictionary<string, ICacheTag>();
             foreach (var tag in jObject.Value<JObject>("Tags").Properties())
@@ -66,7 +64,7 @@ namespace Microsoft.TemplateSearch.Common
 
         public string? GroupIdentity { get; }
 
-        public int Precedence { get; }
+        public int Precedence { get => 0; }
 
         public string Name { get; }
 
