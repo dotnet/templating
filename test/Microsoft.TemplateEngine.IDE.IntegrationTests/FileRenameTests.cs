@@ -209,7 +209,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
 
 
             var foundTemplates = await bootstrapper.GetTemplatesAsync(new[] { WellKnownSearchFilters.NameFilter(templateName) }).ConfigureAwait(false);
-            ITemplateInfo template = foundTemplates.Single(template => template.Info.ShortNameList.Contains($"TestAssets.{templateName}").Info;
+            ITemplateInfo template = foundTemplates.Single(template => template.Info.ShortNameList.Contains($"TestAssets.{templateName}")).Info;
             ICreationEffects result = await bootstrapper.GetCreationEffectsAsync(template, name, output, parametersDict, "").ConfigureAwait(false);
 
             Assert.Equal(expectedResult.CreationResult.PrimaryOutputs.Count, result.CreationResult.PrimaryOutputs.Count);
