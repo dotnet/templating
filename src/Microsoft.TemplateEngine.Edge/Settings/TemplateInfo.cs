@@ -1,49 +1,167 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Microsoft.TemplateEngine.Utils;
 
+#nullable enable
+
 namespace Microsoft.TemplateEngine.Edge.Settings
 {
-    public class TemplateInfo : ITemplateInfo, IShortNameList
+    public partial class TemplateInfo : ITemplateInfo, IShortNameList
     {
-        public static readonly string CurrentVersion = "1.0.0.4";
-
-        public TemplateInfo()
+        public TemplateInfo(JObject jObject)
         {
-            ShortNameList = new List<string>();
-        }
+            MountPointUri = jObject.ToString(nameof(MountPointUri)) ?? throw new ArgumentNullException(nameof(MountPointUri));
+            Author = jObject.ToString(nameof(Author));
+            DefaultName = jObject.ToString(nameof(DefaultName));
+            Description = jObject.ToString(nameof(Description));
+            Identity = jObject.ToString(nameof(Identity)) ?? throw new ArgumentNullException(nameof(Identity));
+            GeneratorId = Guid.Parse(jObject.ToString(nameof(GeneratorId)) ?? throw new ArgumentNullException(nameof(GeneratorId)));
+            GroupIdentity = jObject.ToString(nameof(GroupIdentity));
+            Precedence = jObject.ToInt32(nameof(Precedence));
+            Name = jObject.ToString(nameof(Name)) ?? throw new ArgumentNullException(nameof(Name));
+            ConfigPlace = jObject.ToString(nameof(ConfigPlace)) ?? throw new ArgumentNullException(nameof(ConfigPlace));
+            LocaleConfigPlace = jObject.ToString(nameof(LocaleConfigPlace));
+            HostConfigPlace = jObject.ToString(nameof(HostConfigPlace));
+            ThirdPartyNotices = jObject.ToString(nameof(ThirdPartyNotices));
+            HasScriptRunningPostActions = jObject.ToBool(nameof(HasScriptRunningPostActions));
 
-        private static readonly Func<JObject, TemplateInfo> _defaultReader;
-        private static readonly IReadOnlyDictionary<string, Func<JObject, TemplateInfo>> _infoVersionReaders;
-
-        // Note: Be sure to keep the versioning consistent with SettingsStore
-        static TemplateInfo()
-        {
-            Dictionary<string, Func<JObject, TemplateInfo>> versionReaders = new Dictionary<string, Func<JObject, TemplateInfo>>();
-            versionReaders.Add("1.0.0.0", TemplateInfoReaderVersion1_0_0_0.FromJObject);
-            versionReaders.Add("1.0.0.1", TemplateInfoReaderVersion1_0_0_1.FromJObject);
-            versionReaders.Add("1.0.0.2", TemplateInfoReaderVersion1_0_0_2.FromJObject);
-            versionReaders.Add("1.0.0.3", TemplateInfoReaderVersion1_0_0_3.FromJObject);
-            versionReaders.Add("1.0.0.4", TemplateInfoReaderVersion1_0_0_4.FromJObject);
-            _infoVersionReaders = versionReaders;
-
-            _defaultReader = TemplateInfoReaderInitialVersion.FromJObject;
-        }
-
-        public static TemplateInfo FromJObject(JObject entry, string cacheVersion)
-        {
-            Func<JObject, TemplateInfo> infoReader;
-
-            if (string.IsNullOrEmpty(cacheVersion) || !_infoVersionReaders.TryGetValue(cacheVersion, out infoReader))
+            ShortNameList = JTokenStringOrArrayToCollection(jObject.Get<JToken>(nameof(ShortNameList)), new string[0]);
+            if (ShortNameList.Count == 0)
             {
-                infoReader = _defaultReader;
+                throw new Exception($"Cache is missing {ShortNameList}");
             }
 
-            return infoReader(entry);
+            var classificationsArray = jObject.Get<JArray>(nameof(Classifications));
+            List<string> classifications = new List<string>();
+            Classifications = classifications;
+            if (classificationsArray != null)
+            {
+                foreach (JToken item in classificationsArray)
+                {
+                    classifications.Add(item.ToString());
+                }
+            }
+
+            JObject? tagsObject = jObject.Get<JObject>(nameof(Tags));
+            Dictionary<string, ICacheTag> tags = new Dictionary<string, ICacheTag>();
+            Tags = tags;
+            if (tagsObject != null)
+            {
+                foreach (JProperty item in tagsObject.Properties())
+                {
+                    Dictionary<string, ParameterChoice> choicesAndDescriptions = new Dictionary<string, ParameterChoice>(StringComparer.OrdinalIgnoreCase);
+                    choicesAndDescriptions.Add(item.Value.ToString(), new ParameterChoice(string.Empty, string.Empty));
+                    ICacheTag cacheTag = new CacheTag(
+                        displayName: string.Empty,
+                        description: string.Empty,
+                        choicesAndDescriptions,
+                        item.Value.ToString());
+
+                    tags.Add(item.Name, cacheTag);
+                }
+            }
+
+            JObject? baselineJObject = jObject.Get<JObject>(nameof(ITemplateInfo.BaselineInfo));
+            Dictionary<string, IBaselineInfo> baselineInfo = new Dictionary<string, IBaselineInfo>();
+            if (baselineJObject != null)
+            {
+                foreach (JProperty item in baselineJObject.Properties())
+                {
+                    IBaselineInfo baseline = new BaselineCacheInfo()
+                    {
+                        Description = item.Value.ToString(nameof(IBaselineInfo.Description)),
+                        DefaultOverrides = item.Value.ToStringDictionary(propertyName: nameof(IBaselineInfo.DefaultOverrides))
+                    };
+                    baselineInfo.Add(item.Name, baseline);
+                }
+            }
+            BaselineInfo = baselineInfo;
+
+            Tags = ReadTags(jObject);
+            CacheParameters = ReadParameters(jObject);
+        }
+
+        private static IReadOnlyList<string> JTokenStringOrArrayToCollection(JToken? token, string[] defaultSet)
+        {
+            if (token == null)
+            {
+                return defaultSet;
+            }
+
+            if (token.Type == JTokenType.String)
+            {
+                string tokenValue = token.ToString();
+                return new List<string>() { tokenValue };
+            }
+
+            return token.ArrayAsStrings();
+        }
+
+        private IReadOnlyDictionary<string, ICacheParameter> ReadParameters(JObject jObject)
+        {
+            Dictionary<string, ICacheParameter> cacheParams = new Dictionary<string, ICacheParameter>();
+            JObject? cacheParamsObject = jObject.Get<JObject>(nameof(CacheParameters));
+
+            if (cacheParamsObject != null)
+            {
+                foreach (JProperty item in cacheParamsObject.Properties())
+                {
+                    cacheParams[item.Name] = ReadOneParameter(item);
+                }
+            }
+
+            return cacheParams;
+        }
+
+        private ICacheParameter ReadOneParameter(JProperty item)
+        {
+            return new CacheParameter
+            {
+                DataType = item.Value.ToString(nameof(CacheParameter.DataType)),
+                DefaultValue = item.Value.ToString(nameof(CacheParameter.DefaultValue)),
+                DisplayName = item.Value.ToString(nameof(CacheParameter.DisplayName)),
+                Description = item.Value.ToString(nameof(CacheParameter.Description)),
+                DefaultIfOptionWithoutValue = item.Value.ToString(nameof(CacheParameter.DefaultIfOptionWithoutValue))
+            };
+        }
+
+        private IReadOnlyDictionary<string, ICacheTag> ReadTags(JObject jObject)
+        {
+
+            var tags = new Dictionary<string, ICacheTag>();
+            var tagsObject = jObject.Get<JObject>(nameof(TemplateInfo.Tags));
+
+            if (tagsObject != null)
+            {
+                foreach (JProperty item in tagsObject.Properties())
+                {
+                    tags[item.Name] = ReadOneTag(item);
+                }
+            }
+
+            return tags;
+        }
+
+        private ICacheTag ReadOneTag(JProperty item)
+        {
+            var choices = new Dictionary<string, ParameterChoice>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (JProperty choiceObject in item.Value.PropertiesOf("Choices"))
+            {
+                choices.Add(choiceObject.Name, new ParameterChoice(
+                    choiceObject.Value.ToString(nameof(ParameterChoice.DisplayName)),
+                    choiceObject.Value.ToString(nameof(ParameterChoice.Description))));
+            }
+
+            return new CacheTag(
+                displayName: item.Value.ToString(nameof(CacheTag.DisplayName)),
+                description: item.Value.ToString(nameof(CacheTag.Description)),
+                choices,
+                item.Value.ToString(nameof(CacheTag.DefaultValue)),
+                item.Value.ToString(nameof(CacheTag.DefaultIfOptionWithoutValue)));
         }
 
         [JsonIgnore]
@@ -51,95 +169,77 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         {
             get
             {
-                if (_parameters == null)
+                List<ITemplateParameter> parameters = new List<ITemplateParameter>();
+
+                foreach (KeyValuePair<string, ICacheTag> tagInfo in Tags)
                 {
-                    List<ITemplateParameter> parameters = new List<ITemplateParameter>();
-
-                    foreach (KeyValuePair<string, ICacheTag> tagInfo in Tags)
+                    TemplateParameter param = new TemplateParameter
                     {
-                        ITemplateParameter param = new TemplateParameter
-                        {
-                            Name = tagInfo.Key,
-                            Documentation = tagInfo.Value.Description,
-                            DefaultValue = tagInfo.Value.DefaultValue,
-                            Choices = tagInfo.Value.Choices,
-                            DataType = "choice"
-                        };
+                        Name = tagInfo.Key,
+                        Documentation = tagInfo.Value.Description,
+                        DefaultValue = tagInfo.Value.DefaultValue,
+                        Choices = tagInfo.Value.Choices,
+                        DataType = "choice"
+                    };
 
-                        if (param is IAllowDefaultIfOptionWithoutValue paramWithNoValueDefault
-                            && tagInfo.Value is IAllowDefaultIfOptionWithoutValue tagWithNoValueDefault)
-                        {
-                            paramWithNoValueDefault.DefaultIfOptionWithoutValue = tagWithNoValueDefault.DefaultIfOptionWithoutValue;
-                            parameters.Add(paramWithNoValueDefault as TemplateParameter);
-                        }
-                        else
-                        {
-                            parameters.Add(param);
-                        }
-                    }
-
-                    foreach (KeyValuePair<string, ICacheParameter> paramInfo in CacheParameters)
+                    if (tagInfo.Value is IAllowDefaultIfOptionWithoutValue tagWithNoValueDefault)
                     {
-                        ITemplateParameter param = new TemplateParameter
-                        {
-                            Name = paramInfo.Key,
-                            Documentation = paramInfo.Value.Description,
-                            DataType = paramInfo.Value.DataType,
-                            DefaultValue = paramInfo.Value.DefaultValue,
-                        };
-
-                        if (param is IAllowDefaultIfOptionWithoutValue paramWithNoValueDefault
-                            && paramInfo.Value is IAllowDefaultIfOptionWithoutValue infoWithNoValueDefault)
-                        {
-                            paramWithNoValueDefault.DefaultIfOptionWithoutValue = infoWithNoValueDefault.DefaultIfOptionWithoutValue;
-                            parameters.Add(paramWithNoValueDefault as TemplateParameter);
-                        }
-                        else
-                        {
-                            parameters.Add(param);
-                        }
+                        param.DefaultIfOptionWithoutValue = tagWithNoValueDefault.DefaultIfOptionWithoutValue;
                     }
-
-                    _parameters = parameters;
+                    parameters.Add(param);
                 }
 
-                return _parameters;
+                foreach (KeyValuePair<string, ICacheParameter> paramInfo in CacheParameters)
+                {
+                    TemplateParameter param = new TemplateParameter
+                    {
+                        Name = paramInfo.Key,
+                        Documentation = paramInfo.Value.Description,
+                        DataType = paramInfo.Value.DataType,
+                        DefaultValue = paramInfo.Value.DefaultValue,
+                    };
+
+                    if (paramInfo.Value is IAllowDefaultIfOptionWithoutValue infoWithNoValueDefault)
+                    {
+                        param.DefaultIfOptionWithoutValue = infoWithNoValueDefault.DefaultIfOptionWithoutValue;
+                    }
+                    parameters.Add(param);
+                }
+                return parameters;
             }
         }
-        private IReadOnlyList<ITemplateParameter> _parameters;
-
 
         [JsonProperty]
-        public string MountPointUri { get; set; }
+        public string MountPointUri { get; }
 
         [JsonProperty]
-        public string Author { get; set; }
+        public string? Author { get; }
 
         [JsonProperty]
-        public IReadOnlyList<string> Classifications { get; set; }
+        public IReadOnlyList<string> Classifications { get; }
 
         [JsonProperty]
-        public string DefaultName { get; set; }
+        public string? DefaultName { get; }
 
         [JsonProperty]
-        public string Description { get; set; }
+        public string? Description { get; }
 
         [JsonProperty]
-        public string Identity { get; set; }
+        public string Identity { get; }
 
         [JsonProperty]
-        public Guid GeneratorId { get; set; }
+        public Guid GeneratorId { get; }
 
         [JsonProperty]
-        public string GroupIdentity { get; set; }
+        public string? GroupIdentity { get; }
 
         [JsonProperty]
-        public int Precedence { get; set; }
+        public int Precedence { get; }
 
         [JsonProperty]
-        public string Name { get; set; }
+        public string Name { get; }
 
-        [JsonProperty]
+        [JsonIgnore]
         public string ShortName
         {
             get
@@ -149,75 +249,34 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     return ShortNameList[0];
                 }
 
-                return String.Empty;
-            }
-            set
-            {
-                if (ShortNameList.Count > 0)
-                {
-                    throw new Exception("Can't set the short name when the ShortNameList already has entries.");
-                }
-
-                ShortNameList = new List<string>() { value };
+                return string.Empty;
             }
         }
 
-        // ShortName should get deserialized when it exists, for backwards compat.
-        // But moving forward, ShortNameList should be the definitive source.
-        // It can still be ShortName in the template.json, but in the caches it'll be ShortNameList
-        public bool ShouldSerializeShortName()
-        {
-            return false;
-        }
-
-        public IReadOnlyList<string> ShortNameList { get; set; }
+        public IReadOnlyList<string> ShortNameList { get; }
 
         [JsonProperty]
-        public IReadOnlyDictionary<string, ICacheTag> Tags
-        {
-            get
-            {
-                return _tags;
-            }
-            set
-            {
-                _tags = value;
-                _parameters = null;
-            }
-        }
-        private IReadOnlyDictionary<string, ICacheTag> _tags;
+        public IReadOnlyDictionary<string, ICacheTag> Tags { get; }
 
         [JsonProperty]
-        public IReadOnlyDictionary<string, ICacheParameter> CacheParameters
-        {
-            get
-            {
-                return _cacheParameters;
-            }
-            set
-            {
-                _cacheParameters = value;
-                _parameters = null;
-            }
-        }
-        private IReadOnlyDictionary<string, ICacheParameter> _cacheParameters;
+        public IReadOnlyDictionary<string, ICacheParameter> CacheParameters { get; }
 
         [JsonProperty]
-        public string ConfigPlace { get; set; }
+        public string ConfigPlace { get; }
 
         [JsonProperty]
-        public string LocaleConfigPlace { get; set; }
+        public string? LocaleConfigPlace { get; }
 
         [JsonProperty]
-        public string HostConfigPlace { get; set; }
+        public string? HostConfigPlace { get; }
 
         [JsonProperty]
-        public string ThirdPartyNotices { get; set; }
+        public string? ThirdPartyNotices { get; }
 
         [JsonProperty]
-        public IReadOnlyDictionary<string, IBaselineInfo> BaselineInfo { get; set; }
+        public IReadOnlyDictionary<string, IBaselineInfo> BaselineInfo { get; }
 
         [JsonProperty]
-        public bool HasScriptRunningPostActions { get; set; }
+        public bool HasScriptRunningPostActions { get; }
     }
 }

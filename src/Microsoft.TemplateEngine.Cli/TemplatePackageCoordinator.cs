@@ -548,7 +548,7 @@ namespace Microsoft.TemplateEngine.Cli
                 if (templates.Any())
                 {
                     Reporter.Output.WriteLine($"    {LocalizableStrings.Templates}:");
-                    foreach (TemplateInfo info in templates)
+                    foreach (ITemplateInfo info in templates)
                     {
                         string templateLanguage = info.GetLanguage();
                         if (!string.IsNullOrWhiteSpace(templateLanguage))

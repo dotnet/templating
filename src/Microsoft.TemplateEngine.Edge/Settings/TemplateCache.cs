@@ -4,14 +4,17 @@ using System.Globalization;
 using System.IO;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Edge.Template;
-using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
+#nullable enable
 
 namespace Microsoft.TemplateEngine.Edge.Settings
 {
     internal class TemplateCache
     {
+        internal const string CurrentVersion = "1.0.0.5";
+
         private IDictionary<string, ITemplate> _templateMemoryCache = new Dictionary<string, ITemplate>();
 
         // locale -> identity -> locator
@@ -26,6 +29,8 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             TemplateInfo = new List<TemplateInfo>();
             MountPointsInfo = new Dictionary<string, DateTime>();
             Locale = CultureInfo.CurrentUICulture.Name;
+            Version = CurrentVersion;
+            InstallScanner = new Scanner(environmentSettings);
         }
 
         public TemplateCache(IEngineEnvironmentSettings environmentSettings, JObject parsed)
@@ -53,19 +58,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             return TemplateListFilter.FilterTemplates(TemplateInfo, exactMatchesOnly, filters);
         }
 
-        private Scanner InstallScanner
-        {
-            get
-            {
-                if (_installScanner == null)
-                {
-                    _installScanner = new Scanner(_environmentSettings);
-                }
-
-                return _installScanner;
-            }
-        }
-        private Scanner _installScanner;
+        private Scanner InstallScanner { get; }
 
         private void AddTemplatesAndLangPacksFromScanResult(ScanResult scanResult)
         {
@@ -91,10 +84,19 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             if (contentJobject.TryGetValue(nameof(Version), StringComparison.OrdinalIgnoreCase, out JToken versionToken))
             {
                 Version = versionToken.ToString();
+
+                if (Version != CurrentVersion)
+                {
+                    _environmentSettings.Host.LogDiagnosticMessage(
+                        $"Template cache file version is {Version}, but template engine is {CurrentVersion}, rebuilding cache.",
+                        "Debug");
+                    return;
+                }
             }
             else
             {
                 Version = string.Empty;
+                return;
             }
 
             if (contentJobject.TryGetValue(nameof(Locale), StringComparison.OrdinalIgnoreCase, out JToken localeToken))
@@ -128,7 +130,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     {
                         if (entry != null && entry.Type == JTokenType.Object)
                         {
-                            templateList.Add(Settings.TemplateInfo.FromJObject((JObject)entry, Version));
+                            templateList.Add(new TemplateInfo((JObject)entry));
                         }
                     }
                 }
@@ -162,8 +164,8 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
             foreach (ITemplate newTemplate in _templateMemoryCache.Values)
             {
-                ILocalizationLocator locatorForTemplate = GetPreferredLocatorForTemplate(newTemplate.Identity, newLocatorsForLocale);
-                TemplateInfo localizedTemplate = LocalizeTemplate(newTemplate, locatorForTemplate);
+                ILocalizationLocator? locatorForTemplate = GetPreferredLocatorForTemplate(newTemplate.Identity, newLocatorsForLocale);
+                TemplateInfo localizedTemplate = new TemplateInfo(newTemplate, locatorForTemplate);
                 mergedTemplateList.Add(localizedTemplate);
                 foundTemplates.Add(newTemplate.Identity);
 
@@ -192,11 +194,10 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     templates.RemoveAt(i);
                     --i;
                     hasMountPointChanges = true;
-                    continue;
                 }
             }
 
-            this.Version = Settings.TemplateInfo.CurrentVersion;
+            this.Version = CurrentVersion;
             this.TemplateInfo = templates;
             this.MountPointsInfo = mountPoints;
 
@@ -207,163 +208,13 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             }
         }
 
-        private ILocalizationLocator GetPreferredLocatorForTemplate(string identity, IDictionary<string, ILocalizationLocator> newLocatorsForLocale)
+        private ILocalizationLocator? GetPreferredLocatorForTemplate(string identity, IDictionary<string, ILocalizationLocator> newLocatorsForLocale)
         {
             if (newLocatorsForLocale.TryGetValue(identity, out ILocalizationLocator locatorForTemplate))
             {
                 return locatorForTemplate;
             }
             return null;
-        }
-
-        private TemplateInfo LocalizeTemplate(ITemplateInfo template, ILocalizationLocator localizationInfo)
-        {
-            TemplateInfo localizedTemplate = new TemplateInfo
-            {
-                GeneratorId = template.GeneratorId,
-                ConfigPlace = template.ConfigPlace,
-                MountPointUri = template.MountPointUri,
-                Name = localizationInfo?.Name ?? template.Name,
-                Tags = LocalizeCacheTags(template, localizationInfo),
-                CacheParameters = LocalizeCacheParameters(template, localizationInfo),
-                ShortName = template.ShortName,
-                Classifications = template.Classifications,
-                Author = localizationInfo?.Author ?? template.Author,
-                Description = localizationInfo?.Description ?? template.Description,
-                GroupIdentity = template.GroupIdentity ?? string.Empty,
-                Precedence = template.Precedence,
-                Identity = template.Identity,
-                DefaultName = template.DefaultName,
-                LocaleConfigPlace = localizationInfo?.ConfigPlace ?? null,
-                HostConfigPlace = template.HostConfigPlace,
-                ThirdPartyNotices = template.ThirdPartyNotices,
-                BaselineInfo = template.BaselineInfo,
-                HasScriptRunningPostActions = template.HasScriptRunningPostActions
-            };
-
-            if (template is IShortNameList templateWithShortNameList)
-            {
-                localizedTemplate.ShortNameList = templateWithShortNameList.ShortNameList;
-            }
-
-            return localizedTemplate;
-        }
-
-        private IReadOnlyDictionary<string, ICacheTag> LocalizeCacheTags(ITemplateInfo template, ILocalizationLocator localizationInfo)
-        {
-            if (localizationInfo == null || localizationInfo.ParameterSymbols == null)
-            {
-                return template.Tags;
-            }
-
-            IReadOnlyDictionary<string, ICacheTag> templateTags = template.Tags;
-            IReadOnlyDictionary<string, IParameterSymbolLocalizationModel> localizedParameterSymbols = localizationInfo.ParameterSymbols;
-
-            Dictionary<string, ICacheTag> localizedCacheTags = new Dictionary<string, ICacheTag>();
-
-            foreach (KeyValuePair<string, ICacheTag> templateTag in templateTags)
-            {
-                if (!localizedParameterSymbols.TryGetValue(templateTag.Key, out IParameterSymbolLocalizationModel localizationForTag))
-                {
-                    // There is no localization for this symbol. Use the symbol as is.
-                    localizedCacheTags.Add(templateTag.Key, templateTag.Value);
-                    continue;
-                }
-
-                // There is localization. Create a localized instance, starting with the choices.
-                var localizedChoices = new Dictionary<string, ParameterChoice>();
-
-                foreach (KeyValuePair<string, ParameterChoice> templateChoice in templateTag.Value.Choices)
-                {
-                    ParameterChoice localizedChoice = new ParameterChoice(
-                        templateChoice.Value.DisplayName,
-                        templateChoice.Value.Description);
-
-                    if (localizationForTag.Choices.TryGetValue(templateChoice.Key, out ParameterChoiceLocalizationModel locModel))
-                    {
-                        localizedChoice.Localize(locModel);
-                    }
-
-                    localizedChoices.Add(templateChoice.Key, localizedChoice);
-                }
-
-                ICacheTag localizedTag = new CacheTag(
-                    localizationForTag.DisplayName ?? templateTag.Value.DisplayName,
-                    localizationForTag.Description ?? templateTag.Value.Description,
-                    localizedChoices,
-                    templateTag.Value.DefaultValue,
-                    (templateTag.Value as IAllowDefaultIfOptionWithoutValue)?.DefaultIfOptionWithoutValue);
-
-                localizedCacheTags.Add(templateTag.Key, localizedTag);
-            }
-
-            return localizedCacheTags;
-        }
-
-        private IReadOnlyDictionary<string, ICacheParameter> LocalizeCacheParameters(ITemplateInfo template, ILocalizationLocator localizationInfo)
-        {
-            if (localizationInfo == null || localizationInfo.ParameterSymbols == null)
-            {
-                return template.CacheParameters;
-            }
-
-            IReadOnlyDictionary<string, ICacheParameter> templateCacheParameters = template.CacheParameters;
-            IReadOnlyDictionary<string, IParameterSymbolLocalizationModel> localizedParameterSymbols = localizationInfo.ParameterSymbols;
-
-
-            Dictionary<string, ICacheParameter> localizedCacheParams = new Dictionary<string, ICacheParameter>();
-
-            foreach (KeyValuePair<string, ICacheParameter> templateParam in templateCacheParameters)
-            {
-                if (localizedParameterSymbols.TryGetValue(templateParam.Key, out IParameterSymbolLocalizationModel localizationForParam))
-                {   // there is loc info for this symbol
-                    ICacheParameter localizedParam = new CacheParameter
-                    {
-                        DataType = templateParam.Value.DataType,
-                        DefaultValue = templateParam.Value.DefaultValue,
-                        DisplayName = localizationForParam.DisplayName ?? templateParam.Value.DisplayName,
-                        Description = localizationForParam.Description ?? templateParam.Value.Description
-                    };
-
-                    localizedCacheParams.Add(templateParam.Key, localizedParam);
-                }
-                else
-                {
-                    localizedCacheParams.Add(templateParam.Key, templateParam.Value);
-                }
-            }
-
-            return localizedCacheParams;
-        }
-
-        // return dict is: Identity -> locator
-        private IDictionary<string, ILocalizationLocator> GetLocalizationsFromTemplates(IReadOnlyList<TemplateInfo> templateList, string locale)
-        {
-            IDictionary<string, ILocalizationLocator> locatorLookup = new Dictionary<string, ILocalizationLocator>();
-
-            foreach (TemplateInfo template in templateList)
-            {
-                if (string.IsNullOrEmpty(template.LocaleConfigPlace))
-                {   // Indicates an unlocalized entry in the locale specific template cache.
-                    continue;
-                }
-
-                ILocalizationLocator locator = new LocalizationLocator()
-                {
-                    Locale = locale,
-                    MountPointUri = template.MountPointUri,
-                    ConfigPlace = template.LocaleConfigPlace,
-                    Identity = template.Identity,
-                    Author = template.Author,
-                    Name = template.Name,
-                    Description = template.Description
-                    // ParameterSymbols are not needed here. If things get refactored too much, they might become needed
-                };
-
-                locatorLookup.Add(locator.Identity, locator);
-            }
-
-            return locatorLookup;
         }
 
         // Adds the template to the memory cache, keyed on identity.

@@ -1,6 +1,7 @@
 ﻿using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Mocks;
+using Microsoft.TemplateEngine.TestHelper;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
@@ -14,16 +15,23 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             IEngineEnvironmentSettings mockEnvironmentSettings = new MockEngineEnvironmentSettings();
             TemplateCache cache = new TemplateCache(mockEnvironmentSettings, CacheDataOriginalStyle);
 
-            Assert.Equal(3, cache.TemplateInfo.Count);
+            Assert.NotEqual(TemplateCache.CurrentVersion, cache.Version);
+            Assert.Equal(0, cache.TemplateInfo.Count);
         }
 
         [Fact(DisplayName = nameof(CanReadVersion1000Cache))]
         public void CanReadVersion1000Cache()
         {
-            IEngineEnvironmentSettings mockEnvironmentSettings = new MockEngineEnvironmentSettings();
+            MockEngineEnvironmentSettings mockEnvironmentSettings = new MockEngineEnvironmentSettings();
+            mockEnvironmentSettings.Host= new TestHost
+            {
+                HostIdentifier = "TestRunner",
+                Version = "1.0.0.0",
+            };
             TemplateCache cache = new TemplateCache(mockEnvironmentSettings, CacheDataVersion1000);
 
-            Assert.Equal(3, cache.TemplateInfo.Count);
+            Assert.NotEqual(TemplateCache.CurrentVersion, cache.Version);
+            Assert.Equal(0, cache.TemplateInfo.Count);
         }
 
         private static JObject CacheDataVersion1000

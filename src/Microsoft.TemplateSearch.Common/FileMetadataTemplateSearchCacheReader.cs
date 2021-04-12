@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Edge;
-using Microsoft.TemplateEngine.Edge.Settings;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateSearch.Common
@@ -59,7 +58,7 @@ namespace Microsoft.TemplateSearch.Common
                         {
                             if (entry != null && entry.Type == JTokenType.Object)
                             {
-                                buildingTemplateList.Add(TemplateInfo.FromJObject((JObject)entry, cacheVersion));
+                                buildingTemplateList.Add(new BlobTemplateInfo((JObject)entry));
                             }
                         }
                     }
