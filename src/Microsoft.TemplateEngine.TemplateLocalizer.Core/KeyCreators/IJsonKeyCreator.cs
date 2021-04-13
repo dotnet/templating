@@ -3,7 +3,7 @@
 
 using System.Text.Json;
 
-namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.KeyExtractors
+namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.KeyCreators
 {
     /// <summary>
     /// Creates keys for a given <see cref="JsonElement"/> of a JSON document that can be used to uniquely identify the element

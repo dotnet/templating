@@ -3,12 +3,12 @@
 
 using System.Text.Json;
 
-namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.KeyExtractors
+namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.KeyCreators
 {
     /// <summary>
     /// Creates a key for a given element using the name of the element.
     /// </summary>
-    internal sealed class PropertyNameBasedKeyCreator : IJsonKeyCreator
+    internal sealed class NameBasedKeyCreator : IJsonKeyCreator
     {
         /// <inheritdoc/>
         public string CreateKey(JsonElement element, string? elementName, string? parentElementName, int indexInParent)

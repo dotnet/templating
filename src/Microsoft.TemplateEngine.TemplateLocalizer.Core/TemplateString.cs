@@ -14,12 +14,12 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
         /// Creates an instance of <see cref="TemplateString"/>.
         /// </summary>
         /// <param name="identifier">A string that uniquely identifies this template field in the template.json file.</param>
-        /// <param name="key">A string that uniquely identifies this field in localized templatestrings.json file.</param>
+        /// <param name="localizationKey">A string that uniquely identifies this field in localized templatestrings.json file.</param>
         /// <param name="value">Localizable string.</param>
-        public TemplateString(string identifier, string key, string value)
+        public TemplateString(string identifier, string localizationKey, string value)
         {
             Identifier = identifier;
-            Key = key;
+            LocalizationKey = localizationKey;
             Value = value;
         }
 
@@ -28,7 +28,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
         /// Given a template.json file and an <see cref="Identifier"/>, it is possible to
         /// directly find the corresponding JSON element.
         /// </summary>
-        /// <example>"symbols.Framework.choices[0].displayName".</example>
+        /// <example>"symbols.Framework.choices.[0].displayName".</example>
         public string Identifier { get; }
 
         /// <summary>
@@ -36,7 +36,8 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
         /// file. This is different than <see cref="Identifier"/> in the way that it is intended to
         /// be more user friendly.
         /// </summary>
-        public string Key { get; }
+        /// <example>"symbols.Framework.choices.net6_0.displayName".</example>
+        public string LocalizationKey { get; }
 
         /// <summary>
         /// Gets the value of the string found at the location identified with <see cref="Identifier"/>.
@@ -47,14 +48,14 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
         public bool Equals(TemplateString other)
         {
             return Identifier == other.Identifier
-                && Key == other.Key
+                && LocalizationKey == other.LocalizationKey
                 && Value == other.Value;
         }
 
         /// <inheritdoc/>
         public override string ToString()
         {
-            return string.Concat('{', Key, ',', Value, '}');
+            return string.Concat('{', LocalizationKey, ',', Value, '}');
         }
     }
 }

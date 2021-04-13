@@ -3,7 +3,7 @@
 
 using System.Text.Json;
 
-namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.KeyExtractors
+namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.KeyCreators
 {
     /// <summary>
     /// Creates a key for a given element using the elements index with respect to its siblings.
