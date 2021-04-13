@@ -28,22 +28,39 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
         /// The rules that define which fields in the template json should be extracted to a templatestrings.json file.
         /// </summary>
         private readonly TraversalRule _documentRootTraversalRule =
-            new StringFilteredTraversalRule(string.Empty).WithChildren(
+            // Root element should be included in any case.
+            new AllInclusiveTraversalRule().WithChildren(
+                // Include "name" under the root.
                 new StringFilteredTraversalRule("name"),
+                // Include "description" under the root.
                 new StringFilteredTraversalRule("description"),
+                // Include "symbols" under the root, if they also comply with child rules.
                 new StringFilteredTraversalRule("symbols").WithChild(
+                    // Any symbol is included, skip none.
                     new AllInclusiveTraversalRule().WithChildren(
+                        // Include "displayName" of each symbol.
                         new StringFilteredTraversalRule("displayName"),
+                        // Include "description" of each symbol.
                         new StringFilteredTraversalRule("description"),
+                        // Include "choices" of symbols, if they also comply with child rules.
                         new StringFilteredTraversalRule("choices", new MemberBasedKeyCreator("choice")).WithChild(
-                            new RegexFilteredTraversalRule("[^\\.]*").WithChildren(
+                            // Include any element of the "choices" array. No choice will be skipped.
+                            new AllInclusiveTraversalRule().WithChildren(
+                                // Include "displayName" of each choice.
                                 new StringFilteredTraversalRule("displayName"),
+                                // Include "description" of each choice.
                                 new StringFilteredTraversalRule("description"))))),
+                // Include "postActions" under the root, if they also comply with child rules.
                 new StringFilteredTraversalRule("postActions").WithChild(
+                    // Any post action in "postActions" array should be included. Skip none.
                     new AllInclusiveTraversalRule().WithChildren(
+                        // Include "description" of the post action.
                         new StringFilteredTraversalRule("description"),
+                        // Include "manualInstructions" of the post action, if they also comply with child rules.
                         new RegexFilteredTraversalRule("manualInstructions").WithChild(
+                            // Include all the manual instructions in the array. Skip none.
                             new AllInclusiveTraversalRule().WithChild(
+                                // Include "text" of the post action.
                                 new StringFilteredTraversalRule("text"))))));
 
         public TemplateStringExtractor(JsonDocument document, ILoggerFactory? loggerFactory = null)
