@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Text.Json;
+using Microsoft.TemplateEngine.TemplateLocalizer.Core.Exceptions;
 
 namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.KeyCreators
 {
@@ -27,8 +28,8 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.KeyCreators
         {
             if (!element.TryGetProperty(MemberPropertyName, out JsonElement keyProperty) || keyProperty.ValueKind != JsonValueKind.String)
             {
-                // TODO throw?
-                return string.Empty;
+                string owningElementName = (parentElementName == null ? elementName : (parentElementName + "." + elementName)) ?? string.Empty;
+                throw new JsonMemberMissingException(owningElementName, MemberPropertyName);
             }
 
             string key = keyProperty.GetString()?.Replace('.', '_') ?? string.Empty;

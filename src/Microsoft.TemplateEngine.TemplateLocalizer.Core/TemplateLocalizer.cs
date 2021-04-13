@@ -16,13 +16,16 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
     /// </summary>
     public sealed class TemplateLocalizer
     {
+        private readonly ILoggerFactory _loggerFactory;
+
         private readonly ILogger _logger;
 
         public TemplateLocalizer() : this(null) { }
 
         public TemplateLocalizer(ILoggerFactory? loggerFactory)
         {
-            _logger = (ILogger?)loggerFactory?.CreateLogger<TemplateLocalizer>() ?? NullLogger.Instance;
+            _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
+            _logger = _loggerFactory.CreateLogger<TemplateLocalizer>();
         }
 
         public async Task<ExportResult> ExportLocalizationFilesAsync(string templateJsonPath, ExportOptions options, CancellationToken cancellationToken = default)
@@ -36,7 +39,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
             };
             using JsonDocument jsonDocument = await JsonDocument.ParseAsync(fileStream, jsonOptions, cancellationToken).ConfigureAwait(false);
 
-            TemplateStringExtractor stringExtractor = new TemplateStringExtractor(jsonDocument);
+            TemplateStringExtractor stringExtractor = new TemplateStringExtractor(jsonDocument, _loggerFactory);
             var strings = stringExtractor.ExtractStrings();
 
             // This section is not implemented yet and will be delivered in the future commits. Please ignore during review.

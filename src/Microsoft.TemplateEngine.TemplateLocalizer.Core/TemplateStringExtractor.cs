@@ -17,14 +17,12 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
     /// </summary>
     internal sealed class TemplateStringExtractor
     {
+        private readonly ILoggerFactory _loggerFactory;
         private readonly ILogger _logger;
         private readonly JsonDocument _jsonDocument;
 
         private static readonly IJsonKeyCreator _defaultArrayKeyExtractor = new IndexBasedKeyCreator();
         private static readonly IJsonKeyCreator _defaultObjectKeyExtractor = new NameBasedKeyCreator();
-
-        private readonly List<TemplateString> _extractedStrings = new List<TemplateString>();
-        private readonly HashSet<string> _extractedStringIds = new HashSet<string>();
 
         /// <summary>
         /// The rules that define which fields in the template json should be extracted to a templatestrings.json file.
@@ -44,40 +42,44 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
                 new StringFilteredTraversalRule("postActions").WithChild(
                     new AllInclusiveTraversalRule().WithChildren(
                         new StringFilteredTraversalRule("description"),
-                        new RegexFilteredTraversalRule("manualInstructions\\[([0-9]+)\\]").WithChild(
-                            new StringFilteredTraversalRule("text")))));
+                        new RegexFilteredTraversalRule("manualInstructions").WithChild(
+                            new AllInclusiveTraversalRule().WithChild(
+                                new StringFilteredTraversalRule("text"))))));
 
         public TemplateStringExtractor(JsonDocument document, ILoggerFactory? loggerFactory = null)
         {
             _jsonDocument = document;
-            _logger = loggerFactory?.CreateLogger<TemplateStringExtractor>() ?? (ILogger)NullLogger.Instance;
+            _loggerFactory = loggerFactory ?? NullLoggerFactory.Instance;
+            _logger = _loggerFactory.CreateLogger<TemplateStringExtractor>();
         }
 
         public IReadOnlyList<TemplateString> ExtractStrings()
         {
-            _extractedStringIds.Clear();
-            _extractedStrings.Clear();
+            List<TemplateString>? extractedStrings = new();
+
+            TraversalArgs traversalArgs = new(
+                    identifierPrefix: string.Empty,
+                    keyPrefix: string.Empty,
+                    rules: new List<TraversalRule>() { _documentRootTraversalRule },
+                    extractedStrings,
+                    extractedStringIds: new HashSet<string>());
 
             TraverseJsonElements(
                 _jsonDocument.RootElement,
-                string.Empty,
-                string.Empty,
-                string.Empty,
-                string.Empty,
-                new List<TraversalRule>() { _documentRootTraversalRule });
-            return _extractedStrings;
+                elementName: string.Empty,
+                localizationKey: string.Empty,
+                traversalArgs);
+            return extractedStrings;
         }
 
         private void TraverseJsonElements(
             JsonElement element,
             string elementName,
-            string? identifierPrefix,
-            string key,
-            string? keyPrefix,
-            IEnumerable<TraversalRule> rules)
+            string localizationKey,
+            TraversalArgs args)
         {
             using IDisposable? _ = _logger.BeginScope(elementName);
-            List<TraversalRule> complyingRules = rules.Where(r => r.AllowsTraversalOfIdentifier(elementName)).ToList();
+            List<TraversalRule> complyingRules = args.Rules.Where(r => r.AllowsTraversalOfIdentifier(elementName)).ToList();
 
             if (complyingRules.Count == 0)
             {
@@ -85,35 +87,41 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
                 _logger.LogInformation(
                     "The following element in the template.json will not be included in the localizations" +
                     " because it does not match any of the rules for localizable elements: {0}",
-                    identifierPrefix + "." + elementName);
+                    args.IdentifierPrefix + "." + elementName);
                 return;
             }
 
             JsonValueKind valueKind = element.ValueKind;
             if (valueKind == JsonValueKind.String)
             {
-                ProcessStringElement(element, elementName, identifierPrefix, key, keyPrefix);
+                ProcessStringElement(element, elementName, localizationKey, args);
                 return;
             }
 
-            identifierPrefix = identifierPrefix + "." + elementName;
+            string newIdentifierPrefix = args.IdentifierPrefix + "." + elementName;
             if (valueKind == JsonValueKind.Array)
             {
-                ProcessArrayElement(element, elementName, identifierPrefix, keyPrefix, complyingRules);
+                TraversalArgs newData = args;
+                newData.IdentifierPrefix = newIdentifierPrefix;
+                newData.Rules = complyingRules;
+                ProcessArrayElement(element, elementName, newData);
                 return;
             }
 
             if (valueKind == JsonValueKind.Object)
             {
-                keyPrefix = keyPrefix + "." + key;
-                ProcessObjectElement(element, elementName, identifierPrefix, keyPrefix, complyingRules);
+                TraversalArgs newData = args;
+                newData.IdentifierPrefix = newIdentifierPrefix;
+                newData.Rules = complyingRules;
+                newData.KeyPrefix = args.KeyPrefix + "." + localizationKey;
+                ProcessObjectElement(element, elementName, newData);
             }
         }
 
-        private void ProcessStringElement(JsonElement element, string elementName, string? identifierPrefix, string key, string? keyPrefix)
+        private void ProcessStringElement(JsonElement element, string elementName, string key, TraversalArgs data)
         {
-            string identifier = identifierPrefix + "." + elementName;
-            if (_extractedStringIds.Contains(identifier))
+            string identifier = data.IdentifierPrefix + "." + elementName;
+            if (data.ExtractedStringIds.Contains(identifier))
             {
                 // This string was already included by an earlier rule, possibly with a different key. Skip.
                 _logger.LogWarning(
@@ -123,32 +131,35 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
                 return;
             }
 
-            string finalKey = keyPrefix == null ? key : (keyPrefix + "." + key);
-            _extractedStringIds.Add(identifier);
-            _extractedStrings.Add(new TemplateString(identifier, finalKey, element.GetString() ?? string.Empty));
+            string finalKey = data.KeyPrefix == null ? key : (data.KeyPrefix + "." + key);
+            data.ExtractedStringIds.Add(identifier);
+            data.ExtractedStrings.Add(new TemplateString(identifier, finalKey, element.GetString() ?? string.Empty));
             _logger.LogInformation("Adding into localizable strings: {0}", identifier);
         }
 
-        private void ProcessArrayElement(JsonElement element, string elementName, string? identifierPrefix, string? keyPrefix, List<TraversalRule> complyingRules)
+        private void ProcessArrayElement(JsonElement element, string elementName, TraversalArgs args)
         {
-            foreach (TraversalRule rule in complyingRules)
+            foreach (TraversalRule rule in args.Rules)
             {
                 int childIndex = 0;
                 foreach (var child in element.EnumerateArray())
                 {
                     string childElementName = childIndex.ToString();
-                    string childKey = (rule.KeyCreator ?? _defaultArrayKeyExtractor).CreateKey(child, childElementName, elementName, childIndex);
+                    string? childKey = (rule.KeyCreator ?? _defaultArrayKeyExtractor).CreateKey(child, childElementName, elementName, childIndex);
+
+                    TraversalArgs nextArgs = args;
+                    nextArgs.Rules = rule.ChildRules;
 
                     using IDisposable? __ = _logger.BeginScope(childElementName);
-                    TraverseJsonElements(child, childElementName, identifierPrefix, childKey, keyPrefix, rule.ChildRules);
+                    TraverseJsonElements(child, childElementName, childKey, nextArgs);
                     childIndex++;
                 }
             }
         }
 
-        private void ProcessObjectElement(JsonElement element, string elementName, string? identifierPrefix, string? keyPrefix, List<TraversalRule> complyingRules)
+        private void ProcessObjectElement(JsonElement element, string elementName, TraversalArgs args)
         {
-            foreach (TraversalRule rule in complyingRules)
+            foreach (TraversalRule rule in args.Rules)
             {
                 int childIndex = 0;
                 foreach (JsonProperty child in element.EnumerateObject())
@@ -156,8 +167,11 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
                     string childElementName = child.Name;
                     string childKey = (rule.KeyCreator ?? _defaultObjectKeyExtractor).CreateKey(child.Value, childElementName, elementName, childIndex);
 
+                    TraversalArgs nextArgs = args;
+                    nextArgs.Rules = rule.ChildRules;
+
                     using IDisposable? __ = _logger.BeginScope(childElementName);
-                    TraverseJsonElements(child.Value, childElementName, identifierPrefix, childKey, keyPrefix, rule.ChildRules);
+                    TraverseJsonElements(child.Value, childElementName, childKey, nextArgs);
                     childIndex++;
                 }
             }

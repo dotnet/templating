@@ -53,6 +53,25 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
         }
 
         /// <inheritdoc/>
+        public override bool Equals(object obj)
+        {
+            if (!(obj is TemplateString other))
+            {
+                return false;
+            }
+
+            return Equals(other);
+        }
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+        {
+            return unchecked(((17 * 23 + Identifier.GetHashCode()) * 23
+                + (LocalizationKey?.GetHashCode() ?? 0)) * 23
+                + (Value?.GetHashCode() ?? 0));
+        }
+
+        /// <inheritdoc/>
         public override string ToString()
         {
             return string.Concat('{', LocalizationKey, ',', Value, '}');
