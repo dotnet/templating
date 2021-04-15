@@ -17,8 +17,6 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Commands.Export
     {
         private const string CommandName = "export";
 
-        private const int ConcurrencyLevel = 16;
-
         public ExportCommand(ILoggerFactory loggerFactory) : base(loggerFactory) { }
 
         public override Command CreateCommand()
@@ -86,62 +84,47 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Commands.Export
                 return 1;
             }
 
-            // We will do this in batches to limit concurrency.
-            int batchSize = ConcurrencyLevel;
-            int totalBatchCount = templateJsonFiles.Count / batchSize + (templateJsonFiles.Count % batchSize == 0 ? 0 : 1);
             List<ExportResult> exportResults = new ();
             List<(string templateJsonPath, Task<ExportResult> task)> runningExportTasks = new (templateJsonFiles.Count);
 
-            for (int batchIndex = 0; batchIndex < totalBatchCount; batchIndex++)
+            foreach (string templateJsonPath in templateJsonFiles)
             {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    break;
-                }
+                string templateDirectory = Path.GetDirectoryName(templateJsonPath) ?? string.Empty;
+                string targetDirectory = Path.Combine(templateDirectory, "localize");
 
-                int batchOffset = batchSize * batchIndex;
-                for (int taskIndex = 0; taskIndex < batchSize && batchOffset + taskIndex < templateJsonFiles.Count; taskIndex++)
-                {
-                    string templateJsonPath = templateJsonFiles[batchOffset + taskIndex];
-                    string templateDirectory = Path.GetDirectoryName(templateJsonPath) ?? string.Empty;
-                    string targetDirectory = Path.Combine(templateDirectory, "localize");
+                ExportOptions exportOptions = new (args.DryRun, targetDirectory, args.Languages);
+                runningExportTasks.Add(
+                    (templateJsonPath,
+                    new Core.TemplateLocalizer(LoggerFactory).ExportLocalizationFilesAsync(templateJsonPath, exportOptions, cancellationToken))
+                );
+            }
 
-                    ExportOptions exportOptions = new (args.DryRun, targetDirectory, args.Languages);
-                    runningExportTasks.Add(
-                        (templateJsonPath,
-                        new Core.TemplateLocalizer(LoggerFactory).ExportLocalizationFilesAsync(templateJsonPath, exportOptions, cancellationToken))
-                    );
-                }
+            try
+            {
+                await Task.WhenAll(runningExportTasks.Select(t => t.Item2)).ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                // Task.WhenAll will only throw one of the exceptions. We need to log them all. Handle this outside of catch block.
+            }
 
-                try
+            foreach ((string templateJsonPath, Task<ExportResult> task) pathTaskPair in runningExportTasks)
+            {
+                if (pathTaskPair.task.IsCanceled)
                 {
-                    await Task.WhenAll(runningExportTasks.Select(t => t.Item2)).ConfigureAwait(false);
+                    Logger.LogWarning(LocalizableStrings.command_export_log_cancelled, pathTaskPair.templateJsonPath);
+                    continue;
                 }
-                catch (Exception)
+                else if (pathTaskPair.task.IsFaulted)
                 {
-                    // Task.WhenAll will only throw one of the exceptions. We need to log them all. Handle this outside of catch block.
+                    failed = true;
+                    Logger.LogError(pathTaskPair.task.Exception, LocalizableStrings.command_export_log_templateExportFailedWithException, pathTaskPair.templateJsonPath);
                 }
-
-                foreach ((string templateJsonPath, Task<ExportResult> task) pathTaskPair in runningExportTasks)
+                else
                 {
-                    if (pathTaskPair.task.IsCanceled)
-                    {
-                        Logger.LogWarning(LocalizableStrings.command_export_log_cancelled, pathTaskPair.templateJsonPath);
-                        continue;
-                    }
-                    else if (pathTaskPair.task.IsFaulted)
-                    {
-                        failed = true;
-                        Logger.LogError(pathTaskPair.task.Exception, LocalizableStrings.command_export_log_templateExportFailedWithException, pathTaskPair.templateJsonPath);
-                    }
-                    else
-                    {
-                        // Tasks is known to have already completed. We can get the result without await.
-                        exportResults.Add(pathTaskPair.task.Result);
-                    }
+                    // Tasks is known to have already completed. We can get the result without await.
+                    exportResults.Add(pathTaskPair.task.Result);
                 }
-
-                runningExportTasks.Clear();
             }
 
             PrintResults(exportResults);
