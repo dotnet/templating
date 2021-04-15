@@ -1,7 +1,7 @@
 ## Primary outputs
 Primary outputs define the list of template files for further processing. 
 The primary outputs are returned by template engine API after template instantiation (`Microsoft.TemplateEngine.IDE.Bootstrapper.CreateAsync`, `Microsoft.TemplateEngine.Edge.Template.TemplateCreator.InstantiateAsync`) or dry run (`Microsoft.TemplateEngine.IDE.Bootstrapper.GetCreationEffectsAsync`).
-The main use for primary outputs is to provide the list of files to perform post actions implemented by the host. `dotnet CLI` host and Visual Studio host implement the default set of post actions based on primary outputs returned by API, described in [post-action registry](https://github.com/dotnet/templating/wiki/Post-Action-Registry). In case the template files has to be used in post actions, they should be added as the primary outputs in `template.json` definition.
+The main use for primary outputs is to provide the list of files to perform post actions implemented by the host. `dotnet CLI` host and Visual Studio host implement the default set of post actions based on primary outputs returned by API, described in [post-action registry](https://github.com/dotnet/templating/wiki/Post-Action-Registry). In case the template files have to be used in post actions, they should be added as the primary outputs in `template.json` definition.
 
 The template can define any number of primary outputs. Each primary output contains the following information:
 - `path` - the path should contain the relative path to the file after template instantiation is done, however prior to symbol based renaming is applied.
@@ -63,8 +63,8 @@ Source modifiers defined in `template.json` can override source or target locati
 When changing the source, make sure that primary output path contains final location of the file after instantiation relative to default target path (`./`)
 Example:
 template files:
-- `/Custom/Path/MyTestProject.csproj`
-- `/Custom/Path/Class.cs`
+- `./Custom/Path/MyTestProject.csproj`
+- `./Custom/Path/Class.cs`
 
 `template.json` definition
 ```
@@ -110,7 +110,9 @@ Example:
 dotnet new TestAssets.TemplateWithSourceNameAndCustomSourcePath --name Awesome 
 ```
 The primary output returned by API is: `Awesome.csproj`.
-The final location of the files is: `./Awesome.csproj, ./Class.cs`.
+The final location of the files is: 
+- `./Awesome.csproj`
+- `./Class.cs`
 
 ### Changing target
 When changing the target for template instantiation, make sure that primary output path contains final location of the file after instantiation including target path.
@@ -163,14 +165,16 @@ Example:
 dotnet new TestAssets.TemplateWithSourceNameAndCustomTargetPath --name Awesome 
 ```
 The primary output returned by API is: `/Custom/Path/Awesome.csproj`.
-The final location of the files is: `./Custom/Path/Awesome.csproj, ./Custom/Path/Class.cs`.
+The final location of the files is: 
+- `./Custom/Path/Awesome.csproj`
+- `./Custom/Path/Class.cs`
 
 ### Changing source and target
 When changing both source and target for template instantiation, make sure that primary output path contains final location of the file after instantiation including target path.
 Example:
 template files:
-- `/Src/Custom/Path/MyTestProject.csproj`
-- `/Target/Output/Class.cs`
+- `./Src/Custom/Path/MyTestProject.csproj`
+- `./Src/Custom/Path/Class.cs`
 
 `template.json` definition
 ```
@@ -217,7 +221,9 @@ Example:
 dotnet new TestAssets.TemplateWithSourceNameAndCustomSourceAndTargetPaths --name Awesome 
 ```
 The primary output returned by API is: `Target/Output/Awesome.csproj`.
-The final location of the files is: `./Target/Output/Awesome.csproj, .Target/Output/Class.cs`.
+The final location of the files is: 
+- `./Target/Output/Awesome.csproj,`
+- `./Target/Output/Class.cs`
 
 ### Renaming
 When using renames in source modifiers, make sure that primary output path contains the filename after source based file rename is applied, however before symbol based renames are applied.
@@ -280,10 +286,15 @@ The primary output returned by API is: `MyAwesomeTestProject.csproj`.
 The final location of the files is: `./MyAwesomeTestProject.csproj`.
 
 
-# Examples
+# Different ways of using primary outputs in post actions
+
+Post actions support different ways of choosing the files to process, for more details see the documentation for specific post action.
 
 ## Example 1 - apply post action to all primary outputs
 The following example restores all the projects mentioned in primary outputs:
+template files:
+- `./Src/Custom/Path/MyTestProject.csproj`
+- `./Src/Custom/Path/Class.cs`
 `template.json` definition
 ```
 {
@@ -322,6 +333,9 @@ The following example restores all the projects mentioned in primary outputs:
 
 ## Example 2 - reference source files in post action arguments
 The following example restores individual files specified in `files` property. Defining them in primary outputs is optional.
+template files:
+- `./Src/Custom/Path/MyTestProject.csproj`
+- `./Src/Custom/Path/Class.cs`
 `template.json` definition
 ```
 {
@@ -356,15 +370,15 @@ The following example restores individual files specified in `files` property. D
       "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
       "continueOnError": true,
       "args": {
-        "files": [ "Src/Custom/Path/MyTestProject.csproj" ]  //source location
+        "files": [ "Src/Custom/Path/MyTestProject.csproj" ]  //here the source location should be used as the post action supports this notation
       }
     }
   ]
 }
 ```
 Supported for:
-- restore NuGet packages (dotnet CLI)
-- add reference to a project file (dotnet CLI)
+- restore NuGet packages (`dotnet CLI`)
+- add reference to a project file (`dotnet CLI`)
 
 ## Example 3 - using primary output indexes in post action arguments
 
@@ -389,6 +403,6 @@ Opens the file from primary outputs defined by index.
 ```
 
 Supported for:
-- add projects to a solution file (dotnet CLI)
+- add projects to a solution file (`dotnet CLI`)
 - add reference to a project file (Visual Studio)
 - open a file in the editor (Visual Studio)

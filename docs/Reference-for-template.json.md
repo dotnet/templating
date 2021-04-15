@@ -339,9 +339,10 @@ Values of `OrganizationalAuth`, `WindowsAuth`, `MultiOrgAuth`, `SingleOrgAuth`, 
 |primaryOutputs|A list of template files for further processing by the host (including post-actions). The path should contain the relative path to the file prior to the symbol based renaming that may happen during template generation. It is defined as an array of [Primary Outputs](#primary-output-definition)||
 
 #### Primary Output Definition
+Primary outputs define the list of template files for further processing. 
 |Name|Description|
 |---|---|
-|path|Contains the relative path to the file after the template is instantiated.|
+|path|should contain the relative path to the file after the template is instantiated.|
 |condition|If the condition evaluates to `true`, the corresponding primary output is generated. If `false`, the path is ignored. If no condition is provided for a path, the condition defaults to `true`.|
 
 For more information on primary outputs, refer to [the article](https://github.com/dotnet/templating/wiki/Using-Primary-Outputs-for-Post-Actions).
