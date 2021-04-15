@@ -1,1 +1,2 @@
-﻿echo Hello Unix
+﻿#!/bin/sh
+echo Hello Unix

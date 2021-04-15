@@ -115,15 +115,18 @@ namespace Dotnet_new3.IntegrationTests
                 .Should()
                 .ExitWith(0)
                 .And.NotHaveStdErr()
-                .And.HaveStdOutContaining($"The template \"{templateName}\" was created successfully.");
+                .And.HaveStdOutContaining($"The template \"{templateName}\" was created successfully.")
+                .And.NotHaveStdOutContaining("Run 'chmod +x *.sh'")
+                .And.NotHaveStdOutContaining("Manual instructions: Run 'setup.cmd'")
+                .And.NotHaveStdOutContaining("Manual instructions: Run 'setup.sh'");
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                commandResult.Should().HaveStdOutContaining("Hello Windows").And.NotHaveStdOutContaining("Manual instructions: Run 'setup.cmd'");
+                commandResult.Should().HaveStdOutContaining("Hello Windows");
             }
             else
             {
-                commandResult.Should().HaveStdOutContaining("Hello Unix").And.NotHaveStdOutContaining("Manual instructions: Run 'setup.sh'");
+                commandResult.Should().HaveStdOutContaining("Hello Unix");
             }
         }
 
@@ -228,33 +231,6 @@ namespace Dotnet_new3.IntegrationTests
             string solutionFileContents = File.ReadAllText(Path.Combine(workingDirectory, "MySolution.sln"));
             Assert.Contains("Server.csproj", solutionFileContents);
             Assert.DoesNotContain("Client.csproj", solutionFileContents);
-        }
-
-        [Fact]
-        public void ChangePermissions_Basic()
-        {
-            string templateLocation = "PostActions/ChangeFilePermissions/Basic";
-            string templateName = "TestAssets.PostActions.ChangeFilePermissions.Basic";
-            string home = TestUtils.CreateTemporaryFolder("Home");
-            string workingDirectory = TestUtils.CreateTemporaryFolder();
-            Helpers.InstallTestTemplate(templateLocation, _log, workingDirectory, home);
-
-            var commandResult = new DotnetNewCommand(_log, templateName)
-                .WithWorkingDirectory(workingDirectory)
-                .WithEnvironmentVariable(TestUtils.HomeEnvironmentVariableName, home)
-                .Execute();
-
-            commandResult
-                .Should()
-                .ExitWith(0)
-                .And.NotHaveStdErr()
-                .And.HaveStdOutContaining($"The template \"{templateName}\" was created successfully.")
-                .And.NotHaveStdOutContaining("Manual instructions: Run 'chmod +x *.sh'");
-
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                commandResult.Should().NotHaveStdOutContaining("Manual instructions: Run 'chmod +x *.sh'");
-            }
         }
 
         [Fact]
