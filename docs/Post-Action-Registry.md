@@ -210,21 +210,17 @@ Note: when using `projectFiles` argument the path should indicate location the p
 
 ### Example
 
-Adds `MyTestProject.csproj` and `MyClass.cs` to solution in output directory or its closest parent directory.
+Adds `MyTestProject.csproj` to solution in output directory or its closest parent directory.
 
 ```
 "primaryOutputs": [
     {
       "path": "MyTestProject.csproj"        
-    },
-    {
-      "path": "MyClass.cs"        
     }
 ],
 "postActions": [{
-  "condition": "(postActionAddToSln)",
   "description": "Add projects to solution",
-  "manualInstructions": [ { "text": "Add the generated files to solution manually." } ],
+  "manualInstructions": [ { "text": "Add generated project to solution manually." } ],
   "args": {
     "solutionFolder": "src"
   },
@@ -233,16 +229,15 @@ Adds `MyTestProject.csproj` and `MyClass.cs` to solution in output directory or 
 }]
 ```
 
-Adds `MyTestProject.csproj` and `MyClass.cs` to solution in output directory or its closest parent directory (using `projectFiles` argument).
+Adds `MyTestProject.csproj` to solution in output directory or its closest parent directory (using `projectFiles` argument).
 
 ```
 "postActions": [{
-  "condition": "(postActionAddToSln)",
   "description": "Add projects to solution",
-  "manualInstructions": [ { "text": "Add the generated files to solution manually." } ],
+  "manualInstructions": [ { "text": "Add generated project to solution manually." } ],
   "args": {
     "solutionFolder": "src",
-    "files": ["MyTestProject.csproj", "MyClass.cs"]
+    "projectFiles": ["MyTestProject.csproj"]
   },
   "actionId": "D396686C-DE0E-4DE6-906D-291CD29FC5DE",
   "continueOnError": true
@@ -302,7 +297,7 @@ Prints out the manual instructions after instantiating template in format:
 ```
 Description: <description defined in post action>
 Manual instructions: <manual instructions defined in post action>
-Command: <executable> <args>
+Actual command: <executable> <args>
 ```
 
 Command is printed only if defined in post action arguments.
@@ -320,11 +315,11 @@ Command is printed only if defined in post action arguments.
 
 ```
 "postActions": [{
-  "description": "Manual actions needed",
+  "description": "Manual actions required",
   "manualInstructions": [{
     "text": "Run the following command"
   }],
-  "actionId": "cb9a6cf3-4f5c-4860-b9d2-03a574959774",
+  "actionId": "AC1156F7-BB77-4DB8-B28F-24EEBCCA1E5C",
   "args": {
     "executable": "setup.cmd",
     "args": "<your project name>"

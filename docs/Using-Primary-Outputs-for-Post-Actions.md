@@ -97,7 +97,7 @@ template files:
       "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
       "continueOnError": true,
       "args": {
-        "files": [ "Custom/Path/MyTestProject.csproj" ]
+        "files": [ "./Custom/Path/MyTestProject.csproj" ]
       }
     }
   ]
@@ -140,7 +140,7 @@ template files:
   ],
   "primaryOutputs": [
     {
-      "path": "/Custom/Path/MyTestProject.csproj"        
+      "path": "./Custom/Path/MyTestProject.csproj"        
     }
   ],
   "postActions": [
@@ -208,7 +208,7 @@ template files:
       "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
       "continueOnError": true,
       "args": {
-        "files": [ "Src/Custom/Path/MyTestProject.csproj" ]
+        "files": [ "./Src/Custom/Path/MyTestProject.csproj" ]
       }
     }
   ]
