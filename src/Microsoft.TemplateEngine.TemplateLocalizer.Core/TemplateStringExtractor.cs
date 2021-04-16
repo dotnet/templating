@@ -22,7 +22,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
         private readonly JsonDocument _jsonDocument;
 
         private static readonly IJsonKeyCreator _defaultArrayKeyExtractor = new IndexBasedKeyCreator();
-        private static readonly IJsonKeyCreator _defaultObjectKeyExtractor = new NameBasedKeyCreator();
+        private static readonly IJsonKeyCreator _defaultObjectKeyExtractor = new NameKeyCreator();
 
         /// <summary>
         /// The rules that define which fields in the template json should be extracted to a templatestrings.json file.
@@ -43,7 +43,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
                         // Include "description" of each symbol.
                         new StringFilteredTraversalRule("description"),
                         // Include "choices" of symbols, if they also comply with child rules.
-                        new StringFilteredTraversalRule("choices", new MemberBasedKeyCreator("choice")).WithChild(
+                        new StringFilteredTraversalRule("choices", new ChildValueKeyCreator("choice")).WithChild(
                             // Include any element of the "choices" array. No choice will be skipped.
                             new AllInclusiveTraversalRule().WithChildren(
                                 // Include "displayName" of each choice.
@@ -72,7 +72,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
 
         public IReadOnlyList<TemplateString> ExtractStrings()
         {
-            List<TemplateString>? extractedStrings = new();
+            List<TemplateString> extractedStrings = new ();
 
             TraversalArgs traversalArgs = new(
                     identifierPrefix: string.Empty,

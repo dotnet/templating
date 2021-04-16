@@ -10,9 +10,9 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.KeyCreators
     /// Creates a key for a given element using the value of one of its members.
     /// The type of the value of the member should be string.
     /// </summary>
-    internal sealed class MemberBasedKeyCreator : IJsonKeyCreator
+    internal sealed class ChildValueKeyCreator : IJsonKeyCreator
     {
-        public MemberBasedKeyCreator(string memberPropertyName)
+        public ChildValueKeyCreator(string memberPropertyName)
         {
             MemberPropertyName = memberPropertyName;
         }
