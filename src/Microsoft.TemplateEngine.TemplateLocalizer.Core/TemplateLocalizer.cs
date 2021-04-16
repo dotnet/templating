@@ -23,12 +23,12 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
             _logger = (ILogger?)loggerFactory?.CreateLogger<TemplateLocalizer>() ?? NullLogger.Instance;
         }
 
-        public async Task<ExportResult> ExportLocalizationFilesAsync(string templateJsonPath, ExportOptions options, CancellationToken cancellationToken = default)
+        public Task<ExportResult> ExportLocalizationFilesAsync(string templateJsonPath, ExportOptions options, CancellationToken cancellationToken = default)
         {
             ExportResult result = new ExportResult();
             result.TemplateJsonPath = templateJsonPath;
             result.ErrorMessage = "Operation failed.";
-            return result;
+            return Task.FromResult(result);
         }
     }
 }
