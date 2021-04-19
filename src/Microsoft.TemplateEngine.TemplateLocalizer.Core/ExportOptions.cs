@@ -15,7 +15,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
         /// <param name="dryRun">Specifies whether export operation skip flushing files to disk.</param>
         /// <param name="targetDirectory">Path to the directory where the generated files will be saved into.</param>
         /// <param name="languages">A set of languages for which the localizable files will be exported.</param>
-        public ExportOptions(bool dryRun, string? targetDirectory = null, IEnumerable<string>? languages = null)
+        public ExportOptions(bool dryRun, string? targetDirectory = default, IEnumerable<string>? languages = default)
         {
             DryRun = dryRun;
             TargetDirectory = targetDirectory;
