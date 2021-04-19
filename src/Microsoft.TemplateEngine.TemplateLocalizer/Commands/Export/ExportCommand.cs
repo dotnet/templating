@@ -89,10 +89,8 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Commands.Export
 
             foreach (string templateJsonPath in templateJsonFiles)
             {
-                string templateDirectory = Path.GetDirectoryName(templateJsonPath) ?? string.Empty;
-                string targetDirectory = Path.Combine(templateDirectory, "localize");
 
-                ExportOptions exportOptions = new (args.DryRun, targetDirectory, args.Languages);
+                ExportOptions exportOptions = new (args.DryRun, targetDirectory: null, args.Languages);
                 runningExportTasks.Add(
                     (templateJsonPath,
                     new Core.TemplateLocalizer(LoggerFactory).ExportLocalizationFilesAsync(templateJsonPath, exportOptions, cancellationToken))
