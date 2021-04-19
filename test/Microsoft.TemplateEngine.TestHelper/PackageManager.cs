@@ -23,6 +23,7 @@ namespace Microsoft.TemplateEngine.TestHelper
 {
     public class PackageManager : IDisposable
     {
+        private static SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
         private string _packageLocation = TestUtils.CreateTemporaryFolder("packages");
         private readonly ILogger _nugetLogger = NullLogger.Instance;
         private readonly SourceCacheContext _cacheSettings = new SourceCacheContext()
@@ -39,10 +40,12 @@ namespace Microsoft.TemplateEngine.TestHelper
             return PackNuGetPackage(projectToPack);
         }
 
-        public string GetNuGetPackage(string templatePackName, ITestOutputHelper? log = null)
+        public async Task<string> GetNuGetPackage(string templatePackName, ITestOutputHelper? log = null)
         {
-            lock (string.Intern(templatePackName.ToLowerInvariant()))
+
+            try
             {
+                await semaphore.WaitAsync().ConfigureAwait(false);
                 if (_installedPackages.TryGetValue(templatePackName, out string packagePath))
                 {
                     return packagePath;
@@ -52,9 +55,7 @@ namespace Microsoft.TemplateEngine.TestHelper
                 {
                     try
                     {
-                        Task<string> downloadTask = DownloadPackageAsync(templatePackName, log: log);
-                        downloadTask.Wait();
-                        string downloadedPackage = downloadTask.Result;
+                        string downloadedPackage = await DownloadPackageAsync(templatePackName, log: log).ConfigureAwait(false);
                         _installedPackages[templatePackName] = downloadedPackage;
                         return downloadedPackage;
                     }
@@ -63,9 +64,13 @@ namespace Microsoft.TemplateEngine.TestHelper
                         log?.WriteLine($"[NuGet Package Manager] Download failed: package {templatePackName}, details: {ex}");
                         //retry failed download
                     }
-                    Task.Delay(1000);
+                    await Task.Delay(1000).ConfigureAwait(false);
                 }
                 throw new Exception($"Failed to download {templatePackName} after 5 retries");
+            }
+            finally
+            {
+                semaphore.Release();
             }
         }
 
@@ -309,7 +314,7 @@ namespace Microsoft.TemplateEngine.TestHelper
                 throw new Exception($"Failed to load NuGet sources configured for the folder {currentDirectory}", ex);
             }
 
-            if (additionalSources == null || !additionalSources.Any())
+            if (!additionalSources.Any())
             {
                 if (!defaultSources.Any())
                 {
