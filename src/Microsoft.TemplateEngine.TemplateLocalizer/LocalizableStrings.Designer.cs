@@ -106,7 +106,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Export command for the following file was cancelled: &quot;{0}&quot;..
+        ///   Looks up a localized string similar to &quot;--export&quot; command for the following file was cancelled: &quot;{0}&quot;..
         /// </summary>
         internal static string command_export_log_cancelled {
             get {
@@ -115,7 +115,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Execution of export command has completed. {0} files were processed..
+        ///   Looks up a localized string similar to Execution of &quot;--export&quot; command has completed. {0} files were processed..
         /// </summary>
         internal static string command_export_log_executionEnded {
             get {
@@ -160,7 +160,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &quot;{0}&quot; command has encountered an error. See the logs for more details..
+        ///   Looks up a localized string similar to &quot;--{0}&quot; command has encountered an error. See the logs for more details..
         /// </summary>
         internal static string generic_log_commandExecutionFailed {
             get {
@@ -169,7 +169,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to There was an error while running the &quot;{0}&quot; command. Error message: &quot;{1}&quot;. See the logs for more details..
+        ///   Looks up a localized string similar to There was an error while running the &quot;--{0}&quot; command. Error message: &quot;{1}&quot;. See the logs for more details..
         /// </summary>
         internal static string generic_log_commandExecutionFailedWithErrorMessage {
             get {
