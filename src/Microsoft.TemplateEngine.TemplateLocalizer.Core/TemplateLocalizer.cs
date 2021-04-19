@@ -1,6 +1,8 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Threading;
@@ -30,21 +32,36 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
 
         public async Task<ExportResult> ExportLocalizationFilesAsync(string templateJsonPath, ExportOptions options, CancellationToken cancellationToken = default)
         {
-            using FileStream fileStream = new FileStream(templateJsonPath, FileMode.Open, FileAccess.Read);
-
             JsonDocumentOptions jsonOptions = new JsonDocumentOptions()
             {
                 CommentHandling = JsonCommentHandling.Skip,
                 AllowTrailingCommas = true,
             };
-            using JsonDocument jsonDocument = await JsonDocument.ParseAsync(fileStream, jsonOptions, cancellationToken).ConfigureAwait(false);
 
-            TemplateStringExtractor stringExtractor = new TemplateStringExtractor(jsonDocument, _loggerFactory);
-            var strings = stringExtractor.ExtractStrings();
+            try
+            {
+                using FileStream fileStream = new FileStream(templateJsonPath, FileMode.Open, FileAccess.Read);
+                using JsonDocument jsonDocument = await JsonDocument.ParseAsync(fileStream, jsonOptions, cancellationToken).ConfigureAwait(false);
 
-            // This section is not implemented yet and will be delivered in the future commits. Please ignore during review.
+                TemplateStringExtractor stringExtractor = new TemplateStringExtractor(jsonDocument, _loggerFactory);
+                IReadOnlyList<TemplateString> templateJsonStrings = stringExtractor.ExtractStrings();
 
-            return new ExportResult(templateJsonPath, "Operation Failed", null);
+                string targetDirectory = options.TargetDirectory ?? Path.Combine(Path.GetDirectoryName(templateJsonPath) ?? string.Empty, "localize");
+
+                await TemplateStringUpdater.UpdateStringsAsync(
+                    templateJsonStrings,
+                    templateJsonLanguage: "en",
+                    options.Languages ?? ExportOptions.DefaultLanguages,
+                    targetDirectory,
+                    _logger,
+                    cancellationToken).ConfigureAwait(false);
+
+                return new ExportResult(templateJsonPath);
+            }
+            catch (Exception exception)
+            {
+                return new ExportResult(templateJsonPath, null, exception);
+            }
         }
     }
 }
