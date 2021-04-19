@@ -14,7 +14,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.TraversalRules
     {
         private readonly List<TraversalRule> _childRules = new ();
 
-        protected TraversalRule(IJsonKeyCreator? keyCreator = null)
+        protected TraversalRule(IJsonKeyCreator? keyCreator = default)
         {
             KeyCreator = keyCreator;
         }

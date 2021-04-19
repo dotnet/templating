@@ -10,7 +10,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.TraversalRules
     /// </summary>
     internal sealed class AllInclusiveTraversalRule : TraversalRule
     {
-        public AllInclusiveTraversalRule(IJsonKeyCreator? keyCreator = null)
+        public AllInclusiveTraversalRule(IJsonKeyCreator? keyCreator = default)
             : base(keyCreator) { }
 
         /// <inheritdoc/>

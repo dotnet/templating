@@ -9,7 +9,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.Exceptions
     /// Represents an exception thrown to indicate that a json element with the given name
     /// was not found, even though it was expected to exist under the given parent json element.
     /// </summary>
-    internal class JsonMemberMissingException : Exception
+    internal sealed class JsonMemberMissingException : Exception
     {
         /// <summary>
         /// Creates an instance of <see cref="JsonMemberMissingException"/>.

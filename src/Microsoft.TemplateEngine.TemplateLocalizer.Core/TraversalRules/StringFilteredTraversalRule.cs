@@ -17,7 +17,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.TraversalRules
         /// </summary>
         /// <param name="identifierToMatch">The exact json element name that this rule will accept and not filter out.</param>
         /// <param name="keyCreator"><see cref="IJsonKeyCreator"/> to be used when creating a key for the match elements.</param>
-        public StringFilteredTraversalRule(string identifierToMatch, IJsonKeyCreator? keyCreator = null)
+        public StringFilteredTraversalRule(string identifierToMatch, IJsonKeyCreator? keyCreator = default)
             : base(keyCreator)
         {
             _identifierToMatch = identifierToMatch;
