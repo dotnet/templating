@@ -349,7 +349,7 @@
     <Rule Id="SA1411" Action="Warning" />       <!-- Attribute constructor shouldn't use unnecessary parenthesis -->
     <Rule Id="SA1413" Action="None" />          <!-- Use trailing comma in multi-line initializers -->
     <Rule Id="SA1414" Action="None" />          <!-- Tuple types in signatures should have element names -->
-    <Rule Id="SA1500" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Braces for multi-line statements should not share line -->
+    <Rule Id="SA1500" Action="Warning" TESpecific="true" />          <!-- Braces for multi-line statements should not share line -->
     <Rule Id="SA1501" Action="None" />          <!-- Statement should not be on a single line -->
     <Rule Id="SA1502" Action="None" />          <!-- Element should not be on a single line -->
     <Rule Id="SA1503" Action="Warning" TESpecific="true" />          <!-- Braces should not be omitted -->
