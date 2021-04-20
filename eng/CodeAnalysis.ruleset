@@ -263,7 +263,7 @@
     <Rule Id="SA1012" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Opening brace should be followed by a space -->
     <Rule Id="SA1013" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Closing brace should be preceded by a space -->
     <Rule Id="SA1014" Action="Info" TemporarilyDisabled="true" TESpecific="true" />       <!-- Opening generic brackets should not be preceded by a space -->
-    <Rule Id="SA1015" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Closing generic bracket should not be followed by a space -->
+    <Rule Id="SA1015" Action="Warning" TESpecific="true" />          <!-- Closing generic bracket should not be followed by a space -->
     <Rule Id="SA1018" Action="Warning" />       <!-- Nullable type symbol should not be preceded by a space -->
     <Rule Id="SA1020" Action="Warning" />       <!-- Increment symbol should not be preceded by a space -->
     <Rule Id="SA1021" Action="None" />          <!-- Negative sign should be preceded by a space -->
