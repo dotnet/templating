@@ -318,7 +318,7 @@
     <Rule Id="SA1206" Action="Info" TemporarilyDisabled="true" />       <!-- Keyword ordering -->
     <Rule Id="SA1208" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Using directive ordering -->
     <Rule Id="SA1209" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Using alias directives should be placed after all using namespace directives -->
-    <Rule Id="SA1210" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Using directives should be ordered alphabetically by the namespaces -->
+    <Rule Id="SA1210" Action="Warning" TESpecific="true" />          <!-- Using directives should be ordered alphabetically by the namespaces -->
     <Rule Id="SA1211" Action="Warning" TESpecific="true" />          <!-- Using alias directive ordering -->
     <Rule Id="SA1212" Action="Warning" />       <!-- A get accessor appears after a set accessor within a property or indexer -->
     <Rule Id="SA1214" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Readonly fields should appear before non-readonly fields -->
