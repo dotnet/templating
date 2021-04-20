@@ -354,7 +354,7 @@
     <Rule Id="SA1502" Action="None" />          <!-- Element should not be on a single line -->
     <Rule Id="SA1503" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Braces should not be omitted -->
     <Rule Id="SA1504" Action="None" />          <!-- All accessors should be single-line or multi-line -->
-    <Rule Id="SA1505" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- An opening brace should not be followed by a blank line -->
+    <Rule Id="SA1505" Action="Warning" TESpecific="true" />          <!-- An opening brace should not be followed by a blank line -->
     <Rule Id="SA1506" Action="None" />          <!-- Element documentation headers should not be followed by blank line -->
     <Rule Id="SA1507" Action="Warning" TESpecific="true" />          <!-- Code should not contain multiple blank lines in a row -->
     <Rule Id="SA1508" Action="None" />          <!-- A closing brace should not be preceded by a blank line -->
