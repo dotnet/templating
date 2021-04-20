@@ -26,7 +26,7 @@
     <Rule Id="CA1040" Action="None" />          <!-- Avoid empty interfaces -->
     <Rule Id="CA1041" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Provide ObsoleteAttribute message -->
     <Rule Id="CA1043" Action="None" />          <!-- Use Integral Or String Argument For Indexers -->
-    <Rule Id="CA1044" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Properties should not be write only -->
+    <Rule Id="CA1044" Action="Warning" TESpecific="true" />          <!-- Properties should not be write only -->
     <Rule Id="CA1045" Action="None" />          <!-- Do not pass types by reference -->
     <Rule Id="CA1046" Action="None" />          <!-- Do not overload equality operator on reference types -->
     <Rule Id="CA1047" Action="Warning" />       <!-- Do not declare protected member in sealed type -->
