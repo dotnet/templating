@@ -259,7 +259,7 @@
     <Rule Id="SA1008" Action="None" />          <!-- Opening parenthesis should not be preceded by a space -->
     <Rule Id="SA1009" Action="None" />          <!-- Closing parenthesis should not be followed by a space -->
     <Rule Id="SA1010" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Opening square brackets should not be preceded by a space -->
-    <Rule Id="SA1011" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Closing square bracket should be followed by a space -->
+    <Rule Id="SA1011" Action="Warning" TemporarilyDisabled="true" TESpecific="true" />          <!-- Closing square bracket should be followed by a space -->
     <Rule Id="SA1012" Action="Warning" TESpecific="true" />          <!-- Opening brace should be followed by a space -->
     <Rule Id="SA1013" Action="Warning" TESpecific="true" />          <!-- Closing brace should be preceded by a space -->
     <Rule Id="SA1014" Action="Warning" TESpecific="true" />       <!-- Opening generic brackets should not be preceded by a space -->
