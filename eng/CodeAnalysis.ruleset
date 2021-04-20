@@ -336,7 +336,7 @@
     <Rule Id="SA1312" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Variable should begin with lower-case letter -->
     <Rule Id="SA1313" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Parameter should begin with lower-case letter -->
     <Rule Id="SA1314" Action="None" />          <!-- Type parameter names should begin with T -->
-    <Rule Id="SA1316" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Tuple element names should use correct casing -->
+    <Rule Id="SA1316" Action="Warning" TESpecific="true" />          <!-- Tuple element names should use correct casing -->
     <Rule Id="SA1400" Action="Warning" />       <!-- Member should declare an access modifer -->
     <Rule Id="SA1401" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Fields should be private -->
     <Rule Id="SA1402" Action="None" />          <!-- File may only contain a single type -->
