@@ -268,7 +268,7 @@
     <Rule Id="SA1020" Action="Warning" />       <!-- Increment symbol should not be preceded by a space -->
     <Rule Id="SA1021" Action="None" />          <!-- Negative sign should be preceded by a space -->
     <Rule Id="SA1023" Action="None" />          <!-- Dereference symbol '*' should not be preceded by a space." -->
-    <Rule Id="SA1024" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Colon should be followed by a space -->
+    <Rule Id="SA1024" Action="Warning" TESpecific="true" />          <!-- Colon should be followed by a space -->
     <Rule Id="SA1025" Action="Warning" TESpecific="true" />          <!-- Code should not contain multiple whitespace characters in a row -->
     <Rule Id="SA1026" Action="Warning" />       <!-- Keyword followed by span or blank line -->
     <Rule Id="SA1027" Action="Warning" />       <!-- Tabs and spaces should be used correctly -->
