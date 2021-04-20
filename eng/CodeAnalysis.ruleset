@@ -388,7 +388,7 @@
     <Rule Id="SA1623" Action="None" />          <!-- Property documentation text -->
     <Rule Id="SA1624" Action="None" />          <!-- Because the property only contains a visible get accessor, the documentation summary text should begin with 'Gets' -->
     <Rule Id="SA1625" Action="None" />          <!-- Element documentation should not be copied and pasted -->
-    <Rule Id="SA1626" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Single-line comments should not use documentation style slashes -->
+    <Rule Id="SA1626" Action="Warning" TESpecific="true" />          <!-- Single-line comments should not use documentation style slashes -->
     <Rule Id="SA1627" Action="None" />          <!-- The documentation text within the \'exception\' tag should not be empty -->
     <Rule Id="SA1629" Action="Warning" TESpecific="true" />          <!-- Documentation text should end with a period -->
     <Rule Id="SA1633" Action="None" />          <!-- File should have header -->
