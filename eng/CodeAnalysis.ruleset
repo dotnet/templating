@@ -390,7 +390,7 @@
     <Rule Id="SA1625" Action="None" />          <!-- Element documentation should not be copied and pasted -->
     <Rule Id="SA1626" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Single-line comments should not use documentation style slashes -->
     <Rule Id="SA1627" Action="None" />          <!-- The documentation text within the \'exception\' tag should not be empty -->
-    <Rule Id="SA1629" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Documentation text should end with a period -->
+    <Rule Id="SA1629" Action="Warning" TESpecific="true" />          <!-- Documentation text should end with a period -->
     <Rule Id="SA1633" Action="None" />          <!-- File should have header -->
     <Rule Id="SA1642" Action="None" />          <!-- Constructor summary documentation should begin with standard text -->
     <Rule Id="SA1643" Action="None" />          <!-- Destructor summary documentation should begin with standard text -->
