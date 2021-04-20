@@ -362,7 +362,7 @@
     <Rule Id="SA1510" Action="None" />          <!-- 'else' statement should not be preceded by a blank line -->
     <Rule Id="SA1512" Action="None" />          <!-- Single-line comments should not be followed by blank line -->
     <Rule Id="SA1513" Action="None" />          <!-- Closing brace should be followed by blank line -->
-    <Rule Id="SA1514" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Element documentation header should be preceded by blank line -->
+    <Rule Id="SA1514" Action="Warning" TESpecific="true" />          <!-- Element documentation header should be preceded by blank line -->
     <Rule Id="SA1515" Action="None" />          <!-- Single-line comment should be preceded by blank line -->
     <Rule Id="SA1516" Action="None" />          <!-- Elements should be separated by blank line -->
     <Rule Id="SA1517" Action="Warning" />       <!-- Code should not contain blank lines at start of file -->
