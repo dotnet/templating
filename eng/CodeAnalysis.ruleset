@@ -465,7 +465,7 @@
     <Rule Id="IDE0070" Action="Hidden" />       <!-- UseSystemHashCode -->
     <Rule Id="IDE0071" Action="Hidden" />       <!-- SimplifyInterpolation -->
     <Rule Id="IDE0072" Action="Hidden" />       <!-- PopulateSwitchExpression -->
-    <Rule Id="IDE0073" Action="Info" TemporarilyDisabled="true" />      <!-- FileHeaderMismatch -->
+    <Rule Id="IDE0073" Action="Warning" />      <!-- FileHeaderMismatch -->
     <Rule Id="IDE0074" Action="Hidden" />       <!-- UseCoalesceCompoundAssignment -->
     <Rule Id="IDE0075" Action="Hidden" />       <!-- SimplifyConditionalExpression -->
     <Rule Id="IDE0076" Action="Hidden" />       <!-- InvalidSuppressMessageAttribute -->
