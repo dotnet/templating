@@ -254,7 +254,7 @@
     <Rule Id="SA1001" Action="Info" TemporarilyDisabled="true"  TESpecific="true"/>          <!-- Commas must be spaced correctly -->
     <Rule Id="SA1002" Action="Info" TemporarilyDisabled="true"  TESpecific="true"/>          <!-- Semicolons must be spaced correctly -->
     <Rule Id="SA1003" Action="Info" TemporarilyDisabled="true"  TESpecific="true"/>          <!-- Symbols must be spaced correctly -->
-    <Rule Id="SA1004" Action="Info" TemporarilyDisabled="true"  TESpecific="true"/>          <!-- Documentation line should begin with a space -->
+    <Rule Id="SA1004" Action="Warning" TESpecific="true"/>          <!-- Documentation line should begin with a space -->
     <Rule Id="SA1005" Action="None" />          <!-- Single line comment should begin with a space -->
     <Rule Id="SA1008" Action="None" />          <!-- Opening parenthesis should not be preceded by a space -->
     <Rule Id="SA1009" Action="None" />          <!-- Closing parenthesis should not be followed by a space -->
