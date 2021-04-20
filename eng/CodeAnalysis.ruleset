@@ -315,7 +315,7 @@
     <Rule Id="SA1203" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Constants should appear before fields -->
     <Rule Id="SA1204" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Static elements should appear before instance elements -->
     <Rule Id="SA1205" Action="Warning" />       <!-- Partial elements should declare an access modifier -->
-    <Rule Id="SA1206" Action="Info" TemporarilyDisabled="true" />       <!-- Keyword ordering -->
+    <Rule Id="SA1206" Action="Warning" />       <!-- Keyword ordering -->
     <Rule Id="SA1208" Action="Warning" TESpecific="true" />          <!-- Using directive ordering -->
     <Rule Id="SA1209" Action="Warning" TESpecific="true" />          <!-- Using alias directives should be placed after all using namespace directives -->
     <Rule Id="SA1210" Action="Warning" TESpecific="true" />          <!-- Using directives should be ordered alphabetically by the namespaces -->
