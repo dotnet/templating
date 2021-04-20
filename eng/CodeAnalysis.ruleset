@@ -252,7 +252,7 @@
     <Rule Id="SA0001" Action="None" />          <!-- XML comments -->
     <Rule Id="SA1000" Action="Info" TemporarilyDisabled="true"  TESpecific="true"/>          <!-- Spacing around keywords -->
     <Rule Id="SA1001" Action="Info" TemporarilyDisabled="true"  TESpecific="true"/>          <!-- Commas must be spaced correctly -->
-    <Rule Id="SA1002" Action="Info" TemporarilyDisabled="true"  TESpecific="true"/>          <!-- Semicolons must be spaced correctly -->
+    <Rule Id="SA1002" Action="Warning" TESpecific="true"/>          <!-- Semicolons must be spaced correctly -->
     <Rule Id="SA1003" Action="Warning" TESpecific="true"/>          <!-- Symbols must be spaced correctly -->
     <Rule Id="SA1004" Action="Warning" TESpecific="true"/>          <!-- Documentation line should begin with a space -->
     <Rule Id="SA1005" Action="None" />          <!-- Single line comment should begin with a space -->
