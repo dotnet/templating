@@ -4,18 +4,15 @@ trigger:
     include:
     - stabilize
     - main
-    - release/3*
-    - release/5*
-    - internal/release/3*
-    - internal/release/5*
+    - release/*
+    - internal/release/*
     - feature/*
 pr:
   branches:
     include:
     - stabilize
     - main
-    - release/3*
-    - release/5*
+    - release/*
     - feature/*
 
 variables:
