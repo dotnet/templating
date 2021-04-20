@@ -332,7 +332,7 @@
     <Rule Id="SA1308" Action="None" />          <!-- Field should not begin with the prefix 's_' -->
     <Rule Id="SA1309" Action="None" />          <!-- Field names should not begin with underscore -->
     <Rule Id="SA1310" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Field should not contain an underscore -->
-    <Rule Id="SA1311" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Static readonly fields should begin with upper-case letter -->
+    <Rule Id="SA1311" Action="Warning" TESpecific="true" />          <!-- Static readonly fields should begin with upper-case letter -->
     <Rule Id="SA1312" Action="Warning" TESpecific="true" />          <!-- Variable should begin with lower-case letter -->
     <Rule Id="SA1313" Action="Warning" TESpecific="true" />          <!-- Parameter should begin with lower-case letter -->
     <Rule Id="SA1314" Action="None" />          <!-- Type parameter names should begin with T -->
