@@ -286,7 +286,7 @@
     <Rule Id="SA1114" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Parameter list should follow declaration -->
     <Rule Id="SA1115" Action="Warning" />       <!-- Parameter should begin on the line after the previous parameter -->
     <Rule Id="SA1116" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Split parameters should start on line after declaration -->
-    <Rule Id="SA1117" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Parameters should be on same line or separate lines -->
+    <Rule Id="SA1117" Action="Warning" TESpecific="true" />          <!-- Parameters should be on same line or separate lines -->
     <Rule Id="SA1118" Action="None" />          <!-- Parameter should not span multiple lines -->
     <Rule Id="SA1119" Action="None" />          <!-- Statement should not use unnecessary parenthesis -->
     <Rule Id="SA1120" Action="None" />          <!-- Comments should contain text -->
