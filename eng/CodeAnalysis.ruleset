@@ -327,7 +327,7 @@
     <Rule Id="SA1302" Action="Warning" />       <!-- Interface names should begin with I -->
     <Rule Id="SA1303" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Const field names should begin with upper-case letter -->
     <Rule Id="SA1304" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Non-private readonly fields should begin with upper-case letter -->
-    <Rule Id="SA1306" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Field should begin with lower-case letter -->
+    <Rule Id="SA1306" Action="Warning" TESpecific="true" />          <!-- Field should begin with lower-case letter -->
     <Rule Id="SA1307" Action="Warning" TESpecific="true" />          <!-- Field should begin with upper-case letter -->
     <Rule Id="SA1308" Action="None" />          <!-- Field should not begin with the prefix 's_' -->
     <Rule Id="SA1309" Action="None" />          <!-- Field names should not begin with underscore -->
@@ -482,7 +482,7 @@
     <Rule Id="IDE1003" Action="Hidden" />       <!-- MissingAnalyzerReference -->
     <Rule Id="IDE1004" Action="Hidden" />       <!-- ErrorReadingRuleset -->
     <Rule Id="IDE1005" Action="Hidden" />       <!-- InvokeDelegateWithConditionalAccess -->
-    <Rule Id="IDE1006" Action="Hidden" />       <!-- NamingRule -->
+    <Rule Id="IDE1006" Action="None" />       <!-- NamingRule -->
     <Rule Id="IDE1007" Action="Hidden" />       <!-- UnboundIdentifier -->
     <Rule Id="IDE1008" Action="Hidden" />       <!-- UnboundConstructor -->
   </Rules>
