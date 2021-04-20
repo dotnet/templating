@@ -278,7 +278,7 @@
     <Rule Id="SA1102" Action="Warning" />       <!-- Query clause should follow previous clause -->
     <Rule Id="SA1105" Action="Warning" />       <!-- Query clauses spanning multiple lines should begin on own line -->
     <Rule Id="SA1106" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Code should not contain empty statements -->
-    <Rule Id="SA1107" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Code should not contain multiple statements on one line -->
+    <Rule Id="SA1107" Action="Warning" TESpecific="true" />          <!-- Code should not contain multiple statements on one line -->
     <Rule Id="SA1108" Action="None" />          <!-- Block statements should not contain embedded comments -->
     <Rule Id="SA1110" Action="Warning" TESpecific="true" />          <!-- Opening parenthesis or bracket should be on declaration line -->
     <Rule Id="SA1111" Action="None" />          <!-- Closing parenthesis should be on line of last parameter -->
