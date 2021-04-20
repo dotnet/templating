@@ -32,5 +32,4 @@
     </PropertyGroup>
 
     <Import Project="Version.props" />
-    <Import Project="$(RepositoryEngineeringDir)Analyzers.props" />
 </Project>
