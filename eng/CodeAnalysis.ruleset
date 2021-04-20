@@ -323,7 +323,7 @@
     <Rule Id="SA1212" Action="Warning" />       <!-- A get accessor appears after a set accessor within a property or indexer -->
     <Rule Id="SA1214" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Readonly fields should appear before non-readonly fields -->
     <Rule Id="SA1216" Action="None" />          <!-- Using static directives should be placed at the correct location -->
-    <Rule Id="SA1300" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Element should begin with an uppercase letter -->
+    <Rule Id="SA1300" Action="Warning" TESpecific="true" />          <!-- Element should begin with an uppercase letter -->
     <Rule Id="SA1302" Action="Warning" />       <!-- Interface names should begin with I -->
     <Rule Id="SA1303" Action="Warning" TESpecific="true" />          <!-- Const field names should begin with upper-case letter -->
     <Rule Id="SA1304" Action="Warning" TESpecific="true" />          <!-- Non-private readonly fields should begin with upper-case letter -->
