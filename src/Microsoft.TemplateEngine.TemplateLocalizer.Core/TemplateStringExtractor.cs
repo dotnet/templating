@@ -17,6 +17,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
     /// </summary>
     internal sealed class TemplateStringExtractor
     {
+        private const string _defaultTemplateJsonLanguage = "en";
         private static readonly IJsonKeyCreator _defaultArrayKeyExtractor = new IndexBasedKeyCreator();
         private static readonly IJsonKeyCreator _defaultObjectKeyExtractor = new NameKeyCreator();
 
@@ -70,7 +71,12 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
             _logger = _loggerFactory.CreateLogger<TemplateStringExtractor>();
         }
 
-        public IReadOnlyList<TemplateString> ExtractStrings()
+        /// <summary>
+        /// Extracts localizable strings from the json document as well as the language of the strings.
+        /// </summary>
+        /// <param name="language">The language of the extracted strings</param>
+        /// <returns>The list of localizable strings.</returns>
+        public IReadOnlyList<TemplateString> ExtractStrings(out string language)
         {
             List<TemplateString> extractedStrings = new ();
 
@@ -86,6 +92,9 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
                 elementName: string.Empty,
                 localizationKey: string.Empty,
                 traversalArgs);
+
+            language = GetTemplateLanguage(_jsonDocument);
+
             return extractedStrings;
         }
 
@@ -200,6 +209,20 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
                     childIndex++;
                 }
             }
+        }
+
+        private string GetTemplateLanguage(JsonDocument jsonDocument)
+        {
+            string? language = null;
+
+            if (_jsonDocument.RootElement.TryGetProperty("authoringLanguage", out JsonElement langElement) &&
+                langElement.ValueKind == JsonValueKind.String)
+            {
+                language = langElement.GetString();
+                return string.IsNullOrWhiteSpace(language) ? _defaultTemplateJsonLanguage : language!;
+            }
+
+            return _defaultTemplateJsonLanguage;
         }
     }
 }
