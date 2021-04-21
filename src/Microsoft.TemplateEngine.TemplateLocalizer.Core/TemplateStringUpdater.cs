@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,9 +17,10 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
         /// <summary>
         /// Updates the templatestrings.json files for given languages with the provided strings.
         /// </summary>
-        /// <param name="strings">Template strings to be included in the templatestrings.json files.</param>
-        /// <param name="templateJsonLanguage">The language of the <paramref name="strings"/>.</param>
-        /// <param name="supportedLanguages">The list of languages for which templatestrings.json file will be created.</param>
+        /// <param name="strings">Template strings to be included in the templatestrings.json files.
+        /// These strings are typicall extracted from template.json file using <see cref="TemplateStringExtractor"/>.</param>
+        /// <param name="templateJsonLanguage">The language of the <paramref name="strings"/> as declared in the template.json file.</param>
+        /// <param name="languages">The list of languages for which templatestrings.json file will be created.</param>
         /// <param name="targetDirectory">The directory that will contain the generated templatestrings.json files.</param>
         /// <param name="logger"><see cref="ILogger"/> to be used for logging.</param>
         /// <param name="cancellationToken">Cancellation token to cancel the operation.</param>
@@ -26,14 +28,14 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
         public static async Task UpdateStringsAsync(
             IEnumerable<TemplateString> strings,
             string templateJsonLanguage,
-            IEnumerable<string> supportedLanguages,
+            IEnumerable<string> languages,
             string targetDirectory,
             ILogger logger,
             CancellationToken cancellationToken)
         {
             Directory.CreateDirectory(targetDirectory);
 
-            foreach (string language in supportedLanguages)
+            foreach (string language in languages)
             {
                 string locFilePath = Path.Combine(targetDirectory, language + ".templatestrings.json");
                 Dictionary<string, string>? existingStrings = null;
@@ -90,7 +92,6 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
                 // Allow unescaped characters in the strings. This allows writing "aren't" instead of "aren\u0027t".
                 // This is only considered unsafe in a context where symbols may be interpreted as special characters.
                 // For instance, '<' character should be escaped in html documents where this json will be embedded.
-                // This safety concern doesn't apply to template engine.
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
                 Indented = true,
             };

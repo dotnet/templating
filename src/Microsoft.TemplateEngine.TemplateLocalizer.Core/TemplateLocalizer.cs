@@ -44,13 +44,13 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
                 using JsonDocument jsonDocument = await JsonDocument.ParseAsync(fileStream, jsonOptions, cancellationToken).ConfigureAwait(false);
 
                 TemplateStringExtractor stringExtractor = new TemplateStringExtractor(jsonDocument, _loggerFactory);
-                IReadOnlyList<TemplateString> templateJsonStrings = stringExtractor.ExtractStrings();
+                IReadOnlyList<TemplateString> templateJsonStrings = stringExtractor.ExtractStrings(out string templateJsonLanguage);
 
                 string targetDirectory = options.TargetDirectory ?? Path.Combine(Path.GetDirectoryName(templateJsonPath) ?? string.Empty, "localize");
 
                 await TemplateStringUpdater.UpdateStringsAsync(
                     templateJsonStrings,
-                    templateJsonLanguage: "en",
+                    templateJsonLanguage,
                     options.Languages ?? ExportOptions.DefaultLanguages,
                     targetDirectory,
                     _logger,
