@@ -21,7 +21,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         private readonly IEngineEnvironmentSettings _environmentSettings;
         private readonly Paths _paths;
         private IDictionary<string, ITemplate> _templateMemoryCache = new Dictionary<string, ITemplate>();
-        private Scanner _installScanner;
 
         public TemplateCache(IEngineEnvironmentSettings environmentSettings)
         {
@@ -49,24 +48,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         [JsonProperty]
         public Dictionary<string, DateTime> MountPointsInfo { get; set; }
-
-        private Scanner InstallScanner
-        {
-            get
-            {
-                if (_installScanner == null)
-                {
-                    _installScanner = new Scanner(_environmentSettings);
-                }
-
-                return _installScanner;
-            }
-        }
-        public void Scan(string installDir)
-        {
-            ScanResult scanResult = InstallScanner.Scan(installDir);
-            AddTemplatesAndLangPacksFromScanResult(scanResult);
-        }
 
         public void DeleteAllLocaleCacheFiles()
         {
@@ -112,7 +93,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             WriteTemplateCache(mountPoints, mergedTemplateList, hasContentChanges);
         }
 
-        private void AddTemplatesAndLangPacksFromScanResult(ScanResult scanResult)
+        public void AddTemplatesAndLangPacksFromScanResult(ScanResult scanResult)
         {
             foreach (ILocalizationLocator locator in scanResult.Localizations)
             {

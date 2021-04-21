@@ -26,6 +26,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         private const int MaxLoadAttempts = 20;
         private readonly Paths _paths;
         private readonly IEngineEnvironmentSettings _environmentSettings;
+        private readonly Scanner _installScanner;
         private SettingsStore _userSettings;
         private TemplateCache _userTemplateCache;
         private IMountPointManager _mountPointManager;
@@ -41,6 +42,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             _paths = new Paths(environmentSettings);
             _userTemplateCache = new TemplateCache(environmentSettings);
             _templatePackagesManager = new TemplatePackageManager(environmentSettings);
+            _installScanner = new Scanner(environmentSettings);
         }
 
         public IComponentManager Components
@@ -386,16 +388,25 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 }
             }
 
-            foreach (var place in mountPoints.Where(k => placesThatNeedScanning.Contains(k.Key)).OrderBy(k => k.Value))
+            var scanResults = new List<(ScanResult result, DateTime dateTime)>();
+            Parallel.ForEach(mountPoints.Where(k => placesThatNeedScanning.Contains(k.Key)), (place) =>
             {
                 try
                 {
-                    _userTemplateCache.Scan(place.Key);
+                    var result = _installScanner.Scan(place.Key);
+                    lock (scanResults)
+                    {
+                        scanResults.Add((result, place.Value));
+                    }
                 }
                 catch (Exception ex)
                 {
                     _environmentSettings.Host.OnNonCriticalError(null, $"Failed to scan \"{place}\":{Environment.NewLine}{ex}", null, 0);
                 }
+            });
+            foreach (var result in scanResults.OrderBy(i => i.dateTime))
+            {
+                _userTemplateCache.AddTemplatesAndLangPacksFromScanResult(result.result);
             }
 
             // When writing the template caches, we need the existing cache version to read the existing caches for before updating.
