@@ -401,7 +401,7 @@
     <Rule Id="IDE0002" Action="Hidden" />       <!-- SimplifyMemberAccess -->
     <Rule Id="IDE0003" Action="Hidden" />       <!-- RemoveQualification -->
     <Rule Id="IDE0004" Action="Hidden" />       <!-- RemoveUnnecessaryCast -->
-    <Rule Id="IDE0005" Action="Hidden" />       <!-- RemoveUnnecessaryImports -->
+    <Rule Id="IDE0005" Action="Warning" TESpecific="true" />        <!-- RemoveUnnecessaryImports -->
     <Rule Id="IDE0006" Action="Hidden" />       <!-- IntellisenseBuildFailed -->
     <Rule Id="IDE0007" Action="Hidden" />       <!-- UseImplicitType -->
     <Rule Id="IDE0008" Action="Hidden" />       <!-- UseExplicitType -->
