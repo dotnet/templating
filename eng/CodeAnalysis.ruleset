@@ -310,10 +310,10 @@
     <Rule Id="SA1141" Action="Warning" />       <!-- Use tuple syntax -->
     <Rule Id="SA1142" Action="Warning" />       <!-- Refer to tuple elements by name -->
     <Rule Id="SA1200" Action="None" />          <!-- Using directive should appear within a namespace declaration -->
-    <Rule Id="SA1201" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Elements should appear in the correct order -->
-    <Rule Id="SA1202" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Elements should be ordered by access -->
-    <Rule Id="SA1203" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Constants should appear before fields -->
-    <Rule Id="SA1204" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Static elements should appear before instance elements -->
+    <Rule Id="SA1201" Action="Warning" TESpecific="true" />          <!-- Elements should appear in the correct order -->
+    <Rule Id="SA1202" Action="Warning" TESpecific="true" />          <!-- Elements should be ordered by access -->
+    <Rule Id="SA1203" Action="Warning" TESpecific="true" />          <!-- Constants should appear before fields -->
+    <Rule Id="SA1204" Action="Warning" TESpecific="true" />          <!-- Static elements should appear before instance elements -->
     <Rule Id="SA1205" Action="Warning" />       <!-- Partial elements should declare an access modifier -->
     <Rule Id="SA1206" Action="Warning" />       <!-- Keyword ordering -->
     <Rule Id="SA1208" Action="Warning" TESpecific="true" />          <!-- Using directive ordering -->
@@ -321,7 +321,7 @@
     <Rule Id="SA1210" Action="Warning" TESpecific="true" />          <!-- Using directives should be ordered alphabetically by the namespaces -->
     <Rule Id="SA1211" Action="Warning" TESpecific="true" />          <!-- Using alias directive ordering -->
     <Rule Id="SA1212" Action="Warning" />       <!-- A get accessor appears after a set accessor within a property or indexer -->
-    <Rule Id="SA1214" Action="Info" TemporarilyDisabled="true" TESpecific="true" />          <!-- Readonly fields should appear before non-readonly fields -->
+    <Rule Id="SA1214" Action="Warning" TESpecific="true" />          <!-- Readonly fields should appear before non-readonly fields -->
     <Rule Id="SA1216" Action="None" />          <!-- Using static directives should be placed at the correct location -->
     <Rule Id="SA1300" Action="Warning" TESpecific="true" />          <!-- Element should begin with an uppercase letter -->
     <Rule Id="SA1302" Action="Warning" />       <!-- Interface names should begin with I -->
