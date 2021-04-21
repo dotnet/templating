@@ -61,6 +61,7 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
 
         public async Task<IReadOnlyList<ITemplatePackage>> GetAllTemplatePackagesAsync(CancellationToken cancellationToken)
         {
+            TemplateEngineEventSource.Log.GlobalSettingsProvider_GetPackagesStart();
             var list = new List<ITemplatePackage>();
             foreach (TemplatePackageData entry in await _globalSettings.GetInstalledTemplatePackagesAsync(cancellationToken).ConfigureAwait(false))
             {
@@ -82,6 +83,7 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
                     list.Add(new TemplatePackage(this, entry.MountPointUri, entry.LastChangeTime));
                 }
             }
+            TemplateEngineEventSource.Log.GlobalSettingsProvider_GetPackagesStop();
             return list;
         }
 

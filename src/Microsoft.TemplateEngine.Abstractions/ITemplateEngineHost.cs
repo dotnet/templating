@@ -19,8 +19,6 @@ namespace Microsoft.TemplateEngine.Abstractions
 
         string Version { get; }
 
-        void LogTiming(string label, TimeSpan duration, int depth);
-
         void LogMessage(string message);
 
         void OnCriticalError(string code, string message, string currentFile, long currentPosition);

@@ -26,20 +26,17 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         public bool TryDemandMountPoint(string mountPointUri, out IMountPoint mountPoint)
         {
             //TODO: Split mountPointUri with ;(semicolon) and loop parents instead of always `null`
-            using (Timing.Over(EnvironmentSettings.Host, "Get mount point"))
+            foreach (var factory in mountPointFactories)
             {
-                foreach (var factory in mountPointFactories)
+                if (factory.TryMount(EnvironmentSettings, null, mountPointUri, out var myMountPoint))
                 {
-                    if (factory.TryMount(EnvironmentSettings, null, mountPointUri, out var myMountPoint))
-                    {
-                        mountPoint = myMountPoint;
-                        return true;
-                    }
+                    mountPoint = myMountPoint;
+                    return true;
                 }
-
-                mountPoint = null;
-                return false;
             }
+
+            mountPoint = null;
+            return false;
         }
     }
 }

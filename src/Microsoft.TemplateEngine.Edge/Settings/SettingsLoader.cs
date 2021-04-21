@@ -138,16 +138,18 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             {
                 throw new ObjectDisposedException(nameof(SettingsLoader));
             }
-
+            TemplateEngineEventSource.Log.SettingsLoader_LoadTemplateStart(info.Identity);
             IGenerator generator;
             if (!Components.TryGetComponent(info.GeneratorId, out generator))
             {
+                TemplateEngineEventSource.Log.SettingsLoader_LoadTemplateStop(false);
                 return null;
             }
 
             IMountPoint mountPoint;
             if (!MountPointManager.TryDemandMountPoint(info.MountPointUri, out mountPoint))
             {
+                TemplateEngineEventSource.Log.SettingsLoader_LoadTemplateStop(false);
                 return null;
             }
             IFileSystemInfo config = mountPoint.FileSystemInfo(info.ConfigPlace);
@@ -160,6 +162,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 if (!MountPointManager.TryDemandMountPoint(info.MountPointUri, out localeMountPoint))
                 {
                     // TODO: decide if we should proceed without loc info, instead of bailing.
+                    TemplateEngineEventSource.Log.SettingsLoader_LoadTemplateStop(false);
                     return null;
                 }
 
@@ -169,18 +172,17 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             IFile? hostTemplateConfigFile = FindBestHostTemplateConfigFile(config);
 
             ITemplate template;
-            using (Timing.Over(_environmentSettings.Host, "Template from config"))
+            if (generator.TryGetTemplateFromConfigInfo(config, out template, localeConfig, hostTemplateConfigFile, baselineName))
             {
-                if (generator.TryGetTemplateFromConfigInfo(config, out template, localeConfig, hostTemplateConfigFile, baselineName))
-                {
-                    return template;
-                }
-                else
-                {
-                    //TODO: Log the failure to read the template info
-                }
+                TemplateEngineEventSource.Log.SettingsLoader_LoadTemplateStop(true);
+                return template;
+            }
+            else
+            {
+                //TODO: Log the failure to read the template info
             }
 
+            TemplateEngineEventSource.Log.SettingsLoader_LoadTemplateStop(false);
             return null;
         }
 
@@ -330,77 +332,67 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     return;
                 }
 
-                string? userSettings = null;
-                using (Timing.Over(_environmentSettings.Host, "Read settings"))
-                {
-                    for (int i = 0; i < MaxLoadAttempts; ++i)
-                    {
-                        try
-                        {
-                            userSettings = _paths.ReadAllText(_paths.SettingsFile, "{}");
-                            break;
-                        }
-                        catch (IOException)
-                        {
-                            if (i == MaxLoadAttempts - 1)
-                            {
-                                throw;
-                            }
+                TemplateEngineEventSource.Log.SettingsLoader_EnsureLoadedStart();
 
-                            Task.Delay(2).Wait();
+                string? userSettings = null;
+                for (int i = 0; i < MaxLoadAttempts; ++i)
+                {
+                    try
+                    {
+                        userSettings = _paths.ReadAllText(_paths.SettingsFile, "{}");
+                        break;
+                    }
+                    catch (IOException)
+                    {
+                        if (i == MaxLoadAttempts - 1)
+                        {
+                            throw;
                         }
+
+                        Task.Delay(2).Wait();
                     }
                 }
 
                 JObject parsed;
-                using (Timing.Over(_environmentSettings.Host, "Parse settings"))
+                try
                 {
-                    try
-                    {
-                        parsed = JObject.Parse(userSettings);
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new EngineInitializationException("Error parsing the user settings file", "Settings File", ex);
-                    }
+                    parsed = JObject.Parse(userSettings);
+                }
+                catch (Exception ex)
+                {
+                    throw new EngineInitializationException("Error parsing the user settings file", "Settings File", ex);
                 }
 
-                using (Timing.Over(_environmentSettings.Host, "Deserialize user settings"))
+                _userSettings = new SettingsStore(parsed);
+
+                if (_userSettings.ProbingPaths.Count == 0)
                 {
-                    _userSettings = new SettingsStore(parsed);
+                    _userSettings.ProbingPaths.Add(_paths.Content);
                 }
 
-                using (Timing.Over(_environmentSettings.Host, "Init probing paths"))
-                {
-                    if (_userSettings.ProbingPaths.Count == 0)
-                    {
-                        _userSettings.ProbingPaths.Add(_paths.Content);
-                    }
-                }
+                _componentManager = new ComponentManager(this, _userSettings);
 
-                using (Timing.Over(_environmentSettings.Host, "Init Component manager"))
-                {
-                    _componentManager = new ComponentManager(this, _userSettings);
-                }
-
-                using (Timing.Over(_environmentSettings.Host, "Init MountPoint manager"))
-                {
-                    _mountPointManager = new MountPointManager(_environmentSettings, _componentManager);
-                }
+                _mountPointManager = new MountPointManager(_environmentSettings, _componentManager);
 
                 _loaded = true;
                 EnsureFirstRun();
+
+                TemplateEngineEventSource.Log.SettingsLoader_EnsureLoadedStop();
             }
         }
 
         private async Task<TemplateCache> UpdateTemplateCacheAsync(bool needsRebuild)
         {
+            TemplateEngineEventSource.Log.SettingsLoader_RebuildCacheStart(needsRebuild);
+
             // Kick off gathering template packages, so parsing cache can happen in parallel.
             Task<IReadOnlyList<ITemplatePackage>> getTemplatePackagesTask = _templatePackagesManager.GetTemplatePackagesAsync(needsRebuild);
 
             if (!(_userTemplateCache is TemplateCache cache))
             {
+                TemplateEngineEventSource.Log.SettingsLoader_TemplateCacheParsingStart();
                 cache = new TemplateCache(JObject.Parse(_paths.ReadAllText(_paths.TemplateCacheFile, "{}")));
+                TemplateEngineEventSource.Log.SettingsLoader_TemplateCacheParsingStop();
             }
 
             if (cache.Version == null)
@@ -434,19 +426,21 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 mountPoints[package.MountPointUri] = package.LastChangeTime;
 
                 // We can stop comparing, but we need to keep looping to fill mountPoints
-                if (!needsRebuild)
+                if (needsRebuild)
                 {
-                    if (cache.MountPointsInfo.TryGetValue(package.MountPointUri, out var cachedLastChangeTime))
-                    {
-                        if (package.LastChangeTime > cachedLastChangeTime)
-                        {
-                            needsRebuild = true;
-                        }
-                    }
-                    else
+                    continue;
+                }
+
+                if (cache.MountPointsInfo.TryGetValue(package.MountPointUri, out var cachedLastChangeTime))
+                {
+                    if (package.LastChangeTime > cachedLastChangeTime)
                     {
                         needsRebuild = true;
                     }
+                }
+                else
+                {
+                    needsRebuild = true;
                 }
             }
 
@@ -459,6 +453,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             // Cool, looks like everything is up to date, exit
             if (!needsRebuild)
             {
+                TemplateEngineEventSource.Log.SettingsLoader_RebuildCacheStop(false);
                 return cache;
             }
 
@@ -485,6 +480,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 );
             JObject serialized = JObject.FromObject(cache);
             _paths.WriteAllText(_paths.TemplateCacheFile, serialized.ToString());
+            TemplateEngineEventSource.Log.SettingsLoader_RebuildCacheStop(true);
             return _userTemplateCache = cache;
         }
     }

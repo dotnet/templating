@@ -31,8 +31,6 @@ namespace Microsoft.TemplateEngine.TestHelper
 
         public delegate void CriticalErrorHandler(string code, string message, string currentFile, long currentPosition);
 
-        public event Action<string, TimeSpan>? TimingCompleted;
-
         public event Action<string, object>? SymbolUsed;
 
         public event ParameterErrorHandler? ParameterError;
@@ -58,12 +56,6 @@ namespace Microsoft.TemplateEngine.TestHelper
         public bool TryGetHostParamDefault(string paramName, out string value)
         {
             return HostParamDefaults.TryGetValue(paramName, out value);
-        }
-
-        public void OnTimingCompleted(string label, TimeSpan timing)
-        {
-            Console.WriteLine($"[{HostIdentifier}][{nameof(OnTimingCompleted)}][{label}]: completed in {timing.ToString()}");
-            TimingCompleted?.Invoke(label, timing);
         }
 
         public void OnSymbolUsed(string symbol, object value)
@@ -121,11 +113,6 @@ namespace Microsoft.TemplateEngine.TestHelper
         public void LogDiagnosticMessage(string message, string category, params string[] details)
         {
             Console.WriteLine($"[{HostIdentifier}][{nameof(LogDiagnosticMessage)}][{category}] {message} (details: {string.Join(";", details)})");
-        }
-
-        public void LogTiming(string label, TimeSpan duration, int depth)
-        {
-            OnTimingCompleted(label, duration);
         }
     }
 }

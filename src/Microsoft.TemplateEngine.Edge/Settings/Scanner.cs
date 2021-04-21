@@ -33,6 +33,9 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             {
                 throw new ArgumentException($"{nameof(sourceLocation)} should not be null or empty");
             }
+
+            TemplateEngineEventSource.Log.Scanner_ScanStart(sourceLocation);
+
             MountPointScanSource source = GetOrCreateMountPointScanInfoForInstallSource(sourceLocation);
 
             ScanResult scanResult = new ScanResult();
@@ -40,6 +43,8 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             ScanMountPointForTemplatesAndLangpacks(source, scanResult);
 
             source.MountPoint.Dispose();
+
+            TemplateEngineEventSource.Log.Scanner_ScanStop();
 
             return scanResult;
         }

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Edge.Settings;
@@ -33,6 +34,8 @@ namespace Microsoft.TemplateEngine.Edge.Template
             // SettingsLoader.LoadTemplate is where the loc info should be read!!!
             // templateInfo knows enough to get at the loc, if any
             ITemplate template = _environmentSettings.SettingsLoader.LoadTemplate(templateInfo, baselineName);
+
+            TemplateEngineEventSource.Log.TemplateCreator_InstantiateStart();
 
             try
             {
@@ -63,7 +66,6 @@ namespace Microsoft.TemplateEngine.Edge.Template
                         _environmentSettings.Host.FileSystem.CreateDirectory(targetDir);
                     }
 
-                    Stopwatch sw = Stopwatch.StartNew();
                     IComponentManager componentManager = _environmentSettings.SettingsLoader.Components;
 
                     // setup separate sets of parameters to be used for GetCreationEffects() and by CreateAsync().
@@ -94,8 +96,6 @@ namespace Microsoft.TemplateEngine.Edge.Template
                         creationResult = await template.Generator.CreateAsync(_environmentSettings, template, creationParams, componentManager, targetDir).ConfigureAwait(false);
                     }
 
-                    sw.Stop();
-                    _environmentSettings.Host.LogTiming("Content generation time", sw.Elapsed, 0);
                     return new TemplateCreationResult(string.Empty, CreationResultStatus.Success, template.Name, creationResult, targetDir, creationEffects);
                 }
                 catch (ContentGenerationException cx)
@@ -116,6 +116,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
             finally
             {
                 ReleaseMountPoints(template);
+                TemplateEngineEventSource.Log.TemplateCreator_InstantiateStop();
             }
         }
 

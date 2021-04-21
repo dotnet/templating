@@ -249,7 +249,7 @@ namespace Microsoft.TemplateEngine.TestHelper
             {
                 var finishedTask = await Task.WhenAny(tasks).ConfigureAwait(false);
                 tasks.Remove(finishedTask);
-                (PackageSource Source, IEnumerable<IPackageSearchMetadata> FoundPackages) result = await finishedTask.ConfigureAwait(false);
+                (PackageSource Source, IEnumerable<IPackageSearchMetadata>? FoundPackages) result = await finishedTask.ConfigureAwait(false);
                 if (result.FoundPackages == null)
                 {
                     continue;

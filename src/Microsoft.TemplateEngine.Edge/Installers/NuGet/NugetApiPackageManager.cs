@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Utils;
 using NuGet.Common;
 using NuGet.Configuration;
 using NuGet.Protocol;
@@ -313,6 +314,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             _nugetLogger.LogDebug($"Searching for {packageIdentifier} in {source.Source}.");
             try
             {
+                TemplateEngineEventSource.Log.NugetApiManager_GetPackageMetadataAsyncStart(source.SourceUri.AbsoluteUri);
                 SourceRepository repository = Repository.Factory.GetCoreV3(source);
                 PackageMetadataResource resource = await repository.GetResourceAsync<PackageMetadataResource>(cancellationToken).ConfigureAwait(false);
                 IEnumerable<IPackageSearchMetadata> foundPackages = await resource.GetMetadataAsync(
@@ -331,6 +333,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 {
                     _nugetLogger.LogDebug($"{packageIdentifier} is not found in NuGet feed {source.Source}.");
                 }
+                TemplateEngineEventSource.Log.NugetApiManager_GetPackageMetadataAsyncStop(foundPackages.Count());
                 return (source, foundPackages);
             }
             catch (Exception ex)

@@ -100,6 +100,7 @@ namespace Microsoft.TemplateEngine.Cli
             _ = callbacks ?? throw new ArgumentNullException(nameof(callbacks));
             _ = args ?? throw new ArgumentNullException(nameof(args));
 
+            TemplateEngineEventSource.Log.New3Command_RunStart();
             if (!args.Any(x => string.Equals(x, "--debug:ephemeral-hive")))
             {
                 EnsureEntryMutex(hivePath, host);
@@ -120,6 +121,7 @@ namespace Microsoft.TemplateEngine.Cli
                 {
                     _entryMutex.ReleaseMutex();
                 }
+                TemplateEngineEventSource.Log.New3Command_RunStop();
             }
         }
 
@@ -192,10 +194,8 @@ namespace Microsoft.TemplateEngine.Cli
             int result;
             try
             {
-                using (Timing.Over(host, "Execute"))
-                {
-                    result = commandInput.Execute(args);
-                }
+                TemplateEngineEventSource.Log.New3Command_ExecuteStart();
+                result = commandInput.Execute(args);
             }
             catch (Exception ex)
             {
@@ -229,6 +229,7 @@ namespace Microsoft.TemplateEngine.Cli
             finally
             {
                 instance.EnvironmentSettings.Dispose();
+                TemplateEngineEventSource.Log.New3Command_ExecuteStop();
             }
 
             return result;

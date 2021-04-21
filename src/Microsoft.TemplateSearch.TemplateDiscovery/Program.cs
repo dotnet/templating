@@ -45,20 +45,10 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
                 return;
             }
 
-            PackSourceChecker packSourceChecker;
-
-            // if or when we add other sources to scrape, input args can control which execute(s).
-            if (true)
+            if (!NugetPackScraper.TryCreateDefaultNugetPackScraper(config, out PackSourceChecker packSourceChecker))
             {
-                if (!NugetPackScraper.TryCreateDefaultNugetPackScraper(config, out packSourceChecker))
-                {
-                    Console.WriteLine("Unable to create the NugetPackScraper.");
-                    return;
-                }
-            }
-            else
-            {
-                throw new NotImplementedException("no checker for the input options");
+                Console.WriteLine("Unable to create the NugetPackScraper.");
+                return;
             }
 
             PackSourceCheckResult checkResults = await packSourceChecker.CheckPackagesAsync().ConfigureAwait(false);
