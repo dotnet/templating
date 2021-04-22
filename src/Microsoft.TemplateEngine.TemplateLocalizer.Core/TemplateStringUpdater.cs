@@ -55,7 +55,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
         {
             try
             {
-                logger.LogDebug("Loading existing localizations from file \"{0}\"", locFilePath);
+                logger.LogDebug(LocalizableStrings.stringUpdater_log_commandLoadingLocFile, locFilePath);
                 using FileStream openStream = File.OpenRead(locFilePath);
 
                 JsonSerializerOptions serializerOptions = new()
@@ -75,7 +75,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
             }
             catch (Exception)
             {
-                logger.LogError("Failed to read the existing strings from \"{0}\"", locFilePath);
+                logger.LogError(LocalizableStrings.stringUpdater_log_commandFailedToReadLocFile, locFilePath);
                 throw;
             }
         }
@@ -95,8 +95,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
                 Indented = true,
             };
-
-            logger.LogDebug("Opening the following templatestrings.json file for writing: \"{0}\"", filePath);
+            logger.LogDebug(LocalizableStrings.stringUpdater_log_commandOpeningTemplatesJson, filePath);
             using FileStream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
             using Utf8JsonWriter jsonWriter = new Utf8JsonWriter(fileStream, writerOptions);
 
