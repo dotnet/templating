@@ -435,16 +435,10 @@ Examples:
         {
             string[] lines = stdOut.Split(Environment.NewLine);
 
-            string headerLine = lines.Single(line => expectedColumns.All(column => line.Contains(column)));
-            int headerLineIndex = Array.IndexOf(lines, headerLine);
-
+            int headerLineIndex = Array.FindIndex(lines, line => expectedColumns.All(column => line.Contains(column)));
+            string headerLine = lines[headerLineIndex];
             //table ends after empty line
-            int counter = headerLineIndex;
-            while (lines[counter].Length > 0)
-            {
-                counter++;
-            }
-            var lastLineIndex = counter - 1;
+            int lastLineIndex = Array.FindIndex(lines, headerLineIndex + 1, line => line.Length == 0) - 1;
             var columnsIndexes = expectedColumns.Select(column => headerLine.IndexOf(column)).ToArray();
 
             var parsedTable = new List<List<string>>();
