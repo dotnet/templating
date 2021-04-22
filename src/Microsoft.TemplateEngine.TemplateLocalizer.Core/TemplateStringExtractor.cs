@@ -110,10 +110,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
             if (complyingRules.Count == 0)
             {
                 // This identifier was filtered out.
-                _logger.LogDebug(
-                    "The following element in the template.json will not be included in the localizations" +
-                    " because it does not match any of the rules for localizable elements: {0}",
-                    args.IdentifierPrefix + "." + elementName);
+                _logger.LogDebug(LocalizableStrings.stringExtractor_log_commandDebugElementExcluded, args.IdentifierPrefix + "." + elementName);
                 return;
             }
 
@@ -151,10 +148,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
             if (data.ExtractedStringIds.Contains(identifier))
             {
                 // This string was already included by an earlier rule, possibly with a different key. Skip.
-                _logger.LogWarning(
-                    "The following element in the template.json will be skipped" +
-                    " since it was already added to the list of localizable strings: {0}",
-                    identifier);
+                _logger.LogDebug(LocalizableStrings.stringExtractor_log_commandElementAlreadyAdded, identifier);
                 return;
             }
 
@@ -168,7 +162,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
 
             data.ExtractedStringIds.Add(identifier);
             data.ExtractedStrings.Add(new TemplateString(identifier, finalKey, element.GetString() ?? string.Empty));
-            _logger.LogTrace("Adding into localizable strings: {0}", identifier);
+            _logger.LogTrace(LocalizableStrings.stringExtractor_log_commandElementAdded, identifier);
         }
 
         private void ProcessArrayElement(JsonElement element, string elementName, TraversalArgs args)
