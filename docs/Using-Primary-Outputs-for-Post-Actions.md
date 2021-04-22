@@ -410,5 +410,4 @@ Opens the file from primary outputs defined by index.
 ```
 
 Using indexes in post action arguments is supported by:
-- add reference to a project file (Visual Studio)
 - open a file in the editor (Visual Studio)

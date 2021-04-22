@@ -34,8 +34,8 @@ Used to restore NuGet packages after project create.
  - **Supported in**:
    - `dotnet new3`
    - `dotnet new` (2.0.0 or higher)
- - **Not supported in**:
-   - `Visual Studio` (ignored)
+ - **Ignored in**:
+   - `Visual Studio` - Visual Studio restores all projects automatically, so post action will be be ignored.
 
 Note: when using `files` argument it should contain the path to the file in source template definition, and ignore all the path and filename changes that can happen when instantiating template. For more details, see [the article](https://github.com/dotnet/templating/wiki/Using-Primary-Outputs-for-Post-Actions).
 
@@ -202,8 +202,8 @@ Note: when using `targetFiles` argument it should contain the path to the file i
  - **Supported in**:
    - `dotnet new3`
    - `dotnet new` (2.0.0 or higher)
- - **Not supported in**:
-   - `Visual Studio` (ignored)
+ - **Ignored in**:
+   - `Visual Studio` - the user indicates where to add project explicitly, so post action defined in the template will be ignored.
 
 Note: when using `projectFiles` argument it should contain the path to the file in source template definition, and ignore all the path and filename changes that can happen when instantiating template. For more details, see [the article](https://github.com/dotnet/templating/wiki/Using-Primary-Outputs-for-Post-Actions).
 
