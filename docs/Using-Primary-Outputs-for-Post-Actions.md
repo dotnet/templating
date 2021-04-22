@@ -1,11 +1,11 @@
 ## Primary outputs
 Primary outputs define the list of template files for further processing. 
 The primary outputs are returned by template engine API after template instantiation (`Microsoft.TemplateEngine.IDE.Bootstrapper.CreateAsync`, `Microsoft.TemplateEngine.Edge.Template.TemplateCreator.InstantiateAsync`) or dry run (`Microsoft.TemplateEngine.IDE.Bootstrapper.GetCreationEffectsAsync`).
-The main use for primary outputs is to provide the list of files to perform post actions implemented by the host. `dotnet CLI` host and Visual Studio host implement the default set of post actions based on primary outputs returned by API, described in [post-action registry](https://github.com/dotnet/templating/wiki/Post-Action-Registry). In case the template files have to be used in post actions, they should be added as the primary outputs in `template.json` definition.
+The main use for primary outputs is to provide the list of files to perform post actions implemented by the host. dotnet CLI host and Visual Studio host implement the default set of post actions based on primary outputs returned by API, described in [post-action registry](https://github.com/dotnet/templating/wiki/Post-Action-Registry). In case the template files have to be used in post actions, they should be added as the primary outputs in `template.json` definition.
 
 The template can define any number of primary outputs. Each primary output contains the following information:
-- `path` - the path should contain the relative path to the file after template instantiation is done, however prior to symbol based renaming is applied.
-- `condition` - if the condition evaluates to `true`, the corresponding primary output file will be generated. If `false`, the primary output is ignored. If no condition is provided for a path, the condition defaults to `true`.
+- `path` - the path should contain the relative path to the file after template instantiation is done and prior to symbol based renaming is applied.
+- `condition` - if the condition evaluates to `true`, the corresponding path will be added to primary outputs, if `false`, the path is ignored. If no condition is provided for a path, the condition defaults to `true`.
 
 Basic example:
 
@@ -159,7 +159,7 @@ template files:
 }
 ```
 Note that the example above contains primary output with original name in the final location. The actual primary output returned by API, will contain the final file name after renames are applied.
-Post action `files` should contain the original location in template definition.
+`files` argument should contain the original location in template definition.
 Example:
 ```
 dotnet new TestAssets.TemplateWithSourceNameAndCustomTargetPath --name Awesome 
@@ -196,7 +196,7 @@ template files:
   ],
   "primaryOutputs": [
     {
-      "path": "Target/Output/MyTestProject.csproj"        
+      "path": "./Target/Output/MyTestProject.csproj"        
     }
   ],
   "postActions": [
@@ -291,10 +291,12 @@ The final location of the files is: `./MyAwesomeTestProject.csproj`.
 Post actions support different ways of choosing the files to process, for more details see the documentation for specific post action.
 
 ## Example 1 - apply post action to all primary outputs
-The following example restores all the projects mentioned in primary outputs:
+The following example restores the projects mentioned in primary outputs:
 template files:
-- `./Src/Custom/Path/MyTestProject.csproj`
-- `./Src/Custom/Path/Class.cs`
+- `./Custom/MyTestProject/MyTestProject.csproj`
+- `./Custom/MyTestProject/Class.cs`
+- `./Custom/MyTestProject.Tests/MyTestProject.Tests.csproj`
+- `./Custom/MyTestProject.Tests/Class.cs`
 `template.json` definition
 ```
 {
@@ -309,13 +311,17 @@ template files:
   "sourceName": "MyTestProject",
   "sources": [
     {
-      "source": "./Src/Custom/Path/",
-      "target": "./Target/Output/"
-    }
+      "source": "./Custom/MyTestProject/",
+      "target": "./src/MyTestProject/"
+    },
+    {
+      "source": "./Custom/MyTestProject.Tests/",
+      "target": "./test/MyTestProject.Tests/"
+    },
   ],
   "primaryOutputs": [
     {
-      "path": "Target/Output/MyTestProject.csproj"        
+      "path": "./src/MyTestProject/MyTestProject.csproj"        
     }
   ],
   "postActions": [
@@ -332,10 +338,12 @@ template files:
 ```
 
 ## Example 2 - reference source files in post action arguments
-The following example restores individual files specified in `files` property. Defining them in primary outputs is optional.
+The following example restores individual project specified in `files` property. Defining them in primary outputs is optional.
 template files:
-- `./Src/Custom/Path/MyTestProject.csproj`
-- `./Src/Custom/Path/Class.cs`
+- `./Custom/MyTestProject/MyTestProject.csproj`
+- `./Custom/MyTestProject/Class.cs`
+- `./Custom/MyTestProject.Tests/MyTestProject.Tests.csproj`
+- `./Custom/MyTestProject.Tests/Class.cs`
 `template.json` definition
 ```
 {
@@ -350,15 +358,13 @@ template files:
   "sourceName": "MyTestProject",
   "sources": [
     {
-      "source": "./Src/Custom/Path/",
-      "target": "./Target/Output/"
-    }
-  ],
-
-  "primaryOutputs": [
+      "source": "./Custom/MyTestProject/",
+      "target": "./src/MyTestProject/"
+    },
     {
-      "path": "Target/Output/MyTestProject.csproj"           
-    }
+      "source": "./Custom/MyTestProject.Tests/",
+      "target": "./test/MyTestProject.Tests/"
+    },
   ],
 
   "postActions": [
@@ -370,15 +376,16 @@ template files:
       "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
       "continueOnError": true,
       "args": {
-        "files": [ "Src/Custom/Path/MyTestProject.csproj" ]  //here the source location should be used as the post action supports this notation
+        "files": [ "./Custom/MyTestProject/MyTestProject.csproj" ]  //here the source location should be used as the post action supports this notation
       }
     }
   ]
 }
 ```
-Supported for:
-- restore NuGet packages (`dotnet CLI`)
-- add reference to a project file (`dotnet CLI`)
+Specifying files in post action arguments is supported by:
+- restore NuGet packages (dotnet CLI) - `files` argument
+- add reference to a project file (dotnet CLI) - `targetFiles` argument 
+- add project(s) to a solution file (dotnet CLI) - `projectFiles` argument 
 
 ## Example 3 - using primary output indexes in post action arguments
 
@@ -402,7 +409,6 @@ Opens the file from primary outputs defined by index.
 ]
 ```
 
-Supported for:
-- add projects to a solution file (`dotnet CLI`)
+Using indexes in post action arguments is supported by:
 - add reference to a project file (Visual Studio)
 - open a file in the editor (Visual Studio)

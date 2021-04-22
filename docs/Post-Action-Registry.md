@@ -37,7 +37,7 @@ Used to restore NuGet packages after project create.
  - **Not supported in**:
    - `Visual Studio` (ignored)
 
-Note: when using `files` argument the path should indicate location the path in source template definition, and ignore all the path and names changes that can happen when instantiating template. For more details, see [the article](https://github.com/dotnet/templating/wiki/Using-Primary-Outputs-for-Post-Actions).
+Note: when using `files` argument it should contain the path to the file in source template definition, and ignore all the path and filename changes that can happen when instantiating template. For more details, see [the article](https://github.com/dotnet/templating/wiki/Using-Primary-Outputs-for-Post-Actions).
 
 ### Example
 
@@ -168,7 +168,7 @@ Opens a file in the editor. For command line cases this post action will be igno
    - `dotnet new3`
    - `dotnet new` (2.0.0 or higher)
 
-Note: when using `targetFiles` argument the path should indicate location the path in source template definition, and ignore all the path and names changes that can happen when instantiating template. For more details, see [the article](https://github.com/dotnet/templating/wiki/Using-Primary-Outputs-for-Post-Actions).
+Note: when using `targetFiles` argument it should contain the path to the file in source template definition, and ignore all the path and filename changes that can happen when instantiating template. For more details, see [the article](https://github.com/dotnet/templating/wiki/Using-Primary-Outputs-for-Post-Actions).
 
 ### Example
 
@@ -205,7 +205,7 @@ Note: when using `targetFiles` argument the path should indicate location the pa
  - **Not supported in**:
    - `Visual Studio` (ignored)
 
-Note: when using `projectFiles` argument the path should indicate location the path in source template definition, and ignore all the path and names changes that can happen when instantiating template. For more details, see [the article](https://github.com/dotnet/templating/wiki/Using-Primary-Outputs-for-Post-Actions).
+Note: when using `projectFiles` argument it should contain the path to the file in source template definition, and ignore all the path and filename changes that can happen when instantiating template. For more details, see [the article](https://github.com/dotnet/templating/wiki/Using-Primary-Outputs-for-Post-Actions).
 
 
 ### Example
