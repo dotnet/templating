@@ -53,6 +53,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
                     templateJsonLanguage,
                     options.Languages ?? ExportOptions.DefaultLanguages,
                     targetDirectory,
+                    options.DryRun,
                     _logger,
                     cancellationToken).ConfigureAwait(false);
 
