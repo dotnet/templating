@@ -98,6 +98,47 @@ namespace Dotnet_new3.IntegrationTests
         }
 
         [Theory]
+        [InlineData("PostActions/RestoreNuGet/TwoProjectsPrimaryOutputs", "TestAssets.PostActions.RestoreNuGet.TwoProjectsPrimaryOutputs")]
+        [InlineData("PostActions/RestoreNuGet/TwoProjectsFiles", "TestAssets.PostActions.RestoreNuGet.TwoProjectsFiles")]
+        public void Restore_RestoreOneProjectFromTwo(string templateLocation, string templateName)
+        {
+            string home = TestUtils.CreateTemporaryFolder("Home");
+            string workingDirectory = TestUtils.CreateTemporaryFolder();
+            Helpers.InstallTestTemplate(templateLocation, _log, workingDirectory, home);
+
+            new DotnetNewCommand(_log, templateName, "-n", "TemplateApplication")
+                .WithCustomHive(home)
+                .WithWorkingDirectory(workingDirectory)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And.NotHaveStdErr()
+                .And.HaveStdOutContaining($"The template \"{templateName}\" was created successfully.")
+                .And.HaveStdOutContaining("Restore succeeded.")
+                .And.NotHaveStdOutContaining("Manual instructions: Run 'dotnet restore'");
+
+            Assert.True(File.Exists(Path.Combine(workingDirectory, $"src/TemplateApplication/TemplateApplication.csproj")));
+            Assert.True(File.Exists(Path.Combine(workingDirectory, $"test/TemplateApplication.Tests/TemplateApplication.Tests.csproj")));
+
+            new DotnetCommand(_log, "build", "src/TemplateApplication", "--no-restore")
+                .WithWorkingDirectory(workingDirectory)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And
+                .NotHaveStdErr()
+                .And.HaveStdOutContaining("Build succeeded.")
+                .And.HaveStdOutContaining("TemplateApplication");
+
+            new DotnetCommand(_log, "build", "test/TemplateApplication.Tests", "--no-restore")
+                  .WithWorkingDirectory(workingDirectory)
+                  .Execute()
+                  .Should().Fail()
+                  .And.NotHaveStdOutContaining("Build succeeded.")
+                  .And.HaveStdOutContaining("TemplateApplication.Tests");
+        }
+
+        [Theory]
         [InlineData("PostActions/RestoreNuGet/TwoProjectsWithSourceRenames", "TestAssets.PostActions.RestoreNuGet.TwoProjectsWithSourceRenames")]
         [InlineData("PostActions/RestoreNuGet/TwoProjectsWithSourceRenames2", "TestAssets.PostActions.RestoreNuGet.TwoProjectsWithSourceRenames2")]
         public void Restore_SourceRenameTwoProjectsTest(string templateLocation, string templateName)
