@@ -5,12 +5,11 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests
 {
-    [TestClass]
-    public class ExportCommandTests
+    public class ExportCommandTests : IDisposable
     {
         private const string ComplexTemplateJson = @"{
     ""$schema"": ""http://json.schemastore.org/template"",
@@ -81,20 +80,18 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests
 
         private string _workingDirectory;
 
-        [TestInitialize]
-        public void Initialize()
+        public ExportCommandTests()
         {
             _workingDirectory = Path.Combine(Path.GetTempPath(), "Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests", Path.GetRandomFileName());
             Directory.CreateDirectory(_workingDirectory);
         }
 
-        [TestCleanup]
-        public void Cleanup()
+        public void Dispose()
         {
             Directory.Delete(_workingDirectory, true);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task LocFilesAreExported()
         {
             string[] exportedFiles = await CreateAndExportTemplateJson(
@@ -103,11 +100,11 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests
                 args: new string[] { "export", _workingDirectory })
                 .ConfigureAwait(false);
 
-            Assert.IsTrue(exportedFiles.Length > 0);
-            Assert.IsTrue(exportedFiles.All(p => p.EndsWith(".templatestrings.json")));
+            Assert.True(exportedFiles.Length > 0);
+            Assert.All(exportedFiles, p => Assert.EndsWith(".templatestrings.json", p));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task LocFilesAreNotExportedWithDryRun()
         {
             string[] exportedFiles = await CreateAndExportTemplateJson(
@@ -116,10 +113,10 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests
                 args: new string[] { "export", _workingDirectory, "--dry-run" })
                 .ConfigureAwait(false);
 
-            Assert.IsTrue(exportedFiles.Length == 0);
+            Assert.Empty(exportedFiles);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task LanguagesCanBeOverriden()
         {
             string[] exportedFiles = await CreateAndExportTemplateJson(
@@ -128,12 +125,12 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests
                 args: new string[] { "export", _workingDirectory, "--language", "tr" })
                 .ConfigureAwait(false);
 
-            Assert.IsTrue(exportedFiles.Length == 1);
-            Assert.IsTrue(File.Exists(Path.Combine(_workingDirectory, "localize", "tr.templatestrings.json")));
-            Assert.IsFalse(File.Exists(Path.Combine(_workingDirectory, "localize", "es.templatestrings.json")));
+            Assert.Single(exportedFiles);
+            Assert.True(File.Exists(Path.Combine(_workingDirectory, "localize", "tr.templatestrings.json")));
+            Assert.False(File.Exists(Path.Combine(_workingDirectory, "localize", "es.templatestrings.json")));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task SubdirectoriesAreNotSearchedByDefault()
         {
             Directory.CreateDirectory(Path.Combine(_workingDirectory, "subdir"));
@@ -144,13 +141,13 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests
 
             int runResult = await Program.Main(new string[] { "export", _workingDirectory, "--language", "es" }).ConfigureAwait(false);
             // Error: no templates found under the given folder.
-            Assert.IsTrue(runResult != 0);
+            Assert.NotEqual(0, runResult);
 
-            Assert.IsFalse(File.Exists(Path.Combine(_workingDirectory, "subdir", "localize", "es.templatestrings.json")));
-            Assert.IsFalse(File.Exists(Path.Combine(_workingDirectory, "subdir2", "localize", "es.templatestrings.json")));
+            Assert.False(File.Exists(Path.Combine(_workingDirectory, "subdir", "localize", "es.templatestrings.json")));
+            Assert.False(File.Exists(Path.Combine(_workingDirectory, "subdir2", "localize", "es.templatestrings.json")));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task SubdirectoriesCanBeSearched()
         {
             Directory.CreateDirectory(Path.Combine(_workingDirectory, "subdir", ".template.config"));
@@ -160,13 +157,13 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests
             await File.WriteAllTextAsync(Path.Combine(_workingDirectory, ".template.config", "template.json"), ComplexTemplateJson).ConfigureAwait(false);
 
             int runResult = await Program.Main(new string[] { "export", _workingDirectory, "--language", "es", "--recursive" }).ConfigureAwait(false);
-            Assert.IsTrue(runResult == 0);
+            Assert.Equal(0, runResult);
 
-            Assert.IsTrue(File.Exists(Path.Combine(_workingDirectory, "subdir", ".template.config", "localize", "es.templatestrings.json")));
-            Assert.IsTrue(File.Exists(Path.Combine(_workingDirectory, ".template.config", "localize", "es.templatestrings.json")));
+            Assert.True(File.Exists(Path.Combine(_workingDirectory, "subdir", ".template.config", "localize", "es.templatestrings.json")));
+            Assert.True(File.Exists(Path.Combine(_workingDirectory, ".template.config", "localize", "es.templatestrings.json")));
         }
 
-        [TestMethod]
+        [Fact]
         public async Task SubdirectoriesWithoutTemplateConfigFileAreNotSearched()
         {
             Directory.CreateDirectory(Path.Combine(_workingDirectory, "subdir"));
@@ -175,9 +172,9 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests
 
             int runResult = await Program.Main(new string[] { "export", _workingDirectory, "--language", "es", "--recursive" }).ConfigureAwait(false);
             // Error: no templates found under the given folder.
-            Assert.IsTrue(runResult != 0);
+            Assert.NotEqual(0, runResult);
 
-            Assert.IsFalse(File.Exists(Path.Combine(_workingDirectory, "subdir", "localize", "es.templatestrings.json")));
+            Assert.False(File.Exists(Path.Combine(_workingDirectory, "subdir", "localize", "es.templatestrings.json")));
         }
 
         /// <summary>
@@ -190,7 +187,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests
             await File.WriteAllTextAsync(Path.Combine(directory, "template.json"), jsonContent).ConfigureAwait(false);
 
             int runResult = await Program.Main(args).ConfigureAwait(false);
-            Assert.IsTrue(runResult == 0);
+            Assert.Equal(0, runResult);
 
             string expectedExportDirectory = Path.Combine(directory, "localize");
             try

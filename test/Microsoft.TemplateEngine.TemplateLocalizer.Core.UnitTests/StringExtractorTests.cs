@@ -2,13 +2,11 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.UnitTests
 {
-    [TestClass]
     public class StringExtractorTests
     {
         private const string SimpleTemplateJson = @"{
@@ -91,70 +89,70 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.UnitTests
 }
 ";
 
-        [TestMethod]
+        [Fact]
         public void FirstLevelStringsAreExtracted()
         {
             var strings = ExtractStrings(SimpleTemplateJson, out _);
 
-            Assert.IsTrue(strings.Any(s => s.Identifier == "..name" && s.LocalizationKey == "name" && s.Value == "Class library"));
-            Assert.IsTrue(strings.Any(s => s.Identifier == "..description" && s.LocalizationKey == "description" && s.Value == "dEscRiPtiON: ,./|\\<>{}!@#$%^&*()_+-=? 12 äÄßöÖüÜçÇğĞıIİşŞ"));
+            Assert.Contains(strings, s => s.Identifier == "..name" && s.LocalizationKey == "name" && s.Value == "Class library");
+            Assert.Contains(strings, s => s.Identifier == "..description" && s.LocalizationKey == "description" && s.Value == "dEscRiPtiON: ,./|\\<>{}!@#$%^&*()_+-=? 12 äÄßöÖüÜçÇğĞıIİşŞ");
         }
 
-        [TestMethod]
+        [Fact]
         public void CertainStringsAreOmitted()
         {
             var strings = ExtractStrings(SimpleTemplateJson, out _);
 
-            Assert.IsTrue(!strings.Any(s => s.Identifier == "..$schema" && s.LocalizationKey == "author" && s.Value == "Microsoft"));
-            Assert.IsTrue(!strings.Any(s => s.Identifier == "..classification" || s.LocalizationKey == "classification"));
-            Assert.IsTrue(!strings.Any(s => s.Identifier == "..groupIdentity" || s.LocalizationKey == "groupIdentity"));
+            Assert.DoesNotContain(strings, s => s.Identifier == "..$schema" && s.LocalizationKey == "author" && s.Value == "Microsoft");
+            Assert.DoesNotContain(strings, s => s.Identifier == "..classification" || s.LocalizationKey == "classification");
+            Assert.DoesNotContain(strings, s => s.Identifier == "..groupIdentity" || s.LocalizationKey == "groupIdentity");
         }
 
-        [TestMethod]
+        [Fact]
         public void DefaultAuthoringLanguageIsEnglish()
         {
             _ = ExtractStrings(SimpleTemplateJson, out string language);
 
-            Assert.IsTrue(language == "en");
+            Assert.Equal("en", language);
         }
 
-        [TestMethod]
+        [Fact]
         public void SymbolsAreExtracted()
         {
             var strings = ExtractStrings(ComplexTemplateJson, out _);
 
-            Assert.IsTrue(strings.Any(s => s.Identifier == "..symbols.targetframeworkoverride.description" && s.LocalizationKey == "symbols.TargetFrameworkOverride.description" && s.Value == "tfm description"));
-            Assert.IsTrue(strings.Any(s => s.Identifier == "..symbols.targetframeworkoverride.displayname" && s.LocalizationKey == "symbols.TargetFrameworkOverride.displayName" && s.Value == "tfm display name"));
-            Assert.IsTrue(strings.Any(s => s.Identifier == "..symbols.framework.description" && s.LocalizationKey == "symbols.Framework.description" && s.Value == "framework description"));
-            Assert.IsTrue(strings.Any(s => s.Identifier == "..symbols.framework.displayname" && s.LocalizationKey == "symbols.Framework.displayName" && s.Value == "framework display name"));
+            Assert.Contains(strings, s => s.Identifier == "..symbols.targetframeworkoverride.description" && s.LocalizationKey == "symbols.TargetFrameworkOverride.description" && s.Value == "tfm description");
+            Assert.Contains(strings, s => s.Identifier == "..symbols.targetframeworkoverride.displayname" && s.LocalizationKey == "symbols.TargetFrameworkOverride.displayName" && s.Value == "tfm display name");
+            Assert.Contains(strings, s => s.Identifier == "..symbols.framework.description" && s.LocalizationKey == "symbols.Framework.description" && s.Value == "framework description");
+            Assert.Contains(strings, s => s.Identifier == "..symbols.framework.displayname" && s.LocalizationKey == "symbols.Framework.displayName" && s.Value == "framework display name");
         }
 
-        [TestMethod]
+        [Fact]
         public void SymbolChoicesAreExtracted()
         {
             var strings = ExtractStrings(ComplexTemplateJson, out _);
 
-            Assert.IsTrue(strings.Any(s => s.Identifier == "..symbols.framework.choices.0.description" && s.LocalizationKey == "symbols.Framework.choices.net5_0.description" && s.Value == "Target net5.0"));
-            Assert.IsTrue(strings.Any(s => s.Identifier == "..symbols.framework.choices.0.displayname" && s.LocalizationKey == "symbols.Framework.choices.net5_0.displayName" && s.Value == "net5.0 display name"));
-            Assert.IsTrue(strings.Any(s => s.Identifier == "..symbols.framework.choices.2.description" && s.LocalizationKey == "symbols.Framework.choices.netstandard2_0.description" && s.Value == "Target netstandard2.0"));
-            Assert.IsTrue(strings.Any(s => s.Identifier == "..symbols.framework.choices.2.displayname" && s.LocalizationKey == "symbols.Framework.choices.netstandard2_0.displayName" && s.Value == "netstandard2.0 display name"));
+            Assert.Contains(strings, s => s.Identifier == "..symbols.framework.choices.0.description" && s.LocalizationKey == "symbols.Framework.choices.net5_0.description" && s.Value == "Target net5.0");
+            Assert.Contains(strings, s => s.Identifier == "..symbols.framework.choices.0.displayname" && s.LocalizationKey == "symbols.Framework.choices.net5_0.displayName" && s.Value == "net5.0 display name");
+            Assert.Contains(strings, s => s.Identifier == "..symbols.framework.choices.2.description" && s.LocalizationKey == "symbols.Framework.choices.netstandard2_0.description" && s.Value == "Target netstandard2.0");
+            Assert.Contains(strings, s => s.Identifier == "..symbols.framework.choices.2.displayname" && s.LocalizationKey == "symbols.Framework.choices.netstandard2_0.displayName" && s.Value == "netstandard2.0 display name");
         }
 
-        [TestMethod]
+        [Fact]
         public void PostActionsAreExtracted()
         {
             var strings = ExtractStrings(ComplexTemplateJson, out _);
 
-            Assert.IsTrue(strings.Any(s => s.Identifier == "..postactions.0.description" && s.LocalizationKey == "postActions[0].description" && s.Value == "Restore NuGet packages required by this project."));
-            Assert.IsTrue(strings.Any(s => s.Identifier == "..postactions.1.description" && s.LocalizationKey == "postActions[1].description" && s.Value == "Opens Class1.cs in the editor"));
+            Assert.Contains(strings, s => s.Identifier == "..postactions.0.description" && s.LocalizationKey == "postActions[0].description" && s.Value == "Restore NuGet packages required by this project.");
+            Assert.Contains(strings, s => s.Identifier == "..postactions.1.description" && s.LocalizationKey == "postActions[1].description" && s.Value == "Opens Class1.cs in the editor");
         }
 
-        [TestMethod]
+        [Fact]
         public void ManualInstructionsAreExtracted()
         {
             var strings = ExtractStrings(ComplexTemplateJson, out _);
 
-            Assert.IsTrue(strings.Any(s => s.Identifier == "..postactions.0.manualinstructions.0.text" && s.LocalizationKey == "postActions[0].manualInstructions[0].text" && s.Value == "Run 'dotnet restore'"));
+            Assert.Contains(strings, s => s.Identifier == "..postactions.0.manualinstructions.0.text" && s.LocalizationKey == "postActions[0].manualInstructions[0].text" && s.Value == "Run 'dotnet restore'");
         }
 
         private static IReadOnlyList<TemplateString> ExtractStrings(string json, out string language)
@@ -165,7 +163,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.UnitTests
                 AllowTrailingCommas = true,
             });
 
-            TemplateStringExtractor templateStringExtractor = new TemplateStringExtractor(jsonDocument);
+            TemplateStringExtractor templateStringExtractor = new (jsonDocument);
             return templateStringExtractor.ExtractStrings(out language);
         }
     }

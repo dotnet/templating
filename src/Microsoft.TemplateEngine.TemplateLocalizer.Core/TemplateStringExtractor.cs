@@ -211,14 +211,12 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
             }
         }
 
-        private string GetTemplateLanguage(JsonDocument jsonDocument)
+        private static string GetTemplateLanguage(JsonDocument jsonDocument)
         {
-            string? language = null;
-
-            if (_jsonDocument.RootElement.TryGetProperty("authoringLanguage", out JsonElement langElement) &&
+            if (jsonDocument.RootElement.TryGetProperty("authoringLanguage", out JsonElement langElement) &&
                 langElement.ValueKind == JsonValueKind.String)
             {
-                language = langElement.GetString();
+                string? language = langElement.GetString();
                 return string.IsNullOrWhiteSpace(language) ? _defaultTemplateJsonLanguage : language!;
             }
 
