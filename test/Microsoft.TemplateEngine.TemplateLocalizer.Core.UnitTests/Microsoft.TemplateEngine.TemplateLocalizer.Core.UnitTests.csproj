@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>$(NETCoreTargetFramework)</TargetFramework>
     <LangVersion>9.0</LangVersion>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -9,9 +9,4 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Microsoft.TemplateEngine.TemplateLocalizer.Core\Microsoft.TemplateEngine.TemplateLocalizer.Core.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-      <PackageReference Include="xunit" />
-  </ItemGroup>
-
 </Project>

@@ -10,8 +10,4 @@
     <ProjectReference Include="..\..\src\Microsoft.TemplateEngine.TemplateLocalizer\Microsoft.TemplateEngine.TemplateLocalizer.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-      <PackageReference Include="xunit" />
-  </ItemGroup>
-
 </Project>

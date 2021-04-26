@@ -3,7 +3,6 @@
 
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -94,7 +93,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests
         [Fact]
         public async Task LocFilesAreExported()
         {
-            string[] exportedFiles = await CreateAndExportTemplateJson(
+            string[] exportedFiles = await RunTemplateLocalizer(
                 ComplexTemplateJson,
                 _workingDirectory,
                 args: new string[] { "export", _workingDirectory })
@@ -107,7 +106,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests
         [Fact]
         public async Task LocFilesAreNotExportedWithDryRun()
         {
-            string[] exportedFiles = await CreateAndExportTemplateJson(
+            string[] exportedFiles = await RunTemplateLocalizer(
                 ComplexTemplateJson,
                 _workingDirectory,
                 args: new string[] { "export", _workingDirectory, "--dry-run" })
@@ -119,7 +118,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests
         [Fact]
         public async Task LanguagesCanBeOverriden()
         {
-            string[] exportedFiles = await CreateAndExportTemplateJson(
+            string[] exportedFiles = await RunTemplateLocalizer(
                 ComplexTemplateJson,
                 _workingDirectory,
                 args: new string[] { "export", _workingDirectory, "--language", "tr" })
@@ -182,7 +181,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests
         /// Runs the template localizer tool with given arguments.
         /// Returns all the files found under "localize" folder.
         /// </summary>
-        private static async Task<string[]> CreateAndExportTemplateJson(string jsonContent, string directory, params string[] args)
+        private static async Task<string[]> RunTemplateLocalizer(string jsonContent, string directory, params string[] args)
         {
             await File.WriteAllTextAsync(Path.Combine(directory, "template.json"), jsonContent).ConfigureAwait(false);
 
