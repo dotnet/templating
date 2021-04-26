@@ -4,10 +4,12 @@
     <TargetFramework>$(NETCoreTargetFramework)</TargetFramework>
     <LangVersion>9.0</LangVersion>
     <IsPackable>false</IsPackable>
+    <TestProject>true</TestProject>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Microsoft.TemplateEngine.TemplateLocalizer\Microsoft.TemplateEngine.TemplateLocalizer.csproj" />
+    <ProjectReference Include="..\Microsoft.TemplateEngine.TestTemplates\Microsoft.TemplateEngine.TestTemplates.csproj" />
   </ItemGroup>
 
 </Project>

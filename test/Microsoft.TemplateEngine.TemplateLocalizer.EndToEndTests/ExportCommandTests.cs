@@ -10,73 +10,6 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests
 {
     public class ExportCommandTests : IDisposable
     {
-        private const string ComplexTemplateJson = @"{
-    ""$schema"": ""http://json.schemastore.org/template"",
-    ""author"": ""Microsoft"",
-    ""classifications"": [""Common"", ""Library""],
-    ""name"": ""Class library"",
-    ""generatorVersions"": ""[1.0.0.0-*)"",
-    ""description"": ""dEscRiPtiON: ,./|\\<>{}!@#$%^&*()_+-=? 12 äÄßöÖüÜçÇğĞıIİşŞ"",
-    ""symbols"": {
-        ""TargetFrameworkOverride"": {
-          ""type"": ""parameter"",
-          ""displayName"": ""tfm display name"",
-          ""description"": ""tfm description"",
-          ""replaces"": ""TargetFrameworkOverride"",
-          ""datatype"": ""string"",
-          ""defaultValue"": """"
-        },
-        ""Framework"": {
-          ""type"": ""parameter"",
-          ""displayName"": ""framework display name"",
-          ""description"": ""framework description"",
-          ""datatype"": ""choice"",
-          ""choices"": [
-            {
-              ""choice"": ""net5.0"",
-              ""displayName"": ""net5.0 display name"",
-              ""description"": ""Target net5.0""
-            },
-            {
-              ""choice"": ""netstandard2.1"",
-              ""description"": ""Target netstandard2.1""
-            },
-            {
-              ""choice"": ""netstandard2.0"",
-              ""displayName"": ""netstandard2.0 display name"",
-              ""description"": ""Target netstandard2.0""
-            }
-          ],
-          ""replaces"": ""net5.0"",
-          ""defaultValue"": ""net5.0""
-        },
-    },
-    ""postActions"": [
-        {
-          ""condition"": ""(!skipRestore)"",
-          ""description"": ""Restore NuGet packages required by this project."",
-          ""manualInstructions"": [
-            {
-                ""text"": ""Run 'dotnet restore'""
-            }
-          ],
-          ""actionId"": ""210D431B-A78B-4D2F-B762-4ED3E3EA9025"",
-          ""continueOnError"": true
-        },
-        {
-        ""condition"": ""(HostIdentifier != \""dotnetcli\"" && HostIdentifier != \""dotnetcli-preview\"")"",
-          ""description"": ""Opens Class1.cs in the editor"",
-          ""manualInstructions"": [ ],
-          ""actionId"": ""84C0DA21-51C8-4541-9940-6CA19AF04EE6"",
-          ""args"": {
-            ""files"": ""1""
-          },
-          ""continueOnError"": true
-        }
-      ]
-}
-";
-
         private string _workingDirectory;
 
         public ExportCommandTests()
@@ -94,7 +27,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests
         public async Task LocFilesAreExported()
         {
             string[] exportedFiles = await RunTemplateLocalizer(
-                ComplexTemplateJson,
+                GetTestTemplateJsonContent(),
                 _workingDirectory,
                 args: new string[] { "export", _workingDirectory })
                 .ConfigureAwait(false);
@@ -107,7 +40,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests
         public async Task LocFilesAreNotExportedWithDryRun()
         {
             string[] exportedFiles = await RunTemplateLocalizer(
-                ComplexTemplateJson,
+                GetTestTemplateJsonContent(),
                 _workingDirectory,
                 args: new string[] { "export", _workingDirectory, "--dry-run" })
                 .ConfigureAwait(false);
@@ -119,7 +52,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests
         public async Task LanguagesCanBeOverriden()
         {
             string[] exportedFiles = await RunTemplateLocalizer(
-                ComplexTemplateJson,
+                GetTestTemplateJsonContent(),
                 _workingDirectory,
                 args: new string[] { "export", _workingDirectory, "--language", "tr" })
                 .ConfigureAwait(false);
@@ -135,8 +68,9 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests
             Directory.CreateDirectory(Path.Combine(_workingDirectory, "subdir"));
             Directory.CreateDirectory(Path.Combine(_workingDirectory, "subdir2"));
 
-            await File.WriteAllTextAsync(Path.Combine(_workingDirectory, "subdir", "template.json"), ComplexTemplateJson).ConfigureAwait(false);
-            await File.WriteAllTextAsync(Path.Combine(_workingDirectory, "subdir2", "template.json"), ComplexTemplateJson).ConfigureAwait(false);
+            string templateJson = GetTestTemplateJsonContent();
+            await File.WriteAllTextAsync(Path.Combine(_workingDirectory, "subdir", "template.json"), templateJson).ConfigureAwait(false);
+            await File.WriteAllTextAsync(Path.Combine(_workingDirectory, "subdir2", "template.json"), templateJson).ConfigureAwait(false);
 
             int runResult = await Program.Main(new string[] { "export", _workingDirectory, "--language", "es" }).ConfigureAwait(false);
             // Error: no templates found under the given folder.
@@ -152,8 +86,9 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests
             Directory.CreateDirectory(Path.Combine(_workingDirectory, "subdir", ".template.config"));
             Directory.CreateDirectory(Path.Combine(_workingDirectory, ".template.config"));
 
-            await File.WriteAllTextAsync(Path.Combine(_workingDirectory, "subdir", ".template.config", "template.json"), ComplexTemplateJson).ConfigureAwait(false);
-            await File.WriteAllTextAsync(Path.Combine(_workingDirectory, ".template.config", "template.json"), ComplexTemplateJson).ConfigureAwait(false);
+            string templateJson = GetTestTemplateJsonContent();
+            await File.WriteAllTextAsync(Path.Combine(_workingDirectory, "subdir", ".template.config", "template.json"), templateJson).ConfigureAwait(false);
+            await File.WriteAllTextAsync(Path.Combine(_workingDirectory, ".template.config", "template.json"), templateJson).ConfigureAwait(false);
 
             int runResult = await Program.Main(new string[] { "export", _workingDirectory, "--language", "es", "--recursive" }).ConfigureAwait(false);
             Assert.Equal(0, runResult);
@@ -167,7 +102,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests
         {
             Directory.CreateDirectory(Path.Combine(_workingDirectory, "subdir"));
 
-            await File.WriteAllTextAsync(Path.Combine(_workingDirectory, "subdir", "template.json"), ComplexTemplateJson).ConfigureAwait(false);
+            await File.WriteAllTextAsync(Path.Combine(_workingDirectory, "subdir", "template.json"), GetTestTemplateJsonContent()).ConfigureAwait(false);
 
             int runResult = await Program.Main(new string[] { "export", _workingDirectory, "--language", "es", "--recursive" }).ConfigureAwait(false);
             // Error: no templates found under the given folder.
@@ -198,6 +133,26 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests
                 // Since no templates were created, it is normal that no directory was created.
                 return Array.Empty<string>();
             }
+        }
+
+        private static string GetTestTemplateJsonContent()
+        {
+            string thisDir = Path.GetDirectoryName(typeof(ExportCommandTests).Assembly.Location);
+            string templateJsonPath = Path.GetFullPath(Path.Combine(
+                thisDir,
+                "..",
+                "..",
+                "..",
+                "..",
+                "..",
+                "test",
+                "Microsoft.TemplateEngine.TestTemplates",
+                "test_templates",
+                "TemplateWithLocalization",
+                ".template.config",
+                "template.json"));
+
+            return File.ReadAllText(templateJsonPath);
         }
     }
 }

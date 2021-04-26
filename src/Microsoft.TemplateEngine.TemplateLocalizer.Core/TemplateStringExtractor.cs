@@ -31,6 +31,8 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
         private readonly TraversalRule _documentRootTraversalRule =
             // Root element should be included in any case.
             new AllInclusiveTraversalRule().WithChildren(
+                // Include "author" under the root.
+                new StringFilteredTraversalRule("author"),
                 // Include "name" under the root.
                 new StringFilteredTraversalRule("name"),
                 // Include "description" under the root.
