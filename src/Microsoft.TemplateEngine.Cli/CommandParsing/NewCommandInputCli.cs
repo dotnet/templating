@@ -306,7 +306,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             // type & language: These are "tags" in template.json, which become params in the templateInfo object.
             // name: Gets added as a param in SimpleConfigModel - to facilitate the built in value forms for name.
             //       name can also be explicitly specified in the template.json - for custom value forms on name.
-            List<ITemplateParameter> filteredParams = templateInfo.Parameters.Where(x => !string.Equals(x.Name, "type", StringComparison.OrdinalIgnoreCase)
+            List<CliTemplateParameter> filteredParams = templateInfo.GetParameters().Where(x => !string.Equals(x.Name, "type", StringComparison.OrdinalIgnoreCase)
                                                                                     && !string.Equals(x.Name, "language", StringComparison.OrdinalIgnoreCase)
                                                                                     && !string.Equals(x.Name, "name", StringComparison.OrdinalIgnoreCase))
                                                                                     .ToList();

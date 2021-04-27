@@ -246,14 +246,14 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                 {
                     return null;
                 }
-                string templateLanguage = template.GetLanguage();
+                string? templateLanguage = template.GetLanguage();
                 // only add default language disposition when there is a language specified for the template.
                 if (string.IsNullOrWhiteSpace(templateLanguage))
                 {
                     return null;
                 }
 
-                if (templateLanguage.Equals(defaultLanguage, StringComparison.OrdinalIgnoreCase))
+                if (templateLanguage!.Equals(defaultLanguage, StringComparison.OrdinalIgnoreCase))
                 {
                     return new MatchInfo(DefaultLanguageMatchParameterName, defaultLanguage, MatchKind.Exact);
                 }
@@ -511,7 +511,8 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
 
             public IReadOnlyDictionary<string, ICacheParameter> CacheParameters => _parent.CacheParameters;
 
-            public IReadOnlyList<ITemplateParameter> Parameters => _parent.Parameters;
+            [Obsolete]
+            IReadOnlyList<ITemplateParameter> ITemplateInfo.Parameters => _parent.Parameters;
 
             public string MountPointUri => _parent.MountPointUri;
 

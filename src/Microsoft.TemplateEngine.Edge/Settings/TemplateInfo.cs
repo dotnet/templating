@@ -13,7 +13,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 {
     public class TemplateInfo : ITemplateInfo
     {
-        public static readonly string CurrentVersion = "1.0.0.5";
+        public const string CurrentVersion = "1.0.0.5";
 
         private static readonly Func<JObject, TemplateInfo> _defaultReader = TemplateInfoReaderInitialVersion.FromJObject;
 
@@ -34,13 +34,14 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         private IReadOnlyDictionary<string, ICacheParameter> _cacheParameters;
 
-        public TemplateInfo()
+        internal TemplateInfo()
         {
             ShortNameList = new List<string>();
         }
 
+        [Obsolete]
         [JsonIgnore]
-        public IReadOnlyList<ITemplateParameter> Parameters
+        IReadOnlyList<ITemplateParameter> ITemplateInfo.Parameters
         {
             get
             {
@@ -214,14 +215,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             }
 
             return infoReader(entry);
-        }
-
-        // ShortName should get deserialized when it exists, for backwards compat.
-        // But moving forward, ShortNameList should be the definitive source.
-        // It can still be ShortName in the template.json, but in the caches it'll be ShortNameList
-        public bool ShouldSerializeShortName()
-        {
-            return false;
         }
     }
 }

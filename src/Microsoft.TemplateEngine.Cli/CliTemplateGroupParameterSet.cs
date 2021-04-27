@@ -1,28 +1,29 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Cli
 {
-    internal class TemplateGroupParameterSet : IParameterSet
+    internal class CliTemplateGroupParameterSet
     {
         private readonly IReadOnlyList<IParameterSet> _parameterSetList;
 
-        private IEnumerable<ITemplateParameter> _parameterDefinitions;
+        private IEnumerable<CliTemplateParameter>? _parameterDefinitions;
 
-        private IDictionary<ITemplateParameter, object> _resolvedValues;
+        private IDictionary<CliTemplateParameter, object>? _resolvedValues;
 
-        internal TemplateGroupParameterSet(IReadOnlyList<IParameterSet> parameterSetList)
+        internal CliTemplateGroupParameterSet(IReadOnlyList<IParameterSet> parameterSetList)
         {
             _parameterSetList = parameterSetList;
         }
 
-        public IEnumerable<ITemplateParameter> ParameterDefinitions
+        internal IEnumerable<CliTemplateParameter> ParameterDefinitions
         {
             get
             {
@@ -64,12 +65,20 @@ namespace Microsoft.TemplateEngine.Cli
                     }
 
                     // create the combined params
-                    IList<ITemplateParameter> outputParams = new List<ITemplateParameter>();
+                    IList<CliTemplateParameter> outputParams = new List<CliTemplateParameter>();
                     foreach (KeyValuePair<string, ITemplateParameter> paramInfo in combinedParams)
                     {
                         if (!string.Equals(paramInfo.Value.DataType, "choice", StringComparison.OrdinalIgnoreCase))
                         {
-                            outputParams.Add(paramInfo.Value);
+                            CliTemplateParameter combinedParameter = new CliTemplateParameter(paramInfo.Value.Name)
+                            {
+                                Documentation = paramInfo.Value.Documentation,
+                                Priority = paramInfo.Value.Priority,
+                                DefaultValue = paramInfo.Value.DefaultValue,
+                                DataType = paramInfo.Value.DataType,
+                                DefaultIfOptionWithoutValue = paramInfo.Value.DefaultIfOptionWithoutValue
+                            };
+                            outputParams.Add(combinedParameter);
                         }
                         else
                         {
@@ -79,28 +88,17 @@ namespace Microsoft.TemplateEngine.Cli
                                 choicesAndDescriptions = new Dictionary<string, ParameterChoice>();
                             }
 
-                            ITemplateParameter combinedParameter = new TemplateParameter
+                            CliTemplateParameter combinedParameter = new CliTemplateParameter(paramInfo.Value.Name)
                             {
                                 Documentation = paramInfo.Value.Documentation,
-                                Name = paramInfo.Value.Name,
                                 Priority = paramInfo.Value.Priority,
-                                Type = paramInfo.Value.Type,
-                                IsName = paramInfo.Value.IsName,
                                 DefaultValue = paramInfo.Value.DefaultValue,
                                 DataType = paramInfo.Value.DataType,
-                                Choices = choicesAndDescriptions
+                                Choices = choicesAndDescriptions,
+                                DefaultIfOptionWithoutValue = paramInfo.Value.DefaultIfOptionWithoutValue
                             };
 
-                            if (combinedParameter is IAllowDefaultIfOptionWithoutValue combinedParamWithDefault
-                                && paramInfo.Value is IAllowDefaultIfOptionWithoutValue paramInfoValueWithDefault)
-                            {
-                                combinedParamWithDefault.DefaultIfOptionWithoutValue = paramInfoValueWithDefault.DefaultIfOptionWithoutValue;
-                                outputParams.Add(combinedParamWithDefault as TemplateParameter);
-                            }
-                            else
-                            {
-                                outputParams.Add(combinedParameter);
-                            }
+                            outputParams.Add(combinedParameter);
                         }
                     }
 
@@ -111,17 +109,15 @@ namespace Microsoft.TemplateEngine.Cli
             }
         }
 
-        public IEnumerable<string> RequiredBrokerCapabilities => Enumerable.Empty<string>();
-
-        public IDictionary<ITemplateParameter, object> ResolvedValues
+        internal IDictionary<CliTemplateParameter, object> ResolvedValues
         {
             get
             {
                 if (_resolvedValues == null)
                 {
-                    IDictionary<ITemplateParameter, object> resolvedValues = new Dictionary<ITemplateParameter, object>();
+                    IDictionary<CliTemplateParameter, object> resolvedValues = new Dictionary<CliTemplateParameter, object>();
 
-                    foreach (ITemplateParameter groupParameter in ParameterDefinitions)
+                    foreach (CliTemplateParameter groupParameter in ParameterDefinitions)
                     {
                         // take the first value from the first group that has a a value for this parameter.
                         foreach (IParameterSet baseParamSet in _parameterSetList)
@@ -145,7 +141,7 @@ namespace Microsoft.TemplateEngine.Cli
             }
         }
 
-        public bool TryGetParameterDefinition(string name, out ITemplateParameter parameter)
+        internal bool TryGetParameterDefinition(string name, out CliTemplateParameter parameter)
         {
             parameter = ParameterDefinitions.FirstOrDefault(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase));
 
@@ -154,25 +150,37 @@ namespace Microsoft.TemplateEngine.Cli
                 return true;
             }
 
-            parameter = new TemplateParameter
+            parameter = new CliTemplateParameter(name)
             {
                 Documentation = string.Empty,
-                Name = name,
                 Priority = TemplateParameterPriority.Optional,
-                Type = "string",
-                IsName = false,
                 DefaultValue = string.Empty,
                 DataType = "string",
-                Choices = null
+                Choices = null,
             };
 
-            if (parameter is IAllowDefaultIfOptionWithoutValue parameterWithNoValueDefault)
+            return true;
+        }
+
+        internal bool TryGetRuntimeValue(IEngineEnvironmentSettings environmentSettings, string name, out object? value, bool skipEnvironmentVariableSearch = false)
+        {
+            if (TryGetParameterDefinition(name, out CliTemplateParameter param)
+                && ResolvedValues.TryGetValue(param, out object newValueObject)
+                && newValueObject != null)
             {
-                parameterWithNoValueDefault.DefaultIfOptionWithoutValue = null;
-                parameter = parameterWithNoValueDefault as TemplateParameter;
+                value = newValueObject;
+                return true;
             }
 
-            return true;
+            if ((environmentSettings.Host.TryGetHostParamDefault(name, out string newValue) && newValue != null)
+                || (!skipEnvironmentVariableSearch && environmentSettings.Environment.GetEnvironmentVariables().TryGetValue(name, out newValue) && newValue != null))
+            {
+                value = newValue;
+                return true;
+            }
+
+            value = null;
+            return false;
         }
     }
 }
