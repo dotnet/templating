@@ -89,7 +89,6 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Commands.Export
 
             foreach (string templateJsonPath in templateJsonFiles)
             {
-
                 ExportOptions exportOptions = new (args.DryRun, targetDirectory: null, args.Languages);
                 runningExportTasks.Add(
                     (templateJsonPath,

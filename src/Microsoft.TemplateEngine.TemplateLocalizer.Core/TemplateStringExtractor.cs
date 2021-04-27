@@ -1,6 +1,8 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#pragma warning disable SA1114 // Comments on parameters be allowed https://github.com/DotNetAnalyzers/StyleCopAnalyzers/issues/2917
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -76,7 +78,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
         /// <summary>
         /// Extracts localizable strings from the json document as well as the language of the strings.
         /// </summary>
-        /// <param name="language">The language of the extracted strings</param>
+        /// <param name="language">The language of the extracted strings.</param>
         /// <returns>The list of localizable strings.</returns>
         public IReadOnlyList<TemplateString> ExtractStrings(out string language)
         {
@@ -100,13 +102,25 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
             return extractedStrings;
         }
 
+        private static string GetTemplateLanguage(JsonDocument jsonDocument)
+        {
+            if (jsonDocument.RootElement.TryGetProperty("authoringLanguage", out JsonElement langElement) &&
+                langElement.ValueKind == JsonValueKind.String)
+            {
+                string? language = langElement.GetString();
+                return string.IsNullOrWhiteSpace(language) ? _defaultTemplateJsonLanguage : language!;
+            }
+
+            return _defaultTemplateJsonLanguage;
+        }
+
         private void TraverseJsonElements(
             JsonElement element,
             string elementName,
             string localizationKey,
             TraversalArgs args)
         {
-            using IDisposable? _ = _logger.BeginScope(elementName);
+            using IDisposable? loggerScope = _logger.BeginScope(elementName);
             List<TraversalRule> complyingRules = args.Rules.Where(r => r.AllowsTraversalOfIdentifier(elementName)).ToList();
 
             if (complyingRules.Count == 0)
@@ -180,7 +194,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
                     TraversalArgs nextArgs = args;
                     nextArgs.Rules = rule.ChildRules;
 
-                    using IDisposable? _ = _logger.BeginScope(childElementName);
+                    using IDisposable? loggerScope = _logger.BeginScope(childElementName);
                     TraverseJsonElements(child, childElementName, childKey, nextArgs);
                     childIndex++;
                 }
@@ -200,23 +214,11 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
                     TraversalArgs nextArgs = args;
                     nextArgs.Rules = rule.ChildRules;
 
-                    using IDisposable? _ = _logger.BeginScope(childElementName);
+                    using IDisposable? loggerScope = _logger.BeginScope(childElementName);
                     TraverseJsonElements(child.Value, childElementName, childKey, nextArgs);
                     childIndex++;
                 }
             }
-        }
-
-        private static string GetTemplateLanguage(JsonDocument jsonDocument)
-        {
-            if (jsonDocument.RootElement.TryGetProperty("authoringLanguage", out JsonElement langElement) &&
-                langElement.ValueKind == JsonValueKind.String)
-            {
-                string? language = langElement.GetString();
-                return string.IsNullOrWhiteSpace(language) ? _defaultTemplateJsonLanguage : language!;
-            }
-
-            return _defaultTemplateJsonLanguage;
         }
     }
 }

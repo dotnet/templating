@@ -65,7 +65,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
                 logger.LogDebug(LocalizableStrings.stringUpdater_log_commandLoadingLocFile, locFilePath);
                 using FileStream openStream = File.OpenRead(locFilePath);
 
-                JsonSerializerOptions serializerOptions = new()
+                JsonSerializerOptions serializerOptions = new ()
                 {
                     AllowTrailingCommas = true,
                     MaxDepth = 1,

@@ -114,7 +114,9 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.UnitTests
             CancellationTokenSource cts = new CancellationTokenSource(10000);
             string expectedFilename = Path.Combine(_workingDirectory, "tr.templatestrings.json");
 
-            await File.WriteAllTextAsync(expectedFilename, @"
+            await File.WriteAllTextAsync(
+                expectedFilename,
+                @"
 {
     ""name"": ""existing translations should be preserved."",
     ""_name.comment"": ""comments should be preserved.""
@@ -136,7 +138,9 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.UnitTests
             CancellationTokenSource cts = new CancellationTokenSource(10000);
             string expectedFilename = Path.Combine(_workingDirectory, "en.templatestrings.json");
 
-            await File.WriteAllTextAsync(expectedFilename, @"
+            await File.WriteAllTextAsync(
+                expectedFilename,
+                @"
 {
     ""name"": ""existing translations in authoring language should be removed.""
 }",
@@ -153,7 +157,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.UnitTests
         private static async Task<Dictionary<string, string>> ReadTemplateStringsFromJsonFile(string path, CancellationToken cancellationToken)
         {
             using FileStream openStream = File.OpenRead(path);
-            JsonSerializerOptions serializerOptions = new()
+            JsonSerializerOptions serializerOptions = new ()
             {
                 AllowTrailingCommas = true,
                 MaxDepth = 1,
