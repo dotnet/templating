@@ -65,10 +65,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
                 }
                 else
                 {
-                    p = new Parameter
+                    p = new Parameter(config.VariableName)
                     {
                         IsVariable = true,
-                        Name = config.VariableName,
                         DataType = realConfig.DataType
                     };
                 }

@@ -177,14 +177,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
 
             //prepare parameters
             ParameterSet parameters = new ParameterSet(SimpleConfigModel.FromJObject(environment, JObject.Parse("{}")));
-            Parameter nameParameter = new Parameter()
-            {
-                Name = "name"
-            };
-            Parameter testParameter = new Parameter()
-            {
-                Name = "test"
-            };
+            Parameter nameParameter = new Parameter("name");
+            Parameter testParameter = new Parameter("test");
             parameters.AddParameter(nameParameter);
             parameters.AddParameter(testParameter);
             parameters.ResolvedValues[nameParameter] = "testName";
@@ -222,22 +216,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
 
             //prepare parameters
             ParameterSet parameters = new ParameterSet(SimpleConfigModel.FromJObject(environment, JObject.Parse("{}")));
-            Parameter nameParameter = new Parameter()
-            {
-                Name = "name"
-            };
-            Parameter testParameterIdentity = new Parameter()
-            {
-                Name = "test{-VALUE-FORMS-}identity"
-            };
-            Parameter testParameterUC = new Parameter()
-            {
-                Name = "test{-VALUE-FORMS-}uc"
-            };
-            Parameter testParameterLC = new Parameter()
-            {
-                Name = "test{-VALUE-FORMS-}lc"
-            };
+            Parameter nameParameter = new Parameter("name");
+            Parameter testParameterIdentity = new Parameter("test{-VALUE-FORMS-}identity");
+            Parameter testParameterUC = new Parameter("test{-VALUE-FORMS-}uc");
+            Parameter testParameterLC = new Parameter("test{-VALUE-FORMS-}lc");
             parameters.AddParameter(nameParameter);
             parameters.AddParameter(testParameterIdentity);
             parameters.AddParameter(testParameterUC);
@@ -282,18 +264,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
 
             //prepare parameters
             ParameterSet parameters = new ParameterSet(SimpleConfigModel.FromJObject(environment, JObject.Parse("{}")));
-            Parameter nameParameter = new Parameter()
-            {
-                Name = "name"
-            };
-            Parameter testParameterIdentity = new Parameter()
-            {
-                Name = "test{-VALUE-FORMS-}identity"
-            };
-            Parameter testParameterLC = new Parameter()
-            {
-                Name = "test{-VALUE-FORMS-}lc"
-            };
+            Parameter nameParameter = new Parameter("name");
+            Parameter testParameterIdentity = new Parameter("test{-VALUE-FORMS-}identity");
+            Parameter testParameterLC = new Parameter("test{-VALUE-FORMS-}lc");
             parameters.AddParameter(nameParameter);
             parameters.AddParameter(testParameterIdentity);
             parameters.AddParameter(testParameterLC);
@@ -334,14 +307,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
 
             //prepare parameters
             ParameterSet parameters = new ParameterSet(SimpleConfigModel.FromJObject(environment, JObject.Parse("{}")));
-            Parameter nameParameter = new Parameter()
-            {
-                Name = "name"
-            };
-            Parameter testParameter = new Parameter()
-            {
-                Name = "test"
-            };
+            Parameter nameParameter = new Parameter("name");
+            Parameter testParameter = new Parameter("test");
             parameters.AddParameter(nameParameter);
             parameters.AddParameter(testParameter);
             parameters.ResolvedValues[nameParameter] = "testName";
@@ -378,14 +345,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
 
             //prepare parameters
             ParameterSet parameters = new ParameterSet(SimpleConfigModel.FromJObject(environment, JObject.Parse("{}")));
-            Parameter nameParameter = new Parameter()
-            {
-                Name = "name"
-            };
-            Parameter testParameter = new Parameter()
-            {
-                Name = "test"
-            };
+            Parameter nameParameter = new Parameter("name");
+            Parameter testParameter = new Parameter("test");
             parameters.AddParameter(nameParameter);
             parameters.AddParameter(testParameter);
             parameters.ResolvedValues[nameParameter] = "testName";

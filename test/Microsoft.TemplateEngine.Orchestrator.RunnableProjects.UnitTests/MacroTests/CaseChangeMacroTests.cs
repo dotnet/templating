@@ -39,10 +39,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
             ParameterSetter setter = MacroTestHelpers.TestParameterSetter(_engineEnvironmentSettings, parameters);
 
             string sourceValue = "Original Value SomethingCamelCase";
-            Parameter sourceParam = new Parameter
+            Parameter sourceParam = new Parameter(sourceVariable)
             {
                 IsVariable = true,
-                Name = sourceVariable
             };
 
             variables[sourceVariable] = sourceValue;
@@ -72,10 +71,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
             ParameterSetter setter = MacroTestHelpers.TestParameterSetter(_engineEnvironmentSettings, parameters);
 
             string sourceValue = "Original Value SomethingCamelCase";
-            Parameter sourceParam = new Parameter
+            Parameter sourceParam = new Parameter(sourceVariable)
             {
-                IsVariable = true,
-                Name = sourceVariable
+                IsVariable = true
             };
 
             variables[sourceVariable] = sourceValue;
@@ -108,10 +106,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
             ParameterSetter setter = MacroTestHelpers.TestParameterSetter(_engineEnvironmentSettings, parameters);
 
             string sourceValue = "Original Value SomethingCamelCase";
-            Parameter sourceParam = new Parameter
+            Parameter sourceParam = new Parameter(sourceVariable)
             {
-                IsVariable = true,
-                Name = sourceVariable
+                IsVariable = true
             };
 
             variables[sourceVariable] = sourceValue;

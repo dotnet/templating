@@ -40,10 +40,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             for (int i = 0; i < guidFormats.Length; ++i)
             {
                 string value = char.IsUpper(guidFormats[i]) ? g.ToString(guidFormats[i].ToString()).ToUpperInvariant() : g.ToString(guidFormats[i].ToString()).ToLowerInvariant();
-                Parameter p = new Parameter
+                Parameter p = new Parameter(config.VariableName + "-" + guidFormats[i])
                 {
                     IsVariable = true,
-                    Name = config.VariableName + "-" + guidFormats[i],
                     DataType = config.DataType
                 };
 
@@ -63,10 +62,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             }
             else
             {
-                pd = new Parameter
+                pd = new Parameter(config.VariableName)
                 {
-                    IsVariable = true,
-                    Name = config.VariableName
+                    IsVariable = true
                 };
             }
 

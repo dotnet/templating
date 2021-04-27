@@ -1,6 +1,8 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
@@ -8,20 +10,30 @@ using Newtonsoft.Json;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
-    internal class Parameter : ITemplateParameter, IExtendedTemplateParameter, IAllowDefaultIfOptionWithoutValue
+    internal class Parameter : ITemplateParameter, IExtendedTemplateParameter
     {
+        internal Parameter(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException($"'{nameof(name)}' cannot be null or whitespace.", nameof(name));
+            }
+
+            Name = name;
+        }
+
         [JsonProperty]
         [Obsolete("This property is no longer used. It is populated only when creating parameters from parameter and derived symbols for compatibility reason.")]
-        public string FileRename { get; set; }
+        public string? FileRename { get; set; }
 
         [JsonProperty]
-        public IReadOnlyDictionary<string, ParameterChoice> Choices { get; set; }
+        public IReadOnlyDictionary<string, ParameterChoice>? Choices { get; set; }
 
         [JsonProperty]
-        public IReadOnlyDictionary<string, IReadOnlyList<string>> Forms { get; set; }
+        public IReadOnlyDictionary<string, IReadOnlyList<string>>? Forms { get; set; }
 
         [JsonIgnore]
-        public string Documentation
+        public string? Documentation
         {
             get { return Description; }
             set { Description = value; }
@@ -31,32 +43,27 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         TemplateParameterPriority ITemplateParameter.Priority => Requirement;
 
-        string ITemplateParameter.Type => Type;
+        string? ITemplateParameter.Type => Type;
 
         bool ITemplateParameter.IsName => IsName;
 
-        string ITemplateParameter.DefaultValue => DefaultValue;
+        string? ITemplateParameter.DefaultValue => DefaultValue;
 
-        string ITemplateParameter.DataType => DataType;
+        string? ITemplateParameter.DataType => DataType;
 
-        string IAllowDefaultIfOptionWithoutValue.DefaultIfOptionWithoutValue
+        string? ITemplateParameter.DefaultIfOptionWithoutValue
         {
             get
             {
                 return DefaultIfOptionWithoutValue;
             }
-
-            set
-            {
-                DefaultIfOptionWithoutValue = value;
-            }
         }
 
         [JsonProperty]
-        internal string Description { get; set; }
+        internal string? Description { get; set; }
 
         [JsonProperty]
-        internal string DefaultValue { get; set; }
+        internal string? DefaultValue { get; set; }
 
         [JsonIgnore]
         internal string Name { get; set; }
@@ -68,16 +75,16 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         internal TemplateParameterPriority Requirement { get; set; }
 
         [JsonProperty]
-        internal string Type { get; set; }
+        internal string? Type { get; set; }
 
         [JsonProperty]
         internal bool IsVariable { get; set; }
 
         [JsonProperty]
-        internal string DataType { get; set; }
+        internal string? DataType { get; set; }
 
         [JsonProperty]
-        internal string DefaultIfOptionWithoutValue { get; set; }
+        internal string? DefaultIfOptionWithoutValue { get; set; }
 
         public override string ToString()
         {

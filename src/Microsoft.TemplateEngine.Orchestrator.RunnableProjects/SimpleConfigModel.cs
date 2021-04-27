@@ -234,12 +234,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
                     bool isName = baseSymbol.Binding == NameSymbolName;
 
-                    Parameter parameter = new Parameter
+                    Parameter parameter = new Parameter (symbol.Key)
                     {
                         DefaultValue = baseSymbol.DefaultValue ?? (!baseSymbol.IsRequired ? baseSymbol.Replaces : null),
                         IsName = isName,
                         IsVariable = true,
-                        Name = symbol.Key,
 #pragma warning disable 612,618
                         FileRename = baseSymbol.FileRename,
 #pragma warning restore 612,618
