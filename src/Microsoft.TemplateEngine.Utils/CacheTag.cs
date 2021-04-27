@@ -9,7 +9,11 @@ using Microsoft.TemplateEngine.Abstractions;
 
 namespace Microsoft.TemplateEngine.Utils
 {
-    public class CacheTag : ICacheTag, IAllowDefaultIfOptionWithoutValue
+    /// <summary>
+    /// Default <see cref="ICacheTag"/> implementation, represents data model for cached template tag.
+    /// In Orchestrator.RunnableProjects (template.json) choice parameter symbols and tags are cached as tags. Non-choice parameters are cached as <see cref="CacheParameter"/>in <see cref="ITemplateInfo.CacheParameters"/> collection.
+    /// </summary>
+    public class CacheTag : ICacheTag
     {
         public CacheTag(string? displayName, string? description, IReadOnlyDictionary<string, ParameterChoice> choices, string? defaultValue)
             : this(displayName, description, choices, defaultValue, null)
@@ -34,10 +38,5 @@ namespace Microsoft.TemplateEngine.Utils
         public string? DefaultValue { get; }
 
         public string? DefaultIfOptionWithoutValue { get; set; }
-
-        public bool ShouldSerializeDefaultIfOptionWithoutValue()
-        {
-            return !string.IsNullOrEmpty(DefaultIfOptionWithoutValue);
-        }
     }
 }

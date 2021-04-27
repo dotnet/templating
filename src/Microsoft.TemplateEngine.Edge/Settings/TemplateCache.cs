@@ -307,13 +307,11 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 if (localizedParameterSymbols.TryGetValue(templateParam.Key, out IParameterSymbolLocalizationModel localizationForParam))
                 {
                     // there is loc info for this symbol
-                    ICacheParameter localizedParam = new CacheParameter
-                    {
-                        DataType = templateParam.Value.DataType,
-                        DefaultValue = templateParam.Value.DefaultValue,
-                        DisplayName = localizationForParam.DisplayName ?? templateParam.Value.DisplayName,
-                        Description = localizationForParam.Description ?? templateParam.Value.Description
-                    };
+                    ICacheParameter localizedParam = new CacheParameter(
+                        dataType: templateParam.Value.DataType,
+                        defaultValue: templateParam.Value.DefaultValue,
+                        displayName: localizationForParam.DisplayName ?? templateParam.Value.DisplayName,
+                        description: localizationForParam.Description ?? templateParam.Value.Description);
 
                     localizedCacheParams.Add(templateParam.Key, localizedParam);
                 }

@@ -8,6 +8,10 @@ using System.Collections.Generic;
 
 namespace Microsoft.TemplateEngine.Abstractions
 {
+    /// <summary>
+    /// Template information, used to be stored in the template cache.
+    /// This information is common for all templates that can be managed by different <see cref="IGenerator"/>s.
+    /// </summary>
     public interface ITemplateInfo
     {
         string? Author { get; }
@@ -31,10 +35,20 @@ namespace Microsoft.TemplateEngine.Abstractions
         [Obsolete("Templates support multiple short names, use ShortNameList instead")]
         string ShortName { get; }
 
+        /// <summary>
+        /// Gets template tags.
+        /// In Orchestrator.RunnableProjects (template.json) parameter symbol with choices are also represented as tags.
+        /// Non choice parameter symbols are stored as <see cref="ICacheParameter"/>in <see cref="ITemplateInfo.CacheParameters"/> collection.
+        /// </summary>
         IReadOnlyDictionary<string, ICacheTag> Tags { get; }
 
+        /// <summary>
+        /// Gets cached template parameter definition.
+        /// In Orchestrator.RunnableProjects (template.json) parameter symbols are cached (all types except 'choice'). Choice parameters are stored as <see cref="ICacheTag"/>in <see cref="ITemplateInfo.Tags"/> collection.
+        /// </summary>
         IReadOnlyDictionary<string, ICacheParameter> CacheParameters { get; }
 
+        [Obsolete("use " + nameof(Tags) + " and " + nameof(CacheParameters) + " collections instead.")]
         IReadOnlyList<ITemplateParameter> Parameters { get; }
 
         string MountPointUri { get; }

@@ -7,7 +7,7 @@ namespace Microsoft.TemplateEngine.Abstractions
 {
     /// <summary>
     /// Defines the representation of a parameter in template cache.
-    /// This doesn't include parameters with choices which are represented by <see cref="ICacheTag"/>.
+    /// In Orchestrator.RunnableProjects (template.json) parameter symbols are cached (all types except 'choice'). Choice parameters are stored as <see cref="ICacheTag"/>in <see cref="ITemplateInfo.Tags"/> collection.
     /// </summary>
     public interface ICacheParameter
     {
@@ -32,5 +32,10 @@ namespace Microsoft.TemplateEngine.Abstractions
         /// This property is localized if localizations are provided.
         /// </summary>
         string? Description { get; }
+
+        /// <summary>
+        /// Gets the default value to be used if the user specified the option without value.
+        /// </summary>
+        string? DefaultIfOptionWithoutValue { get; }
     }
 }
