@@ -282,7 +282,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     localizationForTag.Description ?? templateTag.Value.Description,
                     localizedChoices,
                     templateTag.Value.DefaultValue,
-                    (templateTag.Value as IAllowDefaultIfOptionWithoutValue)?.DefaultIfOptionWithoutValue);
+                    templateTag.Value.DefaultIfOptionWithoutValue);
 
                 localizedCacheTags.Add(templateTag.Key, localizedTag);
             }

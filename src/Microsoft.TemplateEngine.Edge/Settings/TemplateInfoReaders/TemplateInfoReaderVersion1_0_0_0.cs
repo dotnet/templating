@@ -11,15 +11,15 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders
 {
-    public class TemplateInfoReaderVersion1_0_0_0
+    internal class TemplateInfoReaderVersion1_0_0_0
     {
-        public static TemplateInfo FromJObject(JObject jObject)
+        internal static TemplateInfo FromJObject(JObject jObject)
         {
             TemplateInfoReaderVersion1_0_0_0 reader = new TemplateInfoReaderVersion1_0_0_0();
             return reader.Read(jObject);
         }
 
-        public virtual TemplateInfo Read(JObject jObject)
+        internal virtual TemplateInfo Read(JObject jObject)
         {
             TemplateInfo info = new TemplateInfo();
 
@@ -117,7 +117,8 @@ namespace Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders
                 displayName: null,
                 description: item.Value.ToString(nameof(ICacheTag.Description)),
                 choicesAndDescriptions,
-                item.Value.ToString(nameof(ICacheTag.DefaultValue)));
+                item.Value.ToString(nameof(ICacheTag.DefaultValue)),
+                item.Value.ToString(nameof(ICacheTag.DefaultIfOptionWithoutValue)));
         }
 
         protected virtual IReadOnlyDictionary<string, ICacheParameter> ReadParameters(JObject jObject)
@@ -138,12 +139,11 @@ namespace Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders
 
         protected virtual ICacheParameter ReadOneParameter(JProperty item)
         {
-            return new CacheParameter
-            {
-                DataType = item.Value.ToString(nameof(ICacheParameter.DataType)),
-                DefaultValue = item.Value.ToString(nameof(ICacheParameter.DefaultValue)),
-                Description = item.Value.ToString(nameof(ICacheParameter.Description))
-            };
+            return new CacheParameter(
+                dataType: item.Value.ToString(nameof(ICacheParameter.DataType)),
+                defaultValue: item.Value.ToString(nameof(ICacheParameter.DefaultValue)),
+                description: item.Value.ToString(nameof(ICacheParameter.Description)),
+                defaultIfOptionWithoutValue: item.Value.ToString(nameof(ICacheParameter.DefaultIfOptionWithoutValue)));
         }
     }
 }

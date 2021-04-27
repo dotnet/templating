@@ -285,12 +285,11 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                         if (template.Info.Tags.TryGetValue(paramName, out ICacheTag paramDetails))
                         {
                             if (string.IsNullOrEmpty(paramValue)
-                                && paramDetails is IAllowDefaultIfOptionWithoutValue paramDetailsWithNoValueDefault
-                                && !string.IsNullOrEmpty(paramDetailsWithNoValueDefault.DefaultIfOptionWithoutValue))
+                                && !string.IsNullOrEmpty(paramDetails.DefaultIfOptionWithoutValue))
                             {
                                 // The user provided the parameter switch on the command line, without a value.
                                 // In this case, the DefaultIfOptionWithoutValue is the effective value.
-                                paramValue = paramDetailsWithNoValueDefault.DefaultIfOptionWithoutValue;
+                                paramValue = paramDetails.DefaultIfOptionWithoutValue!;
                             }
 
                             // key is the value user should provide, value is description

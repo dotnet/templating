@@ -1,6 +1,8 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -23,12 +25,12 @@ namespace Microsoft.TemplateEngine.Edge.Template
             _paths = new SettingsFilePaths(environmentSettings);
         }
 
-        public Task<TemplateCreationResult> InstantiateAsync(ITemplateInfo templateInfo, string name, string fallbackName, string outputPath, IReadOnlyDictionary<string, string> inputParameters, bool skipUpdateCheck, bool forceCreation, string baselineName)
+        public Task<TemplateCreationResult> InstantiateAsync(ITemplateInfo templateInfo, string name, string? fallbackName, string? outputPath, IReadOnlyDictionary<string, string?> inputParameters, bool skipUpdateCheck, bool forceCreation, string baselineName)
         {
             return InstantiateAsync(templateInfo, name, fallbackName, outputPath, inputParameters, skipUpdateCheck, forceCreation, baselineName, false);
         }
 
-        public async Task<TemplateCreationResult> InstantiateAsync(ITemplateInfo templateInfo, string name, string fallbackName, string outputPath, IReadOnlyDictionary<string, string> inputParameters, bool skipUpdateCheck, bool forceCreation, string baselineName, bool dryRun)
+        public async Task<TemplateCreationResult> InstantiateAsync(ITemplateInfo templateInfo, string? name, string? fallbackName, string? outputPath, IReadOnlyDictionary<string, string?> inputParameters, bool skipUpdateCheck, bool forceCreation, string baselineName, bool dryRun)
         {
             // SettingsLoader.LoadTemplate is where the loc info should be read!!!
             // templateInfo knows enough to get at the loc, if any
@@ -53,7 +55,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                     outputPath = name;
                 }
 
-                ICreationResult creationResult = null;
+                ICreationResult? creationResult = null;
                 string targetDir = outputPath ?? _environmentSettings.Host.FileSystem.GetCurrentDirectory();
 
                 try
@@ -67,9 +69,9 @@ namespace Microsoft.TemplateEngine.Edge.Template
                     IComponentManager componentManager = _environmentSettings.SettingsLoader.Components;
 
                     // setup separate sets of parameters to be used for GetCreationEffects() and by CreateAsync().
-                    if (!TryCreateParameterSet(template, realName, inputParameters, out IParameterSet effectParams, out TemplateCreationResult resultIfParameterCreationFailed))
+                    if (!TryCreateParameterSet(template, realName, inputParameters, out IParameterSet? effectParams, out TemplateCreationResult? resultIfParameterCreationFailed))
                     {
-                        return resultIfParameterCreationFailed;
+                        return resultIfParameterCreationFailed!;
                     }
 
                     ICreationEffects creationEffects = template.Generator.GetCreationEffects(_environmentSettings, template, effectParams, componentManager, targetDir);
@@ -84,9 +86,9 @@ namespace Microsoft.TemplateEngine.Edge.Template
                         }
                     }
 
-                    if (!TryCreateParameterSet(template, realName, inputParameters, out IParameterSet creationParams, out resultIfParameterCreationFailed))
+                    if (!TryCreateParameterSet(template, realName, inputParameters, out IParameterSet? creationParams, out resultIfParameterCreationFailed))
                     {
-                        return resultIfParameterCreationFailed;
+                        return resultIfParameterCreationFailed!;
                     }
 
                     if (!dryRun)
@@ -119,7 +121,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
             }
         }
 
-        public bool AnyParametersWithInvalidDefaultsUnresolved(IReadOnlyList<string> defaultParamsWithInvalidValues, IReadOnlyList<string> userParamsWithInvalidValues, IReadOnlyDictionary<string, string> inputParameters, out IReadOnlyList<string> invalidDefaultParameters)
+        public bool AnyParametersWithInvalidDefaultsUnresolved(IReadOnlyList<string> defaultParamsWithInvalidValues, IReadOnlyList<string> userParamsWithInvalidValues, IReadOnlyDictionary<string, string?> inputParameters, out IReadOnlyList<string> invalidDefaultParameters)
         {
             invalidDefaultParameters = defaultParamsWithInvalidValues.Where(x => !inputParameters.ContainsKey(x)).ToList();
             return invalidDefaultParameters.Count > 0;
@@ -198,21 +200,20 @@ namespace Microsoft.TemplateEngine.Edge.Template
         // The template params for which there are same-named input parameters have their values set to the corresponding input parameters value.
         // input parameters that do not have corresponding template params are ignored.
         //
-        public void ResolveUserParameters(ITemplate template, IParameterSet templateParams, IReadOnlyDictionary<string, string> inputParameters, out IReadOnlyList<string> paramsWithInvalidValues)
+        public void ResolveUserParameters(ITemplate template, IParameterSet templateParams, IReadOnlyDictionary<string, string?> inputParameters, out IReadOnlyList<string> paramsWithInvalidValues)
         {
             List<string> tmpParamsWithInvalidValues = new List<string>();
             paramsWithInvalidValues = tmpParamsWithInvalidValues;
 
-            foreach (KeyValuePair<string, string> inputParam in inputParameters)
+            foreach (KeyValuePair<string, string?> inputParam in inputParameters)
             {
                 if (templateParams.TryGetParameterDefinition(inputParam.Key, out ITemplateParameter paramFromTemplate))
                 {
                     if (inputParam.Value == null)
                     {
-                        if (paramFromTemplate is IAllowDefaultIfOptionWithoutValue paramFromTemplateWithNoValueDefault
-                            && !string.IsNullOrEmpty(paramFromTemplateWithNoValueDefault.DefaultIfOptionWithoutValue))
+                        if (!string.IsNullOrEmpty(paramFromTemplate.DefaultIfOptionWithoutValue))
                         {
-                            templateParams.ResolvedValues[paramFromTemplate] = template.Generator.ConvertParameterValueToType(_environmentSettings, paramFromTemplate, paramFromTemplateWithNoValueDefault.DefaultIfOptionWithoutValue, out bool valueResolutionError);
+                            templateParams.ResolvedValues[paramFromTemplate] = template.Generator.ConvertParameterValueToType(_environmentSettings, paramFromTemplate, paramFromTemplate.DefaultIfOptionWithoutValue, out bool valueResolutionError);
                             // don't fail on value resolution errors, but report them as authoring problems.
                             if (valueResolutionError)
                             {
@@ -272,7 +273,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
             return anyMissingParams;
         }
 
-        private bool TryCreateParameterSet(ITemplate template, string realName, IReadOnlyDictionary<string, string> inputParameters, out IParameterSet templateParams, out TemplateCreationResult failureResult)
+        private bool TryCreateParameterSet(ITemplate template, string realName, IReadOnlyDictionary<string, string?> inputParameters, out IParameterSet? templateParams, out TemplateCreationResult? failureResult)
         {
             // there should never be param errors here. If there are, the template is malformed, or the host gave an invalid value.
             templateParams = SetupDefaultParamValuesFromTemplateAndHost(template, realName, out IReadOnlyList<string> defaultParamsWithInvalidValues);
