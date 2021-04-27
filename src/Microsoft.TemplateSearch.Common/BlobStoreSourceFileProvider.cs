@@ -1,6 +1,8 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -72,17 +74,13 @@ namespace Microsoft.TemplateSearch.Common
 
         private bool ShouldDownloadFileFromCloud(IEngineEnvironmentSettings environmentSettings, string metadataFileTargetLocation)
         {
-            IPhysicalFileSystem fileSystem = environmentSettings.Host.FileSystem;
-            if (fileSystem is IFileLastWriteTimeSource lastWriteTimeSource)
+            if (environmentSettings.Host.FileSystem.FileExists(metadataFileTargetLocation))
             {
-                if (fileSystem.FileExists(metadataFileTargetLocation))
+                DateTime utcNow = DateTime.UtcNow;
+                DateTime lastWriteTimeUtc = environmentSettings.Host.FileSystem.GetLastWriteTimeUtc(metadataFileTargetLocation);
+                if (lastWriteTimeUtc.AddHours(CachedFileValidityInHours) > utcNow)
                 {
-                    DateTime utcNow = DateTime.UtcNow;
-                    DateTime lastWriteTimeUtc = lastWriteTimeSource.GetLastWriteTimeUtc(metadataFileTargetLocation);
-                    if (lastWriteTimeUtc.AddHours(CachedFileValidityInHours) > utcNow)
-                    {
-                        return false;
-                    }
+                    return false;
                 }
             }
 
@@ -137,10 +135,8 @@ namespace Microsoft.TemplateSearch.Common
                         else if (response.StatusCode == HttpStatusCode.NotModified)
                         {
                             IPhysicalFileSystem fileSystem = environmentSettings.Host.FileSystem;
-                            if (fileSystem is IFileLastWriteTimeSource lastWriteTimeSource)
-                            {
-                                lastWriteTimeSource.SetLastWriteTimeUtc(searchMetadataFileLocation, DateTime.UtcNow);
-                            }
+
+                            environmentSettings.Host.FileSystem.SetLastWriteTimeUtc(searchMetadataFileLocation, DateTime.UtcNow);
                             return true;
                         }
 
