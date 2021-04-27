@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Cli.CommandParsing;
-using Microsoft.TemplateEngine.Mocks;
 using Xunit;
 
 namespace Microsoft.TemplateEngine.Cli.UnitTests
@@ -50,7 +49,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
                 "foo",
                 "bar",
             };
-            IReadOnlyList<ITemplateParameter> parameters = ParameterNamesToParametersTransform(paramNameList);
+            IReadOnlyList<CliTemplateParameter> parameters = ParameterNamesToParametersTransform(paramNameList);
 
             IDictionary<string, string> longNameOverrides = new Dictionary<string, string>()
             {
@@ -75,7 +74,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
                 "foo",
                 "bar",
             };
-            IReadOnlyList<ITemplateParameter> parameters = ParameterNamesToParametersTransform(paramNameList);
+            IReadOnlyList<CliTemplateParameter> parameters = ParameterNamesToParametersTransform(paramNameList);
 
             IDictionary<string, string> longNameOverrides = new Dictionary<string, string>();
             IDictionary<string, string> shortNameOverrides = new Dictionary<string, string>()
@@ -100,7 +99,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
                 "foo",
                 "bar",
             };
-            IReadOnlyList<ITemplateParameter> parameters = ParameterNamesToParametersTransform(paramNameList);
+            IReadOnlyList<CliTemplateParameter> parameters = ParameterNamesToParametersTransform(paramNameList);
 
             IDictionary<string, string> longNameOverrides = new Dictionary<string, string>();
             IDictionary<string, string> shortNameOverrides = new Dictionary<string, string>()
@@ -124,7 +123,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             {
                 "foo:bar",
             };
-            IReadOnlyList<ITemplateParameter> parameters = ParameterNamesToParametersTransform(paramNameList);
+            IReadOnlyList<CliTemplateParameter> parameters = ParameterNamesToParametersTransform(paramNameList);
 
             IDictionary<string, string> longNameOverrides = new Dictionary<string, string>();
             IDictionary<string, string> shortNameOverrides = new Dictionary<string, string>();
@@ -145,7 +144,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
                 "bar",
                 "f"
             };
-            IReadOnlyList<ITemplateParameter> parameters = ParameterNamesToParametersTransform(paramNameList);
+            IReadOnlyList<CliTemplateParameter> parameters = ParameterNamesToParametersTransform(paramNameList);
 
             IDictionary<string, string> longNameOverrides = new Dictionary<string, string>();
             IDictionary<string, string> shortNameOverrides = new Dictionary<string, string>()
@@ -189,7 +188,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
                 "NoTools",
                 "skipRestore",
             };
-            IReadOnlyList<ITemplateParameter> parameters = ParameterNamesToParametersTransform(paramNameList);
+            IReadOnlyList<CliTemplateParameter> parameters = ParameterNamesToParametersTransform(paramNameList);
 
             IDictionary<string, string> longNameOverrides = new Dictionary<string, string>()
             {
@@ -274,15 +273,14 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
         }
 
         // fills in enough of the parameter info for alias assignment
-        private static IReadOnlyList<ITemplateParameter> ParameterNamesToParametersTransform(IReadOnlyList<string> paramNameList)
+        private static IReadOnlyList<CliTemplateParameter> ParameterNamesToParametersTransform(IReadOnlyList<string> paramNameList)
         {
-            List<ITemplateParameter> parameterList = new List<ITemplateParameter>();
+            List<CliTemplateParameter> parameterList = new List<CliTemplateParameter>();
 
             foreach (string paramName in paramNameList)
             {
-                ITemplateParameter parameter = new MockParameter()
+                CliTemplateParameter parameter = new CliTemplateParameter(paramName)
                 {
-                    Name = paramName,
                     Priority = TemplateParameterPriority.Required,
                 };
 
