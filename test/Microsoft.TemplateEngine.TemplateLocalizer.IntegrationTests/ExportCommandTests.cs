@@ -6,7 +6,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests
+namespace Microsoft.TemplateEngine.TemplateLocalizer.IntegrationTests
 {
     public class ExportCommandTests : IDisposable
     {
@@ -14,7 +14,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests
 
         public ExportCommandTests()
         {
-            _workingDirectory = Path.Combine(Path.GetTempPath(), "Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests", Path.GetRandomFileName());
+            _workingDirectory = Path.Combine(Path.GetTempPath(), "Microsoft.TemplateEngine.TemplateLocalizer.IntegrationTests", Path.GetRandomFileName());
             Directory.CreateDirectory(_workingDirectory);
         }
 

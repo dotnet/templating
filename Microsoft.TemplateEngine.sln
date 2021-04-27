@@ -81,7 +81,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TemplateEngine.Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TemplateEngine.TemplateLocalizer.Core.UnitTests", "test\Microsoft.TemplateEngine.TemplateLocalizer.Core.UnitTests\Microsoft.TemplateEngine.TemplateLocalizer.Core.UnitTests.csproj", "{858B2E28-1FF8-4ED2-A356-B576BD793B71}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests", "test\Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests\Microsoft.TemplateEngine.TemplateLocalizer.EndToEndTests.csproj", "{BB38681E-BBD1-4E77-BCD5-CDB6E532B2C5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TemplateEngine.TemplateLocalizer.IntegrationTests", "test\Microsoft.TemplateEngine.TemplateLocalizer.IntegrationTests\Microsoft.TemplateEngine.TemplateLocalizer.IntegrationTests.csproj", "{BB38681E-BBD1-4E77-BCD5-CDB6E532B2C5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
