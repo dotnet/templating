@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,6 +21,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
         /// <param name="templateJsonLanguage">The language of the <paramref name="strings"/> as declared in the template.json file.</param>
         /// <param name="languages">The list of languages for which templatestrings.json file will be created.</param>
         /// <param name="targetDirectory">The directory that will contain the generated templatestrings.json files.</param>
+        /// <param name="dryRun">If true, the changes will not be written to file system.</param>
         /// <param name="logger"><see cref="ILogger"/> to be used for logging.</param>
         /// <param name="cancellationToken">Cancellation token to cancel the operation.</param>
         /// <returns>The task that tracks the status of the async operation.</returns>
@@ -30,10 +30,14 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
             string templateJsonLanguage,
             IEnumerable<string> languages,
             string targetDirectory,
+            bool dryRun,
             ILogger logger,
             CancellationToken cancellationToken)
         {
-            Directory.CreateDirectory(targetDirectory);
+            if (!dryRun)
+            {
+                Directory.CreateDirectory(targetDirectory);
+            }
 
             foreach (string language in languages)
             {
@@ -47,7 +51,10 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
                     existingStrings = await GetExistingStringsAsync(locFilePath, logger, cancellationToken).ConfigureAwait(false);
                 }
 
-                await SaveTemplateStringsFileAsync(strings, existingStrings, locFilePath, logger, cancellationToken).ConfigureAwait(false);
+                if (!dryRun)
+                {
+                    await SaveTemplateStringsFileAsync(strings, existingStrings, locFilePath, logger, cancellationToken).ConfigureAwait(false);
+                }
             }
         }
 
@@ -68,10 +75,10 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
                     .ConfigureAwait(false)
                     ?? new Dictionary<string, string>();
             }
-            catch (FileNotFoundException)
+            catch (IOException ex) when (ex is DirectoryNotFoundException || ex is FileNotFoundException)
             {
                 // templatestrings.json file doesn't exist. It will be created from scratch.
-                return new();
+                return new ();
             }
             catch (Exception)
             {
@@ -108,6 +115,12 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
                 {
                     // Existing file did not contain a localized version of the string. Use the original value from template.json.
                     localizedText = templateString.Value;
+                }
+                else
+                {
+                    logger.LogDebug(
+                        "The file already contains a localized string for key \"{0}\". The old value will be preserved.",
+                        templateString.LocalizationKey);
                 }
 
                 jsonWriter.WritePropertyName(templateString.LocalizationKey);

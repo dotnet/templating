@@ -45,7 +45,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Commands.Export
             });
             exportCommand.AddOption(new Option("-d")
             {
-                Name = "--DryRun",
+                Name = "--dry-run",
                 Description = LocalizableStrings.command_export_help_dryrun_description,
             });
             exportCommand.Handler = this;

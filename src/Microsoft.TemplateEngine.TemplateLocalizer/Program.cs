@@ -17,7 +17,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer
             (factory) => new ExportCommand(factory),
         };
 
-        private static async Task<int> Main(string[] args)
+        internal static async Task<int> Main(string[] args)
         {
             using ILoggerFactory loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
             ILogger logger = loggerFactory.CreateLogger<Program>();
