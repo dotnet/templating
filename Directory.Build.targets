@@ -1,28 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
-    <Import Project="$(DotNetPackageVersionPropsPath)" Condition="'$(DotNetPackageVersionPropsPath)' != ''" />
+  <Import Project="$(DotNetPackageVersionPropsPath)" Condition="'$(DotNetPackageVersionPropsPath)' != ''" />
 
-    <ItemGroup>
-        <PackageReference Update="System.CommandLine" Version="$(SystemCommandLinePackageVersion)" />
-        <PackageReference Update="System.Diagnostics.Process" Version="4.3.0" />
-        <PackageReference Update="System.IO.Compression" Version="4.3.0" />
-        <PackageReference Update="System.Memory" Version="4.4.0-preview1-25305-02" />
-        <PackageReference Update="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
-        <PackageReference Update="System.Runtime.Loader" Version="4.3.0" />
+  <ItemGroup>
+    <PackageReference Update="System.CommandLine" Version="$(SystemCommandLinePackageVersion)" />
+    <PackageReference Update="System.Diagnostics.Process" Version="4.3.0" />
+    <PackageReference Update="System.IO.Compression" Version="4.3.0" />
+    <PackageReference Update="System.Memory" Version="4.4.0-preview1-25305-02" />
+    <PackageReference Update="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
+    <PackageReference Update="System.Runtime.Loader" Version="4.3.0" />
 
-        <PackageReference Update="Microsoft.DotNet.Cli.CommandLine" Version="$(MicrosoftDotNetCliCommandLinePackageVersion)" />
-        <PackageReference Update="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsLoggingPackageVersion)" />
-        <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftExtensionsLoggingConsolePackageVersion)" />
-        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="15.8.0" />
-        <PackageReference Update="Newtonsoft.Json" Version="$(NewtonsoftJsonPackageVersion)" />
-        <PackageReference Update="xunit" Version="2.3.1" />
-        <PackageReference Update="xunit.runner.visualstudio" Version="2.3.1" />
-    </ItemGroup>
+    <PackageReference Update="Microsoft.DotNet.Cli.CommandLine" Version="$(MicrosoftDotNetCliCommandLinePackageVersion)" />
+    <PackageReference Update="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsLoggingPackageVersion)" />
+    <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftExtensionsLoggingConsolePackageVersion)" />
+    <PackageReference Update="Microsoft.NET.Test.Sdk" Version="15.8.0" />
+    <PackageReference Update="Newtonsoft.Json" Version="$(NewtonsoftJsonPackageVersion)" />
+    <PackageReference Update="xunit.abstractions" Version="2.0.3" />
+  </ItemGroup>
 
-    <ItemGroup Condition="'$(TestProject)' == 'true'">
-        <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
-    </ItemGroup>
-
-    <!-- Leave this file here, even if it's empty. It stops chaining imports. -->
-    <Import Project="Sdk.targets" Sdk="Microsoft.DotNet.Arcade.Sdk" />
+  <!-- Leave this file here, even if it's empty. It stops chaining imports. -->
+  <Import Project="Sdk.targets" Sdk="Microsoft.DotNet.Arcade.Sdk" />
 </Project>
