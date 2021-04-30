@@ -52,8 +52,14 @@ namespace Dotnet_new3
             public Task<IReadOnlyList<ITemplatePackage>> GetAllTemplatePackagesAsync(CancellationToken cancellationToken)
             {
                 List<ITemplatePackage> templatePackages = new List<ITemplatePackage>();
-                string assemblyLocation = Path.GetDirectoryName(typeof(Program).Assembly.Location);
+                string? assemblyLocation = Path.GetDirectoryName(typeof(Program).Assembly.Location);
                 string dn3Path = _settings.Environment.GetEnvironmentVariable("DN3");
+
+                if (string.IsNullOrWhiteSpace(assemblyLocation))
+                {
+                    _settings.Host.LogDiagnosticMessage("Couldn't the setup built-in packages.", "Install");
+                    return Task.FromResult((IReadOnlyList<ITemplatePackage>)templatePackages);
+                }
 
                 if (string.IsNullOrEmpty(dn3Path))
                 {

@@ -29,7 +29,7 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
             Assert.Equal(2, discoveryMetadata.TemplateCache[0].Tags.Count);
 
             //can read parameters: 2 tags + 3 cache parameters
-            Assert.Equal(5, discoveryMetadata.TemplateCache[0].Parameters.Count);
+            Assert.Equal(3, discoveryMetadata.TemplateCache[0].CacheParameters.Count);
         }
 
         [Fact]

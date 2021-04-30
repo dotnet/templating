@@ -41,6 +41,7 @@ namespace Microsoft.TemplateEngine.Cli
             {
                 return _choices;
             }
+
             set
             {
                 _choices = value.CloneIfDifferentComparer(StringComparer.OrdinalIgnoreCase);

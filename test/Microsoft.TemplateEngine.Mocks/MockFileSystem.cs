@@ -54,14 +54,14 @@ namespace Microsoft.TemplateEngine.Mocks
             return _files.ContainsKey(file);
         }
 
-        public void FileDelete(string file)
+        public void FileDelete(string path)
         {
-            if (!_files.ContainsKey(file))
+            if (!_files.ContainsKey(path))
             {
-                throw new Exception($"File {file} does not exist");
+                throw new Exception($"File {path} does not exist");
             }
 
-            _files.Remove(file);
+            _files.Remove(path);
         }
 
         public Stream CreateFile(string path)
@@ -122,7 +122,7 @@ namespace Microsoft.TemplateEngine.Mocks
 
         public byte[] ReadAllBytes(string path)
         {
-            return _files[path].Data;
+            return _files[path].Data ?? Array.Empty<byte>();
         }
 
         public void DirectoryDelete(string path, bool recursive)

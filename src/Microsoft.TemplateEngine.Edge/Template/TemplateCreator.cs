@@ -34,7 +34,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
         {
             // SettingsLoader.LoadTemplate is where the loc info should be read!!!
             // templateInfo knows enough to get at the loc, if any
-            ITemplate template = _environmentSettings.SettingsLoader.LoadTemplate(templateInfo, baselineName);
+            ITemplate? template = _environmentSettings.SettingsLoader.LoadTemplate(templateInfo, baselineName);
 
             try
             {
@@ -43,7 +43,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                     return new TemplateCreationResult("Could not load template", CreationResultStatus.NotFound, templateInfo.Name);
                 }
 
-                string realName = name ?? fallbackName ?? template.DefaultName;
+                string? realName = name ?? fallbackName ?? template.DefaultName;
 
                 if (string.IsNullOrEmpty(realName))
                 {
@@ -69,7 +69,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                     IComponentManager componentManager = _environmentSettings.SettingsLoader.Components;
 
                     // setup separate sets of parameters to be used for GetCreationEffects() and by CreateAsync().
-                    if (!TryCreateParameterSet(template, realName, inputParameters, out IParameterSet? effectParams, out TemplateCreationResult? resultIfParameterCreationFailed))
+                    if (!TryCreateParameterSet(template, realName!, inputParameters, out IParameterSet? effectParams, out TemplateCreationResult? resultIfParameterCreationFailed))
                     {
                         return resultIfParameterCreationFailed!;
                     }
@@ -86,7 +86,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                         }
                     }
 
-                    if (!TryCreateParameterSet(template, realName, inputParameters, out IParameterSet? creationParams, out resultIfParameterCreationFailed))
+                    if (!TryCreateParameterSet(template, realName!, inputParameters, out IParameterSet? creationParams, out resultIfParameterCreationFailed))
                     {
                         return resultIfParameterCreationFailed!;
                     }
@@ -127,7 +127,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
             return invalidDefaultParameters.Count > 0;
         }
 
-        public void ReleaseMountPoints(ITemplate template)
+        public void ReleaseMountPoints(ITemplate? template)
         {
             if (template == null)
             {

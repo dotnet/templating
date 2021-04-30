@@ -553,7 +553,7 @@ namespace Microsoft.TemplateEngine.Utils
                     return ms.ToArray();
                 }
             }
-            return (s as MemoryStream).ToArray();
+            return (s as MemoryStream)!.ToArray();
         }
 
         public void WriteAllText(string path, string value)

@@ -14,6 +14,7 @@ namespace Microsoft.TemplateEngine.Mocks
         {
             Name = name;
         }
+
         public string? Documentation { get; set; }
 
         public string Name { get; set; }
