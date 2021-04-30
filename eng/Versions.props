@@ -8,7 +8,6 @@
     <PreReleaseVersionLabel>preview</PreReleaseVersionLabel>
     <PreReleaseVersionIteration>5</PreReleaseVersionIteration>
     <PackSpecific Condition="'$(OS)' != 'Windows_NT'">true</PackSpecific>
-
     <MicrosoftDotNetCliCommandLinePackageVersion>1.0.0-preview.19208.1</MicrosoftDotNetCliCommandLinePackageVersion>
     <MicrosoftExtensionsLoggingPackageVersion>6.0.0-preview.3.21164.3</MicrosoftExtensionsLoggingPackageVersion>
     <MicrosoftExtensionsLoggingConsolePackageVersion>6.0.0-preview.3.21164.3</MicrosoftExtensionsLoggingConsolePackageVersion>
