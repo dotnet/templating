@@ -101,7 +101,13 @@ namespace Microsoft.TemplateEngine.Utils
             FileSystem = new InMemoryFileSystem(path, FileSystem);
         }
 
-        public bool OnPotentiallyDestructiveChangesDetected(IReadOnlyList<IFileChange> changes, IReadOnlyList<IFileChange> destructiveChanges)
+        [Obsolete("Use OnPotentiallyDestructiveChangesDetected(IReadOnlyList<IFileChange2> changes, IReadOnlyList<IFileChange2> destructiveChanges) instead")]
+        bool ITemplateEngineHost.OnPotentiallyDestructiveChangesDetected(IReadOnlyList<IFileChange> changes, IReadOnlyList<IFileChange> destructiveChanges)
+        {
+            return true;
+        }
+
+        public bool OnPotentiallyDestructiveChangesDetected(IReadOnlyList<IFileChange2> changes, IReadOnlyList<IFileChange2> destructiveChanges)
         {
             return true;
         }

@@ -126,7 +126,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             Assert.NotNull(template);
             Assert.NotNull(template.Generator);
 
-            ICreationEffects effects = template.Generator.GetCreationEffects(
+            ICreationEffects2 effects = template.Generator.GetCreationEffects2(
                 settingsLoader.EnvironmentSettings,
                 template,
                 template.Generator.GetParametersForTemplate(settingsLoader.EnvironmentSettings, template),

@@ -62,6 +62,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return Task.FromResult(GetCreationResult(environmentSettings, template, variables));
         }
 
+        [Obsolete("Use " + nameof(GetCreationEffects2) + " instead")]
+        ICreationEffects IGenerator.GetCreationEffects(IEngineEnvironmentSettings environmentSettings, ITemplate templateData, IParameterSet parameters, IComponentManager componentManager, string targetDirectory)
+        {
+            return (ICreationEffects)GetCreationEffects2(environmentSettings, templateData, parameters, componentManager, targetDirectory);
+        }
+
         /// <summary>
         /// Performs the dry-run of the template instantiation to evaluate the primary outputs, post actions to be applied and file changes to be made when executing the template with specified parameters.
         /// </summary>
@@ -71,7 +77,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         /// <param name="componentManager">the instance of component manager.</param>
         /// <param name="targetDirectory">the output path for the template.</param>
         /// <returns>the primary outputs, post actions and file changes that will be made when executing the template with specified parameters.</returns>
-        public ICreationEffects GetCreationEffects(IEngineEnvironmentSettings environmentSettings, ITemplate templateData, IParameterSet parameters, IComponentManager componentManager, string targetDirectory)
+        public ICreationEffects2 GetCreationEffects2(IEngineEnvironmentSettings environmentSettings, ITemplate templateData, IParameterSet parameters, IComponentManager componentManager, string targetDirectory)
         {
             RunnableProjectTemplate template = (RunnableProjectTemplate)templateData;
             ProcessMacros(environmentSettings, componentManager, template.Config.OperationConfig, parameters);

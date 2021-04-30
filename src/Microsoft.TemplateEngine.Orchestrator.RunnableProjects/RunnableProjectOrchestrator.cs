@@ -8,7 +8,7 @@ using Microsoft.TemplateEngine.Core.Contracts;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
-    internal class RunnableProjectOrchestrator : IOrchestrator, IOrchestrator2
+    internal class RunnableProjectOrchestrator : IOrchestrator2
     {
         private readonly IOrchestrator2 _basicOrchestrator;
 
@@ -25,16 +25,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         public IReadOnlyList<IFileChange2> GetFileChanges(IGlobalRunSpec spec, IDirectory sourceDir, string targetDir)
         {
             return _basicOrchestrator.GetFileChanges(spec, sourceDir, targetDir);
-        }
-
-        IReadOnlyList<IFileChange> IOrchestrator.GetFileChanges(string runSpecPath, IDirectory sourceDir, string targetDir)
-        {
-            return GetFileChanges(runSpecPath, sourceDir, targetDir);
-        }
-
-        IReadOnlyList<IFileChange> IOrchestrator.GetFileChanges(IGlobalRunSpec spec, IDirectory sourceDir, string targetDir)
-        {
-            return GetFileChanges(spec, sourceDir, targetDir);
         }
 
         public void Run(string runSpecPath, IDirectory sourceDir, string targetDir)

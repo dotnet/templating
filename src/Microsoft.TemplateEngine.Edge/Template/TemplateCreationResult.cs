@@ -11,7 +11,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
             : this(message, status, templateFullName, null, null, null)
         { }
 
-        public TemplateCreationResult(string message, CreationResultStatus status, string templateFullName, ICreationResult creationOutputs, string outputBaseDir, ICreationEffects creationEffects)
+        public TemplateCreationResult(string message, CreationResultStatus status, string templateFullName, ICreationResult creationOutputs, string outputBaseDir, ICreationEffects2 creationEffects)
         {
             Message = message;
             Status = status;
@@ -31,6 +31,6 @@ namespace Microsoft.TemplateEngine.Edge.Template
 
         public string OutputBaseDirectory { get; }
 
-        public ICreationEffects CreationEffects { get; }
+        public ICreationEffects2 CreationEffects { get; }
     }
 }

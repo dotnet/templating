@@ -215,7 +215,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             string targetDir = commandInput.OutputPath ?? environmentSettings.Host.FileSystem.GetCurrentDirectory();
             IParameterSet paramsForCreationEffects = templateCreator.SetupDefaultParamValuesFromTemplateAndHost(template, template.DefaultName ?? "testName", out IReadOnlyList<string> throwaway);
             templateCreator.ResolveUserParameters(template, paramsForCreationEffects, commandInput.InputTemplateParams, out IReadOnlyList<string> userParamsWithInvalidValues);
-            ICreationEffects creationEffects = template.Generator.GetCreationEffects(environmentSettings, template, paramsForCreationEffects, environmentSettings.SettingsLoader.Components, targetDir);
+            ICreationEffects2 creationEffects = template.Generator.GetCreationEffects2(environmentSettings, template, paramsForCreationEffects, environmentSettings.SettingsLoader.Components, targetDir);
             return creationEffects.CreationResult.PostActions.Any(x => x.ActionId == ProcessStartPostActionProcessor.ActionProcessorId);
         }
     }

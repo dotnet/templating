@@ -100,13 +100,31 @@ namespace Microsoft.TemplateEngine.Cli
             _baseHost.VirtualizeDirectory(path);
         }
 
-        public bool OnPotentiallyDestructiveChangesDetected(IReadOnlyList<IFileChange> changes, IReadOnlyList<IFileChange> destructiveChanges)
+        [Obsolete("Use OnPotentiallyDestructiveChangesDetected(IReadOnlyList<IFileChange2> changes, IReadOnlyList<IFileChange2> destructiveChanges) instead")]
+        bool ITemplateEngineHost.OnPotentiallyDestructiveChangesDetected(IReadOnlyList<IFileChange> changes, IReadOnlyList<IFileChange> destructiveChanges)
         {
             Reporter.Error.WriteLine(LocalizableStrings.DestructiveChangesNotification.Bold().Red());
             int longestChangeTextLength = destructiveChanges.Max(x => GetChangeString(x.ChangeKind).Length);
             int padLen = 5 + longestChangeTextLength;
 
             foreach (IFileChange change in destructiveChanges)
+            {
+                string changeKind = GetChangeString(change.ChangeKind);
+                Reporter.Error.WriteLine(($"  {changeKind}".PadRight(padLen) + change.TargetRelativePath).Bold().Red());
+            }
+
+            Reporter.Error.WriteLine();
+            Reporter.Error.WriteLine(LocalizableStrings.RerunCommandAndPassForceToCreateAnyway.Bold().Red());
+            return false;
+        }
+
+        public bool OnPotentiallyDestructiveChangesDetected(IReadOnlyList<IFileChange2> changes, IReadOnlyList<IFileChange2> destructiveChanges)
+        {
+            Reporter.Error.WriteLine(LocalizableStrings.DestructiveChangesNotification.Bold().Red());
+            int longestChangeTextLength = destructiveChanges.Max(x => GetChangeString(x.ChangeKind).Length);
+            int padLen = 5 + longestChangeTextLength;
+
+            foreach (IFileChange2 change in destructiveChanges)
             {
                 string changeKind = GetChangeString(change.ChangeKind);
                 Reporter.Error.WriteLine(($"  {changeKind}".PadRight(padLen) + change.TargetRelativePath).Bold().Red());

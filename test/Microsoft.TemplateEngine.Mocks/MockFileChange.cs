@@ -7,7 +7,7 @@ using Xunit.Abstractions;
 
 namespace Microsoft.TemplateEngine.Mocks
 {
-    public class MockFileChange : IFileChange, IFileChange2, IXunitSerializable
+    public class MockFileChange : IFileChange2, IXunitSerializable
     {
         public MockFileChange()
         {

@@ -10,7 +10,7 @@ using Xunit.Abstractions;
 
 namespace Microsoft.TemplateEngine.Mocks
 {
-    public class MockCreationEffects : ICreationEffects, ICreationEffects2, IXunitSerializable
+    public class MockCreationEffects : ICreationEffects2, IXunitSerializable
     {
         private string[] _primaryOutputs = Array.Empty<string>();
 
@@ -22,7 +22,7 @@ namespace Microsoft.TemplateEngine.Mocks
         {
         }
 
-        public IReadOnlyList<IFileChange> FileChanges => _mockFileChanges;
+        public IReadOnlyList<IFileChange2> FileChanges => _mockFileChanges;
 
         public ICreationResult CreationResult
         {

@@ -30,7 +30,10 @@ namespace Microsoft.TemplateEngine.Abstractions
         // return of true means a new value was provided
         bool OnParameterError(ITemplateParameter parameter, string receivedValue, string message, out string newValue);
 
+        [Obsolete("Use OnPotentiallyDestructiveChangesDetected(IReadOnlyList<IFileChange2> changes, IReadOnlyList<IFileChange2> destructiveChanges) instead")]
         bool OnPotentiallyDestructiveChangesDetected(IReadOnlyList<IFileChange> changes, IReadOnlyList<IFileChange> destructiveChanges);
+
+        bool OnPotentiallyDestructiveChangesDetected(IReadOnlyList<IFileChange2> changes, IReadOnlyList<IFileChange2> destructiveChanges);
 
         void OnSymbolUsed(string symbol, object value);
 

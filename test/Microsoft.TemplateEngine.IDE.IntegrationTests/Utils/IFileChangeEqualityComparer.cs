@@ -8,9 +8,9 @@ using Microsoft.TemplateEngine.Abstractions;
 
 namespace Microsoft.TemplateEngine.IDE.IntegrationTests.Utils
 {
-    internal class IFileChangeComparer : IEqualityComparer<IFileChange>, IComparer<IFileChange>
+    internal class IFileChangeComparer : IEqualityComparer<IFileChange2>, IComparer<IFileChange2>
     {
-        public int Compare(IFileChange x, IFileChange y)
+        public int Compare(IFileChange2 x, IFileChange2 y)
         {
             if (Equals(x, y))
             {
@@ -38,10 +38,10 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests.Utils
             {
                 return compareResult;
             }
-            return ComparePaths((x as IFileChange2)?.SourceRelativePath, (y as IFileChange2)?.SourceRelativePath);
+            return ComparePaths(x.SourceRelativePath, y.SourceRelativePath);
         }
 
-        public bool Equals(IFileChange x, IFileChange y)
+        public bool Equals(IFileChange2 x, IFileChange2 y)
         {
             if (x == null && y == null)
             {
@@ -54,17 +54,17 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests.Utils
 
             return ComparePaths(x.TargetRelativePath, y.TargetRelativePath) == 0
                     && x.ChangeKind == y.ChangeKind
-                    && ComparePaths((x as IFileChange2)?.SourceRelativePath, (y as IFileChange2)?.SourceRelativePath) == 0;
+                    && ComparePaths(x.SourceRelativePath, y.SourceRelativePath) == 0;
         }
 
-        public int GetHashCode(IFileChange obj)
+        public int GetHashCode(IFileChange2 obj)
         {
             if (obj == null)
             {
                 return 0;
             }
 
-            return (GetHashValue(obj.TargetRelativePath), obj.ChangeKind, obj is IFileChange2 obj2 ? GetHashValue(obj2.SourceRelativePath) : null).GetHashCode();
+            return (GetHashValue(obj.TargetRelativePath), obj.ChangeKind, obj.SourceRelativePath).GetHashCode();
         }
 
         private static int ComparePaths(string x, string y)

@@ -70,7 +70,7 @@ namespace Microsoft.TemplateEngine.IDE
             return instantiateResult.ResultInfo;
         }
 
-        public async Task<ICreationEffects> GetCreationEffectsAsync(ITemplateInfo info, string name, string outputPath, IReadOnlyDictionary<string, string?> parameters, string baselineName)
+        public async Task<ICreationEffects2> GetCreationEffectsAsync(ITemplateInfo info, string name, string outputPath, IReadOnlyDictionary<string, string?> parameters, string baselineName)
         {
             TemplateCreationResult instantiateResult = await _templateCreator.InstantiateAsync(info, name, name, outputPath, parameters, true, false, baselineName, true).ConfigureAwait(false);
             return instantiateResult.CreationEffects;

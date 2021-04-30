@@ -74,9 +74,9 @@ namespace Microsoft.TemplateEngine.Edge.Template
                         return resultIfParameterCreationFailed!;
                     }
 
-                    ICreationEffects creationEffects = template.Generator.GetCreationEffects(_environmentSettings, template, effectParams, componentManager, targetDir);
-                    IReadOnlyList<IFileChange> changes = creationEffects.FileChanges;
-                    IReadOnlyList<IFileChange> destructiveChanges = changes.Where(x => x.ChangeKind != ChangeKind.Create).ToList();
+                    ICreationEffects2 creationEffects = template.Generator.GetCreationEffects2(_environmentSettings, template, effectParams, componentManager, targetDir);
+                    IReadOnlyList<IFileChange2> changes = creationEffects.FileChanges;
+                    IReadOnlyList<IFileChange2> destructiveChanges = changes.Where(x => x.ChangeKind != ChangeKind.Create).ToList();
 
                     if (!forceCreation && destructiveChanges.Count > 0)
                     {

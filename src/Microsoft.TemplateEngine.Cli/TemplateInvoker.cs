@@ -222,7 +222,7 @@ namespace Microsoft.TemplateEngine.Cli
                     else
                     {
                         Reporter.Output.WriteLine(LocalizableStrings.FileActionsWouldHaveBeenTaken);
-                        foreach (IFileChange change in instantiateResult.CreationEffects.FileChanges)
+                        foreach (IFileChange2 change in instantiateResult.CreationEffects.FileChanges)
                         {
                             Reporter.Output.WriteLine($"  {change.ChangeKind}: {change.TargetRelativePath}");
                         }
