@@ -70,7 +70,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to In templatestrings.json file under the post action with index {1}, there are localized strings for manual instruction(s) {0}. These manual instructions do not exist in the template.json file and should be removed from templatestrings.json file..
+        ///   Looks up a localized string similar to In templatestrings.json file under the post action with &quot;id&quot; &quot;{1}&quot;, there are localized strings for manual instruction(s) with ids &quot;{0}&quot;. These manual instructions do not exist in the template.json file and should be removed from templatestrings.json file..
         /// </summary>
         internal static string Authoring_InvalidManualInstructionLocalizationIndex {
             get {
@@ -79,7 +79,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Post action(s) with index(es) {0} specified in the localization file do not exist in the template.json file. Remove the localized strings from the templatestrings.json file..
+        ///   Looks up a localized string similar to Post action(s) with id(s) &quot;{0}&quot; specified in the localization file do not exist in the template.json file. Remove the localized strings from the templatestrings.json file..
         /// </summary>
         internal static string Authoring_InvalidPostActionLocalizationIndex {
             get {

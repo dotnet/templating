@@ -15,6 +15,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
     internal class PostActionModel : ConditionedConfigurationElementBase, IPostActionModel
     {
         public PostActionModel(
+            string? id,
             string? description,
             Guid actionId,
             bool continueOnError,
@@ -22,6 +23,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             IReadOnlyList<ManualInstructionModel> manualInstructionInfo,
             string? condition)
         {
+            Id = id;
             Description = description;
             ActionId = actionId;
             ContinueOnError = continueOnError;
@@ -30,54 +32,65 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             Condition = condition;
         }
 
-        public string? Description { get; private set; }
+        public string? Id { get; }
 
-        public Guid ActionId { get; private set; }
+        public string? Description { get; }
 
-        public bool ContinueOnError { get; private set; }
+        public Guid ActionId { get; }
 
-        public IReadOnlyDictionary<string, string> Args { get; private set; }
+        public bool ContinueOnError { get; }
 
-        public IReadOnlyList<ManualInstructionModel> ManualInstructionInfo { get; private set; }
+        public IReadOnlyDictionary<string, string> Args { get; }
 
-        internal static IReadOnlyList<IPostActionModel> ListFromJArray(JArray jObject, IReadOnlyDictionary<int, IPostActionLocalizationModel>? localizations, ITemplateEngineHost host)
+        public IReadOnlyList<ManualInstructionModel> ManualInstructionInfo { get; }
+
+        internal static IReadOnlyList<IPostActionModel> ListFromJArray(JArray jObject, IReadOnlyDictionary<string, IPostActionLocalizationModel>? localizations, ITemplateEngineHost host)
         {
             // TODO Host is only here to allow logging. Once ILogger is available, remove host from required parameters.
-            List<IPostActionModel> modelList = new List<IPostActionModel>();
+            List<IPostActionModel> localizedPostActions = new List<IPostActionModel>();
+            int localizedPostActionCount = 0;
 
             if (jObject == null)
             {
-                return modelList;
+                return localizedPostActions;
             }
 
-            int postActionIndex = 0;
-            int localizedPostActions = 0;
             foreach (JToken action in jObject)
             {
-                IPostActionLocalizationModel? actionLocalizations = null;
-                localizations?.TryGetValue(postActionIndex++, out actionLocalizations);
-                localizedPostActions += actionLocalizations != null ? 1 : 0;
+                string? postActionId = action.ToString(nameof(Id));
 
                 Dictionary<string, string> args = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
                 foreach (JProperty argInfo in action.PropertiesOf("Args"))
                 {
                     args.Add(argInfo.Name, argInfo.Value.ToString());
                 }
 
-                List<ManualInstructionModel> instructionOptions = new();
+                IPostActionLocalizationModel? actionLocalizations = null;
 
+                if (postActionId != null &&
+                    localizations != null &&
+                    localizations.TryGetValue(postActionId, out actionLocalizations) &&
+                    actionLocalizations != null)
+                {
+                    localizedPostActionCount++;
+                }
+
+                List<ManualInstructionModel> localizedInstructions = new();
                 JArray? manualInstructions = action.Get<JArray>("ManualInstructions");
 
                 if (manualInstructions != null)
                 {
-                    int localizedManualInstructions = 0;
+                    int localizedInstructionCount = 0;
                     for (int i = 0; i < manualInstructions.Count; i++)
                     {
+                        string? id = manualInstructions[i].ToString("id");
                         string? text = string.Empty;
-                        if (actionLocalizations?.Instructions.TryGetValue(i, out text) ?? false)
+                        string? localizationKey = id ?? (manualInstructions.Count == 0 ? "default" : null);
+
+                        if (id != null && (actionLocalizations?.Instructions.TryGetValue(id, out text) ?? false) ||
+                            manualInstructions.Count == 1 && (actionLocalizations?.Instructions.TryGetValue("default", out text) ?? false))
                         {
-                            localizedManualInstructions++;
+                            localizedInstructionCount++;
                         }
 
                         if (string.IsNullOrEmpty(text))
@@ -85,38 +98,39 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                             text = manualInstructions[i].ToString("text");
                         }
 
-                        instructionOptions.Add(new ManualInstructionModel(text ?? string.Empty, manualInstructions[i].ToString("condition")));
+                        localizedInstructions.Add(new ManualInstructionModel(id, text ?? string.Empty, manualInstructions[i].ToString("condition")));
                     }
 
-                    if (actionLocalizations?.Instructions.Count > localizedManualInstructions)
+                    if (actionLocalizations?.Instructions.Count > localizedInstructionCount)
                     {
                         // Localizations provide more translations than the number of manual instructions we have.
-                        string excessInstructionLocalizationIndexes = string.Join(
+                        string excessInstructionLocalizationIds = string.Join(
                             ", ",
-                            actionLocalizations.Instructions.Keys.Where(k => k < 0 || k > instructionOptions.Count).Select(k => k.ToString()));
-                        host.Logger.LogWarning(string.Format(LocalizableStrings.Authoring_InvalidManualInstructionLocalizationIndex, excessInstructionLocalizationIndexes, postActionIndex));
+                            actionLocalizations.Instructions.Keys.Where(k => !localizedInstructions.Any(i => i.Id == k)));
+                        host.Logger.LogWarning(string.Format(LocalizableStrings.Authoring_InvalidManualInstructionLocalizationIndex, excessInstructionLocalizationIds, postActionId));
                     }
                 }
 
                 PostActionModel model = new PostActionModel(
-                    actionLocalizations?.Description ?? action.ToString(nameof(model.Description)),
+                    postActionId,
+                    actionLocalizations?.Description ?? action.ToString(nameof(Description)),
                     action.ToGuid(nameof(ActionId)),
-                    action.ToBool(nameof(model.ContinueOnError)),
+                    action.ToBool(nameof(ContinueOnError)),
                     args,
-                    instructionOptions,
-                    action.ToString(nameof(model.Condition))
+                    localizedInstructions,
+                    action.ToString(nameof(Condition))
                 );
 
-                modelList.Add(model);
+                localizedPostActions.Add(model);
             }
 
-            if (localizations?.Count > localizedPostActions)
+            if (localizations?.Count > localizedPostActionCount)
             {
                 // Localizations provide more translations than the number of post actions we have.
-                string excessPostActionLocalizationIndexes = string.Join(", ", localizations.Keys.Where(k => k < 0 || k > modelList.Count).Select(k => k.ToString()));
-                host.Logger.LogWarning(string.Format(LocalizableStrings.Authoring_InvalidPostActionLocalizationIndex, excessPostActionLocalizationIndexes));
+                string excessPostActionLocalizationIds = string.Join(", ", localizations.Keys.Where(k => !localizedPostActions.Any(p => p.Id == k)).Select(k => k.ToString()));
+                host.Logger.LogWarning(string.Format(LocalizableStrings.Authoring_InvalidPostActionLocalizationId, excessPostActionLocalizationId));
             }
-            return modelList;
+            return localizedPostActions;
         }
     }
 }

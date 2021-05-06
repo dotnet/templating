@@ -109,12 +109,12 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         }
 
         [Theory]
-        [InlineData(0, null, "pa0_desc", "pa0_manualInstructions")]
-        [InlineData(0, "de-DE", "pa0_desc_de-DE:äÄßöÖüÜ", "pa0_manualInstructions_de-DE:äÄßöÖüÜ")]
-        [InlineData(0, "tr-TR", "pa0_desc_tr-TR:çÇğĞıIİöÖşŞüÜ", "pa0_manualInstructions_tr-TR:çÇğĞıIİöÖşŞüÜ")]
-        [InlineData(1, null, "pa1_desc", "pa1_manualInstructions0")]
-        [InlineData(1, "de-DE", "pa1_desc_de-DE:äÄßöÖüÜ", "pa1_manualInstructions0")]
-        [InlineData(1, "tr-TR", "pa1_desc_tr-TR:çÇğĞıIİöÖşŞüÜ", "pa1_manualInstructions0_tr-TR:çÇğĞıIİöÖşŞüÜ")]
+        [InlineData(1, null, "pa0_desc", "pa0_manualInstructions")]
+        [InlineData(1, "de-DE", "pa0_desc_de-DE:äÄßöÖüÜ", "pa0_manualInstructions_de-DE:äÄßöÖüÜ")]
+        [InlineData(1, "tr-TR", "pa0_desc_tr-TR:çÇğĞıIİöÖşŞüÜ", "pa0_manualInstructions_tr-TR:çÇğĞıIİöÖşŞüÜ")]
+        [InlineData(2, null, "pa1_desc", "pa1_manualInstructions0")]
+        [InlineData(2, "de-DE", "pa1_desc_de-DE:äÄßöÖüÜ", "pa1_manualInstructions0")]
+        [InlineData(2, "tr-TR", "pa1_desc_tr-TR:çÇğĞıIİöÖşŞüÜ", "pa1_manualInstructions0_tr-TR:çÇğĞıIİöÖşŞüÜ")]
         public async Task TestLocalizedPostActionFields(
             int postActionIndex,
             string locale,

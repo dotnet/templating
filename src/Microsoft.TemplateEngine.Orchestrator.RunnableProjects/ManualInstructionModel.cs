@@ -11,16 +11,23 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
     /// </summary>
     internal sealed class ManualInstructionModel : ConditionedConfigurationElementBase
     {
-        public ManualInstructionModel(string text)
+        public ManualInstructionModel(string? id, string text)
         {
+            Id = id;
             Text = text;
         }
 
-        public ManualInstructionModel(string text, string? condition)
+        public ManualInstructionModel(string? id, string text, string? condition)
         {
+            Id = id;
             Text = text;
             Condition = condition;
         }
+
+        /// <summary>
+        /// Gets the string identifying this instruction within the post action.
+        /// </summary>
+        public string? Id { get; }
 
         /// <summary>
         /// Gets the text explaining the steps the user should take.

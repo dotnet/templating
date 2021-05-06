@@ -1,6 +1,8 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
@@ -11,25 +13,32 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
     internal class PostAction : IPostAction
     {
-        Guid IPostAction.ActionId => ActionId;
+        public PostAction(string? id, string? description, string? manualInstructions, Guid actionId, bool continueOnError, IReadOnlyDictionary<string, string> args)
+        {
+            Id = id;
+            Description = description;
+            ManualInstructions = manualInstructions;
+            ActionId = actionId;
+            ContinueOnError = continueOnError;
+            Args = args;
+        }
 
-        bool IPostAction.ContinueOnError => ContinueOnError;
+        /// <summary>
+        /// Gets the string that uniquely identifies this post action within the same template.
+        /// This property can be null if the author has not provided one. In that case this post
+        /// action cannot be referenced in a context where an id is required, such as in templatestrings.json files.
+        /// </summary>
+        public string? Id { get; }
 
-        IReadOnlyDictionary<string, string> IPostAction.Args => Args;
+        public string? Description { get; }
 
-        string IPostAction.ManualInstructions => ManualInstructions;
+        public string? ManualInstructions { get; }
 
-        string IPostAction.Description => Description;
+        public Guid ActionId { get; }
 
-        internal string Description { get; private set; }
+        public bool ContinueOnError { get; private set; }
 
-        internal Guid ActionId { get; private set; }
-
-        internal bool ContinueOnError { get; private set; }
-
-        internal IReadOnlyDictionary<string, string> Args { get; private set; }
-
-        internal string ManualInstructions { get; private set; }
+        public IReadOnlyDictionary<string, string> Args { get; } = new Dictionary<string, string>();
 
         internal static List<IPostAction> ListFromModel(IEngineEnvironmentSettings environmentSettings, IReadOnlyList<IPostActionModel> modelList, IVariableCollection rootVariableCollection)
         {
@@ -74,14 +83,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     }
                 }
 
-                IPostAction postAction = new PostAction()
-                {
-                    Description = model.Description,
-                    ActionId = model.ActionId,
-                    ContinueOnError = model.ContinueOnError,
-                    Args = model.Args,
-                    ManualInstructions = chosenInstruction,
-                };
+                IPostAction postAction = new PostAction(
+                    model.Id,
+                    model.Description,
+                    chosenInstruction,
+                    model.ActionId,
+                    model.ContinueOnError,
+                    model.Args);
 
                 actionList.Add(postAction);
             }

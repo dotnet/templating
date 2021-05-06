@@ -34,8 +34,8 @@ namespace Microsoft.TemplateEngine.Abstractions
 
         /// <summary>
         /// Gets the localization models for the post actions defined in this template.
-        /// The keys represend the indices of the post actions as they appear in the template config file.
+        /// The keys represent the id of the post actions.
         /// </summary>
-        IReadOnlyDictionary<int, IPostActionLocalizationModel> PostActions { get; }
+        IReadOnlyDictionary<string, IPostActionLocalizationModel> PostActions { get; }
     }
 }
