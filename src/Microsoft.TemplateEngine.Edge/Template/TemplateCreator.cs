@@ -3,9 +3,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Utils;
@@ -16,11 +16,13 @@ namespace Microsoft.TemplateEngine.Edge.Template
     {
         private readonly IEngineEnvironmentSettings _environmentSettings;
         private readonly SettingsFilePaths _paths;
+        private readonly ILogger _logger;
 
         public TemplateCreator(IEngineEnvironmentSettings environmentSettings)
         {
             _environmentSettings = environmentSettings;
             _paths = new SettingsFilePaths(environmentSettings);
+            _logger = _environmentSettings.Host.LoggerFactory.CreateLogger<TemplateCreator>();
         }
 
         public Task<TemplateCreationResult> InstantiateAsync(ITemplateInfo templateInfo, string name, string fallbackName, string outputPath, IReadOnlyDictionary<string, string> inputParameters, bool skipUpdateCheck, bool forceCreation, string baselineName)
@@ -56,61 +58,59 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 ICreationResult creationResult = null;
                 string targetDir = outputPath ?? _environmentSettings.Host.FileSystem.GetCurrentDirectory();
 
-                try
+                using (Timing.Over(_logger, "Template content generation"))
                 {
-                    if (!dryRun)
+                    try
                     {
-                        _environmentSettings.Host.FileSystem.CreateDirectory(targetDir);
-                    }
-
-                    Stopwatch sw = Stopwatch.StartNew();
-                    IComponentManager componentManager = _environmentSettings.SettingsLoader.Components;
-
-                    // setup separate sets of parameters to be used for GetCreationEffects() and by CreateAsync().
-                    if (!TryCreateParameterSet(template, realName, inputParameters, out IParameterSet effectParams, out TemplateCreationResult resultIfParameterCreationFailed))
-                    {
-                        return resultIfParameterCreationFailed;
-                    }
-
-                    ICreationEffects creationEffects = template.Generator.GetCreationEffects(_environmentSettings, template, effectParams, componentManager, targetDir);
-                    IReadOnlyList<IFileChange> changes = creationEffects.FileChanges;
-                    IReadOnlyList<IFileChange> destructiveChanges = changes.Where(x => x.ChangeKind != ChangeKind.Create).ToList();
-
-                    if (!forceCreation && destructiveChanges.Count > 0)
-                    {
-                        if (!_environmentSettings.Host.OnPotentiallyDestructiveChangesDetected(changes, destructiveChanges))
+                        if (!dryRun)
                         {
-                            return new TemplateCreationResult("Cancelled", CreationResultStatus.Cancelled, template.Name);
+                            _environmentSettings.Host.FileSystem.CreateDirectory(targetDir);
                         }
-                    }
+                        IComponentManager componentManager = _environmentSettings.SettingsLoader.Components;
 
-                    if (!TryCreateParameterSet(template, realName, inputParameters, out IParameterSet creationParams, out resultIfParameterCreationFailed))
+                        // setup separate sets of parameters to be used for GetCreationEffects() and by CreateAsync().
+                        if (!TryCreateParameterSet(template, realName, inputParameters, out IParameterSet effectParams, out TemplateCreationResult resultIfParameterCreationFailed))
+                        {
+                            return resultIfParameterCreationFailed;
+                        }
+
+                        ICreationEffects creationEffects = template.Generator.GetCreationEffects(_environmentSettings, template, effectParams, componentManager, targetDir);
+                        IReadOnlyList<IFileChange> changes = creationEffects.FileChanges;
+                        IReadOnlyList<IFileChange> destructiveChanges = changes.Where(x => x.ChangeKind != ChangeKind.Create).ToList();
+
+                        if (!forceCreation && destructiveChanges.Count > 0)
+                        {
+                            if (!_environmentSettings.Host.OnPotentiallyDestructiveChangesDetected(changes, destructiveChanges))
+                            {
+                                return new TemplateCreationResult("Cancelled", CreationResultStatus.Cancelled, template.Name);
+                            }
+                        }
+
+                        if (!TryCreateParameterSet(template, realName, inputParameters, out IParameterSet creationParams, out resultIfParameterCreationFailed))
+                        {
+                            return resultIfParameterCreationFailed;
+                        }
+
+                        if (!dryRun)
+                        {
+                            creationResult = await template.Generator.CreateAsync(_environmentSettings, template, creationParams, componentManager, targetDir).ConfigureAwait(false);
+                        }
+                        return new TemplateCreationResult(string.Empty, CreationResultStatus.Success, template.Name, creationResult, targetDir, creationEffects);
+                    }
+                    catch (ContentGenerationException cx)
                     {
-                        return resultIfParameterCreationFailed;
-                    }
+                        string message = cx.Message;
+                        if (cx.InnerException != null)
+                        {
+                            message += Environment.NewLine + cx.InnerException;
+                        }
 
-                    if (!dryRun)
+                        return new TemplateCreationResult(message, CreationResultStatus.CreateFailed, template.Name);
+                    }
+                    catch (Exception ex)
                     {
-                        creationResult = await template.Generator.CreateAsync(_environmentSettings, template, creationParams, componentManager, targetDir).ConfigureAwait(false);
+                        return new TemplateCreationResult(ex.Message, CreationResultStatus.CreateFailed, template.Name);
                     }
-
-                    sw.Stop();
-                    _environmentSettings.Host.LogTiming("Content generation time", sw.Elapsed, 0);
-                    return new TemplateCreationResult(string.Empty, CreationResultStatus.Success, template.Name, creationResult, targetDir, creationEffects);
-                }
-                catch (ContentGenerationException cx)
-                {
-                    string message = cx.Message;
-                    if (cx.InnerException != null)
-                    {
-                        message += Environment.NewLine + cx.InnerException;
-                    }
-
-                    return new TemplateCreationResult(message, CreationResultStatus.CreateFailed, template.Name);
-                }
-                catch (Exception ex)
-                {
-                    return new TemplateCreationResult(ex.Message, CreationResultStatus.CreateFailed, template.Name);
                 }
             }
             finally
@@ -216,7 +216,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                             // don't fail on value resolution errors, but report them as authoring problems.
                             if (valueResolutionError)
                             {
-                                _environmentSettings.Host.LogDiagnosticMessage($"Template {template.Identity} has an invalid DefaultIfOptionWithoutValue value for parameter {inputParam.Key}", "Authoring");
+                                _logger.LogDebug($"Template {template.Identity} has an invalid DefaultIfOptionWithoutValue value for parameter {inputParam.Key}");
                             }
                         }
                         else
@@ -251,21 +251,21 @@ namespace Microsoft.TemplateEngine.Edge.Template
             {
                 if (parameter.Priority == TemplateParameterPriority.Required && !templateParams.ResolvedValues.ContainsKey(parameter))
                 {
-                    string newParamValue;
-                    while (host.OnParameterError(parameter, null, "Missing required parameter", out newParamValue)
-                        && string.IsNullOrEmpty(newParamValue))
-                    {
-                    }
+                    //string newParamValue;
+                    //while (host.OnParameterError(parameter, null, "Missing required parameter", out newParamValue)
+                    //    && string.IsNullOrEmpty(newParamValue))
+                    //{
+                    //}
 
-                    if (!string.IsNullOrEmpty(newParamValue))
-                    {
-                        templateParams.ResolvedValues.Add(parameter, newParamValue);
-                    }
-                    else
-                    {
+                    //if (!string.IsNullOrEmpty(newParamValue))
+                    //{
+                    //    templateParams.ResolvedValues.Add(parameter, newParamValue);
+                    //}
+                    //else
+                    //{
                         missingParamNames.Add(parameter.Name);
                         anyMissingParams = true;
-                    }
+                    //}
                 }
             }
 
