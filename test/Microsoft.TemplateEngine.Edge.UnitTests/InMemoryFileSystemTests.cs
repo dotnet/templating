@@ -4,9 +4,10 @@
 using System.IO;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 using Microsoft.TemplateEngine.Mocks;
+using Microsoft.TemplateEngine.Utils;
 using Xunit;
 
-namespace Microsoft.TemplateEngine.Utils.UnitTests
+namespace Microsoft.TemplateEngine.Edge.UnitTests
 {
     public class InMemoryFileSystemTests
     {
@@ -14,8 +15,8 @@ namespace Microsoft.TemplateEngine.Utils.UnitTests
         public void VerifyMultipleVirtualizationsAreHandled()
         {
             IPhysicalFileSystem mockFileSystem = new MockFileSystem();
-            IPhysicalFileSystem virtualized1 = new InMemoryFileSystem(Directory.GetCurrentDirectory().CombinePaths("test1"), mockFileSystem);
-            IPhysicalFileSystem virtualized2 = new InMemoryFileSystem(Directory.GetCurrentDirectory().CombinePaths("test2"), virtualized1);
+            IPhysicalFileSystem virtualized1 = new Edge.FileSystem.InMemoryFileSystem(Directory.GetCurrentDirectory().CombinePaths("test1"), mockFileSystem);
+            IPhysicalFileSystem virtualized2 = new Edge.FileSystem.InMemoryFileSystem(Directory.GetCurrentDirectory().CombinePaths("test2"), virtualized1);
 
             string testFilePath = Directory.GetCurrentDirectory().CombinePaths("test1", "test.txt");
             virtualized2.CreateFile(testFilePath).Dispose();

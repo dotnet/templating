@@ -6,10 +6,9 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 
-namespace Microsoft.TemplateEngine.Utils
+namespace Microsoft.TemplateEngine.Edge.FileSystem
 {
-    [Obsolete("The class became internal.")]
-    public class PhysicalFileSystem : IPhysicalFileSystem, IFileLastWriteTimeSource
+    internal class PhysicalFileSystem : IPhysicalFileSystem, IFileLastWriteTimeSource
     {
         public bool DirectoryExists(string directory)
         {

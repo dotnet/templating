@@ -8,15 +8,14 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 
-namespace Microsoft.TemplateEngine.Utils
+namespace Microsoft.TemplateEngine.Edge.FileSystem
 {
-    [Obsolete("The class became internal.")]
-    public class InMemoryFileSystem : IPhysicalFileSystem, IFileLastWriteTimeSource
+    internal class InMemoryFileSystem : IPhysicalFileSystem, IFileLastWriteTimeSource
     {
         private readonly FileSystemDirectory _root;
         private readonly IPhysicalFileSystem _basis;
 
-        public InMemoryFileSystem(string root, IPhysicalFileSystem basis)
+        internal InMemoryFileSystem(string root, IPhysicalFileSystem basis)
         {
             _basis = basis;
             _root = new FileSystemDirectory(Path.GetFileName(root.TrimEnd('/', '\\')), root);
