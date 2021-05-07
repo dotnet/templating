@@ -45,7 +45,7 @@ namespace Microsoft.TemplateEngine.Edge
 
         public ISettingsLoader SettingsLoader { get; }
 
-        public ITemplateEngineHost Host { get;  }
+        public ITemplateEngineHost Host { get; }
 
         public IEnvironment Environment { get;  }
 

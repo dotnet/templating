@@ -11,7 +11,6 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Edge;
-using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.TestHelper
 {
@@ -39,7 +38,7 @@ namespace Microsoft.TemplateEngine.TestHelper
             ITemplateEngineHost host = new TestHost(hostIdentifier: string.IsNullOrWhiteSpace(hostIdentifier) ? "TestRunner" : hostIdentifier)
             {
                 BuiltInComponents = new AssemblyComponentCatalog(builtIns),
-                FileSystem = new MonitoredFileSystem(new PhysicalFileSystem()),
+                FileSystem = new MonitoredFileSystem(new Edge.FileSystem.PhysicalFileSystem()),
                 FallbackHostTemplateConfigNames = new[] { "dotnetcli" }
             };
             CultureInfo.CurrentUICulture = new CultureInfo(locale);
