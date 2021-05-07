@@ -70,7 +70,7 @@
       </trans-unit>
       <trans-unit id="AddRefPostActionNoRefConfigured">
         <source>No references configured to be added to project.</source>
-        <target state="translated">Nessun riferimento configurato da aggiungere al progetto.</target>
+        <target state="translated">Non sono stati configurati riferimenti da aggiungere al progetto.</target>
         <note />
       </trans-unit>
       <trans-unit id="AddRefPostActionProjFileListHeader">
@@ -136,7 +136,7 @@ aggiunto    : {0}
       </trans-unit>
       <trans-unit id="AliasHelp">
         <source>Creates, updates, or deletes the named alias. The alias value is the remainder of the command. If extra args files are specified, the alias value includes their expansions.</source>
-        <target state="translated">Crea, aggiorna o elimina l'alias denominato. Il valore dell'alias è il resto del comando. Se si specificano file di argomenti aggiuntivi, il valore dell'alias include le relative espansioni.</target>
+        <target state="translated">Crea, aggiorna o elimina l'alias denominato. La parte rimanente del comando corrisponde al valore dell'alias. Se si specificano file di argomenti aggiuntivi, il valore dell'alias include le relative espansioni.</target>
         <note />
       </trans-unit>
       <trans-unit id="AliasName">
@@ -288,7 +288,7 @@ Eseguire 'dotnet {1}--show-alias ' senza argomenti per mostrare tutti gli alias.
       </trans-unit>
       <trans-unit id="BadPackageSpec">
         <source>Could not install "{0}".</source>
-        <target state="translated">Non è possibile installare "{0}".</target>
+        <target state="translated">Non è stato possibile installare "{0}".</target>
         <note />
       </trans-unit>
       <trans-unit id="Change">
@@ -298,7 +298,7 @@ Eseguire 'dotnet {1}--show-alias ' senza argomenti per mostrare tutti gli alias.
       </trans-unit>
       <trans-unit id="CheckingForUpdates">
         <source>Checking for updates for {0}...</source>
-        <target state="translated">Verifica della disponibilità di aggiornamenti di {0}...</target>
+        <target state="translated">Controllo della disponibilità di aggiornamenti per {0}...</target>
         <note />
       </trans-unit>
       <trans-unit id="ColumnNameAuthor">
@@ -447,7 +447,7 @@ Eseguire 'dotnet {1}--show-alias ' senza argomenti per mostrare tutti gli alias.
       </trans-unit>
       <trans-unit id="DefaultValuePlusSwitchWithoutValueDefault">
         <source>Default: {0} / (*) {1}</source>
-        <target state="translated">Predefinito: {0} / (*) {1}</target>
+        <target state="translated">Impostazione predefinita: {0} / (*) {1}</target>
         <note />
       </trans-unit>
       <trans-unit id="Delete">
@@ -484,7 +484,7 @@ Eseguire 'dotnet {1}--show-alias ' senza argomenti per mostrare tutti gli alias.
       </trans-unit>
       <trans-unit id="ExtraArgsFileHelp">
         <source>Specifies a file containing additional parameters.</source>
-        <target state="translated">Specifica un file contenente parametri aggiuntivi.</target>
+        <target state="translated">Specifica un file che contiene parametri aggiuntivi.</target>
         <note />
       </trans-unit>
       <trans-unit id="Factory">
@@ -561,7 +561,7 @@ Eseguire 'dotnet {1}--show-alias ' senza argomenti per mostrare tutti gli alias.
       </trans-unit>
       <trans-unit id="InstallingUpdates">
         <source>Installing updates...</source>
-        <target state="translated">Installazione degli aggiornamenti in corso...</target>
+        <target state="translated">Installazione degli aggiornamenti...</target>
         <note />
       </trans-unit>
       <trans-unit id="InteractiveHelp">
@@ -626,7 +626,7 @@ Eseguire 'dotnet {1}--show-alias ' senza argomenti per mostrare tutti gli alias.
       </trans-unit>
       <trans-unit id="LocaleHelp">
         <source>The locale to use.</source>
-        <target state="translated">Le impostazioni locali da usare.</target>
+        <target state="translated">Impostazioni locali da usare.</target>
         <note />
       </trans-unit>
       <trans-unit id="MissingRequiredParameter">
@@ -676,7 +676,7 @@ Eseguire 'dotnet {1}--show-alias ' senza argomenti per mostrare tutti gli alias.
       </trans-unit>
       <trans-unit id="NoTemplatesMatchName">
         <source>No templates matched the input template name: {0}.</source>
-        <target state="translated">Nessun modello corrispondeva al nome del modello di input: {0}.</target>
+        <target state="translated">Nessun modello corrisponde al nome del modello di input: {0}.</target>
         <note />
       </trans-unit>
       <trans-unit id="NoTemplatesMatchingInputParameters">
@@ -733,7 +733,7 @@ Le colonne supportate sono: lingua, tag, autore, tipo.</target>
       </trans-unit>
       <trans-unit id="OptionVariantAlreadyDefined">
         <source>Option variant {0} for canonical {1} was already defined for canonical {2}.</source>
-        <target state="translated">La variante di opzione {0} per il canonico {1} era già definita per il canonico {2}.</target>
+        <target state="translated">La variante di opzione {0} per il formato canonico {1} è già stata definita per il formato canonico {2}.</target>
         <note />
       </trans-unit>
       <trans-unit id="OptionalWorkloadsSyncFailed">
@@ -743,7 +743,7 @@ Le colonne supportate sono: lingua, tag, autore, tipo.</target>
       </trans-unit>
       <trans-unit id="OptionalWorkloadsSynchronized">
         <source>The list of templates was synchronized with the Optional SDK Workloads.</source>
-        <target state="translated">L'elenco dei modelli è stato sincronizzato con i carichi di lavoro di SDK facoltativi.</target>
+        <target state="translated">L'elenco dei modelli è stato sincronizzato con i carichi di lavoro SDK facoltativi.</target>
         <note />
       </trans-unit>
       <trans-unit id="Options">
@@ -898,7 +898,7 @@ Esempi:
       </trans-unit>
       <trans-unit id="SearchResultNoMatches">
         <source>No matches found</source>
-        <target state="translated">Nessuna corrispondenza trovata</target>
+        <target state="translated">Non è stata trovata alcuna corrispondenza</target>
         <note />
       </trans-unit>
       <trans-unit id="SearchResultSourceIndicator">
@@ -908,7 +908,7 @@ Esempi:
       </trans-unit>
       <trans-unit id="SearchResultTemplateInfo">
         <source>Template name "{0}" ({1}) from author "{2}" in pack {3}</source>
-        <target state="translated">Nome modello "{0}" ({1}) dell'autore "{2}" nel pacchetto {3}</target>
+        <target state="translated">Nome del modello "{0}" ({1}) dell'autore "{2}" nel pacchetto {3}</target>
         <note />
       </trans-unit>
       <trans-unit id="SearchTemplatesCommand">
@@ -923,7 +923,7 @@ Esempi:
       </trans-unit>
       <trans-unit id="ShowAliasesHelp">
         <source>Displays the value of the named alias, or all aliases if no name is specified.</source>
-        <target state="translated">Visualizza il valore dell'alias denominato o di tutti gli alias, se non viene specificato alcun nome.</target>
+        <target state="translated">Visualizza il valore dell'alias denominato oppure di tutti gli alias, se non viene specificato alcun nome.</target>
         <note />
       </trans-unit>
       <trans-unit id="ShowsAllTemplates">
@@ -943,7 +943,7 @@ Esempi:
       </trans-unit>
       <trans-unit id="SwitchWithoutValueDefaultFootnote">
         <source>* Indicates the value used if the switch is provided without a value.</source>
-        <target state="translated">* Indica il valore usato se lo switch viene fornito senza un valore.</target>
+        <target state="translated">* Indica il valore usato se il parametro viene specificato senza un valore.</target>
         <note />
       </trans-unit>
       <trans-unit id="TemplateArgumentHelp">
@@ -953,7 +953,7 @@ Esempi:
       </trans-unit>
       <trans-unit id="TemplateMultiplePartialNameMatches">
         <source>The following templates partially match the input. Be more specific with the template name and/or language.</source>
-        <target state="translated">I modelli seguenti corrispondono parzialmente all'input. Occorre essere più specifici con il nome del modello e/o la lingua.</target>
+        <target state="translated">I modelli seguenti corrispondono parzialmente all'input. Digitare valori più specifici per nome del modello e/o la lingua.</target>
         <note />
       </trans-unit>
       <trans-unit id="TemplateUpdateError">
@@ -1018,7 +1018,7 @@ Esempi:
       </trans-unit>
       <trans-unit id="UpdateApplyStartMessage">
         <source>Updating...</source>
-        <target state="translated">Aggiornamento in corso...</target>
+        <target state="translated">Aggiornamento...</target>
         <note />
       </trans-unit>
       <trans-unit id="UpdateApplySuccessMessage">
@@ -1038,7 +1038,7 @@ Esempi:
       </trans-unit>
       <trans-unit id="UpdateCheckError">
         <source>An error occured checking for {0} template updates.</source>
-        <target state="translated">Si è verificato un errore durante il controllo degli aggiornamenti dei modelli {0}.</target>
+        <target state="translated">Si è verificato un errore durante il controllo della disponibilità di aggiornamenti per il modello {0}.</target>
         <note />
       </trans-unit>
       <trans-unit id="UpdateCheck_InstallCommand">
@@ -1053,17 +1053,17 @@ Esempi:
       </trans-unit>
       <trans-unit id="UpdateCheckerNotAvailable">
         <source>No update checker(s) for the following:</source>
-        <target state="translated">Nessuna verifica aggiornamento disponibile per gli elementi seguenti:</target>
+        <target state="translated">Non sono disponibili strumenti di controllo della disponibilità di aggiornamenti per gli elementi seguenti:</target>
         <note />
       </trans-unit>
       <trans-unit id="UpdateHelp">
         <source>Update matching templates.</source>
-        <target state="translated">Aggiornare i modelli corrispondenti.</target>
+        <target state="translated">Aggiorna i modelli corrispondenti.</target>
         <note />
       </trans-unit>
       <trans-unit id="UpdatesAvailableListHeader">
         <source>Updates are available for the following:</source>
-        <target state="translated">Gli aggiornamenti sono disponibili per:</target>
+        <target state="translated">Sono disponibili aggiornamenti per:</target>
         <note />
       </trans-unit>
       <trans-unit id="Version">

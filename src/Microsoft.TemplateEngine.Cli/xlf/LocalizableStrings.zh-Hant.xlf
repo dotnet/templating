@@ -136,7 +136,7 @@
       </trans-unit>
       <trans-unit id="AliasHelp">
         <source>Creates, updates, or deletes the named alias. The alias value is the remainder of the command. If extra args files are specified, the alias value includes their expansions.</source>
-        <target state="translated">建立、更新或刪除已命名的別名。別名值是命令的其餘部分。如果指定了額外的引數檔案，則別名值會包含其擴充。</target>
+        <target state="translated">建立、更新或刪除已命名的別名。別名值是命令的餘數。如果指定了額外的引數檔案，則別名值會包含其擴充。</target>
         <note />
       </trans-unit>
       <trans-unit id="AliasName">
@@ -405,7 +405,7 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</source>
       </trans-unit>
       <trans-unit id="CouldntUninstall">
         <source>Could not find something to uninstall called '{0}'.</source>
-        <target state="translated">找不到要解除安裝並稱為 '{0}' 的項目。</target>
+        <target state="translated">找不到要解除安裝並稱為 ‘{0}’ 的項目。</target>
         <note />
       </trans-unit>
       <trans-unit id="CreateAliasHelp">
@@ -514,7 +514,7 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</source>
       </trans-unit>
       <trans-unit id="GenericPlaceholderTemplateContextError">
         <source>Cannot retrieve the type for {0}.</source>
-        <target state="translated">無法為 {0} 擷取該類型。</target>
+        <target state="translated">無法為 {0} 擷取類型。</target>
         <note />
       </trans-unit>
       <trans-unit id="GenericWarning">
@@ -540,7 +540,7 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</source>
       <trans-unit id="InstallFailed">
         <source>"{0}" could not be installed.
 {1}.</source>
-        <target state="translated">無法安裝"{0}"。
+        <target state="translated">無法安裝 "{0}"。
 {1}。</target>
         <note />
       </trans-unit>
@@ -923,7 +923,7 @@ Examples:
       </trans-unit>
       <trans-unit id="ShowAliasesHelp">
         <source>Displays the value of the named alias, or all aliases if no name is specified.</source>
-        <target state="translated">顯示已命名別名的值，如果未指定名稱，則顯示所有別名。</target>
+        <target state="translated">顯示已命名別名的值，或者如果未指定名稱，則顯示所有別名。</target>
         <note />
       </trans-unit>
       <trans-unit id="ShowsAllTemplates">
@@ -948,7 +948,7 @@ Examples:
       </trans-unit>
       <trans-unit id="TemplateArgumentHelp">
         <source>The template to instantiate.</source>
-        <target state="translated">要具現化的範本。</target>
+        <target state="translated">要執行個體化的範本。</target>
         <note />
       </trans-unit>
       <trans-unit id="TemplateMultiplePartialNameMatches">
@@ -1038,7 +1038,7 @@ Examples:
       </trans-unit>
       <trans-unit id="UpdateCheckError">
         <source>An error occured checking for {0} template updates.</source>
-        <target state="translated">檢查 {0} 範本是否有更新時發生錯誤。</target>
+        <target state="translated">檢查 {0} 範本更新時發生錯誤。</target>
         <note />
       </trans-unit>
       <trans-unit id="UpdateCheck_InstallCommand">
@@ -1048,12 +1048,12 @@ Examples:
       </trans-unit>
       <trans-unit id="UpdateCheck_UnknownError">
         <source>An error occured checking for updates for template pack {0}</source>
-        <target state="translated">檢查範本套件 {0} 是否有更新時發生錯誤</target>
+        <target state="translated">檢查範本套件 {0} 的更新時發生錯誤</target>
         <note />
       </trans-unit>
       <trans-unit id="UpdateCheckerNotAvailable">
         <source>No update checker(s) for the following:</source>
-        <target state="translated">下列適用於以下的更新檢查程式:</target>
+        <target state="translated">沒有適用於以下項目的更新檢查程式:</target>
         <note />
       </trans-unit>
       <trans-unit id="UpdateHelp">
@@ -1078,7 +1078,7 @@ Examples:
       </trans-unit>
       <trans-unit id="WillCreateTemplate">
         <source>About to create: </source>
-        <target state="translated">要建立的項目:</target>
+        <target state="translated">要建立的項目: </target>
         <note />
       </trans-unit>
     </body>

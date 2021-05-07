@@ -136,7 +136,7 @@
       </trans-unit>
       <trans-unit id="AliasHelp">
         <source>Creates, updates, or deletes the named alias. The alias value is the remainder of the command. If extra args files are specified, the alias value includes their expansions.</source>
-        <target state="translated">Vytvoří, aktualizuje nebo odstraní pojmenovaný alias. Hodnota aliasu je zbývající částí příkazu. Pokud jsou zadány další soubory argumentů, hodnota aliasu obsahuje jejich rozšíření.</target>
+        <target state="translated">Vytvoří, aktualizuje nebo odstraní pojmenovaný alias. Hodnota aliasu je zbývající částí příkazu. Pokud jsou zadané další soubory argumentů, hodnota aliasu obsahuje jejich rozšíření.</target>
         <note />
       </trans-unit>
       <trans-unit id="AliasName">
@@ -208,7 +208,7 @@ Pokud si chcete zobrazit všechny aliasy, spusťte bez argumentů příkaz dotne
       </trans-unit>
       <trans-unit id="AmbiguousInputTemplateName">
         <source>Unable to determine the desired template from the input template name: {0}.</source>
-        <target state="translated">Nepovedlo se určit požadovanou šablonu z názvu vstupní šablony: {0}.</target>
+        <target state="translated">Nepovedlo se určit požadovanou šablonu z názvu vstupní šablony: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="AmbiguousLanguageHint">
@@ -283,7 +283,7 @@ Pokud si chcete zobrazit všechny aliasy, spusťte bez argumentů příkaz dotne
       </trans-unit>
       <trans-unit id="BadLocaleError">
         <source>Invalid format for input locale: "{0}". Example valid formats: [en] [en-US].</source>
-        <target state="translated">Neplatný formát pro vstupní národní prostředí: {0}. Příklady platných formátů: [en] [EN-US].</target>
+        <target state="translated">Neplatný formát pro vstupní národní prostředí: {0}. Příklady platných formátů: [cs] [CS-CZ]</target>
         <note />
       </trans-unit>
       <trans-unit id="BadPackageSpec">
@@ -298,7 +298,7 @@ Pokud si chcete zobrazit všechny aliasy, spusťte bez argumentů příkaz dotne
       </trans-unit>
       <trans-unit id="CheckingForUpdates">
         <source>Checking for updates for {0}...</source>
-        <target state="translated">Zjišťují se aktualizace pro {0}...</target>
+        <target state="translated">Zjišťují se aktualizace pro {0}…</target>
         <note />
       </trans-unit>
       <trans-unit id="ColumnNameAuthor">
@@ -395,7 +395,7 @@ Pokud si chcete zobrazit všechny aliasy, spusťte bez argumentů příkaz dotne
       </trans-unit>
       <trans-unit id="CouldNotFindItemToInstall">
         <source>Couldn't find item to install: "{0}".</source>
-        <target state="translated">Nepovedlo se najít položku, která se má nainstalovat: {0}.</target>
+        <target state="translated">Nepovedlo se najít položku, která se má nainstalovat: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="CouldntDetermineFilesToRestore">
@@ -415,7 +415,7 @@ Pokud si chcete zobrazit všechny aliasy, spusťte bez argumentů příkaz dotne
       </trans-unit>
       <trans-unit id="CreateDirectoryHelp">
         <source>Indicates whether to create a directory for the generated content.</source>
-        <target state="translated">Označuje, zda se má vytvořit adresář pro generovaný obsah.</target>
+        <target state="translated">Označuje, jestli se má vytvořit adresář pro generovaný obsah.</target>
         <note />
       </trans-unit>
       <trans-unit id="CreateFailed">
@@ -489,7 +489,7 @@ Pokud si chcete zobrazit všechny aliasy, spusťte bez argumentů příkaz dotne
       </trans-unit>
       <trans-unit id="Factory">
         <source>Factory</source>
-        <target state="translated">Továrna</target>
+        <target state="translated">Objekt pro vytváření</target>
         <note />
       </trans-unit>
       <trans-unit id="FileActionsWouldHaveBeenTaken">
@@ -514,7 +514,7 @@ Pokud si chcete zobrazit všechny aliasy, spusťte bez argumentů příkaz dotne
       </trans-unit>
       <trans-unit id="GenericPlaceholderTemplateContextError">
         <source>Cannot retrieve the type for {0}.</source>
-        <target state="translated">Nelze načíst typ pro {0}.</target>
+        <target state="translated">Nedá se načíst typ pro {0}.</target>
         <note />
       </trans-unit>
       <trans-unit id="GenericWarning">
@@ -534,13 +534,13 @@ Pokud si chcete zobrazit všechny aliasy, spusťte bez argumentů příkaz dotne
       </trans-unit>
       <trans-unit id="InstallDescriptor_NotFound">
         <source>Could not find install descriptor for template: {0}</source>
-        <target state="translated">Nepovedlo se najít popisovač instalace pro šablonu: {0}.</target>
+        <target state="translated">Nepovedlo se najít popisovač instalace pro šablonu: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="InstallFailed">
         <source>"{0}" could not be installed.
 {1}.</source>
-        <target state="translated">{0} nešlo nainstalovat.
+        <target state="translated">{0} se nedalo nainstalovat.
 {1}.</target>
         <note />
       </trans-unit>
@@ -551,7 +551,7 @@ Pokud si chcete zobrazit všechny aliasy, spusťte bez argumentů příkaz dotne
       </trans-unit>
       <trans-unit id="InstallSuccessful">
         <source>"{0}" was installed successfully.</source>
-        <target state="translated">{0}: instalace byla úspěšná.</target>
+        <target state="translated">Instalace {0} proběhla úspěšně.</target>
         <note />
       </trans-unit>
       <trans-unit id="InstalledItems">
@@ -626,7 +626,7 @@ Pokud si chcete zobrazit všechny aliasy, spusťte bez argumentů příkaz dotne
       </trans-unit>
       <trans-unit id="LocaleHelp">
         <source>The locale to use.</source>
-        <target state="translated">Národní prostředí, které se má použít.</target>
+        <target state="translated">Národní prostředí, které se má použít</target>
         <note />
       </trans-unit>
       <trans-unit id="MissingRequiredParameter">
@@ -651,7 +651,7 @@ Pokud si chcete zobrazit všechny aliasy, spusťte bez argumentů příkaz dotne
       </trans-unit>
       <trans-unit id="MultipleArgsSpecifiedError">
         <source>Template name is the only allowed argument. Invalid argument: {0}.</source>
-        <target state="translated">Název šablony je jediný povolený argument. Neplatný argument: {0}.</target>
+        <target state="translated">Název šablony je jediný povolený argument. Neplatný argument: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="NameOfOutput">
@@ -676,7 +676,7 @@ Pokud si chcete zobrazit všechny aliasy, spusťte bez argumentů příkaz dotne
       </trans-unit>
       <trans-unit id="NoTemplatesMatchName">
         <source>No templates matched the input template name: {0}.</source>
-        <target state="translated">Názvu vstupní šablony neodpovídají žádné šablony: {0}.</target>
+        <target state="translated">Názvu vstupní šablony neodpovídají žádné šablony: {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="NoTemplatesMatchingInputParameters">
@@ -691,7 +691,7 @@ Pokud si chcete zobrazit všechny aliasy, spusťte bez argumentů příkaz dotne
       </trans-unit>
       <trans-unit id="NoUpdatesFound">
         <source>No updates found.</source>
-        <target state="translated">Nebyly nalezeny žádné aktualizace.</target>
+        <target state="translated">Nenašly se žádné aktualizace.</target>
         <note />
       </trans-unit>
       <trans-unit id="NuGetSourceHelp">
@@ -733,7 +733,7 @@ Podporované sloupce: language, tags, author, type</target>
       </trans-unit>
       <trans-unit id="OptionVariantAlreadyDefined">
         <source>Option variant {0} for canonical {1} was already defined for canonical {2}.</source>
-        <target state="translated">Varianta možnosti {0} pro kanonickou {1} už byla pro kanonickou {2} definována.</target>
+        <target state="translated">Varianta možnosti {0} pro kanonický {1} už byla pro kanonický {2} definována.</target>
         <note />
       </trans-unit>
       <trans-unit id="OptionalWorkloadsSyncFailed">
@@ -818,7 +818,7 @@ Podporované sloupce: language, tags, author, type</target>
       </trans-unit>
       <trans-unit id="QuietModeHelp">
         <source>Doesn't output any status information.</source>
-        <target state="translated">Nebyly vytvořeny žádné výstupní informace o stavu.</target>
+        <target state="translated">Nevytvořily se žádné výstupní informace o stavu.</target>
         <note />
       </trans-unit>
       <trans-unit id="RerunCommandAndPassForceToCreateAnyway">
@@ -898,7 +898,7 @@ Příklady:
       </trans-unit>
       <trans-unit id="SearchResultNoMatches">
         <source>No matches found</source>
-        <target state="translated">Nebyly nalezeny žádné odpovídající položky.</target>
+        <target state="translated">Nenašly se žádné odpovídající položky.</target>
         <note />
       </trans-unit>
       <trans-unit id="SearchResultSourceIndicator">
@@ -943,7 +943,7 @@ Příklady:
       </trans-unit>
       <trans-unit id="SwitchWithoutValueDefaultFootnote">
         <source>* Indicates the value used if the switch is provided without a value.</source>
-        <target state="translated">* Označuje použitou hodnotu v případě, že byl přepínač zadán bez hodnoty.</target>
+        <target state="translated">* Označuje použitou hodnotu v případě, že se přepínač zadal bez hodnoty.</target>
         <note />
       </trans-unit>
       <trans-unit id="TemplateArgumentHelp">
@@ -953,7 +953,7 @@ Příklady:
       </trans-unit>
       <trans-unit id="TemplateMultiplePartialNameMatches">
         <source>The following templates partially match the input. Be more specific with the template name and/or language.</source>
-        <target state="translated">Následující šablony se částečně shodují se vstupem. Upřesněte název šablony a/nebo jazyk.</target>
+        <target state="translated">Následující šablony se částečně shodují se vstupem. Upřesněte název šablony nebo jazyk.</target>
         <note />
       </trans-unit>
       <trans-unit id="TemplateUpdateError">
@@ -1018,12 +1018,12 @@ Příklady:
       </trans-unit>
       <trans-unit id="UpdateApplyStartMessage">
         <source>Updating...</source>
-        <target state="translated">Aktualizuje se...</target>
+        <target state="translated">Probíhá aktualizace…</target>
         <note />
       </trans-unit>
       <trans-unit id="UpdateApplySuccessMessage">
         <source>...Update succeeded</source>
-        <target state="translated">...Aktualizace byla úspěšně dokončena.</target>
+        <target state="translated">… Aktualizace se úspěšně dokončila.</target>
         <note />
       </trans-unit>
       <trans-unit id="UpdateAvailable">
@@ -1053,7 +1053,7 @@ Příklady:
       </trans-unit>
       <trans-unit id="UpdateCheckerNotAvailable">
         <source>No update checker(s) for the following:</source>
-        <target state="translated">Není k dispozici žádné zjišťování aktualizací pro následující:</target>
+        <target state="translated">Pro tyto položky není k dispozici žádné zjišťování aktualizací:</target>
         <note />
       </trans-unit>
       <trans-unit id="UpdateHelp">

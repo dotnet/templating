@@ -208,7 +208,7 @@ Exécutez « dotnet {1} --show-aliases » sans arguments pour afficher tous le
       </trans-unit>
       <trans-unit id="AmbiguousInputTemplateName">
         <source>Unable to determine the desired template from the input template name: {0}.</source>
-        <target state="translated">Impossible de déterminer le modèle souhaité à partir du nom du modèle d’entrée :{0}</target>
+        <target state="translated">Impossible de déterminer le modèle souhaité à partir du nom du modèle d’entrée : {0}.</target>
         <note />
       </trans-unit>
       <trans-unit id="AmbiguousLanguageHint">
@@ -298,7 +298,7 @@ Exécutez « dotnet {1} --show-aliases » sans arguments pour afficher tous le
       </trans-unit>
       <trans-unit id="CheckingForUpdates">
         <source>Checking for updates for {0}...</source>
-        <target state="translated">Recherche de mises à jour pour {0}...</target>
+        <target state="translated">Recherche de mises à jour de {0}...</target>
         <note />
       </trans-unit>
       <trans-unit id="ColumnNameAuthor">
@@ -390,7 +390,7 @@ Exécutez « dotnet {1} --show-aliases » sans arguments pour afficher tous le
       </trans-unit>
       <trans-unit id="ContinueQuestion">
         <source>Continue?</source>
-        <target state="translated">Continuer ?</target>
+        <target state="translated">Voulez-vous continuer ?</target>
         <note />
       </trans-unit>
       <trans-unit id="CouldNotFindItemToInstall">
@@ -540,8 +540,8 @@ Exécutez « dotnet {1} --show-aliases » sans arguments pour afficher tous le
       <trans-unit id="InstallFailed">
         <source>"{0}" could not be installed.
 {1}.</source>
-        <target state="translated">« {0} » ne peut pas être installer.
-{1}</target>
+        <target state="translated">« {0} » ne peut pas être installé.
+{1}.</target>
         <note />
       </trans-unit>
       <trans-unit id="InstallHelp">
@@ -908,7 +908,7 @@ Exemples :
       </trans-unit>
       <trans-unit id="SearchResultTemplateInfo">
         <source>Template name "{0}" ({1}) from author "{2}" in pack {3}</source>
-        <target state="translated">Nom de modèle « {0} » ({1}) à partir de l’auteur « {2} » dans le Pack {3}</target>
+        <target state="translated">Nom de modèle « {0} » ({1}) à partir de l’auteur « {2} » dans le pack {3}</target>
         <note />
       </trans-unit>
       <trans-unit id="SearchTemplatesCommand">
@@ -953,7 +953,7 @@ Exemples :
       </trans-unit>
       <trans-unit id="TemplateMultiplePartialNameMatches">
         <source>The following templates partially match the input. Be more specific with the template name and/or language.</source>
-        <target state="translated">Les modèles suivants correspondent partiellement à l’entrée. Soyez plus précis avec le nom et/ou le langage du modèle.</target>
+        <target state="translated">Les modèles suivants correspondent partiellement à l’entrée. Soyez plus précis avec le nom et/ou la langue du modèle.</target>
         <note />
       </trans-unit>
       <trans-unit id="TemplateUpdateError">
@@ -1028,7 +1028,7 @@ Exemples :
       </trans-unit>
       <trans-unit id="UpdateAvailable">
         <source>An update for template pack {0} is available.</source>
-        <target state="translated">Une mise à jour du pack de modèles «{0}» est disponible.</target>
+        <target state="translated">Une mise à jour du pack de modèles {0} est disponible.</target>
         <note />
       </trans-unit>
       <trans-unit id="UpdateCheckCommandHelp">
@@ -1038,7 +1038,7 @@ Exemples :
       </trans-unit>
       <trans-unit id="UpdateCheckError">
         <source>An error occured checking for {0} template updates.</source>
-        <target state="translated">Une erreur s’est produite lors de la vérification des mises à jour du modèle de {0}.</target>
+        <target state="translated">Une erreur s’est produite lors de la vérification des mises à jour du modèle {0}.</target>
         <note />
       </trans-unit>
       <trans-unit id="UpdateCheck_InstallCommand">
@@ -1048,7 +1048,7 @@ Exemples :
       </trans-unit>
       <trans-unit id="UpdateCheck_UnknownError">
         <source>An error occured checking for updates for template pack {0}</source>
-        <target state="translated">Une erreur s’est produite lors de la vérification des mises à jour du pack de modèle de {0}.</target>
+        <target state="translated">Une erreur s’est produite lors de la vérification des mises à jour du pack de modèles {0}.</target>
         <note />
       </trans-unit>
       <trans-unit id="UpdateCheckerNotAvailable">
@@ -1078,7 +1078,7 @@ Exemples :
       </trans-unit>
       <trans-unit id="WillCreateTemplate">
         <source>About to create: </source>
-        <target state="translated">Événement à créer : </target>
+        <target state="translated">Sur le point de créer : </target>
         <note />
       </trans-unit>
     </body>

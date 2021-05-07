@@ -540,7 +540,7 @@ Tüm diğer adları göstermek için 'dotnet {1} --show-aliases' komutunu bağı
       <trans-unit id="InstallFailed">
         <source>"{0}" could not be installed.
 {1}.</source>
-        <target state="translated">"{0}" yüklenemedi. 
+        <target state="translated">"{0}" yüklenemedi.
 {1}.</target>
         <note />
       </trans-unit>
@@ -601,7 +601,7 @@ Tüm diğer adları göstermek için 'dotnet {1} --show-aliases' komutunu bağı
       </trans-unit>
       <trans-unit id="InvalidParameterValues">
         <source>Error: Invalid values for option(s) {0} for template {1}.</source>
-        <target state="translated">Hata: {1} şablonuna yönelik {0} seçenek için değerler geçersiz.</target>
+        <target state="translated">Hata: {1} şablonuna yönelik {0} seçenekleri için değerler geçersiz.</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidTemplateParameterValues">
@@ -908,7 +908,7 @@ Examples:
       </trans-unit>
       <trans-unit id="SearchResultTemplateInfo">
         <source>Template name "{0}" ({1}) from author "{2}" in pack {3}</source>
-        <target state="translated">{3} paketindeki “{2}” yazarından "{0}" ({1}) şablon adı</target>
+        <target state="translated">{3} paketindeki "{2}" yazarının "{0}" ({1}) şablon adı </target>
         <note />
       </trans-unit>
       <trans-unit id="SearchTemplatesCommand">
@@ -923,7 +923,7 @@ Examples:
       </trans-unit>
       <trans-unit id="ShowAliasesHelp">
         <source>Displays the value of the named alias, or all aliases if no name is specified.</source>
-        <target state="translated">Adlandırılmış diğer adın değerini veya ad belirtilmemişse diğer tüm adları görüntüler.</target>
+        <target state="translated">Adlandırılmış diğer adın değerini veya ad belirtilmemişse tüm diğer adları görüntüler.</target>
         <note />
       </trans-unit>
       <trans-unit id="ShowsAllTemplates">
@@ -943,7 +943,7 @@ Examples:
       </trans-unit>
       <trans-unit id="SwitchWithoutValueDefaultFootnote">
         <source>* Indicates the value used if the switch is provided without a value.</source>
-        <target state="translated">* Anahtar bir değer olmadan sağlandığında kullanılan değeri gösterir.</target>
+        <target state="translated">* Anahtar, bir değer olmadan sağlandığında kullanılan değeri gösterir.</target>
         <note />
       </trans-unit>
       <trans-unit id="TemplateArgumentHelp">
@@ -953,12 +953,12 @@ Examples:
       </trans-unit>
       <trans-unit id="TemplateMultiplePartialNameMatches">
         <source>The following templates partially match the input. Be more specific with the template name and/or language.</source>
-        <target state="translated">Aşağıdaki şablonlar, girişle kısmen eşleşiyor. Şablon adını ve/veya dilini daha ayrıntılı şekilde belirtin.</target>
+        <target state="translated">Aşağıdaki şablonlar girişle kısmen eşleşiyor. Şablon adını ve/veya dili daha ayrıntılı şekilde belirtin.</target>
         <note />
       </trans-unit>
       <trans-unit id="TemplateUpdateError">
         <source>An error occured updating templates for: {0}</source>
-        <target state="translated">Şunun için şablonlar güncelleştirilirken bir hata oluştu: {0}</target>
+        <target state="translated">{0} için şablonlar güncelleştirilirken bir hata oluştu: </target>
         <note />
       </trans-unit>
       <trans-unit id="Templates">
@@ -1038,7 +1038,7 @@ Examples:
       </trans-unit>
       <trans-unit id="UpdateCheckError">
         <source>An error occured checking for {0} template updates.</source>
-        <target state="translated">{0} şablon güncelleştirmesi denetlenirken bir hata oluştu.</target>
+        <target state="translated">{0} şablon paketi için güncelleştirmeler denetlenirken bir hata oluştu.</target>
         <note />
       </trans-unit>
       <trans-unit id="UpdateCheck_InstallCommand">
@@ -1063,7 +1063,7 @@ Examples:
       </trans-unit>
       <trans-unit id="UpdatesAvailableListHeader">
         <source>Updates are available for the following:</source>
-        <target state="translated">Güncelleştirmeler şunlar için kullanılabilir:</target>
+        <target state="translated">Şunlar için güncelleştirmeler var:</target>
         <note />
       </trans-unit>
       <trans-unit id="Version">
@@ -1078,7 +1078,7 @@ Examples:
       </trans-unit>
       <trans-unit id="WillCreateTemplate">
         <source>About to create: </source>
-        <target state="translated">Oluşturulmak üzere olan olay: </target>
+        <target state="translated">Şunu oluşturmak üzeresiniz:</target>
         <note />
       </trans-unit>
     </body>

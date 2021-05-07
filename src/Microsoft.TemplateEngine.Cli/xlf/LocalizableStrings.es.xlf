@@ -248,7 +248,7 @@ Ejecute "dotnet {1} --show-aliases" sin argumentos para mostrar todos los alias.
       </trans-unit>
       <trans-unit id="AmbiguousTemplatesUninstallationHint">
         <source>To check the uninstallation command for the template, run dotnet {0} -u.</source>
-        <target state="translated">Para comprobar el comando de desinstalación de la plantilla, ejecute dotnet {0}-u.</target>
+        <target state="translated">Para comprobar el comando de desinstalación de la plantilla, ejecute dotnet {0} -u.</target>
         <note />
       </trans-unit>
       <trans-unit id="ArgsFileNotFound">
@@ -733,7 +733,7 @@ Las columnas admitidas son: idioma, etiquetas, autor y tipo.</target>
       </trans-unit>
       <trans-unit id="OptionVariantAlreadyDefined">
         <source>Option variant {0} for canonical {1} was already defined for canonical {2}.</source>
-        <target state="translated">La opción Variant {0} para {1} canónico ya se había definido para {2} canónico.</target>
+        <target state="translated">La opción variante {0} para {1} canónico ya se había definido para {2} canónico.</target>
         <note />
       </trans-unit>
       <trans-unit id="OptionalWorkloadsSyncFailed">
@@ -1058,7 +1058,7 @@ Ejemplos:
       </trans-unit>
       <trans-unit id="UpdateHelp">
         <source>Update matching templates.</source>
-        <target state="translated">Actualice las plantillas coincidentes.</target>
+        <target state="translated">Actualizar las plantillas coincidentes.</target>
         <note />
       </trans-unit>
       <trans-unit id="UpdatesAvailableListHeader">

@@ -898,7 +898,7 @@ Beispiele:
       </trans-unit>
       <trans-unit id="SearchResultNoMatches">
         <source>No matches found</source>
-        <target state="translated">Keine Übereinstimmungen gefunden.</target>
+        <target state="translated">Keine Übereinstimmungen gefunden</target>
         <note />
       </trans-unit>
       <trans-unit id="SearchResultSourceIndicator">
