@@ -5,14 +5,29 @@
 
 namespace Microsoft.TemplateEngine.Abstractions
 {
+    /// <summary>
+    /// Represents template engine environment settings.
+    /// </summary>
     public interface IEngineEnvironmentSettings
     {
+        /// <summary>
+        /// Manages template cache and template engine settings.
+        /// </summary>
         ISettingsLoader SettingsLoader { get; }
 
+        /// <summary>
+        /// Gets host-specific properties, loggers and provides access to file system.
+        /// </summary>
         ITemplateEngineHost Host { get; }
 
+        /// <summary>
+        /// Provides access to environment settings, such as environment variables.
+        /// </summary>
         IEnvironment Environment { get; }
 
+        /// <summary>
+        /// Gets main file paths used by template engine.
+        /// </summary>
         IPathInfo Paths { get; }
     }
 }

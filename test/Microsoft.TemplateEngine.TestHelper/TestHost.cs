@@ -71,7 +71,7 @@ namespace Microsoft.TemplateEngine.TestHelper
 
         public ILoggerFactory LoggerFactory { get; private set; }
 
-         public bool TryGetHostParamDefault(string paramName, out string value)
+         public bool TryGetHostParamDefault(string paramName, out string? value)
         {
             return HostParamDefaults.TryGetValue(paramName, out value);
         }
