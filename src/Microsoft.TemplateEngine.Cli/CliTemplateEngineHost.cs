@@ -67,7 +67,7 @@ namespace Microsoft.TemplateEngine.Cli
             }
         }
 
-        public virtual bool TryGetHostParamDefault(string paramName, out string value)
+        public virtual bool TryGetHostParamDefault(string paramName, out string? value)
         {
             switch (paramName)
             {

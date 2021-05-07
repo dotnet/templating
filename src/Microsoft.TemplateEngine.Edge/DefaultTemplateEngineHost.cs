@@ -63,7 +63,7 @@ namespace Microsoft.TemplateEngine.Edge
         public ILoggerFactory LoggerFactory => _loggerFactory;
 
         // stub that will be built out soon.
-        public virtual bool TryGetHostParamDefault(string paramName, out string value)
+        public virtual bool TryGetHostParamDefault(string paramName, out string? value)
         {
             switch (paramName)
             {
