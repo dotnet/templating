@@ -541,7 +541,7 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</source>
         <source>"{0}" could not be installed.
 {1}.</source>
         <target state="translated">“{0}”을(를) 설치할 수 없습니다.
-</target>
+{1}.</target>
         <note />
       </trans-unit>
       <trans-unit id="InstallHelp">
