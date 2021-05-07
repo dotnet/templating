@@ -1,6 +1,8 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
@@ -24,10 +26,10 @@ namespace Microsoft.TemplateEngine.Edge
         public DefaultTemplateEngineHost(
             string hostIdentifier,
             string version,
-            Dictionary<string, string> defaults = null,
-            IReadOnlyList<KeyValuePair<Guid, Func<Type>>> builtIns = null,
-            IReadOnlyList<string> fallbackHostTemplateConfigNames = null,
-            ILoggerFactory loggerFactory = null)
+            Dictionary<string, string>? defaults = null,
+            IReadOnlyList<KeyValuePair<Guid, Func<Type>>>? builtIns = null,
+            IReadOnlyList<string>? fallbackHostTemplateConfigNames = null,
+            ILoggerFactory? loggerFactory = null)
         {
             HostIdentifier = hostIdentifier;
             Version = version;
@@ -47,8 +49,6 @@ namespace Microsoft.TemplateEngine.Edge
         }
 
         public IPhysicalFileSystem FileSystem { get; private set; }
-
-        public Action<string, TimeSpan, int> OnLogTiming { get; set; }
 
         public string HostIdentifier { get; }
 
@@ -87,6 +87,11 @@ namespace Microsoft.TemplateEngine.Edge
 
         #region Obsolete
 
+#pragma warning disable SA1201 // Elements should appear in the correct order
+        [Obsolete("Use " + nameof(Logger) + " instead")]
+        public Action<string, TimeSpan, int>? OnLogTiming { get; set; }
+#pragma warning restore SA1201 // Elements should appear in the correct order
+
         [Obsolete("remove candidate")]
         public bool OnConfirmPartialMatch(string name)
         {
@@ -101,7 +106,7 @@ namespace Microsoft.TemplateEngine.Edge
         [Obsolete("remove candidate")]
         public virtual bool OnParameterError(ITemplateParameter parameter, string receivedValue, string message, out string newValue)
         {
-            newValue = null;
+            newValue = "";
             return false;
         }
 
