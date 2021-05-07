@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Core;
@@ -211,7 +212,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
             catch (Exception ex)
             {
-                host.LogMessage($"Error reading template from file: {templateFile.FullPath} | Error = {ex.Message}");
+                host.Logger.LogError($"Error reading template from file: {templateFile.FullPath} | Error = {ex.Message}");
             }
 
             template = null;
@@ -249,12 +250,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     // Note: if the literal is ever null, it is probably due to a problem in TemplateCreator.Instantiate()
                     // which takes care of making null bool -> true as appropriate.
                     // This else can also happen if there is a value but it can't be converted.
-                    string val;
-                    while (environmentSettings.Host.OnParameterError(param, null, "ParameterValueNotSpecified", out val) && !bool.TryParse(val, out boolVal))
-                    {
-                    }
+                    //string val;
+                    //while (environmentSettings.Host.OnParameterError(param, null, "ParameterValueNotSpecified", out val) && !bool.TryParse(val, out boolVal))
+                    //{
+                    //}
 
-                    valueResolutionError = !bool.TryParse(val, out boolVal);
+                    //valueResolutionError = !bool.TryParse(val, out boolVal);
                     return boolVal;
                 }
             }
@@ -270,14 +271,16 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     return param.DefaultValue;
                 }
 
-                string val;
-                while (environmentSettings.Host.OnParameterError(param, null, "ValueNotValid:" + string.Join(",", param.Choices.Keys), out val)
-                        && !TryResolveChoiceValue(literal, param, out val))
-                {
-                }
+                //string val;
+                //while (environmentSettings.Host.OnParameterError(param, null, "ValueNotValid:" + string.Join(",", param.Choices.Keys), out val)
+                //        && !TryResolveChoiceValue(literal, param, out val))
+                //{
+                //}
 
-                valueResolutionError = val == null;
-                return val;
+                //valueResolutionError = val == null;
+                //return val;
+                valueResolutionError = true;
+                return null;
             }
             else if (string.Equals(param.DataType, "float", StringComparison.OrdinalIgnoreCase))
             {
@@ -287,13 +290,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 }
                 else
                 {
-                    string val;
-                    while (environmentSettings.Host.OnParameterError(param, null, "ValueNotValidMustBeFloat", out val) && (val == null || !ParserExtensions.DoubleTryParseСurrentOrInvariant(val, out convertedFloat)))
-                    {
-                    }
+                    //string val;
+                    //while (environmentSettings.Host.OnParameterError(param, null, "ValueNotValidMustBeFloat", out val) && (val == null || !ParserExtensions.DoubleTryParseСurrentOrInvariant(val, out convertedFloat)))
+                    //{
+                    //}
 
-                    valueResolutionError = !ParserExtensions.DoubleTryParseСurrentOrInvariant(val, out convertedFloat);
-                    return convertedFloat;
+                    //valueResolutionError = !ParserExtensions.DoubleTryParseСurrentOrInvariant(val, out convertedFloat);
+                    //return convertedFloat;
+                    valueResolutionError = true;
+                    return null;
                 }
             }
             else if (string.Equals(param.DataType, "int", StringComparison.OrdinalIgnoreCase)
@@ -305,13 +310,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 }
                 else
                 {
-                    string val;
-                    while (environmentSettings.Host.OnParameterError(param, null, "ValueNotValidMustBeInteger", out val) && (val == null || !long.TryParse(val, out convertedInt)))
-                    {
-                    }
+                    //string val;
+                    //while (environmentSettings.Host.OnParameterError(param, null, "ValueNotValidMustBeInteger", out val) && (val == null || !long.TryParse(val, out convertedInt)))
+                    //{
+                    //}
 
-                    valueResolutionError = !long.TryParse(val, out convertedInt);
-                    return convertedInt;
+                    //valueResolutionError = !long.TryParse(val, out convertedInt);
+                    //return convertedInt;
+                    valueResolutionError = true;
+                    return null;
                 }
             }
             else if (string.Equals(param.DataType, "hex", StringComparison.OrdinalIgnoreCase))
@@ -322,13 +329,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 }
                 else
                 {
-                    string val;
-                    while (environmentSettings.Host.OnParameterError(param, null, "ValueNotValidMustBeHex", out val) && (val == null || val.Length < 3 || !long.TryParse(val.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out convertedHex)))
-                    {
-                    }
+                    //string val;
+                    //while (environmentSettings.Host.OnParameterError(param, null, "ValueNotValidMustBeHex", out val) && (val == null || val.Length < 3 || !long.TryParse(val.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out convertedHex)))
+                    //{
+                    //}
 
-                    valueResolutionError = !long.TryParse(val.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out convertedHex);
-                    return convertedHex;
+                    //valueResolutionError = !long.TryParse(val.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out convertedHex);
+                    //return convertedHex;
+                    valueResolutionError = true;
+                    return null;
                 }
             }
             else if (string.Equals(param.DataType, "text", StringComparison.OrdinalIgnoreCase)
@@ -413,12 +422,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         // checks that all the template sources are under the template root, and they exist.
         internal bool AreAllTemplatePathsValid(IRunnableProjectConfig templateConfig, RunnableProjectTemplate runnableTemplate)
         {
-            ITemplateEngineHost host = runnableTemplate.Source.EnvironmentSettings.Host;
+            ILogger logger = runnableTemplate.Source.EnvironmentSettings.Host.Logger;
 
             if (runnableTemplate.TemplateSourceRoot == null)
             {
-                host.LogDiagnosticMessage(string.Empty, "Authoring");
-                host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateRootOutsideInstallSource, runnableTemplate.Name), "Authoring");
+                logger.LogDebug(string.Format(LocalizableStrings.Authoring_TemplateRootOutsideInstallSource, runnableTemplate.Name));
                 return false;
             }
 
@@ -433,10 +441,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     if (file?.Exists ?? false)
                     {
                         allSourcesValid = false;
-                        host.LogDiagnosticMessage(string.Empty, "Authoring");
-                        host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateNameDisplay, runnableTemplate.Name), "Authoring");
-                        host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateSourceRoot, runnableTemplate.TemplateSourceRoot.FullPath), "Authoring");
-                        host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_SourceMustBeDirectory, source.Source), "Authoring");
+                        logger.LogDebug(string.Format(LocalizableStrings.Authoring_TemplateNameDisplay, runnableTemplate.Name));
+                        logger.LogDebug(string.Format(LocalizableStrings.Authoring_TemplateSourceRoot, runnableTemplate.TemplateSourceRoot.FullPath));
+                        logger.LogDebug(string.Format(LocalizableStrings.Authoring_SourceMustBeDirectory, source.Source));
                     }
                     else
                     {
@@ -446,11 +453,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                         {
                             // non-existant directory
                             allSourcesValid = false;
-                            host.LogDiagnosticMessage(string.Empty, "Authoring");
-                            host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateNameDisplay, runnableTemplate.Name), "Authoring");
-                            host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateSourceRoot, runnableTemplate.TemplateSourceRoot.FullPath), "Authoring");
-                            host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_SourceDoesNotExist, source.Source), "Authoring");
-                            host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_SourceIsOutsideInstallSource, sourceRoot.FullPath), "Authoring");
+                            logger.LogDebug(string.Format(LocalizableStrings.Authoring_TemplateNameDisplay, runnableTemplate.Name));
+                            logger.LogDebug(string.Format(LocalizableStrings.Authoring_TemplateSourceRoot, runnableTemplate.TemplateSourceRoot.FullPath));
+                            logger.LogDebug(string.Format(LocalizableStrings.Authoring_SourceDoesNotExist, source.Source));
+                            logger.LogDebug(string.Format(LocalizableStrings.Authoring_SourceIsOutsideInstallSource, sourceRoot.FullPath));
                         }
                     }
                 }
@@ -459,10 +465,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     // outside the mount point root
                     // TODO: after the null ref exception in DirectoryInfo is fixed, change how this check works.
                     allSourcesValid = false;
-                    host.LogDiagnosticMessage(string.Empty, "Authoring");
-                    host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateNameDisplay, runnableTemplate.Name), "Authoring");
-                    host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateSourceRoot, runnableTemplate.TemplateSourceRoot.FullPath), "Authoring");
-                    host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateRootOutsideInstallSource, source.Source), "Authoring");
+                    logger.LogDebug(string.Format(LocalizableStrings.Authoring_TemplateNameDisplay, runnableTemplate.Name));
+                    logger.LogDebug(string.Format(LocalizableStrings.Authoring_TemplateSourceRoot, runnableTemplate.TemplateSourceRoot.FullPath));
+                    logger.LogDebug(string.Format(LocalizableStrings.Authoring_TemplateRootOutsideInstallSource, source.Source));
                 }
             }
 
@@ -653,21 +658,21 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             if (warningMessages.Count > 0)
             {
-                host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateMissingCommonInformation, templateFile.FullPath), "Authoring");
+                host.Logger.LogDebug(string.Format(LocalizableStrings.Authoring_TemplateMissingCommonInformation, templateFile.FullPath));
 
                 foreach (string message in warningMessages)
                 {
-                    host.LogDiagnosticMessage("    " + message, "Authoring");
+                    host.Logger.LogDebug("    " + message);
                 }
             }
 
             if (errorMessages.Count > 0)
             {
-                host.LogDiagnosticMessage(string.Format(LocalizableStrings.Authoring_TemplateNotInstalled, templateFile.FullPath), "Authoring");
+                host.Logger.LogDebug(string.Format(LocalizableStrings.Authoring_TemplateNotInstalled, templateFile.FullPath));
 
                 foreach (string message in errorMessages)
                 {
-                    host.LogDiagnosticMessage("    " + message, "Authoring");
+                    host.Logger.LogDebug("    " + message);
                 }
 
                 return false;
@@ -693,7 +698,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             catch (Exception ex)
             {
                 ITemplateEngineHost host = file.MountPoint.EnvironmentSettings.Host;
-                host.LogMessage($"Error reading Langpack from file: {file.FullPath} | Error = {ex.ToString()}");
+                host.Logger.LogError($"Error reading Langpack from file: {file.FullPath} | Error = {ex.ToString()}");
             }
 
             locModel = null;
