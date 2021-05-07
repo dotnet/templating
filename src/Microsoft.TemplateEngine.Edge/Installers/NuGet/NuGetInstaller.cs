@@ -47,6 +47,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         {
             Factory = factory ?? throw new ArgumentNullException(nameof(factory));
             _environmentSettings = settings ?? throw new ArgumentNullException(nameof(settings));
+            _logger = settings.Host.LoggerFactory.CreateLogger<NuGetInstaller>();
             _packageDownloader = packageDownloader ?? throw new ArgumentNullException(nameof(packageDownloader));
             _updateChecker = updateChecker ?? throw new ArgumentNullException(nameof(updateChecker));
 

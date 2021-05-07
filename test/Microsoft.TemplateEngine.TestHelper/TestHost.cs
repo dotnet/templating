@@ -8,9 +8,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
-using Microsoft.TemplateEngine.Utils;
+using Microsoft.TemplateEngine.Edge.FileSystem;
 
 namespace Microsoft.TemplateEngine.TestHelper
 {
@@ -23,6 +24,17 @@ namespace Microsoft.TemplateEngine.TestHelper
             BuiltInComponents = new List<KeyValuePair<Guid, Func<Type>>>();
             HostParamDefaults = new Dictionary<string, string>();
             FileSystem = new PhysicalFileSystem();
+            LoggerFactory =
+                Microsoft.Extensions.Logging.LoggerFactory.Create(builder =>
+                    builder
+                        .SetMinimumLevel(LogLevel.Trace)
+                        .AddSimpleConsole(options =>
+                        {
+                            options.SingleLine = true;
+                            options.TimestampFormat = "[yyyy-MM-dd HH:mm:ss.fff] ";
+                            options.IncludeScopes = true;
+                        }));
+            Logger = LoggerFactory.CreateLogger("Test Host");
         }
 
         public delegate bool ParameterErrorHandler(ITemplateParameter parameter, string receivedValue, string message, out string newValue);
@@ -49,13 +61,17 @@ namespace Microsoft.TemplateEngine.TestHelper
 
         public string HostIdentifier { get; }
 
-        public IReadOnlyList<string>? FallbackHostTemplateConfigNames { get; set; }
+        public IReadOnlyList<string> FallbackHostTemplateConfigNames { get; set; } = new List<string>();
 
         public string Version { get; }
 
         public IReadOnlyList<KeyValuePair<Guid, Func<Type>>> BuiltInComponents { get; set; }
 
-        public bool TryGetHostParamDefault(string paramName, out string value)
+        public ILogger Logger { get; private set; }
+
+        public ILoggerFactory LoggerFactory { get; private set; }
+
+         public bool TryGetHostParamDefault(string paramName, out string value)
         {
             return HostParamDefaults.TryGetValue(paramName, out value);
         }
@@ -72,9 +88,9 @@ namespace Microsoft.TemplateEngine.TestHelper
             SymbolUsed?.Invoke(symbol, value);
         }
 
-        public bool OnParameterError(ITemplateParameter parameter, string receivedValue, string message, out string? newValue)
+        public bool OnParameterError(ITemplateParameter parameter, string receivedValue, string message, out string newValue)
         {
-            newValue = null;
+            newValue = "";
             Console.WriteLine($"[{HostIdentifier}][{nameof(OnParameterError)}] {message}; parameter '{parameter.Name}', received value '{receivedValue}'");
             return ParameterError?.Invoke(parameter, receivedValue, message, out newValue) ?? false;
         }
