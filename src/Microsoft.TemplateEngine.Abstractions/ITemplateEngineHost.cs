@@ -95,16 +95,15 @@ namespace Microsoft.TemplateEngine.Abstractions
         [Obsolete("Use " + nameof(Logger) + " instead.")]
         bool OnNonCriticalError(string code, string message, string currentFile, long currentPosition);
 
-        [Obsolete("remove candidate")]
         bool OnParameterError(ITemplateParameter parameter, string receivedValue, string message, out string newValue);
 
-        [Obsolete("remove candidate")]
+        [Obsolete("The method is deprecated.")]
         void OnSymbolUsed(string symbol, object value);
 
         [Obsolete("Use " + nameof(Logger) + " instead.")]
         void LogDiagnosticMessage(string message, string category, params string[] details);
 
-        [Obsolete("remove candidate")]
+        [Obsolete("The method is deprecated.")]
         bool OnConfirmPartialMatch(string name);
 
         #endregion

@@ -92,18 +92,18 @@ namespace Microsoft.TemplateEngine.Edge
         public Action<string, TimeSpan, int>? OnLogTiming { get; set; }
 #pragma warning restore SA1201 // Elements should appear in the correct order
 
-        [Obsolete("remove candidate")]
+        [Obsolete("The method is deprecated.")]
         public bool OnConfirmPartialMatch(string name)
         {
             return true;
         }
 
-        [Obsolete("remove candidate")]
+        [Obsolete("The method is deprecated.")]
         public virtual void OnSymbolUsed(string symbol, object value)
         {
         }
 
-        [Obsolete("remove candidate")]
+        [Obsolete("The method is deprecated.")]
         public virtual bool OnParameterError(ITemplateParameter parameter, string receivedValue, string message, out string newValue)
         {
             newValue = "";

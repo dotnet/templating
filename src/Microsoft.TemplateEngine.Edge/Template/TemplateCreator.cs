@@ -251,21 +251,21 @@ namespace Microsoft.TemplateEngine.Edge.Template
             {
                 if (parameter.Priority == TemplateParameterPriority.Required && !templateParams.ResolvedValues.ContainsKey(parameter))
                 {
-                    //string newParamValue;
-                    //while (host.OnParameterError(parameter, null, "Missing required parameter", out newParamValue)
-                    //    && string.IsNullOrEmpty(newParamValue))
-                    //{
-                    //}
+                    string newParamValue;
+                    while (host.OnParameterError(parameter, null, "Missing required parameter", out newParamValue)
+                        && string.IsNullOrEmpty(newParamValue))
+                    {
+                    }
 
-                    //if (!string.IsNullOrEmpty(newParamValue))
-                    //{
-                    //    templateParams.ResolvedValues.Add(parameter, newParamValue);
-                    //}
-                    //else
-                    //{
+                    if (!string.IsNullOrEmpty(newParamValue))
+                    {
+                        templateParams.ResolvedValues.Add(parameter, newParamValue);
+                    }
+                    else
+                    {
                         missingParamNames.Add(parameter.Name);
                         anyMissingParams = true;
-                    //}
+                    }
                 }
             }
 
