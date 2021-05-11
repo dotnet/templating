@@ -8,7 +8,7 @@ using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 
 namespace Microsoft.TemplateEngine.Utils
 {
-    [Obsolete("The class became internal.")]
+    [Obsolete("Use Microsoft.TemplateEngine.Edge.FileSystem.PhysicalFileSystem instead.")]
     public class PhysicalFileSystem : IPhysicalFileSystem, IFileLastWriteTimeSource
     {
         public bool DirectoryExists(string directory)

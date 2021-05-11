@@ -10,7 +10,7 @@ using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 
 namespace Microsoft.TemplateEngine.Utils
 {
-    [Obsolete("The class became internal.")]
+    [Obsolete("Use Microsoft.TemplateEngine.Edge.FileSystem.InMemoryFileSystem instead.")]
     public class InMemoryFileSystem : IPhysicalFileSystem, IFileLastWriteTimeSource
     {
         private readonly FileSystemDirectory _root;
