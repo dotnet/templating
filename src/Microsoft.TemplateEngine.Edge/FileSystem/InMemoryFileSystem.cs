@@ -10,12 +10,12 @@ using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 
 namespace Microsoft.TemplateEngine.Edge.FileSystem
 {
-    internal class InMemoryFileSystem : IPhysicalFileSystem, IFileLastWriteTimeSource
+    public class InMemoryFileSystem : IPhysicalFileSystem, IFileLastWriteTimeSource
     {
         private readonly FileSystemDirectory _root;
         private readonly IPhysicalFileSystem _basis;
 
-        internal InMemoryFileSystem(string root, IPhysicalFileSystem basis)
+        public InMemoryFileSystem(string root, IPhysicalFileSystem basis)
         {
             _basis = basis;
             _root = new FileSystemDirectory(Path.GetFileName(root.TrimEnd('/', '\\')), root);

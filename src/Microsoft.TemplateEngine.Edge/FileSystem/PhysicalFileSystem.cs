@@ -8,7 +8,7 @@ using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 
 namespace Microsoft.TemplateEngine.Edge.FileSystem
 {
-    internal class PhysicalFileSystem : IPhysicalFileSystem, IFileLastWriteTimeSource
+    public class PhysicalFileSystem : IPhysicalFileSystem, IFileLastWriteTimeSource
     {
         public bool DirectoryExists(string directory)
         {
