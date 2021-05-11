@@ -9,5 +9,6 @@
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="6.0.0-preview3.21153.3" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeStyle" Version="3.8.0" PrivateAssets="all" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.333" PrivateAssets="all" />
+    <PackageReference Condition="'$(EnablePublicApiAnalyzer)' == 'true'" Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.2" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
   </ItemGroup>
 </Project>
