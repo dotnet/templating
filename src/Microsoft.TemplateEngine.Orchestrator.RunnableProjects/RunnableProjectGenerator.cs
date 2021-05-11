@@ -246,17 +246,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 }
                 else
                 {
-                    bool boolVal = false;
-                    // Note: if the literal is ever null, it is probably due to a problem in TemplateCreator.Instantiate()
-                    // which takes care of making null bool -> true as appropriate.
-                    // This else can also happen if there is a value but it can't be converted.
-                    string val;
-                    while (environmentSettings.Host.OnParameterError(param, null, "ParameterValueNotSpecified", out val) && !bool.TryParse(val, out boolVal))
-                    {
-                    }
-
-                    valueResolutionError = !bool.TryParse(val, out boolVal);
-                    return boolVal;
+                    valueResolutionError = true;
+                    return null;
                 }
             }
             else if (string.Equals(param.DataType, "choice", StringComparison.OrdinalIgnoreCase))
@@ -270,15 +261,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 {
                     return param.DefaultValue;
                 }
-
-                string val;
-                while (environmentSettings.Host.OnParameterError(param, null, "ValueNotValid:" + string.Join(",", param.Choices.Keys), out val)
-                        && !TryResolveChoiceValue(literal, param, out val))
-                {
-                }
-
-                valueResolutionError = val == null;
-                return val;
+                valueResolutionError = true;
+                return null;
             }
             else if (string.Equals(param.DataType, "float", StringComparison.OrdinalIgnoreCase))
             {
@@ -288,13 +272,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 }
                 else
                 {
-                    string val;
-                    while (environmentSettings.Host.OnParameterError(param, null, "ValueNotValidMustBeFloat", out val) && (val == null || !ParserExtensions.DoubleTryParseСurrentOrInvariant(val, out convertedFloat)))
-                    {
-                    }
-
-                    valueResolutionError = !ParserExtensions.DoubleTryParseСurrentOrInvariant(val, out convertedFloat);
-                    return convertedFloat;
+                    valueResolutionError = true;
+                    return null;
                 }
             }
             else if (string.Equals(param.DataType, "int", StringComparison.OrdinalIgnoreCase)
@@ -306,13 +285,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 }
                 else
                 {
-                    string val;
-                    while (environmentSettings.Host.OnParameterError(param, null, "ValueNotValidMustBeInteger", out val) && (val == null || !long.TryParse(val, out convertedInt)))
-                    {
-                    }
-
-                    valueResolutionError = !long.TryParse(val, out convertedInt);
-                    return convertedInt;
+                    valueResolutionError = true;
+                    return null;
                 }
             }
             else if (string.Equals(param.DataType, "hex", StringComparison.OrdinalIgnoreCase))
@@ -323,13 +297,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 }
                 else
                 {
-                    string val;
-                    while (environmentSettings.Host.OnParameterError(param, null, "ValueNotValidMustBeHex", out val) && (val == null || val.Length < 3 || !long.TryParse(val.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out convertedHex)))
-                    {
-                    }
-
-                    valueResolutionError = !long.TryParse(val.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out convertedHex);
-                    return convertedHex;
+                    valueResolutionError = true;
+                    return null;
                 }
             }
             else if (string.Equals(param.DataType, "text", StringComparison.OrdinalIgnoreCase)

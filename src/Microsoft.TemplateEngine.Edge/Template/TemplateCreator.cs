@@ -79,10 +79,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
 
                     if (!forceCreation && destructiveChanges.Count > 0)
                     {
-                        if (!_environmentSettings.Host.OnPotentiallyDestructiveChangesDetected(changes, destructiveChanges))
-                        {
-                            return new TemplateCreationResult("Cancelled", CreationResultStatus.Cancelled, template.Name);
-                        }
+                        return new TemplateCreationResult("Destructive changes detected", CreationResultStatus.DestructiveChangesDetected, template.Name, null, null, creationEffects);
                     }
 
                     if (!TryCreateParameterSet(template, realName, inputParameters, out IParameterSet creationParams, out resultIfParameterCreationFailed))
@@ -253,21 +250,8 @@ namespace Microsoft.TemplateEngine.Edge.Template
             {
                 if (parameter.Priority == TemplateParameterPriority.Required && !templateParams.ResolvedValues.ContainsKey(parameter))
                 {
-                    string newParamValue;
-                    while (host.OnParameterError(parameter, null, "Missing required parameter", out newParamValue)
-                        && string.IsNullOrEmpty(newParamValue))
-                    {
-                    }
-
-                    if (!string.IsNullOrEmpty(newParamValue))
-                    {
-                        templateParams.ResolvedValues.Add(parameter, newParamValue);
-                    }
-                    else
-                    {
-                        missingParamNames.Add(parameter.Name);
-                        anyMissingParams = true;
-                    }
+                    missingParamNames.Add(parameter.Name);
+                    anyMissingParams = true;
                 }
             }
 
