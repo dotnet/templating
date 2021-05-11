@@ -486,4 +486,7 @@
     <Rule Id="IDE1007" Action="Hidden" />       <!-- UnboundIdentifier -->
     <Rule Id="IDE1008" Action="Hidden" />       <!-- UnboundConstructor -->
   </Rules>
+  <Rules AnalyzerId="Microsoft.CodeAnalysis.PublicApiAnalyzers" RuleNamespace="Microsoft.CodeAnalysis.PublicApiAnalyzers" >
+    <Rule Id="RS0041" Action="Info" TESpecific="true" /> <!--Public members should not use oblivious types -->
+  </Rules>
 </RuleSet>
