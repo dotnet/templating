@@ -1,4 +1,13 @@
-<RuleSet Name="Microsoft.Analyzers.ManagedCodeAnalysis" Description="Microsoft.Analyzers.ManagedCodeAnalysis" ToolsVersion="14.0">
+<!-- taken from https://github.com/dotnet/runtime/blob/main/eng/CodeAnalysis.ruleset -->
+<RuleSet Name="Microsoft.Analyzers.ManagedCodeAnalysis" Description="dotnet/runtime repo source analyzer rules" ToolsVersion="14.0">
+  <Rules AnalyzerId="Microsoft.DotNet.CodeAnalysis" RuleNamespace="Microsoft.DotNet.CodeAnalysis.Analyzers">
+    <Rule Id="BCL0001" Action="Warning" />      <!-- Ensure minimum API surface is respected -->
+    <Rule Id="BCL0010" Action="Warning" />      <!-- AppContext default value expected to be true -->
+    <Rule Id="BCL0011" Action="Warning" />      <!-- AppContext default value defined in if statement with incorrect pattern -->
+    <Rule Id="BCL0012" Action="Warning" />      <!-- AppContext default value defined in if statement at root of switch case -->
+    <Rule Id="BCL0015" Action="None" />         <!-- Invalid P/Invoke call -->
+    <Rule Id="BCL0020" Action="Warning" />      <!-- Invalid SR.Format call -->
+  </Rules>
   <Rules AnalyzerId="Microsoft.CodeAnalysis.NetAnalyzers" RuleNamespace="Microsoft.CodeAnalysis.NetAnalyzers">
     <Rule Id="CA1000" Action="None" />          <!-- Do not declare static members on generic types -->
     <Rule Id="CA1001" Action="None" />          <!-- Types that own disposable fields should be disposable -->
@@ -24,15 +33,15 @@
     <Rule Id="CA1034" Action="None" />          <!-- Nested types should not be visible -->
     <Rule Id="CA1036" Action="None" />          <!-- Override methods on comparable types -->
     <Rule Id="CA1040" Action="None" />          <!-- Avoid empty interfaces -->
-    <Rule Id="CA1041" Action="Warning" TESpecific="true" />          <!-- Provide ObsoleteAttribute message -->
+    <Rule Id="CA1041" Action="None" />          <!-- Provide ObsoleteAttribute message -->
     <Rule Id="CA1043" Action="None" />          <!-- Use Integral Or String Argument For Indexers -->
-    <Rule Id="CA1044" Action="Warning" TESpecific="true" />          <!-- Properties should not be write only -->
+    <Rule Id="CA1044" Action="None" />          <!-- Properties should not be write only -->
     <Rule Id="CA1045" Action="None" />          <!-- Do not pass types by reference -->
     <Rule Id="CA1046" Action="None" />          <!-- Do not overload equality operator on reference types -->
     <Rule Id="CA1047" Action="Warning" />       <!-- Do not declare protected member in sealed type -->
     <Rule Id="CA1050" Action="Warning" />       <!-- Declare types in namespaces -->
     <Rule Id="CA1051" Action="None" />          <!-- Do not declare visible instance fields -->
-    <Rule Id="CA1052" Action="None" />          <!-- Static holder types should be Static or NotInheritable -->
+    <Rule Id="CA1052" Action="Warning" />       <!-- Static holder types should be Static or NotInheritable -->
     <Rule Id="CA1054" Action="None" />          <!-- Uri parameters should not be strings -->
     <Rule Id="CA1055" Action="None" />          <!-- Uri return values should not be strings -->
     <Rule Id="CA1056" Action="None" />          <!-- Uri properties should not be strings -->
@@ -48,7 +57,7 @@
     <Rule Id="CA1068" Action="None" />          <!-- CancellationToken parameters must come last -->
     <Rule Id="CA1069" Action="None" />          <!-- Enums values should not be duplicated -->
     <Rule Id="CA1070" Action="Info" />          <!-- Do not declare event fields as virtual -->
-    <Rule Id="CA1200" Action="Warning" />       <!-- Avoid using cref tags with a prefix -->
+    <Rule Id="CA1200" Action="Info" />          <!-- Avoid using cref tags with a prefix -->
     <Rule Id="CA1303" Action="None" />          <!-- Do not pass literals as localized parameters -->
     <Rule Id="CA1304" Action="None" />          <!-- Specify CultureInfo -->
     <Rule Id="CA1305" Action="None" />          <!-- Specify IFormatProvider -->
@@ -58,6 +67,7 @@
     <Rule Id="CA1401" Action="Warning" />       <!-- P/Invokes should not be visible -->
     <Rule Id="CA1416" Action="Warning" />       <!-- Validate platform compatibility -->
     <Rule Id="CA1417" Action="Warning" />       <!-- Do not use 'OutAttribute' on string parameters for P/Invokes -->
+    <Rule Id="CA1418" Action="Warning" />       <!-- Use valid platform string -->
     <Rule Id="CA1501" Action="None" />          <!-- Avoid excessive inheritance -->
     <Rule Id="CA1502" Action="None" />          <!-- Avoid excessive complexity -->
     <Rule Id="CA1505" Action="None" />          <!-- Avoid unmaintainable code -->
@@ -108,6 +118,8 @@
     <Rule Id="CA1836" Action="Warning" />       <!-- Prefer IsEmpty over Count -->
     <Rule Id="CA1837" Action="Warning" />       <!-- Use 'Environment.ProcessId' -->
     <Rule Id="CA1838" Action="Warning" />       <!-- Avoid 'StringBuilder' parameters for P/Invokes -->
+    <Rule Id="CA1839" Action="Warning" />       <!-- Use 'Environment.ProcessPath' -->
+    <Rule Id="CA1840" Action="Warning" />       <!-- Use 'Environment.CurrentManagedThreadId' -->
     <Rule Id="CA2000" Action="None" />          <!-- Dispose objects before losing scope -->
     <Rule Id="CA2002" Action="None" />          <!-- Do not lock on objects with weak identity -->
     <Rule Id="CA2007" Action="Warning" />       <!-- Consider calling ConfigureAwait on the awaited task -->
@@ -147,8 +159,7 @@
     <Rule Id="CA2237" Action="None" />          <!-- Mark ISerializable types with serializable -->
     <Rule Id="CA2241" Action="Warning" />       <!-- Provide correct arguments to formatting methods -->
     <Rule Id="CA2242" Action="Warning" />       <!-- Test for NaN correctly -->
-    <!-- CA2243 temporarily disabled: https://github.com/dotnet/roslyn-analyzers/issues/3635 -->
-    <Rule Id="CA2243" Action="None" />          <!-- Attribute string literals should parse correctly -->
+    <Rule Id="CA2243" Action="Warning" />       <!-- Attribute string literals should parse correctly -->
     <Rule Id="CA2244" Action="None" />          <!-- Do not duplicate indexed element initializations -->
     <Rule Id="CA2245" Action="Warning" />       <!-- Do not assign a property to itself. -->
     <Rule Id="CA2246" Action="None" />          <!-- Assigning symbol and its member in the same statement. -->
@@ -250,26 +261,26 @@
   <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
     <Rule Id="AD0001" Action="None" />          <!-- Analyzer threw an exception -->
     <Rule Id="SA0001" Action="None" />          <!-- XML comments -->
-    <Rule Id="SA1000" Action="Warning" TESpecific="true"/>          <!-- Spacing around keywords -->
-    <Rule Id="SA1001" Action="Warning" TESpecific="true"/>          <!-- Commas must be spaced correctly -->
-    <Rule Id="SA1002" Action="Warning" TESpecific="true"/>          <!-- Semicolons must be spaced correctly -->
-    <Rule Id="SA1003" Action="Warning" TESpecific="true"/>          <!-- Symbols must be spaced correctly -->
-    <Rule Id="SA1004" Action="Warning" TESpecific="true"/>          <!-- Documentation line should begin with a space -->
+    <Rule Id="SA1000" Action="Warning" />       <!-- Spacing around keywords -->
+    <Rule Id="SA1001" Action="Warning" />       <!-- Commas should not be preceded by whitespace -->
+    <Rule Id="SA1002" Action="None" />          <!-- Semicolons should not be preceded by a space -->
+    <Rule Id="SA1003" Action="None" />          <!-- Operator should not appear at the end of a line -->
+    <Rule Id="SA1004" Action="None" />          <!-- Documentation line should begin with a space -->
     <Rule Id="SA1005" Action="None" />          <!-- Single line comment should begin with a space -->
     <Rule Id="SA1008" Action="None" />          <!-- Opening parenthesis should not be preceded by a space -->
     <Rule Id="SA1009" Action="None" />          <!-- Closing parenthesis should not be followed by a space -->
-    <Rule Id="SA1010" Action="Warning" TESpecific="true" />          <!-- Opening square brackets should not be preceded by a space -->
-    <Rule Id="SA1011" Action="Warning" TESpecific="true" />          <!-- Closing square bracket should be followed by a space -->
-    <Rule Id="SA1012" Action="Warning" TESpecific="true" />          <!-- Opening brace should be followed by a space -->
-    <Rule Id="SA1013" Action="Warning" TESpecific="true" />          <!-- Closing brace should be preceded by a space -->
-    <Rule Id="SA1014" Action="Warning" TESpecific="true" />       <!-- Opening generic brackets should not be preceded by a space -->
-    <Rule Id="SA1015" Action="Warning" TESpecific="true" />          <!-- Closing generic bracket should not be followed by a space -->
+    <Rule Id="SA1010" Action="None" />          <!-- Opening square brackets should not be preceded by a space -->
+    <Rule Id="SA1011" Action="None" />          <!-- Closing square bracket should be followed by a space -->
+    <Rule Id="SA1012" Action="None" />          <!-- Opening brace should be followed by a space -->
+    <Rule Id="SA1013" Action="None" />          <!-- Closing brace should be preceded by a space -->
+    <Rule Id="SA1014" Action="Warning" />       <!-- Opening generic brackets should not be preceded by a space -->
+    <Rule Id="SA1015" Action="None" />          <!-- Closing generic bracket should not be followed by a space -->
     <Rule Id="SA1018" Action="Warning" />       <!-- Nullable type symbol should not be preceded by a space -->
     <Rule Id="SA1020" Action="Warning" />       <!-- Increment symbol should not be preceded by a space -->
     <Rule Id="SA1021" Action="None" />          <!-- Negative sign should be preceded by a space -->
     <Rule Id="SA1023" Action="None" />          <!-- Dereference symbol '*' should not be preceded by a space." -->
-    <Rule Id="SA1024" Action="Warning" TESpecific="true" />          <!-- Colon should be followed by a space -->
-    <Rule Id="SA1025" Action="Warning" TESpecific="true" />          <!-- Code should not contain multiple whitespace characters in a row -->
+    <Rule Id="SA1024" Action="None" />          <!-- Colon should be followed by a space -->
+    <Rule Id="SA1025" Action="None" />          <!-- Code should not contain multiple whitespace characters in a row -->
     <Rule Id="SA1026" Action="Warning" />       <!-- Keyword followed by span or blank line -->
     <Rule Id="SA1027" Action="Warning" />       <!-- Tabs and spaces should be used correctly -->
     <Rule Id="SA1028" Action="Warning" />       <!-- Code should not contain trailing whitespace -->
@@ -277,16 +288,16 @@
     <Rule Id="SA1101" Action="None" />          <!-- Prefix local calls with this -->
     <Rule Id="SA1102" Action="Warning" />       <!-- Query clause should follow previous clause -->
     <Rule Id="SA1105" Action="Warning" />       <!-- Query clauses spanning multiple lines should begin on own line -->
-    <Rule Id="SA1106" Action="Warning" TESpecific="true" />          <!-- Code should not contain empty statements -->
-    <Rule Id="SA1107" Action="Warning" TESpecific="true" />          <!-- Code should not contain multiple statements on one line -->
+    <Rule Id="SA1106" Action="None" />          <!-- Code should not contain empty statements -->
+    <Rule Id="SA1107" Action="None" />          <!-- Code should not contain multiple statements on one line -->
     <Rule Id="SA1108" Action="None" />          <!-- Block statements should not contain embedded comments -->
-    <Rule Id="SA1110" Action="Warning" TESpecific="true" />          <!-- Opening parenthesis or bracket should be on declaration line -->
+    <Rule Id="SA1110" Action="None" />          <!-- Opening parenthesis or bracket should be on declaration line -->
     <Rule Id="SA1111" Action="None" />          <!-- Closing parenthesis should be on line of last parameter -->
     <Rule Id="SA1113" Action="Warning" />       <!-- Comma should be on the same line as previous parameter -->
-    <Rule Id="SA1114" Action="Warning" TESpecific="true" />          <!-- Parameter list should follow declaration -->
+    <Rule Id="SA1114" Action="None" />          <!-- Parameter list should follow declaration -->
     <Rule Id="SA1115" Action="Warning" />       <!-- Parameter should begin on the line after the previous parameter -->
-    <Rule Id="SA1116" Action="Warning" TESpecific="true" />          <!-- Split parameters should start on line after declaration -->
-    <Rule Id="SA1117" Action="Warning" TESpecific="true" />          <!-- Parameters should be on same line or separate lines -->
+    <Rule Id="SA1116" Action="None" />          <!-- Split parameters should start on line after declaration -->
+    <Rule Id="SA1117" Action="None" />          <!-- Parameters should be on same line or separate lines -->
     <Rule Id="SA1118" Action="None" />          <!-- Parameter should not span multiple lines -->
     <Rule Id="SA1119" Action="None" />          <!-- Statement should not use unnecessary parenthesis -->
     <Rule Id="SA1120" Action="None" />          <!-- Comments should contain text -->
@@ -310,35 +321,35 @@
     <Rule Id="SA1141" Action="Warning" />       <!-- Use tuple syntax -->
     <Rule Id="SA1142" Action="Warning" />       <!-- Refer to tuple elements by name -->
     <Rule Id="SA1200" Action="None" />          <!-- Using directive should appear within a namespace declaration -->
-    <Rule Id="SA1201" Action="None" TESpecific="true" />          <!-- Elements should appear in the correct order -->
-    <Rule Id="SA1202" Action="None" TESpecific="true" />          <!-- Elements should be ordered by access -->
-    <Rule Id="SA1203" Action="None" TESpecific="true" />          <!-- Constants should appear before fields -->
-    <Rule Id="SA1204" Action="None" TESpecific="true" />          <!-- Static elements should appear before instance elements -->
+    <Rule Id="SA1201" Action="None" />          <!-- Elements should appear in the correct order -->
+    <Rule Id="SA1202" Action="None" />          <!-- Elements should be ordered by access -->
+    <Rule Id="SA1203" Action="None" />          <!-- Constants should appear before fields -->
+    <Rule Id="SA1204" Action="None" />          <!-- Static elements should appear before instance elements -->
     <Rule Id="SA1205" Action="Warning" />       <!-- Partial elements should declare an access modifier -->
     <Rule Id="SA1206" Action="Warning" />       <!-- Keyword ordering -->
-    <Rule Id="SA1208" Action="Warning" TESpecific="true" />          <!-- Using directive ordering -->
-    <Rule Id="SA1209" Action="Warning" TESpecific="true" />          <!-- Using alias directives should be placed after all using namespace directives -->
-    <Rule Id="SA1210" Action="Warning" TESpecific="true" />          <!-- Using directives should be ordered alphabetically by the namespaces -->
-    <Rule Id="SA1211" Action="Warning" TESpecific="true" />          <!-- Using alias directive ordering -->
+    <Rule Id="SA1208" Action="None" />          <!-- Using directive ordering -->
+    <Rule Id="SA1209" Action="None" />          <!-- Using alias directives should be placed after all using namespace directives -->
+    <Rule Id="SA1210" Action="None" />          <!-- Using directives should be ordered alphabetically by the namespaces -->
+    <Rule Id="SA1211" Action="None" />          <!-- Using alias directive ordering -->
     <Rule Id="SA1212" Action="Warning" />       <!-- A get accessor appears after a set accessor within a property or indexer -->
-    <Rule Id="SA1214" Action="None" TESpecific="true" />          <!-- Readonly fields should appear before non-readonly fields -->
+    <Rule Id="SA1214" Action="None" />          <!-- Readonly fields should appear before non-readonly fields -->
     <Rule Id="SA1216" Action="None" />          <!-- Using static directives should be placed at the correct location -->
-    <Rule Id="SA1300" Action="Warning" TESpecific="true" />          <!-- Element should begin with an uppercase letter -->
+    <Rule Id="SA1300" Action="None" />          <!-- Element should begin with an uppercase letter -->
     <Rule Id="SA1302" Action="Warning" />       <!-- Interface names should begin with I -->
-    <Rule Id="SA1303" Action="Warning" TESpecific="true" />          <!-- Const field names should begin with upper-case letter -->
-    <Rule Id="SA1304" Action="Warning" TESpecific="true" />          <!-- Non-private readonly fields should begin with upper-case letter -->
-    <Rule Id="SA1306" Action="Warning" TESpecific="true" />          <!-- Field should begin with lower-case letter -->
-    <Rule Id="SA1307" Action="Warning" TESpecific="true" />          <!-- Field should begin with upper-case letter -->
+    <Rule Id="SA1303" Action="None" />          <!-- Const field names should begin with upper-case letter -->
+    <Rule Id="SA1304" Action="None" />          <!-- Non-private readonly fields should begin with upper-case letter -->
+    <Rule Id="SA1306" Action="None" />          <!-- Field should begin with lower-case letter -->
+    <Rule Id="SA1307" Action="None" />          <!-- Field should begin with upper-case letter -->
     <Rule Id="SA1308" Action="None" />          <!-- Field should not begin with the prefix 's_' -->
     <Rule Id="SA1309" Action="None" />          <!-- Field names should not begin with underscore -->
-    <Rule Id="SA1310" Action="Warning" TESpecific="true" />          <!-- Field should not contain an underscore -->
-    <Rule Id="SA1311" Action="Warning" TESpecific="true" />          <!-- Static readonly fields should begin with upper-case letter -->
-    <Rule Id="SA1312" Action="Warning" TESpecific="true" />          <!-- Variable should begin with lower-case letter -->
-    <Rule Id="SA1313" Action="Warning" TESpecific="true" />          <!-- Parameter should begin with lower-case letter -->
+    <Rule Id="SA1310" Action="None" />          <!-- Field should not contain an underscore -->
+    <Rule Id="SA1311" Action="None" />          <!-- Static readonly fields should begin with upper-case letter -->
+    <Rule Id="SA1312" Action="None" />          <!-- Variable should begin with lower-case letter -->
+    <Rule Id="SA1313" Action="None" />          <!-- Parameter should begin with lower-case letter -->
     <Rule Id="SA1314" Action="None" />          <!-- Type parameter names should begin with T -->
-    <Rule Id="SA1316" Action="Warning" TESpecific="true" />          <!-- Tuple element names should use correct casing -->
+    <Rule Id="SA1316" Action="None" />          <!-- Tuple element names should use correct casing -->
     <Rule Id="SA1400" Action="Warning" />       <!-- Member should declare an access modifer -->
-    <Rule Id="SA1401" Action="Warning" TESpecific="true" />          <!-- Fields should be private -->
+    <Rule Id="SA1401" Action="None" />          <!-- Fields should be private -->
     <Rule Id="SA1402" Action="None" />          <!-- File may only contain a single type -->
     <Rule Id="SA1403" Action="None" />          <!-- File may only contain a single namespace -->
     <Rule Id="SA1404" Action="Warning" />       <!-- Code analysis suppression should have justification -->
@@ -349,24 +360,24 @@
     <Rule Id="SA1411" Action="Warning" />       <!-- Attribute constructor shouldn't use unnecessary parenthesis -->
     <Rule Id="SA1413" Action="None" />          <!-- Use trailing comma in multi-line initializers -->
     <Rule Id="SA1414" Action="None" />          <!-- Tuple types in signatures should have element names -->
-    <Rule Id="SA1500" Action="Warning" TESpecific="true" />          <!-- Braces for multi-line statements should not share line -->
+    <Rule Id="SA1500" Action="None" />          <!-- Braces for multi-line statements should not share line -->
     <Rule Id="SA1501" Action="None" />          <!-- Statement should not be on a single line -->
     <Rule Id="SA1502" Action="None" />          <!-- Element should not be on a single line -->
-    <Rule Id="SA1503" Action="Warning" TESpecific="true" />          <!-- Braces should not be omitted -->
+    <Rule Id="SA1503" Action="None" />          <!-- Braces should not be omitted -->
     <Rule Id="SA1504" Action="None" />          <!-- All accessors should be single-line or multi-line -->
-    <Rule Id="SA1505" Action="Warning" TESpecific="true" />          <!-- An opening brace should not be followed by a blank line -->
+    <Rule Id="SA1505" Action="None" />          <!-- An opening brace should not be followed by a blank line -->
     <Rule Id="SA1506" Action="None" />          <!-- Element documentation headers should not be followed by blank line -->
-    <Rule Id="SA1507" Action="Warning" TESpecific="true" />          <!-- Code should not contain multiple blank lines in a row -->
+    <Rule Id="SA1507" Action="None" />          <!-- Code should not contain multiple blank lines in a row -->
     <Rule Id="SA1508" Action="None" />          <!-- A closing brace should not be preceded by a blank line -->
     <Rule Id="SA1509" Action="None" />          <!-- Opening braces should not be preceded by blank line -->
     <Rule Id="SA1510" Action="None" />          <!-- 'else' statement should not be preceded by a blank line -->
     <Rule Id="SA1512" Action="None" />          <!-- Single-line comments should not be followed by blank line -->
     <Rule Id="SA1513" Action="None" />          <!-- Closing brace should be followed by blank line -->
-    <Rule Id="SA1514" Action="Warning" TESpecific="true" />          <!-- Element documentation header should be preceded by blank line -->
+    <Rule Id="SA1514" Action="None" />          <!-- Element documentation header should be preceded by blank line -->
     <Rule Id="SA1515" Action="None" />          <!-- Single-line comment should be preceded by blank line -->
-    <Rule Id="SA1516" Action="Warning" TESpecific="true" />          <!-- Elements should be separated by blank line -->
+    <Rule Id="SA1516" Action="None" />          <!-- Elements should be separated by blank line -->
     <Rule Id="SA1517" Action="Warning" />       <!-- Code should not contain blank lines at start of file -->
-    <Rule Id="SA1518" Action="None" TESpecific="true" />          <!-- Code should not contain blank lines at the end of the file -->
+    <Rule Id="SA1518" Action="Warning" />       <!-- Code should not contain blank lines at the end of the file -->
     <Rule Id="SA1519" Action="None" />          <!-- Braces should not be omitted from multi-line child statement -->
     <Rule Id="SA1520" Action="None" />          <!-- Use braces consistently -->
     <Rule Id="SA1600" Action="None" />          <!-- Elements should be documented -->
@@ -388,9 +399,9 @@
     <Rule Id="SA1623" Action="None" />          <!-- Property documentation text -->
     <Rule Id="SA1624" Action="None" />          <!-- Because the property only contains a visible get accessor, the documentation summary text should begin with 'Gets' -->
     <Rule Id="SA1625" Action="None" />          <!-- Element documentation should not be copied and pasted -->
-    <Rule Id="SA1626" Action="Warning" TESpecific="true" />          <!-- Single-line comments should not use documentation style slashes -->
+    <Rule Id="SA1626" Action="None" />          <!-- Single-line comments should not use documentation style slashes -->
     <Rule Id="SA1627" Action="None" />          <!-- The documentation text within the \'exception\' tag should not be empty -->
-    <Rule Id="SA1629" Action="Warning" TESpecific="true" />          <!-- Documentation text should end with a period -->
+    <Rule Id="SA1629" Action="None" />          <!-- Documentation text should end with a period -->
     <Rule Id="SA1633" Action="None" />          <!-- File should have header -->
     <Rule Id="SA1642" Action="None" />          <!-- Constructor summary documentation should begin with standard text -->
     <Rule Id="SA1643" Action="None" />          <!-- Destructor summary documentation should begin with standard text -->
@@ -401,7 +412,7 @@
     <Rule Id="IDE0002" Action="Hidden" />       <!-- SimplifyMemberAccess -->
     <Rule Id="IDE0003" Action="Hidden" />       <!-- RemoveQualification -->
     <Rule Id="IDE0004" Action="Hidden" />       <!-- RemoveUnnecessaryCast -->
-    <Rule Id="IDE0005" Action="Warning" TESpecific="true" />        <!-- RemoveUnnecessaryImports -->
+    <Rule Id="IDE0005" Action="Hidden" />       <!-- RemoveUnnecessaryImports -->
     <Rule Id="IDE0006" Action="Hidden" />       <!-- IntellisenseBuildFailed -->
     <Rule Id="IDE0007" Action="Hidden" />       <!-- UseImplicitType -->
     <Rule Id="IDE0008" Action="Hidden" />       <!-- UseExplicitType -->
@@ -477,13 +488,23 @@
     <Rule Id="IDE0082" Action="Warning" />      <!-- ConvertTypeOfToNameOf -->
     <Rule Id="IDE0083" Action="Hidden" />       <!-- UseNotPattern -->
     <Rule Id="IDE0084" Action="Hidden" />       <!-- UseIsNotExpression -->
+    <Rule Id="IDE0090" Action="Hidden" />       <!-- UseNew -->
+    <Rule Id="IDE0100" Action="Hidden" />       <!-- RemoveRedundantEquality -->
+    <Rule Id="IDE0110" Action="Hidden" />       <!-- RemoveUnnecessaryDiscard -->
+    <Rule Id="IDE0120" Action="Hidden" />       <!-- SimplifyLINQExpression -->
+    <Rule Id="IDE0130" Action="Hidden" />       <!-- NamespaceDoesNotMatchFolderStructure -->
     <Rule Id="IDE1001" Action="Hidden" />       <!-- AnalyzerChanged -->
     <Rule Id="IDE1002" Action="Hidden" />       <!-- AnalyzerDependencyConflict -->
     <Rule Id="IDE1003" Action="Hidden" />       <!-- MissingAnalyzerReference -->
     <Rule Id="IDE1004" Action="Hidden" />       <!-- ErrorReadingRuleset -->
     <Rule Id="IDE1005" Action="Hidden" />       <!-- InvokeDelegateWithConditionalAccess -->
-    <Rule Id="IDE1006" Action="None" />       <!-- NamingRule -->
+    <Rule Id="IDE1006" Action="Hidden" />       <!-- NamingRule -->
     <Rule Id="IDE1007" Action="Hidden" />       <!-- UnboundIdentifier -->
     <Rule Id="IDE1008" Action="Hidden" />       <!-- UnboundConstructor -->
+    <Rule Id="IDE2000" Action="Hidden" />       <!-- MultipleBlankLines -->
+    <Rule Id="IDE2001" Action="Hidden" />       <!-- EmbeddedStatementsMustBeOnTheirOwnLine -->
+    <Rule Id="IDE2002" Action="Hidden" />       <!-- ConsecutiveBracesMustNotHaveBlankLinesBetweenThem -->
+    <Rule Id="IDE2003" Action="Hidden" />       <!-- ConsecutiveStatementPlacement -->
+    <Rule Id="IDE2004" Action="Hidden" />       <!-- BlankLineNotAllowedAfterConstructorInitializerColon -->
   </Rules>
 </RuleSet>

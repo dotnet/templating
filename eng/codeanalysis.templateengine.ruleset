@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="Microsoft.Analyzers.TemplateEngine" Description="dotnet/templating repo source analyzer rules" ToolsVersion="16.0">
+  <Include Path="codeanalysis.base.ruleset" Action="Default" />
+  <Rules AnalyzerId="Microsoft.CodeAnalysis.CSharp.CodeStyle" RuleNamespace="Microsoft.CodeQuality.Analyzers">
+    <Rule Id="IDE0005" Action="Warning" />
+  </Rules>
+  <Rules AnalyzerId="Microsoft.CodeAnalysis.NetAnalyzers" RuleNamespace="Microsoft.CodeAnalysis.NetAnalyzers">
+    <Rule Id="CA1041" Action="Warning" />
+    <Rule Id="CA1044" Action="Warning" />
+    <Rule Id="CA2243" Action="None" />
+  </Rules>
+  <Rules AnalyzerId="Microsoft.CodeAnalysis.PublicApiAnalyzers" RuleNamespace="Microsoft.CodeAnalysis.PublicApiAnalyzers">
+    <Rule Id="RS0041" Action="Info" />
+  </Rules>
+  <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
+    <Rule Id="SA1000" Action="Warning" />
+    <Rule Id="SA1001" Action="Warning" />
+    <Rule Id="SA1002" Action="Warning" />
+    <Rule Id="SA1003" Action="Warning" />
+    <Rule Id="SA1004" Action="Warning" />
+    <Rule Id="SA1010" Action="Warning" />
+    <Rule Id="SA1011" Action="Warning" />
+    <Rule Id="SA1012" Action="Warning" />
+    <Rule Id="SA1013" Action="Warning" />
+    <Rule Id="SA1014" Action="Warning" />
+    <Rule Id="SA1015" Action="Warning" />
+    <Rule Id="SA1024" Action="Warning" />
+    <Rule Id="SA1025" Action="Warning" />
+    <Rule Id="SA1106" Action="Warning" />
+    <Rule Id="SA1107" Action="Warning" />
+    <Rule Id="SA1110" Action="Warning" />
+    <Rule Id="SA1114" Action="Warning" />
+    <Rule Id="SA1116" Action="Warning" />
+    <Rule Id="SA1117" Action="Warning" />
+    <Rule Id="SA1201" Action="Warning" />          <!-- Elements should appear in the correct order -->
+    <Rule Id="SA1202" Action="Warning" />         <!-- Elements should be ordered by access -->
+    <Rule Id="SA1203" Action="Warning" />         <!-- Constants should appear before fields -->
+    <Rule Id="SA1204" Action="Warning" />         <!-- Static elements should appear before instance elements -->
+    <Rule Id="SA1208" Action="Warning" />         <!-- Using directive ordering -->
+    <Rule Id="SA1209" Action="Warning" />         <!-- Using alias directives should be placed after all using namespace directives -->
+    <Rule Id="SA1210" Action="Warning" />         <!-- Using directives should be ordered alphabetically by the namespaces -->
+    <Rule Id="SA1211" Action="Warning" />         <!-- Using alias directive ordering -->
+    <Rule Id="SA1214" Action="Warning" />         <!-- Readonly fields should appear before non-readonly fields -->
+    <Rule Id="SA1300" Action="Warning" />         <!-- Element should begin with an uppercase letter -->
+    <Rule Id="SA1303" Action="Warning" />         <!-- Const field names should begin with upper-case letter -->
+    <Rule Id="SA1304" Action="Warning" />         <!-- Non-private readonly fields should begin with upper-case letter -->
+    <Rule Id="SA1306" Action="Warning" />         <!-- Field should begin with lower-case letter -->
+    <Rule Id="SA1307" Action="Warning" />         <!-- Field should begin with upper-case letter -->
+    <Rule Id="SA1310" Action="Warning" />         <!-- Field should not contain an underscore -->
+    <Rule Id="SA1311" Action="Warning" />         <!-- Static readonly fields should begin with upper-case letter -->
+    <Rule Id="SA1312" Action="Warning" />         <!-- Variable should begin with lower-case letter -->
+    <Rule Id="SA1313" Action="Warning" />         <!-- Parameter should begin with lower-case letter -->
+    <Rule Id="SA1316" Action="Warning" />         <!-- Tuple element names should use correct casing -->
+    <Rule Id="SA1401" Action="Warning" />         <!-- Fields should be private -->
+    <Rule Id="SA1500" Action="Warning" />         <!-- Braces for multi-line statements should not share line -->
+    <Rule Id="SA1503" Action="Warning" />         <!-- Braces should not be omitted -->
+    <Rule Id="SA1505" Action="Warning" />         <!-- An opening brace should not be followed by a blank line -->
+    <Rule Id="SA1507" Action="Warning" />         <!-- Code should not contain multiple blank lines in a row -->
+    <Rule Id="SA1514" Action="Warning" />         <!-- Element documentation header should be preceded by blank line -->
+    <Rule Id="SA1516" Action="Warning" />          <!-- Elements should be separated by blank line -->
+    <Rule Id="SA1518" Action="None" />         <!-- Code should not contain blank lines at the end of the file -->
+    <Rule Id="SA1626" Action="Warning" />         <!-- Single-line comments should not use documentation style slashes -->
+    <Rule Id="SA1629" Action="Warning" />         <!-- Documentation text should end with a period -->
+  </Rules>
+</RuleSet>

@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <CodeAnalysisRuleset>$(MSBuildThisFileDirectory)CodeAnalysis.ruleset</CodeAnalysisRuleset>
+    <CodeAnalysisRuleset>$(MSBuildThisFileDirectory)codeanalysis.templateengine.ruleset</CodeAnalysisRuleset>
     <EnableAnalyzers>true</EnableAnalyzers>
     <!-- Disable analyzers in sourcebuild -->
     <EnableAnalyzers Condition="'$(DotNetBuildFromSource)' == 'true'">false</EnableAnalyzers>
