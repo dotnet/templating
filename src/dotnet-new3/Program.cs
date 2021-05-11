@@ -10,8 +10,6 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Console;
 using Microsoft.TemplateEngine.Cli;
 using Microsoft.TemplateEngine.Edge;
 
@@ -67,25 +65,13 @@ namespace Dotnet_new3
             }
 
             ConfigureLocale();
-            bool enableVerboseLogging = bool.TryParse(Environment.GetEnvironmentVariable("DOTNET_CLI_CONTEXT_VERBOSE") ?? "false", out bool value) && value;
-            var loggerFactory =
-                LoggerFactory.Create(builder =>
-                    builder
-                        .SetMinimumLevel(enableVerboseLogging ? LogLevel.Trace : LogLevel.Information)
-                        .AddConsole(config => config.FormatterName = nameof(CilConsoleFormatter))
-                        .AddConsoleFormatter<CilConsoleFormatter, ConsoleFormatterOptions>(config =>
-                        {
-                            config.IncludeScopes = true;
-                            config.TimestampFormat = "yyyy-MM-dd HH:mm:ss.fff";
-                        }));
 
             DefaultTemplateEngineHost host = new DefaultTemplateEngineHost(
                 HostIdentifier,
                 HostVersion,
                 preferences,
                 builtIns,
-                new[] { "dotnetcli" },
-                loggerFactory);
+                new[] { "dotnetcli" });
 
             return host;
         }

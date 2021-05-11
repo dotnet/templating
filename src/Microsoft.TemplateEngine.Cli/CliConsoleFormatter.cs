@@ -10,14 +10,14 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Options;
 
-namespace Dotnet_new3
+namespace Microsoft.TemplateEngine.Cli
 {
-    internal class CilConsoleFormatter : ConsoleFormatter, IDisposable
+    internal class CliConsoleFormatter : ConsoleFormatter, IDisposable
     {
         private readonly IDisposable _optionsReloadToken;
         private ConsoleFormatterOptions _formatterOptions;
 
-        public CilConsoleFormatter(IOptionsMonitor<ConsoleFormatterOptions> options) : base(nameof(CilConsoleFormatter))
+        public CliConsoleFormatter(IOptionsMonitor<ConsoleFormatterOptions> options) : base(nameof(CliConsoleFormatter))
             =>
             (_optionsReloadToken, _formatterOptions) =
                 (options.OnChange(ReloadLoggerOptions), options.CurrentValue);
