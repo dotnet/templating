@@ -58,59 +58,61 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 ICreationResult creationResult = null;
                 string targetDir = outputPath ?? _environmentSettings.Host.FileSystem.GetCurrentDirectory();
 
-                using (Timing.Over(_logger, "Template content generation"))
+                Timing contentGeneratorBlock = Timing.Over(_logger, "Template content generation");
+                try
                 {
-                    try
+                    if (!dryRun)
                     {
-                        if (!dryRun)
-                        {
-                            _environmentSettings.Host.FileSystem.CreateDirectory(targetDir);
-                        }
-                        IComponentManager componentManager = _environmentSettings.SettingsLoader.Components;
-
-                        // setup separate sets of parameters to be used for GetCreationEffects() and by CreateAsync().
-                        if (!TryCreateParameterSet(template, realName, inputParameters, out IParameterSet effectParams, out TemplateCreationResult resultIfParameterCreationFailed))
-                        {
-                            return resultIfParameterCreationFailed;
-                        }
-
-                        ICreationEffects creationEffects = template.Generator.GetCreationEffects(_environmentSettings, template, effectParams, componentManager, targetDir);
-                        IReadOnlyList<IFileChange> changes = creationEffects.FileChanges;
-                        IReadOnlyList<IFileChange> destructiveChanges = changes.Where(x => x.ChangeKind != ChangeKind.Create).ToList();
-
-                        if (!forceCreation && destructiveChanges.Count > 0)
-                        {
-                            if (!_environmentSettings.Host.OnPotentiallyDestructiveChangesDetected(changes, destructiveChanges))
-                            {
-                                return new TemplateCreationResult("Cancelled", CreationResultStatus.Cancelled, template.Name);
-                            }
-                        }
-
-                        if (!TryCreateParameterSet(template, realName, inputParameters, out IParameterSet creationParams, out resultIfParameterCreationFailed))
-                        {
-                            return resultIfParameterCreationFailed;
-                        }
-
-                        if (!dryRun)
-                        {
-                            creationResult = await template.Generator.CreateAsync(_environmentSettings, template, creationParams, componentManager, targetDir).ConfigureAwait(false);
-                        }
-                        return new TemplateCreationResult(string.Empty, CreationResultStatus.Success, template.Name, creationResult, targetDir, creationEffects);
+                        _environmentSettings.Host.FileSystem.CreateDirectory(targetDir);
                     }
-                    catch (ContentGenerationException cx)
+                    IComponentManager componentManager = _environmentSettings.SettingsLoader.Components;
+
+                    // setup separate sets of parameters to be used for GetCreationEffects() and by CreateAsync().
+                    if (!TryCreateParameterSet(template, realName, inputParameters, out IParameterSet effectParams, out TemplateCreationResult resultIfParameterCreationFailed))
                     {
-                        string message = cx.Message;
-                        if (cx.InnerException != null)
-                        {
-                            message += Environment.NewLine + cx.InnerException;
-                        }
+                        return resultIfParameterCreationFailed;
+                    }
 
-                        return new TemplateCreationResult(message, CreationResultStatus.CreateFailed, template.Name);
-                    }
-                    catch (Exception ex)
+                    ICreationEffects creationEffects = template.Generator.GetCreationEffects(_environmentSettings, template, effectParams, componentManager, targetDir);
+                    IReadOnlyList<IFileChange> changes = creationEffects.FileChanges;
+                    IReadOnlyList<IFileChange> destructiveChanges = changes.Where(x => x.ChangeKind != ChangeKind.Create).ToList();
+
+                    if (!forceCreation && destructiveChanges.Count > 0)
                     {
-                        return new TemplateCreationResult(ex.Message, CreationResultStatus.CreateFailed, template.Name);
+                        if (!_environmentSettings.Host.OnPotentiallyDestructiveChangesDetected(changes, destructiveChanges))
+                        {
+                            return new TemplateCreationResult("Cancelled", CreationResultStatus.Cancelled, template.Name);
+                        }
                     }
+
+                    if (!TryCreateParameterSet(template, realName, inputParameters, out IParameterSet creationParams, out resultIfParameterCreationFailed))
+                    {
+                        return resultIfParameterCreationFailed;
+                    }
+
+                    if (!dryRun)
+                    {
+                        creationResult = await template.Generator.CreateAsync(_environmentSettings, template, creationParams, componentManager, targetDir).ConfigureAwait(false);
+                    }
+                    return new TemplateCreationResult(string.Empty, CreationResultStatus.Success, template.Name, creationResult, targetDir, creationEffects);
+                }
+                catch (ContentGenerationException cx)
+                {
+                    string message = cx.Message;
+                    if (cx.InnerException != null)
+                    {
+                        message += Environment.NewLine + cx.InnerException;
+                    }
+
+                    return new TemplateCreationResult(message, CreationResultStatus.CreateFailed, template.Name);
+                }
+                catch (Exception ex)
+                {
+                    return new TemplateCreationResult(ex.Message, CreationResultStatus.CreateFailed, template.Name);
+                }
+                finally
+                {
+                    contentGeneratorBlock.Dispose();
                 }
             }
             finally
