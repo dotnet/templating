@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 
@@ -17,11 +18,26 @@ namespace Microsoft.TemplateEngine.Cli
     {
         private readonly New3Command _new3Command;
         private readonly ITemplateEngineHost _baseHost;
+        private readonly ILoggerFactory _loggerFactory;
+        private readonly ILogger _logger;
 
         internal CliTemplateEngineHost(ITemplateEngineHost baseHost, New3Command new3Command)
         {
             _baseHost = baseHost;
             _new3Command = new3Command;
+
+            bool enableVerboseLogging = bool.TryParse(Environment.GetEnvironmentVariable("DOTNET_CLI_CONTEXT_VERBOSE") ?? "false", out bool value) && value;
+            _loggerFactory =
+                Extensions.Logging.LoggerFactory.Create(builder =>
+                    builder
+                        .SetMinimumLevel(enableVerboseLogging ? LogLevel.Trace : LogLevel.Information)
+                        .AddConsole(config => config.FormatterName = nameof(CliConsoleFormatter))
+                        .AddConsoleFormatter<CliConsoleFormatter, ConsoleFormatterOptions>(config =>
+                        {
+                            config.IncludeScopes = true;
+                            config.TimestampFormat = "yyyy-MM-dd HH:mm:ss.fff";
+                        }));
+            _logger = _loggerFactory.CreateLogger<CliTemplateEngineHost>();
         }
 
         public IPhysicalFileSystem FileSystem => _baseHost.FileSystem;
@@ -34,9 +50,9 @@ namespace Microsoft.TemplateEngine.Cli
 
         public virtual IReadOnlyList<KeyValuePair<Guid, Func<Type>>> BuiltInComponents => _baseHost.BuiltInComponents;
 
-        public ILogger Logger => _baseHost.Logger;
+        public ILogger Logger => _logger;
 
-        public ILoggerFactory LoggerFactory => _baseHost.LoggerFactory;
+        public ILoggerFactory LoggerFactory => _loggerFactory;
 
         private bool GlobalJsonFileExistsInPath
         {
