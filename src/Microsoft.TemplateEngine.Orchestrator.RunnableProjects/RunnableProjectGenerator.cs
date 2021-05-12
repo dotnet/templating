@@ -726,13 +726,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     return true;
                 }
 
-                parameter = new Parameter
-                {
-                    Name = name,
-                    Requirement = TemplateParameterPriority.Optional,
-                    IsVariable = true,
-                    Type = "string"
-                };
+                parameter = new Parameter(
+                    name: name,
+                    priority: TemplateParameterPriority.Optional);
 
                 return true;
             }

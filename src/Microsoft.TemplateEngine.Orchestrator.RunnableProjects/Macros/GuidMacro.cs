@@ -40,12 +40,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             for (int i = 0; i < guidFormats.Length; ++i)
             {
                 string value = char.IsUpper(guidFormats[i]) ? g.ToString(guidFormats[i].ToString()).ToUpperInvariant() : g.ToString(guidFormats[i].ToString()).ToLowerInvariant();
-                Parameter p = new Parameter
-                {
-                    IsVariable = true,
-                    Name = config.VariableName + "-" + guidFormats[i],
-                    DataType = config.DataType
-                };
+                Parameter p = new Parameter(config.VariableName + "-" + guidFormats[i], dataType: config.DataType);
 
                 vars[p.Name] = value;
                 setter(p, value);
@@ -57,17 +52,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             {
                 // If there is an existing parameter with this name, it must be reused so it can be referenced by name
                 // for other processing, for example: if the parameter had value forms defined for creating variants.
-                // When the param already exists, use its definition, but set IsVariable = true for consistency.
                 pd = (Parameter)existingParam;
-                pd.IsVariable = true;
             }
             else
             {
-                pd = new Parameter
-                {
-                    IsVariable = true,
-                    Name = config.VariableName
-                };
+                pd = new Parameter(config.VariableName);
             }
 
             vars[config.VariableName] = g.ToString(config.DefaultFormat);

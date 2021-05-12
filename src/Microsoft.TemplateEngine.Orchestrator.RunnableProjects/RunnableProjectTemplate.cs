@@ -139,47 +139,26 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
                     foreach (KeyValuePair<string, ICacheTag> tagInfo in Tags)
                     {
-                        ITemplateParameter param = new Parameter
-                        {
-                            Name = tagInfo.Key,
-                            Documentation = tagInfo.Value.Description,
-                            DefaultValue = tagInfo.Value.DefaultValue,
-                            Choices = tagInfo.Value.Choices,
-                            DataType = "choice"
-                        };
+                        ITemplateParameter param = new Parameter(
+                            name: tagInfo.Key,
+                            documentation: tagInfo.Value.Description,
+                            defaultValue: tagInfo.Value.DefaultValue,
+                            choices: tagInfo.Value.Choices,
+                            dataType: "choice",
+                            defaultIfOptionWithoutValue: tagInfo.Value.DefaultIfOptionWithoutValue);
 
-                        if (param is IAllowDefaultIfOptionWithoutValue paramWithNoValueDefault
-                            && tagInfo.Value is IAllowDefaultIfOptionWithoutValue tagValueWithNoValueDefault)
-                        {
-                            paramWithNoValueDefault.DefaultIfOptionWithoutValue = tagValueWithNoValueDefault.DefaultIfOptionWithoutValue;
-                            parameters.Add(paramWithNoValueDefault as Parameter);
-                        }
-                        else
-                        {
-                            parameters.Add(param);
-                        }
+                        parameters.Add(param);
                     }
 
                     foreach (KeyValuePair<string, ICacheParameter> paramInfo in CacheParameters)
                     {
-                        ITemplateParameter param = new Parameter
-                        {
-                            Name = paramInfo.Key,
-                            Documentation = paramInfo.Value.Description,
-                            DataType = paramInfo.Value.DataType,
-                            DefaultValue = paramInfo.Value.DefaultValue,
-                        };
-
-                        if (param is IAllowDefaultIfOptionWithoutValue paramWithNoValueDefault
-                            && paramInfo.Value is IAllowDefaultIfOptionWithoutValue infoWithNoValueDefault)
-                        {
-                            paramWithNoValueDefault.DefaultIfOptionWithoutValue = infoWithNoValueDefault.DefaultIfOptionWithoutValue;
-                            parameters.Add(paramWithNoValueDefault as Parameter);
-                        }
-                        else
-                        {
-                            parameters.Add(param);
-                        }
+                        ITemplateParameter param = new Parameter(
+                            name: paramInfo.Key,
+                            documentation: paramInfo.Value.Description,
+                            defaultValue: paramInfo.Value.DefaultValue,
+                            dataType: paramInfo.Value.DataType,
+                            defaultIfOptionWithoutValue: paramInfo.Value.DefaultIfOptionWithoutValue);
+                        parameters.Add(param);
                     }
 
                     _parameters = parameters;

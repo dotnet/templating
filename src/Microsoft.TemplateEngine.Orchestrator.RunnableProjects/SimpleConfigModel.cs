@@ -233,27 +233,16 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
                     bool isName = baseSymbol.Binding == NameSymbolName;
 
-                    Parameter parameter = new Parameter
-                    {
-                        DefaultValue = baseSymbol.DefaultValue ?? (!baseSymbol.IsRequired ? baseSymbol.Replaces : null),
-                        IsName = isName,
-                        IsVariable = true,
-                        Name = symbol.Key,
-#pragma warning disable 612,618
-                        FileRename = baseSymbol.FileRename,
-#pragma warning restore 612,618
-                        Requirement = baseSymbol.IsRequired ? TemplateParameterPriority.Required : isName ? TemplateParameterPriority.Implicit : TemplateParameterPriority.Optional,
-                        Type = baseSymbol.Type,
-                        DataType = baseSymbol.DataType
-                    };
-
-                    if (string.Equals(symbol.Value.Type, ParameterSymbol.TypeName, StringComparison.Ordinal) &&
-                            symbol.Value is ParameterSymbol parameterSymbol)
-                    {
-                        parameter.Description = parameterSymbol.Description;
-                        parameter.Choices = parameterSymbol.Choices;
-                        parameter.DefaultIfOptionWithoutValue = parameterSymbol.DefaultIfOptionWithoutValue;
-                    }
+                    Parameter parameter = new Parameter(
+                        name: symbol.Key,
+                        defaultValue: baseSymbol.DefaultValue ?? (!baseSymbol.IsRequired ? baseSymbol.Replaces : null),
+                        isName: isName,
+                        priority: baseSymbol.IsRequired ? TemplateParameterPriority.Required : isName ? TemplateParameterPriority.Implicit : TemplateParameterPriority.Optional,
+                        type: baseSymbol.Type,
+                        dataType: baseSymbol.DataType,
+                        documentation: (symbol.Value as ParameterSymbol)?.Description,
+                        choices: (symbol.Value as ParameterSymbol)?.Choices,
+                        defaultIfOptionWithoutValue: (symbol.Value as ParameterSymbol)?.DefaultIfOptionWithoutValue);
 
                     parameters[symbol.Key] = parameter;
                 }

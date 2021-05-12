@@ -44,9 +44,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             {
                 // If there is an existing parameter with this name, it must be reused so it can be referenced by name
                 // for other processing, for example: if the parameter had value forms defined for creating variants.
-                // When the param already exists, use its definition, but set IsVariable = true for consistency.
                 p = (Parameter)existingParam;
-                p.IsVariable = true;
 
                 if (string.IsNullOrEmpty(p.DataType))
                 {
@@ -55,12 +53,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             }
             else
             {
-                p = new Parameter
-                {
-                    IsVariable = true,
-                    Name = config.VariableName,
-                    DataType = config.DataType
-                };
+                p = new Parameter(config.VariableName, dataType: config.DataType);
             }
 
             vars[config.VariableName] = result.ToString();

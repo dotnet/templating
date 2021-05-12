@@ -1,92 +1,64 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
-using Newtonsoft.Json;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
-    internal class Parameter : ITemplateParameter, IExtendedTemplateParameter, IAllowDefaultIfOptionWithoutValue
+    internal class Parameter : ITemplateParameter
     {
-        [JsonProperty]
-        [Obsolete("This property is no longer used. It is populated only when creating parameters from parameter and derived symbols for compatibility reason.")]
-        public string FileRename { get; set; }
-
-        [JsonProperty]
-        public IReadOnlyDictionary<string, ParameterChoice> Choices { get; set; }
-
-        [JsonProperty]
-        public IReadOnlyDictionary<string, IReadOnlyList<string>> Forms { get; set; }
-
-        [JsonIgnore]
-        public string Documentation
+        internal Parameter(
+            string name,
+            string? type = null,
+            string? dataType = null,
+            bool isName = false,
+            TemplateParameterPriority priority = default,
+            string? documentation = null,
+            string? defaultValue = null,
+            string? defaultIfOptionWithoutValue = null,
+            IReadOnlyDictionary<string, ParameterChoice>? choices = null)
         {
-            get { return Description; }
-            set { Description = value; }
-        }
-
-        string ITemplateParameter.Name => Name;
-
-        TemplateParameterPriority ITemplateParameter.Priority => Requirement;
-
-        string ITemplateParameter.Type => Type;
-
-        bool ITemplateParameter.IsName => IsName;
-
-        string ITemplateParameter.DefaultValue => DefaultValue;
-
-        string ITemplateParameter.DataType => DataType;
-
-        string IAllowDefaultIfOptionWithoutValue.DefaultIfOptionWithoutValue
-        {
-            get
+            if (string.IsNullOrWhiteSpace(name))
             {
-                return DefaultIfOptionWithoutValue;
+                throw new ArgumentException($"'{nameof(name)}' cannot be null or whitespace.", nameof(name));
             }
 
-            set
-            {
-                DefaultIfOptionWithoutValue = value;
-            }
+            Name = name;
+            Type = type;
+            DataType = dataType;
+            Priority = priority;
+            Documentation = documentation;
+            DefaultValue = defaultValue;
+            DefaultIfOptionWithoutValue = defaultIfOptionWithoutValue;
+            Choices = choices ?? new Dictionary<string, ParameterChoice>();
+            IsName = isName;
         }
 
-        [JsonProperty]
-        internal string Description { get; set; }
+        public IReadOnlyDictionary<string, ParameterChoice> Choices { get; }
 
-        [JsonProperty]
-        internal string DefaultValue { get; set; }
+        public string? Documentation { get; }
 
-        [JsonIgnore]
-        internal string Name { get; set; }
+        public TemplateParameterPriority Priority { get; }
 
-        [JsonProperty]
-        internal bool IsName { get; set; }
+        public string? DefaultValue { get; }
 
-        [JsonProperty]
-        internal TemplateParameterPriority Requirement { get; set; }
+        public string Name { get; internal set; }
 
-        [JsonProperty]
-        internal string Type { get; set; }
+        public bool IsName { get; }
 
-        [JsonProperty]
-        internal bool IsVariable { get; set; }
+        public string? Type { get; }
 
-        [JsonProperty]
-        internal string DataType { get; set; }
+        public string? DataType { get; internal set; }
 
-        [JsonProperty]
-        internal string DefaultIfOptionWithoutValue { get; set; }
+        public string? DefaultIfOptionWithoutValue { get; }
 
         public override string ToString()
         {
             return $"{Name} ({Type})";
-        }
-
-        internal bool ShouldSerializeDefaultIfOptionWithoutValue()
-        {
-            return !string.IsNullOrEmpty(DefaultIfOptionWithoutValue);
         }
     }
 }
