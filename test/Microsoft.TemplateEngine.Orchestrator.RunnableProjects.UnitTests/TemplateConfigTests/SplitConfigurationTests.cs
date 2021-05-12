@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.TestHelper;
@@ -167,13 +166,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             IFileSystemInfo templateConfigFileInfo = setup.InfoForSourceFile("templateSource/.template.config/template.json");
             generator.TryGetTemplateFromConfigInfo(templateConfigFileInfo, out ITemplate template, null, null);
 
-            IDictionary<string, ITemplateParameter> parameters = template.Parameters.ToDictionary(p => p.Name, p => p);
-            Assert.Equal(6, parameters.Count);  // 5 in the configs + 1 for 'name' (implicit)
-            Assert.True(parameters.ContainsKey("type"));
-            Assert.True(parameters.ContainsKey("language"));
-            Assert.True(parameters.ContainsKey("RuntimeFrameworkVersion"));
-            Assert.True(parameters.ContainsKey("Framework"));
-            Assert.True(parameters.ContainsKey("MyThing"));
+            Assert.Equal(4, template.Tags.Count);  // 5 in the configs + 1 for 'name' (implicit)
+            Assert.Equal(2, template.CacheParameters.Count);
+            Assert.True(template.Tags.ContainsKey("type"));
+            Assert.True(template.Tags.ContainsKey("language"));
+            Assert.True(template.CacheParameters.ContainsKey("RuntimeFrameworkVersion"));
+            Assert.True(template.Tags.ContainsKey("Framework"));
+            Assert.True(template.Tags.ContainsKey("MyThing"));
         }
 
         // The file outside the proper location is not created - it can't be by this mechanism.

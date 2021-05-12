@@ -1,9 +1,12 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System.Collections.Generic;
+using FakeItEasy;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Mocks;
+using Microsoft.TemplateEngine.Utils;
 using Xunit;
 
 namespace Microsoft.TemplateEngine.Cli.UnitTests
@@ -13,179 +16,177 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
         [Fact(DisplayName = nameof(NonChoiceParameterHasNullCanonicalValueTest))]
         public void NonChoiceParameterHasNullCanonicalValueTest()
         {
-            ITemplateParameter param = new MockParameter()
+            ITemplateInfo templateInfo = A.Fake<ITemplateInfo>();
+            A.CallTo(() => templateInfo.CacheParameters).Returns(new Dictionary<string, ICacheParameter>()
             {
-                Name = "TestName",
-                Choices = null
-            };
-            IReadOnlyList<ITemplateParameter> parametersForTemplate = new List<ITemplateParameter>() { param };
+                { "TestName", new CacheParameter() }
+            });
 
-            ITemplateInfo template = new MockTemplateInfo()
-            {
-                Parameters = parametersForTemplate
-            };
-
-            string canonical = TelemetryHelper.GetCanonicalValueForChoiceParamOrDefault(template, "TestName", "whatever");
+            string canonical = TelemetryHelper.GetCanonicalValueForChoiceParamOrDefault(templateInfo, "TestName", "whatever");
             Assert.Null(canonical);
         }
 
         [Fact(DisplayName = nameof(UnknownParameterNameHasNullCanonicalValueTest))]
         public void UnknownParameterNameHasNullCanonicalValueTest()
         {
-            ITemplateParameter param = new MockParameter()
+            ITemplateInfo templateInfo = A.Fake<ITemplateInfo>();
+            A.CallTo(() => templateInfo.CacheParameters).Returns(new Dictionary<string, ICacheParameter>()
             {
-                Name = "TestName",
-                Choices = null
-            };
-            IReadOnlyList<ITemplateParameter> parametersForTemplate = new List<ITemplateParameter>() { param };
-
-            ITemplateInfo template = new MockTemplateInfo()
-            {
-                Parameters = parametersForTemplate
-            };
-
-            string canonical = TelemetryHelper.GetCanonicalValueForChoiceParamOrDefault(template, "OtherName", "whatever");
+                { "TestName", new CacheParameter() }
+            });
+            string canonical = TelemetryHelper.GetCanonicalValueForChoiceParamOrDefault(templateInfo, "OtherName", "whatever");
             Assert.Null(canonical);
         }
 
         [Fact(DisplayName = nameof(InvalidChoiceValueForParameterHasNullCanonicalValueTest))]
         public void InvalidChoiceValueForParameterHasNullCanonicalValueTest()
         {
-            ITemplateParameter param = new MockParameter()
+            ITemplateInfo templateInfo = A.Fake<ITemplateInfo>();
+            A.CallTo(() => templateInfo.Tags).Returns(new Dictionary<string, ICacheTag>()
             {
-                Name = "TestName",
-                Choices = new Dictionary<string, ParameterChoice>()
                 {
-                    { "foo", new ParameterChoice("Foo", "Foo value") },
-                    { "bar", new ParameterChoice("Bar", "Bar value") }
+                    "TestName",
+                    new CacheTag(
+                        null,
+                        null,
+                        new Dictionary<string, ParameterChoice>()
+                        {
+                            { "foo", new ParameterChoice("Foo", "Foo value") },
+                            { "bar", new ParameterChoice("Bar", "Bar value") }
+                        },
+                        null
+                    )
                 }
-            };
-            IReadOnlyList<ITemplateParameter> parametersForTemplate = new List<ITemplateParameter>() { param };
+            });
 
-            ITemplateInfo template = new MockTemplateInfo()
-            {
-                Parameters = parametersForTemplate
-            };
-
-            string canonical = TelemetryHelper.GetCanonicalValueForChoiceParamOrDefault(template, "TestName", "whatever");
+            string canonical = TelemetryHelper.GetCanonicalValueForChoiceParamOrDefault(templateInfo, "TestName", "whatever");
             Assert.Null(canonical);
         }
 
         [Fact(DisplayName = nameof(ValidChoiceForParameterIsItsOwnCanonicalValueTest))]
         public void ValidChoiceForParameterIsItsOwnCanonicalValueTest()
         {
-            ITemplateParameter param = new MockParameter()
+            ITemplateInfo templateInfo = A.Fake<ITemplateInfo>();
+            A.CallTo(() => templateInfo.Tags).Returns(new Dictionary<string, ICacheTag>()
             {
-                Name = "TestName",
-                Choices = new Dictionary<string, ParameterChoice>()
                 {
-                    { "foo", new ParameterChoice("Foo", "Foo value") },
-                    { "bar", new ParameterChoice("Bar", "Bar value") }
+                    "TestName",
+                    new CacheTag(
+                        null,
+                        null,
+                        new Dictionary<string, ParameterChoice>()
+                        {
+                            { "foo", new ParameterChoice("Foo", "Foo value") },
+                            { "bar", new ParameterChoice("Bar", "Bar value") }
+                        },
+                        null
+                    )
                 }
-            };
-            IReadOnlyList<ITemplateParameter> parametersForTemplate = new List<ITemplateParameter>() { param };
+            });
 
-            ITemplateInfo template = new MockTemplateInfo()
-            {
-                Parameters = parametersForTemplate
-            };
-
-            string canonical = TelemetryHelper.GetCanonicalValueForChoiceParamOrDefault(template, "TestName", "foo");
+            string canonical = TelemetryHelper.GetCanonicalValueForChoiceParamOrDefault(templateInfo, "TestName", "foo");
             Assert.Equal("foo", canonical);
         }
 
         [Fact(DisplayName = nameof(UniqueStartsWithValueResolvesCanonicalValueTest))]
         public void UniqueStartsWithValueResolvesCanonicalValueTest()
         {
-            ITemplateParameter param = new MockParameter()
+            ITemplateInfo templateInfo = A.Fake<ITemplateInfo>();
+            A.CallTo(() => templateInfo.Tags).Returns(new Dictionary<string, ICacheTag>()
             {
-                Name = "TestName",
-                Choices = new Dictionary<string, ParameterChoice>()
                 {
-                    { "foo", new ParameterChoice("Foo", "Foo value") },
-                    { "bar", new ParameterChoice("Bar", "Bar value") }
+                    "TestName",
+                    new CacheTag(
+                        null,
+                        null,
+                        new Dictionary<string, ParameterChoice>()
+                        {
+                            { "foo", new ParameterChoice("Foo", "Foo value") },
+                            { "bar", new ParameterChoice("Bar", "Bar value") }
+                        },
+                        null
+                    )
                 }
-            };
-            IReadOnlyList<ITemplateParameter> parametersForTemplate = new List<ITemplateParameter>() { param };
+            });
 
-            ITemplateInfo template = new MockTemplateInfo()
-            {
-                Parameters = parametersForTemplate
-            };
-
-            string canonical = TelemetryHelper.GetCanonicalValueForChoiceParamOrDefault(template, "TestName", "f");
+            string canonical = TelemetryHelper.GetCanonicalValueForChoiceParamOrDefault(templateInfo, "TestName", "f");
             Assert.Equal("foo", canonical);
         }
 
         [Fact(DisplayName = nameof(AmbiguousStartsWithValueHasNullCanonicalValueTest))]
         public void AmbiguousStartsWithValueHasNullCanonicalValueTest()
         {
-            ITemplateParameter param = new MockParameter()
+            ITemplateInfo templateInfo = A.Fake<ITemplateInfo>();
+            A.CallTo(() => templateInfo.Tags).Returns(new Dictionary<string, ICacheTag>()
             {
-                Name = "TestName",
-                Choices = new Dictionary<string, ParameterChoice>()
                 {
-                    { "foo", new ParameterChoice("Foo", "Foo value") },
-                    { "bar", new ParameterChoice("Bar", "Bar value") },
-                    { "foot", new ParameterChoice("Foot", "Foot value") }
+                    "TestName",
+                    new CacheTag(
+                        null,
+                        null,
+                        new Dictionary<string, ParameterChoice>()
+                        {
+                            { "foo", new ParameterChoice("Foo", "Foo value") },
+                            { "bar", new ParameterChoice("Bar", "Bar value") },
+                            { "foot", new ParameterChoice("Foot", "Foot value") }
+                        },
+                        null
+                    )
                 }
-            };
-            IReadOnlyList<ITemplateParameter> parametersForTemplate = new List<ITemplateParameter>() { param };
+            });
 
-            ITemplateInfo template = new MockTemplateInfo()
-            {
-                Parameters = parametersForTemplate
-            };
-
-            string canonical = TelemetryHelper.GetCanonicalValueForChoiceParamOrDefault(template, "TestName", "f");
+            string canonical = TelemetryHelper.GetCanonicalValueForChoiceParamOrDefault(templateInfo, "TestName", "f");
             Assert.Null(canonical);
         }
 
         [Fact(DisplayName = nameof(ChoiceValueCaseDifferenceIsAMatchTest))]
         public void ChoiceValueCaseDifferenceIsAMatchTest()
         {
-            ITemplateParameter param = new MockParameter()
+            ITemplateInfo templateInfo = A.Fake<ITemplateInfo>();
+            A.CallTo(() => templateInfo.Tags).Returns(new Dictionary<string, ICacheTag>()
             {
-                Name = "TestName",
-                Choices = new Dictionary<string, ParameterChoice>()
                 {
-                    { "foo", new ParameterChoice("Foo", "Foo value") },
-                    { "bar", new ParameterChoice("Bar", "Bar value") }
+                    "TestName",
+                    new CacheTag(
+                        null,
+                        null,
+                        new Dictionary<string, ParameterChoice>()
+                        {
+                            { "foo", new ParameterChoice("Foo", "Foo value") },
+                            { "bar", new ParameterChoice("Bar", "Bar value") }
+                        },
+                        null
+                    )
                 }
-            };
-            IReadOnlyList<ITemplateParameter> parametersForTemplate = new List<ITemplateParameter>() { param };
-
-            ITemplateInfo template = new MockTemplateInfo()
-            {
-                Parameters = parametersForTemplate
-            };
-
-            string canonical = TelemetryHelper.GetCanonicalValueForChoiceParamOrDefault(template, "TestName", "FOO");
-            Assert.Equal("foo", canonical);
+            });
+            string canonical = TelemetryHelper.GetCanonicalValueForChoiceParamOrDefault(templateInfo, "TestName", "FOO");
+            Assert.Equal("FOO", canonical);
         }
 
         [Fact(DisplayName = nameof(ChoiceValueCaseDifferencesContributeToAmbiguousMatchTest))]
         public void ChoiceValueCaseDifferencesContributeToAmbiguousMatchTest()
         {
-            ITemplateParameter param = new MockParameter()
+            ITemplateInfo templateInfo = A.Fake<ITemplateInfo>();
+            A.CallTo(() => templateInfo.Tags).Returns(new Dictionary<string, ICacheTag>()
             {
-                Name = "TestName",
-                Choices = new Dictionary<string, ParameterChoice>()
                 {
-                    { "foot", new ParameterChoice("Foo", "Foo value") },
-                    { "bar", new ParameterChoice("Bar", "Bar value") },
-                    { "Football", new ParameterChoice("Football", "Foo value") },
-                    { "FOOTPOUND", new ParameterChoice("Footpound", "Foo value") }
+                    "TestName",
+                    new CacheTag(
+                        null,
+                        null,
+                        new Dictionary<string, ParameterChoice>()
+                        {
+                            { "foot", new ParameterChoice("Foo", "Foo value") },
+                            { "bar", new ParameterChoice("Bar", "Bar value") },
+                            { "Football", new ParameterChoice("Football", "Foo value") },
+                            { "FOOTPOUND", new ParameterChoice("Footpound", "Foo value") }
+                        },
+                        null
+                    )
                 }
-            };
-            IReadOnlyList<ITemplateParameter> parametersForTemplate = new List<ITemplateParameter>() { param };
+            });
 
-            ITemplateInfo template = new MockTemplateInfo()
-            {
-                Parameters = parametersForTemplate
-            };
-
-            string canonical = TelemetryHelper.GetCanonicalValueForChoiceParamOrDefault(template, "TestName", "foo");
+            string canonical = TelemetryHelper.GetCanonicalValueForChoiceParamOrDefault(templateInfo, "TestName", "foo");
             Assert.Null(canonical);
         }
     }

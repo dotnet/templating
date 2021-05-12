@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Mocks
 {
@@ -35,7 +34,7 @@ namespace Microsoft.TemplateEngine.Mocks
 
         public bool TryGetParameterDefinition(string name, out ITemplateParameter parameter)
         {
-            parameter = new TemplateParameter();
+            parameter = new MockParameter(name);
             return true;
         }
     }

@@ -192,14 +192,14 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
 
             foreach (KeyValuePair<string, string> inputParam in _templateOptions)
             {
-                ITemplateParameter matchedParam = default(ITemplateParameter);
+                CliTemplateParameter matchedParam = default(CliTemplateParameter);
 
-                if (templateInfo.Parameters != null)
+                if (templateInfo.GetParameters() != null)
                 {
-                    matchedParam = templateInfo.Parameters?.FirstOrDefault(x => string.Equals(x.Name, inputParam.Key));
+                    matchedParam = templateInfo.GetParameters().FirstOrDefault(x => string.Equals(x.Name, inputParam.Key));
                 }
 
-                if (matchedParam != default(ITemplateParameter))
+                if (matchedParam != default(CliTemplateParameter))
                 {
                     templateParamValues.Add(inputParam.Key, inputParam.Value);
                 }
@@ -217,7 +217,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
             RemainingParameters = remainingParams;
             RemainingArguments = remainingParams.Keys.ToList();
 
-            _allParametersForTemplate = templateInfo.Parameters.Select(x => x.Name).ToList();
+            _allParametersForTemplate = templateInfo.GetParameters().Select(x => x.Name).ToList();
         }
 
         public void ResetArgs(params string[] args)

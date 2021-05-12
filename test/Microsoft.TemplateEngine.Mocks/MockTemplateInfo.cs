@@ -116,7 +116,8 @@ namespace Microsoft.TemplateEngine.Mocks
             }
         }
 
-        public IReadOnlyList<ITemplateParameter> Parameters
+        [Obsolete]
+        IReadOnlyList<ITemplateParameter> ITemplateInfo.Parameters
         {
             get
             {
@@ -128,11 +129,6 @@ namespace Microsoft.TemplateEngine.Mocks
                     _parameters = parameters;
                 }
                 return _parameters;
-            }
-
-            set
-            {
-                _parameters = value;
             }
         }
 
@@ -219,6 +215,7 @@ namespace Microsoft.TemplateEngine.Mocks
             return new CacheTag(string.Empty, tagDescription, choicesDict, defaultValue, defaultIfOptionWithoutValue);
         }
 
+        [Obsolete]
         private void PopulateParametersFromTags(List<ITemplateParameter> parameters)
         {
             foreach (KeyValuePair<string, ICacheTag> tagInfo in Tags)
@@ -245,6 +242,7 @@ namespace Microsoft.TemplateEngine.Mocks
             }
         }
 
+        [Obsolete]
         private void PopulateParametersFromCacheParameters(List<ITemplateParameter> parameters)
         {
             foreach (KeyValuePair<string, ICacheParameter> paramInfo in CacheParameters)
