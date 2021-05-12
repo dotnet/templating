@@ -246,7 +246,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                 {
                     return null;
                 }
-                string templateLanguage = template.GetLanguage();
+                string? templateLanguage = template.GetLanguage();
                 // only add default language disposition when there is a language specified for the template.
                 if (string.IsNullOrWhiteSpace(templateLanguage))
                 {
@@ -285,12 +285,11 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                         if (template.Info.Tags.TryGetValue(paramName, out ICacheTag? paramDetails))
                         {
                             if (string.IsNullOrEmpty(paramValue)
-                                && paramDetails is IAllowDefaultIfOptionWithoutValue paramDetailsWithNoValueDefault
-                                && !string.IsNullOrEmpty(paramDetailsWithNoValueDefault.DefaultIfOptionWithoutValue))
+                                && !string.IsNullOrEmpty(paramDetails.DefaultIfOptionWithoutValue))
                             {
                                 // The user provided the parameter switch on the command line, without a value.
                                 // In this case, the DefaultIfOptionWithoutValue is the effective value.
-                                paramValue = paramDetailsWithNoValueDefault.DefaultIfOptionWithoutValue;
+                                paramValue = paramDetails.DefaultIfOptionWithoutValue;
                             }
 
                             // key is the value user should provide, value is description
@@ -511,7 +510,8 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
 
             public IReadOnlyDictionary<string, ICacheParameter> CacheParameters => _parent.CacheParameters;
 
-            public IReadOnlyList<ITemplateParameter> Parameters => _parent.Parameters;
+            [Obsolete]
+            IReadOnlyList<ITemplateParameter> ITemplateInfo.Parameters => _parent.Parameters;
 
             public string MountPointUri => _parent.MountPointUri;
 

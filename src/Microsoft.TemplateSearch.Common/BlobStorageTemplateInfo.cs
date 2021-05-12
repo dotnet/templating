@@ -47,54 +47,9 @@ namespace Microsoft.TemplateSearch.Common
             ShortNameList = shortNameList.ToList();
         }
 
+        [Obsolete]
         [JsonIgnore]
-        IReadOnlyList<ITemplateParameter> ITemplateInfo.Parameters
-        {
-            get
-            {
-                List<ITemplateParameter> parameters = new List<ITemplateParameter>();
-
-                foreach (KeyValuePair<string, ICacheTag> tagInfo in Tags)
-                {
-                    ITemplateParameter param = new TemplateParameter
-                    {
-                        Name = tagInfo.Key,
-                        Documentation = tagInfo.Value.Description,
-                        DefaultValue = tagInfo.Value.DefaultValue,
-                        Choices = tagInfo.Value.Choices,
-                        DataType = "choice"
-                    };
-
-                    if (param is IAllowDefaultIfOptionWithoutValue paramWithNoValueDefault
-                        && tagInfo.Value is IAllowDefaultIfOptionWithoutValue tagWithNoValueDefault)
-                    {
-                        paramWithNoValueDefault.DefaultIfOptionWithoutValue = tagWithNoValueDefault.DefaultIfOptionWithoutValue;
-                    }
-
-                    parameters.Add(param);
-                }
-
-                foreach (KeyValuePair<string, ICacheParameter> paramInfo in CacheParameters)
-                {
-                    ITemplateParameter param = new TemplateParameter
-                    {
-                        Name = paramInfo.Key,
-                        Documentation = paramInfo.Value.Description,
-                        DataType = paramInfo.Value.DataType,
-                        DefaultValue = paramInfo.Value.DefaultValue,
-                    };
-
-                    if (param is IAllowDefaultIfOptionWithoutValue paramWithNoValueDefault
-                        && paramInfo.Value is IAllowDefaultIfOptionWithoutValue infoWithNoValueDefault)
-                    {
-                        paramWithNoValueDefault.DefaultIfOptionWithoutValue = infoWithNoValueDefault.DefaultIfOptionWithoutValue;
-                    }
-                    parameters.Add(param);
-                }
-
-                return parameters;
-            }
-        }
+        IReadOnlyList<ITemplateParameter> ITemplateInfo.Parameters => new List<ITemplateParameter>();
 
         [JsonIgnore]
         string ITemplateInfo.MountPointUri => throw new NotImplementedException();
@@ -180,6 +135,9 @@ namespace Microsoft.TemplateSearch.Common
 
         [JsonProperty]
         public string? DefaultValue { get; private set; }
+
+        [JsonProperty]
+        public string? DefaultIfOptionWithoutValue { get; private set; }
     }
 
     internal class CacheParameter : ICacheParameter
@@ -190,11 +148,14 @@ namespace Microsoft.TemplateSearch.Common
         [JsonProperty]
         public string? DefaultValue { get; private set; }
 
-        [JsonIgnore]
-        public string? DisplayName => throw new NotImplementedException();
+        [JsonProperty]
+        public string? DisplayName { get; private set; }
 
         [JsonProperty]
         public string? Description { get; private set; }
+
+        [JsonProperty]
+        public string? DefaultIfOptionWithoutValue { get; private set; }
     }
 
     internal class BaselineCacheInfo : IBaselineInfo
@@ -204,24 +165,5 @@ namespace Microsoft.TemplateSearch.Common
 
         [JsonProperty]
         public IReadOnlyDictionary<string, string> DefaultOverrides { get; private set; } = new Dictionary<string, string>();
-    }
-
-    internal class TemplateParameter : ITemplateParameter
-    {
-        public string? Documentation { get; internal set; }
-
-        public string? Name { get; internal set; }
-
-        public TemplateParameterPriority Priority { get; internal set; }
-
-        public string? Type { get; internal set; }
-
-        public bool IsName { get; internal set; }
-
-        public string? DefaultValue { get; internal set; }
-
-        public string? DataType { get; internal set; }
-
-        public IReadOnlyDictionary<string, ParameterChoice> Choices { get; internal set; } = new Dictionary<string, ParameterChoice>();
     }
 }

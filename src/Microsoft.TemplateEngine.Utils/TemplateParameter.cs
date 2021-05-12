@@ -7,6 +7,7 @@ using Microsoft.TemplateEngine.Abstractions;
 
 namespace Microsoft.TemplateEngine.Utils
 {
+    [Obsolete("This class is deprecated.")]
     public class TemplateParameter : ITemplateParameter, IAllowDefaultIfOptionWithoutValue
     {
         private IReadOnlyDictionary<string, ParameterChoice> _choices;

@@ -176,10 +176,10 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             }
 
             Reporter.Output.Write($"    dotnet {commandName} {templateInfo.ShortNameList[0]}");
-            IReadOnlyList<ITemplateParameter> allParameterDefinitions = templateInfo.Parameters;
-            IEnumerable<ITemplateParameter> filteredParams = TemplateParameterHelpBase.FilterParamsForHelp(allParameterDefinitions, hostTemplateData.HiddenParameterNames, parametersToAlwaysShow: hostTemplateData.ParametersToAlwaysShow);
+            IEnumerable<CliTemplateParameter> allParameterDefinitions = templateInfo.GetParameters();
+            IEnumerable<CliTemplateParameter> filteredParams = TemplateParameterHelpBase.FilterParamsForHelp(allParameterDefinitions, hostTemplateData.HiddenParameterNames, parametersToAlwaysShow: hostTemplateData.ParametersToAlwaysShow);
 
-            foreach (ITemplateParameter parameter in filteredParams)
+            foreach (CliTemplateParameter parameter in filteredParams)
             {
                 if (string.Equals(parameter.DataType, "bool", StringComparison.OrdinalIgnoreCase)
                     && string.Equals(parameter.DefaultValue, "false", StringComparison.OrdinalIgnoreCase))
@@ -190,7 +190,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                 {
                     continue;
                 }
-                else if (string.Equals(parameter.DataType, "choice", StringComparison.OrdinalIgnoreCase) && parameter.Choices.Count == 1)
+                else if (string.Equals(parameter.DataType, "choice", StringComparison.OrdinalIgnoreCase) && parameter.Choices?.Count == 1)
                 {
                     continue;
                 }

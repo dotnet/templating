@@ -128,7 +128,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
         }
 
-        public IReadOnlyList<ITemplateParameter> Parameters
+        [Obsolete]
+        IReadOnlyList<ITemplateParameter> ITemplateInfo.Parameters
         {
             get
             {

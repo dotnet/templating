@@ -9,7 +9,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 {
     internal class AliasAssignmentCoordinator
     {
-        private IReadOnlyList<ITemplateParameter> _parameterDefinitions;
+        private IReadOnlyList<CliTemplateParameter> _parameterDefinitions;
         private IDictionary<string, string> _longNameOverrides;
         private IDictionary<string, string> _shortNameOverrides;
         private HashSet<string> _takenAliases;
@@ -18,7 +18,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
         private HashSet<string> _invalidParams;
         private bool _calculatedAssignments;
 
-        internal AliasAssignmentCoordinator(IReadOnlyList<ITemplateParameter> parameterDefinitions, IDictionary<string, string> longNameOverrides, IDictionary<string, string> shortNameOverrides, HashSet<string> takenAliases)
+        internal AliasAssignmentCoordinator(IReadOnlyList<CliTemplateParameter> parameterDefinitions, IDictionary<string, string> longNameOverrides, IDictionary<string, string> shortNameOverrides, HashSet<string> takenAliases)
         {
             _parameterDefinitions = parameterDefinitions;
             _longNameOverrides = longNameOverrides;
@@ -74,7 +74,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             }
 
             Dictionary<string, KeyValuePair<string, string>> aliasAssignments = new Dictionary<string, KeyValuePair<string, string>>();
-            Dictionary<string, ITemplateParameter> paramNamesNeedingAssignment = _parameterDefinitions.Where(x => x.Priority != TemplateParameterPriority.Implicit)
+            Dictionary<string, CliTemplateParameter> paramNamesNeedingAssignment = _parameterDefinitions.Where(x => x.Priority != TemplateParameterPriority.Implicit)
                                                                                     .ToDictionary(x => x.Name, x => x);
 
             SetupAssignmentsFromLongOverrides(paramNamesNeedingAssignment);
@@ -84,7 +84,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             _calculatedAssignments = true;
         }
 
-        private void SetupAssignmentsFromLongOverrides(IReadOnlyDictionary<string, ITemplateParameter> paramNamesNeedingAssignment)
+        private void SetupAssignmentsFromLongOverrides(IReadOnlyDictionary<string, CliTemplateParameter> paramNamesNeedingAssignment)
         {
             foreach (KeyValuePair<string, string> canonicalAndLong in _longNameOverrides.Where(x => paramNamesNeedingAssignment.ContainsKey(x.Key)))
             {
@@ -107,7 +107,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             }
         }
 
-        private void SetupAssignmentsFromShortOverrides(IReadOnlyDictionary<string, ITemplateParameter> paramNamesNeedingAssignment)
+        private void SetupAssignmentsFromShortOverrides(IReadOnlyDictionary<string, CliTemplateParameter> paramNamesNeedingAssignment)
         {
             foreach (KeyValuePair<string, string> canonicalAndShort in _shortNameOverrides.Where(x => paramNamesNeedingAssignment.ContainsKey(x.Key)))
             {
@@ -137,9 +137,9 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             }
         }
 
-        private void SetupAssignmentsWithoutOverrides(IReadOnlyDictionary<string, ITemplateParameter> paramNamesNeedingAssignment)
+        private void SetupAssignmentsWithoutOverrides(IReadOnlyDictionary<string, CliTemplateParameter> paramNamesNeedingAssignment)
         {
-            foreach (ITemplateParameter parameterInfo in paramNamesNeedingAssignment.Values)
+            foreach (CliTemplateParameter parameterInfo in paramNamesNeedingAssignment.Values)
             {
                 if (_longAssignments.ContainsKey(parameterInfo.Name) && _shortAssignments.ContainsKey(parameterInfo.Name))
                 {

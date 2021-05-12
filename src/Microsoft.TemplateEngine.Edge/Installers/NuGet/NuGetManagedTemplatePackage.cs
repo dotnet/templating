@@ -100,7 +100,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
         public string DisplayName => string.IsNullOrWhiteSpace(Version) ? Identifier : $"{Identifier}::{Version}";
 
-        public string Identifier => Details.TryGetValue(PackageIdKey, out string identifier) ? identifier : null;
+        public string Identifier => Details[PackageIdKey];
 
         public IInstaller Installer { get; }
 

@@ -1,6 +1,8 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +14,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 {
     internal static class CommandParserSupport
     {
-        private static HashSet<string> _argsForBuiltInCommands;
+        private static HashSet<string>? _argsForBuiltInCommands;
 
         internal static HashSet<string> ArgsForBuiltInCommands
         {
@@ -138,7 +140,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
         internal static Command CreateNewCommandWithArgsForTemplate(
             string commandName,
             string templateName,
-            IReadOnlyList<ITemplateParameter> parameterDefinitions,
+            IReadOnlyList<CliTemplateParameter> parameterDefinitions,
             IDictionary<string, string> longNameOverrides,
             IDictionary<string, string> shortNameOverrides,
             out IReadOnlyDictionary<string, IReadOnlyList<string>> templateParamMap)
@@ -155,23 +157,22 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                 throw new Exception($"Template is malformed. The following parameter names are invalid: {unusableDisplayList}");
             }
 
-            foreach (ITemplateParameter parameter in parameterDefinitions.Where(x => x.Priority != TemplateParameterPriority.Implicit))
+            foreach (CliTemplateParameter parameter in parameterDefinitions.Where(x => x.Priority != TemplateParameterPriority.Implicit))
             {
                 Option option;
                 IList<string> aliasesForParam = new List<string>();
 
-                if (assignmentCoordinator.LongNameAssignments.TryGetValue(parameter.Name, out string longVersion))
+                if (assignmentCoordinator.LongNameAssignments.TryGetValue(parameter.Name, out string? longVersion))
                 {
                     aliasesForParam.Add(longVersion);
                 }
 
-                if (assignmentCoordinator.ShortNameAssignments.TryGetValue(parameter.Name, out string shortVersion))
+                if (assignmentCoordinator.ShortNameAssignments.TryGetValue(parameter.Name, out string? shortVersion))
                 {
                     aliasesForParam.Add(shortVersion);
                 }
 
-                if (parameter is IAllowDefaultIfOptionWithoutValue parameterWithNoValueDefault
-                    && !string.IsNullOrEmpty(parameterWithNoValueDefault.DefaultIfOptionWithoutValue))
+                if (!string.IsNullOrEmpty(parameter.DefaultIfOptionWithoutValue))
                 {
                     // This switch can be provided with or without a value.
                     // If the user doesn't specify a value, it gets the value of DefaultIfOptionWithoutValue
