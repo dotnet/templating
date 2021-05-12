@@ -9,9 +9,9 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders
 {
-    public class TemplateInfoReaderVersion1_0_0_4 : TemplateInfoReaderVersion1_0_0_3
+    internal class TemplateInfoReaderVersion1_0_0_4 : TemplateInfoReaderVersion1_0_0_3
     {
-        public static new TemplateInfo FromJObject(JObject jObject)
+        internal static new TemplateInfo FromJObject(JObject jObject)
         {
             TemplateInfoReaderVersion1_0_0_4 reader = new TemplateInfoReaderVersion1_0_0_4();
             return reader.Read(jObject);
@@ -31,22 +31,20 @@ namespace Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders
             CacheTag tag = new CacheTag(
                 displayName: item.Value.ToString("DisplayName"),
                 description: item.Value.ToString("Description"),
-                choices,
-                item.Value.ToString("DefaultValue"));
-
-            tag.DefaultIfOptionWithoutValue = item.Value.ToString("DefaultIfOptionWithoutValue");
+                choices: choices,
+                defaultValue: item.Value.ToString("DefaultValue"),
+                defaultIfOptionWithoutValue: item.Value.ToString("DefaultIfOptionWithoutValue"));
             return tag;
         }
 
         protected override ICacheParameter ReadOneParameter(JProperty item)
         {
-            return new CacheParameter
-            {
-                DataType = item.Value.ToString("DataType"),
-                DefaultValue = item.Value.ToString("DefaultValue"),
-                DisplayName = item.Value.ToString("DisplayName"),
-                Description = item.Value.ToString("Description")
-            };
+            return new CacheParameter(
+                dataType: item.Value.ToString("DataType"),
+                defaultValue: item.Value.ToString("DefaultValue"),
+                displayName: item.Value.ToString("DisplayName"),
+                description: item.Value.ToString("Description"),
+                defaultIfOptionWithoutValue: item.Value.ToString("DefaultIfOptionWithoutValue"));
         }
     }
 }

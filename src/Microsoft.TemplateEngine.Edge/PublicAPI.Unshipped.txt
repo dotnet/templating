@@ -71,18 +71,6 @@ Microsoft.TemplateEngine.Edge.Settings.TemplateInfo.Precedence.get -> int
 Microsoft.TemplateEngine.Edge.Settings.TemplateInfo.Precedence.set -> void
 Microsoft.TemplateEngine.Edge.Settings.TemplateInfo.ShouldSerializeShortName() -> bool
 Microsoft.TemplateEngine.Edge.Settings.TemplateInfo.TemplateInfo() -> void
-Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderInitialVersion
-Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_0
-Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_0.ReadPrimaryInformation(Newtonsoft.Json.Linq.JObject! jObject, Microsoft.TemplateEngine.Edge.Settings.TemplateInfo! info) -> void
-Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_0.TemplateInfoReaderVersion1_0_0_0() -> void
-Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_1
-Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_1.TemplateInfoReaderVersion1_0_0_1() -> void
-Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_2
-Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_2.TemplateInfoReaderVersion1_0_0_2() -> void
-Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_3
-Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_3.TemplateInfoReaderVersion1_0_0_3() -> void
-Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_4
-Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_4.TemplateInfoReaderVersion1_0_0_4() -> void
 Microsoft.TemplateEngine.Edge.Template.CreationResultStatus
 Microsoft.TemplateEngine.Edge.Template.CreationResultStatus.Cancelled = -2147467260 -> Microsoft.TemplateEngine.Edge.Template.CreationResultStatus
 Microsoft.TemplateEngine.Edge.Template.CreationResultStatus.CreateFailed = -2147352567 -> Microsoft.TemplateEngine.Edge.Template.CreationResultStatus
@@ -144,7 +132,6 @@ Microsoft.TemplateEngine.Edge.Template.WellKnownSearchFilters
 Microsoft.TemplateEngine.Edge.TemplateListFilter
 Microsoft.TemplateEngine.Edge.TypeEx
 static Microsoft.TemplateEngine.Edge.ReflectionLoadProbingPath.Reset() -> void
-static Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_0.FromJObject(Newtonsoft.Json.Linq.JObject! jObject) -> Microsoft.TemplateEngine.Edge.Settings.TemplateInfo!
 static Microsoft.TemplateEngine.Edge.Template.WellKnownSearchFilters.AuthorFilter(string! author) -> System.Func<Microsoft.TemplateEngine.Abstractions.ITemplateInfo!, Microsoft.TemplateEngine.Edge.Template.MatchInfo?>!
 static Microsoft.TemplateEngine.Edge.Template.WellKnownSearchFilters.BaselineFilter(string! baselineName) -> System.Func<Microsoft.TemplateEngine.Abstractions.ITemplateInfo!, Microsoft.TemplateEngine.Edge.Template.MatchInfo?>!
 static Microsoft.TemplateEngine.Edge.Template.WellKnownSearchFilters.ClassificationsFilter(string! name) -> System.Func<Microsoft.TemplateEngine.Abstractions.ITemplateInfo!, Microsoft.TemplateEngine.Edge.Template.MatchInfo?>!
@@ -159,12 +146,6 @@ static Microsoft.TemplateEngine.Edge.TemplateListFilter.GetTemplateMatchInfo(Sys
 static Microsoft.TemplateEngine.Edge.TemplateListFilter.PartialMatchFilter.get -> System.Func<Microsoft.TemplateEngine.Edge.Template.ITemplateMatchInfo!, bool>!
 static readonly Microsoft.TemplateEngine.Edge.Mount.Archive.ZipFileMountPointFactory.FactoryId -> System.Guid
 static readonly Microsoft.TemplateEngine.Edge.Settings.ScanResult.Empty -> Microsoft.TemplateEngine.Edge.Settings.ScanResult!
-virtual Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_0.Read(Newtonsoft.Json.Linq.JObject! jObject) -> Microsoft.TemplateEngine.Edge.Settings.TemplateInfo!
-virtual Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_0.ReadOneParameter(Newtonsoft.Json.Linq.JProperty! item) -> Microsoft.TemplateEngine.Abstractions.ICacheParameter!
-virtual Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_0.ReadOneTag(Newtonsoft.Json.Linq.JProperty! item) -> Microsoft.TemplateEngine.Abstractions.ICacheTag!
-virtual Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_0.ReadParameters(Newtonsoft.Json.Linq.JObject! jObject) -> System.Collections.Generic.IReadOnlyDictionary<string!, Microsoft.TemplateEngine.Abstractions.ICacheParameter!>!
-virtual Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_0.ReadShortNameInfo(Newtonsoft.Json.Linq.JObject! jObject, Microsoft.TemplateEngine.Edge.Settings.TemplateInfo! info) -> void
-virtual Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_0.ReadTags(Newtonsoft.Json.Linq.JObject! jObject) -> System.Collections.Generic.IReadOnlyDictionary<string!, Microsoft.TemplateEngine.Abstractions.ICacheTag!>!
 ~abstract Microsoft.TemplateEngine.Edge.Mount.DirectoryBase.EnumerateFileSystemInfos(string pattern, System.IO.SearchOption searchOption) -> System.Collections.Generic.IEnumerable<Microsoft.TemplateEngine.Abstractions.Mount.IFileSystemInfo>
 ~abstract Microsoft.TemplateEngine.Edge.Mount.FileBase.OpenRead() -> System.IO.Stream
 ~Microsoft.TemplateEngine.Edge.AssemblyComponentCatalog.AssemblyComponentCatalog(System.Collections.Generic.IReadOnlyList<System.Reflection.Assembly> assemblies) -> void
@@ -292,21 +273,10 @@ virtual Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoR
 ~Microsoft.TemplateEngine.Edge.Template.TemplateEqualityComparer.GetHashCode(Microsoft.TemplateEngine.Abstractions.ITemplateInfo obj) -> int
 ~Microsoft.TemplateEngine.Edge.Template.TemplateMatchInfoEqualityComparer.Equals(Microsoft.TemplateEngine.Edge.Template.ITemplateMatchInfo x, Microsoft.TemplateEngine.Edge.Template.ITemplateMatchInfo y) -> bool
 ~Microsoft.TemplateEngine.Edge.Template.TemplateMatchInfoEqualityComparer.GetHashCode(Microsoft.TemplateEngine.Edge.Template.ITemplateMatchInfo obj) -> int
-~override Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_2.ReadOneParameter(Newtonsoft.Json.Linq.JProperty item) -> Microsoft.TemplateEngine.Abstractions.ICacheParameter
-~override Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_2.ReadOneTag(Newtonsoft.Json.Linq.JProperty item) -> Microsoft.TemplateEngine.Abstractions.ICacheTag
-~override Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_2.ReadShortNameInfo(Newtonsoft.Json.Linq.JObject jObject, Microsoft.TemplateEngine.Edge.Settings.TemplateInfo info) -> void
-~override Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_3.Read(Newtonsoft.Json.Linq.JObject jObject) -> Microsoft.TemplateEngine.Edge.Settings.TemplateInfo
-~override Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_4.ReadOneParameter(Newtonsoft.Json.Linq.JProperty item) -> Microsoft.TemplateEngine.Abstractions.ICacheParameter
-~override Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_4.ReadOneTag(Newtonsoft.Json.Linq.JProperty item) -> Microsoft.TemplateEngine.Abstractions.ICacheTag
 ~static Microsoft.TemplateEngine.Edge.FilterableTemplateInfo.FromITemplateInfo(Microsoft.TemplateEngine.Abstractions.ITemplateInfo source) -> Microsoft.TemplateEngine.Edge.FilterableTemplateInfo
 ~static Microsoft.TemplateEngine.Edge.ReflectionLoadProbingPath.Add(string basePath) -> void
 ~static Microsoft.TemplateEngine.Edge.ReflectionLoadProbingPath.HasLoaded(string assemblyName) -> bool
 ~static Microsoft.TemplateEngine.Edge.Settings.TemplateInfo.FromJObject(Newtonsoft.Json.Linq.JObject entry, string cacheVersion) -> Microsoft.TemplateEngine.Edge.Settings.TemplateInfo
-~static Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderInitialVersion.FromJObject(Newtonsoft.Json.Linq.JObject entry) -> Microsoft.TemplateEngine.Edge.Settings.TemplateInfo
-~static Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_1.FromJObject(Newtonsoft.Json.Linq.JObject jObject) -> Microsoft.TemplateEngine.Edge.Settings.TemplateInfo
-~static Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_2.FromJObject(Newtonsoft.Json.Linq.JObject jObject) -> Microsoft.TemplateEngine.Edge.Settings.TemplateInfo
-~static Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_3.FromJObject(Newtonsoft.Json.Linq.JObject jObject) -> Microsoft.TemplateEngine.Edge.Settings.TemplateInfo
-~static Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_4.FromJObject(Newtonsoft.Json.Linq.JObject jObject) -> Microsoft.TemplateEngine.Edge.Settings.TemplateInfo
 ~static Microsoft.TemplateEngine.Edge.Template.FilteredTemplateEqualityComparer.Default.get -> System.Collections.Generic.IEqualityComparer<Microsoft.TemplateEngine.Edge.Template.IFilteredTemplateInfo>
 ~static Microsoft.TemplateEngine.Edge.Template.TemplateEqualityComparer.Default.get -> System.Collections.Generic.IEqualityComparer<Microsoft.TemplateEngine.Abstractions.ITemplateInfo>
 ~static Microsoft.TemplateEngine.Edge.Template.TemplateMatchInfoEqualityComparer.Default.get -> System.Collections.Generic.IEqualityComparer<Microsoft.TemplateEngine.Edge.Template.ITemplateMatchInfo>

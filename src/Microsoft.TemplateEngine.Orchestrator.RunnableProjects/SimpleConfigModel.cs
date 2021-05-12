@@ -126,7 +126,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     {
                         if (symbol.Value is ParameterSymbol param && param.DataType != "choice")
                         {
-                            ICacheParameter cacheParam = new CacheParameter(param.DataType, param.DefaultValue, param.DisplayName, param.Description, param.DefaultIfOptionWithoutValue);
+                            ICacheParameter cacheParam = new CacheParameter(
+                                dataType: param.DataType,
+                                defaultValue: param.DefaultValue,
+                                displayName: param.DisplayName,
+                                description: param.Description,
+                                defaultIfOptionWithoutValue: param.DefaultIfOptionWithoutValue);
                             cacheParameters.Add(symbol.Key, cacheParam);
                         }
                     }

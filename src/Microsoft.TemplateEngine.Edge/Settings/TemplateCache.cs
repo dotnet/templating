@@ -202,11 +202,11 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 }
 
                 ICacheTag localizedTag = new CacheTag(
-                    localizationForTag.DisplayName ?? templateTag.Value.DisplayName,
-                    localizationForTag.Description ?? templateTag.Value.Description,
-                    localizedChoices,
-                    templateTag.Value.DefaultValue,
-                    (templateTag.Value as IAllowDefaultIfOptionWithoutValue)?.DefaultIfOptionWithoutValue);
+                    displayName: localizationForTag.DisplayName ?? templateTag.Value.DisplayName,
+                    description: localizationForTag.Description ?? templateTag.Value.Description,
+                    choices: localizedChoices,
+                    defaultValue: templateTag.Value.DefaultValue,
+                    defaultIfOptionWithoutValue: templateTag.Value.DefaultIfOptionWithoutValue);
 
                 localizedCacheTags.Add(templateTag.Key, localizedTag);
             }
@@ -231,13 +231,11 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 if (localizedParameterSymbols.TryGetValue(templateParam.Key, out IParameterSymbolLocalizationModel localizationForParam))
                 {
                     // there is loc info for this symbol
-                    ICacheParameter localizedParam = new CacheParameter
-                    {
-                        DataType = templateParam.Value.DataType,
-                        DefaultValue = templateParam.Value.DefaultValue,
-                        DisplayName = localizationForParam.DisplayName ?? templateParam.Value.DisplayName,
-                        Description = localizationForParam.Description ?? templateParam.Value.Description
-                    };
+                    ICacheParameter localizedParam = new CacheParameter(
+                        dataType: templateParam.Value.DataType,
+                        defaultValue: templateParam.Value.DefaultValue,
+                        displayName: localizationForParam.DisplayName ?? templateParam.Value.DisplayName,
+                        description: localizationForParam.Description ?? templateParam.Value.Description);
 
                     localizedCacheParams.Add(templateParam.Key, localizedParam);
                 }

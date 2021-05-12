@@ -1,6 +1,8 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,7 +22,7 @@ namespace Microsoft.TemplateEngine.Utils
         /// <param name="template">template definition.</param>
         /// <returns>The language defined in the template or null if no language is defined.</returns>
         /// <remarks>The tags are read in <see cref="SimpleConfigModel.ConvertedDeprecatedTagsToParameterSymbols"/> method. The single value for the tag is guaranteed.</remarks>
-        public static string GetLanguage(this ITemplateInfo template)
+        public static string? GetLanguage(this ITemplateInfo template)
         {
             return template.GetTagValues("language")?.Single();
         }
@@ -31,7 +33,7 @@ namespace Microsoft.TemplateEngine.Utils
         /// <param name="template">template definition.</param>
         /// <returns>The type defined in the template or null if no type is defined.</returns>
         /// <remarks>The tags are read in <see cref="SimpleConfigModel.ConvertedDeprecatedTagsToParameterSymbols"/> method. The single value for the tag is guaranteed.</remarks>
-        public static string GetTemplateType(this ITemplateInfo template)
+        public static string? GetTemplateType(this ITemplateInfo template)
         {
             return template.GetTagValues("type")?.Single();
         }
@@ -51,7 +53,7 @@ namespace Microsoft.TemplateEngine.Utils
         /// <param name="template">template definition.</param>
         /// <param name="tagName">tag name.</param>
         /// <returns>The values of tag defined in the template or null if the tag is not defined in the template.</returns>
-        public static IEnumerable<string> GetTagValues(this ITemplateInfo template, string tagName)
+        public static IEnumerable<string>? GetTagValues(this ITemplateInfo template, string tagName)
         {
             if (template.Tags == null || !template.Tags.TryGetValue(tagName, out ICacheTag tag))
             {
