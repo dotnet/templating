@@ -1,6 +1,5 @@
 <Project>
- <!--
-    Add additional signing overrides here
-  -->
-  
+  <PropertyGroup>
+    <UseDotNetCertificate>true</UseDotNetCertificate>
+  </PropertyGroup>
 </Project>
