@@ -191,7 +191,7 @@ function InitializeDotNetCli([bool]$install, [bool]$createSdkLocationFile) {
 }
 
 function GetDotNetInstallScript([string] $dotnetRoot) {
-  return "$($RepoRoot)\install-scripts\dotnet-install.ps1";
+  return "$($repo_root)\install-scripts\dotnet-install.ps1";
 }
 
 function InstallDotNetSdk([string] $dotnetRoot, [string] $version, [string] $architecture = '', [switch] $noPath) {
