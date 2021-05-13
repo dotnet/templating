@@ -260,7 +260,7 @@ function with_retries {
 }
 
 function GetDotNetInstallScript {
-  _GetDotNetInstallScript="$RepoRoot/install-scripts/dotnet-install.sh"
+  _GetDotNetInstallScript="$repo_root/install-scripts/dotnet-install.sh"
 }
 
 function InitializeBuildTool {
