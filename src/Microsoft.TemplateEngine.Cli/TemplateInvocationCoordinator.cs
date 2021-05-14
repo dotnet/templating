@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.TemplateFiltering;
 using Microsoft.TemplateEngine.Cli.CommandParsing;
+using Microsoft.TemplateEngine.Utils;
 using CreationResultStatus = Microsoft.TemplateEngine.Edge.Template.CreationResultStatus;
 
 namespace Microsoft.TemplateEngine.Cli
@@ -36,6 +37,7 @@ namespace Microsoft.TemplateEngine.Cli
 
         internal async Task<CreationResultStatus> CoordinateInvocationOrAcquisitionAsync(ITemplateMatchInfo templateToInvoke, CancellationToken cancellationToken)
         {
+            TemplateEngineEventSource.Log.CoordinateInvocationOrAcquisitionAsyncStart();
             TemplatePackageCoordinator packageCoordinator = new TemplatePackageCoordinator(_telemetryLogger, _environment);
 
             // start checking for updates
@@ -53,6 +55,7 @@ namespace Microsoft.TemplateEngine.Cli
                 packageCoordinator.DisplayUpdateCheckResult(checkForUpdateTask.Result, _commandInput);
             }
 
+            TemplateEngineEventSource.Log.CoordinateInvocationOrAcquisitionAsyncStop();
             // return creation result
             return templateCreationTask.Result;
         }

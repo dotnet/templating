@@ -259,6 +259,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
         public int Execute(params string[] args)
         {
+            TemplateEngineEventSource.Log.ParseArgsStart();
             _args = args;
             ParseArgs();
             bool needsReparse = false;
@@ -285,6 +286,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             {
                 ParseArgs();
             }
+            TemplateEngineEventSource.Log.ParseArgsStop();
 
             return _invoke.Invoke().Result;
         }

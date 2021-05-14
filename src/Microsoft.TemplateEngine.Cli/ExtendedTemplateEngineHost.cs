@@ -127,11 +127,6 @@ namespace Microsoft.TemplateEngine.Cli
             _baseHost.LogDiagnosticMessage(message, category, details);
         }
 
-        public virtual void LogTiming(string label, TimeSpan duration, int depth)
-        {
-            _baseHost.LogTiming(label, duration, depth);
-        }
-
         private static string GetChangeString(ChangeKind kind)
         {
             string changeType;

@@ -28,11 +28,10 @@ namespace Dotnet_new3
 
         public static int Main(string[] args)
         {
-            bool emitTimings = args.Any(x => string.Equals(x, "--debug:emit-timings", StringComparison.OrdinalIgnoreCase));
             bool debugTelemetry = args.Any(x => string.Equals(x, "--debug:emit-telemetry", StringComparison.OrdinalIgnoreCase));
 
             bool disableSdkTemplates = args.Any(x => string.Equals(x, "--debug:disable-sdk-templates", StringComparison.OrdinalIgnoreCase));
-            DefaultTemplateEngineHost host = CreateHost(emitTimings, disableSdkTemplates);
+            DefaultTemplateEngineHost host = CreateHost(disableSdkTemplates);
 
             bool debugAuthoring = args.Any(x => string.Equals(x, "--trace:authoring", StringComparison.OrdinalIgnoreCase));
             bool debugInstall = args.Any(x => string.Equals(x, "--trace:install", StringComparison.OrdinalIgnoreCase));
@@ -50,7 +49,7 @@ namespace Dotnet_new3
             return New3Command.Run(CommandName, host, new TelemetryLogger(null, debugTelemetry), callbacks, args);
         }
 
-        private static DefaultTemplateEngineHost CreateHost(bool emitTimings, bool disableSdkTemplates)
+        private static DefaultTemplateEngineHost CreateHost(bool disableSdkTemplates)
         {
             var preferences = new Dictionary<string, string>
             {
@@ -81,18 +80,7 @@ namespace Dotnet_new3
 
             ConfigureLocale();
 
-            DefaultTemplateEngineHost host = new DefaultTemplateEngineHost(HostIdentifier, HostVersion, preferences, builtIns, new[] { V });
-
-            if (emitTimings)
-            {
-                host.OnLogTiming = (label, duration, depth) =>
-                {
-                    string indent = string.Join("", Enumerable.Repeat("  ", depth));
-                    Console.WriteLine($"{indent} {label} {duration.TotalMilliseconds}");
-                };
-            }
-
-            return host;
+            return new DefaultTemplateEngineHost(HostIdentifier, HostVersion, preferences, builtIns, new[] { V });
         }
 
         private static void AddAuthoringLogger(DefaultTemplateEngineHost host)
