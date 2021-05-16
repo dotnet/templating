@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 
@@ -16,6 +17,8 @@ namespace Microsoft.TemplateEngine.Utils
         private readonly IReadOnlyDictionary<string, string> _hostDefaults;
         private readonly IReadOnlyList<KeyValuePair<Guid, Func<Type>>> _hostBuiltInComponents;
         private Dictionary<string, Action<string, string[]>> _diagnosticLoggers;
+        private ILoggerFactory _loggerFactory;
+        private ILogger _logger;
 
         public DefaultTemplateEngineHost(string hostIdentifier, string version)
                     : this(hostIdentifier, version, null)
@@ -46,6 +49,8 @@ namespace Microsoft.TemplateEngine.Utils
             _hostBuiltInComponents = builtIns ?? NoComponents;
             FallbackHostTemplateConfigNames = fallbackHostTemplateConfigNames ?? new List<string>();
             _diagnosticLoggers = new Dictionary<string, Action<string, string[]>>();
+            _loggerFactory = Extensions.Logging.LoggerFactory.Create(builder => builder.AddProvider(NullLoggerProvider.Instance));
+            _logger = _loggerFactory.CreateLogger("Template Engine") ?? NullLogger.Instance;
         }
 
         public IPhysicalFileSystem FileSystem { get; private set; }
@@ -60,9 +65,9 @@ namespace Microsoft.TemplateEngine.Utils
 
         public virtual IReadOnlyList<KeyValuePair<Guid, Func<Type>>> BuiltInComponents => _hostBuiltInComponents;
 
-        public ILogger Logger => throw new NotImplementedException();
+        public ILogger Logger => _logger;
 
-        public ILoggerFactory LoggerFactory => throw new NotImplementedException();
+        public ILoggerFactory LoggerFactory => _loggerFactory;
 
         public virtual void LogMessage(string message)
         {
