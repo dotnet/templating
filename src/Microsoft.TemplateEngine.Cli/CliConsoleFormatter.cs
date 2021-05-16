@@ -12,7 +12,7 @@ using Microsoft.Extensions.Options;
 
 namespace Microsoft.TemplateEngine.Cli
 {
-    internal class CliConsoleFormatter : ConsoleFormatter, IDisposable
+    internal sealed class CliConsoleFormatter : ConsoleFormatter, IDisposable
     {
         private readonly IDisposable _optionsReloadToken;
         private ConsoleFormatterOptions _formatterOptions;
@@ -70,14 +70,12 @@ namespace Microsoft.TemplateEngine.Cli
 
         private void CreateDebugMessage<TState>(TextWriter textWriter, in LogEntry<TState> logEntry, string message, IExternalScopeProvider scopeProvider)
         {
-            //timestamp
-            textWriter.Write($"[{GetCurrentDateTime()}] ");
-            //log level
-            textWriter.Write($"[{logEntry.LogLevel}] ");
+            //timestamp and log level
+            textWriter.Write($"[{GetCurrentDateTime()}] [{logEntry.LogLevel}]");
             //category
             if (!string.IsNullOrWhiteSpace(logEntry.Category))
             {
-                textWriter.Write($"[{logEntry.Category}]");
+                textWriter.Write($" [{logEntry.Category}]");
             }
 
             // scope information
@@ -86,8 +84,7 @@ namespace Microsoft.TemplateEngine.Cli
                 scopeProvider.ForEachScope(
                     (scope, state) =>
                     {
-                        state.Write(" => ");
-                        state.Write($"[{scope}]");
+                        state.Write($" => [{scope}]");
                     },
                     textWriter);
                 textWriter.Write(": ");

@@ -14,7 +14,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
     /// </summary>
     internal class NuGetLogger : INuGetLogger
     {
-        private Microsoft.Extensions.Logging.ILogger _baseLogger;
+        private readonly Microsoft.Extensions.Logging.ILogger _baseLogger;
 
         internal NuGetLogger(Microsoft.Extensions.Logging.ILoggerFactory loggerFactory)
         {

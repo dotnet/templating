@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Microsoft.TemplateEngine.Utils
 {
-    public class Timing : IDisposable
+    public sealed class Timing : IDisposable
     {
         private readonly ILogger _logger;
         private readonly string _label;

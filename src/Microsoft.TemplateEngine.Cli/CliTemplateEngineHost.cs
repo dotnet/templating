@@ -26,7 +26,7 @@ namespace Microsoft.TemplateEngine.Cli
             _baseHost = baseHost;
             _new3Command = new3Command;
 
-            bool enableVerboseLogging = bool.TryParse(Environment.GetEnvironmentVariable("DOTNET_CLI_CONTEXT_VERBOSE") ?? "false", out bool value) && value;
+            bool enableVerboseLogging = bool.TryParse(Environment.GetEnvironmentVariable("DOTNET_CLI_CONTEXT_VERBOSE"), out bool value) && value;
             _loggerFactory =
                 Extensions.Logging.LoggerFactory.Create(builder =>
                     builder
