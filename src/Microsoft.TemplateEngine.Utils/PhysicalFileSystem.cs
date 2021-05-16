@@ -8,7 +8,10 @@ using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 
 namespace Microsoft.TemplateEngine.Utils
 {
-    [Obsolete("Use Microsoft.TemplateEngine.Edge.FileSystem.PhysicalFileSystem instead.")]
+    /// <summary>
+    /// Local file system implementation of <see cref="IPhysicalFileSystem"/>.
+    /// </summary>
+    /// <seealso cref="Microsoft.TemplateEngine.Abstractions.ITemplateEngineHost"/>
     public class PhysicalFileSystem : IPhysicalFileSystem, IFileLastWriteTimeSource
     {
         public bool DirectoryExists(string directory)

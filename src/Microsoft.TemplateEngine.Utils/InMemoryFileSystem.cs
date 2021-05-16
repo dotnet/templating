@@ -10,7 +10,10 @@ using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 
 namespace Microsoft.TemplateEngine.Utils
 {
-    [Obsolete("Use Microsoft.TemplateEngine.Edge.FileSystem.InMemoryFileSystem instead.")]
+    /// <summary>
+    /// In-memory file system implementation of <see cref="IPhysicalFileSystem"/>.
+    /// </summary>
+    /// <seealso cref="Microsoft.TemplateEngine.Abstractions.ITemplateEngineHost"/>
     public class InMemoryFileSystem : IPhysicalFileSystem, IFileLastWriteTimeSource
     {
         private readonly FileSystemDirectory _root;
@@ -20,8 +23,11 @@ namespace Microsoft.TemplateEngine.Utils
         {
             _basis = basis;
             _root = new FileSystemDirectory(Path.GetFileName(root.TrimEnd('/', '\\')), root);
-            IsPathInCone(root, out root);
-            _root = new FileSystemDirectory(Path.GetFileName(root.TrimEnd('/', '\\')), root);
+            IsPathInCone(root, out string newRoot);
+            if (root != newRoot)
+            {
+                _root = new FileSystemDirectory(Path.GetFileName(newRoot.TrimEnd('/', '\\')), newRoot);
+            }
         }
 
         public void CreateDirectory(string path)
