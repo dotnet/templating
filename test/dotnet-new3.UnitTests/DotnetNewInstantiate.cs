@@ -202,5 +202,32 @@ namespace Dotnet_new3.IntegrationTests
                 .And.HaveStdErrContaining($"{Path.DirectorySeparatorChar}test_templates{Path.DirectorySeparatorChar}TemplateResolution{Path.DirectorySeparatorChar}SamePrecedenceGroup{Path.DirectorySeparatorChar}BasicTemplate2")
                 .And.HaveStdErrContaining($"{Path.DirectorySeparatorChar}test_templates{Path.DirectorySeparatorChar}TemplateResolution{Path.DirectorySeparatorChar}SamePrecedenceGroup{Path.DirectorySeparatorChar}BasicTemplate1");
         }
+
+        [Fact]
+        public void CannotInstantiateTemplateWithSecondShortName()
+        {
+            string home = TestUtils.CreateTemporaryFolder("Home");
+            string workingDirectory = TestUtils.CreateTemporaryFolder();
+            Helpers.InstallNuGetTemplate("Microsoft.DotNet.Web.ProjectTemplates.5.0", _log, workingDirectory, home);
+
+            new DotnetNewCommand(_log, "webapp")
+                .WithCustomHive(home)
+                .WithWorkingDirectory(workingDirectory)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And.NotHaveStdErr()
+                .And.HaveStdOutContaining("The template \"ASP.NET Core Web App\" was created successfully.");
+
+            new DotnetNewCommand(_log, "razor", "-o", "template2")
+                .WithCustomHive(home)
+                .WithWorkingDirectory(workingDirectory)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And.NotHaveStdErr()
+                .And.HaveStdOutContaining("The template \"Razor Class Library\" was created successfully.")
+                .And.NotHaveStdOutContaining("The template \"ASP.NET Core Web App\" was created successfully.");
+        }
     }
 }

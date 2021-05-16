@@ -435,7 +435,7 @@ namespace Microsoft.TemplateEngine.Cli
 
             foreach (ITemplateMatchInfo templateMatchInfo in allTemplates)
             {
-                allShortNames.UnionWith(templateMatchInfo.Info.ShortNameList);
+                allShortNames.Add(templateMatchInfo.Info.ShortName);
             }
 
             return allShortNames;

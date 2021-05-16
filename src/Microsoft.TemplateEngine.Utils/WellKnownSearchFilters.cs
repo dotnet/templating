@@ -34,9 +34,9 @@ namespace Microsoft.TemplateEngine.Utils
         /// Matches <paramref name="name"/> on the following criteria: <br/>
         /// - if <paramref name="name"/> is null or empty, adds match disposition <see cref="MatchInfo.BuiltIn.Name"/> with <see cref="MatchKind.Partial"/>;<br/>
         /// - if <paramref name="name"/> is equal to <see cref="ITemplateInfo.Name"/> (case insensitive), adds match disposition <see cref="MatchInfo.BuiltIn.Name"/> with <see cref="MatchKind.Exact"/>;<br/>
-        /// - if <paramref name="name"/> is equal to one of the short names in <see cref="ITemplateInfo.ShortNameList"/> (case insensitive), adds match disposition <see cref="MatchInfo.BuiltIn.ShortName"/> with <see cref="MatchKind.Exact"/>;<br/>
+        /// - if <paramref name="name"/> is equal to <see cref="ITemplateInfo.ShortName"/> (case insensitive), adds match disposition <see cref="MatchInfo.BuiltIn.ShortName"/> with <see cref="MatchKind.Exact"/>;<br/>
         /// - if <see cref="ITemplateInfo.Name"/> contains <paramref name="name"/> (case insensitive), adds match disposition <see cref="MatchInfo.BuiltIn.Name"/> with <see cref="MatchKind.Partial"/>;<br/>
-        /// - if one of the short names in <see cref="ITemplateInfo.ShortNameList"/> contains <paramref name="name"/> (case insensitive), adds match disposition <see cref="MatchInfo.BuiltIn.ShortName"/> with <see cref="MatchKind.Partial"/>;<br/>
+        /// - if <see cref="ITemplateInfo.ShortName"/> contains <paramref name="name"/> (case insensitive), adds match disposition <see cref="MatchInfo.BuiltIn.ShortName"/> with <see cref="MatchKind.Partial"/>;<br/>
         /// - adds match disposition <see cref="MatchInfo.BuiltIn.Name"/> with <see cref="MatchKind.Mismatch"/> otherwise.<br/>
         /// </summary>
         /// <returns> the predicate to be used with <see cref="ISettingsLoader.GetTemplatesAsync(Func{ITemplateMatchInfo, bool}, System.Collections.Generic.IEnumerable{Func{ITemplateInfo, MatchInfo?}}[], System.Threading.CancellationToken)"/> as the filter.</returns>
@@ -57,18 +57,14 @@ namespace Microsoft.TemplateEngine.Utils
                 }
 
                 bool hasShortNamePartialMatch = false;
+                int shortNameIndex = template.ShortName.IndexOf(name, StringComparison.OrdinalIgnoreCase);
 
-                foreach (string shortName in template.ShortNameList)
+                if (shortNameIndex == 0 && template.ShortName.Length == name.Length)
                 {
-                    int shortNameIndex = shortName.IndexOf(name, StringComparison.OrdinalIgnoreCase);
-
-                    if (shortNameIndex == 0 && shortName.Length == name.Length)
-                    {
-                        return new MatchInfo(MatchInfo.BuiltIn.ShortName, name, MatchKind.Exact);
-                    }
-
-                    hasShortNamePartialMatch |= shortNameIndex > -1;
+                    return new MatchInfo(MatchInfo.BuiltIn.ShortName, name, MatchKind.Exact);
                 }
+
+                hasShortNamePartialMatch = shortNameIndex > -1;
 
                 if (nameIndex > -1)
                 {

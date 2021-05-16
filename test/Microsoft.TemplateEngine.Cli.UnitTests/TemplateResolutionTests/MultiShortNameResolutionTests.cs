@@ -26,7 +26,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
                 if (_multiShortNameGroupTemplateInfo == null)
                 {
                     List<ITemplateInfo> templateList = new List<ITemplateInfo>();
-
+                    //https://github.com/dotnet/templating/issues/3118 only first short name is supported, others will be ignored during processing
                     templateList.Add(
                         new MockTemplateInfo(new string[] { "aaa", "bbb" }, name: "High precedence C# in group", precedence: 2000, identity: "MultiName.Test.High.CSharp", groupIdentity: "MultiName.Test")
                             .WithTag("language", "C#")
@@ -64,30 +64,43 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             {
                 "aaa", "bbb", "ccc", "ddd", "eee", "fff"
             };
+            //only first name in the template is taken into account - others are ignored.
+            IReadOnlyList<string> supportedShortNames = new List<string>()
+            {
+                "aaa", "ccc", "fff"
+            };
             string defaultLanguage = "C#";
 
             foreach (string testShortName in shortNamesForGroup)
             {
                 INewCommandInput userInputs = new MockNewCommandInput(testShortName);
-
                 TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(MultiShortNameGroupTemplateInfo, new MockHostSpecificDataLoader(), userInputs, defaultLanguage);
-                Assert.Equal(TemplateResolutionResult.UnambiguousTemplateGroupStatus.SingleMatch, matchResult.GroupResolutionStatus);
-                Assert.Equal(3, matchResult.UnambiguousTemplateGroup.Templates.Count);
-                Assert.True(matchResult.UnambiguousTemplateGroup.Templates.All(t => WellKnownSearchFilters.MatchesAllCriteria(t)));
 
-                foreach (ITemplateMatchInfo templateMatchInfo in matchResult.UnambiguousTemplateGroup.Templates)
+                if (supportedShortNames.Contains(testShortName))
                 {
-                    Assert.Equal("MultiName.Test", templateMatchInfo.Info.GroupIdentity);
-                    if (templateMatchInfo.Info.GetLanguage().Equals(defaultLanguage, StringComparison.OrdinalIgnoreCase))
+                    Assert.Equal(TemplateResolutionResult.UnambiguousTemplateGroupStatus.SingleMatch, matchResult.GroupResolutionStatus);
+                    Assert.Equal(3, matchResult.UnambiguousTemplateGroup.Templates.Count);
+                    Assert.True(matchResult.UnambiguousTemplateGroup.Templates.All(t => WellKnownSearchFilters.MatchesAllCriteria(t)));
+
+                    foreach (ITemplateMatchInfo templateMatchInfo in matchResult.UnambiguousTemplateGroup.Templates)
                     {
-                        //default language match is part of MatchDisposition collection
-                        Assert.Equal(2, templateMatchInfo.MatchDisposition.Count);
+                        Assert.Equal("MultiName.Test", templateMatchInfo.Info.GroupIdentity);
+                        if (templateMatchInfo.Info.GetLanguage().Equals(defaultLanguage, StringComparison.OrdinalIgnoreCase))
+                        {
+                            //default language match is part of MatchDisposition collection
+                            Assert.Equal(2, templateMatchInfo.MatchDisposition.Count);
+                        }
+                        else
+                        {
+                            Assert.Equal(1, templateMatchInfo.MatchDisposition.Count);
+                        }
+                        Assert.True(templateMatchInfo.MatchDisposition[0].Name == MatchInfo.BuiltIn.ShortName && templateMatchInfo.MatchDisposition[0].Kind == MatchKind.Exact);
                     }
-                    else
-                    {
-                        Assert.Equal(1, templateMatchInfo.MatchDisposition.Count);
-                    }
-                    Assert.True(templateMatchInfo.MatchDisposition[0].Name == MatchInfo.BuiltIn.ShortName && templateMatchInfo.MatchDisposition[0].Kind == MatchKind.Exact);
+                }
+                else
+                {
+                    Assert.Equal(TemplateResolutionResult.UnambiguousTemplateGroupStatus.NoMatch, matchResult.GroupResolutionStatus);
+                    Assert.Null(matchResult.UnambiguousTemplateGroup);
                 }
             }
         }
@@ -99,14 +112,26 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             {
                 "aaa", "bbb", "ccc", "ddd", "eee", "fff"
             };
+            //only first name in the template is taken into account - others are ignored.
+            IReadOnlyList<string> supportedShortNames = new List<string>()
+            {
+                "aaa", "ccc", "fff"
+            };
 
             foreach (string testShortName in shortNamesForGroup)
             {
                 INewCommandInput userInputs = new MockNewCommandInput(testShortName);
-
                 TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(MultiShortNameGroupTemplateInfo, new MockHostSpecificDataLoader(), userInputs, "C#");
-                Assert.Equal(TemplateResolutionResult.Status.SingleMatch, matchResult.ResolutionStatus);
-                Assert.Equal("MultiName.Test.High.CSharp", matchResult.TemplateToInvoke.Info.Identity);
+                if (supportedShortNames.Contains(testShortName))
+                {
+                    Assert.Equal(TemplateResolutionResult.Status.SingleMatch, matchResult.ResolutionStatus);
+                    Assert.Equal("MultiName.Test.High.CSharp", matchResult.TemplateToInvoke.Info.Identity);
+                }
+                else
+                {
+                    Assert.Equal(TemplateResolutionResult.UnambiguousTemplateGroupStatus.NoMatch, matchResult.GroupResolutionStatus);
+                    Assert.Null(matchResult.UnambiguousTemplateGroup);
+                }
             }
         }
 
@@ -117,14 +142,26 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
             {
                 "aaa", "bbb", "ccc", "ddd", "eee", "fff"
             };
-
+            //only first name in the template is taken into account - others are ignored.
+            IReadOnlyList<string> supportedShortNames = new List<string>()
+            {
+                "aaa", "ccc", "fff"
+            };
             foreach (string testShortName in shortNamesForGroup)
             {
                 INewCommandInput userInputs = new MockNewCommandInput(testShortName, "F#");
 
                 TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(MultiShortNameGroupTemplateInfo, new MockHostSpecificDataLoader(), userInputs, "C#");
-                Assert.Equal(TemplateResolutionResult.Status.SingleMatch, matchResult.ResolutionStatus);
-                Assert.Equal("Multiname.Test.Only.FSharp", matchResult.TemplateToInvoke.Info.Identity);
+                if (supportedShortNames.Contains(testShortName))
+                {
+                    Assert.Equal(TemplateResolutionResult.Status.SingleMatch, matchResult.ResolutionStatus);
+                    Assert.Equal("Multiname.Test.Only.FSharp", matchResult.TemplateToInvoke.Info.Identity);
+                }
+                else
+                {
+                    Assert.Equal(TemplateResolutionResult.UnambiguousTemplateGroupStatus.NoMatch, matchResult.GroupResolutionStatus);
+                    Assert.Null(matchResult.UnambiguousTemplateGroup);
+                }    
             }
         }
 
@@ -134,14 +171,22 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
         [InlineData("ccc", "X", "MultiName.Test.Low.CSharp")] // uses a short name from the expected invokable template
         [InlineData("fff", "X", "MultiName.Test.Low.CSharp")] // uses a short name from a different template in the group
         [InlineData("fff", "Y", "Multiname.Test.Only.FSharp")] // uses a short name from the expected invokable template
-        [InlineData("eee", "Y", "Multiname.Test.Only.FSharp")] // uses a short name from a different template in the group
+        [InlineData("eee", "Y", null)] // uses unsupported short name from a different template in the group
         public void ChoiceValueDisambiguatesMatchesWithMultipleShortNames(string name, string fooChoice, string expectedIdentity)
         {
             INewCommandInput commandInput = new MockNewCommandInput(name).WithTemplateOption("foo", fooChoice);
 
             TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(MultiShortNameGroupTemplateInfo, new MockHostSpecificDataLoader(), commandInput, "C#");
-            Assert.Equal(TemplateResolutionResult.Status.SingleMatch, matchResult.ResolutionStatus);
-            Assert.Equal(expectedIdentity, matchResult.TemplateToInvoke.Info.Identity);
+            if (expectedIdentity != null)
+            {
+                Assert.Equal(TemplateResolutionResult.Status.SingleMatch, matchResult.ResolutionStatus);
+                Assert.Equal(expectedIdentity, matchResult.TemplateToInvoke.Info.Identity);
+            }
+            else
+            {
+                Assert.Equal(TemplateResolutionResult.UnambiguousTemplateGroupStatus.NoMatch, matchResult.GroupResolutionStatus);
+                Assert.Null(matchResult.TemplateToInvoke);
+            }
         }
 
         [Theory(DisplayName = nameof(ParameterExistenceDisambiguatesMatchesWithMultipleShortNames))]
@@ -150,14 +195,22 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
         [InlineData("ccc", "LowC", "someValue", "MultiName.Test.Low.CSharp")] // uses a short name from the expected invokable template
         [InlineData("fff", "LowC", "someValue", "MultiName.Test.Low.CSharp")] // uses a short name from a different template in the group
         [InlineData("fff", "OnlyF", "someValue", "Multiname.Test.Only.FSharp")] // uses a short name from the expected invokable template
-        [InlineData("eee", "OnlyF", "someValue", "Multiname.Test.Only.FSharp")] // uses a short name from a different template in the group
+        [InlineData("eee", "OnlyF", "someValue", null)] // uses unsupported short name from a different template in the group
         public void ParameterExistenceDisambiguatesMatchesWithMultipleShortNames(string name, string paramName, string paramValue, string expectedIdentity)
         {
             INewCommandInput commandInput = new MockNewCommandInput(name).WithTemplateOption(paramName, paramValue);
 
             TemplateResolutionResult matchResult = TemplateResolver.GetTemplateResolutionResult(MultiShortNameGroupTemplateInfo, new MockHostSpecificDataLoader(), commandInput, "C#");
-            Assert.Equal(TemplateResolutionResult.Status.SingleMatch, matchResult.ResolutionStatus);
-            Assert.Equal(expectedIdentity, matchResult.TemplateToInvoke.Info.Identity);
+            if (expectedIdentity != null)
+            {
+                Assert.Equal(TemplateResolutionResult.Status.SingleMatch, matchResult.ResolutionStatus);
+                Assert.Equal(expectedIdentity, matchResult.TemplateToInvoke.Info.Identity);
+            }
+            else
+            {
+                Assert.Equal(TemplateResolutionResult.UnambiguousTemplateGroupStatus.NoMatch, matchResult.GroupResolutionStatus);
+                Assert.Null(matchResult.TemplateToInvoke);
+            }
         }
     }
 }

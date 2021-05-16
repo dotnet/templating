@@ -702,8 +702,7 @@
     },
     "shortName": {
       "description": "A shorthand name or a list of names for selecting the template (applies to environments where the template name is specified by the user - not selected via a GUI). The first entry is the preferred short name.",
-      "type": [ "string", "array" ],
-      "minLength": 1
+      "type": [ "string" ]
     },
     "sourceName": {
       "description": "The name in the source tree to replace with the name the user specifies",

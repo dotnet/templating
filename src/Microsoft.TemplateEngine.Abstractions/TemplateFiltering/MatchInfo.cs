@@ -48,7 +48,7 @@ namespace Microsoft.TemplateEngine.Abstractions.TemplateFiltering
             public const string Name = "Name";
 
             /// <summary>
-            /// Template short names <see cref="ITemplateInfo.ShortNameList"/>.
+            /// Template short name <see cref="ITemplateInfo.ShortName"/>.
             /// </summary>
             public const string ShortName = "ShortName";
 

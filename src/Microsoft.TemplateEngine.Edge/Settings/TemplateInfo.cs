@@ -36,7 +36,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         public TemplateInfo()
         {
-            ShortNameList = new List<string>();
         }
 
         [JsonIgnore]
@@ -131,30 +130,11 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         public string Name { get; set; }
 
         [JsonProperty]
-        public string ShortName
-        {
-            get
-            {
-                if (ShortNameList.Count > 0)
-                {
-                    return ShortNameList[0];
-                }
+        public string ShortName { get; set; }
 
-                return string.Empty;
-            }
-
-            set
-            {
-                if (ShortNameList.Count > 0)
-                {
-                    throw new Exception("Can't set the short name when the ShortNameList already has entries.");
-                }
-
-                ShortNameList = new List<string>() { value };
-            }
-        }
-
-        public IReadOnlyList<string> ShortNameList { get; set; }
+        [Obsolete("The templates are limited only to use single short name, Use ShortName instead.")]
+        [JsonProperty]
+        public IReadOnlyList<string> ShortNameList { get; set; } = new List<string>();
 
         [JsonProperty]
         public IReadOnlyDictionary<string, ICacheTag> Tags
@@ -214,14 +194,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             }
 
             return infoReader(entry);
-        }
-
-        // ShortName should get deserialized when it exists, for backwards compat.
-        // But moving forward, ShortNameList should be the definitive source.
-        // It can still be ShortName in the template.json, but in the caches it'll be ShortNameList
-        public bool ShouldSerializeShortName()
-        {
-            return false;
         }
     }
 }

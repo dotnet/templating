@@ -69,7 +69,6 @@ Microsoft.TemplateEngine.Edge.Settings.TemplateInfo.GeneratorId.get -> System.Gu
 Microsoft.TemplateEngine.Edge.Settings.TemplateInfo.GeneratorId.set -> void
 Microsoft.TemplateEngine.Edge.Settings.TemplateInfo.Precedence.get -> int
 Microsoft.TemplateEngine.Edge.Settings.TemplateInfo.Precedence.set -> void
-Microsoft.TemplateEngine.Edge.Settings.TemplateInfo.ShouldSerializeShortName() -> bool
 Microsoft.TemplateEngine.Edge.Settings.TemplateInfo.TemplateInfo() -> void
 Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderInitialVersion
 Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders.TemplateInfoReaderVersion1_0_0_0

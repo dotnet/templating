@@ -611,7 +611,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 errorMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "name", templateFile.FullPath));
             }
 
-            if ((templateModel.ShortNameList?.Count ?? 0) == 0)
+            if (string.IsNullOrWhiteSpace(templateModel.ShortName))
             {
                 errorMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "shortName", templateFile.FullPath));
             }

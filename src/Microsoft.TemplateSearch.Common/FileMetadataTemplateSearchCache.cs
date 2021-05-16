@@ -39,8 +39,7 @@ namespace Microsoft.TemplateSearch.Common
 
             return TemplateDiscoveryMetadata.TemplateCache.Where(
                 template => template.Name.IndexOf(searchName, StringComparison.OrdinalIgnoreCase) >= 0
-                || template.ShortNameList.Any(shortName => shortName.IndexOf(searchName, StringComparison.OrdinalIgnoreCase) >= 0))
-                .ToList();
+                || template.ShortName.IndexOf(searchName, StringComparison.OrdinalIgnoreCase) >= 0).ToList();
         }
 
         public IReadOnlyDictionary<string, PackInfo> GetTemplateToPackMapForTemplateIdentities(IReadOnlyList<string> identities)

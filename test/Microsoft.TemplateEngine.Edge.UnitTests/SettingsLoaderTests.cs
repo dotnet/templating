@@ -42,7 +42,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 .ConfigureAwait(false);
 
             Assert.Equal(1, templates.Count);
-            Assert.Equal("sample99", templates.Single().ShortNameList[0]);
+            Assert.Equal("sample99", templates.Single().ShortName);
         }
 
         [Fact]
@@ -73,7 +73,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 .ConfigureAwait(false);
 
             Assert.Equal(1, templates.Count);
-            Assert.Equal("sample49", templates.Single().ShortNameList[0]);
+            Assert.Equal("sample49", templates.Single().ShortName);
         }
 
         [Fact]

@@ -64,12 +64,12 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             {
                 if (HasSingleTemplate)
                 {
-                    return Templates.First().Info.ShortNameList;
+                    return new[] { Templates.First().Info.ShortName };
                 }
                 HashSet<string> shortNames = new HashSet<string>();
                 foreach (ITemplateMatchInfo template in Templates)
                 {
-                    shortNames.UnionWith(template.Info.ShortNameList);
+                    shortNames.Add(template.Info.ShortName);
                 }
                 return shortNames.ToList();
             }

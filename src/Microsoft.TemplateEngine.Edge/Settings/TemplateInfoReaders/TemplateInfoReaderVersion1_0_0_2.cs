@@ -1,6 +1,7 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Utils;
@@ -18,16 +19,22 @@ namespace Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders
             return reader.Read(jObject);
         }
 
+        [Obsolete("Only single short name is allowed.")]
+#pragma warning disable CS0809 // Obsolete member overrides non-obsolete member
         protected override void ReadShortNameInfo(JObject jObject, TemplateInfo info)
+#pragma warning restore CS0809 // Obsolete member overrides non-obsolete member
         {
             JToken shortNameToken = jObject.Get<JToken>(nameof(TemplateInfo.ShortNameList));
             info.ShortNameList = JTokenStringOrArrayToCollection(shortNameToken, System.Array.Empty<string>());
-
             if (info.ShortNameList.Count == 0)
             {
                 // template.json stores the short name(s) in ShortName
                 // but the cache will store it in ShortNameList
                 base.ReadShortNameInfo(jObject, info);
+            }
+            else
+            {
+                info.ShortName = info.ShortNameList[0];
             }
         }
 

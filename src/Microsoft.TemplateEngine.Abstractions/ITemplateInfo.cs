@@ -28,7 +28,9 @@ namespace Microsoft.TemplateEngine.Abstractions
 
         string Name { get; }
 
-        [Obsolete("Templates support multiple short names, use ShortNameList instead")]
+        /// <summary>
+        /// Gets short name of the template.
+        /// </summary>
         string ShortName { get; }
 
         IReadOnlyDictionary<string, ICacheTag> Tags { get; }
@@ -55,6 +57,7 @@ namespace Microsoft.TemplateEngine.Abstractions
         /// <summary>
         /// Gets the list of short names defined for the template.
         /// </summary>
+        [Obsolete("Templates should have only single short name, use ShortName instead.")]
         IReadOnlyList<string> ShortNameList { get; }
     }
 }

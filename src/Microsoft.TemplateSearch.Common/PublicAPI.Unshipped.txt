@@ -10,6 +10,7 @@ Microsoft.TemplateSearch.Common.BlobStorageTemplateInfo.GroupIdentity.get -> str
 Microsoft.TemplateSearch.Common.BlobStorageTemplateInfo.Identity.get -> string!
 Microsoft.TemplateSearch.Common.BlobStorageTemplateInfo.Name.get -> string!
 Microsoft.TemplateSearch.Common.BlobStorageTemplateInfo.Precedence.get -> int
+Microsoft.TemplateSearch.Common.BlobStorageTemplateInfo.ShortName.get -> string!
 Microsoft.TemplateSearch.Common.BlobStorageTemplateInfo.ShortNameList.get -> System.Collections.Generic.IReadOnlyList<string!>!
 Microsoft.TemplateSearch.Common.BlobStorageTemplateInfo.Tags.get -> System.Collections.Generic.IReadOnlyDictionary<string!, Microsoft.TemplateEngine.Abstractions.ICacheTag!>!
 Microsoft.TemplateSearch.Common.BlobStorageTemplateInfo.ThirdPartyNotices.get -> string?

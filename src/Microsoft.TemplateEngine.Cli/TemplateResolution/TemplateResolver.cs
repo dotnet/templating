@@ -354,7 +354,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                 }
                 catch (CommandParserException ex)
                 {
-                    string shortname = template.Info.ShortNameList.Any() ? template.Info.ShortNameList[0] : $"'{template.Info.Name}'";
+                    string shortname = !string.IsNullOrWhiteSpace(template.Info.ShortName) ? template.Info.ShortName : $"'{template.Info.Name}'";
                     // if we do actually throw, add a non-match
                     Reporter.Error.WriteLine(
                         string.Format(
@@ -390,7 +390,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                     shortNames = new HashSet<string>();
                     shortNamesByGroup[effectiveGroupIdentity] = shortNames;
                 }
-                shortNames.UnionWith(template.ShortNameList);
+                shortNames.Add(template.ShortName);
             }
 
             // create the TemplateInfoWithGroupShortNames with the group short names
@@ -500,9 +500,9 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
 
             public string Name => _parent.Name;
 
-            [Obsolete]
             public string ShortName => _parent.ShortName;
 
+            [Obsolete]
             public IReadOnlyList<string> ShortNameList => _parent.ShortNameList;
 
             public IReadOnlyList<string> GroupShortNameList { get; } = new List<string>();

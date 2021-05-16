@@ -14,7 +14,6 @@ using Microsoft.TemplateEngine.Abstractions.TemplatePackage;
 using Microsoft.TemplateEngine.Cli.CommandParsing;
 using Microsoft.TemplateEngine.Cli.HelpAndUsage;
 using Microsoft.TemplateEngine.Cli.NuGet;
-using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Edge.Template;
 using Microsoft.TemplateEngine.Utils;
 using NuGet.Credentials;
@@ -442,9 +441,7 @@ namespace Microsoft.TemplateEngine.Cli
 
             IReadOnlyList<ITemplateInfo> templates = await _engineEnvironmentSettings.SettingsLoader.GetTemplatesAsync(cancellationToken).ConfigureAwait(false);
             var templatesWithMatchedShortName = templates.Where(template =>
-            {
-                return template.ShortNameList.Contains(sourceIdentifier, StringComparer.OrdinalIgnoreCase);
-            });
+                template.ShortName.Equals(sourceIdentifier, StringComparison.OrdinalIgnoreCase));
 
             var templatePackages = await Task.WhenAll(
                 templatesWithMatchedShortName.Select(
@@ -465,7 +462,7 @@ namespace Microsoft.TemplateEngine.Cli
             IReadOnlyList<ITemplateInfo> templates = await _engineEnvironmentSettings.SettingsLoader.GetTemplatesAsync(cancellationToken).ConfigureAwait(false);
             return templates.Any(template =>
             {
-                return template.ShortNameList.Contains(sourceIdentifier, StringComparer.OrdinalIgnoreCase);
+                return template.ShortName.Equals(sourceIdentifier, StringComparison.OrdinalIgnoreCase);
             });
         }
 
@@ -557,17 +554,16 @@ namespace Microsoft.TemplateEngine.Cli
                 if (templates.Any())
                 {
                     Reporter.Output.WriteLine($"{LocalizableStrings.Templates}:".Indent(level: 2));
-                    foreach (TemplateInfo info in templates)
+                    foreach (ITemplateInfo info in templates)
                     {
                         string templateLanguage = info.GetLanguage();
-                        string shortNames = string.Join(",", info.ShortNameList);
                         if (!string.IsNullOrWhiteSpace(templateLanguage))
                         {
-                            Reporter.Output.WriteLine($"{info.Name} ({shortNames}) {templateLanguage}".Indent(level: 3));
+                            Reporter.Output.WriteLine($"{info.Name} ({info.ShortName}) {templateLanguage}".Indent(level: 3));
                         }
                         else
                         {
-                            Reporter.Output.WriteLine($"{info.Name} ({shortNames})".Indent(level: 3));
+                            Reporter.Output.WriteLine($"{info.Name} ({info.ShortName})".Indent(level: 3));
                         }
                     }
                 }

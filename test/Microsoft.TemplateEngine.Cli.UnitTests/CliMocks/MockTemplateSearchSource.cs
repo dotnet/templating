@@ -91,7 +91,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
 
             foreach (ITemplateNameSearchResult candidate in possibleSearchResults)
             {
-                if (candidate.Template.Name.Contains(templateName) || candidate.Template.ShortNameList.Any(shortName => shortName.Contains(templateName)))
+                if (candidate.Template.Name.Contains(templateName) || candidate.Template.ShortName.Contains(templateName))
                 {
                     if (!_packFilter.ShouldPackBeFiltered(candidate.Template.Name, candidate.PackInfo.Version))
                     {

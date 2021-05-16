@@ -25,7 +25,7 @@ namespace Microsoft.TemplateSearch.Common
         private IReadOnlyDictionary<string, BaselineCacheInfo> _baselineInfo = new Dictionary<string, BaselineCacheInfo>();
 
         [JsonConstructor]
-        private BlobStorageTemplateInfo(string identity, string name, IEnumerable<string> shortNameList)
+        private BlobStorageTemplateInfo(string identity, string name, string? shortName, IEnumerable<string>? shortNameList)
         {
             if (string.IsNullOrWhiteSpace(identity))
             {
@@ -37,14 +37,32 @@ namespace Microsoft.TemplateSearch.Common
                 throw new ArgumentException($"'{nameof(name)}' cannot be null or whitespace.", nameof(name));
             }
 
-            if (!shortNameList.Any())
+            if (!shortNameList?.Any() ?? true && string.IsNullOrWhiteSpace(shortName))
             {
-                throw new ArgumentException($"'{nameof(shortNameList)}' should have at least one entry", nameof(shortNameList));
+                throw new ArgumentException($"'{nameof(shortNameList)}' should have at least one entry or {nameof(shortName)} should be not null or whiteSpace", nameof(shortNameList));
             }
 
             Identity = identity;
             Name = name;
-            ShortNameList = shortNameList.ToList();
+            if (!string.IsNullOrWhiteSpace(shortName))
+            {
+                ShortName = shortName!;
+                if (shortNameList?.Any() ?? false)
+                {
+#pragma warning disable CS0618 // Type or member is obsolete
+                    ShortNameList = shortNameList.ToList();
+                }
+                else
+                {
+                    ShortNameList = new[] { ShortName };
+                }
+            }
+            else
+            {
+                ShortName = shortNameList!.First();
+                ShortNameList = shortNameList.ToList();
+            }
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         [JsonIgnore]
@@ -126,11 +144,11 @@ namespace Microsoft.TemplateSearch.Common
         [JsonProperty]
         public string Name { get; private set; }
 
-        [JsonIgnore]
-        [Obsolete("Use ShortNameList instead.")]
-        string ITemplateInfo.ShortName => throw new NotImplementedException();
+        [JsonProperty]
+        public string ShortName { get; private set; }
 
         [JsonProperty]
+        [Obsolete("Use ShortName instead.")]
         public IReadOnlyList<string> ShortNameList { get; private set; }
 
         [JsonIgnore]

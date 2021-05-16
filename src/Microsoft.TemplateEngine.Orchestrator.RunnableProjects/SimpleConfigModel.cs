@@ -78,7 +78,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         public string Name { get; set; }
 
+        [Obsolete]
         public IReadOnlyList<string> ShortNameList { get; set; }
+
+        public string ShortName { get; set; }
 
         public IReadOnlyList<IPostActionModel> PostActionModel { get; set; }
 
@@ -576,7 +579,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             };
 
             JToken shortNameToken = source.Get<JToken>("ShortName");
+#pragma warning disable CS0612 // Type or member is obsolete
             config.ShortNameList = JTokenStringOrArrayToCollection(shortNameToken, Array.Empty<string>());
+            config.ShortName = config.ShortNameList.Any() ? config.ShortNameList[0] : string.Empty;
+#pragma warning restore CS0612 // Type or member is obsolete
 
             config.Forms = SetupValueFormMapForTemplate(source);
 

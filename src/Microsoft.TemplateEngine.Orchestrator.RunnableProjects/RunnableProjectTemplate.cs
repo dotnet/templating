@@ -29,9 +29,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             DefaultName = config.DefaultName;
             Name = config.Name;
             Identity = config.Identity ?? config.Name;
-
+            ShortName = config.ShortName;
+#pragma warning disable CS0612 // Type or member is obsolete
             ShortNameList = config.ShortNameList ?? new List<string>();
-
+#pragma warning restore CS0612 // Type or member is obsolete
             Author = config.Author;
             Tags = config.Tags ?? new Dictionary<string, ICacheTag>(StringComparer.OrdinalIgnoreCase);
             CacheParameters = config.CacheParameters ?? new Dictionary<string, ICacheParameter>(StringComparer.OrdinalIgnoreCase);
@@ -75,29 +76,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         public string Name { get; }
 
-        public string ShortName
-        {
-            get
-            {
-                if (ShortNameList.Count > 0)
-                {
-                    return ShortNameList[0];
-                }
+        public string ShortName { get; }
 
-                return string.Empty;
-            }
-
-            set
-            {
-                if (ShortNameList.Count > 0)
-                {
-                    throw new Exception("Can't set the short name when the ShortNameList already has entries.");
-                }
-
-                ShortNameList = new List<string>() { value };
-            }
-        }
-
+        [Obsolete]
         public IReadOnlyList<string> ShortNameList { get; private set; }
 
         public IReadOnlyDictionary<string, ICacheTag> Tags

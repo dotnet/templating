@@ -208,9 +208,9 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
         /// <returns>the help command or null in case template does not have short name defined.</returns>
         internal static string? GetTemplateHelpCommand(string commandName, ITemplateInfo template)
         {
-            if (template.ShortNameList.Any())
+            if (!string.IsNullOrWhiteSpace(template.ShortName))
             {
-                return GetTemplateHelpCommand(commandName, template.ShortNameList[0]);
+                return GetTemplateHelpCommand(commandName, template.ShortName);
             }
             return null;
         }
@@ -383,7 +383,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                 {
                     TemplateIdentity = template.Info.Identity,
                     TemplateName = template.Info.Name,
-                    TemplateShortNames = template.Info.ShortNameList,
+                    TemplateShortName = template.Info.ShortName,
                     TemplateLanguage = template.Info.GetLanguage(),
                     TemplatePrecedence = template.Info.Precedence,
                     TemplateAuthor = template.Info.Author ?? string.Empty,
@@ -402,7 +402,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                         blankLineBetweenRows: false)
                     .DefineColumn(t => t.TemplateIdentity, LocalizableStrings.ColumnNameIdentity, showAlways: true)
                     .DefineColumn(t => t.TemplateName, LocalizableStrings.ColumnNameTemplateName, shrinkIfNeeded: true, minWidth: 15, showAlways: true)
-                    .DefineColumn(t => string.Join(",", t.TemplateShortNames), LocalizableStrings.ColumnNameShortName, showAlways: true)
+                    .DefineColumn(t => string.Join(",", t.TemplateShortName), LocalizableStrings.ColumnNameShortName, showAlways: true)
                     .DefineColumn(t => t.TemplateLanguage, LocalizableStrings.ColumnNameLanguage, showAlways: true)
                     .DefineColumn(t => t.TemplatePrecedence.ToString(), out object prcedenceColumn, LocalizableStrings.ColumnNamePrecedence, showAlways: true)
                     .DefineColumn(t => t.TemplateAuthor, LocalizableStrings.ColumnNameAuthor, showAlways: true, shrinkIfNeeded: true, minWidth: 10)
@@ -557,7 +557,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
         {
             internal string TemplateIdentity;
             internal string TemplateName;
-            internal IReadOnlyList<string> TemplateShortNames;
+            internal string TemplateShortName;
             internal string TemplateLanguage;
             internal int TemplatePrecedence;
             internal string TemplateAuthor;
