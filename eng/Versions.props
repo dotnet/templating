@@ -9,6 +9,7 @@
     <PreReleaseVersionIteration>5</PreReleaseVersionIteration>
     <PackSpecific Condition="'$(OS)' != 'Windows_NT'">true</PackSpecific>
     <MicrosoftDotNetCliCommandLinePackageVersion>1.0.0-preview.19208.1</MicrosoftDotNetCliCommandLinePackageVersion>
+    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>6.0.0-preview.3.21164.3</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
     <MicrosoftExtensionsLoggingPackageVersion>6.0.0-preview.3.21164.3</MicrosoftExtensionsLoggingPackageVersion>
     <MicrosoftExtensionsLoggingConsolePackageVersion>6.0.0-preview.3.21164.3</MicrosoftExtensionsLoggingConsolePackageVersion>
     <NewtonsoftJsonPackageVersion>12.0.2</NewtonsoftJsonPackageVersion>
