@@ -3,8 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Edge.Settings.TemplateInfoReaders;
 using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -15,90 +15,18 @@ namespace Microsoft.TemplateEngine.Edge.Settings
     {
         internal const string CurrentVersion = "1.0.0.5";
 
-        private static readonly Func<JObject, TemplateInfo> _defaultReader = TemplateInfoReaderInitialVersion.FromJObject;
-
-        // Note: Be sure to keep the versioning consistent with SettingsStore
-        private static readonly IReadOnlyDictionary<string, Func<JObject, TemplateInfo>> _infoVersionReaders = new Dictionary<string, Func<JObject, TemplateInfo>>()
-        {
-            { "1.0.0.0", TemplateInfoReaderVersion1_0_0_0.FromJObject },
-            { "1.0.0.1", TemplateInfoReaderVersion1_0_0_1.FromJObject },
-            { "1.0.0.2", TemplateInfoReaderVersion1_0_0_2.FromJObject },
-            { "1.0.0.3", TemplateInfoReaderVersion1_0_0_3.FromJObject },
-            { "1.0.0.4", TemplateInfoReaderVersion1_0_0_4.FromJObject },
-            { "1.0.0.5", TemplateInfoReaderVersion1_0_0_4.FromJObject }
-        };
-
-        private IReadOnlyList<ITemplateParameter> _parameters;
-
+#pragma warning disable CS0618 // Type or member is obsolete
         private IReadOnlyDictionary<string, ICacheTag> _tags;
-
         private IReadOnlyDictionary<string, ICacheParameter> _cacheParameters;
+#pragma warning restore CS0618 // Type or member is obsolete
 
         internal TemplateInfo()
         {
             ShortNameList = new List<string>();
         }
 
-        [JsonIgnore]
-        public IReadOnlyList<ITemplateParameter> Parameters
-        {
-            get
-            {
-                if (_parameters == null)
-                {
-                    List<ITemplateParameter> parameters = new List<ITemplateParameter>();
-
-                    foreach (KeyValuePair<string, ICacheTag> tagInfo in Tags)
-                    {
-                        ITemplateParameter param = new TemplateParameter
-                        {
-                            Name = tagInfo.Key,
-                            Documentation = tagInfo.Value.Description,
-                            DefaultValue = tagInfo.Value.DefaultValue,
-                            Choices = tagInfo.Value.Choices,
-                            DataType = "choice"
-                        };
-
-                        if (param is IAllowDefaultIfOptionWithoutValue paramWithNoValueDefault
-                            && tagInfo.Value is IAllowDefaultIfOptionWithoutValue tagWithNoValueDefault)
-                        {
-                            paramWithNoValueDefault.DefaultIfOptionWithoutValue = tagWithNoValueDefault.DefaultIfOptionWithoutValue;
-                            parameters.Add(paramWithNoValueDefault as TemplateParameter);
-                        }
-                        else
-                        {
-                            parameters.Add(param);
-                        }
-                    }
-
-                    foreach (KeyValuePair<string, ICacheParameter> paramInfo in CacheParameters)
-                    {
-                        ITemplateParameter param = new TemplateParameter
-                        {
-                            Name = paramInfo.Key,
-                            Documentation = paramInfo.Value.Description,
-                            DataType = paramInfo.Value.DataType,
-                            DefaultValue = paramInfo.Value.DefaultValue,
-                        };
-
-                        if (param is IAllowDefaultIfOptionWithoutValue paramWithNoValueDefault
-                            && paramInfo.Value is IAllowDefaultIfOptionWithoutValue infoWithNoValueDefault)
-                        {
-                            paramWithNoValueDefault.DefaultIfOptionWithoutValue = infoWithNoValueDefault.DefaultIfOptionWithoutValue;
-                            parameters.Add(paramWithNoValueDefault as TemplateParameter);
-                        }
-                        else
-                        {
-                            parameters.Add(param);
-                        }
-                    }
-
-                    _parameters = parameters;
-                }
-
-                return _parameters;
-            }
-        }
+        [JsonProperty]
+        public IReadOnlyList<ITemplateParameter> Parameters { get; set; }
 
         [JsonProperty]
         public string MountPointUri { get; set; }
@@ -130,7 +58,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         [JsonProperty]
         public string Name { get; set; }
 
-        [JsonProperty]
+        [JsonIgnore]
         public string ShortName
         {
             get
@@ -156,33 +84,53 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         public IReadOnlyList<string> ShortNameList { get; set; }
 
-        [JsonProperty]
+        [JsonIgnore]
+        [Obsolete]
         public IReadOnlyDictionary<string, ICacheTag> Tags
         {
             get
             {
+                if (_tags == null)
+                {
+                    Dictionary<string, ICacheTag> tags = new Dictionary<string, ICacheTag>();
+                    foreach (KeyValuePair<string, string> tag in TagsCollection)
+                    {
+                        tags[tag.Key] = new CacheTag(null, null, new Dictionary<string, ParameterChoice> { { tag.Value, new ParameterChoice(null, null) } }, tag.Value);
+                    }
+                    foreach (ITemplateParameter parameter in Parameters.Where(p => p.DataType.Equals("choice", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        tags[parameter.Name] = new CacheTag(parameter.DisplayName, parameter.Documentation, parameter.Choices, parameter.DefaultValue);
+                    }
+                    return _tags = tags;
+                }
                 return _tags;
-            }
-
-            set
-            {
-                _tags = value;
-                _parameters = null;
             }
         }
 
-        [JsonProperty]
+        [JsonIgnore]
+        [Obsolete]
         public IReadOnlyDictionary<string, ICacheParameter> CacheParameters
         {
             get
             {
-                return _cacheParameters;
-            }
+                if (_cacheParameters == null)
+                {
+                    Dictionary<string, ICacheParameter> cacheParameters = new Dictionary<string, ICacheParameter>();
+                    foreach (ITemplateParameter parameter in Parameters.Where(p => !p.DataType.Equals("choice", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        cacheParameters[parameter.Name] = new CacheParameter()
+                        {
+                             DataType = parameter.DataType,
+                             DefaultValue = parameter.DefaultValue,
+                             Description = parameter.Documentation,
+                             DefaultIfOptionWithoutValue = parameter.DefaultIfOptionWithoutValue,
+                             DisplayName = parameter.DisplayName
 
-            set
-            {
-                _cacheParameters = value;
-                _parameters = null;
+                        };
+                    }
+                    return _cacheParameters = cacheParameters;
+                }
+                return _cacheParameters;
             }
         }
 
@@ -201,27 +149,16 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         [JsonProperty]
         public IReadOnlyDictionary<string, IBaselineInfo> BaselineInfo { get; set; }
 
+        [JsonProperty]
+        public IReadOnlyDictionary<string, string> TagsCollection { get; set; }
+
         [JsonIgnore]
         bool ITemplateInfo.HasScriptRunningPostActions { get; set; }
 
-        public static TemplateInfo FromJObject(JObject entry, string cacheVersion)
+        public static TemplateInfo FromJObject(JObject entry)
         {
-            Func<JObject, TemplateInfo> infoReader;
-
-            if (string.IsNullOrEmpty(cacheVersion) || !_infoVersionReaders.TryGetValue(cacheVersion, out infoReader))
-            {
-                infoReader = _defaultReader;
-            }
-
-            return infoReader(entry);
+            return TemplateInfoReader.FromJObject(entry);
         }
 
-        // ShortName should get deserialized when it exists, for backwards compat.
-        // But moving forward, ShortNameList should be the definitive source.
-        // It can still be ShortName in the template.json, but in the caches it'll be ShortNameList
-        public bool ShouldSerializeShortName()
-        {
-            return false;
-        }
     }
 }

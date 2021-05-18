@@ -28,9 +28,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         string Author { get; }
 
-        IReadOnlyDictionary<string, ICacheTag> Tags { get; }
+        IReadOnlyDictionary<string, string> Tags { get; }
 
-        IReadOnlyDictionary<string, ICacheParameter> CacheParameters { get; }
+        //IReadOnlyDictionary<string, ICacheParameter> CacheParameters { get; }
 
         IReadOnlyList<string> Classifications { get; }
 

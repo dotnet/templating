@@ -113,7 +113,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 {
                     if (entry != null && entry.Type == JTokenType.Object)
                     {
-                        templateList.Add(Settings.TemplateInfo.FromJObject((JObject)entry, Version));
+                        templateList.Add(Settings.TemplateInfo.FromJObject((JObject)entry));
                     }
                 }
             }
@@ -141,8 +141,8 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 ConfigPlace = template.ConfigPlace,
                 MountPointUri = template.MountPointUri,
                 Name = localizationInfo?.Name ?? template.Name,
-                Tags = LocalizeCacheTags(template, localizationInfo),
-                CacheParameters = LocalizeCacheParameters(template, localizationInfo),
+                Parameters = LocalizeParameters(template, localizationInfo),
+                TagsCollection = template.TagsCollection,
 #pragma warning disable CS0618 // Type or member is obsolete
                 ShortName = template.ShortName,
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -163,91 +163,59 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             return localizedTemplate;
         }
 
-        private static IReadOnlyDictionary<string, ICacheTag> LocalizeCacheTags(ITemplateInfo template, ILocalizationLocator? localizationInfo)
+        private static IReadOnlyList<ITemplateParameter> LocalizeParameters(ITemplateInfo template, ILocalizationLocator? localizationInfo)
         {
             if (localizationInfo == null || localizationInfo.ParameterSymbols == null)
             {
-                return template.Tags;
+                return template.Parameters;
             }
 
-            IReadOnlyDictionary<string, ICacheTag> templateTags = template.Tags;
+            //IReadOnlyDictionary<string, ICacheTag> templateTags = template.Tags;
             IReadOnlyDictionary<string, IParameterSymbolLocalizationModel> localizedParameterSymbols = localizationInfo.ParameterSymbols;
 
-            Dictionary<string, ICacheTag> localizedCacheTags = new Dictionary<string, ICacheTag>();
+            List<ITemplateParameter> localizedParameters = new List<ITemplateParameter>();
 
-            foreach (KeyValuePair<string, ICacheTag> templateTag in templateTags)
+            foreach (ITemplateParameter parameter in template.Parameters)
             {
-                if (!localizedParameterSymbols.TryGetValue(templateTag.Key, out IParameterSymbolLocalizationModel localizationForTag))
+                if (!localizedParameterSymbols.TryGetValue(parameter.Name, out IParameterSymbolLocalizationModel localization))
                 {
                     // There is no localization for this symbol. Use the symbol as is.
-                    localizedCacheTags.Add(templateTag.Key, templateTag.Value);
+                    localizedParameters.Add(parameter);
                     continue;
                 }
-
-                // There is localization. Create a localized instance, starting with the choices.
-                var localizedChoices = new Dictionary<string, ParameterChoice>();
-
-                foreach (KeyValuePair<string, ParameterChoice> templateChoice in templateTag.Value.Choices)
+                Dictionary<string, ParameterChoice>? localizedChoices = null;
+                if (parameter.DataType.Equals("choice", StringComparison.OrdinalIgnoreCase) && parameter.Choices != null)
                 {
-                    ParameterChoice localizedChoice = new ParameterChoice(
-                        templateChoice.Value.DisplayName,
-                        templateChoice.Value.Description);
-
-                    if (localizationForTag.Choices.TryGetValue(templateChoice.Key, out ParameterChoiceLocalizationModel locModel))
+                    localizedChoices = new Dictionary<string, ParameterChoice>();
+                    foreach (KeyValuePair<string, ParameterChoice> templateChoice in parameter.Choices)
                     {
-                        localizedChoice.Localize(locModel);
+                        ParameterChoice localizedChoice = new ParameterChoice(
+                            templateChoice.Value.DisplayName,
+                            templateChoice.Value.Description);
+
+                        if (localization.Choices.TryGetValue(templateChoice.Key, out ParameterChoiceLocalizationModel locModel))
+                        {
+                            localizedChoice.Localize(locModel);
+                        }
+                        localizedChoices.Add(templateChoice.Key, localizedChoice);
                     }
-
-                    localizedChoices.Add(templateChoice.Key, localizedChoice);
                 }
 
-                ICacheTag localizedTag = new CacheTag(
-                    localizationForTag.DisplayName ?? templateTag.Value.DisplayName,
-                    localizationForTag.Description ?? templateTag.Value.Description,
-                    localizedChoices,
-                    templateTag.Value.DefaultValue,
-                    (templateTag.Value as IAllowDefaultIfOptionWithoutValue)?.DefaultIfOptionWithoutValue);
+                TemplateParameter localizedParameter = new TemplateParameter(
+                    name: parameter.Name,
+                    displayName: localization.DisplayName ?? parameter.DisplayName,
+                    description: localization.Description ?? parameter.Description,
+                    defaultValue: parameter.DefaultValue,
+                    defaultIfOptionWithoutValue: parameter.DefaultIfOptionWithoutValue,
+                    datatype: parameter.DataType,
+                    priority: parameter.Priority,
+                    type: parameter.Type,
+                    choices: localizedChoices);
 
-                localizedCacheTags.Add(templateTag.Key, localizedTag);
+                localizedParameters.Add(localizedParameter);
             }
 
-            return localizedCacheTags;
-        }
-
-        private static IReadOnlyDictionary<string, ICacheParameter> LocalizeCacheParameters(ITemplateInfo template, ILocalizationLocator? localizationInfo)
-        {
-            if (localizationInfo == null || localizationInfo.ParameterSymbols == null)
-            {
-                return template.CacheParameters;
-            }
-
-            IReadOnlyDictionary<string, ICacheParameter> templateCacheParameters = template.CacheParameters;
-            IReadOnlyDictionary<string, IParameterSymbolLocalizationModel> localizedParameterSymbols = localizationInfo.ParameterSymbols;
-
-            Dictionary<string, ICacheParameter> localizedCacheParams = new Dictionary<string, ICacheParameter>();
-
-            foreach (KeyValuePair<string, ICacheParameter> templateParam in templateCacheParameters)
-            {
-                if (localizedParameterSymbols.TryGetValue(templateParam.Key, out IParameterSymbolLocalizationModel localizationForParam))
-                {
-                    // there is loc info for this symbol
-                    ICacheParameter localizedParam = new CacheParameter
-                    {
-                        DataType = templateParam.Value.DataType,
-                        DefaultValue = templateParam.Value.DefaultValue,
-                        DisplayName = localizationForParam.DisplayName ?? templateParam.Value.DisplayName,
-                        Description = localizationForParam.Description ?? templateParam.Value.Description
-                    };
-
-                    localizedCacheParams.Add(templateParam.Key, localizedParam);
-                }
-                else
-                {
-                    localizedCacheParams.Add(templateParam.Key, templateParam.Value);
-                }
-            }
-
-            return localizedCacheParams;
+            return localizedParameters;
         }
 
         /// <summary>
