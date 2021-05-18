@@ -33,6 +33,7 @@
     <Rule Id="SA1116" Action="Warning" />
     <Rule Id="SA1117" Action="Warning" />
     <Rule Id="SA1201" Action="Warning" />          <!-- Elements should appear in the correct order -->
+    <Rule Id="SA1202" Action="Warning" />         <!-- Elements should be ordered by access -->
     <Rule Id="SA1203" Action="Warning" />         <!-- Constants should appear before fields -->
     <Rule Id="SA1204" Action="Warning" />         <!-- Static elements should appear before instance elements -->
     <Rule Id="SA1208" Action="Warning" />         <!-- Using directive ordering -->
