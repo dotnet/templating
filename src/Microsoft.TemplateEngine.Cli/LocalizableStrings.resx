@@ -278,6 +278,12 @@
   <data name="RestoreSucceeded" xml:space="preserve">
     <value>Restore succeeded.</value>
   </data>
+  <data name="BuildFailed" xml:space="preserve">
+    <value>Build failed.</value>
+  </data>
+  <data name="BuildSucceeded" xml:space="preserve">
+    <value>Build succeeded.</value>
+  </data>
   <data name="RunningDotnetRestoreOn" xml:space="preserve">
     <value>Running 'dotnet restore' on {0}...</value>
   </data>
