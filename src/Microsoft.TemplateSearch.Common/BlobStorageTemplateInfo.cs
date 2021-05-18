@@ -119,33 +119,32 @@ namespace Microsoft.TemplateSearch.Common
             //read parameters
             bool readParameters = false;
             List<ITemplateParameter> templateParameters = new List<ITemplateParameter>();
-            if (entry.TryGetValue(nameof(Parameters), StringComparison.OrdinalIgnoreCase, out JToken parametersArray))
+            JArray? parametersArray = entry.Get<JArray>(nameof(Parameters));
+            if (parametersArray != null)
             {
-                if (parametersArray != null)
+                foreach (JObject item in parametersArray)
                 {
-                    foreach (JObject item in parametersArray)
-                    {
-                        templateParameters.Add(new BlobTemplateParameter(item));
-                    }
+                    templateParameters.Add(new BlobTemplateParameter(item));
                 }
                 readParameters = true;
             }
 
             //try read tags and parameters - for compatibility reason
-            if (entry.TryGetValue("tags", StringComparison.OrdinalIgnoreCase, out JToken tagsCollection) && tagsCollection is JObject tagsObject)
+            JObject? tagsObject = entry.Get<JObject>("tags");
+            if (tagsObject != null)
             {
                 Dictionary<string, string> tags = new Dictionary<string, string>();
                 info.TagsCollection = tags;
                 foreach (JProperty item in tagsObject.Properties())
                 {
-                    JObject tagObj = (JObject)item.Value;
-                    if (tagObj == null)
+                    if (item.Value.Type == JTokenType.String)
                     {
-                        continue;
+                        tags[item.Name.ToString()] = item.Value.ToString();
                     }
-                    if (tagObj.TryGetValue("ChoicesAndDescriptions", StringComparison.OrdinalIgnoreCase, out JToken choicesCollection) && choicesCollection is JObject choicesObject)
+                    else if (item.Value is JObject tagObj)
                     {
-                        if (!readParameters)
+                        JObject? choicesObject = tagObj.Get<JObject>("ChoicesAndDescriptions");
+                        if (choicesObject != null && !readParameters)
                         {
                             Dictionary<string, ParameterChoice> choicesAndDescriptions = new Dictionary<string, ParameterChoice>(StringComparer.OrdinalIgnoreCase);
                             foreach (JProperty cdPair in choicesObject.Properties())
@@ -156,16 +155,16 @@ namespace Microsoft.TemplateSearch.Common
                                 new BlobTemplateParameter(item.Name.ToString(), "parameter", "choice")
                                 {
                                     Choices = choicesAndDescriptions,
-                                    Description = tagObj.TryGetValue(nameof(BlobTemplateParameter.Description), StringComparison.OrdinalIgnoreCase, out JToken description) ? description.ToString() : null,
-                                    DefaultValue = tagObj.TryGetValue(nameof(BlobTemplateParameter.DefaultValue), StringComparison.OrdinalIgnoreCase, out JToken defValue) ? defValue.ToString() : null
+                                    Description = tagObj.ToString(nameof(BlobTemplateParameter.Description)),
+                                    DefaultValue = tagObj.ToString(nameof(BlobTemplateParameter.DefaultValue)),
                                 });
                         }
-                        tags[item.Name.ToString()] = tagObj.TryGetValue(nameof(BlobTemplateParameter.DefaultValue), StringComparison.OrdinalIgnoreCase, out JToken defaultValue) ? defaultValue.ToString() : "";
+                        tags[item.Name.ToString()] = tagObj.ToString(nameof(BlobTemplateParameter.DefaultValue)) ?? "";
                     }
                 }
             }
-
-            if (!readParameters && entry.TryGetValue("cacheParameters", StringComparison.OrdinalIgnoreCase, out JToken cacheParameters) && cacheParameters is JObject cacheParametersObject)
+            JObject? cacheParametersObject = entry.Get<JObject>("cacheParameters");
+            if (!readParameters && cacheParametersObject != null)
             {
                 foreach (JProperty item in cacheParametersObject.Properties())
                 {
@@ -174,12 +173,12 @@ namespace Microsoft.TemplateSearch.Common
                     {
                         continue;
                     }
-                    string dataType = paramObj.TryGetValue(nameof(BlobTemplateParameter.DataType), StringComparison.OrdinalIgnoreCase, out JToken dt) ? dt.ToString() : "";
+                    string dataType = paramObj.ToString(nameof(BlobTemplateParameter.DataType)) ?? "string";
                     templateParameters.Add(
                         new BlobTemplateParameter(item.Name.ToString(), "parameter", dataType)
                         {
-                            Description = paramObj.TryGetValue(nameof(BlobTemplateParameter.Description), StringComparison.OrdinalIgnoreCase, out JToken description) ? description.ToString() : null,
-                            DefaultValue = paramObj.TryGetValue(nameof(BlobTemplateParameter.DefaultValue), StringComparison.OrdinalIgnoreCase, out JToken defValue) ? defValue.ToString() : null
+                            Description = paramObj.ToString(nameof(BlobTemplateParameter.Description)),
+                            DefaultValue = paramObj.ToString(nameof(BlobTemplateParameter.DefaultValue)),
                         });
                 }
             }

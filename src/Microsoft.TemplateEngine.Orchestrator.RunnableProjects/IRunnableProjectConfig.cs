@@ -30,8 +30,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         IReadOnlyDictionary<string, string> Tags { get; }
 
-        //IReadOnlyDictionary<string, ICacheParameter> CacheParameters { get; }
-
         IReadOnlyList<string> Classifications { get; }
 
         string GroupIdentity { get; }

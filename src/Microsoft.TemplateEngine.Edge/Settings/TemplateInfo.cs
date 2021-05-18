@@ -1,6 +1,8 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,55 +13,128 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Edge.Settings
 {
-    internal class TemplateInfo : ITemplateInfo
+    internal partial class TemplateInfo : ITemplateInfo
     {
-        internal const string CurrentVersion = "1.0.0.5";
+        internal const string CurrentVersion = "1.0.0.6";
 
 #pragma warning disable CS0618 // Type or member is obsolete
-        private IReadOnlyDictionary<string, ICacheTag> _tags;
-        private IReadOnlyDictionary<string, ICacheParameter> _cacheParameters;
+        private IReadOnlyDictionary<string, ICacheTag>? _tags;
+        private IReadOnlyDictionary<string, ICacheParameter>? _cacheParameters;
 #pragma warning restore CS0618 // Type or member is obsolete
 
-        internal TemplateInfo()
+        internal TemplateInfo(string identity, string name, IEnumerable<string> shortNames, string mountPointUri, string configPlace)
         {
-            ShortNameList = new List<string>();
+            if (string.IsNullOrWhiteSpace(identity))
+            {
+                throw new ArgumentException($"'{nameof(identity)}' cannot be null or whitespace.", nameof(identity));
+            }
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException($"'{nameof(name)}' cannot be null or whitespace.", nameof(name));
+            }
+
+            if (shortNames is null)
+            {
+                throw new ArgumentNullException(nameof(shortNames));
+            }
+            if (!shortNames.Any())
+            {
+                throw new ArgumentException($"'{nameof(shortNames)}' should contain at least one entry.", nameof(shortNames));
+            }
+            if (shortNames.Any(name => string.IsNullOrWhiteSpace(name)))
+            {
+                throw new ArgumentException($"'{nameof(shortNames)}' should not contain empty values.", nameof(shortNames));
+            }
+
+            if (string.IsNullOrWhiteSpace(mountPointUri))
+            {
+                throw new ArgumentException($"'{nameof(mountPointUri)}' cannot be null or whitespace.", nameof(mountPointUri));
+            }
+
+            if (string.IsNullOrWhiteSpace(configPlace))
+            {
+                throw new ArgumentException($"'{nameof(configPlace)}' cannot be null or whitespace.", nameof(configPlace));
+            }
+
+            Identity = identity;
+            Name = name;
+            MountPointUri = mountPointUri;
+            ConfigPlace = configPlace;
+            ShortNameList = shortNames.ToList();
+        }
+
+        /// <summary>
+        /// Localization copy-constructor.
+        /// </summary>
+        /// <param name="template">unlocalized template.</param>
+        /// <param name="localizationInfo">localization information.</param>
+        internal TemplateInfo(ITemplateInfo template, ILocalizationLocator? localizationInfo)
+        {
+            if (template is null)
+            {
+                throw new ArgumentNullException(nameof(template));
+            }
+
+            GeneratorId = template.GeneratorId;
+            ConfigPlace = template.ConfigPlace;
+            MountPointUri = template.MountPointUri;
+            TagsCollection = template.TagsCollection;
+            Classifications = template.Classifications;
+            GroupIdentity = template.GroupIdentity;
+            Precedence = template.Precedence;
+            Identity = template.Identity;
+            DefaultName = template.DefaultName;
+            HostConfigPlace = template.HostConfigPlace;
+            ThirdPartyNotices = template.ThirdPartyNotices;
+            BaselineInfo = template.BaselineInfo;
+            ShortNameList = template.ShortNameList;
+
+            LocaleConfigPlace = localizationInfo?.ConfigPlace;
+
+            Author = localizationInfo?.Author ?? template.Author;
+            Description = localizationInfo?.Description ?? template.Description;
+
+            Name = localizationInfo?.Name ?? template.Name;
+            Parameters = LocalizeParameters(template, localizationInfo);
         }
 
         [JsonProperty]
-        public IReadOnlyList<ITemplateParameter> Parameters { get; set; }
+        public IReadOnlyList<ITemplateParameter> Parameters { get; private set; } = new List<ITemplateParameter>();
 
         [JsonProperty]
-        public string MountPointUri { get; set; }
+        public string MountPointUri { get; }
 
         [JsonProperty]
-        public string Author { get; set; }
+        public string? Author { get; private set; }
 
         [JsonProperty]
-        public IReadOnlyList<string> Classifications { get; set; }
+        public IReadOnlyList<string> Classifications { get; private set; } = new List<string>();
 
         [JsonProperty]
-        public string DefaultName { get; set; }
+        public string? DefaultName { get; private set; }
 
         [JsonProperty]
-        public string Description { get; set; }
+        public string? Description { get; private set; }
 
         [JsonProperty]
-        public string Identity { get; set; }
+        public string Identity { get; }
 
         [JsonProperty]
-        public Guid GeneratorId { get; set; }
+        public Guid GeneratorId { get; private set; }
 
         [JsonProperty]
-        public string GroupIdentity { get; set; }
+        public string? GroupIdentity { get; private set; }
 
         [JsonProperty]
-        public int Precedence { get; set; }
+        public int Precedence { get; private set; }
 
         [JsonProperty]
-        public string Name { get; set; }
+        public string Name { get; }
 
         [JsonIgnore]
-        public string ShortName
+        [Obsolete]
+        string ITemplateInfo.ShortName
         {
             get
             {
@@ -70,23 +145,13 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
                 return string.Empty;
             }
-
-            set
-            {
-                if (ShortNameList.Count > 0)
-                {
-                    throw new Exception("Can't set the short name when the ShortNameList already has entries.");
-                }
-
-                ShortNameList = new List<string>() { value };
-            }
         }
 
-        public IReadOnlyList<string> ShortNameList { get; set; }
+        public IReadOnlyList<string> ShortNameList { get; } = new List<string>();
 
         [JsonIgnore]
         [Obsolete]
-        public IReadOnlyDictionary<string, ICacheTag> Tags
+        IReadOnlyDictionary<string, ICacheTag> ITemplateInfo.Tags
         {
             get
             {
@@ -99,7 +164,8 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     }
                     foreach (ITemplateParameter parameter in Parameters.Where(p => p.DataType.Equals("choice", StringComparison.OrdinalIgnoreCase)))
                     {
-                        tags[parameter.Name] = new CacheTag(parameter.DisplayName, parameter.Documentation, parameter.Choices, parameter.DefaultValue);
+                        IReadOnlyDictionary<string, ParameterChoice> choices = parameter.Choices ?? new Dictionary<string, ParameterChoice>();
+                        tags[parameter.Name] = new CacheTag(parameter.DisplayName, parameter.Documentation, choices, parameter.DefaultValue);
                     }
                     return _tags = tags;
                 }
@@ -109,7 +175,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         [JsonIgnore]
         [Obsolete]
-        public IReadOnlyDictionary<string, ICacheParameter> CacheParameters
+        IReadOnlyDictionary<string, ICacheParameter> ITemplateInfo.CacheParameters
         {
             get
             {
@@ -135,22 +201,22 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         }
 
         [JsonProperty]
-        public string ConfigPlace { get; set; }
+        public string ConfigPlace { get; }
 
         [JsonProperty]
-        public string LocaleConfigPlace { get; set; }
+        public string? LocaleConfigPlace { get; private set; }
 
         [JsonProperty]
-        public string HostConfigPlace { get; set; }
+        public string? HostConfigPlace { get; private set; }
 
         [JsonProperty]
-        public string ThirdPartyNotices { get; set; }
+        public string? ThirdPartyNotices { get; private set; }
 
         [JsonProperty]
-        public IReadOnlyDictionary<string, IBaselineInfo> BaselineInfo { get; set; }
+        public IReadOnlyDictionary<string, IBaselineInfo> BaselineInfo { get; private set; } = new Dictionary<string, IBaselineInfo>();
 
         [JsonProperty]
-        public IReadOnlyDictionary<string, string> TagsCollection { get; set; }
+        public IReadOnlyDictionary<string, string> TagsCollection { get; private set; } = new Dictionary<string, string>();
 
         [JsonIgnore]
         bool ITemplateInfo.HasScriptRunningPostActions { get; set; }
@@ -160,5 +226,54 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             return TemplateInfoReader.FromJObject(entry);
         }
 
+        private static IReadOnlyList<ITemplateParameter> LocalizeParameters(ITemplateInfo template, ILocalizationLocator? localizationInfo)
+        {
+            //we would like to copy the parameters to format supported for serialization as we cannot be sure that ITemplateInfo supports serialization in needed format.
+            List<ITemplateParameter> localizedParameters = new List<ITemplateParameter>();
+            foreach (ITemplateParameter parameter in template.Parameters)
+            {
+                IParameterSymbolLocalizationModel? localization = null;
+                Dictionary<string, ParameterChoice>? localizedChoices = null;
+                if (localizationInfo != null)
+                {
+                    if (!localizationInfo.ParameterSymbols.TryGetValue(parameter.Name, out localization))
+                    {
+                        // There is no localization for this symbol. Use the symbol as is.
+                        localizedParameters.Add(parameter);
+                        continue;
+                    }
+                    if (parameter.IsChoice() && parameter.Choices != null)
+                    {
+                        localizedChoices = new Dictionary<string, ParameterChoice>();
+                        foreach (KeyValuePair<string, ParameterChoice> templateChoice in parameter.Choices)
+                        {
+                            ParameterChoice localizedChoice = new ParameterChoice(
+                                templateChoice.Value.DisplayName,
+                                templateChoice.Value.Description);
+
+                            if (localization.Choices.TryGetValue(templateChoice.Key, out ParameterChoiceLocalizationModel locModel))
+                            {
+                                localizedChoice.Localize(locModel);
+                            }
+                            localizedChoices.Add(templateChoice.Key, localizedChoice);
+                        }
+                    }
+                }
+
+                TemplateParameter localizedParameter = new TemplateParameter(
+                    name: parameter.Name,
+                    displayName: localization?.DisplayName ?? parameter.DisplayName,
+                    description: localization?.Description ?? parameter.Description,
+                    defaultValue: parameter.DefaultValue,
+                    defaultIfOptionWithoutValue: parameter.DefaultIfOptionWithoutValue,
+                    datatype: parameter.DataType,
+                    priority: parameter.Priority,
+                    type: parameter.Type,
+                    choices: localizedChoices ?? parameter.Choices);
+
+                localizedParameters.Add(localizedParameter);
+            }
+            return localizedParameters;
+        }
     }
 }

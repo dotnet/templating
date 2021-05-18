@@ -27,6 +27,7 @@ namespace Microsoft.TemplateEngine.Abstractions
         /// <summary>
         /// Gets template classifications.
         /// </summary>
+        /// <example>"Common", "Library", "Windows", "Tests", "Web".</example>
         IReadOnlyList<string> Classifications { get; }
 
         /// <summary>
@@ -51,7 +52,7 @@ namespace Microsoft.TemplateEngine.Abstractions
 
         /// <summary>
         /// Gets template precedence.
-        /// The precedence is used to prioritized templates inside template groups.
+        /// The precedence is used to prioritized templates inside template groups: the template with the higher value will be prioritized over the template with lower value.
         /// </summary>
         int Precedence { get; }
 

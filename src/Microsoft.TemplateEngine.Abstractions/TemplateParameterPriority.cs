@@ -8,7 +8,7 @@ using System;
 namespace Microsoft.TemplateEngine.Abstractions
 {
     /// <summary>
-    /// Defines template parameter priority.
+    /// Defines the priority of a template parameter.
     /// </summary>
     public enum TemplateParameterPriority
     {

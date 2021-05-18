@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -59,8 +58,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             foreach (ITemplate newTemplate in templateDeduplicationDictionary.Values)
             {
                 localizationsByTemplateId.TryGetValue(newTemplate.Identity, out ILocalizationLocator locatorForTemplate);
-                TemplateInfo localizedTemplate = LocalizeTemplate(newTemplate, locatorForTemplate);
-                templates.Add(localizedTemplate);
+                templates.Add(new TemplateInfo(newTemplate, locatorForTemplate));
             }
 
             Version = Settings.TemplateInfo.CurrentVersion;
@@ -132,91 +130,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         [JsonProperty]
         public Dictionary<string, DateTime> MountPointsInfo { get; }
-
-        private static TemplateInfo LocalizeTemplate(ITemplateInfo template, ILocalizationLocator? localizationInfo)
-        {
-            TemplateInfo localizedTemplate = new TemplateInfo
-            {
-                GeneratorId = template.GeneratorId,
-                ConfigPlace = template.ConfigPlace,
-                MountPointUri = template.MountPointUri,
-                Name = localizationInfo?.Name ?? template.Name,
-                Parameters = LocalizeParameters(template, localizationInfo),
-                TagsCollection = template.TagsCollection,
-#pragma warning disable CS0618 // Type or member is obsolete
-                ShortName = template.ShortName,
-#pragma warning restore CS0618 // Type or member is obsolete
-                Classifications = template.Classifications,
-                Author = localizationInfo?.Author ?? template.Author,
-                Description = localizationInfo?.Description ?? template.Description,
-                GroupIdentity = template.GroupIdentity ?? string.Empty,
-                Precedence = template.Precedence,
-                Identity = template.Identity,
-                DefaultName = template.DefaultName,
-                LocaleConfigPlace = localizationInfo?.ConfigPlace ?? null,
-                HostConfigPlace = template.HostConfigPlace,
-                ThirdPartyNotices = template.ThirdPartyNotices,
-                BaselineInfo = template.BaselineInfo,
-                ShortNameList = template.ShortNameList
-            };
-
-            return localizedTemplate;
-        }
-
-        private static IReadOnlyList<ITemplateParameter> LocalizeParameters(ITemplateInfo template, ILocalizationLocator? localizationInfo)
-        {
-            if (localizationInfo == null || localizationInfo.ParameterSymbols == null)
-            {
-                return template.Parameters;
-            }
-
-            //IReadOnlyDictionary<string, ICacheTag> templateTags = template.Tags;
-            IReadOnlyDictionary<string, IParameterSymbolLocalizationModel> localizedParameterSymbols = localizationInfo.ParameterSymbols;
-
-            List<ITemplateParameter> localizedParameters = new List<ITemplateParameter>();
-
-            foreach (ITemplateParameter parameter in template.Parameters)
-            {
-                if (!localizedParameterSymbols.TryGetValue(parameter.Name, out IParameterSymbolLocalizationModel localization))
-                {
-                    // There is no localization for this symbol. Use the symbol as is.
-                    localizedParameters.Add(parameter);
-                    continue;
-                }
-                Dictionary<string, ParameterChoice>? localizedChoices = null;
-                if (parameter.DataType.Equals("choice", StringComparison.OrdinalIgnoreCase) && parameter.Choices != null)
-                {
-                    localizedChoices = new Dictionary<string, ParameterChoice>();
-                    foreach (KeyValuePair<string, ParameterChoice> templateChoice in parameter.Choices)
-                    {
-                        ParameterChoice localizedChoice = new ParameterChoice(
-                            templateChoice.Value.DisplayName,
-                            templateChoice.Value.Description);
-
-                        if (localization.Choices.TryGetValue(templateChoice.Key, out ParameterChoiceLocalizationModel locModel))
-                        {
-                            localizedChoice.Localize(locModel);
-                        }
-                        localizedChoices.Add(templateChoice.Key, localizedChoice);
-                    }
-                }
-
-                TemplateParameter localizedParameter = new TemplateParameter(
-                    name: parameter.Name,
-                    displayName: localization.DisplayName ?? parameter.DisplayName,
-                    description: localization.Description ?? parameter.Description,
-                    defaultValue: parameter.DefaultValue,
-                    defaultIfOptionWithoutValue: parameter.DefaultIfOptionWithoutValue,
-                    datatype: parameter.DataType,
-                    priority: parameter.Priority,
-                    type: parameter.Type,
-                    choices: localizedChoices);
-
-                localizedParameters.Add(localizedParameter);
-            }
-
-            return localizedParameters;
-        }
 
         /// <summary>
         /// Given a locale, removes the country/region part and returns.

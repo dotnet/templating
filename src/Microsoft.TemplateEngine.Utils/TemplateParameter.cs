@@ -11,14 +11,6 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Utils
 {
-    public static class TemplateParameterExtensions
-    {
-        public static bool IsChoice(this ITemplateParameter parameter)
-        {
-            return parameter.DataType.Equals("choice", StringComparison.OrdinalIgnoreCase);
-        }
-    }
-
 #pragma warning disable CS0618 // Type or member is obsolete - compatibility
     public class TemplateParameter : ITemplateParameter, IAllowDefaultIfOptionWithoutValue
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -93,7 +85,6 @@ namespace Microsoft.TemplateEngine.Utils
                 Choices = choices ?? new Dictionary<string, ParameterChoice>();
             }
         }
-#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
 
         [Obsolete("Use Description instead.")]
         public string? Documentation => Description;
