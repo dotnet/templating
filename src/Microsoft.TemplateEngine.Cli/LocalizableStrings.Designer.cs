@@ -863,15 +863,6 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Getting ready....
-        /// </summary>
-        internal static string GettingReady {
-            get {
-                return ResourceManager.GetString("GettingReady", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Installs a source or a template package..
         /// </summary>
         internal static string InstallHelp {

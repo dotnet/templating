@@ -182,23 +182,15 @@ namespace Microsoft.TemplateEngine.Core
 
                 if (!parameters.ResolvedValues.TryGetValue(param, out object value))
                 {
-                    if (param.Priority != TemplateParameterPriority.Optional && param.Priority != TemplateParameterPriority.Suggested)
+                    if (param.Priority != TemplateParameterPriority.Optional)
                     {
-                        while (environmentSettings.Host.OnParameterError(param, null, "ParameterValueNotSpecified", out string val))
-                        {
-                        }
-
                         parameters.ResolvedValues[param] = value;
                     }
                 }
                 else if (value == null)
                 {
-                    if (param.Priority != TemplateParameterPriority.Optional && param.Priority != TemplateParameterPriority.Suggested)
+                    if (param.Priority != TemplateParameterPriority.Optional)
                     {
-                        while (environmentSettings.Host.OnParameterError(param, null, "ParameterValueNull", out string val))
-                        {
-                        }
-
                         parameters.ResolvedValues[param] = value;
                     }
                 }

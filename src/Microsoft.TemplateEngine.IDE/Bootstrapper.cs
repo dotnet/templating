@@ -1,8 +1,6 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,8 +12,9 @@ using Microsoft.TemplateEngine.Abstractions.Installer;
 using Microsoft.TemplateEngine.Abstractions.TemplateFiltering;
 using Microsoft.TemplateEngine.Abstractions.TemplatePackage;
 using Microsoft.TemplateEngine.Edge;
+using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Utils;
-using TemplateCreationResult = Microsoft.TemplateEngine.Edge.Template.TemplateCreationResult;
+using ITemplateCreationResult = Microsoft.TemplateEngine.Edge.Template.ITemplateCreationResult;
 using TemplateCreator = Microsoft.TemplateEngine.Edge.Template.TemplateCreator;
 
 namespace Microsoft.TemplateEngine.IDE
@@ -24,29 +23,51 @@ namespace Microsoft.TemplateEngine.IDE
     {
         private readonly ITemplateEngineHost _host;
         private readonly TemplateCreator _templateCreator;
+        private readonly Edge.Settings.TemplatePackageManager _templatePackagesManager;
         private readonly EngineEnvironmentSettings _engineEnvironmentSettings;
 
-        public Bootstrapper(ITemplateEngineHost host, Action<IEngineEnvironmentSettings> onFirstRun, bool virtualizeConfiguration)
+        /// <summary>
+        /// Creates the instance.
+        /// </summary>
+        /// <param name="host">caller <see cref="ITemplateEngineHost"/>.</param>
+        /// <param name="virtualizeConfiguration">if true, settings will be stored in memory and will be disposed with instance.</param>
+        /// <param name="loadDefaultComponents">if true, the default components (providers, installers, generator) will be loaded. Same as calling <see cref="LoadDefaultComponents()"/> after instance is created.</param>
+        public Bootstrapper(ITemplateEngineHost host, bool virtualizeConfiguration, bool loadDefaultComponents = true)
         {
             _host = host ?? throw new ArgumentNullException(nameof(host));
-            _engineEnvironmentSettings = new EngineEnvironmentSettings(host, virtualizeSettings: virtualizeConfiguration, onFirstRun: onFirstRun);
+            _engineEnvironmentSettings = new EngineEnvironmentSettings(host, virtualizeSettings: virtualizeConfiguration);
             _templateCreator = new TemplateCreator(_engineEnvironmentSettings);
+            _templatePackagesManager = new Edge.Settings.TemplatePackageManager(_engineEnvironmentSettings);
+            if (loadDefaultComponents)
+            {
+                LoadDefaultComponents();
+            }
         }
 
-        public void Register(Type type)
+        /// <summary>
+        /// Loads default components: template package providers and installers defined in Microsoft.TemplateEngine.Edge and default template generator defined in Microsoft.TemplateEngine.Orchestrator.RunnableProjects.
+        /// </summary>
+        public void LoadDefaultComponents()
         {
-            _engineEnvironmentSettings.SettingsLoader.Components.Register(type);
+            foreach ((Type Type, IIdentifiedComponent Instance) component in Orchestrator.RunnableProjects.Components.AllComponents)
+            {
+                AddComponent(component.Type, component.Instance);
+            }
+            foreach ((Type Type, IIdentifiedComponent Instance) component in Edge.Components.AllComponents)
+            {
+                AddComponent(component.Type, component.Instance);
+            }
         }
 
-        public void Register(Assembly assembly)
+        /// <summary>
+        /// Adds component to manager, which can be looked up later via <see cref="IComponentManager.TryGetComponent{T}(Guid, out T)"/> or <see cref="IComponentManager.OfType{T}"/>.
+        /// Added components are not persisted and need to be called every time new instance of <see cref="Bootstrapper"/> is created.
+        /// </summary>
+        /// <param name="interfaceType">Interface type that added component implements.</param>
+        /// <param name="instance">Instance of type that implements <paramref name="interfaceType"/>.</param>
+        public void AddComponent(Type interfaceType, IIdentifiedComponent component)
         {
-            _engineEnvironmentSettings.SettingsLoader.Components.RegisterMany(assembly.GetTypes());
-        }
-
-        [Obsolete("Use " + nameof(GetTemplatesAsync) + "instead")]
-        public async Task<IReadOnlyCollection<Edge.Template.IFilteredTemplateInfo>> ListTemplates(bool exactMatchesOnly, params Func<ITemplateInfo, Edge.Template.MatchInfo?>[] filters)
-        {
-            return TemplateListFilter.FilterTemplates(await _engineEnvironmentSettings.SettingsLoader.GetTemplatesAsync(default).ConfigureAwait(false), exactMatchesOnly, filters);
+            _engineEnvironmentSettings.Components.AddComponent(interfaceType, component);
         }
 
         /// <summary>
@@ -61,19 +82,67 @@ namespace Microsoft.TemplateEngine.IDE
         public Task<IReadOnlyList<ITemplateMatchInfo>> GetTemplatesAsync(IEnumerable<Func<ITemplateInfo, MatchInfo?>>? filters = null, bool exactMatchesOnly = true, CancellationToken cancellationToken = default)
         {
             Func<ITemplateMatchInfo, bool> criteria = exactMatchesOnly ? WellKnownSearchFilters.MatchesAllCriteria : WellKnownSearchFilters.MatchesAtLeastOneCriteria;
-            return _engineEnvironmentSettings.SettingsLoader.GetTemplatesAsync(criteria, filters ?? Array.Empty<Func<ITemplateInfo, MatchInfo?>>(), cancellationToken);
+            return _templatePackagesManager.GetTemplatesAsync(criteria, filters ?? Array.Empty<Func<ITemplateInfo, MatchInfo?>>(), cancellationToken);
         }
 
-        public async Task<ICreationResult> CreateAsync(ITemplateInfo info, string name, string outputPath, IReadOnlyDictionary<string, string> parameters, bool skipUpdateCheck, string baselineName)
+        /// <summary>
+        /// Instantiates the template.
+        /// </summary>
+        /// <param name="info">The template to instantiate.</param>
+        /// <param name="name">The name to use.</param>
+        /// <param name="outputPath">The output directory for template instantiation.</param>
+        /// <param name="parameters">The template parameters.</param>
+        /// <param name="baselineName">The baseline configuration to use.</param>
+        /// <returns><see cref="TemplateCreationResult"/> containing information on created template or error occurred.</returns>
+#pragma warning disable RS0027 // Public API with optional parameter(s) should have the most parameters amongst its public overloads
+        public Task<ITemplateCreationResult> CreateAsync(
+            ITemplateInfo info,
+            string? name,
+            string outputPath,
+            IReadOnlyDictionary<string, string?> parameters,
+            string? baselineName = null,
+            CancellationToken cancellationToken = default)
+#pragma warning restore RS0027 // Public API with optional parameter(s) should have the most parameters amongst its public overloads
         {
-            TemplateCreationResult instantiateResult = await _templateCreator.InstantiateAsync(info, name, name, outputPath, parameters, skipUpdateCheck, false, baselineName).ConfigureAwait(false);
-            return instantiateResult.ResultInfo;
+            return _templateCreator.InstantiateAsync(
+                info,
+                name,
+                fallbackName: null,
+                outputPath: outputPath,
+                inputParameters: parameters,
+                forceCreation: false,
+                baselineName: baselineName,
+                dryRun: false,
+                cancellationToken: cancellationToken);
         }
 
-        public async Task<ICreationEffects> GetCreationEffectsAsync(ITemplateInfo info, string name, string outputPath, IReadOnlyDictionary<string, string> parameters, string baselineName)
+        /// <summary>
+        /// Dry runs the template with given parameters.
+        /// </summary>
+        /// <param name="info">The template to instantiate.</param>
+        /// <param name="name">The name to use.</param>
+        /// <param name="outputPath">The output directory for template instantiation.</param>
+        /// <param name="parameters">The template parameters.</param>
+        /// <param name="baselineName">The baseline configuration to use.</param>
+        /// <returns><see cref="ITemplateCreationResult"/> containing information on template that would be created or error occurred.</returns>
+        public Task<ITemplateCreationResult> GetCreationEffectsAsync(
+            ITemplateInfo info,
+            string? name,
+            string outputPath,
+            IReadOnlyDictionary<string, string?> parameters,
+            string? baselineName = null,
+            CancellationToken cancellationToken = default)
         {
-            TemplateCreationResult instantiateResult = await _templateCreator.InstantiateAsync(info, name, name, outputPath, parameters, true, false, baselineName, true).ConfigureAwait(false);
-            return instantiateResult.CreationEffects;
+            return _templateCreator.InstantiateAsync(
+                info,
+                name,
+                fallbackName: null,
+                outputPath: outputPath,
+                inputParameters: parameters,
+                forceCreation: false,
+                baselineName: baselineName,
+                dryRun: true,
+                cancellationToken: cancellationToken);
         }
 
         #region Template Package Management
@@ -86,7 +155,7 @@ namespace Microsoft.TemplateEngine.IDE
         public Task<IReadOnlyList<ITemplatePackage>> GetTemplatePackages(CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return _engineEnvironmentSettings.SettingsLoader.TemplatePackagesManager.GetTemplatePackagesAsync();
+            return _templatePackagesManager.GetTemplatePackagesAsync(false, cancellationToken);
         }
 
         /// <summary>
@@ -97,7 +166,7 @@ namespace Microsoft.TemplateEngine.IDE
         public Task<IReadOnlyList<IManagedTemplatePackage>> GetManagedTemplatePackages(CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return _engineEnvironmentSettings.SettingsLoader.TemplatePackagesManager.GetManagedTemplatePackagesAsync();
+            return _templatePackagesManager.GetManagedTemplatePackagesAsync(false, cancellationToken);
         }
 
         /// <summary>
@@ -127,7 +196,7 @@ namespace Microsoft.TemplateEngine.IDE
                 case InstallationScope.Global:
                 default:
                     {
-                        managedPackageProvider = _engineEnvironmentSettings.SettingsLoader.TemplatePackagesManager.GetBuiltInManagedProvider(InstallationScope.Global);
+                        managedPackageProvider = _templatePackagesManager.GetBuiltInManagedProvider(InstallationScope.Global);
                         break;
                     }
             }
@@ -203,9 +272,27 @@ namespace Microsoft.TemplateEngine.IDE
 
         #endregion Template Package Management
 
-        public void Dispose() => _engineEnvironmentSettings.Dispose();
+        public void Dispose() => _templatePackagesManager.Dispose();
 
         #region Obsolete
+
+        [Obsolete("Use " + nameof(GetTemplatesAsync) + "instead")]
+        public async Task<IReadOnlyCollection<Edge.Template.IFilteredTemplateInfo>> ListTemplates(bool exactMatchesOnly, params Func<ITemplateInfo, Edge.Template.MatchInfo?>[] filters)
+        {
+            return TemplateListFilter.FilterTemplates(await _templatePackagesManager.GetTemplatesAsync(default).ConfigureAwait(false), exactMatchesOnly, filters);
+        }
+
+        [Obsolete("Use ITemplateEngineHost.BuiltInComponents or AddComponent to add components.")]
+        public void Register(Type type)
+        {
+            _engineEnvironmentSettings.Components.Register(type);
+        }
+
+        [Obsolete("Use ITemplateEngineHost.BuiltInComponents or AddComponent to add components.")]
+        public void Register(Assembly assembly)
+        {
+            _engineEnvironmentSettings.Components.RegisterMany(assembly.GetTypes());
+        }
 
         [Obsolete("use Task<IReadOnlyList<InstallResult>> InstallTemplatePackagesAsync(IEnumerable<InstallRequest> installRequests, InstallationScope scope = InstallationScope.Global, CancellationToken cancellationToken = default) instead")]
         public void Install(string path)
@@ -270,6 +357,21 @@ namespace Microsoft.TemplateEngine.IDE
             uninstallTask.Wait();
             return uninstallTask.Result.Select(result => result.TemplatePackage.Identifier);
         }
+
+        [Obsolete("Use Task<TemplateCreationResult> CreateAsync(ITemplateInfo info, string? name, string outputPath, IReadOnlyDictionary<string, string> parameters, string? baselineName = null, CancellationToken cancellationToken = default) instead.")]
+        public async Task<ICreationResult?> CreateAsync(ITemplateInfo info, string name, string outputPath, IReadOnlyDictionary<string, string?> parameters, bool skipUpdateCheck, string baselineName)
+        {
+            ITemplateCreationResult instantiateResult = await _templateCreator.InstantiateAsync(info, name, name, outputPath, parameters, false, baselineName).ConfigureAwait(false);
+            return instantiateResult.CreationResult;
+        }
+
+        [Obsolete("Use Task<TemplateCreationResult> GetCreationEffectsAsync(ITemplateInfo info, string? name, string outputPath, IReadOnlyDictionary<string, string> parameters, string? baselineName = null, CancellationToken cancellationToken = default) instead.")]
+        public async Task<ICreationEffects?> GetCreationEffectsAsync(ITemplateInfo info, string name, string outputPath, IReadOnlyDictionary<string, string?> parameters, string baselineName)
+        {
+            ITemplateCreationResult instantiateResult = await _templateCreator.InstantiateAsync(info, name, name, outputPath, parameters,  false, baselineName, true).ConfigureAwait(false);
+            return instantiateResult.CreationEffects;
+        }
+
         #endregion Obsolete
     }
 }

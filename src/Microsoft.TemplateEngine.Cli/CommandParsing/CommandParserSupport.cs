@@ -20,7 +20,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             {
                 if (_argsForBuiltInCommands == null)
                 {
-                    Option[] allBuiltInArgs = ArrayExtensions.CombineArrays(NewCommandVisibleArgs, NewCommandHiddenArgs, NewCommandReservedArgs, DebuggingCommandArgs);
+                    Option[] allBuiltInArgs = ArrayExtensions.CombineArrays(NewCommandVisibleArgs, NewCommandHiddenArgs, DebuggingCommandArgs);
 
                     _argsForBuiltInCommands = VariantsForOptions(allBuiltInArgs);
                 }
@@ -80,17 +80,6 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                     Create.Option("-all|--show-all", string.Empty, Accept.NoArguments()),
                     Create.Option("--allow-scripts", string.Empty, Accept.ZeroOrOneArgument()),
                     Create.Option("--baseline", string.Empty, Accept.ExactlyOneArgument()),
-                };
-            }
-        }
-
-        private static Option[] NewCommandReservedArgs
-        {
-            get
-            {
-                return new[]
-                {
-                    Create.Option("--skip-update-check", string.Empty, Accept.NoArguments()),
                 };
             }
         }
@@ -166,17 +155,16 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                     aliasesForParam.Add(shortVersion);
                 }
 
-                if (parameter is IAllowDefaultIfOptionWithoutValue parameterWithNoValueDefault
-                    && !string.IsNullOrEmpty(parameterWithNoValueDefault.DefaultIfOptionWithoutValue))
+                if (!string.IsNullOrEmpty(parameter.DefaultIfOptionWithoutValue))
                 {
                     // This switch can be provided with or without a value.
                     // If the user doesn't specify a value, it gets the value of DefaultIfOptionWithoutValue
-                    option = Create.Option(string.Join("|", aliasesForParam), parameter.Documentation, Accept.ZeroOrOneArgument());
+                    option = Create.Option(string.Join("|", aliasesForParam), parameter.Description, Accept.ZeroOrOneArgument());
                 }
                 else
                 {
                     // User must provide a value if this switch is specified.
-                    option = Create.Option(string.Join("|", aliasesForParam), parameter.Documentation, Accept.ExactlyOneArgument());
+                    option = Create.Option(string.Join("|", aliasesForParam), parameter.Description, Accept.ExactlyOneArgument());
                 }
 
                 paramOptionList.Add(option);    // add the option

@@ -21,9 +21,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
     internal class RunnableProjectGenerator : IGenerator
     {
+        internal const string HostTemplateFileConfigBaseName = ".host.json";
         internal const string TemplateConfigDirectoryName = ".template.config";
         internal const string TemplateConfigFileName = "template.json";
-        internal const string LocalizationFileSuffix = ".templatestrings.json";
+        internal const string LocalizationFilePrefix = "templatestrings.";
+        internal const string LocalizationFileExtension = ".json";
         private const string AdditionalConfigFilesIndicator = "AdditionalConfigFiles";
         private const string GeneratorVersion = "1.0.0.0";
         private static readonly Guid GeneratorId = new Guid("0C434DF7-E2CB-4DEE-B216-D7C58C8EB4B3");
@@ -51,13 +53,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             IOrchestrator2 basicOrchestrator = new Core.Util.Orchestrator();
             RunnableProjectOrchestrator orchestrator = new RunnableProjectOrchestrator(basicOrchestrator);
 
-            GlobalRunSpec runSpec = new GlobalRunSpec(template.TemplateSourceRoot, componentManager, parameters, variables, template.Config.OperationConfig, template.Config.SpecialOperationConfig, template.Config.IgnoreFileNames);
+            GlobalRunSpec runSpec = new GlobalRunSpec(templateData.TemplateSourceRoot, componentManager, parameters, variables, template.Config.OperationConfig, template.Config.SpecialOperationConfig, template.Config.IgnoreFileNames);
 
             foreach (FileSourceMatchInfo source in template.Config.Sources)
             {
                 runSpec.SetupFileSource(source);
                 string target = Path.Combine(targetDirectory, source.Target);
-                orchestrator.Run(runSpec, template.TemplateSourceRoot.DirectoryInfo(source.Source), target);
+                orchestrator.Run(runSpec, templateData.TemplateSourceRoot.DirectoryInfo(source.Source), target);
             }
 
             return Task.FromResult(GetCreationResult(environmentSettings, template, variables));
@@ -83,14 +85,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             IOrchestrator2 basicOrchestrator = new Core.Util.Orchestrator();
             RunnableProjectOrchestrator orchestrator = new RunnableProjectOrchestrator(basicOrchestrator);
 
-            GlobalRunSpec runSpec = new GlobalRunSpec(template.TemplateSourceRoot, componentManager, parameters, variables, template.Config.OperationConfig, template.Config.SpecialOperationConfig, template.Config.IgnoreFileNames);
+            GlobalRunSpec runSpec = new GlobalRunSpec(templateData.TemplateSourceRoot, componentManager, parameters, variables, template.Config.OperationConfig, template.Config.SpecialOperationConfig, template.Config.IgnoreFileNames);
             List<IFileChange2> changes = new List<IFileChange2>();
 
             foreach (FileSourceMatchInfo source in template.Config.Sources)
             {
                 runSpec.SetupFileSource(source);
                 string target = Path.Combine(targetDirectory, source.Target);
-                IReadOnlyList<IFileChange2> fileChanges = orchestrator.GetFileChanges(runSpec, template.TemplateSourceRoot.DirectoryInfo(source.Source), target);
+                IReadOnlyList<IFileChange2> fileChanges = orchestrator.GetFileChanges(runSpec, templateData.TemplateSourceRoot.DirectoryInfo(source.Source), target);
 
                 //source and target paths in the file changes are returned relative to source passed
                 //GetCreationEffects method should return the source paths relative to template source root (location of .template.config folder) and target paths relative to output path and not relative to certain source
@@ -121,7 +123,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             foreach (IFile file in folder.EnumerateFiles(TemplateConfigFileName, SearchOption.AllDirectories))
             {
-                IFile hostConfigFile = file.MountPoint.EnvironmentSettings.SettingsLoader.FindBestHostTemplateConfigFile(file);
+                IFile hostConfigFile = FindBestHostTemplateConfigFile(source.EnvironmentSettings, file);
 
                 if (TryGetTemplateFromConfigInfo(file, out ITemplate template, hostTemplateConfigFile: hostConfigFile))
                 {
@@ -130,9 +132,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     IDirectory localizeFolder = file.Parent.DirectoryInfo("localize");
                     if (localizeFolder != null && localizeFolder.Exists)
                     {
-                        foreach (IFile locFile in localizeFolder.EnumerateFiles("*" + LocalizationFileSuffix, SearchOption.AllDirectories))
+                        foreach (IFile locFile in localizeFolder.EnumerateFiles(LocalizationFilePrefix + "*" + LocalizationFileExtension, SearchOption.AllDirectories))
                         {
-                            string locale = locFile.Name.Substring(0, locFile.Name.Length - LocalizationFileSuffix.Length);
+                            string locale = locFile.Name.Substring(LocalizationFilePrefix.Length, locFile.Name.Length - LocalizationFilePrefix.Length - LocalizationFileExtension.Length);
 
                             if (TryGetLangPackFromFile(locFile, out ILocalizationModel locModel))
                             {
@@ -194,7 +196,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 }
 
                 RunnableProjectTemplate runnableProjectTemplate = new RunnableProjectTemplate(srcObject, this, templateFile, templateModel, null, hostTemplateConfigFile);
-                if (!AreAllTemplatePathsValid(templateModel, runnableProjectTemplate))
+                if (!AreAllTemplatePathsValid(templateFile.MountPoint.EnvironmentSettings, templateModel, runnableProjectTemplate))
                 {
                     template = null;
                     return false;
@@ -244,7 +246,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     // which takes care of making null bool -> true as appropriate.
                     // This else can also happen if there is a value but it can't be converted.
                     string val;
+#pragma warning disable CS0618 // Type or member is obsolete - for backward compatibility
                     while (environmentSettings.Host.OnParameterError(param, null, "ParameterValueNotSpecified", out val) && !bool.TryParse(val, out boolVal))
+#pragma warning restore CS0618 // Type or member is obsolete
                     {
                     }
 
@@ -265,7 +269,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 }
 
                 string val;
+#pragma warning disable CS0618 // Type or member is obsolete - for backward compatibility
                 while (environmentSettings.Host.OnParameterError(param, null, "ValueNotValid:" + string.Join(",", param.Choices.Keys), out val)
+#pragma warning restore CS0618 // Type or member is obsolete
                         && !TryResolveChoiceValue(literal, param, out val))
                 {
                 }
@@ -282,7 +288,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 else
                 {
                     string val;
+#pragma warning disable CS0618 // Type or member is obsolete - for backward compatibility
                     while (environmentSettings.Host.OnParameterError(param, null, "ValueNotValidMustBeFloat", out val) && (val == null || !ParserExtensions.DoubleTryParseСurrentOrInvariant(val, out convertedFloat)))
+#pragma warning restore CS0618 // Type or member is obsolete
                     {
                     }
 
@@ -300,7 +308,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 else
                 {
                     string val;
+#pragma warning disable CS0618 // Type or member is obsolete - for backward compatibility
                     while (environmentSettings.Host.OnParameterError(param, null, "ValueNotValidMustBeInteger", out val) && (val == null || !long.TryParse(val, out convertedInt)))
+#pragma warning restore CS0618 // Type or member is obsolete
                     {
                     }
 
@@ -317,7 +327,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 else
                 {
                     string val;
+#pragma warning disable CS0618 // Type or member is obsolete - for backward compatibility
                     while (environmentSettings.Host.OnParameterError(param, null, "ValueNotValidMustBeHex", out val) && (val == null || val.Length < 3 || !long.TryParse(val.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out convertedHex)))
+#pragma warning restore CS0618 // Type or member is obsolete
                     {
                     }
 
@@ -405,9 +417,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         // TODO: localize the diagnostic strings
         // checks that all the template sources are under the template root, and they exist.
-        internal bool AreAllTemplatePathsValid(IRunnableProjectConfig templateConfig, RunnableProjectTemplate runnableTemplate)
+        internal bool AreAllTemplatePathsValid(IEngineEnvironmentSettings environmentSettings, IRunnableProjectConfig templateConfig, ITemplate runnableTemplate)
         {
-            ILogger logger = runnableTemplate.Source.EnvironmentSettings.Host.Logger;
+            ILogger logger = environmentSettings.Host.Logger;
 
             if (runnableTemplate.TemplateSourceRoot == null)
             {
@@ -546,6 +558,34 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
 
             return versionChecker.CheckIfVersionIsValid(GeneratorVersion);
+        }
+
+        private IFile FindBestHostTemplateConfigFile(IEngineEnvironmentSettings engineEnvironment, IFile config)
+        {
+            IDictionary<string, IFile> allHostFilesForTemplate = new Dictionary<string, IFile>();
+
+            foreach (IFile hostFile in config.Parent.EnumerateFiles($"*{HostTemplateFileConfigBaseName}", SearchOption.TopDirectoryOnly))
+            {
+                allHostFilesForTemplate.Add(hostFile.Name, hostFile);
+            }
+
+            string preferredHostFileName = string.Concat(engineEnvironment.Host.HostIdentifier, HostTemplateFileConfigBaseName);
+            if (allHostFilesForTemplate.TryGetValue(preferredHostFileName, out IFile preferredHostFile))
+            {
+                return preferredHostFile;
+            }
+
+            foreach (string fallbackHostName in engineEnvironment.Host.FallbackHostTemplateConfigNames)
+            {
+                string fallbackHostFileName = string.Concat(fallbackHostName, HostTemplateFileConfigBaseName);
+
+                if (allHostFilesForTemplate.TryGetValue(fallbackHostFileName, out IFile fallbackHostFile))
+                {
+                    return fallbackHostFile;
+                }
+            }
+
+            return null;
         }
 
         // Checks the primarySource for additional configuration files.
@@ -717,7 +757,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 parameter = new Parameter
                 {
                     Name = name,
-                    Requirement = TemplateParameterPriority.Optional,
+                    Priority = TemplateParameterPriority.Optional,
                     IsVariable = true,
                     Type = "string"
                 };

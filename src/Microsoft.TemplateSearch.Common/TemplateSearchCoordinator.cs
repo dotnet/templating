@@ -34,13 +34,13 @@ namespace Microsoft.TemplateSearch.Common
 
         protected SearchResults SearchResults { get; set; }
 
-        public async Task<SearchResults> SearchAsync()
+        public async Task<SearchResults> SearchAsync(IReadOnlyList<ITemplatePackage> existingTemplatePackage)
         {
-            await EnsureSearchResultsAsync().ConfigureAwait(false);
+            await EnsureSearchResultsAsync(existingTemplatePackage.OfType<IManagedTemplatePackage>().ToArray()).ConfigureAwait(false);
             return SearchResults;
         }
 
-        protected async Task EnsureSearchResultsAsync()
+        protected async Task EnsureSearchResultsAsync(IReadOnlyList<IManagedTemplatePackage> existingTemplatePackage)
         {
             if (_isSearchPerformed)
             {
@@ -48,9 +48,6 @@ namespace Microsoft.TemplateSearch.Common
             }
 
             TemplateSearcher searcher = new TemplateSearcher(EnvironmentSettings, DefaultLanguage, MatchFilter);
-            IReadOnlyList<IManagedTemplatePackage> existingTemplatePackage;
-
-            existingTemplatePackage = (await EnvironmentSettings.SettingsLoader.TemplatePackagesManager.GetTemplatePackagesAsync(false).ConfigureAwait(false)).OfType<IManagedTemplatePackage>().ToList();
 
             SearchResults = await searcher.SearchForTemplatesAsync(existingTemplatePackage, InputTemplateName).ConfigureAwait(false);
 

@@ -10,6 +10,7 @@ using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Cli.CommandParsing;
 using Microsoft.TemplateEngine.Cli.TemplateSearch;
 using Microsoft.TemplateEngine.Cli.UnitTests.CliMocks;
+using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Mocks;
 using Microsoft.TemplateEngine.TestHelper;
 using Microsoft.TemplateSearch.Common;
@@ -20,10 +21,12 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
     public class TemplateSearchCacheTests : IClassFixture<EnvironmentSettingsHelper>
     {
         private IEngineEnvironmentSettings _engineEnvironmentSettings;
+        private TemplatePackageManager _templatePackageManager;
 
         public TemplateSearchCacheTests(EnvironmentSettingsHelper environmentSettingsHelper)
         {
             _engineEnvironmentSettings = environmentSettingsHelper.CreateEnvironment(hostIdentifier: this.GetType().Name, virtualize: true);
+            _templatePackageManager = new TemplatePackageManager(_engineEnvironmentSettings);
         }
 
         private const string DefaultLanguage = "C#";
@@ -38,7 +41,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             new MockTemplateInfo("foo1", name: "MockFooTemplateOne", identity: "Mock.Foo.1", groupIdentity: "Mock.Foo", author: "TestAuthor")
                 .WithClassifications("CSharp", "Library")
                 .WithDescription("Mock Foo template one")
-                .WithTag("Framework", "netcoreapp3.0", "netcoreapp3.1")
+                .WithChoiceParameter("Framework", "netcoreapp3.0", "netcoreapp3.1")
                 .WithTag("language", "C#")
                 .WithTag("type", "project");
 
@@ -46,7 +49,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             new MockTemplateInfo("foo2", name: "MockFooTemplateTwo", identity: "Mock.Foo.2", groupIdentity: "Mock.Foo")
                 .WithClassifications("CSharp", "Console")
                 .WithDescription("Mock Foo template two")
-                .WithTag("Framework", "netcoreapp2.0", "netcoreapp2.1", "netcoreapp3.1")
+                .WithChoiceParameter("Framework", "netcoreapp2.0", "netcoreapp2.1", "netcoreapp3.1")
                 .WithTag("language", "C#");
 
         private static readonly ITemplateInfo _barCSharpTemplate =
@@ -66,12 +69,13 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
         {
             TemplateDiscoveryMetadata mockTemplateDiscoveryMetadata = SetupDiscoveryMetadata(false);
             MockCliNuGetMetadataSearchSource.SetupMockData(mockTemplateDiscoveryMetadata);
-            _engineEnvironmentSettings.SettingsLoader.Components.Register(typeof(MockCliNuGetMetadataSearchSource));
+            _engineEnvironmentSettings.Components.AddComponent(typeof(ITemplateSearchSource), new MockCliNuGetMetadataSearchSource());
 
             INewCommandInput commandInput = new MockNewCommandInput("foo");
 
             TemplateSearchCoordinator searchCoordinator = CliTemplateSearchCoordinatorFactory.CreateCliTemplateSearchCoordinator(_engineEnvironmentSettings, commandInput, DefaultLanguage);
-            SearchResults searchResults = await searchCoordinator.SearchAsync().ConfigureAwait(false);
+            var templatePackages = await _templatePackageManager.GetTemplatePackagesAsync(false, default).ConfigureAwait(false);
+            SearchResults searchResults = await searchCoordinator.SearchAsync(templatePackages).ConfigureAwait(false);
 
             Assert.True(searchResults.AnySources);
             Assert.Equal(1, searchResults.MatchesBySource.Count);
@@ -88,12 +92,13 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
         {
             TemplateDiscoveryMetadata mockTemplateDiscoveryMetadata = SetupDiscoveryMetadata(true);
             MockCliNuGetMetadataSearchSource.SetupMockData(mockTemplateDiscoveryMetadata);
-            _engineEnvironmentSettings.SettingsLoader.Components.Register(typeof(MockCliNuGetMetadataSearchSource));
+            _engineEnvironmentSettings.Components.AddComponent(typeof(ITemplateSearchSource), new MockCliNuGetMetadataSearchSource());
 
             INewCommandInput commandInput = new MockNewCommandInput("foo").WithTemplateOption("framework", "netcoreapp2.0");
 
             TemplateSearchCoordinator searchCoordinator = CliTemplateSearchCoordinatorFactory.CreateCliTemplateSearchCoordinator(_engineEnvironmentSettings, commandInput, DefaultLanguage);
-            SearchResults searchResults = await searchCoordinator.SearchAsync().ConfigureAwait(false);
+            var templatePackages = await _templatePackageManager.GetTemplatePackagesAsync(false, default).ConfigureAwait(false);
+            SearchResults searchResults = await searchCoordinator.SearchAsync(templatePackages).ConfigureAwait(false);
 
             Assert.True(searchResults.AnySources);
             Assert.Equal(1, searchResults.MatchesBySource.Count);
@@ -103,7 +108,8 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             INewCommandInput shortNameCommandInput = new MockNewCommandInput("foo").WithTemplateOption("f", "netcoreapp2.0");
 
             TemplateSearchCoordinator shortNameSearchCoordinator = CliTemplateSearchCoordinatorFactory.CreateCliTemplateSearchCoordinator(_engineEnvironmentSettings, shortNameCommandInput, DefaultLanguage);
-            SearchResults shortNameSearchResults = await searchCoordinator.SearchAsync().ConfigureAwait(false);
+            templatePackages = await _templatePackageManager.GetTemplatePackagesAsync(false, default).ConfigureAwait(false);
+            SearchResults shortNameSearchResults = await searchCoordinator.SearchAsync(templatePackages).ConfigureAwait(false);
 
             Assert.True(shortNameSearchResults.AnySources);
             Assert.Equal(1, shortNameSearchResults.MatchesBySource.Count);
@@ -117,13 +123,14 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
         {
             TemplateDiscoveryMetadata mockTemplateDiscoveryMetadata = SetupDiscoveryMetadata(true);
             MockCliNuGetMetadataSearchSource.SetupMockData(mockTemplateDiscoveryMetadata);
-            _engineEnvironmentSettings.SettingsLoader.Components.Register(typeof(MockCliNuGetMetadataSearchSource));
+            _engineEnvironmentSettings.Components.AddComponent(typeof(ITemplateSearchSource), new MockCliNuGetMetadataSearchSource());
 
             // "tfm" is not a vaild symbol for the "foo" template. So it should not match.
             INewCommandInput commandInput = new MockNewCommandInput("foo").WithTemplateOption("tfm", "netcoreapp2.0");
 
             TemplateSearchCoordinator searchCoordinator = CliTemplateSearchCoordinatorFactory.CreateCliTemplateSearchCoordinator(_engineEnvironmentSettings, commandInput, DefaultLanguage);
-            SearchResults searchResults = await searchCoordinator.SearchAsync().ConfigureAwait(false);
+            var templatePackages = await _templatePackageManager.GetTemplatePackagesAsync(false, default).ConfigureAwait(false);
+            SearchResults searchResults = await searchCoordinator.SearchAsync(templatePackages).ConfigureAwait(false);
 
             Assert.True(searchResults.AnySources);
             Assert.Equal(0, searchResults.MatchesBySource.Count);
@@ -135,13 +142,14 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
         {
             TemplateDiscoveryMetadata mockTemplateDiscoveryMetadata = SetupDiscoveryMetadata(false);
             MockCliNuGetMetadataSearchSource.SetupMockData(mockTemplateDiscoveryMetadata);
-            _engineEnvironmentSettings.SettingsLoader.Components.Register(typeof(MockCliNuGetMetadataSearchSource));
+            _engineEnvironmentSettings.Components.AddComponent(typeof(ITemplateSearchSource), new MockCliNuGetMetadataSearchSource());
 
             Dictionary<string, string> rawCommandInputs = new Dictionary<string, string>();
             MockNewCommandInput commandInput = new MockNewCommandInput("bar", "F#");
 
             TemplateSearchCoordinator searchCoordinator = CliTemplateSearchCoordinatorFactory.CreateCliTemplateSearchCoordinator(_engineEnvironmentSettings, commandInput, DefaultLanguage);
-            SearchResults searchResults = await searchCoordinator.SearchAsync().ConfigureAwait(false);
+            var templatePackages = await _templatePackageManager.GetTemplatePackagesAsync(false, default).ConfigureAwait(false);
+            SearchResults searchResults = await searchCoordinator.SearchAsync(templatePackages).ConfigureAwait(false);
 
             Assert.True(searchResults.AnySources);
             Assert.Equal(1, searchResults.MatchesBySource.Count);
@@ -157,12 +165,13 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
         {
             TemplateDiscoveryMetadata mockTemplateDiscoveryMetadata = SetupDiscoveryMetadata(false);
             MockCliNuGetMetadataSearchSource.SetupMockData(mockTemplateDiscoveryMetadata);
-            _engineEnvironmentSettings.SettingsLoader.Components.Register(typeof(MockCliNuGetMetadataSearchSource));
+            _engineEnvironmentSettings.Components.AddComponent(typeof(ITemplateSearchSource), new MockCliNuGetMetadataSearchSource());
 
             MockNewCommandInput commandInput = new MockNewCommandInput(commandTemplate).WithCommandOption("--author", commandAuthor);
 
             TemplateSearchCoordinator searchCoordinator = CliTemplateSearchCoordinatorFactory.CreateCliTemplateSearchCoordinator(_engineEnvironmentSettings, commandInput, DefaultLanguage);
-            SearchResults searchResults = await searchCoordinator.SearchAsync().ConfigureAwait(false);
+            var templatePackages = await _templatePackageManager.GetTemplatePackagesAsync(false, default).ConfigureAwait(false);
+            SearchResults searchResults = await searchCoordinator.SearchAsync(templatePackages).ConfigureAwait(false);
 
             Assert.True(searchResults.AnySources);
             if (matchCount == 0)
@@ -184,12 +193,13 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
         {
             TemplateDiscoveryMetadata mockTemplateDiscoveryMetadata = SetupDiscoveryMetadata(false);
             MockCliNuGetMetadataSearchSource.SetupMockData(mockTemplateDiscoveryMetadata);
-            _engineEnvironmentSettings.SettingsLoader.Components.Register(typeof(MockCliNuGetMetadataSearchSource));
+            _engineEnvironmentSettings.Components.AddComponent(typeof(ITemplateSearchSource), new MockCliNuGetMetadataSearchSource());
 
             MockNewCommandInput commandInput = new MockNewCommandInput(commandTemplate, type: commandType);
 
             TemplateSearchCoordinator searchCoordinator = CliTemplateSearchCoordinatorFactory.CreateCliTemplateSearchCoordinator(_engineEnvironmentSettings, commandInput, DefaultLanguage);
-            SearchResults searchResults = await searchCoordinator.SearchAsync().ConfigureAwait(false);
+            var templatePackages = await _templatePackageManager.GetTemplatePackagesAsync(false, default).ConfigureAwait(false);
+            SearchResults searchResults = await searchCoordinator.SearchAsync(templatePackages).ConfigureAwait(false);
 
             Assert.True(searchResults.AnySources);
             if (matchCount == 0)
@@ -212,12 +222,13 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
         {
             TemplateDiscoveryMetadata mockTemplateDiscoveryMetadata = SetupDiscoveryMetadata(false);
             MockCliNuGetMetadataSearchSource.SetupMockData(mockTemplateDiscoveryMetadata);
-            _engineEnvironmentSettings.SettingsLoader.Components.Register(typeof(MockCliNuGetMetadataSearchSource));
+            _engineEnvironmentSettings.Components.AddComponent(typeof(ITemplateSearchSource), new MockCliNuGetMetadataSearchSource());
 
             MockNewCommandInput commandInput = new MockNewCommandInput(commandTemplate).WithCommandOption("--package", commandPackage);
 
             TemplateSearchCoordinator searchCoordinator = CliTemplateSearchCoordinatorFactory.CreateCliTemplateSearchCoordinator(_engineEnvironmentSettings, commandInput, DefaultLanguage);
-            SearchResults searchResults = await searchCoordinator.SearchAsync().ConfigureAwait(false);
+            var templatePackages = await _templatePackageManager.GetTemplatePackagesAsync(false, default).ConfigureAwait(false);
+            SearchResults searchResults = await searchCoordinator.SearchAsync(templatePackages).ConfigureAwait(false);
 
             Assert.True(searchResults.AnySources);
             if (packMatchCount == 0)
@@ -242,12 +253,13 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
         {
             TemplateDiscoveryMetadata mockTemplateDiscoveryMetadata = SetupDiscoveryMetadata(false);
             MockCliNuGetMetadataSearchSource.SetupMockData(mockTemplateDiscoveryMetadata);
-            _engineEnvironmentSettings.SettingsLoader.Components.Register(typeof(MockCliNuGetMetadataSearchSource));
+            _engineEnvironmentSettings.Components.AddComponent(typeof(ITemplateSearchSource), new MockCliNuGetMetadataSearchSource());
 
             MockNewCommandInput commandInput = new MockNewCommandInput(commandTemplate).WithCommandOption("--tag", commandTag);
 
             TemplateSearchCoordinator searchCoordinator = CliTemplateSearchCoordinatorFactory.CreateCliTemplateSearchCoordinator(_engineEnvironmentSettings, commandInput, DefaultLanguage);
-            SearchResults searchResults = await searchCoordinator.SearchAsync().ConfigureAwait(false);
+            var templatePackages = await _templatePackageManager.GetTemplatePackagesAsync(false, default).ConfigureAwait(false);
+            SearchResults searchResults = await searchCoordinator.SearchAsync(templatePackages).ConfigureAwait(false);
 
             Assert.True(searchResults.AnySources);
             if (packMatchCount == 0)
@@ -267,12 +279,13 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
         {
             TemplateDiscoveryMetadata mockTemplateDiscoveryMetadata = SetupDiscoveryMetadata(false);
             MockCliNuGetMetadataSearchSource.SetupMockData(mockTemplateDiscoveryMetadata);
-            _engineEnvironmentSettings.SettingsLoader.Components.Register(typeof(MockCliNuGetMetadataSearchSource));
+            _engineEnvironmentSettings.Components.AddComponent(typeof(ITemplateSearchSource), new MockCliNuGetMetadataSearchSource());
 
             MockNewCommandInput commandInput = new MockNewCommandInput("bar", "VB");
 
             TemplateSearchCoordinator searchCoordinator = CliTemplateSearchCoordinatorFactory.CreateCliTemplateSearchCoordinator(_engineEnvironmentSettings, commandInput, DefaultLanguage);
-            SearchResults searchResults = await searchCoordinator.SearchAsync().ConfigureAwait(false);
+            var templatePackages = await _templatePackageManager.GetTemplatePackagesAsync(false, default).ConfigureAwait(false);
+            SearchResults searchResults = await searchCoordinator.SearchAsync(templatePackages).ConfigureAwait(false);
 
             Assert.True(searchResults.AnySources);
             Assert.Equal(0, searchResults.MatchesBySource.Count);

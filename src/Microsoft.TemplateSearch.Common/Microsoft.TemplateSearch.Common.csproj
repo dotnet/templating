@@ -1,10 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>$(NETStandardTargetFramework)</TargetFramework>
     <Description>Components used by the template discovery tool, and also used for related functionality in the CLI.</Description>
     <IsPackable>true</IsPackable>
     <EnablePublicApiAnalyzer>true</EnablePublicApiAnalyzer>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Shared\JExtensions.cs" Link="JExtensions.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="$(SrcDir)Microsoft.TemplateEngine.Abstractions\Microsoft.TemplateEngine.Abstractions.csproj" />

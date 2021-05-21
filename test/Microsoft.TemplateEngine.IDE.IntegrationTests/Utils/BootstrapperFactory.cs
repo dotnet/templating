@@ -3,8 +3,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.TemplatePackage;
 using Microsoft.TemplateEngine.Edge;
 
 namespace Microsoft.TemplateEngine.IDE.IntegrationTests.Utils
@@ -24,7 +24,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests.Utils
                     host.VirtualizeDirectory(virtualLocation);
                 }
             }
-            return new Bootstrapper(host, null, true);
+            return new Bootstrapper(host, virtualizeConfiguration: true, loadDefaultComponents: true);
         }
 
         private static ITemplateEngineHost CreateHost(bool loadBuiltInTemplates = false)
@@ -34,18 +34,13 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests.Utils
                 { "prefs:language", "C#" }
             };
 
-            var builtIns = new List<Assembly>
-            {
-                typeof(Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions.IMacro).GetTypeInfo().Assembly,            // for assembly: Microsoft.TemplateEngine.Orchestrator.RunnableProjects
-                typeof(AssemblyComponentCatalog).GetTypeInfo().Assembly,            // for assembly: Microsoft.TemplateEngine.Edge
-            };
-
+            var builtIns = new List<(Type, IIdentifiedComponent)>();
             if (loadBuiltInTemplates)
             {
-                builtIns.Add(typeof(BootstrapperFactory).GetTypeInfo().Assembly);
+                builtIns.Add((typeof(ITemplatePackageProviderFactory), new BuiltInTemplatePackagesProviderFactory()));
             }
 
-            return new DefaultTemplateEngineHost(HostIdentifier + Guid.NewGuid().ToString(), HostVersion, preferences, new AssemblyComponentCatalog(builtIns), Array.Empty<string>());
+            return new DefaultTemplateEngineHost(HostIdentifier + Guid.NewGuid().ToString(), HostVersion, preferences, builtIns, Array.Empty<string>());
         }
     }
 }

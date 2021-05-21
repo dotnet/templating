@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.DotNet.Cli.CommandLine;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Edge.Template;
 
 namespace Microsoft.TemplateEngine.Cli.CommandParsing
 {
@@ -202,8 +201,6 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
 
         public bool ShowAllColumns => _parseResult.HasAppliedOption(new[] { _commandName, "columns-all" });
 
-        public bool SkipUpdateCheck => _parseResult.HasAppliedOption(new[] { _commandName, "skip-update-check" });
-
         public string TagFilter => _parseResult.GetArgumentValueAtPath(new[] { _commandName, "tag" });
 
         public string TemplateName => _templateNameArg;
@@ -293,7 +290,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             return _parseResult.HasAppliedOption(new[] { _commandName, flag });
         }
 
-        public void OnExecute(Func<Task<CreationResultStatus>> invoke)
+        public void OnExecute(Func<Task<New3CommandStatus>> invoke)
         {
             _invoke = async () => (int)await invoke().ConfigureAwait(false);
         }

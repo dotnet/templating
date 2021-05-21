@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Edge;
@@ -30,15 +29,16 @@ namespace Microsoft.TemplateEngine.TestHelper
             {
                 locale = "en-US";
             }
-            List<Assembly> builtIns = new List<Assembly>();
+            var builtIns = new List<(Type, IIdentifiedComponent)>();
+            builtIns.AddRange(Edge.Components.AllComponents);
             if (loadDefaultGenerator)
             {
-                builtIns.Add(typeof(Orchestrator.RunnableProjects.Abstractions.IMacro).Assembly);
+                builtIns.AddRange(Orchestrator.RunnableProjects.Components.AllComponents);
             }
 
             ITemplateEngineHost host = new TestHost(hostIdentifier: string.IsNullOrWhiteSpace(hostIdentifier) ? "TestRunner" : hostIdentifier)
             {
-                BuiltInComponents = new AssemblyComponentCatalog(builtIns),
+                BuiltInComponents = builtIns,
                 FileSystem = new MonitoredFileSystem(new PhysicalFileSystem()),
                 FallbackHostTemplateConfigNames = new[] { "dotnetcli" }
             };
@@ -53,7 +53,6 @@ namespace Microsoft.TemplateEngine.TestHelper
                 var templateEngineRoot = Path.Combine(CreateTemporaryFolder(), ".templateengine");
                 engineEnvironmentSettings = new EngineEnvironmentSettings(host, settingsLocation: templateEngineRoot);
             }
-            _engineEnvironmentToDispose.Add(engineEnvironmentSettings);
             return engineEnvironmentSettings;
         }
 
@@ -66,7 +65,6 @@ namespace Microsoft.TemplateEngine.TestHelper
 
         public void Dispose()
         {
-            _engineEnvironmentToDispose.ForEach(e => e.Dispose());
             _foldersToCleanup.ForEach(f => Directory.Delete(f, true));
         }
     }

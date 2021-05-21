@@ -13,14 +13,15 @@ using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Abstractions.TemplateFiltering;
+using Microsoft.TemplateEngine.Abstractions.TemplatePackage;
 using Microsoft.TemplateEngine.Cli.Alias;
 using Microsoft.TemplateEngine.Cli.CommandParsing;
 using Microsoft.TemplateEngine.Cli.HelpAndUsage;
 using Microsoft.TemplateEngine.Cli.TemplateResolution;
 using Microsoft.TemplateEngine.Cli.TemplateSearch;
 using Microsoft.TemplateEngine.Edge;
+using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Utils;
-using CreationResultStatus = Microsoft.TemplateEngine.Edge.Template.CreationResultStatus;
 using TemplateCreator = Microsoft.TemplateEngine.Edge.Template.TemplateCreator;
 
 namespace Microsoft.TemplateEngine.Cli
@@ -31,7 +32,7 @@ namespace Microsoft.TemplateEngine.Cli
         private static Mutex? _entryMutex;
         private readonly ITelemetryLogger _telemetryLogger;
         private readonly TemplateCreator _templateCreator;
-        private readonly ISettingsLoader _settingsLoader;
+        private readonly TemplatePackageManager _templatePackageManager;
         private readonly AliasRegistry _aliasRegistry;
 
         /// <summary>
@@ -54,12 +55,12 @@ namespace Microsoft.TemplateEngine.Cli
         {
             _telemetryLogger = telemetryLogger;
             host = new CliTemplateEngineHost(host, this);
-            EnvironmentSettings = new EngineEnvironmentSettings(host, settingsLocation: hivePath, onFirstRun: FirstRun, virtualizeSettings: virtualize);
-            _settingsLoader = EnvironmentSettings.SettingsLoader;
+            EnvironmentSettings = new EngineEnvironmentSettings(host, settingsLocation: hivePath, virtualizeSettings: virtualize);
+            _templatePackageManager = new TemplatePackageManager(EnvironmentSettings);
             _templateCreator = new TemplateCreator(EnvironmentSettings);
             _aliasRegistry = new AliasRegistry(EnvironmentSettings);
             CommandName = commandName;
-            _hostDataLoader = new HostSpecificDataLoader(EnvironmentSettings.SettingsLoader);
+            _hostDataLoader = new HostSpecificDataLoader(EnvironmentSettings);
             _commandInput = commandInput;
             _callbacks = callbacks;
             if (callbacks == null)
@@ -228,7 +229,7 @@ namespace Microsoft.TemplateEngine.Cli
             }
             finally
             {
-                instance.EnvironmentSettings.Dispose();
+                instance._templatePackageManager.Dispose();
             }
 
             return result;
@@ -244,7 +245,7 @@ namespace Microsoft.TemplateEngine.Cli
         }
 
         // TODO: make sure help / usage works right in these cases.
-        private async Task<CreationResultStatus> EnterMaintenanceFlowAsync()
+        private async Task<New3CommandStatus> EnterMaintenanceFlowAsync()
         {
             if (!TemplateResolver.ValidateRemainingParameters(_commandInput, out IReadOnlyList<string> invalidParams))
             {
@@ -259,12 +260,12 @@ namespace Microsoft.TemplateEngine.Cli
                     Reporter.Error.WriteLine(string.Format(LocalizableStrings.RunHelpForInformationAboutAcceptedParameters, CommandName).Bold().Red());
                 }
 
-                return CreationResultStatus.InvalidParamValues;
+                return New3CommandStatus.InvalidParamValues;
             }
 
             // No other cases specified, we've fallen through to "Optional usage help + List"
             TemplateListResolutionResult templateResolutionResult = TemplateResolver.GetTemplateResolutionResultForListOrHelp(
-                await _settingsLoader.GetTemplatesAsync(default).ConfigureAwait(false),
+                await _templatePackageManager.GetTemplatesAsync(default).ConfigureAwait(false),
                 _hostDataLoader,
                 _commandInput,
                 _defaultLanguage);
@@ -277,15 +278,15 @@ namespace Microsoft.TemplateEngine.Cli
                 _templateCreator,
                 _defaultLanguage);
 
-            return CreationResultStatus.Success;
+            return New3CommandStatus.Success;
         }
 
-        private async Task<CreationResultStatus> EnterTemplateManipulationFlowAsync()
+        private async Task<New3CommandStatus> EnterTemplateManipulationFlowAsync()
         {
             if (_commandInput.IsListFlagSpecified || _commandInput.IsHelpFlagSpecified)
             {
                 TemplateListResolutionResult listingTemplateResolutionResult = TemplateResolver.GetTemplateResolutionResultForListOrHelp(
-                    await _settingsLoader.GetTemplatesAsync(default).ConfigureAwait(false),
+                    await _templatePackageManager.GetTemplatesAsync(default).ConfigureAwait(false),
                     _hostDataLoader,
                     _commandInput,
                     _defaultLanguage);
@@ -299,19 +300,19 @@ namespace Microsoft.TemplateEngine.Cli
                     _defaultLanguage);
             }
 
-            TemplateResolutionResult templateResolutionResult = TemplateResolver.GetTemplateResolutionResult(await _settingsLoader.GetTemplatesAsync(default).ConfigureAwait(false), _hostDataLoader, _commandInput, _defaultLanguage);
+            TemplateResolutionResult templateResolutionResult = TemplateResolver.GetTemplateResolutionResult(await _templatePackageManager.GetTemplatesAsync(default).ConfigureAwait(false), _hostDataLoader, _commandInput, _defaultLanguage);
             if (templateResolutionResult.ResolutionStatus == TemplateResolutionResult.Status.SingleMatch)
             {
-                TemplateInvocationCoordinator invocationCoordinator = new TemplateInvocationCoordinator(_settingsLoader, _commandInput, _telemetryLogger, CommandName, _inputGetter, _callbacks);
+                TemplateInvocationCoordinator invocationCoordinator = new TemplateInvocationCoordinator(EnvironmentSettings, _templatePackageManager, _commandInput, _telemetryLogger, CommandName, _inputGetter, _callbacks);
                 return await invocationCoordinator.CoordinateInvocationOrAcquisitionAsync(templateResolutionResult.TemplateToInvoke, CancellationToken.None).ConfigureAwait(false);
             }
             else
             {
-                return await HelpForTemplateResolution.CoordinateAmbiguousTemplateResolutionDisplayAsync(templateResolutionResult, EnvironmentSettings, _commandInput, _defaultLanguage).ConfigureAwait(false);
+                return await HelpForTemplateResolution.CoordinateAmbiguousTemplateResolutionDisplayAsync(templateResolutionResult, EnvironmentSettings, _templatePackageManager, _commandInput, _defaultLanguage).ConfigureAwait(false);
             }
         }
 
-        private async Task<CreationResultStatus> ExecuteAsync()
+        private async Task<New3CommandStatus> ExecuteAsync()
         {
             // this is checking the initial parse, which is template agnostic.
             if (_commandInput.HasParseError)
@@ -340,9 +341,9 @@ namespace Microsoft.TemplateEngine.Cli
             {
                 // The --alias param is for creating / updating / deleting aliases.
                 // If it's not present, try expanding aliases now.
-                CreationResultStatus aliasExpansionResult = AliasSupport.CoordinateAliasExpansion(_commandInput, _aliasRegistry, _telemetryLogger);
+                New3CommandStatus aliasExpansionResult = AliasSupport.CoordinateAliasExpansion(_commandInput, _aliasRegistry, _telemetryLogger);
 
-                if (aliasExpansionResult != CreationResultStatus.Success)
+                if (aliasExpansionResult != New3CommandStatus.Success)
                 {
                     return aliasExpansionResult;
                 }
@@ -350,7 +351,7 @@ namespace Microsoft.TemplateEngine.Cli
 
             if (!Initialize())
             {
-                return CreationResultStatus.Success;
+                return New3CommandStatus.Success;
             }
 
             bool forceCacheRebuild = _commandInput.HasDebuggingFlag("--debug:rebuildcache");
@@ -358,14 +359,14 @@ namespace Microsoft.TemplateEngine.Cli
             {
                 if (forceCacheRebuild)
                 {
-                    await _settingsLoader.RebuildTemplateCacheAsync(CancellationToken.None).ConfigureAwait(false);
+                    await _templatePackageManager.RebuildTemplateCacheAsync(CancellationToken.None).ConfigureAwait(false);
                 }
             }
             catch (EngineInitializationException eiex)
             {
                 Reporter.Error.WriteLine(eiex.Message.Bold().Red());
                 Reporter.Error.WriteLine(LocalizableStrings.SettingsReadError);
-                return CreationResultStatus.CreateFailed;
+                return New3CommandStatus.CreateFailed;
             }
 
             try
@@ -377,13 +378,13 @@ namespace Microsoft.TemplateEngine.Cli
 
                 if (TemplatePackageCoordinator.IsTemplatePackageManipulationFlow(_commandInput))
                 {
-                    TemplatePackageCoordinator packageCoordinator = new TemplatePackageCoordinator(_telemetryLogger, EnvironmentSettings, _defaultLanguage);
+                    TemplatePackageCoordinator packageCoordinator = new TemplatePackageCoordinator(_telemetryLogger, EnvironmentSettings, _templatePackageManager, _defaultLanguage);
                     return await packageCoordinator.ProcessAsync(_commandInput).ConfigureAwait(false);
                 }
 
                 if (_commandInput.SearchOnline)
                 {
-                    return await CliTemplateSearchCoordinator.SearchForTemplateMatchesAsync(EnvironmentSettings, _commandInput, _defaultLanguage).ConfigureAwait(false);
+                    return await CliTemplateSearchCoordinator.SearchForTemplateMatchesAsync(EnvironmentSettings, _templatePackageManager, _commandInput, _defaultLanguage).ConfigureAwait(false);
                 }
 
                 if (string.IsNullOrWhiteSpace(TemplateName))
@@ -396,7 +397,7 @@ namespace Microsoft.TemplateEngine.Cli
             catch (TemplateAuthoringException tae)
             {
                 Reporter.Error.WriteLine(tae.Message.Bold().Red());
-                return CreationResultStatus.CreateFailed;
+                return New3CommandStatus.CreateFailed;
             }
         }
 
@@ -405,7 +406,7 @@ namespace Microsoft.TemplateEngine.Cli
             bool reinitFlag = _commandInput.HasDebuggingFlag("--debug:reinit");
             if (reinitFlag)
             {
-                EnvironmentSettings.SettingsLoader.ResetHostSettings();
+                EnvironmentSettings.Host.FileSystem.DirectoryDelete(EnvironmentSettings.Paths.HostVersionSettingsDir, true);
             }
 
             if (_commandInput.HasDebuggingFlag("--debug:showconfig"))
@@ -417,19 +418,9 @@ namespace Microsoft.TemplateEngine.Cli
             return true;
         }
 
-        private void FirstRun(IEngineEnvironmentSettings environmentSettings)
-        {
-            if (!_commandInput.IsQuietFlagSpecified)
-            {
-                Reporter.Output.WriteLine(LocalizableStrings.GettingReady);
-            }
-            _callbacks.OnFirstRun?.Invoke(environmentSettings);
-            environmentSettings.SettingsLoader.Components.RegisterMany(typeof(New3Command).GetTypeInfo().Assembly.GetTypes());
-        }
-
         private async Task<HashSet<string>> GetAllTemplateShortNamesAsync()
         {
-            IReadOnlyCollection<ITemplateMatchInfo> allTemplates = TemplateResolver.PerformAllTemplatesQuery(await _settingsLoader.GetTemplatesAsync(default).ConfigureAwait(false), _hostDataLoader);
+            IReadOnlyCollection<ITemplateMatchInfo> allTemplates = TemplateResolver.PerformAllTemplatesQuery(await _templatePackageManager.GetTemplatesAsync(default).ConfigureAwait(false), _hostDataLoader);
 
             HashSet<string> allShortNames = new HashSet<string>(StringComparer.Ordinal);
 
@@ -446,14 +437,14 @@ namespace Microsoft.TemplateEngine.Cli
             Reporter.Output.WriteLine(LocalizableStrings.CurrentConfiguration);
             Reporter.Output.WriteLine(" ");
 
-            TableFormatter.Print(EnvironmentSettings.SettingsLoader.Components.OfType<IMountPointFactory>(), LocalizableStrings.NoItems, "   ", '-', new Dictionary<string, Func<IMountPointFactory, object>>
+            TableFormatter.Print(EnvironmentSettings.Components.OfType<IMountPointFactory>(), LocalizableStrings.NoItems, "   ", '-', new Dictionary<string, Func<IMountPointFactory, object>>
             {
                 { LocalizableStrings.MountPointFactories, x => x.Id },
                 { LocalizableStrings.Type, x => x.GetType().FullName ?? string.Empty },
                 { LocalizableStrings.Assembly, x => x.GetType().GetTypeInfo().Assembly.FullName ?? string.Empty }
             });
 
-            TableFormatter.Print(EnvironmentSettings.SettingsLoader.Components.OfType<IGenerator>(), LocalizableStrings.NoItems, "   ", '-', new Dictionary<string, Func<IGenerator, object>>
+            TableFormatter.Print(EnvironmentSettings.Components.OfType<IGenerator>(), LocalizableStrings.NoItems, "   ", '-', new Dictionary<string, Func<IGenerator, object>>
             {
                 { LocalizableStrings.Generators, x => x.Id },
                 { LocalizableStrings.Type, x => x.GetType().FullName ?? string.Empty },

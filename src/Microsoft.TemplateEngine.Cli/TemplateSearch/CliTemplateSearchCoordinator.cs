@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Cli.CommandParsing;
 using Microsoft.TemplateEngine.Cli.TableOutput;
-using Microsoft.TemplateEngine.Edge.Template;
+using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateSearch.Common;
 
 namespace Microsoft.TemplateEngine.Cli.TemplateSearch
@@ -21,25 +21,26 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
         /// <param name="environmentSettings">environment settings.</param>
         /// <param name="commandInput">new command data.</param>
         /// <param name="defaultLanguage">default language for the host.</param>
-        /// <returns><c>CreationResultStatus.Success</c> when the templates were found and displayed;
-        /// <c>CreationResultStatus.Cancelled</c> when the command validation fails;
-        /// <c>CreationResultStatus.NotFound</c> when no templates found based on the filter criteria.
+        /// <returns><c>New3CommandStatus.Success</c> when the templates were found and displayed;
+        /// <c>New3CommandStatus.Cancelled</c> when the command validation fails;
+        /// <c>New3CommandStatus.NotFound</c> when no templates found based on the filter criteria.
         /// </returns>
-        internal static async Task<CreationResultStatus> SearchForTemplateMatchesAsync(IEngineEnvironmentSettings environmentSettings, INewCommandInput commandInput, string defaultLanguage)
+        internal static async Task<New3CommandStatus> SearchForTemplateMatchesAsync(IEngineEnvironmentSettings environmentSettings, TemplatePackageManager templatePackageManager, INewCommandInput commandInput, string defaultLanguage)
         {
             if (!ValidateCommandInput(commandInput))
             {
-                return CreationResultStatus.Cancelled;
+                return New3CommandStatus.Cancelled;
             }
 
             Reporter.Output.WriteLine(LocalizableStrings.SearchOnlineNotification);
             TemplateSearchCoordinator searchCoordinator = CliTemplateSearchCoordinatorFactory.CreateCliTemplateSearchCoordinator(environmentSettings, commandInput, defaultLanguage);
-            SearchResults searchResults = await searchCoordinator.SearchAsync().ConfigureAwait(false);
+            var templatePackages = await templatePackageManager.GetTemplatePackagesAsync(force: false, cancellationToken: default).ConfigureAwait(false);
+            SearchResults searchResults = await searchCoordinator.SearchAsync(templatePackages).ConfigureAwait(false);
 
             if (!searchResults.AnySources)
             {
                 Reporter.Error.WriteLine(LocalizableStrings.SearchOnlineNoSources.Bold().Red());
-                return CreationResultStatus.NotFound;
+                return New3CommandStatus.NotFound;
             }
 
             if (searchResults.MatchesBySource.Count > 0)
@@ -64,7 +65,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
                 }
                 Reporter.Output.WriteLine("Example:");
                 Reporter.Output.WriteLine(string.Format(LocalizableStrings.SearchResultInstallCommand, commandInput.CommandName, packageIdToShow));
-                return CreationResultStatus.Success;
+                return New3CommandStatus.Success;
             }
             else
             {
@@ -74,7 +75,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
                     : string.IsNullOrWhiteSpace(filters) ? commandInput.TemplateName : string.Join(", ", commandInput.TemplateName, filters);
 
                 Reporter.Error.WriteLine(string.Format(LocalizableStrings.NoTemplatesMatchingInputParameters, searchCriteria).Bold().Red());
-                return CreationResultStatus.NotFound;
+                return New3CommandStatus.NotFound;
             }
         }
 

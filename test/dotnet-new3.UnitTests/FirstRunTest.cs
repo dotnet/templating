@@ -28,7 +28,6 @@ namespace Dotnet_new3.IntegrationTests
                 .Should()
                 .ExitWith(0)
                 .And.NotHaveStdErr()
-                .And.HaveStdOutContaining("Getting ready")
                 .And.NotHaveStdOutContaining("Error");
 
             new DotnetNewCommand(_log, "--list")
