@@ -128,7 +128,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 // Localizations provide more translations than the number of post actions we have.
                 string excessPostActionLocalizationIds = string.Join(", ", localizations.Keys.Where(k => !localizedPostActions.Any(p => p.Id == k)).Select(k => k.ToString()));
-                host.Logger.LogWarning(string.Format(LocalizableStrings.Authoring_InvalidPostActionLocalizationId, excessPostActionLocalizationId));
+                host.Logger.LogWarning(string.Format(LocalizableStrings.Authoring_InvalidPostActionLocalizationIndex, excessPostActionLocalizationIds));
             }
             return localizedPostActions;
         }

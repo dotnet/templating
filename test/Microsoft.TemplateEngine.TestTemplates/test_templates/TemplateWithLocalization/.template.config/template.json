@@ -51,15 +51,6 @@
     },
     "postActions": [
         {
-            "description": "post action with no id: unlocalizable",
-            "manualInstructions": [
-                {
-                    "text": "pa0_manualInstructions"
-                }
-            ],
-            "actionId": "58E1433C-303B-4713-8A47-26E7B03BD8A5"
-        },
-        {
             "id": "pa0",
             "description": "pa0_desc",
             "manualInstructions": [
@@ -79,6 +70,7 @@
                     "text": "pa1_manualInstructions0"
                 },
                 {
+                    "id": "second_instruction",
                     "text": "pa1_manualInstructions1"
                 },
                 {
@@ -87,6 +79,15 @@
                 }
             ],
             "actionId": "2B5CDBB7-1FAC-41EC-ADCC-08A73021BC40"
+        },
+        {
+            "id": "pa2",
+            "manualInstructions": [
+                {
+                    "text": "pa2_manualInstructions"
+                }
+            ],
+            "actionId": "58E1433C-303B-4713-8A47-26E7B03BD8A5"
         }
     ]
 }
