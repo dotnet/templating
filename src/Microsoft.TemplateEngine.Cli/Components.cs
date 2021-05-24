@@ -17,6 +17,7 @@ namespace Microsoft.TemplateEngine.Cli
         private static readonly AddProjectsToSolutionPostAction AddProjectsToSolutionPostAction = new AddProjectsToSolutionPostAction();
         private static readonly AddReferencePostActionProcessor AddReferencePostActionProcessor = new AddReferencePostActionProcessor();
         private static readonly DotnetRestorePostActionProcessor DotnetRestorePostActionProcessor = new DotnetRestorePostActionProcessor();
+        private static readonly DotnetBuildPostActionProcessor DotnetBuildPostActionProcessor = new DotnetBuildPostActionProcessor();
 
         public static IReadOnlyList<(Type Type, IIdentifiedComponent Instance)> AllComponents { get; } =
             new (Type Type, IIdentifiedComponent Instance)[]
@@ -27,6 +28,8 @@ namespace Microsoft.TemplateEngine.Cli
                 (typeof(IPostActionProcessor2), AddReferencePostActionProcessor),
                 (typeof(IPostActionProcessor), DotnetRestorePostActionProcessor),
                 (typeof(IPostActionProcessor2), DotnetRestorePostActionProcessor),
+                (typeof(IPostActionProcessor), DotnetBuildPostActionProcessor),
+                (typeof(IPostActionProcessor2), DotnetBuildPostActionProcessor),
                 (typeof(IPostActionProcessor), new ChmodPostActionProcessor()),
                 (typeof(IPostActionProcessor), new InstructionDisplayPostActionProcessor()),
                 (typeof(IPostActionProcessor), new ProcessStartPostActionProcessor()),

@@ -500,6 +500,24 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Build failed..
+        /// </summary>
+        internal static string BuildFailed {
+            get {
+                return ResourceManager.GetString("BuildFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Build succeeded..
+        /// </summary>
+        internal static string BuildSucceeded {
+            get {
+                return ResourceManager.GetString("BuildSucceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Change.
         /// </summary>
         internal static string Change {

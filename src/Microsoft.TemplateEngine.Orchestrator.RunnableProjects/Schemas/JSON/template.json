@@ -480,191 +480,222 @@
           },
           {
             "oneOf": [
-              {
-                "not": {
-                  "required": [ "actionId" ],
-                  "properties": {
-                    "actionId": {
-                      "enum": [
-                        "AC1156F7-BB77-4DB8-B28F-24EEBCCA1E5C",
-                        "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
-                        "B17581D1-C5C9-4489-8F0A-004BE667B814",
-                        "cb9a6cf3-4f5c-4860-b9d2-03a574959774",
-                        "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
-                        "D396686C-DE0E-4DE6-906D-291CD29FC5DE",
-                        "84C0DA21-51C8-4541-9940-6CA19AF04EE6"
-                      ]
-                    }
-                  }
-
-                }
-              },
-              {
-                "description": "Instruction display - shows a message given by description and manualInstructions as well as an optional command line to ask the user to execute",
-                "properties": {
-                  "actionId": {
-                    "enum": [ "AC1156F7-BB77-4DB8-B28F-24EEBCCA1E5C" ]
-                  },
-                  "args": {
-                    "properties": {
-                      "executable": {
-                        "description": "The executable to instruct the user to run",
-                        "type": "string"
-                      },
-                      "args": {
-                        "description": "The arguments to instruct the user to run the executable with - if executable is not specified, this value is unused",
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              },
-              {
-                "description": "Process start - starts a process",
-                "properties": {
-                  "actionId": {
-                    "enum": [ "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2" ]
-                  },
-                  "args": {
-                    "required": [ "executable" ],
-                    "properties": {
-                      "redirectStandardOutput": {
-                        "description": "Whether or not to redirect stdout for the process (prevents output from being displayed if true)",
-                        "type": "string",
-                        "enum": [ "true", "false" ],
-                        "default": "false"
-                      },
-                      "executable": {
-                        "description": "The executable to run",
-                        "type": "string"
-                      },
-                      "args": {
-                        "description": "The arguments to supply to the executable",
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              },
-              {
-                "description": "Add reference - adds a reference to a project, package or framework assembly",
-                "properties": {
-                  "actionId": {
-                    "enum": [ "B17581D1-C5C9-4489-8F0A-004BE667B814" ]
-                  },
-                  "args": {
-                    "required": [ "referenceType", "reference" ],
-                    "properties": {
-                      "referenceType": {
-                        "description": "The type of reference to add. project = A project to project reference. package = A NuGet package reference. framework - A framework assembly reference.",
-                        "type": "string",
-                        "enum": [ "project", "package", "framework" ],
-                        "default": "false"
-                      },
-                      "projectFileExtensions": {
-                        "description": "Must be a literal extension for the project file(s) of interest, may be a semicolon delimited list. If unspecified, any project file (*.*proj) is allowed",
-                        "type": "string"
-                      },
-                      "reference": {
-                        "description": "The reference to be added (if referenceType=package, this is the package ID; if referenceType=framework, this is the path or assembly name; if referenceType=project, this is the path to the project reference to add)",
-                        "type": "string"
-                      },
-                      "version": {
-                        "description": "The version of the package reference to add, applicable only if referenceType=package",
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              },
-              {
-                "description": "chmod - runs chmod on a particular file",
-                "properties": {
-                  "actionId": {
-                    "enum": [ "cb9a6cf3-4f5c-4860-b9d2-03a574959774" ]
-                  },
-                  "args": {
-                    "additionalProperties": {
-                      "oneOf": [
-                        {
-                          "type": "array",
-                          "description": "The set of files (or patterns) to apply the permission specified in the property name to"
-                        },
-                        {
-                          "type": "string",
-                          "description": "The file (or pattern) to apply the permission specified in the property name to"
+                {
+                    "not": {
+                        "required": [ "actionId" ],
+                        "properties": {
+                            "actionId": {
+                                "enum": [
+                                    "AC1156F7-BB77-4DB8-B28F-24EEBCCA1E5C",
+                                    "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2",
+                                    "B17581D1-C5C9-4489-8F0A-004BE667B814",
+                                    "cb9a6cf3-4f5c-4860-b9d2-03a574959774",
+                                    "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+                                    "D396686C-DE0E-4DE6-906D-291CD29FC5DE",
+                                    "84C0DA21-51C8-4541-9940-6CA19AF04EE6",
+                                    "210A437B-A78E-4D2F-B562-4DD3E3EA4025"
+                                ]
+                            }
                         }
-                      ]
+
                     }
-                  }
-                }
-              },
-              {
-                "description": "NuGet package restore - restores NuGet packages for all primary outputs with file extensions *proj or sln",
-                "properties": {
-                  "actionId": {
-                    "enum": [
-                      "210D431B-A78B-4D2F-B762-4ED3E3EA9025"
-                    ]
-                  },
-                  "args": {
+                },
+                {
+                    "description": "Instruction display - shows a message given by description and manualInstructions as well as an optional command line to ask the user to execute",
                     "properties": {
-                      "files": {
-                        "oneOf": [
-                          {
-                            "type": "array",
-                            "items": {
-                              "type": "string",
-                              "uniqueItems": true
-                            },
-                            "description": "An array of files that should be restored. If not specified, all primary outputs are restored."
-                          },
-                          {
-                            "type": "string",
-                            "description": "A semicolon delimited list of files that should be restored. If not specified, all primary outputs are restored."
-                          }
-                        ]
-                      }
+                        "actionId": {
+                            "enum": [ "AC1156F7-BB77-4DB8-B28F-24EEBCCA1E5C" ]
+                        },
+                        "args": {
+                            "properties": {
+                                "executable": {
+                                    "description": "The executable to instruct the user to run",
+                                    "type": "string"
+                                },
+                                "args": {
+                                    "description": "The arguments to instruct the user to run the executable with - if executable is not specified, this value is unused",
+                                    "type": "string"
+                                }
+                            }
+                        }
                     }
-                  }
-                }
-              },
-              {
-                "description": "Add to solution - Adds one or more of the primary outputs to the first sln file found (searches up the directory tree from the output folder)",
-                "properties": {
-                  "actionId": {
-                    "enum": [ "D396686C-DE0E-4DE6-906D-291CD29FC5DE" ]
-                  },
-                  "args": {
+                },
+                {
+                    "description": "Process start - starts a process",
                     "properties": {
-                      "primaryOutputIndexes": {
-                        "type": "string",
-                        "description": "A semicolon delimited list of indexes of the primary outputs that should be added to the solution, if not specified, all primary outputs are used"
-                      },
-                      "solutionFolder": {
-                        "type": "string",
-                        "description": "Defines the destination solution folder path to add the projects to. Optional."
-                      }
+                        "actionId": {
+                            "enum": [ "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2" ]
+                        },
+                        "args": {
+                            "required": [ "executable" ],
+                            "properties": {
+                                "redirectStandardOutput": {
+                                    "description": "Whether or not to redirect stdout for the process (prevents output from being displayed if true)",
+                                    "type": "string",
+                                    "enum": [ "true", "false" ],
+                                    "default": "false"
+                                },
+                                "executable": {
+                                    "description": "The executable to run",
+                                    "type": "string"
+                                },
+                                "args": {
+                                    "description": "The arguments to supply to the executable",
+                                    "type": "string"
+                                }
+                            }
+                        }
                     }
-                  }
-                }
-              },
-              {
-                "description": "Open in editor - Adds one or more of the primary outputs to the first sln file found (searches up the directory tree from the output folder)",
-                "properties": {
-                  "actionId": {
-                    "enum": [ "84C0DA21-51C8-4541-9940-6CA19AF04EE6" ]
-                  },
-                  "args": {
+                },
+                {
+                    "description": "Add reference - adds a reference to a project, package or framework assembly",
                     "properties": {
-                      "files": {
-                        "type": "string",
-                        "description": "A semicolon delimited list of indexes of the primary outputs that should be opened in the editor"
-                      }
+                        "actionId": {
+                            "enum": [ "B17581D1-C5C9-4489-8F0A-004BE667B814" ]
+                        },
+                        "args": {
+                            "required": [ "referenceType", "reference" ],
+                            "properties": {
+                                "referenceType": {
+                                    "description": "The type of reference to add. project = A project to project reference. package = A NuGet package reference. framework - A framework assembly reference.",
+                                    "type": "string",
+                                    "enum": [ "project", "package", "framework" ],
+                                    "default": "false"
+                                },
+                                "projectFileExtensions": {
+                                    "description": "Must be a literal extension for the project file(s) of interest, may be a semicolon delimited list. If unspecified, any project file (*.*proj) is allowed",
+                                    "type": "string"
+                                },
+                                "reference": {
+                                    "description": "The reference to be added (if referenceType=package, this is the package ID; if referenceType=framework, this is the path or assembly name; if referenceType=project, this is the path to the project reference to add)",
+                                    "type": "string"
+                                },
+                                "version": {
+                                    "description": "The version of the package reference to add, applicable only if referenceType=package",
+                                    "type": "string"
+                                }
+                            }
+                        }
                     }
-                  }
+                },
+                {
+                    "description": "chmod - runs chmod on a particular file",
+                    "properties": {
+                        "actionId": {
+                            "enum": [ "cb9a6cf3-4f5c-4860-b9d2-03a574959774" ]
+                        },
+                        "args": {
+                            "additionalProperties": {
+                                "oneOf": [
+                                    {
+                                        "type": "array",
+                                        "description": "The set of files (or patterns) to apply the permission specified in the property name to"
+                                    },
+                                    {
+                                        "type": "string",
+                                        "description": "The file (or pattern) to apply the permission specified in the property name to"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                {
+                    "description": "NuGet package restore - restores NuGet packages for all primary outputs with file extensions *proj or sln",
+                    "properties": {
+                        "actionId": {
+                            "enum": [
+                                "210D431B-A78B-4D2F-B762-4ED3E3EA9025"
+                            ]
+                        },
+                        "args": {
+                            "properties": {
+                                "files": {
+                                    "oneOf": [
+                                        {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "uniqueItems": true
+                                            },
+                                            "description": "An array of files that should be restored. If not specified, all primary outputs are restored."
+                                        },
+                                        {
+                                            "type": "string",
+                                            "description": "A semicolon delimited list of files that should be restored. If not specified, all primary outputs are restored."
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "description": "Build - builds all primary outputs with file extensions *proj or sln",
+                    "properties": {
+                        "actionId": {
+                            "enum": [
+                                "210A437B-A78E-4D2F-B562-4DD3E3EA4025"
+                            ]
+                        },
+                        "args": {
+                            "properties": {
+                                "files": {
+                                    "oneOf": [
+                                        {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "uniqueItems": true
+                                            },
+                                            "description": "An array of files that should be restored. If not specified, all primary outputs are restored."
+                                        },
+                                        {
+                                            "type": "string",
+                                            "description": "A semicolon delimited list of files that should be restored. If not specified, all primary outputs are restored."
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "description": "Add to solution - Adds one or more of the primary outputs to the first sln file found (searches up the directory tree from the output folder)",
+                    "properties": {
+                        "actionId": {
+                            "enum": [ "D396686C-DE0E-4DE6-906D-291CD29FC5DE" ]
+                        },
+                        "args": {
+                            "properties": {
+                                "primaryOutputIndexes": {
+                                    "type": "string",
+                                    "description": "A semicolon delimited list of indexes of the primary outputs that should be added to the solution, if not specified, all primary outputs are used"
+                                },
+                                "solutionFolder": {
+                                    "type": "string",
+                                    "description": "Defines the destination solution folder path to add the projects to. Optional."
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "description": "Open in editor - Adds one or more of the primary outputs to the first sln file found (searches up the directory tree from the output folder)",
+                    "properties": {
+                        "actionId": {
+                            "enum": [ "84C0DA21-51C8-4541-9940-6CA19AF04EE6" ]
+                        },
+                        "args": {
+                            "properties": {
+                                "files": {
+                                    "type": "string",
+                                    "description": "A semicolon delimited list of indexes of the primary outputs that should be opened in the editor"
+                                }
+                            }
+                        }
+                    }
                 }
-              }
             ]
           }
         ]

@@ -34,6 +34,20 @@ namespace Microsoft.TemplateEngine.Cli
             };
         }
 
+        internal static Dotnet Build(params string[] args)
+        {
+            return new Dotnet
+            {
+                _info = new ProcessStartInfo("dotnet", ArgumentEscaper.EscapeAndConcatenateArgArrayForProcessStart(new[] { "build" }.Concat(args)))
+                {
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardError = true,
+                    RedirectStandardOutput = true
+                }
+            }.ForwardStdErr().ForwardStdOut();
+        }
+
         internal static Dotnet AddProjectToProjectReference(string projectFile, params string[] args)
         {
             return new Dotnet

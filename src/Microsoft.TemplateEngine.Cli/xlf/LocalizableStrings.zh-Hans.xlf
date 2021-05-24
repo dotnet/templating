@@ -256,6 +256,16 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</target>
         <target state="new">An ambiguous choice parameter value prevented unambiguously choosing a template to invoke.</target>
         <note />
       </trans-unit>
+      <trans-unit id="BuildFailed">
+        <source>Build failed.</source>
+        <target state="new">Build failed.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="BuildSucceeded">
+        <source>Build succeeded.</source>
+        <target state="new">Build succeeded.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="Change">
         <source>Change</source>
         <target state="new">Change</target>
