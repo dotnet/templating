@@ -1,6 +1,9 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
@@ -91,7 +94,8 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.UnitTests
 
         private static string GetTestTemplateJsonContent()
         {
-            string thisDir = Path.GetDirectoryName(typeof(StringExtractorTests).Assembly.Location);
+            string thisDir = Path.GetDirectoryName(typeof(StringExtractorTests).Assembly.Location)
+                ?? throw new Exception("Failed to get assembly location, which is required to access test templates.");
             string templateJsonPath = Path.GetFullPath(Path.Combine(
                 thisDir,
                 "..",
