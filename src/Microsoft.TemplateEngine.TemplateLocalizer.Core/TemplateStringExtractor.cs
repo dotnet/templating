@@ -63,7 +63,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
                         // Include "description" of the post action.
                         new StringFilteredTraversalRule("description"),
                         // Include "manualInstructions" of the post action, if they also comply with child rules.
-                        new RegexFilteredTraversalRule("manualInstructions", new ChildValueKeyCreator("id", "default")).WithChild(
+                        new RegexFilteredTraversalRule("manualInstructions", new ChildValueKeyCreator("id", onlyChildDefaultValue: "default")).WithChild(
                             // Include all the manual instructions in the array. Skip none.
                             new AllInclusiveTraversalRule().WithChild(
                                 // Include "text" of the post action.

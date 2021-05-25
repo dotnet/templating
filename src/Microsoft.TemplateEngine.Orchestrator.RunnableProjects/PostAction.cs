@@ -13,22 +13,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
     internal class PostAction : IPostAction
     {
-        public PostAction(string? id, string? description, string? manualInstructions, Guid actionId, bool continueOnError, IReadOnlyDictionary<string, string> args)
+        public PostAction(string? description, string? manualInstructions, Guid actionId, bool continueOnError, IReadOnlyDictionary<string, string> args)
         {
-            Id = id;
             Description = description;
             ManualInstructions = manualInstructions;
             ActionId = actionId;
             ContinueOnError = continueOnError;
             Args = args;
         }
-
-        /// <summary>
-        /// Gets the string that uniquely identifies this post action within the same template.
-        /// This property can be null if the author has not provided one. In that case this post
-        /// action cannot be referenced in a context where an id is required, such as in templatestrings.json files.
-        /// </summary>
-        public string? Id { get; }
 
         public string? Description { get; }
 
@@ -84,7 +76,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 }
 
                 IPostAction postAction = new PostAction(
-                    model.Id,
                     model.Description,
                     chosenInstruction,
                     model.ActionId,

@@ -26,6 +26,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         /// <summary>
         /// Gets the string identifying this instruction within the post action.
+        /// This property can be null if the author has not provided one. In that case this manual instruction
+        /// cannot be referenced in a context where an id is required, such as in templatestrings.json files.
         /// </summary>
         public string? Id { get; }
 

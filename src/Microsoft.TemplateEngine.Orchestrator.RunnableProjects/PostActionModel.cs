@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Microsoft.TemplateEngine.Abstractions;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
@@ -44,20 +43,29 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         public IReadOnlyList<ManualInstructionModel> ManualInstructionInfo { get; }
 
-        internal static IReadOnlyList<IPostActionModel> ListFromJArray(JArray jObject, IReadOnlyDictionary<string, IPostActionLocalizationModel>? localizations, ITemplateEngineHost host)
+        internal static IReadOnlyList<IPostActionModel> ListFromJArray(JArray jArray, IReadOnlyDictionary<string, IPostActionLocalizationModel>? localizations, ILogger logger)
         {
-            // TODO Host is only here to allow logging. Once ILogger is available, remove host from required parameters.
             List<IPostActionModel> localizedPostActions = new List<IPostActionModel>();
             int localizedPostActionCount = 0;
 
-            if (jObject == null)
+            if (jArray == null)
             {
                 return localizedPostActions;
             }
 
-            foreach (JToken action in jObject)
+            HashSet<string> postActionIds = new();
+            HashSet<string> manualInstructionIds = new HashSet<string>();
+            for (int postActionIndex = 0; postActionIndex < jArray.Count; postActionIndex++)
             {
+                JToken action = jArray[postActionIndex];
                 string? postActionId = action.ToString(nameof(Id));
+
+                if (postActionId != null && !postActionIds.Add(postActionId))
+                {
+                    // There is already a post action with the same id. Do not localize this. Let user know.
+                    logger.LogWarning(LocalizableStrings.Authoring_PostActionIdIsNotUnique, postActionId, postActionIndex);
+                    postActionId = null;
+                }
 
                 Dictionary<string, string> args = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                 foreach (JProperty argInfo in action.PropertiesOf("Args"))
@@ -76,6 +84,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 }
 
                 List<ManualInstructionModel> localizedInstructions = new();
+                manualInstructionIds.Clear();
                 JArray? manualInstructions = action.Get<JArray>("ManualInstructions");
 
                 if (manualInstructions != null)
@@ -85,7 +94,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     {
                         string? id = manualInstructions[i].ToString("id");
                         string? text = string.Empty;
-                        string? localizationKey = id ?? (manualInstructions.Count == 0 ? "default" : null);
+
+                        if (id != null && !manualInstructionIds.Add(id))
+                        {
+                            // There is already an instruction with the same id. Do not localize this. Let user know.
+                            logger.LogWarning(LocalizableStrings.Authoring_ManualInstructionIdIsNotUnique, id, i, postActionId);
+                            id = null;
+                        }
 
                         if (id != null && (actionLocalizations?.Instructions.TryGetValue(id, out text) ?? false) ||
                             manualInstructions.Count == 1 && (actionLocalizations?.Instructions.TryGetValue("default", out text) ?? false))
@@ -107,7 +122,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                         string excessInstructionLocalizationIds = string.Join(
                             ", ",
                             actionLocalizations.Instructions.Keys.Where(k => !localizedInstructions.Any(i => i.Id == k)));
-                        host.Logger.LogWarning(string.Format(LocalizableStrings.Authoring_InvalidManualInstructionLocalizationIndex, excessInstructionLocalizationIds, postActionId));
+                        logger.LogWarning(LocalizableStrings.Authoring_InvalidManualInstructionLocalizationIndex, excessInstructionLocalizationIds, postActionId);
                     }
                 }
 
@@ -128,7 +143,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 // Localizations provide more translations than the number of post actions we have.
                 string excessPostActionLocalizationIds = string.Join(", ", localizations.Keys.Where(k => !localizedPostActions.Any(p => p.Id == k)).Select(k => k.ToString()));
-                host.Logger.LogWarning(string.Format(LocalizableStrings.Authoring_InvalidPostActionLocalizationIndex, excessPostActionLocalizationIds));
+                logger.LogWarning(LocalizableStrings.Authoring_InvalidPostActionLocalizationIndex, excessPostActionLocalizationIds);
             }
             return localizedPostActions;
         }
