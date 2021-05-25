@@ -1,4 +1,2 @@
-﻿Microsoft.TemplateEngine.Abstractions.ILocalizationModel.PostActions.get -> System.Collections.Generic.IReadOnlyDictionary<string!, Microsoft.TemplateEngine.Abstractions.IPostActionLocalizationModel!>!
-Microsoft.TemplateEngine.Abstractions.IPostActionLocalizationModel.Instructions.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
-Microsoft.TemplateEngine.Abstractions.IPrioritizedComponent
+﻿Microsoft.TemplateEngine.Abstractions.IPrioritizedComponent
 Microsoft.TemplateEngine.Abstractions.IPrioritizedComponent.Priority.get -> int

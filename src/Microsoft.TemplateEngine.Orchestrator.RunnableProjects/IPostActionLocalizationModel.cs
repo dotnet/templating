@@ -5,12 +5,12 @@
 
 using System.Collections.Generic;
 
-namespace Microsoft.TemplateEngine.Abstractions
+namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
     /// <summary>
     /// Defines <see cref="IPostAction"/> localization model.
     /// </summary>
-    public interface IPostActionLocalizationModel
+    internal interface IPostActionLocalizationModel
     {
         /// <summary>
         /// Gets the localized description of this post action.

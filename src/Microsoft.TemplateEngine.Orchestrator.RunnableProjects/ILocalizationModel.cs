@@ -4,13 +4,14 @@
 #nullable enable
 
 using System.Collections.Generic;
+using Microsoft.TemplateEngine.Abstractions;
 
-namespace Microsoft.TemplateEngine.Abstractions
+namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
     /// <summary>
     /// Represents the data model that contains the localized strings for a template.
     /// </summary>
-    public interface ILocalizationModel
+    internal interface ILocalizationModel
     {
         /// <summary>
         /// Gets the localized author name.
