@@ -1,2 +1,1 @@
-﻿Microsoft.TemplateEngine.Abstractions.IPrioritizedComponent
-Microsoft.TemplateEngine.Abstractions.IPrioritizedComponent.Priority.get -> int
+﻿
