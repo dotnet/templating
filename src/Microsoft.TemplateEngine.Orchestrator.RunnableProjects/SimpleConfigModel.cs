@@ -26,6 +26,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
     {
         private const string NameSymbolName = "name";
         private const string DefaultPlaceholderFilename = "-.-";
+        private const string AdditionalConfigFilesIndicator = "AdditionalConfigFiles";
         private static readonly string[] IncludePatternDefaults = new[] { "**/*" };
 
         private static readonly string[] ExcludePatternDefaults = new[]
@@ -60,6 +61,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         internal SimpleConfigModel()
         {
+            //TODO: pass me logger
             Sources = new[] { new ExtendedFileSource() };
         }
 
@@ -76,6 +78,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         public int Precedence { get; set; }
 
         public string Name { get; set; }
+
+        public string ThirdPartyNotices { get; set; }
+
+        public bool PreferNameDirectory { get; set; }
 
         public IReadOnlyDictionary<string, string> Tags => _tags;
 
@@ -353,6 +359,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
         }
 
+        internal IDirectory TemplateSourceRoot => SourceFile?.Parent?.Parent;
+
         internal IReadOnlyList<IReplacementTokens> SymbolFilenameReplacements
         {
             get
@@ -420,7 +428,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
         }
 
-        public void Evaluate(IParameterSet parameters, IVariableCollection rootVariableCollection, IFileSystemInfo configFile)
+        public void Evaluate(IParameterSet parameters, IVariableCollection rootVariableCollection)
         {
             bool stable = Symbols == null;
             Dictionary<string, bool> computed = new Dictionary<string, bool>();
@@ -457,7 +465,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             parameters.ResolvedValues.TryGetValue(NameParameter, out object resolvedNameParamValue);
 
-            _sources = EvaluateSources(parameters, rootVariableCollection, configFile, resolvedNameParamValue);
+            _sources = EvaluateSources(parameters, rootVariableCollection, resolvedNameParamValue);
 
             // evaluate the conditions and resolve the paths for the PrimaryOutputs
             foreach (ICreationPathModel pathModel in PrimaryOutputs)
@@ -477,27 +485,39 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
         }
 
-        internal static SimpleConfigModel FromJObject(IEngineEnvironmentSettings environmentSettings, JObject source, ISimpleConfigModifiers configModifiers = null, JObject localeSource = null)
+        internal static SimpleConfigModel LoadModel(IFile templateFile, ISimpleConfigModifiers configModifiers = null)
         {
-            ILogger logger = environmentSettings.Host.Logger;
-            _ = LocalizationModelDeserializer.TryDeserialize(localeSource, logger, out ILocalizationModel localizationModel);
+            JObject baseSrcObject = templateFile.ReadJObjectFromIFile();
+            JObject srcObject = MergeAdditionalConfiguration(baseSrcObject, templateFile);
+            SimpleConfigModel templateModel = SimpleConfigModel.FromJObject(templateFile.MountPoint.EnvironmentSettings, srcObject, configModifiers);
+            templateModel.SourceFile = templateFile;
+            return templateModel;
+        }
+
+        internal static SimpleConfigModel FromJObject(IEngineEnvironmentSettings environmentSettings, JObject source, ISimpleConfigModifiers configModifiers = null)
+        {
+            //TODO: SimpleConfigModel should have the logger
+            //ILogger logger = environmentSettings.Host.Logger;
+            //TODO: this method should not do localization / commented out for reference
 
             SimpleConfigModel config = new SimpleConfigModel()
             {
-                Author = localizationModel?.Author ?? source.ToString(nameof(config.Author)),
+                //Author = localizationModel?.Author ?? source.ToString(nameof(config.Author)),
                 Classifications = source.ArrayAsStrings(nameof(config.Classifications)),
                 DefaultName = source.ToString(nameof(DefaultName)),
-                Description = localizationModel?.Description ?? source.ToString(nameof(Description)) ?? string.Empty,
+                //Description = localizationModel?.Description ?? source.ToString(nameof(Description)) ?? string.Empty,
                 GroupIdentity = source.ToString(nameof(GroupIdentity)),
                 Precedence = source.ToInt32(nameof(Precedence)),
                 Guids = source.ArrayAsGuids(nameof(config.Guids)),
                 Identity = source.ToString(nameof(config.Identity)),
-                Name = localizationModel?.Name ?? source.ToString(nameof(config.Name)),
+                //Name = localizationModel?.Name ?? source.ToString(nameof(config.Name)),
 
                 SourceName = source.ToString(nameof(config.SourceName)),
                 PlaceholderFilename = source.ToString(nameof(config.PlaceholderFilename)),
                 EnvironmentSettings = environmentSettings,
-                GeneratorVersions = source.ToString(nameof(config.GeneratorVersions))
+                GeneratorVersions = source.ToString(nameof(config.GeneratorVersions)),
+                ThirdPartyNotices = source.ToString(nameof(config.ThirdPartyNotices)),
+                PreferNameDirectory = source.ToBool(nameof(config.PreferNameDirectory))
             };
 
             JToken shortNameToken = source.Get<JToken>("ShortName");
@@ -573,10 +593,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 }
 
                 IParameterSymbolLocalizationModel symbolLocalization = null;
-                if (localizationModel != null)
-                {
-                    localizationModel.ParameterSymbols.TryGetValue(prop.Name, out symbolLocalization);
-                }
+                //if (localizationModel != null)
+                //{
+                //    localizationModel.ParameterSymbols.TryGetValue(prop.Name, out symbolLocalization);
+                //}
 
                 string defaultOverride = null;
                 if (baseline != null && baseline.DefaultOverrides != null)
@@ -603,7 +623,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 }
             }
 
-            config.PostActionModel = RunnableProjects.PostActionModel.ListFromJArray(source.Get<JArray>("PostActions"), localizationModel?.PostActions, environmentSettings.Host.Logger);
+            //config.PostActionModel = RunnableProjects.PostActionModel.ListFromJArray(source.Get<JArray>("PostActions"), localizationModel?.PostActions, environmentSettings.Host.Logger);
             config.PrimaryOutputs = CreationPathModel.ListFromJArray(source.Get<JArray>(nameof(PrimaryOutputs)));
 
             // Custom operations at the global level
@@ -631,9 +651,22 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
 
             config._specialCustomSetup = specialCustomSetup;
-            LocalizationModelDeserializer.VerifyLocalizationModel(localizationModel, config, logger);
             return config;
         }
+
+        #region Localization
+        internal void LoadLocalization(ILocalizationModel locModel)
+        {
+            //TODO: implement me
+        }
+
+        internal bool VerifyLocalizationModel(ILocalizationModel locModel)
+        {
+            //TOOD: simple
+            //TODO: implement me
+            return false;
+        }
+        #endregion
 
         // If the token is a string:
         //      check if its a valid file in the same directory as the sourceFile.
@@ -776,6 +809,42 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
 
             return symbols;
+        }
+
+        // Checks the primarySource for additional configuration files.
+        // If found, merges them all together.
+        // Returns the merged JObject (or the original if there was nothing to merge).
+        // Additional files must be in the same dir as the template file.
+        private static JObject MergeAdditionalConfiguration(JObject primarySource, IFileSystemInfo primarySourceConfig)
+        {
+            IReadOnlyList<string> otherFiles = primarySource.ArrayAsStrings(AdditionalConfigFilesIndicator);
+
+            if (!otherFiles.Any())
+            {
+                return primarySource;
+            }
+
+            JObject combinedSource = (JObject)primarySource.DeepClone();
+
+            foreach (string partialConfigFileName in otherFiles)
+            {
+                if (!partialConfigFileName.EndsWith("." + RunnableProjectGenerator.TemplateConfigFileName))
+                {
+                    throw new TemplateAuthoringException($"Split configuration error with file [{partialConfigFileName}]. Additional configuration file names must end with '.{RunnableProjectGenerator.TemplateConfigFileName}'.", partialConfigFileName);
+                }
+
+                IFile partialConfigFile = primarySourceConfig.Parent.EnumerateFiles(partialConfigFileName, SearchOption.TopDirectoryOnly).FirstOrDefault(x => string.Equals(x.Name, partialConfigFileName));
+
+                if (partialConfigFile == null)
+                {
+                    throw new TemplateAuthoringException($"Split configuration file [{partialConfigFileName}] could not be found.", partialConfigFileName);
+                }
+
+                JObject partialConfigJson = partialConfigFile.ReadJObjectFromIFile();
+                combinedSource.Merge(partialConfigJson);
+            }
+
+            return combinedSource;
         }
 
         private IGlobalRunConfig ProduceOperationSetup(SpecialOperationConfigParams defaultModel, bool generateMacros, ICustomFileGlobModel customGlobModel = null)
@@ -1048,7 +1117,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return generatedMacroConfigs;
         }
 
-        private List<FileSourceMatchInfo> EvaluateSources(IParameterSet parameters, IVariableCollection rootVariableCollection, IFileSystemInfo configFile, object resolvedNameParamValue)
+        private List<FileSourceMatchInfo> EvaluateSources(IParameterSet parameters, IVariableCollection rootVariableCollection, object resolvedNameParamValue)
         {
             List<FileSourceMatchInfo> sources = new List<FileSourceMatchInfo>();
 
@@ -1092,7 +1161,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
                 string sourceDirectory = source.Source ?? "./";
                 string targetDirectory = source.Target ?? "./";
-                IReadOnlyDictionary<string, string> allRenamesForSource = AugmentRenames(configFile, sourceDirectory, ref targetDirectory, resolvedNameParamValue, parameters, fileRenamesFromSource);
+                IReadOnlyDictionary<string, string> allRenamesForSource = AugmentRenames(SourceFile, sourceDirectory, ref targetDirectory, resolvedNameParamValue, parameters, fileRenamesFromSource);
 
                 FileSourceMatchInfo sourceMatcher = new FileSourceMatchInfo(
                     sourceDirectory,
@@ -1112,7 +1181,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
                 string targetDirectory = string.Empty;
                 Dictionary<string, string> fileRenamesFromSource = new Dictionary<string, string>(StringComparer.Ordinal);
-                IReadOnlyDictionary<string, string> allRenamesForSource = AugmentRenames(configFile, "./", ref targetDirectory, resolvedNameParamValue, parameters, fileRenamesFromSource);
+                IReadOnlyDictionary<string, string> allRenamesForSource = AugmentRenames(SourceFile, "./", ref targetDirectory, resolvedNameParamValue, parameters, fileRenamesFromSource);
 
                 FileSourceMatchInfo sourceMatcher = new FileSourceMatchInfo(
                     "./",

@@ -50,6 +50,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         IReadOnlyDictionary<string, IBaselineInfo> BaselineInfo { get; }
 
-        void Evaluate(IParameterSet parameters, IVariableCollection rootVariableCollection, IFileSystemInfo configFile);
+        void Evaluate(IParameterSet parameters, IVariableCollection rootVariableCollection);
     }
 }

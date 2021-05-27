@@ -15,7 +15,6 @@ using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config;
 using Microsoft.TemplateEngine.Utils;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
@@ -27,7 +26,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         internal const string TemplateConfigFileName = "template.json";
         internal const string LocalizationFilePrefix = "templatestrings.";
         internal const string LocalizationFileExtension = ".json";
-        private const string AdditionalConfigFilesIndicator = "AdditionalConfigFiles";
         private const string GeneratorVersion = "1.0.0.0";
         private static readonly Guid GeneratorId = new Guid("0C434DF7-E2CB-4DEE-B216-D7C58C8EB4B3");
 
@@ -55,7 +53,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             ProcessMacros(environmentSettings, template.Config.OperationConfig, parameters);
 
             IVariableCollection variables = VariableCollection.SetupVariables(environmentSettings, parameters, template.Config.OperationConfig.VariableSetup);
-            template.Config.Evaluate(parameters, variables, template.ConfigFile);
+            template.Config.Evaluate(parameters, variables);
 
             IOrchestrator2 basicOrchestrator = new Core.Util.Orchestrator();
             RunnableProjectOrchestrator orchestrator = new RunnableProjectOrchestrator(basicOrchestrator);
@@ -92,7 +90,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             ProcessMacros(environmentSettings, template.Config.OperationConfig, parameters);
 
             IVariableCollection variables = VariableCollection.SetupVariables(environmentSettings, parameters, template.Config.OperationConfig.VariableSetup);
-            template.Config.Evaluate(parameters, variables, template.ConfigFile);
+            template.Config.Evaluate(parameters, variables);
 
             IOrchestrator2 basicOrchestrator = new Core.Util.Orchestrator();
             RunnableProjectOrchestrator orchestrator = new RunnableProjectOrchestrator(basicOrchestrator);
@@ -137,11 +135,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             foreach (IFile file in folder.EnumerateFiles(TemplateConfigFileName, SearchOption.AllDirectories))
             {
-                IFile hostConfigFile = FindBestHostTemplateConfigFile(source.EnvironmentSettings, file);
-
-                if (TryGetTemplateFromConfigInfo(file, out RunnableProjectTemplate template, hostTemplateConfigFile: hostConfigFile))
+                try
                 {
-                    templateList.Add(template);
+                    IFile hostConfigFile = FindBestHostTemplateConfigFile(source.EnvironmentSettings, file);
+                    var templateModel = LoadBaseTemplate(file);
 
                     IDirectory localizeFolder = file.Parent.DirectoryInfo("localize");
                     if (localizeFolder != null && localizeFolder.Exists)
@@ -150,14 +147,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                         foreach (IFile locFile in localizeFolder.EnumerateFiles(LocalizationFilePrefix + "*" + LocalizationFileExtension, SearchOption.AllDirectories))
                         {
                             string locale = locFile.Name.Substring(LocalizationFilePrefix.Length, locFile.Name.Length - LocalizationFilePrefix.Length - LocalizationFileExtension.Length);
-
                             if (TryGetLangPackFromFile(locFile, out ILocalizationModel locModel) &&
-                                LocalizationModelDeserializer.VerifyLocalizationModel(locModel, template.SimpleConfig, logger))
+                                templateModel.VerifyLocalizationModel(locModel))
                             {
                                 localizations.Add(new LocalizationLocator(
                                     locale,
                                     locFile.FullPath,
-                                    ((ITemplate)template).Identity,
+                                    templateModel.Identity,
                                     locModel.Author,
                                     locModel.Name,
                                     locModel.Description,
@@ -165,6 +161,19 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                             }
                         }
                     }
+
+                    //issue here: we need to pass locale as parameter
+                    //consider passing current locale file here if exists
+                    RunnableProjectTemplate runnableProjectTemplate = new RunnableProjectTemplate(this, templateModel, null, hostConfigFile);
+                    //should throw instead
+                    AreAllTemplatePathsValid(file.MountPoint.EnvironmentSettings, templateModel, runnableProjectTemplate);
+                    templateList.Add(runnableProjectTemplate);
+
+                }
+                catch (Exception ex)
+                {
+                    //TODO: better error handling here
+                    source.EnvironmentSettings.Host.Logger.LogError($"Error reading template from file: {source.MountPointUri}/{file.FullPath} | Error = {ex.Message}");
                 }
             }
 
@@ -173,9 +182,32 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         public bool TryGetTemplateFromConfigInfo(IFileSystemInfo templateFileConfig, out ITemplate template, IFileSystemInfo localeFileConfig = null, IFile hostTemplateConfigFile = null, string baselineName = null)
         {
-            bool result = TryGetTemplateFromConfigInfo(templateFileConfig, out RunnableProjectTemplate runnableProjectTemplate, localeFileConfig, hostTemplateConfigFile, baselineName);
-            template = runnableProjectTemplate;
-            return result;
+            try
+            {
+                IFile templateFile = templateFileConfig as IFile ?? throw new NotSupportedException("template config should be a file");
+                IFile localeFile = localeFileConfig as IFile ?? throw new NotSupportedException("template config should be a file");
+                ILogger logger = localeFile.MountPoint.EnvironmentSettings.Host.Logger;
+                SimpleConfigModel templateModel = LoadBaseTemplate(templateFile, baselineName);
+                if (TryGetLangPackFromFile(localeFile, out ILocalizationModel locModel))
+                {
+                    templateModel.LoadLocalization(locModel);
+                }
+                else
+                {
+                    //TODO: throw
+                }
+                RunnableProjectTemplate runnableProjectTemplate = new RunnableProjectTemplate(this, templateModel, localeFile, hostTemplateConfigFile);
+                //should throw instead
+                AreAllTemplatePathsValid(templateFile.MountPoint.EnvironmentSettings, templateModel, runnableProjectTemplate);
+                template = runnableProjectTemplate;
+                return true;
+            }
+            catch (Exception)
+            {
+                //TODO: handling
+                template = null;
+                return false;
+            }
         }
 
         // For explicitly data-typed variables, attempt to convert the variable value to the specified type.
@@ -379,8 +411,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
         }
 
-        // TODO: localize the diagnostic strings
-        // checks that all the template sources are under the template root, and they exist.
+        //TODO: should throw
         internal bool AreAllTemplatePathsValid(IEngineEnvironmentSettings environmentSettings, IRunnableProjectConfig templateConfig, ITemplate runnableTemplate)
         {
             ILogger logger = environmentSettings.Host.Logger;
@@ -391,8 +422,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 return false;
             }
 
-            // check if any sources get out of the mount point
             bool allSourcesValid = true;
+            // check if any sources get out of the mount point
             foreach (FileSourceMatchInfo source in templateConfig.Sources)
             {
                 try
@@ -405,6 +436,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                         logger.LogDebug(string.Format(LocalizableStrings.Authoring_TemplateNameDisplay, runnableTemplate.Name));
                         logger.LogDebug(string.Format(LocalizableStrings.Authoring_TemplateSourceRoot, runnableTemplate.TemplateSourceRoot.FullPath));
                         logger.LogDebug(string.Format(LocalizableStrings.Authoring_SourceMustBeDirectory, source.Source));
+                        return false;
                     }
                     else
                     {
@@ -412,37 +444,28 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
                         if (!(sourceRoot?.Exists ?? false))
                         {
-                            // non-existant directory
                             allSourcesValid = false;
+                            // non-existant directory
                             logger.LogDebug(string.Format(LocalizableStrings.Authoring_TemplateNameDisplay, runnableTemplate.Name));
                             logger.LogDebug(string.Format(LocalizableStrings.Authoring_TemplateSourceRoot, runnableTemplate.TemplateSourceRoot.FullPath));
                             logger.LogDebug(string.Format(LocalizableStrings.Authoring_SourceDoesNotExist, source.Source));
                             logger.LogDebug(string.Format(LocalizableStrings.Authoring_SourceIsOutsideInstallSource, sourceRoot.FullPath));
+                            return false;
                         }
                     }
                 }
                 catch
                 {
+                    allSourcesValid = false;
                     // outside the mount point root
                     // TODO: after the null ref exception in DirectoryInfo is fixed, change how this check works.
-                    allSourcesValid = false;
                     logger.LogDebug(string.Format(LocalizableStrings.Authoring_TemplateNameDisplay, runnableTemplate.Name));
                     logger.LogDebug(string.Format(LocalizableStrings.Authoring_TemplateSourceRoot, runnableTemplate.TemplateSourceRoot.FullPath));
                     logger.LogDebug(string.Format(LocalizableStrings.Authoring_TemplateRootOutsideInstallSource, source.Source));
+                    return false;
                 }
             }
-
             return allSourcesValid;
-        }
-
-        internal JObject ReadJObjectFromIFile(IFile file)
-        {
-            using (Stream s = file.OpenRead())
-            using (TextReader tr = new StreamReader(s, System.Text.Encoding.UTF8, true))
-            using (JsonReader r = new JsonTextReader(tr))
-            {
-                return JObject.Load(r);
-            }
         }
 
         private static ICreationResult GetCreationResult(IEngineEnvironmentSettings environmentSettings, RunnableProjectTemplate template, IVariableCollection variables)
@@ -509,19 +532,33 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return match != null;
         }
 
-        private bool CheckGeneratorVersionRequiredByTemplate(string generatorVersionsAllowed)
+        private SimpleConfigModel LoadBaseTemplate(IFile templateFile, string baselineName = null)
+        {
+            ITemplateEngineHost host = templateFile.MountPoint.EnvironmentSettings.Host;
+            ISimpleConfigModifiers configModifiers = new SimpleConfigModifiers(baselineName);
+            SimpleConfigModel templateModel = SimpleConfigModel.LoadModel(templateFile, configModifiers);
+
+            //should throw instead
+            PerformTemplateValidation(templateModel, templateFile, host);
+
+            //should throw instead
+            CheckGeneratorVersionRequiredByTemplate(templateModel.GeneratorVersions);
+
+            return templateModel;
+        }
+
+        //TODO: should throw
+        private void CheckGeneratorVersionRequiredByTemplate(string generatorVersionsAllowed)
         {
             if (string.IsNullOrEmpty(generatorVersionsAllowed))
             {
-                return true;
+                return;
             }
 
-            if (!VersionStringHelpers.TryParseVersionSpecification(generatorVersionsAllowed, out IVersionSpecification versionChecker))
+            if (!VersionStringHelpers.TryParseVersionSpecification(generatorVersionsAllowed, out IVersionSpecification versionChecker) || !versionChecker.CheckIfVersionIsValid(GeneratorVersion))
             {
-                return false;
+                throw new Exception("Not supported version");
             }
-
-            return versionChecker.CheckIfVersionIsValid(GeneratorVersion);
         }
 
         private IFile FindBestHostTemplateConfigFile(IEngineEnvironmentSettings engineEnvironment, IFile config)
@@ -552,43 +589,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return null;
         }
 
-        // Checks the primarySource for additional configuration files.
-        // If found, merges them all together.
-        // Returns the merged JObject (or the original if there was nothing to merge).
-        // Additional files must be in the same dir as the template file.
-        private JObject MergeAdditionalConfiguration(JObject primarySource, IFileSystemInfo primarySourceConfig)
-        {
-            IReadOnlyList<string> otherFiles = primarySource.ArrayAsStrings(AdditionalConfigFilesIndicator);
-
-            if (!otherFiles.Any())
-            {
-                return primarySource;
-            }
-
-            JObject combinedSource = (JObject)primarySource.DeepClone();
-
-            foreach (string partialConfigFileName in otherFiles)
-            {
-                if (!partialConfigFileName.EndsWith("." + TemplateConfigFileName))
-                {
-                    throw new TemplateAuthoringException($"Split configuration error with file [{partialConfigFileName}]. Additional configuration file names must end with '.{TemplateConfigFileName}'.", partialConfigFileName);
-                }
-
-                IFile partialConfigFile = primarySourceConfig.Parent.EnumerateFiles(partialConfigFileName, SearchOption.TopDirectoryOnly).FirstOrDefault(x => string.Equals(x.Name, partialConfigFileName));
-
-                if (partialConfigFile == null)
-                {
-                    throw new TemplateAuthoringException($"Split configuration file [{partialConfigFileName}] could not be found.", partialConfigFileName);
-                }
-
-                JObject partialConfigJson = ReadJObjectFromIFile(partialConfigFile);
-                combinedSource.Merge(partialConfigJson);
-            }
-
-            return combinedSource;
-        }
-
-        private bool PerformTemplateValidation(SimpleConfigModel templateModel, IFile templateFile, ITemplateEngineHost host)
+        //TODO: should throw
+        private void PerformTemplateValidation(SimpleConfigModel templateModel, IFile templateFile, ITemplateEngineHost host)
         {
             //Do some basic checks...
             List<string> errorMessages = new List<string>();
@@ -656,16 +658,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             if (errorMessages.Count > 0)
             {
                 host.Logger.LogDebug(string.Format(LocalizableStrings.Authoring_TemplateNotInstalled, templateFile.FullPath));
-
                 foreach (string message in errorMessages)
                 {
                     host.Logger.LogDebug("    " + message);
                 }
-
-                return false;
+                throw new Exception("Template validation failed");
             }
-
-            return true;
         }
 
         private bool TryGetLangPackFromFile(IFile file, out ILocalizationModel locModel)
@@ -680,7 +678,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             try
             {
-                JObject srcObject = ReadJObjectFromIFile(file);
+                JObject srcObject = file.ReadJObjectFromIFile();
                 return LocalizationModelDeserializer.TryDeserialize(srcObject, logger, out locModel);
             }
             catch (Exception ex)
@@ -689,65 +687,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
 
             locModel = null;
-            return false;
-        }
-
-        private bool TryGetTemplateFromConfigInfo(IFileSystemInfo templateFileConfig, out RunnableProjectTemplate template, IFileSystemInfo localeFileConfig = null, IFile hostTemplateConfigFile = null, string baselineName = null)
-        {
-            IFile templateFile = templateFileConfig as IFile;
-
-            if (templateFile == null)
-            {
-                template = null;
-                return false;
-            }
-
-            IFile localeFile = localeFileConfig as IFile;
-            ITemplateEngineHost host = templateFileConfig.MountPoint.EnvironmentSettings.Host;
-
-            try
-            {
-                JObject baseSrcObject = ReadJObjectFromIFile(templateFile);
-                JObject srcObject = MergeAdditionalConfiguration(baseSrcObject, templateFileConfig);
-
-                JObject localeSourceObject = null;
-                if (localeFile != null)
-                {
-                    localeSourceObject = ReadJObjectFromIFile(localeFile);
-                }
-
-                ISimpleConfigModifiers configModifiers = new SimpleConfigModifiers(baselineName);
-                SimpleConfigModel templateModel = SimpleConfigModel.FromJObject(templateFile.MountPoint.EnvironmentSettings, srcObject, configModifiers, localeSourceObject);
-
-                if (!PerformTemplateValidation(templateModel, templateFile, host))
-                {
-                    template = null;
-                    return false;
-                }
-
-                if (!CheckGeneratorVersionRequiredByTemplate(templateModel.GeneratorVersions))
-                {
-                    // template isn't compatible with this generator version
-                    template = null;
-                    return false;
-                }
-
-                RunnableProjectTemplate runnableProjectTemplate = new RunnableProjectTemplate(srcObject, this, templateFile, templateModel, null, hostTemplateConfigFile);
-                if (!AreAllTemplatePathsValid(templateFile.MountPoint.EnvironmentSettings, templateModel, runnableProjectTemplate))
-                {
-                    template = null;
-                    return false;
-                }
-
-                template = runnableProjectTemplate;
-                return true;
-            }
-            catch (Exception ex)
-            {
-                host.Logger.LogError($"Error reading template from file: {templateFile.FullPath} | Error = {ex.Message}");
-            }
-
-            template = null;
             return false;
         }
 
