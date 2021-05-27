@@ -14,7 +14,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
     internal class RunnableProjectTemplate : ITemplate
     {
         private readonly JObject _raw;
-        private readonly IRunnableProjectConfig _config;
+        private readonly SimpleConfigModel _config;
         private readonly IFile _configFile;
         private readonly IGenerator _generator;
         private readonly IFile _localeConfigFile;
@@ -24,7 +24,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             JObject raw,
             IGenerator generator,
             IFile configFile,
-            IRunnableProjectConfig config,
+            SimpleConfigModel config,
             IFile localeConfigFile,
             IFile hostConfigFile)
         {
@@ -125,7 +125,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         {
             get
             {
-                return _config.Parameters.Values
+                return ((IRunnableProjectConfig)_config).Parameters.Values
                     .Where(param => param.Type.Equals("parameter", StringComparison.OrdinalIgnoreCase)
                         && param.Priority != TemplateParameterPriority.Implicit)
                     .ToList();
@@ -157,5 +157,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         internal IRunnableProjectConfig Config => _config;
 
         internal IFile ConfigFile => _configFile;
+
+        internal SimpleConfigModel SimpleConfig => _config;
     }
 }
