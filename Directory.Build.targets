@@ -14,9 +14,7 @@
     <PackageReference Update="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsLoggingPackageVersion)" />
     <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftExtensionsLoggingConsolePackageVersion)" />
     <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsLoggingAbstractionsPackageVersion)" />
-    <PackageReference Update="Microsoft.NET.Test.Sdk" Version="15.8.0" />
     <PackageReference Update="Newtonsoft.Json" Version="$(NewtonsoftJsonPackageVersion)" />
-    <PackageReference Update="xunit.abstractions" Version="2.0.3" />
   </ItemGroup>
 
   <!-- Leave this file here, even if it's empty. It stops chaining imports. -->
