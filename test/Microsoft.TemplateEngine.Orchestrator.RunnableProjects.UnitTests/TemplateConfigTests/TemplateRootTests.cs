@@ -80,9 +80,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             RunnableProjectGenerator generator = new RunnableProjectGenerator();
 
             IFile templateFile = setup.FileInfoForSourceFile(pathToTemplateJson);
-            JObject srcObject = generator.ReadJObjectFromIFile(templateFile);
-            SimpleConfigModel templateModel = SimpleConfigModel.FromJObject(templateFile.MountPoint.EnvironmentSettings, srcObject);
-            RunnableProjectTemplate runnableProjectTemplate = new RunnableProjectTemplate(srcObject, generator, templateFile, templateModel, null, null);
+            SimpleConfigModel templateModel = SimpleConfigModel.LoadModel(templateFile);
+            RunnableProjectTemplate runnableProjectTemplate = new RunnableProjectTemplate(generator, templateModel, null, null);
 
             bool allPathsAreValid = generator.ValidateTemplateSourcePaths(_engineEnvironmentSettings.Host.Logger, templateModel, runnableProjectTemplate);
             Assert.Equal(shouldAllPathsBeValid, allPathsAreValid);
@@ -110,9 +109,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             RunnableProjectGenerator generator = new RunnableProjectGenerator();
 
             IFile templateFile = setup.FileInfoForSourceFile(pathToTemplateConfig);
-            JObject srcObject = generator.ReadJObjectFromIFile(templateFile);
-            SimpleConfigModel templateModel = SimpleConfigModel.FromJObject(templateFile.MountPoint.EnvironmentSettings, srcObject);
-            RunnableProjectTemplate runnableProjectTemplate = new RunnableProjectTemplate(srcObject, generator, templateFile, templateModel, null, null);
+            SimpleConfigModel templateModel = SimpleConfigModel.LoadModel(templateFile);
+            RunnableProjectTemplate runnableProjectTemplate = new RunnableProjectTemplate(generator, templateModel, null, null);
 
             bool allPathsAreValid = generator.ValidateTemplateSourcePaths(_engineEnvironmentSettings.Host.Logger, templateModel, runnableProjectTemplate);
             Assert.Equal(shouldAllPathsBeValid, allPathsAreValid);
@@ -154,9 +152,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             RunnableProjectGenerator generator = new RunnableProjectGenerator();
 
             IFile templateFile = setup.FileInfoForSourceFile(pathToTemplateConfig);
-            JObject srcObject = generator.ReadJObjectFromIFile(templateFile);
-            SimpleConfigModel templateModel = SimpleConfigModel.FromJObject(templateFile.MountPoint.EnvironmentSettings, srcObject);
-            RunnableProjectTemplate runnableProjectTemplate = new RunnableProjectTemplate(srcObject, generator, templateFile, templateModel, null, null);
+            SimpleConfigModel templateModel = SimpleConfigModel.LoadModel(templateFile);
+            RunnableProjectTemplate runnableProjectTemplate = new RunnableProjectTemplate(generator, templateModel, null, null);
 
             bool allPathsAreValid = generator.ValidateTemplateSourcePaths(_engineEnvironmentSettings.Host.Logger, templateModel, runnableProjectTemplate);
             Assert.Equal(shouldAllPathsBeValid, allPathsAreValid);
