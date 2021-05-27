@@ -40,7 +40,15 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
                 info.DefaultName = entry.ToString(nameof(DefaultName));
                 info.Description = entry.ToString(nameof(Description));
-                info.GeneratorId = Guid.Parse(entry.ToString(nameof(GeneratorId)));
+
+                if (entry.ToString(nameof(GeneratorId)) is { Length: > 0 } value)
+                {
+                    if (Guid.TryParse(value, out var generatorId))
+                    {
+                        info.GeneratorId = generatorId;
+                    }
+                }
+
                 info.GroupIdentity = entry.ToString(nameof(GroupIdentity));
                 info.Precedence = entry.ToInt32(nameof(Precedence));
 
