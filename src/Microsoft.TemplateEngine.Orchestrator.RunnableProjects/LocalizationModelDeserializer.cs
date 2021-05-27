@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Localization;
 using Newtonsoft.Json.Linq;
@@ -19,23 +20,71 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         /// </summary>
         private const char KeySeparator = '/';
 
-        public static ILocalizationModel Deserialize(JObject data)
+        /// <summary>
+        /// Deserializes the given json data into an <see cref="ILocalizationModel"/>.
+        /// </summary>
+        /// <param name="data">Json data to be deserialized.</param>
+        /// <param name="logger"><see cref="ILogger"/> to be used for logging diagnostics messages.</param>
+        /// <param name="localizationModel">Deserialized model. Null, if the operation failed.</param>
+        /// <returns>True if deserialization succeeded. False, otherwise.</returns>
+        public static bool TryDeserialize(JObject data, ILogger logger, out ILocalizationModel? localizationModel)
         {
-            var parameterLocalizations = new Dictionary<string, ParameterSymbolLocalizationModel>();
+            try
+            {
+                var parameterLocalizations = new Dictionary<string, ParameterSymbolLocalizationModel>();
 
-            List<(string Key, string Value)> localizedStrings = data.Properties()
-                .Select(p => p.Value.Type == JTokenType.String ? (p.Name, p.Value.ToString()) : throw new Exception(LocalizableStrings.Authoring_InvalidJsonElementInLocalizationFile))
-                .ToList();
+                List<(string Key, string Value)> localizedStrings = data.Properties()
+                    .Select(p => p.Value.Type == JTokenType.String ? (p.Name, p.Value.ToString()) : throw new Exception(LocalizableStrings.Authoring_InvalidJsonElementInLocalizationFile))
+                    .ToList();
 
-            var symbols = LoadSymbolModels(localizedStrings);
-            var postActions = LoadPostActionModels(localizedStrings);
+                var symbols = LoadSymbolModels(localizedStrings);
+                var postActions = LoadPostActionModels(localizedStrings);
 
-            return new LocalizationModel(
-                name: localizedStrings.FirstOrDefault(s => s.Key == "name").Value,
-                description: localizedStrings.FirstOrDefault(s => s.Key == "description").Value,
-                author: localizedStrings.FirstOrDefault(s => s.Key == "author").Value,
-                symbols,
-                postActions);
+                localizationModel = new LocalizationModel(
+                    name: localizedStrings.FirstOrDefault(s => s.Key == "name").Value,
+                    description: localizedStrings.FirstOrDefault(s => s.Key == "description").Value,
+                    author: localizedStrings.FirstOrDefault(s => s.Key == "author").Value,
+                    symbols,
+                    postActions);
+                return true;
+            }
+            catch
+            {
+                localizationModel = null;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Verifies that the given localization model was correctly constructed
+        /// to localize the given template.
+        /// </summary>
+        /// <param name="model">The localization model to be verified.</param>
+        /// <param name="template">The template that the model should be compatible with.</param>
+        /// <param name="logger"><see cref="ILogger"/> to be used for logging.</param>
+        /// <returns>True if the verification succeeds. False otherwise.
+        /// Check logs for details in case of a failed verification.</returns>
+        public static bool VerifyLocalizationModel(ILocalizationModel model, SimpleConfigModel template, ILogger logger)
+        {
+            int unusedPostActionLocs = model.PostActions.Count;
+            foreach (var postAction in template.PostActionModel)
+            {
+                if (postAction.Id != null && model.PostActions.ContainsKey(postAction.Id))
+                {
+                    unusedPostActionLocs--;
+                }
+            }
+
+            if (unusedPostActionLocs > 0)
+            {
+                // Localizations provide more translations than the number of post actions we have.
+                string excessPostActionLocalizationIds = string.Join(", ", model.PostActions.Keys.Where(k => !template.PostActionModel.Any(p => p.Id == k)).Select(k => k.ToString()));
+                logger.LogWarning(LocalizableStrings.Authoring_InvalidPostActionLocalizationIndex, excessPostActionLocalizationIds);
+            }
+
+            // TODO rest of the validation
+
+            return false;
         }
 
         /// <summary>

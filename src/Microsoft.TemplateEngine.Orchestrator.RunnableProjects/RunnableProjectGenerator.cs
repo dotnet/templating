@@ -139,23 +139,25 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 IFile hostConfigFile = FindBestHostTemplateConfigFile(source.EnvironmentSettings, file);
 
-                if (TryGetTemplateFromConfigInfo(file, out ITemplate template, hostTemplateConfigFile: hostConfigFile))
+                if (TryGetTemplateFromConfigInfo(file, out RunnableProjectTemplate template, hostTemplateConfigFile: hostConfigFile))
                 {
                     templateList.Add(template);
 
                     IDirectory localizeFolder = file.Parent.DirectoryInfo("localize");
                     if (localizeFolder != null && localizeFolder.Exists)
                     {
+                        ILogger logger = file.MountPoint.EnvironmentSettings.Host.Logger;
                         foreach (IFile locFile in localizeFolder.EnumerateFiles(LocalizationFilePrefix + "*" + LocalizationFileExtension, SearchOption.AllDirectories))
                         {
                             string locale = locFile.Name.Substring(LocalizationFilePrefix.Length, locFile.Name.Length - LocalizationFilePrefix.Length - LocalizationFileExtension.Length);
 
-                            if (TryGetLangPackFromFile(locFile, out ILocalizationModel locModel))
+                            if (TryGetLangPackFromFile(locFile, out ILocalizationModel locModel) &&
+                                LocalizationModelDeserializer.VerifyLocalizationModel(locModel, template.SimpleConfig, logger))
                             {
                                 localizations.Add(new LocalizationLocator(
                                     locale,
                                     locFile.FullPath,
-                                    template.Identity,
+                                    ((ITemplate)template).Identity,
                                     locModel.Author,
                                     locModel.Name,
                                     locModel.Description,
@@ -171,61 +173,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         public bool TryGetTemplateFromConfigInfo(IFileSystemInfo templateFileConfig, out ITemplate template, IFileSystemInfo localeFileConfig = null, IFile hostTemplateConfigFile = null, string baselineName = null)
         {
-            IFile templateFile = templateFileConfig as IFile;
-
-            if (templateFile == null)
-            {
-                template = null;
-                return false;
-            }
-
-            IFile localeFile = localeFileConfig as IFile;
-            ITemplateEngineHost host = templateFileConfig.MountPoint.EnvironmentSettings.Host;
-
-            try
-            {
-                JObject baseSrcObject = ReadJObjectFromIFile(templateFile);
-                JObject srcObject = MergeAdditionalConfiguration(baseSrcObject, templateFileConfig);
-
-                JObject localeSourceObject = null;
-                if (localeFile != null)
-                {
-                    localeSourceObject = ReadJObjectFromIFile(localeFile);
-                }
-
-                ISimpleConfigModifiers configModifiers = new SimpleConfigModifiers(baselineName);
-                SimpleConfigModel templateModel = SimpleConfigModel.FromJObject(templateFile.MountPoint.EnvironmentSettings, srcObject, configModifiers, localeSourceObject);
-
-                if (!PerformTemplateValidation(templateModel, templateFile, host))
-                {
-                    template = null;
-                    return false;
-                }
-
-                if (!CheckGeneratorVersionRequiredByTemplate(templateModel.GeneratorVersions))
-                {
-                    // template isn't compatible with this generator version
-                    template = null;
-                    return false;
-                }
-
-                RunnableProjectTemplate runnableProjectTemplate = new RunnableProjectTemplate(srcObject, this, templateFile, templateModel, null, hostTemplateConfigFile);
-                if (!AreAllTemplatePathsValid(templateFile.MountPoint.EnvironmentSettings, templateModel, runnableProjectTemplate))
-                {
-                    template = null;
-                    return false;
-                }
-
-                template = runnableProjectTemplate;
-                return true;
-            }
-            catch (Exception ex)
-            {
-                host.Logger.LogError($"Error reading template from file: {templateFile.FullPath} | Error = {ex.Message}");
-            }
-
-            template = null;
-            return false;
+            bool result = TryGetTemplateFromConfigInfo(templateFileConfig, out RunnableProjectTemplate runnableProjectTemplate, localeFileConfig, hostTemplateConfigFile, baselineName);
+            template = runnableProjectTemplate;
+            return result;
         }
 
         // For explicitly data-typed variables, attempt to convert the variable value to the specified type.
@@ -726,19 +676,78 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 return false;
             }
 
+            ILogger logger = file.MountPoint.EnvironmentSettings.Host.Logger;
+
             try
             {
                 JObject srcObject = ReadJObjectFromIFile(file);
-                locModel = SimpleConfigModel.LocalizationFromJObject(srcObject);
+                return LocalizationModelDeserializer.TryDeserialize(srcObject, logger, out locModel);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"Error reading Langpack from file: {file.FullPath} | Error = {ex.ToString()}");
+            }
+
+            locModel = null;
+            return false;
+        }
+
+        private bool TryGetTemplateFromConfigInfo(IFileSystemInfo templateFileConfig, out RunnableProjectTemplate template, IFileSystemInfo localeFileConfig = null, IFile hostTemplateConfigFile = null, string baselineName = null)
+        {
+            IFile templateFile = templateFileConfig as IFile;
+
+            if (templateFile == null)
+            {
+                template = null;
+                return false;
+            }
+
+            IFile localeFile = localeFileConfig as IFile;
+            ITemplateEngineHost host = templateFileConfig.MountPoint.EnvironmentSettings.Host;
+
+            try
+            {
+                JObject baseSrcObject = ReadJObjectFromIFile(templateFile);
+                JObject srcObject = MergeAdditionalConfiguration(baseSrcObject, templateFileConfig);
+
+                JObject localeSourceObject = null;
+                if (localeFile != null)
+                {
+                    localeSourceObject = ReadJObjectFromIFile(localeFile);
+                }
+
+                ISimpleConfigModifiers configModifiers = new SimpleConfigModifiers(baselineName);
+                SimpleConfigModel templateModel = SimpleConfigModel.FromJObject(templateFile.MountPoint.EnvironmentSettings, srcObject, configModifiers, localeSourceObject);
+
+                if (!PerformTemplateValidation(templateModel, templateFile, host))
+                {
+                    template = null;
+                    return false;
+                }
+
+                if (!CheckGeneratorVersionRequiredByTemplate(templateModel.GeneratorVersions))
+                {
+                    // template isn't compatible with this generator version
+                    template = null;
+                    return false;
+                }
+
+                RunnableProjectTemplate runnableProjectTemplate = new RunnableProjectTemplate(srcObject, this, templateFile, templateModel, null, hostTemplateConfigFile);
+                if (!AreAllTemplatePathsValid(templateFile.MountPoint.EnvironmentSettings, templateModel, runnableProjectTemplate))
+                {
+                    template = null;
+                    return false;
+                }
+
+                template = runnableProjectTemplate;
                 return true;
             }
             catch (Exception ex)
             {
-                ITemplateEngineHost host = file.MountPoint.EnvironmentSettings.Host;
-                host.Logger.LogError($"Error reading Langpack from file: {file.FullPath} | Error = {ex.ToString()}");
+                host.Logger.LogError($"Error reading template from file: {templateFile.FullPath} | Error = {ex.Message}");
             }
 
-            locModel = null;
+            template = null;
             return false;
         }
 

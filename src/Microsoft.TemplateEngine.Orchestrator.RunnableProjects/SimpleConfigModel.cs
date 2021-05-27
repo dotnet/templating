@@ -479,7 +479,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         internal static SimpleConfigModel FromJObject(IEngineEnvironmentSettings environmentSettings, JObject source, ISimpleConfigModifiers configModifiers = null, JObject localeSource = null)
         {
-            ILocalizationModel localizationModel = LocalizationFromJObject(localeSource);
+            ILogger logger = environmentSettings.Host.Logger;
+            _ = LocalizationModelDeserializer.TryDeserialize(localeSource, logger, out ILocalizationModel localizationModel);
 
             SimpleConfigModel config = new SimpleConfigModel()
             {
@@ -630,17 +631,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
 
             config._specialCustomSetup = specialCustomSetup;
+            LocalizationModelDeserializer.VerifyLocalizationModel(localizationModel, config, logger);
             return config;
-        }
-
-        internal static ILocalizationModel LocalizationFromJObject(JObject source)
-        {
-            if (source == null)
-            {
-                return null;
-            }
-
-            return LocalizationModelDeserializer.Deserialize(source);
         }
 
         // If the token is a string:
