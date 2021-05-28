@@ -97,7 +97,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to One or more postActions have a malformed or missing manualInstructions value in &apos;{0}&apos;.
+        ///   Looks up a localized string similar to One or more postActions have a malformed or missing manualInstructions value..
         /// </summary>
         internal static string Authoring_MalformedPostActionManualInstructions {
             get {
@@ -115,7 +115,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Missing &apos;{0}&apos; in &apos;{1}&apos;.
+        ///   Looks up a localized string similar to Missing &apos;{0}&apos;..
         /// </summary>
         internal static string Authoring_MissingValue {
             get {
@@ -142,7 +142,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     Source &apos;{0}&apos; in template does not exist..
+        ///   Looks up a localized string similar to Source &apos;{0}&apos; in template does not exist..
         /// </summary>
         internal static string Authoring_SourceDoesNotExist {
             get {
@@ -151,7 +151,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     Source location &apos;{0}&apos; is outside the specified install source location..
+        ///   Looks up a localized string similar to Source location &apos;{0}&apos; is outside the specified install source location..
         /// </summary>
         internal static string Authoring_SourceIsOutsideInstallSource {
             get {
@@ -160,7 +160,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     Source must be a directory, but &apos;{0}&apos; is a file..
+        ///   Looks up a localized string similar to Source must be a directory, but &apos;{0}&apos; is a file..
         /// </summary>
         internal static string Authoring_SourceMustBeDirectory {
             get {
@@ -169,29 +169,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     Source path relative to install location: &apos;{0}&apos;.
-        /// </summary>
-        internal static string Authoring_SourcePathRelativeToInstall {
-            get {
-                return ResourceManager.GetString("Authoring_SourcePathRelativeToInstall", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; is missing common information.
+        ///   Looks up a localized string similar to The template configuration {0} is missing common information:.
         /// </summary>
         internal static string Authoring_TemplateMissingCommonInformation {
             get {
                 return ResourceManager.GetString("Authoring_TemplateMissingCommonInformation", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Template: &apos;{0}&apos;.
-        /// </summary>
-        internal static string Authoring_TemplateNameDisplay {
-            get {
-                return ResourceManager.GetString("Authoring_TemplateNameDisplay", resourceCulture);
             }
         }
         
@@ -205,7 +187,17 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Template: &apos;{0}&apos; - Template root is outside the specified install source location..
+        ///   Looks up a localized string similar to Failed to load template from {0}.
+        ///Details: {1}.
+        /// </summary>
+        internal static string Authoring_TemplateNotInstalled_Message {
+            get {
+                return ResourceManager.GetString("Authoring_TemplateNotInstalled_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The template root is outside the specified install source location..
         /// </summary>
         internal static string Authoring_TemplateRootOutsideInstallSource {
             get {
@@ -214,11 +206,56 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     TemplateSourceRoot = &apos;{0}&apos;.
+        ///   Looks up a localized string similar to Template configuration must be a file, but {0} is not a file..
         /// </summary>
-        internal static string Authoring_TemplateSourceRoot {
+        internal static string RunnableProjectGenerator_Exception_ConfigShouldBeFile {
             get {
-                return ResourceManager.GetString("Authoring_TemplateSourceRoot", resourceCulture);
+                return ResourceManager.GetString("RunnableProjectGenerator_Exception_ConfigShouldBeFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Template localization configuration must be a file, but {0} is not a file..
+        /// </summary>
+        internal static string RunnableProjectGenerator_Exception_LocaleConfigShouldBeFile {
+            get {
+                return ResourceManager.GetString("RunnableProjectGenerator_Exception_LocaleConfigShouldBeFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The template configuration {0} is not valid..
+        /// </summary>
+        internal static string RunnableProjectGenerator_Exception_TemplateValidationFailed {
+            get {
+                return ResourceManager.GetString("RunnableProjectGenerator_Exception_TemplateValidationFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The template is not compatible with generator version: allowed versions: {0}, generator version: {1}..
+        /// </summary>
+        internal static string RunnableProjectGenerator_Exception_TemplateVersionNotSupported {
+            get {
+                return ResourceManager.GetString("RunnableProjectGenerator_Exception_TemplateVersionNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to load additional configuration file {0}, the file does not exist..
+        /// </summary>
+        internal static string SimpleConfigModel_AuthoringException_MergeConfiguration_FileNotFound {
+            get {
+                return ResourceManager.GetString("SimpleConfigModel_AuthoringException_MergeConfiguration_FileNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to load additional configuration file {0}. Additional configuration file names must end with &apos;.{1}&apos;..
+        /// </summary>
+        internal static string SimpleConfigModel_AuthoringException_MergeConfiguration_InvalidFileName {
+            get {
+                return ResourceManager.GetString("SimpleConfigModel_AuthoringException_MergeConfiguration_InvalidFileName", resourceCulture);
             }
         }
     }

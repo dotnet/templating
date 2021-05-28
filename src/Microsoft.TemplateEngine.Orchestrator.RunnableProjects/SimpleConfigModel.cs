@@ -503,14 +503,18 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             SimpleConfigModel config = new SimpleConfigModel()
             {
                 //Author = localizationModel?.Author ?? source.ToString(nameof(config.Author)),
+                Author = source.ToString(nameof(config.Author)),
                 Classifications = source.ArrayAsStrings(nameof(config.Classifications)),
                 DefaultName = source.ToString(nameof(DefaultName)),
                 //Description = localizationModel?.Description ?? source.ToString(nameof(Description)) ?? string.Empty,
+                Description = source.ToString(nameof(Description)) ?? string.Empty,
                 GroupIdentity = source.ToString(nameof(GroupIdentity)),
                 Precedence = source.ToInt32(nameof(Precedence)),
                 Guids = source.ArrayAsGuids(nameof(config.Guids)),
                 Identity = source.ToString(nameof(config.Identity)),
+
                 //Name = localizationModel?.Name ?? source.ToString(nameof(config.Name)),
+                Name = source.ToString(nameof(config.Name)),
 
                 SourceName = source.ToString(nameof(config.SourceName)),
                 PlaceholderFilename = source.ToString(nameof(config.PlaceholderFilename)),
@@ -624,6 +628,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
 
             //config.PostActionModel = RunnableProjects.PostActionModel.ListFromJArray(source.Get<JArray>("PostActions"), localizationModel?.PostActions, environmentSettings.Host.Logger);
+            config.PostActionModel = RunnableProjects.PostActionModel.ListFromJArray(source.Get<JArray>("PostActions"), null, environmentSettings.Host.Logger);
             config.PrimaryOutputs = CreationPathModel.ListFromJArray(source.Get<JArray>(nameof(PrimaryOutputs)));
 
             // Custom operations at the global level
@@ -811,10 +816,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return symbols;
         }
 
-        // Checks the primarySource for additional configuration files.
-        // If found, merges them all together.
-        // Returns the merged JObject (or the original if there was nothing to merge).
-        // Additional files must be in the same dir as the template file.
+        /// <summary>
+        /// Checks the <paramref name="primarySource"/> for additional configuration files.
+        /// If found, merges them all together.
+        /// Returns the merged JObject (or the original if there was nothing to merge).
+        /// Additional files must be in the same folder as the template file.
+        /// </summary>
+        /// <exception cref="TemplateAuthoringException">when additional files configuration is invalid.</exception>
         private static JObject MergeAdditionalConfiguration(JObject primarySource, IFileSystemInfo primarySourceConfig)
         {
             IReadOnlyList<string> otherFiles = primarySource.ArrayAsStrings(AdditionalConfigFilesIndicator);
@@ -830,14 +838,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 if (!partialConfigFileName.EndsWith("." + RunnableProjectGenerator.TemplateConfigFileName))
                 {
-                    throw new TemplateAuthoringException($"Split configuration error with file [{partialConfigFileName}]. Additional configuration file names must end with '.{RunnableProjectGenerator.TemplateConfigFileName}'.", partialConfigFileName);
+                    throw new TemplateAuthoringException(string.Format(LocalizableStrings.SimpleConfigModel_AuthoringException_MergeConfiguration_InvalidFileName, partialConfigFileName, RunnableProjectGenerator.TemplateConfigFileName), partialConfigFileName);
                 }
 
                 IFile partialConfigFile = primarySourceConfig.Parent.EnumerateFiles(partialConfigFileName, SearchOption.TopDirectoryOnly).FirstOrDefault(x => string.Equals(x.Name, partialConfigFileName));
 
                 if (partialConfigFile == null)
                 {
-                    throw new TemplateAuthoringException($"Split configuration file [{partialConfigFileName}] could not be found.", partialConfigFileName);
+                    throw new TemplateAuthoringException(string.Format(LocalizableStrings.SimpleConfigModel_AuthoringException_MergeConfiguration_FileNotFound, partialConfigFileName), partialConfigFileName);
                 }
 
                 JObject partialConfigJson = partialConfigFile.ReadJObjectFromIFile();

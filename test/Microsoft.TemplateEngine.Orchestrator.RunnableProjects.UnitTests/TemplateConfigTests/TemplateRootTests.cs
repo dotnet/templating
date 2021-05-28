@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.TestHelper;
-using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.TemplateConfigTests
@@ -83,8 +82,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             SimpleConfigModel templateModel = SimpleConfigModel.LoadModel(templateFile);
             RunnableProjectTemplate runnableProjectTemplate = new RunnableProjectTemplate(generator, templateModel, null, null);
 
-            bool allPathsAreValid = generator.ValidateTemplateSourcePaths(_engineEnvironmentSettings.Host.Logger, templateModel, runnableProjectTemplate);
-            Assert.Equal(shouldAllPathsBeValid, allPathsAreValid);
+            if (shouldAllPathsBeValid)
+            {
+                Assert.Empty(generator.ValidateTemplateSourcePaths(templateModel));
+            }
+            else
+            {
+                Assert.NotEmpty(generator.ValidateTemplateSourcePaths(templateModel));
+            }    
         }
 
         // Tests source paths when the mount point root is the same as the template root.
@@ -112,8 +117,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             SimpleConfigModel templateModel = SimpleConfigModel.LoadModel(templateFile);
             RunnableProjectTemplate runnableProjectTemplate = new RunnableProjectTemplate(generator, templateModel, null, null);
 
-            bool allPathsAreValid = generator.ValidateTemplateSourcePaths(_engineEnvironmentSettings.Host.Logger, templateModel, runnableProjectTemplate);
-            Assert.Equal(shouldAllPathsBeValid, allPathsAreValid);
+            if (shouldAllPathsBeValid)
+            {
+                Assert.Empty(generator.ValidateTemplateSourcePaths(templateModel));
+            }
+            else
+            {
+                Assert.NotEmpty(generator.ValidateTemplateSourcePaths(templateModel));
+            }
         }
 
         [Theory(DisplayName = nameof(CheckTemplateSourcesRelativeToTemplateRootMultipleDirsUnderMountPoint))]
@@ -155,8 +166,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             SimpleConfigModel templateModel = SimpleConfigModel.LoadModel(templateFile);
             RunnableProjectTemplate runnableProjectTemplate = new RunnableProjectTemplate(generator, templateModel, null, null);
 
-            bool allPathsAreValid = generator.ValidateTemplateSourcePaths(_engineEnvironmentSettings.Host.Logger, templateModel, runnableProjectTemplate);
-            Assert.Equal(shouldAllPathsBeValid, allPathsAreValid);
+            if (shouldAllPathsBeValid)
+            {
+                Assert.Empty(generator.ValidateTemplateSourcePaths(templateModel));
+            }
+            else
+            {
+                Assert.NotEmpty(generator.ValidateTemplateSourcePaths(templateModel));
+            }
         }
     }
 }

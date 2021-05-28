@@ -24,8 +24,8 @@
         <note />
       </trans-unit>
       <trans-unit id="Authoring_MalformedPostActionManualInstructions">
-        <source>One or more postActions have a malformed or missing manualInstructions value in '{0}'</source>
-        <target state="translated">'{0}'에서 하나 이상의 postActions에 잘못된 형식의 수동 지침 값이 있거나 누락된 수동 지침 값이 있습니다.</target>
+        <source>One or more postActions have a malformed or missing manualInstructions value.</source>
+        <target state="new">One or more postActions have a malformed or missing manualInstructions value.</target>
         <note />
       </trans-unit>
       <trans-unit id="Authoring_ManualInstructionIdIsNotUnique">
@@ -36,8 +36,8 @@
 {2} is any identifier string that user provided in the file or a whole number. Such as: myPostAction, firstPostAction, postAction1, 5, 0 etc.</note>
       </trans-unit>
       <trans-unit id="Authoring_MissingValue">
-        <source>Missing '{0}' in '{1}'</source>
-        <target state="translated">'{1}'에 '{0}' 누락</target>
+        <source>Missing '{0}'.</source>
+        <target state="new">Missing '{0}'.</target>
         <note />
       </trans-unit>
       <trans-unit id="Authoring_NonBoolDataTypeForRegexMatch">
@@ -52,48 +52,70 @@
 {1} is a number representing the zero-based index of the post action. Such as "5", or "0".</note>
       </trans-unit>
       <trans-unit id="Authoring_SourceDoesNotExist">
-        <source>    Source '{0}' in template does not exist.</source>
-        <target state="translated">    템플릿에 '{0}' 소스가 없습니다.</target>
+        <source>Source '{0}' in template does not exist.</source>
+        <target state="needs-review-translation">    템플릿에 '{0}' 소스가 없습니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="Authoring_SourceIsOutsideInstallSource">
-        <source>    Source location '{0}' is outside the specified install source location.</source>
-        <target state="translated">    소스 위치 '{0}'이(가) 지정된 설치 소스 위치 밖에 있습니다.</target>
+        <source>Source location '{0}' is outside the specified install source location.</source>
+        <target state="needs-review-translation">    소스 위치 '{0}'이(가) 지정된 설치 소스 위치 밖에 있습니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="Authoring_SourceMustBeDirectory">
-        <source>    Source must be a directory, but '{0}' is a file.</source>
-        <target state="translated">    소스는 디렉터리 여야하지만 '{0}'은 파일입니다.</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="Authoring_SourcePathRelativeToInstall">
-        <source>    Source path relative to install location: '{0}'</source>
-        <target state="translated">    설치 위치에 상대적인 소스 경로: '{0}'</target>
+        <source>Source must be a directory, but '{0}' is a file.</source>
+        <target state="needs-review-translation">    소스는 디렉터리 여야하지만 '{0}'은 파일입니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="Authoring_TemplateMissingCommonInformation">
-        <source>'{0}' is missing common information</source>
-        <target state="translated">'{0}'에 일반적인 정보가 없습니다.</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="Authoring_TemplateNameDisplay">
-        <source>Template: '{0}'</source>
-        <target state="translated">템플릿: '{0}'</target>
-        <note />
+        <source>The template configuration {0} is missing common information:</source>
+        <target state="needs-review-translation">'{0}'에 일반적인 정보가 없습니다.</target>
+        <note>{0} is template configuration location.</note>
       </trans-unit>
       <trans-unit id="Authoring_TemplateNotInstalled">
         <source>Failed to load template from {0}:</source>
         <target state="needs-review-translation">'{0}'이(가) 로드되지 않았습니다.</target>
-        <note>{0} is uri of template location.</note>
+        <note>{0} is template configuration location.</note>
+      </trans-unit>
+      <trans-unit id="Authoring_TemplateNotInstalled_Message">
+        <source>Failed to load template from {0}.
+Details: {1}</source>
+        <target state="new">Failed to load template from {0}.
+Details: {1}</target>
+        <note>{0} is template configuration location.</note>
       </trans-unit>
       <trans-unit id="Authoring_TemplateRootOutsideInstallSource">
-        <source>Template: '{0}' - Template root is outside the specified install source location.</source>
-        <target state="translated">템플릿: '{0}'-템플릿 루트가 지정된 설치 소스 위치 밖에 있습니다.</target>
+        <source>The template root is outside the specified install source location.</source>
+        <target state="new">The template root is outside the specified install source location.</target>
         <note />
       </trans-unit>
-      <trans-unit id="Authoring_TemplateSourceRoot">
-        <source>    TemplateSourceRoot = '{0}'</source>
-        <target state="translated">    TemplateSourceRoot = '{0}'</target>
+      <trans-unit id="RunnableProjectGenerator_Exception_ConfigShouldBeFile">
+        <source>Template configuration must be a file, but {0} is not a file.</source>
+        <target state="new">Template configuration must be a file, but {0} is not a file.</target>
+        <note>{0} is template configuration location.</note>
+      </trans-unit>
+      <trans-unit id="RunnableProjectGenerator_Exception_LocaleConfigShouldBeFile">
+        <source>Template localization configuration must be a file, but {0} is not a file.</source>
+        <target state="new">Template localization configuration must be a file, but {0} is not a file.</target>
+        <note>{0} is template localization configuration location.</note>
+      </trans-unit>
+      <trans-unit id="RunnableProjectGenerator_Exception_TemplateValidationFailed">
+        <source>The template configuration {0} is not valid.</source>
+        <target state="new">The template configuration {0} is not valid.</target>
+        <note>{0} is template configuration location.</note>
+      </trans-unit>
+      <trans-unit id="RunnableProjectGenerator_Exception_TemplateVersionNotSupported">
+        <source>The template is not compatible with generator version: allowed versions: {0}, generator version: {1}.</source>
+        <target state="new">The template is not compatible with generator version: allowed versions: {0}, generator version: {1}.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="SimpleConfigModel_AuthoringException_MergeConfiguration_FileNotFound">
+        <source>Failed to load additional configuration file {0}, the file does not exist.</source>
+        <target state="new">Failed to load additional configuration file {0}, the file does not exist.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="SimpleConfigModel_AuthoringException_MergeConfiguration_InvalidFileName">
+        <source>Failed to load additional configuration file {0}. Additional configuration file names must end with '.{1}'.</source>
+        <target state="new">Failed to load additional configuration file {0}. Additional configuration file names must end with '.{1}'.</target>
         <note />
       </trans-unit>
     </body>
