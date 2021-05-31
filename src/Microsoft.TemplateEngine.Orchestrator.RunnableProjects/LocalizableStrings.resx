@@ -136,10 +136,9 @@
     <value>One or more postActions have a malformed or missing manualInstructions value.</value>
   </data>
   <data name="Authoring_ManualInstructionIdIsNotUnique" xml:space="preserve">
-    <value>Id of the manual instruction "{0}" at index {1} under post action "{2}" is not unique. Only the first manual instruction that uses this Id will be localized.</value>
+    <value>Id of the manual instruction "{0}" at index {1} is not unique. Only the first manual instruction that uses this id will be localized.</value>
     <comment>{0} is any identifier string that user provided in the file. Such as: "myInstruction", "firstInstruction", "instruction1" etc.
-{1} is a whole number representing the zero-based index of the manual instruction. Such as "5", or "0".
-{2} is any identifier string that user provided in the file or a whole number. Such as: myPostAction, firstPostAction, postAction1, 5, 0 etc.</comment>
+{1} is a whole number representing the zero-based index of the manual instruction. Such as "5", or "0".</comment>
   </data>
   <data name="Authoring_MissingValue" xml:space="preserve">
     <value>Missing '{0}'.</value>
@@ -151,6 +150,11 @@
     <value>Id of the post action "{0}" at index {1} is not unique. Only the first post action that uses this Id will be localized.</value>
     <comment>{0} is any identifier string that user provided in the file. Such as "myPostAction", "firstPostAction", "postAction1" etc.
 {1} is a number representing the zero-based index of the post action. Such as "5", or "0".</comment>
+  </data>
+  <data name="Authoring_PostActionMustHaveActionId" xml:space="preserve">
+    <value>Post action at index {0} should have an "actionId" to declare the action to be executed.</value>
+    <comment>{0} is a whole number representing the zero-based index of the post action. Such as "5" or "0".
+Do not localize: actionId</comment>
   </data>
   <data name="Authoring_SourceDoesNotExist" xml:space="preserve">
     <value>Source '{0}' in template does not exist.</value>

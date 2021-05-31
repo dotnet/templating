@@ -19,7 +19,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class LocalizableStrings {
@@ -106,7 +106,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Id of the manual instruction &quot;{0}&quot; at index {1} under post action &quot;{2}&quot; is not unique. Only the first manual instruction that uses this Id will be localized..
+        ///   Looks up a localized string similar to Id of the manual instruction &quot;{0}&quot; at index {1} is not unique. Only the first manual instruction that uses this id will be localized..
         /// </summary>
         internal static string Authoring_ManualInstructionIdIsNotUnique {
             get {
@@ -138,6 +138,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         internal static string Authoring_PostActionIdIsNotUnique {
             get {
                 return ResourceManager.GetString("Authoring_PostActionIdIsNotUnique", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Post action at index {0} should have an &quot;actionId&quot; to declare the action to be executed..
+        /// </summary>
+        internal static string Authoring_PostActionMustHaveActionId {
+            get {
+                return ResourceManager.GetString("Authoring_PostActionMustHaveActionId", resourceCulture);
             }
         }
         

@@ -185,7 +185,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 }
             }
 
-            PostActionModel = RunnableProjects.PostActionModel.ListFromJArray(source.Get<JArray>("PostActions"), null, environmentSettings.Host.Logger);
+            PostActionModel = RunnableProjects.PostActionModel.LoadListFromJArray(source.Get<JArray>("PostActions"), environmentSettings.Host.Logger);
             PrimaryOutputs = CreationPathModel.ListFromJArray(source.Get<JArray>(nameof(PrimaryOutputs)));
 
             // Custom operations at the global level
