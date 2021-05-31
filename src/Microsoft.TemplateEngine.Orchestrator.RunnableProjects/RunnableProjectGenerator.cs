@@ -593,7 +593,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 configModifiers = new SimpleConfigModifiers(baselineName!);
             }
-            SimpleConfigModel templateModel = SimpleConfigModel.LoadModel(templateFile, configModifiers);
+            SimpleConfigModel templateModel = new SimpleConfigModel(templateFile, configModifiers);
 
             CheckGeneratorVersionRequiredByTemplate(templateModel.GeneratorVersions);
             PerformTemplateValidation(templateModel, templateFile, logger);

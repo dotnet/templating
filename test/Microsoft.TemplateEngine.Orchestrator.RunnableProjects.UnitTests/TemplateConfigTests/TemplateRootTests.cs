@@ -79,7 +79,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             RunnableProjectGenerator generator = new RunnableProjectGenerator();
 
             IFile templateFile = setup.FileInfoForSourceFile(pathToTemplateJson);
-            SimpleConfigModel templateModel = SimpleConfigModel.LoadModel(templateFile);
+            SimpleConfigModel templateModel = new SimpleConfigModel(templateFile);
             RunnableProjectTemplate runnableProjectTemplate = new RunnableProjectTemplate(generator, templateModel, null, null);
 
             if (shouldAllPathsBeValid)
@@ -114,7 +114,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             RunnableProjectGenerator generator = new RunnableProjectGenerator();
 
             IFile templateFile = setup.FileInfoForSourceFile(pathToTemplateConfig);
-            SimpleConfigModel templateModel = SimpleConfigModel.LoadModel(templateFile);
+            SimpleConfigModel templateModel = new SimpleConfigModel(templateFile);
             RunnableProjectTemplate runnableProjectTemplate = new RunnableProjectTemplate(generator, templateModel, null, null);
 
             if (shouldAllPathsBeValid)
@@ -163,7 +163,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             RunnableProjectGenerator generator = new RunnableProjectGenerator();
 
             IFile templateFile = setup.FileInfoForSourceFile(pathToTemplateConfig);
-            SimpleConfigModel templateModel = SimpleConfigModel.LoadModel(templateFile);
+            SimpleConfigModel templateModel = new SimpleConfigModel(templateFile);
             RunnableProjectTemplate runnableProjectTemplate = new RunnableProjectTemplate(generator, templateModel, null, null);
 
             if (shouldAllPathsBeValid)

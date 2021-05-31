@@ -28,7 +28,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
         // Note: this does not deal with configs split into multiple files.
         internal static IRunnableProjectConfig ConfigFromSource(IEngineEnvironmentSettings environment, IMountPoint mountPoint, string configFile = null)
         {
-            return SimpleConfigModel.LoadModel((IFile)ConfigFileSystemInfo(mountPoint, configFile));
+            return new SimpleConfigModel((IFile)ConfigFileSystemInfo(mountPoint, configFile));
         }
 
         internal static void SetupFileSourceMatchersOnGlobalRunSpec(MockGlobalRunSpec runSpec, FileSourceMatchInfo source)
