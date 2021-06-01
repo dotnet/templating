@@ -230,7 +230,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 SimpleConfigModel templateModel = LoadBaseTemplate(templateFile, baselineName, logger);
                 if (localeFile != null && TryGetLangPackFromFile(localeFile, out ILocalizationModel? locModel))
                 {
-                    templateModel.LoadLocalization(locModel);
+                    templateModel.Localize(locModel);
                 }
                 else
                 {
@@ -516,7 +516,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         private static ICreationResult GetCreationResult(IEngineEnvironmentSettings environmentSettings, RunnableProjectTemplate template, IVariableCollection variables)
         {
             return new CreationResult(
-                postActions: PostAction.ListFromModel(environmentSettings, template.Config.PostActionModel, variables),
+                postActions: PostAction.ListFromModel(environmentSettings, template.Config.PostActionModels, variables),
                 primaryOutputs: CreationPath.ListFromModel(environmentSettings, template.Config.PrimaryOutputs, variables));
         }
 
@@ -707,7 +707,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "classifications"));
             }
 
-            if (templateModel.PostActionModel != null && templateModel.PostActionModel.Any(x => x.ManualInstructionInfo == null || x.ManualInstructionInfo.Count == 0))
+            if (templateModel.PostActionModels != null && templateModel.PostActionModels.Any(x => x.ManualInstructionInfo == null || x.ManualInstructionInfo.Count == 0))
             {
                 warningMessages.Add(string.Format(LocalizableStrings.Authoring_MalformedPostActionManualInstructions));
             }

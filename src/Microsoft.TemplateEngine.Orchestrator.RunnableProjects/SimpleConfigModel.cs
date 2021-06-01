@@ -60,6 +60,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         private IReadOnlyList<IReplacementTokens> _symbolFilenameReplacements;
         private IReadOnlyList<ICustomFileGlobModel> _specialCustomSetup = new List<ICustomFileGlobModel>();
+        private IReadOnlyList<PostActionModel> _postActions;
 
         internal SimpleConfigModel(ILoggerFactory loggerFactory)
         {
@@ -69,9 +70,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         internal SimpleConfigModel(IEngineEnvironmentSettings environmentSettings, JObject source, ISimpleConfigModifiers configModifiers = null)
         {
-            //TODO: SimpleConfigModel should have the logger
-            //ILogger logger = environmentSettings.Host.Logger;
-            //TODO: this method should not do localization / commented out for reference
             _logger = environmentSettings.Host.LoggerFactory.CreateLogger<SimpleConfigModel>();
 
             Author = source.ToString(nameof(Author));
@@ -185,7 +183,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 }
             }
 
-            PostActionModel = RunnableProjects.PostActionModel.LoadListFromJArray(source.Get<JArray>("PostActions"), environmentSettings.Host.Logger);
+            _postActions = RunnableProjects.PostActionModel.LoadListFromJArray(source.Get<JArray>("PostActions"), environmentSettings.Host.Logger);
             PrimaryOutputs = CreationPathModel.ListFromJArray(source.Get<JArray>(nameof(PrimaryOutputs)));
 
             // Custom operations at the global level
@@ -226,7 +224,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         public int Precedence { get; init; }
 
-        public string Name { get; init; }
+        public string Name { get; private set; }
 
         public string ThirdPartyNotices { get; private set; }
 
@@ -236,7 +234,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         public IReadOnlyList<string> ShortNameList { get; init; }
 
-        public IReadOnlyList<IPostActionModel> PostActionModel { get; init; }
+        public IReadOnlyList<IPostActionModel> PostActionModels => _postActions;
 
         public IReadOnlyList<ICreationPathModel> PrimaryOutputs { get; init; }
 
@@ -634,19 +632,87 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
         }
 
-        #region Localization
-        internal void LoadLocalization(ILocalizationModel locModel)
+        /// <summary>
+        /// Localizes this <see cref="SimpleConfigModel"/> with given localization model.
+        /// </summary>
+        /// <param name="locModel">Localization model containing the localized strings.</param>
+        /// <remarks>This method works on a best-effort basis. If the given model is invalid or incompatible,
+        /// erronous data will be skipped. No errors will be logged. Use <see cref="VerifyLocalizationModel(ILocalizationModel)"/>
+        /// to validate localization models before calling this method.</remarks>
+        internal void Localize(ILocalizationModel locModel)
         {
-            //TODO: implement me
+            Author = locModel.Author ?? Author;
+            Name = locModel.Name ?? Name;
+            Description = locModel.Description ?? Description;
+
+            foreach (var postAction in _postActions)
+            {
+                if (postAction.Id != null && locModel.PostActions.TryGetValue(postAction.Id, out IPostActionLocalizationModel postActionLocModel))
+                {
+                    postAction.Localize(postActionLocModel, _logger);
+                }
+            }
         }
 
+        /// <summary>
+        /// Verifies that the given localization model was correctly constructed
+        /// to localize this SimpleConfigModel.
+        /// </summary>
+        /// <param name="locModel">The localization model to be verified.</param>
+        /// <returns>True if the verification succeeds. False otherwise.
+        /// Check logs for details in case of a failed verification.</returns>
         internal bool VerifyLocalizationModel(ILocalizationModel locModel)
         {
-            //TOOD: simple
-            //TODO: implement me
-            return false;
+            int unusedPostActionLocs = locModel.PostActions.Count;
+            foreach (var postAction in PostActionModels)
+            {
+                if (postAction.Id == null || !locModel.PostActions.TryGetValue(postAction.Id, out IPostActionLocalizationModel postActionLocModel))
+                {
+                    // Post action with no localization model.
+                    continue;
+                }
+
+                unusedPostActionLocs--;
+
+                // Validate manual instructions.
+                bool instructionUsesDefaultKey = postAction.ManualInstructionInfo.Count == 1 && postAction.ManualInstructionInfo[0].Id == null &&
+                    postActionLocModel.Instructions.ContainsKey(PostActionModel.DefaultIdForSingleManualInstruction);
+                if (instructionUsesDefaultKey)
+                {
+                    // Just one manual instruction using the default key. No issues. Continue.
+                    continue;
+                }
+
+                int unusedManualInstructionLocs = postActionLocModel.Instructions.Count;
+                foreach (var instruction in postAction.ManualInstructionInfo)
+                {
+                    if (instruction.Id != null && postActionLocModel.Instructions.ContainsKey(instruction.Id))
+                    {
+                        unusedManualInstructionLocs--;
+                    }
+                }
+
+                if (unusedManualInstructionLocs > 0)
+                {
+                    // Localizations provide more translations than the number of manual instructions we have.
+                    string excessInstructionLocalizationIds = string.Join(
+                        ", ",
+                        postActionLocModel.Instructions.Keys.Where(k => !postAction.ManualInstructionInfo.Any(i => i.Id == k)));
+                    _logger.LogError(LocalizableStrings.Authoring_InvalidManualInstructionLocalizationIndex, excessInstructionLocalizationIds, postAction.Id);
+                    return false;
+                }
+            }
+
+            if (unusedPostActionLocs > 0)
+            {
+                // Localizations provide more translations than the number of post actions we have.
+                string excessPostActionLocalizationIds = string.Join(", ", locModel.PostActions.Keys.Where(k => !PostActionModels.Any(p => p.Id == k)).Select(k => k.ToString()));
+                _logger.LogError(LocalizableStrings.Authoring_InvalidPostActionLocalizationIndex, excessPostActionLocalizationIds);
+                return false;
+            }
+
+            return true;
         }
-        #endregion
 
         // If the token is a string:
         //      check if its a valid file in the same directory as the sourceFile.

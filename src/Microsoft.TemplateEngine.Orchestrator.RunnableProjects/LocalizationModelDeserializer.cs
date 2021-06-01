@@ -56,38 +56,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         }
 
         /// <summary>
-        /// Verifies that the given localization model was correctly constructed
-        /// to localize the given template.
-        /// </summary>
-        /// <param name="model">The localization model to be verified.</param>
-        /// <param name="template">The template that the model should be compatible with.</param>
-        /// <param name="logger"><see cref="ILogger"/> to be used for logging.</param>
-        /// <returns>True if the verification succeeds. False otherwise.
-        /// Check logs for details in case of a failed verification.</returns>
-        public static bool VerifyLocalizationModel(ILocalizationModel model, SimpleConfigModel template, ILogger logger)
-        {
-            int unusedPostActionLocs = model.PostActions.Count;
-            foreach (var postAction in template.PostActionModel)
-            {
-                if (postAction.Id != null && model.PostActions.ContainsKey(postAction.Id))
-                {
-                    unusedPostActionLocs--;
-                }
-            }
-
-            if (unusedPostActionLocs > 0)
-            {
-                // Localizations provide more translations than the number of post actions we have.
-                string excessPostActionLocalizationIds = string.Join(", ", model.PostActions.Keys.Where(k => !template.PostActionModel.Any(p => p.Id == k)).Select(k => k.ToString()));
-                logger.LogWarning(LocalizableStrings.Authoring_InvalidPostActionLocalizationIndex, excessPostActionLocalizationIds);
-            }
-
-            // TODO rest of the validation
-
-            return false;
-        }
-
-        /// <summary>
         /// Generates parameter symbol localization models from the given localized strings.
         /// </summary>
         private static IReadOnlyDictionary<string, IParameterSymbolLocalizationModel> LoadSymbolModels(List<(string Key, string Value)> localizedStrings)

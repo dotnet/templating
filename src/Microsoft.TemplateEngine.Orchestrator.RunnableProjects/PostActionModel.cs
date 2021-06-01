@@ -12,6 +12,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
     internal class PostActionModel : ConditionedConfigurationElementBase, IPostActionModel
     {
+        /// <summary>
+        /// Default id to be used when post action contains only one manual instruction
+        /// and the author has not explicitly specified an id.
+        /// </summary>
+        public const string DefaultIdForSingleManualInstruction = "default";
+
         public PostActionModel()
             : this(new Dictionary<string, string>(), new List<ManualInstructionModel>()) { }
 
@@ -23,7 +29,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         public string? Id { get; init; }
 
-        public string? Description { get; init; }
+        public string? Description { get; private set; }
 
         public Guid ActionId { get; init; }
 
@@ -33,9 +39,26 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         public IReadOnlyList<ManualInstructionModel> ManualInstructionInfo { get; init; } = new List<ManualInstructionModel>();
 
-        internal static IReadOnlyList<IPostActionModel> LoadListFromJArray(JArray jArray, ILogger logger)
+        public void Localize(IPostActionLocalizationModel locModel, ILogger logger)
         {
-            List<IPostActionModel> localizedPostActions = new List<IPostActionModel>();
+            Description = locModel.Description ?? Description;
+
+            foreach (var manualInstruction in ManualInstructionInfo)
+            {
+                string localizedInstruction = string.Empty;
+                bool exactIdMatch = manualInstruction.Id != null && locModel.Instructions.TryGetValue(manualInstruction.Id, out localizedInstruction);
+                bool defaultIdMatch = manualInstruction.Id == null && ManualInstructionInfo.Count == 1 && locModel.Instructions.TryGetValue(DefaultIdForSingleManualInstruction, out localizedInstruction);
+
+                if (exactIdMatch || defaultIdMatch)
+                {
+                    manualInstruction.Localize(localizedInstruction);
+                }
+            }
+        }
+
+        internal static IReadOnlyList<PostActionModel> LoadListFromJArray(JArray jArray, ILogger logger)
+        {
+            List<PostActionModel> localizedPostActions = new List<PostActionModel>();
             if (jArray == null)
             {
                 return localizedPostActions;

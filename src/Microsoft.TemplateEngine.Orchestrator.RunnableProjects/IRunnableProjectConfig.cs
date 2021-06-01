@@ -42,7 +42,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         IReadOnlyList<string> IgnoreFileNames { get; }
 
-        IReadOnlyList<IPostActionModel> PostActionModel { get; }
+        IReadOnlyList<IPostActionModel> PostActionModels { get; }
 
         IReadOnlyList<ICreationPathModel> PrimaryOutputs { get; }
 
