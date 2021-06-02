@@ -68,7 +68,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             Sources = new[] { new ExtendedFileSource() };
         }
 
-        internal SimpleConfigModel(IEngineEnvironmentSettings environmentSettings, JObject source, ISimpleConfigModifiers configModifiers = null)
+        internal SimpleConfigModel(IEngineEnvironmentSettings environmentSettings, JObject source, ISimpleConfigModifiers configModifiers = null, string filename = null)
         {
             _logger = environmentSettings.Host.LoggerFactory.CreateLogger<SimpleConfigModel>();
 
@@ -183,7 +183,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 }
             }
 
-            _postActions = RunnableProjects.PostActionModel.LoadListFromJArray(source.Get<JArray>("PostActions"), environmentSettings.Host.Logger);
+            _postActions = RunnableProjects.PostActionModel.LoadListFromJArray(source.Get<JArray>("PostActions"), _logger, filename);
             PrimaryOutputs = CreationPathModel.ListFromJArray(source.Get<JArray>(nameof(PrimaryOutputs)));
 
             // Custom operations at the global level
@@ -207,7 +207,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         }
 
         internal SimpleConfigModel(IFile templateFile, ISimpleConfigModifiers configModifiers = null)
-            : this(templateFile.MountPoint.EnvironmentSettings, MergeAdditionalConfiguration(templateFile.ReadJObjectFromIFile(), templateFile), configModifiers)
+            : this(templateFile.MountPoint.EnvironmentSettings, MergeAdditionalConfiguration(templateFile.ReadJObjectFromIFile(), templateFile), configModifiers, templateFile.GetFullPath())
         {
             SourceFile = templateFile;
         }
@@ -637,7 +637,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         /// </summary>
         /// <param name="locModel">Localization model containing the localized strings.</param>
         /// <remarks>This method works on a best-effort basis. If the given model is invalid or incompatible,
-        /// erronous data will be skipped. No errors will be logged. Use <see cref="VerifyLocalizationModel(ILocalizationModel)"/>
+        /// erroneous data will be skipped. No errors will be logged. Use <see cref="VerifyLocalizationModel(ILocalizationModel)"/>
         /// to validate localization models before calling this method.</remarks>
         internal void Localize(ILocalizationModel locModel)
         {
@@ -661,8 +661,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         /// <param name="locModel">The localization model to be verified.</param>
         /// <returns>True if the verification succeeds. False otherwise.
         /// Check logs for details in case of a failed verification.</returns>
-        internal bool VerifyLocalizationModel(ILocalizationModel locModel)
+        internal bool VerifyLocalizationModel(ILocalizationModel locModel, out IEnumerable<string> localizedErrorMessages)
         {
+            bool validModel = true;
+            List<string> errorMessages = new List<string>();
             int unusedPostActionLocs = locModel.PostActions.Count;
             foreach (var postAction in PostActionModels)
             {
@@ -698,8 +700,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     string excessInstructionLocalizationIds = string.Join(
                         ", ",
                         postActionLocModel.Instructions.Keys.Where(k => !postAction.ManualInstructionInfo.Any(i => i.Id == k)));
-                    _logger.LogError(LocalizableStrings.Authoring_InvalidManualInstructionLocalizationIndex, excessInstructionLocalizationIds, postAction.Id);
-                    return false;
+
+                    errorMessages.Add(string.Format(LocalizableStrings.Authoring_InvalidManualInstructionLocalizationIndex, excessInstructionLocalizationIds, postAction.Id));
+                    validModel = false;
                 }
             }
 
@@ -707,11 +710,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 // Localizations provide more translations than the number of post actions we have.
                 string excessPostActionLocalizationIds = string.Join(", ", locModel.PostActions.Keys.Where(k => !PostActionModels.Any(p => p.Id == k)).Select(k => k.ToString()));
-                _logger.LogError(LocalizableStrings.Authoring_InvalidPostActionLocalizationIndex, excessPostActionLocalizationIds);
-                return false;
+                errorMessages.Add(string.Format(LocalizableStrings.Authoring_InvalidPostActionLocalizationIndex, excessPostActionLocalizationIds));
+                validModel = false;
             }
-
-            return true;
+            localizedErrorMessages = errorMessages;
+            return validModel;
         }
 
         // If the token is a string:

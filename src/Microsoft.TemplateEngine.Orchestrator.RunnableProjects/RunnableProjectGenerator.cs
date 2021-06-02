@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -157,16 +158,30 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                         foreach (IFile locFile in localizeFolder.EnumerateFiles(LocalizationFilePrefix + "*" + LocalizationFileExtension, SearchOption.AllDirectories))
                         {
                             string locale = locFile.Name.Substring(LocalizationFilePrefix.Length, locFile.Name.Length - LocalizationFilePrefix.Length - LocalizationFileExtension.Length);
-                            if (TryGetLangPackFromFile(locFile, out ILocalizationModel? locModel) && locModel != null && templateModel.VerifyLocalizationModel(locModel))
+
+                            try
                             {
-                                localizations.Add(new LocalizationLocator(
-                                    locale,
-                                    locFile.FullPath,
-                                    templateModel.Identity,
-                                    locModel.Author ?? string.Empty,
-                                    locModel.Name ?? string.Empty,
-                                    locModel.Description ?? string.Empty,
-                                    locModel.ParameterSymbols));
+                                ILocalizationModel locModel = LocalizationModelDeserializer.Deserialize(locFile);
+                                if (templateModel.VerifyLocalizationModel(locModel, out IEnumerable<string> errorMessages))
+                                {
+                                    localizations.Add(new LocalizationLocator(
+                                        locale,
+                                        locFile.FullPath,
+                                        templateModel.Identity,
+                                        locModel.Author ?? string.Empty,
+                                        locModel.Name ?? string.Empty,
+                                        locModel.Description ?? string.Empty,
+                                        locModel.ParameterSymbols));
+                                }
+                                else
+                                {
+                                    HandleLocalizationValidationError(logger, file, locFile, errorMessages);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                logger.LogWarning(LocalizableStrings.LocalizationModelDeserializer_Error_FailedToParse, locFile.GetFullPath());
+                                logger.LogDebug("Details: {0}", ex);
                             }
                         }
                     }
@@ -220,23 +235,31 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 IFile templateFile = templateFileConfig as IFile
                     ?? throw new NotSupportedException(string.Format(LocalizableStrings.RunnableProjectGenerator_Exception_ConfigShouldBeFile, templateFileConfig.GetFullPath()));
 
+                SimpleConfigModel templateModel = LoadBaseTemplate(templateFile, baselineName, logger);
+
                 IFile? localeFile = null;
                 if (localeFileConfig != null)
                 {
-                     localeFile = localeFileConfig as IFile
-                        ?? throw new NotSupportedException(string.Format(LocalizableStrings.RunnableProjectGenerator_Exception_LocaleConfigShouldBeFile, localeFileConfig.GetFullPath()));
+                    localeFile = localeFileConfig as IFile
+                       ?? throw new NotSupportedException(string.Format(LocalizableStrings.RunnableProjectGenerator_Exception_LocaleConfigShouldBeFile, localeFileConfig.GetFullPath()));
+                    try
+                    {
+                        ILocalizationModel locModel = LocalizationModelDeserializer.Deserialize(localeFile);
+                        if (templateModel.VerifyLocalizationModel(locModel, out IEnumerable<string> errorMessages))
+                        {
+                            templateModel.Localize(locModel);
+                        }
+                        else
+                        {
+                            HandleLocalizationValidationError(logger, templateFile, localeFile, errorMessages);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogWarning(LocalizableStrings.LocalizationModelDeserializer_Error_FailedToParse, localeFile.GetFullPath());
+                        logger.LogDebug("Details: {0}", ex);
+                    }
                 }
-
-                SimpleConfigModel templateModel = LoadBaseTemplate(templateFile, baselineName, logger);
-                if (localeFile != null && TryGetLangPackFromFile(localeFile, out ILocalizationModel? locModel))
-                {
-                    templateModel.Localize(locModel);
-                }
-                else
-                {
-                    //TODO: handle
-                }
-
                 template = new RunnableProjectTemplate(this, templateModel, localeFile, hostTemplateConfigFile);
                 return true;
             }
@@ -715,47 +738,41 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             if (warningMessages.Count > 0)
             {
-                logger.LogDebug(LocalizableStrings.Authoring_TemplateMissingCommonInformation, templateFile.GetFullPath());
-
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.AppendLine(string.Format(LocalizableStrings.Authoring_TemplateMissingCommonInformation, templateFile.GetFullPath()));
                 foreach (string message in warningMessages)
                 {
-                    logger.LogDebug("    " + message);
+                    stringBuilder.AppendLine("  " + message);
                 }
+                logger.LogDebug(stringBuilder.ToString());
             }
 
             if (errorMessages.Count > 0)
             {
-                logger.LogError(LocalizableStrings.Authoring_TemplateNotInstalled, templateFile.GetFullPath());
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.AppendLine(string.Format(LocalizableStrings.Authoring_TemplateNotInstalled, templateFile.GetFullPath()));
                 foreach (string message in errorMessages)
                 {
-                    logger.LogError("    " + message);
+                    stringBuilder.AppendLine("  " + message);
                 }
+                logger.LogError(stringBuilder.ToString());
                 throw new TemplateValidationException(string.Format(LocalizableStrings.RunnableProjectGenerator_Exception_TemplateValidationFailed, templateFile.GetFullPath()));
             }
         }
 
-        private bool TryGetLangPackFromFile(IFile file, out ILocalizationModel? locModel)
+        private void HandleLocalizationValidationError(
+            ILogger logger,
+            IFile baseConfiguration,
+            IFile localizationConfiguration,
+            IEnumerable<string> errorMessages)
         {
-            if (file == null)
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine(string.Format(LocalizableStrings.RunnableProjectGenerator_Warning_LocFileSkipped, localizationConfiguration.GetFullPath(), baseConfiguration.GetFullPath()));
+            foreach (string errorMessage in errorMessages)
             {
-                locModel = null;
-                return false;
+                stringBuilder.AppendLine("  " + errorMessage);
             }
-
-            ILogger logger = file.MountPoint.EnvironmentSettings.Host.Logger;
-
-            try
-            {
-                JObject srcObject = file.ReadJObjectFromIFile();
-                return LocalizationModelDeserializer.TryDeserialize(srcObject, logger, out locModel);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError($"Error reading Langpack from file: {file.FullPath} | Error = {ex.ToString()}");
-            }
-
-            locModel = null;
-            return false;
+            logger.LogWarning(stringBuilder.ToString());
         }
 
         internal class ParameterSet : IParameterSet

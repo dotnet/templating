@@ -72,7 +72,6 @@ namespace Microsoft.TemplateEngine
     <ItemGroup>
         <Compile Include="$(GitInfoFile)" Condition="Exists('$(GitInfoFile)')" Link="%(RecursiveDir)%(Filename)%(Extension)" />
         <Compile Include="$(SrcDir)GitInfo.cs" Condition="!Exists('$(GitInfoFile)')" Link="%(RecursiveDir)%(Filename)%(Extension)" />
-        <Compile Include="$(SrcDir)IsExternalInit.cs" Link="%(RecursiveDir)%(Filename)%(Extension)" />
     </ItemGroup>
 
   <Import Project="$(GitInfoProps)" Condition="Exists('$(GitInfoProps)')" />

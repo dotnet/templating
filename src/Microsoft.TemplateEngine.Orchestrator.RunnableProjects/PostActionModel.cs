@@ -56,7 +56,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
         }
 
-        internal static IReadOnlyList<PostActionModel> LoadListFromJArray(JArray jArray, ILogger logger)
+        internal static IReadOnlyList<PostActionModel> LoadListFromJArray(JArray jArray, ILogger logger, string filename)
         {
             List<PostActionModel> localizedPostActions = new List<PostActionModel>();
             if (jArray == null)
@@ -77,13 +77,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 if (postActionId != null && !postActionIds.Add(postActionId))
                 {
                     // There is already a post action with the same id. Localization won't work properly. Let user know.
-                    logger.LogWarning(LocalizableStrings.Authoring_PostActionIdIsNotUnique, postActionId, postActionIndex);
+                    logger.LogWarning(LocalizableStrings.Authoring_PostActionIdIsNotUnique, filename, postActionId, postActionIndex);
                     postActionId = null;
                 }
 
                 if (actionId == default)
                 {
-                    logger.LogError(LocalizableStrings.Authoring_PostActionMustHaveActionId, postActionIndex);
+                    logger.LogError(LocalizableStrings.Authoring_PostActionMustHaveActionId, filename, postActionIndex);
                     continue;
                 }
 

@@ -6,8 +6,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Localization;
 using Newtonsoft.Json.Linq;
 
@@ -21,38 +21,30 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         private const char KeySeparator = '/';
 
         /// <summary>
-        /// Deserializes the given json data into an <see cref="ILocalizationModel"/>.
+        /// Deserializes the given localization file into an <see cref="ILocalizationModel"/>.
         /// </summary>
-        /// <param name="data">Json data to be deserialized.</param>
-        /// <param name="logger"><see cref="ILogger"/> to be used for logging diagnostics messages.</param>
-        /// <param name="localizationModel">Deserialized model. Null, if the operation failed.</param>
-        /// <returns>True if deserialization succeeded. False, otherwise.</returns>
-        public static bool TryDeserialize(JObject data, ILogger logger, out ILocalizationModel? localizationModel)
+        /// <param name="file">File to be deserialized.</param>
+        /// <returns>loaded localization model.</returns>
+        public static ILocalizationModel Deserialize(IFile file)
         {
-            try
-            {
-                var parameterLocalizations = new Dictionary<string, ParameterSymbolLocalizationModel>();
+            _ = file ?? throw new ArgumentNullException(nameof(file));
 
-                List<(string Key, string Value)> localizedStrings = data.Properties()
-                    .Select(p => p.Value.Type == JTokenType.String ? (p.Name, p.Value.ToString()) : throw new Exception(LocalizableStrings.Authoring_InvalidJsonElementInLocalizationFile))
-                    .ToList();
+            JObject srcObject = file.ReadJObjectFromIFile();
+            var parameterLocalizations = new Dictionary<string, ParameterSymbolLocalizationModel>();
 
-                var symbols = LoadSymbolModels(localizedStrings);
-                var postActions = LoadPostActionModels(localizedStrings);
+            List<(string Key, string Value)> localizedStrings = srcObject.Properties()
+                .Select(p => p.Value.Type == JTokenType.String ? (p.Name, p.Value.ToString()) : throw new Exception(LocalizableStrings.Authoring_InvalidJsonElementInLocalizationFile))
+                .ToList();
 
-                localizationModel = new LocalizationModel(
-                    name: localizedStrings.FirstOrDefault(s => s.Key == "name").Value,
-                    description: localizedStrings.FirstOrDefault(s => s.Key == "description").Value,
-                    author: localizedStrings.FirstOrDefault(s => s.Key == "author").Value,
-                    symbols,
-                    postActions);
-                return true;
-            }
-            catch
-            {
-                localizationModel = null;
-                return false;
-            }
+            var symbols = LoadSymbolModels(localizedStrings);
+            var postActions = LoadPostActionModels(localizedStrings);
+
+            return new LocalizationModel(
+                name: localizedStrings.FirstOrDefault(s => s.Key == "name").Value,
+                description: localizedStrings.FirstOrDefault(s => s.Key == "description").Value,
+                author: localizedStrings.FirstOrDefault(s => s.Key == "author").Value,
+                symbols,
+                postActions);
         }
 
         /// <summary>

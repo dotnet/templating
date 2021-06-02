@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Reflection;
+using Microsoft.TemplateEngine.Abstractions.Mount;
 
 namespace Microsoft.TemplateEngine.TestHelper
 {
