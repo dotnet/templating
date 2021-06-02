@@ -401,7 +401,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unable to resolve the template to instantiate, these templates matched your input:.
+        ///   Looks up a localized string similar to Unable to resolve the template, these templates matched your input:.
         /// </summary>
         internal static string AmbiguousTemplateGroupListHeader {
             get {
@@ -419,7 +419,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unable to resolve the template to instantiate, the following installed templates are conflicting:.
+        ///   Looks up a localized string similar to Unable to resolve the template, the following installed templates are conflicting:.
         /// </summary>
         internal static string AmbiguousTemplatesHeader {
             get {

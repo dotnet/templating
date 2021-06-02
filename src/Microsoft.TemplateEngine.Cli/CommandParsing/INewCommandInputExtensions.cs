@@ -3,6 +3,8 @@
 
 #nullable enable
 
+using System.Linq;
+
 namespace Microsoft.TemplateEngine.Cli.CommandParsing
 {
     /// <summary>
