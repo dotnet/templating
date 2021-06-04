@@ -456,7 +456,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                         return new MatchInfo(MatchInfo.BuiltIn.ShortName, name, MatchKind.Exact);
                     }
                 }
-                return new MatchInfo(MatchInfo.BuiltIn.Name, name, MatchKind.Mismatch);
+                return new MatchInfo(MatchInfo.BuiltIn.ShortName, name, MatchKind.Mismatch);
             };
         }
 

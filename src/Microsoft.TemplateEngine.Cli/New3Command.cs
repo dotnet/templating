@@ -291,7 +291,7 @@ namespace Microsoft.TemplateEngine.Cli
                 _inputGetter,
                 _callbacks);
 
-            return await invocationCoordinator.CoordinateInvocationOrAcquisitionAsync(_commandInput, default).ConfigureAwait(false);
+            return await invocationCoordinator.CoordinateInvocationAsync(_commandInput, default).ConfigureAwait(false);
         }
 
         private async Task<New3CommandStatus> ExecuteAsync()

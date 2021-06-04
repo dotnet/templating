@@ -246,31 +246,30 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         private void EvaluateTemplateToInvoke()
         {
             EvaluateUnambiguousTemplateGroup();
-            if (GroupResolutionStatus == UnambiguousTemplateGroupStatus.NotEvaluated)
-            {
-                throw new ArgumentException($"{nameof(GroupResolutionStatus)} should not be {nameof(UnambiguousTemplateGroupStatus.NotEvaluated)} after running {nameof(EvaluateUnambiguousTemplateGroup)}");
-            }
-            //if no template groups were matched - no match
-            if (GroupResolutionStatus == UnambiguousTemplateGroupStatus.NoMatch)
-            {
-                _singularInvokableMatchStatus = Status.NoMatch;
-                return;
-            }
-
-            if (GroupResolutionStatus == UnambiguousTemplateGroupStatus.Ambiguous)
-            {
-                _singularInvokableMatchStatus = Status.AmbiguousTemplateGroupChoice;
-                return;
-            }
-
-            if (GroupResolutionStatus == UnambiguousTemplateGroupStatus.SingleMatch && UnambiguousTemplateGroup == null)
-            {
-                throw new ArgumentException($"{nameof(UnambiguousTemplateGroup)} should not be null if running {nameof(GroupResolutionStatus)} is {nameof(UnambiguousTemplateGroupStatus.SingleMatch)}");
+            switch (GroupResolutionStatus)
+            { 
+                case UnambiguousTemplateGroupStatus.NotEvaluated:
+                    throw new ArgumentException($"{nameof(GroupResolutionStatus)} should not be {nameof(UnambiguousTemplateGroupStatus.NotEvaluated)} after running {nameof(EvaluateUnambiguousTemplateGroup)}");
+                case UnambiguousTemplateGroupStatus.NoMatch:
+                    _singularInvokableMatchStatus = Status.NoMatch;
+                    return;
+                case UnambiguousTemplateGroupStatus.Ambiguous:
+                    _singularInvokableMatchStatus = Status.AmbiguousTemplateGroupChoice;
+                    return;
+                case UnambiguousTemplateGroupStatus.SingleMatch:
+                    if (UnambiguousTemplateGroup == null)
+                    {
+                        throw new ArgumentException($"{nameof(UnambiguousTemplateGroup)} should not be null if running {nameof(GroupResolutionStatus)} is {nameof(UnambiguousTemplateGroupStatus.SingleMatch)}");
+                    }
+                    //valid state to proceed
+                    break;
+                default:
+                    throw new ArgumentException($"Unexpected value of {nameof(UnambiguousTemplateGroup)}: {GroupResolutionStatus}.");
             }
 
             //checking template options match
             //if any template in the group has ambiguous parameter value match - cannot resolve template to instantiate
-            if (UnambiguousTemplateGroup!.Templates.Any(x => x.HasAmbiguousParameterValueMatch()))
+            if (UnambiguousTemplateGroup.Templates.Any(x => x.HasAmbiguousParameterValueMatch()))
             {
                 _singularInvokableMatchStatus = Status.AmbiguousParameterValueChoice;
                 return;

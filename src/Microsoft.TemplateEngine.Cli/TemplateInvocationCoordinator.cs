@@ -7,7 +7,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Abstractions.TemplateFiltering;
 using Microsoft.TemplateEngine.Cli.CommandParsing;
 using Microsoft.TemplateEngine.Cli.HelpAndUsage;
 using Microsoft.TemplateEngine.Cli.TemplateResolution;
@@ -48,7 +47,7 @@ namespace Microsoft.TemplateEngine.Cli
             _invoker = new TemplateInvoker(_environment, _telemetryLogger, _inputGetter, _callbacks);
         }
 
-        internal async Task<New3CommandStatus> CoordinateInvocationOrAcquisitionAsync(INewCommandInput commandInput, CancellationToken cancellationToken)
+        internal async Task<New3CommandStatus> CoordinateInvocationAsync(INewCommandInput commandInput, CancellationToken cancellationToken)
         {
             TemplateResolutionResult templateResolutionResult = TemplateResolver.GetTemplateResolutionResult(
                 await _templatePackageManager.GetTemplatesAsync(default).ConfigureAwait(false),
