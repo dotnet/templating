@@ -117,25 +117,32 @@ namespace Dotnet_new3.IntegrationTests
             var workingDir = TestUtils.CreateTemporaryFolder("Home");
             var testTemplateLocation = TestUtils.GetTestTemplateLocation("Invalid/Localization/ValidationFailure");
 
-            var expectedErrors =
-@$"Warning: [{testTemplateLocation + Path.DirectorySeparatorChar}.template.config/template.json]: id of the post action 'pa2' at index '3' is not unique. Only the first post action that uses this id will be localized.
-Warning: Localization file {testTemplateLocation + Path.DirectorySeparatorChar}.template.config/localize/templatestrings.de-DE.json is not compatible with base configuration {testTemplateLocation + Path.DirectorySeparatorChar}.template.config/template.json, and will be skipped.
+            var expectedErrors = new[]
+            {
+@$"Warning: [{testTemplateLocation + Path.DirectorySeparatorChar}.template.config/template.json]: id of the post action 'pa2' at index '3' is not unique. Only the first post action that uses this id will be localized.",
+
+@$"Warning: Localization file {testTemplateLocation + Path.DirectorySeparatorChar}.template.config/localize/templatestrings.de-DE.json is not compatible with base configuration {testTemplateLocation + Path.DirectorySeparatorChar}.template.config/template.json, and will be skipped.
   In localization file under the post action with id 'pa1', there are localized strings for manual instruction(s) with ids 'do-not-exist'. These manual instructions do not exist in the template.json file and should be removed from localization file.
-  Post action(s) with id(s) 'pa0' specified in the localization file do not exist in the template.json file. Remove the localized strings from the localization file.
+  Post action(s) with id(s) 'pa0' specified in the localization file do not exist in the template.json file. Remove the localized strings from the localization file.",
 
-Warning: Localization file {testTemplateLocation + Path.DirectorySeparatorChar}.template.config/localize/templatestrings.tr.json is not compatible with base configuration {testTemplateLocation + Path.DirectorySeparatorChar}.template.config/template.json, and will be skipped.
-  Post action(s) with id(s) 'pa6' specified in the localization file do not exist in the template.json file. Remove the localized strings from the localization file.";
+@$"Warning: Localization file {testTemplateLocation + Path.DirectorySeparatorChar}.template.config/localize/templatestrings.tr.json is not compatible with base configuration {testTemplateLocation + Path.DirectorySeparatorChar}.template.config/template.json, and will be skipped.
+  Post action(s) with id(s) 'pa6' specified in the localization file do not exist in the template.json file. Remove the localized strings from the localization file."
+  };
 
-            new DotnetNewCommand(_log, "-i", testTemplateLocation)
+            var commandResult = new DotnetNewCommand(_log, "-i", testTemplateLocation)
                 .WithCustomHive(home)
                 .WithWorkingDirectory(workingDir)
-                .Execute()
-                .Should()
+                .Execute();
+
+            commandResult.Should()
                 .ExitWith(0)
                 .And
                 .NotHaveStdErr()
-                .And.HaveStdOutContaining(expectedErrors)
                 .And.HaveStdOutContaining($"Success: {testTemplateLocation} installed the following templates:").And.HaveStdOutContaining("TestAssets.Invalid.Localiation.ValidationFailure");
+            foreach (var error in expectedErrors)
+            {
+                commandResult.Should().HaveStdOutContaining(error);
+            }
         }
 
         [Fact]
