@@ -247,7 +247,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         {
             EvaluateUnambiguousTemplateGroup();
             switch (GroupResolutionStatus)
-            { 
+            {
                 case UnambiguousTemplateGroupStatus.NotEvaluated:
                     throw new ArgumentException($"{nameof(GroupResolutionStatus)} should not be {nameof(UnambiguousTemplateGroupStatus.NotEvaluated)} after running {nameof(EvaluateUnambiguousTemplateGroup)}");
                 case UnambiguousTemplateGroupStatus.NoMatch:

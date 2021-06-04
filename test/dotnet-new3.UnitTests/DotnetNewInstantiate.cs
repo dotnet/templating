@@ -133,6 +133,24 @@ namespace Dotnet_new3.IntegrationTests
         }
 
         [Fact]
+        public void CannotInstantiateTemplate_WhenFullNameIsUsed()
+        {
+            string home = TestUtils.CreateTemporaryFolder("Home");
+            string workingDirectory = TestUtils.CreateTemporaryFolder();
+
+            new DotnetNewCommand(_log, "Console Application")
+                .WithCustomHive(home)
+                .WithWorkingDirectory(workingDirectory)
+                .Execute()
+                .Should().Fail()
+                .And.NotHaveStdOut()
+                .And.NotHaveStdOutContaining("The template \"Console Application\" was created successfully.")
+                .And.HaveStdErrContaining("No templates found matching: 'Console Application'.")
+                .And.HaveStdErrContaining("To list installed templates, run 'dotnet new3 --list'.")
+                .And.HaveStdErrContaining("To search for the templates on NuGet.org, run 'dotnet new3 'Console Application' --search'.");
+        }
+
+        [Fact]
         public void CannotInstantiateTemplate_WhenParameterIsInvalid()
         {
             string home = TestUtils.CreateTemporaryFolder("Home");

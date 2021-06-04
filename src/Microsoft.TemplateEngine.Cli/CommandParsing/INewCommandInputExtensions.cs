@@ -41,6 +41,16 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             return $"dotnet {command.CommandName} --list";
         }
 
+        internal static string SearchCommandExample(this INewCommandInput command, string templateName)
+        {
+            if (templateName.Any(char.IsWhiteSpace))
+            {
+                templateName = $"'{templateName}'";
+            }
+
+            return $"dotnet {command.CommandName} {templateName} --search";
+        }
+
         internal static string UninstallCommandExample(this INewCommandInput command, string packageId = "", bool noArgs = false)
         {
             if (noArgs)

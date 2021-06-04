@@ -204,6 +204,23 @@ To search for the templates on NuGet.org, run 'dotnet new3 class --search'.");
         }
 
         [Fact]
+        public void CannotShowHelpForTemplate_FullNameMatch()
+        {
+            string home = TestUtils.CreateTemporaryFolder("Home");
+            string workingDirectory = TestUtils.CreateTemporaryFolder();
+
+            new DotnetNewCommand(_log, "Console Application", "-h")
+                .WithCustomHive(home)
+                .WithWorkingDirectory(workingDirectory)
+                .Execute()
+                .Should().Fail()
+                .And.HaveStdErr(
+@"No templates found matching: 'Console Application'.
+To list installed templates, run 'dotnet new3 --list'.
+To search for the templates on NuGet.org, run 'dotnet new3 'Console Application' --search'.");
+        }
+
+        [Fact]
         public void CannotShowHelpForTemplate_WhenAmbiguousLanguageChoice()
         {
             string home = TestUtils.CreateTemporaryFolder("Home");
