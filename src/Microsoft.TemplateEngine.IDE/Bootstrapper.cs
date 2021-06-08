@@ -93,7 +93,7 @@ namespace Microsoft.TemplateEngine.IDE
         /// <param name="outputPath">The output directory for template instantiation.</param>
         /// <param name="parameters">The template parameters.</param>
         /// <param name="baselineName">The baseline configuration to use.</param>
-        /// <param name="cancellationToken">A cancellation token.</param>
+        /// <param name="cancellationToken">A cancellation token to cancel the asynchronous operation.</param>
         /// <returns><see cref="ITemplateCreationResult"/> containing information on created template or error occurred.</returns>
 #pragma warning disable RS0027 // Public API with optional parameter(s) should have the most parameters amongst its public overloads
         public Task<ITemplateCreationResult> CreateAsync(
@@ -125,7 +125,7 @@ namespace Microsoft.TemplateEngine.IDE
         /// <param name="outputPath">The output directory for template instantiation.</param>
         /// <param name="parameters">The template parameters.</param>
         /// <param name="baselineName">The baseline configuration to use.</param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="cancellationToken">A cancellation token to cancel the asynchronous operation.</param>
         /// <returns><see cref="ITemplateCreationResult"/> containing information on template that would be created or error occurred.</returns>
         public Task<ITemplateCreationResult> GetCreationEffectsAsync(
             ITemplateInfo info,

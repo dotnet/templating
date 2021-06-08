@@ -365,8 +365,8 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
         /// <param name="unambiguousTemplateGroup">the unambigious template group to use based on the command input.</param>
         /// <param name="commandInput">the command input.</param>
         /// <returns><see cref="New3CommandStatus.InvalidParamValues"/>.</returns>
-        /// <exception cref="ArgumentNullException">when <paramref name="unambiguousTemplateGroup"/>is <c>null</c>.</exception>
-        /// <exception cref="ArgumentNullException">when <paramref name="commandInput"/>is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException">when <paramref name="unambiguousTemplateGroup"/>is <see langword="null" />.</exception>
+        /// <exception cref="ArgumentNullException">when <paramref name="commandInput"/>is <see langword="null" />.</exception>
         private static New3CommandStatus DisplayInvalidParameterError(TemplateGroup unambiguousTemplateGroup, INewCommandInput commandInput)
         {
             _ = unambiguousTemplateGroup ?? throw new ArgumentNullException(paramName: nameof(unambiguousTemplateGroup));
@@ -397,8 +397,8 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
         /// <param name="commandInput">the command input.</param>
         /// <param name="cancellationToken">a cancellation token.</param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException">when <paramref name="unambiguousTemplateGroup"/>is <c>null</c>.</exception>
-        /// <exception cref="ArgumentNullException">when <paramref name="commandInput"/>is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException">when <paramref name="unambiguousTemplateGroup"/> is <see langword="null" />.</exception>
+        /// <exception cref="ArgumentNullException">when <paramref name="commandInput"/> is <see langword="null" />.</exception>
         private static async Task<New3CommandStatus> DisplayAmbiguousPrecedenceErrorAsync(
             TemplateGroup unambiguousTemplateGroup,
             IEngineEnvironmentSettings environmentSettings,
