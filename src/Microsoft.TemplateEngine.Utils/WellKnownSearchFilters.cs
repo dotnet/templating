@@ -11,7 +11,7 @@ using Microsoft.TemplateEngine.Abstractions.TemplateFiltering;
 namespace Microsoft.TemplateEngine.Utils
 {
     /// <summary>
-    /// Collection of the predicates to be used for filtering templates by most used <see cref="ITemplateInfo"/> properties.
+    /// Collection of the predicates to be used for filtering templates by the most used <see cref="ITemplateInfo"/> properties.
     /// </summary>
     public static class WellKnownSearchFilters
     {
