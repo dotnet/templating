@@ -17,7 +17,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.TraversalRules
         /// Creates an instance of <see cref="RegexFilteredTraversalRule"/>.
         /// </summary>
         /// <param name="regexPattern">Regex pattern string that will be used to match json element names.</param>
-        /// <param name="keyCreator"><see cref="IJsonKeyCreator"/> to be used when creating a key for the match elements.</param>
+        /// <param name="keyExtractor"><see cref="IJsonKeyCreator"/> to be used when creating a key for the match elements.</param>
         public RegexFilteredTraversalRule(string regexPattern, IJsonKeyCreator? keyExtractor = default)
             : this(new Regex(regexPattern), keyExtractor)
         { }
@@ -26,7 +26,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.TraversalRules
         /// Creates an instance of <see cref="RegexFilteredTraversalRule"/>.
         /// </summary>
         /// <param name="regex">Regex pattern that will be used to match json element names.</param>
-        /// <param name="keyCreator"><see cref="IJsonKeyCreator"/> to be used when creating a key for the match elements.</param>
+        /// <param name="keyExtractor"><see cref="IJsonKeyCreator"/> to be used when creating a key for the match elements.</param>
         public RegexFilteredTraversalRule(Regex regex, IJsonKeyCreator? keyExtractor = default)
             : base(keyExtractor)
         {

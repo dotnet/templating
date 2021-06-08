@@ -18,7 +18,9 @@ namespace Microsoft.TemplateEngine.Abstractions
         Required,
 
         [Obsolete("the value was never used and is deprecated.")]
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         Suggested,
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
         /// <summary>
         /// The parameter is optional.
