@@ -637,7 +637,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         /// </summary>
         /// <param name="locModel">Localization model containing the localized strings.</param>
         /// <remarks>This method works on a best-effort basis. If the given model is invalid or incompatible,
-        /// erroneous data will be skipped. No errors will be logged. Use <see cref="VerifyLocalizationModel(ILocalizationModel)"/>
+        /// erroneous data will be skipped. No errors will be logged. Use <see cref="Localize(ILocalizationModel)"/>
         /// to validate localization models before calling this method.</remarks>
         internal void Localize(ILocalizationModel locModel)
         {
@@ -659,6 +659,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         /// to localize this SimpleConfigModel.
         /// </summary>
         /// <param name="locModel">The localization model to be verified.</param>
+        /// <param name="localizedErrorMessages">Errors detected during verification.</param>
         /// <returns>True if the verification succeeds. False otherwise.
         /// Check logs for details in case of a failed verification.</returns>
         internal bool VerifyLocalizationModel(ILocalizationModel locModel, out IEnumerable<string> localizedErrorMessages)

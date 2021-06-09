@@ -64,10 +64,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
         /// Creates a clone of the given <see cref="ParameterSymbol"/>.
         /// </summary>
         /// <param name="cloneFrom">The symbol to copy the values from.</param>
-        /// <param name="bindingFallback">The value to be used for <see cref="Binding"/> in the case
-        /// that the <paramref name="cloneFrom"/> does not specify a value for <see cref="Binding"/>.</param>
-        /// <param name="formsFallback">The value to be used for <see cref="Forms"/> in the case
-        /// that the <paramref name="cloneFrom"/> does not specify a value for <see cref="Forms"/>.</param>
+        /// <param name="bindingFallback">The value to be used for <see cref="BaseValueSymbol.Binding"/> in the case
+        /// that the <paramref name="cloneFrom"/> does not specify a value for <see cref="BaseValueSymbol.Binding"/>.</param>
+        /// <param name="formsFallback">The value to be used for <see cref="BaseValueSymbol.Forms"/> in the case
+        /// that the <paramref name="cloneFrom"/> does not specify a value for <see cref="BaseValueSymbol.Forms"/>.</param>
         public ParameterSymbol(ParameterSymbol cloneFrom, string bindingFallback, SymbolValueFormsModel formsFallback)
         {
             DefaultValue = cloneFrom.DefaultValue;

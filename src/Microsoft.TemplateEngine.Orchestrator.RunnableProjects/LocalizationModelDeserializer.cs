@@ -26,7 +26,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         /// <param name="file">File to be deserialized.</param>
         /// <returns>loaded localization model.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="file"/> is null.</exception>
-        /// <exception cref="Exception">The file does not contain valid JSON data, JSON data contains element other than strings</exception>
+        /// <exception cref="Exception">The file does not contain valid JSON data, JSON data contains element other than strings.</exception>
         public static ILocalizationModel Deserialize(IFile file)
         {
             _ = file ?? throw new ArgumentNullException(nameof(file));
