@@ -182,7 +182,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Should()
                 .ExitWith(0)
                 .And.HaveStdOutContaining("Warning: Failed to read parse localization file").And.HaveStdOutContaining("localize/templatestrings.de-DE.json")
-                .And.HaveStdOutContaining("The template \"name\" was created successfully.").And.NotHaveStdOutContaining("name_de-DE:äÄßöÖüÜ");
+                .And.HaveStdOutContaining("Die Vorlage \"name\" wurde erfolgreich erstellt.").And.NotHaveStdOutContaining("name_de-DE:äÄßöÖüÜ");
         }
 
         [Fact]
@@ -225,7 +225,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Should()
                 .ExitWith(0)
                 .And.HaveStdOutContaining(expectedErrors)
-                .And.HaveStdOutContaining("The template \"name\" was created successfully.").And.NotHaveStdOutContaining("name_de-DE:äÄßöÖüÜ");
+                .And.HaveStdOutContaining("Die Vorlage \"name\" wurde erfolgreich erstellt.").And.NotHaveStdOutContaining("name_de-DE:äÄßöÖüÜ");
         }
 
         private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
