@@ -102,15 +102,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
         [Theory]
         [InlineData(
             "{ " +
-                "\"symbols/someSymbol/displayName\": \"localizedSymbol\", " +
-                "\"symbols/someSymbol/description\": \"localizedSymbolDescription\"," +
-                "\"symbols/anotherSymbol/displayName\": \"localizedSymbol\"," +
-                "\"symbols/anotherSymbol/description\": \"localizedSymbolDescription\"" +
+                "\"symbols/someSymbol/displayName\": \"localizedSymbol1\", " +
+                "\"symbols/someSymbol/description\": \"localizedSymbolDescription1\"," +
+                "\"symbols/anotherSymbol/displayName\": \"localizedSymbol2\"," +
+                "\"symbols/anotherSymbol/description\": \"localizedSymbolDescription2\"" +
             "}",
             false,
             "someSymbol|anotherSymbol",
-            "localizedSymbol|localizedSymbol",
-            "localizedSymbolDescription|localizedSymbolDescription")]
+            "localizedSymbol1|localizedSymbol2",
+            "localizedSymbolDescription1|localizedSymbolDescription2")]
         [InlineData("{ \"symbols/someSymbol/displayName\": \"localizedSymbol\" }", false, "someSymbol", "localizedSymbol", "(null)")]
         [InlineData("{ \"symbols/someSymbol/description\": \"localizedSymbolDescription\" }", false, "someSymbol", "(null)", "localizedSymbolDescription")]
         [InlineData("{ description: \"\"}", false, null, null, null)]

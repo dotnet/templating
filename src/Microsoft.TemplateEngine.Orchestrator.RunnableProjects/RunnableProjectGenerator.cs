@@ -18,7 +18,6 @@ using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config;
 using Microsoft.TemplateEngine.Utils;
-using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
@@ -180,14 +179,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                             }
                             catch (Exception ex)
                             {
-                                logger.LogWarning(LocalizableStrings.LocalizationModelDeserializer_Error_FailedToParse, locFile.GetFullPath());
+                                logger.LogWarning(LocalizableStrings.LocalizationModelDeserializer_Error_FailedToParse, locFile.GetDisplayPath());
                                 logger.LogDebug("Details: {0}", ex);
                             }
                         }
                     }
 
-                    //issue here: we need to pass locale as parameter
-                    //consider passing current locale file here if exists
+                    // issue here: we need to pass locale as parameter
+                    // consider passing current locale file here if exists
+                    // tracking issue: https://github.com/dotnet/templating/issues/3255
                     RunnableProjectTemplate runnableProjectTemplate = new RunnableProjectTemplate(this, templateModel, null, hostConfigFile);
                     templateList.Add(runnableProjectTemplate);
 
@@ -200,17 +200,17 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 catch (NotSupportedException ex)
                 {
                     //do not print stack trace for this type.
-                    logger.LogError(LocalizableStrings.Authoring_TemplateNotInstalled_Message, file.GetFullPath(), ex.Message);
+                    logger.LogError(LocalizableStrings.Authoring_TemplateNotInstalled_Message, file.GetDisplayPath(), ex.Message);
                 }
                 catch (TemplateAuthoringException ex)
                 {
                     //do not print stack trace for this type.
-                    logger.LogError(LocalizableStrings.Authoring_TemplateNotInstalled_Message, file.GetFullPath(), ex.Message);
+                    logger.LogError(LocalizableStrings.Authoring_TemplateNotInstalled_Message, file.GetDisplayPath(), ex.Message);
                 }
                 catch (Exception ex)
                 {
                     //unexpected error - print details
-                    logger.LogError(LocalizableStrings.Authoring_TemplateNotInstalled_Message, file.GetFullPath(), ex);
+                    logger.LogError(LocalizableStrings.Authoring_TemplateNotInstalled_Message, file.GetDisplayPath(), ex);
                 }
             }
 
@@ -233,15 +233,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             try
             {
                 IFile templateFile = templateFileConfig as IFile
-                    ?? throw new NotSupportedException(string.Format(LocalizableStrings.RunnableProjectGenerator_Exception_ConfigShouldBeFile, templateFileConfig.GetFullPath()));
+                    ?? throw new NotSupportedException(string.Format(LocalizableStrings.RunnableProjectGenerator_Exception_ConfigShouldBeFile, templateFileConfig.GetDisplayPath()));
 
-                SimpleConfigModel templateModel = LoadBaseTemplate(templateFile, baselineName, logger);
+                SimpleConfigModel templateModel = LoadBaseTemplate(templateFile, logger, baselineName);
 
                 IFile? localeFile = null;
                 if (localeFileConfig != null)
                 {
                     localeFile = localeFileConfig as IFile
-                       ?? throw new NotSupportedException(string.Format(LocalizableStrings.RunnableProjectGenerator_Exception_LocaleConfigShouldBeFile, localeFileConfig.GetFullPath()));
+                       ?? throw new NotSupportedException(string.Format(LocalizableStrings.RunnableProjectGenerator_Exception_LocaleConfigShouldBeFile, localeFileConfig.GetDisplayPath()));
                     try
                     {
                         ILocalizationModel locModel = LocalizationModelDeserializer.Deserialize(localeFile);
@@ -256,7 +256,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     }
                     catch (Exception ex)
                     {
-                        logger.LogWarning(LocalizableStrings.LocalizationModelDeserializer_Error_FailedToParse, localeFile.GetFullPath());
+                        logger.LogWarning(LocalizableStrings.LocalizationModelDeserializer_Error_FailedToParse, localeFile.GetDisplayPath());
                         logger.LogDebug("Details: {0}", ex);
                     }
                 }
@@ -271,17 +271,17 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             catch (NotSupportedException ex)
             {
                 //do not print stack trace for this type.
-                logger.LogError(LocalizableStrings.Authoring_TemplateNotInstalled_Message, templateFileConfig.GetFullPath(), ex.Message);
+                logger.LogError(LocalizableStrings.Authoring_TemplateNotInstalled_Message, templateFileConfig.GetDisplayPath(), ex.Message);
             }
             catch (TemplateAuthoringException ex)
             {
                 //do not print stack trace for this type.
-                logger.LogError(LocalizableStrings.Authoring_TemplateNotInstalled_Message, templateFileConfig.GetFullPath(), ex.Message);
+                logger.LogError(LocalizableStrings.Authoring_TemplateNotInstalled_Message, templateFileConfig.GetDisplayPath(), ex.Message);
             }
             catch (Exception ex)
             {
                 //unexpected error - print details
-                logger.LogError(LocalizableStrings.Authoring_TemplateNotInstalled_Message, templateFileConfig.GetFullPath(), ex);
+                logger.LogError(LocalizableStrings.Authoring_TemplateNotInstalled_Message, templateFileConfig.GetDisplayPath(), ex);
             }
             template = null;
             return false;
@@ -605,12 +605,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         /// </summary>
         /// <exception cref="NotSupportedException">when the version of the template is not supported by the generator.</exception>
         /// <exception cref="TemplateValidationException">on validation error.</exception>
-        private SimpleConfigModel LoadBaseTemplate(IFile templateFile, string? baselineName = null, ILogger? logger = null)
+        private SimpleConfigModel LoadBaseTemplate(IFile templateFile, ILogger logger, string? baselineName = null)
         {
-            if (logger is null)
-            {
-                logger = templateFile.MountPoint.EnvironmentSettings.Host.LoggerFactory.CreateLogger<RunnableProjectGenerator>();
-            }
             ISimpleConfigModifiers? configModifiers = null;
             if (!string.IsNullOrWhiteSpace(baselineName))
             {
@@ -739,7 +735,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             if (warningMessages.Count > 0)
             {
                 StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.AppendLine(string.Format(LocalizableStrings.Authoring_TemplateMissingCommonInformation, templateFile.GetFullPath()));
+                stringBuilder.AppendLine(string.Format(LocalizableStrings.Authoring_TemplateMissingCommonInformation, templateFile.GetDisplayPath()));
                 foreach (string message in warningMessages)
                 {
                     stringBuilder.AppendLine("  " + message);
@@ -750,13 +746,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             if (errorMessages.Count > 0)
             {
                 StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.AppendLine(string.Format(LocalizableStrings.Authoring_TemplateNotInstalled, templateFile.GetFullPath()));
+                stringBuilder.AppendLine(string.Format(LocalizableStrings.Authoring_TemplateNotInstalled, templateFile.GetDisplayPath()));
                 foreach (string message in errorMessages)
                 {
                     stringBuilder.AppendLine("  " + message);
                 }
                 logger.LogError(stringBuilder.ToString());
-                throw new TemplateValidationException(string.Format(LocalizableStrings.RunnableProjectGenerator_Exception_TemplateValidationFailed, templateFile.GetFullPath()));
+                throw new TemplateValidationException(string.Format(LocalizableStrings.RunnableProjectGenerator_Exception_TemplateValidationFailed, templateFile.GetDisplayPath()));
             }
         }
 
@@ -767,7 +763,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             IEnumerable<string> errorMessages)
         {
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine(string.Format(LocalizableStrings.RunnableProjectGenerator_Warning_LocFileSkipped, localizationConfiguration.GetFullPath(), baseConfiguration.GetFullPath()));
+            stringBuilder.AppendLine(string.Format(LocalizableStrings.RunnableProjectGenerator_Warning_LocFileSkipped, localizationConfiguration.GetDisplayPath(), baseConfiguration.GetDisplayPath()));
             foreach (string errorMessage in errorMessages)
             {
                 stringBuilder.AppendLine("  " + errorMessage);

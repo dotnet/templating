@@ -19,7 +19,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class LocalizableStrings {
@@ -106,7 +106,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to id of the manual instruction &apos;{0}&apos; at index {1} is not unique. Only the first manual instruction that uses this id will be localized..
+        ///   Looks up a localized string similar to &apos;id&apos; of the manual instruction &apos;{0}&apos; at index {1} is not unique. Only the first manual instruction that uses this id will be localized..
         /// </summary>
         internal static string Authoring_ManualInstructionIdIsNotUnique {
             get {

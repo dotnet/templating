@@ -18,7 +18,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         string Type { get; }
 
         /// <summary>
-        /// Gets the name of the host property which will provide the value of this symbol.
+        /// Gets the name of the host property or the environment variable which will provide the value of this symbol.
         /// </summary>
         string? Binding { get; }
 
@@ -33,7 +33,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         IReadOnlyList<IReplacementContext> ReplacementContexts { get; }
 
         /// <summary>
-        /// Gets the name of the file that should be replaced by the value of this symbol.
+        /// Gets the part of the file name that should be replaced with the value of this symbol.
         /// </summary>
         string? FileRename { get; }
     }

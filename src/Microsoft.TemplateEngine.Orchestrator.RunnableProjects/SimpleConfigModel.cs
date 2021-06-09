@@ -207,7 +207,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         }
 
         internal SimpleConfigModel(IFile templateFile, ISimpleConfigModifiers configModifiers = null)
-            : this(templateFile.MountPoint.EnvironmentSettings, MergeAdditionalConfiguration(templateFile.ReadJObjectFromIFile(), templateFile), configModifiers, templateFile.GetFullPath())
+            : this(templateFile.MountPoint.EnvironmentSettings, MergeAdditionalConfiguration(templateFile.ReadJObjectFromIFile(), templateFile), configModifiers, templateFile.GetDisplayPath())
         {
             SourceFile = templateFile;
         }

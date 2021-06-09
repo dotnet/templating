@@ -136,7 +136,7 @@
     <value>One or more postActions have a malformed or missing manualInstructions value.</value>
   </data>
   <data name="Authoring_ManualInstructionIdIsNotUnique" xml:space="preserve">
-    <value>id of the manual instruction '{0}' at index {1} is not unique. Only the first manual instruction that uses this id will be localized.</value>
+    <value>'id' of the manual instruction '{0}' at index {1} is not unique. Only the first manual instruction that uses this id will be localized.</value>
     <comment>{0} is any identifier string that user provided in the file. Such as: "myInstruction", "firstInstruction", "instruction1" etc.
 {1} is a whole number representing the zero-based index of the manual instruction. Such as "5", or "0".</comment>
   </data>
