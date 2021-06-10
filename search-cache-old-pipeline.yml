@@ -13,3 +13,9 @@ steps:
   inputs:
     command: 'build'
     projects: '$(Build.SourcesDirectory)/src/Microsoft.TemplateSearch.TemplateDiscovery/Microsoft.TemplateSearch.TemplateDiscovery.csproj'
+- task: DotNetCoreCLI@2
+  displayName: Run Cache Updater
+  inputs:
+    command: 'run'
+    projects: '$(Build.SourcesDirectory)/src/Microsoft.TemplateSearch.TemplateDiscovery/Microsoft.TemplateSearch.TemplateDiscovery.csproj'
+    arguments: '--basePath $(System.DefaultWorkingDirectory)/NugetDownloadDirectory'
