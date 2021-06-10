@@ -6,10 +6,5 @@ schedules:
     - /dev/bozturk/old-search-cache-pipeline
   always: true
 
-resources:
-  repositories:
-  - repository: self
-    ref: legacy/template-discovery-tool
-
 steps:
-- checkout: self
+- checkout: git://internal/dotnet-templating@refs/heads/legacy/template-discovery-tool
