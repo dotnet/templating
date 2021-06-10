@@ -8,3 +8,7 @@ schedules:
 
 steps:
 - checkout: git://internal/dotnet-templating@refs/heads/legacy/template-discovery-tool
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '$(Build.SourcesDirectory)/src/Microsoft.TemplateSearch.TemplateDiscovery/Microsoft.TemplateSearch.TemplateDiscovery.csproj'
