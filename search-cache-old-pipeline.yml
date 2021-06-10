@@ -1,3 +1,11 @@
+schedules:
+- cron: 30 * * * *
+  displayName: Run every 30 minutes
+  branches:
+    include:
+    - /dev/bozturk/old-search-cache-pipeline
+  always: true
+
 resources:
   repositories:
   - repository: self
