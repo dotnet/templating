@@ -1,0 +1,11 @@
+resources:
+  repositories:
+  - repository: self
+    ref: legacy/template-discovery-tool
+
+pool:
+  name: NetCoreInternal-Pool
+  queue: buildpool.windows.10.amd64.vs2017
+
+steps:
+- checkout: self
