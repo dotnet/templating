@@ -8,7 +8,13 @@ schedules:
 
 steps:
 - checkout: git://internal/dotnet-templating@refs/heads/legacy/template-discovery-tool
+- task: UseDotNet@2
+  displayName: Install .NET
+  inputs:
+    packageType: 'sdk'
+    useGlobalJson: true
 - task: DotNetCoreCLI@2
+  displayName: Build Cache Updater Tool
   inputs:
     command: 'build'
     projects: '$(Build.SourcesDirectory)/src/Microsoft.TemplateSearch.TemplateDiscovery/Microsoft.TemplateSearch.TemplateDiscovery.csproj'
