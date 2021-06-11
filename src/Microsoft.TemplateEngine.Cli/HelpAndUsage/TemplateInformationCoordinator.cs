@@ -78,24 +78,17 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                     DisplayTemplateList(resolutionResult.TemplateGroups, commandInput, useErrorOutput: true);
                     Reporter.Error.WriteLine(LocalizableStrings.AmbiguousTemplateGroupListHint.Bold().Red());
                     return Task.FromResult(New3CommandStatus.NotFound);
-                case TemplateResolutionResult.Status.AmbiguousParameterValueChoice:
-                    if (resolutionResult.UnambiguousTemplateGroup == null)
-                    {
-                        throw new ArgumentException($"{nameof(resolutionResult.UnambiguousTemplateGroup)} should not be null if {nameof(resolutionResult.ResolutionStatus)} is {nameof(TemplateResolutionResult.Status.AmbiguousParameterValueChoice)}");
-                    }
-                    Reporter.Verbose.WriteLine(LocalizableStrings.Authoring_AmbiguousChoiceParameterValue);
-                    return Task.FromResult(DisplayInvalidParameterError(resolutionResult.UnambiguousTemplateGroup, commandInput));
                 case TemplateResolutionResult.Status.AmbiguousTemplateChoice:
                     if (resolutionResult.UnambiguousTemplateGroup == null)
                     {
-                        throw new ArgumentException($"{nameof(resolutionResult.UnambiguousTemplateGroup)} should not be null if {nameof(resolutionResult.ResolutionStatus)} is {nameof(TemplateResolutionResult.Status.AmbiguousParameterValueChoice)}");
+                        throw new ArgumentException($"{nameof(resolutionResult.UnambiguousTemplateGroup)} should not be null if {nameof(resolutionResult.ResolutionStatus)} is {nameof(TemplateResolutionResult.Status.AmbiguousTemplateChoice)}");
                     }
                     Reporter.Verbose.WriteLine(LocalizableStrings.Authoring_AmbiguousBestPrecedence);
                     return DisplayAmbiguousPrecedenceErrorAsync(resolutionResult.UnambiguousTemplateGroup, commandInput, cancellationToken);
                 case TemplateResolutionResult.Status.InvalidParameter:
                     if (resolutionResult.UnambiguousTemplateGroup == null)
                     {
-                        throw new ArgumentException($"{nameof(resolutionResult.UnambiguousTemplateGroup)} should not be null if {nameof(resolutionResult.ResolutionStatus)} is {nameof(TemplateResolutionResult.Status.AmbiguousParameterValueChoice)}");
+                        throw new ArgumentException($"{nameof(resolutionResult.UnambiguousTemplateGroup)} should not be null if {nameof(resolutionResult.ResolutionStatus)} is {nameof(TemplateResolutionResult.Status.InvalidParameter)}");
                     }
                     return Task.FromResult(DisplayInvalidParameterError(resolutionResult.UnambiguousTemplateGroup, commandInput));
             }
@@ -334,7 +327,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
         /// <summary>
         /// Displays the help in case <paramref name="commandInput"/> contains invalid parameters for resolved <paramref name="unambiguousTemplateGroup"/>.
         /// </summary>
-        /// <param name="unambiguousTemplateGroup">the unambigious template group to use based on the command input.</param>
+        /// <param name="unambiguousTemplateGroup">the unambiguous template group to use based on the command input.</param>
         /// <param name="commandInput">the command input.</param>
         /// <returns><see cref="New3CommandStatus.InvalidParamValues"/>.</returns>
         /// <exception cref="ArgumentNullException">when <paramref name="unambiguousTemplateGroup"/>is <see langword="null" />.</exception>
