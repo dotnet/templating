@@ -22,6 +22,7 @@ steps:
 - bash: mv -T '$(System.DefaultWorkingDirectory)/NugetDownloadDirectory/SearchCache/templateSearchInfo.json' '$(System.DefaultWorkingDirectory)/NugetDownloadDirectory/SearchCache/NuGetTemplateSearchInfo.json'
 - publish: $(System.DefaultWorkingDirectory)/NugetDownloadDirectory/SearchCache/NuGetTemplateSearchInfo.json
   artifact: outputs
+- bash: az config set extension.use_dynamic_install=yes_without_prompt
 - bash: >
     az storage azcopy blob upload 
     -c nuget-cache-container 
