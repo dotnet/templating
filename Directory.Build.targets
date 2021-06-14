@@ -14,6 +14,9 @@
         <PackageReference Update="Newtonsoft.Json" Version="$(NewtonsoftJsonPackageVersion)" />
         <PackageReference Update="xunit" Version="2.3.1" />
         <PackageReference Update="xunit.runner.visualstudio" Version="2.3.1" />
+        <PackageReference Update="Microsoft.DotNet.Cli.Utils" Version="5.0.200-preview.20609.15" />
+        <PackageReference Update="FluentAssertions" Version="5.10.3" />
+        <PackageReference Update="xunit.abstractions" Version="2.0.3" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TestProject)' == 'true'">
