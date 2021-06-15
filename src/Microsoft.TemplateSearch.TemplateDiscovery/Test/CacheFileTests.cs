@@ -1,68 +1,110 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.NET.TestFramework.Commands;
 using Microsoft.NET.TestFramework.Assertions;
+using Microsoft.NET.TestFramework.Commands;
 using Microsoft.TemplateEngine.TestHelper;
 
 namespace Microsoft.TemplateSearch.TemplateDiscovery.Test
 {
     internal static class CacheFileTests
     {
-        public static void RunTests()
-        {
-            CanSearchWhileInstantiating("3.1");
-            CanCheckUpdates("3.1");
-            CanUpdate("3.1");
-
-            CanSearchWhileInstantiating("5.0.300");
-            CanCheckUpdates("5.0.300");
-            CanUpdate("5.0.300");
-            CanSearch("5.0.300");
-
-            CanSearch("6.0");
-        }
-
-        private static void CanSearchWhileInstantiating(string sdkVersion)
+        public static void RunTests(string cacheFilePath)
         {
             string workingDirectory = TestUtils.CreateTemporaryFolder();
-            CreateGlobalJson(workingDirectory, sdkVersion);
+            CanUseSdkVersion(workingDirectory, "3.1.400", "3.");
+            CanSearchWhileInstantiating(workingDirectory, cacheFilePath);
+            CanCheckUpdates(workingDirectory, cacheFilePath);
+            CanUpdate(workingDirectory, cacheFilePath);
 
-            new DotnetCommand(null, "--version")
+            workingDirectory = TestUtils.CreateTemporaryFolder();
+            CanUseSdkVersion(workingDirectory, "5.0.100", "5.0.1", "latestPatch");
+            CanCheckUpdates(workingDirectory, cacheFilePath);
+            CanUpdate(workingDirectory, cacheFilePath);
+            //CanSearch(workingDirectory, cacheFilePath);
+
+            workingDirectory = TestUtils.CreateTemporaryFolder();
+            CanUseSdkVersion(workingDirectory, "5.0.300", "5.0.", "latestFeature");
+            CanCheckUpdates(workingDirectory, cacheFilePath);
+            CanUpdate(workingDirectory, cacheFilePath);
+            //CanSearch(workingDirectory, cacheFilePath);
+
+            workingDirectory = TestUtils.CreateTemporaryFolder();
+            CanUseSdkVersion(workingDirectory, "6.0.100", "6.0.", allowPrerelease: true);
+            //CanSearch(workingDirectory, cacheFilePath);
+        }
+
+        private static void CanUseSdkVersion(string workingDirectory, string requestedSdkVersion, string resolvedVersionPattern, string rollForward = "latestMinor", bool allowPrerelease = false)
+        {
+            CreateGlobalJson(workingDirectory, requestedSdkVersion, rollForward, allowPrerelease);
+
+            new DotnetCommand(TestOutputLogger.Instance, "--version")
                 .WithWorkingDirectory(workingDirectory)
                 .Execute()
                 .Should()
                 .ExitWith(0)
                 .And
                 .NotHaveStdErr()
-                .And.HaveStdOutContaining($"Version   {sdkVersion}");
+                .And.HaveStdOutContaining(resolvedVersionPattern);
         }
 
-        private static void CanCheckUpdates(string sdkVersion)
+        private static void CanSearchWhileInstantiating(string workingDirectory, string cacheFilePath)
         {
-
+            new DotnetCommand(TestOutputLogger.Instance, "new", "func")
+                .WithWorkingDirectory(workingDirectory)
+                .WithEnvironmentVariable("DOTNET_NEW_SEARCH_FILE_OVERRIDE", cacheFilePath)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And.HaveStdOutContaining("Couldn't find an installed template that matches the input, searching online for one that does...")
+                .And.HaveStdOutContaining("Template name \"Azure Functions\" (func) from author \"Microsoft\" in pack Microsoft.Azure.WebJobs.ProjectTemplates");
         }
 
-        private static void CanUpdate(string sdkVersion)
+        private static void CanCheckUpdates(string workingDirectory, string cacheFilePath)
         {
-
+            new DotnetCommand(TestOutputLogger.Instance, "new", "--update-check")
+                .WithWorkingDirectory(workingDirectory)
+                .WithEnvironmentVariable("DOTNET_NEW_SEARCH_FILE_OVERRIDE", cacheFilePath)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And.NotHaveStdErr()
+                .And.NotHaveStdOutContaining("Exception")
+                .And.HaveStdOutMatching("(Updates are available for the following:|No updates were found.)");
         }
 
-        private static void CanSearch(string sdkVersion)
+        private static void CanUpdate(string workingDirectory, string cacheFilePath)
         {
-
+            new DotnetCommand(TestOutputLogger.Instance, "new", "--update-apply")
+                .WithWorkingDirectory(workingDirectory)
+                .WithEnvironmentVariable("DOTNET_NEW_SEARCH_FILE_OVERRIDE", cacheFilePath)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And.NotHaveStdErr()
+                .And.NotHaveStdOutContaining("Exception")
+                .And.HaveStdOutMatching("(...Update Succeeded|No updates were found.)");
         }
 
-        private static void CreateGlobalJson(string directory, string sdkVersion)
+        private static void CanSearch(string workingDirectory, string cacheFilePath)
         {
-            string jsonContent = $@"{{ ""sdk"": {{ ""version"": ""{sdkVersion}"" }} }}";
+            new DotnetCommand(TestOutputLogger.Instance, "new", "func", "--search")
+                .WithWorkingDirectory(workingDirectory)
+                .WithEnvironmentVariable("DOTNET_NEW_SEARCH_FILE_OVERRIDE", cacheFilePath)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And.NotHaveStdErr()
+                .And.NotHaveStdOutContaining("Exception")
+                .And.HaveStdOutContaining("Microsoft.Azure.Functions.Worker.ProjectTemplates");
+        }
+
+        private static void CreateGlobalJson(string directory, string sdkVersion, string rollForward = "latestMinor", bool allowPrerelease = false)
+        {
+            string prereleaseSection = allowPrerelease ? @", ""allowPrerelease"": ""true""" : string.Empty;
+            string jsonContent = $@"{{ ""sdk"": {{ ""version"": ""{sdkVersion}"", ""rollForward"": ""{rollForward}"" {prereleaseSection}}} }}";
             File.WriteAllText(Path.Combine(directory, "global.json"), jsonContent);
         }
     }

@@ -92,6 +92,8 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
                     if ((count % 10) == 0)
                     {
                         Console.WriteLine($"{count} packs are processed");
+                        // TODO remove break after testing
+                        break;
                     }
                 }
                 Console.WriteLine($"All packs from pack provider {packProvider.Name} are processed");

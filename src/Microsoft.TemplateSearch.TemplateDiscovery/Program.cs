@@ -61,8 +61,10 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
             }
 
             PackSourceCheckResult checkResults = await packSourceChecker.CheckPackagesAsync().ConfigureAwait(false);
-            PackCheckResultReportWriter.TryWriteResults(config.BasePath, checkResults);
-            CacheFileTests.RunTests();
+            PackCheckResultReportWriter.TryWriteResults(config.BasePath, checkResults, out string metadataPath);
+
+            CacheFileTests.RunTests(metadataPath);
+            return;
         }
 
         private static void ShowUsageMessage()
