@@ -23,17 +23,17 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Test
             CanUseSdkVersion(workingDirectory, "5.0.100", "5.0.1", "latestPatch");
             CanCheckUpdates(workingDirectory, cacheFilePath);
             CanUpdate(workingDirectory, cacheFilePath);
-            //CanSearch(workingDirectory, cacheFilePath);
+            CanSearch(workingDirectory, cacheFilePath);
 
             workingDirectory = TestUtils.CreateTemporaryFolder();
             CanUseSdkVersion(workingDirectory, "5.0.300", "5.0.", "latestFeature");
             CanCheckUpdates(workingDirectory, cacheFilePath);
             CanUpdate(workingDirectory, cacheFilePath);
-            //CanSearch(workingDirectory, cacheFilePath);
+            CanSearch(workingDirectory, cacheFilePath);
 
             workingDirectory = TestUtils.CreateTemporaryFolder();
             CanUseSdkVersion(workingDirectory, "6.0.100", "6.0.", allowPrerelease: true);
-            //CanSearch(workingDirectory, cacheFilePath);
+            CanSearch(workingDirectory, cacheFilePath);
         }
 
         private static void CanUseSdkVersion(string workingDirectory, string requestedSdkVersion, string resolvedVersionPattern, string rollForward = "latestMinor", bool allowPrerelease = false)
