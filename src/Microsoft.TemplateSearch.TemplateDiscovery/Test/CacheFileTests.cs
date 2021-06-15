@@ -85,7 +85,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Test
                 .ExitWith(0)
                 .And.NotHaveStdErr()
                 .And.NotHaveStdOutContaining("Exception")
-                .And.HaveStdOutMatching("(...Update Succeeded|No updates were found.)");
+                .And.HaveStdOutMatching("(...Update succeeded|No updates were found.)");
         }
 
         private static void CanSearch(string workingDirectory, string cacheFilePath)
