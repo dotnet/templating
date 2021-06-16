@@ -17,7 +17,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Results
     {
         public static readonly string CacheContentDirectory = "SearchCache";
         // All the metadata needed for searching from dotnet new.
-        public static readonly string SearchMetadataFilename = "templateSearchInfo.json";
+        public static readonly string SearchMetadataFilename = "NuGetTemplateSearchInfo.json";
         // Metadata for the scraper to skip packs known to not contain templates.
         public static readonly string NonTemplatePacksFileName = "nonTemplatePacks.json";
 

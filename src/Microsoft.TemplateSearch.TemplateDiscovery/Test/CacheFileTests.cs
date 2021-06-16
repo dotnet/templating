@@ -14,25 +14,25 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Test
         public static void RunTests(string cacheFilePath)
         {
             string workingDirectory = TestUtils.CreateTemporaryFolder();
-            CanUseSdkVersion(workingDirectory, "3.1.400", "3.");
+            UseSdkVersion(workingDirectory, requestedSdkVersion: "3.1.400", resolvedVersionPattern: "3.");
             CanSearchWhileInstantiating(workingDirectory, cacheFilePath);
             CanCheckUpdates(workingDirectory, cacheFilePath);
             CanUpdate(workingDirectory, cacheFilePath);
 
             workingDirectory = TestUtils.CreateTemporaryFolder();
-            CanUseSdkVersion(workingDirectory, "5.0.100", "5.0.1", "latestPatch");
+            UseSdkVersion(workingDirectory, requestedSdkVersion: "5.0.100", resolvedVersionPattern: "5.0.1", rollForward: "latestPatch");
             CanSearchWhileInstantiating(workingDirectory, cacheFilePath);
             CanCheckUpdates(workingDirectory, cacheFilePath);
             CanUpdate(workingDirectory, cacheFilePath);
 
             workingDirectory = TestUtils.CreateTemporaryFolder();
-            CanUseSdkVersion(workingDirectory, "5.0.300", "5.0.", "latestFeature");
+            UseSdkVersion(workingDirectory, requestedSdkVersion: "5.0.300", resolvedVersionPattern: "5.0.", rollForward: "latestFeature");
             CanCheckUpdates(workingDirectory, cacheFilePath);
             CanUpdate(workingDirectory, cacheFilePath);
             CanSearch(workingDirectory, cacheFilePath);
         }
 
-        private static void CanUseSdkVersion(string workingDirectory, string requestedSdkVersion, string resolvedVersionPattern, string rollForward = "latestMinor", bool allowPrerelease = false)
+        private static void UseSdkVersion(string workingDirectory, string requestedSdkVersion, string resolvedVersionPattern, string rollForward = "latestMinor", bool allowPrerelease = false)
         {
             CreateGlobalJson(workingDirectory, requestedSdkVersion, rollForward, allowPrerelease);
 

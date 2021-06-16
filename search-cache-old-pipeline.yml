@@ -34,7 +34,6 @@ steps:
     command: 'run'
     projects: '$(Build.SourcesDirectory)/src/Microsoft.TemplateSearch.TemplateDiscovery/Microsoft.TemplateSearch.TemplateDiscovery.csproj'
     arguments: '--basePath $(System.DefaultWorkingDirectory)/NugetDownloadDirectory'
-- bash: mv -T '$(System.DefaultWorkingDirectory)/NugetDownloadDirectory/SearchCache/templateSearchInfo.json' '$(System.DefaultWorkingDirectory)/NugetDownloadDirectory/SearchCache/NuGetTemplateSearchInfo.json'
   displayName: Copy cache file
 - publish: $(System.DefaultWorkingDirectory)/NugetDownloadDirectory/SearchCache/NuGetTemplateSearchInfo.json
   artifact: outputs
