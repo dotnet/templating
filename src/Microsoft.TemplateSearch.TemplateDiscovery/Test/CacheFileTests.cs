@@ -30,10 +30,6 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Test
             CanCheckUpdates(workingDirectory, cacheFilePath);
             CanUpdate(workingDirectory, cacheFilePath);
             CanSearch(workingDirectory, cacheFilePath);
-
-            workingDirectory = TestUtils.CreateTemporaryFolder();
-            CanUseSdkVersion(workingDirectory, "6.0.100", "6.0.", allowPrerelease: true);
-            CanSearch(workingDirectory, cacheFilePath);
         }
 
         private static void CanUseSdkVersion(string workingDirectory, string requestedSdkVersion, string resolvedVersionPattern, string rollForward = "latestMinor", bool allowPrerelease = false)
