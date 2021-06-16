@@ -21,9 +21,9 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Test
 
             workingDirectory = TestUtils.CreateTemporaryFolder();
             CanUseSdkVersion(workingDirectory, "5.0.100", "5.0.1", "latestPatch");
+            CanSearchWhileInstantiating(workingDirectory, cacheFilePath);
             CanCheckUpdates(workingDirectory, cacheFilePath);
             CanUpdate(workingDirectory, cacheFilePath);
-            CanSearch(workingDirectory, cacheFilePath);
 
             workingDirectory = TestUtils.CreateTemporaryFolder();
             CanUseSdkVersion(workingDirectory, "5.0.300", "5.0.", "latestFeature");
