@@ -1,0 +1,35 @@
+schedules:
+- cron: 0 * * * *
+  displayName: Run every hour
+  branches:
+    include:
+    - /legacy/template-discovery-tool
+  always: true
+
+steps:
+- checkout: self
+- task: DotNetCoreCLI@2
+  displayName: Build Cache Updater Tool
+  inputs:
+    command: 'build'
+    projects: '$(Build.SourcesDirectory)/src/Microsoft.TemplateSearch.TemplateDiscovery/Microsoft.TemplateSearch.TemplateDiscovery.csproj'
+- task: DotNetCoreCLI@2
+  displayName: Run Cache Updater
+  inputs:
+    command: 'run'
+    projects: '$(Build.SourcesDirectory)/src/Microsoft.TemplateSearch.TemplateDiscovery/Microsoft.TemplateSearch.TemplateDiscovery.csproj'
+    arguments: '--basePath $(System.DefaultWorkingDirectory)/NugetDownloadDirectory'
+- bash: mv -T '$(System.DefaultWorkingDirectory)/NugetDownloadDirectory/SearchCache/templateSearchInfo.json' '$(System.DefaultWorkingDirectory)/NugetDownloadDirectory/SearchCache/NuGetTemplateSearchInfo.json'
+  displayName: Copy cache file
+- publish: $(System.DefaultWorkingDirectory)/NugetDownloadDirectory/SearchCache/NuGetTemplateSearchInfo.json
+  artifact: outputs
+- bash: az config set extension.use_dynamic_install=yes_without_prompt
+  displayName: Disable Azure CLI prompts
+- bash: >
+    az storage azcopy blob upload 
+    -c $(CacheFileStorageContainer)
+    --account-name $(CacheFileStorageAccount) 
+    -s '$(System.DefaultWorkingDirectory)/NugetDownloadDirectory/SearchCache/NuGetTemplateSearchInfo.json' 
+    --sas-token "$(CacheFileStorageSasToken)"
+    -d NuGetTemplateSearchInfo.json
+  displayName: Upload to blob storage
