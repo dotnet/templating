@@ -198,7 +198,7 @@ namespace Dotnet_new3.IntegrationTests
 
             var expectedErrors =
 Regex.Escape(@$"Warnung: Die Lokalisierungsdatei {tmpTemplateLocation + Path.DirectorySeparatorChar}.template.config/localize/templatestrings.de-DE.json ist nicht mit der Basiskonfiguration {tmpTemplateLocation + Path.DirectorySeparatorChar}.template.config/template.json kompatibel und wird übersprungen.
-  In der Lokalisierungsdatei unter der POST-Aktion mit der ID „pa1“ befinden sich lokalisierte Zeichenfolgen für manuelle Anweisungen mit den IDs „do-not-exist“. Diese manuellen Anweisungen sind in der Datei „template.json“ nicht vorhanden und sollten aus der Lokalisierungsdatei entfernt werden.").Replace('„', '.');
+  In der Lokalisierungsdatei unter der POST-Aktion mit der ID „pa1“ befinden sich lokalisierte Zeichenfolgen für manuelle Anweisungen mit den IDs „do-not-exist“. Diese manuellen Anweisungen sind in der Datei „template.json“ nicht vorhanden und sollten aus der Lokalisierungsdatei entfernt werden.").Replace('„', '.').Replace('“', '.');
 
             new DotnetNewCommand(_log, "-i", tmpTemplateLocation)
                 .WithCustomHive(home)
