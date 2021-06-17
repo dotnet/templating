@@ -63,6 +63,9 @@ namespace Dotnet_new3.IntegrationTests
         [InlineData("Class Library", "classlib", "C#", "netcoreapp2.1")]
         [InlineData("Class Library", "classlib", "F#", "netcoreapp2.1")]
         [InlineData("Class Library", "classlib", "VB", "netcoreapp2.1")]
+        [InlineData("Class Library", "classlib", "C#", "netstandard2.0")]
+        [InlineData("Class Library", "classlib", "VB", "netstandard2.0")]
+        [InlineData("Class Library", "classlib", "F#", "netstandard2.0")]
 
         [InlineData("Simple Console Application", "app")]
         [InlineData("Simple Console Application", "app", "C#")]
@@ -167,6 +170,9 @@ Restore succeeded\.");
         [InlineData("Class Library", "classlib", "C#", "netcoreapp2.1")]
         [InlineData("Class Library", "classlib", "F#", "netcoreapp2.1")]
         [InlineData("Class Library", "classlib", "VB", "netcoreapp2.1")]
+        [InlineData("Class Library", "classlib", "C#", "netstandard2.0")]
+        [InlineData("Class Library", "classlib", "VB", "netstandard2.0")]
+        [InlineData("Class Library", "classlib", "F#", "netstandard2.0")]
 
         [InlineData("Simple Console Application", "app")]
         [InlineData("Simple Console Application", "app", "C#")]
@@ -306,7 +312,7 @@ Restore succeeded\.");
         }
 
         [Theory]
-        //unset nullable 
+        //unset nullable
         [InlineData("Nullable", null, "--nullable", "false", "Simple Console Application", "app", null, null)]
         [InlineData("Nullable", null, "--nullable", "false", "Class Library", "classlib", null, null)]
 
