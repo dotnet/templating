@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" target-language="pl" original="../LocalizableStrings.resx">
     <body>
@@ -20,7 +20,7 @@
       </trans-unit>
       <trans-unit id="Authoring_InvalidRegex">
         <source>'{0}' could not be parsed as a regular expression</source>
-        <target state="translated">Nie można przeanalizować szablonu "{0}" jako wyrażenia regularnego</target>
+        <target state="new">'{0}' could not be parsed as a regular expression</target>
         <note />
       </trans-unit>
       <trans-unit id="Authoring_MalformedPostActionManualInstructions">
@@ -41,7 +41,7 @@
       </trans-unit>
       <trans-unit id="Authoring_NonBoolDataTypeForRegexMatch">
         <source>A non-bool DataType was specified for a regexMatch type symbol</source>
-        <target state="translated">Dla symbolu typu regexMatch określono nielogiczny typ danych.</target>
+        <target state="new">A non-bool DataType was specified for a regexMatch type symbol</target>
         <note />
       </trans-unit>
       <trans-unit id="Authoring_PostActionIdIsNotUnique">
@@ -58,27 +58,27 @@ Do not localize: actionId</note>
       </trans-unit>
       <trans-unit id="Authoring_SourceDoesNotExist">
         <source>Source '{0}' in template does not exist.</source>
-        <target state="needs-review-translation">    Źródło "{0}" w szablonie nie istnieje.</target>
+        <target state="new">Source '{0}' in template does not exist.</target>
         <note />
       </trans-unit>
       <trans-unit id="Authoring_SourceIsOutsideInstallSource">
         <source>Source location '{0}' is outside the specified install source location.</source>
-        <target state="needs-review-translation">    Lokalizacja źródła "{0}" jest poza określoną lokalizacją źródła instalacji.</target>
+        <target state="new">Source location '{0}' is outside the specified install source location.</target>
         <note />
       </trans-unit>
       <trans-unit id="Authoring_SourceMustBeDirectory">
         <source>Source must be a directory, but '{0}' is a file.</source>
-        <target state="needs-review-translation">    Źródło musi być katalogiem, ale szablon "{0}" jest plikiem.</target>
+        <target state="new">Source must be a directory, but '{0}' is a file.</target>
         <note />
       </trans-unit>
       <trans-unit id="Authoring_TemplateMissingCommonInformation">
         <source>The template configuration {0} is missing common information:</source>
-        <target state="needs-review-translation">Szablon "{0}" nie zawiera informacji ogólnych</target>
+        <target state="new">The template configuration {0} is missing common information:</target>
         <note>{0} is template configuration location.</note>
       </trans-unit>
       <trans-unit id="Authoring_TemplateNotInstalled">
         <source>Failed to load template from {0}:</source>
-        <target state="needs-review-translation">Nie załadowano szablonu "{0}"</target>
+        <target state="new">Failed to load template from {0}:</target>
         <note>{0} is template configuration location.</note>
       </trans-unit>
       <trans-unit id="Authoring_TemplateNotInstalled_Message">
