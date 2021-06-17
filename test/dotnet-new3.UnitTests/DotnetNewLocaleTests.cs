@@ -3,6 +3,7 @@
 
 #nullable enable
 
+using System;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -196,8 +197,8 @@ namespace Dotnet_new3.IntegrationTests
             DirectoryCopy(validTestTemplateLocation, tmpTemplateLocation, copySubDirs: true);
 
             var expectedErrors =
-@$"Warnung: Die Lokalisierungsdatei {tmpTemplateLocation + Path.DirectorySeparatorChar}.template.config/localize/templatestrings.de-DE.json ist nicht mit der Basiskonfiguration {tmpTemplateLocation + Path.DirectorySeparatorChar}.template.config/template.json kompatibel und wird übersprungen.
-  In der Lokalisierungsdatei unter der POST-Aktion mit der ID „pa1“ befinden sich lokalisierte Zeichenfolgen für manuelle Anweisungen mit den IDs „do-not-exist“. Diese manuellen Anweisungen sind in der Datei „template.json“ nicht vorhanden und sollten aus der Lokalisierungsdatei entfernt werden.";
+Regex.Escape(@$"Warnung: Die Lokalisierungsdatei {tmpTemplateLocation + Path.DirectorySeparatorChar}.template.config/localize/templatestrings.de-DE.json ist nicht mit der Basiskonfiguration {tmpTemplateLocation + Path.DirectorySeparatorChar}.template.config/template.json kompatibel und wird übersprungen.
+  In der Lokalisierungsdatei unter der POST-Aktion mit der ID „pa1“ befinden sich lokalisierte Zeichenfolgen für manuelle Anweisungen mit den IDs „do-not-exist“. Diese manuellen Anweisungen sind in der Datei „template.json“ nicht vorhanden und sollten aus der Lokalisierungsdatei entfernt werden.").Replace('„', '.');
 
             new DotnetNewCommand(_log, "-i", tmpTemplateLocation)
                 .WithCustomHive(home)
@@ -224,7 +225,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Execute()
                 .Should()
                 .ExitWith(0)
-                .And.HaveStdOutContaining(expectedErrors)
+                .And.HaveStdOutMatching(expectedErrors)
                 .And.HaveStdOutContaining("Die Vorlage \"name\" wurde erfolgreich erstellt.").And.NotHaveStdOutContaining("name_de-DE:äÄßöÖüÜ");
         }
 
