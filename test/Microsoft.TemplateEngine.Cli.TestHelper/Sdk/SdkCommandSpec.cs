@@ -35,6 +35,8 @@ namespace Microsoft.NET.TestFramework.Commands
             ret.FileName = FileName;
             ret.Arguments = EscapeArgs();
             ret.UseShellExecute = false;
+            ret.StandardOutputEncoding = System.Text.Encoding.UTF8;
+            ret.StandardErrorEncoding = System.Text.Encoding.UTF8;
             foreach (var kvp in Environment)
             {
                 ret.Environment[kvp.Key] = kvp.Value;
