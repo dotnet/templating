@@ -230,7 +230,7 @@ Restore succeeded\.");
 
         [Theory]
         [InlineData("Nullable", "enable", "Simple Console Application", "app", null, null)]
-        [InlineData("CheckForOverflowUnderflow", "true", "Simple Console Application", "app", null, null)]
+        [InlineData("CheckForOverflowUnderflow", null, "Simple Console Application", "app", null, null)]
         [InlineData("LangVersion", null, "Simple Console Application", "app", null, null)]
         [InlineData("TargetFramework", "net6.0", "Simple Console Application", "app", null, null)]
 
@@ -251,7 +251,7 @@ Restore succeeded\.");
         [InlineData("TargetFramework", "net6.0", "Console Application", "console", "VB", null)]
 
         [InlineData("Nullable", "enable", "Class Library", "classlib", null, null)]
-        [InlineData("CheckForOverflowUnderflow", "true", "Class Library", "classlib", null, null)]
+        [InlineData("CheckForOverflowUnderflow", null, "Class Library", "classlib", null, null)]
         [InlineData("LangVersion", null, "Class Library", "classlib", null, null)]
         [InlineData("TargetFramework", "net6.0", "Class Library", "classlib", null, null)]
 
