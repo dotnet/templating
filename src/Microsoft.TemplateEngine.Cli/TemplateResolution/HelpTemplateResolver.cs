@@ -20,6 +20,12 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
     /// </summary>
     internal class HelpTemplateResolver : BaseTemplateResolver
     {
+        private static IReadOnlyList<FilterOption> _supportedFilters = new[]
+        {
+            SupportedFilterOptions.BaselineFilter,
+            SupportedFilterOptions.TypeFilter
+        };
+
         internal HelpTemplateResolver(TemplatePackageManager templatePackageManager, IHostSpecificDataLoader hostSpecificDataLoader)
             : base(templatePackageManager, hostSpecificDataLoader)
         {
@@ -30,17 +36,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         {
         }
 
-        internal static IReadOnlyList<FilterOption> SupportedFilters
-        {
-            get
-            {
-                return new[]
-                {
-                    SupportedFilterOptions.BaselineFilter,
-                    SupportedFilterOptions.TypeFilter
-                };
-            }
-        }
+        internal static IReadOnlyList<FilterOption> SupportedFilters => _supportedFilters;
 
         internal override IReadOnlyList<FilterOption> Filters => SupportedFilters;
 

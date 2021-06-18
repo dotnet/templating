@@ -272,9 +272,9 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                 return;
             }
 
-            if (_unambiguousTemplateGroup.TemplateToInvoke != null)
+            _templateToInvoke = _unambiguousTemplateGroup.GetTemplateToInvoke();
+            if (_templateToInvoke != null)
             {
-                _templateToInvoke = _unambiguousTemplateGroup.TemplateToInvoke;
                 _singularInvokableMatchStatus = Status.SingleMatch;
                 return;
             }

@@ -17,21 +17,17 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
 {
     internal static class CliTemplateSearchCoordinator
     {
-        internal static IReadOnlyList<FilterOption> SupportedFilters
+        private static IReadOnlyList<FilterOption> _supportedFilters = new[]
         {
-            get
-            {
-                return new[]
-                {
-                    SupportedFilterOptions.AuthorFilter,
-                    SupportedFilterOptions.BaselineFilter,
-                    SupportedFilterOptions.LanguageFilter,
-                    SupportedFilterOptions.TypeFilter,
-                    SupportedFilterOptions.TagFilter,
-                    SupportedFilterOptions.PackageFilter
-                };
-            }
-        }
+            SupportedFilterOptions.AuthorFilter,
+            SupportedFilterOptions.BaselineFilter,
+            SupportedFilterOptions.LanguageFilter,
+            SupportedFilterOptions.TypeFilter,
+            SupportedFilterOptions.TagFilter,
+            SupportedFilterOptions.PackageFilter
+        };
+
+        internal static IReadOnlyList<FilterOption> SupportedFilters => _supportedFilters;
 
         /// <summary>
         /// Executes searching for the templates in configured remote sources.

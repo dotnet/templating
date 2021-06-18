@@ -50,22 +50,6 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         internal TemplateGroup GroupInfo => _templateGroup;
 
         /// <summary>
-        /// Returns the template to be invoked based on the command input.
-        /// </summary>
-        internal (ITemplateInfo Template, IReadOnlyDictionary<string, string?> Parameters)? TemplateToInvoke
-        {
-            get
-            {
-                var templates = GetHighestPrecedenceTemplateMatchInfos();
-                if (templates.Count() != 1)
-                {
-                    return null;
-                }
-                return (templates.Single().Info, templates.Single().GetValidTemplateParameters());
-            }
-        }
-
-        /// <summary>
         /// True when the group matches group filters.
         /// </summary>
         internal bool IsGroupMatch => _groupDispositions.Any(x => x.Kind != MatchKind.Mismatch);
@@ -204,7 +188,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
         /// <param name="group">The template group to apply filters to.</param>
         /// <param name="groupFilters">The group-based filters.</param>
         /// <param name="templateInfoFilters">The template info filters.</param>
-        /// <param name="templateParamtersFilter">The template parameters filters.</param>
+        /// <param name="templateParametersFilter">The template parameters filters.</param>
         /// <returns><see cref="TemplateGroupMatchInfo"/> with match information for the filters applied.</returns>
         /// <remarks>
         /// Note that filters are applied in the order: group-based filters, template info filters and template parameters filters.
@@ -214,7 +198,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             TemplateGroup group,
             IEnumerable<Func<TemplateGroup, MatchInfo?>> groupFilters,
             IEnumerable<Func<ITemplateInfo, MatchInfo?>> templateInfoFilters,
-            Func<ITemplateInfo, IEnumerable<MatchInfo>>? templateParamtersFilter = null)
+            Func<ITemplateInfo, IEnumerable<MatchInfo>>? templateParametersFilter = null)
         {
             List<MatchInfo> groupMatchDispositions = new List<MatchInfo>();
             foreach (Func<TemplateGroup, MatchInfo?>? filter in groupFilters)
@@ -241,7 +225,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
 #pragma warning restore CS0618 // Type or member is obsolete
 
             //if template info is not a match the further evaluation is skipped
-            if (templateMatchDispositions.All(template => !TemplateInfoMatch(template)) || templateParamtersFilter == null)
+            if (templateMatchDispositions.All(template => !TemplateInfoMatch(template)) || templateParametersFilter == null)
             {
                 return new TemplateGroupMatchInfo(
                     group,
@@ -252,13 +236,26 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
 
             foreach (var template in templateMatchDispositions)
             {
-                var parameterMatchInfos = templateParamtersFilter(template.Info);
+                var parameterMatchInfos = templateParametersFilter(template.Info);
                 foreach (var parameterMatchInfo in parameterMatchInfos)
                 {
                     template.AddMatchDisposition(parameterMatchInfo);
                 }
             }
             return new TemplateGroupMatchInfo(group, groupMatchDispositions, templateMatchDispositions.ToList());
+        }
+
+        /// <summary>
+        /// Returns the template to be invoked based on the command input or <see langword="null"/> if template to invoke cannot be resolved.
+        /// </summary>
+        internal (ITemplateInfo Template, IReadOnlyDictionary<string, string?> Parameters)? GetTemplateToInvoke()
+        {
+            var templates = GetHighestPrecedenceTemplateMatchInfos();
+            if (templates.Count() != 1)
+            {
+                return null;
+            }
+            return (templates.Single().Info, templates.Single().GetValidTemplateParameters());
         }
 
         /// <summary>
