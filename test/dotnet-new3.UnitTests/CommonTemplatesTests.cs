@@ -63,6 +63,9 @@ namespace Dotnet_new3.IntegrationTests
         [InlineData("Class Library", "classlib", "C#", "netcoreapp2.1")]
         [InlineData("Class Library", "classlib", "F#", "netcoreapp2.1")]
         [InlineData("Class Library", "classlib", "VB", "netcoreapp2.1")]
+        [InlineData("Class Library", "classlib", "C#", "netstandard2.1")]
+        [InlineData("Class Library", "classlib", "VB", "netstandard2.1")]
+        [InlineData("Class Library", "classlib", "F#", "netstandard2.1")]
         [InlineData("Class Library", "classlib", "C#", "netstandard2.0")]
         [InlineData("Class Library", "classlib", "VB", "netstandard2.0")]
         [InlineData("Class Library", "classlib", "F#", "netstandard2.0")]
@@ -170,6 +173,9 @@ Restore succeeded\.");
         [InlineData("Class Library", "classlib", "C#", "netcoreapp2.1")]
         [InlineData("Class Library", "classlib", "F#", "netcoreapp2.1")]
         [InlineData("Class Library", "classlib", "VB", "netcoreapp2.1")]
+        [InlineData("Class Library", "classlib", "C#", "netstandard2.1")]
+        [InlineData("Class Library", "classlib", "VB", "netstandard2.1")]
+        [InlineData("Class Library", "classlib", "F#", "netstandard2.1")]
         [InlineData("Class Library", "classlib", "C#", "netstandard2.0")]
         [InlineData("Class Library", "classlib", "VB", "netstandard2.0")]
         [InlineData("Class Library", "classlib", "F#", "netstandard2.0")]
@@ -254,17 +260,20 @@ Restore succeeded\.");
         [InlineData("CheckForOverflowUnderflow", null, "Class Library", "classlib", null, null)]
         [InlineData("LangVersion", null, "Class Library", "classlib", null, null)]
         [InlineData("TargetFramework", "net6.0", "Class Library", "classlib", null, null)]
+        [InlineData("Nullable", null, "Class Library", "classlib", null, "netstandard2.0")]
 
         [InlineData("Nullable", null, "Class Library", "classlib", "F#", null)]
         [InlineData("CheckForOverflowUnderflow", null, "Class Library", "classlib", "F#", null)]
         [InlineData("LangVersion", null, "Class Library", "classlib", "F#", null)]
         [InlineData("TargetFramework", "net6.0", "Class Library", "classlib", "F#", null)]
         [InlineData("GenerateDocumentationFile", "true", "Class Library", "classlib", "F#", null)]
+        [InlineData("Nullable", null, "Class Library", "classlib", "F#", "netstandard2.0")]
 
         [InlineData("Nullable", null, "Class Library", "classlib", "VB", null)]
         [InlineData("CheckForOverflowUnderflow", null, "Class Library", "classlib", "VB", null)]
         [InlineData("LangVersion", null, "Class Library", "classlib", "VB", null)]
         [InlineData("TargetFramework", "net6.0", "Class Library", "classlib", "VB", null)]
+        [InlineData("Nullable", null, "Class Library", "classlib", "VB", "netstandard2.0")]
 
         public void SetPropertiesByDefault(string propertyName, string? propertyValue, string expectedTemplateName, string templateShortName, string? language, string? framework)
         {
@@ -315,6 +324,8 @@ Restore succeeded\.");
         //unset nullable
         [InlineData("Nullable", null, "--nullable", "false", "Simple Console Application", "app", null, null)]
         [InlineData("Nullable", null, "--nullable", "false", "Class Library", "classlib", null, null)]
+        [InlineData("Nullable", null, "--nullable", "true", "Class Library", "classlib", null, "netstandard2.0")]
+        [InlineData("Nullable", null, "--nullable", "false", "Class Library", "classlib", null, "netstandard2.0")]
 
         //language version
         [InlineData("LangVersion", "9.0", "--langVersion", "9.0", "Simple Console Application", "app", null, null)]
