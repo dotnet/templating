@@ -3,12 +3,12 @@
   "name": "Class Library",
   "description": "一个用于创建面向 NET Standard 或 .NET Core 的类库的项目",
   "symbols/TargetFrameworkOverride/description": "Overrides the target framework",
-  "symbols/Framework/description": "The target framework for the project.",
-  "symbols/Framework/choices/net6.0/description": "Target net6.0",
-  "symbols/Framework/choices/netstandard2.1/description": "Target netstandard2.1",
-  "symbols/Framework/choices/netstandard2.0/description": "Target netstandard2.0",
+  "symbols/Framework/description": "项目的目标框架。",
+  "symbols/Framework/choices/net6.0/description": "目标 net6.0",
+  "symbols/Framework/choices/netstandard2.1/description": "目标 netstandard2.1",
+  "symbols/Framework/choices/netstandard2.0/description": "目标 netstandard2.0",
   "symbols/skipRestore/description": "If specified, skips the automatic restore of the project on create.",
   "postActions/restore/description": "Restore NuGet packages required by this project.",
-  "postActions/restore/manualInstructions/default/text": "Run 'dotnet restore'",
-  "postActions/open-file/description": "Opens Library.fs in the editor"
+  "postActions/restore/manualInstructions/default/text": "运行“dotnet restore”",
+  "postActions/open-file/description": "在编辑器中打开 Library.fs"
 }

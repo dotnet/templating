@@ -2,12 +2,12 @@
   "author": "Microsoft",
   "name": "Console Application",
   "description": "Проект для создания приложения командной строки, которое может выполняться в среде .NET Core в Windows, Linux и Mac OS",
-  "symbols/TargetFrameworkOverride/description": "Overrides the target framework",
+  "symbols/TargetFrameworkOverride/description": "Переопределяет целевую платформу.",
   "symbols/Framework/description": "The target framework for the project.",
   "symbols/Framework/choices/net5.0/description": "Target net5.0",
-  "symbols/langVersion/description": "Sets the LangVersion property in the created project file",
+  "symbols/langVersion/description": "Задает свойство LangVersion в создаваемом файле проекта.",
   "symbols/skipRestore/description": "If specified, skips the automatic restore of the project on create.",
-  "postActions/restore/description": "Restore NuGet packages required by this project.",
+  "postActions/restore/description": "Восстановление требуемых пакетов NuGet для этого проекта.",
   "postActions/restore/manualInstructions/default/text": "Run 'dotnet restore'",
   "postActions/open-file/description": "Opens Program.cs in the editor"
 }
