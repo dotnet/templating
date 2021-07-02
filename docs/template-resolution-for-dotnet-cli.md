@@ -7,18 +7,18 @@ templates.
 
 Template group is set of templates with same `groupIdentity` defined in
 template.json. In case group identity is not set, the template is treated as
-individual template groups.
+a template group on its own.
 
 `dotnet new --list` and `dotnet new --search` show the list of template groups, not
 all the templates.
 
-Templates in template group:
+Templates in a template group:
 -   can have different languages (all the languages are shown in ‘Language’
     column in table listing)
--   can have different short name: in this case short names can be equally used
+-   can have different short names: in this case the short names can be equally used
     as synonyms in command input and will be shown in comma separated list in
     table listing.
--   assume to have same type, name, author, and tags (classification). When
+-   are assumed to have the same type, name, author, and tags (classification). When
     showing the group, the information from the template with highest
     ‘precedence’ value will be shown; however, the template group will be
     considered as match if at least one template from the group is a match. For
@@ -30,7 +30,7 @@ When resolving the template to be shown/used:
     Name match/partial matches is only applicable for `--list` and `--search`.
 -   when evaluating the template group, the supported languages are considered:
     if the template group has multiple languages defined and the user didn’t
-    specify language to use the default language (C\#) will be used, otherwise
+    specify a language to use the default language (C\#) will be used. Otherwise
     the input results in error.
 -   then the other matches of the group are evaluated based on the other
     template info filters (type, author, tag, baseline) and template specific
@@ -44,9 +44,9 @@ single template from single template group:
     to run. If the precedence value is not given or is the same for multiple
     templates, it results in error.
 
-In order to show help for the template, the command input should resolve the
-single template group (based on short name), however, may resolve multiple
-templates, but they should have same language. In case of multiple templates,
+In order to show help for a template, the command input should resolve to a
+single template group (based on short name). If the resolved group
+contains multiple matching templates, they should have same language. In case of multiple templates,
 the template parameters will be combined when displaying the help; the template
 information will be taken from highest precedence template.
 
@@ -61,9 +61,9 @@ Argument (name) matching: exact short name
 
 ### Template info filters
 -   Language
-    -   If user specified the language via `--language` option, should be exact
-        match
-    -   If the template group has multiple languages defined, default language
+    -   If the user specified the language via `--language` option, the value should 
+    exactly match the template language.
+    -   If the template group has multiple languages defined, the default language
         is preferred
     -   If the template group has single language defined, this language is used
 
@@ -154,7 +154,7 @@ Argument (name) matching: exact or partial short name or name, optional.
 -   Language
     -   If user specified the language via `--language` option, only the template
         groups that match the language will be shown (exact match)
-    -   Default language is not considered
+    -   The default language is not considered
 
     -   *Example:* `dotnet new --list --language F#`
     -   *Example:* `dotnet new con --list --language F#`
@@ -189,20 +189,20 @@ Argument (name) matching: exact or partial short name or name, optional.
 
 ### Template parameter filters
 
--   if template parameter is given without the value list all the templates that
+-   if template parameter is given without the value, list all the templates that
     have that parameter
 
     -   *Example:* `dotnet new --list --framework`
     -   *Example:* `dotnet new con --list --framework`
 
--   (choice only) if template parameter is given with value then list all the
-    templates that have that parameter and value fits the parameter constraints.
+-   (choice only) if template parameter is given with a value, then list all the
+    templates that have that parameter and the value fits the parameter constraints.
 
     -   *Example:* `dotnet new --list --framework net5.0`
     -   *Example:* `dotnet new con --list--framework net5.0`
 
--   (non-choice only) if template parameter is given with value then list all
-    the templates that have that parameter and ignores the value
+-   (non-choice only) if template parameter is given with a value, then list all
+    the templates that have that parameter and ignore the value
 
     -   *Example:* `dotnet new --list --langVersion 9.0` *(same as dotnet new --list
         \--langVersion)*
@@ -286,7 +286,7 @@ filters applied.
 -   Language
     -   If user specified the language via `--language` option, only the template
         groups that match the language will be shown (exact match)
-    -   Default language is not considered
+    -   The default language is not considered
 
     -   *Example:* `dotnet new --search --language F#`
     -   *Example:* `dotnet new con --search --language F#`
@@ -329,20 +329,20 @@ filters applied.
 
 ### Template parameter filters
 
--   if template parameter is given without the value list all the templates that
+-   if template parameter is given without a value, list all the templates that
     have that parameter
 
     -   *Example:* `dotnet new --search --framework`
     -   *Example:* `dotnet new con --search --framework`
 
--   (choice only) if template parameter is given with value then list all the
+-   (choice only) if template parameter is given with a value, then list all the
     templates that have that parameter and value fits the parameter constraints.
 
     -   *Example:* `dotnet new --search --framework net5.0`
     -   *Example:* `dotnet new con --search --framework net5.0`
 
--   (non-choice only) if template parameter is given with value then list all
-    the templates that have that parameter and ignores the value
+-   (non-choice only) if template parameter is given with a value, then list all
+    the templates that have that parameter and ignore the value
 
     -   *Example:* `dotnet new --search --langVersion 9.0` *(same as dotnet new
         \--search --langVersion)*
