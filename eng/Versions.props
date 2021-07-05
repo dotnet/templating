@@ -14,6 +14,6 @@
     <MicrosoftExtensionsLoggingConsolePackageVersion>6.0.0-preview.3.21164.3</MicrosoftExtensionsLoggingConsolePackageVersion>
     <NewtonsoftJsonPackageVersion>12.0.2</NewtonsoftJsonPackageVersion>
     <SystemCommandLinePackageVersion>2.0.0-beta1.21109.1</SystemCommandLinePackageVersion>
-    <MicrosoftNETCoreAppRefPackageVersion>6.0.0-preview.7.21352.16</MicrosoftNETCoreAppRefPackageVersion>
+    <MicrosoftNETCoreAppRefPackageVersion>6.0.0-preview.7.21355.1</MicrosoftNETCoreAppRefPackageVersion>
   </PropertyGroup>
 </Project>
