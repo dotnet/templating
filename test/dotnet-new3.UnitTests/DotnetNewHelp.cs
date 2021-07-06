@@ -132,7 +132,7 @@ Options:
             string home = TestUtils.CreateTemporaryFolder("Home");
             string workingDirectory = TestUtils.CreateTemporaryFolder();
 
-            new DotnetNewCommand(_log, "--help", "--quiet")
+            new DotnetNewCommand(_log, "--help")
                 .WithCustomHive(home)
                 .WithWorkingDirectory(workingDirectory)
                 .Execute()
