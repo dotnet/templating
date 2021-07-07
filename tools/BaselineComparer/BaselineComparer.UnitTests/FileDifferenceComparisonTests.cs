@@ -3,7 +3,7 @@ using BaselineComparer.TemplateComparison;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
-namespace BaselineComparerTests
+namespace BaselineComparer.UnitTests
 {
     public class FileDifferenceComparisonTests
     {

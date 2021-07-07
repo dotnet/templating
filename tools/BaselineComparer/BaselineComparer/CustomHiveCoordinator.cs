@@ -73,7 +73,6 @@ namespace BaselineComparer
             return true;
         }
 
-        private static readonly string UninstallListHeader = "Currently installed items:";
 
         // TODO: better detection that installs actually worked (Can't do right now)
         private bool TryUninstallAllTemplatesFromHive()
