@@ -9,9 +9,9 @@
     <PreReleaseVersionIteration>7</PreReleaseVersionIteration>
     <PackSpecific Condition="'$(OS)' != 'Windows_NT'">true</PackSpecific>
     <MicrosoftDotNetCliCommandLinePackageVersion>1.0.0-preview.19208.1</MicrosoftDotNetCliCommandLinePackageVersion>
-    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>6.0.0-preview.3.21164.3</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
-    <MicrosoftExtensionsLoggingPackageVersion>6.0.0-preview.3.21164.3</MicrosoftExtensionsLoggingPackageVersion>
-    <MicrosoftExtensionsLoggingConsolePackageVersion>6.0.0-preview.3.21164.3</MicrosoftExtensionsLoggingConsolePackageVersion>
+    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>6.0.0-preview.7.21356.11</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
+    <MicrosoftExtensionsLoggingPackageVersion>6.0.0-preview.7.21356.11</MicrosoftExtensionsLoggingPackageVersion>
+    <MicrosoftExtensionsLoggingConsolePackageVersion>6.0.0-preview.7.21356.11</MicrosoftExtensionsLoggingConsolePackageVersion>
     <NewtonsoftJsonPackageVersion>12.0.2</NewtonsoftJsonPackageVersion>
     <SystemCommandLinePackageVersion>2.0.0-beta1.21356.1</SystemCommandLinePackageVersion>
     <MicrosoftNETCoreAppRefPackageVersion>6.0.0-preview.7.21351.2</MicrosoftNETCoreAppRefPackageVersion>
