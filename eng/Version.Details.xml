@@ -15,6 +15,10 @@
       <Uri>https://github.com/dotnet/runtime</Uri>
       <Sha>cf2938f44fc1494ae984c52a1568a03d51e513ca</Sha>
     </Dependency>
+    <Dependency Name="System.CommandLine" Version="2.0.0-beta1.21356.1">
+      <Uri>https://github.com/dotnet/command-line-api</Uri>
+      <Sha>b751c2e3cc5aeee1916be9892a2fee5ddbef69fb</Sha>
+    </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
     <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="6.0.0-beta.21355.2">
