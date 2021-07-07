@@ -15,6 +15,9 @@
     <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftExtensionsLoggingConsolePackageVersion)" />
     <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsLoggingAbstractionsPackageVersion)" />
     <PackageReference Update="Newtonsoft.Json" Version="$(NewtonsoftJsonPackageVersion)" />
+    <PackageReference Update="NuGet.Configuration" Version="$(NuGetConfigurationPackageVersion)" />
+    <PackageReference Update="NuGet.Credentials" Version="$(NuGetCredentialsPackageVersion)" />
+    <PackageReference Update="NuGet.Protocol" Version="$(NuGetProtocolPackageVersion)" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' AND '$(BuildingInsideVisualStudio)' != 'true'">
