@@ -31,6 +31,18 @@
       <Uri>https://github.com/dotnet/runtime</Uri>
       <Sha />
     </Dependency>
+    <Dependency Name="NuGet.Credentials" Version="6.0.0-preview.2.129">
+      <Uri>https://github.com/nuget/nuget.client</Uri>
+      <Sha />
+    </Dependency>
+    <Dependency Name="NuGet.Configuration" Version="6.0.0-preview.2.129">
+      <Uri>https://github.com/nuget/nuget.client</Uri>
+      <Sha />
+    </Dependency>
+    <Dependency Name="NuGet.Protocol" Version="6.0.0-preview.2.129">
+      <Uri>https://github.com/nuget/nuget.client</Uri>
+      <Sha />
+    </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
     <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="6.0.0-beta.21355.2">
