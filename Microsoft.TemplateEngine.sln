@@ -99,7 +99,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComparisonCleanup", "tools\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DependencyUpdater", "tools\DependencyUpdater\DependencyUpdater.csproj", "{1824AAB4-9F5B-414F-845F-96ECA03BEC0C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectTestRunner", "tools\ProjectTestRunner\ProjectTestRunner.csproj", "{1E2E3DC5-DAEC-4474-B767-17B678A72381}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjectTestRunner.IntegrationTests", "tools\ProjectTestRunner\ProjectTestRunner.IntegrationTests.csproj", "{1E2E3DC5-DAEC-4474-B767-17B678A72381}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "legacy", "legacy", "{63EA4B62-2D2F-4BC9-BDF4-BB4AA269A3C4}"
 EndProject
