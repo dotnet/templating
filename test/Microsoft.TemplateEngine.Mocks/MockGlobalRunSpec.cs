@@ -15,7 +15,7 @@ namespace Microsoft.TemplateEngine.Mocks
             CopyOnly = new List<IPathMatcher>();
             Operations = new List<IOperationProvider>();
             Special = new List<KeyValuePair<IPathMatcher, IRunSpec>>();
-            LocalizationOperations = new Dictionary<string, IReadOnlyList<IOperationProvider>>();
+            LocalizationOperations = new Dictionary<string, IReadOnlyDictionary<string, string>>();
             Rename = new Dictionary<string, string>();
             IgnoreFileNames = new[] { "-.-", "_._" };
         }
@@ -32,7 +32,7 @@ namespace Microsoft.TemplateEngine.Mocks
 
         public IReadOnlyList<KeyValuePair<IPathMatcher, IRunSpec>> Special { get; set; }
 
-        public IReadOnlyDictionary<string, IReadOnlyList<IOperationProvider>> LocalizationOperations { get; set; }
+        public IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> LocalizationOperations { get; set; }
 
         public IReadOnlyList<string> IgnoreFileNames { get; set; }
 

@@ -1,1 +1,1 @@
-﻿
+﻿~Microsoft.TemplateEngine.Core.Contracts.IGlobalRunSpec.LocalizationOperations.get -> System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IReadOnlyDictionary<string, string>>

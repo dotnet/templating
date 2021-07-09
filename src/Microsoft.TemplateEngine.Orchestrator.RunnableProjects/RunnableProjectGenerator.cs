@@ -59,7 +59,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             IOrchestrator2 basicOrchestrator = new Core.Util.Orchestrator();
             RunnableProjectOrchestrator orchestrator = new RunnableProjectOrchestrator(basicOrchestrator);
 
-            GlobalRunSpec runSpec = new GlobalRunSpec(templateData.TemplateSourceRoot, environmentSettings.Components, parameters, variables, template.Config.OperationConfig, template.Config.SpecialOperationConfig, template.Config.IgnoreFileNames);
+            GlobalRunSpec runSpec = new GlobalRunSpec(templateData.TemplateSourceRoot, environmentSettings.Components, parameters, variables, template.Config.OperationConfig, template.Config.SpecialOperationConfig, template.Config.LocalizationOperations, template.Config.IgnoreFileNames);
 
             foreach (FileSourceMatchInfo source in template.Config.Sources)
             {
@@ -96,7 +96,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             IOrchestrator2 basicOrchestrator = new Core.Util.Orchestrator();
             RunnableProjectOrchestrator orchestrator = new RunnableProjectOrchestrator(basicOrchestrator);
 
-            GlobalRunSpec runSpec = new GlobalRunSpec(templateData.TemplateSourceRoot, environmentSettings.Components, parameters, variables, template.Config.OperationConfig, template.Config.SpecialOperationConfig, template.Config.IgnoreFileNames);
+            GlobalRunSpec runSpec = new GlobalRunSpec(templateData.TemplateSourceRoot, environmentSettings.Components, parameters, variables, template.Config.OperationConfig, template.Config.SpecialOperationConfig, template.Config.LocalizationOperations, template.Config.IgnoreFileNames);
             List<IFileChange2> changes = new List<IFileChange2>();
 
             foreach (FileSourceMatchInfo source in template.Config.Sources)

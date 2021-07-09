@@ -38,5 +38,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         /// The keys represent the id of the post actions.
         /// </summary>
         IReadOnlyDictionary<string, IPostActionLocalizationModel> PostActions { get; }
+
+        /// <summary>
+        /// Gets the localizated string replacements to be applied to contents of files.
+        /// </summary>
+        IReadOnlyList<IFileLocalizationModel> LocalizableReplacements { get; }
     }
 }

@@ -181,7 +181,7 @@ namespace Microsoft.TemplateEngine
             return res as T;
         }
 
-        internal static IReadOnlyDictionary<string, string> ToStringDictionary(this JToken token, StringComparer? comparer = null, string? propertyName = null)
+        internal static Dictionary<string, string> ToStringDictionary(this JToken token, StringComparer? comparer = null, string? propertyName = null)
         {
             Dictionary<string, string> result = new Dictionary<string, string>(comparer ?? StringComparer.Ordinal);
 
@@ -199,7 +199,7 @@ namespace Microsoft.TemplateEngine
         }
 
         // Leaves the values as JTokens.
-        internal static IReadOnlyDictionary<string, JToken> ToJTokenDictionary(this JToken token, StringComparer? comparaer = null, string? propertyName = null)
+        internal static Dictionary<string, JToken> ToJTokenDictionary(this JToken token, StringComparer? comparaer = null, string? propertyName = null)
         {
             Dictionary<string, JToken> result = new Dictionary<string, JToken>(comparaer ?? StringComparer.Ordinal);
 

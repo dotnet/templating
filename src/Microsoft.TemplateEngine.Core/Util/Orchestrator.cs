@@ -8,6 +8,7 @@ using System.Linq;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Core.Contracts;
+using Microsoft.TemplateEngine.Core.Operations;
 using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Core.Util
@@ -252,7 +253,8 @@ namespace Microsoft.TemplateEngine.Core.Util
                             }
                             else if (!copy)
                             {
-                                ProcessFile(file, sourceRel, targetDir, spec, fallback, fileGlobProcessors);
+                                spec.LocalizationOperations.TryGetValue(sourceRel, out var localizedReplacements);
+                                ProcessFile(file, sourceRel, targetDir, spec, fallback, localizedReplacements, fileGlobProcessors);
                             }
                             else
                             {
@@ -272,12 +274,28 @@ namespace Microsoft.TemplateEngine.Core.Util
             }
         }
 
-        private void ProcessFile(IFile sourceFile, string sourceRel, string targetDir, IGlobalRunSpec spec, IProcessor fallback, IEnumerable<KeyValuePair<IPathMatcher, IProcessor>> fileGlobProcessors)
+        private void ProcessFile(
+            IFile sourceFile,
+            string sourceRel,
+            string targetDir,
+            IGlobalRunSpec spec,
+            IProcessor fallback,
+            IReadOnlyDictionary<string, string> localizedReplacementsForFile,
+            IEnumerable<KeyValuePair<IPathMatcher, IProcessor>> fileGlobProcessors)
         {
             IProcessor runner = fileGlobProcessors.FirstOrDefault(x => x.Key.IsMatch(sourceRel)).Value ?? fallback;
             if (runner == null)
             {
                 throw new InvalidOperationException("At least one of [runner] or [fallback] cannot be null");
+            }
+
+            if (localizedReplacementsForFile != null)
+            {
+                List<IOperationProvider> fileLocalizationOperations = localizedReplacementsForFile
+                    .Select(l => new Replacement(l.Key.TokenConfig(), l.Value, null, true))
+                    .Cast<IOperationProvider>()
+                    .ToList();
+                runner = runner.CloneAndAppendOperations(fileLocalizationOperations);
             }
 
             if (!spec.TryGetTargetRelPath(sourceRel, out string targetRel))

@@ -14,6 +14,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         IReadOnlyList<KeyValuePair<string, IGlobalRunConfig>> SpecialOperationConfig { get; }
 
+        IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> LocalizationOperations { get; }
+
         IGlobalRunConfig OperationConfig { get; }
 
         IReadOnlyList<FileSourceMatchInfo> Sources { get; }
