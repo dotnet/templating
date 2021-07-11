@@ -3,11 +3,14 @@
 open System
 
 // Define a function to construct a message to print
-let from whom =
-    sprintf "from %s" whom
+let helloFrom whom =
+  $"Hello world from {whom}"
 
 [<EntryPoint>]
 let main argv =
-    let message = from "F#" // Call the function
-    printfn "Hello world %s" message
+    // Get the caller from the launch arguments, or a default
+    let caller = if Array.length argv > 0 then argv.[0] else "F#"
+    // Call the function
+    printfn "%s" (helloFrom caller)
     0 // return an integer exit code
+
