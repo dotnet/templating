@@ -6,11 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="xunit" />
-    <PackageReference Include="xunit.runner.visualstudio" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\BaselineComparer\BaselineComparer.csproj" />
   </ItemGroup>
 

@@ -33,7 +33,7 @@ namespace ProjectTestRunner
 
         static Battery()
         {
-            string assemblyPath = typeof(Battery).GetTypeInfo().Assembly.CodeBase;
+            string assemblyPath = typeof(Battery).GetTypeInfo().Assembly.Location;
             Uri assemblyUri = new Uri(assemblyPath, UriKind.Absolute);
             assemblyPath = assemblyUri.LocalPath;
             BasePath = Path.GetDirectoryName(assemblyPath);
