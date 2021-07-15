@@ -16,13 +16,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Localization
             string? description,
             string? author,
             IReadOnlyDictionary<string, IParameterSymbolLocalizationModel> parameterSymbols,
-            IReadOnlyDictionary<string, IPostActionLocalizationModel> postActions)
+            IReadOnlyDictionary<string, IPostActionLocalizationModel> postActions,
+            IReadOnlyList<IFileLocalizationModel> fileLocalizations)
         {
             Name = name;
             Description = description;
             Author = author;
             ParameterSymbols = parameterSymbols ?? throw new ArgumentNullException(nameof(parameterSymbols));
             PostActions = postActions ?? throw new ArgumentNullException(nameof(postActions));
+            LocalizableReplacements = fileLocalizations ?? throw new ArgumentNullException(nameof(fileLocalizations));
         }
 
         /// <inheritdoc/>
@@ -39,5 +41,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Localization
 
         /// <inheritdoc/>
         public IReadOnlyDictionary<string, IPostActionLocalizationModel> PostActions { get; }
+
+        /// <inheritdoc/>
+        public IReadOnlyList<IFileLocalizationModel> LocalizableReplacements { get; }
     }
 }

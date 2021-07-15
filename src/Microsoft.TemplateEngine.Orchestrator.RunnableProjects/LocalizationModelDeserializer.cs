@@ -41,12 +41,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             var symbols = LoadSymbolModels(localizedStrings);
             var postActions = LoadPostActionModels(localizedStrings);
 
+            // TODO load localized replacements: "localizedReplacements/globbing_string/symbol_name": "localized value"
+
             return new LocalizationModel(
                 name: localizedStrings.FirstOrDefault(s => s.Key == "name").Value,
                 description: localizedStrings.FirstOrDefault(s => s.Key == "description").Value,
                 author: localizedStrings.FirstOrDefault(s => s.Key == "author").Value,
                 symbols,
-                postActions);
+                postActions,
+                pass_localized_replacements_here);
         }
 
         /// <summary>

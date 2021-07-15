@@ -30,11 +30,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             IVariableCollection variables,
             IGlobalRunConfig globalConfig,
             IReadOnlyList<KeyValuePair<string, IGlobalRunConfig>> fileGlobConfigs,
+            IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> localizationOperations,
             IReadOnlyList<string> ignoreFileNames)
         {
             EnsureOperationConfigs(componentManager);
 
             RootVariableCollection = variables;
+            LocalizationOperations = localizationOperations;
             IgnoreFileNames = ignoreFileNames;
             Operations = ResolveOperations(globalConfig, templateRoot, variables, parameters);
             List<KeyValuePair<IPathMatcher, IRunSpec>> specials = new List<KeyValuePair<IPathMatcher, IRunSpec>>();
@@ -71,6 +73,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         public IVariableCollection RootVariableCollection { get; }
 
         public IReadOnlyList<KeyValuePair<IPathMatcher, IRunSpec>> Special { get; }
+
+        public IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> LocalizationOperations { get; }
 
         public IReadOnlyList<string> IgnoreFileNames { get; }
 

@@ -102,7 +102,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 src.Exclude = item.Get<JToken>(nameof(src.Exclude));
                 src.Include = item.Get<JToken>(nameof(src.Include));
                 src.Condition = item.ToString(nameof(src.Condition));
-                src.Rename = item.Get<JObject>(nameof(src.Rename)).ToStringDictionary().ToDictionary(x => x.Key, x => x.Value);
+                src.Rename = item.Get<JObject>(nameof(src.Rename)).ToStringDictionary();
 
                 List<SourceModifier> modifiers = new List<SourceModifier>();
                 src.Modifiers = modifiers;
@@ -183,7 +183,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 }
             }
 
-            _postActions = RunnableProjects.PostActionModel.LoadListFromJArray(source.Get<JArray>("PostActions"), _logger, filename);
+            _postActions = PostActionModel.LoadListFromJArray(source.Get<JArray>("PostActions"), _logger, filename);
             PrimaryOutputs = CreationPathModel.ListFromJArray(source.Get<JArray>(nameof(PrimaryOutputs)));
 
             // Custom operations at the global level
@@ -204,6 +204,18 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
 
             _specialCustomSetup = specialCustomSetup;
+
+            // Localized string replacements. Template config file only contains the authoring language replacements. The rest will come from localization files.
+            Dictionary<string, JToken> localizedReplacementFiles = source.ToJTokenDictionary(StringComparer.OrdinalIgnoreCase, "localizedReplacements");
+            Dictionary<string, IReadOnlyDictionary<string, string>> localizations = new Dictionary<string, IReadOnlyDictionary<string, string>>();
+            if (localizedReplacementFiles != null)
+            {
+                foreach (var fileTokenPair in localizedReplacementFiles)
+                {
+                    localizations.Add(fileTokenPair.Key, fileTokenPair.Value.ToStringDictionary(StringComparer.OrdinalIgnoreCase));
+                }
+            }
+            LocalizationOperations = localizations;
         }
 
         internal SimpleConfigModel(IFile templateFile, ISimpleConfigModifiers configModifiers = null)
@@ -253,6 +265,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 _ignoreFileNames = value;
             }
         }
+
+        /// <summary>
+        /// Gets the localized replacement strings for each file.
+        /// Each key of the outter dictionary is a globbing pattern that defines which files
+        /// will be considered for replacement. Each value is a dictionary mapping the
+        /// token to be replaced to the new value.
+        /// </summary>
+        public IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> LocalizationOperations { get; private set; }
 
         IReadOnlyList<string> IRunnableProjectConfig.Classifications => Classifications;
 
@@ -651,6 +671,40 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 {
                     postAction.Localize(postActionLocModel, _logger);
                 }
+            }
+
+            if (locModel.LocalizableReplacements != null)
+            {
+                // Recreate the data in the localized way.
+                Dictionary<string, IReadOnlyDictionary<string, string>> newLocalizedOperations = new Dictionary<string, IReadOnlyDictionary<string, string>>();
+
+                // Get the localized replacements from the model.
+                foreach (var fileLocalizations in locModel.LocalizableReplacements)
+                {
+                    // Find the matching file listed from the template config file
+                    if (!LocalizationOperations.TryGetValue(fileLocalizations.File, out var replacements))
+                    {
+                        // No data available in template config file for this localized data.
+                        continue;
+                    }
+
+                    Dictionary<string, string> localizedReplacementsForFile = new Dictionary<string, string>();
+                    foreach (var replacement in replacements)
+                    {
+                        // Find the matching localization for the replacement
+                        if (!fileLocalizations.Localizations.TryGetValue(replacement.Key, out string localizedString))
+                        {
+                            // No loc data for this token. Use original value.
+                            localizedReplacementsForFile[replacement.Key] = replacement.Value;
+                            continue;
+                        }
+
+                        localizedReplacementsForFile[replacement.Key] = localizedString;
+                    }
+                    newLocalizedOperations[fileLocalizations.File] = localizedReplacementsForFile;
+                }
+
+                LocalizationOperations = newLocalizedOperations;
             }
         }
 
