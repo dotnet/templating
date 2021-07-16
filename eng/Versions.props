@@ -5,8 +5,8 @@
     <UsingToolXliff>true</UsingToolXliff>
     <UsingToolNetFrameworkReferenceAssemblies>true</UsingToolNetFrameworkReferenceAssemblies>
     <VersionPrefix>6.0.100</VersionPrefix>
-    <PreReleaseVersionLabel>preview</PreReleaseVersionLabel>
-    <PreReleaseVersionIteration>7</PreReleaseVersionIteration>
+    <PreReleaseVersionLabel>rc</PreReleaseVersionLabel>
+    <PreReleaseVersionIteration>1</PreReleaseVersionIteration>
     <PackSpecific Condition="'$(OS)' != 'Windows_NT'">true</PackSpecific>
     <NewtonsoftJsonPackageVersion>12.0.2</NewtonsoftJsonPackageVersion>
     <SystemDiagnosticsProcessPackageVersion>4.3.0</SystemDiagnosticsProcessPackageVersion>
