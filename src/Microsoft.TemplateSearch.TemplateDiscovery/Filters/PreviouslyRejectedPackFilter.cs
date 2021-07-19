@@ -12,11 +12,11 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Filters
     {
         private const string FilterId = "Previously Seen";
 
-        internal static Func<IDownloadedPackInfo, PreFilterResult> SetupPackFilter(HashSet<string> nonTemplatePacks)
+        internal static Func<DownloadedPackInfo, PreFilterResult> SetupPackFilter(HashSet<string> nonTemplatePacks)
         {
-            Func<IDownloadedPackInfo, PreFilterResult> previouslyRejectedPackFilter = (packInfo) =>
+            Func<DownloadedPackInfo, PreFilterResult> previouslyRejectedPackFilter = (packInfo) =>
             {
-                if (nonTemplatePacks.Contains(packInfo.Id))
+                if (nonTemplatePacks.Contains(packInfo.PackInfo.Name))
                 {
                     return new PreFilterResult(FilterId, isFiltered: true, "Package was previously examined, and does not contain templates.");
                 }

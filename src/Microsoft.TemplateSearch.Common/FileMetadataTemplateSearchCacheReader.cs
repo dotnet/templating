@@ -128,12 +128,12 @@ namespace Microsoft.TemplateSearch.Common
                         string packName = packEntry.Name.ToString();
                         JObject entryValue = (JObject)packEntry.Value;
 
-                        if (entryValue.TryGetValue(nameof(PackToTemplateEntry.Version), StringComparison.OrdinalIgnoreCase, out JToken versionToken)
+                        if (entryValue.TryGetValue(nameof(PackToTemplateEntry.PackInfo.Version), StringComparison.OrdinalIgnoreCase, out JToken versionToken)
                             && versionToken.Type == JTokenType.String
                             && entryValue.TryGetValue(nameof(PackToTemplateEntry.TemplateIdentificationEntry), StringComparison.OrdinalIgnoreCase, out JToken identificationToken)
                             && identificationToken is JArray identificationArray)
                         {
-                            string version = versionToken.Value<string>();
+                            PackInfo packInfo = new PackInfo(packName, entryValue);
                             List<TemplateIdentificationEntry> templatesInPack = new List<TemplateIdentificationEntry>();
 
                             foreach (JObject templateIdentityInfo in identificationArray)
@@ -145,12 +145,7 @@ namespace Microsoft.TemplateSearch.Common
                                 templatesInPack.Add(deserializedEntry);
                             }
 
-                            workingPackToTemplateMap[packName] = new PackToTemplateEntry(version, templatesInPack);
-                            if (entryValue.TryGetValue(nameof(PackToTemplateEntry.TotalDownloads), out JToken totalDownloadsToken)
-                                && long.TryParse(totalDownloadsToken.Value<string>(), out long totalDownloads))
-                            {
-                                workingPackToTemplateMap[packName].TotalDownloads = totalDownloads;
-                            }
+                            workingPackToTemplateMap[packName] = new PackToTemplateEntry(packInfo, templatesInPack);
                         }
                     }
                 }

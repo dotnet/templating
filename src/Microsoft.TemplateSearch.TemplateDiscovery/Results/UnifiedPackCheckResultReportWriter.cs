@@ -4,7 +4,6 @@
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateSearch.Common;
 using Microsoft.TemplateSearch.TemplateDiscovery.AdditionalData;
-using Microsoft.TemplateSearch.TemplateDiscovery.Nuget;
 using Microsoft.TemplateSearch.TemplateDiscovery.PackChecking.Reporting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -55,17 +54,12 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Results
             Dictionary<string, PackToTemplateEntry> packToTemplateMap = packSourceCheckResults.PackCheckData
                             .Where(r => r.AnyTemplates)
                             .ToDictionary(
-                                r => r.PackInfo.Id,
+                                r => r.PackInfo.Name,
                                 r =>
                                 {
                                     PackToTemplateEntry packToTemplateEntry = new PackToTemplateEntry(
-                                            r.PackInfo.Version,
+                                            r.PackInfo,
                                             r.FoundTemplates.Select(t => new TemplateIdentificationEntry(t.Identity, t.GroupIdentity)).ToList());
-
-                                    if (r.PackInfo is NugetPackInfo npi)
-                                    {
-                                        packToTemplateEntry.TotalDownloads = npi.TotalDownloads;
-                                    }
                                     return packToTemplateEntry;
                                 });
 
@@ -82,7 +76,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Results
         private static void WriteNonTemplatePackList(string reportPath, IReadOnlyList<PackCheckResult> packCheckResults)
         {
             List<string> packsWithoutTemplates = packCheckResults.Where(r => !r.AnyTemplates)
-                                                                .Select(r => r.PackInfo.Id)
+                                                                .Select(r => r.PackInfo.Name)
                                                                 .ToList();
             string serializedContent = JsonConvert.SerializeObject(packsWithoutTemplates, Formatting.Indented);
 
@@ -103,7 +97,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Results
                 {
                     return false;
                 }
-                return string.Equals(x.Identity, y.Identity, System.StringComparison.Ordinal);
+                return string.Equals(x.Identity, y.Identity, StringComparison.Ordinal);
             }
 
             public int GetHashCode(ITemplateInfo obj)

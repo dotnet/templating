@@ -322,20 +322,20 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             {
                 new TemplateIdentificationEntry(_fooOneTemplate.Identity, _fooOneTemplate.GroupIdentity)
             };
-            packToTemplateMap[_packOneInfo.Name] = new PackToTemplateEntry(_packOneInfo.Version, packOneTemplateInfo);
+            packToTemplateMap[_packOneInfo.Name] = new PackToTemplateEntry(_packOneInfo, packOneTemplateInfo);
 
             List<TemplateIdentificationEntry> packTwoTemplateInfo = new List<TemplateIdentificationEntry>()
             {
                 new TemplateIdentificationEntry(_fooTwoTemplate.Identity, _fooTwoTemplate.GroupIdentity)
             };
-            packToTemplateMap[_packTwoInfo.Name] = new PackToTemplateEntry(_packTwoInfo.Version, packTwoTemplateInfo);
+            packToTemplateMap[_packTwoInfo.Name] = new PackToTemplateEntry(_packTwoInfo, packTwoTemplateInfo);
 
             List<TemplateIdentificationEntry> packThreeTemplateInfo = new List<TemplateIdentificationEntry>()
             {
                 new TemplateIdentificationEntry(_barCSharpTemplate.Identity, _barCSharpTemplate.GroupIdentity),
                 new TemplateIdentificationEntry(_barFSharpTemplate.Identity, _barFSharpTemplate.GroupIdentity)
             };
-            packToTemplateMap[_packThreeInfo.Name] = new PackToTemplateEntry(_packThreeInfo.Version, packThreeTemplateInfo);
+            packToTemplateMap[_packThreeInfo.Name] = new PackToTemplateEntry(_packThreeInfo, packThreeTemplateInfo);
 
             Dictionary<string, object> additionalData = new Dictionary<string, object>();
 

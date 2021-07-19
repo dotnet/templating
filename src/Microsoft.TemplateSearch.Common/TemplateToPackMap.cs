@@ -1,6 +1,8 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 
@@ -10,22 +12,18 @@ namespace Microsoft.TemplateSearch.Common
     {
         private readonly IReadOnlyDictionary<string, PackInfo> _identityToPackMap;
 
-        private readonly IReadOnlyDictionary<string, PackInfo> _groupIdentityToPackMap;
-
-        protected TemplateToPackMap(Dictionary<string, PackInfo> identityToPackMap, Dictionary<string, PackInfo> groupIdentityToPackMap)
+        protected TemplateToPackMap(Dictionary<string, PackInfo> identityToPackMap)
         {
             _identityToPackMap = identityToPackMap;
-            _groupIdentityToPackMap = groupIdentityToPackMap;
         }
 
         public static TemplateToPackMap FromPackToTemplateDictionary(IReadOnlyDictionary<string, PackToTemplateEntry> templateDictionary)
         {
             Dictionary<string, PackInfo> identityToPackMap = new Dictionary<string, PackInfo>(StringComparer.OrdinalIgnoreCase);
-            Dictionary<string, PackInfo> groupIdentityToPackMap = new Dictionary<string, PackInfo>(StringComparer.OrdinalIgnoreCase);
 
             foreach (KeyValuePair<string, PackToTemplateEntry> entry in templateDictionary)
             {
-                PackInfo packAndVersion = new PackInfo(entry.Key, entry.Value.Version, entry.Value.TotalDownloads);
+                PackInfo packInfo = entry.Value.PackInfo;
 
                 foreach (TemplateIdentificationEntry templateIdentityInfo in entry.Value.TemplateIdentificationEntry)
                 {
@@ -34,38 +32,22 @@ namespace Microsoft.TemplateSearch.Common
 
                     if (!string.IsNullOrEmpty(templateIdentityInfo.Identity))
                     {
-                        identityToPackMap[templateIdentityInfo.Identity] = packAndVersion;
-                    }
-
-                    if (!string.IsNullOrEmpty(templateIdentityInfo.GroupIdentity))
-                    {
-                        groupIdentityToPackMap[templateIdentityInfo.GroupIdentity] = packAndVersion;
+                        identityToPackMap[templateIdentityInfo.Identity] = packInfo;
                     }
                 }
             }
 
-            return new TemplateToPackMap(identityToPackMap, groupIdentityToPackMap);
+            return new TemplateToPackMap(identityToPackMap);
         }
 
-        public bool TryGetPackInfoForTemplateIdentity(string templateName, out PackInfo packAndVersion)
+        public bool TryGetPackInfoForTemplateIdentity(string templateName, out PackInfo? packAndVersion)
         {
             if (_identityToPackMap.TryGetValue(templateName, out packAndVersion))
             {
                 return true;
             }
 
-            packAndVersion = PackInfo.Empty;
-            return false;
-        }
-
-        public bool TryGetPackInfoForTemplateGroupIdentity(string templateName, out PackInfo packAndVersion)
-        {
-            if (_groupIdentityToPackMap.TryGetValue(templateName, out packAndVersion))
-            {
-                return true;
-            }
-
-            packAndVersion = PackInfo.Empty;
+            packAndVersion = null;
             return false;
         }
     }

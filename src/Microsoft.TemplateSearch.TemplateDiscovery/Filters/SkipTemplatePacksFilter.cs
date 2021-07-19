@@ -25,15 +25,15 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Filters
             "microsoft.aspnetcore.components.webassembly.template"
         };
 
-        internal static Func<IDownloadedPackInfo, PreFilterResult> SetupPackFilter()
+        internal static Func<DownloadedPackInfo, PreFilterResult> SetupPackFilter()
         {
-            Func<IDownloadedPackInfo, PreFilterResult> filter = (packInfo) =>
+            Func<DownloadedPackInfo, PreFilterResult> filter = (packInfo) =>
             {
                 foreach (string package in PackagesToBeSkipped)
                 {
-                    if (packInfo.Id.StartsWith(package, StringComparison.OrdinalIgnoreCase))
+                    if (packInfo.PackInfo.Name.StartsWith(package, StringComparison.OrdinalIgnoreCase))
                     {
-                        return new PreFilterResult(_FilterId, isFiltered: true, $"Package {packInfo.Id} is skipped as it matches the package name to be permanently skipped.");
+                        return new PreFilterResult(_FilterId, isFiltered: true, $"Package {packInfo.PackInfo.Name} is skipped as it matches the package name to be permanently skipped.");
                     }
                 }
                 return new PreFilterResult(_FilterId, isFiltered: false);

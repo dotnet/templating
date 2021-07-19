@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Runtime.CompilerServices;
+using Microsoft.TemplateSearch.Common;
+using Microsoft.TemplateSearch.TemplateDiscovery.NuGet;
 
 namespace Microsoft.TemplateSearch.TemplateDiscovery.PackProviders
 {
@@ -26,18 +28,18 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackProviders
             return Task.FromResult(0);
         }
 
-        public Task<IDownloadedPackInfo?> DownloadPackageAsync(IPackInfo packinfo, CancellationToken token)
+        public Task<DownloadedPackInfo?> DownloadPackageAsync(PackInfo packinfo, CancellationToken token)
         {
-            return Task.FromResult((IDownloadedPackInfo?)packinfo);
+            return Task.FromResult((DownloadedPackInfo?)new DownloadedPackInfo(packinfo, packinfo.Name));
         }
 
-        public async IAsyncEnumerable<IPackInfo> GetCandidatePacksAsync([EnumeratorCancellation]CancellationToken token)
+        public async IAsyncEnumerable<PackInfo> GetCandidatePacksAsync([EnumeratorCancellation]CancellationToken token)
         {
             var directoryInfo = new DirectoryInfo(_folder);
 
             foreach (FileInfo package in directoryInfo.EnumerateFiles("*.nupkg", SearchOption.AllDirectories))
             {
-                yield return new TestPackInfo(package.FullName);
+                yield return new PackInfo(package.FullName, "1.0");
             }
 
             await Task.CompletedTask.ConfigureAwait(false);
@@ -46,25 +48,6 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackProviders
         public Task<int> GetPackageCountAsync(CancellationToken token)
         {
             return Task.FromResult(new DirectoryInfo(_folder).EnumerateFiles("*.nupkg", SearchOption.AllDirectories).Count());
-        }
-
-        private class TestPackInfo : IPackInfo, IDownloadedPackInfo
-        {
-            internal TestPackInfo(string path)
-            {
-                Path = path;
-                Id = System.IO.Path.GetFileNameWithoutExtension(path);
-            }
-
-            public string Id { get; }
-
-            public string Version => "1.0";
-
-            public long TotalDownloads => 0;
-
-            public string VersionedPackageIdentity => $"{Id}::{Version}";
-
-            public string Path { get; }
         }
     }
 }

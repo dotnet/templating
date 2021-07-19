@@ -3,6 +3,7 @@
 
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Cli;
+using Microsoft.TemplateSearch.Common;
 using Microsoft.TemplateSearch.TemplateDiscovery.PackProviders;
 using Newtonsoft.Json;
 
@@ -25,7 +26,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.AdditionalData
 
         public object Data => _hostDataForPackByTemplate;
 
-        public void CreateDataForTemplatePack(IDownloadedPackInfo packInfo, IReadOnlyList<ITemplateInfo> templateList, IEngineEnvironmentSettings environment)
+        public void CreateDataForTemplatePack(PackInfo packInfo, IReadOnlyList<ITemplateInfo> templateList, IEngineEnvironmentSettings environment)
         {
             IHostSpecificDataLoader hostDataLoader = new HostSpecificDataLoader(environment);
 

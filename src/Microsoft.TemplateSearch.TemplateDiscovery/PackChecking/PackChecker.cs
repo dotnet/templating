@@ -14,7 +14,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
     {
         private const string HostIdentifierBase = "dotnetcli-discovery-";
 
-        internal PackCheckResult TryGetTemplatesInPack(IDownloadedPackInfo packInfo, IReadOnlyList<IAdditionalDataProducer> additionalDataProducers, HashSet<string> alreadySeenTemplateIdentities)
+        internal PackCheckResult TryGetTemplatesInPack(DownloadedPackInfo packInfo, IReadOnlyList<IAdditionalDataProducer> additionalDataProducers, HashSet<string> alreadySeenTemplateIdentities)
         {
             ITemplateEngineHost host = CreateHost(packInfo);
             EngineEnvironmentSettings environmentSettings = new EngineEnvironmentSettings(host, virtualizeSettings: true);
@@ -26,26 +26,26 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
                 if (TryInstallPackage(packInfo.Path, environmentSettings, out IReadOnlyList<ITemplateInfo> installedTemplates))
                 {
                     IReadOnlyList<ITemplateInfo> filteredInstalledTemplates = installedTemplates.Where(t => !alreadySeenTemplateIdentities.Contains(t.Identity)).ToList();
-                    checkResult = new PackCheckResult(packInfo, filteredInstalledTemplates);
+                    checkResult = new PackCheckResult(packInfo.PackInfo, filteredInstalledTemplates);
                     ProduceAdditionalDataForPack(additionalDataProducers, checkResult, environmentSettings);
                 }
                 else
                 {
                     IReadOnlyList<ITemplateInfo> foundTemplates = new List<ITemplateInfo>();
-                    checkResult = new PackCheckResult(packInfo, foundTemplates);
+                    checkResult = new PackCheckResult(packInfo.PackInfo, foundTemplates);
                 }
             }
             catch
             {
                 IReadOnlyList<ITemplateInfo> foundTemplates = new List<ITemplateInfo>();
-                checkResult = new PackCheckResult(packInfo, foundTemplates);
+                checkResult = new PackCheckResult(packInfo.PackInfo, foundTemplates);
             }
             return checkResult;
         }
 
-        private static ITemplateEngineHost CreateHost(IDownloadedPackInfo packInfo)
+        private static ITemplateEngineHost CreateHost(DownloadedPackInfo packInfo)
         {
-            string hostIdentifier = HostIdentifierBase + packInfo.Id;
+            string hostIdentifier = HostIdentifierBase + packInfo.PackInfo.Name;
 
             ITemplateEngineHost host = TemplateEngineHostHelper.CreateHost(hostIdentifier);
 

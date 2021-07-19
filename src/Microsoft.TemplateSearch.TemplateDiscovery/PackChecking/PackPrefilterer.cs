@@ -8,18 +8,18 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
 {
     internal class PackPreFilterer
     {
-        private readonly IReadOnlyList<Func<IDownloadedPackInfo, PreFilterResult>> _preFilters;
+        private readonly IReadOnlyList<Func<DownloadedPackInfo, PreFilterResult>> _preFilters;
 
-        internal PackPreFilterer(IReadOnlyList<Func<IDownloadedPackInfo, PreFilterResult>> preFilters)
+        internal PackPreFilterer(IReadOnlyList<Func<DownloadedPackInfo, PreFilterResult>> preFilters)
         {
             _preFilters = preFilters;
         }
 
-        internal PreFilterResultList FilterPack(IDownloadedPackInfo packInfo)
+        internal PreFilterResultList FilterPack(DownloadedPackInfo packInfo)
         {
             List<PreFilterResult> resultList = new List<PreFilterResult>();
 
-            foreach (Func<IDownloadedPackInfo, PreFilterResult> filter in _preFilters)
+            foreach (Func<DownloadedPackInfo, PreFilterResult> filter in _preFilters)
             {
                 PreFilterResult result = filter(packInfo);
                 resultList.Add(result);
