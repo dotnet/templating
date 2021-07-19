@@ -15,9 +15,9 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Filters
 
         private static ITemplateEngineHost _host = TemplateEngineHostHelper.CreateHost("filterHost");
 
-        internal static Func<IDownloadedPackInfo, PreFilterResult> SetupPackFilter()
+        internal static Func<DownloadedPackInfo, PreFilterResult> SetupPackFilter()
         {
-            Func<IDownloadedPackInfo, PreFilterResult> filter = (packInfo) =>
+            Func<DownloadedPackInfo, PreFilterResult> filter = (packInfo) =>
             {
                 EngineEnvironmentSettings environmentSettings = new EngineEnvironmentSettings(_host, virtualizeSettings: true);
                 foreach (IMountPointFactory factory in environmentSettings.Components.OfType<IMountPointFactory>())

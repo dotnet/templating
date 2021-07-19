@@ -2,7 +2,9 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateSearch.Common;
 using Microsoft.TemplateSearch.TemplateDiscovery.AdditionalData;
+using Microsoft.TemplateSearch.TemplateDiscovery.NuGet;
 using Microsoft.TemplateSearch.TemplateDiscovery.PackChecking.Reporting;
 using Microsoft.TemplateSearch.TemplateDiscovery.PackProviders;
 
@@ -29,7 +31,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
         internal async Task<PackSourceCheckResult> CheckPackagesAsync(CancellationToken token)
         {
             List<PackCheckResult> checkResultList = new List<PackCheckResult>();
-            HashSet<IPackInfo> alreadySeenPacks = new HashSet<IPackInfo>();
+            HashSet<PackInfo> alreadySeenPacks = new HashSet<PackInfo>(new PackInfoEqualityComparer());
             HashSet<string> alreadySeenTemplateIdentities = new HashSet<string>();
             try
             {
@@ -39,26 +41,26 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
                     int count = 0;
                     Console.WriteLine($"{await packProvider.GetPackageCountAsync(token).ConfigureAwait(false)} packs discovered, starting processing");
 
-                    await foreach (IPackInfo sourceInfo in packProvider.GetCandidatePacksAsync(token).ConfigureAwait(false))
+                    await foreach (PackInfo sourceInfo in packProvider.GetCandidatePacksAsync(token).ConfigureAwait(false))
                     {
                         if (alreadySeenPacks.Contains(sourceInfo))
                         {
-                            Verbose.WriteLine($"Package {sourceInfo.Id}::{sourceInfo.Version} is already processed.");
+                            Verbose.WriteLine($"Package {sourceInfo.Name}::{sourceInfo.Version} is already processed.");
                             continue;
                         }
                         alreadySeenPacks.Add(sourceInfo);
 
-                        IDownloadedPackInfo? packInfo = await packProvider.DownloadPackageAsync(sourceInfo, token).ConfigureAwait(false);
+                        DownloadedPackInfo? packInfo = await packProvider.DownloadPackageAsync(sourceInfo, token).ConfigureAwait(false);
                         if (packInfo == null)
                         {
-                            Console.WriteLine($"Package {sourceInfo.Id}::{sourceInfo.Version} is not processed.");
+                            Console.WriteLine($"Package {sourceInfo.Name}::{sourceInfo.Version} is not processed.");
                             continue;
                         }
 
                         PackCheckResult preFilterResult = PrefilterPackInfo(packInfo);
                         if (preFilterResult.PreFilterResults.ShouldBeFiltered)
                         {
-                            Verbose.WriteLine($"{packInfo.Id}::{packInfo.Version} is skipped, {preFilterResult.PreFilterResults.Reason}");
+                            Verbose.WriteLine($"{packInfo.PackInfo.Name}::{packInfo.PackInfo.Version} is skipped, {preFilterResult.PreFilterResults.Reason}");
                             checkResultList.Add(preFilterResult);
                         }
                         else
@@ -66,7 +68,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
                             PackCheckResult packCheckResult = _packChecker.TryGetTemplatesInPack(packInfo, _additionalDataProducers, alreadySeenTemplateIdentities);
                             checkResultList.Add(packCheckResult);
 
-                            Verbose.WriteLine($"{packCheckResult.PackInfo.Id}::{packCheckResult.PackInfo.Version} is processed");
+                            Verbose.WriteLine($"{packCheckResult.PackInfo.Name}::{packCheckResult.PackInfo.Version} is processed");
                             if (packCheckResult.FoundTemplates.Any())
                             {
                                 Verbose.WriteLine("Found templates:");
@@ -112,10 +114,10 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
             }
         }
 
-        private PackCheckResult PrefilterPackInfo(IDownloadedPackInfo packInfo)
+        private PackCheckResult PrefilterPackInfo(DownloadedPackInfo packInfo)
         {
             PreFilterResultList preFilterResult = _packPreFilterer.FilterPack(packInfo);
-            return new PackCheckResult(packInfo, preFilterResult);
+            return new PackCheckResult(packInfo.PackInfo, preFilterResult);
         }
     }
 }

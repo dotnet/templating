@@ -71,7 +71,7 @@ namespace Microsoft.TemplateSearch.Common
             cancellationToken.ThrowIfCancellationRequested();
 
             IReadOnlyDictionary<string, PackToTemplateEntry> matchedPacks = SearchCache.GetInfoForNamedPacks(packNameList)
-                                    .Where(packInfo => !_packFilter.ShouldPackBeFiltered(packInfo.Key, packInfo.Value.Version))
+                                    .Where(packInfo => !_packFilter.ShouldPackBeFiltered(packInfo.Key, packInfo.Value.PackInfo.Version))
                                     .ToDictionary(packInfo => packInfo.Key, packInfo => packInfo.Value);
 
             return Task.FromResult(matchedPacks);

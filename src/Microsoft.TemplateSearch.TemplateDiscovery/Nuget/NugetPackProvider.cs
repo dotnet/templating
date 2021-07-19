@@ -2,12 +2,13 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Runtime.CompilerServices;
+using Microsoft.TemplateSearch.Common;
 using Microsoft.TemplateSearch.TemplateDiscovery.PackProviders;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
+namespace Microsoft.TemplateSearch.TemplateDiscovery.NuGet
 {
-    internal class NugetPackProvider : IPackProvider
+    internal class NuGetPackProvider : IPackProvider
     {
         // {PackageId}.{Version}.nupkg
         private const string DownloadUrlFormat = "https://api.nuget.org/v3-flatcontainer/{0}/{1}/{0}.{1}.nupkg";
@@ -19,7 +20,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
         private readonly bool _runOnlyOnePage;
         private string _searchUriFormat;
 
-        internal NugetPackProvider(string name, string query, string packageTempBasePath, int pageSize, bool runOnlyOnePage, bool includePreviewPacks)
+        internal NuGetPackProvider(string name, string query, string packageTempBasePath, int pageSize, bool runOnlyOnePage, bool includePreviewPacks)
         {
             Name = name;
             _pageSize = pageSize;
@@ -39,7 +40,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
 
         public string Name { get; private set; }
 
-        public async IAsyncEnumerable<IPackInfo> GetCandidatePacksAsync([EnumeratorCancellation] CancellationToken token)
+        public async IAsyncEnumerable<PackInfo> GetCandidatePacksAsync([EnumeratorCancellation] CancellationToken token)
         {
             int skip = 0;
             bool done = false;
@@ -56,13 +57,13 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
                     {
                         string responseText = await response.Content.ReadAsStringAsync(token).ConfigureAwait(false);
 
-                        NugetPackageSearchResult resultsForPage = NugetPackageSearchResult.FromJObject(JObject.Parse(responseText));
+                        NuGetPackageSearchResult resultsForPage = NuGetPackageSearchResult.FromJObject(JObject.Parse(responseText));
 
                         if (resultsForPage.Data.Count > 0)
                         {
                             skip += _pageSize;
                             packCount += resultsForPage.Data.Count;
-                            foreach (NugetPackageSourceInfo sourceInfo in resultsForPage.Data)
+                            foreach (PackInfo sourceInfo in resultsForPage.Data)
                             {
                                 yield return sourceInfo;
                             }
@@ -81,10 +82,10 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
             while (!done && !_runOnlyOnePage);
         }
 
-        public async Task<IDownloadedPackInfo?> DownloadPackageAsync(IPackInfo packinfo, CancellationToken token)
+        public async Task<DownloadedPackInfo?> DownloadPackageAsync(PackInfo packinfo, CancellationToken token)
         {
-            string downloadUrl = string.Format(DownloadUrlFormat, packinfo.Id, packinfo.Version);
-            string packageFileName = string.Format(DownloadPackageFileNameFormat, packinfo.Id, packinfo.Version);
+            string downloadUrl = string.Format(DownloadUrlFormat, packinfo.Name, packinfo.Version);
+            string packageFileName = string.Format(DownloadPackageFileNameFormat, packinfo.Name, packinfo.Version);
             string outputPackageFileNameFullPath = Path.Combine(_packageTempPath, packageFileName);
 
             try
@@ -93,7 +94,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
                 {
                     byte[] packageBytes = await client.GetByteArrayAsync(downloadUrl, token).ConfigureAwait(false);
                     await File.WriteAllBytesAsync(outputPackageFileNameFullPath, packageBytes, token).ConfigureAwait(false);
-                    return new NugetPackInfo(packinfo, outputPackageFileNameFullPath);
+                    return new DownloadedPackInfo(packinfo, outputPackageFileNameFullPath);
                 }
             }
             catch (TaskCanceledException)
@@ -102,7 +103,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Failed to download package {packinfo.Id} {packinfo.Version}, reason: {e.ToString()}.");
+                Console.WriteLine($"Failed to download package {packinfo.Name} {packinfo.Version}, reason: {e.ToString()}.");
                 return null;
             }
         }
@@ -116,7 +117,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
             {
                 response.EnsureSuccessStatusCode();
                 string responseText = await response.Content.ReadAsStringAsync(token).ConfigureAwait(false);
-                NugetPackageSearchResult resultsForPage = NugetPackageSearchResult.FromJObject(JObject.Parse(responseText));
+                NuGetPackageSearchResult resultsForPage = NuGetPackageSearchResult.FromJObject(JObject.Parse(responseText));
                 return resultsForPage.TotalHits;
             }
         }

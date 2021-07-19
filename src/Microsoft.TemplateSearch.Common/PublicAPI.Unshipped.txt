@@ -1,1 +1,8 @@
 ﻿Microsoft.TemplateSearch.Common.BlobStorageTemplateInfo.BlobStorageTemplateInfo(Microsoft.TemplateEngine.Abstractions.ITemplateInfo! templateInfo) -> void
+Microsoft.TemplateSearch.Common.PackInfo.Owners.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Microsoft.TemplateSearch.Common.PackInfo.PackInfo(string! name, string! version, long totalDownloads = 0, System.Collections.Generic.IReadOnlyList<string!>? owners = null, bool verified = false) -> void
+Microsoft.TemplateSearch.Common.PackInfo.Verified.get -> bool
+Microsoft.TemplateSearch.Common.TemplateToPackMap.TemplateToPackMap(System.Collections.Generic.Dictionary<string!, Microsoft.TemplateSearch.Common.PackInfo!>! identityToPackMap) -> void
+Microsoft.TemplateSearch.Common.TemplateToPackMap.TryGetPackInfoForTemplateIdentity(string! templateName, out Microsoft.TemplateSearch.Common.PackInfo? packAndVersion) -> bool
+~Microsoft.TemplateSearch.Common.PackToTemplateEntry.PackInfo.get -> Microsoft.TemplateSearch.Common.PackInfo
+~Microsoft.TemplateSearch.Common.PackToTemplateEntry.PackToTemplateEntry(Microsoft.TemplateSearch.Common.PackInfo packInfo, System.Collections.Generic.List<Microsoft.TemplateSearch.Common.TemplateIdentificationEntry> templateinfo) -> void

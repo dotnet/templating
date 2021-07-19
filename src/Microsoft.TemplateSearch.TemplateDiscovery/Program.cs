@@ -1,7 +1,7 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using Microsoft.TemplateSearch.TemplateDiscovery.Nuget;
+using Microsoft.TemplateSearch.TemplateDiscovery.NuGet;
 using Microsoft.TemplateSearch.TemplateDiscovery.PackChecking;
 using Microsoft.TemplateSearch.TemplateDiscovery.PackChecking.Reporting;
 using Microsoft.TemplateSearch.TemplateDiscovery.Results;
@@ -49,7 +49,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
             // if or when we add other sources to scrape, input args can control which execute(s).
             if (true)
             {
-                if (!NugetPackScraper.TryCreateDefaultNugetPackScraper(config, out packSourceChecker) || packSourceChecker == null)
+                if (!NuGetPackScraper.TryCreateDefaultNugetPackScraper(config, out packSourceChecker) || packSourceChecker == null)
                 {
                     Console.WriteLine("Unable to create the NugetPackScraper.");
                     return;
@@ -92,7 +92,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
             Console.WriteLine($"{_saveDownloadedPacksFlag} - Don't delete downloaded candidate packs (by default, they're deleted at the end of a run).");
             Console.WriteLine($"{_noTemplateJsonFilterFlag} - Don't prefilter packs that don't contain any template.json files (this filter is applied by default).");
             Console.WriteLine($"{_verbose} - Verbose output for template processing).");
-            Console.WriteLine($"{_providers} - bar separated list of providers to run. Supported providers: {string.Join(",", NugetPackScraper.SupportedProvidersList)}.");
+            Console.WriteLine($"{_providers} - bar separated list of providers to run. Supported providers: {string.Join(",", NuGetPackScraper.SupportedProvidersList)}.");
         }
 
         private static bool TryParseArgs(string[] args, ScraperConfig config)
@@ -187,9 +187,9 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
                         config.Providers.AddRange(providersList.Split('|', StringSplitOptions.TrimEntries));
                         foreach (string provider in config.Providers)
                         {
-                            if (!NugetPackScraper.SupportedProvidersList.Contains(provider, StringComparer.OrdinalIgnoreCase))
+                            if (!NuGetPackScraper.SupportedProvidersList.Contains(provider, StringComparer.OrdinalIgnoreCase))
                             {
-                                Console.WriteLine($"Provider {provider} is not supported. Supported providers: {string.Join(",", NugetPackScraper.SupportedProvidersList)}.");
+                                Console.WriteLine($"Provider {provider} is not supported. Supported providers: {string.Join(",", NuGetPackScraper.SupportedProvidersList)}.");
                                 return false;
                             }
                         }
