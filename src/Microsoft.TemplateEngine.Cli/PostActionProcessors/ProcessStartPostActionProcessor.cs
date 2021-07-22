@@ -69,36 +69,7 @@ namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
                 if (commandResult.ExitCode != 0)
                 {
                     Reporter.Error.WriteLine(LocalizableStrings.CommandFailed);
-                    if (redirectStandardOutput || redirectStandardError)
-                    {
-                        Reporter.Error.WriteLine(LocalizableStrings.CommandOutput);
-                    }
-                    if (redirectStandardOutput)
-                    {
-                        string output = commandResult.StandardOutput.ReadToEnd();
-                        Reporter.Error.WriteLine("StdOut:");
-                        if (string.IsNullOrWhiteSpace(output))
-                        {
-                            Reporter.Error.WriteLine(LocalizableStrings.Generic_Empty);
-                        }
-                        else
-                        {
-                            Reporter.Error.WriteLine(output);
-                        }
-                    }
-                    if (redirectStandardError)
-                    {
-                        string output = commandResult.StandardError.ReadToEnd();
-                        Reporter.Error.WriteLine("StdErr:");
-                        if (string.IsNullOrWhiteSpace(output))
-                        {
-                            Reporter.Error.WriteLine(LocalizableStrings.Generic_Empty);
-                        }
-                        else
-                        {
-                            Reporter.Error.WriteLine(output);
-                        }
-                    }
+                    Reporter.Error.WriteCommandOutput(commandResult);
                     Reporter.Error.WriteLine(string.Empty);
                     return false;
                 }
@@ -111,7 +82,7 @@ namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
             catch (Exception ex)
             {
                 Reporter.Error.WriteLine(LocalizableStrings.CommandFailed);
-                Reporter.Error.WriteLine(string.Format(LocalizableStrings.CommandOutput, ex.Message));
+                Reporter.Error.WriteLine(ex.Message);
                 Reporter.Error.WriteLine(string.Empty);
                 Reporter.Verbose.WriteLine(string.Format(LocalizableStrings.Generic_Details, ex.ToString()));
                 return false;
