@@ -377,8 +377,10 @@ Execute 'dotnet {1} --mostrar- aliases' sem nenhum args para mostrar todos os al
         <note />
       </trans-unit>
       <trans-unit id="CommandOutput">
-        <source>Output from command:</source>
-        <target state="new">Output from command:</target>
+        <source>Output from command:
+{0}</source>
+        <target state="translated">Saída do comando:
+{0}</target>
         <note />
       </trans-unit>
       <trans-unit id="CommandSucceeded">
@@ -494,11 +496,6 @@ Execute 'dotnet {1} --mostrar- aliases' sem nenhum args para mostrar todos os al
         <source>Details: {0}</source>
         <target state="translated">Detalhes: {0}</target>
         <note />
-      </trans-unit>
-      <trans-unit id="Generic_Empty">
-        <source>(empty)</source>
-        <target state="new">(empty)</target>
-        <note>shown when there is no data to show</note>
       </trans-unit>
       <trans-unit id="Generic_ExampleHeader">
         <source>Example:</source>
@@ -819,7 +816,7 @@ As colunas com suporte são: idioma, marcas, autor, tipo.</target>
       </trans-unit>
       <trans-unit id="TemplateInformationCoordinator_TemplateHelp_Info_HelpForOtherLanguagesHint">
         <source>To see help for other template languages ({0}), use --language option:</source>
-        <target state="translated">Para ver a ajuda de outros idiomas de modelo ({0}), use --opção de idioma:</target>
+        <target state="translated">Para ver a ajuda de outros idiomas de modelo ({0}), use a opção--language:</target>
         <note>{0} is comma-separated list of supported programming languages by template. --language should not be translated.</note>
       </trans-unit>
       <trans-unit id="TemplatePackageCoordinator_Error_PackageForTemplateNotFound">

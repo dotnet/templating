@@ -377,8 +377,10 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</source>
         <note />
       </trans-unit>
       <trans-unit id="CommandOutput">
-        <source>Output from command:</source>
-        <target state="new">Output from command:</target>
+        <source>Output from command:
+{0}</source>
+        <target state="translated">命令的输出:
+{0}</target>
         <note />
       </trans-unit>
       <trans-unit id="CommandSucceeded">
@@ -494,11 +496,6 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</source>
         <source>Details: {0}</source>
         <target state="translated">详细信息: {0}</target>
         <note />
-      </trans-unit>
-      <trans-unit id="Generic_Empty">
-        <source>(empty)</source>
-        <target state="new">(empty)</target>
-        <note>shown when there is no data to show</note>
       </trans-unit>
       <trans-unit id="Generic_ExampleHeader">
         <source>Example:</source>
@@ -819,7 +816,7 @@ The supported columns are: language, tags, author, type.</source>
       </trans-unit>
       <trans-unit id="TemplateInformationCoordinator_TemplateHelp_Info_HelpForOtherLanguagesHint">
         <source>To see help for other template languages ({0}), use --language option:</source>
-        <target state="translated">要查看有关其他模板语言({0})的帮助，请使用 - 语言选项:</target>
+        <target state="translated">要查看有关其他模板语言({0})的帮助，请使用 --language 选项:</target>
         <note>{0} is comma-separated list of supported programming languages by template. --language should not be translated.</note>
       </trans-unit>
       <trans-unit id="TemplatePackageCoordinator_Error_PackageForTemplateNotFound">
