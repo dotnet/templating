@@ -198,7 +198,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                         matchInfos.Add(new ParameterMatchInfo(paramName, paramValue, matchKind, mismatchKind, reparsedCommand.TemplateParamInputFormat(paramName)));
                     }
 
-                    foreach (string unmatchedParamName in reparsedCommand.RemainingParameters.Where(x => !x.Contains(':') && x.StartsWith('-'))) // filter debugging params and parameters that do not start with '-'
+                    foreach (string unmatchedParamName in reparsedCommand.RemainingParameters.Where(x => !x.Contains(':'))) // filter debugging params
                     {
                         if (reparsedCommand.TryGetCanonicalNameForVariant(unmatchedParamName, out string? canonical) && !string.IsNullOrWhiteSpace(canonical))
                         {
@@ -299,7 +299,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
                         matchInfos.Add(new ParameterMatchInfo(paramName, paramValue, matchKind, mismatchKind, reparsedCommand.TemplateParamInputFormat(paramName)));
                     }
 
-                    foreach (string unmatchedParamName in reparsedCommand.RemainingParameters.Where(x => !x.Contains(':') && x.StartsWith('-'))) // filter debugging params and parameters that do not start with '-'
+                    foreach (string unmatchedParamName in reparsedCommand.RemainingParameters.Where(x => !x.Contains(':'))) // filter debugging params
                     {
                         if (reparsedCommand.TryGetCanonicalNameForVariant(unmatchedParamName, out string? canonical) && !string.IsNullOrWhiteSpace(canonical))
                         {

@@ -753,4 +753,10 @@ The supported columns are: language, tags, author, type.</value>
     <value>(empty)</value>
     <comment>shown when there is no data to show</comment>
   </data>
+  <data name="EnsureCommandSyntax" xml:space="preserve">
+    <value>Ensure that the command matches required syntax:</value>
+  </data>
+  <data name="NoTemplatesMatchingInputParameters_NoCriteria" xml:space="preserve">
+    <value>No templates found matching input criteria.</value>
+  </data>
 </root>

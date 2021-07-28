@@ -458,6 +458,11 @@ Ejecute "dotnet {1} --show-aliases" sin argumentos para mostrar todos los alias.
         <target state="translated">Muestra un resumen de lo que sucede si se ejecuta la línea de comandos dada si se crea una plantilla.</target>
         <note />
       </trans-unit>
+      <trans-unit id="EnsureCommandSyntax">
+        <source>Ensure that the command matches required syntax:</source>
+        <target state="new">Ensure that the command matches required syntax:</target>
+        <note />
+      </trans-unit>
       <trans-unit id="ExtraArgsCommandAfterExpansion">
         <source>After expanding the extra args files, the command is:
     dotnet {0}</source>
@@ -603,6 +608,11 @@ Ejecute "dotnet {1} --show-aliases" sin argumentos para mostrar todos los alias.
       <trans-unit id="NoTemplatesMatchingInputParameters">
         <source>No templates found matching: {0}.</source>
         <target state="translated">No se encontró ninguna plantilla que coincida con: {0}</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="NoTemplatesMatchingInputParameters_NoCriteria">
+        <source>No templates found matching input criteria.</source>
+        <target state="new">No templates found matching input criteria.</target>
         <note />
       </trans-unit>
       <trans-unit id="NuGetSourceHelp">

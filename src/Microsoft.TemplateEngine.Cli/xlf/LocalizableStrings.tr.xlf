@@ -458,6 +458,11 @@ Tüm diğer adları göstermek için 'dotnet {1} --show-aliases' komutunu bağı
         <target state="translated">Verilen komut satırı bir şablon oluşturma eylemiyle sonuçlanacak durumdayken çalıştırılsaydı olacak şeylerin özetini görüntüler.</target>
         <note />
       </trans-unit>
+      <trans-unit id="EnsureCommandSyntax">
+        <source>Ensure that the command matches required syntax:</source>
+        <target state="new">Ensure that the command matches required syntax:</target>
+        <note />
+      </trans-unit>
       <trans-unit id="ExtraArgsCommandAfterExpansion">
         <source>After expanding the extra args files, the command is:
     dotnet {0}</source>
@@ -603,6 +608,11 @@ Tüm diğer adları göstermek için 'dotnet {1} --show-aliases' komutunu bağı
       <trans-unit id="NoTemplatesMatchingInputParameters">
         <source>No templates found matching: {0}.</source>
         <target state="translated">Eşleşen şablon bulunamadı: {0}.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="NoTemplatesMatchingInputParameters_NoCriteria">
+        <source>No templates found matching input criteria.</source>
+        <target state="new">No templates found matching input criteria.</target>
         <note />
       </trans-unit>
       <trans-unit id="NuGetSourceHelp">

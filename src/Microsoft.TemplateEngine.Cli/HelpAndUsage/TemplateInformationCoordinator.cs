@@ -269,9 +269,9 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             ListTemplateResolver resolver = new ListTemplateResolver(_templatePackageManager, _hostSpecificDataLoader);
             TemplateResolutionResult resolutionResult = await resolver.ResolveTemplatesAsync(commandInput, _defaultLanguage, cancellationToken).ConfigureAwait(false);
 
-            IReadOnlyDictionary<string, string?>? appliedParameterMatches = resolutionResult.GetAllMatchedParametersList();
             if (resolutionResult.TemplateGroupsWithMatchingTemplateInfoAndParameters.Any())
             {
+                IReadOnlyDictionary<string, string?>? appliedParameterMatches = resolutionResult.GetAllMatchedParametersList();
                 Reporter.Output.WriteLine(
                     string.Format(
                         LocalizableStrings.TemplatesFoundMatchingInputParameters,
@@ -282,13 +282,24 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             }
             else
             {
-                // No templates found matching the following input parameter(s): {0}.
+                //the command has any unmatched tokens: can be template options or invalid syntax
+                //since cannot evaluate what case it is, show invalid syntax help as it is more likely.
+                if (commandInput.RemainingParameters.Any())
+                {
+                    // No templates found matching input criteria.
+                    Reporter.Error.WriteLine(LocalizableStrings.NoTemplatesMatchingInputParameters_NoCriteria.Bold().Red());
+                    // Ensure that the command matches required syntax:
+                    Reporter.Error.WriteLine(LocalizableStrings.EnsureCommandSyntax);
+                    Reporter.Error.WriteCommand(commandInput.ListCommandExample(usePlaceholder: true, useFilterPlaceholder: true));
+                    return New3CommandStatus.InvalidCommandSyntax;
+                }
+
+                // No templates found matching: {0}.
                 Reporter.Error.WriteLine(
                     string.Format(
                         LocalizableStrings.NoTemplatesMatchingInputParameters,
-                        GetInputParametersString(ListTemplateResolver.SupportedFilters, commandInput, appliedParameterMatches))
+                        GetInputParametersString(ListTemplateResolver.SupportedFilters, commandInput))
                     .Bold().Red());
-
                 if (resolutionResult.HasTemplateGroupMatches)
                 {
                     // {0} template(s) partially matched, but failed on {1}.
@@ -296,7 +307,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
                         string.Format(
                             LocalizableStrings.TemplatesNotValidGivenTheSpecifiedFilter,
                             resolutionResult.TemplateGroups.Count(),
-                            GetPartialMatchReason(resolutionResult, commandInput, appliedParameterMatches))
+                            GetPartialMatchReason(resolutionResult, commandInput))
                         .Bold().Red());
                 }
 

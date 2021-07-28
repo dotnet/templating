@@ -458,6 +458,11 @@ Exécutez « dotnet {1} --show-aliases » sans arguments pour afficher tous le
         <target state="translated">Affiche un résumé de ce qui se passerait si la ligne de commande donnée était exécutée si cela aboutissait à la création d’un modèle.</target>
         <note />
       </trans-unit>
+      <trans-unit id="EnsureCommandSyntax">
+        <source>Ensure that the command matches required syntax:</source>
+        <target state="new">Ensure that the command matches required syntax:</target>
+        <note />
+      </trans-unit>
       <trans-unit id="ExtraArgsCommandAfterExpansion">
         <source>After expanding the extra args files, the command is:
     dotnet {0}</source>
@@ -603,6 +608,11 @@ Exécutez « dotnet {1} --show-aliases » sans arguments pour afficher tous le
       <trans-unit id="NoTemplatesMatchingInputParameters">
         <source>No templates found matching: {0}.</source>
         <target state="translated">Aucun modèle trouvé correspondant : {0}.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="NoTemplatesMatchingInputParameters_NoCriteria">
+        <source>No templates found matching input criteria.</source>
+        <target state="new">No templates found matching input criteria.</target>
         <note />
       </trans-unit>
       <trans-unit id="NuGetSourceHelp">

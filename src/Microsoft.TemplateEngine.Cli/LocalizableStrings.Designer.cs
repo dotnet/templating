@@ -861,6 +861,15 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ensure that the command matches required syntax:.
+        /// </summary>
+        internal static string EnsureCommandSyntax {
+            get {
+                return ResourceManager.GetString("EnsureCommandSyntax", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to After expanding the extra args files, the command is:
         ///    dotnet {0}.
         /// </summary>
@@ -1119,6 +1128,15 @@ namespace Microsoft.TemplateEngine.Cli {
         internal static string NoTemplatesMatchingInputParameters {
             get {
                 return ResourceManager.GetString("NoTemplatesMatchingInputParameters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No templates found matching input criteria..
+        /// </summary>
+        internal static string NoTemplatesMatchingInputParameters_NoCriteria {
+            get {
+                return ResourceManager.GetString("NoTemplatesMatchingInputParameters_NoCriteria", resourceCulture);
             }
         }
         

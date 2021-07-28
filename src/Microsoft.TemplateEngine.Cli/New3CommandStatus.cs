@@ -63,6 +63,11 @@ namespace Microsoft.TemplateEngine.Cli
         /// <summary>
         /// Generic error when displaying help.
         /// </summary>
-        DisplayHelpFailed = unchecked((int)0x80010004)
+        DisplayHelpFailed = unchecked((int)0x80010004),
+
+        /// <summary>
+        /// The command syntax is potentially incorrect.
+        /// </summary>
+        InvalidCommandSyntax = unchecked((int)0x80010005),
     }
 }

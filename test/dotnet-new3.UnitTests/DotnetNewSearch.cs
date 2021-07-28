@@ -642,6 +642,18 @@ Examples:
               .And.HaveStdErrContaining("No templates found matching: 'con', language='C#', --unknown.");
         }
 
+        [Fact]
+        public void CannotSearchTemplates_MisplacedName()
+        {
+            new DotnetNewCommand(_log, "--search", "console")
+                .WithCustomHive(_sharedHome.HomeDirectory)
+                .Execute()
+                .Should().Fail()
+                .And.HaveStdErrContaining("No templates found matching input criteria.")
+                .And.HaveStdErrContaining("Ensure that the command matches required syntax:")
+                .And.HaveStdErrContaining("   dotnet new3 <TEMPLATE_NAME> --search [FILTERS]");
+        }
+
         private static bool AllRowsContain(List<List<string>> tableOutput, string[] columnsNames, string value)
         {
             var columnIndexes = columnsNames.Select(columnName => tableOutput[0].IndexOf(columnName));

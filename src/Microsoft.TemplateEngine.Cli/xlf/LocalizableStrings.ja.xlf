@@ -458,6 +458,11 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</source>
         <target state="translated">指定されたコマンドラインがテンプレートを実行した場合に発生する結果の概要を表示します。</target>
         <note />
       </trans-unit>
+      <trans-unit id="EnsureCommandSyntax">
+        <source>Ensure that the command matches required syntax:</source>
+        <target state="new">Ensure that the command matches required syntax:</target>
+        <note />
+      </trans-unit>
       <trans-unit id="ExtraArgsCommandAfterExpansion">
         <source>After expanding the extra args files, the command is:
     dotnet {0}</source>
@@ -603,6 +608,11 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</source>
       <trans-unit id="NoTemplatesMatchingInputParameters">
         <source>No templates found matching: {0}.</source>
         <target state="translated">テンプレートが見つかりません: {0}。</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="NoTemplatesMatchingInputParameters_NoCriteria">
+        <source>No templates found matching input criteria.</source>
+        <target state="new">No templates found matching input criteria.</target>
         <note />
       </trans-unit>
       <trans-unit id="NuGetSourceHelp">

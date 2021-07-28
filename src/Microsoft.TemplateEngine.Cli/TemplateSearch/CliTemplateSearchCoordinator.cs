@@ -84,8 +84,20 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
             }
             else
             {
+                //the command has any unmatched tokens: can be template options or invalid syntax.
+                //since cannot evaluate what case it is, show invalid syntax help as it is more likely.
+                if (commandInput.RemainingParameters.Any())
+                {
+                    // No templates found matching input criteria.
+                    Reporter.Error.WriteLine(LocalizableStrings.NoTemplatesMatchingInputParameters_NoCriteria.Bold().Red());
+                    // Ensure that the command matches required syntax:
+                    Reporter.Error.WriteLine(LocalizableStrings.EnsureCommandSyntax);
+                    Reporter.Error.WriteCommand(commandInput.SearchCommandExample(usePlaceholder: true, useFilterPlaceholder: true));
+                    return New3CommandStatus.InvalidCommandSyntax;
+                }
+
                 IReadOnlyDictionary<string, string?>? appliedParameterMatches = TemplateCommandInput.GetTemplateParametersFromCommand(commandInput);
-                // No templates found matching the following input parameter(s): {0}.
+                // No templates found matching: {0}.
                 Reporter.Error.WriteLine(
                     string.Format(
                         LocalizableStrings.NoTemplatesMatchingInputParameters,

@@ -34,12 +34,18 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             return $"dotnet {command.CommandName} --update-apply";
         }
 
-        internal static string ListCommandExample(this INewCommandInput command)
+        internal static string ListCommandExample(this INewCommandInput command, bool usePlaceholder = false, bool useFilterPlaceholder = false)
         {
-            return $"dotnet {command.CommandName} --list";
+            string commandStr = usePlaceholder ? $"dotnet {command.CommandName} [TEMPLATE_NAME] --list" : $"dotnet {command.CommandName} --list";
+            return useFilterPlaceholder ? commandStr + " [FILTERS]" : commandStr;
         }
 
-        internal static string SearchCommandExample(this INewCommandInput command, string? templateName = null, IEnumerable<string>? additionalArgs = null, bool usePlaceholder = false)
+        internal static string SearchCommandExample(
+            this INewCommandInput command,
+            string? templateName = null,
+            IEnumerable<string>? additionalArgs = null,
+            bool usePlaceholder = false,
+            bool useFilterPlaceholder = false)
         {
             if (usePlaceholder)
             {
@@ -63,6 +69,10 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
             if (additionalArgs?.Any() ?? false)
             {
                 commandStr += $" {string.Join(" ", additionalArgs)}";
+            }
+            else if (useFilterPlaceholder)
+            {
+                commandStr += $" [FILTERS]";
             }
             return commandStr;
         }

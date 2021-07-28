@@ -525,7 +525,7 @@ Worker Service                                worker         [C#],F#     Common/
                 .WithCustomHive(_sharedHome.HomeDirectory)
                 .Execute()
                 .Should().Fail()
-                .And.HaveStdErrContaining("No templates found matching: language='unknown'.")
+                .And.HaveStdErrContaining("No templates found matching: language='unknown', --framework='unknown'.")
                 .And.HaveStdErrContaining("8 template(s) partially matched, but failed on language='unknown'.")
                 .And.HaveStdErrContaining($"To search for the templates on NuGet.org, run:{Environment.NewLine}   dotnet new3 <TEMPLATE_NAME> --search");
 
@@ -533,7 +533,7 @@ Worker Service                                worker         [C#],F#     Common/
                 .WithCustomHive(_sharedHome.HomeDirectory)
                 .Execute()
                 .Should().Fail()
-                .And.HaveStdErrContaining("No templates found matching: 'c', language='unknown'.")
+                .And.HaveStdErrContaining("No templates found matching: 'c', language='unknown', --framework='unknown'.")
                 .And.HaveStdErrContaining("5 template(s) partially matched, but failed on language='unknown'.")
                 .And.HaveStdErrContaining($"To search for the templates on NuGet.org, run:{Environment.NewLine}   dotnet new3 c --search");
         }
@@ -553,6 +553,30 @@ Worker Service                                worker         [C#],F#     Common/
                 .And.NotHaveStdErr()
                 .And.HaveStdOutContaining("These templates matched your input:")
                 .And.HaveStdOutMatching("Basic FSharp +template-grouping +\\[C#],F# +item +Author1 +Test Asset +\\r?\\n +Q# +item,project +Author2 +Test Asset");
+        }
+
+        [Fact]
+        public void CannotListTemplates_MisplacedName()
+        {
+            new DotnetNewCommand(_log, "--list")
+                .WithCustomHive(_sharedHome.HomeDirectory)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And.NotHaveStdErr()
+                .And.HaveStdOutContaining("These templates matched your input:")
+                .And.HaveStdOutMatching("Template Name\\s+Short Name\\s+Language\\s+Tags")
+                .And.HaveStdOutMatching("Console Application\\s+console\\s+\\[C#\\],F#,VB\\s+Common/Console")
+                .And.HaveStdOutMatching("Class Library\\s+classlib\\s+\\[C#\\],F#,VB\\s+Common/Library")
+                .And.HaveStdOutMatching("NuGet Config\\s+nugetconfig\\s+Config");
+
+            new DotnetNewCommand(_log, "--list", "console")
+                .WithCustomHive(_sharedHome.HomeDirectory)
+                .Execute()
+                .Should().Fail()
+                .And.HaveStdErrContaining("No templates found matching input criteria.")
+                .And.HaveStdErrContaining("Ensure that the command matches required syntax:")
+                .And.HaveStdErrContaining("   dotnet new3 [TEMPLATE_NAME] --list [FILTERS]");
         }
 
     }

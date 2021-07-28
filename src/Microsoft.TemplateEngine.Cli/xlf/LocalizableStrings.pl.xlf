@@ -458,6 +458,11 @@ Uruchom polecenie "dotnet {1}--show-aliases" bez argumentów, aby wyświetlić w
         <target state="translated">Wyświetla podsumowanie co się stanie, jeśli dany wiersz polecenia zostanie uruchomiony i jeśli to spowoduje utworzenie szablonu.</target>
         <note />
       </trans-unit>
+      <trans-unit id="EnsureCommandSyntax">
+        <source>Ensure that the command matches required syntax:</source>
+        <target state="new">Ensure that the command matches required syntax:</target>
+        <note />
+      </trans-unit>
       <trans-unit id="ExtraArgsCommandAfterExpansion">
         <source>After expanding the extra args files, the command is:
     dotnet {0}</source>
@@ -603,6 +608,11 @@ Uruchom polecenie "dotnet {1}--show-aliases" bez argumentów, aby wyświetlić w
       <trans-unit id="NoTemplatesMatchingInputParameters">
         <source>No templates found matching: {0}.</source>
         <target state="translated">Nie stwierdzono dopasowania żadnych szablonów: {0}.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="NoTemplatesMatchingInputParameters_NoCriteria">
+        <source>No templates found matching input criteria.</source>
+        <target state="new">No templates found matching input criteria.</target>
         <note />
       </trans-unit>
       <trans-unit id="NuGetSourceHelp">

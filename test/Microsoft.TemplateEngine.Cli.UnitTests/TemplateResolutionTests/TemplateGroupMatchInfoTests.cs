@@ -41,7 +41,8 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
                 },
                 new MockInvalidParameterInfo[]
                 {
-                    new MockInvalidParameterInfo(InvalidParameterInfo.Kind.InvalidParameterName, "--fake", null)
+                    new MockInvalidParameterInfo(InvalidParameterInfo.Kind.InvalidParameterName, "--fake", null),
+                    new MockInvalidParameterInfo(InvalidParameterInfo.Kind.InvalidParameterName, "netcoreapp3.0", null)
                 }
             };
 
@@ -86,6 +87,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.TemplateResolutionTests
                 {
                     new MockInvalidParameterInfo(InvalidParameterInfo.Kind.InvalidParameterValue, "--framework", "net"),
                     new MockInvalidParameterInfo(InvalidParameterInfo.Kind.InvalidParameterName, "--fake", null),
+                    new MockInvalidParameterInfo(InvalidParameterInfo.Kind.InvalidParameterName, "fake", null),
                     new MockInvalidParameterInfo(InvalidParameterInfo.Kind.InvalidParameterValue, "--OtherChoice", "fake")
                 }
             };

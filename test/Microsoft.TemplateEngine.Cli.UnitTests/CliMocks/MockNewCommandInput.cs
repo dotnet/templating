@@ -135,6 +135,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.CliMocks
             get
             {
                 List<string> tokens = new List<string>();
+                tokens.Add(CommandName);
                 if (!string.IsNullOrWhiteSpace(TemplateName))
                 {
                     tokens.Add(TemplateName);

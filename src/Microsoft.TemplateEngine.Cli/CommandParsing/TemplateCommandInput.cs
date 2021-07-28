@@ -101,11 +101,11 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                 IEnumerable<string> tokens;
                 if (string.IsNullOrWhiteSpace(commandInput.TemplateName))
                 {
-                    tokens = commandInput.Tokens;
+                    tokens = commandInput.Tokens.Skip(1);  //skip command name
                 }
                 else
                 {
-                    tokens = commandInput.Tokens.Skip(1);
+                    tokens = commandInput.Tokens.Skip(2);  //skip command name and template name
                 }
                 return ParseArgs(
                     commandInput.CommandName,
@@ -140,6 +140,9 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                 }
                 else
                 {
+                    //unrecognized option name, add as is.
+                    //can happen in case the unparsed tokes start with the token that does not start with '-' or '--'
+                    templateParameters[commandInput.RemainingParameters[i]] = null;
                     i++;
                 }
             }
