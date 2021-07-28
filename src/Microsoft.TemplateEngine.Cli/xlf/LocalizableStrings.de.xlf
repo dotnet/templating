@@ -377,8 +377,10 @@ Führen Sie "dotnet {1}--show-aliases" ohne Argumente aus, um alle Aliase anzuze
         <note />
       </trans-unit>
       <trans-unit id="CommandOutput">
-        <source>Output from command:</source>
-        <target state="translated">Ausgabe des Befehls:</target>
+        <source>Output from command:
+{0}</source>
+        <target state="new">Output from command:
+{0}</target>
         <note />
       </trans-unit>
       <trans-unit id="CommandSucceeded">
@@ -494,11 +496,6 @@ Führen Sie "dotnet {1}--show-aliases" ohne Argumente aus, um alle Aliase anzuze
         <source>Details: {0}</source>
         <target state="translated">Details: {0}</target>
         <note />
-      </trans-unit>
-      <trans-unit id="Generic_Empty">
-        <source>(empty)</source>
-        <target state="translated">(leer)</target>
-        <note>shown when there is no data to show</note>
       </trans-unit>
       <trans-unit id="Generic_ExampleHeader">
         <source>Example:</source>

@@ -377,8 +377,10 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</source>
         <note />
       </trans-unit>
       <trans-unit id="CommandOutput">
-        <source>Output from command:</source>
-        <target state="translated">명령의 출력:</target>
+        <source>Output from command:
+{0}</source>
+        <target state="new">Output from command:
+{0}</target>
         <note />
       </trans-unit>
       <trans-unit id="CommandSucceeded">
@@ -494,11 +496,6 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</source>
         <source>Details: {0}</source>
         <target state="translated">세부 정보 :{0}</target>
         <note />
-      </trans-unit>
-      <trans-unit id="Generic_Empty">
-        <source>(empty)</source>
-        <target state="translated">(비어 있음)</target>
-        <note>shown when there is no data to show</note>
       </trans-unit>
       <trans-unit id="Generic_ExampleHeader">
         <source>Example:</source>
