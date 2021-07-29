@@ -7,9 +7,9 @@ using Microsoft.TemplateSearch.TemplateDiscovery.PackChecking;
 using Microsoft.TemplateSearch.TemplateDiscovery.PackChecking.Reporting;
 using Microsoft.TemplateSearch.TemplateDiscovery.PackProviders;
 
-namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
+namespace Microsoft.TemplateSearch.TemplateDiscovery.NuGet
 {
-    internal static class NugetPackScraper
+    internal static class NuGetPackScraper
     {
         private static readonly Dictionary<string, string> SupportedProviders = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -33,13 +33,13 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
             }
             else if (!config.Providers.Any())
             {
-                providers.AddRange(SupportedProviders.Select(kvp => new NugetPackProvider(kvp.Key, kvp.Value, config.BasePath, config.PageSize, config.RunOnlyOnePage, config.IncludePreviewPacks)));
+                providers.AddRange(SupportedProviders.Select(kvp => new NuGetPackProvider(kvp.Key, kvp.Value, config.BasePath, config.PageSize, config.RunOnlyOnePage, config.IncludePreviewPacks)));
             }
             else
             {
                 foreach (string provider in config.Providers.Distinct(StringComparer.OrdinalIgnoreCase))
                 {
-                    providers.Add(new NugetPackProvider(provider, SupportedProviders[provider], config.BasePath, config.PageSize, config.RunOnlyOnePage, config.IncludePreviewPacks));
+                    providers.Add(new NuGetPackProvider(provider, SupportedProviders[provider], config.BasePath, config.PageSize, config.RunOnlyOnePage, config.IncludePreviewPacks));
                 }
             }
 
