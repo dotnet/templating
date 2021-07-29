@@ -33,7 +33,10 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.NuGet
         public string Version { get; private set; }
 
         [JsonProperty]
-        public long TotalDownloads { get; set; }
+        public long TotalDownloads { get; private set; }
+
+        [JsonProperty]
+        public IReadOnlyList<string> Authors { get; private set; } = Array.Empty<string>();
 
         internal static NuGetPackageSourceInfo FromJObject (JObject entry)
         {
@@ -41,6 +44,8 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.NuGet
             string version = entry.ToString(nameof(Version)) ?? throw new ArgumentException($"{nameof(entry)} doesn't have {nameof(Version)} property.", nameof(entry));
             NuGetPackageSourceInfo sourceInfo = new NuGetPackageSourceInfo(id, version);
             sourceInfo.TotalDownloads = entry.ToInt32(nameof(TotalDownloads));
+            sourceInfo.Authors = entry.GetValue(nameof(Authors)).JTokenStringOrArrayToCollection(Array.Empty<string>());
+
             return sourceInfo;
         }
 

@@ -28,5 +28,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.NuGet
         public string Path { get; private set; }
 
         public long TotalDownloads => _info.TotalDownloads;
+
+        public IReadOnlyList<string> Authors => _info.Authors;
     }
 }

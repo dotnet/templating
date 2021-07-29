@@ -1,4 +1,5 @@
 ﻿Microsoft.TemplateSearch.Common.Abstractions.ITemplatePackageInfo
+Microsoft.TemplateSearch.Common.Abstractions.ITemplatePackageInfo.Authors.get -> System.Collections.Generic.IReadOnlyList<string!>!
 Microsoft.TemplateSearch.Common.Abstractions.ITemplatePackageInfo.Name.get -> string!
 Microsoft.TemplateSearch.Common.Abstractions.ITemplatePackageInfo.TotalDownloads.get -> long
 Microsoft.TemplateSearch.Common.Abstractions.ITemplatePackageInfo.Version.get -> string?
@@ -16,6 +17,7 @@ Microsoft.TemplateSearch.Common.SearchResult.SearchHits.get -> System.Collection
 Microsoft.TemplateSearch.Common.SearchResult.Success.get -> bool
 Microsoft.TemplateSearch.Common.TemplatePackageSearchData
 Microsoft.TemplateSearch.Common.TemplatePackageSearchData.AdditionalData.get -> System.Collections.Generic.IDictionary<string!, object!>!
+Microsoft.TemplateSearch.Common.TemplatePackageSearchData.Authors.get -> System.Collections.Generic.IReadOnlyList<string!>!
 Microsoft.TemplateSearch.Common.TemplatePackageSearchData.Name.get -> string!
 Microsoft.TemplateSearch.Common.TemplatePackageSearchData.TemplatePackageSearchData(Microsoft.TemplateSearch.Common.Abstractions.ITemplatePackageInfo! packInfo, System.Collections.Generic.IEnumerable<Microsoft.TemplateSearch.Common.TemplateSearchData!>! templates, System.Collections.Generic.IDictionary<string!, object!>? data = null) -> void
 Microsoft.TemplateSearch.Common.TemplatePackageSearchData.Templates.get -> System.Collections.Generic.IReadOnlyList<Microsoft.TemplateSearch.Common.TemplateSearchData!>!

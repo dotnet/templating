@@ -30,6 +30,7 @@ namespace Microsoft.TemplateSearch.Common
                 : throw new ArgumentException($"{nameof(jObject)} doesn't have {nameof(Name)} property or it is not a string.", nameof(jObject));
             Version = jObject.ToString(nameof(Version));
             TotalDownloads = jObject.ToInt32(nameof(TotalDownloads));
+            Authors = jObject.GetValue(nameof(Authors)).JTokenStringOrArrayToCollection(Array.Empty<string>());
 
             JArray? templatesData = jObject.Get<JArray>(nameof(Templates));
             if (templatesData == null)
@@ -87,6 +88,23 @@ namespace Microsoft.TemplateSearch.Common
                 {
                     writer.WritePropertyName(nameof(TotalDownloads));
                     writer.WriteValue(value.TotalDownloads);
+                }
+                if (value.Authors.Any())
+                {
+                    writer.WritePropertyName(nameof(Authors));
+                    if (value.Authors.Count == 1)
+                    {
+                        writer.WriteValue(value.Authors[0]);
+                    }
+                    else
+                    {
+                        writer.WriteStartArray();
+                        foreach (string author in value.Authors)
+                        {
+                            writer.WriteValue(author);
+                        }
+                        writer.WriteEndArray();
+                    }
                 }
 
                 writer.WritePropertyName(nameof(Templates));

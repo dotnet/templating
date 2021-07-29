@@ -37,11 +37,8 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Results
                                     PackToTemplateEntry packToTemplateEntry = new PackToTemplateEntry(
                                             r.PackInfo.Version ?? "",
                                             r.FoundTemplates.Select(t => new TemplateIdentificationEntry(t.Identity, t.GroupIdentity)).ToList());
-
-                                    if (r.PackInfo is NuGetPackInfo npi)
-                                    {
-                                        packToTemplateEntry.TotalDownloads = npi.TotalDownloads;
-                                    }
+                                    packToTemplateEntry.TotalDownloads = r.PackInfo.TotalDownloads;
+                                    packToTemplateEntry.Authors = r.PackInfo.Authors;
                                     return packToTemplateEntry;
                                 });
 

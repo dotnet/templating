@@ -1,6 +1,8 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.Collections.Generic;
+
 namespace Microsoft.TemplateSearch.Common.Abstractions
 {
     /// <summary>
@@ -23,5 +25,10 @@ namespace Microsoft.TemplateSearch.Common.Abstractions
         /// Optional, might be 0 in case search provider cannot provide number of downloads.
         /// </summary>
         public long TotalDownloads { get; }
+
+        /// <summary>
+        /// Gets the list of template package authors.
+        /// </summary>
+        public IReadOnlyList<string> Authors { get; }
     }
 }

@@ -64,6 +64,8 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackProviders
             public long TotalDownloads => 0;
 
             public string Path { get; }
+
+            public IReadOnlyList<string> Authors => new[] { "TestAuthor" };
         }
     }
 }

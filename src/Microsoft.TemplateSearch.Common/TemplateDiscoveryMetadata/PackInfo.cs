@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.TemplateSearch.Common.Abstractions;
 using Newtonsoft.Json;
 
@@ -16,11 +18,12 @@ namespace Microsoft.TemplateSearch.Common
             Version = version;
         }
 
-        internal PackInfo(string name, string version, long totalDownloads)
+        internal PackInfo(string name, string version, long totalDownloads, IEnumerable<string> authors)
         {
             Name = name;
             Version = version;
             TotalDownloads = totalDownloads;
+            Authors = authors.ToList();
         }
 
         [JsonProperty]
@@ -31,5 +34,8 @@ namespace Microsoft.TemplateSearch.Common
 
         [JsonProperty]
         public long TotalDownloads { get; }
+
+        [JsonProperty]
+        public IReadOnlyList<string> Authors { get; } = Array.Empty<string>();
     }
 }
