@@ -268,7 +268,7 @@ Ejecute "dotnet {1} --show-aliases" sin argumentos para mostrar todos los alias.
       </trans-unit>
       <trans-unit id="CliTemplateSearchCoordinator_Error_NoTemplateName">
         <source>Search failed: not enough information specified for search.</source>
-        <target state="needs-review-translation">Error de búsqueda: no se especificó ningún nombre de plantilla.</target>
+        <target state="new">Search failed: not enough information specified for search.</target>
         <note />
       </trans-unit>
       <trans-unit id="CliTemplateSearchCoordinator_Error_NotFound">
@@ -293,7 +293,7 @@ Ejecute "dotnet {1} --show-aliases" sin argumentos para mostrar todos los alias.
       </trans-unit>
       <trans-unit id="CliTemplateSearchCoordinator_Info_SearchHelp">
         <source>To search for templates, specify partial template name or use one of supported filters: {0}.</source>
-        <target state="needs-review-translation">Para buscar la plantilla, especifique el nombre de la plantilla o use uno de los filtros admitidos: {0}.</target>
+        <target state="new">To search for templates, specify partial template name or use one of supported filters: {0}.</target>
         <note />
       </trans-unit>
       <trans-unit id="CliTemplateSearchCoordinator_Info_SearchInProgress">
