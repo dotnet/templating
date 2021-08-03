@@ -267,19 +267,14 @@ Pokud si chcete zobrazit všechny aliasy, spusťte bez argumentů příkaz dotne
         <note />
       </trans-unit>
       <trans-unit id="CliTemplateSearchCoordinator_Error_NoTemplateName">
-        <source>Search failed: not enough information specified for search.</source>
-        <target state="needs-review-translation">Hledání selhalo: není zadaný název šablony.</target>
+        <source>Search failed: no template name is specified.</source>
+        <target state="translated">Hledání selhalo: není zadaný název šablony.</target>
         <note />
       </trans-unit>
       <trans-unit id="CliTemplateSearchCoordinator_Error_NotFound">
         <source>Template '{0}' was not found.</source>
         <target state="translated">Šablona {0} se nenašla.</target>
         <note />
-      </trans-unit>
-      <trans-unit id="CliTemplateSearchCoordinator_Error_SearchFailure">
-        <source>Search failed: {0}</source>
-        <target state="new">Search failed: {0}</target>
-        <note>0 - localized error message</note>
       </trans-unit>
       <trans-unit id="CliTemplateSearchCoordinator_Error_TemplateNameIsTooShort">
         <source>Search failed: template name is too short, minimum 2 characters are required.</source>
@@ -297,8 +292,8 @@ Pokud si chcete zobrazit všechny aliasy, spusťte bez argumentů příkaz dotne
         <note />
       </trans-unit>
       <trans-unit id="CliTemplateSearchCoordinator_Info_SearchHelp">
-        <source>To search for templates, specify partial template name or use one of supported filters: {0}.</source>
-        <target state="needs-review-translation">Pokud chcete šablonu vyhledat, zadejte název šablony nebo použijte jeden z podporovaných filtrů: {0}.</target>
+        <source>To search for the template, specify template name or use one of supported filters: {0}.</source>
+        <target state="translated">Pokud chcete šablonu vyhledat, zadejte název šablony nebo použijte jeden z podporovaných filtrů: {0}.</target>
         <note />
       </trans-unit>
       <trans-unit id="CliTemplateSearchCoordinator_Info_SearchInProgress">
@@ -382,8 +377,10 @@ Pokud si chcete zobrazit všechny aliasy, spusťte bez argumentů příkaz dotne
         <note />
       </trans-unit>
       <trans-unit id="CommandOutput">
-        <source>Output from command:</source>
-        <target state="translated">Výstup příkazu:</target>
+        <source>Output from command:
+{0}</source>
+        <target state="new">Output from command:
+{0}</target>
         <note />
       </trans-unit>
       <trans-unit id="CommandSucceeded">
@@ -500,11 +497,6 @@ Pokud si chcete zobrazit všechny aliasy, spusťte bez argumentů příkaz dotne
         <target state="translated">Podrobnosti: {0}</target>
         <note />
       </trans-unit>
-      <trans-unit id="Generic_Empty">
-        <source>(empty)</source>
-        <target state="translated">(prázdné)</target>
-        <note>shown when there is no data to show</note>
-      </trans-unit>
       <trans-unit id="Generic_ExampleHeader">
         <source>Example:</source>
         <target state="translated">Příklad:</target>
@@ -554,11 +546,6 @@ Pokud si chcete zobrazit všechny aliasy, spusťte bez argumentů příkaz dotne
         <source>For more information, run:</source>
         <target state="translated">Další informace – spusťte:</target>
         <note />
-      </trans-unit>
-      <trans-unit id="InvalidSyntax">
-        <source>Invalid command syntax: use '{0}' instead.</source>
-        <target state="new">Invalid command syntax: use '{0}' instead.</target>
-        <note>{0} - command syntax, example: dotnet new [PARTIAL_NAME] --list [FILTER_OPTIONS].</note>
       </trans-unit>
       <trans-unit id="LanguageParameter">
         <source>Filters templates based on language and specifies the language of the template to create.</source>

@@ -267,19 +267,14 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</source>
         <note />
       </trans-unit>
       <trans-unit id="CliTemplateSearchCoordinator_Error_NoTemplateName">
-        <source>Search failed: not enough information specified for search.</source>
-        <target state="needs-review-translation">検索に失敗しました。テンプレート名が指定されていません。</target>
+        <source>Search failed: no template name is specified.</source>
+        <target state="translated">検索に失敗しました。テンプレート名が指定されていません。</target>
         <note />
       </trans-unit>
       <trans-unit id="CliTemplateSearchCoordinator_Error_NotFound">
         <source>Template '{0}' was not found.</source>
         <target state="translated">テンプレート '{0}' が見つかりませんでした。</target>
         <note />
-      </trans-unit>
-      <trans-unit id="CliTemplateSearchCoordinator_Error_SearchFailure">
-        <source>Search failed: {0}</source>
-        <target state="new">Search failed: {0}</target>
-        <note>0 - localized error message</note>
       </trans-unit>
       <trans-unit id="CliTemplateSearchCoordinator_Error_TemplateNameIsTooShort">
         <source>Search failed: template name is too short, minimum 2 characters are required.</source>
@@ -297,8 +292,8 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</source>
         <note />
       </trans-unit>
       <trans-unit id="CliTemplateSearchCoordinator_Info_SearchHelp">
-        <source>To search for templates, specify partial template name or use one of supported filters: {0}.</source>
-        <target state="needs-review-translation">テンプレートを検索するには、テンプレート名を指定するか、サポートされているフィルターのいずれかをお使いください: {0}。</target>
+        <source>To search for the template, specify template name or use one of supported filters: {0}.</source>
+        <target state="translated">テンプレートを検索するには、テンプレート名を指定するか、サポートされているフィルターのいずれかをお使いください: {0}。</target>
         <note />
       </trans-unit>
       <trans-unit id="CliTemplateSearchCoordinator_Info_SearchInProgress">
@@ -382,8 +377,10 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</source>
         <note />
       </trans-unit>
       <trans-unit id="CommandOutput">
-        <source>Output from command:</source>
-        <target state="translated">コマンドからの出力:</target>
+        <source>Output from command:
+{0}</source>
+        <target state="new">Output from command:
+{0}</target>
         <note />
       </trans-unit>
       <trans-unit id="CommandSucceeded">
@@ -500,11 +497,6 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</source>
         <target state="translated">詳細: {0}</target>
         <note />
       </trans-unit>
-      <trans-unit id="Generic_Empty">
-        <source>(empty)</source>
-        <target state="translated">(空)</target>
-        <note>shown when there is no data to show</note>
-      </trans-unit>
       <trans-unit id="Generic_ExampleHeader">
         <source>Example:</source>
         <target state="translated">例:</target>
@@ -554,11 +546,6 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</source>
         <source>For more information, run:</source>
         <target state="translated">詳しい情報を見るには、以下を実行してください。</target>
         <note />
-      </trans-unit>
-      <trans-unit id="InvalidSyntax">
-        <source>Invalid command syntax: use '{0}' instead.</source>
-        <target state="new">Invalid command syntax: use '{0}' instead.</target>
-        <note>{0} - command syntax, example: dotnet new [PARTIAL_NAME] --list [FILTER_OPTIONS].</note>
       </trans-unit>
       <trans-unit id="LanguageParameter">
         <source>Filters templates based on language and specifies the language of the template to create.</source>
