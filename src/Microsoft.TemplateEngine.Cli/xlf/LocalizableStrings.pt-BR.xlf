@@ -268,7 +268,7 @@ Execute 'dotnet {1} --mostrar- aliases' sem nenhum args para mostrar todos os al
       </trans-unit>
       <trans-unit id="CliTemplateSearchCoordinator_Error_NoTemplateName">
         <source>Search failed: not enough information specified for search.</source>
-        <target state="needs-review-translation">A pesquisa falhou: nenhum nome de modelo foi especificado.</target>
+        <target state="new">Search failed: not enough information specified for search.</target>
         <note />
       </trans-unit>
       <trans-unit id="CliTemplateSearchCoordinator_Error_NotFound">
@@ -298,7 +298,7 @@ Execute 'dotnet {1} --mostrar- aliases' sem nenhum args para mostrar todos os al
       </trans-unit>
       <trans-unit id="CliTemplateSearchCoordinator_Info_SearchHelp">
         <source>To search for templates, specify partial template name or use one of supported filters: {0}.</source>
-        <target state="needs-review-translation">Para pesquisar o modelo, especifique o nome do modelo ou use um dos filtros compatíveis: {0}.</target>
+        <target state="new">To search for templates, specify partial template name or use one of supported filters: {0}.</target>
         <note />
       </trans-unit>
       <trans-unit id="CliTemplateSearchCoordinator_Info_SearchInProgress">
