@@ -22,9 +22,9 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Filters
                 EngineEnvironmentSettings environmentSettings = new EngineEnvironmentSettings(_host, virtualizeSettings: true);
                 foreach (IMountPointFactory factory in environmentSettings.Components.OfType<IMountPointFactory>())
                 {
-                    if (factory.TryMount(environmentSettings, null, packInfo.Path, out IMountPoint mountPoint))
+                    if (factory.TryMount(environmentSettings, null, packInfo.Path, out IMountPoint? mountPoint))
                     {
-                        bool hasTemplateJson = mountPoint.Root.EnumerateFiles("template.json", SearchOption.AllDirectories).Any();
+                        bool hasTemplateJson = mountPoint!.Root.EnumerateFiles("template.json", SearchOption.AllDirectories).Any();
                         mountPoint.Dispose();
 
                         if (hasTemplateJson)

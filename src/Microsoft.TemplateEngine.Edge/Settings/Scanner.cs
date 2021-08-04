@@ -57,7 +57,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         {
             foreach (IMountPointFactory factory in _environmentSettings.Components.OfType<IMountPointFactory>().ToList())
             {
-                if (factory.TryMount(_environmentSettings, null, sourceLocation, out IMountPoint mountPoint))
+                if (factory.TryMount(_environmentSettings, null, sourceLocation, out IMountPoint? mountPoint))
                 {
                     // file-based and not originating in the scratch dir.
                     bool isLocalFlatFileSource = mountPoint is FileSystemMountPoint
@@ -65,7 +65,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
                     return new MountPointScanSource(
                         location: sourceLocation,
-                        mountPoint: mountPoint,
+                        mountPoint: mountPoint!,
                         shouldStayInOriginalLocation: isLocalFlatFileSource,
                         foundComponents: false,
                         foundTemplates: false

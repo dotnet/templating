@@ -1,2 +1,3 @@
 ﻿Microsoft.TemplateEngine.Utils.IFileSystemInfoExtensions
+static Microsoft.TemplateEngine.Utils.EngineEnvironmentSettingsExtensions.CanMount(this Microsoft.TemplateEngine.Abstractions.IEngineEnvironmentSettings! engineEnvironment, string! mountPointUri) -> bool
 static Microsoft.TemplateEngine.Utils.IFileSystemInfoExtensions.GetDisplayPath(this Microsoft.TemplateEngine.Abstractions.Mount.IFileSystemInfo! fileSystemInfo) -> string!

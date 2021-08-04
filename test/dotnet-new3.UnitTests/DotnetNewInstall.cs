@@ -526,5 +526,41 @@ namespace Dotnet_new3.IntegrationTests
                 .And.HaveStdOutContaining($"  Source location './' is outside the specified install source location.")
                 .And.HaveStdOutContaining($"No templates were found in the package {invalidTemplatePath}.");
         }
+        
+        [Fact]
+        public void IgnoreRemovedPackages()
+        {
+            string hiveRoot = TestUtils.CreateTemporaryFolder("HiveRoot");
+            string templateLocation = TestUtils.GetTestTemplateLocation("TemplateWithSourceName");
+            string templateCopyDir = TestUtils.CreateTemporaryFolder("CopyOfTemplate");
+            TestUtils.DirectoryCopy(templateLocation, templateCopyDir, true);
+
+            new DotnetNewCommand(_log, "-i", templateCopyDir)
+                .WithCustomHive(hiveRoot)
+                .Execute()
+                .Should()
+                .NotHaveStdErr()
+                .And.ExitWith(0)
+                .And.HaveStdOutContaining("TestAssets.TemplateWithSourceName");
+
+            new DotnetNewCommand(_log, "--list")
+                .WithCustomHive(hiveRoot)
+                .Execute()
+                .Should()
+                .NotHaveStdErr()
+                .And.ExitWith(0)
+                .And.HaveStdOutContaining("TestAssets.TemplateWithSourceName");
+
+            Directory.Delete(templateCopyDir, true);
+
+            new DotnetNewCommand(_log, "--list")
+                .WithCustomHive(hiveRoot)
+                .Execute()
+                .Should()
+                .NotHaveStdErr()
+                .And.ExitWith(0)
+                .And.NotHaveStdOutContaining("TestAssets.TemplateWithSourceName");
+
+        }
     }
 }

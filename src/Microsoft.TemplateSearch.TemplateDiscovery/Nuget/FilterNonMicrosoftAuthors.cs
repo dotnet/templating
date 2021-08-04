@@ -29,9 +29,9 @@ internal class FilterNonMicrosoftAuthors
             EngineEnvironmentSettings environmentSettings = new EngineEnvironmentSettings(_host, virtualizeSettings: true);
             foreach (IMountPointFactory factory in environmentSettings.Components.OfType<IMountPointFactory>())
             {
-                if (factory.TryMount(environmentSettings, null, packInfo.Path, out IMountPoint mountPoint))
+                if (factory.TryMount(environmentSettings, null, packInfo.Path, out IMountPoint? mountPoint))
                 {
-                    foreach (var templateJson in mountPoint.Root.EnumerateFiles("template.json", SearchOption.AllDirectories))
+                    foreach (var templateJson in mountPoint!.Root.EnumerateFiles("template.json", SearchOption.AllDirectories))
                     {
                         try
                         {

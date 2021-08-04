@@ -1,1 +1,1 @@
-﻿
+﻿Microsoft.TemplateEngine.Abstractions.Mount.IMountPointFactory.CanMount(Microsoft.TemplateEngine.Abstractions.IEngineEnvironmentSettings! environmentSettings, Microsoft.TemplateEngine.Abstractions.Mount.IMountPoint? parent, string! mountPointUri) -> bool

@@ -1,6 +1,8 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System;
 using System.IO;
 using Microsoft.TemplateEngine.Abstractions;
@@ -16,7 +18,7 @@ namespace Microsoft.TemplateEngine.Edge.Mount.FileSystem
     {
         private SettingsFilePaths _paths;
 
-        internal FileSystemMountPoint(IEngineEnvironmentSettings environmentSettings, IMountPoint parent, string mountPointUri, string mountPointRootPath)
+        internal FileSystemMountPoint(IEngineEnvironmentSettings environmentSettings, IMountPoint? parent, string mountPointUri, string mountPointRootPath)
         {
             MountPointUri = mountPointUri;
             MountPointRootPath = mountPointRootPath;
@@ -29,7 +31,7 @@ namespace Microsoft.TemplateEngine.Edge.Mount.FileSystem
 
         public IEngineEnvironmentSettings EnvironmentSettings { get; }
 
-        public IMountPoint Parent { get; }
+        public IMountPoint? Parent { get; }
 
         public Guid MountPointFactoryId => FileSystemMountPointFactory.FactoryId;
 

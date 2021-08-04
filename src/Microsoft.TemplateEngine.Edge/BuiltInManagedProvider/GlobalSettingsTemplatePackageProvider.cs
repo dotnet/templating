@@ -71,18 +71,28 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
                 {
                     try
                     {
-                        list.Add(((ISerializableInstaller)installer).Deserialize(this, entry));
+                        var package = ((ISerializableInstaller)installer).Deserialize(this, entry);
+                        if (_environmentSettings.CanMount(package.MountPointUri))
+                        {
+                            list.Add(package);
+                        }
                     }
                     catch (Exception e)
                     {
                         _logger.LogDebug($"[{Factory.DisplayName}] Failed to deserialize template package data entry {entry.MountPointUri}, details: {e}.", DebugLogCategory);
                         //adding template package as non-managed
-                        list.Add(new TemplatePackage(this, entry.MountPointUri, entry.LastChangeTime));
+                        if (_environmentSettings.CanMount(entry.MountPointUri))
+                        {
+                            list.Add(new TemplatePackage(this, entry.MountPointUri, entry.LastChangeTime));
+                        }
                     }
                 }
                 else
                 {
-                    list.Add(new TemplatePackage(this, entry.MountPointUri, entry.LastChangeTime));
+                    if (_environmentSettings.CanMount(entry.MountPointUri))
+                    {
+                        list.Add(new TemplatePackage(this, entry.MountPointUri, entry.LastChangeTime));
+                    }
                 }
             }
             return list;

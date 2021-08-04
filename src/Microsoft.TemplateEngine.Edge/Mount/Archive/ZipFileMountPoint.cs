@@ -1,6 +1,8 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.IO.Compression;
@@ -15,20 +17,17 @@ namespace Microsoft.TemplateEngine.Edge.Mount.Archive
     /// </summary>
     internal class ZipFileMountPoint : IMountPoint
     {
-        private IReadOnlyDictionary<string, IFileSystemInfo> _universe;
+        private IReadOnlyDictionary<string, IFileSystemInfo>? _universe;
 
-        internal ZipFileMountPoint(IEngineEnvironmentSettings environmentSettings, IMountPoint parent, string mountPointUri, ZipArchive archive)
+        internal ZipFileMountPoint(IEngineEnvironmentSettings environmentSettings, string mountPointUri, ZipArchive archive)
         {
             MountPointUri = mountPointUri;
-            Parent = parent;
             EnvironmentSettings = environmentSettings;
             Archive = archive;
             Root = new ZipFileDirectory(this, "/", "");
         }
 
         public IDirectory Root { get; }
-
-        public IMountPoint Parent { get; }
 
         public string MountPointUri { get; }
 
@@ -51,7 +50,7 @@ namespace Microsoft.TemplateEngine.Edge.Mount.Archive
                     {
                         string[] parts = entry.FullName.Split('/', '\\');
                         string path = "/";
-                        IDirectory parentDir = (IDirectory)universe["/"];
+                        IDirectory? parentDir = (IDirectory)universe["/"];
 
                         for (int i = 0; parentDir != null && i < parts.Length - 1; ++i)
                         {
@@ -96,13 +95,13 @@ namespace Microsoft.TemplateEngine.Edge.Mount.Archive
 
         public IDirectory DirectoryInfo(string path)
         {
-            if (Universe.TryGetValue(path, out IFileSystemInfo info))
+            if (Universe.TryGetValue(path, out IFileSystemInfo info) && info is IDirectory dir)
             {
-                return info as IDirectory;
+                return dir;
             }
-            else if (Universe.TryGetValue(path + "/", out info))
+            else if (Universe.TryGetValue(path + "/", out info) && info is IDirectory dirWithSlash)
             {
-                return info as IDirectory;
+                return dirWithSlash;
             }
 
             return new ZipFileDirectory(this, path, path.Substring(path.LastIndexOf('/') + 1));

@@ -460,9 +460,9 @@ false,
         {
             foreach (var factory in engineEnvironmentSettings.Components.OfType<IMountPointFactory>())
             {
-                if (factory.TryMount(engineEnvironmentSettings, null, path, out IMountPoint myMountPoint))
+                if (factory.TryMount(engineEnvironmentSettings, null, path, out IMountPoint? myMountPoint))
                 {
-                    return myMountPoint;
+                    return myMountPoint!;
                 }
             }
             throw new Exception($"Failed to mount the location {path}");

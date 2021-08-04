@@ -331,13 +331,13 @@ Microsoft.TemplateEngine.Abstractions.IComponentManager.TryGetComponent<T>(Syste
 ~Microsoft.TemplateEngine.Abstractions.Mount.IFileSystemInfo.MountPoint.get -> Microsoft.TemplateEngine.Abstractions.Mount.IMountPoint
 ~Microsoft.TemplateEngine.Abstractions.Mount.IFileSystemInfo.Name.get -> string
 ~Microsoft.TemplateEngine.Abstractions.Mount.IFileSystemInfo.Parent.get -> Microsoft.TemplateEngine.Abstractions.Mount.IDirectory
-~Microsoft.TemplateEngine.Abstractions.Mount.IMountPoint.DirectoryInfo(string path) -> Microsoft.TemplateEngine.Abstractions.Mount.IDirectory
-~Microsoft.TemplateEngine.Abstractions.Mount.IMountPoint.EnvironmentSettings.get -> Microsoft.TemplateEngine.Abstractions.IEngineEnvironmentSettings
-~Microsoft.TemplateEngine.Abstractions.Mount.IMountPoint.FileInfo(string path) -> Microsoft.TemplateEngine.Abstractions.Mount.IFile
-~Microsoft.TemplateEngine.Abstractions.Mount.IMountPoint.FileSystemInfo(string path) -> Microsoft.TemplateEngine.Abstractions.Mount.IFileSystemInfo
-~Microsoft.TemplateEngine.Abstractions.Mount.IMountPoint.MountPointUri.get -> string
-~Microsoft.TemplateEngine.Abstractions.Mount.IMountPoint.Root.get -> Microsoft.TemplateEngine.Abstractions.Mount.IDirectory
-~Microsoft.TemplateEngine.Abstractions.Mount.IMountPointFactory.TryMount(Microsoft.TemplateEngine.Abstractions.IEngineEnvironmentSettings environmentSettings, Microsoft.TemplateEngine.Abstractions.Mount.IMountPoint parent, string mountPointUri, out Microsoft.TemplateEngine.Abstractions.Mount.IMountPoint mountPoint) -> bool
+Microsoft.TemplateEngine.Abstractions.Mount.IMountPoint.DirectoryInfo(string! path) -> Microsoft.TemplateEngine.Abstractions.Mount.IDirectory!
+Microsoft.TemplateEngine.Abstractions.Mount.IMountPoint.EnvironmentSettings.get -> Microsoft.TemplateEngine.Abstractions.IEngineEnvironmentSettings!
+Microsoft.TemplateEngine.Abstractions.Mount.IMountPoint.FileInfo(string! path) -> Microsoft.TemplateEngine.Abstractions.Mount.IFile!
+Microsoft.TemplateEngine.Abstractions.Mount.IMountPoint.FileSystemInfo(string! path) -> Microsoft.TemplateEngine.Abstractions.Mount.IFileSystemInfo!
+Microsoft.TemplateEngine.Abstractions.Mount.IMountPoint.MountPointUri.get -> string!
+Microsoft.TemplateEngine.Abstractions.Mount.IMountPoint.Root.get -> Microsoft.TemplateEngine.Abstractions.Mount.IDirectory!
+Microsoft.TemplateEngine.Abstractions.Mount.IMountPointFactory.TryMount(Microsoft.TemplateEngine.Abstractions.IEngineEnvironmentSettings! environmentSettings, Microsoft.TemplateEngine.Abstractions.Mount.IMountPoint? parent, string! mountPointUri, out Microsoft.TemplateEngine.Abstractions.Mount.IMountPoint? mountPoint) -> bool
 ~Microsoft.TemplateEngine.Abstractions.Mount.IMountPointManager.EnvironmentSettings.get -> Microsoft.TemplateEngine.Abstractions.IEngineEnvironmentSettings
 ~Microsoft.TemplateEngine.Abstractions.Mount.IMountPointManager.TryDemandMountPoint(string mountPointUri, out Microsoft.TemplateEngine.Abstractions.Mount.IMountPoint mountPoint) -> bool
 ~Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem.IFileLastWriteTimeSource.GetLastWriteTimeUtc(string file) -> System.DateTime

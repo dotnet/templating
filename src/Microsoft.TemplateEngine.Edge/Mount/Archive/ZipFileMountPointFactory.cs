@@ -1,6 +1,8 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System;
 using System.IO.Compression;
 using Microsoft.TemplateEngine.Abstractions;
@@ -15,7 +17,17 @@ namespace Microsoft.TemplateEngine.Edge.Mount.Archive
 
         public Guid Id => FactoryId;
 
-        public bool TryMount(IEngineEnvironmentSettings environmentSettings, IMountPoint parent, string mountPointUri, out IMountPoint mountPoint)
+        public bool CanMount(IEngineEnvironmentSettings environmentSettings, IMountPoint? parent, string mountPointUri)
+        {
+            return InnerTryMount(environmentSettings, parent, mountPointUri, out _, true);
+        }
+
+        public bool TryMount(IEngineEnvironmentSettings environmentSettings, IMountPoint? parent, string mountPointUri, out IMountPoint? mountPoint)
+        {
+            return InnerTryMount(environmentSettings, parent, mountPointUri, out mountPoint, false);
+        }
+
+        private bool InnerTryMount(IEngineEnvironmentSettings environmentSettings, IMountPoint? parent, string mountPointUri, out IMountPoint? mountPoint, bool skipMounting)
         {
             if (!Uri.TryCreate(mountPointUri, UriKind.Absolute, out var uri))
             {
@@ -38,6 +50,11 @@ namespace Microsoft.TemplateEngine.Edge.Mount.Archive
                     mountPoint = null;
                     return false;
                 }
+                if (skipMounting)
+                {
+                    mountPoint = null;
+                    return true;
+                }
 
                 try
                 {
@@ -58,6 +75,11 @@ namespace Microsoft.TemplateEngine.Edge.Mount.Archive
                     mountPoint = null;
                     return false;
                 }
+                if (skipMounting)
+                {
+                    mountPoint = null;
+                    return true;
+                }
 
                 try
                 {
@@ -70,7 +92,7 @@ namespace Microsoft.TemplateEngine.Edge.Mount.Archive
                 }
             }
 
-            mountPoint = new ZipFileMountPoint(environmentSettings, parent, mountPointUri, archive);
+            mountPoint = new ZipFileMountPoint(environmentSettings, mountPointUri, archive);
             return true;
         }
     }

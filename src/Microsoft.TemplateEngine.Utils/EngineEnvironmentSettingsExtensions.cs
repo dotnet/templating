@@ -32,5 +32,22 @@ namespace Microsoft.TemplateEngine.Utils
             mountPoint = null;
             return false;
         }
+
+        /// <summary>
+        /// Tries to mount a <see cref="IMountPoint"/> from specified <see cref="System.Uri"/>.
+        /// Using all <see cref="IMountPointFactory"/> in <see cref="IEngineEnvironmentSettings.Components"/>.
+        /// </summary>
+        public static bool CanMount(this IEngineEnvironmentSettings engineEnvironment, string mountPointUri)
+        {
+            foreach (var factory in engineEnvironment.Components.OfType<IMountPointFactory>())
+            {
+                if (factory.CanMount(engineEnvironment, null, mountPointUri))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }
