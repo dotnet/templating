@@ -27,14 +27,14 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Results
                 Directory.CreateDirectory(reportPath);
                 Console.WriteLine($"Created directory:{reportPath}");
             }
-			
-			string legacyMetadataFilePath = Path.Combine(reportPath, SearchMetadataFilename);
-			string metadataFilePath = Path.Combine(reportPath, SearchMetadataFilenameVer2);
-			
+
+            string legacyMetadataFilePath = Path.Combine(reportPath, SearchMetadataFilename);
+            string metadataFilePath = Path.Combine(reportPath, SearchMetadataFilenameVer2);
+
             WriteNonTemplatePackList(reportPath, packSourceCheckResults.PackCheckData);
             LegacyMetadataWriter.WriteLegacySearchMetadata(packSourceCheckResults, legacyMetadataFilePath);
             WriteSearchMetadata(packSourceCheckResults, metadataFilePath);
-			return metadataFilePath;
+            return metadataFilePath;
 
         }
 

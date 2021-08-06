@@ -5,6 +5,7 @@ using Microsoft.TemplateSearch.TemplateDiscovery.Nuget;
 using Microsoft.TemplateSearch.TemplateDiscovery.PackChecking;
 using Microsoft.TemplateSearch.TemplateDiscovery.PackChecking.Reporting;
 using Microsoft.TemplateSearch.TemplateDiscovery.Results;
+using Microsoft.TemplateSearch.TemplateDiscovery.Test;
 
 namespace Microsoft.TemplateSearch.TemplateDiscovery
 {
@@ -72,7 +73,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
             {
                 PackSourceCheckResult checkResults = await packSourceChecker.CheckPackagesAsync(cts.Token).ConfigureAwait(false);
                 string metadataPath = PackCheckResultReportWriter.WriteResults(config.BasePath, checkResults);
-				CacheFileTests.RunTests(metadataPath);
+                CacheFileTests.RunTests(metadataPath);
             }
             catch (TaskCanceledException)
             {
