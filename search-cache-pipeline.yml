@@ -34,17 +34,17 @@ steps:
     command: 'run'
     projects: '$(Build.SourcesDirectory)/src/Microsoft.TemplateSearch.TemplateDiscovery/Microsoft.TemplateSearch.TemplateDiscovery.csproj'
     arguments: '-- --basePath $(System.DefaultWorkingDirectory)/NugetDownloadDirectory --allowPreviewPacks -v'
-- publish: $(System.DefaultWorkingDirectory)/NugetDownloadDirectory/SearchCache/NuGetTemplateSearchInfo.json
+- publish: $(System.DefaultWorkingDirectory)/NugetDownloadDirectory/SearchCache/NuGetTemplateSearchInfoVer2.json
   artifact: outputs
 - bash: az config set extension.use_dynamic_install=yes_without_prompt
   displayName: Disable Azure CLI prompts
-- bash: >
-    az storage azcopy blob upload 
-    -c $(CacheFileStorageContainer)
-    --account-name $(CacheFileStorageAccount) 
-    -s '$(System.DefaultWorkingDirectory)/NugetDownloadDirectory/SearchCache/NuGetTemplateSearchInfo.json' 
-    --sas-token "$(CacheFileStorageSasToken)"
-    -d Partners/NuGetTemplateSearchInfo.json
-    | tee upload.log
-    && grep ".*Number of Transfers Completed: 1" upload.log || (echo ; echo "Upload failed"; false)
-  displayName: Upload to blob storage
+#- bash: >
+#    az storage azcopy blob upload 
+#    -c $(CacheFileStorageContainer)
+#    --account-name $(CacheFileStorageAccount) 
+#    -s '$(System.DefaultWorkingDirectory)/NugetDownloadDirectory/SearchCache/NuGetTemplateSearchInfoVer2.json' 
+#    --sas-token "$(CacheFileStorageSasToken)"
+#    -d Partners/NuGetTemplateSearchInfoVer2.json
+#    | tee upload.log
+#    && grep ".*Number of Transfers Completed: 1" upload.log || (echo ; echo "Upload failed"; false)
+#  displayName: Upload to blob storage
