@@ -33,8 +33,7 @@ steps:
   inputs:
     command: 'run'
     projects: '$(Build.SourcesDirectory)/src/Microsoft.TemplateSearch.TemplateDiscovery/Microsoft.TemplateSearch.TemplateDiscovery.csproj'
-    arguments: '--basePath $(System.DefaultWorkingDirectory)/NugetDownloadDirectory'
-  displayName: Copy cache file
+    arguments: '-- --basePath $(System.DefaultWorkingDirectory)/NugetDownloadDirectory --allowPreviewPacks -v'
 - publish: $(System.DefaultWorkingDirectory)/NugetDownloadDirectory/SearchCache/NuGetTemplateSearchInfo.json
   artifact: outputs
 - bash: az config set extension.use_dynamic_install=yes_without_prompt
@@ -45,5 +44,7 @@ steps:
     --account-name $(CacheFileStorageAccount) 
     -s '$(System.DefaultWorkingDirectory)/NugetDownloadDirectory/SearchCache/NuGetTemplateSearchInfo.json' 
     --sas-token "$(CacheFileStorageSasToken)"
-    -d NuGetTemplateSearchInfo.json
+    -d Partners/NuGetTemplateSearchInfo.json
+    | tee upload.log
+    && grep ".*Number of Transfers Completed: 1" upload.log || (echo ; echo "Upload failed"; false)
   displayName: Upload to blob storage
