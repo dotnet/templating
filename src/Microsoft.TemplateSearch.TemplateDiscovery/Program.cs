@@ -71,7 +71,8 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
             try
             {
                 PackSourceCheckResult checkResults = await packSourceChecker.CheckPackagesAsync(cts.Token).ConfigureAwait(false);
-                PackCheckResultReportWriter.WriteResults(config.BasePath, checkResults);
+                PackCheckResultReportWriter.WriteResults(config.BasePath, checkResults, out string metadataPath);
+				CacheFileTests.RunTests(metadataPath);
             }
             catch (TaskCanceledException)
             {
