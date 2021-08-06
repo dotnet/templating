@@ -3,7 +3,7 @@ schedules:
   displayName: Run every hour
   branches:
     include:
-    - /legacy/template-discovery-tool
+    - /dev/bozturk/new-search-cache-pipeline
   always: true
 
 steps:
@@ -34,7 +34,7 @@ steps:
     command: 'run'
     projects: '$(Build.SourcesDirectory)/src/Microsoft.TemplateSearch.TemplateDiscovery/Microsoft.TemplateSearch.TemplateDiscovery.csproj'
     arguments: '-- --basePath $(System.DefaultWorkingDirectory)/NugetDownloadDirectory --allowPreviewPacks -v'
-- publish: $(System.DefaultWorkingDirectory)/NugetDownloadDirectory/SearchCache/NuGetTemplateSearchInfoVer2.json
+- publish: $(System.DefaultWorkingDirectory)/NugetDownloadDirectory/SearchCache/NuGetTemplateSearchInfo*.json
   artifact: outputs
 - bash: az config set extension.use_dynamic_install=yes_without_prompt
   displayName: Disable Azure CLI prompts
