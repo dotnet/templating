@@ -15,6 +15,7 @@
     <PackageReference Update="NuGet.Configuration" Version="$(NuGetConfigurationPackageVersion)" />
     <PackageReference Update="NuGet.Credentials" Version="$(NuGetCredentialsPackageVersion)" />
     <PackageReference Update="NuGet.Protocol" Version="$(NuGetProtocolPackageVersion)" />
+    <PackageReference Update="Wcwidth.Sources" Version="$(WcwidthSourcesPackageVersion)" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' AND '$(BuildingInsideVisualStudio)' != 'true'">

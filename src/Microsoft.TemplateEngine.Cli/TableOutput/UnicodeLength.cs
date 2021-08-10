@@ -9,7 +9,7 @@ namespace Microsoft.TemplateEngine.Cli.TableOutput
     {
         internal static int GetUnicodeLength (this string s)
         {
-            return s.Sum(ch => GetWidth((int)ch));
+            return s.Sum(ch => Wcwidth.UnicodeCalculator.GetWidth((int)ch));
         }
     }
 }
