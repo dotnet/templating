@@ -33,11 +33,12 @@ steps:
     packageType: sdk
     version: 6.x
     includePreviewVersions: true
-- task: DotNetCoreCLI@2
-  displayName: Build Cache Updater Tool
-  inputs:
-    command: 'build'
-    projects: '$(Build.SourcesDirectory)/src/Microsoft.TemplateSearch.TemplateDiscovery/Microsoft.TemplateSearch.TemplateDiscovery.csproj'
+- script: '$(Build.SourcesDirectory)\build.cmd'
+#- task: DotNetCoreCLI@2
+#  displayName: Build Cache Updater Tool
+#  inputs:
+#    command: 'build'
+#    projects: '$(Build.SourcesDirectory)/src/Microsoft.TemplateSearch.TemplateDiscovery/Microsoft.TemplateSearch.TemplateDiscovery.csproj'
 - task: DotNetCoreCLI@2
   displayName: Run Cache Updater
   inputs:
