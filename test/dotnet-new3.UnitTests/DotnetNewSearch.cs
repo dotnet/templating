@@ -3,7 +3,9 @@
 
 #nullable enable
 
+using System.Security.Cryptography;
 using Microsoft.NET.TestFramework.Assertions;
+using NuGet.Common;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -536,43 +538,54 @@ Examples:
             var commandResult = new DotnetNewCommand(_log, "con", "--search", "--langVersion", "smth")
                 .WithCustomHive(_sharedHome.HomeDirectory)
                 .Execute();
+            try
+            {
+                commandResult.Should()
+                    .ExitWith(0)
+                    .And.NotHaveStdErr()
+                    .And.HaveStdOutContaining("Searching for the templates...")
+                    .And.HaveStdOutContaining("Matches from template source: NuGet.org")
+                    .And.HaveStdOutContaining("These templates matched your input: 'con', --langVersion")
+                    .And.HaveStdOutMatching("Template Name\\s+Short Name\\s+Author\\s+Language\\s+Package\\s+Downloads")
+                    .And.HaveStdOutContaining("To use the template, run the following command to install the package:")
+                    .And.HaveStdOutContaining("   dotnet new3 --install <PACKAGE_ID>");
 
-            commandResult.Should()
-                .ExitWith(0)
-                .And.NotHaveStdErr()
-                .And.HaveStdOutContaining("Searching for the templates...")
-                .And.HaveStdOutContaining("Matches from template source: NuGet.org")
-                .And.HaveStdOutContaining("These templates matched your input: 'con', --langVersion")
-                .And.HaveStdOutMatching("Template Name\\s+Short Name\\s+Author\\s+Language\\s+Package\\s+Downloads")
-                .And.HaveStdOutContaining("To use the template, run the following command to install the package:")
-                .And.HaveStdOutContaining("   dotnet new3 --install <PACKAGE_ID>");
+                var tableOutput = ParseTableOutput(commandResult.StdOut, expectedColumns: new[] { "Template Name", "Short Name", "Author", "Language", "Package", "Downloads" });
+                Assert.True(AllRowsContain(tableOutput, new[] { "Template Name", "Short Name" }, "con"), "'Template Name' or 'Short Name' columns do not contain the criteria");
+                Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Template Name"), "'Template Name' column contains empty values");
+                Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Short Name"), "'Short Name' column contains empty values");
+                Assert.True(AllRowsAreNotEmpty(tableOutput, "Package"), "'Package' column contains empty values");
+                Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Downloads"), "'Downloads' column contains empty values");
 
-            var tableOutput = ParseTableOutput(commandResult.StdOut, expectedColumns: new[] { "Template Name", "Short Name", "Author", "Language", "Package", "Downloads" });
-            Assert.True(AllRowsContain(tableOutput, new[] { "Template Name", "Short Name" }, "con"), "'Template Name' or 'Short Name' columns do not contain the criteria");
-            Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Template Name"), "'Template Name' column contains empty values");
-            Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Short Name"), "'Short Name' column contains empty values");
-            Assert.True(AllRowsAreNotEmpty(tableOutput, "Package"), "'Package' column contains empty values");
-            Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Downloads"), "'Downloads' column contains empty values");
+                commandResult = new DotnetNewCommand(_log, "--search", "--langVersion", "smth")
+                    .WithCustomHive(_sharedHome.HomeDirectory)
+                    .Execute();
 
-            commandResult = new DotnetNewCommand(_log, "--search", "--langVersion", "smth")
-                .WithCustomHive(_sharedHome.HomeDirectory)
-                .Execute();
+                commandResult.Should()
+                    .ExitWith(0)
+                    .And.NotHaveStdErr()
+                    .And.HaveStdOutContaining("Searching for the templates...")
+                    .And.HaveStdOutContaining("Matches from template source: NuGet.org")
+                    .And.HaveStdOutContaining("These templates matched your input: --langVersion")
+                    .And.HaveStdOutMatching("Template Name\\s+Short Name\\s+Author\\s+Language\\s+Package\\s+Downloads")
+                    .And.HaveStdOutContaining("To use the template, run the following command to install the package:")
+                    .And.HaveStdOutContaining("   dotnet new3 --install <PACKAGE_ID>");
 
-            commandResult.Should()
-                .ExitWith(0)
-                .And.NotHaveStdErr()
-                .And.HaveStdOutContaining("Searching for the templates...")
-                .And.HaveStdOutContaining("Matches from template source: NuGet.org")
-                .And.HaveStdOutContaining("These templates matched your input: --langVersion")
-                .And.HaveStdOutMatching("Template Name\\s+Short Name\\s+Author\\s+Language\\s+Package\\s+Downloads")
-                .And.HaveStdOutContaining("To use the template, run the following command to install the package:")
-                .And.HaveStdOutContaining("   dotnet new3 --install <PACKAGE_ID>");
-
-            tableOutput = ParseTableOutput(commandResult.StdOut, expectedColumns: new[] { "Template Name", "Short Name", "Author", "Language", "Package", "Downloads" });
-            Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Template Name"), "'Template Name' column contains empty values");
-            Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Short Name"), "'Short Name' column contains empty values");
-            Assert.True(AllRowsAreNotEmpty(tableOutput, "Package"), "'Package' column contains empty values");
-            Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Downloads"), "'Downloads' column contains empty values");
+                tableOutput = ParseTableOutput(commandResult.StdOut, expectedColumns: new[] { "Template Name", "Short Name", "Author", "Language", "Package", "Downloads" });
+                Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Template Name"), "'Template Name' column contains empty values");
+                Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Short Name"), "'Short Name' column contains empty values");
+                Assert.True(AllRowsAreNotEmpty(tableOutput, "Package"), "'Package' column contains empty values");
+                Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Downloads"), "'Downloads' column contains empty values");
+            }
+            catch (Exception)
+            {
+                _log.WriteLine("David StdErr:" + commandResult.StdErr);
+                _log.WriteLine("David StdOut:" + commandResult.StdOut);
+                _log.WriteLine("Davig eTag:" + File.ReadAllText(Path.Combine(_sharedHome.HomeDirectory, "dotnetcli-preview", "v2.0.0", "nugetTemplateSearchInfo.json.etag")));
+                var jsonPath = Path.Combine(_sharedHome.HomeDirectory, "dotnetcli-preview", "v2.0.0", "nugetTemplateSearchInfo.json");
+                _log.WriteLine("David StdOut:" + SHA256.Create().ComputeHashAsBase64(new FileStream(jsonPath, FileMode.Open), false));
+                throw;
+            }
         }
 
         [Fact]
