@@ -582,9 +582,12 @@ Examples:
                 _log.WriteLine("David StdErr:" + commandResult.StdErr);
                 _log.WriteLine("David StdOut:" + commandResult.StdOut);
                 _log.WriteLine("Davig eTag:" + File.ReadAllText(Path.Combine(_sharedHome.HomeDirectory, "dotnetcli-preview", "v2.0.0", "nugetTemplateSearchInfo.json.etag")));
-                using var fs = new FileStream(Path.Combine(_sharedHome.HomeDirectory, "dotnetcli-preview", "v2.0.0", "nugetTemplateSearchInfo.json"), FileMode.Open);
+                string path = Path.Combine(_sharedHome.HomeDirectory, "dotnetcli-preview", "v2.0.0", "nugetTemplateSearchInfo.json");
+                var fs = new FileStream(path, FileMode.Open);
                 _log.WriteLine("David file lenght:" + fs.Length);
                 _log.WriteLine("David file hash:" + SHA256.Create().ComputeHashAsBase64(fs));
+                fs.Dispose();
+                _log.WriteLine("David file content:" + File.ReadAllText(path));
                 throw;
             }
         }
