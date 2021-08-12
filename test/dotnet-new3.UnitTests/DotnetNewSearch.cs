@@ -582,8 +582,9 @@ Examples:
                 _log.WriteLine("David StdErr:" + commandResult.StdErr);
                 _log.WriteLine("David StdOut:" + commandResult.StdOut);
                 _log.WriteLine("Davig eTag:" + File.ReadAllText(Path.Combine(_sharedHome.HomeDirectory, "dotnetcli-preview", "v2.0.0", "nugetTemplateSearchInfo.json.etag")));
-                var jsonPath = Path.Combine(_sharedHome.HomeDirectory, "dotnetcli-preview", "v2.0.0", "nugetTemplateSearchInfo.json");
-                _log.WriteLine("David StdOut:" + SHA256.Create().ComputeHashAsBase64(new FileStream(jsonPath, FileMode.Open), false));
+                using var fs = new FileStream(Path.Combine(_sharedHome.HomeDirectory, "dotnetcli-preview", "v2.0.0", "nugetTemplateSearchInfo.json"), FileMode.Open);
+                _log.WriteLine("David file lenght:" + fs.Length);
+                _log.WriteLine("David file hash:" + SHA256.Create().ComputeHashAsBase64(fs));
                 throw;
             }
         }
