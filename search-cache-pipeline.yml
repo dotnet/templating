@@ -39,7 +39,7 @@ steps:
 #  inputs:
 #    command: 'build'
 #    projects: '$(Build.SourcesDirectory)/src/Microsoft.TemplateSearch.TemplateDiscovery/Microsoft.TemplateSearch.TemplateDiscovery.csproj'
-- script: echo "$dotnetRoot"
+- script: echo "$env:DOTNET_INSTALL_DIR"
   displayName: Print dotnet location
 - task: DotNetCoreCLI@2
   displayName: Run Cache Updater
