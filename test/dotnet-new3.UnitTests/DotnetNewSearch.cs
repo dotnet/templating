@@ -175,7 +175,9 @@ Examples:
             Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Downloads"), "'Downloads' column contains empty values");
         }
 
-        [Fact]
+#pragma warning disable xUnit1004 // Test methods should not be skipped
+        [Fact(Skip = "Randomly failing")]
+#pragma warning restore xUnit1004 // Test methods should not be skipped
         public void CanFilterAuthor()
         {
             var commandResult = new DotnetNewCommand(_log, "console", "--search", "--columns", "author", "--author", "micro")
@@ -202,7 +204,9 @@ Examples:
             Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Downloads"), "'Downloads' column contains empty values");
         }
 
-        [Fact]
+#pragma warning disable xUnit1004 // Test methods should not be skipped
+        [Fact(Skip = "Randomly failing")]
+#pragma warning restore xUnit1004 // Test methods should not be skipped
         public void CanFilterAuthor_WithoutName()
         {
             var commandResult = new DotnetNewCommand(_log, "--search", "--columns", "author", "--author", "micro")
