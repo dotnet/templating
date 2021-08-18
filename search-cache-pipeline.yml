@@ -36,7 +36,7 @@ steps:
 - script: '$(Build.SourcesDirectory)\build.cmd'
 - powershell: >
     $(Build.SourcesDirectory)/.dotnet/dotnet.exe run $(Build.SourcesDirectory)/src/Microsoft.TemplateSearch.TemplateDiscovery/Microsoft.TemplateSearch.TemplateDiscovery.csproj
-    --basePath $(System.DefaultWorkingDirectory)/NugetDownloadDirectory --allowPreviewPacks -v
+    -- --basePath $(System.DefaultWorkingDirectory)/NugetDownloadDirectory --allowPreviewPacks -v
   displayName: Run Cache Updater
 - publish: $(System.DefaultWorkingDirectory)/NugetDownloadDirectory/SearchCache/NuGetTemplateSearchInfo*.json
   artifact: outputs
