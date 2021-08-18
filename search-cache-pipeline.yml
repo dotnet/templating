@@ -15,22 +15,22 @@ steps:
 - task: UseDotNet@2
   displayName: 'Use .NET 3.1'
   inputs:
-    packageType: sdk
+    packageType: runtime
     version: 3.1.x
 - task: UseDotNet@2
   displayName: 'Use .NET 5.0.100'
   inputs:
-    packageType: sdk
+    packageType: runtime
     version: 5.0.100
 - task: UseDotNet@2
   displayName: 'Use .NET 5.0.300'
   inputs:
-    packageType: sdk
+    packageType: runtime
     version: 5.0.300
 #- task: UseDotNet@2
 #  displayName: 'Use .NET 6'
 #  inputs:
-#    packageType: sdk
+#    packageType: runtime
 #    version: 6.x
 #    includePreviewVersions: true
 - script: '$(Build.SourcesDirectory)\build.cmd'
