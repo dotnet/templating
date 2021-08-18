@@ -33,13 +33,13 @@ steps:
 #    packageType: sdk
 #    version: 6.x
 #    includePreviewVersions: true
-- script: '$(Build.SourcesDirectory)\build.cmd'
+- script: '$(Build.SourcesDirectory)\build.cmd -verbosity d'
 #- task: DotNetCoreCLI@2
 #  displayName: Build Cache Updater Tool
 #  inputs:
 #    command: 'build'
 #    projects: '$(Build.SourcesDirectory)/src/Microsoft.TemplateSearch.TemplateDiscovery/Microsoft.TemplateSearch.TemplateDiscovery.csproj'
-- powershell: echo "$env:DOTNET_INSTALL_DIR"
+- powershell: echo "$(DotNetRoot)"
   displayName: Print dotnet location
 - task: DotNetCoreCLI@2
   displayName: Run Cache Updater
