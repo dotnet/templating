@@ -1,4 +1,5 @@
-﻿using Microsoft.NET.TestFramework.Assertions;
+﻿using System.IO.Compression;
+using Microsoft.NET.TestFramework.Assertions;
 using Microsoft.NET.TestFramework.Commands;
 using Microsoft.TemplateEngine.TestHelper;
 using Xunit;
@@ -38,7 +39,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.IntegrationTests
             string[] cacheFilePaths = new[]
             {
                 Path.Combine(testDir, "SearchCache", "NuGetTemplateSearchInfo.json"),
-                Path.Combine(testDir, "SearchCache", "NuGetTemplateSearchInfoVer2.json")
+                Path.Combine(testDir, "SearchCache", "NuGetTemplateSearchInfoV2.json")
             };
             var settingsPath = TestUtils.CreateTemporaryFolder();
 
@@ -109,7 +110,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.IntegrationTests
             string[] cacheFilePaths = new[]
             {
                 Path.Combine(testDir, "SearchCache", "NuGetTemplateSearchInfo.json"),
-                Path.Combine(testDir, "SearchCache", "NuGetTemplateSearchInfoVer2.json")
+                Path.Combine(testDir, "SearchCache", "NuGetTemplateSearchInfoV2.json")
             };
             var settingsPath = TestUtils.CreateTemporaryFolder();
 
@@ -167,6 +168,51 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.IntegrationTests
                     .WithEnvironmentVariable("DOTNET_CLI_CONTEXT_VERBOSE", "true")
                     .Execute()
                     .Should().Fail();
+            }
+        }
+
+        [Fact]
+        public void CanGZip()
+        {
+            string testDir = TestUtils.CreateTemporaryFolder();
+            using var packageManager = new PackageManager();
+            string packageLocation = packageManager.PackTestTemplatesNuGetPackage();
+
+            new DotnetCommand(
+                _log,
+                "Microsoft.TemplateSearch.TemplateDiscovery.dll",
+                "--basePath",
+                testDir,
+                "--packagesPath",
+                Path.GetDirectoryName(packageLocation),
+                "-v")
+                .Execute()
+                .Should()
+                .ExitWith(0);
+
+            string[] cacheFilePaths = new[]
+            {
+                Path.Combine(testDir, "SearchCache", "NuGetTemplateSearchInfo.json"),
+                Path.Combine(testDir, "SearchCache", "NuGetTemplateSearchInfoV2.json")
+            };
+            var settingsPath = TestUtils.CreateTemporaryFolder();
+
+            foreach (var cacheFilePath in cacheFilePaths)
+            {
+                Assert.True(File.Exists(cacheFilePath));
+                Assert.True(File.Exists(cacheFilePath + ".gz"));
+
+                using FileStream nonCompressedFileStream = new FileInfo(cacheFilePath).OpenRead();
+                using FileStream compressedFileStream = new FileInfo(cacheFilePath + ".gz").OpenRead();
+                using GZipStream decompressionStream = new GZipStream(compressedFileStream, CompressionMode.Decompress);
+
+                int currentByte = nonCompressedFileStream.ReadByte();
+                while (currentByte != -1)
+                { 
+                    Assert.Equal(currentByte, decompressionStream.ReadByte());
+                    currentByte = nonCompressedFileStream.ReadByte();
+                }
+                Assert.Equal(-1, decompressionStream.ReadByte());
             }
         }
     }

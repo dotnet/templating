@@ -1,10 +1,14 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.IO.Compression;
+using System.Text;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateSearch.Common;
+using Microsoft.TemplateSearch.Common.Abstractions;
 using Microsoft.TemplateSearch.TemplateDiscovery.PackChecking.Reporting;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateSearch.TemplateDiscovery.Results
 {
@@ -13,7 +17,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Results
         internal const string CacheContentDirectory = "SearchCache";
         // All the metadata needed for searching from dotnet new.
         internal const string SearchMetadataFilename = "NuGetTemplateSearchInfo.json";
-        internal const string SearchMetadataFilenameVer2 = "NuGetTemplateSearchInfoVer2.json";
+        internal const string SearchMetadataFilenameVer2 = "NuGetTemplateSearchInfoV2.json";
 
         // Metadata for the scraper to skip packs known to not contain templates.
         internal const string NonTemplatePacksFileName = "nonTemplatePacks.json";
@@ -27,18 +31,30 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Results
                 Directory.CreateDirectory(reportPath);
                 Console.WriteLine($"Created directory:{reportPath}");
             }
-            WriteNonTemplatePackList(reportPath, packSourceCheckResults.PackCheckData);
-            LegacyMetadataWriter.WriteLegacySearchMetadata(packSourceCheckResults, Path.Combine(reportPath, SearchMetadataFilename));
-            WriteSearchMetadata(packSourceCheckResults, Path.Combine(reportPath, SearchMetadataFilenameVer2));
 
+            WriteNonTemplatePackList(reportPath, packSourceCheckResults.PackCheckData);
+
+            //v2
+            TemplateSearchCache searchMetadata = CreateSearchMetadata(packSourceCheckResults);
+            WriteSearchMetadata(searchMetadata.ToJObject(), Path.Combine(reportPath, SearchMetadataFilenameVer2));
+
+            //v1
+#pragma warning disable CS0618 // Type or member is obsolete
+            TemplateDiscoveryMetadata legacySearchMetadata = LegacyMetadataWriter.CreateLegacySearchMetadata(packSourceCheckResults);
+#pragma warning restore CS0618 // Type or member is obsolete
+            WriteSearchMetadata(legacySearchMetadata.ToJObject(), Path.Combine(reportPath, SearchMetadataFilename));
         }
 
-        private static string WriteSearchMetadata(PackSourceCheckResult packSourceCheckResults, string outputFileName)
+        private static void WriteSearchMetadata(JObject jobj, string outputFileName)
         {
-            TemplateSearchCache searchMetadata = CreateSearchMetadata(packSourceCheckResults);
-            File.WriteAllText(outputFileName, searchMetadata.ToJObject().ToString(Formatting.None));
+            string serialized = jobj.ToString(Formatting.None);
+            File.WriteAllText(outputFileName, serialized);
             Console.WriteLine($"Search cache file created: {outputFileName}");
-            return outputFileName;
+            using MemoryStream serializedStream = new MemoryStream(Encoding.UTF8.GetBytes(serialized));
+            using FileStream compressedFileStream = File.Create(outputFileName + ".gz");
+            using GZipStream compressionStream = new GZipStream(compressedFileStream, CompressionMode.Compress);
+            serializedStream.CopyTo(compressionStream);
+            Console.WriteLine($"Search cache file (gzip) created: {outputFileName}.gz");
         }
 
         private static TemplateSearchCache CreateSearchMetadata(PackSourceCheckResult packSourceCheckResults)

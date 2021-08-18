@@ -11,16 +11,8 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Results
 {
     internal partial class LegacyMetadataWriter
     {
-        internal static string WriteLegacySearchMetadata(PackSourceCheckResult packSourceCheckResults, string outputFileName)
-        {
-            var searchMetadata = CreateLegacySearchMetadata(packSourceCheckResults);
-            File.WriteAllText(outputFileName, searchMetadata.ToJObject().ToString(Newtonsoft.Json.Formatting.None));
-            Console.WriteLine($"Legacy search cache file created: {outputFileName}");
-            return outputFileName;
-        }
-
 #pragma warning disable CS0618 // Type or member is obsolete
-        private static TemplateDiscoveryMetadata CreateLegacySearchMetadata(PackSourceCheckResult packSourceCheckResults)
+        internal static TemplateDiscoveryMetadata CreateLegacySearchMetadata(PackSourceCheckResult packSourceCheckResults)
         {
             List<ITemplateInfo> templateCache = packSourceCheckResults.PackCheckData.Where(r => r.AnyTemplates)
                                                     .SelectMany(r => r.FoundTemplates)
