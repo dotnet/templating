@@ -33,20 +33,11 @@ steps:
 #    packageType: sdk
 #    version: 6.x
 #    includePreviewVersions: true
-- script: '$(Build.SourcesDirectory)\build.cmd -verbosity d'
-#- task: DotNetCoreCLI@2
-#  displayName: Build Cache Updater Tool
-#  inputs:
-#    command: 'build'
-#    projects: '$(Build.SourcesDirectory)/src/Microsoft.TemplateSearch.TemplateDiscovery/Microsoft.TemplateSearch.TemplateDiscovery.csproj'
-- powershell: echo "$(DotNetRoot)"
-  displayName: Print dotnet location
-- task: DotNetCoreCLI@2
+- script: '$(Build.SourcesDirectory)\build.cmd'
+- powershell: >
+    $(Build.SourcesDirectory)/.dotnet/dotnet.exe run $(Build.SourcesDirectory)/src/Microsoft.TemplateSearch.TemplateDiscovery/Microsoft.TemplateSearch.TemplateDiscovery.csproj
+    --basePath $(System.DefaultWorkingDirectory)/NugetDownloadDirectory --allowPreviewPacks -v
   displayName: Run Cache Updater
-  inputs:
-    command: 'run'
-    projects: '$(Build.SourcesDirectory)/src/Microsoft.TemplateSearch.TemplateDiscovery/Microsoft.TemplateSearch.TemplateDiscovery.csproj'
-    arguments: '-- --basePath $(System.DefaultWorkingDirectory)/NugetDownloadDirectory --allowPreviewPacks -v'
 - publish: $(System.DefaultWorkingDirectory)/NugetDownloadDirectory/SearchCache/NuGetTemplateSearchInfo*.json
   artifact: outputs
 - bash: az config set extension.use_dynamic_install=yes_without_prompt
