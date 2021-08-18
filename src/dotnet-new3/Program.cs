@@ -63,6 +63,7 @@ namespace Dotnet_new3
             }
 
             ConfigureLocale();
+            Console.OutputEncoding = Encoding.UTF8;
 
             DefaultTemplateEngineHost host = new DefaultTemplateEngineHost(
                 HostIdentifier,
