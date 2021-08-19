@@ -30,8 +30,8 @@ steps:
 #    version: 6.x
 #    includePreviewVersions: true
 - powershell: >
-    $(Build.SourcesDirectory)/.dotnet/dotnet.exe run --project $(Build.SourcesDirectory)/src/Microsoft.TemplateSearch.TemplateDiscovery/Microsoft.TemplateSearch.TemplateDiscovery.csproj
-    -- --basePath $(System.DefaultWorkingDirectory)/NugetDownloadDirectory --allowPreviewPacks -v
+    ./$(Build.SourcesDirectory)/artifacts/bin/Microsoft.TemplateSearch.TemplateDiscovery/Debug/net6.0/Microsoft.TemplateSearch.TemplateDiscovery.exe
+    --basePath $(System.DefaultWorkingDirectory)/NugetDownloadDirectory --allowPreviewPacks -v
   displayName: Run Cache Updater
 - publish: $(System.DefaultWorkingDirectory)/NugetDownloadDirectory/SearchCache/NuGetTemplateSearchInfo*.json
   artifact: outputs
