@@ -16,13 +16,13 @@ steps:
 - task: UseDotNet@2
   displayName: 'Use .NET 3.1'
   inputs:
-    packageType: runtime
+    packageType: sdk
     version: 3.1.x
 - task: UseDotNet@2
-  displayName: 'Use .NET 5.0'
+  displayName: 'Use .NET 5.0.300'
   inputs:
-    packageType: runtime
-    version: 5.0.x
+    packageType: sdk
+    version: 5.0.3xx
 #- task: UseDotNet@2
 #  displayName: 'Use .NET 6'
 #  inputs:
@@ -30,7 +30,7 @@ steps:
 #    version: 6.x
 #    includePreviewVersions: true
 - powershell: >
-    ./$(Build.SourcesDirectory)/artifacts/bin/Microsoft.TemplateSearch.TemplateDiscovery/Debug/net6.0/Microsoft.TemplateSearch.TemplateDiscovery.exe
+    $(Build.SourcesDirectory)/artifacts/bin/Microsoft.TemplateSearch.TemplateDiscovery/Debug/net6.0/Microsoft.TemplateSearch.TemplateDiscovery.exe
     --basePath $(System.DefaultWorkingDirectory)/NugetDownloadDirectory --allowPreviewPacks -v
   displayName: Run Cache Updater
 - publish: $(System.DefaultWorkingDirectory)/NugetDownloadDirectory/SearchCache/NuGetTemplateSearchInfo*.json
