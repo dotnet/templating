@@ -17,16 +17,19 @@ steps:
   inputs:
     packageType: sdk
     version: 3.1.x
+    installationPath: $(Build.SourcesDirectory)/.dotnet
 - task: UseDotNet@2
   displayName: 'Use .NET 5.0.300'
   inputs:
     packageType: sdk
     version: 5.0.300
+    installationPath: $(Build.SourcesDirectory)/.dotnet
 #- task: UseDotNet@2
 #  displayName: 'Use .NET 6'
 #  inputs:
 #    packageType: runtime
 #    version: 6.x
+#    installationPath: $(Build.SourcesDirectory)/.dotnet
 #    includePreviewVersions: true
 - powershell: >
     $(Build.SourcesDirectory)/.dotnet/dotnet.exe $(Build.SourcesDirectory)/artifacts/bin/Microsoft.TemplateSearch.TemplateDiscovery/Debug/net6.0/Microsoft.TemplateSearch.TemplateDiscovery.dll
