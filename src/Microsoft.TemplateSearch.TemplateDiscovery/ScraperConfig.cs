@@ -22,5 +22,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
         internal bool DontFilterOnTemplateJson { get; set; }
 
         internal List<string> Providers { get; } = new List<string>();
+
+        internal bool RunValidationTests { get; set; }
     }
 }

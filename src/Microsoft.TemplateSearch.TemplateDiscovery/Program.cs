@@ -26,6 +26,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
         private const string _verbose = "-v";
         private const string _providers = "--providers";
         private const string _packagesPath = "--packagesPath";
+        private const string _runTests = "-test";
 
         private static async Task Main(string[] args)
         {
@@ -73,7 +74,11 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
             {
                 PackSourceCheckResult checkResults = await packSourceChecker.CheckPackagesAsync(cts.Token).ConfigureAwait(false);
                 string metadataPath = PackCheckResultReportWriter.WriteResults(config.BasePath, checkResults);
-                CacheFileTests.RunTests(metadataPath);
+
+                if (config.RunValidationTests)
+                {
+                    CacheFileTests.RunTests(metadataPath);
+                }
             }
             catch (TaskCanceledException)
             {
@@ -95,6 +100,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
             Console.WriteLine($"{_noTemplateJsonFilterFlag} - Don't prefilter packs that don't contain any template.json files (this filter is applied by default).");
             Console.WriteLine($"{_verbose} - Verbose output for template processing).");
             Console.WriteLine($"{_providers} - bar separated list of providers to run. Supported providers: {string.Join(",", NugetPackScraper.SupportedProvidersList)}.");
+            Console.WriteLine($"{_runTests} - Run validation tests after the metadata files are created.");
         }
 
         private static bool TryParseArgs(string[] args, ScraperConfig config)
@@ -202,7 +208,11 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
                         return false;
                     }
                 }
-
+                else if (string.Equals(args[index], _runTests, StringComparison.Ordinal))
+                {
+                    config.RunValidationTests = true;
+                    ++index;
+                }
                 else
                 {
                     return false;
