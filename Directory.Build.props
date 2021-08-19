@@ -26,10 +26,7 @@
         <TemplatesNoTimestampDir>$(ArtifactsDir)templates-notimestamp\</TemplatesNoTimestampDir>
         <SrcDir>$(RepoRoot)src\</SrcDir>
         <TestDir>$(RepoRoot)test\</TestDir>
-        <GitInfoFile>$(ArtifactsDir)GitInfo.cs</GitInfoFile>
-        <GitInfoProps>$(ArtifactsDir)GitInfo.props</GitInfoProps>
         <StrongNameKeyId>MicrosoftAspNetCore</StrongNameKeyId>
     </PropertyGroup>
 
-    <Import Project="Version.props" />
 </Project>
