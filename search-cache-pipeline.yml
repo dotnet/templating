@@ -7,8 +7,7 @@
 #  always: true
 
 pool:
-    name: NetCoreInternal-Pool
-    queue: buildpool.windows.10.amd64.vs2017
+    name: DotNetCore-Windows
 
 steps:
 - checkout: self
@@ -22,7 +21,7 @@ steps:
   displayName: 'Use .NET 5.0.300'
   inputs:
     packageType: sdk
-    version: 5.0.3xx
+    version: 5.0.300
 #- task: UseDotNet@2
 #  displayName: 'Use .NET 6'
 #  inputs:
