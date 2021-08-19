@@ -12,6 +12,7 @@ pool:
 
 steps:
 - checkout: self
+- script: '$(Build.SourcesDirectory)\build.cmd'
 - task: UseDotNet@2
   displayName: 'Use .NET 3.1'
   inputs:
@@ -28,9 +29,8 @@ steps:
 #    packageType: runtime
 #    version: 6.x
 #    includePreviewVersions: true
-- script: '$(Build.SourcesDirectory)\build.cmd'
 - powershell: >
-    dotnet run --project $(Build.SourcesDirectory)/src/Microsoft.TemplateSearch.TemplateDiscovery/Microsoft.TemplateSearch.TemplateDiscovery.csproj
+    $(Build.SourcesDirectory)/.dotnet/dotnet.exe run --project $(Build.SourcesDirectory)/src/Microsoft.TemplateSearch.TemplateDiscovery/Microsoft.TemplateSearch.TemplateDiscovery.csproj
     -- --basePath $(System.DefaultWorkingDirectory)/NugetDownloadDirectory --allowPreviewPacks -v
   displayName: Run Cache Updater
 - publish: $(System.DefaultWorkingDirectory)/NugetDownloadDirectory/SearchCache/NuGetTemplateSearchInfo*.json
