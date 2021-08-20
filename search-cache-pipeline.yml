@@ -19,6 +19,12 @@ steps:
     version: 3.1.x
     installationPath: $(Build.SourcesDirectory)/.dotnet
 - task: UseDotNet@2
+  displayName: 'Use .NET 5.0.100'
+  inputs:
+    packageType: sdk
+    version: 5.0.100
+    installationPath: $(Build.SourcesDirectory)/.dotnet
+- task: UseDotNet@2
   displayName: 'Use .NET 5.0.300'
   inputs:
     packageType: sdk

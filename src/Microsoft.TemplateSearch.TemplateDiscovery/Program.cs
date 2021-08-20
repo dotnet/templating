@@ -73,11 +73,12 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
             try
             {
                 PackSourceCheckResult checkResults = await packSourceChecker.CheckPackagesAsync(cts.Token).ConfigureAwait(false);
-                string metadataPath = PackCheckResultReportWriter.WriteResults(config.BasePath, checkResults);
+                (string metadataPath, string legacyMetadataPath) = PackCheckResultReportWriter.WriteResults(config.BasePath, checkResults);
 
                 if (config.RunValidationTests)
                 {
-                    CacheFileTests.RunTests(metadataPath);
+                    CacheFileTests.RunTests(legacyMetadataPath);
+                    CacheFileV2Tests.RunTests(metadataPath);
                 }
             }
             catch (TaskCanceledException)

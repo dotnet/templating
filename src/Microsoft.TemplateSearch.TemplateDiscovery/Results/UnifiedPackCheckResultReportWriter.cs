@@ -18,7 +18,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Results
         // Metadata for the scraper to skip packs known to not contain templates.
         internal const string NonTemplatePacksFileName = "nonTemplatePacks.json";
 
-        internal static string WriteResults(string outputBasePath, PackSourceCheckResult packSourceCheckResults)
+        internal static (string MetadataPath, string LegacyMetadataPath) WriteResults(string outputBasePath, PackSourceCheckResult packSourceCheckResults)
         {
             string reportPath = Path.Combine(outputBasePath, CacheContentDirectory);
 
@@ -34,7 +34,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Results
             WriteNonTemplatePackList(reportPath, packSourceCheckResults.PackCheckData);
             LegacyMetadataWriter.WriteLegacySearchMetadata(packSourceCheckResults, legacyMetadataFilePath);
             WriteSearchMetadata(packSourceCheckResults, metadataFilePath);
-            return metadataFilePath;
+            return (metadataFilePath, legacyMetadataFilePath);
 
         }
 
