@@ -41,7 +41,8 @@ steps:
     &powershell -NoProfile -ExecutionPolicy unrestricted 
     -Command "&([scriptblock]::Create((Invoke-WebRequest -UseBasicParsing 'https://dot.net/v1/dotnet-install.ps1'))) 
     -Version 6.0.100-rc.2.21420.30
-    -InstallDir $(Build.SourcesDirectory)/.dotnet"
+    -InstallDir $(Build.SourcesDirectory)/.dotnet
+    -SkipNonVersionedFiles"
 - powershell: >
     $(Build.SourcesDirectory)/.dotnet/dotnet.exe $(Build.SourcesDirectory)/artifacts/bin/Microsoft.TemplateSearch.TemplateDiscovery/Debug/net6.0/Microsoft.TemplateSearch.TemplateDiscovery.dll
     --basePath $(System.DefaultWorkingDirectory)/NugetDownloadDirectory --allowPreviewPacks -v -test
