@@ -47,8 +47,12 @@ steps:
     $(Build.SourcesDirectory)/.dotnet/dotnet.exe $(Build.SourcesDirectory)/artifacts/bin/Microsoft.TemplateSearch.TemplateDiscovery/Debug/net6.0/Microsoft.TemplateSearch.TemplateDiscovery.dll
     --basePath $(System.DefaultWorkingDirectory)/NugetDownloadDirectory --allowPreviewPacks -v -test
   displayName: Run Cache Updater
-- publish: $(System.DefaultWorkingDirectory)/NugetDownloadDirectory/SearchCache/NuGetTemplateSearchInfo*.json
+- publish: $(System.DefaultWorkingDirectory)/NugetDownloadDirectory/SearchCache/NuGetTemplateSearchInfo.json
   artifact: outputs
+  displayName: Publish Legacy cache file
+- publish: $(System.DefaultWorkingDirectory)/NugetDownloadDirectory/SearchCache/NuGetTemplateSearchInfoVer2.json
+  artifact: outputs
+  displayName: Publish search cache file
 - bash: az config set extension.use_dynamic_install=yes_without_prompt
   displayName: Disable Azure CLI prompts
 #- bash: >
