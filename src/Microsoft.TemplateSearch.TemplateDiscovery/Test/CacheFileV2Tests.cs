@@ -17,7 +17,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Test
             cacheFileV2Path = Path.GetFullPath(cacheFileV2Path);
             Console.WriteLine($"Running tests for: {cacheFileV2Path}.");
             string workingDirectory = TestUtils.CreateTemporaryFolder();
-            UseSdkVersion(workingDirectory, requestedSdkVersion: "6.0.100-preview.7.21364.4", resolvedVersionPattern: "6.0.", rollForward: "latestFeature");
+            UseSdkVersion(workingDirectory, requestedSdkVersion: "6.0.100-rc.2.21420.30", resolvedVersionPattern: "6.0.", rollForward: "latestFeature");
             CanCheckUpdates(workingDirectory, cacheFileV2Path);
             CanUpdate(workingDirectory, cacheFileV2Path);
             CanSearch(workingDirectory, cacheFileV2Path);
