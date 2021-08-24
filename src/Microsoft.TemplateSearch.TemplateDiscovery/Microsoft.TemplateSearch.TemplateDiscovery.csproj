@@ -5,6 +5,7 @@
     <TargetFramework>$(NETCoreTargetFramework)</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ExcludeFromSourceBuild>true</ExcludeFromSourceBuild>
   </PropertyGroup>
 
   <ItemGroup>
