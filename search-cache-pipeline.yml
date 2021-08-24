@@ -60,13 +60,24 @@ steps:
 - bash: az config set extension.use_dynamic_install=yes_without_prompt
   displayName: Disable Azure CLI prompts
 
-#- bash: >
-#    az storage azcopy blob upload 
-#    -c $(CacheFileStorageContainer)
-#    --account-name $(CacheFileStorageAccount) 
-#    -s '$(System.DefaultWorkingDirectory)/NugetDownloadDirectory/SearchCache/NuGetTemplateSearchInfoVer2.json' 
-#    --sas-token "$(CacheFileStorageSasToken)"
-#    -d Partners/NuGetTemplateSearchInfoVer2.json
-#    | tee upload.log
-#    && grep ".*Number of Transfers Completed: 1" upload.log || (echo ; echo "Upload failed"; false)
-#  displayName: Upload to blob storage
+- bash: >
+    az storage azcopy blob upload 
+    -c $(CacheFileStorageContainer)
+    --account-name $(CacheFileStorageAccount) 
+    -s '$(System.DefaultWorkingDirectory)/ArtifactsToPublish/NuGetTemplateSearchInfoVer2.json' 
+    --sas-token "$(CacheFileStorageSasToken)"
+    -d NuGetTemplateSearchInfoVer2.json
+    | tee upload.log
+    && grep ".*Number of Transfers Completed: 1" upload.log || (echo ; echo "Cache file upload failed"; false)
+  displayName: Upload to blob storage
+
+- bash: >
+    az storage azcopy blob upload 
+    -c $(LegacyCacheFileStorageContainer)
+    --account-name $(LegacyCacheFileStorageAccount) 
+    -s '$(System.DefaultWorkingDirectory)/ArtifactsToPublish/NuGetTemplateSearchInfo.json' 
+    --sas-token "$(LegacyCacheFileStorageSasToken)"
+    -d NuGetTemplateSearchInfo.json
+    | tee upload-legacy.log
+    && grep ".*Number of Transfers Completed: 1" upload-legacy.log || (echo ; echo "Legacy cache file upload failed"; false)
+  displayName: Upload legacy file to blob storage
