@@ -29,6 +29,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
             bool savePacks,
             bool noTemplateJsonFilter,
             bool verbose,
+            bool test,
             IEnumerable<SupportedQueries>? queries,
             DirectoryInfo? packagesPath)
         {
@@ -49,12 +50,12 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
             {
                 PackSourceCheckResult checkResults = await packSourceChecker.CheckPackagesAsync(cts.Token).ConfigureAwait(false);
                 (string metadataPath, string legacyMetadataPath) = PackCheckResultReportWriter.WriteResults(config.OutputPath, checkResults);
-                if (config.RunValidationTests)
+                if (test)
                 {
                     CacheFileTests.RunTests(legacyMetadataPath);
                     CacheFileV2Tests.RunTests(metadataPath);
                 }
-				return 0;
+                return 0;
             }
             catch (TaskCanceledException)
             {
@@ -103,6 +104,11 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
                 Description = "Verbose output for template processing.",
             };
 
+            Option<bool> testOption = new Option<bool>(new[] { "-t", "--test" })
+            {
+                Description = "Run tests on generated metadata files.",
+            };
+
             Option<SupportedQueries[]> queriesOption = new Option<SupportedQueries[]>("--queries")
             {
                 Arity = ArgumentArity.OneOrMore,
@@ -125,6 +131,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
                 savePacksOption,
                 noTemplateJsonFilterOption,
                 verboseOption,
+                testOption,
                 queriesOption,
                 packagesPathOption
             };
@@ -138,6 +145,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
                 savePacksOption,
                 noTemplateJsonFilterOption,
                 verboseOption,
+                testOption,
                 queriesOption,
                 packagesPathOption,
                 ExecuteAsync);
