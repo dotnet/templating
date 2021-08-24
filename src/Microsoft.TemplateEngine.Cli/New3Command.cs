@@ -36,7 +36,11 @@ namespace Microsoft.TemplateEngine.Cli
         {
             _telemetryLogger = telemetryLogger;
             _host = new CliTemplateEngineHost(host, commandInput);
-            EnvironmentSettings = new EngineEnvironmentSettings(_host, settingsLocation: hivePath, virtualizeSettings: virtualize);
+            EnvironmentSettings = new EngineEnvironmentSettings(
+                _host,
+                settingsLocation: hivePath,
+                virtualizeSettings: virtualize,
+                environment: new CliEnvironment());
             _templatePackageManager = new TemplatePackageManager(EnvironmentSettings);
             _templateCreator = new TemplateCreator(EnvironmentSettings);
             _aliasRegistry = new AliasRegistry(EnvironmentSettings);
@@ -117,12 +121,6 @@ namespace Microsoft.TemplateEngine.Cli
 
         private static int ActualRun(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, New3Callbacks callbacks, string[] args, string? hivePath)
         {
-            if (args.Any(x => string.Equals(x, "--debug:version", StringComparison.Ordinal)))
-            {
-                ShowVersion();
-                return 0;
-            }
-
             if (args.Any(x => string.Equals(x, "--debug:attach", StringComparison.Ordinal)))
             {
                 Console.ReadLine();
@@ -200,15 +198,6 @@ namespace Microsoft.TemplateEngine.Cli
             }
 
             return result;
-        }
-
-        private static void ShowVersion()
-        {
-            Reporter.Output.WriteLine(LocalizableStrings.CommandDescription);
-            Reporter.Output.WriteLine();
-            int targetLength = Math.Max(LocalizableStrings.Version.Length, LocalizableStrings.CommitHash.Length);
-            Reporter.Output.WriteLine($" {LocalizableStrings.Version.PadRight(targetLength)} {GitInfo.PackageVersion}");
-            Reporter.Output.WriteLine($" {LocalizableStrings.CommitHash.PadRight(targetLength)} {GitInfo.CommitHash}");
         }
 
         private async Task<New3CommandStatus> EnterMaintenanceFlowAsync(INewCommandInput commandInput)

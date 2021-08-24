@@ -244,9 +244,13 @@ _Pvt_Extensions
 .fake/
 Microsoft.TemplateEngine.VC.db
 
-# Dotnet CLI
-.dotnet
-.tools
-
 # Mac
 .DS_Store
+
+# Tools directory
+.dotnet/
+.packages/
+.tools/
+
+# Visual Studio Code
+.vscode/

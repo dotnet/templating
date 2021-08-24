@@ -432,9 +432,6 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</value>
   <data name="PartialTemplateMatchSwitchesNotValidForAllMatches" xml:space="preserve">
     <value>Some partially matched templates may not support these input switches:</value>
   </data>
-  <data name="CommitHash" xml:space="preserve">
-    <value>Commit Hash:</value>
-  </data>
   <data name="Version" xml:space="preserve">
     <value>Version:</value>
   </data>
@@ -760,5 +757,13 @@ The supported columns are: language, tags, author, type.</value>
   <data name="InvalidSyntax" xml:space="preserve">
     <value>Invalid command syntax: use '{0}' instead.</value>
     <comment>{0} - command syntax, example: dotnet new [PARTIAL_NAME] --list [FILTER_OPTIONS].</comment>
+  </data>
+  <data name="HostSpecificDataLoader_Warning_FailedToRead" xml:space="preserve">
+    <value>Failed to load dotnet CLI host data for template {0} from cache.</value>
+    <comment>{0} - template short name</comment>
+  </data>
+  <data name="HostSpecificDataLoader_Warning_FailedToReadFromFile" xml:space="preserve">
+    <value>Failed to load dotnet CLI host data for template {0} from {1}. The host data will be ignored.</value>
+    <comment>{0} - template short name, {1} - file path to host data.</comment>
   </data>
 </root>

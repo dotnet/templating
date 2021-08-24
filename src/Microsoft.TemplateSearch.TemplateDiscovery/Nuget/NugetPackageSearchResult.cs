@@ -4,19 +4,20 @@
 using Microsoft.TemplateEngine;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
+namespace Microsoft.TemplateSearch.TemplateDiscovery.NuGet
 {
-    internal class NugetPackageSearchResult
+    internal class NuGetPackageSearchResult
     {
         internal int TotalHits { get; private set; }
 
-        internal List<NugetPackageSourceInfo> Data { get; private set; } = new List<NugetPackageSourceInfo>();
+        internal List<NuGetPackageSourceInfo> Data { get; private set; } = new List<NuGetPackageSourceInfo>();
 
-        internal static NugetPackageSearchResult FromJObject(JObject entry)
+        //property names are explained here: https://docs.microsoft.com/en-us/nuget/api/search-query-service-resource
+        internal static NuGetPackageSearchResult FromJObject(JObject entry)
         {
-            NugetPackageSearchResult searchResult = new NugetPackageSearchResult();
-            searchResult.TotalHits = entry.ToInt32(nameof(TotalHits));
-            var dataArray = entry.Get<JArray>(nameof(Data));
+            NuGetPackageSearchResult searchResult = new NuGetPackageSearchResult();
+            searchResult.TotalHits = entry.ToInt32("totalHits");
+            var dataArray = entry.Get<JArray>("data");
             if (dataArray != null)
             {
                 foreach (JToken data in dataArray)
@@ -24,7 +25,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
                     JObject? dataObj = data as JObject;
                     if (dataObj != null)
                     {
-                        searchResult.Data.Add(NugetPackageSourceInfo.FromJObject(dataObj));
+                        searchResult.Data.Add(NuGetPackageSourceInfo.FromJObject(dataObj));
                     }
                 }
 

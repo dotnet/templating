@@ -3,6 +3,7 @@
 
 #nullable enable
 
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -225,6 +226,84 @@ Restore succeeded\.");
                 .And.NotHaveStdErr()
                 .And.HaveStdOut($@"The template ""{expectedTemplateName}"" was created successfully.");
 
+            Directory.Delete(workingDir, true);
+        }
+
+        [Fact]
+        public void EditorConfigTests()
+        {
+            string workingDir = TestUtils.CreateTemporaryFolder();
+
+            new DotnetNewCommand(_log, "editorconfig")
+                .WithCustomHive(_fixture.HomeDirectory)
+                .WithWorkingDirectory(workingDir)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And.NotHaveStdErr()
+                .And.HaveStdOut($@"The template ""EditorConfig file"" was created successfully.");
+
+            string path = Path.Combine(workingDir, ".editorconfig");
+            string editorConfigContent = File.ReadAllText(path);
+            Assert.Contains("dotnet_naming_rule", editorConfigContent);
+            Assert.Contains("dotnet_style_", editorConfigContent);
+            Assert.Contains("dotnet_naming_symbols", editorConfigContent);
+            File.Delete(path);
+
+            new DotnetNewCommand(_log, "editorconfig", "--empty")
+                .WithCustomHive(_fixture.HomeDirectory)
+                .WithWorkingDirectory(workingDir)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And.NotHaveStdErr()
+                .And.HaveStdOut($@"The template ""EditorConfig file"" was created successfully.");
+
+            editorConfigContent = File.ReadAllText(path);
+            Assert.DoesNotContain("dotnet_naming_rule", editorConfigContent);
+            Assert.DoesNotContain("dotnet_style_", editorConfigContent);
+            Assert.DoesNotContain("dotnet_naming_symbols", editorConfigContent);
+            Assert.Contains("root = true", editorConfigContent);
+            Directory.Delete(workingDir, true);
+        }
+
+        [Theory]
+        [InlineData(
+@"{
+  ""sdk"": {
+    ""version"": ""5.0.200""
+  }
+}",
+            "globaljson",
+            "--sdk-version",
+            "5.0.200")]
+        [InlineData(
+@"{
+  ""sdk"": {
+    ""rollForward"": ""major"",
+    ""version"": ""5.0.200""
+  }
+}",
+            "globaljson",
+            "--sdk-version",
+            "5.0.200",
+            "--roll-forward",
+            "major")]
+        public void GlobalJsonTests( string expectedContent, params string[] parameters)
+        {
+            string workingDir = TestUtils.CreateTemporaryFolder();
+
+            new DotnetNewCommand(_log, parameters)
+                .WithCustomHive(_fixture.HomeDirectory)
+                .WithWorkingDirectory(workingDir)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And.NotHaveStdErr()
+                .And.HaveStdOut($@"The template ""global.json file"" was created successfully.");
+
+            string globalJsonConent = File.ReadAllText(Path.Combine(workingDir, "global.json"));
+            Assert.Equal(expectedContent.Replace("\r\n", "\n"), globalJsonConent.Replace("\r\n", "\n"));
             Directory.Delete(workingDir, true);
         }
 
@@ -546,12 +625,12 @@ Restore succeeded\.");
             if (supportsFeature)
             {
                 Assert.DoesNotContain("using System;", programFileContent);
-                Assert.Null(projectXml.Root?.Element(ns + "PropertyGroup")?.Element(ns + "DisableImplicitNamespaceImports"));
+                Assert.Equal("enable", projectXml.Root?.Element(ns + "PropertyGroup")?.Element(ns + "ImplicitUsings")?.Value);
             }
             else
             {
                 Assert.Contains("using System;", programFileContent);
-                Assert.Equal("true", projectXml.Root?.Element(ns + "PropertyGroup")?.Element(ns + "DisableImplicitNamespaceImports")?.Value);
+                Assert.Null(projectXml.Root?.Element(ns + "PropertyGroup")?.Element(ns + "ImplicitUsings"));
             }
         }
 

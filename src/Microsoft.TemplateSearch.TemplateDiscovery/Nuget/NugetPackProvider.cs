@@ -10,9 +10,9 @@ using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
 
-namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
+namespace Microsoft.TemplateSearch.TemplateDiscovery.NuGet
 {
-    internal class NugetPackProvider : IPackProvider
+    internal class NuGetPackProvider : IPackProvider
     {
         private const string NuGetOrgFeed = "https://api.nuget.org/v3/index.json";
         private const string DownloadPackageFileNameFormat = "{0}.{1}.nupkg";
@@ -25,12 +25,12 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
         private readonly FindPackageByIdResource _downloadResource;
         private string _searchUriFormat;
 
-        internal NugetPackProvider(string name, string query, string packageTempBasePath, int pageSize, bool runOnlyOnePage, bool includePreviewPacks)
+        internal NuGetPackProvider(string name, string query, DirectoryInfo packageTempBasePath, int pageSize, bool runOnlyOnePage, bool includePreviewPacks)
         {
             Name = name;
             _pageSize = pageSize;
             _runOnlyOnePage = runOnlyOnePage;
-            _packageTempPath = Path.GetFullPath(Path.Combine(packageTempBasePath, DownloadedPacksDir, Name));
+            _packageTempPath = Path.GetFullPath(Path.Combine(packageTempBasePath.FullName, DownloadedPacksDir, Name));
             _repository = Repository.Factory.GetCoreV3(NuGetOrgFeed);
             ServiceIndexResourceV3 indexResource = _repository.GetResource<ServiceIndexResourceV3>();
             IReadOnlyList<ServiceIndexEntry> searchResources = indexResource.GetServiceEntries("SearchQueryService");
@@ -41,7 +41,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
                 throw new Exception($"{NuGetOrgFeed} does not support search API (SearchQueryService)");
             }
 
-            _searchUriFormat = $"{searchResources[0].Uri}?{query}&skip={{0}}&take={{1}}&prerelease={includePreviewPacks}";
+            _searchUriFormat = $"{searchResources[0].Uri}?{query}&skip={{0}}&take={{1}}&prerelease={includePreviewPacks}&semVerLevel=2.0.0";
 
             if (Directory.Exists(_packageTempPath))
             {
@@ -72,13 +72,13 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
                     {
                         string responseText = await response.Content.ReadAsStringAsync(token).ConfigureAwait(false);
 
-                        NugetPackageSearchResult resultsForPage = NugetPackageSearchResult.FromJObject(JObject.Parse(responseText));
+                        NuGetPackageSearchResult resultsForPage = NuGetPackageSearchResult.FromJObject(JObject.Parse(responseText));
 
                         if (resultsForPage.Data.Count > 0)
                         {
                             skip += _pageSize;
                             packCount += resultsForPage.Data.Count;
-                            foreach (NugetPackageSourceInfo sourceInfo in resultsForPage.Data)
+                            foreach (NuGetPackageSourceInfo sourceInfo in resultsForPage.Data)
                             {
                                 yield return sourceInfo;
                             }
@@ -113,7 +113,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
                     NullLogger.Instance,
                     token).ConfigureAwait(false))
                 {
-                    return new NugetPackInfo(packinfo, outputPackageFileNameFullPath);
+                    return new NuGetPackInfo(packinfo, outputPackageFileNameFullPath);
                 }
                 else
                 {
@@ -140,7 +140,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Nuget
             {
                 response.EnsureSuccessStatusCode();
                 string responseText = await response.Content.ReadAsStringAsync(token).ConfigureAwait(false);
-                NugetPackageSearchResult resultsForPage = NugetPackageSearchResult.FromJObject(JObject.Parse(responseText));
+                NuGetPackageSearchResult resultsForPage = NuGetPackageSearchResult.FromJObject(JObject.Parse(responseText));
                 return resultsForPage.TotalHits;
             }
         }

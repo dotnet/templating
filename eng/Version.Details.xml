@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dependencies>
   <ProductDependencies>
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build" Version="0.1.0-alpha.1.21380.1">
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build" Version="0.1.0-alpha.1.21421.1">
       <Uri>https://github.com/dotnet/source-build</Uri>
-      <Sha>978d5b02597d3cddf532a65f316c8db15246be54</Sha>
+      <Sha>c3f9d2aae8ecfa3c08a5b2e213daf09938170b70</Sha>
       <SourceBuild RepoName="source-build" ManagedOnly="true" />
     </Dependency>
     <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="5.0.0-alpha.1.20473.1">
@@ -11,37 +11,37 @@
       <Sha>def2e2c6dc5064319250e2868a041a3dc07f9579</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Ref" Version="6.0.0-rc.1.21401.1">
+    <Dependency Name="Microsoft.NETCore.App.Ref" Version="6.0.0-rc.1.21417.1">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>26ddd7a44eef96509596fd60b908f0948732cd79</Sha>
+      <Sha>14b34eb02bc8969b77c0d3a1e39fb38f450625cf</Sha>
     </Dependency>
-    <Dependency Name="System.CommandLine" Version="2.0.0-beta1.21374.1">
+    <Dependency Name="System.CommandLine" Version="2.0.0-beta1.21417.2">
       <Uri>https://github.com/dotnet/command-line-api</Uri>
-      <Sha>d2203f9a74f8e07218b68b25271e6a265bd8b31f</Sha>
+      <Sha>bd9c63c9e74681617fccf2e371cd90f00d01cef7</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging" Version="6.0.0-rc.1.21401.1">
+    <Dependency Name="Microsoft.Extensions.Logging" Version="6.0.0-rc.1.21417.1">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>26ddd7a44eef96509596fd60b908f0948732cd79</Sha>
+      <Sha>14b34eb02bc8969b77c0d3a1e39fb38f450625cf</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0-rc.1.21401.1">
+    <Dependency Name="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0-rc.1.21417.1">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>26ddd7a44eef96509596fd60b908f0948732cd79</Sha>
+      <Sha>14b34eb02bc8969b77c0d3a1e39fb38f450625cf</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging.Console" Version="6.0.0-rc.1.21401.1">
+    <Dependency Name="Microsoft.Extensions.Logging.Console" Version="6.0.0-rc.1.21417.1">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>26ddd7a44eef96509596fd60b908f0948732cd79</Sha>
+      <Sha>14b34eb02bc8969b77c0d3a1e39fb38f450625cf</Sha>
     </Dependency>
-    <Dependency Name="NuGet.Credentials" Version="6.0.0-preview.3.158">
+    <Dependency Name="NuGet.Credentials" Version="6.0.0-preview.3.179">
       <Uri>https://github.com/nuget/nuget.client</Uri>
-      <Sha>93159e30255273caf3528ddc53b55405a9c911af</Sha>
+      <Sha>7363366401b43f4ea250394db8dad3707e9a9636</Sha>
     </Dependency>
-    <Dependency Name="NuGet.Configuration" Version="6.0.0-preview.3.158">
+    <Dependency Name="NuGet.Configuration" Version="6.0.0-preview.3.179">
       <Uri>https://github.com/nuget/nuget.client</Uri>
-      <Sha>93159e30255273caf3528ddc53b55405a9c911af</Sha>
+      <Sha>7363366401b43f4ea250394db8dad3707e9a9636</Sha>
     </Dependency>
-    <Dependency Name="NuGet.Protocol" Version="6.0.0-preview.3.158">
+    <Dependency Name="NuGet.Protocol" Version="6.0.0-preview.3.179">
       <Uri>https://github.com/nuget/nuget.client</Uri>
-      <Sha>93159e30255273caf3528ddc53b55405a9c911af</Sha>
+      <Sha>7363366401b43f4ea250394db8dad3707e9a9636</Sha>
     </Dependency>
     <Dependency Name="Microsoft.DotNet.Cli.CommandLine" Version="1.0.0-preview.19208.1">
       <Uri>https://github.com/dotnet/clicommandlineparser</Uri>
@@ -49,9 +49,9 @@
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
-    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="6.0.0-beta.21379.2">
+    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="6.0.0-beta.21420.4">
       <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>62a8aafffd4c68ef887680f6837abdff906a662c</Sha>
+      <Sha>fe787bd48ed72e51a98eb5e4e5e5af74edb531e5</Sha>
       <SourceBuild RepoName="arcade" ManagedOnly="true" />
     </Dependency>
   </ToolsetDependencies>

@@ -743,15 +743,6 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Commit Hash:.
-        /// </summary>
-        internal static string CommitHash {
-            get {
-                return ResourceManager.GetString("CommitHash", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Configured Value: {0}.
         /// </summary>
         internal static string ConfiguredValue {
@@ -957,6 +948,24 @@ namespace Microsoft.TemplateEngine.Cli {
         internal static string GenericWarning {
             get {
                 return ResourceManager.GetString("GenericWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to load dotnet CLI host data for template {0} from cache..
+        /// </summary>
+        internal static string HostSpecificDataLoader_Warning_FailedToRead {
+            get {
+                return ResourceManager.GetString("HostSpecificDataLoader_Warning_FailedToRead", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to load dotnet CLI host data for template {0} from {1}. The host data will be ignored..
+        /// </summary>
+        internal static string HostSpecificDataLoader_Warning_FailedToReadFromFile {
+            get {
+                return ResourceManager.GetString("HostSpecificDataLoader_Warning_FailedToReadFromFile", resourceCulture);
             }
         }
         

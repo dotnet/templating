@@ -165,7 +165,7 @@ Details: {1}.</source>
       </trans-unit>
       <trans-unit id="Scanner_Error_TemplatePackageLocationIsNotSupported">
         <source>Template package location {0} is not supported, or doesn't exist.</source>
-        <target state="new">Template package location {0} is not supported, or doesn't exist.</target>
+        <target state="translated">템플릿 패키지 위치 {0}이(가) 지원되지 않거나 존재하지 않습니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="TemplateCreator_TemplateCreationResult_Error_CouldNotLoadTemplate">
@@ -185,11 +185,16 @@ Details: {0}.</source>
         <target state="translated">파괴적 변경이 감지되었습니다.</target>
         <note />
       </trans-unit>
+      <trans-unit id="TemplateInfo_Warning_FailedToReadHostData">
+        <source>Failed to load host data in {0} at {1}.</source>
+        <target state="new">Failed to load host data in {0} at {1}.</target>
+        <note>{0} - path to template location, {1} relative path inside template location.</note>
+      </trans-unit>
       <trans-unit id="TemplatePackageManager_Error_FailedToScan">
         <source>Failed to scan {0}.
 Details: {1}</source>
-        <target state="needs-review-translation">{0}을(를) 검사하지 못했습니다.
-세부 정보: {1}.</target>
+        <target state="translated">{0}을(를) 검사하지 못했습니다.
+세부 정보: {1}</target>
         <note>last line should not end with a period, period is a part of the format entry</note>
       </trans-unit>
     </body>

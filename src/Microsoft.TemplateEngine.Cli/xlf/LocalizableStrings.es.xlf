@@ -268,7 +268,7 @@ Ejecute "dotnet {1} --show-aliases" sin argumentos para mostrar todos los alias.
       </trans-unit>
       <trans-unit id="CliTemplateSearchCoordinator_Error_NoTemplateName">
         <source>Search failed: not enough information specified for search.</source>
-        <target state="needs-review-translation">Error de búsqueda: no se especificó ningún nombre de plantilla.</target>
+        <target state="translated">Error de búsqueda: no se especificó suficiente información para la búsqueda.</target>
         <note />
       </trans-unit>
       <trans-unit id="CliTemplateSearchCoordinator_Error_NotFound">
@@ -278,7 +278,7 @@ Ejecute "dotnet {1} --show-aliases" sin argumentos para mostrar todos los alias.
       </trans-unit>
       <trans-unit id="CliTemplateSearchCoordinator_Error_SearchFailure">
         <source>Search failed: {0}</source>
-        <target state="new">Search failed: {0}</target>
+        <target state="translated">Error de búsqueda: {0}</target>
         <note>0 - localized error message</note>
       </trans-unit>
       <trans-unit id="CliTemplateSearchCoordinator_Error_TemplateNameIsTooShort">
@@ -298,7 +298,7 @@ Ejecute "dotnet {1} --show-aliases" sin argumentos para mostrar todos los alias.
       </trans-unit>
       <trans-unit id="CliTemplateSearchCoordinator_Info_SearchHelp">
         <source>To search for templates, specify partial template name or use one of supported filters: {0}.</source>
-        <target state="needs-review-translation">Para buscar la plantilla, especifique el nombre de la plantilla o use uno de los filtros admitidos: {0}.</target>
+        <target state="translated">Para buscar plantillas, especifique el nombre de plantilla parcial o use uno de los filtros admitidos: {0}.</target>
         <note />
       </trans-unit>
       <trans-unit id="CliTemplateSearchCoordinator_Info_SearchInProgress">
@@ -389,11 +389,6 @@ Ejecute "dotnet {1} --show-aliases" sin argumentos para mostrar todos los alias.
       <trans-unit id="CommandSucceeded">
         <source>Command succeeded.</source>
         <target state="translated">El comando se ejecutó correctamente.</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="CommitHash">
-        <source>Commit Hash:</source>
-        <target state="translated">Hash de commit:</target>
         <note />
       </trans-unit>
       <trans-unit id="ConfiguredValue">
@@ -515,6 +510,16 @@ Ejecute "dotnet {1} --show-aliases" sin argumentos para mostrar todos los alias.
         <target state="translated">Ejemplos:</target>
         <note />
       </trans-unit>
+      <trans-unit id="HostSpecificDataLoader_Warning_FailedToRead">
+        <source>Failed to load dotnet CLI host data for template {0} from cache.</source>
+        <target state="new">Failed to load dotnet CLI host data for template {0} from cache.</target>
+        <note>{0} - template short name</note>
+      </trans-unit>
+      <trans-unit id="HostSpecificDataLoader_Warning_FailedToReadFromFile">
+        <source>Failed to load dotnet CLI host data for template {0} from {1}. The host data will be ignored.</source>
+        <target state="new">Failed to load dotnet CLI host data for template {0} from {1}. The host data will be ignored.</target>
+        <note>{0} - template short name, {1} - file path to host data.</note>
+      </trans-unit>
       <trans-unit id="InstallHelp">
         <source>Installs a source or a template package.</source>
         <target state="translated">Instala un paquete de origen o de plantilla.</target>
@@ -557,7 +562,7 @@ Ejecute "dotnet {1} --show-aliases" sin argumentos para mostrar todos los alias.
       </trans-unit>
       <trans-unit id="InvalidSyntax">
         <source>Invalid command syntax: use '{0}' instead.</source>
-        <target state="new">Invalid command syntax: use '{0}' instead.</target>
+        <target state="translated">Sintaxis de comando no válida: utilice "{0}" en su lugar.</target>
         <note>{0} - command syntax, example: dotnet new [PARTIAL_NAME] --list [FILTER_OPTIONS].</note>
       </trans-unit>
       <trans-unit id="LanguageParameter">
