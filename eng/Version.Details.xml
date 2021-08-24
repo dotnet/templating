@@ -39,15 +39,15 @@
       <Uri>https://github.com/dotnet/runtime</Uri>
       <Sha>4822e3c3aa77eb82b2fb33c9321f923cf11ddde6</Sha>
     </Dependency>
-    <Dependency Name="NuGet.Credentials" Version="6.0.0-preview.3.179">
+    <Dependency Name="NuGet.Credentials" Version="6.0.0">
       <Uri>https://github.com/nuget/nuget.client</Uri>
       <Sha>7363366401b43f4ea250394db8dad3707e9a9636</Sha>
     </Dependency>
-    <Dependency Name="NuGet.Configuration" Version="6.0.0-preview.3.179">
+    <Dependency Name="NuGet.Configuration" Version="6.0.0">
       <Uri>https://github.com/nuget/nuget.client</Uri>
       <Sha>7363366401b43f4ea250394db8dad3707e9a9636</Sha>
     </Dependency>
-    <Dependency Name="NuGet.Protocol" Version="6.0.0-preview.3.179">
+    <Dependency Name="NuGet.Protocol" Version="6.0.0">
       <Uri>https://github.com/nuget/nuget.client</Uri>
       <Sha>7363366401b43f4ea250394db8dad3707e9a9636</Sha>
     </Dependency>
