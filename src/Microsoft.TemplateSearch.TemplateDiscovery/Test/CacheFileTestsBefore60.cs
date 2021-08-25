@@ -15,7 +15,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Test
         public static void RunTests(string cacheFilePath)
         {
             cacheFilePath = Path.GetFullPath(cacheFilePath);
-            Console.WriteLine($"Running tests for: {cacheFilePath}.");
+            Console.WriteLine($"Running tests on .NET < 6.0 for: {cacheFilePath}.");
             string workingDirectory = TestUtils.CreateTemporaryFolder();
             UseSdkVersion(workingDirectory, requestedSdkVersion: "3.1.400", resolvedVersionPattern: "3.");
             CanSearchWhileInstantiating(workingDirectory, cacheFilePath);
