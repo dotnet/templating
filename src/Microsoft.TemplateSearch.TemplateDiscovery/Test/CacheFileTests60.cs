@@ -10,30 +10,18 @@ using Microsoft.TemplateEngine.TestHelper;
 
 namespace Microsoft.TemplateSearch.TemplateDiscovery.Test
 {
-    internal static class CacheFileTests
+    internal static class CacheFileTests60
     {
-        public static void RunTests(string cacheFilePath)
+        public static void RunTests(string cacheFileV2Path)
         {
-            cacheFilePath = Path.GetFullPath(cacheFilePath);
-            Console.WriteLine($"Running tests for: {cacheFilePath}.");
+            cacheFileV2Path = Path.GetFullPath(cacheFileV2Path);
+            Console.WriteLine($"Running tests for: {cacheFileV2Path}.");
             string workingDirectory = TestUtils.CreateTemporaryFolder();
-            UseSdkVersion(workingDirectory, requestedSdkVersion: "3.1.400", resolvedVersionPattern: "3.");
-            CanSearchWhileInstantiating(workingDirectory, cacheFilePath);
-            CanCheckUpdates(workingDirectory, cacheFilePath);
-            CanUpdate(workingDirectory, cacheFilePath);
-
-            workingDirectory = TestUtils.CreateTemporaryFolder();
-            UseSdkVersion(workingDirectory, requestedSdkVersion: "5.0.100", resolvedVersionPattern: "5.0.1", rollForward: "latestPatch");
-            CanSearchWhileInstantiating(workingDirectory, cacheFilePath);
-            CanCheckUpdates(workingDirectory, cacheFilePath);
-            CanUpdate(workingDirectory, cacheFilePath);
-
-            workingDirectory = TestUtils.CreateTemporaryFolder();
-            UseSdkVersion(workingDirectory, requestedSdkVersion: "5.0.300", resolvedVersionPattern: "5.0.", rollForward: "latestFeature");
-            CanCheckUpdates(workingDirectory, cacheFilePath);
-            CanUpdate(workingDirectory, cacheFilePath);
-            CanSearch(workingDirectory, cacheFilePath);
-            Console.WriteLine($"Tests succeeded.");
+            UseSdkVersion(workingDirectory, requestedSdkVersion: "6.0.100-rc.2.21420.30", resolvedVersionPattern: "6.0.", rollForward: "latestFeature");
+            CanCheckUpdates(workingDirectory, cacheFileV2Path);
+            CanUpdate(workingDirectory, cacheFileV2Path);
+            CanSearch(workingDirectory, cacheFileV2Path);
+            Console.WriteLine($"Tests fo V2 succeeded.");
         }
 
         private static void UseSdkVersion(string workingDirectory, string requestedSdkVersion, string resolvedVersionPattern, string rollForward = "latestMinor", bool allowPrerelease = false)
@@ -82,8 +70,8 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Test
                 .ExitWith(0)
                 .And.NotHaveStdErr()
                 .And.NotHaveStdOutContaining("Exception")
-                .And.HaveStdOutContaining("Updates are available for the following:")
-                .And.HaveStdOutContaining("Microsoft.Azure.WebJobs.ItemTemplates::2.1.1785");
+                .And.HaveStdOutContaining("An update for template packages is available:")
+                .And.HaveStdOutMatching("Microsoft.Azure.WebJobs.ItemTemplates.*2.1.1785");
         }
 
         private static void CanUpdate(string workingDirectory, string cacheFilePath)
@@ -105,8 +93,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Test
                 .ExitWith(0)
                 .And.NotHaveStdErr()
                 .And.NotHaveStdOutContaining("Exception")
-                .And.HaveStdOutMatching("Update succeeded")
-                .And.HaveStdOutContaining("Microsoft.Azure.WebJobs.ItemTemplates::2.1.1785");
+                .And.HaveStdOutMatching("Success: Microsoft.Azure.WebJobs.ItemTemplates::.\\..\\..... installed the following templates");
         }
 
         private static void CanSearch(string workingDirectory, string cacheFilePath)

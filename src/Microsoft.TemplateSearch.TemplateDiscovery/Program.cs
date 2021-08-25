@@ -52,8 +52,9 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
                 (string metadataPath, string legacyMetadataPath) = PackCheckResultReportWriter.WriteResults(config.OutputPath, checkResults);
                 if (test)
                 {
-                    CacheFileTests.RunTests(legacyMetadataPath);
-                    CacheFileV2Tests.RunTests(metadataPath);
+                    CacheFileTestsBefore60.RunTests(legacyMetadataPath);
+                    CacheFileTests60.RunTests(legacyMetadataPath);
+                    CacheFileTests60.RunTests(metadataPath);
                 }
                 return 0;
             }
