@@ -19,10 +19,10 @@
     <NuGetConfigurationPackageVersion>6.0.0-preview.3.179</NuGetConfigurationPackageVersion>
     <NuGetProtocolPackageVersion>6.0.0-preview.3.179</NuGetProtocolPackageVersion>
     <!-- Dependencies from https://github.com/dotnet/runtime -->
-    <MicrosoftNETCoreAppRefPackageVersion>6.0.0-rc.2.21427.5</MicrosoftNETCoreAppRefPackageVersion>
-    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>6.0.0-rc.2.21427.5</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
-    <MicrosoftExtensionsLoggingPackageVersion>6.0.0-rc.2.21427.5</MicrosoftExtensionsLoggingPackageVersion>
-    <MicrosoftExtensionsLoggingConsolePackageVersion>6.0.0-rc.2.21427.5</MicrosoftExtensionsLoggingConsolePackageVersion>
+    <MicrosoftNETCoreAppRefPackageVersion>6.0.0-rc.2.21427.9</MicrosoftNETCoreAppRefPackageVersion>
+    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>6.0.0-rc.2.21427.9</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
+    <MicrosoftExtensionsLoggingPackageVersion>6.0.0-rc.2.21427.9</MicrosoftExtensionsLoggingPackageVersion>
+    <MicrosoftExtensionsLoggingConsolePackageVersion>6.0.0-rc.2.21427.9</MicrosoftExtensionsLoggingConsolePackageVersion>
     <!-- Dependencies from https://github.com/dotnet/clicommandlineparser -->
     <MicrosoftDotNetCliCommandLinePackageVersion>1.0.0-preview.19208.1</MicrosoftDotNetCliCommandLinePackageVersion>
   </PropertyGroup>
