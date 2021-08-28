@@ -11,25 +11,25 @@
       <Sha>def2e2c6dc5064319250e2868a041a3dc07f9579</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Ref" Version="6.0.0-rc.2.21427.20">
+    <Dependency Name="Microsoft.NETCore.App.Ref" Version="6.0.0-rc.2.21427.26">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>30a3aa244041ebf074ace0052f323e7c4eb48219</Sha>
+      <Sha>e209402ffa8817fcc8160d9e6e91c380a47b4a55</Sha>
     </Dependency>
     <Dependency Name="System.CommandLine" Version="2.0.0-beta1.21406.1">
       <Uri>https://github.com/dotnet/command-line-api</Uri>
       <Sha>27d86d37b34973e24d273d6d3ee00e8ee78e11de</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging" Version="6.0.0-rc.2.21427.20">
+    <Dependency Name="Microsoft.Extensions.Logging" Version="6.0.0-rc.2.21427.26">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>30a3aa244041ebf074ace0052f323e7c4eb48219</Sha>
+      <Sha>e209402ffa8817fcc8160d9e6e91c380a47b4a55</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0-rc.2.21427.20">
+    <Dependency Name="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0-rc.2.21427.26">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>30a3aa244041ebf074ace0052f323e7c4eb48219</Sha>
+      <Sha>e209402ffa8817fcc8160d9e6e91c380a47b4a55</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging.Console" Version="6.0.0-rc.2.21427.20">
+    <Dependency Name="Microsoft.Extensions.Logging.Console" Version="6.0.0-rc.2.21427.26">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>30a3aa244041ebf074ace0052f323e7c4eb48219</Sha>
+      <Sha>e209402ffa8817fcc8160d9e6e91c380a47b4a55</Sha>
     </Dependency>
     <Dependency Name="NuGet.Credentials" Version="6.0.0-preview.3.179">
       <Uri>https://github.com/nuget/nuget.client</Uri>
