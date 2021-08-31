@@ -19,7 +19,8 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
                 bool savePacks,
                 bool noTemplateJsonFilter,
                 IEnumerable<SupportedQueries>? queries,
-                DirectoryInfo? packagesPath
+                DirectoryInfo? packagesPath,
+                string latestSdkToTest
             )
         {
             OutputPath = basePath ?? throw new ArgumentNullException(nameof(basePath));
@@ -30,6 +31,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
             DontFilterOnTemplateJson = noTemplateJsonFilter;
             Queries = queries?.ToArray() ?? Array.Empty<SupportedQueries>();
             LocalPackagePath = packagesPath;
+            LatestSdkToTest = latestSdkToTest;
         }
 
         internal DirectoryInfo? LocalPackagePath { get; }
@@ -47,5 +49,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
         internal bool DontFilterOnTemplateJson { get; }
 
         internal IReadOnlyList<SupportedQueries> Queries { get; }
+
+        internal string LatestSdkToTest { get; }
     }
 }

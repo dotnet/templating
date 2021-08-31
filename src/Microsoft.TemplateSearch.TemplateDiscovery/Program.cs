@@ -31,10 +31,11 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
             bool verbose,
             bool test,
             IEnumerable<SupportedQueries>? queries,
-            DirectoryInfo? packagesPath)
+            DirectoryInfo? packagesPath,
+            string latestSdkToTest)
         {
             Verbose.IsEnabled = verbose;
-            CommandArgs config = new CommandArgs(basePath, allowPreviewPacks, pageSize, onePage, savePacks, noTemplateJsonFilter, queries, packagesPath);
+            CommandArgs config = new CommandArgs(basePath, allowPreviewPacks, pageSize, onePage, savePacks, noTemplateJsonFilter, queries, packagesPath, latestSdkToTest);
 
             PackSourceChecker packSourceChecker = NuGetPackSourceCheckerFactory.CreatePackSourceChecker(config);
 
@@ -53,8 +54,8 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
                 if (test)
                 {
                     CacheFileTestsBefore60.RunTests(legacyMetadataPath);
-                    CacheFileTests60.RunTests(legacyMetadataPath);
-                    CacheFileTests60.RunTests(metadataPath);
+                    CacheFileTestsForLatestSdk.RunTests(legacyMetadataPath, config.LatestSdkToTest);
+                    CacheFileTestsForLatestSdk.RunTests(metadataPath, config.LatestSdkToTest);
                 }
                 return 0;
             }
@@ -128,6 +129,11 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
                 Description = $"Path to pre-downloaded packages. If specified, the packages won't be downloaded from NuGet.org.",
             }.ExistingOnly());
 
+            Option<string> latestSdkToTestOption = (new Option<string>("--latestVersionToTest")
+            {
+                Description = $"Latest .NET SDK version to be tested.",
+            });
+
             RootCommand rootCommand = new RootCommand("Generates the template package search cache file based on the packages available on NuGet.org.")
             {
                 basePathOption,
@@ -139,7 +145,8 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
                 verboseOption,
                 testOption,
                 queriesOption,
-                packagesPathOption
+                packagesPathOption,
+                latestSdkToTestOption,
             };
 
             rootCommand.TreatUnmatchedTokensAsErrors = true;
@@ -154,6 +161,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
                 testOption,
                 queriesOption,
                 packagesPathOption,
+                latestSdkToTestOption,
                 ExecuteAsync);
 
             return rootCommand;

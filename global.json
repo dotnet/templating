@@ -1,6 +1,6 @@
 {
   "tools": {
-    "dotnet": "6.0.100-rc.1.21415.3",
+    "dotnet": "6.0.100-rc.2.21420.30",
     "runtimes": {
       "dotnet": [
         "$(MicrosoftNETCoreAppRefPackageVersion)"
