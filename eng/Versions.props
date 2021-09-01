@@ -7,6 +7,11 @@
     <VersionPrefix>7.0.100</VersionPrefix>
     <PreReleaseVersionLabel>alpha</PreReleaseVersionLabel>
     <PreReleaseVersionIteration>1</PreReleaseVersionIteration>
+    <!--
+        When StabilizePackageVersion is set to 'true', this branch will produce stable outputs for 'Shipping' packages
+    -->
+    <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">false</StabilizePackageVersion>
+    <DotNetFinalVersionKind Condition="'$(StabilizePackageVersion)' == 'true'">release</DotNetFinalVersionKind>
     <PackSpecific Condition="'$(OS)' != 'Windows_NT'">true</PackSpecific>
     <NewtonsoftJsonPackageVersion>13.0.1</NewtonsoftJsonPackageVersion>
     <SystemDiagnosticsProcessPackageVersion>4.3.0</SystemDiagnosticsProcessPackageVersion>
@@ -20,6 +25,8 @@
     <NuGetProtocolPackageVersion>6.0.0-preview.4.221</NuGetProtocolPackageVersion>
     <!-- Dependencies from https://github.com/dotnet/runtime -->
     <MicrosoftNETCoreAppRefPackageVersion>7.0.0-alpha.1.21451.1</MicrosoftNETCoreAppRefPackageVersion>
+    <MicrosoftNETCoreAppRuntimewinx64PackageVersion>7.0.0-alpha.1.21451.1</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
+    <VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>7.0.0-alpha.1.21451.1</VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>
     <MicrosoftExtensionsLoggingAbstractionsPackageVersion>7.0.0-alpha.1.21451.1</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
     <MicrosoftExtensionsLoggingPackageVersion>7.0.0-alpha.1.21451.1</MicrosoftExtensionsLoggingPackageVersion>
     <MicrosoftExtensionsLoggingConsolePackageVersion>7.0.0-alpha.1.21451.1</MicrosoftExtensionsLoggingConsolePackageVersion>
