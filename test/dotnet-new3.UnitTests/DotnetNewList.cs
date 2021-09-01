@@ -77,13 +77,13 @@ namespace Dotnet_new3.IntegrationTests
                 .And.NotHaveStdOutMatching("dotnet gitignore file\\s+gitignore\\s+Config")
                 .And.HaveStdOutMatching("Class Library\\s+classlib\\s+\\[C#\\],F#,VB\\s+Common/Library");
 
-            new DotnetNewCommand(_log, "application", "--list", "--tag", "Common")
+            new DotnetNewCommand(_log, "app", "--list", "--tag", "Common")
                  .WithCustomHive(_sharedHome.HomeDirectory)
                  .Execute()
                  .Should()
                  .ExitWith(0)
                  .And.NotHaveStdErr()
-                 .And.HaveStdOutContaining("These templates matched your input: 'application', tag='Common'")
+                 .And.HaveStdOutContaining("These templates matched your input: 'app', tag='Common'")
                  .And.HaveStdOutMatching("Template Name\\s+Short Name\\s+Language\\s+Tags")
                  .And.HaveStdOutMatching("Console App\\s+console\\s+\\[C#\\],F#,VB\\s+Common/Console")
                  .And.NotHaveStdOutMatching("dotnet gitignore file\\s+gitignore\\s+Config")
@@ -104,7 +104,7 @@ ASP.NET Core Web App (Model-View-Controller)  mvc            [C#],F#     Web/MVC
 Blazor Server App                             blazorserver   [C#]        Web/Blazor            
 Blazor WebAssembly App                        blazorwasm     [C#]        Web/Blazor/WebAssembly
 Class Library                                 classlib       [C#],F#,VB  Common/Library        
-Console App                           console        [C#],F#,VB  Common/Console        
+Console App                                   console        [C#],F#,VB  Common/Console        
 dotnet gitignore file                         gitignore                  Config                
 Dotnet local tool manifest file               tool-manifest              Config                
 EditorConfig file                             editorconfig               Config                
