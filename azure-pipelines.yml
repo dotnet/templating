@@ -123,63 +123,65 @@ stages:
             $(_InternalRuntimeDownloadArgs)
           displayName: Windows Build / Publish
 
-      - job: OSX
-        pool:
-          name: Hosted macOS
-        strategy:
-          matrix:
-            debug_configuration:
-              _BuildConfig: Debug
-              _SignType: none
-            release_configuration:
-              _BuildConfig: Release
-              _SignType: none
-        steps:
-        - ${{ if ne(variables['System.TeamProject'], 'public') }}:
-          - task: Bash@3
-            displayName: Setup Private Feeds Credentials
-            inputs:
-              filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.sh
-              arguments: $(Build.SourcesDirectory)/NuGet.config $Token
-            env:
-              Token: $(dn-bot-dnceng-artifact-feeds-rw)
-        - script: eng/common/cibuild.sh
-            --configuration $(_BuildConfig)
-            --prepareMachine
-            --integrationTest
-            $(_InternalRuntimeDownloadArgs)
-          name: Build
-          displayName: Build
+      - ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
+        - job: OSX
+          pool:
+            name: Hosted macOS
+          strategy:
+            matrix:
+              debug_configuration:
+                _BuildConfig: Debug
+                _SignType: none
+              release_configuration:
+                _BuildConfig: Release
+                _SignType: none
+          steps:
+          - ${{ if ne(variables['System.TeamProject'], 'public') }}:
+            - task: Bash@3
+              displayName: Setup Private Feeds Credentials
+              inputs:
+                filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.sh
+                arguments: $(Build.SourcesDirectory)/NuGet.config $Token
+              env:
+                Token: $(dn-bot-dnceng-artifact-feeds-rw)
+          - script: eng/common/cibuild.sh
+              --configuration $(_BuildConfig)
+              --prepareMachine
+              --integrationTest
+              $(_InternalRuntimeDownloadArgs)
+            name: Build
+            displayName: Build
 
-      - job: Linux
-        pool:
-          name: Hosted Ubuntu 1604
-        container: LinuxContainer
-        strategy:
-          matrix:
-            debug_configuration:
-              _BuildConfig: Debug
-              _SignType: none
-            release_configuration:
-              _BuildConfig: Release
-              _SignType: none
-        steps:
-        - ${{ if ne(variables['System.TeamProject'], 'public') }}:
-          - task: Bash@3
-            displayName: Setup Private Feeds Credentials
-            inputs:
-              filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.sh
-              arguments: $(Build.SourcesDirectory)/NuGet.config $Token
-            env:
-              Token: $(dn-bot-dnceng-artifact-feeds-rw)
-        - script: eng/common/cibuild.sh
-            --configuration $(_BuildConfig)
-            --prepareMachine
-            --integrationTest
-            $(_InternalRuntimeDownloadArgs)
-          name: Build
-          displayName: Build
-          condition: succeeded()
+      - ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
+        - job: Linux
+          pool:
+            name: Hosted Ubuntu 1604
+          container: LinuxContainer
+          strategy:
+            matrix:
+              debug_configuration:
+                _BuildConfig: Debug
+                _SignType: none
+              release_configuration:
+                _BuildConfig: Release
+                _SignType: none
+          steps:
+          - ${{ if ne(variables['System.TeamProject'], 'public') }}:
+            - task: Bash@3
+              displayName: Setup Private Feeds Credentials
+              inputs:
+                filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.sh
+                arguments: $(Build.SourcesDirectory)/NuGet.config $Token
+              env:
+                Token: $(dn-bot-dnceng-artifact-feeds-rw)
+          - script: eng/common/cibuild.sh
+              --configuration $(_BuildConfig)
+              --prepareMachine
+              --integrationTest
+              $(_InternalRuntimeDownloadArgs)
+            name: Build
+            displayName: Build
+            condition: succeeded()
 
 - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
   - template: eng\common\templates\post-build\post-build.yml
