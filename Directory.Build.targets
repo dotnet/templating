@@ -21,7 +21,7 @@
     <FrameworkReference
         Update="Microsoft.NETCore.App"
         TargetingPackVersion="$(MicrosoftNETCoreAppRefPackageVersion)"
-        RuntimeFrameworkVersion="$(MicrosoftNETCoreAppRefPackageVersion)" />
+        RuntimeFrameworkVersion="$(MicrosoftNETCoreAppRuntimewinx64PackageVersion)" />
   </ItemGroup>
 
   <!-- Leave this file here, even if it's empty. It stops chaining imports. -->
