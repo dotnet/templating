@@ -3,7 +3,7 @@
     "dotnet": "6.0.100-rc.1.21415.3",
     "runtimes": {
       "dotnet": [
-        "$(MicrosoftNETCoreAppRefPackageVersion)"
+        "$(VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion)"
       ]
     }
   },
