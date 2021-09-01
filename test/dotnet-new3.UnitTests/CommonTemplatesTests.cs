@@ -114,7 +114,7 @@ $@"The template ""{expectedTemplateName}"" was created successfully\.
 
 Processing post-creation actions\.\.\.
 Running 'dotnet restore' on ({finalProjectName})\.\.\.
-  Determining projects to restore\.\.\.
+  Determining projects to restore\.\.\.(\n.*$)*
   Restored ({finalProjectName}) \(in \d{{1,3}} ms|\d(\.\d{{1,3}}){{0,1}} sec\)\.
 
 Restore succeeded\.");
