@@ -3,7 +3,7 @@
 
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateSearch.Common.Abstractions;
-using Microsoft.TemplateSearch.TemplateDiscovery.PackProviders;
+using Microsoft.TemplateSearch.TemplateDiscovery.PackChecking;
 
 namespace Microsoft.TemplateSearch.TemplateDiscovery.AdditionalData
 {
@@ -11,15 +11,14 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.AdditionalData
     {
         string DataUniqueName { get; }
 
-        string Serialized { get; }
-
+        [Obsolete]
         object? Data { get; }
 
+        object? CreateDataForTemplatePackage(ITemplatePackageInfo packInfo);
+
+        object? CreateDataForTemplate(ITemplateInfo templates, IEngineEnvironmentSettings environment);
+
+        [Obsolete]
         void CreateDataForTemplatePack(IDownloadedPackInfo packInfo, IReadOnlyList<ITemplateInfo> templates, IEngineEnvironmentSettings environment);
-
-        object? GetDataForPack(ITemplatePackageInfo packInfo);
-
-        object? GetDataForTemplate(ITemplatePackageInfo packInfo, string templateIdentity);
-
     }
 }

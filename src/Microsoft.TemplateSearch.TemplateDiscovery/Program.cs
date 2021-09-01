@@ -5,7 +5,6 @@ using System.CommandLine;
 using System.CommandLine.Invocation;
 using Microsoft.TemplateSearch.TemplateDiscovery.NuGet;
 using Microsoft.TemplateSearch.TemplateDiscovery.PackChecking;
-using Microsoft.TemplateSearch.TemplateDiscovery.PackChecking.Reporting;
 using Microsoft.TemplateSearch.TemplateDiscovery.Results;
 using Microsoft.TemplateSearch.TemplateDiscovery.Test;
 
@@ -32,12 +31,25 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
             bool test,
             IEnumerable<SupportedQueries>? queries,
             DirectoryInfo? packagesPath,
-            string latestSdkToTest)
+            string latestSdkToTest,
+            bool diffMode,
+            FileInfo? overridePreviousCachePath,
+            FileInfo? overrideNonPackagesListPath)
         {
             Verbose.IsEnabled = verbose;
-            CommandArgs config = new CommandArgs(basePath, allowPreviewPacks, pageSize, onePage, savePacks, noTemplateJsonFilter, queries, packagesPath, latestSdkToTest);
-
-            PackSourceChecker packSourceChecker = NuGetPackSourceCheckerFactory.CreatePackSourceChecker(config);
+            CommandArgs config = new CommandArgs(
+                basePath,
+                allowPreviewPacks,
+                pageSize,
+                onePage,
+                savePacks,
+                noTemplateJsonFilter,
+                queries,
+                packagesPath,
+                latestSdkToTest,
+                diffMode,
+                overridePreviousCachePath,
+                overrideNonPackagesListPath);
 
             var cts = new CancellationTokenSource();
             Console.CancelKeyPress += (s, e) =>
@@ -49,6 +61,8 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
 
             try
             {
+                IPackCheckerFactory factory = packagesPath == null ? new NuGetPackSourceCheckerFactory() : new TestPackCheckerFactory();
+                PackSourceChecker packSourceChecker = await factory.CreatePackSourceCheckerAsync(config, cts.Token).ConfigureAwait(false);
                 PackSourceCheckResult checkResults = await packSourceChecker.CheckPackagesAsync(cts.Token).ConfigureAwait(false);
                 (string metadataPath, string legacyMetadataPath) = PackCheckResultReportWriter.WriteResults(config.OutputPath, checkResults);
                 if (test)
@@ -134,6 +148,21 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
                 Description = $"Latest .NET SDK version to be tested.",
             });
 
+            Option<bool> diffOption = new Option<bool>("--diff", getDefaultValue: () => true)
+            {
+                Description = $"The list of packages will be compared with previous run, and if package version is not changed, the package won't be rescanned.",
+            };
+
+            Option<FileInfo> diffOverrideCacheOption = new Option<FileInfo>("--diff-override-cache")
+            {
+                Description = $"Location of current search cache (local path only).",
+            }.ExistingOnly();
+
+            Option<FileInfo> diffOverrideNonPackagesOption = new Option<FileInfo>("--diff-override-non-packages")
+            {
+                Description = $"Location of the list of packages known not to be a valid package (local path only).",
+            }.ExistingOnly();
+
             RootCommand rootCommand = new RootCommand("Generates the template package search cache file based on the packages available on NuGet.org.")
             {
                 basePathOption,
@@ -147,6 +176,9 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
                 queriesOption,
                 packagesPathOption,
                 latestSdkToTestOption,
+                diffOption,
+                diffOverrideCacheOption,
+                diffOverrideNonPackagesOption
             };
 
             rootCommand.TreatUnmatchedTokensAsErrors = true;
@@ -162,6 +194,9 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
                 queriesOption,
                 packagesPathOption,
                 latestSdkToTestOption,
+                diffOption,
+                diffOverrideCacheOption,
+                diffOverrideNonPackagesOption,
                 ExecuteAsync);
 
             return rootCommand;
