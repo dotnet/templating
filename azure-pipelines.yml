@@ -45,7 +45,7 @@ stages:
 - stage: build
   displayName: Build
   jobs:
-  - ${{ if and( ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest'), or( eq(variables['Build.SourceBranch'], 'refs/heads/main'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'))) }}:
+  - ${{ if and( ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/release/6.0.1xx')) }}:
     - template: /eng/common/templates/job/onelocbuild.yml
       parameters:
         MirrorRepo: templating
