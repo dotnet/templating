@@ -1,1 +1,2 @@
 ﻿Microsoft.TemplateEngine.Cli.HostSpecificTemplateData.UsageExamples.get -> System.Collections.Generic.IReadOnlyList<string!>!
+static Microsoft.TemplateEngine.Cli.New3Command.CreateCommand(string! commandName, Microsoft.TemplateEngine.Abstractions.ITemplateEngineHost! host, Microsoft.TemplateEngine.Cli.ITelemetryLogger! telemetryLogger, Microsoft.TemplateEngine.Cli.New3Callbacks! callbacks) -> System.CommandLine.Command!
