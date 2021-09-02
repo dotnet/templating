@@ -25,5 +25,7 @@
     <MicrosoftExtensionsLoggingConsolePackageVersion>7.0.0-alpha.1.21430.29</MicrosoftExtensionsLoggingConsolePackageVersion>
     <!-- Dependencies from https://github.com/dotnet/clicommandlineparser -->
     <MicrosoftDotNetCliCommandLinePackageVersion>1.0.0-preview.19208.1</MicrosoftDotNetCliCommandLinePackageVersion>
+    <!-- Dependencies from https://github.com/dotnet/sdk -->
+    <MicrosoftNETSdkPackageVersion>7.0.100-alpha.1.21451.95</MicrosoftNETSdkPackageVersion>
   </PropertyGroup>
 </Project>

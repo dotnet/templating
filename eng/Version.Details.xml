@@ -47,6 +47,10 @@
       <Uri>https://github.com/dotnet/clicommandlineparser</Uri>
       <Sha />
     </Dependency>
+    <Dependency Name="Microsoft.NET.Sdk" Version="">
+      <Uri>https://www.github.com/dotnet/sdk</Uri>
+      <Sha />
+    </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
     <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="6.0.0-beta.21430.1">

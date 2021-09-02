@@ -24,10 +24,8 @@ steps:
 - script: '$(Build.SourcesDirectory)/build.sh'
 
 - bash: |
-    source $(Build.SourcesDirectory)/eng/common/tools.sh
-    ReadGlobalVersion "dotnet"
-    echo $_ReadGlobalVersion
-    echo "##vso[task.setvariable variable=RepoSdkVersion;]$_ReadGlobalVersion"
+    SdkVersion=$(dotnet msbuild $(Build.SourcesDirectory)/eng/Versions.props -verbosity:diagnostic | grep "MicrosoftNETSdkPackageVersion = " | xargs | cut -d' ' -f 3)
+    echo "##vso[task.setvariable variable=RepoSdkVersion;]$SdkVersion"
   displayName: 'Determine SDK version'
 
 - task: UseDotNet@2
