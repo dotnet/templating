@@ -47,8 +47,8 @@
       <Uri>https://github.com/dotnet/clicommandlineparser</Uri>
       <Sha />
     </Dependency>
-    <Dependency Name="Microsoft.NET.Sdk" Version="">
-      <Uri>https://www.github.com/dotnet/sdk</Uri>
+    <Dependency Name="VS.Redist.Common.NetCore.Toolset.x64" Version="">
+      <Uri>https://www.github.com/dotnet/installer</Uri>
       <Sha />
     </Dependency>
   </ProductDependencies>
