@@ -32,5 +32,6 @@
     <MicrosoftExtensionsLoggingConsolePackageVersion>7.0.0-alpha.1.21452.3</MicrosoftExtensionsLoggingConsolePackageVersion>
     <!-- Dependencies from https://github.com/dotnet/clicommandlineparser -->
     <MicrosoftDotNetCliCommandLinePackageVersion>1.0.0-preview.19208.1</MicrosoftDotNetCliCommandLinePackageVersion>
+    <VSRedistCommonNetCoreToolsetx64PackageVersion>7.0.100-alpha.1.21451.23</VSRedistCommonNetCoreToolsetx64PackageVersion>
   </PropertyGroup>
 </Project>
