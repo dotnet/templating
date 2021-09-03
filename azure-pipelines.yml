@@ -45,13 +45,14 @@ stages:
 - stage: build
   displayName: Build
   jobs:
-  - ${{ if and( ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest'), or( eq(variables['Build.SourceBranch'], 'refs/heads/main'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'))) }}:
+  - ${{ if and( ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
     - template: /eng/common/templates/job/onelocbuild.yml
       parameters:
         MirrorRepo: templating
-        MirrorBranch: main
+        MirrorBranch: $(OneLocBuildBranch)
         LclSource: lclFilesfromPackage
         LclPackageId: 'LCL-JUNO-PROD-TEMPLATING'
+        condition: eq(variables['Build.SourceBranch'], format('{0}{1}', 'refs/heads/', variables['OneLocBuildBranch'] ))
   - template: /eng/common/templates/jobs/jobs.yml
     parameters:
       enableMicrobuild: true
