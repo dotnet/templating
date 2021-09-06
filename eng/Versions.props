@@ -7,22 +7,39 @@
     <VersionPrefix>7.0.100</VersionPrefix>
     <PreReleaseVersionLabel>alpha</PreReleaseVersionLabel>
     <PreReleaseVersionIteration>1</PreReleaseVersionIteration>
-    <!--
-        When StabilizePackageVersion is set to 'true', this branch will produce stable outputs for 'Shipping' packages
-    -->
+    <!-- When StabilizePackageVersion is set to 'true', this branch will produce stable outputs for 'Shipping' packages -->
     <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">false</StabilizePackageVersion>
     <DotNetFinalVersionKind Condition="'$(StabilizePackageVersion)' == 'true'">release</DotNetFinalVersionKind>
     <PackSpecific Condition="'$(OS)' != 'Windows_NT'">true</PackSpecific>
+  </PropertyGroup>
+
+  <!-- Package Versions -->
+  <PropertyGroup>
+    <!-- Pinned Package Versions - Ordered by package name -->
+
+    <MicrosoftBuildFrameworkPackageVersion>16.10.0</MicrosoftBuildFrameworkPackageVersion>
+    <MicrosoftBuildUtilitiesCorePackageVersion>16.10.0</MicrosoftBuildUtilitiesCorePackageVersion>
     <NewtonsoftJsonPackageVersion>13.0.1</NewtonsoftJsonPackageVersion>
     <SystemDiagnosticsProcessPackageVersion>4.3.0</SystemDiagnosticsProcessPackageVersion>
     <SystemIOCompressionPackageVersion>4.3.0</SystemIOCompressionPackageVersion>
     <SystemRuntimeLoaderPackageVersion>4.3.0</SystemRuntimeLoaderPackageVersion>
+
+    <!-- Maestro-managed Package Versions - Ordered by repo name -->
+
+    <!-- Dependencies from https://github.com/dotnet/clicommandlineparser -->
+    <MicrosoftDotNetCliCommandLinePackageVersion>1.0.0-preview.19208.1</MicrosoftDotNetCliCommandLinePackageVersion>
+
     <!-- Dependencies from https://github.com/dotnet/command-line-api -->
     <SystemCommandLinePackageVersion>2.0.0-beta1.21473.1</SystemCommandLinePackageVersion>
+
+    <!-- Dependencies from https://github.com/dotnet/installer -->
+    <VSRedistCommonNetCoreToolsetx64PackageVersion>7.0.100-alpha.1.21451.23</VSRedistCommonNetCoreToolsetx64PackageVersion>
+
     <!-- Dependencies from https://github.com/nuget/nuget.client -->
     <NuGetCredentialsPackageVersion>6.0.0-rc.278</NuGetCredentialsPackageVersion>
     <NuGetConfigurationPackageVersion>6.0.0-rc.278</NuGetConfigurationPackageVersion>
     <NuGetProtocolPackageVersion>6.0.0-rc.278</NuGetProtocolPackageVersion>
+
     <!-- Dependencies from https://github.com/dotnet/runtime -->
     <MicrosoftNETCoreAppRefPackageVersion>7.0.0-alpha.1.21551.1</MicrosoftNETCoreAppRefPackageVersion>
     <MicrosoftNETCoreAppRuntimewinx64PackageVersion>7.0.0-alpha.1.21551.1</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
@@ -30,9 +47,7 @@
     <MicrosoftExtensionsLoggingAbstractionsPackageVersion>7.0.0-alpha.1.21551.1</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
     <MicrosoftExtensionsLoggingPackageVersion>7.0.0-alpha.1.21551.1</MicrosoftExtensionsLoggingPackageVersion>
     <MicrosoftExtensionsLoggingConsolePackageVersion>7.0.0-alpha.1.21551.1</MicrosoftExtensionsLoggingConsolePackageVersion>
-    <!-- Dependencies from https://github.com/dotnet/clicommandlineparser -->
-    <MicrosoftDotNetCliCommandLinePackageVersion>1.0.0-preview.19208.1</MicrosoftDotNetCliCommandLinePackageVersion>
-    <VSRedistCommonNetCoreToolsetx64PackageVersion>7.0.100-alpha.1.21451.23</VSRedistCommonNetCoreToolsetx64PackageVersion>
+
     <WcwidthSourcesPackageVersion>0.5.0</WcwidthSourcesPackageVersion>
   </PropertyGroup>
 </Project>
