@@ -13,7 +13,7 @@ regions and process `if`, `else if`, `else` and `end if` style statements.
 This repository only contains the following templates:
 - Console Application (console)
 - Class Library (classlib)
-- Common item templates (gitignore, globaljson, nugetconfig, sln, etc)
+- Common item templates (gitignore, globaljson, nugetconfig, sln, etc.)
 
 Other templates are located in the following repositories:
 
@@ -25,7 +25,7 @@ Other templates are located in the following repositories:
 |Test templates|[dotnet/test-templates](https://github.com/dotnet/test-templates)|
 |MAUI templates|[dotnet/maui](https://github.com/dotnet/maui)|
 
-Issues for the template content should be opened in coresponding repositories.
+Issues for the template content should be opened in the corresponding repository.
 
 # Template Samples
 
