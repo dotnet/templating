@@ -7,10 +7,25 @@ When `dotnet new` is invoked, it will call the Template Engine to create the art
 Template Engine is a library for manipulating streams, including operations to replace values, include/exclude 
 regions and process `if`, `else if`, `else` and `end if` style statements.
 
-# Content Repositories
-* [Class Library/Console App](https://github.com/dotnet/templating/tree/main/template_feed)
-* [Test projects](https://github.com/dotnet/test-templates/tree/master/template_feed)
-* [ASP.NET project and items](https://github.com/aspnet/AspNetCore/tree/main/src/ProjectTemplates)
+# Template Content Repositories
+
+[.NET default templates](https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-new-sdk-templates) are located in several repositories.
+This repository only contains the following templates:
+- Console Application (console)
+- Class Library (classlib)
+- Common item templates (gitignore, globaljson, nugetconfig, sln, etc)
+
+Other templates are located in the following repositories:
+
+| Templates | Repository |
+|---|---|
+|ASP.NET and Blazor templates|[dotnet/aspnetcore](https://github.com/dotnet/aspnetcore)|
+|WPF templates|[dotnet/wpf](https://github.com/dotnet/wpf)|
+|Windows Forms templates|[dotnet/winforms](https://github.com/dotnet/winforms)|
+|Test templates|[dotnet/test-templates](https://github.com/dotnet/test-templates)|
+|MAUI templates|[dotnet/maui](https://github.com/dotnet/maui)|
+
+Issues for the template content should be opened in coresponding repositories.
 
 # Template Samples
 
