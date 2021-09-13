@@ -1,6 +1,6 @@
 ﻿{
   "author": "Microsoft",
-  "name": "Application console",
+  "name": "Console App",
   "description": "Projet de création d'une application en ligne de commande pouvant s'exécuter sur .NET Core sur Windows, Linux et macOS",
   "symbols/TargetFrameworkOverride/description": "Remplace l’infrastructure cible",
   "symbols/TargetFrameworkOverride/displayName": "Remplacement du frame cible",
@@ -9,7 +9,7 @@
   "symbols/Framework/choices/netcoreapp3.0/displayName": ".NET Core 3.0",
   "symbols/Framework/displayName": "Framework",
   "symbols/langVersion/description": "Définit la propriété LangVersion dans le fichier projet créé",
-  "symbols/langVersion/displayName": "Language version",
+  "symbols/langVersion/displayName": "Version du langage",
   "symbols/skipRestore/description": "S’il est spécifié, ignore la restauration automatique du projet lors de la création.",
   "symbols/skipRestore/displayName": "Ignorer la restauration",
   "postActions/restore/description": "Restaurez les packages NuGet requis par ce projet.",
