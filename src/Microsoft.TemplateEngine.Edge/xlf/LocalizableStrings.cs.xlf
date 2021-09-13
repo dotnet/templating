@@ -187,7 +187,7 @@ Podrobnosti: {0}.</target>
       </trans-unit>
       <trans-unit id="TemplateInfo_Warning_FailedToReadHostData">
         <source>Failed to load host data in {0} at {1}.</source>
-        <target state="new">Failed to load host data in {0} at {1}.</target>
+        <target state="translated">Nepovedlo se načíst data hostitele v {0} v {1}.</target>
         <note>{0} - path to template location, {1} relative path inside template location.</note>
       </trans-unit>
       <trans-unit id="TemplatePackageManager_Error_FailedToScan">
