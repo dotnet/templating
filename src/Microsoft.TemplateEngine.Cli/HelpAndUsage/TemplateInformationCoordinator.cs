@@ -351,7 +351,9 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
 
             string? preferredLanguage =
                 resolutionResult.UnambiguousTemplateGroupMatchInfo
-                    .TemplatesWithMatchingParametersForPreferredLanguage.First().GetLanguage();
+                    .TemplatesWithMatchingParametersForPreferredLanguage
+                    .OrderBy(t => t.GetLanguage(), StringComparer.OrdinalIgnoreCase)
+                    .First().GetLanguage();
 
             List<string> supportedLanguages = new List<string>();
             foreach (string? language in resolutionResult.UnambiguousTemplateGroup.Languages)
