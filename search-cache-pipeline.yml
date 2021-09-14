@@ -1,3 +1,6 @@
+# Don't trigger for CI events: push, PR created etc.
+trigger: none
+# Trigger periodically instead.
 schedules:
 - cron: 0 * * * *
   displayName: Run every hour
