@@ -20,9 +20,9 @@
     <!-- Dependencies from https://github.com/dotnet/command-line-api -->
     <SystemCommandLinePackageVersion>2.0.0-beta1.21417.2</SystemCommandLinePackageVersion>
     <!-- Dependencies from https://github.com/nuget/nuget.client -->
-    <NuGetCredentialsPackageVersion>6.0.0-preview.4.243</NuGetCredentialsPackageVersion>
-    <NuGetConfigurationPackageVersion>6.0.0-preview.4.243</NuGetConfigurationPackageVersion>
-    <NuGetProtocolPackageVersion>6.0.0-preview.4.243</NuGetProtocolPackageVersion>
+    <NuGetCredentialsPackageVersion>6.0.0-rc.244</NuGetCredentialsPackageVersion>
+    <NuGetConfigurationPackageVersion>6.0.0-rc.244</NuGetConfigurationPackageVersion>
+    <NuGetProtocolPackageVersion>6.0.0-rc.244</NuGetProtocolPackageVersion>
     <!-- Dependencies from https://github.com/dotnet/runtime -->
     <MicrosoftNETCoreAppRefPackageVersion>7.0.0-alpha.1.21463.1</MicrosoftNETCoreAppRefPackageVersion>
     <MicrosoftNETCoreAppRuntimewinx64PackageVersion>7.0.0-alpha.1.21463.1</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
