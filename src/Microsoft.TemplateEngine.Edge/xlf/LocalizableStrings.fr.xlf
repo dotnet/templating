@@ -187,7 +187,7 @@ Détails : {0}.</target>
       </trans-unit>
       <trans-unit id="TemplateInfo_Warning_FailedToReadHostData">
         <source>Failed to load host data in {0} at {1}.</source>
-        <target state="new">Failed to load host data in {0} at {1}.</target>
+        <target state="translated">Échec du chargement des données de l’hôte dans la {0} à {1}.</target>
         <note>{0} - path to template location, {1} relative path inside template location.</note>
       </trans-unit>
       <trans-unit id="TemplatePackageManager_Error_FailedToScan">

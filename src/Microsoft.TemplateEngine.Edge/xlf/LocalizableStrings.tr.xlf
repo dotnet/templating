@@ -187,7 +187,7 @@ Ayrıntılar: {0}.</target>
       </trans-unit>
       <trans-unit id="TemplateInfo_Warning_FailedToReadHostData">
         <source>Failed to load host data in {0} at {1}.</source>
-        <target state="new">Failed to load host data in {0} at {1}.</target>
+        <target state="translated">{1} konumundaki {0} içinde yer alan konak verileri yüklenemedi.</target>
         <note>{0} - path to template location, {1} relative path inside template location.</note>
       </trans-unit>
       <trans-unit id="TemplatePackageManager_Error_FailedToScan">
