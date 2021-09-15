@@ -34,7 +34,7 @@
       </trans-unit>
       <trans-unit id="command_export_log_executionEnded">
         <source>Execution of "export" command has completed. {0} files were processed.</source>
-        <target state="needs-review-translation">Ukończono wykonywanie polecenia „eksportuj”. Przetworzone pliki: {0}.</target>
+        <target state="translated">Ukończono wykonywanie polecenia „eksportuj”. Przetworzone pliki: .</target>
         <note>{0} is the number of files. Do not localize "export"</note>
       </trans-unit>
       <trans-unit id="command_export_log_templateExportFailedWithError">
