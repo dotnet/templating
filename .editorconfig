@@ -201,5 +201,5 @@ end_of_line = lf
 [*.{cmd,bat}]
 end_of_line = crlf
 
-[src/Microsoft.TemplateEngine.Cli/ExternalSource/**]
-file_header_template = unset
+[**/.packages/**]
+generated_code = true
