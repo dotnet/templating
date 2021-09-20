@@ -51,4 +51,8 @@
   <ItemGroup>
     <Compile Include="$(PkgWcwidth_Sources)\contentFiles\cs\net5.0\**" LinkBase="ExternalSource/Wcwidth" Visible="true" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ExternalSource\" />
+  </ItemGroup>
 </Project>

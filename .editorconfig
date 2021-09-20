@@ -203,3 +203,6 @@ end_of_line = crlf
 
 [.packages/**/*.*]
 generated_code = true
+
+# Default severity for analyzer diagnostics with category 'StyleCop.CSharp.MaintainabilityRules'
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.MaintainabilityRules.severity = none
