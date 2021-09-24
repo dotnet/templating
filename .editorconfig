@@ -206,3 +206,5 @@ generated_code = true
 
 # Default severity for all analyzer diagnostics
 dotnet_analyzer_diagnostic.severity = none
+
+dotnet_diagnostic.IDE0005.severity = none
