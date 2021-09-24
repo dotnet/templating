@@ -344,8 +344,8 @@ Dotnet 本地工具清单文件  tool-manifest
             string expectedOutput =
 @"模板名          短名称       
 --------------  -------------
-dotnet git...   gitignore    
-Dotnet 本...    tool-manifest
+dotnet giti...  gitignore    
+Dotnet 本地...  tool-manifest
 控制台应用程序  console      
 类库            classlib     
 ";
