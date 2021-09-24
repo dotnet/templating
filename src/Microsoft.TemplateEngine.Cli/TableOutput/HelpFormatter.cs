@@ -219,7 +219,7 @@ namespace Microsoft.TemplateEngine.Cli.TableOutput
 
             int desiredLength = maxLength - ShrinkReplacement.Length;
             int possibleLength = 1;
-            while (text.Substring(0, possibleLength).GetUnicodeLength() < desiredLength)
+            while (text.Substring(0, possibleLength).GetUnicodeLength() <= desiredLength)
             {
                 possibleLength++;
             }
