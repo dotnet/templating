@@ -18,7 +18,7 @@
     <SystemIOCompressionPackageVersion>4.3.0</SystemIOCompressionPackageVersion>
     <SystemRuntimeLoaderPackageVersion>4.3.0</SystemRuntimeLoaderPackageVersion>
     <!-- Dependencies from https://github.com/dotnet/command-line-api -->
-    <SystemCommandLinePackageVersion>2.0.0-beta1.21417.2</SystemCommandLinePackageVersion>
+    <SystemCommandLinePackageVersion>2.0.0-beta1.21473.1</SystemCommandLinePackageVersion>
     <!-- Dependencies from https://github.com/nuget/nuget.client -->
     <NuGetCredentialsPackageVersion>6.0.0-rc.244</NuGetCredentialsPackageVersion>
     <NuGetConfigurationPackageVersion>6.0.0-rc.244</NuGetConfigurationPackageVersion>
