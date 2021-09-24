@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <RuleSet Name="Microsoft.Analyzers.TemplateEngine" Description="dotnet/templating repo source analyzer rules" ToolsVersion="16.0">
   <Include Path="codeanalysis.base.ruleset" Action="Default" />
-  <Rules AnalyzerId="Microsoft.CodeAnalysis.CSharp.CodeStyle" RuleNamespace="Microsoft.CodeQuality.Analyzers">
-    <Rule Id="IDE0005" Action="Warning" />
-  </Rules>
   <Rules AnalyzerId="Microsoft.CodeAnalysis.NetAnalyzers" RuleNamespace="Microsoft.CodeAnalysis.NetAnalyzers">
     <Rule Id="CA1041" Action="Warning" />
     <Rule Id="CA1044" Action="Warning" />
