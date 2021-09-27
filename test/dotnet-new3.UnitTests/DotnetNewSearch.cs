@@ -3,6 +3,7 @@
 
 #nullable enable
 
+using System.Text;
 using Microsoft.NET.TestFramework.Assertions;
 using Xunit;
 using Xunit.Abstractions;
@@ -783,7 +784,7 @@ Examples:
             string headerLine = lines[headerLineIndex];
             //table ends after empty line
             int lastLineIndex = Array.FindIndex(lines, headerLineIndex + 1, line => line.Length == 0) - 1;
-            var columnsIndexes = expectedColumns.Select(column => headerLine.IndexOf(column)).ToArray();
+            var columnIndexes = expectedColumns.Select(column => headerLine.IndexOf(column)).ToArray();
 
             var parsedTable = new List<List<string>>();
             // first array contain headers
@@ -794,15 +795,30 @@ Examples:
             }
             parsedTable.Add(headerRow);
 
+            StringBuilder columnBuilder = new(capacity: 16);
             //we start from 2nd row after header (1st row contains separator)
             for (int i = headerLineIndex + 2; i <= lastLineIndex; i++)
             {
                 var parsedRow = new List<string>();
-                for (int j = 0; j < columnsIndexes.Length - 1; j++)
+                string line = lines[i];
+                int processedCharCount = 0;
+
+                for (int j = 0; j < columnIndexes.Length; j++)
                 {
-                    parsedRow.Add(lines[i].Substring(columnsIndexes[j], columnsIndexes[j + 1] - columnsIndexes[j]).Trim());
+                    int unfilledColumnWidth = (j == columnIndexes.Length - 1 ? line.Length : columnIndexes[j + 1] ) - columnIndexes[j];
+                    columnBuilder.Clear();
+
+                    while (unfilledColumnWidth > 0)
+                    {
+                        char c = line[processedCharCount++];
+                        int charLength = Wcwidth.UnicodeCalculator.GetWidth(c);
+                        columnBuilder.Append(c);
+                        unfilledColumnWidth -= charLength;
+                    }
+
+                    parsedRow.Add(columnBuilder.ToString().Trim());
                 }
-                parsedRow.Add(lines[i].Substring(columnsIndexes[columnsIndexes.Length - 1]).Trim());
+
                 parsedTable.Add(parsedRow);
             }
             return parsedTable;
@@ -833,7 +849,7 @@ Examples:
                 {
                     return string.Compare(left, right, StringComparison.OrdinalIgnoreCase);
                 }
-                
+
                 if (rightIsShrunk && left.StartsWith(right.Substring(0, right.Length - 3), StringComparison.OrdinalIgnoreCase))
                 {
                     return -1;
