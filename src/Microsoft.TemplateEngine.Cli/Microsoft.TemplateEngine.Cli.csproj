@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>$(NETCoreTargetFramework)</TargetFrameworks>
     <Description>Template creation for the dotnet CLI</Description>
@@ -49,7 +49,7 @@
     </EmbeddedResource>
   </ItemGroup>
 
-  <Target BeforeTargets="BeforeBuild" Name="CopyExternalSourceFilesIntoProject" >
+  <Target BeforeTargets="AfterResolveReferences" Name="CopyExternalSourceFilesIntoProject" >
     <ItemGroup>
       <WcwidthFiles Include="$(PkgWcwidth_Sources)\contentFiles\cs\net5.0\External\**\*" />
     </ItemGroup>
