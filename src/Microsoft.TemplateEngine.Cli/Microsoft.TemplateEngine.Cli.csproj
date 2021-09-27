@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>$(NETCoreTargetFramework)</TargetFrameworks>
     <Description>Template creation for the dotnet CLI</Description>
@@ -31,7 +31,7 @@
     <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="Microsoft.Extensions.Logging" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" />
-    <PackageReference Include="Wcwidth.Sources"/>
+    <PackageReference Include="Wcwidth.Sources" ExcludeAssets="all" GeneratePathProperty="true" />
   </ItemGroup>
 
   <ItemGroup>
@@ -48,4 +48,12 @@
       <LastGenOutput>LocalizableStrings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+
+  <Target BeforeTargets="BeforeBuild" Name="CopyExternalSourceFilesIntoProject" >
+    <ItemGroup>
+      <WcwidthFiles Include="$(PkgWcwidth_Sources)\contentFiles\cs\net5.0\External\**\*" />
+    </ItemGroup>
+    <RemoveDir Directories="$(MSBuildProjectDirectory)/External/Wcwidth/" />
+    <Copy SourceFiles="@(WcwidthFiles)" DestinationFolder="$(MSBuildProjectDirectory)/External/%(RecursiveDir)"/>
+  </Target>
 </Project>
