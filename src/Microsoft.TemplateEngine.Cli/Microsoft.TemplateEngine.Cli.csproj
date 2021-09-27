@@ -49,11 +49,14 @@
     </EmbeddedResource>
   </ItemGroup>
 
-  <Target BeforeTargets="AfterResolveReferences" Name="CopyExternalSourceFilesIntoProject" >
+  <Target Name="CopyExternalSourceFilesIntoProject" BeforeTargets="BeforeBuild" >
     <ItemGroup>
       <WcwidthFiles Include="$(PkgWcwidth_Sources)\contentFiles\cs\net5.0\External\**\*" />
     </ItemGroup>
     <RemoveDir Directories="$(MSBuildProjectDirectory)/External/Wcwidth/" />
     <Copy SourceFiles="@(WcwidthFiles)" DestinationFolder="$(MSBuildProjectDirectory)/External/%(RecursiveDir)"/>
+    <ItemGroup>
+      <Compile Include="$(MSBuildProjectDirectory)/External/**/*.cs" />
+    </ItemGroup>
   </Target>
 </Project>
