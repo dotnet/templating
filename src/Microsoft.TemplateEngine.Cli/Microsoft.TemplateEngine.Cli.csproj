@@ -56,7 +56,8 @@
     <RemoveDir Directories="$(MSBuildProjectDirectory)/External/Wcwidth/" />
     <Copy SourceFiles="@(WcwidthFiles)" DestinationFolder="$(MSBuildProjectDirectory)/External/%(RecursiveDir)"/>
     <ItemGroup>
-      <Compile Include="$(MSBuildProjectDirectory)/External/**/*.cs" />
+      <Compile Remove="External/**/*.cs" />
+      <Compile Include="External/**/*.cs" />
     </ItemGroup>
   </Target>
 </Project>

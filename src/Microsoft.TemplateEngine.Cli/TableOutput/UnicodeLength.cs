@@ -7,9 +7,14 @@ namespace Microsoft.TemplateEngine.Cli.TableOutput
 {
     internal static class UnicodeLength
     {
-        internal static int GetUnicodeLength (this string s)
+        internal static int GetUnicodeLength(this string s)
         {
-            return s.Sum(ch => Wcwidth.UnicodeCalculator.GetWidth((int)ch));
+            int totalWidth = 0;
+            for (int i = 0; i < s.Length; i++)
+            {
+                totalWidth += Wcwidth.UnicodeCalculator.GetWidth((int)s[i]);
+            }
+            return totalWidth;
         }
     }
 }

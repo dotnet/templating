@@ -795,33 +795,42 @@ Examples:
             }
             parsedTable.Add(headerRow);
 
-            StringBuilder columnBuilder = new(capacity: 16);
             //we start from 2nd row after header (1st row contains separator)
             for (int i = headerLineIndex + 2; i <= lastLineIndex; i++)
             {
-                var parsedRow = new List<string>();
-                string line = lines[i];
-                int processedCharCount = 0;
-
-                for (int j = 0; j < columnIndexes.Length; j++)
-                {
-                    int unfilledColumnWidth = (j == columnIndexes.Length - 1 ? line.Length : columnIndexes[j + 1] ) - columnIndexes[j];
-                    columnBuilder.Clear();
-
-                    while (unfilledColumnWidth > 0)
-                    {
-                        char c = line[processedCharCount++];
-                        int charLength = Wcwidth.UnicodeCalculator.GetWidth(c);
-                        columnBuilder.Append(c);
-                        unfilledColumnWidth -= charLength;
-                    }
-
-                    parsedRow.Add(columnBuilder.ToString().Trim());
-                }
-
+                List<string> parsedRow = new(SplitLineByColumns(lines[i], columnIndexes).Select(c => c.Trim()));
                 parsedTable.Add(parsedRow);
             }
             return parsedTable;
+        }
+
+        /// <summary>
+        /// Splits the given input string into multiple columns using the given indices.
+        /// Indices do not refer to the number of characters, but to the visual space occupied by characters when drawn.
+        /// </summary>
+        /// <param name="input">Input string to be splitted.</param>
+        /// <param name="indexes">Indices to split the string from.</param>
+        /// <returns></returns>
+        private static IEnumerable<string> SplitLineByColumns(string input, int[] indexes)
+        {
+            StringBuilder columnBuilder = new(capacity: 16);
+            int processedCharCount = 0;
+
+            for (int j = 0; j < indexes.Length; j++)
+            {
+                int unfilledColumnWidth = (j == indexes.Length - 1 ? input.Length : indexes[j + 1]) - indexes[j];
+                columnBuilder.Clear();
+
+                while (unfilledColumnWidth > 0)
+                {
+                    char c = input[processedCharCount++];
+                    int charLength = Wcwidth.UnicodeCalculator.GetWidth(c);
+                    columnBuilder.Append(c);
+                    unfilledColumnWidth -= charLength;
+                }
+
+                yield return columnBuilder.ToString();
+            }
         }
 
         private class ShrinkAwareOrdinalStringComparer : IComparer<string>
