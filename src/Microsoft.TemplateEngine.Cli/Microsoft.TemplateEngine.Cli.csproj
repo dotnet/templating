@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>$(NETCoreTargetFramework)</TargetFrameworks>
     <Description>Template creation for the dotnet CLI</Description>
@@ -53,11 +53,9 @@
     <ItemGroup>
       <WcwidthFiles Include="$(PkgWcwidth_Sources)\contentFiles\cs\net5.0\External\**\*" />
     </ItemGroup>
-    <RemoveDir Directories="$(MSBuildProjectDirectory)/External/Wcwidth/" />
-    <Copy SourceFiles="@(WcwidthFiles)" DestinationFolder="$(MSBuildProjectDirectory)/External/%(RecursiveDir)"/>
+    <Copy SourceFiles="@(WcwidthFiles)" DestinationFolder="$(BaseIntermediateOutputPath)/External/%(RecursiveDir)"/>
     <ItemGroup>
-      <Compile Remove="External/**/*.cs" />
-      <Compile Include="External/**/*.cs" />
-    </ItemGroup>
+      <Compile Include="$(BaseIntermediateOutputPath)/External/**/*.cs" />
+    </ItemGroup> 
   </Target>
 </Project>

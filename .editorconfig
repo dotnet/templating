@@ -202,6 +202,6 @@ end_of_line = lf
 [*.{cmd,bat}]
 end_of_line = crlf
 
-[src/Microsoft.TemplateEngine.Cli/External/**/*]
+[*/obj/*/External/**/*]
 generated_code = true
 dotnet_analyzer_diagnostic.severity = none
