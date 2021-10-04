@@ -219,20 +219,12 @@ namespace Microsoft.TemplateEngine.Cli.TableOutput
             // If the text is too long, shorten it enough to allow room for the ellipsis, then add the ellipsis
 
             int desiredLength = maxLength - ShrinkReplacement.Length;
-            int displayableLength;
-            for (displayableLength = 0; displayableLength < text.Length; displayableLength++)
+            int possibleLength = 1;
+            while (text.Substring(0, possibleLength).GetUnicodeLength() <= desiredLength)
             {
-                int displaySize = UnicodeCalculator.GetWidth(text[displayableLength]);
-                desiredLength -= displaySize;
-
-                if (displaySize < 0)
-                {
-                    // Adding the last character goes out of our limit for this column. Stop before that.
-                    break;
-                }
+                possibleLength++;
             }
-
-            return text.Substring(0, displayableLength) + ShrinkReplacement;
+            return text.Substring(0, possibleLength - 1) + ShrinkReplacement;
         }
 
         private void CalculateColumnWidth(IReadOnlyDictionary<int, int> columnWidthLookup)
