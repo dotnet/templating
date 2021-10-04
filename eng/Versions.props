@@ -32,5 +32,6 @@
     <MicrosoftExtensionsLoggingConsolePackageVersion>6.0.0-rtm.21501.9</MicrosoftExtensionsLoggingConsolePackageVersion>
     <!-- Dependencies from https://github.com/dotnet/clicommandlineparser -->
     <MicrosoftDotNetCliCommandLinePackageVersion>1.0.0-preview.19208.1</MicrosoftDotNetCliCommandLinePackageVersion>
+    <WcwidthSourcesPackageVersion>0.5.0</WcwidthSourcesPackageVersion>
   </PropertyGroup>
 </Project>
