@@ -25,12 +25,12 @@
     <NuGetConfigurationPackageVersion>6.0.0-preview.3.179</NuGetConfigurationPackageVersion>
     <NuGetProtocolPackageVersion>6.0.0-preview.3.179</NuGetProtocolPackageVersion>
     <!-- Dependencies from https://github.com/dotnet/runtime -->
-    <MicrosoftNETCoreAppRefPackageVersion>6.0.0-rtm.21506.17</MicrosoftNETCoreAppRefPackageVersion>
-    <MicrosoftNETCoreAppRuntimewinx64PackageVersion>6.0.0-rtm.21506.17</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
-    <VSRedistCommonNetCoreSharedFrameworkx6460PackageVersion>6.0.0-rtm.21506.17</VSRedistCommonNetCoreSharedFrameworkx6460PackageVersion>
-    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>6.0.0-rtm.21506.17</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
-    <MicrosoftExtensionsLoggingPackageVersion>6.0.0-rtm.21506.17</MicrosoftExtensionsLoggingPackageVersion>
-    <MicrosoftExtensionsLoggingConsolePackageVersion>6.0.0-rtm.21506.17</MicrosoftExtensionsLoggingConsolePackageVersion>
+    <MicrosoftNETCoreAppRefPackageVersion>6.0.0-rtm.21506.22</MicrosoftNETCoreAppRefPackageVersion>
+    <MicrosoftNETCoreAppRuntimewinx64PackageVersion>6.0.0-rtm.21506.22</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
+    <VSRedistCommonNetCoreSharedFrameworkx6460PackageVersion>6.0.0-rtm.21506.22</VSRedistCommonNetCoreSharedFrameworkx6460PackageVersion>
+    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>6.0.0-rtm.21506.22</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
+    <MicrosoftExtensionsLoggingPackageVersion>6.0.0-rtm.21506.22</MicrosoftExtensionsLoggingPackageVersion>
+    <MicrosoftExtensionsLoggingConsolePackageVersion>6.0.0-rtm.21506.22</MicrosoftExtensionsLoggingConsolePackageVersion>
     <!-- Dependencies from https://github.com/dotnet/clicommandlineparser -->
     <MicrosoftDotNetCliCommandLinePackageVersion>1.0.0-preview.19208.1</MicrosoftDotNetCliCommandLinePackageVersion>
   </PropertyGroup>
