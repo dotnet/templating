@@ -54,20 +54,25 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             using TemplatePackageManager templatePackageManager = new TemplatePackageManager(environmentSettings);
             var templates = templatePackageManager.GetTemplatesAsync(CancellationToken.None).Result;
 
+            //TODO: implement correct logic
             if (!string.IsNullOrEmpty(args.ShortName))
             {
-                var template = templates.FirstOrDefault(template => template.ShortNameList.Contains(args.ShortName));
+                var matchingTemplates = templates.Where(template => template.ShortNameList.Contains(args.ShortName));
+                HashSet<string> distinctSuggestions = new HashSet<string>();
 
-                if (template != null)
+                foreach (var template in matchingTemplates)
                 {
                     var templateGroupCommand = new TemplateGroupCommand(this, environmentSettings, template);
                     var parsed = templateGroupCommand.Parse(args.Arguments ?? Array.Empty<string>());
                     foreach (var suggestion in templateGroupCommand.GetSuggestions(parsed, textToMatch))
                     {
-                        yield return suggestion;
+                        if (distinctSuggestions.Add(suggestion))
+                        {
+                            yield return suggestion;
+                        }
                     }
-                    yield break;
                 }
+                yield break;
             }
             else
             {
