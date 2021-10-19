@@ -33,7 +33,10 @@ namespace Microsoft.TemplateEngine.Cli.Commands
 
             if (templateGroupArgs.HelpRequested)
             {
-                context.HelpBuilder.Write(context.ParseResult.CommandResult.Command, StandardStreamWriter.Create(context.Console.Out));
+                context.HelpBuilder.Write(
+                    context.ParseResult.CommandResult.Command,
+                    StandardStreamWriter.Create(context.Console.Out),
+                    context.ParseResult);
                 return 0;
             }
 
