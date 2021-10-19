@@ -177,5 +177,20 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
             Assert.Contains("source", args.TemplatePackages);
         }
 
+        [Theory]
+        [InlineData("--add-source my-custom-source", "--add-source")]
+        [InlineData("--interactive", "--interactive")]
+        public void Install_CanReturnParseError_OnLegacyOptionMisplacement(string optionSyntax, string expectedOptionName)
+        {
+            ITemplateEngineHost host = TestHost.GetVirtualHost(additionalComponents: BuiltInTemplatePackagesProviderFactory.GetComponents(includeTestTemplates: false));
+            NewCommand myCommand = (NewCommand)NewCommandFactory.Create("new", host, new TelemetryLogger(null, false), new NewCommandCallbacks());
+
+            var parseResult = myCommand.Parse($"new {optionSyntax} install source");
+
+            Assert.NotEmpty(parseResult.Errors);
+            Assert.Single(parseResult.Errors);
+            Assert.Contains($"Option '{expectedOptionName}' should be used after 'install'.", parseResult.Errors.Select(error => error.Message));
+        }
+
     }
 }

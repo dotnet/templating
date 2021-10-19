@@ -25,18 +25,9 @@ namespace Microsoft.TemplateEngine.Cli.Commands
                 NewCommandCallbacks callbacks)
             : base(host, logger, callbacks, "install")
         {
-            AddValidator(ValidateLegacyUsage);
             _legacyInstallCommand = legacyInstallCommand;
-        }
-
-        private string? ValidateLegacyUsage(CommandResult symbolResult)
-        {
-            //TODO:
-            //if (symbolResult.Parent!.Children.Any((a)=> a // _legacyInstallCommand.InteractiveOption))
-            //{
-            //    return "We are doomed!";
-            //}
-            return null;
+            AddValidator(symbolResult => ValidateOptionUsageInParent(symbolResult, _legacyInstallCommand.InteractiveOption));
+            AddValidator(symbolResult => ValidateOptionUsageInParent(symbolResult, _legacyInstallCommand.AddSourceOption));
         }
     }
 
@@ -104,6 +95,7 @@ namespace Microsoft.TemplateEngine.Cli.Commands
                 templateInformationCoordinator,
                 environmentSettings.GetDefaultLanguage());
 
+            //TODO: we need to await, otherwise templatePackageManager will be disposed.
             return await templatePackageCoordinator.EnterInstallFlowAsync(args, context.GetCancellationToken()).ConfigureAwait(false);
         }
 
