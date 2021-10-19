@@ -151,7 +151,7 @@ stages:
       - ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
         - job: Linux
           pool:
-            name:  NetCore1ESPool-Public
+            name:  NetCore1ESPool-Svc-Public
             demands: ImageOverride -equals Build.Ubuntu.1804.Amd64.Open
           strategy:
             matrix:
