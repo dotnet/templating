@@ -553,7 +553,7 @@ Worker Service                                worker         [C#],F#     Common/
                 .ExitWith(0)
                 .And.NotHaveStdErr()
                 .And.HaveStdOutContaining("These templates matched your input:")
-                .And.HaveStdOutMatching("Basic FSharp +template-grouping +\\[C#],F# +item +Author1 +Test Asset +\\r?\\n +Q# +item,project +Author2 +Test Asset");
+                .And.HaveStdOutMatching("Basic FSharp +template-grouping +\\[C#],F# +item +Author1 +Test Asset +\\r?\\n +Q# +(item\\,project|project\\,item) +Author2 +Test Asset");
         }
 
         [Theory]
