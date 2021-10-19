@@ -16,10 +16,9 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Commands.Export
         public override Command CreateCommand()
         {
             Command exportCommand = new(CommandName, LocalizableStrings.command_export_help_description);
-            exportCommand.AddArgument(new Argument("template-path")
+            exportCommand.AddArgument(new Argument<string>("template-path")
             {
                 Arity = ArgumentArity.OneOrMore,
-                ArgumentType = typeof(string),
                 Description = LocalizableStrings.command_export_help_templatePath_description,
             });
             exportCommand.AddOption(new Option("-r")
