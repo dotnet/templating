@@ -42,69 +42,69 @@ Options:
   --no-update-check              Disables checking for the template package updates when instantiating a template.";
 
         private const string ConsoleHelp =
-@"Console App (C#)
-Author: Microsoft
-Description: A project for creating a command-line application that can run on .NET Core on Windows, Linux and macOS
+@"Console App \(C#\)
+Author\: Microsoft
+Description\: A project for creating a command-line application that can run on \.NET Core on Windows\, Linux and macOS
 Options:                                                                             
-  -f|--framework  The target framework for the project.                              
-                      net6.0           - Target net6.0                               
-                      net5.0           - Target net5.0                               
-                      netcoreapp3.1    - Target netcoreapp3.1                        
-                      netcoreapp3.0    - Target netcoreapp3.0                        
-                      netcoreapp2.2    - Target netcoreapp2.2                        
-                      netcoreapp2.1    - Target netcoreapp2.1                        
-                      netcoreapp2.0    - Target netcoreapp2.0                        
-                      netcoreapp1.0    - Target netcoreapp1.0                        
-                      netcoreapp1.1    - Target netcoreapp1.1                        
-                  Default: net6.0                                                    
+  \-f\|\-\-framework  The target framework for the project\.                              
+                      net6\.0           \- Target net6\.0                               
+                      net5\.0           \- Target net5\.0                               
+                      netcoreapp3\.1    \- Target netcoreapp3\.1                        
+                      netcoreapp3\.0    \- Target netcoreapp3\.0                        
+                      netcoreapp2\.2    \- Target netcoreapp2\.2                        
+                      netcoreapp2\.1    \- Target netcoreapp2\.1                        
+                      netcoreapp2\.0    \- Target netcoreapp2\.0                        
+                      netcoreapp1\.0    \- Target netcoreapp1\.0                        
+                      netcoreapp1\.1    \- Target netcoreapp1\.1                        
+                  Default\: net6\.0                                                    
 
-  --langVersion   Sets the LangVersion property in the created project file          
-                  text - Optional                                                    
+  \-\-langVersion   Sets the LangVersion property in the created project file          
+                  text \- Optional                                                    
 
-  --no-restore    If specified, skips the automatic restore of the project on create.
-                  bool - Optional                                                    
-                  Default: false                                                     
+  \-\-no\-restore    If specified, skips the automatic restore of the project on create\.
+                  bool \- Optional                                                    
+                  Default\: false                                                     
 
 
-To see help for other template languages (F#, VB), use --language option:
-   dotnet new3 console -h --language F#";
+To see help for other template languages \(F#\, VB\)\, use \-\-language option\:
+   dotnet new3 console \-h \-\-language (F#|VB)";
 
         private const string ClassLibHelp =
-@"Class Library (C#)
-Author: Microsoft
-Description: A project for creating a class library that targets .NET Standard or .NET Core
-Options:                                                                             
-  -f|--framework  The target framework for the project.                              
-                      net6.0            - Target net6.0                              
-                      netstandard2.1    - Target netstandard2.1                      
-                      netstandard2.0    - Target netstandard2.0                      
-                      net5.0            - Target net5.0                              
-                      netcoreapp3.1     - Target netcoreapp3.1                       
-                      netcoreapp3.0     - Target netcoreapp3.0                       
-                      netcoreapp2.2     - Target netcoreapp2.2                       
-                      netcoreapp2.1     - Target netcoreapp2.1                       
-                      netcoreapp2.0     - Target netcoreapp2.0                       
-                      netcoreapp1.0     - Target netcoreapp1.0                       
-                      netcoreapp1.1     - Target netcoreapp1.1                       
-                      netstandard1.0    - Target netstandard1.0                      
-                      netstandard1.1    - Target netstandard1.1                      
-                      netstandard1.2    - Target netstandard1.2                      
-                      netstandard1.3    - Target netstandard1.3                      
-                      netstandard1.4    - Target netstandard1.4                      
-                      netstandard1.5    - Target netstandard1.5                      
-                      netstandard1.6    - Target netstandard1.6                      
-                  Default: net6.0                                                    
+@"Class Library \(C#\)
+Author\: Microsoft
+Description\: A project for creating a class library that targets \.NET Standard or \.NET Core
+Options\:                                                                             
+  \-f\|\-\-framework  The target framework for the project\.                              
+                      net6\.0            \- Target net6\.0                              
+                      netstandard2\.1    \- Target netstandard2\.1                      
+                      netstandard2\.0    \- Target netstandard2\.0                      
+                      net5\.0            \- Target net5\.0                              
+                      netcoreapp3\.1     \- Target netcoreapp3\.1                       
+                      netcoreapp3\.0     \- Target netcoreapp3\.0                       
+                      netcoreapp2\.2     \- Target netcoreapp2\.2                       
+                      netcoreapp2\.1     \- Target netcoreapp2\.1                       
+                      netcoreapp2\.0     \- Target netcoreapp2\.0                       
+                      netcoreapp1\.0     \- Target netcoreapp1\.0                       
+                      netcoreapp1\.1     \- Target netcoreapp1\.1                       
+                      netstandard1\.0    \- Target netstandard1\.0                      
+                      netstandard1\.1    \- Target netstandard1\.1                      
+                      netstandard1\.2    \- Target netstandard1\.2                      
+                      netstandard1\.3    \- Target netstandard1\.3                      
+                      netstandard1\.4    \- Target netstandard1\.4                      
+                      netstandard1\.5    \- Target netstandard1\.5                      
+                      netstandard1\.6    \- Target netstandard1\.6                      
+                  Default\: net6\.0                                                    
 
-  --langVersion   Sets the LangVersion property in the created project file          
-                  text - Optional                                                    
+  \-\-langVersion   Sets the LangVersion property in the created project file          
+                  text \- Optional                                                    
 
-  --no-restore    If specified, skips the automatic restore of the project on create.
-                  bool - Optional                                                    
-                  Default: false                                                     
+  \-\-no\-restore    If specified, skips the automatic restore of the project on create\.
+                  bool \- Optional                                                    
+                  Default\: false                                                     
 
 
-To see help for other template languages (F#, VB), use --language option:
-   dotnet new3 classlib -h --language F#";
+To see help for other template languages \(F#\, VB\)\, use \-\-language option\:
+   dotnet new3 classlib \-h \-\-language (F#|VB)";
 
         #endregion
         private readonly ITestOutputHelper _log;
@@ -152,7 +152,7 @@ To see help for other template languages (F#, VB), use --language option:
                 .Should()
                 .ExitWith(0)
                 .And.NotHaveStdErr()
-                .And.HaveStdOut(ConsoleHelp)
+                .And.HaveStdOutMatching(ConsoleHelp)
                 .And.NotHaveStdOutContaining(HelpOutput);
 
             new DotnetNewCommand(_log, "classlib", "-h")
@@ -162,7 +162,7 @@ To see help for other template languages (F#, VB), use --language option:
                 .Should()
                 .ExitWith(0)
                 .And.NotHaveStdErr()
-                .And.HaveStdOut(ClassLibHelp)
+                .And.HaveStdOutMatching(ClassLibHelp)
                 .And.NotHaveStdOutContaining(HelpOutput);
         }
 
@@ -230,20 +230,20 @@ To search for the templates on NuGet.org, run:
         public void CanShowHelpForTemplate_MatchOnChoice()
         {
             const string ConsoleHelp =
-@"Console App (C#)
-Author: Microsoft
-Description: A project for creating a command-line application that can run on .NET Core on Windows, Linux and macOS
-Options:                                                                            
-  --langVersion  Sets the LangVersion property in the created project file          
-                 text - Optional                                                    
+@"Console App \(C#\)
+Author\: Microsoft
+Description\: A project for creating a command-line application that can run on \.NET Core on Windows\, Linux and macOS
+Options\:                                                                            
+  \-\-langVersion  Sets the LangVersion property in the created project file          
+                 text \- Optional                                                    
 
-  --no-restore   If specified, skips the automatic restore of the project on create.
-                 bool - Optional                                                    
-                 Default: false                                                     
+  \-\-no\-restore   If specified\, skips the automatic restore of the project on create\.
+                 bool \- Optional                                                    
+                 Default\: false                                                     
 
 
-To see help for other template languages (F#, VB), use --language option:
-   dotnet new3 console -h --language F#";
+To see help for other template languages \(F#\, VB\)\, use \-\-language option\:
+   dotnet new3 console \-h \-\-language (F#|VB)";
 
             string home = TestUtils.CreateTemporaryFolder("Home");
             string workingDirectory = TestUtils.CreateTemporaryFolder();
@@ -254,7 +254,7 @@ To see help for other template languages (F#, VB), use --language option:
                 .Execute()
                 .Should().Pass()
                 .And.NotHaveStdErr()
-                .And.HaveStdOut(ConsoleHelp)
+                .And.HaveStdOutMatching(ConsoleHelp)
                 .And.NotHaveStdOutContaining(HelpOutput);
         }
 
@@ -316,33 +316,33 @@ For more information, run:
         public void CanShowHelpForTemplate_MatchOnNonChoiceParam()
         {
             const string ConsoleHelp =
-@"Console App (C#)
-Author: Microsoft
-Description: A project for creating a command-line application that can run on .NET Core on Windows, Linux and macOS
-Options:                                                                             
-  -f|--framework  The target framework for the project.                              
-                      net6.0           - Target net6.0                               
-                      net5.0           - Target net5.0                               
-                      netcoreapp3.1    - Target netcoreapp3.1                        
-                      netcoreapp3.0    - Target netcoreapp3.0                        
-                      netcoreapp2.2    - Target netcoreapp2.2                        
-                      netcoreapp2.1    - Target netcoreapp2.1                        
-                      netcoreapp2.0    - Target netcoreapp2.0                        
-                      netcoreapp1.0    - Target netcoreapp1.0                        
-                      netcoreapp1.1    - Target netcoreapp1.1                        
-                  Default: net6.0                                                    
+@"Console App \(C#\)
+Author\: Microsoft
+Description\: A project for creating a command-line application that can run on \.NET Core on Windows\, Linux and macOS
+Options\:                                                                             
+  \-f\|\-\-framework  The target framework for the project\.                              
+                      net6\.0           \- Target net6\.0                               
+                      net5\.0           \- Target net5\.0                               
+                      netcoreapp3\.1    \- Target netcoreapp3\.1                        
+                      netcoreapp3\.0    \- Target netcoreapp3\.0                        
+                      netcoreapp2\.2    \- Target netcoreapp2\.2                        
+                      netcoreapp2\.1    \- Target netcoreapp2\.1                        
+                      netcoreapp2\.0    \- Target netcoreapp2\.0                        
+                      netcoreapp1\.0    \- Target netcoreapp1\.0                        
+                      netcoreapp1\.1    \- Target netcoreapp1\.1                        
+                  Default\: net6\.0                                                    
 
-  --langVersion   Sets the LangVersion property in the created project file          
-                  text - Optional                                                    
-                  Configured Value: 8.0                                              
+  \-\-langVersion   Sets the LangVersion property in the created project file          
+                  text \- Optional                                                    
+                  Configured Value\: 8\.0                                              
 
-  --no-restore    If specified, skips the automatic restore of the project on create.
-                  bool - Optional                                                    
-                  Default: false                                                     
+  \-\-no\-restore    If specified\, skips the automatic restore of the project on create\.
+                  bool \- Optional                                                    
+                  Default\: false                                                     
 
 
-To see help for other template languages (F#, VB), use --language option:
-   dotnet new3 console -h --language F#";
+To see help for other template languages \(F#\, VB\)\, use \-\-language option\:
+   dotnet new3 console \-h \-\-language (F#|VB)";
 
         string home = TestUtils.CreateTemporaryFolder("Home");
         string workingDirectory = TestUtils.CreateTemporaryFolder();
@@ -353,7 +353,7 @@ To see help for other template languages (F#, VB), use --language option:
                 .Execute()
                 .Should().Pass()
                 .And.NotHaveStdErr()
-                .And.HaveStdOut(ConsoleHelp)
+                .And.HaveStdOutMatching(ConsoleHelp)
                 .And.NotHaveStdOutContaining(HelpOutput);
         }
 
@@ -361,29 +361,29 @@ To see help for other template languages (F#, VB), use --language option:
         public void CanShowHelpForTemplate_MatchOnLanguage()
         {
             const string ConsoleHelp =
-@"Console App (F#)
-Author: Microsoft
-Description: A project for creating a command-line application that can run on .NET Core on Windows, Linux and macOS
-Options:                                                                             
-  -f|--framework  The target framework for the project.                              
-                      net6.0           - Target net6.0                               
-                      net5.0           - Target net5.0                               
-                      netcoreapp3.1    - Target netcoreapp3.1                        
-                      netcoreapp3.0    - Target netcoreapp3.0                        
-                      netcoreapp2.2    - Target netcoreapp2.2                        
-                      netcoreapp2.1    - Target netcoreapp2.1                        
-                      netcoreapp2.0    - Target netcoreapp2.0                        
-                      netcoreapp1.0    - Target netcoreapp1.0                        
-                      netcoreapp1.1    - Target netcoreapp1.1                        
-                  Default: net6.0                                                    
+@"Console App \(F#\)
+Author\: Microsoft
+Description\: A project for creating a command-line application that can run on \.NET Core on Windows\, Linux and macOS
+Options\:                                                                             
+  \-f\|\-\-framework  The target framework for the project\.                              
+                      net6\.0           \- Target net6\.0                               
+                      net5\.0           \- Target net5\.0                               
+                      netcoreapp3\.1    \- Target netcoreapp3\.1                        
+                      netcoreapp3\.0    \- Target netcoreapp3\.0                        
+                      netcoreapp2\.2    \- Target netcoreapp2\.2                        
+                      netcoreapp2\.1    \- Target netcoreapp2\.1                        
+                      netcoreapp2\.0    \- Target netcoreapp2\.0                        
+                      netcoreapp1\.0    \- Target netcoreapp1\.0                        
+                      netcoreapp1\.1    \- Target netcoreapp1\.1                        
+                  Default\: net6\.0                                                    
 
-  --no-restore    If specified, skips the automatic restore of the project on create.
-                  bool - Optional                                                    
-                  Default: false                                                     
+  \-\-no\-restore    If specified\, skips the automatic restore of the project on create\.
+                  bool \- Optional                                                    
+                  Default\: false                                                     
 
 
-To see help for other template languages (C#, VB), use --language option:
-   dotnet new3 console -h --language C#";
+To see help for other template languages \(C#\, VB\)\, use \-\-language option\:
+   dotnet new3 console \-h \-\-language (C#|VB)";
 
             string home = TestUtils.CreateTemporaryFolder("Home");
             string workingDirectory = TestUtils.CreateTemporaryFolder();
@@ -394,7 +394,7 @@ To see help for other template languages (C#, VB), use --language option:
                     .Execute()
                     .Should().Pass()
                     .And.NotHaveStdErr()
-                    .And.HaveStdOut(ConsoleHelp)
+                    .And.HaveStdOutMatching(ConsoleHelp)
                     .And.NotHaveStdOutContaining(HelpOutput);
         }
 
