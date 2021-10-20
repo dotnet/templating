@@ -7,7 +7,7 @@ using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.TemplatePackage;
 using Microsoft.TemplateEngine.Cli.CommandParsing;
 using Microsoft.TemplateEngine.Cli.HelpAndUsage;
-using Microsoft.TemplateEngine.Cli.TableOutput;
+using Microsoft.TemplateEngine.Cli.TabularOutput;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateSearch.Common;
 using Microsoft.TemplateSearch.Common.Abstractions;
@@ -139,15 +139,11 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
 
             IReadOnlyCollection<SearchResultTableRow> data = GetSearchResultsForDisplay(results, commandInput.Language, defaultLanguage, environmentSettings.Environment);
 
-            HelpFormatter<SearchResultTableRow> formatter =
-                HelpFormatter
+            TabularOutput<SearchResultTableRow> formatter =
+                TabularOutput.TabularOutput
                     .For(
-                        environmentSettings,
-                        commandInput,
-                        data,
-                        columnPadding: 2,
-                        headerSeparator: '-',
-                        blankLineBetweenRows: false)
+                        new CliTabularOutputSettings(environmentSettings.Environment),
+                        data)
                     .DefineColumn(r => r.TemplateGroupInfo.Name, out object nameColumn, LocalizableStrings.ColumnNameTemplateName, showAlways: true, shrinkIfNeeded: true, minWidth: 15)
                     .DefineColumn(r => r.TemplateGroupInfo.ShortNames, LocalizableStrings.ColumnNameShortName, showAlways: true)
                     .DefineColumn(r => r.TemplateGroupInfo.Author, LocalizableStrings.ColumnNameAuthor, BaseCommandInput.AuthorColumnFilter, defaultColumn: true, shrinkIfNeeded: true, minWidth: 10)
