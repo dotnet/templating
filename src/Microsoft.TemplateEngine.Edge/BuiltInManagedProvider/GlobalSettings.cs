@@ -93,11 +93,10 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
                     foreach (var package in jObject.Get<JArray>(nameof(GlobalSettingsData.Packages)) ?? new JArray())
                     {
                         packages.Add(new TemplatePackageData(
-                            package.ToGuid(nameof(TemplatePackageData.InstallerId)),
-                            package.Value<string>(nameof(TemplatePackageData.MountPointUri)),
-                            (DateTime)package[nameof(TemplatePackageData.LastChangeTime)],
-                            package.ToStringDictionary(propertyName: nameof(TemplatePackageData.Details))
-                        ));
+                               package.ToGuid(nameof(TemplatePackageData.InstallerId)),
+                               package.Value<string>(nameof(TemplatePackageData.MountPointUri)) ?? "",
+                               ((DateTime?)package[nameof(TemplatePackageData.LastChangeTime)]) ?? default,
+                               package.ToStringDictionary(propertyName: nameof(TemplatePackageData.Details))));
                     }
 
                     return packages;
