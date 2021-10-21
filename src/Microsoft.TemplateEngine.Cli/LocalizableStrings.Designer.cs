@@ -1042,15 +1042,6 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Filters templates based on language and specifies the language of the template to create..
-        /// </summary>
-        internal static string LanguageParameter {
-            get {
-                return ResourceManager.GetString("LanguageParameter", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Lists templates containing the specified template name. If no name is specified, lists all templates..
         /// </summary>
         internal static string ListsTemplates {
@@ -1159,6 +1150,15 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Filters the templates based on baseline defined in the template..
+        /// </summary>
+        internal static string OptionDescriptionBaseline {
+            get {
+                return ResourceManager.GetString("OptionDescriptionBaseline", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Only check for updates and display the template packages to be updated without applying update..
         /// </summary>
         internal static string OptionDescriptionCheckOnly {
@@ -1192,6 +1192,15 @@ namespace Microsoft.TemplateEngine.Cli {
         internal static string OptionDescriptionInteractive {
             get {
                 return ResourceManager.GetString("OptionDescriptionInteractive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Filters templates based on language and specifies the language of the template to create..
+        /// </summary>
+        internal static string OptionDescriptionLanguageFilter {
+            get {
+                return ResourceManager.GetString("OptionDescriptionLanguageFilter", resourceCulture);
             }
         }
         
@@ -1237,6 +1246,15 @@ namespace Microsoft.TemplateEngine.Cli {
         internal static string OptionDescriptionTagFilter {
             get {
                 return ResourceManager.GetString("OptionDescriptionTagFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Filters templates based on available types. Predefined values are &quot;project&quot; and &quot;item&quot;..
+        /// </summary>
+        internal static string OptionDescriptionTypeFilter {
+            get {
+                return ResourceManager.GetString("OptionDescriptionTypeFilter", resourceCulture);
             }
         }
         
@@ -1462,15 +1480,6 @@ namespace Microsoft.TemplateEngine.Cli {
         internal static string ShowsAllTemplates {
             get {
                 return ResourceManager.GetString("ShowsAllTemplates", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Filters templates based on available types. Predefined values are &quot;project&quot; and &quot;item&quot;..
-        /// </summary>
-        internal static string ShowsFilteredTemplates {
-            get {
-                return ResourceManager.GetString("ShowsFilteredTemplates", resourceCulture);
             }
         }
         

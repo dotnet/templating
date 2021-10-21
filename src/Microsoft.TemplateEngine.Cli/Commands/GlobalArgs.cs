@@ -17,7 +17,6 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             DebugReinit = parseResult.GetValueForOption(command.DebugReinitOption);
             DebugRebuildCache = parseResult.GetValueForOption(command.DebugRebuildCacheOption);
             DebugShowConfig = parseResult.GetValueForOption(command.DebugShowConfigOption);
-            //TODO: check if it gets the command name correctly.
             CommandName = GetNewCommandName(parseResult);
             ParseResult = parseResult;
         }
@@ -37,6 +36,25 @@ namespace Microsoft.TemplateEngine.Cli.Commands
         internal bool DebugShowConfig { get; private set; }
 
         internal string? DebugCustomSettingsLocation { get; private set; }
+
+        protected static IReadOnlyDictionary<FilterOptionDefinition, string> ParseFilters(IFilterableCommand filterableCommand, ParseResult parseResult)
+        {
+            Dictionary<FilterOptionDefinition, string> filterValues = new Dictionary<FilterOptionDefinition, string>();
+            foreach (var filter in filterableCommand.Filters)
+            {
+                string? value = parseResult.GetValueForOption(filter.Value)?.ToString();
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    filterValues[filter.Key] = value;
+                }
+            }
+            return filterValues;
+        }
+
+        protected static (bool, IReadOnlyList<string>?) ParseTabularOutputSettings(ITabularOutputCommand command, ParseResult parseResult)
+        {
+            return (parseResult.GetValueForOption(command.ColumnsAllOption), parseResult.GetValueForOption(command.ColumnsOption));
+        }
 
         private string GetNewCommandName(ParseResult parseResult)
         {

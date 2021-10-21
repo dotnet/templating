@@ -3,25 +3,158 @@
 
 #nullable enable
 
+using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Cli.Extensions;
+using Microsoft.TemplateEngine.Cli.TemplateSearch;
+using Microsoft.TemplateEngine.Edge.Settings;
 
 namespace Microsoft.TemplateEngine.Cli.Commands
 {
-    internal class SearchCommand : BaseCommand<SearchCommandArgs>
+    internal class SearchCommand : BaseSearchCommand
     {
-        internal SearchCommand(ITemplateEngineHost host, ITelemetryLogger logger, NewCommandCallbacks callbacks) : base(host, logger, callbacks, "search", LocalizableStrings.SearchTemplatesCommand) { }
-
-        protected override Task<NewCommandStatus> ExecuteAsync(SearchCommandArgs args, IEngineEnvironmentSettings environmentSettings, InvocationContext context) => throw new NotImplementedException();
-
-        protected override SearchCommandArgs ParseContext(ParseResult parseResult) => throw new NotImplementedException();
+        public SearchCommand(
+                NewCommand parentCommand,
+                ITemplateEngineHost host,
+                ITelemetryLogger logger,
+                NewCommandCallbacks callbacks)
+            : base(parentCommand, host, logger, callbacks, "search")
+        {
+            foreach (KeyValuePair<FilterOptionDefinition, Option> legacyOption in parentCommand.LegacyFilters)
+            {
+                if (SupportedFilters.Contains(legacyOption.Key))
+                {
+                    AddValidator(symbolResult => ValidateOptionUsageInParent(symbolResult, legacyOption.Value));
+                }
+            }
+            AddValidator(symbolResult => ValidateOptionUsageInParent(symbolResult, parentCommand.ColumnsAllOption));
+            AddValidator(symbolResult => ValidateOptionUsageInParent(symbolResult, parentCommand.ColumnsOption));
+            AddValidator(symbolResult => ValidateArgumentUsageInParent(symbolResult, parentCommand.ShortNameArgument));
+        }
     }
 
-    internal class SearchCommandArgs : GlobalArgs
+    internal class LegacySearchCommand : BaseSearchCommand
     {
-        public SearchCommandArgs(SearchCommand command, ParseResult parseResult) : base(command, parseResult)
+        public LegacySearchCommand(NewCommand newCommand, ITemplateEngineHost host, ITelemetryLogger logger, NewCommandCallbacks callbacks)
+            : base(newCommand, host, logger, callbacks, "--search")
         {
+            this.IsHidden = true;
+            AddValidator(ValidateParentCommandArgumentIsNotUsed);
         }
+
+        public override Option<bool> ColumnsAllOption => ParentCommand.ColumnsAllOption;
+
+        public override Option<IReadOnlyList<string>> ColumnsOption => ParentCommand.ColumnsOption;
+
+        protected override Option GetFilterOption(FilterOptionDefinition def)
+        {
+            return ParentCommand.GetLegacyFilterOption(def);
+        }
+
+        private string? ValidateParentCommandArgumentIsNotUsed(SymbolResult symbolResult)
+        {
+            CommandResult commandResult = symbolResult as CommandResult ?? throw new Exception("Validator should be used with command");
+            var nameArgumentResult = commandResult.Children.FirstOrDefault(symbol => symbol.Symbol == this.NameArgument);
+            if (nameArgumentResult == null)
+            {
+                return null;
+            }
+            var newCommandArgument = commandResult.Parent?.Children.FirstOrDefault(symbol => symbol.Symbol == ParentCommand.ShortNameArgument) as ArgumentResult;
+            if (newCommandArgument != null)
+            {
+                return $"Invalid command syntax: argument '{newCommandArgument.Tokens[0].Value}' should be used after '{symbolResult.Symbol.Name}'.";
+            }
+            return null;
+        }
+    }
+
+    internal class BaseSearchCommand : BaseCommand<SearchCommandArgs>, IFilterableCommand, ITabularOutputCommand
+    {
+        internal static readonly IReadOnlyList<FilterOptionDefinition> SupportedFilters = new List<FilterOptionDefinition>()
+        {
+            FilterOptionDefinition.AuthorFilter,
+            FilterOptionDefinition.BaselineFilter,
+            FilterOptionDefinition.LanguageFilter,
+            FilterOptionDefinition.TypeFilter,
+            FilterOptionDefinition.TagFilter,
+            FilterOptionDefinition.PackageFilter
+        };
+
+        internal BaseSearchCommand(NewCommand parentCommand, ITemplateEngineHost host, ITelemetryLogger logger, NewCommandCallbacks callbacks, string commandName) : base(host, logger, callbacks, commandName, LocalizableStrings.SearchTemplatesCommand)
+        {
+            ParentCommand = parentCommand;
+            Filters = SetupFilterOptions(SupportedFilters);
+
+            this.AddArgument(NameArgument);
+            SetupTabularOutputOptions(this);
+        }
+
+        public virtual Option<bool> ColumnsAllOption { get; } = SharedOptionsFactory.GetColumnsAllOption();
+
+        public virtual Option<IReadOnlyList<string>> ColumnsOption { get; } = SharedOptionsFactory.GetColumnsOption();
+
+        public IReadOnlyDictionary<FilterOptionDefinition, Option> Filters { get; protected set; }
+
+        internal Argument<string> NameArgument { get; } = new("name")
+        {
+            Description = "Name of template to search for",
+            Arity = new ArgumentArity(0, 1)
+        };
+
+        internal NewCommand ParentCommand { get; }
+
+        protected override async Task<NewCommandStatus> ExecuteAsync(SearchCommandArgs args, IEngineEnvironmentSettings environmentSettings, InvocationContext context)
+        {
+            using TemplatePackageManager templatePackageManager = new TemplatePackageManager(environmentSettings);
+            //TODO: we need to await, otherwise templatePackageManager will be disposed.
+            return await CliTemplateSearchCoordinator.SearchForTemplateMatchesAsync(
+                environmentSettings,
+                templatePackageManager,
+                args,
+                environmentSettings.GetDefaultLanguage(),
+                context.GetCancellationToken()).ConfigureAwait(false);
+        }
+
+        protected override SearchCommandArgs ParseContext(ParseResult parseResult)
+        {
+            return new SearchCommandArgs(this, parseResult);
+        }
+    }
+
+    internal class SearchCommandArgs : GlobalArgs, IFilterableArgs, ITabularOutputArgs
+    {
+        internal SearchCommandArgs(BaseSearchCommand command, ParseResult parseResult) : base(command, parseResult)
+        {
+            string? nameCriteria = parseResult.GetValueForArgument(command.NameArgument);
+            if (!string.IsNullOrWhiteSpace(nameCriteria))
+            {
+                SearchNameCriteria = nameCriteria;
+            }
+            // for legacy case new command argument is also accepted
+            else if (command is LegacySearchCommand legacySearchCommand)
+            {
+                string? newCommandArgument = parseResult.GetValueForArgument(legacySearchCommand.ParentCommand.ShortNameArgument);
+                if (!string.IsNullOrWhiteSpace(newCommandArgument))
+                {
+                    SearchNameCriteria = newCommandArgument;
+                }
+            }
+
+            Filters = ParseFilters(command, parseResult);
+            (DisplayAllColumns, ColumnsToDisplay) = ParseTabularOutputSettings(command, parseResult);
+        }
+
+        public IReadOnlyDictionary<FilterOptionDefinition, string> Filters { get; }
+
+        public bool DisplayAllColumns { get; }
+
+        public IReadOnlyList<string>? ColumnsToDisplay { get; }
+
+        internal string? SearchNameCriteria { get; }
+
+        //TODO:
+        internal string? Language { get; }
     }
 }

@@ -20,10 +20,13 @@ namespace Dotnet_new3.IntegrationTests
             _log = log;
         }
 
-        [Fact]
-        public void BasicTest()
+        [Theory]
+        [InlineData("console --search")]
+        [InlineData("--search console")]
+        [InlineData("search console")]
+        public void BasicTest(string testCase)
         {
-            var commandResult = new DotnetNewCommand(_log, "console", "--search")
+            var commandResult = new DotnetNewCommand(_log, testCase.Split(" "))
                 .WithCustomHive(_sharedHome.HomeDirectory)
                 .Execute();
 
@@ -45,10 +48,12 @@ namespace Dotnet_new3.IntegrationTests
             Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Downloads"), "'Downloads' column contains empty values");
         }
 
-        [Fact]
-        public void CannotExecuteEmptyCriteria()
+        [Theory]
+        [InlineData("--search")]
+        [InlineData("search")]
+        public void CannotExecuteEmptyCriteria(string testCase)
         {
-            new DotnetNewCommand(_log, "--search")
+            new DotnetNewCommand(_log, testCase)
                 .WithCustomHive(_sharedHome.HomeDirectory)
                 .Execute()
                 .Should().Fail()
@@ -62,10 +67,12 @@ Examples:
    dotnet new3 <TEMPLATE_NAME> --search --author Microsoft");
         }
 
-        [Fact]
-        public void CannotExecuteSearchWithShortCriteria()
+        [Theory]
+        [InlineData("--search c")]
+        [InlineData("search c")]
+        public void CannotExecuteSearchWithShortCriteria(string testCase)
         {
-            new DotnetNewCommand(_log, "c", "--search")
+            new DotnetNewCommand(_log, testCase.Split(" "))
                 .WithCustomHive(_sharedHome.HomeDirectory)
                 .Execute()
                 .Should().Fail()
@@ -73,10 +80,13 @@ Examples:
                 .And.HaveStdErrContaining("Search failed: template name is too short, minimum 2 characters are required.");
         }
 
-        [Fact]
-        public void ExamplePrefersMicrosoftPackage()
+        [Theory]
+        [InlineData("azure --search")]
+        [InlineData("--search azure")]
+        [InlineData("search azure")]
+        public void ExamplePrefersMicrosoftPackage(string testCase)
         {
-            var commandResult = new DotnetNewCommand(_log, "azure", "--search")
+            var commandResult = new DotnetNewCommand(_log, testCase.Split(" "))
                 .WithCustomHive(_sharedHome.HomeDirectory)
                 .Execute();
 
@@ -99,10 +109,13 @@ Examples:
             commandResult.Should().HaveStdOutContaining(containsOneOfInstallationCommands, "Checks if the output contains one of the expected installation commands");
         }
 
-        [Fact]
-        public void CanShowAllColumns()
+        [Theory]
+        [InlineData("console --search --columns-all")]
+        [InlineData("--columns-all --search console")]
+        [InlineData("search console --columns-all")]
+        public void CanShowAllColumns(string testCase)
         {
-            var commandResult = new DotnetNewCommand(_log, "console", "--search", "--columns-all")
+            var commandResult = new DotnetNewCommand(_log, testCase.Split(" "))
                 .WithCustomHive(_sharedHome.HomeDirectory)
                 .Execute();
 
@@ -123,10 +136,13 @@ Examples:
             Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Downloads"), "'Downloads' column contains empty values");
         }
 
-        [Fact]
-        public void CanFilterTags()
+        [Theory]
+        [InlineData("console --search --columns tags --tag Common")]
+        [InlineData("--search console --columns tags --tag Common")]
+        [InlineData("search console --columns tags --tag Common")]
+        public void CanFilterTags(string testCase)
         {
-            var commandResult = new DotnetNewCommand(_log, "console", "--search", "--columns", "tags", "--tag", "Common")
+            var commandResult = new DotnetNewCommand(_log, testCase.Split(" "))
                 .WithCustomHive(_sharedHome.HomeDirectory)
                 .Execute();
 
@@ -150,10 +166,13 @@ Examples:
             Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Downloads"), "'Downloads' column contains empty values");
         }
 
-        [Fact]
-        public void CanFilterTags_WithoutName()
+        [Theory]
+        [InlineData("--search --columns tags --tag Common")]
+        [InlineData("--columns tags --search --tag Common")]
+        [InlineData("search --columns tags --tag Common")]
+        public void CanFilterTags_WithoutName(string testCase)
         {
-            var commandResult = new DotnetNewCommand(_log, "--search", "--columns", "tags", "--tag", "Common")
+            var commandResult = new DotnetNewCommand(_log, testCase.Split(" "))
                 .WithCustomHive(_sharedHome.HomeDirectory)
                 .Execute();
 
@@ -175,10 +194,13 @@ Examples:
             Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Downloads"), "'Downloads' column contains empty values");
         }
 
-        [Fact]
-        public void CanFilterAuthor()
+        [Theory]
+        [InlineData("func --search --columns author --author micro")]
+        [InlineData("--search func --columns author --author micro")]
+        [InlineData("search func --columns author --author micro")]
+        public void CanFilterAuthor(string testCase)
         {
-            var commandResult = new DotnetNewCommand(_log, "func", "--search", "--columns", "author", "--author", "micro")
+            var commandResult = new DotnetNewCommand(_log, testCase.Split(" "))
                 .WithCustomHive(_sharedHome.HomeDirectory)
                 .WithDebug()
                 .Execute();
@@ -203,10 +225,12 @@ Examples:
             Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Downloads"), "'Downloads' column contains empty values");
         }
 
-        [Fact]
-        public void CanFilterAuthor_WithoutName()
+        [Theory]
+        [InlineData("--search --columns author --author micro")]
+        [InlineData("search --columns author --author micro")]
+        public void CanFilterAuthor_WithoutName(string testCase)
         {
-            var commandResult = new DotnetNewCommand(_log, "--search", "--columns", "author", "--author", "micro")
+            var commandResult = new DotnetNewCommand(_log, testCase.Split(" "))
                 .WithCustomHive(_sharedHome.HomeDirectory)
                 .WithDebug()
                 .Execute();
@@ -230,10 +254,13 @@ Examples:
             Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Downloads"), "'Downloads' column contains empty values");
         }
 
-        [Fact]
-        public void CanFilterLanguage()
+        [Theory]
+        [InlineData("console --search --columns language --language Q#")]
+        [InlineData("--search console --columns language --language Q#")]
+        [InlineData("search console --columns language --language Q#")]
+        public void CanFilterLanguage(string testCase)
         {
-            var commandResult = new DotnetNewCommand(_log, "console", "--search", "--columns", "language", "--language", "Q#")
+            var commandResult = new DotnetNewCommand(_log, testCase.Split(" "))
                 .WithCustomHive(_sharedHome.HomeDirectory)
                 .Execute();
 
@@ -258,10 +285,12 @@ Examples:
             Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Downloads"), "'Downloads' column contains empty values");
         }
 
-        [Fact]
-        public void CanFilterLanguage_WithoutName()
+        [Theory]
+        [InlineData("--search --columns language --language Q#")]
+        [InlineData("search --columns language --language Q#")]
+        public void CanFilterLanguage_WithoutName(string testCase)
         {
-            var commandResult = new DotnetNewCommand(_log, "--search", "--columns", "language", "--language", "F#")
+            var commandResult = new DotnetNewCommand(_log, testCase.Split(" "))
                 .WithCustomHive(_sharedHome.HomeDirectory)
                 .Execute();
 
@@ -275,7 +304,7 @@ Examples:
                 .And.HaveStdOutContaining("   dotnet new3 --install <PACKAGE_ID>");
 
             var tableOutput = ParseTableOutput(commandResult.StdOut, expectedColumns: new[] { "Template Name", "Short Name", "Language", "Package", "Downloads" });
-            Assert.True(AllRowsContain(tableOutput, new[] { "Language" }, "F#"), "'Language' column does not contain criteria");
+            Assert.True(AllRowsContain(tableOutput, new[] { "Language" }, "Q#"), "'Language' column does not contain criteria");
 
             Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Template Name"), "'Template Name' column contains empty values");
             Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Short Name"), "'Short Name' column contains empty values");
@@ -284,10 +313,13 @@ Examples:
             Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Downloads"), "'Downloads' column contains empty values");
         }
 
-        [Fact]
-        public void CanFilterType()
+        [Theory]
+        [InlineData("console --search --columns type --type item")]
+        [InlineData("--search console --columns type --type item")]
+        [InlineData("search console --columns type --type item")]
+        public void CanFilterType(string testCase)
         {
-            var commandResult = new DotnetNewCommand(_log, "console", "--search", "--columns", "type", "--type", "item")
+            var commandResult = new DotnetNewCommand(_log, testCase.Split(" "))
                 .WithCustomHive(_sharedHome.HomeDirectory).WithDebug()
                 .Execute();
 
@@ -312,10 +344,12 @@ Examples:
             Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Downloads"), "'Downloads' column contains empty values");
         }
 
-        [Fact]
-        public void CanFilterType_WithoutName()
+        [Theory]
+        [InlineData("--search --columns type --type item")]
+        [InlineData("search --columns type --type item")]
+        public void CanFilterType_WithoutName(string testCase)
         {
-            var commandResult = new DotnetNewCommand(_log, "--search", "--columns", "type", "--type", "item")
+            var commandResult = new DotnetNewCommand(_log, testCase.Split(" "))
                 .WithCustomHive(_sharedHome.HomeDirectory).WithDebug()
                 .Execute();
 
@@ -338,10 +372,13 @@ Examples:
             Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Downloads"), "'Downloads' column contains empty values");
         }
 
-        [Fact]
-        public void CanFilterPackage()
+        [Theory]
+        [InlineData("console --search --package core")]
+        [InlineData("--search console --package core")]
+        [InlineData("search console --package core")]
+        public void CanFilterPackage(string testCase)
         {
-            var commandResult = new DotnetNewCommand(_log, "console", "--search", "--package", "core")
+            var commandResult = new DotnetNewCommand(_log, testCase.Split(" "))
                 .WithCustomHive(_sharedHome.HomeDirectory)
                 .Execute();
 
@@ -365,10 +402,12 @@ Examples:
             Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Downloads"), "'Downloads' column contains empty values");
         }
 
-        [Fact]
-        public void CanFilterPackage_WithoutName()
+        [Theory]
+        [InlineData("--search --package core")]
+        [InlineData("search --package core")]
+        public void CanFilterPackage_WithoutName(string testCase)
         {
-            var commandResult = new DotnetNewCommand(_log, "--search", "--package", "core")
+            var commandResult = new DotnetNewCommand(_log, testCase.Split(" "))
                 .WithCustomHive(_sharedHome.HomeDirectory)
                 .Execute();
 
@@ -389,10 +428,13 @@ Examples:
             Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Downloads"), "'Downloads' column contains empty values");
         }
 
-        [Fact]
-        public void CanSortByName()
+        [Theory]
+        [InlineData("console --search")]
+        [InlineData("--search console")]
+        [InlineData("search console")]
+        public void CanSortByName(string testCase)
         {
-            var commandResult = new DotnetNewCommand(_log, "console", "--search")
+            var commandResult = new DotnetNewCommand(_log, testCase.Split(" "))
                 .WithCustomHive(_sharedHome.HomeDirectory)
                 .WithEnvironmentVariable("DOTNET_CLI_UI_LANGUAGE", "en-US")
                 .Execute();
@@ -421,7 +463,9 @@ Examples:
             }
         }
 
-        [Fact]
+#pragma warning disable xUnit1004 // Test methods should not be skipped
+        [Fact (Skip = "Template options filtering is not implemented.")]
+#pragma warning restore xUnit1004 // Test methods should not be skipped
         public void CanFilterByChoiceParameter()
         {
             var commandResult = new DotnetNewCommand(_log, "con", "--search", "--framework")
@@ -487,7 +531,9 @@ Examples:
             Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Downloads"), "'Downloads' column contains empty values");
         }
 
-        [Fact]
+#pragma warning disable xUnit1004 // Test methods should not be skipped
+        [Fact(Skip = "Template options filtering is not implemented.")]
+#pragma warning restore xUnit1004 // Test methods should not be skipped
         public void CanFilterByNonChoiceParameter()
         {
             var commandResult = new DotnetNewCommand(_log, "con", "--search", "--langVersion")
@@ -534,7 +580,9 @@ Examples:
             Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Downloads"), "'Downloads' column contains empty values");
         }
 
-        [Fact]
+#pragma warning disable xUnit1004 // Test methods should not be skipped
+        [Fact(Skip = "Template options filtering is not implemented.")]
+#pragma warning restore xUnit1004 // Test methods should not be skipped
         public void IgnoresValueForNonChoiceParameter()
         {
             var commandResult = new DotnetNewCommand(_log, "con", "--search", "--langVersion", "smth")
@@ -581,7 +629,9 @@ Examples:
             Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Downloads"), "'Downloads' column contains empty values");
         }
 
-        [Fact]
+#pragma warning disable xUnit1004 // Test methods should not be skipped
+        [Fact(Skip = "Template options filtering is not implemented.")]
+#pragma warning restore xUnit1004 // Test methods should not be skipped
         public void CanFilterByChoiceParameterWithValue()
         {
             var commandResult = new DotnetNewCommand(_log, "con", "--search", "-f", "netcoreapp3.1")
@@ -628,7 +678,9 @@ Examples:
             Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Downloads"), "'Downloads' column contains empty values");
         }
 
-        [Fact]
+#pragma warning disable xUnit1004 // Test methods should not be skipped
+        [Fact(Skip = "Template options filtering is not implemented.")]
+#pragma warning restore xUnit1004 // Test methods should not be skipped
         public void CannotSearchTemplatesWithUnknownParameter()
         {
             new DotnetNewCommand(_log, "--search", "--unknown")
@@ -670,34 +722,38 @@ Examples:
         [Theory]
         [InlineData("--search foo --columns-all bar", "bar", "foo")]
         [InlineData("--search foo bar", "bar", "foo")]
-        [InlineData("foo --search bar", "bar", "foo", true)]
-        [InlineData("foo --search bar --language F#", "bar", "foo", true)]
-        [InlineData("foo --search --columns-all bar", "bar", "foo")]
-        [InlineData("foo --search --columns-all --framework net6.0 bar", "bar", "foo|--framework|net6.0")]
-        [InlineData("foo --search --columns-all -other-param --framework net6.0 bar", "bar", "foo|--framework|net6.0|-other-param")]
-        public void CannotSearchOnParseError(string command, string invalidArguments, string validArguments, bool invalidSyntax = false)
+        [InlineData("foo --search --columns-all --framework net6.0 bar", "bar|net6.0", "foo|--framework")]
+        [InlineData("foo --search --columns-all -other-param --framework net6.0 bar", "bar|net6.0|--framework", "foo|-other-param")]
+        [InlineData("search foo --columns-all bar", "bar", "foo")]
+        public void CannotSearchOnParseError(string command, string invalidArguments, string validArguments)
         {
             var commandResult = new DotnetNewCommand(_log, command.Split())
              .WithCustomHive(_sharedHome.HomeDirectory)
              .Execute();
 
-            if (invalidSyntax)
+            foreach (string argumentName in invalidArguments.Split('|'))
             {
-                commandResult.Should().Fail().And.HaveStdErrContaining("Invalid command syntax: use 'dotnet new3 --search [PARTIAL_NAME] [FILTER_OPTIONS]' instead.");
-                return;
+                commandResult.Should().Fail()
+                     .And.HaveStdErrContaining($"Unrecognized command or argument '{argumentName}'");
             }
 
-            commandResult.Should().Fail()
-                .And.HaveStdErrContaining("Error: Invalid option(s):");
-            foreach (string arg in invalidArguments.Split('|'))
+            foreach (string argumentName in validArguments.Split('|'))
             {
-                commandResult.Should().HaveStdErrContaining(arg);
+                commandResult.Should().NotHaveStdErrContaining($"Unrecognized command or argument '{argumentName}'");
             }
+        }
 
-            foreach (string arg in validArguments.Split('|'))
-            {
-                commandResult.Should().NotHaveStdErrContaining(arg);
-            }
+        [Theory]
+        [InlineData("foo --search bar", "foo")]
+        [InlineData("foo --search bar --language F#", "foo")]
+        [InlineData("foo --search --columns-all bar", "foo")]
+        public void CannotSearchOnParseError_MisplacedArgument(string command, string misplacedArgument)
+        {
+            var commandResult = new DotnetNewCommand(_log, command.Split())
+             .WithCustomHive(_sharedHome.HomeDirectory)
+             .Execute();
+
+            commandResult.Should().Fail().And.HaveStdErrContaining($"Invalid command syntax: argument '{misplacedArgument}' should be used after '--search'.");
         }
 
         private static bool AllRowsContain(List<List<string>> tableOutput, string[] columnsNames, string value)

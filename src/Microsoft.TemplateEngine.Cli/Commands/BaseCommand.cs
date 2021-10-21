@@ -151,6 +151,17 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             return null;
         }
 
+        protected static string? ValidateArgumentUsageInParent(SymbolResult symbolResult, Argument argument)
+        {
+            CommandResult commandResult = symbolResult as CommandResult ?? throw new Exception("Validator should be used with command");
+            var newCommandArgument = commandResult.Parent?.Children.FirstOrDefault(symbol => symbol.Symbol == argument) as ArgumentResult;
+            if (newCommandArgument != null)
+            {
+                return $"Invalid command syntax: argument '{newCommandArgument.Tokens[0].Value}' should be used after '{symbolResult.Symbol.Name}'.";
+            }
+            return null;
+        }
+
         protected virtual IEnumerable<string> GetSuggestions(TArgs args, IEngineEnvironmentSettings environmentSettings, string? textToMatch)
         {
             return base.GetSuggestions(args.ParseResult, textToMatch);
@@ -171,6 +182,29 @@ namespace Microsoft.TemplateEngine.Cli.Commands
         protected abstract Task<NewCommandStatus> ExecuteAsync(TArgs args, IEngineEnvironmentSettings environmentSettings, InvocationContext context);
 
         protected abstract TArgs ParseContext(ParseResult parseResult);
+
+        protected virtual Option GetFilterOption(FilterOptionDefinition def)
+        {
+            return def.OptionFactory();
+        }
+
+        protected IReadOnlyDictionary<FilterOptionDefinition, Option> SetupFilterOptions(IReadOnlyList<FilterOptionDefinition> filtersToSetup)
+        {
+            Dictionary<FilterOptionDefinition, Option> options = new Dictionary<FilterOptionDefinition, Option>();
+            foreach (var filterDef in filtersToSetup)
+            {
+                var newOption = GetFilterOption(filterDef);
+                this.AddOption(newOption);
+                options[filterDef] = newOption;
+            }
+            return options;
+        }
+
+        protected void SetupTabularOutputOptions(ITabularOutputCommand command)
+        {
+            this.AddOption(command.ColumnsAllOption);
+            this.AddOption(command.ColumnsOption);
+        }
 
         private static async Task<AsyncMutex?> EnsureEntryMutex(TArgs args, IEngineEnvironmentSettings environmentSettings, CancellationToken token)
         {
