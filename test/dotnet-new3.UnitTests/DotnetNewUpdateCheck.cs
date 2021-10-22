@@ -23,6 +23,7 @@ namespace Dotnet_new3.IntegrationTests
         [Theory]
         [InlineData("--update-check")]
         [InlineData("update --check-only")]
+        [InlineData("update --dry-run")]
         public void CanCheckForUpdate(string testCase)
         {
             var home = TestUtils.CreateTemporaryFolder("Home");
@@ -57,6 +58,7 @@ namespace Dotnet_new3.IntegrationTests
         [Theory]
         [InlineData("--update-check")]
         [InlineData("update --check-only")]
+        [InlineData("update --dry-run")]
         public void DoesNotShowUpdatesWhenAllTemplatesAreUpToDate(string testCase)
         {
             var home = TestUtils.CreateTemporaryFolder("Home");

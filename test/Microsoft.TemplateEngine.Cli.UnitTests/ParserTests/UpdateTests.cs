@@ -73,13 +73,15 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
             Assert.False(args.Interactive);
         }
 
-        [Fact]
-        public void Update_CanParseCheckOnlyOption()
+        [Theory]
+        [InlineData("--check-only")]
+        [InlineData("--dry-run")]
+        public void Update_CanParseCheckOnlyOption(string optionAlias)
         {
             ITemplateEngineHost host = TestHost.GetVirtualHost(additionalComponents: BuiltInTemplatePackagesProviderFactory.GetComponents(includeTestTemplates: false));
             NewCommand myCommand = (NewCommand)NewCommandFactory.Create("new", host, new TelemetryLogger(null, false), new NewCommandCallbacks());
 
-            var parseResult = myCommand.Parse($"new update --check-only");
+            var parseResult = myCommand.Parse($"new update {optionAlias}");
             UpdateCommandArgs args = new UpdateCommandArgs((UpdateCommand)parseResult.CommandResult.Command, parseResult);
 
             Assert.True(args.CheckOnly);

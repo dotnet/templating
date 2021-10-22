@@ -621,8 +621,8 @@ Tüm diğer adları göstermek için 'dotnet {1} --show-aliases' komutunu bağı
         <note />
       </trans-unit>
       <trans-unit id="OptionDescriptionCheckOnly">
-        <source>Only check for updates and display the template packages to be updated if update subcommand is run.</source>
-        <target state="new">Only check for updates and display the template packages to be updated if update subcommand is run.</target>
+        <source>Only check for updates and display the template packages to be updated without applying update.</source>
+        <target state="new">Only check for updates and display the template packages to be updated without applying update.</target>
         <note />
       </trans-unit>
       <trans-unit id="OptionDescriptionColumns">

@@ -1159,7 +1159,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Only check for updates and display the template packages to be updated if update subcommand is run..
+        ///   Looks up a localized string similar to Only check for updates and display the template packages to be updated without applying update..
         /// </summary>
         internal static string OptionDescriptionCheckOnly {
             get {

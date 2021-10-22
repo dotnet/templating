@@ -29,7 +29,7 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             this.AddOption(CheckOnlyOption);
         }
 
-        internal Option<bool> CheckOnlyOption { get; } = new("--check-only")
+        internal Option<bool> CheckOnlyOption { get; } = new(new[] { "--check-only", "--dry-run" })
         {
             Description = LocalizableStrings.OptionDescriptionCheckOnly
         };
@@ -93,14 +93,11 @@ namespace Microsoft.TemplateEngine.Cli.Commands
                 templatePackageManager,
                 templateInformationCoordinator);
 
+            //TODO: we need to await, otherwise templatePackageManager will be disposed.
             return await templatePackageCoordinator.EnterUpdateFlowAsync(args, context.GetCancellationToken()).ConfigureAwait(false);
         }
 
-        protected override UpdateCommandArgs ParseContext(ParseResult parseResult)
-        {
-            return new UpdateCommandArgs(this, parseResult);
-        }
-
+        protected override UpdateCommandArgs ParseContext(ParseResult parseResult) => new(this, parseResult);
     }
 
     internal class UpdateCommandArgs : GlobalArgs
@@ -111,13 +108,17 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             {
                 CheckOnly = parseResult.GetValueForOption(updateCommand.CheckOnlyOption);
             }
-            else if (command is LegacyUpdateCheckCommand checkCommand)
+            else if (command is LegacyUpdateCheckCommand)
             {
                 CheckOnly = true;
             }
-            else
+            else if (command is LegacyUpdateApplyCommand)
             {
                 CheckOnly = false;
+            }
+            else
+            {
+                throw new ArgumentException($"Unsupported type {command.GetType().FullName}", nameof(command));
             }
 
             Interactive = parseResult.GetValueForOption(command.InteractiveOption);
