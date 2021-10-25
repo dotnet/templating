@@ -80,20 +80,15 @@ namespace Microsoft.TemplateEngine.Cli.Commands
         internal Option<bool> HelpOption { get; } = new Option<bool>(new string[] { "-h", "--help", "-?" });
 
         #region Legacy Options
-        internal Option<bool> InteractiveOption { get; } = SharedOptionsFactory.GetInteractiveOption().AsHidden();
+        internal Option<bool> InteractiveOption { get; } = SharedOptionsFactory.CreateInteractiveOption().AsHidden();
 
-        internal Option<IReadOnlyList<string>> AddSourceOption { get; } = SharedOptionsFactory.GetAddSourceOption().AsHidden().DisableAllowMultipleArgumentsPerToken();
+        internal Option<IReadOnlyList<string>> AddSourceOption { get; } = SharedOptionsFactory.CreateAddSourceOption().AsHidden().DisableAllowMultipleArgumentsPerToken();
 
-        internal Option<bool> ColumnsAllOption { get; } = SharedOptionsFactory.GetColumnsAllOption().AsHidden();
+        internal Option<bool> ColumnsAllOption { get; } = SharedOptionsFactory.CreateColumnsAllOption().AsHidden();
 
-        internal Option<IReadOnlyList<string>> ColumnsOption { get; } = SharedOptionsFactory.GetColumnsOption().AsHidden().DisableAllowMultipleArgumentsPerToken();
+        internal Option<IReadOnlyList<string>> ColumnsOption { get; } = SharedOptionsFactory.CreateColumnsOption().AsHidden().DisableAllowMultipleArgumentsPerToken();
 
         internal IReadOnlyDictionary<FilterOptionDefinition, Option> LegacyFilters { get; }
-
-        internal Option GetLegacyFilterOption(FilterOptionDefinition def)
-        {
-            return LegacyFilters[def];
-        }
         #endregion
 
         protected override IEnumerable<string> GetSuggestions(NewCommandArgs args, IEngineEnvironmentSettings environmentSettings, string? textToMatch)

@@ -27,42 +27,42 @@ namespace Microsoft.TemplateEngine.Cli.Commands
         internal static FilterOptionDefinition AuthorFilter { get; } =
              new TemplateFilterOptionDefinition(
                  "author",
-                 optionFactory: () => SharedOptionsFactory.GetAuthorOption(),
+                 optionFactory: () => SharedOptionsFactory.CreateAuthorOption(),
                  matchFilter: authorArg => WellKnownSearchFilters.AuthorFilter(authorArg),
                  mismatchCriteria: resolutionResult => resolutionResult.HasAuthorMismatch);
 
         internal static FilterOptionDefinition BaselineFilter { get; } =
             new TemplateFilterOptionDefinition(
                 "baseline",
-                optionFactory: () => SharedOptionsFactory.GetBaselineOption(),
+                optionFactory: () => SharedOptionsFactory.CreateBaselineOption(),
                 matchFilter: baselineArg => WellKnownSearchFilters.BaselineFilter(baselineArg),
                 mismatchCriteria: resolutionResult => resolutionResult.HasBaselineMismatch);
 
         internal static FilterOptionDefinition LanguageFilter { get; } =
             new TemplateFilterOptionDefinition(
                 "language",
-                optionFactory: () => SharedOptionsFactory.GetLanguageOption(),
+                optionFactory: () => SharedOptionsFactory.CreateLanguageOption(),
                 matchFilter: languageArg => WellKnownSearchFilters.LanguageFilter(languageArg),
                 mismatchCriteria: resolutionResult => resolutionResult.HasLanguageMismatch);
 
         internal static FilterOptionDefinition TagFilter { get; } =
             new TemplateFilterOptionDefinition(
                 "tag",
-                optionFactory: () => SharedOptionsFactory.GetTagOption(),
+                optionFactory: () => SharedOptionsFactory.CreateTagOption(),
                 matchFilter: tagArg => WellKnownSearchFilters.ClassificationFilter(tagArg),
                 mismatchCriteria: resolutionResult => resolutionResult.HasClassificationMismatch);
 
         internal static FilterOptionDefinition TypeFilter { get; } =
             new TemplateFilterOptionDefinition(
                 "type",
-                optionFactory: () => SharedOptionsFactory.GetTypeOption(),
+                optionFactory: () => SharedOptionsFactory.CreateTypeOption(),
                 matchFilter: typeArg => WellKnownSearchFilters.TypeFilter(typeArg),
                 mismatchCriteria: resolutionResult => resolutionResult.HasTypeMismatch);
 
         internal static FilterOptionDefinition PackageFilter { get; } =
             new PackageFilterOptionDefinition(
                 "package",
-                optionFactory: () => SharedOptionsFactory.GetPackageOption(),
+                optionFactory: () => SharedOptionsFactory.CreatePackageOption(),
                 matchFilter: PackageMatchFilter);
 
         //TODO: check if it's needed
@@ -85,7 +85,7 @@ namespace Microsoft.TemplateEngine.Cli.Commands
                 {
                     return true;
                 }
-                return pack.Name.IndexOf(packageArg, StringComparison.OrdinalIgnoreCase) > -1;
+                return pack.Name.Contains(packageArg, StringComparison.OrdinalIgnoreCase);
             };
         }
     }

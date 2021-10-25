@@ -734,6 +734,24 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid command syntax: argument &apos;{0}&apos; should be used after &apos;{1}&apos;..
+        /// </summary>
+        internal static string Commands_Validator_WrongArgumentPosition {
+            get {
+                return ResourceManager.GetString("Commands_Validator_WrongArgumentPosition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid command syntax: option &apos;{0}&apos; should be used after &apos;{1}&apos;..
+        /// </summary>
+        internal static string Commands_Validator_WrongOptionPosition {
+            get {
+                return ResourceManager.GetString("Commands_Validator_WrongOptionPosition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Command succeeded..
         /// </summary>
         internal static string CommandSucceeded {

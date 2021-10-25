@@ -8,7 +8,7 @@ namespace Microsoft.TemplateEngine.Cli.Commands
 {
     internal static class SharedOptionsFactory
     {
-        internal static Option<bool> GetInteractiveOption()
+        internal static Option<bool> CreateInteractiveOption()
         {
             return new Option<bool>("--interactive")
             {
@@ -17,7 +17,7 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             };
         }
 
-        internal static Option<IReadOnlyList<string>> GetAddSourceOption()
+        internal static Option<IReadOnlyList<string>> CreateAddSourceOption()
         {
             return new(new[] { "--add-source", "--nuget-source" })
             {
@@ -27,7 +27,7 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             };
         }
 
-        internal static Option<string> GetAuthorOption()
+        internal static Option<string> CreateAuthorOption()
         {
             return new(new[] { "--author" })
             {
@@ -36,7 +36,7 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             };
         }
 
-        internal static Option<string> GetBaselineOption()
+        internal static Option<string> CreateBaselineOption()
         {
             return new(new[] { "--baseline" })
             {
@@ -46,7 +46,7 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             };
         }
 
-        internal static Option<string> GetLanguageOption()
+        internal static Option<string> CreateLanguageOption()
         {
             return new(new[] { "--language", "-lang" })
             {
@@ -55,7 +55,7 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             };
         }
 
-        internal static Option<string> GetTypeOption()
+        internal static Option<string> CreateTypeOption()
         {
             return new(new[] { "--type" })
             {
@@ -64,7 +64,7 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             };
         }
 
-        internal static Option<string> GetTagOption()
+        internal static Option<string> CreateTagOption()
         {
             return new(new[] { "--tag" })
             {
@@ -73,7 +73,7 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             };
         }
 
-        internal static Option<string> GetPackageOption()
+        internal static Option<string> CreatePackageOption()
         {
             return new(new[] { "--package" })
             {
@@ -82,7 +82,7 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             };
         }
 
-        internal static Option<bool> GetColumnsAllOption()
+        internal static Option<bool> CreateColumnsAllOption()
         {
             return new(new[] { "--columns-all" })
             {
@@ -91,7 +91,7 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             };
         }
 
-        internal static Option<IReadOnlyList<string>> GetColumnsOption()
+        internal static Option<IReadOnlyList<string>> CreateColumnsOption()
         {
             Option<IReadOnlyList<string>> option = new(new[] { "--columns" }, ParseCommaSeparatedValues)
             {

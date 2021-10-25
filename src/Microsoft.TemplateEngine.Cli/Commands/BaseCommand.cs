@@ -141,23 +141,24 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             return GetSuggestions(args, environmentSettings, textToMatch);
         }
 
-        protected static string? ValidateOptionUsageInParent(CommandResult symbolResult, Option option)
+        protected static string? ValidateOptionUsageInParent(CommandResult commandResult, Option option)
         {
-            OptionResult? optionResult = symbolResult.Parent?.Children.FirstOrDefault(symbol => symbol.Symbol == option) as OptionResult;
+            OptionResult? optionResult = commandResult.Parent?.Children.FirstOrDefault(symbol => symbol.Symbol == option) as OptionResult;
             if (optionResult != null)
             {
-                return $"Option '{optionResult.Token?.Value}' should be used after '{symbolResult.Symbol.Name}'.";
+                //Invalid command syntax: option '{0}' should be used after '{1}'.
+                return string.Format(LocalizableStrings.Commands_Validator_WrongOptionPosition, optionResult.Token?.Value, commandResult.Symbol.Name);
             }
             return null;
         }
 
-        protected static string? ValidateArgumentUsageInParent(SymbolResult symbolResult, Argument argument)
+        protected static string? ValidateArgumentUsageInParent(CommandResult commandResult, Argument argument)
         {
-            CommandResult commandResult = symbolResult as CommandResult ?? throw new Exception("Validator should be used with command");
             var newCommandArgument = commandResult.Parent?.Children.FirstOrDefault(symbol => symbol.Symbol == argument) as ArgumentResult;
             if (newCommandArgument != null)
             {
-                return $"Invalid command syntax: argument '{newCommandArgument.Tokens[0].Value}' should be used after '{symbolResult.Symbol.Name}'.";
+                //Invalid command syntax: argument '{0}' should be used after '{1}'.
+                return string.Format(LocalizableStrings.Commands_Validator_WrongArgumentPosition, newCommandArgument.Tokens[0].Value, commandResult.Symbol.Name);
             }
             return null;
         }
@@ -200,6 +201,9 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             return options;
         }
 
+        /// <summary>
+        /// Adds the tabular output settings options for the command from <paramref name="command"/>.
+        /// </summary>
         protected void SetupTabularOutputOptions(ITabularOutputCommand command)
         {
             this.AddOption(command.ColumnsAllOption);

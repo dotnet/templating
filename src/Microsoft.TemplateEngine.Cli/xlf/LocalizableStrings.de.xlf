@@ -391,6 +391,16 @@ Führen Sie "dotnet {1}--show-aliases" ohne Argumente aus, um alle Aliase anzuze
         <target state="translated">Ausführen des Befehls erfolgreich.</target>
         <note />
       </trans-unit>
+      <trans-unit id="Commands_Validator_WrongArgumentPosition">
+        <source>Invalid command syntax: argument '{0}' should be used after '{1}'.</source>
+        <target state="new">Invalid command syntax: argument '{0}' should be used after '{1}'.</target>
+        <note>{0} - argument value, {1} - command name (list, search. etc.).</note>
+      </trans-unit>
+      <trans-unit id="Commands_Validator_WrongOptionPosition">
+        <source>Invalid command syntax: option '{0}' should be used after '{1}'.</source>
+        <target state="new">Invalid command syntax: option '{0}' should be used after '{1}'.</target>
+        <note>{0} - option name, {1} - command name (list, search. etc.).</note>
+      </trans-unit>
       <trans-unit id="ConfiguredValue">
         <source>Configured Value: {0}</source>
         <target state="translated">Konfigurierter Wert: {0}</target>
