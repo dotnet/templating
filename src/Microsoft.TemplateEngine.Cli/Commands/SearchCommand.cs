@@ -144,6 +144,8 @@ namespace Microsoft.TemplateEngine.Cli.Commands
 
             Filters = ParseFilters(command, parseResult);
             (DisplayAllColumns, ColumnsToDisplay) = ParseTabularOutputSettings(command, parseResult);
+            Filters.TryGetValue(FilterOptionDefinition.LanguageFilter, out string? language);
+            Language = language;
         }
 
         public IReadOnlyDictionary<FilterOptionDefinition, string> Filters { get; }
@@ -154,7 +156,6 @@ namespace Microsoft.TemplateEngine.Cli.Commands
 
         internal string? SearchNameCriteria { get; }
 
-        //TODO:
         internal string? Language { get; }
     }
 }
