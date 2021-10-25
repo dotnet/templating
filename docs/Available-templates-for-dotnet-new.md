@@ -1,4 +1,13 @@
-Here is a list (alpha sorted) of templates which are available for use with `dotnet new`
+To search for the templates available on NuGet.org, use [`dotnet new --search`](https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-new-search).
+```
+    dotnet new --search web
+    dotnet new --search azure --type project
+    dotnet new --search azure --author Microsoft
+```
+
+To ensure that the template package appears in `dotnet new --search` result, set [the NuGet package type](https://docs.microsoft.com/en-us/nuget/create-packages/set-package-type) is set to `Template`.
+
+Below is a list (alpha sorted) of selected templates which are available for use with `dotnet new`:
 
 # C# Templates
 
