@@ -447,7 +447,7 @@ namespace Microsoft.TemplateEngine.Cli
                 var formatter =
                    TabularOutput.TabularOutput
                        .For(
-                           new CliTabularOutputSettings(_engineEnvironmentSettings.Environment),
+                           new TabularOutputSettings(_engineEnvironmentSettings.Environment),
                            displayableResults)
                        .DefineColumn(r => r.Identifier, out object packageColumn, LocalizableStrings.ColumnNamePackage, showAlways: true)
                        .DefineColumn(r => r.CurrentVersion, LocalizableStrings.ColumnNameCurrentVersion, showAlways: true)

@@ -25,7 +25,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
         private readonly ITelemetryLogger _telemetryLogger;
         private readonly string? _defaultLanguage;
 
-        private readonly ITabularOutputSettings _defaultTabularOutputSettings;
+        private readonly TabularOutputSettings _defaultTabularOutputSettings;
 
         internal TemplateInformationCoordinator(
             IEngineEnvironmentSettings engineEnvironmentSettings,
@@ -43,7 +43,7 @@ namespace Microsoft.TemplateEngine.Cli.HelpAndUsage
             _telemetryLogger = telemetryLogger ?? throw new ArgumentNullException(nameof(telemetryLogger));
             _defaultLanguage = defaultLanguage;
 
-            _defaultTabularOutputSettings = new CliTabularOutputSettings(engineEnvironmentSettings.Environment);
+            _defaultTabularOutputSettings = new TabularOutputSettings(engineEnvironmentSettings.Environment);
         }
 
         /// <summary>
