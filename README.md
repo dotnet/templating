@@ -77,7 +77,13 @@ Now that we've covered the basics of using `dotnew new`, lets move on to info fo
 
 # Available templates
 
-You can install additional templates that can be used by `dotnet new`. See [Available templates for dotnet new](https://github.com/dotnet/templating/wiki/Available-templates-for-dotnet-new).
+You can install additional templates that can be used by `dotnet new`. 
+To search for the templates available on NuGet.org, use [`dotnet new --search`](https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-new-search).
+```
+    dotnet new --search web
+    dotnet new --search azure --type project
+    dotnet new --search azure --author Microsoft
+```
 
 # What to expect when working with this repo
 
@@ -94,9 +100,9 @@ Check out our [contributing](docs/Contributing.md) page to learn how you can bui
 Templates can be installed from packages in any NuGet feed, directories on the file system or ZIP type archives (zip, nupkg, vsix, etc.)
 To install a new template use the command:
 
-    dotnet .\dotnet-new3.dll -i {the path to the folder containing the template or *.nupkg file or nuget package name}
-    dotnet .\dotnet-new3.dll -i "Boxed.Templates::*"
-    dotnet .\dotnet-new3.dll -i <your repo location>\artifacts\packages\Debug\Shipping\Microsoft.DotNet.Common.ProjectTemplates.3.1.6.0.0-dev.nupkg
+    dotnet .\dotnet-new3.dll --install {the path to the folder containing the template or *.nupkg file or nuget package name}
+    dotnet .\dotnet-new3.dll --install "Boxed.Templates::*"
+    dotnet .\dotnet-new3.dll --install <your repo location>\artifacts\packages\Debug\Shipping\Microsoft.DotNet.Common.ProjectTemplates.3.1.6.0.0-dev.nupkg
 
 # Basic Commands
 ## Showing help
