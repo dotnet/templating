@@ -123,7 +123,7 @@ namespace Microsoft.TemplateEngine.Cli.Commands
         }
     }
 
-    internal class SearchCommandArgs : GlobalArgs, IFilterableArgs, ITabularOutputArgs
+    internal class SearchCommandArgs : BaseFilterableArgs, ITabularOutputArgs
     {
         internal SearchCommandArgs(BaseSearchCommand command, ParseResult parseResult) : base(command, parseResult)
         {
@@ -141,14 +141,13 @@ namespace Microsoft.TemplateEngine.Cli.Commands
                     SearchNameCriteria = newCommandArgument;
                 }
             }
-
-            Filters = ParseFilters(command, parseResult);
             (DisplayAllColumns, ColumnsToDisplay) = ParseTabularOutputSettings(command, parseResult);
-            Filters.TryGetValue(FilterOptionDefinition.LanguageFilter, out string? language);
-            Language = language;
-        }
 
-        public IReadOnlyDictionary<FilterOptionDefinition, string> Filters { get; }
+            if (AppliedFilters.Contains(FilterOptionDefinition.LanguageFilter))
+            {
+                Language = GetFilterValue(FilterOptionDefinition.LanguageFilter);
+            }
+        }
 
         public bool DisplayAllColumns { get; }
 

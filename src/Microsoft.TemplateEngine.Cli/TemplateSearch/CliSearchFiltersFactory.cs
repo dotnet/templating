@@ -61,9 +61,9 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
                 };
 
                 IEnumerable<Func<ITemplateInfo, MatchInfo?>> templateFilters =
-                    commandArgs.Filters.Keys
+                    commandArgs.AppliedFilters
                         .OfType<TemplateFilterOptionDefinition>()
-                        .Select(filter => filter.TemplateMatchFilter(commandArgs.Filters[filter]));
+                        .Select(filter => filter.TemplateMatchFilter(commandArgs.GetFilterValue(filter)));
 
                 IEnumerable<TemplateGroupMatchInfo> matchInformation =
                     templateGroups.Select(
@@ -87,9 +87,9 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
             return templatePackageSearchData =>
             {
                 return AlreadyInstalledFilter(templatePackageSearchData)
-                && commandArgs.Filters.Keys
+                && commandArgs.AppliedFilters
                         .OfType<PackageFilterOptionDefinition>()
-                        .All(packFilter => packFilter.PackageMatchFilter(commandArgs.Filters[packFilter])(templatePackageSearchData));
+                        .All(filter => filter.PackageMatchFilter(commandArgs.GetFilterValue(filter))(templatePackageSearchData));
             };
         }
 

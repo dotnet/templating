@@ -18,66 +18,52 @@ namespace Microsoft.TemplateEngine.Cli.Commands
     /// </summary>
     internal class FilterOptionDefinition
     {
-        internal FilterOptionDefinition(string name, Func<Option> optionFactory)
+        internal FilterOptionDefinition(Func<Option> optionFactory)
         {
-            Name = string.IsNullOrWhiteSpace(name) ? throw new ArgumentException($"{nameof(name)} should not be null or whitespace", nameof(name)) : name;
             OptionFactory = optionFactory ?? throw new ArgumentNullException(nameof(optionFactory));
         }
 
         internal static FilterOptionDefinition AuthorFilter { get; } =
              new TemplateFilterOptionDefinition(
-                 "author",
                  optionFactory: () => SharedOptionsFactory.CreateAuthorOption(),
                  matchFilter: authorArg => WellKnownSearchFilters.AuthorFilter(authorArg),
                  mismatchCriteria: resolutionResult => resolutionResult.HasAuthorMismatch);
 
         internal static FilterOptionDefinition BaselineFilter { get; } =
             new TemplateFilterOptionDefinition(
-                "baseline",
                 optionFactory: () => SharedOptionsFactory.CreateBaselineOption(),
                 matchFilter: baselineArg => WellKnownSearchFilters.BaselineFilter(baselineArg),
                 mismatchCriteria: resolutionResult => resolutionResult.HasBaselineMismatch);
 
         internal static FilterOptionDefinition LanguageFilter { get; } =
             new TemplateFilterOptionDefinition(
-                "language",
                 optionFactory: () => SharedOptionsFactory.CreateLanguageOption(),
                 matchFilter: languageArg => WellKnownSearchFilters.LanguageFilter(languageArg),
                 mismatchCriteria: resolutionResult => resolutionResult.HasLanguageMismatch);
 
         internal static FilterOptionDefinition TagFilter { get; } =
             new TemplateFilterOptionDefinition(
-                "tag",
                 optionFactory: () => SharedOptionsFactory.CreateTagOption(),
                 matchFilter: tagArg => WellKnownSearchFilters.ClassificationFilter(tagArg),
                 mismatchCriteria: resolutionResult => resolutionResult.HasClassificationMismatch);
 
         internal static FilterOptionDefinition TypeFilter { get; } =
             new TemplateFilterOptionDefinition(
-                "type",
                 optionFactory: () => SharedOptionsFactory.CreateTypeOption(),
                 matchFilter: typeArg => WellKnownSearchFilters.TypeFilter(typeArg),
                 mismatchCriteria: resolutionResult => resolutionResult.HasTypeMismatch);
 
         internal static FilterOptionDefinition PackageFilter { get; } =
             new PackageFilterOptionDefinition(
-                "package",
                 optionFactory: () => SharedOptionsFactory.CreatePackageOption(),
                 matchFilter: PackageMatchFilter);
-
-        //TODO: check if it's needed
-
-        /// <summary>
-        /// Name of the option, should match option long name.
-        /// </summary>
-        internal string Name { get; }
 
         /// <summary>
         /// A predicate that creates instance of option.
         /// </summary>
         internal Func<Option> OptionFactory { get; }
 
-        private static Func<ITemplatePackageInfo, bool> PackageMatchFilter(string packageArg)
+        private static Func<ITemplatePackageInfo, bool> PackageMatchFilter(string? packageArg)
         {
             return (pack) =>
             {
@@ -96,10 +82,9 @@ namespace Microsoft.TemplateEngine.Cli.Commands
     internal class TemplateFilterOptionDefinition : FilterOptionDefinition
     {
         internal TemplateFilterOptionDefinition(
-            string name,
             Func<Option> optionFactory,
-            Func<string, Func<ITemplateInfo, MatchInfo?>> matchFilter,
-            Func<TemplateResolutionResult, bool> mismatchCriteria) : base(name, optionFactory)
+            Func<string?, Func<ITemplateInfo, MatchInfo?>> matchFilter,
+            Func<TemplateResolutionResult, bool> mismatchCriteria) : base(optionFactory)
         {
             TemplateMatchFilter = matchFilter ?? throw new ArgumentNullException(nameof(matchFilter));
             MismatchCriteria = mismatchCriteria ?? throw new ArgumentNullException(nameof(mismatchCriteria));
@@ -112,7 +97,7 @@ namespace Microsoft.TemplateEngine.Cli.Commands
         /// <remarks>
         /// Common template match filters are defined in Microsoft.TemplateEngine.Utils.WellKnonwnSearchFilter class.
         /// </remarks>
-        internal Func<string, Func<ITemplateInfo, MatchInfo?>> TemplateMatchFilter { get; set; }
+        internal Func<string?, Func<ITemplateInfo, MatchInfo?>> TemplateMatchFilter { get; set; }
 
         /// <summary>
         /// A predicate that returns if the filter option caused a mismatch in <see cref="TemplateResolutionResult"/> in case of partial match.
@@ -126,9 +111,8 @@ namespace Microsoft.TemplateEngine.Cli.Commands
     internal class PackageFilterOptionDefinition : FilterOptionDefinition
     {
         internal PackageFilterOptionDefinition(
-            string name,
             Func<Option> optionFactory,
-            Func<string, Func<ITemplatePackageInfo, bool>> matchFilter) : base(name, optionFactory)
+            Func<string?, Func<ITemplatePackageInfo, bool>> matchFilter) : base(optionFactory)
         {
             PackageMatchFilter = matchFilter ?? throw new ArgumentNullException(nameof(matchFilter));
         }
@@ -137,6 +121,6 @@ namespace Microsoft.TemplateEngine.Cli.Commands
         /// A predicate that returns the package match filter for the filter option
         /// Package match filter should if package is a match based on filter value.
         /// </summary>
-        internal Func<string, Func<ITemplatePackageInfo, bool>> PackageMatchFilter { get; set; }
+        internal Func<string?, Func<ITemplatePackageInfo, bool>> PackageMatchFilter { get; set; }
     }
 }

@@ -35,6 +35,7 @@ namespace Dotnet_new3.IntegrationTests
                 .And.NotHaveStdErr()
                 .And.HaveStdOutContaining("Searching for the templates...")
                 .And.HaveStdOutContaining("Matches from template source: NuGet.org")
+                .And.HaveStdOutContaining("These templates matched your input: 'console'")
                 .And.HaveStdOutMatching("Template Name\\s+Short Name\\s+Author\\s+Language\\s+Package\\s+Downloads")
                 .And.HaveStdOutContaining("To use the template, run the following command to install the package:")
                 .And.HaveStdOutContaining("   dotnet new3 --install <PACKAGE_ID>");
@@ -60,7 +61,7 @@ namespace Dotnet_new3.IntegrationTests
                 .And.NotHaveStdOut()
                 .And.HaveStdErrContaining(
 @"Search failed: not enough information specified for search.
-To search for templates, specify partial template name or use one of supported filters: 'author', 'baseline', 'language', 'type', 'tag', 'package'.
+To search for templates, specify partial template name or use one of supported filters: '--author', '--baseline', '--language', '--type', '--tag', '--package'.
 Examples:
    dotnet new3 <TEMPLATE_NAME> --search
    dotnet new3 --search --author Microsoft
@@ -78,6 +79,21 @@ Examples:
                 .Should().Fail()
                 .And.NotHaveStdOut()
                 .And.HaveStdErrContaining("Search failed: template name is too short, minimum 2 characters are required.");
+        }
+
+        [Theory]
+        [InlineData("--search fofofo", "'fofofo'")]
+        [InlineData("search fofofo", "'fofofo'")]
+        [InlineData("search fofofo --type item", "'fofofo', --type='item'")]
+        [InlineData("search fofofo --language Z#", "'fofofo', --language='Z#'")]
+        [InlineData("search -lang Z#", "-lang='Z#'")]
+        public void CanDisplayNoResults(string testCase, string criteria)
+        {
+            new DotnetNewCommand(_log, testCase.Split(" "))
+                .WithCustomHive(_sharedHome.HomeDirectory)
+                .Execute()
+                .Should().Fail()
+                .And.HaveStdErrContaining($"No templates found matching: {criteria}.");
         }
 
         [Theory]
@@ -151,6 +167,7 @@ Examples:
                 .And.NotHaveStdErr()
                 .And.HaveStdOutContaining("Searching for the templates...")
                 .And.HaveStdOutContaining("Matches from template source: NuGet.org")
+                .And.HaveStdOutContaining("These templates matched your input: 'console', --tag='Common'")
                 .And.HaveStdOutMatching("Template Name\\s+Short Name\\s+Tags\\s+Package\\s+Downloads")
                 .And.HaveStdOutContaining("To use the template, run the following command to install the package:")
                 .And.HaveStdOutContaining("   dotnet new3 --install <PACKAGE_ID>");
@@ -181,6 +198,7 @@ Examples:
                 .And.NotHaveStdErr()
                 .And.HaveStdOutContaining("Searching for the templates...")
                 .And.HaveStdOutContaining("Matches from template source: NuGet.org")
+                .And.HaveStdOutContaining("These templates matched your input: --tag='Common'")
                 .And.HaveStdOutMatching("Template Name\\s+Short Name\\s+Tags\\s+Package\\s+Downloads")
                 .And.HaveStdOutContaining("To use the template, run the following command to install the package:")
                 .And.HaveStdOutContaining("   dotnet new3 --install <PACKAGE_ID>");
@@ -210,6 +228,7 @@ Examples:
                 .And.NotHaveStdErr()
                 .And.HaveStdOutContaining("Searching for the templates...")
                 .And.HaveStdOutContaining("Matches from template source: NuGet.org")
+                .And.HaveStdOutContaining("These templates matched your input: 'func', --author='micro'")
                 .And.HaveStdOutMatching("Template Name\\s+Short Name\\s+Author\\s+Package\\s+Downloads")
                 .And.HaveStdOutContaining("To use the template, run the following command to install the package:")
                 .And.HaveStdOutContaining("   dotnet new3 --install <PACKAGE_ID>");
@@ -239,6 +258,7 @@ Examples:
                 .ExitWith(0)
                 .And.NotHaveStdErr()
                 .And.HaveStdOutContaining("Searching for the templates...")
+                .And.HaveStdOutContaining("These templates matched your input: --author='micro'")
                 .And.HaveStdOutContaining("Matches from template source: NuGet.org")
                 .And.HaveStdOutMatching("Template Name\\s+Short Name\\s+Author\\s+Package\\s+Downloads")
                 .And.HaveStdOutContaining("To use the template, run the following command to install the package:")
@@ -268,6 +288,7 @@ Examples:
                 .ExitWith(0)
                 .And.NotHaveStdErr()
                 .And.HaveStdOutContaining("Searching for the templates...")
+                .And.HaveStdOutContaining("These templates matched your input: 'console', --language='Q#'")
                 .And.HaveStdOutContaining("Matches from template source: NuGet.org")
                 .And.HaveStdOutMatching("Template Name\\s+Short Name\\s+Language\\s+Package\\s+Downloads")
                 .And.HaveStdOutContaining("To use the template, run the following command to install the package:")
@@ -286,9 +307,11 @@ Examples:
         }
 
         [Theory]
-        [InlineData("--search --columns language --language Q#")]
-        [InlineData("search --columns language --language Q#")]
-        public void CanFilterLanguage_WithoutName(string testCase)
+        [InlineData("--search --columns language --language Q#", "--language")]
+        [InlineData("search --columns language --language Q#", "--language")]
+        [InlineData("--search --columns language -lang Q#", "-lang")]
+        [InlineData("search --columns language -lang Q#", "-lang")]
+        public void CanFilterLanguage_WithoutName(string testCase, string optionName)
         {
             var commandResult = new DotnetNewCommand(_log, testCase.Split(" "))
                 .WithCustomHive(_sharedHome.HomeDirectory)
@@ -298,6 +321,7 @@ Examples:
                 .ExitWith(0)
                 .And.NotHaveStdErr()
                 .And.HaveStdOutContaining("Searching for the templates...")
+                .And.HaveStdOutContaining($"These templates matched your input: {optionName}='Q#'")
                 .And.HaveStdOutContaining("Matches from template source: NuGet.org")
                 .And.HaveStdOutMatching("Template Name\\s+Short Name\\s+Language\\s+Package\\s+Downloads")
                 .And.HaveStdOutContaining("To use the template, run the following command to install the package:")
@@ -327,6 +351,7 @@ Examples:
                 .ExitWith(0)
                 .And.NotHaveStdErr()
                 .And.HaveStdOutContaining("Searching for the templates...")
+                .And.HaveStdOutContaining("These templates matched your input: 'console', --type='item'")
                 .And.HaveStdOutContaining("Matches from template source: NuGet.org")
                 .And.HaveStdOutMatching("Template Name\\s+Short Name\\s+Type\\s+Package\\s+Downloads")
                 .And.HaveStdOutContaining("To use the template, run the following command to install the package:")
@@ -357,6 +382,7 @@ Examples:
                 .ExitWith(0)
                 .And.NotHaveStdErr()
                 .And.HaveStdOutContaining("Searching for the templates...")
+                .And.HaveStdOutContaining("These templates matched your input: --type='item'")
                 .And.HaveStdOutContaining("Matches from template source: NuGet.org")
                 .And.HaveStdOutMatching("Template Name\\s+Short Name\\s+Type\\s+Package\\s+Downloads")
                 .And.HaveStdOutContaining("To use the template, run the following command to install the package:")
@@ -386,6 +412,7 @@ Examples:
                 .ExitWith(0)
                 .And.NotHaveStdErr()
                 .And.HaveStdOutContaining("Searching for the templates...")
+                .And.HaveStdOutContaining("These templates matched your input: 'console', --package='core'")
                 .And.HaveStdOutContaining("Matches from template source: NuGet.org")
                 .And.HaveStdOutMatching("Template Name\\s+Short Name\\s+Author\\s+Language\\s+Package\\s+Downloads")
                 .And.HaveStdOutContaining("To use the template, run the following command to install the package:")
@@ -415,6 +442,7 @@ Examples:
                 .ExitWith(0)
                 .And.NotHaveStdErr()
                 .And.HaveStdOutContaining("Searching for the templates...")
+                .And.HaveStdOutContaining("These templates matched your input: --package='core'")
                 .And.HaveStdOutContaining("Matches from template source: NuGet.org")
                 .And.HaveStdOutMatching("Template Name\\s+Short Name\\s+Author\\s+Language\\s+Package\\s+Downloads")
                 .And.HaveStdOutContaining("To use the template, run the following command to install the package:")

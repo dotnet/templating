@@ -11,9 +11,4 @@ namespace Microsoft.TemplateEngine.Cli.Commands
     {
         IReadOnlyDictionary<FilterOptionDefinition, Option> Filters { get; }
     }
-
-    internal interface IFilterableArgs
-    {
-        IReadOnlyDictionary<FilterOptionDefinition, string> Filters { get; }
-    }
 }

@@ -172,12 +172,12 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
 
         private static bool ValidateCommandInput(SearchCommandArgs commandArgs)
         {
-            if (string.IsNullOrWhiteSpace(commandArgs.SearchNameCriteria) && !commandArgs.Filters.Any())
+            if (string.IsNullOrWhiteSpace(commandArgs.SearchNameCriteria) && !commandArgs.AppliedFilters.Any())
             //TODO: implement it for template options matching
             // && !commandInput.RemainingParameters.Any())
             {
                 Reporter.Error.WriteLine(LocalizableStrings.CliTemplateSearchCoordinator_Error_NoTemplateName.Red().Bold());
-                Reporter.Error.WriteLine(string.Format(LocalizableStrings.CliTemplateSearchCoordinator_Info_SearchHelp, string.Join(", ", SearchCommand.SupportedFilters.Select(f => $"'{f.Name}'"))));
+                Reporter.Error.WriteLine(string.Format(LocalizableStrings.CliTemplateSearchCoordinator_Info_SearchHelp, string.Join(", ", SearchCommand.SupportedFilters.Select(f => $"'{f.OptionFactory().Aliases.First()}'"))));
                 Reporter.Error.WriteLine(LocalizableStrings.Generic_ExamplesHeader);
                 Reporter.Error.WriteCommand(CommandExamples.SearchCommandExample(commandArgs.CommandName, usePlaceholder: true));
                 Reporter.Error.WriteCommand(CommandExamples.SearchCommandExample(commandArgs.CommandName, additionalArgs: new[] { "--author", "Microsoft" }));
@@ -197,9 +197,8 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
         private static string GetInputParametersString(SearchCommandArgs commandArgs/*, IReadOnlyDictionary<string, string?>? templateParameters = null*/)
         {
             string separator = ", ";
-            IEnumerable<string> appliedFilters = commandArgs
-                .Filters
-                .Select(filter => $"{filter.Key.Name}='{filter.Value}'");
+            IEnumerable<string> appliedFilters = commandArgs.AppliedFilters
+                .Select(filter => $"{commandArgs.GetFilterToken(filter)}='{commandArgs.GetFilterValue(filter)}'");
 
             //TODO: implement it for template options matching
             //IEnumerable<string> appliedTemplateParameters = templateParameters?

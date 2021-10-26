@@ -4,6 +4,7 @@
 #nullable enable
 
 using System.CommandLine;
+using System.CommandLine.Parsing;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Cli.Commands;
 using Microsoft.TemplateEngine.TestHelper;
@@ -69,9 +70,8 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
             var parseResult = myCommand.Parse(command);
             SearchCommandArgs args = new SearchCommandArgs((BaseSearchCommand)parseResult.CommandResult.Command, parseResult);
 
-            Assert.Single(args.Filters);
-            Assert.True(args.Filters.TryGetValue(expectedDef, out string? filterValue));
-            Assert.Contains("filter-value", filterValue);
+            Assert.Single(args.AppliedFilters);
+            Assert.Contains("filter-value", args.GetFilterValue(expectedDef));
             Assert.Equal("source", args.SearchNameCriteria);
         }
 
@@ -104,9 +104,8 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
             var parseResult = myCommand.Parse(command);
             SearchCommandArgs args = new SearchCommandArgs((BaseSearchCommand)parseResult.CommandResult.Command, parseResult);
 
-            Assert.Single(args.Filters);
-            Assert.True(args.Filters.TryGetValue(expectedDef, out string? filterValue));
-            Assert.Contains("filter-value", filterValue);
+            Assert.Single(args.AppliedFilters);
+            Assert.Contains("filter-value", args.GetFilterValue(expectedDef));
             Assert.Null(args.SearchNameCriteria);
         }
 
@@ -151,7 +150,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
             var parseResult = myCommand.Parse(command);
 
             Assert.NotEmpty(parseResult.Errors);
-            Assert.Equal($"Option '{expectedFilter}' should be used after 'search'.", parseResult.Errors.First().Message);
+            Assert.Equal($"Invalid command syntax: option '{expectedFilter}' should be used after 'search'.", parseResult.Errors.First().Message);
         }
 
         [Fact]
