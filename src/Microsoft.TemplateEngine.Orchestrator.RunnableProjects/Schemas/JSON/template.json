@@ -956,7 +956,7 @@
           },
           "displayName": {
             "type": "string",
-            "description": "The friendly name of the symbol to be displayed to the user. This property is localized if localizations are provided. This property is localizable."
+            "description": "The friendly name of the symbol to be displayed to the user. This property is localizable."
           }
         },
         "oneOf": [
