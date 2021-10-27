@@ -101,10 +101,10 @@ namespace Microsoft.TemplateEngine.Cli.Commands
                 AllowMultipleArgumentsPerToken = true,
             };
             option.FromAmong(
-                TabularOutputSettings.Constants.AuthorColumnName,
-                TabularOutputSettings.Constants.LanguageColumnName,
-                TabularOutputSettings.Constants.TypeColumnName,
-                TabularOutputSettings.Constants.TagsColumnName);
+                TabularOutputSettings.ColumnNames.Author,
+                TabularOutputSettings.ColumnNames.Language,
+                TabularOutputSettings.ColumnNames.Type,
+                TabularOutputSettings.ColumnNames.Tags);
             return option;
         }
 

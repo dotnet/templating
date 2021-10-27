@@ -52,12 +52,12 @@ namespace Microsoft.TemplateEngine.Cli.TabularOutput
 
         public string ShrinkReplacement => "...";
 
-        internal static class Constants
+        internal static class ColumnNames
         {
-            internal const string AuthorColumnName = "author";
-            internal const string LanguageColumnName = "language";
-            internal const string TagsColumnName = "tags";
-            internal const string TypeColumnName = "type";
+            internal const string Author = "author";
+            internal const string Language = "language";
+            internal const string Tags = "tags";
+            internal const string Type = "type";
         }
     }
 }

@@ -1,13 +1,15 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.Reflection;
+using Microsoft.TemplateEngine.Cli.Commands;
 using Microsoft.TemplateEngine.Cli.TabularOutput;
 using Microsoft.TemplateEngine.Mocks;
 using Xunit;
 
-namespace Microsoft.TemplateEngine.Cli.UnitTests.HelpTests
+namespace Microsoft.TemplateEngine.Cli.UnitTests
 {
-    public class HelpFormatterTests
+    public class TabularOutputTests
     {
         [Fact(DisplayName = nameof(CanShrinkOneColumn))]
         public void CanShrinkOneColumn()
@@ -201,6 +203,26 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.HelpTests
 
             string result = formatter.Layout();
             Assert.Equal(expectedOutput, result);
+        }
+
+        [Fact]
+        public void VerifyColumnsOptionHasAllColumnNamesDefined()
+        {
+            var columnOption = SharedOptionsFactory.CreateColumnsOption();
+
+            //Gets suggestions defined in column options
+            var suggestedValues = columnOption.GetSuggestions().ToList();
+            suggestedValues.Sort();
+
+            //Gets constants defined in TabularOutputSettings.ColumnNams
+            List<string> columnNamesConstants = (typeof(TabularOutputSettings.ColumnNames))
+                .GetFields(BindingFlags.NonPublic | BindingFlags.Static)
+                .Where(fi => fi.IsLiteral && !fi.IsInitOnly)
+                .Select(fi => (string)fi.GetValue(null)) 
+                .ToList();
+            columnNamesConstants.Sort();
+
+            Assert.Equal(suggestedValues, columnNamesConstants);
         }
     }
 }
