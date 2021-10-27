@@ -138,7 +138,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
             TabularOutput<SearchResultTableRow> formatter =
                 TabularOutput.TabularOutput
                     .For(
-                        new CliTabularOutputSettings(environmentSettings.Environment, commandArgs),
+                        new TabularOutputSettings(environmentSettings.Environment, commandArgs),
                         data)
                     .DefineColumn(r => r.TemplateGroupInfo.Name, out object nameColumn, LocalizableStrings.ColumnNameTemplateName, showAlways: true, shrinkIfNeeded: true, minWidth: 15)
                     .DefineColumn(r => r.TemplateGroupInfo.ShortNames, LocalizableStrings.ColumnNameShortName, showAlways: true)
