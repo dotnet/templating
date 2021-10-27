@@ -114,14 +114,12 @@ namespace Microsoft.TemplateEngine.Cli.Commands
                 new HostSpecificDataLoader(environmentSettings),
                 TelemetryLogger);
 
-            //TODO: we need to await, otherwise templatePackageManager will be disposed.
+            //TODO: consider putting TemplatePackageManager into base class, so no need to await here for dispose.
             return await templateListCoordinator.DisplayTemplateGroupListAsync(args, default).ConfigureAwait(false);
         }
 
-        protected override ListCommandArgs ParseContext(ParseResult parseResult)
-        {
-            return new ListCommandArgs(this, parseResult);
-        }
+        protected override ListCommandArgs ParseContext(ParseResult parseResult) => new(this, parseResult);
+
     }
 
     internal class ListCommandArgs : BaseFilterableArgs, ITabularOutputArgs
@@ -143,6 +141,10 @@ namespace Microsoft.TemplateEngine.Cli.Commands
                 }
             }
             (DisplayAllColumns, ColumnsToDisplay) = ParseTabularOutputSettings(command, parseResult);
+            if (AppliedFilters.Contains(FilterOptionDefinition.LanguageFilter))
+            {
+                Language = GetFilterValue(FilterOptionDefinition.LanguageFilter);
+            }
         }
 
         public bool DisplayAllColumns { get; }
@@ -151,7 +153,6 @@ namespace Microsoft.TemplateEngine.Cli.Commands
 
         internal string? ListNameCriteria { get; }
 
-        //TODO:
         internal string? Language { get; }
     }
 }
