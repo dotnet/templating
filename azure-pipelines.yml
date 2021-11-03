@@ -26,11 +26,6 @@ variables:
   - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
     - group: Templating-SDLValidation-Params
 
-resources:
-  containers:
-  - container: LinuxContainer
-    image: mcr.microsoft.com/dotnet-buildtools/prereqs:ubuntu-14.04-cross-0cd4667-20170319080304
-
 stages:
 - stage: build
   displayName: Build
@@ -115,8 +110,8 @@ stages:
 
       - job: Linux
         pool:
-          name: Hosted Ubuntu 1604
-        container: LinuxContainer
+          name: NetCore1ESPool-Public
+          demands: ImageOverride -equals Build.Ubuntu.1804.Amd64.Open
         strategy:
           matrix:
             debug_configuration:
