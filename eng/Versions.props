@@ -33,12 +33,12 @@
     <NuGetConfigurationPackageVersion>6.0.0-rc.278</NuGetConfigurationPackageVersion>
     <NuGetProtocolPackageVersion>6.0.0-rc.278</NuGetProtocolPackageVersion>
     <!-- Dependencies from https://github.com/dotnet/runtime -->
-    <MicrosoftNETCoreAppRefPackageVersion>7.0.0-alpha.1.21551.1</MicrosoftNETCoreAppRefPackageVersion>
-    <MicrosoftNETCoreAppRuntimewinx64PackageVersion>7.0.0-alpha.1.21551.1</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
-    <VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>7.0.0-alpha.1.21551.1</VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>
-    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>7.0.0-alpha.1.21551.1</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
-    <MicrosoftExtensionsLoggingPackageVersion>7.0.0-alpha.1.21551.1</MicrosoftExtensionsLoggingPackageVersion>
-    <MicrosoftExtensionsLoggingConsolePackageVersion>7.0.0-alpha.1.21551.1</MicrosoftExtensionsLoggingConsolePackageVersion>
+    <MicrosoftNETCoreAppRefPackageVersion>7.0.0-alpha.1.21556.5</MicrosoftNETCoreAppRefPackageVersion>
+    <MicrosoftNETCoreAppRuntimewinx64PackageVersion>7.0.0-alpha.1.21556.5</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
+    <VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>7.0.0-alpha.1.21556.5</VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>
+    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>7.0.0-alpha.1.21556.5</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
+    <MicrosoftExtensionsLoggingPackageVersion>7.0.0-alpha.1.21556.5</MicrosoftExtensionsLoggingPackageVersion>
+    <MicrosoftExtensionsLoggingConsolePackageVersion>7.0.0-alpha.1.21556.5</MicrosoftExtensionsLoggingConsolePackageVersion>
     <WcwidthSourcesPackageVersion>0.5.0</WcwidthSourcesPackageVersion>
   </PropertyGroup>
 </Project>
