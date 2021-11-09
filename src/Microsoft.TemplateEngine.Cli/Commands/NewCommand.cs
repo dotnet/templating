@@ -5,7 +5,6 @@
 
 using System.CommandLine;
 using System.CommandLine.Invocation;
-using System.CommandLine.IO;
 using System.CommandLine.Parsing;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Edge.Settings;
@@ -24,12 +23,8 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             FilterOptionDefinition.PackageFilter
         };
 
-        private readonly string _commandName;
-
         internal NewCommand(string commandName, ITemplateEngineHost host, ITelemetryLogger telemetryLogger, NewCommandCallbacks callbacks) : base(host, telemetryLogger, callbacks, commandName, LocalizableStrings.CommandDescription)
         {
-            _commandName = commandName;
-
             this.AddArgument(ShortNameArgument);
             this.AddArgument(RemainingArguments);
             this.AddOption(HelpOption);
@@ -172,53 +167,11 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             //}
         }
 
-        protected override async Task<NewCommandStatus> ExecuteAsync(NewCommandArgs args, IEngineEnvironmentSettings environmentSettings, InvocationContext context)
+        protected override Task<NewCommandStatus> ExecuteAsync(NewCommandArgs args, IEngineEnvironmentSettings environmentSettings, InvocationContext context)
         {
-            if (string.IsNullOrWhiteSpace(args.ShortName) && args.HelpRequested)
-            {
-                context.HelpBuilder.Write(
-                    context.ParseResult.CommandResult.Command,
-                    StandardStreamWriter.Create(context.Console.Out),
-                    context.ParseResult);
-
-                return NewCommandStatus.Success;
-            }
-
-            using TemplatePackageManager templatePackageManager = new TemplatePackageManager(environmentSettings);
-            var hostSpecificDataLoader = new HostSpecificDataLoader(environmentSettings);
-
-            if (string.IsNullOrWhiteSpace(args.ShortName))
-            {
-                TemplateListCoordinator templateListCoordinator = new TemplateListCoordinator(
-                    environmentSettings,
-                    templatePackageManager,
-                    hostSpecificDataLoader,
-                    TelemetryLogger);
-
-                return await templateListCoordinator.DisplayCommandDescriptionAsync(args, default).ConfigureAwait(false);
-            }
-
-            var templates = await templatePackageManager.GetTemplatesAsync(context.GetCancellationToken()).ConfigureAwait(false);
-            var templateGroups = TemplateGroup.FromTemplateList(CliTemplateInfo.FromTemplateInfo(templates, hostSpecificDataLoader));
-
-            //TODO: decide what to do if there are more than 1 group.
-            var selectedTemplateGroup = templateGroups.FirstOrDefault(template => template.ShortNames.Contains(args.ShortName));
-
-            if (selectedTemplateGroup == null)
-            {
-                Reporter.Error.WriteLine(
-                    string.Format(LocalizableStrings.NoTemplatesMatchingInputParameters, args.ShortName).Bold().Red());
-                Reporter.Error.WriteLine();
-
-                Reporter.Error.WriteLine(LocalizableStrings.ListTemplatesCommand);
-                Reporter.Error.WriteCommand(CommandExamples.ListCommandExample(args.CommandName));
-
-                Reporter.Error.WriteLine(LocalizableStrings.SearchTemplatesCommand);
-                Reporter.Error.WriteCommand(CommandExamples.SearchCommandExample(args.CommandName, args.ShortName));
-                Reporter.Error.WriteLine();
-                return NewCommandStatus.NotFound;
-            }
-            return await HandleTemplateInstantationAsync(args, environmentSettings, templatePackageManager, selectedTemplateGroup).ConfigureAwait(false);
+            InstantiateCommand command = InstantiateCommand.FromNewCommand(this);
+            ParseResult reparseResult = TemplateParserFactory.CreateParser(command).Parse(args.Tokens);
+            return command.ExecuteAsync(reparseResult, environmentSettings, context);
         }
 
         protected override NewCommandArgs ParseContext(ParseResult parseResult) => new(this, parseResult);
@@ -272,51 +225,5 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             return null;
         }
 
-        private async Task<NewCommandStatus> HandleTemplateInstantationAsync(
-            NewCommandArgs args,
-            IEngineEnvironmentSettings environmentSettings,
-            TemplatePackageManager templatePackageManager,
-            TemplateGroup templateGroup)
-        {
-            foreach (IGrouping<int, CliTemplateInfo> templateGrouping in templateGroup.Templates.GroupBy(g => g.Precedence).OrderByDescending(g => g.Key))
-            {
-                HashSet<TemplateCommand> candidates = new HashSet<TemplateCommand>();
-                foreach (CliTemplateInfo template in templateGrouping)
-                {
-                    TemplateCommand command = new TemplateCommand(this, environmentSettings, templatePackageManager, templateGroup, template);
-                    Parser parser = TemplateParserFactory.CreateParser(command);
-                    ParseResult parseResult = parser.Parse(args.Arguments ?? Array.Empty<string>());
-                    if (!parseResult.Errors.Any())
-                    {
-                        candidates.Add(command);
-                    }
-                }
-                if (!candidates.Any())
-                {
-                    continue;
-                }
-                if (candidates.Count == 1)
-                {
-                    this.AddCommand(candidates.First());
-                    return (NewCommandStatus)await this.InvokeAsync(args.InitialTokens).ConfigureAwait(false);
-                }
-                return HandleAmbuguousResult();
-            }
-
-            //TODO: handle it better
-            Reporter.Error.WriteLine(
-                string.Format(LocalizableStrings.NoTemplatesMatchingInputParameters, args.ShortName).Bold().Red());
-            Reporter.Error.WriteLine();
-
-            Reporter.Error.WriteLine(LocalizableStrings.ListTemplatesCommand);
-            Reporter.Error.WriteCommand(CommandExamples.ListCommandExample(args.CommandName));
-
-            Reporter.Error.WriteLine(LocalizableStrings.SearchTemplatesCommand);
-            Reporter.Error.WriteCommand(CommandExamples.SearchCommandExample(args.CommandName, args.ShortName));
-            Reporter.Error.WriteLine();
-            return NewCommandStatus.NotFound;
-        }
-
-        private NewCommandStatus HandleAmbuguousResult() => throw new NotImplementedException();
     }
 }

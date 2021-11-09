@@ -17,8 +17,10 @@ namespace Microsoft.TemplateEngine.Cli.Commands
 {
     internal abstract class BaseCommand : Command
     {
-        protected BaseCommand(string name, string? description = null) : base(name, description)
+        protected BaseCommand(ITelemetryLogger logger, NewCommandCallbacks callbacks, string name, string? description = null) : base(name, description)
         {
+            TelemetryLogger = logger;
+            Callbacks = callbacks;
         }
 
         internal Option<string?> DebugCustomSettingsLocationOption { get; } = new("--debug:custom-hive", "Sets custom settings location")
@@ -50,21 +52,30 @@ namespace Microsoft.TemplateEngine.Cli.Commands
         {
             IsHidden = true
         };
+
+        internal ITelemetryLogger TelemetryLogger { get; }
+
+        internal NewCommandCallbacks Callbacks { get; }
     }
 
     internal abstract class BaseCommand<TArgs> : BaseCommand, ICommandHandler where TArgs : GlobalArgs
     {
         private static readonly Guid _entryMutexGuid = new Guid("5CB26FD1-32DB-4F4C-B3DC-49CFD61633D2");
-        private readonly ITemplateEngineHost _host;
+        private readonly ITemplateEngineHost? _host;
 
         internal BaseCommand(ITemplateEngineHost host, ITelemetryLogger logger, NewCommandCallbacks callbacks, string name, string? description = null)
-            : base(name, description)
+            : this(logger, callbacks, name, description)
         {
             _host = host;
-            TelemetryLogger = logger;
-            Callbacks = callbacks;
             this.Handler = this;
 
+        }
+
+        //command called via this constructor is not invokable
+        internal BaseCommand(BaseCommand parent, string name, string? description = null) : this(parent.TelemetryLogger, parent.Callbacks, name, description) { }
+
+        private BaseCommand(ITelemetryLogger logger, NewCommandCallbacks callbacks, string name, string? description = null) : base(logger, callbacks, name, description)
+        {
             this.AddOption(DebugCustomSettingsLocationOption);
             this.AddOption(DebugVirtualizeSettingsOption);
             this.AddOption(DebugAttachOption);
@@ -72,10 +83,6 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             this.AddOption(DebugRebuildCacheOption);
             this.AddOption(DebugShowConfigOption);
         }
-
-        internal ITelemetryLogger TelemetryLogger { get; }
-
-        internal NewCommandCallbacks Callbacks { get; }
 
         public async Task<int> InvokeAsync(InvocationContext context)
         {
@@ -146,19 +153,28 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             return base.GetSuggestions(args.ParseResult, textToMatch);
         }
 
-        protected IEngineEnvironmentSettings CreateEnvironmentSettings(TArgs args)
+        private IEngineEnvironmentSettings CreateEnvironmentSettings(TArgs args)
         {
-            string? outputPath = (args as InstantiateCommandArgs)?.OutputPath;
+            //TODO: replace with reparse
+            //string? outputPath = (args as InstantiateCommandArgs)?.OutputPath;
+
+            if (_host is null)
+            {
+                throw new ArgumentException("The method should not be used if host is not available.");
+            }
 
             IEngineEnvironmentSettings environmentSettings = new EngineEnvironmentSettings(
-                new CliTemplateEngineHost(_host, outputPath),
+                new CliTemplateEngineHost(_host, string.Empty),
+                //new CliTemplateEngineHost(_host, outputPath),
                 settingsLocation: args.DebugCustomSettingsLocation,
                 virtualizeSettings: args.DebugVirtualizeSettings,
                 environment: new CliEnvironment());
             return environmentSettings;
         }
 
+#pragma warning disable SA1202 // Elements should be ordered by access
         protected abstract Task<NewCommandStatus> ExecuteAsync(TArgs args, IEngineEnvironmentSettings environmentSettings, InvocationContext context);
+#pragma warning restore SA1202 // Elements should be ordered by access
 
         protected abstract TArgs ParseContext(ParseResult parseResult);
 

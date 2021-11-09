@@ -17,13 +17,13 @@ namespace Microsoft.TemplateEngine.Cli.Commands
     {
         private readonly TemplatePackageManager _templatePackageManager;
         private readonly IEngineEnvironmentSettings _environmentSettings;
-        private readonly NewCommand _newCommand;
+        private readonly InstantiateCommand _instantiateCommand;
         private readonly TemplateGroup _templateGroup;
         private readonly CliTemplateInfo _template;
         private Dictionary<string, Option> _templateSpecificOptions = new Dictionary<string, Option>();
 
         public TemplateCommand(
-            NewCommand newCommand,
+            InstantiateCommand instantiateCommand,
             IEngineEnvironmentSettings environmentSettings,
             TemplatePackageManager templatePackageManager,
             TemplateGroup templateGroup,
@@ -32,7 +32,7 @@ namespace Microsoft.TemplateEngine.Cli.Commands
                   templateGroup.ShortNames[0],
                   template.Name + Environment.NewLine + template.Description)
         {
-            _newCommand = newCommand;
+            _instantiateCommand = instantiateCommand;
             _environmentSettings = environmentSettings;
             _templatePackageManager = templatePackageManager;
             _templateGroup = templateGroup;
@@ -137,14 +137,16 @@ namespace Microsoft.TemplateEngine.Cli.Commands
 
         internal IReadOnlyDictionary<string, Option> TemplateOptions => _templateSpecificOptions;
 
+        internal CliTemplateInfo Template => _template;
+
         public async Task<int> InvokeAsync(InvocationContext context)
         {
-            TemplateArgs args = new TemplateArgs(this, _template, context.ParseResult);
+            TemplateArgs args = new TemplateArgs(this, context.ParseResult);
 
-            TemplateInvoker invoker = new TemplateInvoker(_environmentSettings, _newCommand.TelemetryLogger, () => Console.ReadLine() ?? string.Empty, _newCommand.Callbacks);
+            TemplateInvoker invoker = new TemplateInvoker(_environmentSettings, _instantiateCommand.TelemetryLogger, () => Console.ReadLine() ?? string.Empty, _instantiateCommand.Callbacks);
             if (!args.NoUpdateCheck)
             {
-                TemplatePackageCoordinator packageCoordinator = new TemplatePackageCoordinator(_newCommand.TelemetryLogger, _environmentSettings, _templatePackageManager);
+                TemplatePackageCoordinator packageCoordinator = new TemplatePackageCoordinator(_instantiateCommand.TelemetryLogger, _environmentSettings, _templatePackageManager);
                 Task<CheckUpdateResult?> checkForUpdateTask = packageCoordinator.CheckUpdateForTemplate(args.Template, context.GetCancellationToken());
                 Task<NewCommandStatus> instantiateTask = invoker.InvokeTemplateAsync(args, context.GetCancellationToken());
                 await Task.WhenAll(checkForUpdateTask, instantiateTask).ConfigureAwait(false);
@@ -152,7 +154,7 @@ namespace Microsoft.TemplateEngine.Cli.Commands
                 if (checkForUpdateTask?.Result != null)
                 {
                     // print if there is update for this template
-                    packageCoordinator.DisplayUpdateCheckResult(checkForUpdateTask.Result, _newCommand.Name);
+                    packageCoordinator.DisplayUpdateCheckResult(checkForUpdateTask.Result, args.NewCommandName);
                 }
                 // return creation result
                 return (int)instantiateTask.Result;
@@ -173,7 +175,7 @@ namespace Microsoft.TemplateEngine.Cli.Commands
                 reservedAliases.Add(alias);
             }
             //add options of parent? - this covers debug: options
-            foreach (string alias in _newCommand.SelectMany(p => p.Children).OfType<Option>().SelectMany(o => o.Aliases))
+            foreach (string alias in _instantiateCommand.SelectMany(p => p.Children).OfType<Option>().SelectMany(o => o.Aliases))
             {
                 reservedAliases.Add(alias);
             }
