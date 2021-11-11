@@ -88,7 +88,9 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.IntegrationTests
             }
         }
 
-        [Fact]
+#pragma warning disable xUnit1004 // Test methods should not be skipped
+        [Fact(Skip = "Template options filtering is not implemented.")]
+#pragma warning restore xUnit1004 // Test methods should not be skipped
         public void CanReadCliData()
         {
             string testDir = TestUtils.CreateTemporaryFolder();
