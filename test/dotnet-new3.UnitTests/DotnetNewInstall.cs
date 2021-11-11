@@ -229,7 +229,7 @@ namespace Dotnet_new3.IntegrationTests
                .And
                .NotHaveStdErr()
                .And.HaveStdOutContaining("console")
-               .And.HaveStdOutContaining("Console Application");
+               .And.HaveStdOutContaining("Console App");
 
             new DotnetNewCommand(_log, commandName, "Microsoft.DotNet.Web.ProjectTemplates.5.0")
                 .WithCustomHive(home)

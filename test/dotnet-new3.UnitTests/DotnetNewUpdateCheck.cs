@@ -184,7 +184,7 @@ namespace Dotnet_new3.IntegrationTests
                   .ExitWith(0)
                   .And
                   .NotHaveStdErr()
-                  .And.HaveStdOutContaining("The template \"Console Application\" was created successfully.")
+                  .And.HaveStdOutContaining("The template \"Console App\" was created successfully.")
                   .And.NotHaveStdOutContaining("An update for template package 'Microsoft.DotNet.Common.ProjectTemplates.5.0::5.0.0' is available")
                   .And.NotHaveStdOutContaining("To update the package use:")
                   .And.NotHaveStdOutMatching("    dotnet new3 --install Microsoft.DotNet.Common.ProjectTemplates.5.0::([\\d\\.a-z-])+");
