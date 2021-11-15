@@ -24,9 +24,9 @@
     <NuGetConfigurationPackageVersion>6.0.0-preview.3.179</NuGetConfigurationPackageVersion>
     <NuGetProtocolPackageVersion>6.0.0-preview.3.179</NuGetProtocolPackageVersion>
     <!-- Dependencies from https://github.com/dotnet/runtime -->
-    <MicrosoftNETCoreAppRefPackageVersion>6.0.0-rtm.21501.9</MicrosoftNETCoreAppRefPackageVersion>
-    <MicrosoftNETCoreAppRuntimewinx64PackageVersion>6.0.0-rtm.21501.9</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
-    <VSRedistCommonNetCoreSharedFrameworkx6460PackageVersion>6.0.0-rtm.21501.9</VSRedistCommonNetCoreSharedFrameworkx6460PackageVersion>
+    <MicrosoftNETCoreAppRefPackageVersion>6.0.1</MicrosoftNETCoreAppRefPackageVersion>
+    <MicrosoftNETCoreAppRuntimewinx64PackageVersion>6.0.1</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
+    <VSRedistCommonNetCoreSharedFrameworkx6460PackageVersion>6.0.1-servicing.21562.11</VSRedistCommonNetCoreSharedFrameworkx6460PackageVersion>
     <MicrosoftExtensionsLoggingAbstractionsPackageVersion>6.0.0-rtm.21501.9</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
     <MicrosoftExtensionsLoggingPackageVersion>6.0.0-rtm.21501.9</MicrosoftExtensionsLoggingPackageVersion>
     <MicrosoftExtensionsLoggingConsolePackageVersion>6.0.0-rtm.21501.9</MicrosoftExtensionsLoggingConsolePackageVersion>
