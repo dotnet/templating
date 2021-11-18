@@ -22,7 +22,7 @@ namespace Microsoft.TemplateEngine.EndToEndTestHarness
         private const string CommandName = "test-test";
         private static readonly Dictionary<string, Func<IPhysicalFileSystem, JObject, string, bool>> VerificationLookup = new Dictionary<string, Func<IPhysicalFileSystem, JObject, string, bool>>(StringComparer.OrdinalIgnoreCase);
 
-        private static int Main(string[] args)
+        private static async Task<int> Main(string[] args)
         {
             VerificationLookup["dir_exists"] = CheckDirectoryExists;
             VerificationLookup["file_exists"] = CheckFileExists;
@@ -62,7 +62,7 @@ namespace Microsoft.TemplateEngine.EndToEndTestHarness
 
             var command = NewCommandFactory.Create(CommandName, host, new TelemetryLogger(null), new NewCommandCallbacks());
 
-            int result = ParserFactory.CreateParser(command).Parse(passthroughArgs).Invoke();
+            int result = await ParserFactory.CreateParser(command).Parse(passthroughArgs).InvokeAsync().ConfigureAwait(false);
 
             bool verificationsPassed = false;
 
