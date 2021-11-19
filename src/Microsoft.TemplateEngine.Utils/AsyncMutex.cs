@@ -28,7 +28,8 @@ namespace Microsoft.TemplateEngine.Utils
             _mutexName = mutexName;
             _token = token;
             _taskCompletionSource = new TaskCompletionSource<AsyncMutex>();
-            ThreadPool.QueueUserWorkItem(WaitLoop);
+            Thread waitThread = new Thread(() => WaitLoop());
+            waitThread.Start();
         }
 
         /// <summary>
@@ -63,7 +64,7 @@ namespace Microsoft.TemplateEngine.Utils
             _blockReleasingMutex.Set();
         }
 
-        private void WaitLoop(object state)
+        private void WaitLoop()
         {
             var mutex = new Mutex(false, _mutexName);
             var mutexAcquired = false;
