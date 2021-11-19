@@ -114,7 +114,9 @@ To see help for other template languages (F#, VB), use --language option:
             _log = log;
         }
 
-        [Fact]
+#pragma warning disable xUnit1004 // Test methods should not be skipped
+        [Fact (Skip = "help is not implemented yet")]
+#pragma warning restore xUnit1004 // Test methods should not be skipped
         public void CanShowHelp()
         {
             string home = TestUtils.CreateTemporaryFolder("Home");
@@ -139,7 +141,9 @@ To see help for other template languages (F#, VB), use --language option:
                 .And.HaveStdOut(HelpOutput);
         }
 
-        [Fact]
+#pragma warning disable xUnit1004 // Test methods should not be skipped
+        [Fact(Skip = "help is not implemented yet")]
+#pragma warning restore xUnit1004 // Test methods should not be skipped
         public void CanShowHelpForTemplate()
         {
             string home = TestUtils.CreateTemporaryFolder("Home");
@@ -166,7 +170,9 @@ To see help for other template languages (F#, VB), use --language option:
                 .And.NotHaveStdOutContaining(HelpOutput);
         }
 
-        [Fact]
+#pragma warning disable xUnit1004 // Test methods should not be skipped
+        [Fact(Skip = "help is not implemented yet")]
+#pragma warning restore xUnit1004 // Test methods should not be skipped
         public void CannotShowHelpForTemplate_PartialNameMatch()
         {
             string home = TestUtils.CreateTemporaryFolder("Home");
@@ -186,7 +192,9 @@ To search for the templates on NuGet.org, run:
    dotnet new3 class --search");
         }
 
-        [Fact]
+#pragma warning disable xUnit1004 // Test methods should not be skipped
+        [Fact(Skip = "help is not implemented yet")]
+#pragma warning restore xUnit1004 // Test methods should not be skipped
         public void CannotShowHelpForTemplate_FullNameMatch()
         {
             string home = TestUtils.CreateTemporaryFolder("Home");
@@ -206,7 +214,9 @@ To search for the templates on NuGet.org, run:
    dotnet new3 'Console Application' --search");
         }
 
-        [Fact]
+#pragma warning disable xUnit1004 // Test methods should not be skipped
+        [Fact(Skip = "help is not implemented yet")]
+#pragma warning restore xUnit1004 // Test methods should not be skipped
         public void CannotShowHelpForTemplate_WhenAmbiguousLanguageChoice()
         {
             string home = TestUtils.CreateTemporaryFolder("Home");
@@ -226,7 +236,9 @@ To search for the templates on NuGet.org, run:
                 .And.HaveStdErrContaining("basic").And.HaveStdErrContaining("F#").And.HaveStdErrContaining("VB");
         }
 
-        [Fact]
+#pragma warning disable xUnit1004 // Test methods should not be skipped
+        [Fact(Skip = "help is not implemented yet")]
+#pragma warning restore xUnit1004 // Test methods should not be skipped
         public void CanShowHelpForTemplate_MatchOnChoice()
         {
             const string ConsoleHelp =
@@ -258,7 +270,9 @@ To see help for other template languages (F#, VB), use --language option:
                 .And.NotHaveStdOutContaining(HelpOutput);
         }
 
-        [Fact]
+#pragma warning disable xUnit1004 // Test methods should not be skipped
+        [Fact(Skip = "help is not implemented yet")]
+#pragma warning restore xUnit1004 // Test methods should not be skipped
         public void CannotShowHelpForTemplate_MatchOnChoiceWithoutValue()
         {
             string expectedOutput =
@@ -289,7 +303,9 @@ For more information, run:
                 .And.HaveStdErr(expectedOutput);
         }
 
-        [Fact]
+#pragma warning disable xUnit1004 // Test methods should not be skipped
+        [Fact(Skip = "help is not implemented yet")]
+#pragma warning restore xUnit1004 // Test methods should not be skipped
         public void CannotShowHelpForTemplate_MatchOnUnexistingParam()
         {
             string expectedOutput =
@@ -312,7 +328,9 @@ For more information, run:
                 .And.HaveStdErr(expectedOutput);
         }
 
-        [Fact]
+#pragma warning disable xUnit1004 // Test methods should not be skipped
+        [Fact(Skip = "help is not implemented yet")]
+#pragma warning restore xUnit1004 // Test methods should not be skipped
         public void CanShowHelpForTemplate_MatchOnNonChoiceParam()
         {
             const string ConsoleHelp =
@@ -357,7 +375,9 @@ To see help for other template languages (F#, VB), use --language option:
                 .And.NotHaveStdOutContaining(HelpOutput);
         }
 
-        [Fact]
+#pragma warning disable xUnit1004 // Test methods should not be skipped
+        [Fact(Skip = "help is not implemented yet")]
+#pragma warning restore xUnit1004 // Test methods should not be skipped
         public void CanShowHelpForTemplate_MatchOnLanguage()
         {
             const string ConsoleHelp =
@@ -398,7 +418,9 @@ To see help for other template languages (C#, VB), use --language option:
                     .And.NotHaveStdOutContaining(HelpOutput);
         }
 
-        [Fact]
+#pragma warning disable xUnit1004 // Test methods should not be skipped
+        [Fact(Skip = "help is not implemented yet")]
+#pragma warning restore xUnit1004 // Test methods should not be skipped
         public void WontShowLanguageHintInCaseOfOneLang()
         {
             string home = TestUtils.CreateTemporaryFolder("Home");
@@ -413,7 +435,9 @@ To see help for other template languages (C#, VB), use --language option:
                     .And.NotHaveStdOutContaining("To see help for other template languages");
         }
 
-        [Fact]
+#pragma warning disable xUnit1004 // Test methods should not be skipped
+        [Fact(Skip = "help is not implemented yet")]
+#pragma warning restore xUnit1004 // Test methods should not be skipped
         public void CannotShowHelpForTemplate_MatchOnNonChoiceParamWithoutValue()
         {
             string expectedOutput =
