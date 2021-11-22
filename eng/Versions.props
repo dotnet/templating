@@ -22,8 +22,6 @@
     <SystemIOCompressionPackageVersion>4.3.0</SystemIOCompressionPackageVersion>
     <SystemRuntimeLoaderPackageVersion>4.3.0</SystemRuntimeLoaderPackageVersion>
     <!-- Maestro-managed Package Versions - Ordered by repo name -->
-    <!-- Dependencies from https://github.com/dotnet/clicommandlineparser -->
-    <MicrosoftDotNetCliCommandLinePackageVersion>1.0.0-preview.19208.1</MicrosoftDotNetCliCommandLinePackageVersion>
     <!-- Dependencies from https://github.com/dotnet/command-line-api -->
     <SystemCommandLinePackageVersion>2.0.0-beta2.22057.1</SystemCommandLinePackageVersion>
     <!-- Dependencies from https://github.com/dotnet/installer -->
