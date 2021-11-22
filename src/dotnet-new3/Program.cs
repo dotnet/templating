@@ -23,6 +23,11 @@ namespace Dotnet_new3
 
         public static int Main(string[] args)
         {
+            if (Console.IsOutputRedirected)
+            {
+                Console.OutputEncoding = System.Text.Encoding.UTF8;
+            }
+
             Command new3Command = new New3Command();
             ParseResult preParseResult = ParserFactory.CreateParser(new3Command, disableHelp: true).Parse(args);
 
