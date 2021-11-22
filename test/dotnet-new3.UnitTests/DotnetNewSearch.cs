@@ -871,7 +871,7 @@ Examples:
             int headerLineIndex = Array.FindIndex(lines, line => expectedColumns.All(column => line.Contains(column)));
             string headerLine = lines[headerLineIndex];
             //table ends after empty line
-            int lastLineIndex = Array.FindIndex(lines, headerLineIndex + 1, line => line.Length == 0) - 1;
+            int lastLineIndex = Array.FindIndex(lines, headerLineIndex + 1, line => (line.Length == 0 || line.Contains("[Debug]"))) - 1;
             var columnIndexes = expectedColumns.Select(column => headerLine.IndexOf(column)).ToArray();
 
             var parsedTable = new List<List<string>>();
