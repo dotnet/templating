@@ -15,6 +15,7 @@ namespace Microsoft.TemplateEngine.Core.Util
     {
         private static readonly ConcurrentDictionary<IReadOnlyList<IOperationProvider>, Dictionary<Encoding, Trie<OperationTerminal>>> TrieLookup = new ConcurrentDictionary<IReadOnlyList<IOperationProvider>, Dictionary<Encoding, Trie<OperationTerminal>>>();
         private static readonly ConcurrentDictionary<IReadOnlyList<IOperationProvider>, List<string>> OperationsToExplicitlySetOnByDefault = new ConcurrentDictionary<IReadOnlyList<IOperationProvider>, List<string>>();
+        private readonly Stream _temporaryTarget;
         private readonly Stream _target;
         private readonly TrieEvaluator<OperationTerminal> _trie;
         private readonly int _flushThreshold;
@@ -51,6 +52,7 @@ namespace Microsoft.TemplateEngine.Core.Util
                     {
                         bufferSize = (int)source.Length;
                     }
+                    _temporaryTarget = new MemoryStream((int)source.Length);
                 }
                 catch
                 {
@@ -66,6 +68,7 @@ namespace Microsoft.TemplateEngine.Core.Util
 
             _source = source;
             _target = target;
+            _temporaryTarget ??= new MemoryStream();
             Config = config;
             _flushThreshold = flushThreshold;
             CurrentBuffer = new byte[bufferSize];
@@ -216,7 +219,7 @@ namespace Microsoft.TemplateEngine.Core.Util
                             //Console.WriteLine("UnmatchedBlock");
                             //string text = System.Text.Encoding.UTF8.GetString(CurrentBuffer, handoffBufferPosition - toWrite - matchLength, toWrite).Replace("\0", "\\0");
                             //Console.WriteLine(text);
-                            _target.Write(CurrentBuffer, handoffBufferPosition - toWrite - matchLength, toWrite);
+                            _temporaryTarget.Write(CurrentBuffer, handoffBufferPosition - toWrite - matchLength, toWrite);
                             bytesWrittenSinceLastFlush += toWrite;
                             nextSequenceNumberThatCouldBeWritten = posedPosition - matchLength + 1;
                         }
@@ -226,7 +229,7 @@ namespace Microsoft.TemplateEngine.Core.Util
                             CurrentSequenceNumber += handoffBufferPosition - CurrentBufferPosition;
                             CurrentBufferPosition = handoffBufferPosition;
                             posedPosition = handoffBufferPosition;
-                            int bytesWritten = operation.HandleMatch(this, CurrentBufferLength, ref posedPosition, terminal.Terminal.Token, _target);
+                            int bytesWritten = operation.HandleMatch(this, CurrentBufferLength, ref posedPosition, terminal.Terminal.Token, _temporaryTarget);
                             bytesWrittenSinceLastFlush += bytesWritten;
 
                             CurrentSequenceNumber += posedPosition - CurrentBufferPosition;
@@ -244,7 +247,7 @@ namespace Microsoft.TemplateEngine.Core.Util
 
                         if (bytesWrittenSinceLastFlush >= _flushThreshold)
                         {
-                            _target.Flush();
+                            _temporaryTarget.Flush();
                             bytesWrittenSinceLastFlush = 0;
                         }
                     }
@@ -279,7 +282,7 @@ namespace Microsoft.TemplateEngine.Core.Util
                     // Console.WriteLine($"CurrentBuffer.Length {CurrentBuffer.Length}");
                     // string text = System.Text.Encoding.UTF8.GetString(CurrentBuffer, bufferPositionToAdvanceTo - toWrite, toWrite).Replace("\0", "\\0");
                     // Console.WriteLine(text);
-                    _target.Write(CurrentBuffer, bufferPositionToAdvanceTo - toWrite, toWrite);
+                    _temporaryTarget.Write(CurrentBuffer, bufferPositionToAdvanceTo - toWrite, toWrite);
                     bytesWrittenSinceLastFlush += toWrite;
                     nextSequenceNumberThatCouldBeWritten = _trie.OldestRequiredSequenceNumber;
                 }
@@ -303,7 +306,7 @@ namespace Microsoft.TemplateEngine.Core.Util
                             // Console.WriteLine("TailUnmatchedBlock");
                             // string text = System.Text.Encoding.UTF8.GetString(CurrentBuffer, handoffBufferPosition - toWrite - matchLength, toWrite).Replace("\0", "\\0");
                             // Console.WriteLine(text);
-                            _target.Write(CurrentBuffer, handoffBufferPosition - toWrite - matchLength, toWrite);
+                            _temporaryTarget.Write(CurrentBuffer, handoffBufferPosition - toWrite - matchLength, toWrite);
                             bytesWrittenSinceLastFlush += toWrite;
                             nextSequenceNumberThatCouldBeWritten = terminal.Location;
                         }
@@ -313,7 +316,7 @@ namespace Microsoft.TemplateEngine.Core.Util
                             CurrentSequenceNumber += handoffBufferPosition - CurrentBufferPosition;
                             CurrentBufferPosition = handoffBufferPosition;
                             posedPosition = handoffBufferPosition;
-                            int bytesWritten = operation.HandleMatch(this, CurrentBufferLength, ref posedPosition, terminal.Terminal.Token, _target);
+                            int bytesWritten = operation.HandleMatch(this, CurrentBufferLength, ref posedPosition, terminal.Terminal.Token, _temporaryTarget);
                             bytesWrittenSinceLastFlush += bytesWritten;
 
                             CurrentSequenceNumber += posedPosition - CurrentBufferPosition;
@@ -342,9 +345,12 @@ namespace Microsoft.TemplateEngine.Core.Util
                 // Console.WriteLine("LastBlock");
                 // string text = System.Text.Encoding.UTF8.GetString(CurrentBuffer, CurrentBufferLength - toWrite, toWrite).Replace("\0", "\\0");
                 // Console.WriteLine(text);
-                _target.Write(CurrentBuffer, CurrentBufferLength - toWrite, toWrite);
+                _temporaryTarget.Write(CurrentBuffer, CurrentBufferLength - toWrite, toWrite);
             }
 
+            _temporaryTarget.Flush();
+            _temporaryTarget.Position = 0;
+            _temporaryTarget.CopyTo(_target);
             _target.Flush();
             return anyOperationsExecuted;
         }
@@ -357,18 +363,18 @@ namespace Microsoft.TemplateEngine.Core.Util
         public void SeekBackUntil(ITokenTrie match, bool consume)
         {
             byte[] buffer = new byte[match.MaxLength];
-            while (_target.Position > _bomSize)
+            while (_temporaryTarget.Position > _bomSize)
             {
-                if (_target.Position - _bomSize < buffer.Length)
+                if (_temporaryTarget.Position - _bomSize < buffer.Length)
                 {
-                    _target.Position = _bomSize;
+                    _temporaryTarget.Position = _bomSize;
                 }
                 else
                 {
-                    _target.Position -= buffer.Length;
+                    _temporaryTarget.Position -= buffer.Length;
                 }
 
-                int nRead = ReadExactBytes(_target, buffer, 0, buffer.Length);
+                int nRead = ReadExactBytes(_temporaryTarget, buffer, 0, buffer.Length);
 
                 int best = -1;
                 int bestPos = -1;
@@ -385,43 +391,43 @@ namespace Microsoft.TemplateEngine.Core.Util
 
                 if (best != -1)
                 {
-                    _target.Position -= nRead - bestPos + (consume ? match.TokenLength[best] : 0);
-                    _target.SetLength(_target.Position);
+                    _temporaryTarget.Position -= nRead - bestPos + (consume ? match.TokenLength[best] : 0);
+                    _temporaryTarget.SetLength(_temporaryTarget.Position);
                     return;
                 }
 
                 //Back up the amount we already read to get a new window of data in
-                if (_target.Position - _bomSize < buffer.Length)
+                if (_temporaryTarget.Position - _bomSize < buffer.Length)
                 {
-                    _target.Position = _bomSize;
+                    _temporaryTarget.Position = _bomSize;
                 }
                 else
                 {
-                    _target.Position -= buffer.Length;
+                    _temporaryTarget.Position -= buffer.Length;
                 }
             }
 
-            if (_target.Position == _bomSize)
+            if (_temporaryTarget.Position == _bomSize)
             {
-                _target.SetLength(_bomSize);
+                _temporaryTarget.SetLength(_bomSize);
             }
         }
 
         public void SeekBackWhile(ITokenTrie match)
         {
             byte[] buffer = new byte[match.MaxLength];
-            while (_target.Position > _bomSize)
+            while (_temporaryTarget.Position > _bomSize)
             {
-                if (_target.Position - _bomSize < buffer.Length)
+                if (_temporaryTarget.Position - _bomSize < buffer.Length)
                 {
-                    _target.Position = _bomSize;
+                    _temporaryTarget.Position = _bomSize;
                 }
                 else
                 {
-                    _target.Position -= buffer.Length;
+                    _temporaryTarget.Position -= buffer.Length;
                 }
 
-                int nRead = ReadExactBytes(_target, buffer, 0, buffer.Length);
+                int nRead = ReadExactBytes(_temporaryTarget, buffer, 0, buffer.Length);
                 bool anyMatch = false;
                 int token = -1;
                 int i = nRead - match.MinLength;
@@ -438,24 +444,24 @@ namespace Microsoft.TemplateEngine.Core.Util
 
                 if (!anyMatch || (token != -1 && i + match.TokenLength[token] != nRead))
                 {
-                    _target.SetLength(_target.Position);
+                    _temporaryTarget.SetLength(_temporaryTarget.Position);
                     return;
                 }
 
                 //Back up the amount we already read to get a new window of data in
-                if (_target.Position - _bomSize < buffer.Length)
+                if (_temporaryTarget.Position - _bomSize < buffer.Length)
                 {
-                    _target.Position = _bomSize;
+                    _temporaryTarget.Position = _bomSize;
                 }
                 else
                 {
-                    _target.Position -= buffer.Length;
+                    _temporaryTarget.Position -= buffer.Length;
                 }
             }
 
-            if (_target.Position == _bomSize)
+            if (_temporaryTarget.Position == _bomSize)
             {
-                _target.SetLength(_bomSize);
+                _temporaryTarget.SetLength(_bomSize);
             }
         }
 
