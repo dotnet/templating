@@ -44,7 +44,7 @@ Options:
         private const string ConsoleHelp =
 @"Console App (C#)
 Author: Microsoft
-Description: A project for creating a command-line application that can run on .NET Core on Windows, Linux and macOS
+Description: A project for creating a command-line application that can run on .NET on Windows, Linux and macOS
 Options:                                                                             
   -f|--framework  The target framework for the project.                              
                       net6.0           - Target net6.0                               
@@ -72,7 +72,7 @@ To see help for other template languages (F#, VB), use --language option:
         private const string ClassLibHelp =
 @"Class Library (C#)
 Author: Microsoft
-Description: A project for creating a class library that targets .NET Standard or .NET Core
+Description: A project for creating a class library that targets .NET or .NET Standard
 Options:                                                                             
   -f|--framework  The target framework for the project.                              
                       net6.0            - Target net6.0                              
@@ -232,7 +232,7 @@ To search for the templates on NuGet.org, run:
             const string ConsoleHelp =
 @"Console App (C#)
 Author: Microsoft
-Description: A project for creating a command-line application that can run on .NET Core on Windows, Linux and macOS
+Description: A project for creating a command-line application that can run on .NET on Windows, Linux and macOS
 Options:                                                                            
   --langVersion  Sets the LangVersion property in the created project file          
                  text - Optional                                                    
@@ -318,7 +318,7 @@ For more information, run:
             const string ConsoleHelp =
 @"Console App (C#)
 Author: Microsoft
-Description: A project for creating a command-line application that can run on .NET Core on Windows, Linux and macOS
+Description: A project for creating a command-line application that can run on .NET on Windows, Linux and macOS
 Options:                                                                             
   -f|--framework  The target framework for the project.                              
                       net6.0           - Target net6.0                               
@@ -363,7 +363,7 @@ To see help for other template languages (F#, VB), use --language option:
             const string ConsoleHelp =
 @"Console App (F#)
 Author: Microsoft
-Description: A project for creating a command-line application that can run on .NET Core on Windows, Linux and macOS
+Description: A project for creating a command-line application that can run on .NET on Windows, Linux and macOS
 Options:                                                                             
   -f|--framework  The target framework for the project.                              
                       net6.0           - Target net6.0                               
