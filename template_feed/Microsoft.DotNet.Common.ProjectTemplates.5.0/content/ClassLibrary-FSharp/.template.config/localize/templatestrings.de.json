@@ -1,7 +1,7 @@
 ﻿{
   "author": "Microsoft",
   "name": "Klassenbibliothek",
-  "description": "Ein Projekt zum Erstellen einer Klassenbibliothek für .NET Standard oder .NET Core",
+  "description": "A project for creating a class library that targets .NET or .NET Standard",
   "symbols/TargetFrameworkOverride/description": "Überschreibt das Zielframework",
   "symbols/TargetFrameworkOverride/displayName": "Zielframeworküberschreibung",
   "symbols/Framework/description": "Das Zielframework für das Projekt.",
