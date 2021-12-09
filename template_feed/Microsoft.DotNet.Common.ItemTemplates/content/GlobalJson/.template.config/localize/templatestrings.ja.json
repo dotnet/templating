@@ -1,8 +1,8 @@
 ﻿{
   "author": "Microsoft",
   "name": "global.json ファイル",
-  "description": ".NET Core SDK のバージョンを選択するためのファイルです。",
-  "symbols/SdkVersion/description": "使用する .NET Core SDK のバージョンです。",
+  "description": "A file for selecting the .NET SDK version.",
+  "symbols/SdkVersion/description": "The version of the .NET SDK to use.",
   "symbols/SdkVersion/displayName": "SDK バージョン",
   "symbols/dotnet-cli-version/displayName": "dotnet CLI バージョン",
   "symbols/RollForward/description": "SDK バージョンを選択する場合に使用するロールフォワード ポリシー。",

@@ -1,8 +1,8 @@
 ﻿{
   "author": "Microsoft",
   "name": "fichier global.json",
-  "description": "Fichier permettant de sélectionner la version kit SDK .NET Core.",
-  "symbols/SdkVersion/description": "Version du kit SDK .NET Core à utiliser.",
+  "description": "A file for selecting the .NET SDK version.",
+  "symbols/SdkVersion/description": "The version of the .NET SDK to use.",
   "symbols/SdkVersion/displayName": "Version du SDK",
   "symbols/dotnet-cli-version/displayName": "Version de l’interface CLI dotnet",
   "symbols/RollForward/description": "La stratégie d'actualisation à utiliser lors de la sélection d'une version du kit de développement logiciel (SDK).",
