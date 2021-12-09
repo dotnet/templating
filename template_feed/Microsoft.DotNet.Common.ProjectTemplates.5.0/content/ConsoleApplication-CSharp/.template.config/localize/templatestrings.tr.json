@@ -1,7 +1,7 @@
 ﻿{
   "author": "Microsoft",
   "name": "Konsol Uygulaması",
-  "description": "Windows, Linux ve macOS'de .NET Core üzerinde çalışabilen bir komut satırı uygulaması oluşturma projesi",
+  "description": "A project for creating a command-line application that can run on .NET on Windows, Linux and macOS",
   "symbols/TargetFrameworkOverride/description": "Hedef çerçeveyi geçersiz kılar",
   "symbols/TargetFrameworkOverride/displayName": "Hedef çerçeveyi geçersiz kılma",
   "symbols/Framework/description": "Projenin hedef çerçevesi.",
