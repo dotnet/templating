@@ -17,13 +17,13 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Commands
         // @inheritdoc
         public override Task<int> InvokeAsync(InvocationContext context)
         {
-            return CommandHandler.Create<TModel, CancellationToken>(ExecuteAsync).InvokeAsync(context);
+            return System.CommandLine.NamingConventionBinder.CommandHandler.Create<TModel, CancellationToken>(ExecuteAsync).InvokeAsync(context);
         }
 
         /// <summary>
         /// Executes the command with the given input.
         /// </summary>
         /// <param name="args">Arguments for the command.</param>
-        protected abstract Task<int> ExecuteAsync(TModel args, CancellationToken cancellationToken = default);
+        protected abstract Task<int> ExecuteAsync(TModel args, CancellationToken cancellationToken);
     }
 }
