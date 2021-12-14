@@ -1,8 +1,8 @@
 ﻿{
   "author": "Microsoft",
   "name": "Файл global.json",
-  "description": "Файл для выбора версии пакета SDK для .NET Core.",
-  "symbols/SdkVersion/description": "Используемая версия пакета SDK для .NET Core.",
+  "description": "A file for selecting the .NET SDK version.",
+  "symbols/SdkVersion/description": "The version of the .NET SDK to use.",
   "symbols/SdkVersion/displayName": "Версия пакета SDK",
   "symbols/dotnet-cli-version/displayName": "Версия CLI dotnet",
   "symbols/RollForward/description": "Политика наката, используемая при выборе версии пакета SDK.",

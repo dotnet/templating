@@ -1,8 +1,8 @@
 ﻿{
   "author": "Microsoft",
   "name": "global.json file",
-  "description": ".NET Core SDK sürümünü seçmeye yönelik bir dosya.",
-  "symbols/SdkVersion/description": "Kullanılacak .NET Core SDK sürümü.",
+  "description": "A file for selecting the .NET SDK version.",
+  "symbols/SdkVersion/description": "The version of the .NET SDK to use.",
   "symbols/SdkVersion/displayName": "SDK sürümü",
   "symbols/dotnet-cli-version/displayName": "dotnet CLI sürümü",
   "symbols/RollForward/description": "SDK sürümü seçerken kullanılacak ileri alma ilkesi.",
