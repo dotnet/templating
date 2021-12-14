@@ -373,7 +373,7 @@ Pokud si chcete zobrazit všechny aliasy, spusťte bez argumentů příkaz dotne
       </trans-unit>
       <trans-unit id="CommandDescription">
         <source>Template Instantiation Commands for .NET CLI</source>
-        <target state="needs-review-translation">Příkazy pro vytvoření instancí šablon pro .NET Core CLI.</target>
+        <target state="new">Template Instantiation Commands for .NET CLI</target>
         <note />
       </trans-unit>
       <trans-unit id="CommandFailed">

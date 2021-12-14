@@ -1,7 +1,7 @@
 ﻿{
   "author": "Microsoft",
   "name": "クラス ライブラリ",
-  "description": ".NET Standard または .NET Core を対象とするクラス ライブラリを作成するためのプロジェクト",
+  "description": ".NET または .NET Standard を対象とするクラス ライブラリを作成するためのプロジェクト",
   "symbols/TargetFrameworkOverride/description": "ターゲット フレームワークをオーバーライドする",
   "symbols/TargetFrameworkOverride/displayName": "ターゲット フレームワークのオーバーライド",
   "symbols/Framework/description": "プロジェクトのターゲット フレームワークです。",

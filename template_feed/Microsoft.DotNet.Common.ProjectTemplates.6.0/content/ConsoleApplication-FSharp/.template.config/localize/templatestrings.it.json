@@ -1,7 +1,7 @@
 ﻿{
   "author": "Microsoft",
   "name": "App console",
-  "description": "Progetto per la creazione di un'applicazione da riga di comando eseguibile in .NET Core in Windows, Linux e macOS",
+  "description": "A project for creating a command-line application that can run on .NET on Windows, Linux and macOS",
   "symbols/TargetFrameworkOverride/description": "Ignora il framework di destinazione",
   "symbols/TargetFrameworkOverride/displayName": "Override del framework di destinazione",
   "symbols/Framework/description": "Il framework di destinazione per il progetto.",
