@@ -92,7 +92,7 @@ stages:
 
       - job: OSX
         pool:
-          name: Hosted macOS
+          vmImage: 'macOS-latest'
         strategy:
           matrix:
             debug_configuration:
