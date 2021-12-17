@@ -20,6 +20,7 @@ Other templates are located in the following repositories:
 | Templates | Repository |
 |---|---|
 |ASP.NET and Blazor templates|[dotnet/aspnetcore](https://github.com/dotnet/aspnetcore)|
+|ASP.NET Single Page Application templates| [dotnet/spa-templates](https://github.com/dotnet/spa-templates)|
 |WPF templates|[dotnet/wpf](https://github.com/dotnet/wpf)|
 |Windows Forms templates|[dotnet/winforms](https://github.com/dotnet/winforms)|
 |Test templates|[dotnet/test-templates](https://github.com/dotnet/test-templates)|
