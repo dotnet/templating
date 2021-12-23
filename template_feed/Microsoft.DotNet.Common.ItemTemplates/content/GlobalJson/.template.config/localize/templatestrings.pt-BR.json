@@ -1,8 +1,8 @@
 ﻿{
   "author": "Microsoft",
   "name": "arquivo global.json",
-  "description": "Um arquivo para selecionar a versão do .NET Core SDK.",
-  "symbols/SdkVersion/description": "A versão do .NET Core SDK a ser usada.",
+  "description": "Um arquivo para selecionar a versão do SDK do .NET.",
+  "symbols/SdkVersion/description": "A versão do SDK do .NET a ser usada.",
   "symbols/SdkVersion/displayName": "Versão do SDK",
   "symbols/dotnet-cli-version/displayName": "Versão do CLI do dotnet",
   "symbols/RollForward/description": "A política de rolar para frente a ser usada ao selecionar uma versão do SDK.",

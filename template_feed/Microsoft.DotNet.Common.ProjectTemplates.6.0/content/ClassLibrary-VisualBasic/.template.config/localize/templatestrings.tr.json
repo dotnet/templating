@@ -1,7 +1,7 @@
 ﻿{
   "author": "Microsoft",
   "name": "Sınıf Kitaplığı",
-  "description": ".NET Standard veya .NET Core’u hedefleyen bir sınıf kitaplığı oluşturma projesi",
+  "description": ".NET veya .NET Standard’ı hedefleyen bir sınıf kitaplığı oluşturmaya yönelik proje.",
   "symbols/TargetFrameworkOverride/description": "Hedef çerçeveyi geçersiz kılar",
   "symbols/TargetFrameworkOverride/displayName": "Hedef çerçeveyi geçersiz kılma",
   "symbols/Framework/description": "Projenin hedef çerçevesi.",

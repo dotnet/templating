@@ -1,8 +1,8 @@
 ﻿{
   "author": "Microsoft",
   "name": "plik global.json",
-  "description": "Plik służący do wybierania wersji zestaw .SDLK NET Core.",
-  "symbols/SdkVersion/description": "Wersja zestaw SDK .NET Core, która ma zostać użyta.",
+  "description": "Plik do wybrania wersji zestawu .NET SDK.",
+  "symbols/SdkVersion/description": "Wersja zestawu .NET SDK do użycia.",
   "symbols/SdkVersion/displayName": "Wersja zestawu SDK",
   "symbols/dotnet-cli-version/displayName": "Wersja interfejsu wiersza polecenia dotnet",
   "symbols/RollForward/description": "Zasady przechodzenia używane w przypadku wybierania wersji zestawu SDK.",

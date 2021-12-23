@@ -1,7 +1,7 @@
 ﻿{
   "author": "Microsoft",
   "name": "Application console",
-  "description": "Projet de création d'une application en ligne de commande pouvant s'exécuter sur .NET Core sur Windows, Linux et macOS",
+  "description": "Projet de création d'une application en ligne de commande pouvant s'exécuter sur .NET sur Windows, Linux et macOS",
   "symbols/TargetFrameworkOverride/description": "Remplace l’infrastructure cible",
   "symbols/TargetFrameworkOverride/displayName": "Remplacement du frame cible",
   "symbols/Framework/description": "Framework cible du projet.",

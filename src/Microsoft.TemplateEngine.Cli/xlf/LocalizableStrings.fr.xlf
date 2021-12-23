@@ -373,7 +373,7 @@ Exécutez « dotnet {1} --show-aliases » sans arguments pour afficher tous le
       </trans-unit>
       <trans-unit id="CommandDescription">
         <source>Template Instantiation Commands for .NET CLI</source>
-        <target state="needs-review-translation">Commandes d’instanciation du modèle pour CLI .NET Core</target>
+        <target state="translated">Commandes d'instanciation de modèle pour .NET CLI</target>
         <note />
       </trans-unit>
       <trans-unit id="CommandFailed">

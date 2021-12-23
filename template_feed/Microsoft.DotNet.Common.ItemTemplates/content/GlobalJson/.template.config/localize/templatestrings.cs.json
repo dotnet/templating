@@ -1,8 +1,8 @@
 ﻿{
   "author": "Microsoft",
   "name": "global.json file",
-  "description": "Soubor pro výběr verze .NET Core SDK",
-  "symbols/SdkVersion/description": "Verze .NET Core SDK, která se má použít",
+  "description": "Soubor pro výběr verze .NET SDK.",
+  "symbols/SdkVersion/description": "Verze .NET SDK, která se má použít.",
   "symbols/SdkVersion/displayName": "Verze SDK",
   "symbols/dotnet-cli-version/displayName": "verze dotnet CLI",
   "symbols/RollForward/description": "Zásada posunutí vpřed, která se použije při výběru verze sady SDK",

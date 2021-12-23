@@ -373,7 +373,7 @@ Ejecute "dotnet {1} --show-aliases" sin argumentos para mostrar todos los alias.
       </trans-unit>
       <trans-unit id="CommandDescription">
         <source>Template Instantiation Commands for .NET CLI</source>
-        <target state="needs-review-translation">Comandos de creación de instancias de plantilla para CLI de .NET Core</target>
+        <target state="translated">Comandos de creación de instancias de plantilla para CLI de .NET</target>
         <note />
       </trans-unit>
       <trans-unit id="CommandFailed">

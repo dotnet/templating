@@ -176,7 +176,7 @@ Details: {1}.</source>
       <trans-unit id="TemplateCreator_TemplateCreationResult_Error_CreationFailed">
         <source>Failed to create template.
 Details: {0}</source>
-        <target state="needs-review-translation">未能创建模板。
+        <target state="translated">未能创建模板。
 详细信息: {0}。</target>
         <note />
       </trans-unit>

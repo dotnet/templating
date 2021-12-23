@@ -176,7 +176,7 @@ Podrobnosti: {1}.</target>
       <trans-unit id="TemplateCreator_TemplateCreationResult_Error_CreationFailed">
         <source>Failed to create template.
 Details: {0}</source>
-        <target state="needs-review-translation">Nepovedlo se vytvořit šablonu. 
+        <target state="translated">Nepovedlo se vytvořit šablonu. 
 Podrobnosti: {0}.</target>
         <note />
       </trans-unit>

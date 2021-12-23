@@ -1,8 +1,8 @@
 ﻿{
   "author": "Microsoft",
   "name": "global.json file",
-  "description": "用于选择 .NET Core SDK 版本的文件。",
-  "symbols/SdkVersion/description": "要使用的 .NET Core SDK 版本。",
+  "description": "用于选择 .NET SDK 版本的文件。",
+  "symbols/SdkVersion/description": "要使用的 .NET SDK 的版本。",
   "symbols/SdkVersion/displayName": "SDK 版本",
   "symbols/dotnet-cli-version/displayName": "dotnet CLI 版本",
   "symbols/RollForward/description": "选择 SDK 版本时要使用的前滚策略。",
