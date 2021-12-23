@@ -1,8 +1,8 @@
 ﻿{
   "author": "Microsoft",
   "name": "archivo global.json",
-  "description": "A file for selecting the .NET SDK version.",
-  "symbols/SdkVersion/description": "The version of the .NET SDK to use.",
+  "description": "Archivo para seleccionar la versión del SDK de .NET.",
+  "symbols/SdkVersion/description": "Versión del SDK de .NET que se va a usar.",
   "symbols/SdkVersion/displayName": "versión de SDK",
   "symbols/dotnet-cli-version/displayName": "versión de la CLI de dotnet",
   "symbols/RollForward/description": "Directiva de reenvío que se va a usar al seleccionar una versión de SDK.",

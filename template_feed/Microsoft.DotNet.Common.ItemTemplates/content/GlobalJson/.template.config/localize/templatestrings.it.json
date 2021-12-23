@@ -1,8 +1,8 @@
 ﻿{
   "author": "Microsoft",
   "name": "file global.json",
-  "description": "A file for selecting the .NET SDK version.",
-  "symbols/SdkVersion/description": "The version of the .NET SDK to use.",
+  "description": "File per la selezione della versione del .NE SDK.",
+  "symbols/SdkVersion/description": "Versione del .NET SDK da utilizzare.",
   "symbols/SdkVersion/displayName": "Versione SDK",
   "symbols/dotnet-cli-version/displayName": "Versione dotnet CLI",
   "symbols/RollForward/description": "I criteri di roll-forward da utilizzare quando si seleziona una versione dell'SDK.",
