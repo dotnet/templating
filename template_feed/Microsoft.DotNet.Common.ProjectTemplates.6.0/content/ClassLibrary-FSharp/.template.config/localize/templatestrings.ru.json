@@ -1,7 +1,7 @@
 ﻿{
   "author": "Microsoft",
   "name": "Библиотека классов",
-  "description": "A project for creating a class library that targets .NET or .NET Standard",
+  "description": "Проект для создания библиотеки классов, предназначенной для .NET или .NET Standard.",
   "symbols/TargetFrameworkOverride/description": "Переопределяет целевую платформу",
   "symbols/TargetFrameworkOverride/displayName": "Переопределение целевой платформы",
   "symbols/Framework/description": "Целевая платформа для проекта.",
