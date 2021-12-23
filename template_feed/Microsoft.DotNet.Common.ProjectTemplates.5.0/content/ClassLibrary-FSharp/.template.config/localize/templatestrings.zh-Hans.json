@@ -1,7 +1,7 @@
 ﻿{
   "author": "Microsoft",
   "name": "类库",
-  "description": "A project for creating a class library that targets .NET or .NET Standard",
+  "description": "用于创建面向 .NET 或 .NET Standard 的类库的项目",
   "symbols/TargetFrameworkOverride/description": "替代目标框架",
   "symbols/TargetFrameworkOverride/displayName": "目标框架替代",
   "symbols/Framework/description": "项目的目标框架。",
