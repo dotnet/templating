@@ -619,7 +619,9 @@ Examples:
             Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Downloads"), "'Downloads' column contains empty values");
         }
 
-        [Fact]
+#pragma warning disable xUnit1004 // Test methods should not be skipped
+        [Fact(Skip = "This test doesn't work now due to invalid template in the cache. This is fixed in the later versions.")]
+#pragma warning restore xUnit1004 // Test methods should not be skipped
         public void CannotSearchTemplatesWithUnknownParameter()
         {
             new DotnetNewCommand(_log, "--search", "--unknown")
