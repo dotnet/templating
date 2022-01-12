@@ -19,7 +19,6 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Commands.Export
             exportCommand.AddArgument(new Argument("template-path")
             {
                 Arity = ArgumentArity.OneOrMore,
-                ValueType = typeof(string),
                 Description = LocalizableStrings.command_export_help_templatePath_description,
             });
             exportCommand.AddOption(new Option("-r")
