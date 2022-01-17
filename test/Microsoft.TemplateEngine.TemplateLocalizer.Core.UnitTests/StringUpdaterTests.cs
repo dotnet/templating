@@ -149,6 +149,44 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.UnitTests
         }
 
         [Fact]
+        public async Task UnchangedFileShouldntBeOverwritten()
+        {
+            CancellationTokenSource cts = new CancellationTokenSource(10000);
+            string expectedFilename = Path.Combine(_workingDirectory, "templatestrings.fr.json");
+
+            // Manually create a json to be observed.
+            JsonWriterOptions writerOptions = new JsonWriterOptions()
+            {
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                Indented = true,
+            };
+            using (FileStream fileStream = new FileStream(expectedFilename, FileMode.Create, FileAccess.Write))
+            {
+                using Utf8JsonWriter jsonWriter = new Utf8JsonWriter(fileStream, writerOptions);
+
+                jsonWriter.WriteStartObject();
+
+                foreach (TemplateString locString in InputStrings)
+                {
+                    jsonWriter.WritePropertyName(locString.LocalizationKey);
+                    jsonWriter.WriteStringValue(locString.Value);
+                }
+
+                jsonWriter.WriteEndObject();
+                await jsonWriter.FlushAsync(cts.Token).ConfigureAwait(false);
+            }
+
+            // Open the file and allow subsequent readings, but prevent writing.
+            // If something attempts to write to the file, it will get IOException.
+            using FileStream fileLock = new FileStream(expectedFilename, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+            // Attempt to update the previously created json to see if it will be overwritten.
+            // The content is identical. So we can read, but we shouldn't write to the file after this point.
+            await TemplateStringUpdater.UpdateStringsAsync(InputStrings, "en", new string[] { "fr" }, _workingDirectory, dryRun: false, NullLogger.Instance, cts.Token)
+                .ConfigureAwait(false);
+        }
+
+        [Fact]
         public async Task ExistingCommentsOfAuthoringLanguageArePreserved()
         {
             CancellationTokenSource cts = new CancellationTokenSource(10000);
