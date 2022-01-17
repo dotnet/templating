@@ -157,7 +157,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.UnitTests
             // Manually create a json to be observed.
             JsonWriterOptions writerOptions = new JsonWriterOptions()
             {
-                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                Encoder = new ExtendedJavascriptEncoder(),
                 Indented = true,
             };
             using (FileStream fileStream = new FileStream(expectedFilename, FileMode.Create, FileAccess.Write))
@@ -210,6 +210,40 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.UnitTests
             Assert.Contains("Class library", fileContent);
             Assert.Contains("_name.comment", fileContent);
             Assert.Contains("comments should be preserved.", fileContent);
+        }
+
+        [Fact]
+        public async Task AllowedCharactersAreNotEscaped()
+        {
+            List<TemplateString> locStrings = new List<TemplateString>()
+            {
+                // No-break space shouldn't be escaped.
+                new TemplateString("..name", "name", "\u00A0")
+            };
+
+            CancellationTokenSource cts = new CancellationTokenSource(10000);
+            await TemplateStringUpdater.UpdateStringsAsync(
+                locStrings,
+                templateJsonLanguage: "en",
+                languages: new string[] { "it" },
+                _workingDirectory,
+                dryRun: false,
+                NullLogger.Instance,
+                cts.Token)
+                .ConfigureAwait(false);
+
+            string expectedFilename = Path.Combine(_workingDirectory, "templatestrings.it.json");
+            string fileContent = File.ReadAllText(expectedFilename);
+
+            Assert.Contains("\u00A0", fileContent);
+            Assert.DoesNotContain("\\u00A0", fileContent, StringComparison.OrdinalIgnoreCase);
+
+            Dictionary<string, string> resultStrings =
+                await ReadTemplateStringsFromJsonFile(expectedFilename, cts.Token)
+                .ConfigureAwait(false);
+
+            Assert.Equal(locStrings.Count, resultStrings.Count);
+            Assert.All(locStrings, x => Assert.Contains(x.Value, resultStrings.Values));
         }
 
         private static async Task<Dictionary<string, string>> ReadTemplateStringsFromJsonFile(string path, CancellationToken cancellationToken)

@@ -5,7 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Unicode;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -99,7 +101,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
                 // Allow unescaped characters in the strings. This allows writing "aren't" instead of "aren\u0027t".
                 // This is only considered unsafe in a context where symbols may be interpreted as special characters.
                 // For instance, '<' character should be escaped in html documents where this json will be embedded.
-                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                Encoder = new ExtendedJavascriptEncoder(),
                 Indented = true,
             };
 
