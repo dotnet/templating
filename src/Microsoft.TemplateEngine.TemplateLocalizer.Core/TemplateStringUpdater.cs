@@ -133,26 +133,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
                 }
             }
 
-            bool dataWasUnchanged = true;
-
-            if (valuesToWrite.Count != (existingStrings?.Count ?? 0))
-            {
-                dataWasUnchanged = false;
-            }
-            else if (existingStrings != null)
-            {
-                foreach ((string key, string value) in valuesToWrite)
-                {
-                    if (!existingStrings.TryGetValue(key, out string existingValue)
-                        || value != existingValue)
-                    {
-                        dataWasUnchanged = false;
-                        break;
-                    }
-                }
-            }
-
-            if (dataWasUnchanged)
+            if (SequenceEqual(valuesToWrite, existingStrings))
             {
                 // Data appears to be same as before. Don't rewrite it.
                 // Rewriting the same data causes differences in encoding/BOM etc, which marks files as 'changed' in git.
@@ -174,6 +155,28 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
 
             jsonWriter.WriteEndObject();
             await jsonWriter.FlushAsync(cancellationToken).ConfigureAwait(false);
+        }
+
+        private static bool SequenceEqual(List<(string, string)> lhs, Dictionary<string, string>? rhs)
+        {
+            if (lhs.Count != (rhs?.Count ?? 0))
+            {
+                return false;
+            }
+
+            if (rhs != null)
+            {
+                foreach ((string key, string value) in lhs)
+                {
+                    if (!rhs.TryGetValue(key, out string existingValue)
+                        || value != existingValue)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
     }
 }
