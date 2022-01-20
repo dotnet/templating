@@ -184,6 +184,9 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.UnitTests
             // The content is identical. So we can read, but we shouldn't write to the file after this point.
             await TemplateStringUpdater.UpdateStringsAsync(InputStrings, "en", new string[] { "fr" }, _workingDirectory, dryRun: false, NullLogger.Instance, cts.Token)
                 .ConfigureAwait(false);
+
+            // An exception will be thrown, failing the test, if the call above tries to write to the file.
+            // The execution should reach this point if the call did not try to write to the file, which indicates success for the test.
         }
 
         [Fact]
