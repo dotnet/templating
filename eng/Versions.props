@@ -23,7 +23,7 @@
     <SystemRuntimeLoaderPackageVersion>4.3.0</SystemRuntimeLoaderPackageVersion>
     <!-- Maestro-managed Package Versions - Ordered by repo name -->
     <!-- Dependencies from https://github.com/dotnet/command-line-api -->
-    <SystemCommandLinePackageVersion>2.0.0-beta2.22069.1</SystemCommandLinePackageVersion>
+    <SystemCommandLinePackageVersion>2.0.0-beta2.22071.1</SystemCommandLinePackageVersion>
     <!-- Dependencies from https://github.com/dotnet/installer -->
     <VSRedistCommonNetCoreToolsetx64PackageVersion>7.0.100-alpha.1.21451.23</VSRedistCommonNetCoreToolsetx64PackageVersion>
     <!-- Dependencies from https://github.com/nuget/nuget.client -->
