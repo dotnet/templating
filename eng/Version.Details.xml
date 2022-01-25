@@ -23,7 +23,7 @@
       <Uri>https://github.com/dotnet/runtime</Uri>
       <Sha>09ff1acdad2e7789908b5db9bb89896144c13042</Sha>
     </Dependency>
-    <Dependency Name="System.CommandLine" Version="2.0.0-beta2.22072.3">
+    <Dependency Name="System.CommandLine" Version="2.0.0-beta2.22074.2">
       <Uri>https://github.com/dotnet/command-line-api</Uri>
       <Sha>9b9febab3883179628829ce621971f03a89ea814</Sha>
     </Dependency>
