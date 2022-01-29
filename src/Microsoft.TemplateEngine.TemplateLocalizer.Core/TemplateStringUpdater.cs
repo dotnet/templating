@@ -181,6 +181,11 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
             {
                 read = await fileStream.ReadAsync(preamble, offset, preamble.Length - offset, cancellationToken).ConfigureAwait(false);
                 offset += read;
+                // Optimization to not call .ReadAsync twice
+                if (offset == preamble.Length)
+                {
+                    break;
+                }
             }
             while (read > 0);
 
