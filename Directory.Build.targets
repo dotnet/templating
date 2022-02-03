@@ -18,13 +18,6 @@
     <PackageReference Update="Wcwidth.Sources" Version="$(WcwidthSourcesPackageVersion)" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' AND '$(BuildingInsideVisualStudio)' != 'true'">
-    <FrameworkReference
-        Update="Microsoft.NETCore.App"
-        TargetingPackVersion="$(MicrosoftNETCoreAppRefPackageVersion)"
-        RuntimeFrameworkVersion="$(MicrosoftNETCoreAppRuntimewinx64PackageVersion)" />
-  </ItemGroup>
-
   <!-- Leave this file here, even if it's empty. It stops chaining imports. -->
   <Import Project="Sdk.targets" Sdk="Microsoft.DotNet.Arcade.Sdk" />
 </Project>
