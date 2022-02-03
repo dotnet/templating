@@ -61,14 +61,11 @@ stages:
       jobs:
       - job: Windows_NT
         pool:
-          # For public or PR jobs, use the hosted pool.  For internal jobs use the internal pool.
-          # Will eventually change this to two BYOC pools.
-          ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
+          ${{ if eq(variables['System.TeamProject'], 'public') }}:
             vmImage: windows-2019
-          ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+          ${{ if eq(variables['System.TeamProject'], 'internal') }}:
             name: NetCore1ESPool-Internal
-            demands: ImageOverride -equals build.windows.10.amd64.vs2017
-
+            demands: ImageOverride -equals build.windows.10.amd64.vs2019
         variables:
         - _InternalBuildArgs: ''
 
@@ -151,8 +148,11 @@ stages:
       - ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
         - job: Linux
           pool:
-            name:  NetCore1ESPool-Public
-            demands: ImageOverride -equals Build.Ubuntu.1804.Amd64.Open
+            ${{ if eq(variables['System.TeamProject'], 'public') }}:
+              vmImage: ubuntu-18.04 
+            ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+              name: NetCore1ESPool-Internal
+              demands: ImageOverride -equals Build.Ubuntu.1804.Amd64
           strategy:
             matrix:
               debug_configuration:
