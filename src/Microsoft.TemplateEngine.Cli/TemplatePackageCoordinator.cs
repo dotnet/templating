@@ -251,6 +251,12 @@ namespace Microsoft.TemplateEngine.Cli
             }
             Reporter.Output.WriteLine();
 
+            bool validated = await ValidateInstallationRequestsAsync(commandInput, installRequests, cancellationToken).ConfigureAwait(false);
+            if (!validated)
+            {
+                return New3CommandStatus.CreateFailed;
+            }
+
             IReadOnlyList<InstallResult> installResults = await managedSourceProvider.InstallAsync(installRequests, cancellationToken).ConfigureAwait(false);
             foreach (InstallResult result in installResults)
             {
@@ -261,6 +267,55 @@ namespace Microsoft.TemplateEngine.Cli
                 }
             }
             return resultStatus;
+        }
+
+        private async Task<bool> ValidateInstallationRequestsAsync(INewCommandInput commandInput, List<InstallRequest> installRequests, CancellationToken cancellationToken)
+        {
+            var templatePackages = await _templatePackageManager.GetTemplatePackagesAsync(force: false, cancellationToken).ConfigureAwait(false);
+            IReadOnlyList<(string Id, string Version)> unmanagedTemplatePackages = templatePackages
+                .Where(tp => tp is not IManagedTemplatePackage)
+                .Select(tp => NuGetUtils.GetNuGetPackageInfo(_engineEnvironmentSettings, tp.MountPointUri))
+                .Where(i => i != default)
+                .ToList();
+
+            HashSet<(InstallRequest Request, (string Id, string Version) PackageInfo)> invalidTemplatePackages = new();
+
+            foreach (var installRequest in installRequests)
+            {
+                var foundPackage = unmanagedTemplatePackages.FirstOrDefault(package => string.Equals(package.Id, installRequest.PackageIdentifier, StringComparison.OrdinalIgnoreCase));
+                if (foundPackage != default)
+                {
+                    invalidTemplatePackages.Add((installRequest, foundPackage));
+                }
+            }
+
+            if (invalidTemplatePackages.Any())
+            {
+                Reporter reporter = commandInput.IsForceFlagSpecified ? Reporter.Output : Reporter.Error;
+
+                reporter.WriteLine(LocalizableStrings.TemplatePackageCoordinator_Install_Info_OverrideNotice);
+                reporter.WriteLine(LocalizableStrings.TemplatePackageCoordinator_Install_Info_PackageIsAvailable);
+                foreach (var request in invalidTemplatePackages)
+                {
+                    reporter.WriteLine($"{request.PackageInfo.Id}::{request.PackageInfo.Version}".Indent());
+                }
+                reporter.WriteLine();
+
+                if (!commandInput.IsForceFlagSpecified)
+                {
+                    reporter.WriteLine(string.Format(LocalizableStrings.TemplatePackageCoordinator_Install_Info_UseForceToOverride, "--force"));
+
+                    string commandExample = $"dotnet {commandInput.CommandName}";
+                    foreach (var request in installRequests)
+                    {
+                        commandExample += $" --install {request.DisplayName}";
+                    }
+                    commandExample += " --force";
+                    reporter.WriteCommand(commandExample);
+                    return false;
+                }
+            }
+            return true;
         }
 
         /// <summary>

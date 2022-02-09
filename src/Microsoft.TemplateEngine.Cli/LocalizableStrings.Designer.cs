@@ -1592,11 +1592,38 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Installing the template package(s) will override the available template package(s)..
+        /// </summary>
+        internal static string TemplatePackageCoordinator_Install_Info_OverrideNotice {
+            get {
+                return ResourceManager.GetString("TemplatePackageCoordinator_Install_Info_OverrideNotice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The following template package(s) are already available:.
+        /// </summary>
+        internal static string TemplatePackageCoordinator_Install_Info_PackageIsAvailable {
+            get {
+                return ResourceManager.GetString("TemplatePackageCoordinator_Install_Info_PackageIsAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The following template packages will be installed:.
         /// </summary>
         internal static string TemplatePackageCoordinator_Install_Info_PackagesToBeInstalled {
             get {
                 return ResourceManager.GetString("TemplatePackageCoordinator_Install_Info_PackagesToBeInstalled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to To install the template package(s) anyway, apply &apos;{0}&apos; option:.
+        /// </summary>
+        internal static string TemplatePackageCoordinator_Install_Info_UseForceToOverride {
+            get {
+                return ResourceManager.GetString("TemplatePackageCoordinator_Install_Info_UseForceToOverride", resourceCulture);
             }
         }
         
