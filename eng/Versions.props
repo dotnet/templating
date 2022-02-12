@@ -22,9 +22,9 @@
     <!-- Dependencies from https://github.com/dotnet/command-line-api -->
     <SystemCommandLinePackageVersion>2.0.0-beta3.22114.1</SystemCommandLinePackageVersion>
     <!-- Dependencies from https://github.com/nuget/nuget.client -->
-    <NuGetCredentialsPackageVersion>6.2.0-preview.1.33</NuGetCredentialsPackageVersion>
-    <NuGetConfigurationPackageVersion>6.2.0-preview.1.33</NuGetConfigurationPackageVersion>
-    <NuGetProtocolPackageVersion>6.2.0-preview.1.33</NuGetProtocolPackageVersion>
+    <NuGetCredentialsPackageVersion>6.2.0-preview.2.58</NuGetCredentialsPackageVersion>
+    <NuGetConfigurationPackageVersion>6.2.0-preview.2.58</NuGetConfigurationPackageVersion>
+    <NuGetProtocolPackageVersion>6.2.0-preview.2.58</NuGetProtocolPackageVersion>
     <!-- Dependencies from https://github.com/dotnet/clicommandlineparser -->
     <MicrosoftDotNetCliCommandLinePackageVersion>1.0.0-preview.19208.1</MicrosoftDotNetCliCommandLinePackageVersion>
     <WcwidthSourcesPackageVersion>0.5.0</WcwidthSourcesPackageVersion>
