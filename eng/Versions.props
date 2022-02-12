@@ -20,7 +20,7 @@
     <MicrosoftExtensionsLoggingPackageVersion>6.0.0</MicrosoftExtensionsLoggingPackageVersion>
     <MicrosoftExtensionsLoggingConsolePackageVersion>6.0.0</MicrosoftExtensionsLoggingConsolePackageVersion>
     <!-- Dependencies from https://github.com/dotnet/command-line-api -->
-    <SystemCommandLinePackageVersion>2.0.0-beta3.22109.1</SystemCommandLinePackageVersion>
+    <SystemCommandLinePackageVersion>2.0.0-beta3.22111.2</SystemCommandLinePackageVersion>
     <!-- Dependencies from https://github.com/nuget/nuget.client -->
     <NuGetCredentialsPackageVersion>6.2.0-preview.1.33</NuGetCredentialsPackageVersion>
     <NuGetConfigurationPackageVersion>6.2.0-preview.1.33</NuGetConfigurationPackageVersion>
