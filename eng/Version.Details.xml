@@ -23,9 +23,9 @@
       <Uri>https://github.com/dotnet/runtime</Uri>
       <Sha>0ae04e5b33afac1c14a6127df1037f83d39a6ec3</Sha>
     </Dependency>
-    <Dependency Name="System.CommandLine" Version="2.0.0-beta3.22111.2">
+    <Dependency Name="System.CommandLine" Version="2.0.0-beta3.22113.1">
       <Uri>https://github.com/dotnet/command-line-api</Uri>
-      <Sha>8152e35ea9aedbef2bb2237b95eecd03d77dc7c6</Sha>
+      <Sha>d86f87aa98d6392f99a407930e2b6451f6a33372</Sha>
     </Dependency>
     <Dependency Name="Microsoft.Extensions.Logging" Version="7.0.0-preview.2.22103.2">
       <Uri>https://github.com/dotnet/runtime</Uri>
