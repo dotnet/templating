@@ -60,6 +60,7 @@ stages:
       helixRepo: dotnet/templating
       jobs:
       - job: Windows_NT
+        timeoutInMinutes: 90
         pool:
           ${{ if eq(variables['System.TeamProject'], 'public') }}:
             vmImage: windows-2019
