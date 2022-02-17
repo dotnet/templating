@@ -27,9 +27,9 @@
     <!-- Dependencies from https://github.com/dotnet/installer -->
     <VSRedistCommonNetCoreToolsetx64PackageVersion>7.0.100-alpha.1.21451.23</VSRedistCommonNetCoreToolsetx64PackageVersion>
     <!-- Dependencies from https://github.com/nuget/nuget.client -->
-    <NuGetCredentialsPackageVersion>6.0.0-rc.278</NuGetCredentialsPackageVersion>
-    <NuGetConfigurationPackageVersion>6.0.0-rc.278</NuGetConfigurationPackageVersion>
-    <NuGetProtocolPackageVersion>6.0.0-rc.278</NuGetProtocolPackageVersion>
+    <NuGetCredentialsPackageVersion>6.2.0-preview.2.58</NuGetCredentialsPackageVersion>
+    <NuGetConfigurationPackageVersion>6.2.0-preview.2.58</NuGetConfigurationPackageVersion>
+    <NuGetProtocolPackageVersion>6.2.0-preview.2.58</NuGetProtocolPackageVersion>
     <!-- Dependencies from https://github.com/dotnet/runtime -->
     <MicrosoftNETCoreAppRefPackageVersion>7.0.0-preview.2.22113.2</MicrosoftNETCoreAppRefPackageVersion>
     <MicrosoftNETCoreAppRuntimewinx64PackageVersion>7.0.0-preview.2.22113.2</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
