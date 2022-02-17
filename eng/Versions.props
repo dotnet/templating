@@ -11,6 +11,7 @@
     <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">false</StabilizePackageVersion>
     <DotNetFinalVersionKind Condition="'$(StabilizePackageVersion)' == 'true'">release</DotNetFinalVersionKind>
     <PackSpecific Condition="'$(OS)' != 'Windows_NT'">true</PackSpecific>
+
   </PropertyGroup>
   <!-- Package Versions -->
   <PropertyGroup>
@@ -21,6 +22,7 @@
     <SystemDiagnosticsProcessPackageVersion>4.3.0</SystemDiagnosticsProcessPackageVersion>
     <SystemIOCompressionPackageVersion>4.3.0</SystemIOCompressionPackageVersion>
     <SystemRuntimeLoaderPackageVersion>4.3.0</SystemRuntimeLoaderPackageVersion>
+    <WcwidthSourcesPackageVersion>0.5.0</WcwidthSourcesPackageVersion>
     <!-- Maestro-managed Package Versions - Ordered by repo name -->
     <!-- Dependencies from https://github.com/dotnet/command-line-api -->
     <SystemCommandLinePackageVersion>2.0.0-beta3.22118.1</SystemCommandLinePackageVersion>
@@ -30,6 +32,12 @@
     <NuGetCredentialsPackageVersion>6.2.0-preview.2.75</NuGetCredentialsPackageVersion>
     <NuGetConfigurationPackageVersion>6.2.0-preview.2.75</NuGetConfigurationPackageVersion>
     <NuGetProtocolPackageVersion>6.2.0-preview.2.75</NuGetProtocolPackageVersion>
+    <!-- Dependencies from https://github.com/dotnet/roslyn -->
+    <MicrosoftNetCompilersToolsetPackageVersion>4.2.0-1.22116.16</MicrosoftNetCompilersToolsetPackageVersion>
+    <MicrosoftCodeAnalysisCSharpCodeStylePackageVersion>4.2.0-1.22116.16</MicrosoftCodeAnalysisCSharpCodeStylePackageVersion>
+    <!-- Dependencies from https://github.com/dotnet/roslyn-analyzers -->
+    <MicrosoftCodeAnalysisNetAnalyzersPackageVersion>7.0.0-preview1.22116.1</MicrosoftCodeAnalysisNetAnalyzersPackageVersion>
+    <MicrosoftCodeAnalysisPublicApiAnalyzersPackageVersion>3.3.4-beta1.22116.1</MicrosoftCodeAnalysisPublicApiAnalyzersPackageVersion>
     <!-- Dependencies from https://github.com/dotnet/runtime -->
     <MicrosoftNETCoreAppRefPackageVersion>7.0.0-preview.2.22113.2</MicrosoftNETCoreAppRefPackageVersion>
     <MicrosoftNETCoreAppRuntimewinx64PackageVersion>7.0.0-preview.2.22113.2</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
@@ -37,6 +45,5 @@
     <MicrosoftExtensionsLoggingAbstractionsPackageVersion>7.0.0-preview.2.22113.2</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
     <MicrosoftExtensionsLoggingPackageVersion>7.0.0-preview.2.22113.2</MicrosoftExtensionsLoggingPackageVersion>
     <MicrosoftExtensionsLoggingConsolePackageVersion>7.0.0-preview.2.22113.2</MicrosoftExtensionsLoggingConsolePackageVersion>
-    <WcwidthSourcesPackageVersion>0.5.0</WcwidthSourcesPackageVersion>
   </PropertyGroup>
 </Project>
