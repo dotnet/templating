@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dependencies>
   <ProductDependencies>
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-externals" Version="7.0.0-alpha.1.22114.1">
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-externals" Version="7.0.0-alpha.1.22128.2">
       <Uri>https://github.com/dotnet/source-build-externals</Uri>
-      <Sha>a28332454bd70964205fb18bf3d0a1146a228b25</Sha>
+      <Sha>bf6d8e8cff9b0e46ef0897fcdd5ac89381e9c287</Sha>
       <SourceBuild RepoName="source-build-externals" ManagedOnly="true" />
     </Dependency>
     <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="7.0.0-alpha.1.22117.4">
