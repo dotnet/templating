@@ -39,17 +39,17 @@
       <Uri>https://github.com/dotnet/runtime</Uri>
       <Sha>accf6fb6bf18f822fbbd227b1b4e31c65001a4ff</Sha>
     </Dependency>
-    <Dependency Name="NuGet.Credentials" Version="6.2.0-preview.2.107">
+    <Dependency Name="NuGet.Credentials" Version="6.2.0-preview.2.109">
       <Uri>https://github.com/nuget/nuget.client</Uri>
-      <Sha>63b0e919076850705b9a83c5cd36bc50ceb96df3</Sha>
+      <Sha>919c7e10ebdcc43235c36cf0b72c389d741835a8</Sha>
     </Dependency>
-    <Dependency Name="NuGet.Configuration" Version="6.2.0-preview.2.107">
+    <Dependency Name="NuGet.Configuration" Version="6.2.0-preview.2.109">
       <Uri>https://github.com/nuget/nuget.client</Uri>
-      <Sha>63b0e919076850705b9a83c5cd36bc50ceb96df3</Sha>
+      <Sha>919c7e10ebdcc43235c36cf0b72c389d741835a8</Sha>
     </Dependency>
-    <Dependency Name="NuGet.Protocol" Version="6.2.0-preview.2.107">
+    <Dependency Name="NuGet.Protocol" Version="6.2.0-preview.2.109">
       <Uri>https://github.com/nuget/nuget.client</Uri>
-      <Sha>63b0e919076850705b9a83c5cd36bc50ceb96df3</Sha>
+      <Sha>919c7e10ebdcc43235c36cf0b72c389d741835a8</Sha>
     </Dependency>
     <Dependency Name="VS.Redist.Common.NetCore.Toolset.x64" Version="">
       <Uri>https://www.github.com/dotnet/installer</Uri>
