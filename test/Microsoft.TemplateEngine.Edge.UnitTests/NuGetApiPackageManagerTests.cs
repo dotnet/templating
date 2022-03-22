@@ -122,12 +122,24 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         }
 
         [Fact]
-        public async Task GetLatestVersion_UnknownPackage()
+        public async Task GetLatestVersion_UnknownPackage_GromLocalNuget()
         {
             IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
 
             NuGetApiPackageManager packageManager = new NuGetApiPackageManager(engineEnvironmentSettings);
-            var exception = await Assert.ThrowsAsync<PackageNotFoundException>(() => packageManager.GetLatestVersionAsync("Microsoft.DotNet.NotCommon.ProjectTemplates.5.0", "5.0.0")).ConfigureAwait(false);
+            (string latestVersion, bool isLatestVersion) = await packageManager.GetLatestVersionAsync("Microsoft.DotNet.NotCommon.ProjectTemplates.5.0", "5.0.0").ConfigureAwait(false);
+
+            latestVersion.Should().Be("5.0.0");
+            isLatestVersion.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task GetLatestVersion_UnknownPackage_FromPackageRepository()
+        {
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
+
+            NuGetApiPackageManager packageManager = new NuGetApiPackageManager(engineEnvironmentSettings);
+            var exception = await Assert.ThrowsAsync<PackageNotFoundException>(() => packageManager.GetLatestVersionAsync("Microsoft.DotNet.NotCommon.ProjectTemplates.5.0", "5.0.0", "someExternalPackagesRepository")).ConfigureAwait(false);
 
             exception.PackageIdentifier.Should().Be("Microsoft.DotNet.NotCommon.ProjectTemplates.5.0");
             exception.Message.Should().NotBeNullOrEmpty();

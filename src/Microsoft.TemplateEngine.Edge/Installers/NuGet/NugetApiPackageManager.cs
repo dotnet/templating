@@ -66,7 +66,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
             if (string.IsNullOrWhiteSpace(version))
             {
-                (source, packageMetadata) = await GetLatestVersionInternalAsync(identifier, packagesSources, includePreview: false, cancellationToken).ConfigureAwait(false);
+                (source, packageMetadata) = await GetLatestVersionInternalAsync(identifier, packagesSources, includePreview: false, throwOnPackageNotFound: true, cancellationToken).ConfigureAwait(false);
             }
             else
             {
@@ -183,14 +183,29 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 previewVersionInstalled = currentVersion.IsPrerelease;
             }
 
+            bool isLocalNuget = string.IsNullOrWhiteSpace(additionalSource);
             string[] additionalSources = string.IsNullOrWhiteSpace(additionalSource) ? Array.Empty<string>() : new[] { additionalSource! };
             IEnumerable<PackageSource> packageSources = LoadNuGetSources(additionalSources);
-            var (_, package) = await GetLatestVersionInternalAsync(identifier, packageSources, previewVersionInstalled, cancellationToken).ConfigureAwait(false);
-            bool isLatestVersion = currentVersion != null ? currentVersion >= package.Identity.Version : false;
-            return (package.Identity.Version.ToNormalizedString(), isLatestVersion);
+            var (_, package) = await GetLatestVersionInternalAsync(
+                identifier,
+                packageSources,
+                previewVersionInstalled,
+                !isLocalNuget,
+                cancellationToken)
+                .ConfigureAwait(false);
+            bool isLocalNugetWithNoUpdate = isLocalNuget && package == default;
+            bool isLatestVersion = currentVersion != null ?
+                isLocalNugetWithNoUpdate ||
+                currentVersion >= package!.Identity.Version : false;
+            return (isLocalNugetWithNoUpdate ? (version ?? string.Empty) : package!.Identity.Version.ToNormalizedString(), isLatestVersion);
         }
 
-        private async Task<(PackageSource, IPackageSearchMetadata)> GetLatestVersionInternalAsync(string packageIdentifier, IEnumerable<PackageSource> packageSources, bool includePreview, CancellationToken cancellationToken)
+        private async Task<(PackageSource, IPackageSearchMetadata)> GetLatestVersionInternalAsync(
+            string packageIdentifier,
+            IEnumerable<PackageSource> packageSources,
+            bool includePreview,
+            bool throwOnPackageNotFound,
+            CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(packageIdentifier))
             {
@@ -214,12 +229,20 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
             if (!accumulativeSearchResults.Any())
             {
-                _nugetLogger.LogWarning(
+                _nugetLogger.Log(
+                    throwOnPackageNotFound ? LogLevel.Warning : LogLevel.Debug,
                     string.Format(
                         LocalizableStrings.NuGetApiPackageManager_Warning_PackageNotFound,
                         packageIdentifier,
                         string.Join(", ", packageSources.Select(source => source.Source))));
-                throw new PackageNotFoundException(packageIdentifier, packageSources.Select(source => source.Source));
+                if (throwOnPackageNotFound)
+                {
+                    throw new PackageNotFoundException(packageIdentifier, packageSources.Select(source => source.Source));
+                }
+                else
+                {
+                    return default;
+                }
             }
 
             if (!includePreview)
