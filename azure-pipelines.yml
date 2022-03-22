@@ -48,6 +48,13 @@ stages:
         LclSource: lclFilesfromPackage
         LclPackageId: 'LCL-JUNO-PROD-TEMPLATING'
         condition: eq(variables['Build.SourceBranch'], format('{0}{1}', 'refs/heads/', variables['OneLocBuildBranch'] ))
+    - template: /eng/common/templates/job/onelocbuild.yml
+      parameters:
+        MirrorRepo: templating
+        MirrorBranch: main
+        LclSource: lclFilesfromPackage
+        LclPackageId: 'LCL-JUNO-PROD-TMPLTNGMAIN'
+        condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
   - template: /eng/common/templates/jobs/jobs.yml
     parameters:
       enableMicrobuild: true
