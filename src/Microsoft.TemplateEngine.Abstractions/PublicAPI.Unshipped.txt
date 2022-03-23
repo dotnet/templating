@@ -1,1 +1,2 @@
-﻿Microsoft.TemplateEngine.Abstractions.ITemplateInfo.PostActions.get -> System.Collections.Generic.IReadOnlyList<System.Guid>!
+﻿Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode.PackageIsLocalOnly = 9 -> Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode
+Microsoft.TemplateEngine.Abstractions.ITemplateInfo.PostActions.get -> System.Collections.Generic.IReadOnlyList<System.Guid>!

@@ -214,7 +214,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
             if (!accumulativeSearchResults.Any())
             {
-                _nugetLogger.LogWarning(
+                _nugetLogger.LogDebug(
                     string.Format(
                         LocalizableStrings.NuGetApiPackageManager_Warning_PackageNotFound,
                         packageIdentifier,
