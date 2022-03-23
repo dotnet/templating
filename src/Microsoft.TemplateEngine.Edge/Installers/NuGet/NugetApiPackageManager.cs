@@ -340,7 +340,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             }
             catch (Exception ex)
             {
-                _nugetLogger.LogError(string.Format(LocalizableStrings.NuGetApiPackageManager_Error_FailedToReadPackage, source.Source));
+                _nugetLogger.LogDebug(string.Format(LocalizableStrings.NuGetApiPackageManager_Error_FailedToReadPackage, source.Source));
                 _nugetLogger.LogDebug($"Details: {ex.ToString()}.");
             }
             return (source, FoundPackages: null);
