@@ -44,10 +44,14 @@ stages:
     - template: /eng/common/templates/job/onelocbuild.yml
       parameters:
         MirrorRepo: templating
-        MirrorBranch: $(OneLocBuildBranch)
         LclSource: lclFilesfromPackage
-        LclPackageId: 'LCL-JUNO-PROD-TEMPLATING'
-        condition: eq(variables['Build.SourceBranch'], format('{0}{1}', 'refs/heads/', variables['OneLocBuildBranch'] ))
+        ${{ if eq(variables['Build.SourceBranch'], format('{0}{1}', 'refs/heads/', variables['OneLocBuildBranch'])) }}:
+          MirrorBranch: $(OneLocBuildBranch)
+          LclPackageId: 'LCL-JUNO-PROD-TEMPLATING'
+        ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
+          MirrorBranch: 'main'
+          LclPackageId: 'LCL-JUNO-PROD-TMPLTNGMAIN'
+        condition: eq(or(variables['Build.SourceBranch'], format('{0}{1}', 'refs/heads/', variables['OneLocBuildBranch'] )), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
   - template: /eng/common/templates/jobs/jobs.yml
     parameters:
       enableMicrobuild: true
