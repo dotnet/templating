@@ -11,9 +11,9 @@
       <Sha>def2e2c6dc5064319250e2868a041a3dc07f9579</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="System.CommandLine" Version="2.0.0-beta3.22166.1">
+    <Dependency Name="System.CommandLine" Version="2.0.0-beta3.22173.1">
       <Uri>https://github.com/dotnet/command-line-api</Uri>
-      <Sha>049480251357b8459311350b1a7b3c72eb31897e</Sha>
+      <Sha>6c71bd788d9c8f8628787792d865b9eb683f851f</Sha>
     </Dependency>
     <Dependency Name="NuGet.Credentials" Version="6.2.0-preview.2.109">
       <Uri>https://github.com/nuget/nuget.client</Uri>
