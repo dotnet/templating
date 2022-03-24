@@ -7,18 +7,21 @@ using System.IO.Compression;
 using FluentAssertions;
 using Microsoft.NET.TestFramework.Assertions;
 using Microsoft.TemplateEngine.TestHelper;
+using VerifyTests;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace Dotnet_new3.IntegrationTests
 {
-    public class DotnetNewInstantiate
+    public partial class DotnetNewInstantiate : IClassFixture<VerifySettingsFixture>
     {
         private readonly ITestOutputHelper _log;
+        private readonly VerifySettings _verifySettings;
 
-        public DotnetNewInstantiate(ITestOutputHelper log)
+        public DotnetNewInstantiate(VerifySettingsFixture verifySettings, ITestOutputHelper log)
         {
             _log = log;
+            _verifySettings = verifySettings.Settings;
         }
 
         [Fact]

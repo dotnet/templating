@@ -13,6 +13,7 @@ using Microsoft.TemplateEngine.Cli.TableOutput;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Utils;
 using NuGet.Credentials;
+using NuGet.Versioning;
 
 namespace Microsoft.TemplateEngine.Cli
 {
@@ -139,6 +140,52 @@ namespace Microsoft.TemplateEngine.Cli
             return (await managedTemplatePackage.ManagedProvider.GetLatestVersionsAsync(new[] { managedTemplatePackage }, cancellationToken).ConfigureAwait(false)).Single();
         }
 
+        internal async Task<(string, string)> ValidateBuiltInPackageAvailabilityAsync(ITemplateInfo template, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            ITemplatePackage templatePackage;
+            try
+            {
+                templatePackage = await _templatePackageManager.GetTemplatePackageAsync(template, cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                Reporter.Error.WriteLine(string.Format(LocalizableStrings.TemplatePackageCoordinator_Error_PackageForTemplateNotFound, template.Identity));
+                return default;
+            }
+
+            if (!(templatePackage is IManagedTemplatePackage managedTemplatePackage))
+            {
+                //update is not supported - built-in or optional workload source
+                return default;
+            }
+
+            IReadOnlyList<ITemplatePackage> templatePackages = await _templatePackageManager.GetTemplatePackagesAsync(force: false, cancellationToken).ConfigureAwait(false);
+            IEnumerable<(string Id, string Version)> unmanagedTemplatePackages = templatePackages
+                .Where(tp => tp is not IManagedTemplatePackage)
+                .Select(tp => NuGetUtils.GetNuGetPackageInfo(_engineEnvironmentSettings, tp.MountPointUri))
+                .Where(i => i != default);
+
+            var matchingTemplatePackage = unmanagedTemplatePackages.FirstOrDefault(package => string.Equals(managedTemplatePackage.Identifier, package.Id, StringComparison.OrdinalIgnoreCase));
+            if (matchingTemplatePackage == default)
+            {
+                return default;
+            }
+
+            NuGetVersion managedPackageVersion;
+            NuGetVersion unmanagedPackageVersion;
+
+            if (NuGetVersion.TryParse(managedTemplatePackage.Version, out managedPackageVersion) && NuGetVersion.TryParse(matchingTemplatePackage.Version, out unmanagedPackageVersion))
+            {
+                if (unmanagedPackageVersion >= managedPackageVersion)
+                {
+                    return matchingTemplatePackage;
+                }
+            }
+            return default;
+        }
+
         internal void DisplayUpdateCheckResult(CheckUpdateResult versionCheckResult, INewCommandInput commandInput)
         {
             _ = versionCheckResult ?? throw new ArgumentNullException(nameof(versionCheckResult));
@@ -155,12 +202,24 @@ namespace Microsoft.TemplateEngine.Cli
                     Reporter.Output.WriteCommand(commandInput.InstallCommandExample(
                         packageID: versionCheckResult.TemplatePackage.Identifier,
                         version: versionCheckResult.LatestVersion));
+                    Reporter.Output.WriteLine();
                 }
             }
             else
             {
                 HandleUpdateCheckErrors(versionCheckResult);
+                Reporter.Error.WriteLine();
             }
+        }
+
+        internal void DisplayBuiltInPackagesCheckResult(string packageId, string version, INewCommandInput commandInput)
+        {
+            Reporter.Output.WriteLine(
+                string.Format(
+                    LocalizableStrings.TemplatePackageCoordinator_BuiltInCheck_Info_BuiltInPackageAvailable,
+                    $"{packageId}::{version}"));
+            Reporter.Output.WriteLine(LocalizableStrings.TemplatePackageCoordinator_BuiltInCheck_Info_UninstallPackage);
+            Reporter.Output.WriteCommand(commandInput.UninstallCommandExample(packageId));
         }
 
         private static void InitializeNuGetCredentialService(INewCommandInput commandInput)
