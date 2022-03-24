@@ -51,12 +51,6 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
         /// <summary>
         /// The requested package is invalid and cannot be processed.
         /// </summary>
-        InvalidPackage = 8,
-
-        /// <summary>
-        /// The template package is local only (no remote source configured)
-        ///  and it was not found in default remote sources.
-        /// </summary>
-        PackageIsLocalOnly = 9
+        InvalidPackage = 8
     }
 }

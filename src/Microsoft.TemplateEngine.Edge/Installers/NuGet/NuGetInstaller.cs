@@ -129,7 +129,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                         {
                             return CheckUpdateResult.CreateFailure(
                                 package,
-                                nugetPackage.LocalPackage ? InstallerErrorCode.PackageIsLocalOnly : InstallerErrorCode.PackageNotFound,
+                                InstallerErrorCode.PackageNotFound,
                                 string.Format(LocalizableStrings.NuGetInstaller_Error_FailedToReadPackage, e.PackageIdentifier, string.Join(", ", e.SourcesList)));
                         }
                         catch (InvalidNuGetSourceException e)

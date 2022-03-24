@@ -304,11 +304,10 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         }
 
         [Theory]
-        [InlineData(nameof(PackageNotFoundException), false, InstallerErrorCode.PackageNotFound)]
-        [InlineData(nameof(PackageNotFoundException), true, InstallerErrorCode.PackageIsLocalOnly)]
-        [InlineData(nameof(InvalidNuGetSourceException), false, InstallerErrorCode.InvalidSource)]
-        [InlineData(nameof(Exception), false, InstallerErrorCode.GenericError)]
-        public async Task GetLatestVersion_RemotePackage_HandleExceptions(string exception, bool isLocalPackage, InstallerErrorCode expectedErrorCode)
+        [InlineData(nameof(PackageNotFoundException), InstallerErrorCode.PackageNotFound)]
+        [InlineData(nameof(InvalidNuGetSourceException), InstallerErrorCode.InvalidSource)]
+        [InlineData(nameof(Exception), InstallerErrorCode.GenericError)]
+        public async Task GetLatestVersion_RemotePackage_HandleExceptions(string exception, InstallerErrorCode expectedErrorCode)
         {
             MockInstallerFactory factory = new MockInstallerFactory();
             MockManagedTemplatePackageProvider provider = new MockManagedTemplatePackageProvider();
@@ -318,7 +317,6 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 
             NuGetInstaller installer = new NuGetInstaller(factory, engineEnvironmentSettings, installPath, mockPackageManager, mockPackageManager);
             NuGetManagedTemplatePackage source = new NuGetManagedTemplatePackage(engineEnvironmentSettings, installer, provider, installPath, exception);
-            source.LocalPackage = isLocalPackage;
             IReadOnlyList<CheckUpdateResult> checkUpdateResults = await installer.GetLatestVersionAsync(new[] { source }, provider, CancellationToken.None).ConfigureAwait(false);
 
             Assert.Single(checkUpdateResults);
