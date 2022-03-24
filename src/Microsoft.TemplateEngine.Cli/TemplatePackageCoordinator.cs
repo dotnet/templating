@@ -84,7 +84,7 @@ namespace Microsoft.TemplateEngine.Cli
             }
             else
             {
-                HandleUpdateCheckErrors(versionCheckResult, true);
+                HandleUpdateCheckErrors(versionCheckResult, ignoreLocalPackageNotFound: true);
             }
         }
 
@@ -486,7 +486,7 @@ namespace Microsoft.TemplateEngine.Cli
                 {
                     // explicit check of updates requested - so we do not want to ignore errors for
                     //  local only packages
-                    HandleUpdateCheckErrors(result, false);
+                    HandleUpdateCheckErrors(result, ignoreLocalPackageNotFound: false);
                 }
                 Reporter.Error.WriteLine();
             }
