@@ -1,10 +1,10 @@
-{
+﻿{
   "author": "Microsoft",
-  "name": "Файл global.json",
-  "description": "Файл для выбора версии пакета SDK для .NET Core.",
-  "symbols/SdkVersion/description": "Используемая версия пакета SDK для .NET Core.",
-  "symbols/SdkVersion/displayName": "Версия пакета SDK",
-  "symbols/dotnet-cli-version/displayName": "Версия CLI dotnet",
+  "name": "global.json file",
+  "description": "A file for selecting the .NET SDK version.",
+  "symbols/SdkVersion/description": "The version of the .NET SDK to use.",
+  "symbols/SdkVersion/displayName": "SDK version",
+  "symbols/dotnet-cli-version/displayName": "dotnet CLI version",
   "symbols/RollForward/description": "The roll-forward policy to use when selecting an SDK version.",
   "symbols/RollForward/displayName": "Roll-forward policy",
   "symbols/RollForward/choices/patch/description": "Uses the specified version.\nIf not found, rolls forward to the latest patch level.\nIf not found, fails.\nThis value is the legacy behavior from the earlier versions of the SDK.",
@@ -25,5 +25,5 @@
   "symbols/RollForward/choices/latestMajor/displayName": "Latest major",
   "symbols/RollForward/choices/disable/description": "Doesn't roll forward. Exact match required.",
   "symbols/RollForward/choices/disable/displayName": "Disable roll-forward",
-  "postActions/open-file/description": "Открывает файл global.json в редакторе"
+  "postActions/open-file/description": "Opens global.json in the editor"
 }
