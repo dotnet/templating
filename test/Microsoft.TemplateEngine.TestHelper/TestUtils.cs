@@ -18,9 +18,27 @@ namespace Microsoft.TemplateEngine.TestHelper
 
         public static string GetTestTemplateLocation(string templateName)
         {
+            return GetTestArtifactLocation(Path.Combine("test_templates", templateName));
+        }
+
+        public static string GetTestNugetLocation(string templateName = "TestNupkgInstallTemplateV2.0.0.2.nupkg")
+        {
+            string artifactsDir = GetTestArtifactLocation("nupkg_templates");
+            string nupkgPath = Path.Combine(artifactsDir, templateName);
+
+            if (!File.Exists(nupkgPath))
+            {
+                throw new FileNotFoundException($"{nupkgPath} does not exist");
+            }
+
+            return Path.GetFullPath(nupkgPath);
+        }
+
+        private static string GetTestArtifactLocation(string artifactLocation)
+        {
             string codebase = typeof(TestUtils).GetTypeInfo().Assembly.Location;
             string dir = Path.GetDirectoryName(codebase);
-            string templateLocation = Path.Combine(dir, "..", "..", "..", "..", "..", "test", "Microsoft.TemplateEngine.TestTemplates", "test_templates", templateName);
+            string templateLocation = Path.Combine(dir, "..", "..", "..", "..", "..", "test", "Microsoft.TemplateEngine.TestTemplates", artifactLocation);
 
             if (!Directory.Exists(templateLocation))
             {

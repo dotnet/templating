@@ -319,5 +319,37 @@ namespace Dotnet_new3.IntegrationTests
             Assert.Equal($"{string.Format(expectedCommandFormat, "bar")}{expectedEol}bar{expectedEol}", File.ReadAllText(testFile));
         }
 
+        [Fact]
+        public void DoesNotReportErrorOnDefaultUpdateCheckOfLocalPackageDuringInstantiation()
+        {
+            string nugetName = "TestNupkgInstallTemplate";
+            string nugetVersion = "0.0.1";
+            string nugetFullName = $"{nugetName}::{nugetVersion}";
+            string nugetFileName = $"{nugetName}.{nugetVersion}.nupkg";
+            string templateName = "nupkginstall";
+
+            var home = TestUtils.CreateTemporaryFolder("Home");
+            new DotnetNewCommand(_log, "install", TestUtils.GetTestNugetLocation(nugetFileName))
+                .WithCustomHive(home).WithoutBuiltInTemplates()
+                .WithWorkingDirectory(TestUtils.CreateTemporaryFolder())
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And
+                .NotHaveStdErr()
+                .And.NotHaveStdOutContaining("Determining projects to restore...")
+                .And.HaveStdOutContaining("installed the following templates")
+                .And.HaveStdOutContaining(templateName);
+
+            new DotnetNewCommand(_log, templateName, "--dry-run")
+                .WithCustomHive(home).WithoutBuiltInTemplates()
+                .WithWorkingDirectory(TestUtils.CreateTemporaryFolder())
+                .Execute()
+                .Should()
+                .Pass()
+                .And.NotHaveStdErr()
+                .And.HaveStdOutContaining("File actions would have been taken:");
+        }
+
     }
 }

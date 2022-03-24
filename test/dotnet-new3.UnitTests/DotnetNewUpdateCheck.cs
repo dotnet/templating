@@ -53,6 +53,38 @@ namespace Dotnet_new3.IntegrationTests
                 .And.HaveStdOutMatching("   dotnet-new3 new3 install Microsoft\\.DotNet\\.Common\\.ProjectTemplates\\.5\\.0::([\\d\\.a-z-])+");
         }
 
+        [Fact]
+        public void ReportsErrorOnUpdateCheckOfLocalPackage()
+        {
+            string nugetName = "TestNupkgInstallTemplate";
+            string nugetVersion = "0.0.1";
+            string nugetFullName = $"{nugetName}::{nugetVersion}";
+            string nugetFileName = $"{nugetName}.{nugetVersion}.nupkg";
+            string templateName = "nupkginstall";
+
+            var home = TestUtils.CreateTemporaryFolder("Home");
+            new DotnetNewCommand(_log, "install", TestUtils.GetTestNugetLocation(nugetFileName))
+                .WithCustomHive(home).WithoutBuiltInTemplates()
+                .WithWorkingDirectory(TestUtils.CreateTemporaryFolder())
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And
+                .NotHaveStdErr()
+                .And.NotHaveStdOutContaining("Determining projects to restore...")
+                .And.HaveStdOutContaining("installed the following templates")
+                .And.HaveStdOutContaining(templateName);
+
+            new DotnetNewCommand(_log, "--update-check")
+                .WithCustomHive(home).WithoutBuiltInTemplates()
+                .WithWorkingDirectory(TestUtils.CreateTemporaryFolder())
+                .Execute()
+                .Should()
+                .Fail()
+                .And.NotHaveStdOut()
+                .And.HaveStdErr($"Failed to check update for {nugetFullName}: the package is not available in configured NuGet feeds.");
+        }
+
         [Theory]
         [InlineData("--update-check")]
         [InlineData("update --check-only")]
