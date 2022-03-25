@@ -4,12 +4,12 @@
     <body>
       <trans-unit id="stringExtractor_log_jsonElementAdded">
         <source>Adding into localizable strings: {0}</source>
-        <target state="new">Adding into localizable strings: {0}</target>
+        <target state="translated">Ajout dans des chaînes localisables : {0}</target>
         <note>{0} is a string similar to "postActions/0/manualInstructions/2/text"</note>
       </trans-unit>
       <trans-unit id="stringExtractor_log_jsonElementExcluded">
         <source>The following element in the template.json will not be included in the localizations because it does not match any of the rules for localizable elements: {0}</source>
-        <target state="new">The following element in the template.json will not be included in the localizations because it does not match any of the rules for localizable elements: {0}</target>
+        <target state="translated">L’élément suivant dans le fichier template.json ne sera pas inclus dans les localisations, car il ne correspond à aucune règle pour les éléments localisables : {0}</target>
         <note>{0} is any string from a json file. Such as "postActions", "myParameter", "author" etc.</note>
       </trans-unit>
       <trans-unit id="stringExtractor_log_jsonKeyIsNotUnique">
@@ -25,7 +25,7 @@
       </trans-unit>
       <trans-unit id="stringExtractor_log_skippingAlreadyAddedElement">
         <source>The following element in the template.json will be skipped since it was already added to the list of localizable strings: {0}</source>
-        <target state="new">The following element in the template.json will be skipped since it was already added to the list of localizable strings: {0}</target>
+        <target state="translated">L’élément suivant dans le fichier template.json est ignoré, car il a déjà été ajouté à la liste des chaînes localisables : {0}</target>
         <note>{0} is a string similar to "postActions/0/manualInstructions/2/text"</note>
       </trans-unit>
       <trans-unit id="stringUpdater_log_dataIsUnchanged">

@@ -4,12 +4,12 @@
     <body>
       <trans-unit id="stringExtractor_log_jsonElementAdded">
         <source>Adding into localizable strings: {0}</source>
-        <target state="new">Adding into localizable strings: {0}</target>
+        <target state="translated">Probíhá přidávání do lokalizovatelných řetězců: {0}</target>
         <note>{0} is a string similar to "postActions/0/manualInstructions/2/text"</note>
       </trans-unit>
       <trans-unit id="stringExtractor_log_jsonElementExcluded">
         <source>The following element in the template.json will not be included in the localizations because it does not match any of the rules for localizable elements: {0}</source>
-        <target state="new">The following element in the template.json will not be included in the localizations because it does not match any of the rules for localizable elements: {0}</target>
+        <target state="translated">Následující element ze souboru template.json se do lokalizace nezahrne, protože neodpovídá žádným pravidlům pro lokalizovatelné elementy: {0}</target>
         <note>{0} is any string from a json file. Such as "postActions", "myParameter", "author" etc.</note>
       </trans-unit>
       <trans-unit id="stringExtractor_log_jsonKeyIsNotUnique">
@@ -25,7 +25,7 @@
       </trans-unit>
       <trans-unit id="stringExtractor_log_skippingAlreadyAddedElement">
         <source>The following element in the template.json will be skipped since it was already added to the list of localizable strings: {0}</source>
-        <target state="new">The following element in the template.json will be skipped since it was already added to the list of localizable strings: {0}</target>
+        <target state="translated">Následující element ze souboru template.json se přeskočí, protože už byl přidaný do seznamu lokalizovatelných řetězců: {0}</target>
         <note>{0} is a string similar to "postActions/0/manualInstructions/2/text"</note>
       </trans-unit>
       <trans-unit id="stringUpdater_log_dataIsUnchanged">
