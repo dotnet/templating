@@ -60,24 +60,18 @@ namespace Dotnet_new3.IntegrationTests
             string nugetVersion = "0.0.1";
             string nugetFullName = $"{nugetName}::{nugetVersion}";
             string nugetFileName = $"{nugetName}.{nugetVersion}.nupkg";
-            string templateName = "nupkginstall";
-
+            string workingDirectory = TestUtils.CreateTemporaryFolder();
             var home = TestUtils.CreateTemporaryFolder("Home");
-            new DotnetNewCommand(_log, "install", TestUtils.GetTestNugetLocation(nugetFileName))
-                .WithCustomHive(home).WithoutBuiltInTemplates()
-                .WithWorkingDirectory(TestUtils.CreateTemporaryFolder())
-                .Execute()
-                .Should()
-                .ExitWith(0)
-                .And
-                .NotHaveStdErr()
-                .And.NotHaveStdOutContaining("Determining projects to restore...")
-                .And.HaveStdOutContaining("installed the following templates")
-                .And.HaveStdOutContaining(templateName);
+
+            Helpers.InstallNuGetTemplate(
+                TestUtils.GetTestNugetLocation(nugetFileName),
+                _log,
+                home,
+                workingDirectory);
 
             new DotnetNewCommand(_log, "--update-check")
                 .WithCustomHive(home).WithoutBuiltInTemplates()
-                .WithWorkingDirectory(TestUtils.CreateTemporaryFolder())
+                .WithWorkingDirectory(workingDirectory)
                 .Execute()
                 .Should()
                 .Fail()

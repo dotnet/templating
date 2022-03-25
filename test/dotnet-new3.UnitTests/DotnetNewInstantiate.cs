@@ -327,29 +327,23 @@ namespace Dotnet_new3.IntegrationTests
             string nugetFullName = $"{nugetName}::{nugetVersion}";
             string nugetFileName = $"{nugetName}.{nugetVersion}.nupkg";
             string templateName = "nupkginstall";
-
+            string workingDirectory = TestUtils.CreateTemporaryFolder();
             var home = TestUtils.CreateTemporaryFolder("Home");
-            new DotnetNewCommand(_log, "install", TestUtils.GetTestNugetLocation(nugetFileName))
-                .WithCustomHive(home).WithoutBuiltInTemplates()
-                .WithWorkingDirectory(TestUtils.CreateTemporaryFolder())
-                .Execute()
-                .Should()
-                .ExitWith(0)
-                .And
-                .NotHaveStdErr()
-                .And.NotHaveStdOutContaining("Determining projects to restore...")
-                .And.HaveStdOutContaining("installed the following templates")
-                .And.HaveStdOutContaining(templateName);
+
+            Helpers.InstallNuGetTemplate(
+                TestUtils.GetTestNugetLocation(nugetFileName),
+                _log,
+                home,
+                workingDirectory);
 
             new DotnetNewCommand(_log, templateName, "--dry-run")
                 .WithCustomHive(home).WithoutBuiltInTemplates()
-                .WithWorkingDirectory(TestUtils.CreateTemporaryFolder())
+                .WithWorkingDirectory(workingDirectory)
                 .Execute()
                 .Should()
                 .Pass()
                 .And.NotHaveStdErr()
                 .And.HaveStdOutContaining("File actions would have been taken:");
         }
-
     }
 }
