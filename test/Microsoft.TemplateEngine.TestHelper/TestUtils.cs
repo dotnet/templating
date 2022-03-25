@@ -18,15 +18,77 @@ namespace Microsoft.TemplateEngine.TestHelper
 
         public static string GetTestTemplateLocation(string templateName)
         {
-            string codebase = typeof(TestUtils).GetTypeInfo().Assembly.Location;
-            string dir = Path.GetDirectoryName(codebase);
-            string templateLocation = Path.Combine(dir, "..", "..", "..", "..", "..", "test", "Microsoft.TemplateEngine.TestTemplates", "test_templates", templateName);
+            return GetTestArtifactLocation(Path.Combine("test_templates", templateName));
+        }
+
+        public static string GetTestNugetLocation(string templateName = "TestNupkgInstallTemplateV2.0.0.2.nupkg")
+        {
+            string artifactsDir = GetTestArtifactLocation("nupkg_templates");
+            string nupkgPath = Path.Combine(artifactsDir, templateName);
+
+            if (!File.Exists(nupkgPath))
+            {
+                throw new FileNotFoundException($"{nupkgPath} does not exist");
+            }
+
+            return Path.GetFullPath(nupkgPath);
+        }
+
+        public static string CodeBaseRoot
+        {
+            get
+            {
+                string codebase = typeof(TestUtils).GetTypeInfo().Assembly.Location;
+                string codeBaseRoot = new FileInfo(codebase).Directory.Parent.Parent.Parent.Parent.Parent.FullName;
+                return codeBaseRoot;
+            }
+        }   
+
+        private static string GetTestArtifactLocation(string artifactLocation)
+        {
+            string templateLocation = Path.Combine(CodeBaseRoot, "test", "Microsoft.TemplateEngine.TestTemplates", artifactLocation);
 
             if (!Directory.Exists(templateLocation))
             {
                 throw new Exception($"{templateLocation} does not exist");
             }
             return Path.GetFullPath(templateLocation);
+        }
+
+        public static string GetPackagesLocation()
+        {
+#if DEBUG
+            string configuration = "Debug";
+#elif RELEASE
+            string configuration = "Release";
+#else
+            throw new NotSupportedException("The configuration is not supported");
+#endif
+
+            string packagesLocation = Path.Combine(CodeBaseRoot, "artifacts", "packages", configuration, "Shipping");
+
+            if (!Directory.Exists(packagesLocation))
+            {
+                throw new Exception($"{packagesLocation} does not exist");
+            }
+            return Path.GetFullPath(packagesLocation);
+        }
+
+        public static void SetupNuGetConfigForPackagesLocation(string projectDirectory)
+        {
+            string nugetConfigShim =
+$@"<?xml version=""1.0"" encoding=""utf-8""?>
+<configuration>
+  <config>
+    <add key=""globalPackagesFolder"" value=""{CreateTemporaryFolder("Packages")}"" />
+  </config>
+  <packageSources>
+    <clear />
+    <add key=""testPackages"" value=""{GetPackagesLocation()}"" />
+  </packageSources>
+</configuration>";
+
+            File.WriteAllText(Path.Combine(projectDirectory, "nuget.config"), nugetConfigShim);
         }
 
         public static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
