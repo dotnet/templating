@@ -61,7 +61,7 @@ namespace Microsoft.TemplateEngine.Cli
                     templateResolutionResult.TemplateToInvoke.Value.Parameters,
                     commandInput);
 
-                Task<(string Id, string Version)> builtInPackageCheck = packageCoordinator.ValidateBuiltInPackageAvailabilityAsync(templateResolutionResult.TemplateToInvoke.Value.Template, cancellationToken);
+                Task<(string Id, string Version, string Provider)> builtInPackageCheck = packageCoordinator.ValidateBuiltInPackageAvailabilityAsync(templateResolutionResult.TemplateToInvoke.Value.Template, cancellationToken);
 
                 // await for both tasks to finish
                 await Task.WhenAll(checkForUpdateTask, templateCreationTask, builtInPackageCheck).ConfigureAwait(false);
@@ -79,6 +79,7 @@ namespace Microsoft.TemplateEngine.Cli
                     packageCoordinator.DisplayBuiltInPackagesCheckResult(
                         builtInPackageCheck.Result.Id,
                         builtInPackageCheck.Result.Version,
+                        builtInPackageCheck.Result.Provider,
                         commandInput);
                 }
 

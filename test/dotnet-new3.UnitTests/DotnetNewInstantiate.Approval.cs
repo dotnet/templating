@@ -36,7 +36,7 @@ namespace Dotnet_new3.IntegrationTests
             return Verifier.Verify(commandResult.StdOut, _verifySettings)
             .AddScrubber(output =>
             {
-                output.ScrubByRegex("'Microsoft\\.DotNet\\.Common\\.ItemTemplates::[A-Za-z0-9.-]+' is available from built-in provider", "'Microsoft.DotNet.Common.ItemTemplates::%VERSION%' is available from built-in provider");
+                output.ScrubByRegex("'Microsoft\\.DotNet\\.Common\\.ItemTemplates::[A-Za-z0-9.-]+' is available in", "'Microsoft.DotNet.Common.ItemTemplates::%VERSION%' is available in");
             });
         }
     }

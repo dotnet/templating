@@ -140,7 +140,9 @@ namespace Microsoft.TemplateEngine.Cli
             return (await managedTemplatePackage.ManagedProvider.GetLatestVersionsAsync(new[] { managedTemplatePackage }, cancellationToken).ConfigureAwait(false)).Single();
         }
 
-        internal async Task<(string, string)> ValidateBuiltInPackageAvailabilityAsync(ITemplateInfo template, CancellationToken cancellationToken)
+        internal async Task<(string Id, string Version, string Provider)> ValidateBuiltInPackageAvailabilityAsync(
+            ITemplateInfo template,
+            CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -162,10 +164,16 @@ namespace Microsoft.TemplateEngine.Cli
             }
 
             IReadOnlyList<ITemplatePackage> templatePackages = await _templatePackageManager.GetTemplatePackagesAsync(force: false, cancellationToken).ConfigureAwait(false);
-            IEnumerable<(string Id, string Version)> unmanagedTemplatePackages = templatePackages
+
+            IEnumerable<(string Id, string Version, string Provider)> unmanagedTemplatePackages = templatePackages
                 .Where(tp => tp is not IManagedTemplatePackage)
-                .Select(tp => NuGetUtils.GetNuGetPackageInfo(_engineEnvironmentSettings, tp.MountPointUri))
-                .Where(i => i != default);
+                .Select(tp => new
+                {
+                    Info = NuGetUtils.GetNuGetPackageInfo(_engineEnvironmentSettings, tp.MountPointUri),
+                    Package = tp
+                })
+                .Where(i => i.Info != default)
+                .Select(i => (i.Info.Id, i.Info.Version, i.Package.Provider.Factory.DisplayName));
 
             var matchingTemplatePackage = unmanagedTemplatePackages.FirstOrDefault(package => string.Equals(managedTemplatePackage.Identifier, package.Id, StringComparison.OrdinalIgnoreCase));
             if (matchingTemplatePackage == default)
@@ -212,12 +220,13 @@ namespace Microsoft.TemplateEngine.Cli
             }
         }
 
-        internal void DisplayBuiltInPackagesCheckResult(string packageId, string version, INewCommandInput commandInput)
+        internal void DisplayBuiltInPackagesCheckResult(string packageId, string version, string provider, INewCommandInput commandInput)
         {
             Reporter.Output.WriteLine(
                 string.Format(
                     LocalizableStrings.TemplatePackageCoordinator_BuiltInCheck_Info_BuiltInPackageAvailable,
-                    $"{packageId}::{version}"));
+                    $"{packageId}::{version}",
+                    provider));
             Reporter.Output.WriteLine(LocalizableStrings.TemplatePackageCoordinator_BuiltInCheck_Info_UninstallPackage);
             Reporter.Output.WriteCommand(commandInput.UninstallCommandExample(packageId));
         }
