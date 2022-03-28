@@ -828,9 +828,9 @@ The header is followed by the list of parameters and their errors (might be seve
 {1} - comma separated, escaped in quotes list of allowed values</note>
       </trans-unit>
       <trans-unit id="TemplatePackageCoordinator_BuiltInCheck_Info_BuiltInPackageAvailable">
-        <source>An update for template package '{0}' is available from built-in provider.</source>
-        <target state="new">An update for template package '{0}' is available from built-in provider.</target>
-        <note>{0} - id and version of template package</note>
+        <source>An update for template package '{0}' is available in the '{1}' provider.</source>
+        <target state="new">An update for template package '{0}' is available in the '{1}' provider.</target>
+        <note>{0} - id and version of template package, {1} - provider name (.NET SDK, Optional workloads, etc)</note>
       </trans-unit>
       <trans-unit id="TemplatePackageCoordinator_BuiltInCheck_Info_UninstallPackage">
         <source>To use built-in template package, uninstall manually installed template package using:</source>

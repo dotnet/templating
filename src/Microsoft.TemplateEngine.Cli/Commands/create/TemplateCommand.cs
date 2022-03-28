@@ -158,7 +158,7 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             TemplatePackageCoordinator packageCoordinator = new TemplatePackageCoordinator(telemetryLogger, _environmentSettings, _templatePackageManager);
 
             Task<NewCommandStatus> instantiateTask = invoker.InvokeTemplateAsync(args, cancellationToken);
-            Task<(string Id, string Version)> builtInPackageCheck = packageCoordinator.ValidateBuiltInPackageAvailabilityAsync(args.Template, cancellationToken);
+            Task<(string Id, string Version, string Provider)> builtInPackageCheck = packageCoordinator.ValidateBuiltInPackageAvailabilityAsync(args.Template, cancellationToken);
             Task<CheckUpdateResult?> checkForUpdateTask = packageCoordinator.CheckUpdateForTemplate(args, cancellationToken);
 
             Task[] tasksToWait = new Task[] { instantiateTask, builtInPackageCheck, checkForUpdateTask };
@@ -178,6 +178,7 @@ namespace Microsoft.TemplateEngine.Cli.Commands
                 packageCoordinator.DisplayBuiltInPackagesCheckResult(
                     builtInPackageCheck.Result.Id,
                     builtInPackageCheck.Result.Version,
+                    builtInPackageCheck.Result.Provider,
                     args);
             }
 

@@ -1483,7 +1483,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An update for template package &apos;{0}&apos; is available from built-in provider..
+        ///   Looks up a localized string similar to An update for template package &apos;{0}&apos; is available in the &apos;{1}&apos; provider..
         /// </summary>
         internal static string TemplatePackageCoordinator_BuiltInCheck_Info_BuiltInPackageAvailable {
             get {
