@@ -470,11 +470,6 @@ Execute 'dotnet {1} --mostrar- aliases' sem nenhum args para mostrar todos os al
         <target state="translated">As ações de arquivo seriam tomadas:</target>
         <note />
       </trans-unit>
-      <trans-unit id="ForcesTemplateCreation">
-        <source>Forces content to be generated even if it would change existing files.</source>
-        <target state="translated">Força o conteúdo a ser gerado mesmo que ele altere arquivos existentes.</target>
-        <note />
-      </trans-unit>
       <trans-unit id="Generators">
         <source>Generators</source>
         <target state="translated">Geradores</target>
@@ -640,6 +635,11 @@ As colunas com suporte são: idioma, marcas, autor, tipo.</target>
       <trans-unit id="OptionDescriptionColumnsAll">
         <source>Display all columns in --list and --search output.</source>
         <target state="translated">Exibir todas as colunas na saída de --lista e --pesquisa.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="OptionDescriptionForce">
+        <source>Forces content to be generated even if it would change existing files. If used together with --install option, allows installing template packages from the specified sources even if they would override a template package from another source.</source>
+        <target state="new">Forces content to be generated even if it would change existing files. If used together with --install option, allows installing template packages from the specified sources even if they would override a template package from another source.</target>
         <note />
       </trans-unit>
       <trans-unit id="OptionDescriptionNoUpdateCheck">

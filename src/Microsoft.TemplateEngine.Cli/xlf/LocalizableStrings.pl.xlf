@@ -470,11 +470,6 @@ Uruchom polecenie "dotnet {1}--show-aliases" bez argumentów, aby wyświetlić w
         <target state="translated">Podjęto akcje dotyczące plików:</target>
         <note />
       </trans-unit>
-      <trans-unit id="ForcesTemplateCreation">
-        <source>Forces content to be generated even if it would change existing files.</source>
-        <target state="translated">Wymusza wygenerowanie zawartości nawet w przypadku zmiany istniejących plików.</target>
-        <note />
-      </trans-unit>
       <trans-unit id="Generators">
         <source>Generators</source>
         <target state="translated">Generatory</target>
@@ -640,6 +635,11 @@ Obsługiwane kolumny to: język, tagi, autor, typ.</target>
       <trans-unit id="OptionDescriptionColumnsAll">
         <source>Display all columns in --list and --search output.</source>
         <target state="translated">Wyświetl wszystkie kolumny w danych wyjściowych --list i --search.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="OptionDescriptionForce">
+        <source>Forces content to be generated even if it would change existing files. If used together with --install option, allows installing template packages from the specified sources even if they would override a template package from another source.</source>
+        <target state="new">Forces content to be generated even if it would change existing files. If used together with --install option, allows installing template packages from the specified sources even if they would override a template package from another source.</target>
         <note />
       </trans-unit>
       <trans-unit id="OptionDescriptionNoUpdateCheck">

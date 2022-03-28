@@ -470,11 +470,6 @@ Tüm diğer adları göstermek için 'dotnet {1} --show-aliases' komutunu bağı
         <target state="translated">Şu dosya eylemleri gerçekleştirilirdi:</target>
         <note />
       </trans-unit>
-      <trans-unit id="ForcesTemplateCreation">
-        <source>Forces content to be generated even if it would change existing files.</source>
-        <target state="translated">Mevcut dosyalar değiştirilecek olsaydı bile içerik oluşturmaya zorlar.</target>
-        <note />
-      </trans-unit>
       <trans-unit id="Generators">
         <source>Generators</source>
         <target state="translated">Oluşturucular</target>
@@ -640,6 +635,11 @@ Desteklenen sütunlar şunlardır: dil, etiketler, yazar ve tür.</target>
       <trans-unit id="OptionDescriptionColumnsAll">
         <source>Display all columns in --list and --search output.</source>
         <target state="translated">Tüm sütunları “--list” ve “--search” çıkışında görüntüleyin.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="OptionDescriptionForce">
+        <source>Forces content to be generated even if it would change existing files. If used together with --install option, allows installing template packages from the specified sources even if they would override a template package from another source.</source>
+        <target state="new">Forces content to be generated even if it would change existing files. If used together with --install option, allows installing template packages from the specified sources even if they would override a template package from another source.</target>
         <note />
       </trans-unit>
       <trans-unit id="OptionDescriptionNoUpdateCheck">

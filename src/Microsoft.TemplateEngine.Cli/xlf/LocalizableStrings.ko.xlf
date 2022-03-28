@@ -470,11 +470,6 @@ Run 'dotnet {1} --show-aliases' with no args to show all aliases.</source>
         <target state="translated">파일 조치가 취해졌습니다.</target>
         <note />
       </trans-unit>
-      <trans-unit id="ForcesTemplateCreation">
-        <source>Forces content to be generated even if it would change existing files.</source>
-        <target state="translated">기존 파일을 변경하더라도 콘텐츠를 강제로 생성합니다.</target>
-        <note />
-      </trans-unit>
       <trans-unit id="Generators">
         <source>Generators</source>
         <target state="translated">발전기</target>
@@ -640,6 +635,11 @@ The supported columns are: language, tags, author, type.</source>
       <trans-unit id="OptionDescriptionColumnsAll">
         <source>Display all columns in --list and --search output.</source>
         <target state="translated">--list 및 --search 출력의 모든 열을 표시합니다.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="OptionDescriptionForce">
+        <source>Forces content to be generated even if it would change existing files. If used together with --install option, allows installing template packages from the specified sources even if they would override a template package from another source.</source>
+        <target state="new">Forces content to be generated even if it would change existing files. If used together with --install option, allows installing template packages from the specified sources even if they would override a template package from another source.</target>
         <note />
       </trans-unit>
       <trans-unit id="OptionDescriptionNoUpdateCheck">

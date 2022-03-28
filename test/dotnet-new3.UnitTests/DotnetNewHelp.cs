@@ -28,7 +28,7 @@ Options:
   --add-source, --nuget-source   Specifies a NuGet source to use during install.
   --type                         Filters templates based on available types. Predefined values are ""project"" and ""item"".
   --dry-run                      Displays a summary of what would happen if the given command line were run if it would result in a template creation.
-  --force                        Forces content to be generated even if it would change existing files.
+  --force                        Forces content to be generated even if it would change existing files. If used together with --install option, allows installing template packages from the specified sources even if they would override a template package from another source.
   -lang, --language              Filters templates based on language and specifies the language of the template to create.
   --update-check                 Check the currently installed template packages for updates.
   --update-apply                 Check the currently installed template packages for update, and install the updates.

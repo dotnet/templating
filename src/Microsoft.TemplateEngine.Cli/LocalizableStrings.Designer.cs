@@ -880,15 +880,6 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Forces content to be generated even if it would change existing files..
-        /// </summary>
-        internal static string ForcesTemplateCreation {
-            get {
-                return ResourceManager.GetString("ForcesTemplateCreation", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Generators.
         /// </summary>
         internal static string Generators {
@@ -1192,6 +1183,15 @@ namespace Microsoft.TemplateEngine.Cli {
         internal static string OptionDescriptionColumnsAll {
             get {
                 return ResourceManager.GetString("OptionDescriptionColumnsAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Forces content to be generated even if it would change existing files. If used together with --install option, allows installing template packages from the specified sources even if they would override a template package from another source..
+        /// </summary>
+        internal static string OptionDescriptionForce {
+            get {
+                return ResourceManager.GetString("OptionDescriptionForce", resourceCulture);
             }
         }
         

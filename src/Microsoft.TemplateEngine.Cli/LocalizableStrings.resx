@@ -166,8 +166,8 @@
   <data name="DisplaysHelp" xml:space="preserve">
     <value>Displays help for this command.</value>
   </data>
-  <data name="ForcesTemplateCreation" xml:space="preserve">
-    <value>Forces content to be generated even if it would change existing files.</value>
+  <data name="OptionDescriptionForce" xml:space="preserve">
+    <value>Forces content to be generated even if it would change existing files. If used together with --install option, allows installing template packages from the specified sources even if they would override a template package from another source.</value>
   </data>
   <data name="Generators" xml:space="preserve">
     <value>Generators</value>
