@@ -64,9 +64,15 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             PackageSource source;
             IPackageSearchMetadata packageMetadata;
 
-            if (string.IsNullOrWhiteSpace(version))
+            if (NuGetVersionHelper.IsFloatingVersionString(version))
             {
-                (source, packageMetadata) = await GetLatestVersionInternalAsync(identifier, packagesSources, includePreview: false, cancellationToken).ConfigureAwait(false);
+                (source, packageMetadata) =
+                    await GetLatestVersionInternalAsync(
+                        identifier,
+                        packagesSources,
+                        includePreview: false,
+                        cancellationToken,
+                        version).ConfigureAwait(false);
             }
             else
             {
@@ -190,7 +196,12 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             return (package.Identity.Version.ToNormalizedString(), isLatestVersion);
         }
 
-        private async Task<(PackageSource, IPackageSearchMetadata)> GetLatestVersionInternalAsync(string packageIdentifier, IEnumerable<PackageSource> packageSources, bool includePreview, CancellationToken cancellationToken)
+        private async Task<(PackageSource, IPackageSearchMetadata)> GetLatestVersionInternalAsync(
+            string packageIdentifier,
+            IEnumerable<PackageSource> packageSources,
+            bool includePreview,
+            CancellationToken cancellationToken,
+            string? versionPattern = null)
         {
             if (string.IsNullOrWhiteSpace(packageIdentifier))
             {
@@ -222,6 +233,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 throw new PackageNotFoundException(packageIdentifier, packageSources.Select(source => source.Source));
             }
 
+            versionPattern = NuGetVersionHelper.GetVersionPatternWithoutWildcard(versionPattern);
+
             if (!includePreview)
             {
                 (PackageSource, IPackageSearchMetadata) latestStableVersion = accumulativeSearchResults
@@ -229,7 +242,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                     default,
                     (max, current) =>
                     {
-                        if (current.Package.Identity.Version.IsPrerelease)
+                        if (current.Package.Identity.Version.IsPrerelease || !NuGetVersionHelper.VersionMatches(current.Package.Identity.Version, versionPattern))
                         {
                             return max;
                         }
@@ -248,7 +261,10 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             (PackageSource, IPackageSearchMetadata) latestVersion = accumulativeSearchResults.Aggregate(
                 (max, current) =>
                 {
-                    return current.package.Identity.Version > max.package.Identity.Version ? current : max;
+                    return
+                        current.package.Identity.Version > max.package.Identity.Version &&
+                        NuGetVersionHelper.VersionMatches(current.package.Identity.Version, versionPattern) ?
+                            current : max;
                 });
             return latestVersion;
         }
