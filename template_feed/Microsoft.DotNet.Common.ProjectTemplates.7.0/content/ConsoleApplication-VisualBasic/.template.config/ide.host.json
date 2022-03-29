@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json.schemastore.org/vs-2017.3.host",
+  "icon": "ide/ConsoleApplicationVB.ico",
+  "order": 10,
+  "tags": [
+    {
+      "type": "projectType",
+      "add": [],
+      "remove": [ "Common" ]
+    }
+  ],
+  "symbolInfo": [
+    {
+      "id": "langVersion",
+      "isVisible": "true"
+    },
+    {
+      "id": "skipRestore",
+      "isVisible": "true"
+    }
+  ]
+}
