@@ -31,20 +31,6 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         }
 
         [Theory]
-        [InlineData(null, "")]
-        [InlineData("", "")]
-        [InlineData("*", "")]
-        [InlineData("1.*", "1.")]
-        [InlineData("55.66.77.*", "55.66.77.")]
-        [InlineData("55.66.77*", "55.66.77")]
-        [InlineData("123.456.789.012", "123.456.789.012")]
-        [InlineData("1.2", "1.2")]
-        public void GetVersionPatternWithoutWildcardTest(string versionString, string patternWithoutWildcard)
-        {
-            Assert.Equal(patternWithoutWildcard, NuGetVersionHelper.GetVersionPatternWithoutWildcard(versionString));
-        }
-
-        [Theory]
         [InlineData(null, true)]
         [InlineData("", true)]
         [InlineData("*", true)]
@@ -53,22 +39,23 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         [InlineData("55.66.77*", true)]
         [InlineData("123.456.789.012", false)]
         [InlineData("1.2", false)]
-        public void IsFloatingVersionStringTest(string versionString, bool isFloatingVersion)
+        public void TryParseFloatRangeReturnsExpectedBoolFlag(string versionString, bool isFloatingVersion)
         {
-            Assert.Equal(isFloatingVersion, NuGetVersionHelper.IsFloatingVersionString(versionString));
+            Assert.Equal(isFloatingVersion, NuGetVersionHelper.TryParseFloatRangeEx(versionString, out _));
         }
 
         [Theory]
         [InlineData("1.2.3.4", null, true)]
         [InlineData("1.2.3.4", "", true)]
-        [InlineData("1.2.3.4", "1", true)]
-        [InlineData("1.2.3.4", "1.2.", true)]
-        [InlineData("1.2.3.4", "1.2.3.4.", false)]
-        [InlineData("1.2.3.4", "2.2", false)]
-        public void VersionMatchesTest(string versionString, string patternWithoutWildcard, bool iaMatch)
+        [InlineData("1.2.3.4", "1.2.*", true)]
+        [InlineData("1.2.3.4", "2.2*", false)]
+        [InlineData("1.2.3.4", "1.2.*-*", true)]
+        public void TryParseFloatRangeMatchingTest(string versionString, string pattern, bool isMatch)
         {
             NuGetVersion version = new NuGetVersion(versionString);
-            Assert.Equal(iaMatch, NuGetVersionHelper.VersionMatches(version, patternWithoutWildcard));
+            FloatRange floatRange;
+            Assert.True(NuGetVersionHelper.TryParseFloatRangeEx(pattern, out floatRange));
+            Assert.Equal(isMatch, floatRange.Satisfies(version));
         }
     }
 }

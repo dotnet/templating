@@ -60,23 +60,22 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
             IEnumerable<PackageSource> packagesSources = LoadNuGetSources(additionalSources?.ToArray() ?? Array.Empty<string>());
 
-            NuGetVersion packageVersion;
             PackageSource source;
             IPackageSearchMetadata packageMetadata;
 
-            if (NuGetVersionHelper.IsFloatingVersionString(version))
+            if (NuGetVersionHelper.TryParseFloatRangeEx(version, out FloatRange floatRange))
             {
                 (source, packageMetadata) =
                     await GetLatestVersionInternalAsync(
                         identifier,
                         packagesSources,
-                        includePreview: false,
-                        cancellationToken,
-                        version).ConfigureAwait(false);
+                        floatRange,
+                        cancellationToken)
+                        .ConfigureAwait(false);
             }
             else
             {
-                packageVersion = new NuGetVersion(version);
+                NuGetVersion packageVersion = new NuGetVersion(version);
                 (source, packageMetadata) = await GetPackageMetadataAsync(identifier, packageVersion, packagesSources, cancellationToken).ConfigureAwait(false);
             }
 
@@ -189,9 +188,11 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 previewVersionInstalled = currentVersion.IsPrerelease;
             }
 
+            FloatRange floatRange = new FloatRange(previewVersionInstalled ? NuGetVersionFloatBehavior.AbsoluteLatest : NuGetVersionFloatBehavior.Major);
+
             string[] additionalSources = string.IsNullOrWhiteSpace(additionalSource) ? Array.Empty<string>() : new[] { additionalSource! };
             IEnumerable<PackageSource> packageSources = LoadNuGetSources(additionalSources);
-            var (_, package) = await GetLatestVersionInternalAsync(identifier, packageSources, previewVersionInstalled, cancellationToken).ConfigureAwait(false);
+            var (_, package) = await GetLatestVersionInternalAsync(identifier, packageSources, floatRange, cancellationToken).ConfigureAwait(false);
             bool isLatestVersion = currentVersion != null ? currentVersion >= package.Identity.Version : false;
             return (package.Identity.Version.ToNormalizedString(), isLatestVersion);
         }
@@ -199,9 +200,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         private async Task<(PackageSource, IPackageSearchMetadata)> GetLatestVersionInternalAsync(
             string packageIdentifier,
             IEnumerable<PackageSource> packageSources,
-            bool includePreview,
-            CancellationToken cancellationToken,
-            string? versionPattern = null)
+            FloatRange floatRange,
+            CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(packageIdentifier))
             {
@@ -233,37 +233,12 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 throw new PackageNotFoundException(packageIdentifier, packageSources.Select(source => source.Source));
             }
 
-            versionPattern = NuGetVersionHelper.GetVersionPatternWithoutWildcard(versionPattern);
-
-            if (!includePreview)
-            {
-                (PackageSource, IPackageSearchMetadata) latestStableVersion = accumulativeSearchResults
-                    .Aggregate<(PackageSource Source, IPackageSearchMetadata Package), (PackageSource Source, IPackageSearchMetadata Package)>(
-                    default,
-                    (max, current) =>
-                    {
-                        if (current.Package.Identity.Version.IsPrerelease || !NuGetVersionHelper.VersionMatches(current.Package.Identity.Version, versionPattern))
-                        {
-                            return max;
-                        }
-                        if (max == default)
-                        {
-                            return current;
-                        }
-                        return current.Package.Identity.Version > max.Package.Identity.Version ? current : max;
-                    });
-                if (latestStableVersion != default)
-                {
-                    return latestStableVersion;
-                }
-            }
-
             (PackageSource, IPackageSearchMetadata) latestVersion = accumulativeSearchResults.Aggregate(
                 (max, current) =>
                 {
                     return
                         current.package.Identity.Version > max.package.Identity.Version &&
-                        NuGetVersionHelper.VersionMatches(current.package.Identity.Version, versionPattern) ?
+                        floatRange.Satisfies(current.package.Identity.Version) ?
                             current : max;
                 });
             return latestVersion;

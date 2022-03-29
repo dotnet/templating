@@ -3,71 +3,37 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using NuGet.Versioning;
 
 namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
     internal static class NuGetVersionHelper
     {
-        public static string GetVersionPatternWithoutWildcard(string? versionString)
-        {
-            if (IsSpecificVersionString(versionString) || string.IsNullOrEmpty(versionString))
-            {
-                return versionString ?? string.Empty;
-            }
-
-            return versionString!.Substring(0, versionString.Length - 1);
-        }
-
         public static bool IsSupportedVersionString(string? versionString)
         {
             return
-                IsFloatingVersionString(versionString) && IsSupportedFloatingVersion(versionString)
+                string.IsNullOrEmpty(versionString)
                 ||
-                NuGetVersion.TryParse(versionString, out _);
+                NuGetVersion.TryParse(versionString, out _)
+                ||
+                FloatRange.TryParse(versionString, out _);
         }
 
-        public static bool IsSpecificVersionString(string? versionString)
+        /// <summary>
+        /// Tries to parse given string and return <see cref="FloatRange"/> provided there
+        ///  is an existing floating range behavior in the provided string.
+        ///  null or empty string are regarded to be requests to any release version (behavior identical to '*').
+        /// </summary>
+        /// <param name="versionString">Input string to be parsed.</param>
+        /// <param name="floatRange">Output <see cref="FloatRange"/> parameter, populated in case function returned true.</param>
+        /// <returns></returns>
+        public static bool TryParseFloatRangeEx(string? versionString, out FloatRange floatRange)
         {
-            return !IsFloatingVersionString(versionString);
-        }
+            floatRange =
+                string.IsNullOrEmpty(versionString) ?
+                new FloatRange(NuGetVersionFloatBehavior.Major) : FloatRange.Parse(versionString);
 
-        public static bool IsFloatingVersionString(string? versionString)
-        {
-            return
-                string.IsNullOrEmpty(versionString) ||
-                versionString.Last() == '*' && versionString.Count(c => c == '*') == 1;
-        }
-
-        public static bool VersionMatches(NuGetVersion version, string? versionPatternWithoutWildcard)
-        {
-            return
-                string.IsNullOrEmpty(versionPatternWithoutWildcard) ||
-                version.ToString().StartsWith(versionPatternWithoutWildcard, StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static bool IsSupportedFloatingVersion(string? versionString)
-        {
-            if (string.IsNullOrEmpty(versionString))
-            {
-                return true;
-            }
-
-            int trailingCharsToRemove = 1;
-            if (versionString!.Length > 1 && versionString[versionString.Length - 2] == '.')
-            {
-                trailingCharsToRemove++;
-            }
-
-            string parseableVersionString = versionString.Substring(0, versionString.Length - trailingCharsToRemove);
-
-            return
-                string.IsNullOrEmpty(parseableVersionString) ||
-                NuGetVersion.TryParse(parseableVersionString, out _);
+            return floatRange != null && floatRange.FloatBehavior != NuGetVersionFloatBehavior.None;
         }
     }
 }
