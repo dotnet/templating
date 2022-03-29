@@ -61,7 +61,7 @@ namespace Microsoft.TemplateEngine.Cli.CommandParsing
                     Create.Option("--nuget-source|--add-source", LocalizableStrings.NuGetSourceHelp, Accept.OneOrMoreArguments()),
                     Create.Option("--type", LocalizableStrings.ShowsFilteredTemplates, Accept.ExactlyOneArgument()),
                     Create.Option("--dry-run", LocalizableStrings.DryRunDescription, Accept.NoArguments()),
-                    Create.Option("--force", LocalizableStrings.ForcesTemplateCreation, Accept.NoArguments()),
+                    Create.Option("--force", LocalizableStrings.OptionDescriptionForce, Accept.NoArguments()),
                     Create.Option("-lang|--language", LocalizableStrings.LanguageParameter, Accept.ExactlyOneArgument()),
                     Create.Option("--update-check", LocalizableStrings.UpdateCheckCommandHelp, Accept.NoArguments()),
                     Create.Option("--update-apply", LocalizableStrings.UpdateApplyCommandHelp, Accept.NoArguments()),

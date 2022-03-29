@@ -205,3 +205,6 @@ end_of_line = crlf
 [*/obj/*/External/**/*]
 generated_code = true
 dotnet_analyzer_diagnostic.severity = none
+
+[*.txt]
+insert_final_newline = false

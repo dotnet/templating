@@ -880,15 +880,6 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Forces content to be generated even if it would change existing files..
-        /// </summary>
-        internal static string ForcesTemplateCreation {
-            get {
-                return ResourceManager.GetString("ForcesTemplateCreation", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Generators.
         /// </summary>
         internal static string Generators {
@@ -1192,6 +1183,15 @@ namespace Microsoft.TemplateEngine.Cli {
         internal static string OptionDescriptionColumnsAll {
             get {
                 return ResourceManager.GetString("OptionDescriptionColumnsAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Forces content to be generated even if it would change existing files. If used together with --install option, allows installing template packages from the specified sources even if they would override a template package from another source..
+        /// </summary>
+        internal static string OptionDescriptionForce {
+            get {
+                return ResourceManager.GetString("OptionDescriptionForce", resourceCulture);
             }
         }
         
@@ -1538,6 +1538,24 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An update for template package &apos;{0}&apos; is available in the &apos;{1}&apos; provider..
+        /// </summary>
+        internal static string TemplatePackageCoordinator_BuiltInCheck_Info_BuiltInPackageAvailable {
+            get {
+                return ResourceManager.GetString("TemplatePackageCoordinator_BuiltInCheck_Info_BuiltInPackageAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to To use built-in template package, uninstall manually installed template package using:.
+        /// </summary>
+        internal static string TemplatePackageCoordinator_BuiltInCheck_Info_UninstallPackage {
+            get {
+                return ResourceManager.GetString("TemplatePackageCoordinator_BuiltInCheck_Info_UninstallPackage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not find the template package containing template &apos;{0}&apos;.
         /// </summary>
         internal static string TemplatePackageCoordinator_Error_PackageForTemplateNotFound {
@@ -1592,11 +1610,38 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Installing the template package(s) will override the available template package(s)..
+        /// </summary>
+        internal static string TemplatePackageCoordinator_Install_Info_OverrideNotice {
+            get {
+                return ResourceManager.GetString("TemplatePackageCoordinator_Install_Info_OverrideNotice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The following template package(s) are already available:.
+        /// </summary>
+        internal static string TemplatePackageCoordinator_Install_Info_PackageIsAvailable {
+            get {
+                return ResourceManager.GetString("TemplatePackageCoordinator_Install_Info_PackageIsAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The following template packages will be installed:.
         /// </summary>
         internal static string TemplatePackageCoordinator_Install_Info_PackagesToBeInstalled {
             get {
                 return ResourceManager.GetString("TemplatePackageCoordinator_Install_Info_PackagesToBeInstalled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to To install the template package(s) anyway, apply &apos;{0}&apos; option:.
+        /// </summary>
+        internal static string TemplatePackageCoordinator_Install_Info_UseForceToOverride {
+            get {
+                return ResourceManager.GetString("TemplatePackageCoordinator_Install_Info_UseForceToOverride", resourceCulture);
             }
         }
         

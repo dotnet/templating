@@ -13,6 +13,7 @@ using Microsoft.TemplateEngine.Cli.TableOutput;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Utils;
 using NuGet.Credentials;
+using NuGet.Versioning;
 
 namespace Microsoft.TemplateEngine.Cli
 {
@@ -123,9 +124,10 @@ namespace Microsoft.TemplateEngine.Cli
             {
                 templatePackage = await _templatePackageManager.GetTemplatePackageAsync(template, cancellationToken).ConfigureAwait(false);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 Reporter.Error.WriteLine(string.Format(LocalizableStrings.TemplatePackageCoordinator_Error_PackageForTemplateNotFound, template.Identity));
+                Reporter.Verbose.WriteLine(string.Format(LocalizableStrings.Generic_Details, ex.ToString()));
                 return null;
             }
 
@@ -137,6 +139,61 @@ namespace Microsoft.TemplateEngine.Cli
 
             InitializeNuGetCredentialService(commandInput);
             return (await managedTemplatePackage.ManagedProvider.GetLatestVersionsAsync(new[] { managedTemplatePackage }, cancellationToken).ConfigureAwait(false)).Single();
+        }
+
+        internal async Task<(string Id, string Version, string Provider)> ValidateBuiltInPackageAvailabilityAsync(
+            ITemplateInfo template,
+            CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            ITemplatePackage templatePackage;
+            try
+            {
+                templatePackage = await _templatePackageManager.GetTemplatePackageAsync(template, cancellationToken).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Reporter.Error.WriteLine(string.Format(LocalizableStrings.TemplatePackageCoordinator_Error_PackageForTemplateNotFound, template.Identity));
+                Reporter.Verbose.WriteLine(string.Format(LocalizableStrings.Generic_Details, ex.ToString()));
+                return default;
+            }
+
+            if (!(templatePackage is IManagedTemplatePackage managedTemplatePackage))
+            {
+                //update is not supported - built-in or optional workload source
+                return default;
+            }
+
+            IReadOnlyList<ITemplatePackage> templatePackages = await _templatePackageManager.GetTemplatePackagesAsync(force: false, cancellationToken).ConfigureAwait(false);
+
+            IEnumerable<(string Id, string Version, string Provider)> unmanagedTemplatePackages = templatePackages
+                .Where(tp => tp is not IManagedTemplatePackage)
+                .Select(tp => new
+                {
+                    Info = NuGetUtils.GetNuGetPackageInfo(_engineEnvironmentSettings, tp.MountPointUri),
+                    Package = tp
+                })
+                .Where(i => i.Info != default)
+                .Select(i => (i.Info.Id, i.Info.Version, i.Package.Provider.Factory.DisplayName));
+
+            var matchingTemplatePackage = unmanagedTemplatePackages.FirstOrDefault(package => string.Equals(managedTemplatePackage.Identifier, package.Id, StringComparison.OrdinalIgnoreCase));
+            if (matchingTemplatePackage == default)
+            {
+                return default;
+            }
+
+            NuGetVersion managedPackageVersion;
+            NuGetVersion unmanagedPackageVersion;
+
+            if (NuGetVersion.TryParse(managedTemplatePackage.Version, out managedPackageVersion) && NuGetVersion.TryParse(matchingTemplatePackage.Version, out unmanagedPackageVersion))
+            {
+                if (unmanagedPackageVersion >= managedPackageVersion)
+                {
+                    return matchingTemplatePackage;
+                }
+            }
+            return default;
         }
 
         internal void DisplayUpdateCheckResult(CheckUpdateResult versionCheckResult, INewCommandInput commandInput)
@@ -155,12 +212,25 @@ namespace Microsoft.TemplateEngine.Cli
                     Reporter.Output.WriteCommand(commandInput.InstallCommandExample(
                         packageID: versionCheckResult.TemplatePackage.Identifier,
                         version: versionCheckResult.LatestVersion));
+                    Reporter.Output.WriteLine();
                 }
             }
             else
             {
                 HandleUpdateCheckErrors(versionCheckResult);
+                Reporter.Error.WriteLine();
             }
+        }
+
+        internal void DisplayBuiltInPackagesCheckResult(string packageId, string version, string provider, INewCommandInput commandInput)
+        {
+            Reporter.Output.WriteLine(
+                string.Format(
+                    LocalizableStrings.TemplatePackageCoordinator_BuiltInCheck_Info_BuiltInPackageAvailable,
+                    $"{packageId}::{version}",
+                    provider));
+            Reporter.Output.WriteLine(LocalizableStrings.TemplatePackageCoordinator_BuiltInCheck_Info_UninstallPackage);
+            Reporter.Output.WriteCommand(commandInput.UninstallCommandExample(packageId));
         }
 
         private static void InitializeNuGetCredentialService(INewCommandInput commandInput)
@@ -251,6 +321,12 @@ namespace Microsoft.TemplateEngine.Cli
             }
             Reporter.Output.WriteLine();
 
+            bool validated = await ValidateInstallationRequestsAsync(commandInput, installRequests, cancellationToken).ConfigureAwait(false);
+            if (!validated)
+            {
+                return New3CommandStatus.CreateFailed;
+            }
+
             IReadOnlyList<InstallResult> installResults = await managedSourceProvider.InstallAsync(installRequests, cancellationToken).ConfigureAwait(false);
             foreach (InstallResult result in installResults)
             {
@@ -261,6 +337,55 @@ namespace Microsoft.TemplateEngine.Cli
                 }
             }
             return resultStatus;
+        }
+
+        private async Task<bool> ValidateInstallationRequestsAsync(INewCommandInput commandInput, List<InstallRequest> installRequests, CancellationToken cancellationToken)
+        {
+            var templatePackages = await _templatePackageManager.GetTemplatePackagesAsync(force: false, cancellationToken).ConfigureAwait(false);
+            IReadOnlyList<(string Id, string Version)> unmanagedTemplatePackages = templatePackages
+                .Where(tp => tp is not IManagedTemplatePackage)
+                .Select(tp => NuGetUtils.GetNuGetPackageInfo(_engineEnvironmentSettings, tp.MountPointUri))
+                .Where(i => i != default)
+                .ToList();
+
+            HashSet<(InstallRequest Request, (string Id, string Version) PackageInfo)> invalidTemplatePackages = new();
+
+            foreach (var installRequest in installRequests)
+            {
+                var foundPackage = unmanagedTemplatePackages.FirstOrDefault(package => string.Equals(package.Id, installRequest.PackageIdentifier, StringComparison.OrdinalIgnoreCase));
+                if (foundPackage != default)
+                {
+                    invalidTemplatePackages.Add((installRequest, foundPackage));
+                }
+            }
+
+            if (invalidTemplatePackages.Any())
+            {
+                Reporter reporter = commandInput.IsForceFlagSpecified ? Reporter.Output : Reporter.Error;
+
+                reporter.WriteLine(LocalizableStrings.TemplatePackageCoordinator_Install_Info_OverrideNotice);
+                reporter.WriteLine(LocalizableStrings.TemplatePackageCoordinator_Install_Info_PackageIsAvailable);
+                foreach (var request in invalidTemplatePackages)
+                {
+                    reporter.WriteLine($"{request.PackageInfo.Id}::{request.PackageInfo.Version}".Indent());
+                }
+                reporter.WriteLine();
+
+                if (!commandInput.IsForceFlagSpecified)
+                {
+                    reporter.WriteLine(string.Format(LocalizableStrings.TemplatePackageCoordinator_Install_Info_UseForceToOverride, "--force"));
+
+                    string commandExample = $"dotnet {commandInput.CommandName}";
+                    foreach (var request in installRequests)
+                    {
+                        commandExample += $" --install {request.DisplayName}";
+                    }
+                    commandExample += " --force";
+                    reporter.WriteCommand(commandExample);
+                    return false;
+                }
+            }
+            return true;
         }
 
         /// <summary>

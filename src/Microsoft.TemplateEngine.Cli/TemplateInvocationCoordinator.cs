@@ -61,13 +61,26 @@ namespace Microsoft.TemplateEngine.Cli
                     templateResolutionResult.TemplateToInvoke.Value.Parameters,
                     commandInput);
 
+                Task<(string Id, string Version, string Provider)> builtInPackageCheck = packageCoordinator.ValidateBuiltInPackageAvailabilityAsync(templateResolutionResult.TemplateToInvoke.Value.Template, cancellationToken);
+
                 // await for both tasks to finish
-                await Task.WhenAll(checkForUpdateTask, templateCreationTask).ConfigureAwait(false);
+                await Task.WhenAll(checkForUpdateTask, templateCreationTask, builtInPackageCheck).ConfigureAwait(false);
+                Reporter.Output.WriteLine();
 
                 if (checkForUpdateTask.Result != null)
                 {
                     // print if there is update for this template
                     packageCoordinator.DisplayUpdateCheckResult(checkForUpdateTask.Result, commandInput);
+                }
+
+                if (builtInPackageCheck.Result != default)
+                {
+                    // print if there is same or newer built-in package
+                    packageCoordinator.DisplayBuiltInPackagesCheckResult(
+                        builtInPackageCheck.Result.Id,
+                        builtInPackageCheck.Result.Version,
+                        builtInPackageCheck.Result.Provider,
+                        commandInput);
                 }
 
                 // return creation result

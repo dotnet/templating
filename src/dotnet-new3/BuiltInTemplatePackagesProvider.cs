@@ -17,7 +17,7 @@ namespace Dotnet_new3
     {
         public static readonly Guid FactoryId = new Guid("{3227D09D-C1EA-48F1-A33B-1F132BFD9F06}");
 
-        public string DisplayName => "new3 BuiltIn";
+        public string DisplayName => "new3 built-in";
 
         public Guid Id => FactoryId;
 
@@ -76,7 +76,13 @@ namespace Dotnet_new3
                     {
                         string expandedPath = Environment.ExpandEnvironmentVariables(sourceLocation).Replace('\\', Path.DirectorySeparatorChar);
                         IEnumerable<string> expandedPaths = InstallRequestPathResolution.ExpandMaskedPath(expandedPath, _settings);
-                        templatePackages.AddRange(expandedPaths.Select(path => new TemplatePackage(this, path, _settings.Host.FileSystem.GetLastWriteTimeUtc(path))));
+                        foreach (string path in expandedPaths)
+                        {
+                            if (_settings.Host.FileSystem.FileExists(path) || _settings.Host.FileSystem.DirectoryExists(path))
+                            {
+                                templatePackages.Add(new TemplatePackage(this, path, _settings.Host.FileSystem.GetLastWriteTimeUtc(path)));
+                            }
+                        }
                     }
                 }
 

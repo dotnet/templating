@@ -1,0 +1,9 @@
+%DN3%\artifacts\packages\Release\Shipping\*.ProjectTemplates.*.nupkg
+%DN3%\artifacts\packages\Release\Shipping\*.ItemTemplates.*.nupkg
+%DN3%\template_feed\Microsoft.DotNet.Common.ProjectTemplates.1.x
+%DN3%\template_feed\Microsoft.DotNet.Common.ProjectTemplates.2.0
+%DN3%\template_feed\Microsoft.DotNet.Common.ProjectTemplates.2.1
+%DN3%\template_feed\Microsoft.DotNet.Common.ProjectTemplates.2.2
+%DN3%\template_feed\Microsoft.DotNet.Common.ProjectTemplates.3.0
+%DN3%\template_feed\Microsoft.DotNet.Common.ProjectTemplates.3.1
+%DN3%\template_feed\Microsoft.DotNet.Common.ProjectTemplates.5.0

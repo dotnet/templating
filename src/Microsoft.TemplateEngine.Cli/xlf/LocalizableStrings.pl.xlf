@@ -470,11 +470,6 @@ Uruchom polecenie "dotnet {1}--show-aliases" bez argumentów, aby wyświetlić w
         <target state="translated">Podjęto akcje dotyczące plików:</target>
         <note />
       </trans-unit>
-      <trans-unit id="ForcesTemplateCreation">
-        <source>Forces content to be generated even if it would change existing files.</source>
-        <target state="translated">Wymusza wygenerowanie zawartości nawet w przypadku zmiany istniejących plików.</target>
-        <note />
-      </trans-unit>
       <trans-unit id="Generators">
         <source>Generators</source>
         <target state="translated">Generatory</target>
@@ -640,6 +635,11 @@ Obsługiwane kolumny to: język, tagi, autor, typ.</target>
       <trans-unit id="OptionDescriptionColumnsAll">
         <source>Display all columns in --list and --search output.</source>
         <target state="translated">Wyświetl wszystkie kolumny w danych wyjściowych --list i --search.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="OptionDescriptionForce">
+        <source>Forces content to be generated even if it would change existing files. If used together with --install option, allows installing template packages from the specified sources even if they would override a template package from another source.</source>
+        <target state="new">Forces content to be generated even if it would change existing files. If used together with --install option, allows installing template packages from the specified sources even if they would override a template package from another source.</target>
         <note />
       </trans-unit>
       <trans-unit id="OptionDescriptionNoUpdateCheck">
@@ -837,6 +837,16 @@ Obsługiwane kolumny to: język, tagi, autor, typ.</target>
         <target state="translated">Aby wyświetlić pomoc dotyczącą innych języków szablonów ({0}), użyj opcji --język:</target>
         <note>{0} is comma-separated list of supported programming languages by template. --language should not be translated.</note>
       </trans-unit>
+      <trans-unit id="TemplatePackageCoordinator_BuiltInCheck_Info_BuiltInPackageAvailable">
+        <source>An update for template package '{0}' is available in the '{1}' provider.</source>
+        <target state="new">An update for template package '{0}' is available in the '{1}' provider.</target>
+        <note>{0} - id and version of template package, {1} - provider name (.NET SDK, Optional workloads, etc)</note>
+      </trans-unit>
+      <trans-unit id="TemplatePackageCoordinator_BuiltInCheck_Info_UninstallPackage">
+        <source>To use built-in template package, uninstall manually installed template package using:</source>
+        <target state="new">To use built-in template package, uninstall manually installed template package using:</target>
+        <note>followed by command to uninstall package</note>
+      </trans-unit>
       <trans-unit id="TemplatePackageCoordinator_Error_PackageForTemplateNotFound">
         <source>Could not find the template package containing template '{0}'</source>
         <target state="translated">Nie można znaleźć pakietu szablonów zawierającego szablon "{0}"</target>
@@ -867,10 +877,25 @@ Obsługiwane kolumny to: język, tagi, autor, typ.</target>
         <target state="translated">Polecenie próbuje zainstalować pakiet szablonów "{0}" dwa razy. Sprawdź argumenty i ponów próbę.</target>
         <note />
       </trans-unit>
+      <trans-unit id="TemplatePackageCoordinator_Install_Info_OverrideNotice">
+        <source>Installing the template package(s) will override the available template package(s).</source>
+        <target state="new">Installing the template package(s) will override the available template package(s).</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="TemplatePackageCoordinator_Install_Info_PackageIsAvailable">
+        <source>The following template package(s) are already available:</source>
+        <target state="new">The following template package(s) are already available:</target>
+        <note>Followed by list of packages that are available</note>
+      </trans-unit>
       <trans-unit id="TemplatePackageCoordinator_Install_Info_PackagesToBeInstalled">
         <source>The following template packages will be installed:</source>
         <target state="translated">Zostaną zainstalowane następujące pakiety szablonów:</target>
         <note />
+      </trans-unit>
+      <trans-unit id="TemplatePackageCoordinator_Install_Info_UseForceToOverride">
+        <source>To install the template package(s) anyway, apply '{0}' option:</source>
+        <target state="new">To install the template package(s) anyway, apply '{0}' option:</target>
+        <note>{0} is option to use (--force). Followed by command to use to install the packages.</note>
       </trans-unit>
       <trans-unit id="TemplatePackageCoordinator_Uninstall_Error_GenericError">
         <source>Failed to uninstall {0}, reason: {1}.</source>

@@ -9,9 +9,14 @@
     <ProjectReference Include="$(TestDir)Microsoft.TemplateEngine.Cli.TestHelper\Microsoft.TemplateEngine.Cli.TestHelper.csproj" />
     <ProjectReference Include="$(TestDir)Microsoft.TemplateEngine.TestHelper\Microsoft.TemplateEngine.TestHelper.csproj" />
     <PackageReference Include="Wcwidth.Sources" />
+    <PackageReference Include="Verify.XUnit" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(BuildingInsideVisualStudio)' == 'true'">
+    <Exec Command="dotnet pack $(SolutionDir)template_feed\Microsoft.DotNet.Common.ProjectTemplates.6.0" />
+    <Exec Command="dotnet pack $(SolutionDir)template_feed\Microsoft.DotNet.Common.ItemTemplates" />
+  </Target>
 </Project>

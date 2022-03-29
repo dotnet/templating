@@ -166,8 +166,8 @@
   <data name="DisplaysHelp" xml:space="preserve">
     <value>Displays help for this command.</value>
   </data>
-  <data name="ForcesTemplateCreation" xml:space="preserve">
-    <value>Forces content to be generated even if it would change existing files.</value>
+  <data name="OptionDescriptionForce" xml:space="preserve">
+    <value>Forces content to be generated even if it would change existing files. If used together with --install option, allows installing template packages from the specified sources even if they would override a template package from another source.</value>
   </data>
   <data name="Generators" xml:space="preserve">
     <value>Generators</value>
@@ -765,5 +765,24 @@ The supported columns are: language, tags, author, type.</value>
   <data name="HostSpecificDataLoader_Warning_FailedToReadFromFile" xml:space="preserve">
     <value>Failed to load dotnet CLI host data for template {0} from {1}. The host data will be ignored.</value>
     <comment>{0} - template short name, {1} - file path to host data.</comment>
+  </data>
+  <data name="TemplatePackageCoordinator_Install_Info_OverrideNotice" xml:space="preserve">
+    <value>Installing the template package(s) will override the available template package(s).</value>
+  </data>
+  <data name="TemplatePackageCoordinator_Install_Info_PackageIsAvailable" xml:space="preserve">
+    <value>The following template package(s) are already available:</value>
+    <comment>Followed by list of packages that are available</comment>
+  </data>
+  <data name="TemplatePackageCoordinator_Install_Info_UseForceToOverride" xml:space="preserve">
+    <value>To install the template package(s) anyway, apply '{0}' option:</value>
+    <comment>{0} is option to use (--force). Followed by command to use to install the packages.</comment>
+  </data>
+  <data name="TemplatePackageCoordinator_BuiltInCheck_Info_BuiltInPackageAvailable" xml:space="preserve">
+    <value>An update for template package '{0}' is available in the '{1}' provider.</value>
+    <comment>{0} - id and version of template package, {1} - provider name (.NET SDK, Optional workloads, etc)</comment>
+  </data>
+  <data name="TemplatePackageCoordinator_BuiltInCheck_Info_UninstallPackage" xml:space="preserve">
+    <value>To use built-in template package, uninstall manually installed template package using:</value>
+    <comment>followed by command to uninstall package</comment>
   </data>
 </root>
