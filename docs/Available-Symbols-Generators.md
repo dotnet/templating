@@ -240,8 +240,7 @@ In this sample `KestrelPortGenerated` is a symbol that return the number of an a
 
 *Note:* [Guids section in `template.json`](Reference-for-template.json.md#guids) can be used to achieve same goals with easier configuration
 
-Creates a formatted guid for a replacement. To configure the output format of the macro you can use the **defaultFormat** parameter that accepts a value from **ndbpx** for lowercase output and **NDPBX** for uppercase output. 
-
+Creates a formatted guid for a replacement. To configure the output format of the macro you can use the **defaultFormat** parameter that accepts a single value from **{'n', 'd', 'b', 'p', 'x'}** for lowercase output or **{'N', 'D', 'B', 'P', 'X'}** for uppercase output. The formats are defined in [`Guid.ToString()`  method documentation](https://msdn.microsoft.com/en-us/library/97af8hh4(v=vs.110).aspx)
 #### Parameters
 | Name     |Data Type| Description   |
 |----------|------|---------------|
