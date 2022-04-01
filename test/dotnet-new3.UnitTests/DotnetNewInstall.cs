@@ -107,7 +107,7 @@ namespace Dotnet_new3.IntegrationTests
 
         [Theory]
         [InlineData("-i")]
-        [InlineData("install")]
+        [InlineData("--install")]
         public void CanInstallRemoteNuGetPackageWithVersionWildcard(string commandName)
         {
             var command1 = new DotnetNewCommand(_log, commandName, "Microsoft.DotNet.Common.ProjectTemplates.5.0::5.*")
