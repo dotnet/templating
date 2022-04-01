@@ -217,7 +217,7 @@ namespace Microsoft.TemplateEngine.Cli
             }
             else
             {
-                HandleUpdateCheckErrors(versionCheckResult);
+                HandleUpdateCheckErrors(versionCheckResult, ignoreLocalPackageNotFound: true);
                 Reporter.Error.WriteLine();
             }
         }
@@ -657,7 +657,9 @@ namespace Microsoft.TemplateEngine.Cli
             {
                 foreach (CheckUpdateResult result in versionCheckResults.Where(result => !result.Success))
                 {
-                    HandleUpdateCheckErrors(result);
+                    // explicit check of updates requested - so we do not want to ignore errors for
+                    //  local only packages
+                    HandleUpdateCheckErrors(result, ignoreLocalPackageNotFound: false);
                 }
                 Reporter.Error.WriteLine();
             }
@@ -809,7 +811,7 @@ namespace Microsoft.TemplateEngine.Cli
             }
         }
 
-        private void HandleUpdateCheckErrors(InstallerOperationResult result)
+        private void HandleUpdateCheckErrors(InstallerOperationResult result, bool ignoreLocalPackageNotFound)
         {
             switch (result.Error)
             {
@@ -820,10 +822,13 @@ namespace Microsoft.TemplateEngine.Cli
                             result.TemplatePackage.DisplayName).Bold().Red());
                     break;
                 case InstallerErrorCode.PackageNotFound:
-                    Reporter.Error.WriteLine(
-                        string.Format(
-                            LocalizableStrings.TemplatePackageCoordinator_Update_Error_PackageNotFound,
-                            result.TemplatePackage.DisplayName).Bold().Red());
+                    if (!ignoreLocalPackageNotFound || !result.TemplatePackage.IsLocalPackage)
+                    {
+                        Reporter.Error.WriteLine(
+                            string.Format(
+                                LocalizableStrings.TemplatePackageCoordinator_Update_Error_PackageNotFound,
+                                result.TemplatePackage.DisplayName).Bold().Red());
+                    }
                     break;
                 case InstallerErrorCode.UnsupportedRequest:
                     Reporter.Error.WriteLine(

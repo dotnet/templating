@@ -53,12 +53,40 @@ namespace Dotnet_new3.IntegrationTests
         }
 
         [Fact]
-        public void DoesNotShowUpdatesWhenAllTemplatesAreUpToDate()
+        public void ReportsErrorOnUpdateCheckOfLocalPackage()
+        {
+            string nugetName = "TestNupkgInstallTemplate";
+            string nugetVersion = "0.0.1";
+            string nugetFullName = $"{nugetName}::{nugetVersion}";
+            string nugetFileName = $"{nugetName}.{nugetVersion}.nupkg";
+            string workingDirectory = TestUtils.CreateTemporaryFolder();
+            var home = workingDirectory;
+
+            Helpers.InstallNuGetTemplate(
+                TestUtils.GetTestNugetLocation(nugetFileName),
+                _log,
+                home,
+                workingDirectory);
+
+            new DotnetNewCommand(_log, "--update-check")
+                .WithCustomHive(home).WithoutBuiltInTemplates()
+                .WithWorkingDirectory(workingDirectory)
+                .Execute()
+                .Should()
+                .Fail()
+                .And.NotHaveStdOut()
+                .And.HaveStdErr($"Failed to check update for {nugetFullName}: the package is not available in configured NuGet feeds.");
+        }
+
+        [Theory]
+        [InlineData("--update-check")]
+        [InlineData("--update-check --dry-run")]
+        public void DoesNotShowUpdatesWhenAllTemplatesAreUpToDate(string testCase)
         {
             var home = TestUtils.CreateTemporaryFolder("Home");
             string workingDirectory = TestUtils.CreateTemporaryFolder();
-            Helpers.InstallTestTemplate("TemplateResolution/DifferentLanguagesGroup/BasicFSharp", _log, workingDirectory, home);
-            new DotnetNewCommand(_log, "-i", "Microsoft.DotNet.Common.ProjectTemplates.5.0")
+            Helpers.InstallTestTemplate("TemplateResolution/DifferentLanguagesGroup/BasicFSharp", _log, home, workingDirectory);
+            new DotnetNewCommand(_log, "--install", "Microsoft.DotNet.Common.ProjectTemplates.5.0")
                 .WithCustomHive(home)
                 .WithWorkingDirectory(TestUtils.CreateTemporaryFolder())
                 .Execute()
@@ -70,7 +98,7 @@ namespace Dotnet_new3.IntegrationTests
                 .And.HaveStdOutContaining("console")
                 .And.HaveStdOutContaining("classlib");
 
-            new DotnetNewCommand(_log, "--update-check")
+            new DotnetNewCommand(_log, testCase.Split(" "))
                 .WithCustomHive(home)
                 .WithWorkingDirectory(TestUtils.CreateTemporaryFolder())
                 .Execute()
