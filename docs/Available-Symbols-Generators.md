@@ -238,12 +238,14 @@ In this sample `KestrelPortGenerated` is a symbol that return the number of an a
 
 ## Guid
 
-Creates a formatted guid for a replacement. To configure the output format of the macro you can use the **format** parameter that accepts a value from **ndbpx** for lowercase output and **NDPBX** for uppercase output. 
+*Note:* [Guids section in `template.json`](Reference-for-template.json.md#guids) can be used to achieve same goals with easier configuration
+
+Creates a formatted guid for a replacement. To configure the output format of the macro you can use the **defaultFormat** parameter that accepts a value from **ndbpx** for lowercase output and **NDPBX** for uppercase output. 
 
 #### Parameters
 | Name     |Data Type| Description   |
 |----------|------|---------------|
-|format|string|Format Descriptor| 
+|defaultFormat|string|Format Descriptor| 
 
 ### Samples
 This sample creates different symbols showing the different formatting available for the generated guid.
@@ -255,7 +257,7 @@ This sample creates different symbols showing the different formatting available
     "generator": "guid",
     "replaces": "myid01",
     "parameters": {
-      "format":"N"
+      "defaultFormat":"N"
     }
   },
   "id02":{
@@ -263,7 +265,7 @@ This sample creates different symbols showing the different formatting available
     "generator": "guid",
     "replaces": "myid02",
     "parameters": {
-      "format":"D"
+      "defaultFormat":"D"
     }
   },
   "id03":{
@@ -271,7 +273,7 @@ This sample creates different symbols showing the different formatting available
     "generator": "guid",
     "replaces": "myid03",
     "parameters": {
-      "format":"B"
+      "defaultFormat":"B"
     }
   },
   "id04":{
@@ -279,7 +281,7 @@ This sample creates different symbols showing the different formatting available
     "generator": "guid",
     "replaces": "myid04",
     "parameters": {
-      "format":"P"
+      "defaultFormat":"P"
     }
   },
   "id05":{
@@ -287,7 +289,7 @@ This sample creates different symbols showing the different formatting available
     "generator": "guid",
     "replaces": "myid05",
     "parameters": {
-      "format":"X"
+      "defaultFormat":"X"
     }
   }
 }
@@ -295,8 +297,8 @@ This sample creates different symbols showing the different formatting available
 
 ### Related 
 [`Implementation class`](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.Orchestrator.RunnableProjects/Macros/GuidMacro.cs)
-[`Guid Format Documentation`](https://msdn.microsoft.com/en-us/library/97af8hh4(v=vs.110).aspx)    
-[`Sample`](https://github.com/dotnet/dotnet-template-samples/tree/master/14-guid)
+[`Guid Format Documentation`](https://msdn.microsoft.com/en-us/library/97af8hh4(v=vs.110).aspx)
+[Guids section in `template.json`](Reference-for-template.json.md#guids)
 
 
 ## Now

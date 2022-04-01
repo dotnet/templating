@@ -54,7 +54,7 @@
         },
         "parameters": {
           "properties": {
-            "format": {
+            "defaultFormat": {
               "description": "When a string representation of the guid is needed, this is used as the format string in Guid.ToString().",
               "type": "string"
             }
