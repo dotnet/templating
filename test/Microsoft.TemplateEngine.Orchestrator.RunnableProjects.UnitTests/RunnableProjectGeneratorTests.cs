@@ -62,30 +62,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
 
             IEngineEnvironmentSettings environment = _environmentSettingsHelper.CreateEnvironment();
             string sourceBasePath = FileSystemHelpers.GetNewVirtualizedPath(environment);
-
-            foreach (KeyValuePair<string, string?> fileInfo in templateSourceFiles)
-            {
-                string filePath = Path.Combine(sourceBasePath, fileInfo.Key);
-                string fullPathDir = Path.GetDirectoryName(filePath)!;
-                environment.Host.FileSystem.CreateDirectory(fullPathDir);
-                environment.Host.FileSystem.WriteAllText(filePath, fileInfo.Value ?? string.Empty);
-            }
-
             string targetDir = FileSystemHelpers.GetNewVirtualizedPath(environment);
 
-            //create mount point
-            IMountPoint? sourceMountPoint = null;
-            foreach (var factory in environment.Components.OfType<IMountPointFactory>())
-            {
-                if (factory.TryMount(environment, null, sourceBasePath, out IMountPoint myMountPoint))
-                {
-                    sourceMountPoint = myMountPoint;
-                    break;
-                }
-            }
-            Assert.True(sourceMountPoint != null, "couldn't create source mount point");
-
-            IRunnableProjectConfig runnableConfig = TemplateConfigTestHelpers.ConfigFromSource(environment, sourceMountPoint);
+            TemplateConfigTestHelpers.WriteTemplateSource(environment, sourceBasePath, templateSourceFiles);
+            IMountPoint? sourceMountPoint = TemplateConfigTestHelpers.CreateMountPoint(environment, sourceBasePath);
+            IRunnableProjectConfig runnableConfig = TemplateConfigTestHelpers.ConfigFromSource(environment, sourceMountPoint!);
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
             IParameterSet parameters = new ParameterSet(runnableConfig);
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/");
