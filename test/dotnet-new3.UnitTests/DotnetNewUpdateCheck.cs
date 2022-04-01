@@ -60,7 +60,7 @@ namespace Dotnet_new3.IntegrationTests
             string nugetFullName = $"{nugetName}::{nugetVersion}";
             string nugetFileName = $"{nugetName}.{nugetVersion}.nupkg";
             string workingDirectory = TestUtils.CreateTemporaryFolder();
-            var home = TestUtils.CreateTemporaryFolder("Home");
+            var home = workingDirectory;
 
             Helpers.InstallNuGetTemplate(
                 TestUtils.GetTestNugetLocation(nugetFileName),
@@ -80,14 +80,13 @@ namespace Dotnet_new3.IntegrationTests
 
         [Theory]
         [InlineData("--update-check")]
-        [InlineData("update --check-only")]
-        [InlineData("update --dry-run")]
+        [InlineData("--update-check --dry-run")]
         public void DoesNotShowUpdatesWhenAllTemplatesAreUpToDate(string testCase)
         {
             var home = TestUtils.CreateTemporaryFolder("Home");
             string workingDirectory = TestUtils.CreateTemporaryFolder();
             Helpers.InstallTestTemplate("TemplateResolution/DifferentLanguagesGroup/BasicFSharp", _log, home, workingDirectory);
-            new DotnetNewCommand(_log, "install", "Microsoft.DotNet.Common.ProjectTemplates.5.0")
+            new DotnetNewCommand(_log, "--install", "Microsoft.DotNet.Common.ProjectTemplates.5.0")
                 .WithCustomHive(home)
                 .WithWorkingDirectory(TestUtils.CreateTemporaryFolder())
                 .Execute()

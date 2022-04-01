@@ -574,7 +574,7 @@ namespace Dotnet_new3.IntegrationTests
             string nugetFileName = $"{nugetName}.{nugetVersion}.nupkg";
             string templateName = "nupkginstall";
             string workingDirectory = TestUtils.CreateTemporaryFolder();
-            var home = TestUtils.CreateTemporaryFolder("Home");
+            var home = workingDirectory;
 
             Helpers.InstallNuGetTemplate(
                 TestUtils.GetTestNugetLocation(nugetFileName),
