@@ -28,9 +28,9 @@
     <!-- Dependencies from https://github.com/dotnet/installer -->
     <VSRedistCommonNetCoreToolsetx64PackageVersion>7.0.100-alpha.1.21451.23</VSRedistCommonNetCoreToolsetx64PackageVersion>
     <!-- Dependencies from https://github.com/nuget/nuget.client -->
-    <NuGetCredentialsPackageVersion>6.2.0-preview.3.131</NuGetCredentialsPackageVersion>
-    <NuGetConfigurationPackageVersion>6.2.0-preview.3.131</NuGetConfigurationPackageVersion>
-    <NuGetProtocolPackageVersion>6.2.0-preview.3.131</NuGetProtocolPackageVersion>
+    <NuGetCredentialsPackageVersion>6.2.0-rc.140</NuGetCredentialsPackageVersion>
+    <NuGetConfigurationPackageVersion>6.2.0-rc.140</NuGetConfigurationPackageVersion>
+    <NuGetProtocolPackageVersion>6.2.0-rc.140</NuGetProtocolPackageVersion>
     <!-- Dependencies from https://github.com/dotnet/roslyn -->
     <MicrosoftNetCompilersToolsetPackageVersion>4.2.0-1.22116.16</MicrosoftNetCompilersToolsetPackageVersion>
     <MicrosoftCodeAnalysisCSharpCodeStylePackageVersion>4.2.0-1.22116.16</MicrosoftCodeAnalysisCSharpCodeStylePackageVersion>
