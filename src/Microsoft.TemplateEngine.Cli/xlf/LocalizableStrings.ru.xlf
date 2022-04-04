@@ -639,7 +639,7 @@ The supported columns are: language, tags, author, type.</source>
       </trans-unit>
       <trans-unit id="OptionDescriptionForce">
         <source>Forces content to be generated even if it would change existing files. If used together with --install option, allows installing template packages from the specified sources even if they would override a template package from another source.</source>
-        <target state="new">Forces content to be generated even if it would change existing files. If used together with --install option, allows installing template packages from the specified sources even if they would override a template package from another source.</target>
+        <target state="translated">Принудительно создает содержимое, даже если это приведет к изменению существующих файлов. Если используется вместе с параметром --install, разрешает установку пакетов шаблонов из указанных источников, даже когда они переопределяют пакет шаблона из другого источника.</target>
         <note />
       </trans-unit>
       <trans-unit id="OptionDescriptionNoUpdateCheck">
@@ -839,12 +839,12 @@ The supported columns are: language, tags, author, type.</source>
       </trans-unit>
       <trans-unit id="TemplatePackageCoordinator_BuiltInCheck_Info_BuiltInPackageAvailable">
         <source>An update for template package '{0}' is available in the '{1}' provider.</source>
-        <target state="new">An update for template package '{0}' is available in the '{1}' provider.</target>
+        <target state="translated">Обновление для пакета шаблона \"{0}\" доступно у поставщика \"{1}\".</target>
         <note>{0} - id and version of template package, {1} - provider name (.NET SDK, Optional workloads, etc)</note>
       </trans-unit>
       <trans-unit id="TemplatePackageCoordinator_BuiltInCheck_Info_UninstallPackage">
         <source>To use built-in template package, uninstall manually installed template package using:</source>
-        <target state="new">To use built-in template package, uninstall manually installed template package using:</target>
+        <target state="translated">Чтобы использовать встроенный пакет шаблонов, удалите пакет шаблонов, который был установлен вручную, с помощью:</target>
         <note>followed by command to uninstall package</note>
       </trans-unit>
       <trans-unit id="TemplatePackageCoordinator_Error_PackageForTemplateNotFound">
@@ -879,12 +879,12 @@ The supported columns are: language, tags, author, type.</source>
       </trans-unit>
       <trans-unit id="TemplatePackageCoordinator_Install_Info_OverrideNotice">
         <source>Installing the template package(s) will override the available template package(s).</source>
-        <target state="new">Installing the template package(s) will override the available template package(s).</target>
+        <target state="translated">При установке пакетов шаблонов будут переопределены доступные пакеты шаблонов.</target>
         <note />
       </trans-unit>
       <trans-unit id="TemplatePackageCoordinator_Install_Info_PackageIsAvailable">
         <source>The following template package(s) are already available:</source>
-        <target state="new">The following template package(s) are already available:</target>
+        <target state="translated">Следующие пакеты шаблонов уже доступны:</target>
         <note>Followed by list of packages that are available</note>
       </trans-unit>
       <trans-unit id="TemplatePackageCoordinator_Install_Info_PackagesToBeInstalled">
@@ -894,7 +894,7 @@ The supported columns are: language, tags, author, type.</source>
       </trans-unit>
       <trans-unit id="TemplatePackageCoordinator_Install_Info_UseForceToOverride">
         <source>To install the template package(s) anyway, apply '{0}' option:</source>
-        <target state="new">To install the template package(s) anyway, apply '{0}' option:</target>
+        <target state="translated">Чтобы все равно установить пакеты шаблонов, примените параметр \"{0}\":</target>
         <note>{0} is option to use (--force). Followed by command to use to install the packages.</note>
       </trans-unit>
       <trans-unit id="TemplatePackageCoordinator_Uninstall_Error_GenericError">
