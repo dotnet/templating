@@ -501,6 +501,7 @@ Concatenates multiple symbols or constants with the defined separator into a new
 |----------|---------|----------|-----|    
 |symbols   |array    |no     |all values to concatenate|
 |separator |string   |yes      |the value used as the separator between the values to be concatenated, notice that you can use `/` as folder separator also on Windows since File API will convert it into `\` |
+|removeEmptyValues |bool   |yes      |indicates whether empty values should be skiped or honored. By default this switch is off - leading to multiple consecutive separators in output string in case that same input values are null or empty|
 
 Symbols definition
 
@@ -548,12 +549,68 @@ This sample shows how to change the replacement value based on evaluating condit
             "value": "product"
           }
         ],
-        "separator": "/"
+        "separator": "/",
+        "removeEmptyValues": true
       }
     }
   }
 ```
 This sample will rename folder called `Api` into `Source/Api/Microsoft/Visual Studio`. Notice that File API will automatically change `/` into `\` on Windows.
+
+<a id="multichoice-join-sample"></a>Joining [multi-choice symbol](Reference-for-template.json.md#multichoice-symbols-specifics) values:
+
+`template.json`:
+```
+  "symbols": {
+    "Framework": {
+      "type": "parameter",
+      "description": "The target framework for the project.",
+      "datatype": "multichoice",
+      "choices": [
+        {
+          "choice": "netcoreapp3.1",
+          "description": "Target netcoreapp3.1"
+        },
+        {
+          "choice": "netstandard2.1",
+          "description": "Target netstandard2.1"
+        },
+        {
+          "choice": "netstandard2.0",
+          "description": "Target netstandard2.0"
+        }
+      ],
+      "defaultValue": "netstandard2.0|netstandard2.1"
+    },
+    "joinedRename": {
+      "type": "generated",
+      "generator": "join",
+      "replaces": "SupportedFrameworks",
+      "parameters": {
+        "symbols": [
+          {
+            "type": "ref",
+            "value": "Framework"
+          }
+        ],
+        "separator": ", ",
+        "removeEmptyValues": true,
+      }
+    }
+  }
+```
+
+`Program.cs`:
+```C#
+// This file is generated for frameworks: SupportedFrameworks
+```
+
+This sample will expand and join values of `Framework` argument and replace `SupportedFrameworks` string with `netstandard2.0, netstandard2.1`:
+
+`Program.cs`:
+```C#
+// This file is generated for frameworks: netstandard2.0, netstandard2.1
+```
 
 ### Related
 [`Implementation class`](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.Orchestrator.RunnableProjects/Macros/JoinMacro.cs)

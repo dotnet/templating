@@ -157,7 +157,7 @@ Boolean optional parameter with default value `false`:
   },
 ```
  
-Choice optional parameter with 3 possible values:
+<a id="choice-sample"></a>Choice optional parameter with 3 possible values:
 ```json
   "symbols": {
     "Framework": {
@@ -196,6 +196,58 @@ String optional parameter, replaces TargetFrameworkOverride:
     }
 }
 ```
+
+#### Multichoice symbols specifics
+Multichoice symbols have similar behavior and usage scenarios as [C# Flag enums](https://docs.microsoft.com/en-us/dotnet/api/system.flagsattribute) - they express a range of possible values (not a single value - unlike the plain [choice symbol](#choice-sample))
+
+There are some specifics in behavior of multichoice symbols that are worth noting:
+
+* Condition evaluation - closer described in [Conditions document](Conditions.md#multichoice-literals).
+* [`Switch` symbol](Available-Symbols-Generators.md#switch) evaluation - conditions are evaluated by identical evaluator as preprocessing conditions (previous bulet point). 
+* Tab completion on CLI - Tab completion is works identically as for standard choice symbol, user can specify multiple values via repeating the option switch - e.g.: `dotnet new MyTemplate --MyParameter value1 --MyParameter value2`
+* Outputing multichoice value as a string using the [`join` symbol](Available-Symbols-Generators.md#join):
+
+```
+ "symbols": {
+    "Framework": {
+      "type": "parameter",
+      "description": "The target framework for the project.",
+      "datatype": "choice",
+      "allowMultiple": true,  //multichoice indicator
+      "choices": [
+        {
+          "choice": "netcoreapp3.1",
+          "description": "Target netcoreapp3.1"
+        },
+        {
+          "choice": "netstandard2.1",
+          "description": "Target netstandard2.1"
+        },
+        {
+          "choice": "netstandard2.0",
+          "description": "Target netstandard2.0"
+        }
+      ],
+      "defaultValue": "netstandard2.0|netstandard2.1"
+    },
+    "joinedRename": {
+      "type": "generated",
+      "generator": "join",
+      "fileRename": "Api",
+      "parameters": {
+        "symbols": [
+          {
+            "type": "ref",
+            "value": "Framework"
+          }
+        ],
+        "separator": ", "
+      }
+    }
+  }
+```
+
+
 
 #### Derived symbol
 
