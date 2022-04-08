@@ -200,20 +200,15 @@ String optional parameter, replaces TargetFrameworkOverride:
 #### Multichoice symbols specifics
 Multichoice symbols have similar behavior and usage scenarios as [C# Flag enums](https://docs.microsoft.com/en-us/dotnet/api/system.flagsattribute) - they express a range of possible values (not a single value - unlike the plain [choice symbol](#choice-sample))
 
-There are some specifics in behavior of multichoice symbols that are worth noting:
+##### Example definition of multichoice symbol:
 
-* Condition evaluation - closer described in [Conditions document](Conditions.md#multichoice-literals).
-* [`Switch` symbol](Available-Symbols-Generators.md#switch) evaluation - conditions are evaluated by identical evaluator as preprocessing conditions (previous bulet point). 
-* Tab completion on CLI - Tab completion is works identically as for standard choice symbol, user can specify multiple values via repeating the option switch - e.g.: `dotnet new MyTemplate --MyParameter value1 --MyParameter value2`
-* Outputing multichoice value as a string using the [`join` symbol](Available-Symbols-Generators.md#join):
-
-```
- "symbols": {
+```json
+  "symbols": {
     "Framework": {
       "type": "parameter",
       "description": "The target framework for the project.",
       "datatype": "choice",
-      "allowMultiple": true,  //multichoice indicator
+      "allowMultiple": true,  // multichoice indicator
       "choices": [
         {
           "choice": "netcoreapp3.1",
@@ -229,23 +224,20 @@ There are some specifics in behavior of multichoice symbols that are worth notin
         }
       ],
       "defaultValue": "netstandard2.0|netstandard2.1"
-    },
-    "joinedRename": {
-      "type": "generated",
-      "generator": "join",
-      "fileRename": "Api",
-      "parameters": {
-        "symbols": [
-          {
-            "type": "ref",
-            "value": "Framework"
-          }
-        ],
-        "separator": ", "
-      }
     }
-  }
+}
 ```
+
+There are some specifics in behavior of multichoice symbols that are worth noting:
+
+* Condition evaluation - closer described in [Conditions document](Conditions.md#multichoice-literals).
+* [`Switch` symbol](Available-Symbols-Generators.md#switch) evaluation - conditions are evaluated by identical evaluator as preprocessing conditions (previous bullet point). 
+* Argument passing and tab completion on CLI - Tab completion works identically as for standard choice symbol, user can specify multiple options via repeating the argument switch for each option:  
+  `dotnet new MyTemplate --MyParameter value1 --MyParameter value2`  
+  or via passing multiple options to a single argument switch:  
+  `dotnet new MyTemplate --MyParameter value1 value2`
+
+* Outputing multichoice value as a string - this can be achieved via leveraging the [`join` symbol](Available-Symbols-Generators.md#multichoice-join-sample)
 
 
 
