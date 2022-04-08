@@ -45,25 +45,29 @@ Options:
 @"Console App (C#)
 Author: Microsoft
 Description: A project for creating a command-line application that can run on .NET on Windows, Linux and macOS
-Options:                                                                             
-  -f|--framework  The target framework for the project.                              
-                      net6.0           - Target net6.0                               
-                      net5.0           - Target net5.0                               
-                      netcoreapp3.1    - Target netcoreapp3.1                        
-                      netcoreapp3.0    - Target netcoreapp3.0                        
-                      netcoreapp2.2    - Target netcoreapp2.2                        
-                      netcoreapp2.1    - Target netcoreapp2.1                        
-                      netcoreapp2.0    - Target netcoreapp2.0                        
-                      netcoreapp1.0    - Target netcoreapp1.0                        
-                      netcoreapp1.1    - Target netcoreapp1.1                        
-                  Default: net6.0                                                    
+Options:                                                                                                            
+  -f|--framework      The target framework for the project.                                                         
+                          net6.0           - Target net6.0                                                          
+                          net5.0           - Target net5.0                                                          
+                          netcoreapp3.1    - Target netcoreapp3.1                                                   
+                          netcoreapp3.0    - Target netcoreapp3.0                                                   
+                          netcoreapp2.2    - Target netcoreapp2.2                                                   
+                          netcoreapp2.1    - Target netcoreapp2.1                                                   
+                          netcoreapp2.0    - Target netcoreapp2.0                                                   
+                          netcoreapp1.0    - Target netcoreapp1.0                                                   
+                          netcoreapp1.1    - Target netcoreapp1.1                                                   
+                      Default: net6.0                                                                               
 
-  --langVersion   Sets the LangVersion property in the created project file          
-                  text - Optional                                                    
+  --langVersion       Sets the LangVersion property in the created project file                                     
+                      text - Optional                                                                               
 
-  --no-restore    If specified, skips the automatic restore of the project on create.
-                  bool - Optional                                                    
-                  Default: false                                                     
+  --no-restore        If specified, skips the automatic restore of the project on create.                           
+                      bool - Optional                                                                               
+                      Default: false                                                                                
+
+  --use-program-main  Whether to generate an explicit Program class and Main method instead of top-level statements.
+                      bool - Optional                                                                               
+                      Default: false                                                                                
 
 
 To see help for other template languages (F#, VB), use --language option:
@@ -319,26 +323,30 @@ For more information, run:
 @"Console App (C#)
 Author: Microsoft
 Description: A project for creating a command-line application that can run on .NET on Windows, Linux and macOS
-Options:                                                                             
-  -f|--framework  The target framework for the project.                              
-                      net6.0           - Target net6.0                               
-                      net5.0           - Target net5.0                               
-                      netcoreapp3.1    - Target netcoreapp3.1                        
-                      netcoreapp3.0    - Target netcoreapp3.0                        
-                      netcoreapp2.2    - Target netcoreapp2.2                        
-                      netcoreapp2.1    - Target netcoreapp2.1                        
-                      netcoreapp2.0    - Target netcoreapp2.0                        
-                      netcoreapp1.0    - Target netcoreapp1.0                        
-                      netcoreapp1.1    - Target netcoreapp1.1                        
-                  Default: net6.0                                                    
+Options:                                                                                                            
+  -f|--framework      The target framework for the project.                                                         
+                          net6.0           - Target net6.0                                                          
+                          net5.0           - Target net5.0                                                          
+                          netcoreapp3.1    - Target netcoreapp3.1                                                   
+                          netcoreapp3.0    - Target netcoreapp3.0                                                   
+                          netcoreapp2.2    - Target netcoreapp2.2                                                   
+                          netcoreapp2.1    - Target netcoreapp2.1                                                   
+                          netcoreapp2.0    - Target netcoreapp2.0                                                   
+                          netcoreapp1.0    - Target netcoreapp1.0                                                   
+                          netcoreapp1.1    - Target netcoreapp1.1                                                   
+                      Default: net6.0                                                                               
 
-  --langVersion   Sets the LangVersion property in the created project file          
-                  text - Optional                                                    
-                  Configured Value: 8.0                                              
+  --langVersion       Sets the LangVersion property in the created project file                                     
+                      text - Optional                                                                               
+                      Configured Value: 8.0                                                                         
 
-  --no-restore    If specified, skips the automatic restore of the project on create.
-                  bool - Optional                                                    
-                  Default: false                                                     
+  --no-restore        If specified, skips the automatic restore of the project on create.                           
+                      bool - Optional                                                                               
+                      Default: false                                                                                
+
+  --use-program-main  Whether to generate an explicit Program class and Main method instead of top-level statements.
+                      bool - Optional                                                                               
+                      Default: false                                                                                
 
 
 To see help for other template languages (F#, VB), use --language option:
