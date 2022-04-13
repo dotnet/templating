@@ -639,7 +639,7 @@ Le colonne supportate sono: lingua, tag, autore, tipo.</target>
       </trans-unit>
       <trans-unit id="OptionDescriptionForce">
         <source>Forces content to be generated even if it would change existing files. If used together with --install option, allows installing template packages from the specified sources even if they would override a template package from another source.</source>
-        <target state="new">Forces content to be generated even if it would change existing files. If used together with --install option, allows installing template packages from the specified sources even if they would override a template package from another source.</target>
+        <target state="translated">Impone la generazione del contenuto anche se i file esistenti venissero modificati. Se usato insieme all'opzione --install, consente di installare pacchetti di modelli dalle origini specificate anche se sovrascrivono un pacchetto di modelli da un'altra origine.</target>
         <note />
       </trans-unit>
       <trans-unit id="OptionDescriptionNoUpdateCheck">
