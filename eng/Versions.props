@@ -32,8 +32,8 @@
     <NuGetConfigurationPackageVersion>6.2.0-rc.140</NuGetConfigurationPackageVersion>
     <NuGetProtocolPackageVersion>6.2.0-rc.140</NuGetProtocolPackageVersion>
     <!-- Dependencies from https://github.com/dotnet/roslyn -->
-    <MicrosoftNetCompilersToolsetPackageVersion>4.2.0-1.22116.16</MicrosoftNetCompilersToolsetPackageVersion>
-    <MicrosoftCodeAnalysisCSharpCodeStylePackageVersion>4.2.0-1.22116.16</MicrosoftCodeAnalysisCSharpCodeStylePackageVersion>
+    <MicrosoftNetCompilersToolsetPackageVersion>4.2.0-4.22212.4</MicrosoftNetCompilersToolsetPackageVersion>
+    <MicrosoftCodeAnalysisCSharpCodeStylePackageVersion>4.2.0-4.22212.4</MicrosoftCodeAnalysisCSharpCodeStylePackageVersion>
     <!-- Dependencies from https://github.com/dotnet/roslyn-analyzers -->
     <MicrosoftCodeAnalysisNetAnalyzersPackageVersion>7.0.0-preview1.22116.1</MicrosoftCodeAnalysisNetAnalyzersPackageVersion>
     <MicrosoftCodeAnalysisPublicApiAnalyzersPackageVersion>3.3.4-beta1.22116.1</MicrosoftCodeAnalysisPublicApiAnalyzersPackageVersion>
