@@ -59,13 +59,13 @@
       <Uri>https://github.com/dotnet/roslyn</Uri>
       <Sha>f2d278f9a5131b7944d6ac5fecf2ce5b0a98195f</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.0.0-preview1.22212.1">
+    <Dependency Name="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.0.0-preview1.22217.1">
       <Uri>https://github.com/dotnet/roslyn-analyzers</Uri>
-      <Sha>5b0b341f5202a855179864a5b7cad0aba13d5582</Sha>
+      <Sha>91188b6cbdc115a6f170b27b72e6c5b00d67476c</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4-beta1.22212.1">
+    <Dependency Name="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4-beta1.22217.1">
       <Uri>https://github.com/dotnet/roslyn-analyzers</Uri>
-      <Sha>5b0b341f5202a855179864a5b7cad0aba13d5582</Sha>
+      <Sha>91188b6cbdc115a6f170b27b72e6c5b00d67476c</Sha>
     </Dependency>
     <Dependency Name="Microsoft.Net.Compilers.Toolset" Version="4.2.0-4.22212.4">
       <Uri>https://github.com/dotnet/roslyn</Uri>
