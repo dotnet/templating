@@ -564,6 +564,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         internal IEngineEnvironmentSettings EnvironmentSettings { get; private init; }
 
+        internal IReadOnlyList<TemplateConstraintInfo> Constraints { get; private set; }
+
         private ITemplateParameter NameParameter
         {
             get

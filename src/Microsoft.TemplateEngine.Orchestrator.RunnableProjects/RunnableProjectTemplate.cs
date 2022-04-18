@@ -147,6 +147,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         IReadOnlyList<Guid> ITemplateInfo.PostActions => _config.PostActionModels.Select(pam => pam.ActionId).ToArray();
 
+        IReadOnlyList<TemplateConstraintInfo> ITemplateInfo.Constraints => _config.Constraints;
+
         internal IRunnableProjectConfig Config => _config;
     }
 }
