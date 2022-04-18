@@ -1,6 +1,6 @@
 # Template localization 
 
-The templates are localizable. If the template is localized for the language matching the current locale, its elements will appear in that language in UX including `dotnet new` and Visual Studio.
+.NET Templates are localizable. If a template is localized for the language matching the current locale, its elements will appear in that language in hosts that use the Template Engine libraries, including `dotnet new` and the Visual Studio New Project Dialog.
 Localizable elements are:
 - name 
 - author
@@ -13,25 +13,25 @@ Localizable elements are:
   - description
   - manual instructions
 
-Localization files should be put to `localize` folder inside `.template.config`. Format of localization file is JSON, there is one file per language.
-Naming convention for localization files is: `templatestrings.<lang code>.json`. Language code should match name of [cultures](https://docs.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo.name?view=net-6.0#system-globalization-cultureinfo-name).
-Content of JSON are key-value pairs, where:
-- key is the reference to element of `template.json` to be localized. if the element is child, the full path using `/` delimiter should be given, example: `symbols/Framework/choices/netstandard2.1/description`.
-- value is localization of the element given in the key. 
+Localization files should be located inside a `.template-config\localize` folder. The format of the localization file is JSON, and there should be one file per language.
+The naming convention for localization files is: `templatestrings.<lang code>.json`, where the `lang code` should match one of the CultureInfo [names](https://docs.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo.name?view=net-6.0#system-globalization-cultureinfo-name) from the list provided by [GetCultures](https://docs.microsoft.com/dotnet/api/system.globalization.cultureinfo.getcultures?view=net-6.0).
+The structure of the localization JSON files are key-value pairs, where:
+- The key is the reference to an element of `template.json` to be localized. If the element is child, the full path using `/` delimiter should be given, example: `symbols/Framework/choices/netstandard2.1/description`.
+- The value is the localization of the element given in the key. 
 
 Examples of localization files can be found [here](https://github.com/dotnet/templating/tree/main/template_feed/Microsoft.DotNet.Common.ProjectTemplates.7.0/content/ClassLibrary-CSharp/.template.config/localize).
 
-These files can be parsed by template engine when loading information about the template. Template engine API returns the information for localizable properties in language matching the current UI culture (if localization is available).
+These files are be parsed by the template engine when loading information about the template. The Template Engine API returns information for localizable properties in language matching the current UI culture (if localization is available) transparently, without explicit user action.
 
 ### Post action localization
-Ensure to add `id` property for all post actions in `template.json` prior setting up the localization. `id` should be unique within the template. 
+Ensure that all post actions in `template.json` have an `id` property prior setting up the localization. The `id` should be unique within the template. 
 Without the `id` property the localization files cannot be created.
 In case the post action uses more than one `manualInstructions`, `id` should be also added for each manual instruction.
 
 ## Automatic generation of localization files
 
-The localization files can be generated automatically on the build using `LocalizeTemplates` MSBuild task from `Microsoft.TemplateEngine.Tasks` package.
-The task is meant to be used in template package project and will create the JSON files after the project is build.
+The localization files can be generated automatically as part of a build using the `LocalizeTemplates` MSBuild task from the [`Microsoft.TemplateEngine.Tasks`](https://www.nuget.org/packages/Microsoft.TemplateEngine.Tasks) package.
+The task is meant to be used in template package project and will create the JSON files after the project is built.
 The task supports the configuration using following properties:
 - `LocalizableTemplatesPath` - the folder containing templates to be localized. Default value: `.`.
 - `TemplateLanguages` - the languages to create files for. Default value: `cs;de;en;es;fr;it;ja;ko;pl;pt-BR;ru;tr;zh-Hans;zh-Hant`.
@@ -39,11 +39,14 @@ The task supports the configuration using following properties:
 
 Example of usage:
 ```xml
- <ItemGroup>
-    <PackageReference Include="Microsoft.TemplateEngine.Tasks" Version="1.0.0.0" PrivateAssets="all" IsImplicitlyDefined="true" />
- </ItemGroup>
- <LocalizeTemplates>true</LocalizeTemplates>
- <TemplateLanguages>en;de</TemplateLanguages>
+<PropertyGroup>
+   <LocalizeTemplates>true</LocalizeTemplates>
+   <TemplateLanguages>en;de</TemplateLanguages>
+</PropertyGroup>
+
+<ItemGroup>
+   <PackageReference Include="Microsoft.TemplateEngine.Tasks" Version="1.0.0.0" PrivateAssets="all" IsImplicitlyDefined="true" />
+</ItemGroup>
 ```
 
 This example will generate localization files for English and German languages for all templates in the package.
