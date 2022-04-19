@@ -425,20 +425,30 @@ namespace Microsoft.TemplateEngine.Cli
             NewCommandStatus result = NewCommandStatus.Success;
             IReadOnlyList<IManagedTemplatePackage> templatePackages = await _templatePackageManager.GetManagedTemplatePackagesAsync(false, cancellationToken).ConfigureAwait(false);
 
-            List<string> parsedIdentifiers = new List<string>();
-            foreach (string entry in commandArgs.TemplatePackages)
+            List<Tuple<string, string>> parsedIdentifiers = new List<Tuple<string, string>>();
+            foreach (string requestedPackageIdentifier in commandArgs.TemplatePackages)
             {
-                parsedIdentifiers.AddRange(InstallRequestPathResolution.ExpandMaskedPath(entry, _engineEnvironmentSettings));
+                // First try to search for installed packages that have identical identifier as requested to be unistalled - this will prevent issues
+                //  during clashes of packages and local path names
+                parsedIdentifiers.AddRange(
+                    InstallRequestPathResolution.ExpandMaskedPath(requestedPackageIdentifier, _engineEnvironmentSettings)
+                    .Select(expandedPackageIdentifier => new Tuple<string, string>(requestedPackageIdentifier, expandedPackageIdentifier))
+                    );
             }
 
             var packagesToUninstall = new Dictionary<IManagedTemplatePackageProvider, List<IManagedTemplatePackage>>();
-            foreach (string templatePackageIdentifier in parsedIdentifiers)
+            foreach (Tuple<string, string> templatePackageIdentifier in parsedIdentifiers)
             {
                 bool templatePackageIdentified = false;
 
                 foreach (IManagedTemplatePackage templatePackage in templatePackages)
                 {
-                    if (templatePackage.Identifier.Equals(templatePackageIdentifier, StringComparison.OrdinalIgnoreCase))
+                    if (
+                        // Original or expanded package identifier matches
+                        templatePackage.Identifier.Equals(templatePackageIdentifier.Item1, StringComparison.OrdinalIgnoreCase)
+                        ||
+                        templatePackage.Identifier.Equals(templatePackageIdentifier.Item2, StringComparison.OrdinalIgnoreCase)
+                        )
                     {
                         templatePackageIdentified = true;
                         if (packagesToUninstall.TryGetValue(templatePackage.ManagedProvider, out List<IManagedTemplatePackage>? packages))
@@ -461,17 +471,17 @@ namespace Microsoft.TemplateEngine.Cli
                 Reporter.Error.WriteLine(
                     string.Format(
                         LocalizableStrings.TemplatePackageCoordinator_Error_PackageNotFound,
-                        templatePackageIdentifier).Bold().Red());
-                if (await IsTemplateShortNameAsync(templatePackageIdentifier, cancellationToken).ConfigureAwait(false))
+                        templatePackageIdentifier.Item2).Bold().Red());
+                if (await IsTemplateShortNameAsync(templatePackageIdentifier.Item2, cancellationToken).ConfigureAwait(false))
                 {
-                    var packages = await GetTemplatePackagesByShortNameAsync(templatePackageIdentifier, cancellationToken).ConfigureAwait(false);
+                    var packages = await GetTemplatePackagesByShortNameAsync(templatePackageIdentifier.Item2, cancellationToken).ConfigureAwait(false);
                     var managedPackages = packages.OfType<IManagedTemplatePackage>();
                     if (managedPackages.Any())
                     {
                         Reporter.Error.WriteLine(
                               string.Format(
                                   LocalizableStrings.TemplatePackageCoordinator_Error_TemplateIncludedToPackages,
-                                  templatePackageIdentifier));
+                                  templatePackageIdentifier.Item2));
                         foreach (IManagedTemplatePackage managedPackage in managedPackages)
                         {
                             IEnumerable<ITemplateInfo> templates = await _templatePackageManager.GetTemplatesAsync(managedPackage, cancellationToken).ConfigureAwait(false);
