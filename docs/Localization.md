@@ -21,7 +21,7 @@ The structure of the localization JSON files are key-value pairs, where:
 
 Examples of localization files can be found [here](https://github.com/dotnet/templating/tree/main/template_feed/Microsoft.DotNet.Common.ProjectTemplates.7.0/content/ClassLibrary-CSharp/.template.config/localize).
 
-These files are be parsed by the template engine when loading information about the template. The Template Engine API returns information for localizable properties in language matching the current UI culture (if localization is available) transparently, without explicit user action.
+These files are to be parsed by the template engine when loading information about the template. The Template Engine API returns information for localizable properties in language matching the current UI culture (if localization is available) transparently, without explicit user action.
 
 ### Post action localization
 Ensure that all post actions in `template.json` have an `id` property prior setting up the localization. The `id` should be unique within the template. 
@@ -59,7 +59,7 @@ See the [link](https://aka.ms/AllAboutLoc) for more details.
 ### Repo is using arcade
 
 `Microsoft.TemplateEngine.Tasks` is included to `Microsoft.DotNet.Arcade.Sdk`.
-To start localizing the templates, enable the following property in template package project: <UsingToolTemplateLocalizer>true</UsingToolTemplateLocalizer>. This enables generating localization JSON files on the build.
+To start localizing the templates, enable the following property in template package project: `<UsingToolTemplateLocalizer>true</UsingToolTemplateLocalizer>`. This enables generating localization JSON files on the build.
 Arcade has all the configuration applied that allows to automatically detect template package project and handover JSON files for localization and receive the back.
 After the translation is done, the repo receives the PR replacing original English values in generated files with localized one.
 
@@ -72,7 +72,7 @@ In addition to that, localization handover process should be changed as followin
 After the translation is done, the repo should receive the PR replacing original English values in generated JSON files with localized ones. It is important to ensure that files are handed over to original location (`.template.config\localize` folder).
 
 It is recommended to setup a way to update `Microsoft.TemplateEngine.Tasks` package version, however it is not recommended to update it on each daily build. 
-The package is released with any build of dotnet/templating repo, though it might have no changes, so updating version on each build might be superfluous. It is recommended to update the version when the next preview or stable version is released.
+The package is released with each build of dotnet/templating repo, even if there are no changes. Therefore, updating the version on each build might be superfluous. It is recommended to update the version when the next preview or stable version is released.
 
 ## 3rd party templates localization
 
