@@ -55,9 +55,9 @@
       <Uri>https://www.github.com/dotnet/installer</Uri>
       <Sha />
     </Dependency>
-    <Dependency Name="Microsoft.CodeAnalysis.CSharp.CodeStyle" Version="4.2.0-4.22212.4">
+    <Dependency Name="Microsoft.CodeAnalysis.CSharp.CodeStyle" Version="4.2.0-4.22220.5">
       <Uri>https://github.com/dotnet/roslyn</Uri>
-      <Sha>f2d278f9a5131b7944d6ac5fecf2ce5b0a98195f</Sha>
+      <Sha>432d17a83aa5623e4581756f4d642997048056bd</Sha>
     </Dependency>
     <Dependency Name="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.0.0-preview1.22218.1">
       <Uri>https://github.com/dotnet/roslyn-analyzers</Uri>
@@ -67,9 +67,9 @@
       <Uri>https://github.com/dotnet/roslyn-analyzers</Uri>
       <Sha>890b7e8d68e95a5b05a66c7662d13a17323d6937</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Net.Compilers.Toolset" Version="4.2.0-4.22212.4">
+    <Dependency Name="Microsoft.Net.Compilers.Toolset" Version="4.2.0-4.22220.5">
       <Uri>https://github.com/dotnet/roslyn</Uri>
-      <Sha>f2d278f9a5131b7944d6ac5fecf2ce5b0a98195f</Sha>
+      <Sha>432d17a83aa5623e4581756f4d642997048056bd</Sha>
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
