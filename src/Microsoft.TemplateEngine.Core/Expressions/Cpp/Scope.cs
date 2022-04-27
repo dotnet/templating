@@ -112,7 +112,34 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Cpp
                 return string.Equals(sx, sy, StringComparison.OrdinalIgnoreCase);
             }
 
+            {
+                if (x is MultiValue mv && y is string sv)
+                {
+                    return MultivalueEquals(mv, sv);
+                }
+            }
+
+            {
+                if (y is MultiValue mv && x is string sv)
+                {
+                    return MultivalueEquals(mv, sv);
+                }
+            }
+
             return Equals(x, y);
+        }
+
+        private static bool MultivalueEquals(MultiValue mv, string comparand)
+        {
+            foreach (string s in mv.Values)
+            {
+                if (string.Equals(s, comparand, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

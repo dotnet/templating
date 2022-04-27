@@ -31,12 +31,6 @@ namespace Microsoft.TemplateEngine.Cli
             _choices = parameter.Choices.ToDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.OrdinalIgnoreCase);
         }
 
-        internal ChoiceTemplateParameter(string name, IEnumerable<string>? shortNameOverrides = null, IEnumerable<string>? longNameOverrides = null)
-            : base(name, ParameterType.Choice, shortNameOverrides, longNameOverrides)
-        {
-            _choices = new Dictionary<string, ParameterChoice>(StringComparer.OrdinalIgnoreCase);
-        }
-
         internal ChoiceTemplateParameter(ChoiceTemplateParameter choiceTemplateParameter)
            : base(choiceTemplateParameter)
         {
@@ -80,7 +74,7 @@ namespace Microsoft.TemplateEngine.Cli
                 aliases.ToArray(),
                 parseArgument: result => GetParseChoiceArgument(this)(result))
             {
-                Arity = new ArgumentArity(DefaultIfOptionWithoutValue == null ? 1 : 0, 1)
+                Arity = new ArgumentArity(DefaultIfOptionWithoutValue == null ? 1 : 0, AllowMultipleValues ? _choices.Count : 1)
             };
 
             option.FromAmongCaseInsensitive(Choices.Keys.ToArray());
@@ -142,26 +136,32 @@ namespace Microsoft.TemplateEngine.Cli
                     argumentResult.ErrorMessage = string.Format(LocalizableStrings.ParseTemplateOption_Error_MissingDefaultIfNoOptionValue, or.Token?.Value);
                     return string.Empty;
                 }
-                else if (argumentResult.Tokens.Count == 1)
-                {
-                    if (TryConvertValueToChoice(argumentResult.Tokens[0].Value, parameter, out string value, out string error))
-                    {
-                        return value;
-                    }
-                    //Cannot parse argument '{0}' for option '{1}' as expected type '{2}': {3}.
-                    argumentResult.ErrorMessage = string.Format(
-                        LocalizableStrings.ParseChoiceTemplateOption_Error_InvalidArgument,
-                        argumentResult.Tokens[0].Value,
-                        or.Token?.Value,
-                        "choice",
-                        error);
-                    return string.Empty;
-                }
-                else
+                else if (!parameter.AllowMultipleValues && argumentResult.Tokens.Count != 1)
                 {
                     //Using more than 1 argument is not allowed for '{0}', used: {1}.
                     argumentResult.ErrorMessage = string.Format(LocalizableStrings.ParseTemplateOption_Error_InvalidCount, or.Token?.Value, argumentResult.Tokens.Count);
                     return string.Empty;
+                }
+                else
+                {
+                    List<string> values = new List<string>();
+                    foreach (Token token in argumentResult.Tokens)
+                    {
+                        if (!TryConvertValueToChoice(token.Value, parameter, out string value, out string error))
+                        {
+                            //Cannot parse argument '{0}' for option '{1}' as expected type '{2}': {3}.
+                            argumentResult.ErrorMessage = string.Format(
+                                LocalizableStrings.ParseChoiceTemplateOption_Error_InvalidArgument,
+                                argumentResult.Tokens[0].Value,
+                                or.Token?.Value,
+                                "choice",
+                                error);
+                            return string.Empty;
+                        }
+                        values.Add(value);
+                    }
+
+                    return string.Join(" ", values);
                 }
             };
         }

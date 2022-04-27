@@ -351,6 +351,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                         parameter.Choices = parameterSymbol.Choices;
                         parameter.DefaultIfOptionWithoutValue = parameterSymbol.DefaultIfOptionWithoutValue;
                         parameter.DisplayName = parameterSymbol.DisplayName;
+                        parameter.AllowMultipleValues = parameterSymbol.AllowMultipleValues;
                     }
 
                     parameters[symbol.Key] = parameter;

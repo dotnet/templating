@@ -391,6 +391,9 @@ namespace Microsoft.TemplateEngine.Mocks
 
             [JsonProperty]
             public string? DisplayName { get; }
+
+            [JsonProperty]
+            public bool AllowMultipleValues { get; }
         }
     }
 

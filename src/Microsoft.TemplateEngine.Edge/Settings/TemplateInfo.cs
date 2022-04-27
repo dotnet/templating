@@ -298,6 +298,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     datatype: parameter.DataType,
                     priority: parameter.Priority,
                     type: parameter.Type,
+                    allowMultipleValues: parameter.AllowMultipleValues,
                     choices: localizedChoices ?? parameter.Choices);
 
                 localizedParameters.Add(localizedParameter);

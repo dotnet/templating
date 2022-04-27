@@ -349,26 +349,22 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
             else if (param.IsChoice())
             {
-                if (TryResolveChoiceValue(literal, param, out string? match))
+                if (param.AllowMultipleValues)
                 {
-                    return match;
-                }
+                    List<string?> val = literal.Tokenize().Select(t => ResolveChoice(environmentSettings, t, param)).Where(r => !string.IsNullOrEmpty(r)).ToList();
+                    if (val.Count <= 1)
+                    {
+                        return val.Count == 0 ? string.Empty : val[0];
+                    }
 
-                if (literal == null && param.Priority != TemplateParameterPriority.Required)
+                    return new MultiValue(val);
+                }
+                else
                 {
-                    return param.DefaultValue;
+                    string? val = ResolveChoice(environmentSettings, literal, param);
+                    valueResolutionError = val == null;
+                    return val;
                 }
-
-                string? val;
-#pragma warning disable CS0618 // Type or member is obsolete - for backward compatibility
-                while (environmentSettings.Host.OnParameterError(param, string.Empty, "ValueNotValid:" + string.Join(",", param.Choices!.Keys), out val)
-#pragma warning restore CS0618 // Type or member is obsolete
-                        && !TryResolveChoiceValue(literal, param, out val))
-                {
-                }
-
-                valueResolutionError = val == null;
-                return val;
             }
             else if (string.Equals(param.DataType, "float", StringComparison.OrdinalIgnoreCase))
             {
@@ -578,6 +574,26 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return new CreationResult(
                 postActions: PostAction.ListFromModel(environmentSettings, runnableProjectConfig.PostActionModels, variables),
                 primaryOutputs: CreationPath.ListFromModel(environmentSettings, runnableProjectConfig.PrimaryOutputs, variables));
+        }
+
+        private static string? ResolveChoice(IEngineEnvironmentSettings environmentSettings, string? literal, ITemplateParameter param)
+        {
+            if (TryResolveChoiceValue(literal, param, out string? match))
+            {
+                return match;
+            }
+
+            if (literal == null && param.Priority != TemplateParameterPriority.Required)
+            {
+                return param.DefaultValue;
+            }
+
+            string? val;
+#pragma warning disable CS0618 // Type or member is obsolete - for backward compatibility
+            environmentSettings.Host.OnParameterError(param, string.Empty, "ValueNotValid:" + string.Join(",", param.Choices!.Keys), out val);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+            return val;
         }
 
         private static bool TryResolveChoiceValue(string? literal, ITemplateParameter param, out string? match)
