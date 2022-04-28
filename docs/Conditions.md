@@ -45,7 +45,7 @@ using System;
 
 ### Choice literals
 
-[Choice Symbol](Reference-for-template.json.md#examples) can have one of N predefined values. Those predefined values can be referenced in the conditions as quoted or unquoted literals. Following 2 expressions are equivalent:
+[Choice Symbol](Reference-for-template.json.md#examples) can have one of N predefined values. Those predefined values can be referenced in the conditions as quoted literals. Unquoted literals are as well supported as opt-in feature via [`enableQuotelessLiterals`](Reference-for-template.json.md#enableQuotelessLiterals). Following 2 expressions are equivalent when opted in:
 
 `#if (PLATFORM == "Windows")`
 
@@ -66,7 +66,8 @@ Comparison to multichoice symbol results in operation checking of a presence of 
       "type": "parameter",
       "description": "The target framework for the project.",
       "datatype": "choice",
-      "allowMultiple": true,
+      "allowMultipleValues": true,
+      "enableQuotelessLiterals": true,
       "choices": [
         {
           "choice": "netcoreapp3.1",
@@ -99,7 +100,7 @@ Order of operands doesn't matter - `PLATFORM == Windows` evaluates identical as 
 
 ### Using Computed Conditions to work with Multichoice Symbols
 
-Cases that needs evaluation of different type of condition over multichoice symbols than 'contains' (e.g. exclusive equality or membership in subset of possible values) can be achieved with slightly more involved condition - so we recomend definition of aliases via computed conditions.
+Cases that needs evaluation of different type of condition over multichoice symbols than 'contains' (e.g. exclusive equality or membership in subset of possible values) can be achieved with slightly more involved condition - so we recommend definition of aliases via computed conditions.
 
 #### Example:
 
@@ -112,7 +113,8 @@ Lets consider following multichoice symbol:
       "type": "parameter",
       "description": "The target platform for the project.",
       "datatype": "choice",
-      "allowMultiple": true,
+      "allowMultipleValues": true,
+      "enableQuotelessLiterals": true,
       "choices": [
         {
           "choice": "Windows",

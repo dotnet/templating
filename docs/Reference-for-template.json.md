@@ -208,7 +208,7 @@ Multichoice symbols have similar behavior and usage scenarios as [C# Flag enums]
       "type": "parameter",
       "description": "The target framework for the project.",
       "datatype": "choice",
-      "allowMultiple": true,  // multichoice indicator
+      "allowMultipleValues": true,  // multichoice indicator
       "choices": [
         {
           "choice": "netcoreapp3.1",
