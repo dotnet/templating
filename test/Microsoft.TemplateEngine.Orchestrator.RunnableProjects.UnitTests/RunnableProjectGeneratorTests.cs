@@ -102,14 +102,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             Assert.NotEqual(inputTestGuid, expectedResultGuid);
         }
 
-        [Fact]
-        public async void CreateAsyncTest_ConditionWithUnquotedChoiceLiteral()
-        {
-            //
-            // Template content preparation
-            //
-
-            string templateConfig = @"
+        private const string TemplateConfigQuotelessLiteralsNotEnabled = @"
 {
     ""symbols"": {	
 	    ""ChoiceParam"": {
@@ -135,6 +128,43 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
     }
 }
 ";
+
+        private const string TemplateConfigQuotelessLiteralsEnabled = @"
+{
+    ""symbols"": {	
+	    ""ChoiceParam"": {
+	      ""type"": ""parameter"",
+	      ""description"": ""sample switch"",
+	      ""datatype"": ""choice"",
+          ""enableQuotelessLiterals"": true,
+	      ""choices"": [
+		    {
+		      ""choice"": ""FirstChoice"",
+		      ""description"": ""First Sample Choice""
+		    },
+		    {
+		      ""choice"": ""SecondChoice"",
+		      ""description"": ""Second Sample Choice""
+		    },
+		    {
+		      ""choice"": ""ThirdChoice"",
+		      ""description"": ""Third Sample Choice""
+		    }
+	      ],
+          ""defaultValue"": ""ThirdChoice"",
+	    }
+    }
+}
+";
+
+        [Theory]
+        [InlineData(TemplateConfigQuotelessLiteralsNotEnabled, "UNKNOWN")]
+        [InlineData(TemplateConfigQuotelessLiteralsEnabled, "SECOND")]
+        public async void CreateAsyncTest_ConditionWithUnquotedChoiceLiteral(string templateConfig, string expectedResult)
+        {
+            //
+            // Template content preparation
+            //
 
             string sourceSnippet = @"
 //#if( ChoiceParam == FirstChoice )
@@ -184,7 +214,7 @@ UNKNOWN
             //
 
             string resultContent = environment.Host.FileSystem.ReadAllText(Path.Combine(targetDir, "sourcFile")).Trim();
-            Assert.Equal("SECOND", resultContent);
+            Assert.Equal(expectedResult, resultContent);
         }
     }
 }

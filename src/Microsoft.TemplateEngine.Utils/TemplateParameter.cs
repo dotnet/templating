@@ -41,6 +41,7 @@ namespace Microsoft.TemplateEngine.Utils
             DefaultIfOptionWithoutValue = jObject.ToString(nameof(DefaultIfOptionWithoutValue));
             DisplayName = jObject.ToString(nameof(DisplayName));
             IsName = jObject.ToBool(nameof(IsName));
+            EnableQuotelessLiterals = jObject.ToBool(nameof(EnableQuotelessLiterals));
 
             if (this.IsChoice())
             {
@@ -73,6 +74,7 @@ namespace Microsoft.TemplateEngine.Utils
             string? defaultIfOptionWithoutValue = null,
             string? description = null,
             string? displayName = null,
+            bool enableQuotelessLiterals = false,
             IReadOnlyDictionary<string, ParameterChoice>? choices = null)
         {
             Name = name;
@@ -84,6 +86,7 @@ namespace Microsoft.TemplateEngine.Utils
             DefaultIfOptionWithoutValue = defaultIfOptionWithoutValue;
             Description = description;
             DisplayName = displayName;
+            EnableQuotelessLiterals = enableQuotelessLiterals;
 
             if (this.IsChoice())
             {
@@ -123,6 +126,9 @@ namespace Microsoft.TemplateEngine.Utils
 
         [JsonProperty]
         public string? DisplayName { get; }
+
+        [JsonProperty]
+        public bool EnableQuotelessLiterals { get; }
     }
 
 }

@@ -340,7 +340,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                         Name = symbol.Key,
                         Priority = baseSymbol.IsRequired ? TemplateParameterPriority.Required : isName ? TemplateParameterPriority.Implicit : TemplateParameterPriority.Optional,
                         Type = baseSymbol.Type,
-                        DataType = baseSymbol.DataType
+                        DataType = baseSymbol.DataType,
+                        EnableQuotelessLiterals = baseSymbol.EnableQuotelessLiterals
                     };
 
                     if (string.Equals(symbol.Value.Type, ParameterSymbol.TypeName, StringComparison.Ordinal) &&

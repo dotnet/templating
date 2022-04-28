@@ -201,7 +201,7 @@ namespace Microsoft.TemplateEngine.Core
                 }
 
                 // Add choice values to variables - to allow them to be recognizable unquoted
-                if (param.IsChoice())
+                if (param.EnableQuotelessLiterals && param.IsChoice())
                 {
                     foreach (string choiceKey in param.Choices.Keys)
                     {
