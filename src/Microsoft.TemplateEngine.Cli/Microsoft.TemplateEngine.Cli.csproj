@@ -35,6 +35,7 @@
   <!-- forces the version in sub dependencies -->
   <ItemGroup>
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
+    <PackageReference Include="System.Security.Cryptography.X509Certificates" Version="4.3.0" /> 
   </ItemGroup>
   
   <ItemGroup>
