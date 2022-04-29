@@ -25,7 +25,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
                 throw new InvalidCastException("Couldn't cast the rawConfig as RandomMacroConfig");
             }
 
-            Random rnd = new Random();
+            var rnd = new Utils.CryptoRandom();
             int value = rnd.Next(config.Low, config.High);
 
             Parameter p;

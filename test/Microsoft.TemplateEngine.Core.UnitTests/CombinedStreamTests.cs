@@ -20,7 +20,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
         [InlineData(1024 * 1024 + 10000)]
         public void CanReadStream(int requestedCount)
         {
-            Random rnd = new Random();
+            var rnd = new Utils.CryptoRandom();
             byte[] valueBytes1 = new byte[1024 * 1024];
             byte[] valueBytes2 = new byte[1024 * 1024];
             rnd.NextBytes(valueBytes1);
