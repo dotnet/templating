@@ -1,12 +1,4 @@
-﻿Microsoft.TemplateEngine.Utils.CryptoRandom
-Microsoft.TemplateEngine.Utils.CryptoRandom.CryptoRandom() -> void
-Microsoft.TemplateEngine.Utils.CryptoRandom.CryptoRandom(int ignoredSeed) -> void
-override Microsoft.TemplateEngine.Utils.CryptoRandom.Next() -> int
-override Microsoft.TemplateEngine.Utils.CryptoRandom.Next(int maxValue) -> int
-override Microsoft.TemplateEngine.Utils.CryptoRandom.Next(int minValue, int maxValue) -> int
-override Microsoft.TemplateEngine.Utils.CryptoRandom.NextDouble() -> double
-static Microsoft.TemplateEngine.Utils.WellKnownSearchFilters.AuthorFilter(string? author) -> System.Func<Microsoft.TemplateEngine.Abstractions.ITemplateInfo!, Microsoft.TemplateEngine.Abstractions.TemplateFiltering.MatchInfo?>!
+﻿static Microsoft.TemplateEngine.Utils.WellKnownSearchFilters.AuthorFilter(string? author) -> System.Func<Microsoft.TemplateEngine.Abstractions.ITemplateInfo!, Microsoft.TemplateEngine.Abstractions.TemplateFiltering.MatchInfo?>!
 static Microsoft.TemplateEngine.Utils.WellKnownSearchFilters.BaselineFilter(string? baselineName) -> System.Func<Microsoft.TemplateEngine.Abstractions.ITemplateInfo!, Microsoft.TemplateEngine.Abstractions.TemplateFiltering.MatchInfo?>!
 static Microsoft.TemplateEngine.Utils.WellKnownSearchFilters.ClassificationFilter(string? classification) -> System.Func<Microsoft.TemplateEngine.Abstractions.ITemplateInfo!, Microsoft.TemplateEngine.Abstractions.TemplateFiltering.MatchInfo?>!
 static Microsoft.TemplateEngine.Utils.WellKnownSearchFilters.LanguageFilter(string? language) -> System.Func<Microsoft.TemplateEngine.Abstractions.ITemplateInfo!, Microsoft.TemplateEngine.Abstractions.TemplateFiltering.MatchInfo?>!
-~override Microsoft.TemplateEngine.Utils.CryptoRandom.NextBytes(byte[] buffer) -> void

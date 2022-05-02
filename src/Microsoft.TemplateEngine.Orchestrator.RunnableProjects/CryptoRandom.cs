@@ -1,27 +1,37 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System;
 using System.Security.Cryptography;
 
-namespace Microsoft.TemplateEngine.Utils
+namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
-    public class CryptoRandom : Random
+    internal class CryptoRandom : IDisposable
     {
-        private RandomNumberGenerator _rng = RandomNumberGenerator.Create();
-        private byte[] _uint32Buffer = new byte[4];
+        private readonly RandomNumberGenerator _rng = RandomNumberGenerator.Create();
+        private readonly byte[] _uint32Buffer = new byte[4];
 
         public CryptoRandom() { }
 
         public CryptoRandom(int ignoredSeed) { }
 
-        public override int Next()
+        public static int NextInt(int minValue, int maxValue)
+        {
+            using (CryptoRandom random = new CryptoRandom())
+            {
+                return random.Next(minValue, maxValue);
+            }
+        }
+
+        public int Next()
         {
             _rng.GetBytes(_uint32Buffer);
             return BitConverter.ToInt32(_uint32Buffer, 0) & 0x7FFFFFFF;
         }
 
-        public override int Next(int maxValue)
+        public int Next(int maxValue)
         {
             if (maxValue < 0)
             {
@@ -31,7 +41,7 @@ namespace Microsoft.TemplateEngine.Utils
             return Next(0, maxValue);
         }
 
-        public override int Next(int minValue, int maxValue)
+        public int Next(int minValue, int maxValue)
         {
             if (minValue > maxValue)
             {
@@ -59,17 +69,22 @@ namespace Microsoft.TemplateEngine.Utils
             }
         }
 
-        public override double NextDouble()
+        public double NextDouble()
         {
             _rng.GetBytes(_uint32Buffer);
             uint rand = BitConverter.ToUInt32(_uint32Buffer, 0);
             return rand / (1.0 + uint.MaxValue);
         }
 
-        public override void NextBytes(byte[] buffer)
+        public void NextBytes(byte[] buffer)
         {
             buffer = buffer ?? throw new ArgumentNullException(nameof(buffer));
             _rng.GetBytes(buffer);
+        }
+
+        public void Dispose()
+        {
+            _rng.Dispose();
         }
     }
 }

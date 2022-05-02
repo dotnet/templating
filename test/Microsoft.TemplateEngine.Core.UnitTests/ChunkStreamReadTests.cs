@@ -28,7 +28,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
         [Fact]
         public void VerifyLongStreamNoReplacement()
         {
-            var rnd = new Utils.CryptoRandom();
+            Random rnd = new Random();
             byte[] valueBytes = new byte[1024 * 1024];
             rnd.NextBytes(valueBytes);
             ChunkMemoryStream input = new ChunkMemoryStream(valueBytes, 512);
