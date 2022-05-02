@@ -8,7 +8,7 @@ namespace Microsoft.TemplateEngine.Utils
 {
     public class CryptoRandom : Random
     {
-        private RNGCryptoServiceProvider _rng = new RNGCryptoServiceProvider();
+        private RandomNumberGenerator _rng = RandomNumberGenerator.Create();
         private byte[] _uint32Buffer = new byte[4];
 
         public CryptoRandom() { }
@@ -23,16 +23,28 @@ namespace Microsoft.TemplateEngine.Utils
 
         public override int Next(int maxValue)
         {
-            if (maxValue < 0) { throw new ArgumentOutOfRangeException(nameof(maxValue)); }
+            if (maxValue < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(maxValue));
+            }
+
             return Next(0, maxValue);
         }
 
         public override int Next(int minValue, int maxValue)
         {
-            if (minValue > maxValue) { throw new ArgumentOutOfRangeException(nameof(minValue)); }
-            if (minValue == maxValue) { return minValue; }
+            if (minValue > maxValue)
+            {
+                throw new ArgumentOutOfRangeException(nameof(minValue));
+            }
+
+            if (minValue == maxValue)
+            {
+                return minValue;
+            }
+
             long diff = maxValue - minValue;
-            // We are avoiding reminder bias by discarding the reminder.
+            // We are avoiding remainder bias by discarding the remainder.
             //  background: https://ericlippert.com/2013/12/16/how-much-bias-is-introduced-by-the-remainder-technique/
             while (true)
             {
@@ -56,7 +68,7 @@ namespace Microsoft.TemplateEngine.Utils
 
         public override void NextBytes(byte[] buffer)
         {
-            if (buffer == null) { throw new ArgumentNullException(nameof(buffer)); }
+            buffer = buffer ?? throw new ArgumentNullException(nameof(buffer));
             _rng.GetBytes(buffer);
         }
     }
