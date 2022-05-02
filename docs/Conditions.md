@@ -62,39 +62,51 @@ Comparison to multichoice symbol results in operation checking of a presence of 
 `template.json`:
 ```json
   "symbols": {
-    "Framework": {
+    "Platform": {
       "type": "parameter",
-      "description": "The target framework for the project.",
+      "description": "The target platform for the project.",
       "datatype": "choice",
       "allowMultipleValues": true,
       "enableQuotelessLiterals": true,
       "choices": [
         {
-          "choice": "netcoreapp3.1",
-          "description": "Target netcoreapp3.1"
+          "choice": "Windows",
+          "description": "Windows Desktop"
         },
         {
-          "choice": "netstandard2.1",
-          "description": "Target netstandard2.1"
+          "choice": "WindowsPhone",
+          "description": "Windows Phone"
         },
         {
-          "choice": "netstandard2.0",
-          "description": "Target netstandard2.0"
+          "choice": "MacOS",
+          "description": "Macintosh computers"
+        },
+        {
+          "choice": "iOS",
+          "description": "iOS mobile"
+        },
+        {
+          "choice": "android",
+          "description": "android mobile"
+        },
+        {
+          "choice": "nix",
+          "description": "Linux distributions"
         }
       ],
-      "defaultValue": "netstandard2.0|netstandard2.1"
+      "defaultValue": "MacOS|iOS"
     }
 }
 ```
 
 `Program.cs`:
 ```C#
-#if (Framework = netstandard2.1)
-//netstandard2.1 choice flag specified here
+#if (Platform = MacOS)
+// MacOS choice flag specified here
 #endif
 ```
 
-In above example if `Framework` has it's default value (`netstandard2.0` and `netstandard2.1`) or if those 2 values are passed to the engine (e.g. via commandline: `dotnet new MyTemplate --Framework netstandard2.0 --Framework netstandard2.1`), the condition in `Program.cs` file will be evaluated as true.
+In above example if `Platform` has it's default value (`MacOS` and `iOS`) or if those 2 values are passed to the engine (e.g. via commandline: `dotnet new MyTemplate --Platform MacOS --Platform iOS`), the condition in `Program.cs` file will be evaluated as true.
 
 Order of operands doesn't matter - `PLATFORM == Windows` evaluates identical as `Windows == PLATFORM`. Comparing 2 multichoice symbols leads to standard equality check
 

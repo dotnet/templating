@@ -562,35 +562,48 @@ This sample will rename folder called `Api` into `Source/Api/Microsoft/Visual St
 `template.json`:
 ```
   "symbols": {
-    "Framework": {
+    "Platform": {
       "type": "parameter",
       "description": "The target framework for the project.",
-      "datatype": "multichoice",
+      "datatype": "choice",
+      "allowMultipleValues": true,
       "choices": [
         {
-          "choice": "netcoreapp3.1",
-          "description": "Target netcoreapp3.1"
+          "choice": "Windows",
+          "description": "Windows Desktop"
         },
         {
-          "choice": "netstandard2.1",
-          "description": "Target netstandard2.1"
+          "choice": "WindowsPhone",
+          "description": "Windows Phone"
         },
         {
-          "choice": "netstandard2.0",
-          "description": "Target netstandard2.0"
+          "choice": "MacOS",
+          "description": "Macintosh computers"
+        },
+        {
+          "choice": "iOS",
+          "description": "iOS mobile"
+        },
+        {
+          "choice": "android",
+          "description": "android mobile"
+        },
+        {
+          "choice": "nix",
+          "description": "Linux distributions"
         }
       ],
-      "defaultValue": "netstandard2.0|netstandard2.1"
+      "defaultValue": "MacOS|iOS"
     },
     "joinedRename": {
       "type": "generated",
       "generator": "join",
-      "replaces": "SupportedFrameworks",
+      "replaces": "SupportedPlatforms",
       "parameters": {
         "symbols": [
           {
             "type": "ref",
-            "value": "Framework"
+            "value": "Platform"
           }
         ],
         "separator": ", ",
@@ -602,14 +615,14 @@ This sample will rename folder called `Api` into `Source/Api/Microsoft/Visual St
 
 `Program.cs`:
 ```C#
-// This file is generated for frameworks: SupportedFrameworks
+// This file is generated for platfrom: SupportedPlatforms
 ```
 
-This sample will expand and join values of `Framework` argument and replace `SupportedFrameworks` string with `netstandard2.0, netstandard2.1`:
+This sample will expand and join values of `Platform` argument and replace `SupportedPlatforms` string with `MacOS, iOS`:
 
 `Program.cs`:
 ```C#
-// This file is generated for frameworks: netstandard2.0, netstandard2.1
+// This file is generated for platfrom: MacOS, iOS
 ```
 
 ### Related

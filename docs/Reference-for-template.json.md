@@ -141,7 +141,9 @@ A symbol for which the config provides literal and/or default values.
 |`fileRename`|The portion of template filenames to be replaced by the symbol value.| 
 |`description`|Human readable text describing the meaning of the symbol. This has no effect on template generation.|
 |`isRequired`|Indicates if the parameter is required or not.|
-|`choices`|List of available choices. Applicable only when `datatype=choice.` Contains array of the elements: <br />- `choice`: possible value of the symbol.<br />- `description`: human readable text describing the meaning of the choice. This has no effect on template generation. <br /> If not provided, there are no valid choices for the symbol, so it can never be assigned a value.|
+|`choices`|Applicable only when `datatype=choice.`<br />List of available choices. Contains array of the elements: <br />- `choice`: possible value of the symbol.<br />- `description`: human readable text describing the meaning of the choice. This has no effect on template generation. <br /> If not provided, there are no valid choices for the symbol, so it can never be assigned a value.|
+|`allowMultipleValues`|Applicable only when `datatype=choice.`<br />. Enables ability to specify multiple values for single symbol.|
+|<a id="enableQuotelessLiterals"></a>`enableQuotelessLiterals`|Applicable only when `datatype=choice.`<br />. Enables ability to specify choice literals in conditions without quotation.|
 |`onlyIf`| |
 |`forms`|Defines the set of transforms that can be referenced by symbol definitions. Forms allow the specification of a "replaces"/"replacement" pair to also apply to other ways the "replaces" value may have been specified in the source by specifying a transform from the original value of "replaces" in configuration to the one that may be found in the source. [Details](https://github.com/dotnet/templating/wiki/Runnable-Project-Templates---Value-Forms)|
 
@@ -164,6 +166,7 @@ Boolean optional parameter with default value `false`:
       "type": "parameter",
       "description": "The target framework for the project.",
       "datatype": "choice",
+      "enableQuotelessLiterals": true,
       "choices": [
         {
           "choice": "netcoreapp3.1",
@@ -204,26 +207,38 @@ Multichoice symbols have similar behavior and usage scenarios as [C# Flag enums]
 
 ```json
   "symbols": {
-    "Framework": {
+        "Platform": {
       "type": "parameter",
-      "description": "The target framework for the project.",
+      "description": "The target platform for the project.",
       "datatype": "choice",
       "allowMultipleValues": true,  // multichoice indicator
       "choices": [
         {
-          "choice": "netcoreapp3.1",
-          "description": "Target netcoreapp3.1"
+          "choice": "Windows",
+          "description": "Windows Desktop"
         },
         {
-          "choice": "netstandard2.1",
-          "description": "Target netstandard2.1"
+          "choice": "WindowsPhone",
+          "description": "Windows Phone"
         },
         {
-          "choice": "netstandard2.0",
-          "description": "Target netstandard2.0"
+          "choice": "MacOS",
+          "description": "Macintosh computers"
+        },
+        {
+          "choice": "iOS",
+          "description": "iOS mobile"
+        },
+        {
+          "choice": "android",
+          "description": "android mobile"
+        },
+        {
+          "choice": "nix",
+          "description": "Linux distributions"
         }
       ],
-      "defaultValue": "netstandard2.0|netstandard2.1"
+      "defaultValue": "MacOS|iOS"
     }
 }
 ```
@@ -234,10 +249,9 @@ There are some specifics in behavior of multichoice symbols that are worth notin
 * [`Switch` symbol](Available-Symbols-Generators.md#switch) evaluation - conditions are evaluated by identical evaluator as preprocessing conditions (previous bullet point). 
 * Argument passing and tab completion on CLI - Tab completion works identically as for standard choice symbol, user can specify multiple options via repeating the argument switch for each option:  
   `dotnet new MyTemplate --MyParameter value1 --MyParameter value2`  
-  or via passing multiple options to a single argument switch:  
-  `dotnet new MyTemplate --MyParameter value1 value2`
 
-* Outputing multichoice value as a string - this can be achieved via leveraging the [`join` symbol](Available-Symbols-Generators.md#multichoice-join-sample)
+* Default values specification and API usage - Currently multiple values can be specified within single string separated by `|` or `,` characters. Escaping of those characters within values is currently not supported.
+* Outputing multichoice value as a string - this can be achieved via leveraging the [`join` symbol](Available-Symbols-Generators.md#multichoice-join-sample). For simplicity it is as well possible to specify replacement for choice symbol with multiple values - in such case the values will be rendered into single string separated by `|` sign.
 
 
 
