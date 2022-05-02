@@ -11,33 +11,33 @@
       <Sha>8523f28ad3a7ef4df4be3c15b02376868a1e3238</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="VS.Redist.Common.NetCore.SharedFramework.x64.7.0" Version="7.0.0-preview.5.22224.3">
+    <Dependency Name="VS.Redist.Common.NetCore.SharedFramework.x64.7.0" Version="7.0.0-preview.5.22251.6">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>47d9c43ab1f10a98a348a28b3fd7ed9c4d35328b</Sha>
+      <Sha>b03ea7c79a3947c904b870742321e2cf5831afbe</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="7.0.0-preview.5.22224.3">
+    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="7.0.0-preview.5.22251.6">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>47d9c43ab1f10a98a348a28b3fd7ed9c4d35328b</Sha>
+      <Sha>b03ea7c79a3947c904b870742321e2cf5831afbe</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Ref" Version="7.0.0-preview.5.22224.3">
+    <Dependency Name="Microsoft.NETCore.App.Ref" Version="7.0.0-preview.5.22251.6">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>47d9c43ab1f10a98a348a28b3fd7ed9c4d35328b</Sha>
+      <Sha>b03ea7c79a3947c904b870742321e2cf5831afbe</Sha>
     </Dependency>
     <Dependency Name="System.CommandLine" Version="2.0.0-beta3.22222.1">
       <Uri>https://github.com/dotnet/command-line-api</Uri>
       <Sha>372d408431a3c0001cbe9e8e247a8e1561dc2e89</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging" Version="7.0.0-preview.5.22224.3">
+    <Dependency Name="Microsoft.Extensions.Logging" Version="7.0.0-preview.5.22251.6">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>47d9c43ab1f10a98a348a28b3fd7ed9c4d35328b</Sha>
+      <Sha>b03ea7c79a3947c904b870742321e2cf5831afbe</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0-preview.5.22224.3">
+    <Dependency Name="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0-preview.5.22251.6">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>47d9c43ab1f10a98a348a28b3fd7ed9c4d35328b</Sha>
+      <Sha>b03ea7c79a3947c904b870742321e2cf5831afbe</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging.Console" Version="7.0.0-preview.5.22224.3">
+    <Dependency Name="Microsoft.Extensions.Logging.Console" Version="7.0.0-preview.5.22251.6">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>47d9c43ab1f10a98a348a28b3fd7ed9c4d35328b</Sha>
+      <Sha>b03ea7c79a3947c904b870742321e2cf5831afbe</Sha>
     </Dependency>
     <Dependency Name="NuGet.Credentials" Version="6.2.0-rc.146">
       <Uri>https://github.com/nuget/nuget.client</Uri>
