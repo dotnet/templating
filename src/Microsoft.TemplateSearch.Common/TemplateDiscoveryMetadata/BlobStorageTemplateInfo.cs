@@ -423,7 +423,7 @@ namespace Microsoft.TemplateSearch.Common
             [JsonProperty]
             public bool AllowMultipleValues { get; internal set; }
 
-			[JsonProperty]
+            [JsonProperty]
             public bool EnableQuotelessLiterals { get; internal set; }
         }
 

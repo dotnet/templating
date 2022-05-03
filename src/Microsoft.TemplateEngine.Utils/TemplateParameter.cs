@@ -133,7 +133,7 @@ namespace Microsoft.TemplateEngine.Utils
         [JsonProperty]
         public bool AllowMultipleValues { get; }
 
-		[JsonProperty]
+        [JsonProperty]
         public bool EnableQuotelessLiterals { get; }
     }
 
