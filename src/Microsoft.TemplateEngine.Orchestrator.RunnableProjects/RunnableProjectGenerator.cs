@@ -347,7 +347,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     return boolVal;
                 }
             }
-            else if (string.Equals(param.DataType, "choice", StringComparison.OrdinalIgnoreCase))
+            else if (param.IsChoice())
             {
                 if (TryResolveChoiceValue(literal, param, out string? match))
                 {

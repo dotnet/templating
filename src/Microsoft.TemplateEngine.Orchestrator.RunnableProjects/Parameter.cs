@@ -49,6 +49,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         public string DefaultIfOptionWithoutValue { get; set; }
 
         [JsonProperty]
+        public bool EnableQuotelessLiterals { get; internal set; }
+
+        [JsonProperty]
         internal bool IsVariable { get; set; }
 
         public override string ToString()

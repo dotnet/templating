@@ -6,6 +6,7 @@ using System.CommandLine.Help;
 using System.CommandLine.Parsing;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Cli.Commands;
+using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Cli
 {
@@ -19,7 +20,7 @@ namespace Microsoft.TemplateEngine.Cli
 
         internal ChoiceTemplateParameter(ITemplateParameter parameter, HostSpecificTemplateData data) : base(parameter, data)
         {
-            if (!parameter.DataType.Equals("choice", StringComparison.OrdinalIgnoreCase))
+            if (!parameter.IsChoice())
             {
                 throw new ArgumentException($"{nameof(parameter)} should have {nameof(parameter.Type)} {nameof(ParameterType.Choice)}");
             }

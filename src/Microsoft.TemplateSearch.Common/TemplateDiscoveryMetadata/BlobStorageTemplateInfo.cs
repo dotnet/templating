@@ -340,6 +340,7 @@ namespace Microsoft.TemplateSearch.Common
                 Priority = parameter.Priority;
                 DefaultIfOptionWithoutValue = parameter.DefaultIfOptionWithoutValue;
                 Description = parameter.Description;
+                EnableQuotelessLiterals = parameter.EnableQuotelessLiterals;
             }
 
             internal BlobTemplateParameter(string name, string dataType)
@@ -379,6 +380,7 @@ namespace Microsoft.TemplateSearch.Common
                 Priority = jObject.ToEnum<TemplateParameterPriority>(nameof(Priority));
                 DefaultIfOptionWithoutValue = jObject.ToString(nameof(DefaultIfOptionWithoutValue));
                 Description = jObject.ToString(nameof(Description));
+                EnableQuotelessLiterals = jObject.ToBool(nameof(EnableQuotelessLiterals));
             }
 
             [JsonProperty]
@@ -415,6 +417,9 @@ namespace Microsoft.TemplateSearch.Common
             [Obsolete]
             [JsonIgnore]
             string? ITemplateParameter.Documentation => throw new NotImplementedException();
+
+            [JsonProperty]
+            public bool EnableQuotelessLiterals { get; internal set; }
         }
 
         private class BlobLegacyCacheTag : ICacheTag
