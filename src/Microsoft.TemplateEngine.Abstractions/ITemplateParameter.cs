@@ -73,5 +73,10 @@ namespace Microsoft.TemplateEngine.Abstractions
         /// Gets the default value to be used if the parameter is passed without value for template instantiation.
         /// </summary>
         string? DefaultIfOptionWithoutValue { get; }
+
+        /// <summary>
+        /// Indicate whether choice literals can be refered unquoted within conditions.
+        /// </summary>
+        bool EnableQuotelessLiterals { get; }
     }
 }

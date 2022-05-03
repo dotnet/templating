@@ -51,6 +51,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         [JsonProperty]
         public bool AllowMultipleValues { get; internal set; }
 
+		[JsonProperty]
+        public bool EnableQuotelessLiterals { get; internal set; }
+
         [JsonProperty]
         internal bool IsVariable { get; set; }
 

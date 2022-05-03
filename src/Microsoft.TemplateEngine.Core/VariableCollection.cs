@@ -201,7 +201,7 @@ namespace Microsoft.TemplateEngine.Core
                 }
 
                 // Add choice values to variables - to allow them to be recognizable unquoted
-                if (param.IsChoice())
+                if (param.EnableQuotelessLiterals && param.IsChoice())
                 {
                     foreach (string choiceKey in param.Choices.Keys)
                     {
@@ -211,7 +211,7 @@ namespace Microsoft.TemplateEngine.Core
                             !string.Equals(choiceKey, existingValue, StringComparison.CurrentCulture)
                             )
                         {
-                            throw new InvalidOperationException($"Variable [{choiceKey}] already added with value [{existingValue}]. Cannot add it as implicit variable with value of self.");
+                            throw new InvalidOperationException(string.Format(LocalizableStrings.variableCollection_cannotAddImplicitChoice, choiceKey, existingValue));
                         }
                         vc[choiceKey] = choiceKey;
                     }
