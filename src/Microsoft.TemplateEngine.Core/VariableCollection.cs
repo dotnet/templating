@@ -211,7 +211,7 @@ namespace Microsoft.TemplateEngine.Core
                             !string.Equals(choiceKey, existingValue, StringComparison.CurrentCulture)
                             )
                         {
-                            throw new InvalidOperationException($"Variable [{choiceKey}] already added with value [{existingValue}]. Cannot add it as implicit variable with value of self.");
+                            throw new InvalidOperationException(string.Format(LocalizableStrings.variableCollection_cannotAddImplicitChoice, choiceKey, existingValue));
                         }
                         vc[choiceKey] = choiceKey;
                     }
