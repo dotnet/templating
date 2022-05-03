@@ -51,9 +51,9 @@
       <Uri>https://github.com/nuget/nuget.client</Uri>
       <Sha>b8a61266d9a6780cb7eb9c1942695cf813fdef0a</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.CodeAnalysis.CSharp.CodeStyle" Version="4.2.0-4.22223.6">
+    <Dependency Name="Microsoft.CodeAnalysis.CSharp.CodeStyle" Version="4.2.0-4.22252.24">
       <Uri>https://github.com/dotnet/roslyn</Uri>
-      <Sha>68ce7949a2ac960994374d387ec3c840523f2a44</Sha>
+      <Sha>47cdc16a21bbb8a4aadfb666b011e2059e1be5d2</Sha>
     </Dependency>
     <Dependency Name="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.0.0-preview1.22230.1">
       <Uri>https://github.com/dotnet/roslyn-analyzers</Uri>
@@ -63,9 +63,9 @@
       <Uri>https://github.com/dotnet/roslyn-analyzers</Uri>
       <Sha>ce9b89bec421dbb174436fff9c366d2558cb7f79</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Net.Compilers.Toolset" Version="4.2.0-4.22223.6">
+    <Dependency Name="Microsoft.Net.Compilers.Toolset" Version="4.2.0-4.22252.24">
       <Uri>https://github.com/dotnet/roslyn</Uri>
-      <Sha>68ce7949a2ac960994374d387ec3c840523f2a44</Sha>
+      <Sha>47cdc16a21bbb8a4aadfb666b011e2059e1be5d2</Sha>
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
