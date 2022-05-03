@@ -14,6 +14,7 @@ using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.TemplateConfigTests;
 using Microsoft.TemplateEngine.TestHelper;
 using Microsoft.TemplateEngine.Utils;
+using Newtonsoft.Json.Linq;
 using NuGet.Protocol;
 using Xunit;
 using static Microsoft.TemplateEngine.Orchestrator.RunnableProjects.RunnableProjectGenerator;
@@ -112,6 +113,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
 
             string templateConfig = @"
 {
+    ""identity"": ""test.template"",
     ""symbols"": {	
 	    ""ChoiceParam"": {
 	      ""type"": ""parameter"",
@@ -166,8 +168,9 @@ UNKNOWN
 
             TemplateConfigTestHelpers.WriteTemplateSource(environment, sourceBasePath, templateSourceFiles);
             IMountPoint? sourceMountPoint = TemplateConfigTestHelpers.CreateMountPoint(environment, sourceBasePath);
-            IRunnableProjectConfig runnableConfig = TemplateConfigTestHelpers.ConfigFromSource(environment, sourceMountPoint!);
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
+            SimpleConfigModel configModel = SimpleConfigModel.FromJObject(JObject.Parse(templateConfig));
+            IRunnableProjectConfig runnableConfig = new RunnableProjectConfig(environment, rpg, configModel, sourceMountPoint.FileInfo(TemplateConfigTestHelpers.DefaultConfigRelativePath));
             IParameterSet parameters = new ParameterSet(runnableConfig);
             ITemplateParameter choiceParameter;
             Assert.True(parameters.TryGetParameterDefinition("ChoiceParam", out choiceParameter), "ChoiceParam expected to be extracted from template config");
@@ -197,6 +200,7 @@ UNKNOWN
 
             string templateConfig = @"
 {
+    ""identity"": ""test.template"",
     ""symbols"": {	
 	    ""ChoiceParam"": {
 	      ""type"": ""parameter"",
@@ -261,8 +265,9 @@ THIRD
 
             TemplateConfigTestHelpers.WriteTemplateSource(environment, sourceBasePath, templateSourceFiles);
             IMountPoint? sourceMountPoint = TemplateConfigTestHelpers.CreateMountPoint(environment, sourceBasePath);
-            IRunnableProjectConfig runnableConfig = TemplateConfigTestHelpers.ConfigFromSource(environment, sourceMountPoint!);
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
+            SimpleConfigModel configModel = SimpleConfigModel.FromJObject(JObject.Parse(templateConfig));
+            IRunnableProjectConfig runnableConfig = new RunnableProjectConfig(environment, rpg, configModel, sourceMountPoint.FileInfo(TemplateConfigTestHelpers.DefaultConfigRelativePath));
             IParameterSet parameters = new ParameterSet(runnableConfig);
             ITemplateParameter choiceParameter;
             Assert.True(parameters.TryGetParameterDefinition("ChoiceParam", out choiceParameter), "ChoiceParam expected to be extracted from template config");
