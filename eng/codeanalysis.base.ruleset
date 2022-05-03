@@ -245,7 +245,7 @@
     <Rule Id="CA5391" Action="None" />          <!-- Use antiforgery tokens in ASP.NET Core MVC controllers -->
     <Rule Id="CA5392" Action="None" />          <!-- Use DefaultDllImportSearchPaths attribute for P/Invokes -->
     <Rule Id="CA5393" Action="None" />          <!-- Do not use unsafe DllImportSearchPath value -->
-    <Rule Id="CA5394" Action="None" />          <!-- Do not use insecure randomness -->
+    <Rule Id="CA5394" Action="Warning" />          <!-- Do not use insecure randomness -->
     <Rule Id="CA5395" Action="None" />          <!-- Miss HttpVerb attribute for action methods -->
     <Rule Id="CA5396" Action="None" />          <!-- Set HttpOnly to true for HttpCookie -->
     <Rule Id="CA5397" Action="None" />          <!-- Do not use deprecated SslProtocols values -->
