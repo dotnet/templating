@@ -32,9 +32,10 @@ namespace Microsoft.TemplateEngine.Cli
         {
             Write(message);
             Writer.WriteLine();
+            Writer.Flush();
         }
 
-        internal void Write(string message)
+        private void Write(string message)
         {
             var escapeScan = 0;
             for (; ; )

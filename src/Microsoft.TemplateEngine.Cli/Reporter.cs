@@ -65,20 +65,5 @@ namespace Microsoft.TemplateEngine.Cli
                 _console?.Writer?.WriteLine();
             }
         }
-
-        internal void Write(string message)
-        {
-            lock (_lock)
-            {
-                if (ShouldPassAnsiCodesThrough)
-                {
-                    _console?.Writer?.Write(message);
-                }
-                else
-                {
-                    _console?.Write(message);
-                }
-            }
-        }
     }
 }

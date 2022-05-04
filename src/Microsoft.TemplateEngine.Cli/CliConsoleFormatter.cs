@@ -50,6 +50,8 @@ namespace Microsoft.TemplateEngine.Cli
                     CreateDebugMessage(textWriter, logEntry, message!, scopeProvider);
                     break;
             }
+
+            textWriter.Flush();
         }
 
         public void Dispose() => _optionsReloadToken?.Dispose();
