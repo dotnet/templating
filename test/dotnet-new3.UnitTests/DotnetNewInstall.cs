@@ -615,6 +615,8 @@ namespace Dotnet_new3.IntegrationTests
         {
             var home = TestUtils.CreateTemporaryFolder("Home");
             string invalidTemplatePath = TestUtils.GetTestTemplateLocation("Invalid/MissingMandatoryConfig");
+            var assets = new string[] { Path.Combine(invalidTemplatePath, "template.json") };
+            TestUtils.EnsureTestAssetsAvailable(assets, _log);
             new DotnetNewCommand(_log, "-i", invalidTemplatePath)
                 .WithCustomHive(home)
                 .WithWorkingDirectory(TestUtils.CreateTemporaryFolder())
@@ -636,6 +638,8 @@ namespace Dotnet_new3.IntegrationTests
         {
             string home = TestUtils.CreateTemporaryFolder("Home");
             string invalidTemplatePath = TestUtils.GetTestTemplateLocation("Invalid/InvalidHostData");
+            var assets = new string[] { Path.Combine(invalidTemplatePath, ".template.config/dotnetcli.host.json") };
+            TestUtils.EnsureTestAssetsAvailable(assets, _log);
             new DotnetNewCommand(_log, "-i", invalidTemplatePath)
                 .WithCustomHive(home)
                 .WithWorkingDirectory(TestUtils.CreateTemporaryFolder())

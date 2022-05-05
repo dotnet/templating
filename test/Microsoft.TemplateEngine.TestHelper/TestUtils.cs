@@ -2,8 +2,10 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using Xunit.Abstractions;
 
 namespace Microsoft.TemplateEngine.TestHelper
 {
@@ -145,6 +147,46 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             }
             while ((file1byte == file2byte) && (file1byte != -1));
             return ((file1byte - file2byte) == 0);
+        }
+
+        public static void EnsureTestAssetsAvailable(string[] paths, ITestOutputHelper log)
+        {
+            if (paths == null)
+            {
+                return;
+            }
+
+            List<Exception> exceptions = new List<Exception>();
+            foreach (string path in paths)
+            {
+                if (!File.Exists(path))
+                {
+                    // Check file existence
+                    exceptions.Add(new FileNotFoundException($"File {path} doesn't exist or can not be found."));
+                }
+                else
+                {
+                    // Check if file can be read
+                    try
+                    {
+                        using (FileStream fs = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read))
+                        using (StreamReader sr = new StreamReader(fs))
+                        {
+                            var content = sr.ReadToEnd();
+                            log.WriteLine($"The content of file {path} is:");
+                            log.WriteLine(content);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        exceptions.Add(ex);
+                    }
+                }
+            }
+            if (exceptions.Count > 0)
+            {
+                throw new AggregateException("Test assets are not available.", exceptions);
+            }
         }
     }
 }

@@ -34,7 +34,7 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
                     .ToList();
 
             var searchCoordinator = new TemplateSearchCoordinator(engineEnvironmentSettings);
-            var searchResult = await searchCoordinator.SearchAsync(p => true, filter, default).ConfigureAwait(false);
+            var searchResult = await AttemptSearchAsync(3, 10, filter, searchCoordinator);
 
             Assert.NotNull(searchResult);
             Assert.Equal(1, searchResult.Count);
@@ -121,7 +121,7 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
                     .ToList();
 
             var searchCoordinator = new TemplateSearchCoordinator(engineEnvironmentSettings);
-            var searchResult = await searchCoordinator.SearchAsync(p => true, filter, default).ConfigureAwait(false);
+            var searchResult = await AttemptSearchAsync(3, 10, filter, searchCoordinator);
 
             Assert.NotNull(searchResult);
             Assert.Equal(1, searchResult.Count);
@@ -131,7 +131,7 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
             Assert.Equal($"Local search cache '{Path.Combine(engineEnvironmentSettings.Paths.HostVersionSettingsDir, "nugetTemplateSearchInfo.json")}' does not exist.", searchResult[0].ErrorMessage);
 
             environment.SetEnvironmentVariable("DOTNET_NEW_LOCAL_SEARCH_FILE_ONLY", null);
-            searchResult = await searchCoordinator.SearchAsync(p => true, filter, default).ConfigureAwait(false);
+            searchResult = await AttemptSearchAsync(3, 10, filter, searchCoordinator);
 
             Assert.NotNull(searchResult);
             Assert.Equal(1, searchResult.Count);
@@ -140,7 +140,7 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
             Assert.True(searchResult[0].SearchHits.Count > 0);
 
             environment.SetEnvironmentVariable("DOTNET_NEW_LOCAL_SEARCH_FILE_ONLY", "true");
-            searchResult = await searchCoordinator.SearchAsync(p => true, filter, default).ConfigureAwait(false);
+            searchResult = await AttemptSearchAsync(3, 10, filter, searchCoordinator);
 
             Assert.NotNull(searchResult);
             Assert.Equal(1, searchResult.Count);
@@ -332,6 +332,31 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
             string targetPath = Path.Combine(TestUtils.CreateTemporaryFolder(), "searchCacheV2.json");
             File.WriteAllText(targetPath, cache.ToJObject().ToString());
             return targetPath;
+        }
+
+        private async Task<IReadOnlyList<SearchResult>> AttemptSearchAsync(int count, int intervalInSeconds, Func<TemplatePackageSearchData, IReadOnlyList<ITemplateInfo>> filter, TemplateSearchCoordinator searchCoordinator)
+        {
+            IReadOnlyList<SearchResult> searchResult = new List<SearchResult>();
+            int attempt = 0;
+            while (attempt < count)
+            {
+                try
+                {
+                    searchResult = await searchCoordinator.SearchAsync(p => true, filter, default).ConfigureAwait(false);
+                    break;
+                }
+                catch (AggregateException ex)
+                {
+                    if (!ex.InnerExceptions.Any(e => e is HttpRequestException) || attempt + 1 == count)
+                    {
+                        throw ex;
+                    }
+                }
+                Thread.Sleep(intervalInSeconds * 1000);
+                attempt++;
+            }
+
+            return searchResult;
         }
 
         private class MockEnvironment : IEnvironment
