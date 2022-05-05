@@ -188,14 +188,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 if (prop.Value is not JObject obj)
                 {
-                    _logger?.LogWarning($"'{nameof(Constraints).ToLowerInvariant()}' should contain objects.");
+                    _logger?.LogWarning(LocalizableStrings.SimpleConfigModel_Error_Constraints_InvalidSyntax, nameof(Constraints).ToLowerInvariant());
                     continue;
                 }
 
                 string? type = obj.ToString(nameof(TemplateConstraintInfo.Type));
                 if (string.IsNullOrWhiteSpace(type))
                 {
-                    _logger?.LogWarning($"Constraint definition '{obj}' does not contain mandatory property '{nameof(TemplateConstraintInfo.Type).ToLowerInvariant()}'.");
+                    _logger?.LogWarning(LocalizableStrings.SimpleConfigModel_Error_Constraints_MissingType, obj.ToString(), nameof(TemplateConstraintInfo.Type).ToLowerInvariant());
                     continue;
                 }
                 obj.TryGetValue(nameof(TemplateConstraintInfo.Args), StringComparison.OrdinalIgnoreCase, out JToken? args);
