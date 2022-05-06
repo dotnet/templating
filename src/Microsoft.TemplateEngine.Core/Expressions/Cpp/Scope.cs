@@ -113,14 +113,14 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Cpp
             }
 
             {
-                if (x is MultiValue mv && y is string sv)
+                if (x is MultiValueParameter mv && y is string sv)
                 {
                     return MultivalueEquals(mv, sv);
                 }
             }
 
             {
-                if (y is MultiValue mv && x is string sv)
+                if (y is MultiValueParameter mv && x is string sv)
                 {
                     return MultivalueEquals(mv, sv);
                 }
@@ -129,7 +129,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Cpp
             return Equals(x, y);
         }
 
-        private static bool MultivalueEquals(MultiValue mv, string comparand)
+        private static bool MultivalueEquals(MultiValueParameter mv, string comparand)
         {
             foreach (string s in mv.Values)
             {

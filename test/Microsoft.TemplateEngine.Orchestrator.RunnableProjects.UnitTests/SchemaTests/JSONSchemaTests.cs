@@ -19,6 +19,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Schem
         [InlineData(@"SchemaTests/StarterWebTest.json")]
         [InlineData(@"SchemaTests/PostActionTest.json")]
         [InlineData(@"SchemaTests/SymbolsTest.json")]
+        [InlineData(@"SchemaTests/MultiValueChoice.json")]
         public void IsJSONSchemaValid(string testFile)
         {
             using (TextReader schemaFileStream = File.OpenText(@"SchemaTests/template.json"))

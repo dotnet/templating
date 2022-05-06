@@ -144,37 +144,50 @@ namespace Microsoft.TemplateEngine.Cli
                 }
                 else
                 {
-                    List<string> values = new List<string>();
-                    foreach (Token token in argumentResult.Tokens)
+                    if (!TryConvertValueToChoice(argumentResult.Tokens.Select(t => t.Value), parameter, out string value, out string error))
                     {
-                        if (!TryConvertValueToChoice(token.Value, parameter, out string value, out string error))
-                        {
-                            //Cannot parse argument '{0}' for option '{1}' as expected type '{2}': {3}.
-                            argumentResult.ErrorMessage = string.Format(
-                                LocalizableStrings.ParseChoiceTemplateOption_Error_InvalidArgument,
-                                argumentResult.Tokens[0].Value,
-                                or.Token?.Value,
-                                "choice",
-                                error);
-                            return string.Empty;
-                        }
-                        values.Add(value);
+                        //Cannot parse argument '{0}' for option '{1}' as expected type '{2}': {3}.
+                        argumentResult.ErrorMessage = string.Format(
+                            LocalizableStrings.ParseChoiceTemplateOption_Error_InvalidArgument,
+                            argumentResult.Tokens[0].Value,
+                            or.Token?.Value,
+                            "choice",
+                            error);
+                        return string.Empty;
                     }
 
-                    return string.Join(" ", values);
+                    return value;
                 }
             };
         }
 
         private static bool TryConvertValueToChoice(string value, ChoiceTemplateParameter parameter, out string parsedValue, out string error)
         {
+            return TryConvertValueToChoice(value.Tokenize(), parameter, out parsedValue, out error);
+        }
+
+        private static bool TryConvertValueToChoice(IEnumerable<string> values, ChoiceTemplateParameter parameter, out string parsedValue, out string error)
+        {
             parsedValue = string.Empty;
-            if (parameter.Choices == null)
+            error = string.Empty;
+
+            List<string> parsedValues = new List<string>();
+            foreach (string val in values)
             {
-                //no choices are defined for parameter
-                error = LocalizableStrings.ParseChoiceTemplateOption_ErrorText_NoChoicesDefined;
-                return false;
+                if (!TryConvertSingleValueToChoice(val, parameter, out string value, out error))
+                {
+                    return false;
+                }
+                parsedValues.Add(value);
             }
+
+            parsedValue = string.Join("|", parsedValues);
+            return true;
+        }
+
+        private static bool TryConvertSingleValueToChoice(string value, ChoiceTemplateParameter parameter, out string parsedValue, out string error)
+        {
+            parsedValue = string.Empty;
 
             foreach (string choiceValue in parameter.Choices.Keys)
             {

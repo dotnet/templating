@@ -53,7 +53,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
                                 values.Add(string.Empty);
                             }
                         }
-                        else if (working != null && working is MultiValue multiValue)
+                        else if (working != null && working is MultiValueParameter multiValue)
                         {
                             values.AddRange(multiValue.Values);
                         }

@@ -335,7 +335,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                         return val.Count == 0 ? string.Empty : val[0];
                     }
 
-                    return new MultiValue(val);
+                    return new MultiValueParameter(val);
                 }
                 else
                 {

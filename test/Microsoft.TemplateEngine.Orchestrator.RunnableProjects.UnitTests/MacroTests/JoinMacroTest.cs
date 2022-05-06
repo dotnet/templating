@@ -37,7 +37,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
             string referenceSymbolName = "referenceSymbol";
             string referenceSymbolValue = "referenceValue";
             string referenceEmptySymbolName = "referenceEmptySymbol";
-            //string referenceEmptySymbolValue = "referenceEmptyValue";
             string constantValue = "constantValue";
 
             List<KeyValuePair<string, string>> definitions = new List<KeyValuePair<string, string>>

@@ -301,7 +301,7 @@ THIRD
             IParameterSet parameters = new ParameterSet(runnableConfig);
             ITemplateParameter choiceParameter;
             Assert.True(parameters.TryGetParameterDefinition("ChoiceParam", out choiceParameter), "ChoiceParam expected to be extracted from template config");
-            parameters.ResolvedValues[choiceParameter] = new MultiValue(new[] { "SecondChoice", "ThirdChoice" });
+            parameters.ResolvedValues[choiceParameter] = new MultiValueParameter(new[] { "SecondChoice", "ThirdChoice" });
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/");
 
             //
@@ -412,7 +412,7 @@ THIRD
             IParameterSet parameters = new ParameterSet(runnableConfig);
             ITemplateParameter choiceParameter;
             Assert.True(parameters.TryGetParameterDefinition("Platform", out choiceParameter), "ChoiceParam expected to be extracted from template config");
-            parameters.ResolvedValues[choiceParameter] = new MultiValue(new[] { "MacOS", "iOS" });
+            parameters.ResolvedValues[choiceParameter] = new MultiValueParameter(new[] { "MacOS", "iOS" });
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/");
 
             //
