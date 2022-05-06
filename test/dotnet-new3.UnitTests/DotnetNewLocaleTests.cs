@@ -97,6 +97,7 @@ namespace Dotnet_new3.IntegrationTests
             var assets = new string[] { Path.Combine(testTemplateLocation, ".template.config/localize/templatestrings.de-DE.json") };
             TestUtils.EnsureTestAssetsAvailable(assets, _log);
             new DotnetNewCommand(_log, "-i", testTemplateLocation)
+                .WithDebug()
                 .WithCustomHive(home)
                 .WithWorkingDirectory(workingDir)
                 .Execute()
@@ -136,6 +137,7 @@ namespace Dotnet_new3.IntegrationTests
   };
 
             var commandResult = new DotnetNewCommand(_log, "-i", testTemplateLocation)
+                .WithDebug()
                 .WithCustomHive(home)
                 .WithWorkingDirectory(workingDir)
                 .Execute();

@@ -92,7 +92,8 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
                 A.Fake<ITemplateSearchProviderFactory>(),
                 environmentSettings,
                 new Dictionary<string, Func<object, object>>());
-            await AttemptGetSearchFileAsync(3, 10, sourceFileProvider);
+            Func<Task<string>> search = async () => await sourceFileProvider.GetSearchFileAsync(default).ConfigureAwait(false);
+            await TestUtils.AttemptSearch<string, HttpRequestException>(3, TimeSpan.FromSeconds(10), search);
             string content = environmentSettings.Host.FileSystem.ReadAllText(Path.Combine(environmentSettings.Paths.HostVersionSettingsDir, "nugetTemplateSearchInfo.json"));
             var jObj = JObject.Parse(content);
             Assert.NotNull(TemplateSearchCache.FromJObject(jObj, environmentSettings.Host.Logger, null));
@@ -107,7 +108,8 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
                 environmentSettings,
                 new Dictionary<string, Func<object, object>>(),
                 new[] { "https://go.microsoft.com/fwlink/?linkid=2087906&clcid=0x409" });  //v1 search cache
-            await AttemptGetSearchFileAsync(3, 10, sourceFileProvider);
+            Func<Task<string>> search = async () => await sourceFileProvider.GetSearchFileAsync(default).ConfigureAwait(false);
+            await TestUtils.AttemptSearch<string, HttpRequestException>(3, TimeSpan.FromSeconds(10), search);
             string content = environmentSettings.Host.FileSystem.ReadAllText(Path.Combine(environmentSettings.Paths.HostVersionSettingsDir, "nugetTemplateSearchInfo.json"));
             var jObj = JObject.Parse(content);
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -170,31 +172,6 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
 
             Assert.Equal(2, ((ITemplateInfo)templateToTest).PostActions.Count);
             Assert.Equal(new[] { postAction1, postAction2 }, ((ITemplateInfo)templateToTest).PostActions);
-        }
-
-        private async Task<string> AttemptGetSearchFileAsync(int count, int intervalInSeconds, NuGetMetadataSearchProvider searchProvider)
-        {
-            string location = string.Empty;
-            int attempt = 0;
-            while (attempt < count)
-            {
-                try
-                {
-                    location = await searchProvider.GetSearchFileAsync(default).ConfigureAwait(false);
-                    break;
-                }
-                catch (AggregateException ex)
-                {
-                    if (!ex.InnerExceptions.Any(e => e is HttpRequestException) || attempt + 1 == count)
-                    {
-                        throw ex;
-                    }
-                }
-                Thread.Sleep(intervalInSeconds * 1000);
-                attempt++;
-            }
-
-            return location;
         }
     }
 }

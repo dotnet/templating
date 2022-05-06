@@ -618,6 +618,7 @@ namespace Dotnet_new3.IntegrationTests
             var assets = new string[] { Path.Combine(invalidTemplatePath, "template.json") };
             TestUtils.EnsureTestAssetsAvailable(assets, _log);
             new DotnetNewCommand(_log, "-i", invalidTemplatePath)
+                .WithDebug()
                 .WithCustomHive(home)
                 .WithWorkingDirectory(TestUtils.CreateTemporaryFolder())
                 .Execute()
@@ -641,6 +642,7 @@ namespace Dotnet_new3.IntegrationTests
             var assets = new string[] { Path.Combine(invalidTemplatePath, ".template.config/dotnetcli.host.json") };
             TestUtils.EnsureTestAssetsAvailable(assets, _log);
             new DotnetNewCommand(_log, "-i", invalidTemplatePath)
+                .WithDebug()
                 .WithCustomHive(home)
                 .WithWorkingDirectory(TestUtils.CreateTemporaryFolder())
                 .Execute()
