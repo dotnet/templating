@@ -374,6 +374,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                             parameter.DefaultIfOptionWithoutValue = parameterSymbol.DefaultIfOptionWithoutValue;
                             parameter.DisplayName = parameterSymbol.DisplayName;
                             parameter.EnableQuotelessLiterals = parameterSymbol.EnableQuotelessLiterals;
+                            parameter.AllowMultipleValues = parameterSymbol.AllowMultipleValues;
                         }
 
                         parameters[symbol.Key] = parameter;

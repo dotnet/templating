@@ -175,7 +175,19 @@ namespace Microsoft.TemplateEngine.Mocks
             return this;
         }
 
-        public MockTemplateInfo WithChoiceParameter(string name, string[] values, bool isRequired = false, string? defaultValue = null, string? defaultIfNoOptionValue = null, string? description = null)
+        public MockTemplateInfo WithMultiChoiceParameter(string name, params string[] values)
+        {
+            _parameters.Add(name, new TemplateParameter(
+                name,
+                type: "parameter",
+                datatype: "choice",
+                priority: TemplateParameterPriority.Optional,
+                allowMultipleValues: true,
+                choices: values.ToDictionary(v => v, v => new ParameterChoice(null, null))));
+            return this;
+        }
+
+        public MockTemplateInfo WithChoiceParameter(string name, string[] values, bool isRequired = false, string? defaultValue = null, string? defaultIfNoOptionValue = null, string? description = null, bool allowMultipleValues = false)
         {
             _parameters.Add(name, new TemplateParameter(
                 name,
@@ -185,6 +197,7 @@ namespace Microsoft.TemplateEngine.Mocks
                 priority: isRequired ? TemplateParameterPriority.Required : TemplateParameterPriority.Optional,
                 defaultValue: defaultValue,
                 defaultIfOptionWithoutValue: defaultIfNoOptionValue,
+                allowMultipleValues: allowMultipleValues,
                 choices: values.ToDictionary(v => v, v => new ParameterChoice(null, null))));
             return this;
         }
@@ -341,7 +354,8 @@ namespace Microsoft.TemplateEngine.Mocks
                 string? defaultIfOptionWithoutValue = null,
                 string? description = null,
                 string? displayName = null,
-                IReadOnlyDictionary<string, ParameterChoice>? choices = null)
+                IReadOnlyDictionary<string, ParameterChoice>? choices = null,
+                bool allowMultipleValues = false)
             {
                 Name = name;
                 Type = type;
@@ -352,6 +366,7 @@ namespace Microsoft.TemplateEngine.Mocks
                 DefaultIfOptionWithoutValue = defaultIfOptionWithoutValue;
                 Description = description;
                 DisplayName = displayName;
+                AllowMultipleValues = allowMultipleValues;
 
                 if (this.IsChoice())
                 {
@@ -392,6 +407,9 @@ namespace Microsoft.TemplateEngine.Mocks
             [JsonProperty]
             public string? DisplayName { get; }
 
+            [JsonProperty]
+            public bool AllowMultipleValues { get; }
+			
             [JsonProperty]
             public bool EnableQuotelessLiterals { get; }
         }

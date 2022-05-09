@@ -130,7 +130,6 @@ There";
             byte[] valueBytes = Encoding.UTF8.GetBytes(value);
             MemoryStream input = new MemoryStream(valueBytes);
             MemoryStream output = new MemoryStream();
-
             VariableCollection vc = new VariableCollection { ["VALUE"] = "Foo", ["Foo"] = "Foo" };
             IProcessor processor = SetupCStyleNoCommentsProcessor(vc);
 
