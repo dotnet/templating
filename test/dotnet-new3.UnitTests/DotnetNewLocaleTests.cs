@@ -94,7 +94,6 @@ namespace Dotnet_new3.IntegrationTests
             var home = TestUtils.CreateTemporaryFolder("Home");
             var workingDir = TestUtils.CreateTemporaryFolder("Home");
             var testTemplateLocation = TestUtils.GetTestTemplateLocation("Invalid/Localization/InvalidFormat");
-            var assets = new string[] { Path.Combine(testTemplateLocation, ".template.config/localize/templatestrings.de-DE.json") };
             new DotnetNewCommand(_log, "-i", testTemplateLocation)
                 .WithDebug()
                 .WithCustomHive(home)
@@ -115,12 +114,6 @@ namespace Dotnet_new3.IntegrationTests
             var home = TestUtils.CreateTemporaryFolder("Home");
             var workingDir = TestUtils.CreateTemporaryFolder("Home");
             var testTemplateLocation = TestUtils.GetTestTemplateLocation("Invalid/Localization/ValidationFailure");
-            var assets = new string[]
-            {
-                Path.Combine(testTemplateLocation, ".template.config/template.json"),
-                Path.Combine(testTemplateLocation, ".template.config/localize/templatestrings.de-DE.json"),
-                Path.Combine(testTemplateLocation, ".template.config/localize/templatestrings.tr.json")
-            };
 
             var expectedErrors = new[]
             {
