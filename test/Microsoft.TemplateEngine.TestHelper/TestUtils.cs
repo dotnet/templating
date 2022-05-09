@@ -151,46 +151,6 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             return ((file1byte - file2byte) == 0);
         }
 
-        public static void EnsureTestAssetsAvailable(string[] paths, ITestOutputHelper log)
-        {
-            if (paths == null)
-            {
-                return;
-            }
-
-            List<Exception> exceptions = new List<Exception>();
-            foreach (string path in paths)
-            {
-                if (!File.Exists(path))
-                {
-                    // Check file existence
-                    exceptions.Add(new FileNotFoundException($"File {path} doesn't exist or can not be found."));
-                }
-                else
-                {
-                    // Check if file can be read
-                    try
-                    {
-                        using (FileStream fs = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-                        using (StreamReader sr = new StreamReader(fs))
-                        {
-                            var content = sr.ReadToEnd();
-                            log.WriteLine($"The content of file {path} is:");
-                            log.WriteLine(content);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        exceptions.Add(ex);
-                    }
-                }
-            }
-            if (exceptions.Count > 0)
-            {
-                throw new AggregateException("Test assets are not available.", exceptions);
-            }
-        }
-
         public static async Task<T> AttemptSearch<T, E>(int count, TimeSpan interval, Func<Task<T>> execute) where E : Exception
         {
             T? result = default;
@@ -209,10 +169,9 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                         throw ex;
                     }
 
-                    if (ex is AggregateException)
+                    if (ex is AggregateException agEx)
                     {
-                        var agEx = ex as AggregateException;
-                        if (!agEx!.InnerExceptions.Any(e => e is E))
+                        if (!agEx.InnerExceptions.Any(e => e is E))
                         {
                             throw ex;
                         }
