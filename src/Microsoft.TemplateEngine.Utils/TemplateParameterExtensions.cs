@@ -10,25 +10,39 @@ using Microsoft.TemplateEngine.Abstractions;
 
 namespace Microsoft.TemplateEngine.Utils
 {
+    /// <summary>
+    /// Extensions helper methods for work with <see cref="ITemplateParameter"/>.
+    /// </summary>
     public static class TemplateParameterExtensions
     {
-        private const char[]? _whitespaceSeparators = null;
-        private static readonly char[] _multiValueSeparators = new[] { '|', ',' };
-
+        /// <summary>
+        /// Indicates whether the input parameter is of a choice type.
+        /// </summary>
+        /// <param name="parameter">Parameter to be inspected.</param>
+        /// <returns>True if given parameter is of a choice type, false otherwise.</returns>
         public static bool IsChoice(this ITemplateParameter parameter)
         {
             return parameter.DataType?.Equals("choice", StringComparison.OrdinalIgnoreCase) ?? false;
         }
 
-        public static IReadOnlyList<string> Tokenize(this string literal)
+        /// <summary>
+        /// Splits a string value representing a multi valued parameter (currently applicable only to choices) into atomic tokens.
+        /// </summary>
+        /// <param name="literal">A string representing multi valued parameter.</param>
+        /// <returns>List of atomic string tokens.</returns>
+        public static IReadOnlyList<string> TokenizeMultiValueParameter(this string literal)
         {
-            string[] tokens = literal.Split(_multiValueSeparators, StringSplitOptions.RemoveEmptyEntries);
-            if (tokens.Length == 1)
-            {
-                tokens = literal.Split(_whitespaceSeparators, StringSplitOptions.RemoveEmptyEntries);
-            }
+            return literal.Split(MultiValueParameter.MultiValueSeparators, StringSplitOptions.RemoveEmptyEntries);
+        }
 
-            return tokens.Select(t => t.Trim()).ToList();
+        /// <summary>
+        /// Check a multi valued parameter value (currently applicable only to choices), whether it doesn't contain any disallowed (separator) characters.
+        /// </summary>
+        /// <param name="value">Parameter value to be checked.</param>
+        /// <returns>True if given value doesn't contain any disallowed characters, false otherwise.</returns>
+        public static bool IsValidMultiValueParameterValue(this string value)
+        {
+            return value.IndexOfAny(MultiValueParameter.MultiValueSeparators) == -1;
         }
     }
 

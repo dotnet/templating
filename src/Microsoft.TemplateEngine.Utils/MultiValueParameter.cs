@@ -1,6 +1,8 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,6 +14,11 @@ namespace Microsoft.TemplateEngine.Utils
     /// </summary>
     public class MultiValueParameter
     {
+        /// <summary>
+        /// Separator of multi valued parameters (currently applicable only to choices).
+        /// </summary>
+        public const char MultiValueSeparator = '|';
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MultiValueParameter"/> class.
         /// </summary>
@@ -26,6 +33,9 @@ namespace Microsoft.TemplateEngine.Utils
         /// </summary>
         public IReadOnlyList<string> Values { get; private init; }
 
-        public override string ToString() => string.Join("|", Values);
+        internal static char[] MultiValueSeparators { get; } = new[] { MultiValueSeparator, ',' };
+
+        /// <inheritdoc/>
+        public override string ToString() => string.Join(MultiValueSeparator.ToString(), Values);
     }
 }

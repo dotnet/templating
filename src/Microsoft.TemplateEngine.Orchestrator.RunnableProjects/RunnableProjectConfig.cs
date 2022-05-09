@@ -984,7 +984,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         /// https://github.com/dotnet/templating/issues/2623.
         /// </summary>
         /// <exception cref="TemplateValidationException">in case of validation fails.</exception>
-        private void PerformTemplateValidation()
+#pragma warning disable SA1202 // Elements should be ordered by access
+        internal void PerformTemplateValidation()
+#pragma warning restore SA1202 // Elements should be ordered by access
         {
             //Do some basic checks...
             List<string> errorMessages = new List<string>();
@@ -1005,6 +1007,23 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 errorMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "shortName"));
             }
+
+            var invalidMultichoices =
+                _configuration.Symbols.Values
+                    .OfType<ParameterSymbol>()
+                    .Where(p => p.AllowMultipleValues)
+                    .Where(p => p.Choices.Any(c => !c.Key.IsValidMultiValueParameterValue()));
+            errorMessages.AddRange(
+                invalidMultichoices.Select(p =>
+                    string.Format(
+                        LocalizableStrings.Authoring_InvalidMultichoiceSymbol,
+                        p.DisplayName,
+                        string.Join(
+                            ",",
+                            p.Choices.Where(c => !c.Key.IsValidMultiValueParameterValue())
+                                .Select(c => $"{{{c.Key}}}"))))
+            );
+
             errorMessages.AddRange(ValidateTemplateSourcePaths());
             #endregion
 
