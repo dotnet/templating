@@ -1018,8 +1018,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     string.Format(
                         LocalizableStrings.Authoring_InvalidMultichoiceSymbol,
                         p.DisplayName,
+                        string.Join(", ", MultiValueParameter.MultiValueSeparators.Select(c => $"'{c}'")),
                         string.Join(
-                            ",",
+                            ", ",
                             p.Choices.Where(c => !c.Key.IsValidMultiValueParameterValue())
                                 .Select(c => $"{{{c.Key}}}"))))
             );

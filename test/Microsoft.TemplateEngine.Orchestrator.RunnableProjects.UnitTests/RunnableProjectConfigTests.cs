@@ -148,7 +148,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
                 Assert.Single(loggedMessages.Where(l => l.Item1 >= LogLevel.Warning));
                 string errorMessage = loggedMessages.First(l => l.Item1 >= LogLevel.Warning).Item2;
                 Assert.Contains(
-                    "Choice parameter  is invalid. It allows multiple values ('AllowMultipleValues=true'), while some of the configured choices contain separator characters. Invalid choices: {First|Choice}",
+                    "Choice parameter  is invalid. It allows multiple values ('AllowMultipleValues=true'), while some of the configured choices contain separator characters ('|', ','). Invalid choices: {First|Choice}",
                     errorMessage);
             }
         }

@@ -29,11 +29,14 @@ namespace Microsoft.TemplateEngine.Utils
         }
 
         /// <summary>
+        /// Set of characters that can be used for separating multi valued parameters (currently applicable only to choices).
+        /// </summary>
+        public static char[] MultiValueSeparators { get; } = new[] { MultiValueSeparator, ',' };
+
+        /// <summary>
         /// The actual atomic values specified for the parameter.
         /// </summary>
         public IReadOnlyList<string> Values { get; private init; }
-
-        internal static char[] MultiValueSeparators { get; } = new[] { MultiValueSeparator, ',' };
 
         /// <inheritdoc/>
         public override string ToString() => string.Join(MultiValueSeparator.ToString(), Values);
