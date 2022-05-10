@@ -1,6 +1,8 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System.CommandLine;
 using System.CommandLine.Help;
 using System.CommandLine.Parsing;
@@ -163,7 +165,7 @@ namespace Microsoft.TemplateEngine.Cli
 
         private static bool TryConvertValueToChoice(string value, ChoiceTemplateParameter parameter, out string parsedValue, out string error)
         {
-            return TryConvertValueToChoice(value.Tokenize(), parameter, out parsedValue, out error);
+            return TryConvertValueToChoice(value.TokenizeMultiValueParameter(), parameter, out parsedValue, out error);
         }
 
         private static bool TryConvertValueToChoice(IEnumerable<string> values, ChoiceTemplateParameter parameter, out string parsedValue, out string error)
@@ -181,7 +183,7 @@ namespace Microsoft.TemplateEngine.Cli
                 parsedValues.Add(value);
             }
 
-            parsedValue = string.Join("|", parsedValues);
+            parsedValue = string.Join(MultiValueParameter.MultiValueSeparator, parsedValues);
             return true;
         }
 

@@ -329,7 +329,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 if (param.AllowMultipleValues)
                 {
-                    List<string?> val = literal.Tokenize().Select(t => ResolveChoice(environmentSettings, t, param)).Where(r => !string.IsNullOrEmpty(r)).ToList();
+                    List<string> val =
+                        literal
+                            .TokenizeMultiValueParameter()
+                            .Select(t => ResolveChoice(environmentSettings, t, param))
+                            .Where(r => !string.IsNullOrEmpty(r))
+                            .Select(r => r!)
+                            .ToList();
                     if (val.Count <= 1)
                     {
                         return val.Count == 0 ? string.Empty : val[0];
