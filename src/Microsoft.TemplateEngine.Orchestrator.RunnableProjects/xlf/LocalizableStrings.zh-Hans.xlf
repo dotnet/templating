@@ -103,6 +103,11 @@ Details: {1}</source>
         <target state="translated">无法读取分析本地化文件 {0}，后续处理中将会跳过该文件。</target>
         <note />
       </trans-unit>
+      <trans-unit id="RunnableProjectGenerator_CannotAddImplicitChoice">
+        <source>Variable [{0}] already added with value [{1}]. Cannot add it as implicit variable with value of self.</source>
+        <target state="new">Variable [{0}] already added with value [{1}]. Cannot add it as implicit variable with value of self.</target>
+        <note>{0} is the choiceKey, {1} is the existing conflict value</note>
+      </trans-unit>
       <trans-unit id="RunnableProjectGenerator_Exception_ConfigShouldBeFile">
         <source>Template configuration must be a file, but {0} is not a file.</source>
         <target state="translated">模板配置必须为文件，但 {0} 不是文件。</target>

@@ -199,23 +199,6 @@ namespace Microsoft.TemplateEngine.Core
                 {
                     vc[key] = value;
                 }
-
-                // Add choice values to variables - to allow them to be recognizable unquoted
-                if (param.EnableQuotelessLiterals && param.IsChoice())
-                {
-                    foreach (string choiceKey in param.Choices.Keys)
-                    {
-                        if (
-                            vc.TryGetValue(choiceKey, out object existingValueObj) &&
-                            existingValueObj is string existingValue &&
-                            !string.Equals(choiceKey, existingValue, StringComparison.CurrentCulture)
-                            )
-                        {
-                            throw new InvalidOperationException(string.Format(LocalizableStrings.variableCollection_cannotAddImplicitChoice, choiceKey, existingValue));
-                        }
-                        vc[choiceKey] = choiceKey;
-                    }
-                }
             }
 
             return vc;

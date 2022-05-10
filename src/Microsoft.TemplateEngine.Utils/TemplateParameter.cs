@@ -42,7 +42,6 @@ namespace Microsoft.TemplateEngine.Utils
             DisplayName = jObject.ToString(nameof(DisplayName));
             IsName = jObject.ToBool(nameof(IsName));
             AllowMultipleValues = jObject.ToBool(nameof(AllowMultipleValues));
-            EnableQuotelessLiterals = jObject.ToBool(nameof(EnableQuotelessLiterals));
 
             if (this.IsChoice())
             {
@@ -89,7 +88,6 @@ namespace Microsoft.TemplateEngine.Utils
             Description = description;
             DisplayName = displayName;
             AllowMultipleValues = allowMultipleValues;
-            EnableQuotelessLiterals = enableQuotelessLiterals;
 
             if (this.IsChoice())
             {
@@ -132,9 +130,6 @@ namespace Microsoft.TemplateEngine.Utils
 
         [JsonProperty]
         public bool AllowMultipleValues { get; }
-
-        [JsonProperty]
-        public bool EnableQuotelessLiterals { get; }
     }
 
 }

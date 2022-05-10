@@ -341,7 +341,6 @@ namespace Microsoft.TemplateSearch.Common
                 DefaultIfOptionWithoutValue = parameter.DefaultIfOptionWithoutValue;
                 Description = parameter.Description;
                 AllowMultipleValues = parameter.AllowMultipleValues;
-                EnableQuotelessLiterals = parameter.EnableQuotelessLiterals;
             }
 
             internal BlobTemplateParameter(string name, string dataType)
@@ -382,7 +381,6 @@ namespace Microsoft.TemplateSearch.Common
                 DefaultIfOptionWithoutValue = jObject.ToString(nameof(DefaultIfOptionWithoutValue));
                 Description = jObject.ToString(nameof(Description));
                 AllowMultipleValues = jObject.ToBool(nameof(AllowMultipleValues));
-                EnableQuotelessLiterals = jObject.ToBool(nameof(EnableQuotelessLiterals));
             }
 
             [JsonProperty]
@@ -422,9 +420,6 @@ namespace Microsoft.TemplateSearch.Common
 
             [JsonProperty]
             public bool AllowMultipleValues { get; internal set; }
-
-            [JsonProperty]
-            public bool EnableQuotelessLiterals { get; internal set; }
         }
 
         private class BlobLegacyCacheTag : ICacheTag

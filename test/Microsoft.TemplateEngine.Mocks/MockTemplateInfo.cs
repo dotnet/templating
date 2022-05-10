@@ -409,9 +409,6 @@ namespace Microsoft.TemplateEngine.Mocks
 
             [JsonProperty]
             public bool AllowMultipleValues { get; }
-			
-            [JsonProperty]
-            public bool EnableQuotelessLiterals { get; }
         }
     }
 
