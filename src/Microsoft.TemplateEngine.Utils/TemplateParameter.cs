@@ -75,7 +75,6 @@ namespace Microsoft.TemplateEngine.Utils
             string? description = null,
             string? displayName = null,
             bool allowMultipleValues = false,
-            bool enableQuotelessLiterals = false,
             IReadOnlyDictionary<string, ParameterChoice>? choices = null)
         {
             Name = name;
