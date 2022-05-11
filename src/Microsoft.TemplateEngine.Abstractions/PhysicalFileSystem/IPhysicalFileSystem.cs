@@ -132,7 +132,8 @@ namespace Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem
         /// </summary>
         /// <param name="target">Path to be converted to relative if possible.</param>
         /// <param name="relativeTo">Base of the relative path to be returned.</param>
+        /// <param name="desiredDirectorySeparator">Desired separator of directories in resulting path. If not specified, defaults to <see cref="Path.DirectorySeparatorChar"/>.</param>
         /// <returns></returns>
-        string PathRelativeTo(string target, string relativeTo);
+        string PathRelativeTo(string target, string relativeTo, char desiredDirectorySeparator = char.MaxValue);
     }
 }

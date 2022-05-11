@@ -85,7 +85,8 @@ namespace Microsoft.TemplateEngine.TestHelper
 
         public void SetLastWriteTimeUtc(string file, DateTime lastWriteTimeUtc) => _baseFileSystem.SetLastWriteTimeUtc(file, lastWriteTimeUtc);
 
-        public string PathRelativeTo(string target, string relativeTo) => _baseFileSystem.PathRelativeTo(target, relativeTo);
+        public string PathRelativeTo(string target, string relativeTo, char desiredDirectorySeparator = char.MaxValue) =>
+            _baseFileSystem.PathRelativeTo(target, relativeTo, desiredDirectorySeparator);
 
         private void RecordDirectoryScan(string directoryName, string pattern, SearchOption searchOption)
         {

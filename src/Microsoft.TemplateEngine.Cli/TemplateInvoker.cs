@@ -114,30 +114,10 @@ namespace Microsoft.TemplateEngine.Cli
                 return targetPath;
             }
 
-            return TryGetRelativePath(Path.Combine(requestedOutputPath, targetPath), Directory.GetCurrentDirectory());
-        }
-
-        /// <summary>
-        /// Attempts to reconstruct the path relative to `basePath`. If `path` is not subfolder of `basePath` or if error occurs, original path is returned.
-        /// </summary>
-        /// <param name="path">Path to attempt to make relative.</param>
-        /// <param name="basePath">base folder to relativize the path.</param>
-        /// <returns></returns>
-        private static string TryGetRelativePath(string path, string basePath)
-        {
-            try
-            {
-                string sourceFullPath = Path.GetFullPath(path);
-                if (sourceFullPath.StartsWith(basePath, StringComparison.CurrentCulture))
-                {
-                    return sourceFullPath.Substring(basePath.Length + 1);
-                }
-            }
-            catch (Exception)
-            {
-            }
-
-            return path;
+            return new PhysicalFileSystem()
+                .PathRelativeTo(
+                    Path.Combine(requestedOutputPath, targetPath),
+                    Directory.GetCurrentDirectory());
         }
 
         private async Task<NewCommandStatus> CreateTemplateAsync(TemplateCommandArgs templateArgs, CancellationToken cancellationToken)

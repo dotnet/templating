@@ -222,7 +222,7 @@ namespace Microsoft.TemplateEngine.Mocks
             _files[file].LastWriteTimeUtc = lastWriteTimeUtc;
         }
 
-        public string PathRelativeTo(string target, string relativeTo) => throw new NotImplementedException();
+        public string PathRelativeTo(string target, string relativeTo, char desiredDirectorySeparator = char.MaxValue) => throw new NotImplementedException();
 
         public IDisposable WatchFileChanges(string filepath, FileSystemEventHandler fileChanged) => throw new NotImplementedException();
 

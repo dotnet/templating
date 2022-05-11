@@ -23,12 +23,11 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
         [Fact(DisplayName = nameof(VerifyRun))]
         public void VerifyRun()
         {
-            Util.Orchestrator orchestrator = new Util.Orchestrator();
-            //TODO: check usage of mocked file system - make sure to add mocked dir and file
             MockFileSystem fileSystem = new MockFileSystem();
+            Util.Orchestrator orchestrator = new Util.Orchestrator(_logger, new MockFileSystem());
             //mnt.MockRoot.AddDirectory("subdir").AddFile("test.file", System.Array.Empty<byte>());
             fileSystem.Add("subdir/test.file", string.Empty);
-            orchestrator.Run(new MockGlobalRunSpec(), _logger, new MockFileSystem(),  "/", @"c:\temp");
+            orchestrator.Run(new MockGlobalRunSpec(),  "/", @"c:\temp");
         }
     }
 }

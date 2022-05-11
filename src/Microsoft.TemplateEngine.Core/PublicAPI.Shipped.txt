@@ -228,7 +228,6 @@ Microsoft.TemplateEngine.Core.Util.EncodingConfig
 Microsoft.TemplateEngine.Core.Util.EncodingUtil
 Microsoft.TemplateEngine.Core.Util.EngineConfig
 Microsoft.TemplateEngine.Core.Util.Orchestrator
-Microsoft.TemplateEngine.Core.Util.Orchestrator.Orchestrator() -> void
 Microsoft.TemplateEngine.Core.Util.Processor
 Microsoft.TemplateEngine.Core.Util.ProcessorState
 Microsoft.TemplateEngine.Core.Util.ProcessorState.AdvanceBuffer(int bufferPosition) -> bool

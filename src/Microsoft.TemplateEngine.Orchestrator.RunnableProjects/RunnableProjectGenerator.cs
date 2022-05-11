@@ -73,7 +73,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             IVariableCollection variables = SetupVariables(environmentSettings, parameters, runnableProjectConfig.OperationConfig.VariableSetup);
             runnableProjectConfig.Evaluate(parameters, variables);
 
-            IOrchestrator2 basicOrchestrator = new Core.Util.Orchestrator();
+            IOrchestrator2 basicOrchestrator = new Core.Util.Orchestrator(environmentSettings.Host.Logger, environmentSettings.Host.FileSystem);
             RunnableProjectOrchestrator orchestrator = new RunnableProjectOrchestrator(basicOrchestrator);
 
             GlobalRunSpec runSpec = new GlobalRunSpec(templateSourceRoot, environmentSettings.Components, parameters, variables, runnableProjectConfig.OperationConfig, runnableProjectConfig.SpecialOperationConfig, runnableProjectConfig.IgnoreFileNames);
@@ -82,8 +82,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 runSpec.SetupFileSource(source);
                 string target = Path.Combine(targetDirectory, source.Target);
-                //TODO: get and pass fileSystem as abstraction
-                orchestrator.Run(runSpec, environmentSettings.Host.Logger, new PhysicalFileSystem(), source.Source, target);
+                orchestrator.Run(runSpec, Path.Combine(templateSourceRoot.FullPath, source.Source), target);
             }
 
             return Task.FromResult(GetCreationResult(environmentSettings, runnableProjectConfig, variables));
@@ -111,7 +110,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             IVariableCollection variables = SetupVariables(environmentSettings, parameters, templateConfig.OperationConfig.VariableSetup);
             templateConfig.Evaluate(parameters, variables);
 
-            IOrchestrator2 basicOrchestrator = new Core.Util.Orchestrator();
+            IOrchestrator2 basicOrchestrator = new Core.Util.Orchestrator(environmentSettings.Host.Logger, environmentSettings.Host.FileSystem);
             RunnableProjectOrchestrator orchestrator = new RunnableProjectOrchestrator(basicOrchestrator);
 
             GlobalRunSpec runSpec = new GlobalRunSpec(templateData.TemplateSourceRoot, environmentSettings.Components, parameters, variables, templateConfig.OperationConfig, templateConfig.SpecialOperationConfig, templateConfig.IgnoreFileNames);
@@ -121,8 +120,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 runSpec.SetupFileSource(source);
                 string target = Path.Combine(targetDirectory, source.Target);
-                //TODO: get and pass FileSystem as abstraction
-                IReadOnlyList<IFileChange2> fileChanges = orchestrator.GetFileChanges(runSpec, environmentSettings.Host.Logger, new PhysicalFileSystem(), source.Source, target);
+                IReadOnlyList<IFileChange2> fileChanges = orchestrator.GetFileChanges(runSpec, Path.Combine(templateData.TemplateSourceRoot.FullPath, source.Source), target);
 
                 //source and target paths in the file changes are returned relative to source passed
                 //GetCreationEffects method should return the source paths relative to template source root (location of .template.config folder) and target paths relative to output path and not relative to certain source

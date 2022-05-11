@@ -2,10 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Abstractions.Mount;
-using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 using Microsoft.TemplateEngine.Core.Contracts;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
@@ -19,24 +16,24 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             _basicOrchestrator = basicOrchestrator;
         }
 
-        public IReadOnlyList<IFileChange2> GetFileChanges(string runSpecPath, ILogger logger, IPhysicalFileSystem fileSystem, string sourceDir, string targetDir)
+        public IReadOnlyList<IFileChange2> GetFileChanges(string runSpecPath, string sourceDir, string targetDir)
         {
-            return _basicOrchestrator.GetFileChanges(runSpecPath, logger, fileSystem, sourceDir, targetDir);
+            return _basicOrchestrator.GetFileChanges(runSpecPath, sourceDir, targetDir);
         }
 
-        public IReadOnlyList<IFileChange2> GetFileChanges(IGlobalRunSpec spec, ILogger logger, IPhysicalFileSystem fileSystem, string sourceDir, string targetDir)
+        public IReadOnlyList<IFileChange2> GetFileChanges(IGlobalRunSpec spec, string sourceDir, string targetDir)
         {
-            return _basicOrchestrator.GetFileChanges(spec, logger, fileSystem, sourceDir, targetDir);
+            return _basicOrchestrator.GetFileChanges(spec, sourceDir, targetDir);
         }
 
-        public void Run(string runSpecPath, ILogger logger, IPhysicalFileSystem fileSystem, string sourceDir, string targetDir)
+        public void Run(string runSpecPath, string sourceDir, string targetDir)
         {
-            _basicOrchestrator.Run(runSpecPath, logger, fileSystem, sourceDir, targetDir);
+            _basicOrchestrator.Run(runSpecPath, sourceDir, targetDir);
         }
 
-        public void Run(IGlobalRunSpec runSpec, ILogger logger, IPhysicalFileSystem fileSystem, string directoryInfo, string target)
+        public void Run(IGlobalRunSpec runSpec, string directoryInfo, string target)
         {
-            _basicOrchestrator.Run(runSpec, logger, fileSystem, directoryInfo, target);
+            _basicOrchestrator.Run(runSpec, directoryInfo, target);
         }
     }
 }
