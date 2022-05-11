@@ -111,6 +111,26 @@ namespace Microsoft.TemplateEngine.Utils
             File.SetLastWriteTimeUtc(file, lastWriteTimeUtc);
         }
 
+        public string PathRelativeTo(string target, string relativeTo)
+        {
+            string resultPath = target;
+            try
+            {
+                string basePath = Path.GetFullPath(relativeTo);
+                string sourceFullPath = Path.GetFullPath(target);
+                resultPath = sourceFullPath;
+                if (sourceFullPath.StartsWith(basePath, StringComparison.CurrentCulture))
+                {
+                    return sourceFullPath.Substring(basePath.Length + 1);
+                }
+            }
+            catch (Exception)
+            {
+            }
+
+            return NormalizePath(resultPath);
+        }
+
         public IDisposable WatchFileChanges(string filepath, FileSystemEventHandler fileChanged)
         {
             FileSystemWatcher watcher = new FileSystemWatcher(Path.GetDirectoryName(filepath), Path.GetFileName(filepath));
@@ -118,6 +138,11 @@ namespace Microsoft.TemplateEngine.Utils
             watcher.NotifyFilter = NotifyFilters.LastWrite;
             watcher.EnableRaisingEvents = true;
             return watcher;
+        }
+
+        private static string NormalizePath(string path)
+        {
+            return path.Replace('\\', '/');
         }
     }
 }

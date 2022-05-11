@@ -2,26 +2,26 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
-using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Core.Contracts;
 
 namespace Microsoft.TemplateEngine.Core.Util
 {
     public class EngineConfig : IEngineConfig
     {
-        public EngineConfig(IEngineEnvironmentSettings environmentSettings, IVariableCollection variables)
-             : this(environmentSettings, DefaultWhitespaces, DefaultLineEndings, variables)
+        public EngineConfig(ILogger logger, IVariableCollection variables)
+             : this(logger, DefaultWhitespaces, DefaultLineEndings, variables)
         {
         }
 
-        public EngineConfig(IEngineEnvironmentSettings environmentSettings, IVariableCollection variables, string variableFormatString)
-            : this(environmentSettings, DefaultWhitespaces, DefaultLineEndings, variables, variableFormatString)
+        public EngineConfig(ILogger logger, IVariableCollection variables, string variableFormatString)
+            : this(logger, DefaultWhitespaces, DefaultLineEndings, variables, variableFormatString)
         {
         }
 
-        public EngineConfig(IEngineEnvironmentSettings environmentSettings, IReadOnlyList<string> whitespaces, IReadOnlyList<string> lineEndings, IVariableCollection variables, string variableFormatString = "{0}")
+        public EngineConfig(ILogger logger, IReadOnlyList<string> whitespaces, IReadOnlyList<string> lineEndings, IVariableCollection variables, string variableFormatString = "{0}")
         {
-            EnvironmentSettings = environmentSettings;
+            Logger = logger;
             Whitespaces = whitespaces;
             LineEndings = lineEndings;
             Variables = variables;
@@ -43,6 +43,6 @@ namespace Microsoft.TemplateEngine.Core.Util
 
         public IDictionary<string, bool> Flags { get; }
 
-        public IEngineEnvironmentSettings EnvironmentSettings { get; }
+        public ILogger Logger { get; }
     }
 }

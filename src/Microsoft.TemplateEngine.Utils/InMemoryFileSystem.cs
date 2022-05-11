@@ -705,6 +705,9 @@ namespace Microsoft.TemplateEngine.Utils
             targetFile.LastWriteTimeUtc = lastWriteTimeUtc;
         }
 
+        // TODO: implement
+        public string PathRelativeTo(string target, string relativeTo) => throw new NotImplementedException();
+
         /// <summary>
         /// Currently not implemented in <see cref="InMemoryFileSystem"/>.
         /// Just returns <see cref="IDisposable"/> object, but never calls callback.

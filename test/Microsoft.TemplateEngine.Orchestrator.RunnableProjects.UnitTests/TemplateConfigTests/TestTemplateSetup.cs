@@ -6,9 +6,11 @@ using System.IO;
 using FakeItEasy;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
+using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Mocks;
+using Microsoft.TemplateEngine.Utils;
 using Xunit;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.TemplateConfigTests
@@ -104,7 +106,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
 
             MockGlobalRunSpec runSpec = new MockGlobalRunSpec();
             runSpec.RootVariableCollection = variables;
-            IDirectory sourceDir = SourceMountPoint.DirectoryInfo("/");
+            string sourceDirPath = "/";
+            IDirectory sourceDir = SourceMountPoint.DirectoryInfo(sourceDirPath);
+
+            IPhysicalFileSystem fileSystem = new PhysicalFileSystem();
 
             IOrchestrator2 basicOrchestrator = new Core.Util.Orchestrator();
             RunnableProjectOrchestrator orchestrator = new RunnableProjectOrchestrator(basicOrchestrator);
@@ -113,7 +118,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             {
                 TemplateConfigTestHelpers.SetupFileSourceMatchersOnGlobalRunSpec(runSpec, source);
                 string targetDirForSource = Path.Combine(targetBaseDir, source.Target);
-                orchestrator.Run(runSpec, sourceDir, targetDirForSource);
+                orchestrator.Run(runSpec, _environmentSettings.Host.Logger, fileSystem, sourceDirPath, targetDirForSource);
             }
         }
 
@@ -133,7 +138,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             runnableConfig.Evaluate(parameters, variables);
 
             MockGlobalRunSpec runSpec = new MockGlobalRunSpec();
-            IDirectory sourceDir = SourceMountPoint.DirectoryInfo("/");
+            string sourceDirPath = "/";
+            IDirectory sourceDir = SourceMountPoint.DirectoryInfo(sourceDirPath);
+
+            IPhysicalFileSystem fileSystem = new PhysicalFileSystem();
 
             IOrchestrator2 basicOrchestrator = new Core.Util.Orchestrator();
             RunnableProjectOrchestrator orchestrator = new RunnableProjectOrchestrator(basicOrchestrator);
@@ -144,7 +152,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             {
                 TemplateConfigTestHelpers.SetupFileSourceMatchersOnGlobalRunSpec(runSpec, source);
                 string targetDirForSource = Path.Combine(targetBaseDir, source.Target);
-                IReadOnlyList<IFileChange2> changes = orchestrator.GetFileChanges(runSpec, sourceDir, targetDirForSource);
+                IReadOnlyList<IFileChange2> changes = orchestrator.GetFileChanges(runSpec, _environmentSettings.Host.Logger, fileSystem, sourceDirPath, targetDirForSource);
                 changesByTarget[source.Target] = changes;
             }
 

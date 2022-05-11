@@ -1,6 +1,7 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Core.Expressions.MSBuild;
@@ -13,11 +14,11 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
 {
     public class InlineMarkupConditionalTests : TestBase, IClassFixture<EnvironmentSettingsHelper>
     {
-        private IEngineEnvironmentSettings _engineEnvironmentSettings;
+        private ILogger _logger;
 
-        public InlineMarkupConditionalTests(EnvironmentSettingsHelper environmentSettingsHelper)
+        public InlineMarkupConditionalTests(LoggerHelper loggerHelper)
         {
-            _engineEnvironmentSettings = environmentSettingsHelper.CreateEnvironment(hostIdentifier: this.GetType().Name, virtualize: true);
+            _logger = loggerHelper.CreateLogger();
         }
 
         [Fact(DisplayName = nameof(VerifyInlineMarkupTrue))]
@@ -314,7 +315,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
 
         private IProcessor SetupXmlPlusMsBuildProcessor(IVariableCollection vc)
         {
-            EngineConfig cfg = new EngineConfig(_engineEnvironmentSettings, vc, "$({0})");
+            EngineConfig cfg = new EngineConfig(_logger, vc, "$({0})");
             return Processor.Create(cfg, new InlineMarkupConditional(
                 new MarkupTokens("<".TokenConfig(), "</".TokenConfig(), ">".TokenConfig(), "/>".TokenConfig(), "Condition=\"".TokenConfig(), "\"".TokenConfig()),
                 true,
@@ -328,7 +329,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
 
         private IProcessor SetupXmlPlusMsBuildProcessorAndReplacement(IVariableCollection vc)
         {
-            EngineConfig cfg = new EngineConfig(_engineEnvironmentSettings, vc, "$({0})");
+            EngineConfig cfg = new EngineConfig(_logger, vc, "$({0})");
             return Processor.Create(
                 cfg,
                 new InlineMarkupConditional(
@@ -344,7 +345,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
 
         private IProcessor SetupXmlPlusMsBuildProcessorAndReplacementWithLookaround(IVariableCollection vc)
         {
-            EngineConfig cfg = new EngineConfig(_engineEnvironmentSettings, vc, "$({0})");
+            EngineConfig cfg = new EngineConfig(_logger, vc, "$({0})");
             return Processor.Create(
                 cfg,
                 new InlineMarkupConditional(

@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Core.Operations;
@@ -12,11 +13,11 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
 {
     public class PhasedOperationTests : TestBase, IClassFixture<EnvironmentSettingsHelper>
     {
-        private IEngineEnvironmentSettings _engineEnvironmentSettings;
+        private ILogger _logger;
 
-        public PhasedOperationTests(EnvironmentSettingsHelper environmentSettingsHelper)
+        public PhasedOperationTests(LoggerHelper loggerHelper)
         {
-            _engineEnvironmentSettings = environmentSettingsHelper.CreateEnvironment(hostIdentifier: this.GetType().Name, virtualize: true);
+            _logger = loggerHelper.CreateLogger();
         }
 
         [Fact(DisplayName = nameof(VerifyPhasedOperationStateProgression))]
@@ -64,7 +65,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
 
         private IProcessor SetupConfig(IVariableCollection vc, params Phase[] phases)
         {
-            EngineConfig cfg = new EngineConfig(_engineEnvironmentSettings, vc, "$({0})");
+            EngineConfig cfg = new EngineConfig(_logger, vc, "$({0})");
             return Processor.Create(cfg, new PhasedOperation(null, phases, true));
         }
     }

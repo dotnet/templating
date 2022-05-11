@@ -82,7 +82,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 runSpec.SetupFileSource(source);
                 string target = Path.Combine(targetDirectory, source.Target);
-                orchestrator.Run(runSpec, templateSourceRoot.DirectoryInfo(source.Source), target);
+                //TODO: get and pass fileSystem as abstraction
+                orchestrator.Run(runSpec, environmentSettings.Host.Logger, new PhysicalFileSystem(), source.Source, target);
             }
 
             return Task.FromResult(GetCreationResult(environmentSettings, runnableProjectConfig, variables));
@@ -120,7 +121,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 runSpec.SetupFileSource(source);
                 string target = Path.Combine(targetDirectory, source.Target);
-                IReadOnlyList<IFileChange2> fileChanges = orchestrator.GetFileChanges(runSpec, templateData.TemplateSourceRoot.DirectoryInfo(source.Source), target);
+                //TODO: get and pass FileSystem as abstraction
+                IReadOnlyList<IFileChange2> fileChanges = orchestrator.GetFileChanges(runSpec, environmentSettings.Host.Logger, new PhysicalFileSystem(), source.Source, target);
 
                 //source and target paths in the file changes are returned relative to source passed
                 //GetCreationEffects method should return the source paths relative to template source root (location of .template.config folder) and target paths relative to output path and not relative to certain source

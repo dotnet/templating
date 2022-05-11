@@ -39,7 +39,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 // Note: this check is probably superfluous. The Model has evaluation info.
                 // OTOH: this is probaby a cleaner way to do it.
                 if (string.IsNullOrEmpty(model.Condition)
-                    || Cpp2StyleEvaluatorDefinition.EvaluateFromString(environmentSettings, model.Condition, rootVariableCollection))
+                    || Cpp2StyleEvaluatorDefinition.EvaluateFromString(environmentSettings.Host.Logger, model.Condition, rootVariableCollection))
                 {
                     ICreationPath path = new CreationPath(model.PathResolved);
                     pathList.Add(path);

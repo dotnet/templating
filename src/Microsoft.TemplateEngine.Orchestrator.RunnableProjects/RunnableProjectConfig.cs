@@ -368,7 +368,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     if (string.Equals(symbol.Value.Type, ComputedSymbol.TypeName, StringComparison.Ordinal))
                     {
                         ComputedSymbol sym = (ComputedSymbol)symbol.Value;
-                        bool value = Cpp2StyleEvaluatorDefinition.EvaluateFromString(_settings, sym.Value, rootVariableCollection);
+                        bool value = Cpp2StyleEvaluatorDefinition.EvaluateFromString(_settings.Host.Logger, sym.Value, rootVariableCollection);
                         stable &= computed.TryGetValue(symbol.Key, out bool currentValue) && currentValue == value;
                         rootVariableCollection[symbol.Key] = value;
                         computed[symbol.Key] = value;
@@ -937,7 +937,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             foreach (ExtendedFileSource source in _configuration.Sources)
             {
-                if (!string.IsNullOrEmpty(source.Condition) && !Cpp2StyleEvaluatorDefinition.EvaluateFromString(_settings, source.Condition, rootVariableCollection))
+                if (!string.IsNullOrEmpty(source.Condition) && !Cpp2StyleEvaluatorDefinition.EvaluateFromString(_settings.Host.Logger, source.Condition, rootVariableCollection))
                 {
                     continue;
                 }
@@ -954,7 +954,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 {
                     foreach (SourceModifier modifier in source.Modifiers)
                     {
-                        if (string.IsNullOrEmpty(modifier.Condition) || Cpp2StyleEvaluatorDefinition.EvaluateFromString(_settings, modifier.Condition, rootVariableCollection))
+                        if (string.IsNullOrEmpty(modifier.Condition) || Cpp2StyleEvaluatorDefinition.EvaluateFromString(_settings.Host.Logger, modifier.Condition, rootVariableCollection))
                         {
                             IReadOnlyList<string> modifierIncludes = JTokenAsFilenameToReadOrArrayToCollection(modifier.Include, SourceFile, Array.Empty<string>());
                             IReadOnlyList<string> modifierExcludes = JTokenAsFilenameToReadOrArrayToCollection(modifier.Exclude, SourceFile, Array.Empty<string>());

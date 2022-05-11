@@ -5,8 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
+using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Utils;
 
@@ -14,13 +16,13 @@ namespace Microsoft.TemplateEngine.Core.Util
 {
     public class Orchestrator : IOrchestrator, IOrchestrator2
     {
-        public void Run(string runSpecPath, IDirectory sourceDir, string targetDir)
+        public void Run(string runSpecPath, ILogger logger, IPhysicalFileSystem fileSystem, string sourceDir, string targetDir)
         {
             IGlobalRunSpec spec;
-            using (Stream stream = sourceDir.MountPoint.EnvironmentSettings.Host.FileSystem.OpenRead(runSpecPath))
+            using (Stream stream = fileSystem.OpenRead(runSpecPath))
             {
                 spec = RunSpecLoader(stream);
-                EngineConfig config = new EngineConfig(sourceDir.MountPoint.EnvironmentSettings, EngineConfig.DefaultWhitespaces, EngineConfig.DefaultLineEndings, spec.RootVariableCollection);
+                EngineConfig config = new EngineConfig(logger, EngineConfig.DefaultWhitespaces, EngineConfig.DefaultLineEndings, spec.RootVariableCollection);
                 IProcessor processor = Processor.Create(config, spec.Operations);
                 stream.Position = 0;
                 using (MemoryStream ms = new MemoryStream())
@@ -31,16 +33,16 @@ namespace Microsoft.TemplateEngine.Core.Util
                 }
             }
 
-            RunInternal(sourceDir.MountPoint.EnvironmentSettings, sourceDir, targetDir, spec);
+            RunInternal(logger, fileSystem, sourceDir, targetDir, spec);
         }
 
-        public IReadOnlyList<IFileChange2> GetFileChanges(string runSpecPath, IDirectory sourceDir, string targetDir)
+        public IReadOnlyList<IFileChange2> GetFileChanges(string runSpecPath, ILogger logger, IPhysicalFileSystem fileSystem, string sourceDir, string targetDir)
         {
             IGlobalRunSpec spec;
-            using (Stream stream = sourceDir.MountPoint.EnvironmentSettings.Host.FileSystem.OpenRead(runSpecPath))
+            using (Stream stream = fileSystem.OpenRead(runSpecPath))
             {
                 spec = RunSpecLoader(stream);
-                EngineConfig config = new EngineConfig(sourceDir.MountPoint.EnvironmentSettings, EngineConfig.DefaultWhitespaces, EngineConfig.DefaultLineEndings, spec.RootVariableCollection);
+                EngineConfig config = new EngineConfig(logger, EngineConfig.DefaultWhitespaces, EngineConfig.DefaultLineEndings, spec.RootVariableCollection);
                 IProcessor processor = Processor.Create(config, spec.Operations);
                 stream.Position = 0;
                 using (MemoryStream ms = new MemoryStream())
@@ -51,27 +53,17 @@ namespace Microsoft.TemplateEngine.Core.Util
                 }
             }
 
-            return GetFileChangesInternal(sourceDir.MountPoint.EnvironmentSettings, sourceDir, targetDir, spec);
+            return GetFileChangesInternal(logger, fileSystem, sourceDir, targetDir, spec);
         }
 
-        public void Run(IGlobalRunSpec spec, IDirectory sourceDir, string targetDir)
+        public void Run(IGlobalRunSpec spec, ILogger logger, IPhysicalFileSystem fileSystem, string sourceDir, string targetDir)
         {
-            RunInternal(sourceDir.MountPoint.EnvironmentSettings, sourceDir, targetDir, spec);
+            RunInternal(logger, fileSystem, sourceDir, targetDir, spec);
         }
 
-        public IReadOnlyList<IFileChange2> GetFileChanges(IGlobalRunSpec spec, IDirectory sourceDir, string targetDir)
+        public IReadOnlyList<IFileChange2> GetFileChanges(IGlobalRunSpec spec, ILogger logger, IPhysicalFileSystem fileSystem, string sourceDir, string targetDir)
         {
-            return GetFileChangesInternal(sourceDir.MountPoint.EnvironmentSettings, sourceDir, targetDir, spec);
-        }
-
-        IReadOnlyList<IFileChange> IOrchestrator.GetFileChanges(string runSpecPath, IDirectory sourceDir, string targetDir)
-        {
-            return GetFileChanges(runSpecPath, sourceDir, targetDir);
-        }
-
-        IReadOnlyList<IFileChange> IOrchestrator.GetFileChanges(IGlobalRunSpec spec, IDirectory sourceDir, string targetDir)
-        {
-            return GetFileChanges(spec, sourceDir, targetDir);
+            return GetFileChangesInternal(logger, fileSystem, sourceDir, targetDir, spec);
         }
 
         protected virtual IGlobalRunSpec RunSpecLoader(Stream runSpec)
@@ -79,19 +71,19 @@ namespace Microsoft.TemplateEngine.Core.Util
             return null;
         }
 
-        protected virtual bool TryGetBufferSize(IFile sourceFile, out int bufferSize)
+        protected virtual bool TryGetBufferSize(string sourceFile, out int bufferSize)
         {
             bufferSize = -1;
             return false;
         }
 
-        protected virtual bool TryGetFlushThreshold(IFile sourceFile, out int threshold)
+        protected virtual bool TryGetFlushThreshold(string sourceFile, out int threshold)
         {
             threshold = -1;
             return false;
         }
 
-        private static List<KeyValuePair<IPathMatcher, IProcessor>> CreateFileGlobProcessors(IEngineEnvironmentSettings environmentSettings, IGlobalRunSpec spec)
+        private static List<KeyValuePair<IPathMatcher, IProcessor>> CreateFileGlobProcessors(ILogger logger, IGlobalRunSpec spec)
         {
             List<KeyValuePair<IPathMatcher, IProcessor>> processorList = new List<KeyValuePair<IPathMatcher, IProcessor>>();
 
@@ -100,7 +92,7 @@ namespace Microsoft.TemplateEngine.Core.Util
                 foreach (KeyValuePair<IPathMatcher, IRunSpec> runSpec in spec.Special)
                 {
                     IReadOnlyList<IOperationProvider> operations = runSpec.Value.GetOperations(spec.Operations);
-                    EngineConfig config = new EngineConfig(environmentSettings, EngineConfig.DefaultWhitespaces, EngineConfig.DefaultLineEndings, spec.RootVariableCollection, runSpec.Value.VariableFormatString);
+                    EngineConfig config = new EngineConfig(logger, EngineConfig.DefaultWhitespaces, EngineConfig.DefaultLineEndings, spec.RootVariableCollection, runSpec.Value.VariableFormatString);
                     IProcessor processor = Processor.Create(config, operations);
 
                     processorList.Add(new KeyValuePair<IPathMatcher, IProcessor>(runSpec.Key, processor));
@@ -110,7 +102,7 @@ namespace Microsoft.TemplateEngine.Core.Util
             return processorList;
         }
 
-        private static string CreateTargetDir(IEngineEnvironmentSettings environmentSettings, string sourceRel, string targetDir, IGlobalRunSpec spec)
+        private static string CreateTargetDir(IPhysicalFileSystem fileSystem, string sourceRel, string targetDir, IGlobalRunSpec spec)
         {
             if (!spec.TryGetTargetRelPath(sourceRel, out string targetRel))
             {
@@ -119,22 +111,22 @@ namespace Microsoft.TemplateEngine.Core.Util
 
             string targetPath = Path.Combine(targetDir, targetRel);
             string fullTargetDir = Path.GetDirectoryName(targetPath);
-            environmentSettings.Host.FileSystem.CreateDirectory(fullTargetDir);
+            fileSystem.CreateDirectory(fullTargetDir);
 
             return targetPath;
         }
 
-        private IReadOnlyList<IFileChange2> GetFileChangesInternal(IEngineEnvironmentSettings environmentSettings, IDirectory sourceDir, string targetDir, IGlobalRunSpec spec)
+        private IReadOnlyList<IFileChange2> GetFileChangesInternal(ILogger logger, IPhysicalFileSystem fileSystem, string sourceDir, string targetDir, IGlobalRunSpec spec)
         {
-            EngineConfig cfg = new EngineConfig(environmentSettings, EngineConfig.DefaultWhitespaces, EngineConfig.DefaultLineEndings, spec.RootVariableCollection);
+            EngineConfig cfg = new EngineConfig(logger, EngineConfig.DefaultWhitespaces, EngineConfig.DefaultLineEndings, spec.RootVariableCollection);
             IProcessor fallback = Processor.Create(cfg, spec.Operations);
 
             List<IFileChange2> changes = new List<IFileChange2>();
-            List<KeyValuePair<IPathMatcher, IProcessor>> fileGlobProcessors = CreateFileGlobProcessors(sourceDir.MountPoint.EnvironmentSettings, spec);
+            List<KeyValuePair<IPathMatcher, IProcessor>> fileGlobProcessors = CreateFileGlobProcessors(logger, spec);
 
-            foreach (IFile file in sourceDir.EnumerateFiles("*", SearchOption.AllDirectories))
+            foreach (string file in fileSystem.EnumerateFiles(sourceDir, "*", SearchOption.AllDirectories))
             {
-                string sourceRel = file.PathRelativeTo(sourceDir);
+                string sourceRel = fileSystem.PathRelativeTo(file, sourceDir);
                 string fileName = Path.GetFileName(sourceRel);
                 bool checkingDirWithPlaceholderFile = false;
 
@@ -173,7 +165,7 @@ namespace Microsoft.TemplateEngine.Core.Util
                                 targetPath = Path.GetDirectoryName(targetPath);
                                 targetRel = Path.GetDirectoryName(targetRel);
 
-                                if (environmentSettings.Host.FileSystem.DirectoryExists(targetPath))
+                                if (fileSystem.DirectoryExists(targetPath))
                                 {
                                     changes.Add(new FileChange(sourceRel, targetRel, ChangeKind.Overwrite));
                                 }
@@ -182,7 +174,7 @@ namespace Microsoft.TemplateEngine.Core.Util
                                     changes.Add(new FileChange(sourceRel, targetRel, ChangeKind.Create));
                                 }
                             }
-                            else if (environmentSettings.Host.FileSystem.FileExists(targetPath))
+                            else if (fileSystem.FileExists(targetPath))
                             {
                                 changes.Add(new FileChange(sourceRel, targetRel, ChangeKind.Overwrite));
                             }
@@ -200,16 +192,16 @@ namespace Microsoft.TemplateEngine.Core.Util
             return changes;
         }
 
-        private void RunInternal(IEngineEnvironmentSettings environmentSettings, IDirectory sourceDir, string targetDir, IGlobalRunSpec spec)
+        private void RunInternal(ILogger logger, IPhysicalFileSystem fileSystem, string sourceDir, string targetDir, IGlobalRunSpec spec)
         {
-            EngineConfig cfg = new EngineConfig(environmentSettings, EngineConfig.DefaultWhitespaces, EngineConfig.DefaultLineEndings, spec.RootVariableCollection);
+            EngineConfig cfg = new EngineConfig(logger, EngineConfig.DefaultWhitespaces, EngineConfig.DefaultLineEndings, spec.RootVariableCollection);
             IProcessor fallback = Processor.Create(cfg, spec.Operations);
 
-            List<KeyValuePair<IPathMatcher, IProcessor>> fileGlobProcessors = CreateFileGlobProcessors(sourceDir.MountPoint.EnvironmentSettings, spec);
+            List<KeyValuePair<IPathMatcher, IProcessor>> fileGlobProcessors = CreateFileGlobProcessors(logger, spec);
 
-            foreach (IFile file in sourceDir.EnumerateFiles("*", SearchOption.AllDirectories))
+            foreach (string file in fileSystem.EnumerateFiles(sourceDir, "*", SearchOption.AllDirectories))
             {
-                string sourceRel = file.PathRelativeTo(sourceDir);
+                string sourceRel = fileSystem.PathRelativeTo(file, sourceDir);
                 string fileName = Path.GetFileName(sourceRel);
                 bool checkingDirWithPlaceholderFile = false;
 
@@ -248,18 +240,18 @@ namespace Microsoft.TemplateEngine.Core.Util
 
                             if (checkingDirWithPlaceholderFile)
                             {
-                                CreateTargetDir(environmentSettings, sourceRel, targetDir, spec);
+                                CreateTargetDir(fileSystem, sourceRel, targetDir, spec);
                             }
                             else if (!copy)
                             {
-                                ProcessFile(file, sourceRel, targetDir, spec, fallback, fileGlobProcessors);
+                                ProcessFile(file, sourceRel, targetDir, fileSystem, spec, fallback, fileGlobProcessors);
                             }
                             else
                             {
-                                string targetPath = CreateTargetDir(environmentSettings, sourceRel, targetDir, spec);
+                                string targetPath = CreateTargetDir(fileSystem, sourceRel, targetDir, spec);
 
-                                using (Stream sourceStream = file.OpenRead())
-                                using (Stream targetStream = environmentSettings.Host.FileSystem.CreateFile(targetPath))
+                                using (Stream sourceStream = fileSystem.OpenRead(file))
+                                using (Stream targetStream = fileSystem.CreateFile(targetPath))
                                 {
                                     sourceStream.CopyTo(targetStream);
                                 }
@@ -272,7 +264,7 @@ namespace Microsoft.TemplateEngine.Core.Util
             }
         }
 
-        private void ProcessFile(IFile sourceFile, string sourceRel, string targetDir, IGlobalRunSpec spec, IProcessor fallback, IEnumerable<KeyValuePair<IPathMatcher, IProcessor>> fileGlobProcessors)
+        private void ProcessFile(string sourceFile, string sourceRel, string targetDir, IPhysicalFileSystem fileSystem, IGlobalRunSpec spec, IProcessor fallback, IEnumerable<KeyValuePair<IPathMatcher, IProcessor>> fileGlobProcessors)
         {
             IProcessor runner = fileGlobProcessors.FirstOrDefault(x => x.Key.IsMatch(sourceRel)).Value ?? fallback;
             if (runner == null)
@@ -291,12 +283,12 @@ namespace Microsoft.TemplateEngine.Core.Util
             bool customBufferSize = TryGetBufferSize(sourceFile, out int bufferSize);
             bool customFlushThreshold = TryGetFlushThreshold(sourceFile, out int flushThreshold);
             string fullTargetDir = Path.GetDirectoryName(targetPath);
-            sourceFile.MountPoint.EnvironmentSettings.Host.FileSystem.CreateDirectory(fullTargetDir);
+            fileSystem.CreateDirectory(fullTargetDir);
 
             try
             {
-                using (Stream source = sourceFile.OpenRead())
-                using (Stream target = sourceFile.MountPoint.EnvironmentSettings.Host.FileSystem.CreateFile(targetPath))
+                using (Stream source = fileSystem.OpenRead(sourceFile))
+                using (Stream target = fileSystem.CreateFile(targetPath))
                 {
                     if (!customBufferSize)
                     {
@@ -317,7 +309,8 @@ namespace Microsoft.TemplateEngine.Core.Util
             }
             catch (Exception ex)
             {
-                throw new ContentGenerationException($"Error while processing file {sourceFile.FullPath}", ex);
+                //TODO: add FullPath to IPhysicalFileSystem and use here
+                throw new ContentGenerationException($"Error while processing file {sourceFile}", ex);
             }
         }
     }

@@ -46,7 +46,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         public bool EvaluateCondition(IEngineEnvironmentSettings environmentSettings, IVariableCollection variables)
         {
             return ConditionResult = string.IsNullOrEmpty(Condition) ||
-                Cpp2StyleEvaluatorDefinition.EvaluateFromString(environmentSettings, Condition, variables);
+                Cpp2StyleEvaluatorDefinition.EvaluateFromString(environmentSettings.Host.Logger, Condition, variables);
         }
     }
 }
