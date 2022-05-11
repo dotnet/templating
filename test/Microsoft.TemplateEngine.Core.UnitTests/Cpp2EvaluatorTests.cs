@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Microsoft.TemplateEngine.Core.UnitTests
 {
-    public class Cpp2EvaluatorTests : TestBase, IClassFixture<EnvironmentSettingsHelper>
+    public class Cpp2EvaluatorTests : TestBase, IClassFixture<LoggerHelper>
     {
         private ILogger _logger;
 

@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Microsoft.TemplateEngine.Core.UnitTests
 {
-    public class InlineMarkupConditionalTests : TestBase, IClassFixture<EnvironmentSettingsHelper>
+    public class InlineMarkupConditionalTests : TestBase, IClassFixture<LoggerHelper>
     {
         private ILogger _logger;
 

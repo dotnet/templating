@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Microsoft.TemplateEngine.Core.UnitTests
 {
-    public class OrchestratorTests : IClassFixture<EnvironmentSettingsHelper>
+    public class OrchestratorTests : IClassFixture<LoggerHelper>
     {
         private ILogger _logger;
 

@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Microsoft.TemplateEngine.Core.UnitTests
 {
-    public class PhasedOperationTests : TestBase, IClassFixture<EnvironmentSettingsHelper>
+    public class PhasedOperationTests : TestBase, IClassFixture<LoggerHelper>
     {
         private ILogger _logger;
 

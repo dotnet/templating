@@ -13,7 +13,7 @@ using Xunit;
 
 namespace Microsoft.TemplateEngine.Core.UnitTests
 {
-    public class CommonOperationsTests : IClassFixture<EnvironmentSettingsHelper>
+    public class CommonOperationsTests : IClassFixture<LoggerHelper>
     {
         private ILogger _logger;
 

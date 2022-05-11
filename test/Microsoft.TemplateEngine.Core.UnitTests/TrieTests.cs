@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Microsoft.TemplateEngine.Core.UnitTests
 {
-    public class TrieTests : TestBase, IClassFixture<EnvironmentSettingsHelper>
+    public class TrieTests : TestBase, IClassFixture<LoggerHelper>
     {
         private ILogger _logger;
 
