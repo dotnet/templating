@@ -1,7 +1,5 @@
-﻿Microsoft.TemplateEngine.Abstractions.ITemplateInfo.PostActions.get -> System.Collections.Generic.IReadOnlyList<System.Guid>!
-Microsoft.TemplateEngine.Abstractions.ITemplateParameter.AllowMultipleValues.get -> bool
-Microsoft.TemplateEngine.Abstractions.TemplatePackage.IManagedTemplatePackage.IsLocalPackage.get -> bool
 ﻿const Microsoft.TemplateEngine.Abstractions.TemplateFiltering.MatchInfo.BuiltIn.Constraint = "Constraint" -> string!
+Microsoft.TemplateEngine.Abstractions.ITemplateParameter.AllowMultipleValues.get -> bool
 Microsoft.TemplateEngine.Abstractions.ITemplateConstraint
 Microsoft.TemplateEngine.Abstractions.ITemplateConstraint.DisplayName.get -> string!
 Microsoft.TemplateEngine.Abstractions.ITemplateConstraint.Evaluate(string? args) -> Microsoft.TemplateEngine.Abstractions.TemplateConstraintResult!
