@@ -70,7 +70,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             cancellationToken.ThrowIfCancellationRequested();
             ProcessMacros(environmentSettings, runnableProjectConfig.OperationConfig, parameters);
 
-            IVariableCollection variables = VariableCollection.SetupVariables(environmentSettings, parameters, runnableProjectConfig.OperationConfig.VariableSetup);
+            IVariableCollection variables = SetupVariables(environmentSettings, parameters, runnableProjectConfig.OperationConfig.VariableSetup);
             runnableProjectConfig.Evaluate(parameters, variables);
 
             IOrchestrator2 basicOrchestrator = new Core.Util.Orchestrator();
@@ -107,7 +107,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             RunnableProjectConfig templateConfig = (RunnableProjectConfig)templateData;
             ProcessMacros(environmentSettings, templateConfig.OperationConfig, parameters);
 
-            IVariableCollection variables = VariableCollection.SetupVariables(environmentSettings, parameters, templateConfig.OperationConfig.VariableSetup);
+            IVariableCollection variables = SetupVariables(environmentSettings, parameters, templateConfig.OperationConfig.VariableSetup);
             templateConfig.Evaluate(parameters, variables);
 
             IOrchestrator2 basicOrchestrator = new Core.Util.Orchestrator();
@@ -486,6 +486,33 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
         }
 
+        private static IVariableCollection SetupVariables(IEngineEnvironmentSettings environmentSettings, IParameterSet parameters, IVariableConfig variableConfig)
+        {
+            IVariableCollection variables = VariableCollection.SetupVariables(environmentSettings, parameters, variableConfig);
+
+            foreach (Parameter param in parameters.ParameterDefinitions.OfType<Parameter>())
+            {
+                // Add choice values to variables - to allow them to be recognizable unquoted
+                if (param.EnableQuotelessLiterals && param.IsChoice())
+                {
+                    foreach (string choiceKey in param.Choices.Keys)
+                    {
+                        if (
+                            variables.TryGetValue(choiceKey, out object existingValueObj) &&
+                            existingValueObj is string existingValue &&
+                            !string.Equals(choiceKey, existingValue, StringComparison.CurrentCulture)
+                        )
+                        {
+                            throw new InvalidOperationException(string.Format(LocalizableStrings.RunnableProjectGenerator_CannotAddImplicitChoice, choiceKey, existingValue));
+                        }
+                        variables[choiceKey] = choiceKey;
+                    }
+                }
+            }
+
+            return variables;
+        }
+
         // Note the deferred-config macros (generated) are part of the runConfig.Macros
         //      and not in the ComputedMacros.
         //  Possibly make a separate property for the deferred-config macros
@@ -493,14 +520,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         {
             if (runConfig.Macros != null)
             {
-                IVariableCollection varsForMacros = VariableCollection.SetupVariables(environmentSettings, parameters, runConfig.VariableSetup);
+                IVariableCollection varsForMacros = SetupVariables(environmentSettings, parameters, runConfig.VariableSetup);
                 MacrosOperationConfig macroProcessor = new MacrosOperationConfig();
                 macroProcessor.ProcessMacros(environmentSettings, runConfig.Macros, varsForMacros, parameters);
             }
 
             if (runConfig.ComputedMacros != null)
             {
-                IVariableCollection varsForMacros = VariableCollection.SetupVariables(environmentSettings, parameters, runConfig.VariableSetup);
+                IVariableCollection varsForMacros = SetupVariables(environmentSettings, parameters, runConfig.VariableSetup);
                 MacrosOperationConfig macroProcessor = new MacrosOperationConfig();
                 macroProcessor.ProcessMacros(environmentSettings, runConfig.ComputedMacros, varsForMacros, parameters);
             }

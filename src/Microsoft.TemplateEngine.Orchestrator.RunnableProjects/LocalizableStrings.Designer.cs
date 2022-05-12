@@ -233,6 +233,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Variable [{0}] already added with value [{1}]. Cannot add it as implicit variable with value of self..
+        /// </summary>
+        internal static string RunnableProjectGenerator_CannotAddImplicitChoice {
+            get {
+                return ResourceManager.GetString("RunnableProjectGenerator_CannotAddImplicitChoice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Template configuration must be a file, but {0} is not a file..
         /// </summary>
         internal static string RunnableProjectGenerator_Exception_ConfigShouldBeFile {

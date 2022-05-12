@@ -27,8 +27,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
             Replaces = jObject.ToString(nameof(Replaces));
             DataType = jObject.ToString(nameof(DataType));
             ReplacementContexts = SymbolModelConverter.ReadReplacementContexts(jObject);
-            AllowMultipleValues = jObject.ToBool(nameof(AllowMultipleValues));
-            EnableQuotelessLiterals = jObject.ToBool(nameof(EnableQuotelessLiterals));
 
             if (!jObject.TryGetValue(nameof(Forms), StringComparison.OrdinalIgnoreCase, out JToken formsToken) || !(formsToken is JObject formsObject))
             {
@@ -59,11 +57,5 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
         internal bool IsRequired { get; init; }
 
         internal string DataType { get; init; }
-
-        // If this is set, it's allowed to sepcify multiple values of that parameter
-        internal bool AllowMultipleValues { get; init; }
-
-        // If this is set, it's allowed to sepcify choice literals without quotation within conditions.
-        internal bool EnableQuotelessLiterals { get; init; }
     }
 }

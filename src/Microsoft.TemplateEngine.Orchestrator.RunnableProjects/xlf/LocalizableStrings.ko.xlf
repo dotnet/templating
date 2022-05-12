@@ -103,6 +103,11 @@ Details: {1}</source>
         <target state="translated">구문 분석 지역화 파일 {0}을(를) 읽지 못했습니다. 해당 파일을 추가 처리에서 건너뜁니다.</target>
         <note />
       </trans-unit>
+      <trans-unit id="RunnableProjectGenerator_CannotAddImplicitChoice">
+        <source>Variable [{0}] already added with value [{1}]. Cannot add it as implicit variable with value of self.</source>
+        <target state="new">Variable [{0}] already added with value [{1}]. Cannot add it as implicit variable with value of self.</target>
+        <note>{0} is the choiceKey, {1} is the existing conflict value</note>
+      </trans-unit>
       <trans-unit id="RunnableProjectGenerator_Exception_ConfigShouldBeFile">
         <source>Template configuration must be a file, but {0} is not a file.</source>
         <target state="translated">템플릿 구성은 파일이어야 하지만 {0}은(는) 파일이 아닙니다.</target>

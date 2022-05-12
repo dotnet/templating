@@ -259,6 +259,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         {
             //we would like to copy the parameters to format supported for serialization as we cannot be sure that ITemplateInfo supports serialization in needed format.
             List<ITemplateParameter> localizedParameters = new List<ITemplateParameter>();
+
             foreach (ITemplateParameter parameter in template.Parameters)
             {
                 IParameterSymbolLocalizationModel? localization = null;
@@ -299,7 +300,6 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     priority: parameter.Priority,
                     type: parameter.Type,
                     allowMultipleValues: parameter.AllowMultipleValues,
-                    enableQuotelessLiterals: parameter.EnableQuotelessLiterals,
                     choices: localizedChoices ?? parameter.Choices);
 
                 localizedParameters.Add(localizedParameter);

@@ -103,6 +103,11 @@ Dettagli: {1}</target>
         <target state="translated">Non è stato possibile leggere il file di localizzazione dell'analisi {0}. Verrà ignorato dall'ulteriore elaborazione.</target>
         <note />
       </trans-unit>
+      <trans-unit id="RunnableProjectGenerator_CannotAddImplicitChoice">
+        <source>Variable [{0}] already added with value [{1}]. Cannot add it as implicit variable with value of self.</source>
+        <target state="new">Variable [{0}] already added with value [{1}]. Cannot add it as implicit variable with value of self.</target>
+        <note>{0} is the choiceKey, {1} is the existing conflict value</note>
+      </trans-unit>
       <trans-unit id="RunnableProjectGenerator_Exception_ConfigShouldBeFile">
         <source>Template configuration must be a file, but {0} is not a file.</source>
         <target state="translated">La configurazione del modello deve essere un file, ma {0} non è un file.</target>
