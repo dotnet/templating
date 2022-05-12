@@ -11,13 +11,15 @@ using Xunit;
 
 namespace Microsoft.TemplateEngine.Core.UnitTests
 {
-    public class OrchestratorTests : IClassFixture<LoggerHelper>
+    public class OrchestratorTests : IClassFixture<EnvironmentSettingsHelper>
     {
+        private IEngineEnvironmentSettings _engineEnvironmentSettings;
         private ILogger _logger;
 
-        public OrchestratorTests(LoggerHelper loggerHelper)
+        public OrchestratorTests(EnvironmentSettingsHelper environmentSettingsHelper)
         {
-            _logger = loggerHelper.CreateLogger();
+            _engineEnvironmentSettings = environmentSettingsHelper.CreateEnvironment(hostIdentifier: this.GetType().Name, virtualize: true);
+            _logger = _engineEnvironmentSettings.Host.Logger;
         }
 
         [Fact(DisplayName = nameof(VerifyRun))]
@@ -25,9 +27,9 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
         {
             MockFileSystem fileSystem = new MockFileSystem();
             Util.Orchestrator orchestrator = new Util.Orchestrator(_logger, new MockFileSystem());
-            //mnt.MockRoot.AddDirectory("subdir").AddFile("test.file", System.Array.Empty<byte>());
-            fileSystem.Add("subdir/test.file", string.Empty);
-            orchestrator.Run(new MockGlobalRunSpec(),  "/", @"c:\temp");
+            MockMountPoint mnt = new MockMountPoint(_engineEnvironmentSettings);
+            mnt.MockRoot.AddDirectory("subdir").AddFile("test.file", System.Array.Empty<byte>());
+            orchestrator.Run(new MockGlobalRunSpec(),  mnt.Root, @"c:\temp");
         }
     }
 }

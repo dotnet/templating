@@ -73,7 +73,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             IVariableCollection variables = SetupVariables(environmentSettings, parameters, runnableProjectConfig.OperationConfig.VariableSetup);
             runnableProjectConfig.Evaluate(parameters, variables);
 
-            IOrchestrator2 basicOrchestrator = new Core.Util.Orchestrator(environmentSettings.Host.Logger, environmentSettings.Host.FileSystem);
+            IOrchestrator basicOrchestrator = new Core.Util.Orchestrator(environmentSettings.Host.Logger, environmentSettings.Host.FileSystem);
             RunnableProjectOrchestrator orchestrator = new RunnableProjectOrchestrator(basicOrchestrator);
 
             GlobalRunSpec runSpec = new GlobalRunSpec(templateSourceRoot, environmentSettings.Components, parameters, variables, runnableProjectConfig.OperationConfig, runnableProjectConfig.SpecialOperationConfig, runnableProjectConfig.IgnoreFileNames);
@@ -82,7 +82,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 runSpec.SetupFileSource(source);
                 string target = Path.Combine(targetDirectory, source.Target);
-                orchestrator.Run(runSpec, Path.Combine(templateSourceRoot.FullPath, source.Source), target);
+                orchestrator.Run(runSpec, templateSourceRoot.DirectoryInfo(source.Source), target);
             }
 
             return Task.FromResult(GetCreationResult(environmentSettings, runnableProjectConfig, variables));
@@ -110,7 +110,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             IVariableCollection variables = SetupVariables(environmentSettings, parameters, templateConfig.OperationConfig.VariableSetup);
             templateConfig.Evaluate(parameters, variables);
 
-            IOrchestrator2 basicOrchestrator = new Core.Util.Orchestrator(environmentSettings.Host.Logger, environmentSettings.Host.FileSystem);
+            IOrchestrator basicOrchestrator = new Core.Util.Orchestrator(environmentSettings.Host.Logger, environmentSettings.Host.FileSystem);
             RunnableProjectOrchestrator orchestrator = new RunnableProjectOrchestrator(basicOrchestrator);
 
             GlobalRunSpec runSpec = new GlobalRunSpec(templateData.TemplateSourceRoot, environmentSettings.Components, parameters, variables, templateConfig.OperationConfig, templateConfig.SpecialOperationConfig, templateConfig.IgnoreFileNames);
@@ -120,15 +120,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 runSpec.SetupFileSource(source);
                 string target = Path.Combine(targetDirectory, source.Target);
-
-                //TODO: templateData.TemplateSourceRoot.FullPath vs templateData.MountPointUri
-                // We need a full path so that InMemoryFileSystem (if used) in Orchestrator knows correctly which of the 2 mounts (source vs target)
-                //  needs to be used.
-                // The templateData.TemplateSourceRoot.FullPath can return just "/" (as path is mounted to root) - but then the InMemoryFileSystem just
-                //  selects the first handler - which is target (or even worse fallback physical file system) - and resolves paths incorrectly
-                //
-                // However! In CreateAsync we use the templateData.TemplateSourceRoot.FullPath - as we do have access only to the IDirectory
-                IReadOnlyList<IFileChange2> fileChanges = orchestrator.GetFileChanges(runSpec, Path.Combine(templateData.MountPointUri, source.Source), target);
+                IReadOnlyList<IFileChange2> fileChanges = orchestrator.GetFileChanges(runSpec, templateData.TemplateSourceRoot.DirectoryInfo(source.Source), target);
 
                 //source and target paths in the file changes are returned relative to source passed
                 //GetCreationEffects method should return the source paths relative to template source root (location of .template.config folder) and target paths relative to output path and not relative to certain source

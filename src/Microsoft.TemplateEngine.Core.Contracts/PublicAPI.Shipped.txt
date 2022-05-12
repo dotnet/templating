@@ -16,7 +16,6 @@ Microsoft.TemplateEngine.Core.Contracts.IOperation
 Microsoft.TemplateEngine.Core.Contracts.IOperation.IsInitialStateOn.get -> bool
 Microsoft.TemplateEngine.Core.Contracts.IOperationProvider
 Microsoft.TemplateEngine.Core.Contracts.IOrchestrator
-Microsoft.TemplateEngine.Core.Contracts.IOrchestrator2
 Microsoft.TemplateEngine.Core.Contracts.IPathMatcher
 Microsoft.TemplateEngine.Core.Contracts.IProcessor
 Microsoft.TemplateEngine.Core.Contracts.IProcessorState
