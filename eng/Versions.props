@@ -24,23 +24,23 @@
     <WcwidthSourcesPackageVersion>0.5.0</WcwidthSourcesPackageVersion>
     <!-- Maestro-managed Package Versions - Ordered by repo name -->
     <!-- Dependencies from https://github.com/dotnet/command-line-api -->
-    <SystemCommandLinePackageVersion>2.0.0-beta3.22222.1</SystemCommandLinePackageVersion>
+    <SystemCommandLinePackageVersion>2.0.0-beta3.22260.1</SystemCommandLinePackageVersion>
     <!-- Dependencies from https://github.com/nuget/nuget.client -->
     <NuGetCredentialsPackageVersion>6.2.0-rc.146</NuGetCredentialsPackageVersion>
     <NuGetConfigurationPackageVersion>6.2.0-rc.146</NuGetConfigurationPackageVersion>
     <NuGetProtocolPackageVersion>6.2.0-rc.146</NuGetProtocolPackageVersion>
     <!-- Dependencies from https://github.com/dotnet/roslyn -->
-    <MicrosoftNetCompilersToolsetPackageVersion>4.2.0-4.22252.24</MicrosoftNetCompilersToolsetPackageVersion>
-    <MicrosoftCodeAnalysisCSharpCodeStylePackageVersion>4.2.0-4.22252.24</MicrosoftCodeAnalysisCSharpCodeStylePackageVersion>
+    <MicrosoftNetCompilersToolsetPackageVersion>4.2.0-4.22255.15</MicrosoftNetCompilersToolsetPackageVersion>
+    <MicrosoftCodeAnalysisCSharpCodeStylePackageVersion>4.2.0-4.22255.15</MicrosoftCodeAnalysisCSharpCodeStylePackageVersion>
     <!-- Dependencies from https://github.com/dotnet/roslyn-analyzers -->
     <MicrosoftCodeAnalysisNetAnalyzersPackageVersion>7.0.0-preview1.22252.2</MicrosoftCodeAnalysisNetAnalyzersPackageVersion>
     <MicrosoftCodeAnalysisPublicApiAnalyzersPackageVersion>3.3.4-beta1.22252.2</MicrosoftCodeAnalysisPublicApiAnalyzersPackageVersion>
     <!-- Dependencies from https://github.com/dotnet/runtime -->
-    <MicrosoftNETCoreAppRefPackageVersion>7.0.0-preview.5.22251.6</MicrosoftNETCoreAppRefPackageVersion>
-    <MicrosoftNETCoreAppRuntimewinx64PackageVersion>7.0.0-preview.5.22251.6</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
-    <VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>7.0.0-preview.5.22251.6</VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>
-    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>7.0.0-preview.5.22251.6</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
-    <MicrosoftExtensionsLoggingPackageVersion>7.0.0-preview.5.22251.6</MicrosoftExtensionsLoggingPackageVersion>
-    <MicrosoftExtensionsLoggingConsolePackageVersion>7.0.0-preview.5.22251.6</MicrosoftExtensionsLoggingConsolePackageVersion>
+    <MicrosoftNETCoreAppRefPackageVersion>7.0.0-preview.5.22258.4</MicrosoftNETCoreAppRefPackageVersion>
+    <MicrosoftNETCoreAppRuntimewinx64PackageVersion>7.0.0-preview.5.22258.4</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
+    <VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>7.0.0-preview.5.22258.4</VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>
+    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>7.0.0-preview.5.22258.4</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
+    <MicrosoftExtensionsLoggingPackageVersion>7.0.0-preview.5.22258.4</MicrosoftExtensionsLoggingPackageVersion>
+    <MicrosoftExtensionsLoggingConsolePackageVersion>7.0.0-preview.5.22258.4</MicrosoftExtensionsLoggingConsolePackageVersion>
   </PropertyGroup>
 </Project>
