@@ -29,6 +29,8 @@ namespace Microsoft.TemplateEngine.Mocks
 
         private Guid[] _postActions = Array.Empty<Guid>();
 
+        private TemplateConstraintInfo[] _constraints = Array.Empty<TemplateConstraintInfo>();
+
         private Dictionary<string, string> _tags = new Dictionary<string, string>();
 
         public MockTemplateInfo()
@@ -149,6 +151,8 @@ namespace Microsoft.TemplateEngine.Mocks
 
         public IReadOnlyList<Guid> PostActions => _postActions;
 
+        public IReadOnlyList<TemplateConstraintInfo> Constraints => _constraints;
+
         public MockTemplateInfo WithParameters(params string[] parameters)
         {
             foreach (var param in parameters)
@@ -256,6 +260,19 @@ namespace Microsoft.TemplateEngine.Mocks
             else
             {
                 _postActions = _postActions.Concat(postActions).ToArray();
+            }
+            return this;
+        }
+
+        public MockTemplateInfo WithConstraints(params TemplateConstraintInfo[] constraintInfos)
+        {
+            if (_constraints.Length == 0)
+            {
+                _constraints = constraintInfos;
+            }
+            else
+            {
+                _constraints = _constraints.Concat(constraintInfos).ToArray();
             }
             return this;
         }
