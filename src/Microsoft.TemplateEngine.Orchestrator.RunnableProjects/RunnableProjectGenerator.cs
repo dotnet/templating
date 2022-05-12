@@ -120,7 +120,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 runSpec.SetupFileSource(source);
                 string target = Path.Combine(targetDirectory, source.Target);
-                IReadOnlyList<IFileChange2> fileChanges = orchestrator.GetFileChanges(runSpec, Path.Combine(templateData.TemplateSourceRoot.FullPath, source.Source), target);
+
+                //TODO: templateData.TemplateSourceRoot.FullPath vs templateData.MountPointUri
+                // We need a full path so that InMemoryFileSystem (if used) in Orchestrator knows correctly which of the 2 mounts (source vs target)
+                //  needs to be used.
+                // The templateData.TemplateSourceRoot.FullPath can return just "/" (as path is mounted to root) - but then the InMemoryFileSystem just
+                //  selects the first handler - which is target (or even worse fallback physical file system) - and resolves paths incorrectly
+                //
+                // However! In CreateAsync we use the templateData.TemplateSourceRoot.FullPath - as we do have access only to the IDirectory
+                IReadOnlyList<IFileChange2> fileChanges = orchestrator.GetFileChanges(runSpec, Path.Combine(templateData.MountPointUri, source.Source), target);
 
                 //source and target paths in the file changes are returned relative to source passed
                 //GetCreationEffects method should return the source paths relative to template source root (location of .template.config folder) and target paths relative to output path and not relative to certain source
