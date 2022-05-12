@@ -142,7 +142,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
         // [2] input format
         // [3] param value
         // [4] error message
-        internal void CanEvaluateInvalidParameters(string command, MockTemplateInfo[] templates, string?[][] expectedInvalidParams)
+        internal async Task CanEvaluateInvalidParameters(string command, MockTemplateInfo[] templates, string?[][] expectedInvalidParams)
         {
             TemplateGroup templateGroup = TemplateGroup.FromTemplateList(
                 CliTemplateInfo.FromTemplateInfo(templates, A.Fake<IHostSpecificDataLoader>()))
@@ -155,7 +155,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
             NewCommand myCommand = (NewCommand)NewCommandFactory.Create("new", _ => host, _ => new TelemetryLogger(null, false), new NewCommandCallbacks());
             var parseResult = myCommand.Parse($" new {command}");
             var args = InstantiateCommandArgs.FromNewCommandArgs(new NewCommandArgs(myCommand, parseResult));
-            var templateCommands = InstantiateCommand.GetTemplateCommand(args, settings, A.Fake<TemplatePackageManager>(), templateGroup);
+            var templateCommands = await InstantiateCommand.GetTemplateCommandAsync(args, settings, A.Fake<TemplatePackageManager>(), templateGroup, default);
             Assert.Empty(templateCommands);
 
             var templateMatchInfos = InstantiateCommand.CollectTemplateMatchInfo(args, settings, templatePackageManager, templateGroup);

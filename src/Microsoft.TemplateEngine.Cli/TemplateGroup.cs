@@ -3,6 +3,7 @@
 
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.TemplatePackage;
+using Microsoft.TemplateEngine.Edge;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Utils;
 
@@ -20,6 +21,8 @@ namespace Microsoft.TemplateEngine.Cli
     /// </summary>
     internal sealed class TemplateGroup
     {
+        private Dictionary<CliTemplateInfo, IReadOnlyList<TemplateConstraintResult>>? _constraints;
+
         /// <param name="templates">the templates of the template group.</param>
         /// <exception cref="ArgumentNullException">when <paramref name="templates"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">when <paramref name="templates"/> is empty or don't have same <see cref="ITemplateInfo.GroupIdentity"/> defined.</exception>
@@ -213,6 +216,34 @@ namespace Microsoft.TemplateEngine.Cli
         {
             var templatePackages = await Task.WhenAll(Templates.Select(t => templatePackageManager.GetTemplatePackageAsync(t, cancellationToken))).ConfigureAwait(false);
             return templatePackages.Distinct().ToArray();
+        }
+
+        internal async Task<IEnumerable<CliTemplateInfo>> GetAllowedTemplatesAsync(TemplateConstraintManager constraintManager, CancellationToken cancellationToken)
+        {
+            if (_constraints == null)
+            {
+                _constraints = await EvaluateConstraintsAsync(constraintManager, cancellationToken).ConfigureAwait(false);
+            }
+            return _constraints.Where(kvp => kvp.Value.All(r => r.EvaluationStatus == TemplateConstraintResult.Status.Allowed)).Select(kvp => kvp.Key);
+        }
+
+        internal async Task<IEnumerable<TemplateConstraintResult>> GetTemplateConstrainsInfo(CliTemplateInfo template, TemplateConstraintManager constraintManager, CancellationToken cancellationToken)
+        {
+            if (_constraints == null)
+            {
+                _constraints = await EvaluateConstraintsAsync(constraintManager, cancellationToken).ConfigureAwait(false);
+            }
+            if (!_constraints.TryGetValue(template, out var result))
+            {
+                throw new ArgumentException($"{nameof(template)} should be one of the templates in the template group.");
+            }
+            return result;
+        }
+
+        private async Task<Dictionary<CliTemplateInfo, IReadOnlyList<TemplateConstraintResult>>> EvaluateConstraintsAsync(TemplateConstraintManager constraintManager, CancellationToken cancellationToken)
+        {
+            var constraintResults = await constraintManager.EvaluateConstraintsAsync(Templates, cancellationToken).ConfigureAwait(false);
+            return constraintResults.ToDictionary(r => r.Template as CliTemplateInfo ?? throw new Exception ($"The templates are not {typeof(CliTemplateInfo)}"), r => r.Result);
         }
 
         private IEnumerable<ITemplateInfo> GetHighestPrecedenceTemplates()
