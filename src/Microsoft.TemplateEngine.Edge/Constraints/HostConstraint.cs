@@ -55,16 +55,16 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
                         {
                             if (hostInfo.Version == null || hostInfo.Version.CheckIfVersionIsValid(_environmentSettings.Host.Version))
                             {
-                                return new TemplateConstraintResult(TemplateConstraintResult.Status.Allowed);
+                                return TemplateConstraintResult.CreateAllowed(Type);
                             }
                         }
                     }
                     string errorMessage = string.Format(LocalizableStrings.HostConstraint_Message_Restricted, _environmentSettings.Host.HostIdentifier, _environmentSettings.Host.Version, string.Join(", ", supportedHosts));
-                    return new TemplateConstraintResult(TemplateConstraintResult.Status.Restricted, errorMessage);
+                    return TemplateConstraintResult.CreateRestricted(Type, errorMessage);
                 }
                 catch (ConfigurationException ce)
                 {
-                    return new TemplateConstraintResult(TemplateConstraintResult.Status.NotEvaluated, ce.Message, LocalizableStrings.Generic_Constraint_WrongConfigurationCTA);
+                    return TemplateConstraintResult.CreateFailure(Type, ce.Message, LocalizableStrings.Generic_Constraint_WrongConfigurationCTA);
                 }
             }
 
@@ -121,7 +121,30 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
                         hostInformation.Add(new HostInformation(hostName!));
                         continue;
                     }
-                    if (ExactVersionSpecification.TryParse(version!, out IVersionSpecification? exactVersion))
+
+                    //check version in the following order:
+                    //NuGet exact verion
+                    //NuGet floating version
+                    //NuGet version range
+                    //Legacy template engine exact version
+                    //Legacy template engine version range
+
+                    if (NuGetVersionSpecification.TryParse(version!, out NuGetVersionSpecification? exactNuGetVersion))
+                    {
+                        hostInformation.Add(new HostInformation(hostName!, exactNuGetVersion));
+                        continue;
+                    }
+                    else if (NuGetFloatRangeSpecification.TryParse(version!, out NuGetFloatRangeSpecification? floatVersion))
+                    {
+                        hostInformation.Add(new HostInformation(hostName!, floatVersion));
+                        continue;
+                    }
+                    else if (NuGetVersionRangeSpecification.TryParse(version!, out NuGetVersionRangeSpecification? rangeNuGetVersion))
+                    {
+                        hostInformation.Add(new HostInformation(hostName!, rangeNuGetVersion));
+                        continue;
+                    }
+                    else if (ExactVersionSpecification.TryParse(version!, out IVersionSpecification? exactVersion))
                     {
                         hostInformation.Add(new HostInformation(hostName!, exactVersion));
                         continue;
