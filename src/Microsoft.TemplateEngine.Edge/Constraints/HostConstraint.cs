@@ -49,9 +49,20 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
                 {
                     IEnumerable<HostInformation> supportedHosts = ParseArgs(args);
 
-                    foreach (HostInformation hostInfo in supportedHosts)
+                    //check primary host name first
+                    bool primaryHostNameMatch = false;
+                    foreach (HostInformation hostInfo in supportedHosts.Where(h => h.HostName.Equals(_environmentSettings.Host.HostIdentifier, StringComparison.OrdinalIgnoreCase)))
                     {
-                        if (hostInfo.HostName.Equals(_environmentSettings.Host.HostIdentifier, StringComparison.OrdinalIgnoreCase))
+                        primaryHostNameMatch = true;
+                        if (hostInfo.Version == null || hostInfo.Version.CheckIfVersionIsValid(_environmentSettings.Host.Version))
+                        {
+                            return TemplateConstraintResult.CreateAllowed(Type);
+                        }
+                    }
+                    if (!primaryHostNameMatch)
+                    {
+                        //if there is no primary host name, check fallback host names
+                        foreach (HostInformation hostInfo in supportedHosts.Where(h => _environmentSettings.Host.FallbackHostTemplateConfigNames.Contains(h.HostName, StringComparer.OrdinalIgnoreCase)))
                         {
                             if (hostInfo.Version == null || hostInfo.Version.CheckIfVersionIsValid(_environmentSettings.Host.Version))
                             {
