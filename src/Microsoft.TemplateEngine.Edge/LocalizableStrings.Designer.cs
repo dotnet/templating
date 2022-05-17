@@ -61,6 +61,15 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; should not contain empty items.
+        /// </summary>
+        internal static string Constaint_Error_ArgumentHasEmptyString {
+            get {
+                return ResourceManager.GetString("Constaint_Error_ArgumentHasEmptyString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Argument(s) were not specified. At least one argument should be specified..
         /// </summary>
         internal static string Constraint_Error_ArgumentsNotSpecified {
@@ -84,6 +93,33 @@ namespace Microsoft.TemplateEngine.Edge {
         internal static string Constraint_Error_InvalidJson {
             get {
                 return ResourceManager.GetString("Constraint_Error_InvalidJson", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; should be an array of objects..
+        /// </summary>
+        internal static string Constraint_Error_InvalidJsonArray_Objects {
+            get {
+                return ResourceManager.GetString("Constraint_Error_InvalidJsonArray_Objects", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not a valid JSON array..
+        /// </summary>
+        internal static string Constraint_Error_InvalidJsonType_Array {
+            get {
+                return ResourceManager.GetString("Constraint_Error_InvalidJsonType_Array", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not a valid JSON string or array..
+        /// </summary>
+        internal static string Constraint_Error_InvalidJsonType_StringOrArray {
+            get {
+                return ResourceManager.GetString("Constraint_Error_InvalidJsonType_StringOrArray", resourceCulture);
             }
         }
         
@@ -177,51 +213,6 @@ namespace Microsoft.TemplateEngine.Edge {
         internal static string GlobalSettingsTemplatePackagesProvider_Info_PackageUninstalled {
             get {
                 return ResourceManager.GetString("GlobalSettingsTemplatePackagesProvider_Info_PackageUninstalled", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Argument(s) were not specified. At least one argument should be specified..
-        /// </summary>
-        internal static string HostConstraint_Error_ArgumentsNotSpecified {
-            get {
-                return ResourceManager.GetString("HostConstraint_Error_ArgumentsNotSpecified", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; does not contain valid host configurations..
-        /// </summary>
-        internal static string HostConstraint_Error_ArrayHasNoObjects {
-            get {
-                return ResourceManager.GetString("HostConstraint_Error_ArrayHasNoObjects", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; is not a valid JSON.
-        /// </summary>
-        internal static string HostConstraint_Error_InvalidJson {
-            get {
-                return ResourceManager.GetString("HostConstraint_Error_InvalidJson", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; is not a valid JSON array..
-        /// </summary>
-        internal static string HostConstraint_Error_InvalidJsonArray {
-            get {
-                return ResourceManager.GetString("HostConstraint_Error_InvalidJsonArray", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; should be an array of objects..
-        /// </summary>
-        internal static string HostConstraint_Error_InvalidJsonArray_Objects {
-            get {
-                return ResourceManager.GetString("HostConstraint_Error_InvalidJsonArray_Objects", resourceCulture);
             }
         }
         
@@ -459,15 +450,6 @@ namespace Microsoft.TemplateEngine.Edge {
         internal static string NuGetInstaller_InstallResut_Error_UpdateCheckGeneric {
             get {
                 return ResourceManager.GetString("NuGetInstaller_InstallResut_Error_UpdateCheckGeneric", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; is not a valid JSON string or array..
-        /// </summary>
-        internal static string OSConstraint_Error_InvalidJsonType {
-            get {
-                return ResourceManager.GetString("OSConstraint_Error_InvalidJsonType", resourceCulture);
             }
         }
         

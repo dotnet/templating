@@ -91,35 +91,10 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
             //      }]
             private static IEnumerable<HostInformation> ParseArgs(string? args)
             {
-                if (string.IsNullOrWhiteSpace(args))
-                {
-                    throw new ConfigurationException(LocalizableStrings.HostConstraint_Error_ArgumentsNotSpecified);
-                }
-
-                JToken? token;
-                try
-                {
-                    token = JToken.Parse(args!);
-                }
-                catch (Exception e)
-                {
-                    throw new ConfigurationException(string.Format(LocalizableStrings.HostConstraint_Error_InvalidJson, args), e);
-                }
-
-                if (token is not JArray array)
-                {
-                    throw new ConfigurationException(string.Format(LocalizableStrings.HostConstraint_Error_InvalidJsonArray, args));
-                }
-
                 List<HostInformation> hostInformation = new List<HostInformation>();
 
-                foreach (JToken value in array)
+                foreach (JObject jobj in args.ParseConstraintJObjects())
                 {
-                    if (value is not JObject jobj)
-                    {
-                        throw new ConfigurationException(string.Format(LocalizableStrings.HostConstraint_Error_InvalidJsonArray_Objects, args));
-                    }
-
                     string? hostName = jobj.ToString("hostname");
                     string? version = jobj.ToString("version");
 
@@ -168,10 +143,6 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
                     throw new ConfigurationException(string.Format(LocalizableStrings.HostConstraint_Error_InvalidVersion, version));
                 }
 
-                if (!hostInformation.Any())
-                {
-                    throw new ConfigurationException(string.Format(LocalizableStrings.HostConstraint_Error_ArrayHasNoObjects, args));
-                }
                 return hostInformation;
             }
 

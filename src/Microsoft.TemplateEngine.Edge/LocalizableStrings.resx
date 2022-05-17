@@ -117,6 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Constaint_Error_ArgumentHasEmptyString" xml:space="preserve">
+    <value>'{0}' should not contain empty items</value>
+    <comment>{0} is JSON configuration for constraint</comment>
+  </data>
   <data name="Constraint_Error_ArgumentsNotSpecified" xml:space="preserve">
     <value>Argument(s) were not specified. At least one argument should be specified.</value>
   </data>
@@ -126,6 +130,18 @@
   </data>
   <data name="Constraint_Error_InvalidJson" xml:space="preserve">
     <value>'{0}' is not a valid JSON.</value>
+    <comment>{0} is JSON configuration for constraint</comment>
+  </data>
+  <data name="Constraint_Error_InvalidJsonArray_Objects" xml:space="preserve">
+    <value>'{0}' should be an array of objects.</value>
+    <comment>{0} is JSON configuration for constraint</comment>
+  </data>
+  <data name="Constraint_Error_InvalidJsonType_Array" xml:space="preserve">
+    <value>'{0}' is not a valid JSON array.</value>
+    <comment>{0} is JSON configuration for constraint</comment>
+  </data>
+  <data name="Constraint_Error_InvalidJsonType_StringOrArray" xml:space="preserve">
+    <value>'{0}' is not a valid JSON string or array.</value>
     <comment>{0} is JSON configuration for constraint</comment>
   </data>
   <data name="Constraint_WrongConfigurationCTA" xml:space="preserve">
@@ -159,25 +175,6 @@
   </data>
   <data name="GlobalSettingsTemplatePackagesProvider_Info_PackageUninstalled" xml:space="preserve">
     <value>{0} was successfully uninstalled.</value>
-  </data>
-  <data name="HostConstraint_Error_ArgumentsNotSpecified" xml:space="preserve">
-    <value>Argument(s) were not specified. At least one argument should be specified.</value>
-  </data>
-  <data name="HostConstraint_Error_ArrayHasNoObjects" xml:space="preserve">
-    <value>'{0}' does not contain valid host configurations.</value>
-    <comment>{0} is JSON configuration for constraint</comment>
-  </data>
-  <data name="HostConstraint_Error_InvalidJson" xml:space="preserve">
-    <value>'{0}' is not a valid JSON</value>
-    <comment>{0} is JSON configuration for constraint</comment>
-  </data>
-  <data name="HostConstraint_Error_InvalidJsonArray" xml:space="preserve">
-    <value>'{0}' is not a valid JSON array.</value>
-    <comment>{0} is JSON configuration for constraint</comment>
-  </data>
-  <data name="HostConstraint_Error_InvalidJsonArray_Objects" xml:space="preserve">
-    <value>'{0}' should be an array of objects.</value>
-    <comment>{0} is JSON configuration for constraint</comment>
   </data>
   <data name="HostConstraint_Error_InvalidVersion" xml:space="preserve">
     <value>'{0}' is not a valid version or version range.</value>
@@ -264,10 +261,6 @@ Details: {1}.</value>
   <data name="NuGetInstaller_InstallResut_Error_UpdateCheckGeneric" xml:space="preserve">
     <value>Failed to check the update for the package {0}.
 Details: {1}.</value>
-  </data>
-  <data name="OSConstraint_Error_InvalidJsonType" xml:space="preserve">
-    <value>'{0}' is not a valid JSON string or array.</value>
-    <comment>{0} is JSON configuration for constraint</comment>
   </data>
   <data name="OSConstraint_Error_InvalidOSName" xml:space="preserve">
     <value>'{0}' is not a valid operating system name. Allowed values are: {1}.</value>

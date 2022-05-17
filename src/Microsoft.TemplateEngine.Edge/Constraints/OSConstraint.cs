@@ -76,48 +76,16 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
             private static IEnumerable<OSPlatform> ParseArgs(string? args)
             {
                 string supportedValues = string.Join(", ", _platformMap.Keys.Select(e => $"'{e}'"));
-                if (string.IsNullOrWhiteSpace(args))
-                {
-                    throw new ConfigurationException(LocalizableStrings.Constraint_Error_ArgumentsNotSpecified);
-                }
 
-                JToken? token;
-                try
-                {
-                    token = JToken.Parse(args!);
-                }
-                catch (Exception e)
-                {
-                    throw new ConfigurationException(string.Format(LocalizableStrings.Constraint_Error_InvalidJson, args), e);
-                }
+                return args.ParseConstraintStrings().Select(Parse);
 
-                if (token!.Type == JTokenType.String)
+                OSPlatform Parse(string arg)
                 {
-                    return new[] { Parse(token.Value<string>()) };
-                }
-                else if (token is JArray jArray)
-                {
-                    IEnumerable<string?> values = jArray.Values<string>();
-                    List<OSPlatform> readValues = new List<OSPlatform>();
-                    foreach (string? value in values)
-                    {
-                        readValues.Add(Parse(value));
-                    }
-                    if (!readValues.Any())
-                    {
-                        throw new ConfigurationException(string.Format(LocalizableStrings.Constraint_Error_ArrayHasNoObjects, args));
-                    }
-                    return readValues;
-                }
-                throw new ConfigurationException(string.Format(LocalizableStrings.OSConstraint_Error_InvalidJsonType, args));
-                OSPlatform Parse(string? arg)
-                {
-                    string value = arg ?? throw new ConfigurationException(string.Format(LocalizableStrings.OSConstraint_Error_InvalidOSName, arg, supportedValues));
-                    if (_platformMap.TryGetValue(value, out OSPlatform parsedValue))
+                    if (_platformMap.TryGetValue(arg, out OSPlatform parsedValue))
                     {
                         return parsedValue;
                     }
-                    throw new ConfigurationException(string.Format(LocalizableStrings.OSConstraint_Error_InvalidOSName, value, supportedValues));
+                    throw new ConfigurationException(string.Format(LocalizableStrings.OSConstraint_Error_InvalidOSName, arg, supportedValues));
                 }
             }
         }
