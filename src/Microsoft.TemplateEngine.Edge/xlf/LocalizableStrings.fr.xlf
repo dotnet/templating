@@ -37,6 +37,11 @@
         <target state="new">'{0}' is not a valid JSON string or array.</target>
         <note>{0} is JSON configuration for constraint</note>
       </trans-unit>
+      <trans-unit id="Constraint_Error_InvalidVersion">
+        <source>'{0}' is not a valid version or version range.</source>
+        <target state="new">'{0}' is not a valid version or version range.</target>
+        <note>{0} is version range specified in JSON configuration</note>
+      </trans-unit>
       <trans-unit id="Constraint_WrongConfigurationCTA">
         <source>Check the constraint configuration in template.json.</source>
         <target state="new">Check the constraint configuration in template.json.</target>
@@ -86,11 +91,6 @@
         <source>{0} was successfully uninstalled.</source>
         <target state="translated">{0} a été désinstallé.</target>
         <note />
-      </trans-unit>
-      <trans-unit id="HostConstraint_Error_InvalidVersion">
-        <source>'{0}' is not a valid version or version range.</source>
-        <target state="new">'{0}' is not a valid version or version range.</target>
-        <note>{0} is version range specified in JSON configuration</note>
       </trans-unit>
       <trans-unit id="HostConstraint_Error_MissingMandatoryProperty">
         <source>'{0}' does not have mandatory property '{1}'.</source>
@@ -246,6 +246,31 @@ Détails : {1}.</target>
         <target state="translated">L’emplacement du package de modèles {0} n’est pas pris en charge ou n’existe pas.</target>
         <note />
       </trans-unit>
+      <trans-unit id="SdkConstraint_Error_InvalidVersion">
+        <source>"'{0}' is not a valid semver version."</source>
+        <target state="new">"'{0}' is not a valid semver version."</target>
+        <note>{0} is the provided version</note>
+      </trans-unit>
+      <trans-unit id="SdkConstraint_Error_MismatchedProviders">
+        <source>"Multiple 'ISdkInfoProvider' components provided by host. Component {0} provides different SDK version info: {1} then previously injected provider(s) ({2}): {3}, therefore SdkVersionConstraints cannot be properly initialized."</source>
+        <target state="new">"Multiple 'ISdkInfoProvider' components provided by host. Component {0} provides different SDK version info: {1} then previously injected provider(s) ({2}): {3}, therefore SdkVersionConstraints cannot be properly initialized."</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="SdkConstraint_Error_MissingProvider">
+        <source>"No 'ISdkInfoProvider' component provided by host. SdkVersionConstraints cannot be properly initialized."</source>
+        <target state="new">"No 'ISdkInfoProvider' component provided by host. SdkVersionConstraints cannot be properly initialized."</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="SdkConstraint_Message_Restricted">
+        <source>"Running template on current dotnet SDK version ({0}) is unsupported. Supported SDK instance(s): {1}"</source>
+        <target state="new">"Running template on current dotnet SDK version ({0}) is unsupported. Supported SDK instance(s): {1}"</target>
+        <note>{0} isthe current SDK version, {1} is the list of supported SDK versions</note>
+      </trans-unit>
+      <trans-unit id="SdkConstraint_Warning_DuplicatedProviders">
+        <source>"Multiple 'ISdkInfoProvider' components provided by host ({0}). All providing same SDK version info, so proceeding with the first provider."</source>
+        <target state="new">"Multiple 'ISdkInfoProvider' components provided by host ({0}). All providing same SDK version info, so proceeding with the first provider."</target>
+        <note />
+      </trans-unit>
       <trans-unit id="TemplateConstraintManager_Error_FailedToEvaluate">
         <source>The constraint '{0}' failed to be evaluated for the args '{1}', details: {2}</source>
         <target state="translated">La contrainte '{0}' n’a pas pu être évaluée pour les arguments '{1} ', détails : {2}</target>
@@ -307,10 +332,30 @@ Template cache will be recreated on the next run.</source>
 Le cache de modèles sera recréé lors de la prochaine exécution.</target>
         <note>{0} should not end with period - period is a part of the format entry.</note>
       </trans-unit>
+      <trans-unit id="WorkloadConstraint_Error_MismatchedProviders">
+        <source>"Multiple 'IWorkloadsInfoProvider' components provided by host. Component {0} provides different workloads then previously injected providers ({1}), therefore WorkloadConstraints cannot be properly initialized."</source>
+        <target state="new">"Multiple 'IWorkloadsInfoProvider' components provided by host. Component {0} provides different workloads then previously injected providers ({1}), therefore WorkloadConstraints cannot be properly initialized."</target>
+        <note>{0} is Id of current provider, {1} is list of ids of previous providers</note>
+      </trans-unit>
+      <trans-unit id="WorkloadConstraint_Error_MissingProvider">
+        <source>"No 'IWorkloadsInfoProvider' component provided by host. WorkloadConstraints cannot be properly initialized."</source>
+        <target state="new">"No 'IWorkloadsInfoProvider' component provided by host. WorkloadConstraints cannot be properly initialized."</target>
+        <note />
+      </trans-unit>
       <trans-unit id="WorkloadConstraint_Message_Restricted">
         <source>Running template on this host is not supported. It is supported on workload(s): {0}. Currently installed optional workloads: {1}</source>
         <target state="new">Running template on this host is not supported. It is supported on workload(s): {0}. Currently installed optional workloads: {1}</target>
         <note>{0} is list of supported workloads. {1} is list of installed optional workloads</note>
+      </trans-unit>
+      <trans-unit id="WorkloadConstraint_Warning_DuplicateWorkloads">
+        <source>"'IWorkloadsInfoProvider' component provided by host provided some duplicated workloads (duplicates: {0}). Duplicates will be skipped."</source>
+        <target state="new">"'IWorkloadsInfoProvider' component provided by host provided some duplicated workloads (duplicates: {0}). Duplicates will be skipped."</target>
+        <note>{0} is the list of duplicates</note>
+      </trans-unit>
+      <trans-unit id="WorkloadConstraint_Warning_DuplicatedProviders">
+        <source>"Multiple 'IWorkloadsInfoProvider' components provided by host ({0}). All providing same workloads, so proceeding with the first provider."</source>
+        <target state="new">"Multiple 'IWorkloadsInfoProvider' components provided by host ({0}). All providing same workloads, so proceeding with the first provider."</target>
+        <note>{0} is the list of ids of all providers</note>
       </trans-unit>
       <trans-unit id="Workload_Message_CTA">
         <source>Run 'dotnet workloads search' to search workloads available to be installed on your SDK.</source>

@@ -124,6 +124,15 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not a valid version or version range..
+        /// </summary>
+        internal static string Constraint_Error_InvalidVersion {
+            get {
+                return ResourceManager.GetString("Constraint_Error_InvalidVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Check the constraint configuration in template.json..
         /// </summary>
         internal static string Constraint_WrongConfigurationCTA {
@@ -213,15 +222,6 @@ namespace Microsoft.TemplateEngine.Edge {
         internal static string GlobalSettingsTemplatePackagesProvider_Info_PackageUninstalled {
             get {
                 return ResourceManager.GetString("GlobalSettingsTemplatePackagesProvider_Info_PackageUninstalled", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &apos;{0}&apos; is not a valid version or version range..
-        /// </summary>
-        internal static string HostConstraint_Error_InvalidVersion {
-            get {
-                return ResourceManager.GetString("HostConstraint_Error_InvalidVersion", resourceCulture);
             }
         }
         
@@ -490,6 +490,51 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &quot;&apos;{0}&apos; is not a valid semver version.&quot;.
+        /// </summary>
+        internal static string SdkConstraint_Error_InvalidVersion {
+            get {
+                return ResourceManager.GetString("SdkConstraint_Error_InvalidVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &quot;Multiple &apos;ISdkInfoProvider&apos; components provided by host. Component {0} provides different SDK version info: {1} then previously injected provider(s) ({2}): {3}, therefore SdkVersionConstraints cannot be properly initialized.&quot;.
+        /// </summary>
+        internal static string SdkConstraint_Error_MismatchedProviders {
+            get {
+                return ResourceManager.GetString("SdkConstraint_Error_MismatchedProviders", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &quot;No &apos;ISdkInfoProvider&apos; component provided by host. SdkVersionConstraints cannot be properly initialized.&quot;.
+        /// </summary>
+        internal static string SdkConstraint_Error_MissingProvider {
+            get {
+                return ResourceManager.GetString("SdkConstraint_Error_MissingProvider", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &quot;Running template on current dotnet SDK version ({0}) is unsupported. Supported SDK instance(s): {1}&quot;.
+        /// </summary>
+        internal static string SdkConstraint_Message_Restricted {
+            get {
+                return ResourceManager.GetString("SdkConstraint_Message_Restricted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &quot;Multiple &apos;ISdkInfoProvider&apos; components provided by host ({0}). All providing same SDK version info, so proceeding with the first provider.&quot;.
+        /// </summary>
+        internal static string SdkConstraint_Warning_DuplicatedProviders {
+            get {
+                return ResourceManager.GetString("SdkConstraint_Warning_DuplicatedProviders", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The constraint &apos;{0}&apos; failed to be evaluated for the args &apos;{1}&apos;, details: {2}.
         /// </summary>
         internal static string TemplateConstraintManager_Error_FailedToEvaluate {
@@ -593,11 +638,47 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &quot;Multiple &apos;IWorkloadsInfoProvider&apos; components provided by host. Component {0} provides different workloads then previously injected providers ({1}), therefore WorkloadConstraints cannot be properly initialized.&quot;.
+        /// </summary>
+        internal static string WorkloadConstraint_Error_MismatchedProviders {
+            get {
+                return ResourceManager.GetString("WorkloadConstraint_Error_MismatchedProviders", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &quot;No &apos;IWorkloadsInfoProvider&apos; component provided by host. WorkloadConstraints cannot be properly initialized.&quot;.
+        /// </summary>
+        internal static string WorkloadConstraint_Error_MissingProvider {
+            get {
+                return ResourceManager.GetString("WorkloadConstraint_Error_MissingProvider", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Running template on this host is not supported. It is supported on workload(s): {0}. Currently installed optional workloads: {1}.
         /// </summary>
         internal static string WorkloadConstraint_Message_Restricted {
             get {
                 return ResourceManager.GetString("WorkloadConstraint_Message_Restricted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &quot;Multiple &apos;IWorkloadsInfoProvider&apos; components provided by host ({0}). All providing same workloads, so proceeding with the first provider.&quot;.
+        /// </summary>
+        internal static string WorkloadConstraint_Warning_DuplicatedProviders {
+            get {
+                return ResourceManager.GetString("WorkloadConstraint_Warning_DuplicatedProviders", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &quot;&apos;IWorkloadsInfoProvider&apos; component provided by host provided some duplicated workloads (duplicates: {0}). Duplicates will be skipped.&quot;.
+        /// </summary>
+        internal static string WorkloadConstraint_Warning_DuplicateWorkloads {
+            get {
+                return ResourceManager.GetString("WorkloadConstraint_Warning_DuplicateWorkloads", resourceCulture);
             }
         }
     }

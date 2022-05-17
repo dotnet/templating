@@ -62,7 +62,7 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
                         }
                     }
                 }
-                string errorMessage = string.Format(LocalizableStrings.HostConstraint_Message_Restricted, EnvironmentSettings.Host.HostIdentifier, EnvironmentSettings.Host.Version, string.Join(", ", supportedHosts));
+                string errorMessage = string.Format(LocalizableStrings.HostConstraint_Message_Restricted, EnvironmentSettings.Host.HostIdentifier, EnvironmentSettings.Host.Version, supportedHosts.ToCsvString());
                 return TemplateConstraintResult.CreateRestricted(Type, errorMessage);
             }
 
@@ -95,39 +95,7 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
                         continue;
                     }
 
-                    //check version in the following order:
-                    //NuGet exact verion
-                    //NuGet floating version
-                    //NuGet version range
-                    //Legacy template engine exact version
-                    //Legacy template engine version range
-
-                    if (NuGetVersionSpecification.TryParse(version!, out NuGetVersionSpecification? exactNuGetVersion))
-                    {
-                        hostInformation.Add(new HostInformation(hostName!, exactNuGetVersion));
-                        continue;
-                    }
-                    else if (NuGetFloatRangeSpecification.TryParse(version!, out NuGetFloatRangeSpecification? floatVersion))
-                    {
-                        hostInformation.Add(new HostInformation(hostName!, floatVersion));
-                        continue;
-                    }
-                    else if (NuGetVersionRangeSpecification.TryParse(version!, out NuGetVersionRangeSpecification? rangeNuGetVersion))
-                    {
-                        hostInformation.Add(new HostInformation(hostName!, rangeNuGetVersion));
-                        continue;
-                    }
-                    else if (ExactVersionSpecification.TryParse(version!, out IVersionSpecification? exactVersion))
-                    {
-                        hostInformation.Add(new HostInformation(hostName!, exactVersion));
-                        continue;
-                    }
-                    else if (RangeVersionSpecification.TryParse(version!, out IVersionSpecification? rangeVersion))
-                    {
-                        hostInformation.Add(new HostInformation(hostName!, rangeVersion));
-                        continue;
-                    }
-                    throw new ConfigurationException(string.Format(LocalizableStrings.HostConstraint_Error_InvalidVersion, version));
+                    hostInformation.Add(new HostInformation(hostName!, version!.ParseVersionSpecification()));
                 }
 
                 return hostInformation;

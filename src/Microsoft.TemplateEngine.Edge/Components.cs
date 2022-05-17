@@ -30,7 +30,9 @@ namespace Microsoft.TemplateEngine.Edge
                 (typeof(IInstallerFactory), new FolderInstallerFactory()),
                 (typeof(IInstallerFactory), new NuGetInstallerFactory()),
                 (typeof(ITemplateConstraintFactory), new OSConstraintFactory()),
-                (typeof(ITemplateConstraintFactory), new HostConstraintFactory())
+                (typeof(ITemplateConstraintFactory), new HostConstraintFactory()),
+                (typeof(ITemplateConstraintFactory), new WorkloadConstraintFactory()),
+                (typeof(ITemplateConstraintFactory), new SdkVersionConstraintFactory()),
             };
     }
 }

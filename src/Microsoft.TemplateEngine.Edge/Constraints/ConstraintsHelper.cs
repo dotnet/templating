@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Edge.Constraints
@@ -49,6 +50,51 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
 
                 return jobj;
             });
+        }
+
+        /// <summary>
+        /// Attempts to parse given string and return the version specification (throws <see cref="ConfigurationException"/> if unsuccessful).
+        /// checks version in the following order:
+        /// NuGet exact version
+        /// NuGet floating version
+        /// NuGet version range
+        /// Legacy template engine exact version
+        /// Legacy template engine version range.
+        /// </summary>
+        /// <param name="versionString">Version string to be parsed.</param>
+        /// <returns>IVersionSpecification instance representing the given string representation of the version.</returns>
+        /// <exception cref="ConfigurationException">Thrown if given string is not recognized as any valid version format.</exception>
+        public static IVersionSpecification ParseVersionSpecification(this string versionString)
+        {
+            IVersionSpecification? versionInstance = null;
+
+            if (NuGetVersionSpecification.TryParse(versionString, out NuGetVersionSpecification? exactNuGetVersion))
+            {
+                versionInstance = exactNuGetVersion;
+            }
+            else if (NuGetFloatRangeSpecification.TryParse(versionString, out NuGetFloatRangeSpecification? floatVersion))
+            {
+                versionInstance = floatVersion;
+            }
+            else if (NuGetVersionRangeSpecification.TryParse(versionString, out NuGetVersionRangeSpecification? rangeNuGetVersion))
+            {
+                versionInstance = rangeNuGetVersion;
+            }
+            else if (ExactVersionSpecification.TryParse(versionString, out IVersionSpecification? exactVersion))
+            {
+                versionInstance = exactVersion;
+            }
+            else if (RangeVersionSpecification.TryParse(versionString, out IVersionSpecification? rangeVersion))
+            {
+                versionInstance = rangeVersion;
+            }
+
+            if (versionInstance == null)
+            {
+                throw new ConfigurationException(string.Format(LocalizableStrings.Constraint_Error_InvalidVersion, versionString));
+            }
+
+            return versionInstance;
         }
 
         private static JToken ParseConstraintJToken(this string? args)
