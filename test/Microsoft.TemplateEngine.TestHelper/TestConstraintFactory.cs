@@ -47,13 +47,13 @@ namespace Microsoft.TemplateEngine.TestHelper
             {
                 if (args == "yes")
                 {
-                    return TemplateConstraintResult.CreateAllowed(Type);
+                    return TemplateConstraintResult.CreateAllowed(this);
                 }
                 else if (args == "no")
                 {
-                    return TemplateConstraintResult.CreateRestricted(Type, "cannot run", "do smth");
+                    return TemplateConstraintResult.CreateRestricted(this, "cannot run", "do smth");
                 }
-                return TemplateConstraintResult.CreateFailure(Type, "bad params");
+                return TemplateConstraintResult.CreateEvaluationFailure(this, "bad params");
             }
         }
     }

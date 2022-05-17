@@ -56,7 +56,7 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
                         primaryHostNameMatch = true;
                         if (hostInfo.Version == null || hostInfo.Version.CheckIfVersionIsValid(_environmentSettings.Host.Version))
                         {
-                            return TemplateConstraintResult.CreateAllowed(Type);
+                            return TemplateConstraintResult.CreateAllowed(this);
                         }
                     }
                     if (!primaryHostNameMatch)
@@ -66,16 +66,16 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
                         {
                             if (hostInfo.Version == null || hostInfo.Version.CheckIfVersionIsValid(_environmentSettings.Host.Version))
                             {
-                                return TemplateConstraintResult.CreateAllowed(Type);
+                                return TemplateConstraintResult.CreateAllowed(this);
                             }
                         }
                     }
                     string errorMessage = string.Format(LocalizableStrings.HostConstraint_Message_Restricted, _environmentSettings.Host.HostIdentifier, _environmentSettings.Host.Version, string.Join(", ", supportedHosts));
-                    return TemplateConstraintResult.CreateRestricted(Type, errorMessage);
+                    return TemplateConstraintResult.CreateRestricted(this, errorMessage);
                 }
                 catch (ConfigurationException ce)
                 {
-                    return TemplateConstraintResult.CreateFailure(Type, ce.Message, LocalizableStrings.Generic_Constraint_WrongConfigurationCTA);
+                    return TemplateConstraintResult.CreateEvaluationFailure(this, ce.Message, LocalizableStrings.Generic_Constraint_WrongConfigurationCTA);
                 }
             }
 
