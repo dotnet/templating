@@ -101,5 +101,22 @@ namespace Dotnet_new3.IntegrationTests
 
             return Verifier.Verify(commandResult.StdOut, _verifySettings);
         }
+
+        [Fact]
+        public Task CanShowWarning_WhenConstraintTemplateIsInstalled()
+        {
+            var testTemplateLocation = TestUtils.GetTestTemplateLocation("Constraints/RestrictedTemplate");
+            var commandResult = new DotnetNewCommand(_log, "install", testTemplateLocation)
+                .WithCustomHive()
+                .WithWorkingDirectory(TestUtils.CreateTemporaryFolder())
+                .Execute();
+
+            commandResult
+                .Should()
+                .Pass();
+
+            return Verifier.Verify(commandResult.StdOut, _verifySettings)
+                .AddScrubber(output => output.ScrubAndReplace(testTemplateLocation, "%TEMPLATE FOLDER%"));
+        }
     }
 }
