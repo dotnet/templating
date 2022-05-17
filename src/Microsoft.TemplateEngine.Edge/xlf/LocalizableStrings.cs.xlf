@@ -307,6 +307,16 @@ Template cache will be recreated on the next run.</source>
 Mezipaměť šablony bude při příštím spuštění znovu vytvořena.</target>
         <note>{0} should not end with period - period is a part of the format entry.</note>
       </trans-unit>
+      <trans-unit id="WorkloadConstraint_Message_Restricted">
+        <source>Running template on this host is not supported. It is supported on workload(s): {0}. Currently installed optional workloads: {1}</source>
+        <target state="new">Running template on this host is not supported. It is supported on workload(s): {0}. Currently installed optional workloads: {1}</target>
+        <note>{0} is list of supported workloads. {1} is list of installed optional workloads</note>
+      </trans-unit>
+      <trans-unit id="Workload_Message_CTA">
+        <source>Run 'dotnet workloads search' to search workloads available to be installed on your SDK.</source>
+        <target state="new">Run 'dotnet workloads search' to search workloads available to be installed on your SDK.</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

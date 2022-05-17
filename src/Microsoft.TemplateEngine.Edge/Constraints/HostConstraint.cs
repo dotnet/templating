@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Constraints;
 using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json.Linq;
 using NuGet.Configuration;
@@ -28,55 +29,41 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
             return Task.FromResult((ITemplateConstraint)new HostConstraint(environmentSettings, this));
         }
 
-        internal class HostConstraint : ITemplateConstraint
+        internal class HostConstraint : ConstraintBase
         {
-            private readonly IEngineEnvironmentSettings _environmentSettings;
-            private readonly ITemplateConstraintFactory _factory;
-
             internal HostConstraint(IEngineEnvironmentSettings environmentSettings, ITemplateConstraintFactory factory)
+                : base(environmentSettings, factory)
+            { }
+
+            public override string DisplayName => "Template engine host";
+
+            protected override TemplateConstraintResult EvaluateInternal(string? args)
             {
-                _environmentSettings = environmentSettings;
-                _factory = factory;
-            }
+                IEnumerable<HostInformation> supportedHosts = ParseArgs(args);
 
-            public string Type => _factory.Type;
-
-            public string DisplayName => "Template engine host";
-
-            public TemplateConstraintResult Evaluate(string? args)
-            {
-                try
+                //check primary host name first
+                bool primaryHostNameMatch = false;
+                foreach (HostInformation hostInfo in supportedHosts.Where(h => h.HostName.Equals(EnvironmentSettings.Host.HostIdentifier, StringComparison.OrdinalIgnoreCase)))
                 {
-                    IEnumerable<HostInformation> supportedHosts = ParseArgs(args);
-
-                    //check primary host name first
-                    bool primaryHostNameMatch = false;
-                    foreach (HostInformation hostInfo in supportedHosts.Where(h => h.HostName.Equals(_environmentSettings.Host.HostIdentifier, StringComparison.OrdinalIgnoreCase)))
+                    primaryHostNameMatch = true;
+                    if (hostInfo.Version == null || hostInfo.Version.CheckIfVersionIsValid(EnvironmentSettings.Host.Version))
                     {
-                        primaryHostNameMatch = true;
-                        if (hostInfo.Version == null || hostInfo.Version.CheckIfVersionIsValid(_environmentSettings.Host.Version))
+                        return TemplateConstraintResult.CreateAllowed(Type);
+                    }
+                }
+                if (!primaryHostNameMatch)
+                {
+                    //if there is no primary host name, check fallback host names
+                    foreach (HostInformation hostInfo in supportedHosts.Where(h => EnvironmentSettings.Host.FallbackHostTemplateConfigNames.Contains(h.HostName, StringComparer.OrdinalIgnoreCase)))
+                    {
+                        if (hostInfo.Version == null || hostInfo.Version.CheckIfVersionIsValid(EnvironmentSettings.Host.Version))
                         {
                             return TemplateConstraintResult.CreateAllowed(Type);
                         }
                     }
-                    if (!primaryHostNameMatch)
-                    {
-                        //if there is no primary host name, check fallback host names
-                        foreach (HostInformation hostInfo in supportedHosts.Where(h => _environmentSettings.Host.FallbackHostTemplateConfigNames.Contains(h.HostName, StringComparer.OrdinalIgnoreCase)))
-                        {
-                            if (hostInfo.Version == null || hostInfo.Version.CheckIfVersionIsValid(_environmentSettings.Host.Version))
-                            {
-                                return TemplateConstraintResult.CreateAllowed(Type);
-                            }
-                        }
-                    }
-                    string errorMessage = string.Format(LocalizableStrings.HostConstraint_Message_Restricted, _environmentSettings.Host.HostIdentifier, _environmentSettings.Host.Version, string.Join(", ", supportedHosts));
-                    return TemplateConstraintResult.CreateRestricted(Type, errorMessage);
                 }
-                catch (ConfigurationException ce)
-                {
-                    return TemplateConstraintResult.CreateFailure(Type, ce.Message, LocalizableStrings.Generic_Constraint_WrongConfigurationCTA);
-                }
+                string errorMessage = string.Format(LocalizableStrings.HostConstraint_Message_Restricted, EnvironmentSettings.Host.HostIdentifier, EnvironmentSettings.Host.Version, string.Join(", ", supportedHosts));
+                return TemplateConstraintResult.CreateRestricted(Type, errorMessage);
             }
 
             // configuration examples

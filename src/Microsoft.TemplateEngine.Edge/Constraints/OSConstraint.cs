@@ -11,6 +11,7 @@ using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Constraints;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Edge.Constraints
@@ -34,40 +35,26 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
             return Task.FromResult((ITemplateConstraint)new OSConstraint(environmentSettings, this));
         }
 
-        internal class OSConstraint : ITemplateConstraint
+        internal class OSConstraint : ConstraintBase
         {
-            private readonly IEngineEnvironmentSettings _environmentSettings;
-            private readonly ITemplateConstraintFactory _factory;
-
             internal OSConstraint(IEngineEnvironmentSettings environmentSettings, ITemplateConstraintFactory factory)
+                : base(environmentSettings, factory)
+            { }
+
+            public override string DisplayName => LocalizableStrings.OSConstraint_Name;
+
+            protected override TemplateConstraintResult EvaluateInternal(string? args)
             {
-                _environmentSettings = environmentSettings;
-                _factory = factory;
-            }
+            IEnumerable<OSPlatform> supportedOS = ParseArgs(args);
 
-            public string Type => _factory.Type;
-
-            public string DisplayName => LocalizableStrings.OSConstraint_Name;
-
-            public TemplateConstraintResult Evaluate(string? args)
-            {
-                try
+                foreach (OSPlatform platform in supportedOS)
                 {
-                    IEnumerable<OSPlatform> supportedOS = ParseArgs(args);
-
-                    foreach (OSPlatform platform in supportedOS)
+                    if (RuntimeInformation.IsOSPlatform(platform))
                     {
-                        if (RuntimeInformation.IsOSPlatform(platform))
-                        {
-                            return TemplateConstraintResult.CreateAllowed(Type);
-                        }
+                        return TemplateConstraintResult.CreateAllowed(Type);
                     }
-                    return TemplateConstraintResult.CreateRestricted(Type, string.Format(LocalizableStrings.OSConstraint_Message_Restricted, RuntimeInformation.OSDescription, string.Join(", ", supportedOS)));
                 }
-                catch (ConfigurationException ce)
-                {
-                    return TemplateConstraintResult.CreateFailure(Type, ce.Message, LocalizableStrings.Constraint_WrongConfigurationCTA);
-                }
+                return TemplateConstraintResult.CreateRestricted(Type, string.Format(LocalizableStrings.OSConstraint_Message_Restricted, RuntimeInformation.OSDescription, string.Join(", ", supportedOS)));
             }
 
             //supported configuration:

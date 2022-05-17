@@ -582,5 +582,23 @@ namespace Microsoft.TemplateEngine.Edge {
                 return ResourceManager.GetString("TemplatePackageManager_Error_FailedToStoreCache", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Run &apos;dotnet workloads search&apos; to search workloads available to be installed on your SDK..
+        /// </summary>
+        internal static string Workload_Message_CTA {
+            get {
+                return ResourceManager.GetString("Workload_Message_CTA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Running template on this host is not supported. It is supported on workload(s): {0}. Currently installed optional workloads: {1}.
+        /// </summary>
+        internal static string WorkloadConstraint_Message_Restricted {
+            get {
+                return ResourceManager.GetString("WorkloadConstraint_Message_Restricted", resourceCulture);
+            }
+        }
     }
 }
