@@ -4,23 +4,30 @@
 using System.CommandLine.Completions;
 using System.CommandLine.Parsing;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Edge;
 using Microsoft.TemplateEngine.Edge.Settings;
 
 namespace Microsoft.TemplateEngine.Cli.Commands
 {
     internal partial class InstantiateCommand : BaseCommand<InstantiateCommandArgs>
     {
+        private const int ConstraintEvaluationTimeout = 1000;
+
         internal static IEnumerable<CompletionItem> GetTemplateNameCompletions(string? tempalteName, IEnumerable<TemplateGroup> templateGroups, IEngineEnvironmentSettings environmentSettings)
         {
+            TemplateConstraintManager constraintManager = new TemplateConstraintManager(environmentSettings);
             if (string.IsNullOrWhiteSpace(tempalteName))
             {
-                return templateGroups
+                return GetAllowedTemplateGroups(constraintManager, templateGroups)
                     .SelectMany(g => g.ShortNames, (g, shortName) => new CompletionItem(shortName, documentation: g.Description))
                     .Distinct()
                     .OrderBy(c => c.Label, StringComparer.OrdinalIgnoreCase)
                     .ToArray();
             }
-            return templateGroups
+
+            var matchingTemplateGroups = templateGroups.Where(t => t.ShortNames.Any(sn => sn.StartsWith(tempalteName, StringComparison.OrdinalIgnoreCase)));
+
+            return GetAllowedTemplateGroups(constraintManager, matchingTemplateGroups)
                 .SelectMany(g => g.ShortNames, (g, shortName) => new CompletionItem(shortName, documentation: g.Description))
                 .Where(c => c.Label.StartsWith(tempalteName))
                 .Distinct()
@@ -36,9 +43,10 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             TextCompletionContext context)
         {
             HashSet<CompletionItem> distinctCompletions = new HashSet<CompletionItem>();
+            TemplateConstraintManager constraintManager = new TemplateConstraintManager(environmentSettings);
             foreach (TemplateGroup templateGroup in templateGroups.Where(template => template.ShortNames.Contains(args.ShortName)))
             {
-                foreach (IGrouping<int, CliTemplateInfo> templateGrouping in templateGroup.Templates.GroupBy(g => g.Precedence).OrderByDescending(g => g.Key))
+                foreach (IGrouping<int, CliTemplateInfo> templateGrouping in GetAllowedTemplates(constraintManager, templateGroup).GroupBy(g => g.Precedence).OrderByDescending(g => g.Key))
                 {
                     foreach (CliTemplateInfo template in templateGrouping)
                     {
@@ -109,6 +117,79 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             {
                 yield return completion;
             }
+        }
+
+        private static IEnumerable<CliTemplateInfo> GetAllowedTemplates(TemplateConstraintManager constraintManager, TemplateGroup templateGroup)
+        {
+            if (templateGroup.Templates.SelectMany(t => t.Constraints).Any())
+            {
+                CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+                cancellationTokenSource.CancelAfter(ConstraintEvaluationTimeout);
+                var constraintEvaluationTask = templateGroup.GetAllowedTemplatesAsync(constraintManager, cancellationTokenSource.Token);
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        await constraintEvaluationTask.WaitAsync(cancellationTokenSource.Token).ConfigureAwait(false);
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        //do nothing
+                    }
+                }).GetAwaiter().GetResult();
+
+                if (constraintEvaluationTask.IsCompletedSuccessfully)
+                {
+                    return constraintEvaluationTask.Result;
+                }
+            }
+            return templateGroup.Templates;
+        }
+
+        private static IEnumerable<TemplateGroup> GetAllowedTemplateGroups(TemplateConstraintManager constraintManager, IEnumerable<TemplateGroup> templateGroups)
+        {
+            List<TemplateGroup> allowedTemplateGroups = new List<TemplateGroup>();
+            List<(TemplateGroup TemplateGroup, Task<IEnumerable<CliTemplateInfo>> Task)> tasksToWait = new();
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.CancelAfter(ConstraintEvaluationTimeout);
+            foreach (var group in templateGroups)
+            {
+                if (group.Templates.All(t => t.Constraints.Any()))
+                {
+                    tasksToWait.Add((group, group.GetAllowedTemplatesAsync(constraintManager, cancellationTokenSource.Token)));
+                }
+                else
+                {
+                    allowedTemplateGroups.Add(group);
+                }
+            }
+            if (!tasksToWait.Any())
+            {
+                return allowedTemplateGroups;
+            }
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await Task.WhenAll(tasksToWait.Select(t => t.Task)).WaitAsync(cancellationTokenSource.Token).ConfigureAwait(false);
+                }
+                catch (TaskCanceledException)
+                {
+                    //do nothing
+                }
+            }).GetAwaiter().GetResult();
+            foreach (var task in tasksToWait)
+            {
+                if (task.Task.IsCompletedSuccessfully)
+                {
+                    if (task.Task.Result.Any())
+                    {
+                        allowedTemplateGroups.Add(task.TemplateGroup);
+                    }
+                }
+            }
+            return allowedTemplateGroups;
         }
     }
 }
