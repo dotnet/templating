@@ -43,9 +43,12 @@ namespace Microsoft.TemplateEngine.Edge
         public int ConsoleBufferWidth => Console.IsOutputRedirected ? DefaultBufferWidth : Console.BufferWidth;
 
         /// <inheritdoc/>
+        public string UserProfilePath => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+        /// <inheritdoc/>
         public string ExpandEnvironmentVariables(string name)
         {
-            return System.Environment.ExpandEnvironmentVariables(name);
+            return Environment.ExpandEnvironmentVariables(name);
         }
 
         /// <inheritdoc/>

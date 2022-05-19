@@ -35,6 +35,8 @@ namespace Microsoft.TemplateEngine.Mocks
 
         public int ConsoleBufferWidth { get; set; } = 160;
 
+        public string UserProfilePath => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
         public string ExpandEnvironmentVariables(string name)
         {
             return Environment.ExpandEnvironmentVariables(name);

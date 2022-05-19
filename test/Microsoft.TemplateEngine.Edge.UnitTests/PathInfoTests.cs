@@ -15,23 +15,35 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
     public class PathInfoTests
     {
         [Theory]
-        [InlineData (false, false)]
-        [InlineData (false, true)]
-        [InlineData (true, false)]
-        [InlineData (true, true)]
-        public void UserProfileEnvironment(bool useHome, bool useDotnetCliHome)
+        [InlineData (false, false, false)]
+        [InlineData (false, false, true)]
+        [InlineData (false, true, false)]
+        [InlineData (false, true, true)]
+        [InlineData (true, false, false)]
+        [InlineData (true, false, true)]
+        [InlineData (true, true, false)]
+        [InlineData (true, true, true)]
+        public void UserProfileEnvironment(bool useHome, bool useDotnetCliHome, bool useUserProfilePath)
         {
             var environment = A.Fake<IEnvironment>();
             string testDotnetCliHomePath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "C:\\users\\user1" : "/home/path1";
             string testHomePath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "C:\\users\\user2" : "/home/path2";
+            string testUserProfilePath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "C:\\users\\user3" : "/home/path3";
 
             A.CallTo(() => environment.GetEnvironmentVariable("DOTNET_CLI_HOME")).Returns(useDotnetCliHome ? testDotnetCliHomePath : null);
             A.CallTo(() => environment.GetEnvironmentVariable("HOME")).Returns(useHome ? testHomePath : null);
             A.CallTo(() => environment.GetEnvironmentVariable("USERPROFILE")).Returns(useHome ? testHomePath : null);
+            A.CallTo(() => environment.UserProfilePath).Returns(useUserProfilePath ? testUserProfilePath : string.Empty);
 
             var host = A.Fake<ITemplateEngineHost>();
             A.CallTo(() => host.HostIdentifier).Returns("hostID");
             A.CallTo(() => host.Version).Returns("1.0.0");
+
+            if (!useHome && !useDotnetCliHome && !useUserProfilePath)
+            {
+                Assert.Throws<NotSupportedException>(() => new DefaultPathInfo(environment, host));
+                return;
+            }
 
             DefaultPathInfo pathInfo = new DefaultPathInfo(environment, host);
 
@@ -47,8 +59,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             }
             else
             {
-                Assert.NotEqual(testHomePath, pathInfo.UserProfileDir);
-                Assert.NotEqual(testDotnetCliHomePath, pathInfo.UserProfileDir);
+               Assert.True(useUserProfilePath);
+               Assert.Equal(testUserProfilePath, pathInfo.UserProfileDir);
             }
         }
 

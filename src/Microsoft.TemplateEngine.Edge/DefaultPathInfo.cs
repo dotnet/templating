@@ -106,11 +106,10 @@ namespace Microsoft.TemplateEngine.Edge
                 home = environment.GetEnvironmentVariable(platformHomeVariableName);
                 if (string.IsNullOrEmpty(home))
                 {
-                    home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                    home = environment.UserProfilePath;
                     if (string.IsNullOrEmpty(home))
                     {
-                        throw new NotSupportedException(
-                            "Unable to determine user profile directory. DOTNET_CLI_HOME, HOME or USERPROFILE environment variables are not defined, the environment is not supported.");
+                        throw new NotSupportedException(LocalizableStrings.Environment_Error_UserProfileUndetermined);
                     }
                 }
             }

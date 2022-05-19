@@ -22,6 +22,11 @@
         <target state="new">Check the constraint configuration in template.json.</target>
         <note />
       </trans-unit>
+      <trans-unit id="Environment_Error_UserProfileUndetermined">
+        <source>Unable to determine user profile directory. DOTNET_CLI_HOME, HOME or USERPROFILE environment variables are not defined, the environment is not supported.</source>
+        <target state="new">Unable to determine user profile directory. DOTNET_CLI_HOME, HOME or USERPROFILE environment variables are not defined, the environment is not supported.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="FolderInstaller_InstallResult_Error_FolderDoesNotExist">
         <source>The folder {0} doesn't exist.</source>
         <target state="translated">フォルダー {0} が存在しません。</target>

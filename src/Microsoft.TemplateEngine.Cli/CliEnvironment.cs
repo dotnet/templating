@@ -34,6 +34,9 @@ namespace Microsoft.TemplateEngine.Cli
         public int ConsoleBufferWidth => Console.IsOutputRedirected ? DefaultBufferWidth : Console.BufferWidth;
 
         /// <inheritdoc/>
+        public string UserProfilePath => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+        /// <inheritdoc/>
         public string ExpandEnvironmentVariables(string name)
         {
             return Environment.ExpandEnvironmentVariables(name);

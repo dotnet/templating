@@ -29,3 +29,4 @@ static Microsoft.TemplateEngine.Abstractions.TemplateConstraintResult.CreateFail
 static Microsoft.TemplateEngine.Abstractions.TemplateConstraintResult.CreateFailure(string! type, string! localizedErrorMessage, string? cta = null) -> Microsoft.TemplateEngine.Abstractions.TemplateConstraintResult!
 static Microsoft.TemplateEngine.Abstractions.TemplateConstraintResult.CreateRestricted(Microsoft.TemplateEngine.Abstractions.TemplateConstraintInfo! constraintInfo, string! localizedErrorMessage, string? cta = null) -> Microsoft.TemplateEngine.Abstractions.TemplateConstraintResult!
 static Microsoft.TemplateEngine.Abstractions.TemplateConstraintResult.CreateRestricted(string! type, string! localizedErrorMessage, string? cta = null) -> Microsoft.TemplateEngine.Abstractions.TemplateConstraintResult!
+Microsoft.TemplateEngine.Abstractions.IEnvironment.UserProfilePath.get -> string!

@@ -600,5 +600,14 @@ namespace Microsoft.TemplateEngine.Edge {
                 return ResourceManager.GetString("TemplatePackageManager_Error_FailedToStoreCache", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Unable to determine user profile directory. DOTNET_CLI_HOME, HOME or USERPROFILE environment variables are not defined, the environment is not supported.
+        /// </summary>
+        internal static string  Environment_Error_UserProfileUndetermined {
+            get {
+                return ResourceManager.GetString("Environment_Error_UserProfileUndetermined", resourceCulture);
+            }
+        }
     }
 }

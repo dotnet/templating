@@ -67,7 +67,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             string v1FileLocation = SetupDiscoveryMetadata(cacheLocation, false);
             string v2FileLocation = SetupTemplateCache(cacheLocation, false);
 
-            var environment = A.Fake<IEnvironment>();
+            var environment = CreateFakeEnvironment();
             var engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(
                 virtualize: true,
                 environment: environment,
@@ -112,7 +112,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             string v1FileLocation = SetupDiscoveryMetadata(cacheLocation, true);
             string v2FileLocation = SetupTemplateCache(cacheLocation, true);
 
-            var environment = A.Fake<IEnvironment>();
+            var environment = CreateFakeEnvironment();
             var engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(
                 virtualize: true,
                 environment: environment,
@@ -154,7 +154,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             string v1FileLocation = SetupDiscoveryMetadata(cacheLocation, true);
             string v2FileLocation = SetupTemplateCache(cacheLocation, true);
 
-            var environment = A.Fake<IEnvironment>();
+            var environment = CreateFakeEnvironment();
             var engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(
                 virtualize: true,
                 environment: environment,
@@ -193,7 +193,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             string v1FileLocation = SetupDiscoveryMetadata(cacheLocation, false);
             string v2FileLocation = SetupTemplateCache(cacheLocation, false);
 
-            var environment = A.Fake<IEnvironment>();
+            var environment = CreateFakeEnvironment();
             var engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(
                 virtualize: true,
                 environment: environment,
@@ -237,7 +237,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             string v1FileLocation = SetupDiscoveryMetadata(cacheLocation, false);
             string v2FileLocation = SetupTemplateCache(cacheLocation, false);
 
-            var environment = A.Fake<IEnvironment>();
+            var environment = CreateFakeEnvironment();
             var engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(
                 virtualize: true,
                 environment: environment,
@@ -278,7 +278,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             string v1FileLocation = SetupDiscoveryMetadata(cacheLocation, false);
             string v2FileLocation = SetupTemplateCache(cacheLocation, false);
 
-            var environment = A.Fake<IEnvironment>();
+            var environment = CreateFakeEnvironment();
             var engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(
                 virtualize: true,
                 environment: environment,
@@ -320,7 +320,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             string v1FileLocation = SetupDiscoveryMetadata(cacheLocation, false);
             string v2FileLocation = SetupTemplateCache(cacheLocation, false);
 
-            var environment = A.Fake<IEnvironment>();
+            var environment = CreateFakeEnvironment();
             var engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(
                 virtualize: true,
                 environment: environment,
@@ -367,7 +367,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             string v1FileLocation = SetupDiscoveryMetadata(cacheLocation, false);
             string v2FileLocation = SetupTemplateCache(cacheLocation, false);
 
-            var environment = A.Fake<IEnvironment>();
+            var environment = CreateFakeEnvironment();
             var engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(
                 virtualize: true,
                 environment: environment,
@@ -409,7 +409,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             string v1FileLocation = SetupDiscoveryMetadata(cacheLocation, false);
             string v2FileLocation = SetupTemplateCache(cacheLocation, false);
 
-            var environment = A.Fake<IEnvironment>();
+            var environment = CreateFakeEnvironment();
             var engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(
                 virtualize: true,
                 environment: environment,
@@ -448,7 +448,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             string cacheLocation = TestUtils.CreateTemporaryFolder();
             string v2FileLocation = SetupInvalidTemplateCache(cacheLocation);
 
-            var environment = A.Fake<IEnvironment>();
+            var environment = CreateFakeEnvironment();
 
             var engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(hostIdentifier: this.GetType().Name, virtualize: true, environment: environment);
             var templatePackageManager = new TemplatePackageManager(engineEnvironmentSettings);
@@ -610,6 +610,13 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             string targetPath = Path.Combine(fileLocation, "searchCacheV2.json");
             File.WriteAllText(targetPath, toSerialize.ToString());
             return targetPath;
+        }
+
+        private static IEnvironment CreateFakeEnvironment()
+        {
+            var environment = A.Fake<IEnvironment>();
+            A.CallTo(() => environment.UserProfilePath).Returns(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+            return environment;
         }
     }
 }

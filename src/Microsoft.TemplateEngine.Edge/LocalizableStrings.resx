@@ -329,4 +329,7 @@ Details: {1}</value>
 Template cache will be recreated on the next run.</value>
     <comment>{0} should not end with period - period is a part of the format entry.</comment>
   </data>
+  <data name="Environment_Error_UserProfileUndetermined" xml:space="preserve">
+    <value>Unable to determine user profile directory. DOTNET_CLI_HOME, HOME or USERPROFILE environment variables are not defined, the environment is not supported.</value>
+  </data>
 </root>
