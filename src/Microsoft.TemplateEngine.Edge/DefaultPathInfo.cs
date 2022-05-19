@@ -99,8 +99,8 @@ namespace Microsoft.TemplateEngine.Edge
         {
             const string DotnetHomeVariableName = "DOTNET_CLI_HOME";
             string platformHomeVariableName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "USERPROFILE" : "HOME";
-            string? home = environment.GetEnvironmentVariable(DotnetHomeVariableName);
 
+            string? home = environment.GetEnvironmentVariable(DotnetHomeVariableName);
             if (string.IsNullOrEmpty(home))
             {
                 home = environment.GetEnvironmentVariable(platformHomeVariableName);
