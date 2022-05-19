@@ -208,7 +208,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
 
         [Theory]
         [MemberData(nameof(CanEvaluateTemplateToRunData))]
-        internal async Task CanEvaluateTemplateToRun(string command, string templateSet, string? defaultLanguage, string? expectedIdentitiesStr)
+        internal void CanEvaluateTemplateToRun(string command, string templateSet, string? defaultLanguage, string? expectedIdentitiesStr)
         {
             TemplateGroup templateGroup = TemplateGroup.FromTemplateList(
                 CliTemplateInfo.FromTemplateInfo(_testSets[templateSet], A.Fake<IHostSpecificDataLoader>()))
@@ -228,7 +228,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
             NewCommand myCommand = (NewCommand)NewCommandFactory.Create("new", _ => host, _ => new TelemetryLogger(null, false), new NewCommandCallbacks());
             var parseResult = myCommand.Parse($" new {command}");
             InstantiateCommandArgs args = InstantiateCommandArgs.FromNewCommandArgs(new NewCommandArgs(myCommand, parseResult));
-            var templateCommands = await InstantiateCommand.GetTemplateCommandAsync(args, settings, A.Fake<TemplatePackageManager>(), templateGroup, default);
+            var templateCommands = InstantiateCommand.GetTemplateCommand(args, settings, A.Fake<TemplatePackageManager>(), templateGroup);
             Assert.Equal(expectedIdentities.Count(), templateCommands.Count);
             Assert.Equal(expectedIdentities.OrderBy(s => s), templateCommands.Select(templateCommand => templateCommand.Template.Identity).OrderBy(s => s));
         }
@@ -559,7 +559,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
         }
 
         [Theory]
-        [InlineData("foo", AllowRunScripts.Prompt)]
+        [InlineData ("foo", AllowRunScripts.Prompt)]
         [InlineData("foo --allow-scripts prompt", AllowRunScripts.Prompt)]
         [InlineData("foo --allow-scripts Prompt", AllowRunScripts.Prompt)]
         [InlineData("foo --allow-scripts yes", AllowRunScripts.Yes)]
@@ -599,7 +599,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
         [InlineData("ddd")]
         [InlineData("eee")]
         [InlineData("fff")]
-        public async Task AllTemplatesInGroupUseAllShortNamesForResolution(string shortName)
+        public void AllTemplatesInGroupUseAllShortNamesForResolution(string shortName)
         {
             TemplateGroup templateGroup = TemplateGroup.FromTemplateList(
                CliTemplateInfo.FromTemplateInfo(_testSets["MultiShortNameGroup"], A.Fake<IHostSpecificDataLoader>()))
@@ -615,7 +615,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
             NewCommand myCommand = (NewCommand)NewCommandFactory.Create("new", _ => host, _ => new TelemetryLogger(null, false), new NewCommandCallbacks());
             var parseResult = myCommand.Parse($"new {shortName}");
             InstantiateCommandArgs args = InstantiateCommandArgs.FromNewCommandArgs(new NewCommandArgs(myCommand, parseResult));
-            var templateCommands = await InstantiateCommand.GetTemplateCommandAsync(args, settings, A.Fake<TemplatePackageManager>(), templateGroup, default);
+            var templateCommands = InstantiateCommand.GetTemplateCommand(args, settings, A.Fake<TemplatePackageManager>(), templateGroup);
             Assert.Equal(1, templateCommands.Count);
             Assert.Equal("MultiName.Test.High.CSharp", templateCommands.Single().Template.Identity);
         }
@@ -627,7 +627,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
         [InlineData("ddd")]
         [InlineData("eee")]
         [InlineData("fff")]
-        public async Task ExplicitLanguageChoiceIsHonoredWithMultipleShortNames(string shortName)
+        public void ExplicitLanguageChoiceIsHonoredWithMultipleShortNames(string shortName)
         {
             TemplateGroup templateGroup = TemplateGroup.FromTemplateList(
                CliTemplateInfo.FromTemplateInfo(_testSets["MultiShortNameGroup"], A.Fake<IHostSpecificDataLoader>()))
@@ -644,7 +644,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
             string command = $"new {shortName} --language F#";
             var parseResult = myCommand.Parse(command);
             InstantiateCommandArgs args = InstantiateCommandArgs.FromNewCommandArgs(new NewCommandArgs(myCommand, parseResult));
-            var templateCommands = await InstantiateCommand.GetTemplateCommandAsync(args, settings, A.Fake<TemplatePackageManager>(), templateGroup, default);
+            var templateCommands = InstantiateCommand.GetTemplateCommand(args, settings, A.Fake<TemplatePackageManager>(), templateGroup);
             Assert.Equal(1, templateCommands.Count);
             Assert.Equal("Multiname.Test.Only.FSharp", templateCommands.Single().Template.Identity);
 
@@ -657,7 +657,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
         [InlineData("fff", "X", "MultiName.Test.Low.CSharp")] // uses a short name from a different template in the group
         [InlineData("fff", "Y", "Multiname.Test.Only.FSharp")] // uses a short name from the expected invokable template
         [InlineData("eee", "Y", "Multiname.Test.Only.FSharp")] // uses a short name from a different template in the group
-        public async Task ChoiceValueDisambiguatesMatchesWithMultipleShortNames(string name, string fooChoice, string expectedIdentity)
+        public void ChoiceValueDisambiguatesMatchesWithMultipleShortNames(string name, string fooChoice, string expectedIdentity)
         {
             TemplateGroup templateGroup = TemplateGroup.FromTemplateList(
                CliTemplateInfo.FromTemplateInfo(_testSets["MultiShortNameGroup"], A.Fake<IHostSpecificDataLoader>()))
@@ -675,7 +675,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
             string command = $"new {name} --foo {fooChoice}";
             var parseResult = myCommand.Parse($" new {command}");
             InstantiateCommandArgs args = InstantiateCommandArgs.FromNewCommandArgs(new NewCommandArgs(myCommand, parseResult));
-            var templateCommands = await InstantiateCommand.GetTemplateCommandAsync(args, settings, A.Fake<TemplatePackageManager>(), templateGroup, default);
+            var templateCommands = InstantiateCommand.GetTemplateCommand(args, settings, A.Fake<TemplatePackageManager>(), templateGroup);
             Assert.Equal(1, templateCommands.Count);
             Assert.Equal(expectedIdentity, templateCommands.Single().Template.Identity);
         }
@@ -687,7 +687,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
         [InlineData("fff", "LowC", "someValue", "MultiName.Test.Low.CSharp")] // uses a short name from a different template in the group
         [InlineData("fff", "OnlyF", "someValue", "Multiname.Test.Only.FSharp")] // uses a short name from the expected invokable template
         [InlineData("eee", "OnlyF", "someValue", "Multiname.Test.Only.FSharp")] // uses a short name from a different template in the group
-        public async Task ParameterExistenceDisambiguatesMatchesWithMultipleShortNames(string name, string paramName, string paramValue, string expectedIdentity)
+        public void ParameterExistenceDisambiguatesMatchesWithMultipleShortNames(string name, string paramName, string paramValue, string expectedIdentity)
         {
             TemplateGroup templateGroup = TemplateGroup.FromTemplateList(
                CliTemplateInfo.FromTemplateInfo(_testSets["MultiShortNameGroup"], A.Fake<IHostSpecificDataLoader>()))
@@ -705,7 +705,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
             string command = $"new {name} --{paramName} {paramValue}";
             var parseResult = myCommand.Parse($" new {command}");
             InstantiateCommandArgs args = InstantiateCommandArgs.FromNewCommandArgs(new NewCommandArgs(myCommand, parseResult));
-            var templateCommands = await InstantiateCommand.GetTemplateCommandAsync(args, settings, A.Fake<TemplatePackageManager>(), templateGroup, default);
+            var templateCommands = InstantiateCommand.GetTemplateCommand(args, settings, A.Fake<TemplatePackageManager>(), templateGroup);
             Assert.Equal(1, templateCommands.Count);
             Assert.Equal(expectedIdentity, templateCommands.Single().Template.Identity);
         }

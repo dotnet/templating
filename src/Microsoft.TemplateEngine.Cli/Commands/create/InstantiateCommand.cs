@@ -56,16 +56,14 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             return templateGroups.Where(template => template.ShortNames.Contains(instantiateArgs.ShortName));
         }
 
-        internal static async Task<HashSet<TemplateCommand>> GetTemplateCommandAsync(
+        internal static HashSet<TemplateCommand> GetTemplateCommand(
                 InstantiateCommandArgs args,
                 IEngineEnvironmentSettings environmentSettings,
                 TemplatePackageManager templatePackageManager,
-                TemplateGroup templateGroup,
-                CancellationToken cancellationToken)
+                TemplateGroup templateGroup)
         {
-            var allowedTemplates = await templateGroup.GetAllowedTemplatesAsync(new Edge.TemplateConstraintManager(environmentSettings), cancellationToken).ConfigureAwait(false);
             //groups templates in the group by precedence
-            foreach (IGrouping<int, CliTemplateInfo> templateGrouping in allowedTemplates.GroupBy(g => g.Precedence).OrderByDescending(g => g.Key))
+            foreach (IGrouping<int, CliTemplateInfo> templateGrouping in templateGroup.Templates.GroupBy(g => g.Precedence).OrderByDescending(g => g.Key))
             {
                 HashSet<TemplateCommand> candidates = ReparseForTemplate(
                     args,
@@ -266,7 +264,7 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             TemplateGroup templateGroup,
             CancellationToken cancellationToken)
         {
-            HashSet<TemplateCommand> candidates = await GetTemplateCommandAsync(args, environmentSettings, templatePackageManager, templateGroup, cancellationToken).ConfigureAwait(false);
+            HashSet<TemplateCommand> candidates = GetTemplateCommand(args, environmentSettings, templatePackageManager, templateGroup);
             if (candidates.Count == 1)
             {
                 TemplateCommand templateCommandToRun = candidates.Single();

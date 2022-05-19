@@ -33,7 +33,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
 
         [Theory]
         [MemberData(nameof(CanEvaluateTemplateToRunData))]
-        internal async Task Create_CanEvaluateTemplateToRun(string command, string templateSet, string? defaultLanguage, string? expectedIdentitiesStr)
+        internal void Create_CanEvaluateTemplateToRun(string command, string templateSet, string? defaultLanguage, string? expectedIdentitiesStr)
         {
             TemplateGroup templateGroup = TemplateGroup.FromTemplateList(
                 CliTemplateInfo.FromTemplateInfo(_testSets[templateSet], A.Fake<IHostSpecificDataLoader>()))
@@ -54,7 +54,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
             var parseResult = myCommand.Parse($"new create {command}");
             var instantiateCommand = (InstantiateCommand)parseResult.CommandResult.Command;
             var args = new InstantiateCommandArgs(instantiateCommand, parseResult);
-            var templateCommands = await InstantiateCommand.GetTemplateCommandAsync(args, settings, A.Fake<TemplatePackageManager>(), templateGroup, default);
+            var templateCommands = InstantiateCommand.GetTemplateCommand(args, settings, A.Fake<TemplatePackageManager>(), templateGroup);
             Assert.Equal(expectedIdentities.Count(), templateCommands.Count);
             Assert.Equal(expectedIdentities.OrderBy(s => s), templateCommands.Select(templateCommand => templateCommand.Template.Identity).OrderBy(s => s));
         }
@@ -232,7 +232,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
         [Theory]
         [InlineData("create", "createTemplate")]
         [InlineData("list", "listTemplate")]
-        internal async Task Create_CanEvaluateTemplateWithSubcommandShortName(string command, string? expectedIdentitiesStr)
+        internal void Create_CanEvaluateTemplateWithSubcommandShortName(string command, string? expectedIdentitiesStr)
         {
             MockTemplateInfo template = new MockTemplateInfo(command, identity: $"{command}Template");
 
@@ -248,7 +248,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
             var parseResult = myCommand.Parse($"new create {command}");
             var instantiateCommand = (InstantiateCommand)parseResult.CommandResult.Command;
             var args = new InstantiateCommandArgs(instantiateCommand, parseResult);
-            var templateCommands = await InstantiateCommand.GetTemplateCommandAsync(args, settings, A.Fake<TemplatePackageManager>(), templateGroup, default);
+            var templateCommands = InstantiateCommand.GetTemplateCommand(args, settings, A.Fake<TemplatePackageManager>(), templateGroup);
             Assert.Equal(expectedIdentities.Count(), templateCommands.Count);
             Assert.Equal(expectedIdentities.OrderBy(s => s), templateCommands.Select(templateCommand => templateCommand.Template.Identity).OrderBy(s => s));
         }
