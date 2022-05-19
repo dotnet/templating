@@ -340,22 +340,22 @@ Template cache will be recreated on the next run.</value>
     <comment>{0} should not end with period - period is a part of the format entry.</comment>
   </data>
   <data name="WorkloadConstraint_Error_MismatchedProviders" xml:space="preserve">
-    <value>"Multiple 'IWorkloadsInfoProvider' components provided by host. Component {0} provides different workloads then previously injected providers ({1}), therefore WorkloadConstraints cannot be properly initialized."</value>
+    <value>Multiple 'IWorkloadsInfoProvider' components provided by host. Component {0} provides different workloads then previously injected providers ({1}), therefore WorkloadConstraints cannot be properly initialized.</value>
     <comment>{0} is Id of current provider, {1} is list of ids of previous providers</comment>
   </data>
   <data name="WorkloadConstraint_Error_MissingProvider" xml:space="preserve">
-    <value>"No 'IWorkloadsInfoProvider' component provided by host. WorkloadConstraints cannot be properly initialized."</value>
+    <value>No 'IWorkloadsInfoProvider' component provided by host. WorkloadConstraints cannot be properly initialized.</value>
   </data>
   <data name="WorkloadConstraint_Message_Restricted" xml:space="preserve">
     <value>Running template on this host is not supported. It is supported on workload(s): {0}. Currently installed optional workloads: {1}</value>
     <comment>{0} is list of supported workloads. {1} is list of installed optional workloads</comment>
   </data>
   <data name="WorkloadConstraint_Warning_DuplicatedProviders" xml:space="preserve">
-    <value>"Multiple 'IWorkloadsInfoProvider' components provided by host ({0}). All providing same workloads, so proceeding with the first provider."</value>
+    <value>Multiple 'IWorkloadsInfoProvider' components provided by host ({0}). All providing same workloads, so proceeding with the first provider.</value>
     <comment>{0} is the list of ids of all providers</comment>
   </data>
   <data name="WorkloadConstraint_Warning_DuplicateWorkloads" xml:space="preserve">
-    <value>"'IWorkloadsInfoProvider' component provided by host provided some duplicated workloads (duplicates: {0}). Duplicates will be skipped."</value>
+    <value>'IWorkloadsInfoProvider' component provided by host provided some duplicated workloads (duplicates: {0}). Duplicates will be skipped.</value>
     <comment>{0} is the list of duplicates</comment>
   </data>
   <data name="Workload_Message_CTA" xml:space="preserve">

@@ -12,9 +12,9 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Edge.Constraints
 {
-    internal static class ConstraintsHelper
+    internal static class ConstraintsExtensions
     {
-        public static IEnumerable<string> ParseConstraintStrings(this string? args)
+        public static IEnumerable<string> ParseArrayOfConstraintStrings(this string? args)
         {
             JToken token = ParseConstraintJToken(args);
 
@@ -36,7 +36,7 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
             });
         }
 
-        public static IEnumerable<JObject> ParseConstraintJObjects(this string? args)
+        public static IEnumerable<JObject> ParseArrayOfConstraintJObjects(this string? args)
         {
             JToken token = ParseConstraintJToken(args);
             JArray array = token.ToConstraintsJArray(args, false);

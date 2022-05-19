@@ -333,13 +333,13 @@ Template cache will be recreated on the next run.</source>
         <note>{0} should not end with period - period is a part of the format entry.</note>
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Error_MismatchedProviders">
-        <source>"Multiple 'IWorkloadsInfoProvider' components provided by host. Component {0} provides different workloads then previously injected providers ({1}), therefore WorkloadConstraints cannot be properly initialized."</source>
-        <target state="new">"Multiple 'IWorkloadsInfoProvider' components provided by host. Component {0} provides different workloads then previously injected providers ({1}), therefore WorkloadConstraints cannot be properly initialized."</target>
+        <source>Multiple 'IWorkloadsInfoProvider' components provided by host. Component {0} provides different workloads then previously injected providers ({1}), therefore WorkloadConstraints cannot be properly initialized.</source>
+        <target state="new">Multiple 'IWorkloadsInfoProvider' components provided by host. Component {0} provides different workloads then previously injected providers ({1}), therefore WorkloadConstraints cannot be properly initialized.</target>
         <note>{0} is Id of current provider, {1} is list of ids of previous providers</note>
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Error_MissingProvider">
-        <source>"No 'IWorkloadsInfoProvider' component provided by host. WorkloadConstraints cannot be properly initialized."</source>
-        <target state="new">"No 'IWorkloadsInfoProvider' component provided by host. WorkloadConstraints cannot be properly initialized."</target>
+        <source>No 'IWorkloadsInfoProvider' component provided by host. WorkloadConstraints cannot be properly initialized.</source>
+        <target state="new">No 'IWorkloadsInfoProvider' component provided by host. WorkloadConstraints cannot be properly initialized.</target>
         <note />
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Message_Restricted">
@@ -348,13 +348,13 @@ Template cache will be recreated on the next run.</source>
         <note>{0} is list of supported workloads. {1} is list of installed optional workloads</note>
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Warning_DuplicateWorkloads">
-        <source>"'IWorkloadsInfoProvider' component provided by host provided some duplicated workloads (duplicates: {0}). Duplicates will be skipped."</source>
-        <target state="new">"'IWorkloadsInfoProvider' component provided by host provided some duplicated workloads (duplicates: {0}). Duplicates will be skipped."</target>
+        <source>'IWorkloadsInfoProvider' component provided by host provided some duplicated workloads (duplicates: {0}). Duplicates will be skipped.</source>
+        <target state="new">'IWorkloadsInfoProvider' component provided by host provided some duplicated workloads (duplicates: {0}). Duplicates will be skipped.</target>
         <note>{0} is the list of duplicates</note>
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Warning_DuplicatedProviders">
-        <source>"Multiple 'IWorkloadsInfoProvider' components provided by host ({0}). All providing same workloads, so proceeding with the first provider."</source>
-        <target state="new">"Multiple 'IWorkloadsInfoProvider' components provided by host ({0}). All providing same workloads, so proceeding with the first provider."</target>
+        <source>Multiple 'IWorkloadsInfoProvider' components provided by host ({0}). All providing same workloads, so proceeding with the first provider.</source>
+        <target state="new">Multiple 'IWorkloadsInfoProvider' components provided by host ({0}). All providing same workloads, so proceeding with the first provider.</target>
         <note>{0} is the list of ids of all providers</note>
       </trans-unit>
       <trans-unit id="Workload_Message_CTA">

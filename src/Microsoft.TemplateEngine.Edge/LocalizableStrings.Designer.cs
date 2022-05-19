@@ -638,7 +638,7 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &quot;Multiple &apos;IWorkloadsInfoProvider&apos; components provided by host. Component {0} provides different workloads then previously injected providers ({1}), therefore WorkloadConstraints cannot be properly initialized.&quot;.
+        ///   Looks up a localized string similar to Multiple &apos;IWorkloadsInfoProvider&apos; components provided by host. Component {0} provides different workloads then previously injected providers ({1}), therefore WorkloadConstraints cannot be properly initialized..
         /// </summary>
         internal static string WorkloadConstraint_Error_MismatchedProviders {
             get {
@@ -647,7 +647,7 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &quot;No &apos;IWorkloadsInfoProvider&apos; component provided by host. WorkloadConstraints cannot be properly initialized.&quot;.
+        ///   Looks up a localized string similar to No &apos;IWorkloadsInfoProvider&apos; component provided by host. WorkloadConstraints cannot be properly initialized..
         /// </summary>
         internal static string WorkloadConstraint_Error_MissingProvider {
             get {
@@ -665,7 +665,7 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &quot;Multiple &apos;IWorkloadsInfoProvider&apos; components provided by host ({0}). All providing same workloads, so proceeding with the first provider.&quot;.
+        ///   Looks up a localized string similar to Multiple &apos;IWorkloadsInfoProvider&apos; components provided by host ({0}). All providing same workloads, so proceeding with the first provider..
         /// </summary>
         internal static string WorkloadConstraint_Warning_DuplicatedProviders {
             get {
@@ -674,7 +674,7 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &quot;&apos;IWorkloadsInfoProvider&apos; component provided by host provided some duplicated workloads (duplicates: {0}). Duplicates will be skipped.&quot;.
+        ///   Looks up a localized string similar to &apos;IWorkloadsInfoProvider&apos; component provided by host provided some duplicated workloads (duplicates: {0}). Duplicates will be skipped..
         /// </summary>
         internal static string WorkloadConstraint_Warning_DuplicateWorkloads {
             get {

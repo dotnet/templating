@@ -45,7 +45,7 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
 
             protected override TemplateConstraintResult EvaluateInternal(string? args)
             {
-            IEnumerable<OSPlatform> supportedOS = ParseArgs(args);
+                IEnumerable<OSPlatform> supportedOS = ParseArgs(args);
 
                 foreach (OSPlatform platform in supportedOS)
                 {
@@ -64,7 +64,7 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
             {
                 string supportedValues = string.Join(", ", _platformMap.Keys.Select(e => $"'{e}'"));
 
-                return args.ParseConstraintStrings().Select(Parse);
+                return args.ParseArrayOfConstraintStrings().Select(Parse);
 
                 OSPlatform Parse(string arg)
                 {

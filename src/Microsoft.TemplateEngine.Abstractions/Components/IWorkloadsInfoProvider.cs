@@ -1,11 +1,12 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.TemplateEngine.Abstractions.Constraints;
 
-namespace Microsoft.TemplateEngine.Abstractions.Constraints
+namespace Microsoft.TemplateEngine.Abstractions.Components
 {
     /// <summary>
     /// Provider of descriptors of SDK workloads available to particular host (that is usually providing this component).
@@ -13,8 +14,10 @@ namespace Microsoft.TemplateEngine.Abstractions.Constraints
     public interface IWorkloadsInfoProvider : IIdentifiedComponent
     {
         /// <summary>
-        /// Set of installed workloads.
+        /// Fetches set of installed workloads.
         /// </summary>
-        public IEnumerable<WorkloadInfo> InstalledWorkloads { get; }
+        /// <param name="token"></param>
+        /// <returns>Set of installed workloads.</returns>
+        public Task<IEnumerable<WorkloadInfo>> GetInstalledWorkloadsAsync(CancellationToken token);
     }
 }

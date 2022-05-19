@@ -1,15 +1,12 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Microsoft.TemplateEngine.Abstractions.Constraints
+namespace Microsoft.TemplateEngine.Abstractions.Components
 {
     /// <summary>
     /// SDK workload descriptor.
-    /// Analogous to SDK type Microsoft.NET.Sdk.WorkloadManifestReader.WorkloadResolver.WorkloadInfo.
+    /// Analogous to SDK type Microsoft.NET.Sdk.WorkloadManifestReader.WorkloadResolver.WorkloadInfo
+    ///  (https://github.com/dotnet/sdk/blob/main/src/Resolvers/Microsoft.NET.Sdk.WorkloadManifestReader/WorkloadResolver.cs#L645).
     /// </summary>
     public class WorkloadInfo
     {

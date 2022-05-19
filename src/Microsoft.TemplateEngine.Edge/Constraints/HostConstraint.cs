@@ -39,7 +39,7 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
 
             protected override TemplateConstraintResult EvaluateInternal(string? args)
             {
-                IEnumerable<HostInformation> supportedHosts = ParseArgs(args);
+                IReadOnlyList<HostInformation> supportedHosts = ParseArgs(args).ToList();
 
                 //check primary host name first
                 bool primaryHostNameMatch = false;
@@ -80,7 +80,7 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
             {
                 List<HostInformation> hostInformation = new List<HostInformation>();
 
-                foreach (JObject jobj in args.ParseConstraintJObjects())
+                foreach (JObject jobj in args.ParseArrayOfConstraintJObjects())
                 {
                     string? hostName = jobj.ToString("hostname");
                     string? version = jobj.ToString("version");

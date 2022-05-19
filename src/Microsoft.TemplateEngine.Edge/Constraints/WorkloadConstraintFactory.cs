@@ -11,7 +11,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Components;
 using Microsoft.TemplateEngine.Abstractions.Constraints;
+using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Edge.Constraints
@@ -22,10 +24,11 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
 
         public string Type => "workload";
 
-        public Task<ITemplateConstraint> CreateTemplateConstraintAsync(IEngineEnvironmentSettings environmentSettings, CancellationToken cancellationToken)
+        public async Task<ITemplateConstraint> CreateTemplateConstraintAsync(IEngineEnvironmentSettings environmentSettings, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult((ITemplateConstraint)new WorkloadConstraint(environmentSettings, this));
+            // need to await due to lack of covariance on Tasks
+            return await WorkloadConstraint.CreateAsync(environmentSettings, this, cancellationToken).ConfigureAwait(false);
         }
 
         internal class WorkloadConstraint : ConstraintBase
@@ -33,15 +36,24 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
             private readonly HashSet<string> _installedWorkloads;
             private readonly string _installedWorkloadsString;
 
-            internal WorkloadConstraint(IEngineEnvironmentSettings environmentSettings, ITemplateConstraintFactory factory)
+            private WorkloadConstraint(IEngineEnvironmentSettings environmentSettings, ITemplateConstraintFactory factory, IReadOnlyList<WorkloadInfo> workloads)
                 : base(environmentSettings, factory)
             {
-                IReadOnlyList<WorkloadInfo> workloads = ExtractWorkloadInfo(environmentSettings.Components.OfType<IWorkloadsInfoProvider>(), environmentSettings.Host.Logger);
                 _installedWorkloads = new HashSet<string>(workloads.Select(w => w.Id), StringComparer.InvariantCultureIgnoreCase);
                 _installedWorkloadsString = workloads.Select(w => $"{w.Id} \"{w.Description}\"").ToCsvString();
             }
 
             public override string DisplayName => "Workload";
+
+            internal static async Task<WorkloadConstraint> CreateAsync(IEngineEnvironmentSettings environmentSettings, ITemplateConstraintFactory factory, CancellationToken cancellationToken)
+            {
+                IReadOnlyList<WorkloadInfo> workloads =
+                    await ExtractWorkloadInfoAsync(
+                        environmentSettings.Components.OfType<IWorkloadsInfoProvider>(),
+                        environmentSettings.Host.Logger,
+                        cancellationToken).ConfigureAwait(false);
+                return new WorkloadConstraint(environmentSettings, factory, workloads);
+            }
 
             protected override TemplateConstraintResult EvaluateInternal(string? args)
             {
@@ -68,19 +80,21 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
             // "args": [ "maui-mobile", "maui-desktop" ] // any of workloads expected
             private static IEnumerable<string> ParseArgs(string? args)
             {
-                return args.ParseConstraintStrings();
+                return args.ParseArrayOfConstraintStrings();
             }
 
-            private static IReadOnlyList<WorkloadInfo> ExtractWorkloadInfo(IEnumerable<IWorkloadsInfoProvider> workloadsInfoProviders, ILogger logger)
+            private static async Task<IReadOnlyList<WorkloadInfo>> ExtractWorkloadInfoAsync(IEnumerable<IWorkloadsInfoProvider> workloadsInfoProviders, ILogger logger, CancellationToken token)
             {
                 List<WorkloadInfo>? workloads = null;
                 List<Guid> previousComponentsGuids = new List<Guid>();
 
                 foreach (IWorkloadsInfoProvider workloadsInfoProvider in workloadsInfoProviders)
                 {
+                    token.ThrowIfCancellationRequested();
+                    IEnumerable<WorkloadInfo> currentProviderWorkloads = await workloadsInfoProvider.GetInstalledWorkloadsAsync(token).ConfigureAwait(false);
                     if (workloads == null)
                     {
-                        workloads = workloadsInfoProvider.InstalledWorkloads.ToList();
+                        workloads = currentProviderWorkloads.ToList();
                     }
                     else
                     {
@@ -88,7 +102,7 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
                             !workloads
                                 .Select(w => w.Id)
                                 .OrderBy(id => id)
-                                .SequenceEqual(workloadsInfoProvider.InstalledWorkloads.Select(w => w.Id).OrderBy(id => id))
+                                .SequenceEqual(currentProviderWorkloads.Select(w => w.Id).OrderBy(id => id))
                             )
                         {
                             throw new ConfigurationException(string.Format(
