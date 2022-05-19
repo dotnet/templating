@@ -42,7 +42,8 @@ namespace Microsoft.TemplateEngine.Mocks
 
         public string GetEnvironmentVariable(string name)
         {
-            return _environmentVariables[name];
+            _environmentVariables.TryGetValue(name, out string result);
+            return result;
         }
 
         public IReadOnlyDictionary<string, string> GetEnvironmentVariables()

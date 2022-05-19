@@ -14,6 +14,44 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 {
     public class PathInfoTests
     {
+        [Theory]
+        [InlineData (false, false)]
+        [InlineData (false, true)]
+        [InlineData (true, false)]
+        [InlineData (true, true)]
+        public void UserProfileEnvironment(bool useHome, bool useDotnetCliHome)
+        {
+            var environment = A.Fake<IEnvironment>();
+            string testDotnetCliHomePath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "C:\\users\\user1" : "/home/path1";
+            string testHomePath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "C:\\users\\user2" : "/home/path2";
+
+            A.CallTo(() => environment.GetEnvironmentVariable("DOTNET_CLI_HOME")).Returns(useDotnetCliHome ? testDotnetCliHomePath : null);
+            A.CallTo(() => environment.GetEnvironmentVariable("HOME")).Returns(useHome ? testHomePath : null);
+            A.CallTo(() => environment.GetEnvironmentVariable("USERPROFILE")).Returns(useHome ? testHomePath : null);
+
+            var host = A.Fake<ITemplateEngineHost>();
+            A.CallTo(() => host.HostIdentifier).Returns("hostID");
+            A.CallTo(() => host.Version).Returns("1.0.0");
+
+            DefaultPathInfo pathInfo = new DefaultPathInfo(environment, host);
+
+            Assert.NotNull(pathInfo.UserProfileDir);
+
+            if (useDotnetCliHome)
+            {
+                Assert.Equal(testDotnetCliHomePath, pathInfo.UserProfileDir);
+            }
+            else if (useHome)
+            {
+               Assert.Equal(testHomePath, pathInfo.UserProfileDir);
+            }
+            else
+            {
+                Assert.NotEqual(testHomePath, pathInfo.UserProfileDir);
+                Assert.NotEqual(testDotnetCliHomePath, pathInfo.UserProfileDir);
+            }
+        }
+
         [Fact]
         public void DefaultLocationTest()
         {

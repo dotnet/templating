@@ -97,9 +97,25 @@ namespace Microsoft.TemplateEngine.Edge
 
         private static string GetUserProfileDir (IEnvironment environment)
         {
-            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            return environment.GetEnvironmentVariable(isWindows ? "USERPROFILE" : "HOME")
-                ?? throw new NotSupportedException("HOME or USERPROFILE environment variable is not defined, the environment is not supported");
+            const string DotnetHomeVariableName = "DOTNET_CLI_HOME";
+            string platformHomeVariableName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "USERPROFILE" : "HOME";
+            string? home = environment.GetEnvironmentVariable(DotnetHomeVariableName);
+
+            if (string.IsNullOrEmpty(home))
+            {
+                home = environment.GetEnvironmentVariable(platformHomeVariableName);
+                if (string.IsNullOrEmpty(home))
+                {
+                    home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                    if (string.IsNullOrEmpty(home))
+                    {
+                        throw new NotSupportedException(
+                            "Unable to determine user profile directory. DOTNET_CLI_HOME, HOME or USERPROFILE environment variables are not defined, the environment is not supported.");
+                    }
+                }
+            }
+
+            return home!;
         }
 
         private static string GetDefaultGlobalSettingsDir (string userDir)
