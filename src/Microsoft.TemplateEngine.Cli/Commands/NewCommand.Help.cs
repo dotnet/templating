@@ -22,6 +22,8 @@ namespace Microsoft.TemplateEngine.Cli.Commands
                 IEngineEnvironmentSettings environmentSettings = CreateEnvironmentSettings(args, context.ParseResult);
                 InstantiateCommandArgs instantiateCommandArgs = InstantiateCommandArgs.FromNewCommandArgs(args);
                 InstantiateCommand.WriteHelp(context, instantiateCommandArgs, environmentSettings);
+                // Through disposing LoggerFactory ensure logs from different logger instances to output
+                environmentSettings.Host.LoggerFactory?.Dispose();
             };
         }
     }

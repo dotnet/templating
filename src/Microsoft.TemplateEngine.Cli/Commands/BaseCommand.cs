@@ -138,6 +138,11 @@ namespace Microsoft.TemplateEngine.Cli.Commands
                 }
                 return 1;
             }
+            finally
+            {
+                // Through disposing LoggerFactory ensure logs from different logger instances to output
+                environmentSettings.Host.LoggerFactory?.Dispose();
+            }
         }
 
         public int Invoke(InvocationContext context) => InvokeAsync(context).GetAwaiter().GetResult();
