@@ -73,5 +73,43 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
             
         }
 
+        [Fact]
+        public async Task Constraints_WhenTheTemplateIsAllowed()
+        {
+            var template = new MockTemplateInfo(shortName: "test", identity: "testId1").WithConstraints(new TemplateConstraintInfo("test", "yes"));
+
+            ITemplateEngineHost host = TestHost.GetVirtualHost(additionalComponents: new[] { (typeof(ITemplateConstraintFactory), (IIdentifiedComponent)new TestConstraintFactory("test")) });
+            IEngineEnvironmentSettings settings = new EngineEnvironmentSettings(host, virtualizeSettings: true);
+
+            var templateConstraintManager = new TemplateConstraintManager(settings);
+
+            Assert.Empty(await TemplateCommand.ValidateConsratintsAsync(templateConstraintManager, template, default).ConfigureAwait(false));
+        }
+
+        [Fact]
+        public async Task Constraints_WhenTheTemplateIsRestricted()
+        {
+            var template = new MockTemplateInfo(shortName: "test").WithConstraints(new TemplateConstraintInfo("test", "no"));
+
+            ITemplateEngineHost host = TestHost.GetVirtualHost(additionalComponents: new[] { (typeof(ITemplateConstraintFactory), (IIdentifiedComponent)new TestConstraintFactory("test")) });
+            IEngineEnvironmentSettings settings = new EngineEnvironmentSettings(host, virtualizeSettings: true);
+
+            var templateConstraintManager = new TemplateConstraintManager(settings);
+
+            Assert.NotEmpty(await TemplateCommand.ValidateConsratintsAsync(templateConstraintManager, template, default).ConfigureAwait(false));
+        }
+
+        [Fact]
+        public async Task Constraints_WhenTheConstraintCannotBeEvaluated()
+        {
+            var template = new MockTemplateInfo(shortName: "test").WithConstraints(new TemplateConstraintInfo("test", "bad-arg"));
+            ITemplateEngineHost host = TestHost.GetVirtualHost(additionalComponents: new[] { (typeof(ITemplateConstraintFactory), (IIdentifiedComponent)new TestConstraintFactory("test")) });
+            IEngineEnvironmentSettings settings = new EngineEnvironmentSettings(host, virtualizeSettings: true);
+
+            var templateConstraintManager = new TemplateConstraintManager(settings);
+
+            Assert.NotEmpty(await TemplateCommand.ValidateConsratintsAsync(templateConstraintManager, template, default).ConfigureAwait(false));
+        }
+
     }
 }
