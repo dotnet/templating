@@ -30,13 +30,15 @@ namespace Microsoft.TemplateEngine.Edge
         /// <param name="pathInfo">implememtation of <see cref="IPathInfo"/> to use. If not specified, <see cref="DefaultPathInfo"/> will be used (if <paramref name="settingsLocation"/> is used, settings location will be overriden as mentioned in <paramref name="settingsLocation"/> description). <br/>
         /// If <paramref name="pathInfo"/> is specified, do not provide <paramref name="settingsLocation"/>.
         /// </param>
+        /// <param name="userProfilePath">Optional path to user's home directory.</param>
         public EngineEnvironmentSettings(
             ITemplateEngineHost host,
             bool virtualizeSettings = false,
             string? settingsLocation = null,
             IEnvironment? environment = null,
             IComponentManager? componentManager = null,
-            IPathInfo? pathInfo = null)
+            IPathInfo? pathInfo = null,
+            string? userProfilePath = null)
         {
             if (pathInfo != null && !string.IsNullOrWhiteSpace(settingsLocation))
             {
@@ -45,7 +47,7 @@ namespace Microsoft.TemplateEngine.Edge
 
             Host = host ?? throw new ArgumentNullException(nameof(host));
             Environment = environment ?? new DefaultEnvironment();
-            Paths = pathInfo ?? new DefaultPathInfo(this, settingsLocation);
+            Paths = pathInfo ?? new DefaultPathInfo(this, settingsLocation, userProfilePath);
             if (virtualizeSettings)
             {
                 Host.VirtualizeDirectory(Paths.GlobalSettingsDir);

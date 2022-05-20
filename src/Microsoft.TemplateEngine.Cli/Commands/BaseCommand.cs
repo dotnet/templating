@@ -47,11 +47,14 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             //it's kept private so it is not reused for any other purpose except initializing host
             //for template instantiaton it has to be reparsed
             string? outputPath = ParseOutputOption(parseResult);
+            CliEnvironment cliEnvironment = new();
+
             IEngineEnvironmentSettings environmentSettings = new EngineEnvironmentSettings(
                 new CliTemplateEngineHost(_hostBuilder(parseResult), outputPath),
                 settingsLocation: args.DebugCustomSettingsLocation,
                 virtualizeSettings: args.DebugVirtualizeSettings,
-                environment: new CliEnvironment());
+                environment: cliEnvironment,
+                userProfilePath: cliEnvironment.GetEnvironmentVariable("DOTNET_CLI_HOME"));
             return environmentSettings;
         }
 

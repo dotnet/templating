@@ -39,13 +39,20 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             A.CallTo(() => host.HostIdentifier).Returns("hostID");
             A.CallTo(() => host.Version).Returns("1.0.0");
 
+            var envSettings = A.Fake<IEngineEnvironmentSettings>();
+            A.CallTo(() => envSettings.Host).Returns(host);
+            A.CallTo(() => envSettings.Environment).Returns(environment);
+
             if (!useHome && !useDotnetCliHome && !useUserProfilePath)
             {
-                Assert.Throws<NotSupportedException>(() => new DefaultPathInfo(environment, host));
+                Assert.Throws<NotSupportedException>(() => new DefaultPathInfo(envSettings, settingsLocation: null, userProfilePath: null));
                 return;
             }
 
-            DefaultPathInfo pathInfo = new DefaultPathInfo(environment, host);
+            DefaultPathInfo pathInfo = new DefaultPathInfo(
+                envSettings,
+                settingsLocation: null,
+                userProfilePath: useDotnetCliHome ? environment.GetEnvironmentVariable("DOTNET_CLI_HOME") : null);
 
             Assert.NotNull(pathInfo.UserProfileDir);
 

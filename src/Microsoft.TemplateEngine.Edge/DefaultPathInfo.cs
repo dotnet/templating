@@ -42,7 +42,7 @@ namespace Microsoft.TemplateEngine.Edge
             string? hostSettingsDir = null,
             string? hostVersionSettingsDir = null)
         {
-            UserProfileDir = GetUserProfileDir(environment);
+            UserProfileDir = GetUserProfileDir(environment, null);
 
             if (string.IsNullOrWhiteSpace(globalSettingsDir))
             {
@@ -65,9 +65,10 @@ namespace Microsoft.TemplateEngine.Edge
 
         internal DefaultPathInfo(
             IEngineEnvironmentSettings engineEnvironmentSettings,
-            string? settingsLocation)
+            string? settingsLocation,
+            string? userProfilePath = null)
         {
-            UserProfileDir = GetUserProfileDir(engineEnvironmentSettings.Environment);
+            UserProfileDir = GetUserProfileDir(engineEnvironmentSettings.Environment, userProfilePath);
 
             GlobalSettingsDir = string.IsNullOrWhiteSpace(settingsLocation) ? GetDefaultGlobalSettingsDir(UserProfileDir) : settingsLocation!;
             HostSettingsDir = GetDefaultHostSettingsDir(engineEnvironmentSettings.Host, globalDir: GlobalSettingsDir);
@@ -95,12 +96,11 @@ namespace Microsoft.TemplateEngine.Edge
         /// </summary>
         public string HostVersionSettingsDir { get; }
 
-        private static string GetUserProfileDir (IEnvironment environment)
+        private static string GetUserProfileDir (IEnvironment environment, string? optionalUserProfilePath)
         {
-            const string DotnetHomeVariableName = "DOTNET_CLI_HOME";
             string platformHomeVariableName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "USERPROFILE" : "HOME";
 
-            string? home = environment.GetEnvironmentVariable(DotnetHomeVariableName);
+            string? home = optionalUserProfilePath;
             if (string.IsNullOrEmpty(home))
             {
                 home = environment.GetEnvironmentVariable(platformHomeVariableName);
