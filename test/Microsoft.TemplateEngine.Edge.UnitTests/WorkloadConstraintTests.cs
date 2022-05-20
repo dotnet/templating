@@ -42,16 +42,16 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             };
 
             var configModel = SimpleConfigModel.FromJObject(JObject.FromObject(config));
-            IWorkloadsInfoProvider workloadInfoProvider = A.Fake<IWorkloadsInfoProvider>();
+            IWorkloadsInfoProvider workloadInfoProvider = new WorkloadsInfoProviderMock(workloads); //A.Fake<IWorkloadsInfoProvider>();
             IEngineEnvironmentSettings settings = A.Fake<IEngineEnvironmentSettings>();
             A.CallTo(() => settings.Components.OfType<IWorkloadsInfoProvider>()).Returns(new[] { workloadInfoProvider });
             A.CallTo(() => settings.Components.OfType<ITemplateConstraintFactory>()).Returns(new[] { new WorkloadConstraintFactory() });
 
             var constraintManager = new TemplateConstraintManager(settings);
 
-            A.CallTo(() => workloadInfoProvider
-                .GetInstalledWorkloadsAsync(A<CancellationToken>._))
-                .Returns(Task.FromResult(workloads.Select(s => new WorkloadInfo(s, $"D:{s}"))));
+            //A.CallTo(() => workloadInfoProvider
+            //    .GetInstalledWorkloadsAsync(A<CancellationToken>._))
+            //    .Returns(Task.FromResult(workloads.Select(s => new WorkloadInfo(s, $"D:{s}"))));
 
             var evaluateResult = await constraintManager.EvaluateConstraintAsync(configModel.Constraints.Single().Type, configModel.Constraints.Single().Args, default).ConfigureAwait(false);
             Assert.Equal(allowed ? TemplateConstraintResult.Status.Allowed : TemplateConstraintResult.Status.Restricted, evaluateResult.EvaluationStatus);
@@ -136,10 +136,21 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             var constraintManager = new TemplateConstraintManager(settings);
 
             var evaluateResult = await constraintManager.EvaluateConstraintAsync(configModel.Constraints.Single().Type, configModel.Constraints.Single().Args, default).ConfigureAwait(false);
-            Assert.Equal(TemplateConstraintResult.Status.Allowed, evaluateResult.EvaluationStatus);
-            Assert.Equal(1, messagesCollection.Count(t => t.Item1 >= LogLevel.Warning));
-            Assert.Equal(LogLevel.Warning, messagesCollection.First(t => t.Item1 >= LogLevel.Warning).Item1);
-            Assert.StartsWith("Multiple 'IWorkloadsInfoProvider' components provided by host", messagesCollection.First(t => t.Item1 >= LogLevel.Warning).Item2);
+            Assert.Equal(TemplateConstraintResult.Status.NotEvaluated, evaluateResult.EvaluationStatus);
+            Assert.Equal(0, messagesCollection.Count(t => t.Item1 >= LogLevel.Warning));
+            Assert.StartsWith("The constraint 'workload' failed to initialize", evaluateResult.LocalizedErrorMessage);
+        }
+
+        // This is a workaround in a weird bug with FakeItEasy - more details in SdkVersionConstraintTests.cs
+        private class WorkloadsInfoProviderMock : IWorkloadsInfoProvider
+        {
+            private readonly IEnumerable<WorkloadInfo> _res;
+
+            public WorkloadsInfoProviderMock(IEnumerable<string> res) => _res = res.Select(s => new WorkloadInfo(s, $"D:{s}"));
+
+            public Guid Id { get; }
+
+            public Task<IEnumerable<WorkloadInfo>> GetInstalledWorkloadsAsync(CancellationToken token) => Task.FromResult(_res);
         }
     }
 }

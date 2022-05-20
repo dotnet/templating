@@ -32,7 +32,8 @@ Microsoft.TemplateEngine.Abstractions.ITemplateParameter.AllowMultipleValues.get
 Microsoft.TemplateEngine.Abstractions.ITemplateInfo.Constraints.get -> System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Abstractions.Constraints.TemplateConstraintInfo!>!
 Microsoft.TemplateEngine.Abstractions.ITemplateInfo.PostActions.get -> System.Collections.Generic.IReadOnlyList<System.Guid>!
 Microsoft.TemplateEngine.Abstractions.TemplatePackage.IManagedTemplatePackage.IsLocalPackage.get -> bool
-~Microsoft.TemplateEngine.Abstractions.Components.ISdkInfoProvider.GetVersionAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<string>
+~Microsoft.TemplateEngine.Abstractions.Components.ISdkInfoProvider.GetCurrentVersionAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<string>
+~Microsoft.TemplateEngine.Abstractions.Components.ISdkInfoProvider.GetInstalledVersionsAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<string>>
 ~Microsoft.TemplateEngine.Abstractions.Components.IWorkloadsInfoProvider.GetInstalledWorkloadsAsync(System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Microsoft.TemplateEngine.Abstractions.Components.WorkloadInfo>>
 ~Microsoft.TemplateEngine.Abstractions.Components.WorkloadInfo.Description.get -> string
 ~Microsoft.TemplateEngine.Abstractions.Components.WorkloadInfo.Id.get -> string

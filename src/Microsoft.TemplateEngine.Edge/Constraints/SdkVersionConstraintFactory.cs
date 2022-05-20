@@ -16,13 +16,13 @@ using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Edge.Constraints
 {
-    internal class SdkVersionConstraintFactory : ITemplateConstraintFactory
+    public class SdkVersionConstraintFactory : ITemplateConstraintFactory
     {
-        public Guid Id { get; } = Guid.Parse("{4E9721EF-0C02-4C09-A5A4-56C3D29BFC8E}");
+        Guid IIdentifiedComponent.Id { get; } = Guid.Parse("{4E9721EF-0C02-4C09-A5A4-56C3D29BFC8E}");
 
-        public string Type => "sdk-version";
+        string ITemplateConstraintFactory.Type => "sdk-version";
 
-        public async Task<ITemplateConstraint> CreateTemplateConstraintAsync(IEngineEnvironmentSettings environmentSettings, CancellationToken cancellationToken)
+        async Task<ITemplateConstraint> ITemplateConstraintFactory.CreateTemplateConstraintAsync(IEngineEnvironmentSettings environmentSettings, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             // need to await due to lack of covariance on Tasks
@@ -31,24 +31,29 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
 
         internal class SdkVersionConstraint : ConstraintBase
         {
-            private readonly NuGetVersionSpecification _installedSdkVersion;
+            private readonly NuGetVersionSpecification _currentSdkVersion;
+            private readonly IReadOnlyList<NuGetVersionSpecification> _installedSdkVersion;
 
-            private SdkVersionConstraint(IEngineEnvironmentSettings environmentSettings, ITemplateConstraintFactory factory, NuGetVersionSpecification installedSdkVersion)
+            private SdkVersionConstraint(
+                IEngineEnvironmentSettings environmentSettings,
+                ITemplateConstraintFactory factory,
+                NuGetVersionSpecification currentSdkVersion,
+                IEnumerable<NuGetVersionSpecification> installedSdkVersions)
                 : base(environmentSettings, factory)
             {
-                _installedSdkVersion = installedSdkVersion;
+                _currentSdkVersion = currentSdkVersion;
+                _installedSdkVersion = installedSdkVersions.ToList();
             }
 
             public override string DisplayName => ".NET SDK version";
 
             internal static async Task<SdkVersionConstraint> CreateAsync(IEngineEnvironmentSettings environmentSettings, ITemplateConstraintFactory factory, CancellationToken cancellationToken)
             {
-                NuGetVersionSpecification installedSdkVersion =
+                var versions =
                     await ExtractInstalledSdkVersionAsync(
                         environmentSettings.Components.OfType<ISdkInfoProvider>(),
-                        environmentSettings.Host.Logger,
                         cancellationToken).ConfigureAwait(false);
-                return new SdkVersionConstraint(environmentSettings, factory, installedSdkVersion);
+                return new SdkVersionConstraint(environmentSettings, factory, versions.Item1, versions.Item2);
             }
 
             protected override TemplateConstraintResult EvaluateInternal(string? args)
@@ -57,15 +62,27 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
 
                 foreach (IVersionSpecification supportedSdk in supportedSdks)
                 {
-                    if (supportedSdk.CheckIfVersionIsValid(_installedSdkVersion.ToString()))
+                    if (supportedSdk.CheckIfVersionIsValid(_currentSdkVersion.ToString()))
                     {
                         return TemplateConstraintResult.CreateAllowed(Type);
                     }
                 }
 
+                string cta = LocalizableStrings.SdkConstraint_Message_InstallSdk;
+
+                string viableInstalledVersionsCsv = _installedSdkVersion.Where(installed =>
+                        supportedSdks.Any(supported => supported.CheckIfVersionIsValid(installed.ToString())))
+                    .ToCsvString();
+
+                if (!string.IsNullOrEmpty(viableInstalledVersionsCsv))
+                {
+                    cta = string.Format(LocalizableStrings.SdkConstraint_Message_SwitchSdk, viableInstalledVersionsCsv);
+                }
+
                 return TemplateConstraintResult.CreateRestricted(
                     Type,
-                    string.Format(LocalizableStrings.SdkConstraint_Message_Restricted, _installedSdkVersion.ToString(), supportedSdks.ToCsvString()));
+                    string.Format(LocalizableStrings.SdkConstraint_Message_Restricted, _currentSdkVersion.ToString(), supportedSdks.ToCsvString()),
+                    cta);
             }
 
             //supported configuration:
@@ -76,46 +93,39 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
                 return args.ParseArrayOfConstraintStrings().Select(ConstraintsExtensions.ParseVersionSpecification);
             }
 
-            private static async Task<NuGetVersionSpecification> ExtractInstalledSdkVersionAsync(IEnumerable<ISdkInfoProvider> sdkInfoProviders, ILogger logger, CancellationToken cancellationToken)
+            private static async Task<(NuGetVersionSpecification, IEnumerable<NuGetVersionSpecification>)> ExtractInstalledSdkVersionAsync(IEnumerable<ISdkInfoProvider> sdkInfoProviders, CancellationToken cancellationToken)
             {
-                NuGetVersionSpecification? installedSdkVersion = null;
-                List<Guid> previousComponentsGuids = new List<Guid>();
+                List<ISdkInfoProvider> providers = sdkInfoProviders.ToList();
 
-                foreach (ISdkInfoProvider sdkInfoProvider in sdkInfoProviders)
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    string version = await sdkInfoProvider.GetVersionAsync(cancellationToken).ConfigureAwait(false);
-                    if (installedSdkVersion == null)
-                    {
-                        if (!NuGetVersionSpecification.TryParse(version, out installedSdkVersion))
-                        {
-                            throw new ConfigurationException(string.Format(LocalizableStrings.SdkConstraint_Error_InvalidVersion, version));
-                        }
-                    }
-                    else if (!installedSdkVersion.CheckIfVersionIsValid(version))
-                    {
-                        throw new ConfigurationException(string.Format(
-                            LocalizableStrings.SdkConstraint_Error_MismatchedProviders,
-                            sdkInfoProvider.Id,
-                            version,
-                            previousComponentsGuids.ToCsvString(),
-                            installedSdkVersion));
-                    }
-
-                    previousComponentsGuids.Add(sdkInfoProvider.Id);
-                }
-
-                if (previousComponentsGuids.Count > 1)
-                {
-                    logger.LogWarning(LocalizableStrings.SdkConstraint_Warning_DuplicatedProviders, previousComponentsGuids.ToCsvString());
-                }
-
-                if (previousComponentsGuids.Count == 0)
+                if (providers.Count == 0)
                 {
                     throw new ConfigurationException(LocalizableStrings.SdkConstraint_Error_MissingProvider);
                 }
 
-                return installedSdkVersion!;
+                if (providers.Count > 1)
+                {
+                    throw new ConfigurationException(
+                        string.Format(LocalizableStrings.SdkConstraint_Error_MismatchedProviders, providers.Select(p => p.Id).ToCsvString()));
+                }
+
+                cancellationToken.ThrowIfCancellationRequested();
+                string version = await providers[0].GetCurrentVersionAsync(cancellationToken).ConfigureAwait(false);
+                NuGetVersionSpecification currentSdkVersion = ParseVersion(version);
+
+                cancellationToken.ThrowIfCancellationRequested();
+                IEnumerable<NuGetVersionSpecification> versions = (await providers[0].GetInstalledVersionsAsync(cancellationToken).ConfigureAwait(false)).Select(ParseVersion);
+
+                return (currentSdkVersion, versions);
+            }
+
+            private static NuGetVersionSpecification ParseVersion(string version)
+            {
+                if (!NuGetVersionSpecification.TryParse(version, out NuGetVersionSpecification? sdkVersion))
+                {
+                    throw new ConfigurationException(string.Format(LocalizableStrings.SdkConstraint_Error_InvalidVersion, version));
+                }
+
+                return sdkVersion!;
             }
         }
     }

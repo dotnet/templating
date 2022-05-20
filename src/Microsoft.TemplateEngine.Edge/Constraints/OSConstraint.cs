@@ -16,7 +16,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Edge.Constraints
 {
-    internal class OSConstraintFactory : ITemplateConstraintFactory
+    public class OSConstraintFactory : ITemplateConstraintFactory
     {
         private static readonly Dictionary<string, OSPlatform> _platformMap = new Dictionary<string, OSPlatform>(StringComparer.OrdinalIgnoreCase)
         {
@@ -25,11 +25,11 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
             { "OSX",  OSPlatform.OSX }
         };
 
-        public Guid Id { get; } = Guid.Parse("{73DE9788-264A-427B-A26F-2CA3911EE424}");
+        Guid IIdentifiedComponent.Id { get; } = Guid.Parse("{73DE9788-264A-427B-A26F-2CA3911EE424}");
 
-        public string Type => "os";
+        string ITemplateConstraintFactory.Type => "os";
 
-        public Task<ITemplateConstraint> CreateTemplateConstraintAsync(IEngineEnvironmentSettings environmentSettings, CancellationToken cancellationToken)
+        Task<ITemplateConstraint> ITemplateConstraintFactory.CreateTemplateConstraintAsync(IEngineEnvironmentSettings environmentSettings, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             return Task.FromResult((ITemplateConstraint)new OSConstraint(environmentSettings, this));

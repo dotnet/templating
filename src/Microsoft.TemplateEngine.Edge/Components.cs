@@ -35,16 +35,13 @@ namespace Microsoft.TemplateEngine.Edge
                 (typeof(ITemplateConstraintFactory), new SdkVersionConstraintFactory()),
             };
 
-        public static IReadOnlyList<(Type Type, IIdentifiedComponent Instance)> UniversalComponents { get; } =
+        public static IReadOnlyList<(Type Type, IIdentifiedComponent Instance)> RecomendComponents { get; } =
             new (Type Type, IIdentifiedComponent Instance)[]
             {
                 (typeof(IMountPointFactory), new ZipFileMountPointFactory()),
                 (typeof(IMountPointFactory), new FileSystemMountPointFactory()),
                 (typeof(ITemplatePackageProviderFactory), new GlobalSettingsTemplatePackageProviderFactory()),
                 (typeof(IInstallerFactory), new FolderInstallerFactory()),
-                (typeof(IInstallerFactory), new NuGetInstallerFactory()),
-                (typeof(ITemplateConstraintFactory), new OSConstraintFactory()),
-                (typeof(ITemplateConstraintFactory), new HostConstraintFactory()),
             };
     }
 }

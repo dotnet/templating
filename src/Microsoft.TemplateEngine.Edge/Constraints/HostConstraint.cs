@@ -17,13 +17,13 @@ using NuGet.Configuration;
 
 namespace Microsoft.TemplateEngine.Edge.Constraints
 {
-    internal class HostConstraintFactory : ITemplateConstraintFactory
+    public class HostConstraintFactory : ITemplateConstraintFactory
     {
-        public Guid Id { get; } = Guid.Parse("{93721B30-6890-403F-BAE7-5925990865A2}");
+        Guid IIdentifiedComponent.Id { get; } = Guid.Parse("{93721B30-6890-403F-BAE7-5925990865A2}");
 
-        public string Type => "host";
+        string ITemplateConstraintFactory.Type => "host";
 
-        public Task<ITemplateConstraint> CreateTemplateConstraintAsync(IEngineEnvironmentSettings environmentSettings, CancellationToken cancellationToken)
+        Task<ITemplateConstraint> ITemplateConstraintFactory.CreateTemplateConstraintAsync(IEngineEnvironmentSettings environmentSettings, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             return Task.FromResult((ITemplateConstraint)new HostConstraint(environmentSettings, this));

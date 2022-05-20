@@ -18,13 +18,13 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Edge.Constraints
 {
-    internal class WorkloadConstraintFactory : ITemplateConstraintFactory
+    public class WorkloadConstraintFactory : ITemplateConstraintFactory
     {
-        public Guid Id { get; } = Guid.Parse("{F8BA5B13-7BD6-47C8-838C-66626526817B}");
+        Guid IIdentifiedComponent.Id { get; } = Guid.Parse("{F8BA5B13-7BD6-47C8-838C-66626526817B}");
 
-        public string Type => "workload";
+        string ITemplateConstraintFactory.Type => "workload";
 
-        public async Task<ITemplateConstraint> CreateTemplateConstraintAsync(IEngineEnvironmentSettings environmentSettings, CancellationToken cancellationToken)
+        async Task<ITemplateConstraint> ITemplateConstraintFactory.CreateTemplateConstraintAsync(IEngineEnvironmentSettings environmentSettings, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             // need to await due to lack of covariance on Tasks
@@ -85,43 +85,23 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
 
             private static async Task<IReadOnlyList<WorkloadInfo>> ExtractWorkloadInfoAsync(IEnumerable<IWorkloadsInfoProvider> workloadsInfoProviders, ILogger logger, CancellationToken token)
             {
+                List<IWorkloadsInfoProvider> providers = workloadsInfoProviders.ToList();
                 List<WorkloadInfo>? workloads = null;
-                List<Guid> previousComponentsGuids = new List<Guid>();
 
-                foreach (IWorkloadsInfoProvider workloadsInfoProvider in workloadsInfoProviders)
-                {
-                    token.ThrowIfCancellationRequested();
-                    IEnumerable<WorkloadInfo> currentProviderWorkloads = await workloadsInfoProvider.GetInstalledWorkloadsAsync(token).ConfigureAwait(false);
-                    if (workloads == null)
-                    {
-                        workloads = currentProviderWorkloads.ToList();
-                    }
-                    else
-                    {
-                        if (
-                            !workloads
-                                .Select(w => w.Id)
-                                .OrderBy(id => id)
-                                .SequenceEqual(currentProviderWorkloads.Select(w => w.Id).OrderBy(id => id))
-                            )
-                        {
-                            throw new ConfigurationException(string.Format(
-                                LocalizableStrings.WorkloadConstraint_Error_MismatchedProviders, workloadsInfoProvider.Id, previousComponentsGuids.ToCsvString()));
-                        }
-                    }
-
-                    previousComponentsGuids.Add(workloadsInfoProvider.Id);
-                }
-
-                if (previousComponentsGuids.Count > 1)
-                {
-                    logger.LogWarning(LocalizableStrings.WorkloadConstraint_Warning_DuplicatedProviders, previousComponentsGuids.ToCsvString());
-                }
-
-                if (previousComponentsGuids.Count == 0)
+                if (providers.Count == 0)
                 {
                     throw new ConfigurationException(LocalizableStrings.WorkloadConstraint_Error_MissingProvider);
                 }
+
+                if (providers.Count > 1)
+                {
+                    throw new ConfigurationException(
+                        string.Format(LocalizableStrings.WorkloadConstraint_Error_MismatchedProviders, providers.Select(p => p.Id).ToCsvString()));
+                }
+
+                token.ThrowIfCancellationRequested();
+                IEnumerable<WorkloadInfo> currentProviderWorkloads = await providers[0].GetInstalledWorkloadsAsync(token).ConfigureAwait(false);
+                workloads = currentProviderWorkloads.ToList();
 
                 if (workloads!.Select(w => w.Id).HasDuplicities(StringComparer.InvariantCultureIgnoreCase))
                 {
