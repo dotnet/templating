@@ -24,7 +24,7 @@
     <WcwidthSourcesPackageVersion>0.5.0</WcwidthSourcesPackageVersion>
     <!-- Maestro-managed Package Versions - Ordered by repo name -->
     <!-- Dependencies from https://github.com/dotnet/command-line-api -->
-    <SystemCommandLinePackageVersion>2.0.0-beta3.22260.1</SystemCommandLinePackageVersion>
+    <SystemCommandLinePackageVersion>2.0.0-beta4.22272.1</SystemCommandLinePackageVersion>
     <!-- Dependencies from https://github.com/nuget/nuget.client -->
     <NuGetCredentialsPackageVersion>6.2.0-rc.146</NuGetCredentialsPackageVersion>
     <NuGetConfigurationPackageVersion>6.2.0-rc.146</NuGetConfigurationPackageVersion>
