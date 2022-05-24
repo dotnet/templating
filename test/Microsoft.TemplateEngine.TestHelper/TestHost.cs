@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
@@ -12,13 +13,14 @@ using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.TestHelper
 {
-    public class TestHost : ITemplateEngineHost
+    public partial class TestHost : ITemplateEngineHost
     {
         private IPhysicalFileSystem _fileSystem;
         private readonly ILoggerFactory _loggerFactory;
         private readonly ILogger _logger;
         private readonly string _hostIdentifier;
         private readonly string _version;
+        private readonly List<(LogLevel, string)> _messagesCollection = new List<(LogLevel, string)>();
         private IReadOnlyList<(Type, IIdentifiedComponent)> _builtIns;
         private IReadOnlyList<string> _fallbackNames;
 
@@ -28,7 +30,8 @@ namespace Microsoft.TemplateEngine.TestHelper
             bool loadDefaultGenerator = true,
             IReadOnlyList<(Type, IIdentifiedComponent)>? additionalComponents = null,
             IPhysicalFileSystem? fileSystem = null,
-            IReadOnlyList<string>? fallbackNames = null)
+            IReadOnlyList<string>? fallbackNames = null,
+            IEnumerable<ILoggerProvider>? addLoggerProviders = null)
         {
             _hostIdentifier = string.IsNullOrWhiteSpace(hostIdentifier) ? "TestRunner" : hostIdentifier;
             _version = string.IsNullOrWhiteSpace(version) ? "1.0.0" : version;
@@ -47,16 +50,27 @@ namespace Microsoft.TemplateEngine.TestHelper
             _builtIns = builtIns;
             HostParamDefaults = new Dictionary<string, string>();
             _fileSystem = fileSystem ?? new PhysicalFileSystem();
+
             _loggerFactory =
                 Microsoft.Extensions.Logging.LoggerFactory.Create(builder =>
+                {
                     builder
-                        .SetMinimumLevel(LogLevel.Trace)
-                        .AddSimpleConsole(options =>
+                      .SetMinimumLevel(LogLevel.Trace);
+
+                    if (addLoggerProviders?.Any() ?? false)
+                    {
+                        foreach (ILoggerProvider loggerProvider in addLoggerProviders)
+                        {
+                            builder.AddProvider(loggerProvider);
+                        }
+                    }
+                    builder.AddSimpleConsole(options =>
                         {
                             options.SingleLine = true;
                             options.TimestampFormat = "[yyyy-MM-dd HH:mm:ss.fff] ";
                             options.IncludeScopes = true;
-                        }));
+                        });
+                });
             _logger = _loggerFactory.CreateLogger("Test Host");
             _fallbackNames = fallbackNames ?? new[] { "dotnetcli" };
         }

@@ -4,7 +4,16 @@
       <TargetFrameworks Condition="'$(PackSpecific)' == 'true'">$(NETCoreTargetFramework)</TargetFrameworks>
     </PropertyGroup>
     <ItemGroup>
+      <None Remove="xunit.runner.json" />
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="xunit.runner.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+    <ItemGroup>
       <PackageReference Include="Newtonsoft.Json.Schema" />
+      <PackageReference Include="FakeItEasy" />
     </ItemGroup>
 
     <ItemGroup>
@@ -21,10 +30,16 @@
     </ItemGroup>
 
     <ItemGroup>
+      <None Update="SchemaTests\ConstraintsTest.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
       <None Update="SchemaTests\BasicTest.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="SchemaTests\GeneratorTest.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="SchemaTests\MultiValueChoice.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="SchemaTests\PostActionTest.json">

@@ -79,6 +79,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Choice parameter {0} is invalid. It allows multiple values (&apos;AllowMultipleValues=true&apos;), while some of the configured choices contain separator characters ({1}). Invalid choices: {2}.
+        /// </summary>
+        internal static string Authoring_InvalidMultichoiceSymbol {
+            get {
+                return ResourceManager.GetString("Authoring_InvalidMultichoiceSymbol", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Post action(s) with id(s) &apos;{0}&apos; specified in the localization file do not exist in the template.json file. Remove the localized strings from the localization file..
         /// </summary>
         internal static string Authoring_InvalidPostActionLocalizationIndex {
@@ -224,6 +233,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Variable [{0}] already added with value [{1}]. Cannot add it as implicit variable with value of self..
+        /// </summary>
+        internal static string RunnableProjectGenerator_CannotAddImplicitChoice {
+            get {
+                return ResourceManager.GetString("RunnableProjectGenerator_CannotAddImplicitChoice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Template configuration must be a file, but {0} is not a file..
         /// </summary>
         internal static string RunnableProjectGenerator_Exception_ConfigShouldBeFile {
@@ -283,6 +301,24 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         internal static string SimpleConfigModel_AuthoringException_MergeConfiguration_InvalidFileName {
             get {
                 return ResourceManager.GetString("SimpleConfigModel_AuthoringException_MergeConfiguration_InvalidFileName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; should contain objects..
+        /// </summary>
+        internal static string SimpleConfigModel_Error_Constraints_InvalidSyntax {
+            get {
+                return ResourceManager.GetString("SimpleConfigModel_Error_Constraints_InvalidSyntax", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Constraint definition &apos;{0}&apos; does not contain mandatory property &apos;{1}&apos;..
+        /// </summary>
+        internal static string SimpleConfigModel_Error_Constraints_MissingType {
+            get {
+                return ResourceManager.GetString("SimpleConfigModel_Error_Constraints_MissingType", resourceCulture);
             }
         }
     }

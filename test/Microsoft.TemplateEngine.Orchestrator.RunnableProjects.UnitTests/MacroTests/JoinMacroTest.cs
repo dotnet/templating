@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
+using FakeItEasy;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Core.Contracts;
@@ -24,26 +25,31 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
         }
 
         [Theory(DisplayName = nameof(TestJoinConstantAndReferenceSymbolConfig))]
-        [InlineData(",")]
-        [InlineData("")]
-        [InlineData(null)]
-        public void TestJoinConstantAndReferenceSymbolConfig(string separator)
+        [InlineData(",", true)]
+        [InlineData("", true)]
+        [InlineData(null, true)]
+        [InlineData(",", false)]
+        [InlineData("", false)]
+        [InlineData(null, false)]
+        public void TestJoinConstantAndReferenceSymbolConfig(string separator, bool removeEmptyValues)
         {
             string variableName = "joinedParameter";
             string referenceSymbolName = "referenceSymbol";
             string referenceSymbolValue = "referenceValue";
+            string referenceEmptySymbolName = "referenceEmptySymbol";
             string constantValue = "constantValue";
 
             List<KeyValuePair<string, string>> definitions = new List<KeyValuePair<string, string>>
             {
                 new KeyValuePair<string, string>("const", constantValue),
+                new KeyValuePair<string, string>("ref", referenceEmptySymbolName),
                 new KeyValuePair<string, string>("ref", referenceSymbolName)
             };
 
-            JoinMacroConfig macroConfig = new JoinMacroConfig(variableName, null, definitions, separator);
+            JoinMacroConfig macroConfig = new JoinMacroConfig(variableName, null, definitions, separator, removeEmptyValues);
 
             IVariableCollection variables = new VariableCollection();
-            IRunnableProjectConfig config = new SimpleConfigModel(_engineEnvironmentSettings.Host.LoggerFactory);
+            IRunnableProjectConfig config = A.Fake<IRunnableProjectConfig>();
             IParameterSet parameters = new RunnableProjectGenerator.ParameterSet(config);
             ParameterSetter setter = MacroTestHelpers.TestParameterSetter(_engineEnvironmentSettings, parameters);
 
@@ -62,7 +68,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
             Assert.True(parameters.TryGetParameterDefinition(variableName, out ITemplateParameter convertedParam));
 
             string convertedValue = (string)parameters.ResolvedValues[convertedParam];
-            string expectedValue = string.Join(separator, constantValue, referenceSymbolValue);
+            string expectedValue =
+                removeEmptyValues ?
+                string.Join(separator, constantValue, referenceSymbolValue) :
+                string.Join(separator, constantValue, null, referenceSymbolValue);
             Assert.Equal(convertedValue, expectedValue);
         }
 
@@ -89,7 +98,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
             GeneratedSymbolDeferredMacroConfig deferredConfig = new GeneratedSymbolDeferredMacroConfig("JoinMacro", null, variableName, jsonParameters);
 
             IVariableCollection variables = new VariableCollection();
-            IRunnableProjectConfig config = new SimpleConfigModel(_engineEnvironmentSettings.Host.LoggerFactory);
+            IRunnableProjectConfig config = A.Fake<IRunnableProjectConfig>();
             IParameterSet parameters = new RunnableProjectGenerator.ParameterSet(config);
             ParameterSetter setter = MacroTestHelpers.TestParameterSetter(_engineEnvironmentSettings, parameters);
 

@@ -93,6 +93,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             BaselineInfo = template.BaselineInfo;
             ShortNameList = template.ShortNameList;
             PostActions = template.PostActions;
+            Constraints = template.Constraints;
 
             LocaleConfigPlace = localizationInfo?.ConfigPlace;
 
@@ -104,6 +105,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
             if (template.GeneratorId == RunnableProjectGeneratorId && HostConfigPlace != null)
             {
+                logger.LogDebug($"Start loading host config {HostConfigPlace}");
                 try
                 {
                     using (var sr = new StreamReader(template.TemplateSourceRoot.FileInfo(HostConfigPlace).OpenRead()))
@@ -120,6 +122,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                         template.MountPointUri,
                         template.HostConfigPlace);
                 }
+                logger.LogDebug($"End loading host config {HostConfigPlace}");
             }
         }
 
@@ -186,7 +189,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     {
                         tags[tag.Key] = new CacheTag(null, null, new Dictionary<string, ParameterChoice> { { tag.Value, new ParameterChoice(null, null) } }, tag.Value);
                     }
-                    foreach (ITemplateParameter parameter in Parameters.Where(p => p.DataType.Equals("choice", StringComparison.OrdinalIgnoreCase)))
+                    foreach (ITemplateParameter parameter in Parameters.Where(TemplateParameterExtensions.IsChoice))
                     {
                         IReadOnlyDictionary<string, ParameterChoice> choices = parameter.Choices ?? new Dictionary<string, ParameterChoice>();
                         tags[parameter.Name] = new CacheTag(parameter.DisplayName, parameter.Documentation, choices, parameter.DefaultValue);
@@ -206,7 +209,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 if (_cacheParameters == null)
                 {
                     Dictionary<string, ICacheParameter> cacheParameters = new Dictionary<string, ICacheParameter>();
-                    foreach (ITemplateParameter parameter in Parameters.Where(p => !p.DataType.Equals("choice", StringComparison.OrdinalIgnoreCase)))
+                    foreach (ITemplateParameter parameter in Parameters.Where(p => !p.IsChoice()))
                     {
                         cacheParameters[parameter.Name] = new CacheParameter()
                         {
@@ -250,6 +253,9 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         [JsonProperty]
         public IReadOnlyList<Guid> PostActions { get; private set; } = Array.Empty<Guid>();
 
+        [JsonProperty]
+        public IReadOnlyList<TemplateConstraintInfo> Constraints { get; private set; } = Array.Empty<TemplateConstraintInfo>();
+
         public static TemplateInfo FromJObject(JObject entry)
         {
             return TemplateInfoReader.FromJObject(entry);
@@ -259,6 +265,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         {
             //we would like to copy the parameters to format supported for serialization as we cannot be sure that ITemplateInfo supports serialization in needed format.
             List<ITemplateParameter> localizedParameters = new List<ITemplateParameter>();
+
             foreach (ITemplateParameter parameter in template.Parameters)
             {
                 IParameterSymbolLocalizationModel? localization = null;
@@ -298,6 +305,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     datatype: parameter.DataType,
                     priority: parameter.Priority,
                     type: parameter.Type,
+                    allowMultipleValues: parameter.AllowMultipleValues,
                     choices: localizedChoices ?? parameter.Choices);
 
                 localizedParameters.Add(localizedParameter);

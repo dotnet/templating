@@ -150,6 +150,9 @@ namespace Microsoft.TemplateSearch.Common
         [JsonProperty]
         public IReadOnlyList<Guid> PostActions { get; private set; } = Array.Empty<Guid>();
 
+        [JsonIgnore]
+        IReadOnlyList<TemplateConstraintInfo> ITemplateInfo.Constraints => throw new NotImplementedException();
+
         public static BlobStorageTemplateInfo FromJObject(JObject entry)
         {
             string identity = entry.ToString(nameof(Identity))
@@ -340,6 +343,7 @@ namespace Microsoft.TemplateSearch.Common
                 Priority = parameter.Priority;
                 DefaultIfOptionWithoutValue = parameter.DefaultIfOptionWithoutValue;
                 Description = parameter.Description;
+                AllowMultipleValues = parameter.AllowMultipleValues;
             }
 
             internal BlobTemplateParameter(string name, string dataType)
@@ -379,6 +383,7 @@ namespace Microsoft.TemplateSearch.Common
                 Priority = jObject.ToEnum<TemplateParameterPriority>(nameof(Priority));
                 DefaultIfOptionWithoutValue = jObject.ToString(nameof(DefaultIfOptionWithoutValue));
                 Description = jObject.ToString(nameof(Description));
+                AllowMultipleValues = jObject.ToBool(nameof(AllowMultipleValues));
             }
 
             [JsonProperty]
@@ -415,6 +420,9 @@ namespace Microsoft.TemplateSearch.Common
             [Obsolete]
             [JsonIgnore]
             string? ITemplateParameter.Documentation => throw new NotImplementedException();
+
+            [JsonProperty]
+            public bool AllowMultipleValues { get; internal set; }
         }
 
         private class BlobLegacyCacheTag : ICacheTag

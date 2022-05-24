@@ -21,14 +21,14 @@ using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
-    internal class RunnableProjectGenerator : IGenerator
+    internal partial class RunnableProjectGenerator : IGenerator
     {
         internal const string HostTemplateFileConfigBaseName = ".host.json";
         internal const string TemplateConfigDirectoryName = ".template.config";
         internal const string TemplateConfigFileName = "template.json";
         internal const string LocalizationFilePrefix = "templatestrings.";
         internal const string LocalizationFileExtension = ".json";
-        private const string GeneratorVersion = "1.0.0.0";
+        internal const string GeneratorVersion = "1.0.0.0";
         private static readonly Guid GeneratorId = new Guid("0C434DF7-E2CB-4DEE-B216-D7C58C8EB4B3");
 
         public Guid Id => GeneratorId;
@@ -49,10 +49,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             string targetDirectory,
             CancellationToken cancellationToken)
         {
-            RunnableProjectTemplate template = (RunnableProjectTemplate)templateData;
+            RunnableProjectConfig templateConfig = (RunnableProjectConfig)templateData;
             return CreateAsync(
                 environmentSettings,
-                template.Config,
+                templateConfig,
                 templateData.TemplateSourceRoot,
                 parameters,
                 targetDirectory,
@@ -70,7 +70,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             cancellationToken.ThrowIfCancellationRequested();
             ProcessMacros(environmentSettings, runnableProjectConfig.OperationConfig, parameters);
 
-            IVariableCollection variables = VariableCollection.SetupVariables(environmentSettings, parameters, runnableProjectConfig.OperationConfig.VariableSetup);
+            IVariableCollection variables = SetupVariables(environmentSettings, parameters, runnableProjectConfig.OperationConfig.VariableSetup);
             runnableProjectConfig.Evaluate(parameters, variables);
 
             IOrchestrator2 basicOrchestrator = new Core.Util.Orchestrator();
@@ -104,19 +104,19 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             string targetDirectory,
             CancellationToken cancellationToken)
         {
-            RunnableProjectTemplate template = (RunnableProjectTemplate)templateData;
-            ProcessMacros(environmentSettings, template.Config.OperationConfig, parameters);
+            RunnableProjectConfig templateConfig = (RunnableProjectConfig)templateData;
+            ProcessMacros(environmentSettings, templateConfig.OperationConfig, parameters);
 
-            IVariableCollection variables = VariableCollection.SetupVariables(environmentSettings, parameters, template.Config.OperationConfig.VariableSetup);
-            template.Config.Evaluate(parameters, variables);
+            IVariableCollection variables = SetupVariables(environmentSettings, parameters, templateConfig.OperationConfig.VariableSetup);
+            templateConfig.Evaluate(parameters, variables);
 
             IOrchestrator2 basicOrchestrator = new Core.Util.Orchestrator();
             RunnableProjectOrchestrator orchestrator = new RunnableProjectOrchestrator(basicOrchestrator);
 
-            GlobalRunSpec runSpec = new GlobalRunSpec(templateData.TemplateSourceRoot, environmentSettings.Components, parameters, variables, template.Config.OperationConfig, template.Config.SpecialOperationConfig, template.Config.IgnoreFileNames);
+            GlobalRunSpec runSpec = new GlobalRunSpec(templateData.TemplateSourceRoot, environmentSettings.Components, parameters, variables, templateConfig.OperationConfig, templateConfig.SpecialOperationConfig, templateConfig.IgnoreFileNames);
             List<IFileChange2> changes = new List<IFileChange2>();
 
-            foreach (FileSourceMatchInfo source in template.Config.Sources)
+            foreach (FileSourceMatchInfo source in templateConfig.Sources)
             {
                 runSpec.SetupFileSource(source);
                 string target = Path.Combine(targetDirectory, source.Target);
@@ -136,13 +136,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 #pragma warning restore CS0618 // Type or member is obsolete
             }
 
-            return Task.FromResult((ICreationEffects)new CreationEffects2(changes, GetCreationResult(environmentSettings, template.Config, variables)));
+            return Task.FromResult((ICreationEffects)new CreationEffects2(changes, GetCreationResult(environmentSettings, templateConfig, variables)));
         }
 
         public IParameterSet GetParametersForTemplate(IEngineEnvironmentSettings environmentSettings, ITemplate template)
         {
-            RunnableProjectTemplate tmplt = (RunnableProjectTemplate)template;
-            return new ParameterSet(tmplt.Config);
+            RunnableProjectConfig templateConfig = (RunnableProjectConfig)template;
+            return new ParameterSet(templateConfig);
         }
 
         /// <summary>
@@ -163,10 +163,16 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             foreach (IFile file in folder.EnumerateFiles(TemplateConfigFileName, SearchOption.AllDirectories))
             {
+                logger.LogDebug($"Found {TemplateConfigFileName} at {file.GetDisplayPath()}.");
                 try
                 {
                     IFile? hostConfigFile = FindBestHostTemplateConfigFile(source.EnvironmentSettings, file);
-                    var templateModel = LoadBaseTemplate(file, logger: logger);
+                    logger.LogDebug($"Found *{HostTemplateFileConfigBaseName} at {hostConfigFile?.GetDisplayPath()}.");
+
+                    // issue here: we need to pass locale as parameter
+                    // consider passing current locale file here if exists
+                    // tracking issue: https://github.com/dotnet/templating/issues/3255
+                    var templateConfiguration = new RunnableProjectConfig(source.EnvironmentSettings, this, file, hostConfigFile);
 
                     IDirectory localizeFolder = file.Parent.DirectoryInfo("localize");
                     if (localizeFolder != null && localizeFolder.Exists)
@@ -178,20 +184,16 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                             try
                             {
                                 ILocalizationModel locModel = LocalizationModelDeserializer.Deserialize(locFile);
-                                if (templateModel.VerifyLocalizationModel(locModel, out IEnumerable<string> errorMessages))
+                                if (templateConfiguration.VerifyLocalizationModel(locModel, locFile))
                                 {
                                     localizations.Add(new LocalizationLocator(
                                         locale,
                                         locFile.FullPath,
-                                        templateModel.Identity,
+                                        templateConfiguration.Identity,
                                         locModel.Author ?? string.Empty,
                                         locModel.Name ?? string.Empty,
                                         locModel.Description ?? string.Empty,
                                         locModel.ParameterSymbols));
-                                }
-                                else
-                                {
-                                    HandleLocalizationValidationError(logger, file, locFile, errorMessages);
                                 }
                             }
                             catch (Exception ex)
@@ -201,12 +203,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                             }
                         }
                     }
-
-                    // issue here: we need to pass locale as parameter
-                    // consider passing current locale file here if exists
-                    // tracking issue: https://github.com/dotnet/templating/issues/3255
-                    RunnableProjectTemplate runnableProjectTemplate = new RunnableProjectTemplate(this, templateModel, null, hostConfigFile);
-                    templateList.Add(runnableProjectTemplate);
+                    templateList.Add(templateConfiguration);
 
                 }
                 catch (TemplateValidationException)
@@ -252,32 +249,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 IFile templateFile = templateFileConfig as IFile
                     ?? throw new NotSupportedException(string.Format(LocalizableStrings.RunnableProjectGenerator_Exception_ConfigShouldBeFile, templateFileConfig.GetDisplayPath()));
 
-                SimpleConfigModel templateModel = LoadBaseTemplate(templateFile, logger, baselineName);
-
                 IFile? localeFile = null;
                 if (localeFileConfig != null)
                 {
                     localeFile = localeFileConfig as IFile
-                       ?? throw new NotSupportedException(string.Format(LocalizableStrings.RunnableProjectGenerator_Exception_LocaleConfigShouldBeFile, localeFileConfig.GetDisplayPath()));
-                    try
-                    {
-                        ILocalizationModel locModel = LocalizationModelDeserializer.Deserialize(localeFile);
-                        if (templateModel.VerifyLocalizationModel(locModel, out IEnumerable<string> errorMessages))
-                        {
-                            templateModel.Localize(locModel);
-                        }
-                        else
-                        {
-                            HandleLocalizationValidationError(logger, templateFile, localeFile, errorMessages);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.LogWarning(LocalizableStrings.LocalizationModelDeserializer_Error_FailedToParse, localeFile.GetDisplayPath());
-                        logger.LogDebug("Details: {0}", ex);
-                    }
+                      ?? throw new NotSupportedException(string.Format(LocalizableStrings.RunnableProjectGenerator_Exception_LocaleConfigShouldBeFile, localeFileConfig.GetDisplayPath()));
                 }
-                template = new RunnableProjectTemplate(this, templateModel, localeFile, hostTemplateConfigFile);
+
+                var templateConfiguration = new RunnableProjectConfig(templateFileConfig.MountPoint.EnvironmentSettings, this, templateFile, hostTemplateConfigFile, localeFile, baselineName);
+                template = templateConfiguration;
                 return true;
             }
             catch (TemplateValidationException)
@@ -347,28 +327,30 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     return boolVal;
                 }
             }
-            else if (string.Equals(param.DataType, "choice", StringComparison.OrdinalIgnoreCase))
+            else if (param.IsChoice())
             {
-                if (TryResolveChoiceValue(literal, param, out string? match))
+                if (param.AllowMultipleValues)
                 {
-                    return match;
-                }
+                    List<string> val =
+                        literal
+                            .TokenizeMultiValueParameter()
+                            .Select(t => ResolveChoice(environmentSettings, t, param))
+                            .Where(r => !string.IsNullOrEmpty(r))
+                            .Select(r => r!)
+                            .ToList();
+                    if (val.Count <= 1)
+                    {
+                        return val.Count == 0 ? string.Empty : val[0];
+                    }
 
-                if (literal == null && param.Priority != TemplateParameterPriority.Required)
+                    return new MultiValueParameter(val);
+                }
+                else
                 {
-                    return param.DefaultValue;
+                    string? val = ResolveChoice(environmentSettings, literal, param);
+                    valueResolutionError = val == null;
+                    return val;
                 }
-
-                string? val;
-#pragma warning disable CS0618 // Type or member is obsolete - for backward compatibility
-                while (environmentSettings.Host.OnParameterError(param, string.Empty, "ValueNotValid:" + string.Join(",", param.Choices!.Keys), out val)
-#pragma warning restore CS0618 // Type or member is obsolete
-                        && !TryResolveChoiceValue(literal, param, out val))
-                {
-                }
-
-                valueResolutionError = val == null;
-                return val;
             }
             else if (string.Equals(param.DataType, "float", StringComparison.OrdinalIgnoreCase))
             {
@@ -506,51 +488,31 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
         }
 
-        /// <summary>
-        /// The method checks if all the sources defined in <paramref name="templateConfig"/> are valid.
-        /// Example: the source directory should exist, should not be a file, should be accessible via mount point.
-        /// </summary>
-        /// <param name="templateConfig">template configuration.</param>
-        /// <returns>list of found errors.</returns>
-        internal IEnumerable<string> ValidateTemplateSourcePaths(SimpleConfigModel templateConfig)
+        private static IVariableCollection SetupVariables(IEngineEnvironmentSettings environmentSettings, IParameterSet parameters, IVariableConfig variableConfig)
         {
-            List<string> errors = new List<string>();
-            if (templateConfig.TemplateSourceRoot == null)
+            IVariableCollection variables = VariableCollection.SetupVariables(environmentSettings, parameters, variableConfig);
+
+            foreach (Parameter param in parameters.ParameterDefinitions.OfType<Parameter>())
             {
-                errors.Add(LocalizableStrings.Authoring_TemplateRootOutsideInstallSource);
-            }
-            // check if any sources get out of the mount point
-            foreach (FileSourceMatchInfo source in ((IRunnableProjectConfig)templateConfig).Sources)
-            {
-                try
+                // Add choice values to variables - to allow them to be recognizable unquoted
+                if (param.EnableQuotelessLiterals && param.IsChoice())
                 {
-                    IFile file = templateConfig.TemplateSourceRoot.FileInfo(source.Source);
-                    //template source root should not be a file
-                    if (file?.Exists ?? false)
+                    foreach (string choiceKey in param.Choices.Keys)
                     {
-                        errors.Add(string.Format(LocalizableStrings.Authoring_SourceMustBeDirectory, source.Source));
-                    }
-                    else
-                    {
-                        IDirectory sourceRoot = templateConfig.TemplateSourceRoot.DirectoryInfo(source.Source);
-                        if (sourceRoot is null)
+                        if (
+                            variables.TryGetValue(choiceKey, out object existingValueObj) &&
+                            existingValueObj is string existingValue &&
+                            !string.Equals(choiceKey, existingValue, StringComparison.CurrentCulture)
+                        )
                         {
-                            errors.Add(string.Format(LocalizableStrings.Authoring_SourceIsOutsideInstallSource, source.Source));
+                            throw new InvalidOperationException(string.Format(LocalizableStrings.RunnableProjectGenerator_CannotAddImplicitChoice, choiceKey, existingValue));
                         }
-                        else if (!sourceRoot.Exists)
-                        {
-                            errors.Add(string.Format(LocalizableStrings.Authoring_SourceDoesNotExist, source.Source));
-                        }
+                        variables[choiceKey] = choiceKey;
                     }
                 }
-                catch
-                {
-                    // outside the mount point root
-                    // TODO: after the null ref exception in DirectoryInfo is fixed, change how this check works.
-                    errors.Add(string.Format(LocalizableStrings.Authoring_SourceIsOutsideInstallSource, source.Source));
-                }
             }
-            return errors;
+
+            return variables;
         }
 
         // Note the deferred-config macros (generated) are part of the runConfig.Macros
@@ -560,14 +522,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         {
             if (runConfig.Macros != null)
             {
-                IVariableCollection varsForMacros = VariableCollection.SetupVariables(environmentSettings, parameters, runConfig.VariableSetup);
+                IVariableCollection varsForMacros = SetupVariables(environmentSettings, parameters, runConfig.VariableSetup);
                 MacrosOperationConfig macroProcessor = new MacrosOperationConfig();
                 macroProcessor.ProcessMacros(environmentSettings, runConfig.Macros, varsForMacros, parameters);
             }
 
             if (runConfig.ComputedMacros != null)
             {
-                IVariableCollection varsForMacros = VariableCollection.SetupVariables(environmentSettings, parameters, runConfig.VariableSetup);
+                IVariableCollection varsForMacros = SetupVariables(environmentSettings, parameters, runConfig.VariableSetup);
                 MacrosOperationConfig macroProcessor = new MacrosOperationConfig();
                 macroProcessor.ProcessMacros(environmentSettings, runConfig.ComputedMacros, varsForMacros, parameters);
             }
@@ -578,6 +540,26 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return new CreationResult(
                 postActions: PostAction.ListFromModel(environmentSettings, runnableProjectConfig.PostActionModels, variables),
                 primaryOutputs: CreationPath.ListFromModel(environmentSettings, runnableProjectConfig.PrimaryOutputs, variables));
+        }
+
+        private static string? ResolveChoice(IEngineEnvironmentSettings environmentSettings, string? literal, ITemplateParameter param)
+        {
+            if (TryResolveChoiceValue(literal, param, out string? match))
+            {
+                return match;
+            }
+
+            if (literal == null && param.Priority != TemplateParameterPriority.Required)
+            {
+                return param.DefaultValue;
+            }
+
+            string? val;
+#pragma warning disable CS0618 // Type or member is obsolete - for backward compatibility
+            environmentSettings.Host.OnParameterError(param, string.Empty, "ValueNotValid:" + string.Join(",", param.Choices!.Keys), out val);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+            return val;
         }
 
         private static bool TryResolveChoiceValue(string? literal, ITemplateParameter param, out string? match)
@@ -617,38 +599,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return match != null;
         }
 
-        /// <summary>
-        /// Loads base template configuration from <paramref name="templateFile"/> and performs its validation.
-        /// </summary>
-        /// <exception cref="NotSupportedException">when the version of the template is not supported by the generator.</exception>
-        /// <exception cref="TemplateValidationException">on validation error.</exception>
-        private SimpleConfigModel LoadBaseTemplate(IFile templateFile, ILogger logger, string? baselineName = null)
-        {
-            ISimpleConfigModifiers? configModifiers = null;
-            if (!string.IsNullOrWhiteSpace(baselineName))
-            {
-                configModifiers = new SimpleConfigModifiers(baselineName!);
-            }
-            SimpleConfigModel templateModel = new SimpleConfigModel(templateFile, configModifiers);
-
-            CheckGeneratorVersionRequiredByTemplate(templateModel.GeneratorVersions);
-            PerformTemplateValidation(templateModel, templateFile, logger);
-            return templateModel;
-        }
-
-        private void CheckGeneratorVersionRequiredByTemplate(string generatorVersionsAllowed)
-        {
-            if (string.IsNullOrWhiteSpace(generatorVersionsAllowed))
-            {
-                return;
-            }
-
-            if (!VersionStringHelpers.TryParseVersionSpecification(generatorVersionsAllowed, out IVersionSpecification versionChecker) || !versionChecker.CheckIfVersionIsValid(GeneratorVersion))
-            {
-                throw new NotSupportedException(string.Format(LocalizableStrings.RunnableProjectGenerator_Exception_TemplateVersionNotSupported, generatorVersionsAllowed, GeneratorVersion));
-            }
-        }
-
         private IFile? FindBestHostTemplateConfigFile(IEngineEnvironmentSettings engineEnvironment, IFile config)
         {
             IDictionary<string, IFile> allHostFilesForTemplate = new Dictionary<string, IFile>();
@@ -675,117 +625,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// The method validates loaded <paramref name="templateModel"/>. The errors and warnings are printed using <paramref name="logger"/>.
-        /// The warning messages is mainly only for template authoring, and should be used for template validation, so for now they are logged in debug level only.
-        /// https://github.com/dotnet/templating/issues/2623.
-        /// </summary>
-        /// <param name="templateModel">the template configuration to validate.</param>
-        /// <param name="templateFile">the template configuration file.</param>
-        /// <param name="logger">the logger to use to log the errors.</param>
-        /// <exception cref="TemplateValidationException">in case of validation fails.</exception>
-        private void PerformTemplateValidation(SimpleConfigModel templateModel, IFile templateFile, ILogger logger)
-        {
-            //Do some basic checks...
-            List<string> errorMessages = new List<string>();
-            List<string> warningMessages = new List<string>();
-
-            #region Errors
-            if (string.IsNullOrWhiteSpace(templateModel.Identity))
-            {
-                errorMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "identity"));
-            }
-
-            if (string.IsNullOrWhiteSpace(templateModel.Name))
-            {
-                errorMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "name"));
-            }
-
-            if ((templateModel.ShortNameList?.Count ?? 0) == 0)
-            {
-                errorMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "shortName"));
-            }
-            errorMessages.AddRange(ValidateTemplateSourcePaths(templateModel));
-            #endregion
-
-            #region Warnings
-            //TODO: the warning messages should be transferred to validate subcommand, as they are not useful for final user, but useful for template author.
-            //https://github.com/dotnet/templating/issues/2623
-            if (string.IsNullOrWhiteSpace(templateModel.SourceName))
-            {
-                warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "sourceName"));
-            }
-
-            if (string.IsNullOrWhiteSpace(templateModel.Author))
-            {
-                warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "author"));
-            }
-
-            if (string.IsNullOrWhiteSpace(templateModel.GroupIdentity))
-            {
-                warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "groupIdentity"));
-            }
-
-            if (string.IsNullOrWhiteSpace(templateModel.GeneratorVersions))
-            {
-                warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "generatorVersions"));
-            }
-
-            if (templateModel.Precedence == 0)
-            {
-                warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "precedence"));
-            }
-
-            if ((templateModel.Classifications?.Count ?? 0) == 0)
-            {
-                warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "classifications"));
-            }
-
-            if (templateModel.PostActionModels != null && templateModel.PostActionModels.Any(x => x.ManualInstructionInfo == null || x.ManualInstructionInfo.Count == 0))
-            {
-                warningMessages.Add(string.Format(LocalizableStrings.Authoring_MalformedPostActionManualInstructions));
-            }
-            #endregion
-
-            if (warningMessages.Count > 0)
-            {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.AppendLine(string.Format(LocalizableStrings.Authoring_TemplateMissingCommonInformation, templateFile.GetDisplayPath()));
-                foreach (string message in warningMessages)
-                {
-                    stringBuilder.AppendLine("  " + message);
-                }
-                logger.LogDebug(stringBuilder.ToString());
-            }
-
-            if (errorMessages.Count > 0)
-            {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.AppendLine(string.Format(LocalizableStrings.Authoring_TemplateNotInstalled, templateFile.GetDisplayPath()));
-                foreach (string message in errorMessages)
-                {
-                    stringBuilder.AppendLine("  " + message);
-                }
-                logger.LogError(stringBuilder.ToString());
-                throw new TemplateValidationException(string.Format(LocalizableStrings.RunnableProjectGenerator_Exception_TemplateValidationFailed, templateFile.GetDisplayPath()));
-            }
-        }
-
-        private void HandleLocalizationValidationError(
-            ILogger logger,
-            IFile baseConfiguration,
-            IFile localizationConfiguration,
-            IEnumerable<string> errorMessages)
-        {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine(string.Format(LocalizableStrings.RunnableProjectGenerator_Warning_LocFileSkipped, localizationConfiguration.GetDisplayPath(), baseConfiguration.GetDisplayPath()));
-            foreach (string errorMessage in errorMessages)
-            {
-                stringBuilder.AppendLine("  " + errorMessage);
-            }
-            logger.LogWarning(stringBuilder.ToString());
         }
 
         internal class ParameterSet : IParameterSet
@@ -828,11 +667,5 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 _parameters[param.Name] = param;
             }
         }
-
-        private class TemplateValidationException : Exception
-        {
-            internal TemplateValidationException(string message) : base(message) { }
-        }
-
     }
 }

@@ -1,81 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dependencies>
   <ProductDependencies>
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-externals" Version="7.0.0-alpha.1.22173.1">
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-externals" Version="7.0.0-alpha.1.22259.2">
       <Uri>https://github.com/dotnet/source-build-externals</Uri>
-      <Sha>e01107a6030bc41037fc46932a5ad923acfa679d</Sha>
+      <Sha>929686f9bb080937b5cd8f496527f4c02123a11e</Sha>
       <SourceBuild RepoName="source-build-externals" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="7.0.0-alpha.1.22178.1">
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="7.0.0-alpha.1.22270.1">
       <Uri>https://github.com/dotnet/source-build-reference-packages</Uri>
-      <Sha>9ff1056546eeec1aa46ebe914f85e4809916df1a</Sha>
+      <Sha>3dbb19f76474f2f22749b2e64d34c15178381ffb</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="VS.Redist.Common.NetCore.SharedFramework.x64.7.0" Version="7.0.0-preview.4.22201.3">
+    <Dependency Name="VS.Redist.Common.NetCore.SharedFramework.x64.7.0" Version="7.0.0-preview.5.22272.3">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>c3e44952bb75d054517f2a24943502d3a14a47f5</Sha>
+      <Sha>0864cc5539e0ddd109b443b0bee804878cd7ba76</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="7.0.0-preview.4.22201.3">
+    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="7.0.0-preview.5.22272.3">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>c3e44952bb75d054517f2a24943502d3a14a47f5</Sha>
+      <Sha>0864cc5539e0ddd109b443b0bee804878cd7ba76</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Ref" Version="7.0.0-preview.4.22201.3">
+    <Dependency Name="Microsoft.NETCore.App.Ref" Version="7.0.0-preview.5.22272.3">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>c3e44952bb75d054517f2a24943502d3a14a47f5</Sha>
+      <Sha>0864cc5539e0ddd109b443b0bee804878cd7ba76</Sha>
     </Dependency>
-    <Dependency Name="System.CommandLine" Version="2.0.0-beta3.22173.1">
+    <Dependency Name="System.CommandLine" Version="2.0.0-beta4.22272.1">
       <Uri>https://github.com/dotnet/command-line-api</Uri>
-      <Sha>6c71bd788d9c8f8628787792d865b9eb683f851f</Sha>
+      <Sha>209b724a3c843253d3071e8348c353b297b0b8b5</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging" Version="7.0.0-preview.4.22201.3">
+    <Dependency Name="Microsoft.Extensions.Logging" Version="7.0.0-preview.5.22272.3">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>c3e44952bb75d054517f2a24943502d3a14a47f5</Sha>
+      <Sha>0864cc5539e0ddd109b443b0bee804878cd7ba76</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0-preview.4.22201.3">
+    <Dependency Name="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0-preview.5.22272.3">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>c3e44952bb75d054517f2a24943502d3a14a47f5</Sha>
+      <Sha>0864cc5539e0ddd109b443b0bee804878cd7ba76</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging.Console" Version="7.0.0-preview.4.22201.3">
+    <Dependency Name="Microsoft.Extensions.Logging.Console" Version="7.0.0-preview.5.22272.3">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>c3e44952bb75d054517f2a24943502d3a14a47f5</Sha>
+      <Sha>0864cc5539e0ddd109b443b0bee804878cd7ba76</Sha>
     </Dependency>
-    <Dependency Name="NuGet.Credentials" Version="6.2.0-rc.140">
+    <Dependency Name="NuGet.Credentials" Version="6.2.0-rc.146">
       <Uri>https://github.com/nuget/nuget.client</Uri>
-      <Sha>6f54dbd49fcda01ca8d71eb4fa4eea6ef54379ab</Sha>
+      <Sha>b8a61266d9a6780cb7eb9c1942695cf813fdef0a</Sha>
     </Dependency>
-    <Dependency Name="NuGet.Configuration" Version="6.2.0-rc.140">
+    <Dependency Name="NuGet.Configuration" Version="6.2.0-rc.146">
       <Uri>https://github.com/nuget/nuget.client</Uri>
-      <Sha>6f54dbd49fcda01ca8d71eb4fa4eea6ef54379ab</Sha>
+      <Sha>b8a61266d9a6780cb7eb9c1942695cf813fdef0a</Sha>
     </Dependency>
-    <Dependency Name="NuGet.Protocol" Version="6.2.0-rc.140">
+    <Dependency Name="NuGet.Protocol" Version="6.2.0-rc.146">
       <Uri>https://github.com/nuget/nuget.client</Uri>
-      <Sha>6f54dbd49fcda01ca8d71eb4fa4eea6ef54379ab</Sha>
+      <Sha>b8a61266d9a6780cb7eb9c1942695cf813fdef0a</Sha>
     </Dependency>
-    <Dependency Name="VS.Redist.Common.NetCore.Toolset.x64" Version="">
-      <Uri>https://www.github.com/dotnet/installer</Uri>
-      <Sha />
-    </Dependency>
-    <Dependency Name="Microsoft.CodeAnalysis.CSharp.CodeStyle" Version="4.2.0-1.22116.16">
+    <Dependency Name="Microsoft.CodeAnalysis.CSharp.CodeStyle" Version="4.2.0-4.22266.5">
       <Uri>https://github.com/dotnet/roslyn</Uri>
-      <Sha />
+      <Sha>5886de67259d3fe055e48985ba5cefb9d089a840</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.0.0-preview1.22116.1">
+    <Dependency Name="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.0.0-preview1.22274.2">
       <Uri>https://github.com/dotnet/roslyn-analyzers</Uri>
-      <Sha />
+      <Sha>04edea1ac503805a8d9a6959ec18e20bff506bb5</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4-beta1.22116.1">
+    <Dependency Name="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4-beta1.22274.2">
       <Uri>https://github.com/dotnet/roslyn-analyzers</Uri>
-      <Sha />
+      <Sha>04edea1ac503805a8d9a6959ec18e20bff506bb5</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Net.Compilers.Toolset" Version="4.2.0-1.22116.16">
+    <Dependency Name="Microsoft.Net.Compilers.Toolset" Version="4.2.0-4.22266.5">
       <Uri>https://github.com/dotnet/roslyn</Uri>
-      <Sha />
+      <Sha>5886de67259d3fe055e48985ba5cefb9d089a840</Sha>
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
-    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="7.0.0-beta.22181.2">
+    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="7.0.0-beta.22273.1">
       <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>e0b311bcd81fc9e27bcf7715dcda62fa38dfa49a</Sha>
+      <Sha>ad55f9b957b9539613ecff82649d17650e4624d2</Sha>
       <SourceBuild RepoName="arcade" ManagedOnly="true" />
     </Dependency>
   </ToolsetDependencies>

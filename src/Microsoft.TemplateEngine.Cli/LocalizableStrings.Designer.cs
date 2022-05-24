@@ -743,6 +743,24 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Warning: use of &apos;{0}&apos; is deprecated. Use &apos;{1}&apos; instead..
+        /// </summary>
+        internal static string Commands_Warning_DeprecatedCommand {
+            get {
+                return ResourceManager.GetString("Commands_Warning_DeprecatedCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to For more information, run: .
+        /// </summary>
+        internal static string Commands_Warning_DeprecatedCommand_Info {
+            get {
+                return ResourceManager.GetString("Commands_Warning_DeprecatedCommand_Info", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Command succeeded..
         /// </summary>
         internal static string CommandSucceeded {
@@ -1596,6 +1614,15 @@ namespace Microsoft.TemplateEngine.Cli {
         internal static string TemplatePackageCoordinator_lnstall_Error_AlreadyInstalled {
             get {
                 return ResourceManager.GetString("TemplatePackageCoordinator_lnstall_Error_AlreadyInstalled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to To reinstall the same version of the template package, use &apos;{0}&apos; option:.
+        /// </summary>
+        internal static string TemplatePackageCoordinator_lnstall_Error_AlreadyInstalled_Hint {
+            get {
+                return ResourceManager.GetString("TemplatePackageCoordinator_lnstall_Error_AlreadyInstalled_Hint", resourceCulture);
             }
         }
         
