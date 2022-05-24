@@ -59,7 +59,7 @@
       </trans-unit>
       <trans-unit id="GlobalSettingsTemplatePackagesProvider_Info_PackageAlreadyInstalled">
         <source>{0} is already installed, it will be replaced with {1}.</source>
-        <target state="new">{0} is already installed, it will be replaced with {1}.</target>
+        <target state="translated">Balíček {0} je už nainstalovaný, nahradí se za {1}.</target>
         <note />
       </trans-unit>
       <trans-unit id="GlobalSettingsTemplatePackagesProvider_Info_PackageUninstalled">
