@@ -140,8 +140,8 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             }
             finally
             {
-                // Through disposing LoggerFactory ensure logs from different logger instances to output
-                environmentSettings.Host.LoggerFactory?.Dispose();
+                // It disposes LoggerFactory ensuring logs from different logger instances to output
+                environmentSettings.Dispose();
             }
         }
 
@@ -155,7 +155,10 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             }
             GlobalArgs args = new GlobalArgs(this, context.ParseResult);
             IEngineEnvironmentSettings environmentSettings = CreateEnvironmentSettings(args, context.ParseResult);
-            return GetCompletions(context, environmentSettings);
+            var result = GetCompletions(context, environmentSettings);
+            // It disposes LoggerFactory ensuring logs from different logger instances to output
+            environmentSettings.Dispose();
+            return result;
         }
 
         protected abstract Task<NewCommandStatus> ExecuteAsync(TArgs args, IEngineEnvironmentSettings environmentSettings, ITelemetryLogger telemetryLogger, InvocationContext context);

@@ -393,6 +393,11 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
                 Console.WriteLine("Failed to read package {0}::{1}, details: {2}. The package will be skipped.", packInfo.Name, packInfo.Version, ex);
                 return Array.Empty<TemplateSearchData>();
             }
+            finally
+            {
+                // It disposes LoggerFactory ensuring logs from different logger instances to output
+                environmentSettings.Dispose();
+            }
         }
 
         private (IReadOnlyList<TemplatePackageSearchData>, IReadOnlyList<FilteredPackageInfo>) EvaluateRemovedPackages(

@@ -53,6 +53,8 @@ internal class FilterNonMicrosoftAuthors
                     mountPoint.Dispose();
                 }
             }
+            // It disposes LoggerFactory ensuring logs from different logger instances to output
+            environmentSettings.Dispose();
             return new PreFilterResult(_FilterId, isFiltered: false);
         };
 

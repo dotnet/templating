@@ -34,6 +34,8 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Filters
                         break;  // this factory mounted the pack. No more checking is needed.
                     }
                 }
+                // It disposes LoggerFactory ensuring logs from different logger instances to output
+                environmentSettings.Dispose();
 
                 return new PreFilterResult(_FilterId, isFiltered: true, "Package did not contain any template.json files");
             };
