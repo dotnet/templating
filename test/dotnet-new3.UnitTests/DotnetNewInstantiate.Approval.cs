@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using FluentAssertions;
 using Microsoft.NET.TestFramework.Assertions;
 using Microsoft.TemplateEngine.TestHelper;
+using VerifyTests;
 using VerifyXunit;
 using Xunit;
 
@@ -238,13 +239,49 @@ namespace Dotnet_new3.IntegrationTests
         }
 
         [Fact]
-        public Task CanInstantiateTemplate_MultiValueChoiceParameterConditions()
+        public async Task CanInstantiateTemplate_MultiValueChoiceParameterConditions()
+        {
+            // We cannot use Data-driven unit test (InlineData) as it's not supported by verifier framework (unless separate file per parameters is supplied)
+            await MultiValueChoiceParameterConditionsExecutor(new[] { "TestAssets.TemplateWithMultiValueChoice", "--Platform", "MacOS", "--Platform", "iOS" });
+            await MultiValueChoiceParameterConditionsExecutor(new[] { "TestAssets.TemplateWithMultiValueChoice", "--Platform", "MacOS", "iOS" });
+        }
+
+        private Task MultiValueChoiceParameterConditionsExecutor(string[] args)
         {
             string home = TestUtils.CreateTemporaryFolder("Home");
             string workingDirectory = TestUtils.CreateTemporaryFolder();
             Helpers.InstallTestTemplate("TemplateWithMultiValueChoice", _log, home, workingDirectory);
 
-            var commandResult = new DotnetNewCommand(_log, "TestAssets.TemplateWithMultiValueChoice", "--Platform", "MacOS", "--Platform", "iOS")
+            var commandResult = new DotnetNewCommand(_log, args)
+                .WithCustomHive(home)
+                .WithWorkingDirectory(workingDirectory)
+                .Execute();
+
+            commandResult
+                .Should()
+                .Pass()
+                .And.NotHaveStdErr()
+                .And.HaveStdOutMatching("The template \"TemplateWithMultiValueChoice\" was created successfully\\.");
+
+            string resultFileContent = File.ReadAllText(Path.Combine(workingDirectory, "Test.cs"));
+
+            var settings = new VerifySettings();
+            settings.UseDirectory("Approvals");
+            settings.DisableRequireUniquePrefix();
+
+            return Verifier.Verify(resultFileContent, settings);
+        }
+
+        [Theory]
+        [InlineData("TestAssets.TemplateWithMultiValueChoice", "--Platform", "MacOS", "--Platform", "iOS")]
+        [InlineData("TestAssets.TemplateWithMultiValueChoice", "--Platform", "MacOS", "iOS")]
+        public Task CanInstantiateTemplate_MultiValueChoiceParameterConditions2(params string[] args)
+        {
+            string home = TestUtils.CreateTemporaryFolder("Home");
+            string workingDirectory = TestUtils.CreateTemporaryFolder();
+            Helpers.InstallTestTemplate("TemplateWithMultiValueChoice", _log, home, workingDirectory);
+
+            var commandResult = new DotnetNewCommand(_log, args)
                 .WithCustomHive(home)
                 .WithWorkingDirectory(workingDirectory)
                 .Execute();

@@ -247,8 +247,14 @@ There are some specifics in behavior of multichoice symbols that are worth notin
 
 * Condition evaluation - closer described in [Conditions document](Conditions.md#multichoice-literals).
 * [`Switch` symbol](Available-Symbols-Generators.md#switch) evaluation - conditions are evaluated by identical evaluator as preprocessing conditions (previous bullet point). 
-* Argument passing and tab completion on CLI - Tab completion works identically as for standard choice symbol, user can specify multiple options via repeating the argument switch for each option:  
-  `dotnet new MyTemplate --MyParameter value1 --MyParameter value2`  
+* Argument passing and tab completion on CLI - User can specify multiple options via repeating the argument switch for each option:  
+  `dotnet new MyTemplate --MyParameter value1 --MyParameter value2`
+
+  or by passing multiple tokens to single option switch:
+
+  `dotnet new MyTemplate --MyParameter value1 value2`  
+
+  Tab completion works identically as for standard choice symbol
 
 * Default values specification and API usage - Currently multiple values can be specified within single string separated by `|` or `,` characters. Escaping of those characters within values is currently not supported.
 * Outputing multichoice value as a string - this can be achieved via leveraging the [`join` symbol](Available-Symbols-Generators.md#multichoice-join-sample). For simplicity it is as well possible to specify replacement for choice symbol with multiple values - in such case the values will be rendered into single string separated by `|` sign.
