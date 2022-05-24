@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.IO.Compression;
+using System.Text;
 using FluentAssertions;
 using Microsoft.NET.TestFramework.Assertions;
 using Microsoft.TemplateEngine.TestHelper;
@@ -317,6 +318,52 @@ namespace Dotnet_new3.IntegrationTests
             testFile = Path.Combine(workingDirectory, fileName);
             Assert.True(File.Exists(testFile));
             Assert.Equal($"{string.Format(expectedCommandFormat, "bar")}{expectedEol}bar{expectedEol}", File.ReadAllText(testFile));
+        }
+
+        [Fact]
+        public void CanInstantiateTemplate_ConditionalProcessing()
+        {
+            string workingDirectory = TestUtils.CreateTemporaryFolder();
+            string home = TestUtils.CreateTemporaryFolder("Home");
+            string templateName = "TemplateConditionalProcessing";
+            Helpers.InstallTestTemplate($"{templateName}/Template", _log, home, workingDirectory);
+
+            new DotnetNewCommand(_log, "TestAssets.ConditionalProcessing")
+                .WithCustomHive(home)
+                .WithWorkingDirectory(workingDirectory)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And.NotHaveStdErr()
+                .And.HaveStdOutContaining("The template \"ConditionalProcessing\" was created successfully.");
+
+            string expectedLocation = TestUtils.GetTestTemplateLocation($"{templateName}/Expected");
+            string[] expectedFiles = Directory.GetFiles(expectedLocation);
+            string[] actualFiles = Directory.GetFiles(workingDirectory);
+            Assert.True(actualFiles.Length == expectedFiles.Length, $"Actual output files are:{Environment.NewLine}{string.Join(Environment.NewLine, actualFiles.Select(path => Path.GetFileName(path)))}");
+
+            List<string> differences = new List<string>();
+            foreach (var fileName in expectedFiles.Select(path => Path.GetFileName(path)))
+            {
+                string actualFilePath = Path.Combine(workingDirectory, fileName);
+                if (!File.Exists(actualFilePath))
+                {
+                    differences.Add($"{fileName} was not found in the output folder {workingDirectory}");
+                    continue;
+                }
+
+                string expectedContent = File.ReadAllText(Path.Combine(expectedLocation, fileName));
+                string actualContent = File.ReadAllText(actualFilePath);
+                if (actualContent != expectedContent)
+                {
+                    differences.Add($"{fileName} in the output folder has unexpected content. Detailed content is:{Environment.NewLine}{actualContent}");
+                }
+            }
+            string failMessage = differences.Aggregate(
+                new StringBuilder(),
+                (sb, message) => sb.AppendFormat("{0}{1}", sb.Length > 0 ? Environment.NewLine : string.Empty, message),
+                sb => sb.ToString());
+            Assert.True(failMessage.Length == 0, failMessage);
         }
 
         [Fact]

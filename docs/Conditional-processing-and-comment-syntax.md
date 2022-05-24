@@ -125,9 +125,9 @@ let main argv =
 
 #### File Extensions
 
-`.vb`, `.js`,`.ts`.
+`.vb`.
 
-With these file types the expressions must be preceded by a `//` comment . 
+For Visual Basic file the expressions must be preceded by a `'` comment and conditional expressions are **#If**, **#ElseIf**, **#Else**, **#End If**. 
 
 #### Visual Basic Sample
 
@@ -138,18 +138,24 @@ Module Module1
 
     Sub Main()
         Console.WriteLine("Hello World!")
-//#if( addMethod )		
+'#If( addMethod )		
         HelloWorldAgain()
-//#endif
+'#End If
     End Sub
 
-//#if( addMethod )		
+'#If( addMethod )		
     Sub HelloWorldAgain()
         Console.WriteLine("Hello World Again!")
     End Sub
-//#endif
+'#End If
 End Module
 ```
+
+#### File Extensions
+
+`.js`,`.ts`.
+
+With these file types the expressions must be preceded by a `//` comment . 
 
 #### JavaScript Sample
 
@@ -244,8 +250,12 @@ Xamarin.Calabash.Start();
 The first expression is not emitted because it is processed, and the condition evaluated to `false`. The second expression is copied as-is because the conditional processing is turned off for that part of the file. 
 
 ### Related
-[Sample](https://github.com/dotnet/templating/blob/rel/vs2017/3-Preview3/template_feed/Microsoft.DotNet.Web.ProjectTemplates.2.0/content/WebApi-CSharp/Startup.cs)
-
+[C# Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.cs)  
+[C++ Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.cpp)  
+[F# Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.fs)  
+[VB Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.vb)  
+[JavaScript Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.js)  
+[TypeScript Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.ts)  
 
 ## JSON Files
 
@@ -276,7 +286,7 @@ content for when both param1 & param2 are false
 Changing from `////#else` to `//#else` the result will be
 
 ```jsonc
-// comment related to the 'else' content
+//// comment related to the 'else' content
 // content for when both param1 & param2 are false
 ```
 
@@ -294,6 +304,7 @@ Changing from `////#else` to `//#else` the result will be
 ```
 
 ### Related
+[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.json)
 
 ## XML Files
 
@@ -309,7 +320,7 @@ the comment block starts with `<!--` and ends with `-->`. Inside this block you 
 
 ### Samples
 
-description of first sample here
+In this sample, conditional expression is inside the comment `<!--` and `-->` in the same line. According to the value of the `IndividualLocalAuth` and `UseLocalDB` symbol, an element is added.
  
 ```xml
 <!--#if (IndividualLocalAuth && UseLocalDB) -->
@@ -317,13 +328,16 @@ description of first sample here
 <!--#endif -->
 ```
  
-description of second sample here
+In this sample, conditional expression is inside the comment `<!--` and `-->` in a block.
 
 ```xml
 <!--#if (IndividualLocalAuth && UseLocalDB)
   <SomeXmlHere>true</SomeXmlHere>
 #endif -->
 ```
+
+### Related
+[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.xml)
 
 ## MSBuild Files
 
@@ -352,14 +366,14 @@ In this sample, we can see that if the **TargetFrameworkOverride** symbol is def
 </ItemGroup>
 ```
 
+In this sample, it can also use conditional expressions inside an xml type comment for MSBuild files.
 
 ```xml
 <!--#if (IndividualLocalAuth && UseLocalDB) -->
-
-<!--#endif -->
-  <ItemGroup Condition=" '$(IndividualLocalAuth)' == 'True' AND '$(UseLocalDB)' != 'True' ">
+  <ItemGroup>
     <None Update="Company.WebApplication1.db" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+<!--#endif -->
 ```
 
 ### Ignore conditions expressions in MSBuild files
@@ -422,7 +436,7 @@ The first `<Foo Condition...` is copied as-is because the `msbuild-conditional` 
 
 ### Related
 
-[Sample](https://github.com/dotnet/templating/blob/rel/vs2017/3-Preview3/template_feed/Microsoft.DotNet.Web.ProjectTemplates.2.0/content/WebApi-CSharp/Company.WebApplication1.csproj)
+[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.csproj)
 
 ## Single hash line comments
 
@@ -495,6 +509,8 @@ http {
 }
 ```
 
+### Related
+[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.yml)
 
 ## CSS Files
 
@@ -508,7 +524,7 @@ the comment block starts with `/*` and ends with `*/`. Inside this block you can
 In this sample, according to the value of the `IndividualLocalAuth` symbol, a few classes are added to the css file.
  
 ```css
-/*#if (IndividualLocalAuth)
+/*#if (IndividualLocalAuth)*/
 /* buttons and links extension to use brackets: [ click me ] */
 .btn-bracketed::before {
     display: inline-block;
@@ -527,16 +543,16 @@ In this sample, according to the value of the `IndividualLocalAuth` symbol, a fe
     white-space: normal;
 }
 
-#endif*/
+/*#endif*/
 ```
 
 ### Related
 
-[Sample](https://github.com/dotnet/templating/blob/rel/vs2017/3-Preview3/template_feed/Microsoft.DotNet.Web.ProjectTemplates.2.0/content/StarterWeb-CSharp/wwwroot/css/site.css)
+[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.css)
 
 ## Command Files
 
-The comment block starts with `rem ` to the end of line 
+The comment block starts with `rem ` to the end of line. After this marker you can add the conditional expressions.
 
 #### File Extensions
 
@@ -544,7 +560,16 @@ The comment block starts with `rem ` to the end of line
 
 ### Samples
 
+In this sample, according to the value of the `enableVerbose` symbol, an environment variable is set as true.
+
+```cmd
+rem #if enableVerbose
+set environment_verbose = true
+rem #endif
+```
+
 ### Related    
+[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.cmd)
 
 ## Razor Views
 
@@ -574,14 +599,27 @@ In this sample, according to the value of the `IndividualB2CAuth` symbol, the in
 
 ### Related
 
-[Sample](https://github.com/dotnet/templating/blob/rel/vs2017/3-Preview3/template_feed/Microsoft.DotNet.Web.ProjectTemplates.2.0/content/StarterWeb-CSharp/Views/Shared/_Layout.cshtml)
+[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.cshtml)
 
 ## Haml Files
 
 #### File Extensions
 `.haml`
 
-The comment block starts with `-#` to the end of the line. Inside this block you can add your conditional expressions. 
+The comment block starts with `-#` to the end of the line. After this marker you can add the conditional expressions. 
+
+### Samples
+
+In this sample, according to the value of the `addParagraph` symbol, a paragraph is added.
+
+```haml
+-##if addParagraph
+    %p A new paragraph is added.
+-##endif
+```
+
+### Related
+[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.haml)
 
 ## Jsx Files
 
@@ -590,6 +628,24 @@ The comment block starts with `-#` to the end of the line. Inside this block you
 `.jsx `,`.tsx`
 
 The comment block starts with `{/*` and ends with `*/}`. Inside this block you can add your conditional expressions. 
+
+### Samples
+
+In this sample, according to the value of the `addParagraph` symbol, a paragraph is added.
+
+```jsx
+const myElement = (
+    <div>
+        {/*#if addParagraph
+        <p>A new paragraph is added</p>
+        #endif*/}
+        <p>I am a paragraph.</p>
+    </div>
+  );
+```
+
+### Related
+[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.jsx)
 
 ## Other File Types
 
@@ -605,3 +661,6 @@ option1
 //#endif
 option2
 ```
+
+### Related
+[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.othertype)
