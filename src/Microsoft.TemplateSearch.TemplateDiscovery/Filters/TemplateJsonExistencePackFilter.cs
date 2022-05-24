@@ -18,7 +18,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Filters
         {
             Func<IDownloadedPackInfo, PreFilterResult> filter = (packInfo) =>
             {
-                EngineEnvironmentSettings environmentSettings = new EngineEnvironmentSettings(_host, virtualizeSettings: true);
+                using EngineEnvironmentSettings environmentSettings = new EngineEnvironmentSettings(_host, virtualizeSettings: true);
                 foreach (IMountPointFactory factory in environmentSettings.Components.OfType<IMountPointFactory>())
                 {
                     if (factory.TryMount(environmentSettings, null, packInfo.Path, out IMountPoint mountPoint))
@@ -34,8 +34,6 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Filters
                         break;  // this factory mounted the pack. No more checking is needed.
                     }
                 }
-                // It disposes LoggerFactory ensuring logs from different logger instances to output
-                environmentSettings.Dispose();
 
                 return new PreFilterResult(_FilterId, isFiltered: true, "Package did not contain any template.json files");
             };

@@ -90,10 +90,8 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             yield return (context) =>
             {
                 InstantiateCommandArgs instantiateCommandArgs = new InstantiateCommandArgs(this, context.ParseResult);
-                IEngineEnvironmentSettings environmentSettings = CreateEnvironmentSettings(instantiateCommandArgs, context.ParseResult);
+                using IEngineEnvironmentSettings environmentSettings = CreateEnvironmentSettings(instantiateCommandArgs, context.ParseResult);
                 WriteHelp(context, instantiateCommandArgs, environmentSettings);
-                // It disposes LoggerFactory ensuring logs from different logger instances to output
-                environmentSettings.Dispose();
             };
         }
 

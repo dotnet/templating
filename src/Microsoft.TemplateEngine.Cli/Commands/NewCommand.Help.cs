@@ -19,11 +19,9 @@ namespace Microsoft.TemplateEngine.Cli.Commands
                     throw new ArgumentException($"{nameof(context)} should be for {nameof(NewCommand)}");
                 }
                 NewCommandArgs args = new NewCommandArgs(newCommand, context.ParseResult);
-                IEngineEnvironmentSettings environmentSettings = CreateEnvironmentSettings(args, context.ParseResult);
+                using IEngineEnvironmentSettings environmentSettings = CreateEnvironmentSettings(args, context.ParseResult);
                 InstantiateCommandArgs instantiateCommandArgs = InstantiateCommandArgs.FromNewCommandArgs(args);
                 InstantiateCommand.WriteHelp(context, instantiateCommandArgs, environmentSettings);
-                // It disposes LoggerFactory ensuring logs from different logger instances to output
-                environmentSettings.Dispose();
             };
         }
     }

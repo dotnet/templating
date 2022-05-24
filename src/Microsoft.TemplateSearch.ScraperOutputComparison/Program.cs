@@ -15,11 +15,8 @@ namespace Microsoft.TemplateSearch.ScraperOutputComparison
                 return;
             }
 
-            ScrapeComparer comparer = new ScrapeComparer(comparisonConfig);
-            var result = comparer.Compare(out ScrapeComparisonResult comparisonResult);
-            // It disposes LoggerFactory ensuring logs from different logger instances to output
-            comparer.Dispose();
-            if (!result)
+            using ScrapeComparer comparer = new ScrapeComparer(comparisonConfig);
+            if (!comparer.Compare(out ScrapeComparisonResult comparisonResult))
             {
                 Console.WriteLine("Unable to read one or both of the scraper outputs to compare");
                 return;

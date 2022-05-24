@@ -155,10 +155,7 @@ namespace Microsoft.TemplateEngine.Cli.Commands
             }
             GlobalArgs args = new GlobalArgs(this, context.ParseResult);
             IEngineEnvironmentSettings environmentSettings = CreateEnvironmentSettings(args, context.ParseResult);
-            var result = GetCompletions(context, environmentSettings);
-            // It disposes LoggerFactory ensuring logs from different logger instances to output
-            environmentSettings.Dispose();
-            return result;
+            return GetCompletions(context, environmentSettings);
         }
 
         protected abstract Task<NewCommandStatus> ExecuteAsync(TArgs args, IEngineEnvironmentSettings environmentSettings, ITelemetryLogger telemetryLogger, InvocationContext context);
