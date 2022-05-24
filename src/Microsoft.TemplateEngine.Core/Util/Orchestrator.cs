@@ -1,6 +1,8 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -77,7 +79,7 @@ namespace Microsoft.TemplateEngine.Core.Util
 
         protected virtual IGlobalRunSpec RunSpecLoader(Stream runSpec)
         {
-            return null;
+            throw new NotImplementedException();
         }
 
         protected virtual bool TryGetBufferSize(IFile sourceFile, out int bufferSize)
@@ -253,7 +255,7 @@ namespace Microsoft.TemplateEngine.Core.Util
                             }
                             else if (!copy)
                             {
-                                ProcessFile(file, sourceRel, targetDir, _fileSystem, spec, fallback, fileGlobProcessors);
+                                ProcessFile(file, sourceRel, targetDir, spec, fallback, fileGlobProcessors);
                             }
                             else
                             {
@@ -273,7 +275,7 @@ namespace Microsoft.TemplateEngine.Core.Util
             }
         }
 
-        private void ProcessFile(IFile sourceFile, string sourceRel, string targetDir, IPhysicalFileSystem fileSystem, IGlobalRunSpec spec, IProcessor fallback, IEnumerable<KeyValuePair<IPathMatcher, IProcessor>> fileGlobProcessors)
+        private void ProcessFile(IFile sourceFile, string sourceRel, string targetDir, IGlobalRunSpec spec, IProcessor fallback, IEnumerable<KeyValuePair<IPathMatcher, IProcessor>> fileGlobProcessors)
         {
             IProcessor runner = fileGlobProcessors.FirstOrDefault(x => x.Key.IsMatch(sourceRel)).Value ?? fallback;
             if (runner == null)
@@ -292,12 +294,12 @@ namespace Microsoft.TemplateEngine.Core.Util
             bool customBufferSize = TryGetBufferSize(sourceFile, out int bufferSize);
             bool customFlushThreshold = TryGetFlushThreshold(sourceFile, out int flushThreshold);
             string fullTargetDir = Path.GetDirectoryName(targetPath);
-            fileSystem.CreateDirectory(fullTargetDir);
+            _fileSystem.CreateDirectory(fullTargetDir);
 
             try
             {
                 using (Stream source = sourceFile.OpenRead())
-                using (Stream target = fileSystem.CreateFile(targetPath))
+                using (Stream target = _fileSystem.CreateFile(targetPath))
                 {
                     if (!customBufferSize)
                     {

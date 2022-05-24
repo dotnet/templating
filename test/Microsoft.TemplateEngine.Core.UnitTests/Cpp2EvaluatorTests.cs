@@ -9,13 +9,13 @@ using Xunit;
 
 namespace Microsoft.TemplateEngine.Core.UnitTests
 {
-    public class Cpp2EvaluatorTests : TestBase, IClassFixture<LoggerHelper>
+    public class Cpp2EvaluatorTests : TestBase, IClassFixture<TestLoggerFactory>
     {
         private ILogger _logger;
 
-        public Cpp2EvaluatorTests(LoggerHelper loggerHelper)
+        public Cpp2EvaluatorTests(TestLoggerFactory testLoggerFactory)
         {
-            _logger = loggerHelper.CreateLogger();
+            _logger = testLoggerFactory.CreateLogger();
         }
 
         [Fact(DisplayName = nameof(VerifyCpp2EvaluatorTrue))]

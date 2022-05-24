@@ -12,13 +12,13 @@ using Xunit;
 
 namespace Microsoft.TemplateEngine.Core.UnitTests
 {
-    public class InlineMarkupConditionalTests : TestBase, IClassFixture<LoggerHelper>
+    public class InlineMarkupConditionalTests : TestBase, IClassFixture<TestLoggerFactory>
     {
         private ILogger _logger;
 
-        public InlineMarkupConditionalTests(LoggerHelper loggerHelper)
+        public InlineMarkupConditionalTests(TestLoggerFactory testLoggerFactory)
         {
-            _logger = loggerHelper.CreateLogger();
+            _logger = testLoggerFactory.CreateLogger();
         }
 
         [Fact(DisplayName = nameof(VerifyInlineMarkupTrue))]

@@ -706,17 +706,17 @@ namespace Microsoft.TemplateEngine.Utils
         }
 
         /// <inheritdoc/>
-        public string PathRelativeTo(string target, string relativeTo, char desiredDirectorySeparator = char.MaxValue)
+        public string PathRelativeTo(string target, string relativeTo)
         {
             if (
                 !IsPathInCone(target, out string targetProcessed)
                 ||
                 !IsPathInCone(relativeTo, out string relativeToProcessed))
             {
-                return _basis.PathRelativeTo(target, relativeTo, desiredDirectorySeparator);
+                return _basis.PathRelativeTo(target, relativeTo);
             }
 
-            return PhysicalFileSystem.PathRelativeToInternal(targetProcessed, relativeToProcessed, desiredDirectorySeparator);
+            return PhysicalFileSystem.PathRelativeToInternal(targetProcessed, relativeToProcessed);
         }
 
         /// <summary>

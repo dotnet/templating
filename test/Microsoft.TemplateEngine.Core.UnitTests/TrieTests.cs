@@ -12,13 +12,13 @@ using Xunit;
 
 namespace Microsoft.TemplateEngine.Core.UnitTests
 {
-    public class TrieTests : TestBase, IClassFixture<LoggerHelper>
+    public class TrieTests : TestBase, IClassFixture<TestLoggerFactory>
     {
         private ILogger _logger;
 
-        public TrieTests(LoggerHelper loggerHelper)
+        public TrieTests(TestLoggerFactory testLoggerFactory)
         {
-            _logger = loggerHelper.CreateLogger();
+            _logger = testLoggerFactory.CreateLogger();
         }
 
         [Fact]

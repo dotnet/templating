@@ -1,5 +1,5 @@
 const Microsoft.TemplateEngine.Abstractions.TemplateFiltering.MatchInfo.BuiltIn.Constraint = "Constraint" -> string!
-Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem.IPhysicalFileSystem.PathRelativeTo(string! target, string! relativeTo, char desiredDirectorySeparator = '\uffff') -> string!
+Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem.IPhysicalFileSystem.PathRelativeTo(string! target, string! relativeTo) -> string!
 Microsoft.TemplateEngine.Abstractions.ITemplateParameter.AllowMultipleValues.get -> bool
 Microsoft.TemplateEngine.Abstractions.ITemplateConstraint
 Microsoft.TemplateEngine.Abstractions.ITemplateConstraint.DisplayName.get -> string!

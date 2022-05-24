@@ -553,9 +553,7 @@ override Microsoft.TemplateEngine.Core.TokenConfig.GetHashCode() -> int
 ~static Microsoft.TemplateEngine.Core.TokenConfigExtensions.TokenConfigs(this System.Collections.Generic.IEnumerable<string> s) -> System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Core.Contracts.ITokenConfig>
 ~static Microsoft.TemplateEngine.Core.Util.EncodingUtil.Detect(byte[] buffer, int currentBufferLength, out byte[] bom) -> System.Text.Encoding
 ~static Microsoft.TemplateEngine.Core.Util.EngineConfig.DefaultLineEndings.get -> System.Collections.Generic.IReadOnlyList<string>
-~static Microsoft.TemplateEngine.Core.Util.EngineConfig.DefaultLineEndings.set -> void
 ~static Microsoft.TemplateEngine.Core.Util.EngineConfig.DefaultWhitespaces.get -> System.Collections.Generic.IReadOnlyList<string>
-~static Microsoft.TemplateEngine.Core.Util.EngineConfig.DefaultWhitespaces.set -> void
 ~static Microsoft.TemplateEngine.Core.Util.Processor.Create(Microsoft.TemplateEngine.Core.Util.EngineConfig config, params Microsoft.TemplateEngine.Core.Contracts.IOperationProvider[] operations) -> Microsoft.TemplateEngine.Core.Contracts.IProcessor
 ~static Microsoft.TemplateEngine.Core.Util.Processor.Create(Microsoft.TemplateEngine.Core.Util.EngineConfig config, System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Core.Contracts.IOperationProvider> operations) -> Microsoft.TemplateEngine.Core.Contracts.IProcessor
 ~static Microsoft.TemplateEngine.Core.VariableCollection.Environment(Microsoft.TemplateEngine.Abstractions.IEngineEnvironmentSettings environmentSettings) -> Microsoft.TemplateEngine.Core.VariableCollection

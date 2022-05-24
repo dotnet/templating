@@ -11,13 +11,13 @@ using Xunit;
 
 namespace Microsoft.TemplateEngine.Core.UnitTests
 {
-    public class PhasedOperationTests : TestBase, IClassFixture<LoggerHelper>
+    public class PhasedOperationTests : TestBase, IClassFixture<TestLoggerFactory>
     {
         private ILogger _logger;
 
-        public PhasedOperationTests(LoggerHelper loggerHelper)
+        public PhasedOperationTests(TestLoggerFactory testLoggerFactory)
         {
-            _logger = loggerHelper.CreateLogger();
+            _logger = testLoggerFactory.CreateLogger();
         }
 
         [Fact(DisplayName = nameof(VerifyPhasedOperationStateProgression))]

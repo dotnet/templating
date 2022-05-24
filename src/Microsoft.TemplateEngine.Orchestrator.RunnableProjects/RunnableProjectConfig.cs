@@ -387,7 +387,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             // the result is needed for SpecialOperationConfig
             foreach (ICustomFileGlobModel fileGlobModel in _configuration.SpecialCustomOperations)
             {
-                fileGlobModel.EvaluateCondition(_settings, rootVariableCollection);
+                fileGlobModel.EvaluateCondition(_settings.Host.Logger, rootVariableCollection);
             }
 
             parameters.ResolvedValues.TryGetValue(NameParameter, out object resolvedNameParamValue);
@@ -397,7 +397,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             // evaluate the conditions and resolve the paths for the PrimaryOutputs
             foreach (ICreationPathModel pathModel in _configuration.PrimaryOutputs)
             {
-                pathModel.EvaluateCondition(_settings, rootVariableCollection);
+                pathModel.EvaluateCondition(_settings.Host.Logger, rootVariableCollection);
 
                 if (pathModel.ConditionResult)
                 {

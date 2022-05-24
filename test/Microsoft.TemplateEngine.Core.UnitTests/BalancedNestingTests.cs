@@ -11,13 +11,13 @@ using Xunit;
 
 namespace Microsoft.TemplateEngine.Core.UnitTests
 {
-    public class BalancedNestingTests : TestBase, IClassFixture<LoggerHelper>
+    public class BalancedNestingTests : TestBase, IClassFixture<TestLoggerFactory>
     {
         private ILogger _logger;
 
-        public BalancedNestingTests(LoggerHelper loggerHelper)
+        public BalancedNestingTests(TestLoggerFactory testLoggerFactory)
         {
-            _logger = loggerHelper.CreateLogger();
+            _logger = testLoggerFactory.CreateLogger();
         }
 
         // The initial construction of the BalancedNesting operation is supposed to have comment fixing off by default.

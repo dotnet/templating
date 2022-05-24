@@ -13,13 +13,13 @@ using Xunit;
 
 namespace Microsoft.TemplateEngine.Core.UnitTests
 {
-    public class CommonOperationsTests : IClassFixture<LoggerHelper>
+    public class CommonOperationsTests : IClassFixture<TestLoggerFactory>
     {
         private ILogger _logger;
 
-        public CommonOperationsTests(LoggerHelper loggerHelper)
+        public CommonOperationsTests(TestLoggerFactory testLoggerFactory)
         {
-            _logger = loggerHelper.CreateLogger();
+            _logger = testLoggerFactory.CreateLogger();
         }
 
         [Fact(DisplayName = nameof(VerifyTrimWhitespaceForward))]

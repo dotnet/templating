@@ -1,6 +1,8 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -539,7 +541,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Cpp
             return (bool)Convert.ChangeType(current.Evaluate() ?? "false", typeof(bool));
         }
 
-        private static object InferTypeAndConvertLiteral(string literal)
+        private static object? InferTypeAndConvertLiteral(string literal)
         {
             //A propertly quoted string must be...
             //  At least two characters long

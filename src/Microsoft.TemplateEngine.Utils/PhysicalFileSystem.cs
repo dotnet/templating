@@ -111,18 +111,18 @@ namespace Microsoft.TemplateEngine.Utils
             File.SetLastWriteTimeUtc(file, lastWriteTimeUtc);
         }
 
-        public string PathRelativeTo(string target, string relativeTo, char desiredDirectorySeparator = char.MaxValue)
+        public string PathRelativeTo(string target, string relativeTo)
         {
             string resultPath;
             try
             {
                 string basePath = Path.GetFullPath(relativeTo);
                 string sourceFullPath = Path.GetFullPath(target);
-                resultPath = PathRelativeToInternal(sourceFullPath, basePath, desiredDirectorySeparator);
+                resultPath = PathRelativeToInternal(sourceFullPath, basePath);
             }
             catch (Exception)
             {
-                resultPath = NormalizePath(target, desiredDirectorySeparator);
+                resultPath = NormalizePath(target);
             }
 
             return resultPath;
@@ -137,7 +137,7 @@ namespace Microsoft.TemplateEngine.Utils
             return watcher;
         }
 
-        internal static string PathRelativeToInternal(string target, string relativeTo, char desiredDirectorySeparator)
+        internal static string PathRelativeToInternal(string target, string relativeTo)
         {
             string resultPath = target;
             relativeTo = relativeTo.TrimEnd('/', '\\');
@@ -146,12 +146,12 @@ namespace Microsoft.TemplateEngine.Utils
                 resultPath = target.Substring(relativeTo.Length + 1);
             }
 
-            return NormalizePath(resultPath, desiredDirectorySeparator);
+            return NormalizePath(resultPath);
         }
 
-        private static string NormalizePath(string path, char desiredDirectorySeparator)
+        private static string NormalizePath(string path)
         {
-            desiredDirectorySeparator = desiredDirectorySeparator == char.MaxValue ? Path.DirectorySeparatorChar : desiredDirectorySeparator;
+            char desiredDirectorySeparator = Path.DirectorySeparatorChar;
             char undesiredSeparatorChar;
             switch (desiredDirectorySeparator)
             {
@@ -162,8 +162,8 @@ namespace Microsoft.TemplateEngine.Utils
                     undesiredSeparatorChar = '/';
                     break;
                 default:
-                    //TODO: localize
-                    throw new ArgumentException($"Unsupported directory separator [{desiredDirectorySeparator}]. Only '/' and '\\' are supported.", nameof(desiredDirectorySeparator));
+                    undesiredSeparatorChar = desiredDirectorySeparator;
+                    break;
             }
 
             return path.Replace(undesiredSeparatorChar, desiredDirectorySeparator);

@@ -2,7 +2,6 @@
 Microsoft.TemplateEngine.Core.Contracts.IConditionedConfigurationElement
 Microsoft.TemplateEngine.Core.Contracts.IConditionedConfigurationElement.Condition.get -> string?
 Microsoft.TemplateEngine.Core.Contracts.IConditionedConfigurationElement.ConditionResult.get -> bool
-Microsoft.TemplateEngine.Core.Contracts.IConditionedConfigurationElement.EvaluateCondition(Microsoft.TemplateEngine.Abstractions.IEngineEnvironmentSettings! environmentSettings, Microsoft.TemplateEngine.Core.Contracts.IVariableCollection! variables) -> bool
 Microsoft.TemplateEngine.Core.Contracts.ICustomFileGlobModel
 Microsoft.TemplateEngine.Core.Contracts.ICustomOperationModel
 Microsoft.TemplateEngine.Core.Contracts.IEncodingConfig
