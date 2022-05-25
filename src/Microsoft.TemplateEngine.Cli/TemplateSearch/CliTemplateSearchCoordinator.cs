@@ -24,7 +24,7 @@ namespace Microsoft.TemplateEngine.Cli.TemplateSearch
         /// <param name="defaultLanguage">default language for the host.</param>
         /// <param name="cancellationToken"></param>
         /// <returns><see cref="NewCommandStatus.Success"/> when the templates were found and displayed;
-        /// <see cref="NewCommandStatus.Cancelled"/> when the command validation fails;
+        /// <see cref="NewCommandStatus.InvalidParamValues"/> when the command validation fails;
         /// <see cref="NewCommandStatus.NotFound"/> when no templates found based on the filter criteria.
         /// </returns>
         internal static async Task<NewCommandStatus> SearchForTemplateMatchesAsync(

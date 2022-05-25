@@ -7,3 +7,5 @@
 
 For more information, run:
    dotnet-new3 new3 console -h
+
+For details on current exit code please visit https://aka.ms/templating-exit-codes#103

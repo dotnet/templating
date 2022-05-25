@@ -3,66 +3,63 @@
 
 namespace Microsoft.TemplateEngine.Cli
 {
+    /// <summary>
+    /// Exit codes based on
+    ///  * https://tldp.org/LDP/abs/html/exitcodes.html
+    ///  * https://github.com/openbsd/src/blob/master/include/sysexits.h.
+    /// Further documentation: https://aka.ms/templating-exit-codes.
+    /// Future exit codes should be allocated in a range of 107 - 113. If not sufficient, a range of 79 - 99 may be used as well.
+    /// </summary>
     internal enum NewCommandStatus
     {
+        /// <summary>
+        /// Unexpected internal software issue. The result received from template engine core is not expected.
+        /// </summary>
+        Unexpected = 70,
+
+        /// <summary>
+        /// Can't create output file. The operation was cancelled due to detection of an attempt to perform destructive changes to existing files.
+        /// </summary>
+        DestructiveChangesDetected = 73,
+
         /// <summary>
         /// The template was instantiated successfully.
         /// </summary>
         Success = 0,
 
         /// <summary>
-        /// The template instantiation failed.
+        /// Instantiation Failed - Processing issues.
         /// </summary>
-        CreateFailed = unchecked((int)0x80020009),
+        CreateFailed = 100,
 
         /// <summary>
-        /// The mandatory parameters for template are missing.
+        /// Instantiation Failed - Missing mandatory parameter(s) for template.
         /// </summary>
-        MissingMandatoryParam = unchecked((int)0x8002000F),
+        MissingMandatoryParam = 101,
 
         /// <summary>
-        /// The values passed for template parameters are invalid.
+        /// Instantiation/Search Failed - parameter(s) value(s) invalid.
         /// </summary>
-        InvalidParamValues = unchecked((int)0x80020005),
+        InvalidParamValues = 102,
 
         /// <summary>
-        /// The subcommand to run is not specified.
+        /// The template was not found.
         /// </summary>
-        OperationNotSpecified = unchecked((int)0x8002000E),
+        NotFound = 103,
 
         /// <summary>
-        /// The template is not found.
+        /// The operation was cancelled.
         /// </summary>
-        NotFound = unchecked((int)0x800200006),
+        Cancelled = 104,
 
         /// <summary>
-        /// The operation is cancelled.
+        /// Instantiation Failed - Post action failed.
         /// </summary>
-        Cancelled = unchecked((int)0x80004004),
+        PostActionFailed = 105,
 
         /// <summary>
-        /// The result received from template engine core is not expected.
+        /// Installation/Uninstallation Failed - Processing issues.
         /// </summary>
-        UnexpectedResult = unchecked((int)0x80010001),
-
-        /// <summary>
-        /// The manipulation with alias has failed.
-        /// </summary>
-        AliasFailed = unchecked((int)0x80010002),
-
-        /// <summary>
-        /// The operation is cancelled due to destructive changes to existing files are detected.
-        /// </summary>
-        DestructiveChangesDetected = unchecked((int)0x8002000D),
-
-        /// <summary>
-        /// Post action failed.
-        /// </summary>
-        PostActionFailed = unchecked((int)0x80010003),
-
-        /// <summary>
-        /// Generic error when displaying help.
-        /// </summary>
-        DisplayHelpFailed = unchecked((int)0x80010004)
+        InstallFailed = 106,
     }
 }

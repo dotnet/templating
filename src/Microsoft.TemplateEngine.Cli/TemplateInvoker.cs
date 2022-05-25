@@ -150,7 +150,7 @@ namespace Microsoft.TemplateEngine.Cli
                 string printableChars = string.Join(", ", invalidChars.Where(x => !char.IsControl(x)).Select(x => $"'{x}'"));
                 string nonPrintableChars = string.Join(", ", invalidChars.Where(char.IsControl).Select(x => $"char({(int)x})"));
                 Reporter.Error.WriteLine(string.Format(LocalizableStrings.InvalidNameParameter, printableChars, nonPrintableChars).Bold().Red());
-                return NewCommandStatus.CreateFailed;
+                return NewCommandStatus.InvalidParamValues;
             }
 
             string? fallbackName = new DirectoryInfo(
@@ -283,7 +283,7 @@ namespace Microsoft.TemplateEngine.Cli
                     Reporter.Error.WriteLine(LocalizableStrings.RerunCommandAndPassForceToCreateAnyway.Bold().Red());
                     return NewCommandStatus.DestructiveChangesDetected;
                 default:
-                    return NewCommandStatus.UnexpectedResult;
+                    return NewCommandStatus.Unexpected;
             }
         }
 
@@ -297,7 +297,7 @@ namespace Microsoft.TemplateEngine.Cli
                 PostActionExecutionStatus.Failure => NewCommandStatus.PostActionFailed,
                 PostActionExecutionStatus.Cancelled => NewCommandStatus.Cancelled,
                 PostActionExecutionStatus.Failure | PostActionExecutionStatus.Cancelled => NewCommandStatus.PostActionFailed,
-                _ => NewCommandStatus.UnexpectedResult
+                _ => NewCommandStatus.Unexpected
             };
         }
     }

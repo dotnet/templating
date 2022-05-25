@@ -805,4 +805,8 @@ The header is followed by the list of parameters and their errors (might be seve
     <value>To reinstall the same version of the template package, use '{0}' option:</value>
     <comment>{0} - option name (--force). Followed by command example on new line.</comment>
   </data>
+  <data name="BaseCommand_ExitCodeHelp" xml:space="preserve">
+    <value>For details on current exit code please visit https://aka.ms/templating-exit-codes#{0}</value>
+    <comment>{0} is the exit code</comment>
+  </data>
 </root>

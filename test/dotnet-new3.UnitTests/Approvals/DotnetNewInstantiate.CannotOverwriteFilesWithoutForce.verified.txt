@@ -3,3 +3,5 @@
   Overwrite   folderA/%FILENAME%
 
 Rerun the command and pass --force to accept and create.
+
+For details on current exit code please visit https://aka.ms/templating-exit-codes#73

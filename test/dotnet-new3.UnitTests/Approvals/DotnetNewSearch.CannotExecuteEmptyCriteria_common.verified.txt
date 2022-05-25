@@ -4,3 +4,5 @@ Examples:
    dotnet-new3 new3 search web
    dotnet-new3 new3 search --author Microsoft
    dotnet-new3 new3 search web --language C#
+
+For details on current exit code please visit https://aka.ms/templating-exit-codes#102

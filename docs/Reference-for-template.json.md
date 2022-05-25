@@ -140,7 +140,7 @@ A symbol for which the config provides literal and/or default values.
 |`replaces`|The text to be replaced by the symbol value in the template files content|	 
 |`fileRename`|The portion of template filenames to be replaced by the symbol value.| 
 |`description`|Human readable text describing the meaning of the symbol. This has no effect on template generation.|
-|`isRequired`|Indicates if the parameter is required or not.|
+|<a name="isRequired"></a>`isrequired`|Indicates if the parameter is required or not.|
 |`choices`|List of available choices. Applicable only when `datatype=choice.` Contains array of the elements: <br />- `choice`: possible value of the symbol.<br />- `description`: human readable text describing the meaning of the choice. This has no effect on template generation. <br /> If not provided, there are no valid choices for the symbol, so it can never be assigned a value.|
 |`onlyIf`| |
 |`forms`|Defines the set of transforms that can be referenced by symbol definitions. Forms allow the specification of a "replaces"/"replacement" pair to also apply to other ways the "replaces" value may have been specified in the source by specifying a transform from the original value of "replaces" in configuration to the one that may be found in the source. [Details](https://github.com/dotnet/templating/wiki/Runnable-Project-Templates---Value-Forms)|
