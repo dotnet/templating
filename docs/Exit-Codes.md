@@ -55,7 +55,7 @@ Destructive changes can be forced with `--force` option
 This is a semi-standardized exit code (see [EX_CANTCREAT in /usr/include/sysexits.h](https://github.com/openbsd/src/blob/master/include/sysexits.h#L110))
 
 
-## 100 - Instantiation Failed - Processing issues
+## <a name="100"></a>100 - Instantiation Failed - Processing issues
 
 The template instantiation failed due to error(s). Caused either by environment (failure to read/write templates or cache) or by errorneous templates (incomplete conditions, symbols or macros etc.). Exact error reason will be output to stderr.
 
@@ -76,7 +76,7 @@ Incomplete condition in template file:
     static void Foo() { } 
 ```
 
-## 101 - Instantiation Failed - Missing mandatory parameter(s) for template.
+## <a name="101"></a>101 - Instantiation Failed - Missing mandatory parameter(s) for template.
 
 A parameter [marked as required](Reference-for-template.json.md#isrequired) was not supplied during template instantiation.
 
@@ -88,7 +88,7 @@ Mandatory option --MyMandatoryParam missing for template My Template.
 For details on current exit code please visit https://aka.ms/templating-exit-codes#101
 ```
 
-## 102 - Instantiation/Search Failed - parameter(s) value(s) invalid.
+## <a name="102"></a>102 - Instantiation/Search Failed - parameter(s) value(s) invalid.
 
 Usually a mismatch in type of the specified parameter or unrecognized choice option. Applicable to `search` command with not enough information as well.
 
@@ -116,7 +116,7 @@ Examples:
 For details on current exit code please visit https://aka.ms/templating-exit-codes#102
 ```
 
-## 103 - The template was not found.
+## <a name="103"></a>103 - The template was not found.
 
 Applicable to instantiation, listing and remote sources searching.
 
@@ -152,14 +152,14 @@ No templates found matching: 'xyz'.
 For details on current exit code please visit https://aka.ms/templating-exit-codes#103
 ```
 
-## 104 - The operation was cancelled. 
+## <a name="104"></a>104 - The operation was cancelled. 
 
 Currently applicable only to case when user aborts custom post action.
 
 
-## 105 - Instantiation Failed - Post action failed.
+## <a name="105"></a>105 - Instantiation Failed - Post action failed.
 
-## 106 - Installation/Uninstallation Failed
+## <a name="106"></a>106 - Installation/Uninstallation Failed
 
 Failure to download packages, read/write templates or cache, erorrneous or corrupted template, or an attempt to install same package multiple times.
 
