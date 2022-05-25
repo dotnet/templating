@@ -92,7 +92,6 @@ namespace Microsoft.TemplateEngine.Cli.Commands
 
         protected internal override IEnumerable<CompletionItem> GetCompletions(CompletionContext context, IEngineEnvironmentSettings environmentSettings)
         {
-            using IDisposable disposable = environmentSettings;
             if (context is not TextCompletionContext textCompletionContext)
             {
                 foreach (CompletionItem completion in base.GetCompletions(context, environmentSettings))

@@ -154,8 +154,8 @@ namespace Microsoft.TemplateEngine.Cli.Commands
                 return base.GetCompletions(context);
             }
             GlobalArgs args = new GlobalArgs(this, context.ParseResult);
-            IEngineEnvironmentSettings environmentSettings = CreateEnvironmentSettings(args, context.ParseResult);
-            return GetCompletions(context, environmentSettings);
+            using IEngineEnvironmentSettings environmentSettings = CreateEnvironmentSettings(args, context.ParseResult);
+            return GetCompletions(context, environmentSettings).ToList();
         }
 
         protected abstract Task<NewCommandStatus> ExecuteAsync(TArgs args, IEngineEnvironmentSettings environmentSettings, ITelemetryLogger telemetryLogger, InvocationContext context);
