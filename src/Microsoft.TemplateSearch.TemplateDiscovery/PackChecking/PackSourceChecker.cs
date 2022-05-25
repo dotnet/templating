@@ -366,7 +366,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
         private IEnumerable<TemplateSearchData> TryGetTemplatesInPack(IDownloadedPackInfo packInfo, IReadOnlyList<IAdditionalDataProducer> additionalDataProducers)
         {
             ITemplateEngineHost host = TemplateEngineHostHelper.CreateHost(HostIdentifierBase + packInfo.Name);
-            EngineEnvironmentSettings environmentSettings = new EngineEnvironmentSettings(host, virtualizeSettings: true);
+            using EngineEnvironmentSettings environmentSettings = new EngineEnvironmentSettings(host, virtualizeSettings: true);
             Scanner scanner = new Scanner(environmentSettings);
             try
             {
@@ -392,11 +392,6 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
             {
                 Console.WriteLine("Failed to read package {0}::{1}, details: {2}. The package will be skipped.", packInfo.Name, packInfo.Version, ex);
                 return Array.Empty<TemplateSearchData>();
-            }
-            finally
-            {
-                // It disposes LoggerFactory ensuring logs from different logger instances to output
-                environmentSettings.Dispose();
             }
         }
 

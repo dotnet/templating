@@ -93,7 +93,7 @@ namespace Microsoft.TemplateEngine.Cli.Commands
         public async Task<int> InvokeAsync(InvocationContext context)
         {
             TArgs args = ParseContext(context.ParseResult);
-            IEngineEnvironmentSettings environmentSettings = CreateEnvironmentSettings(args, context.ParseResult);
+            using IEngineEnvironmentSettings environmentSettings = CreateEnvironmentSettings(args, context.ParseResult);
             ITelemetryLogger telemetryLogger = CreateTelemetryLogger(context.ParseResult);
 
             CancellationToken cancellationToken = context.GetCancellationToken();
@@ -137,11 +137,6 @@ namespace Microsoft.TemplateEngine.Cli.Commands
                     Reporter.Error.WriteLine(ex.StackTrace.Bold().Red());
                 }
                 return 1;
-            }
-            finally
-            {
-                // It disposes LoggerFactory ensuring logs from different logger instances to output
-                environmentSettings.Dispose();
             }
         }
 
