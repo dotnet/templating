@@ -18,14 +18,14 @@ Exit codes are chosen to confrom to existing standards or standardization attemp
 
 ## <a name="70"></a>70 - Unexpected internal software issue
 
-The result received from template engine core is not expected. [File a bug](https://github.com/dotnet/templating/issues/new) if you encounter this exit code.
+The result received from template engine core is not expected. [File a bug](https://github.com/dotnet/templating/issues/new?title=Unexpected%20Internal%20Software%20Issue%20(EX_SOFTWARE)) if you encounter this exit code.
 
 This is a semi-standardized exit code (see [EX_SOFTWARE in /usr/include/sysexits.h](https://github.com/openbsd/src/blob/master/include/sysexits.h#L107))
 
 
 ## <a name="73"></a>73 - Can't create output file.
 
-The operation was cancelled due to detection of an attempt to perform destructive changes to existing files. This can happen if you are attempting to instantiate template into the same folder where it was previously instantiated under same target name (specified via `--name` option)
+The operation was cancelled due to detection of an attempt to perform destructive changes to existing files. This can happen if you are attempting to instantiate template into the same folder where it was previously instantiated under same target name (specified via `--name` option or defaults to the target directory name)
 
 _Example:_
 ```console
@@ -50,14 +50,14 @@ Rerun the command and pass --force to accept and create.
 For details on current exit code please visit https://aka.ms/templating-exit-codes#73
 ```
 
-Destructive changes can be forced with `--force` option
+Destructive changes can be forced by passing `--force` option
 
 This is a semi-standardized exit code (see [EX_CANTCREAT in /usr/include/sysexits.h](https://github.com/openbsd/src/blob/master/include/sysexits.h#L110))
 
 
 ## <a name="100"></a>100 - Instantiation Failed - Processing issues
 
-The template instantiation failed due to error(s). Caused either by environment (failure to read/write templates or cache) or by errorneous templates (incomplete conditions, symbols or macros etc.). Exact error reason will be output to stderr.
+The template instantiation failed due to error(s). Caused either by environment (failure to read/write template(s) or cache) or by errorneous template(s) (incomplete conditions, symbols or macros etc.). Exact error reason will be output to stderr.
 
 _Examples:_
 
@@ -104,7 +104,7 @@ Error: Invalid option(s):
 For details on current exit code please visit https://aka.ms/templating-exit-codes#102
 ```
 
-```
+```console
 > dotnet new search
 Search failed: not enough information specified for search.
 To search for templates, specify partial template name or use one of the supported filters: '--author', '--baseline', '--language', '--type', '--tag', '--package'.
@@ -121,7 +121,7 @@ For details on current exit code please visit https://aka.ms/templating-exit-cod
 Applicable to instantiation, listing and remote sources searching.
 
 _Examples:_
-```
+```console
 > dotnet new xyz
 No templates found matching: 'xyz'.
 
@@ -133,7 +133,7 @@ To search for the templates on NuGet.org, run:
 For details on current exit code please visit https://aka.ms/templating-exit-codes#103
 ```
 
-```
+```console
 > dotnet new list xyz
 No templates found matching: 'xyz'.
 
@@ -143,7 +143,7 @@ To search for the templates on NuGet.org, run:
 For details on current exit code please visit https://aka.ms/templating-exit-codes#103
 ```
 
-```
+```console
 > dotnet new search xyz
 Searching for the templates...
 Matches from template source: NuGet.org
@@ -164,7 +164,7 @@ Currently applicable only to case when user aborts custom post action.
 Failure to download packages, read/write templates or cache, erorrneous or corrupted template, or an attempt to install same package multiple times.
 
 _Example:_
-```
+```console
 > dotnet new install foobarbaz
 The following template packages will be installed:
    foobarbaz
@@ -178,7 +178,7 @@ For details on current exit code please visit https://aka.ms/templating-exit-cod
 
 Reserved for future use.
 
-[File a bug](https://github.com/dotnet/templating/issues/new) if you encounter any of this exit codes.
+[File a bug](https://github.com/dotnet/templating/issues/new?title=Unexpected%20Exit%20Code) if you encounter any of these exit codes.
 
 
 <BR/>
