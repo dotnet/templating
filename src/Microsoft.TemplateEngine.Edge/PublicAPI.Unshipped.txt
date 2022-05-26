@@ -8,6 +8,7 @@ Microsoft.TemplateEngine.Edge.Constraints.SdkVersionConstraintFactory
 Microsoft.TemplateEngine.Edge.Constraints.SdkVersionConstraintFactory.SdkVersionConstraintFactory() -> void
 Microsoft.TemplateEngine.Edge.Constraints.WorkloadConstraintFactory
 Microsoft.TemplateEngine.Edge.Constraints.WorkloadConstraintFactory.WorkloadConstraintFactory() -> void
+Microsoft.TemplateEngine.Edge.DefaultTemplateEngineHost.Dispose() -> void
 Microsoft.TemplateEngine.Edge.Installers.Folder.FolderInstallerFactory
 Microsoft.TemplateEngine.Edge.Installers.Folder.FolderInstallerFactory.FolderInstallerFactory() -> void
 Microsoft.TemplateEngine.Edge.Installers.NuGet.NuGetInstallerFactory
@@ -16,7 +17,6 @@ Microsoft.TemplateEngine.Edge.Mount.Archive.ZipFileMountPointFactory
 Microsoft.TemplateEngine.Edge.Mount.Archive.ZipFileMountPointFactory.ZipFileMountPointFactory() -> void
 Microsoft.TemplateEngine.Edge.Mount.FileSystem.FileSystemMountPointFactory
 Microsoft.TemplateEngine.Edge.Mount.FileSystem.FileSystemMountPointFactory.FileSystemMountPointFactory() -> void
-﻿Microsoft.TemplateEngine.Edge.DefaultTemplateEngineHost.Dispose() -> void
 Microsoft.TemplateEngine.Edge.EngineEnvironmentSettings.Dispose() -> void
 Microsoft.TemplateEngine.Edge.TemplateConstraintManager
 Microsoft.TemplateEngine.Edge.TemplateConstraintManager.Dispose() -> void
