@@ -2,9 +2,34 @@
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" target-language="ko" original="../LocalizableStrings.resx">
     <body>
+      <trans-unit id="Constraint_Error_ArgumentsNotSpecified">
+        <source>Argument(s) were not specified. At least one argument should be specified.</source>
+        <target state="translated">인수를 지정하지 않았습니다. 인수를 하나 이상 지정해야 합니다.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="Constraint_Error_ArrayHasNoObjects">
+        <source>'{0}' does not contain valid items.</source>
+        <target state="translated">'{0}'에 유효한 항목이 없습니다.</target>
+        <note>{0} is JSON configuration for constraint</note>
+      </trans-unit>
+      <trans-unit id="Constraint_Error_InvalidJson">
+        <source>'{0}' is not a valid JSON.</source>
+        <target state="translated">'{0}'은(는) 유효한 JSON이 아닙니다.</target>
+        <note>{0} is JSON configuration for constraint</note>
+      </trans-unit>
+      <trans-unit id="Constraint_WrongConfigurationCTA">
+        <source>Check the constraint configuration in template.json.</source>
+        <target state="translated">template.json에서 제약 조건 구성을 확인합니다.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="FolderInstaller_InstallResult_Error_FolderDoesNotExist">
         <source>The folder {0} doesn't exist.</source>
         <target state="translated">폴더 {0}이(가) 존재하지 않습니다.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="Generic_Constraint_WrongConfigurationCTA">
+        <source>Check the constraint configuration in template.json.</source>
+        <target state="translated">template.json에서 제약 조건 구성을 확인합니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="Generic_LatestVersion">
@@ -33,14 +58,56 @@
         <note />
       </trans-unit>
       <trans-unit id="GlobalSettingsTemplatePackagesProvider_Info_PackageAlreadyInstalled">
-        <source>{0} is already installed, version: {1}, it will be replaced with {2}.</source>
-        <target state="translated">{0}이(가) 이미 설치되어 있습니다. 버전: {1}이(가) {2}(으)로 대체됩니다.</target>
+        <source>{0} is already installed, it will be replaced with {1}.</source>
+        <target state="translated">{0}이(가) 이미 설치되어 있으므로 {1}(으)로 바뀝니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="GlobalSettingsTemplatePackagesProvider_Info_PackageUninstalled">
         <source>{0} was successfully uninstalled.</source>
         <target state="translated">{0}이(가) 성공적으로 제거되었습니다.</target>
         <note />
+      </trans-unit>
+      <trans-unit id="HostConstraint_Error_ArgumentsNotSpecified">
+        <source>Argument(s) were not specified. At least one argument should be specified.</source>
+        <target state="translated">인수를 지정하지 않았습니다. 인수를 하나 이상 지정해야 합니다.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="HostConstraint_Error_ArrayHasNoObjects">
+        <source>'{0}' does not contain valid host configurations.</source>
+        <target state="translated">'{0}'에 올바른 호스트 구성이 없습니다.</target>
+        <note>{0} is JSON configuration for constraint</note>
+      </trans-unit>
+      <trans-unit id="HostConstraint_Error_InvalidJson">
+        <source>'{0}' is not a valid JSON</source>
+        <target state="translated">'{0}'은(는) 유효한 JSON이 아닙니다.</target>
+        <note>{0} is JSON configuration for constraint</note>
+      </trans-unit>
+      <trans-unit id="HostConstraint_Error_InvalidJsonArray">
+        <source>'{0}' is not a valid JSON array.</source>
+        <target state="translated">'{0}'은(는) 유효한 JSON 배열이 아닙니다.</target>
+        <note>{0} is JSON configuration for constraint</note>
+      </trans-unit>
+      <trans-unit id="HostConstraint_Error_InvalidJsonArray_Objects">
+        <source>'{0}' should be an array of objects.</source>
+        <target state="translated">'{0}'은(는) 개체 배열이어야 합니다.</target>
+        <note>{0} is JSON configuration for constraint</note>
+      </trans-unit>
+      <trans-unit id="HostConstraint_Error_InvalidVersion">
+        <source>'{0}' is not a valid version or version range.</source>
+        <target state="translated">'{0}'은(는) 올바른 버전 또는 버전 범위가 아닙니다.</target>
+        <note>{0} is version range specified in JSON configuration</note>
+      </trans-unit>
+      <trans-unit id="HostConstraint_Error_MissingMandatoryProperty">
+        <source>'{0}' does not have mandatory property '{1}'.</source>
+        <target state="translated">'{0}'에 '{1}' 필수 속성이 없습니다.</target>
+        <note>{0} is JSON configuration, {1} mandatory JSON property name</note>
+      </trans-unit>
+      <trans-unit id="HostConstraint_Message_Restricted">
+        <source>Running template on {0} (version: {1}) is not supported, supported hosts is/are: {2}.</source>
+        <target state="translated">{0}(버전: {1})에서 템플릿을 실행할 수 없습니다. 지원되는 호스트는 {2}입니다.</target>
+        <note>{0} - host name ("dotnetcli", "ide"..)
+{1} - host version (usually matches VS or SDK version)
+{2} - comma-separated list of supported hosts and their versions (example: host1, host2(1.0.0), host3([1.0.0-*]))</note>
       </trans-unit>
       <trans-unit id="NuGetApiPackageManager_Error_FailedToLoadSource">
         <source>Failed to load the NuGet source {0}.</source>
@@ -163,6 +230,27 @@ Details: {1}.</source>
 세부 정보: {1}.</target>
         <note />
       </trans-unit>
+      <trans-unit id="OSConstraint_Error_InvalidJsonType">
+        <source>'{0}' is not a valid JSON string or array.</source>
+        <target state="translated">'{0}'은(는) 유효한 JSON 문자열 또는 배열이 아닙니다.</target>
+        <note>{0} is JSON configuration for constraint</note>
+      </trans-unit>
+      <trans-unit id="OSConstraint_Error_InvalidOSName">
+        <source>'{0}' is not a valid operating system name. Allowed values are: {1}.</source>
+        <target state="translated">'{0}'은(는) 올바른 운영 체제 이름이 아닙니다. 허용되는 값은 {1}입니다.</target>
+        <note>{0} - OS name in configuration
+{1} - comma-separated list of allowed operating system names</note>
+      </trans-unit>
+      <trans-unit id="OSConstraint_Message_Restricted">
+        <source>Running template on {0} is not supported, supported OS is/are: {1}.</source>
+        <target state="translated">{0}에서 템플릿을 실행할 수 없습니다. 지원되는 OS는 {1}입니다.</target>
+        <note>{0} - name of the executing operating system, {1} - comma separated list of supported operating systems.</note>
+      </trans-unit>
+      <trans-unit id="OSConstraint_Name">
+        <source>Operating System</source>
+        <target state="translated">운영 체제</target>
+        <note>this is name of constraint that will appear in the UI</note>
+      </trans-unit>
       <trans-unit id="Scanner_Error_TemplatePackageLocationIsNotSupported">
         <source>Template package location {0} is not supported, or doesn't exist.</source>
         <target state="translated">템플릿 패키지 위치 {0}이(가) 지원되지 않거나 존재하지 않습니다.</target>
@@ -170,20 +258,20 @@ Details: {1}.</source>
       </trans-unit>
       <trans-unit id="TemplateConstraintManager_Error_FailedToEvaluate">
         <source>The constraint '{0}' failed to be evaluated for the args '{1}', details: {2}</source>
-        <target state="new">The constraint '{0}' failed to be evaluated for the args '{1}', details: {2}</target>
+        <target state="translated">'{0}' 제약 조건을 '{1}' 인수에 대해 평가하지 못했습니다. 세부 정보: {2}</target>
         <note>{0} - constraint type
 {1} - arguments (in JSON format)
 {2} - reason of failure (has the period).</note>
       </trans-unit>
       <trans-unit id="TemplateConstraintManager_Error_FailedToInitialize">
         <source>The constraint '{0}' failed to initialize: {1}</source>
-        <target state="new">The constraint '{0}' failed to initialize: {1}</target>
+        <target state="translated">제약 조건 '{0}'을(를) 초기화하지 못했습니다. {1}</target>
         <note>{0} is constraint type
 {1} - reason of failure (has the period).</note>
       </trans-unit>
       <trans-unit id="TemplateConstraintManager_Error_UnknownType">
         <source>The constraint '{0}' is unknown.</source>
-        <target state="new">The constraint '{0}' is unknown.</target>
+        <target state="translated">제약 조건 '{0}'을(를) 알 수 없습니다.</target>
         <note>{0} is constraint type</note>
       </trans-unit>
       <trans-unit id="TemplateCreator_TemplateCreationResult_Error_CouldNotLoadTemplate">
