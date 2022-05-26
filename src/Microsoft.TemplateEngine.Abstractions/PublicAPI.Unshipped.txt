@@ -28,7 +28,6 @@ static Microsoft.TemplateEngine.Abstractions.Constraints.TemplateConstraintResul
 static Microsoft.TemplateEngine.Abstractions.Constraints.TemplateConstraintResult.CreateFailure(string! type, string! localizedErrorMessage, string? cta = null) -> Microsoft.TemplateEngine.Abstractions.Constraints.TemplateConstraintResult!
 static Microsoft.TemplateEngine.Abstractions.Constraints.TemplateConstraintResult.CreateRestricted(Microsoft.TemplateEngine.Abstractions.Constraints.TemplateConstraintInfo! constraintInfo, string! localizedErrorMessage, string? cta = null) -> Microsoft.TemplateEngine.Abstractions.Constraints.TemplateConstraintResult!
 static Microsoft.TemplateEngine.Abstractions.Constraints.TemplateConstraintResult.CreateRestricted(string! type, string! localizedErrorMessage, string? cta = null) -> Microsoft.TemplateEngine.Abstractions.Constraints.TemplateConstraintResult!
-const Microsoft.TemplateEngine.Abstractions.TemplateFiltering.MatchInfo.BuiltIn.Constraint = "Constraint" -> string!
 Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem.IPhysicalFileSystem.PathRelativeTo(string! target, string! relativeTo) -> string!
 Microsoft.TemplateEngine.Abstractions.Installer.InstallRequest.Details.get -> System.Collections.Generic.Dictionary<string!, string!>!
 Microsoft.TemplateEngine.Abstractions.Installer.InstallRequest.DisplayName.get -> string!
