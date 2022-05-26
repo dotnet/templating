@@ -52,6 +52,7 @@ namespace Microsoft.TemplateEngine.TestHelper
             _fileSystem = fileSystem ?? new PhysicalFileSystem();
 
             _loggerFactory = new TestLoggerFactory();
+            addLoggerProviders?.ToList().ForEach(_loggerFactory.AddProvider);
             _logger = _loggerFactory.CreateLogger("Test Host");
             _fallbackNames = fallbackNames ?? new[] { "dotnetcli" };
         }
