@@ -28,6 +28,13 @@ static Microsoft.TemplateEngine.Abstractions.Constraints.TemplateConstraintResul
 static Microsoft.TemplateEngine.Abstractions.Constraints.TemplateConstraintResult.CreateFailure(string! type, string! localizedErrorMessage, string? cta = null) -> Microsoft.TemplateEngine.Abstractions.Constraints.TemplateConstraintResult!
 static Microsoft.TemplateEngine.Abstractions.Constraints.TemplateConstraintResult.CreateRestricted(Microsoft.TemplateEngine.Abstractions.Constraints.TemplateConstraintInfo! constraintInfo, string! localizedErrorMessage, string? cta = null) -> Microsoft.TemplateEngine.Abstractions.Constraints.TemplateConstraintResult!
 static Microsoft.TemplateEngine.Abstractions.Constraints.TemplateConstraintResult.CreateRestricted(string! type, string! localizedErrorMessage, string? cta = null) -> Microsoft.TemplateEngine.Abstractions.Constraints.TemplateConstraintResult!
+Microsoft.TemplateEngine.Abstractions.Installer.InstallRequest.Details.get -> System.Collections.Generic.Dictionary<string!, string!>!
+Microsoft.TemplateEngine.Abstractions.Installer.InstallRequest.DisplayName.get -> string!
+Microsoft.TemplateEngine.Abstractions.Installer.InstallRequest.Force.get -> bool
+Microsoft.TemplateEngine.Abstractions.Installer.InstallRequest.InstallerName.get -> string?
+Microsoft.TemplateEngine.Abstractions.Installer.InstallRequest.InstallRequest(string! identifier, string? version = null, string? installerName = null, System.Collections.Generic.Dictionary<string!, string!>? details = null, bool force = false) -> void
+Microsoft.TemplateEngine.Abstractions.Installer.InstallRequest.PackageIdentifier.get -> string!
+Microsoft.TemplateEngine.Abstractions.Installer.InstallRequest.Version.get -> string?
 Microsoft.TemplateEngine.Abstractions.ITemplateParameter.AllowMultipleValues.get -> bool
 Microsoft.TemplateEngine.Abstractions.ITemplateInfo.Constraints.get -> System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Abstractions.Constraints.TemplateConstraintInfo!>!
 Microsoft.TemplateEngine.Abstractions.ITemplateInfo.PostActions.get -> System.Collections.Generic.IReadOnlyList<System.Guid>!
@@ -38,3 +45,4 @@ Microsoft.TemplateEngine.Abstractions.TemplatePackage.IManagedTemplatePackage.Is
 ~Microsoft.TemplateEngine.Abstractions.Components.WorkloadInfo.Description.get -> string
 ~Microsoft.TemplateEngine.Abstractions.Components.WorkloadInfo.Id.get -> string
 ~Microsoft.TemplateEngine.Abstractions.Components.WorkloadInfo.WorkloadInfo(string id, string description) -> void
+override Microsoft.TemplateEngine.Abstractions.Installer.InstallRequest.ToString() -> string!
