@@ -1,4 +1,4 @@
-const myElement = (
+﻿const myElement = (
     <div>
         <p>DefaultTrueIncluded</p>
         <p>DefaultFalseIncluded</p>

@@ -366,7 +366,7 @@ In this sample, we can see that if the **TargetFrameworkOverride** symbol is def
 </ItemGroup>
 ```
 
-In this sample, it can also use conditional expressions inside an xml type comment for MSBuild files.
+In this snippet of MSBuild file, we see usage of conditional expression embeded inside a xml comment.
 
 ```xml
 <!--#if (IndividualLocalAuth && UseLocalDB) -->
@@ -560,7 +560,7 @@ The comment block starts with `rem ` to the end of line. After this marker you c
 
 ### Samples
 
-In this sample, according to the value of the `enableVerbose` symbol, an environment variable is set as true.
+In this sample, according to the value of the `enableVerbose` symbol, an environment variable is set to true.
 
 ```cmd
 rem #if enableVerbose

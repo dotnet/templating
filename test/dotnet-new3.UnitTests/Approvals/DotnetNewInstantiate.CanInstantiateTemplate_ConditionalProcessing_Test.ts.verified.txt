@@ -1,4 +1,4 @@
-declare class DefaultTrueIncluded { }
+﻿declare class DefaultTrueIncluded { }
 
 //#if defaultTrue
 declare class InsideUnknownDirectiveNoEmit { }

@@ -1,4 +1,4 @@
-open System
+﻿open System
 
 type DefaultTrueIncluded() = do printfn ""
 

@@ -1,4 +1,4 @@
-function DefaultTrueIncluded() { }
+﻿function DefaultTrueIncluded() { }
 
 //#if defaultTrue
 function InsideUnknownDirectiveNoEmit() { }
