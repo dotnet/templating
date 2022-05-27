@@ -16,7 +16,7 @@ namespace Microsoft.TemplateEngine.Cli.Commands
 {
     internal class TemplateCommand : Command
     {
-        private const int ConstraintEvaluationTimeout = 1000;
+        private static readonly TimeSpan ConstraintEvaluationTimeout = TimeSpan.FromMilliseconds(1000);
         private static readonly string[] _helpAliases = new[] { "-h", "/h", "--help", "-?", "/?" };
         private readonly TemplatePackageManager _templatePackageManager;
         private readonly IEngineEnvironmentSettings _environmentSettings;
