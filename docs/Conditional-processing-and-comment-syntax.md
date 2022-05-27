@@ -250,12 +250,12 @@ Xamarin.Calabash.Start();
 The first expression is not emitted because it is processed, and the condition evaluated to `false`. The second expression is copied as-is because the conditional processing is turned off for that part of the file. 
 
 ### Related
-[C# Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.cs)  
-[C++ Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.cpp)  
-[F# Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.fs)  
-[VB Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.vb)  
-[JavaScript Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.js)  
-[TypeScript Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.ts)  
+[C# Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Test.cs)  
+[C++ Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Test.cpp)  
+[F# Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Test.fs)  
+[VB Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Test.vb)  
+[JavaScript Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Test.js)  
+[TypeScript Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Test.ts)  
 
 ## JSON Files
 
@@ -304,7 +304,7 @@ Changing from `////#else` to `//#else` the result will be
 ```
 
 ### Related
-[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.json)
+[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Test.json)
 
 ## XML Files
 
@@ -337,7 +337,7 @@ In this sample, conditional expression is inside the comment `<!--` and `-->` in
 ```
 
 ### Related
-[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.xml)
+[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Test.xml)
 
 ## MSBuild Files
 
@@ -436,7 +436,7 @@ The first `<Foo Condition...` is copied as-is because the `msbuild-conditional` 
 
 ### Related
 
-[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.csproj)
+[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Test.csproj)
 
 ## Single hash line comments
 
@@ -510,7 +510,7 @@ http {
 ```
 
 ### Related
-[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.yml)
+[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Test.yml)
 
 ## CSS Files
 
@@ -548,7 +548,7 @@ In this sample, according to the value of the `IndividualLocalAuth` symbol, a fe
 
 ### Related
 
-[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.css)
+[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Test.css)
 
 ## Command Files
 
@@ -569,7 +569,7 @@ rem #endif
 ```
 
 ### Related    
-[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.cmd)
+[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Test.cmd)
 
 ## Razor Views
 
@@ -599,7 +599,7 @@ In this sample, according to the value of the `IndividualB2CAuth` symbol, the in
 
 ### Related
 
-[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.cshtml)
+[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Test.cshtml)
 
 ## Haml Files
 
@@ -619,7 +619,7 @@ In this sample, according to the value of the `addParagraph` symbol, a paragraph
 ```
 
 ### Related
-[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.haml)
+[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Test.haml)
 
 ## Jsx Files
 
@@ -645,7 +645,7 @@ const myElement = (
 ```
 
 ### Related
-[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.jsx)
+[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Test.jsx)
 
 ## Other File Types
 
@@ -663,4 +663,4 @@ option2
 ```
 
 ### Related
-[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Template/Test.othertype)
+[Sample](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.TestTemplates/test_templates/TemplateConditionalProcessing/Test.othertype)
