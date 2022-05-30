@@ -247,7 +247,7 @@ namespace Microsoft.TemplateEngine.Cli
                 await DisplayInstallResultAsync(result.InstallRequest.DisplayName, result, args.ParseResult, cancellationToken).ConfigureAwait(false);
                 if (!result.Success)
                 {
-                    resultStatus = NewCommandStatus.InstallFailed;
+                    resultStatus = result.Error == InstallerErrorCode.PackageNotFound ? NewCommandStatus.NotFound : NewCommandStatus.InstallFailed;
                 }
             }
             return resultStatus;

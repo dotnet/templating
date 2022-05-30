@@ -6,4 +6,4 @@ TestAssets.Group2  Basic VB       basic       VB        Test Asset  %TEMPLATE TW
 
 Uninstall the template packages containing the templates to keep only one template from the list or add the template options which differentiate the template to run.
 
-For details on current exit code please visit https://aka.ms/templating-exit-codes#103
+For details on the exit code, refer to https://aka.ms/templating-exit-codes#103

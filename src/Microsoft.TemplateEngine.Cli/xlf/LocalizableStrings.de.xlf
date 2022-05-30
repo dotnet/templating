@@ -259,8 +259,8 @@ Führen Sie \"dotnet {1}--show-aliases\" ohne Argumente aus, um alle Aliase anzu
         <note />
       </trans-unit>
       <trans-unit id="BaseCommand_ExitCodeHelp">
-        <source>For details on current exit code please visit https://aka.ms/templating-exit-codes#{0}</source>
-        <target state="new">For details on current exit code please visit https://aka.ms/templating-exit-codes#{0}</target>
+        <source>For details on the exit code, refer to https://aka.ms/templating-exit-codes#{0}</source>
+        <target state="new">For details on the exit code, refer to https://aka.ms/templating-exit-codes#{0}</target>
         <note>{0} is the exit code</note>
       </trans-unit>
       <trans-unit id="Change">
@@ -564,8 +564,8 @@ The header is followed by the list of parameters and their errors (might be seve
         <note />
       </trans-unit>
       <trans-unit id="MissingRequiredParameter">
-        <source>Mandatory option {0} missing for template {1}.</source>
-        <target state="translated">Die obligatorische Option \"{0}\" ist für die Vorlage \"{1}\" nicht vorhanden.</target>
+        <source>Mandatory option '{0}' is missing for the template '{1}'.</source>
+        <target state="needs-review-translation">Die obligatorische Option \"{0}\" ist für die Vorlage \"{1}\" nicht vorhanden.</target>
         <note />
       </trans-unit>
       <trans-unit id="MissingTemplateContentDetected">

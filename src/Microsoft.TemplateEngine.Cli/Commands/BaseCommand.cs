@@ -105,7 +105,6 @@ namespace Microsoft.TemplateEngine.Cli.Commands
                 using (Timing.Over(environmentSettings.Host.Logger, "Execute"))
                 {
                     await HandleGlobalOptionsAsync(args, environmentSettings, cancellationToken).ConfigureAwait(false);
-                    // Todo: here handle the error codes
                     returnCode = await ExecuteAsync(args, environmentSettings, telemetryLogger, context).ConfigureAwait(false);
                 }
             }

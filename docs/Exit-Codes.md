@@ -1,6 +1,6 @@
 # `dotnet new` exit codes and their meaning
 
-Exit codes are chosen to confrom to existing standards or standardization attempts and well known exit code. See [Related resources](#related) for more details 
+Exit codes are chosen to conform to existing standards or standardization attempts and well known exit code. See [Related resources](#related) for more details 
 
 | Exit&nbsp;Code | Reason |
 |:-----|----------|
@@ -8,17 +8,31 @@ Exit codes are chosen to confrom to existing standards or standardization attemp
 | [70](#70) | Unexpected internal software issue. |
 | [73](#73) | Can't create output file. |
 | [100](#100) | Instantiation Failed - Processing issues. |
-| [101](#101) | Instantiation Failed - Missing mandatory parameter(s) for template. |
-| [102](#102) | Instantiation/Search Failed - parameter(s) value(s) invalid. |
-| [103](#103) | The template was not found. |
+| [101](#101) | Missing required option(s) and/or argument(s) for the command. |
+| [102](#102) | Invalid option(s) and/or argument(s) for a command. |
+| [103](#103) | The template or the template package was not found. |
 | [104](#104) | The operation was cancelled. |
 | [105](#105) | Instantiation Failed - Post action failed. |
 | [106](#106) | Installation/Uninstallation Failed. |
 | [107 - 113](#107) | Reserved |
+| [127](#127) | Command not found |
+
+
+To enable verbose logging in order to troubleshoot issue(s), set the `DOTNET_CLI_CONTEXT_VERBOSE` environment variable to `true`
+
+_PowerShell:_
+```PowerShell
+$env:DOTNET_CLI_CONTEXT_VERBOSE = 'true'
+```
+
+_Cmd:_
+```cmd
+set DOTNET_CLI_CONTEXT_VERBOSE=true
+```
 
 ## <a name="70"></a>70 - Unexpected internal software issue
 
-The result received from template engine core is not expected. [File a bug](https://github.com/dotnet/templating/issues/new?title=Unexpected%20Internal%20Software%20Issue%20(EX_SOFTWARE)) if you encounter this exit code.
+Unexpected result or issue. [File a bug](https://github.com/dotnet/templating/issues/new?title=Unexpected%20Internal%20Software%20Issue%20(EX_SOFTWARE)) if you encounter this exit code.
 
 This is a semi-standardized exit code (see [EX_SOFTWARE in /usr/include/sysexits.h](https://github.com/openbsd/src/blob/master/include/sysexits.h#L107))
 
@@ -76,21 +90,25 @@ Incomplete condition in template file:
     static void Foo() { } 
 ```
 
-## <a name="101"></a>101 - Instantiation Failed - Missing mandatory parameter(s) for template.
+## <a name="101"></a>101 - Missing required option(s) and/or argument(s) for the command.
 
-A parameter [marked as required](Reference-for-template.json.md#isrequired) was not supplied during template instantiation.
+The exit code is used when one or more required options or/and arguments used for the command were not passed. 
+
+Applicable as well if template option [marked as required](Reference-for-template.json.md#isrequired) was not supplied during the template instantiation.
 
 _Example:_
 ```console
 > dotnet new my-template
-Mandatory option --MyMandatoryParam missing for template My Template.
+Mandatory option '--MyMandatoryParam' is missing for the template 'My Template'.
 
 For details on current exit code please visit https://aka.ms/templating-exit-codes#101
 ```
 
-## <a name="102"></a>102 - Instantiation/Search Failed - parameter(s) value(s) invalid.
+## <a name="102"></a>102 - Invalid option(s) and/or argument(s) for a command.
 
-Usually a mismatch in type of the specified parameter or unrecognized choice option. Applicable to `search` command with not enough information as well.
+The exit code is used when one or more options or/and arguments used in the command are invalid. 
+
+Usually a mismatch in type of the specified template option or unrecognized choice value. Applicable to `search` command with not enough information as well.
 
 _Examples:_
 ```console
@@ -116,9 +134,9 @@ Examples:
 For details on current exit code please visit https://aka.ms/templating-exit-codes#102
 ```
 
-## <a name="103"></a>103 - The template was not found.
+## <a name="103"></a>103 - The template or the template package was not found..
 
-Applicable to instantiation, listing and remote sources searching.
+Applicable to instantiation, listing, remote sources searching and installation.
 
 _Examples:_
 ```console
@@ -152,6 +170,16 @@ No templates found matching: 'xyz'.
 For details on current exit code please visit https://aka.ms/templating-exit-codes#103
 ```
 
+```console
+> dotnet new install foobarbaz
+The following template packages will be installed:
+   foobarbaz
+
+foobarbaz could not be installed, no NuGet feeds are configured or they are invalid.
+
+For details on current exit code please visit https://aka.ms/templating-exit-codes#103
+```
+
 ## <a name="104"></a>104 - The operation was cancelled. 
 
 Currently applicable only to case when user aborts custom post action.
@@ -165,11 +193,15 @@ Failure to download packages, read/write templates or cache, erorrneous or corru
 
 _Example:_
 ```console
-> dotnet new install foobarbaz
-The following template packages will be installed:
-   foobarbaz
+>dotnet nuget disable source nuget.org
+Package source with Name: nuget.org disabled successfully.
 
-foobarbaz could not be installed, the package does not exist.
+> dotnet new install webapi2
+The following template packages will be installed:
+   webapi2
+
+Error: No NuGet sources are defined or enabled.
+webapi2 could not be installed, the package does not exist.
 
 For details on current exit code please visit https://aka.ms/templating-exit-codes#106
 ```
@@ -180,6 +212,38 @@ Reserved for future use.
 
 [File a bug](https://github.com/dotnet/templating/issues/new?title=Unexpected%20Exit%20Code) if you encounter any of these exit codes.
 
+
+## <a name="127"></a>127 - Command not found
+
+Dotnet new subcommand or it's arg is not recognized.
+
+_Example:_
+```console
+dotnet new update --smth
+Unrecognized command or argument '--smth'
+
+
+
+Description:
+Checks the currently installed template packages for update, and install the updates.
+
+
+
+Usage:
+dotnet new update [options]
+
+
+
+Options:
+--interactive Allows the command to stop and wait for user input or action (for
+example to complete authentication).
+--add-source, --nuget-source <nuget-source> Specifies a NuGet source to use during install.
+--check-only, --dry-run Only check for updates and display the template packages to be updated
+without applying update.
+-?, -h, --help Show command line help.
+
+For details on current exit code please visit https://aka.ms/templating-exit-codes#127
+```
 
 <BR/>
 <BR/>

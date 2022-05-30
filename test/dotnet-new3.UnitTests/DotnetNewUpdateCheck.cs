@@ -78,7 +78,7 @@ namespace Dotnet_new3.IntegrationTests
                 .And.HaveStdErr($@"Failed to check update for {nugetFullName}: the package is not available in configured NuGet feeds.
 
 
-For details on current exit code please visit https://aka.ms/templating-exit-codes#106");
+For details on the exit code, refer to https://aka.ms/templating-exit-codes#106");
         }
 
         [Theory]

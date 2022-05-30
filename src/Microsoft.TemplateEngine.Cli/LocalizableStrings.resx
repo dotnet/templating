@@ -167,7 +167,7 @@
     <value>Language</value>
   </data>
   <data name="MissingRequiredParameter" xml:space="preserve">
-    <value>Mandatory option {0} missing for template {1}.</value>
+    <value>Mandatory option '{0}' is missing for the template '{1}'.</value>
   </data>
   <data name="MountPointFactories" xml:space="preserve">
     <value>Mount Point Factories</value>
@@ -806,7 +806,7 @@ The header is followed by the list of parameters and their errors (might be seve
     <comment>{0} - option name (--force). Followed by command example on new line.</comment>
   </data>
   <data name="BaseCommand_ExitCodeHelp" xml:space="preserve">
-    <value>For details on current exit code please visit https://aka.ms/templating-exit-codes#{0}</value>
+    <value>For details on the exit code, refer to https://aka.ms/templating-exit-codes#{0}</value>
     <comment>{0} is the exit code</comment>
   </data>
 </root>

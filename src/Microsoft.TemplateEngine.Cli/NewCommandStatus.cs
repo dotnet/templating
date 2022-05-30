@@ -9,9 +9,17 @@ namespace Microsoft.TemplateEngine.Cli
     ///  * https://github.com/openbsd/src/blob/master/include/sysexits.h.
     /// Further documentation: https://aka.ms/templating-exit-codes.
     /// Future exit codes should be allocated in a range of 107 - 113. If not sufficient, a range of 79 - 99 may be used as well.
+    ///
+    /// 127 is not explicitly used here - it is injected from sdk:
+    ///    https://github.com/dotnet/sdk/blob/main/src/Cli/dotnet/Parser.cs#L148.
     /// </summary>
     internal enum NewCommandStatus
     {
+        /// <summary>
+        /// The template was instantiated successfully.
+        /// </summary>
+        Success = 0,
+
         /// <summary>
         /// Unexpected internal software issue. The result received from template engine core is not expected.
         /// </summary>
@@ -20,12 +28,7 @@ namespace Microsoft.TemplateEngine.Cli
         /// <summary>
         /// Can't create output file. The operation was cancelled due to detection of an attempt to perform destructive changes to existing files.
         /// </summary>
-        DestructiveChangesDetected = 73,
-
-        /// <summary>
-        /// The template was instantiated successfully.
-        /// </summary>
-        Success = 0,
+        CannotCreateOutputFile = 73,
 
         /// <summary>
         /// Instantiation Failed - Processing issues.
@@ -33,17 +36,17 @@ namespace Microsoft.TemplateEngine.Cli
         CreateFailed = 100,
 
         /// <summary>
-        /// Instantiation Failed - Missing mandatory parameter(s) for template.
+        /// Missing required option(s) and/or argument(s) for the command.
         /// </summary>
-        MissingMandatoryParam = 101,
+        MissingRequiredOption = 101,
 
         /// <summary>
-        /// Instantiation/Search Failed - parameter(s) value(s) invalid.
+        /// Invalid option(s) and/or argument(s) for a command.
         /// </summary>
-        InvalidParamValues = 102,
+        InvalidOption = 102,
 
         /// <summary>
-        /// The template was not found.
+        /// The template or the template package was not found.
         /// </summary>
         NotFound = 103,
 

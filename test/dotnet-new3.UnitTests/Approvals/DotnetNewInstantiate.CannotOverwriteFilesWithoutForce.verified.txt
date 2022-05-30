@@ -4,4 +4,4 @@
 
 Rerun the command and pass --force to accept and create.
 
-For details on current exit code please visit https://aka.ms/templating-exit-codes#73
+For details on the exit code, refer to https://aka.ms/templating-exit-codes#73
