@@ -2,22 +2,7 @@
 <Project>
   <Import Project="$(DotNetPackageVersionPropsPath)" Condition="'$(DotNetPackageVersionPropsPath)' != ''" />
 
-  <ItemGroup>
-    <PackageReference Update="System.CommandLine" Version="$(SystemCommandLinePackageVersion)" />
-    <PackageReference Update="System.Diagnostics.Process" Version="$(SystemDiagnosticsProcessPackageVersion)" />
-    <PackageReference Update="System.IO.Compression" Version="$(SystemIOCompressionPackageVersion)" />
-    <PackageReference Update="System.Runtime.Loader" Version="$(SystemRuntimeLoaderPackageVersion)" />   
-    <PackageReference Update="Microsoft.Build.Framework" Version="$(MicrosoftBuildFrameworkPackageVersion)" />
-    <PackageReference Update="Microsoft.Build.Utilities.Core" Version="$(MicrosoftBuildUtilitiesCorePackageVersion)" />
-    <PackageReference Update="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsLoggingPackageVersion)" />
-    <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftExtensionsLoggingConsolePackageVersion)" />
-    <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsLoggingAbstractionsPackageVersion)" />
-    <PackageReference Update="Newtonsoft.Json" Version="$(NewtonsoftJsonPackageVersion)" />
-    <PackageReference Update="NuGet.Configuration" Version="$(NuGetConfigurationPackageVersion)" />
-    <PackageReference Update="NuGet.Credentials" Version="$(NuGetCredentialsPackageVersion)" />
-    <PackageReference Update="NuGet.Protocol" Version="$(NuGetProtocolPackageVersion)" />
-    <PackageReference Update="Wcwidth.Sources" Version="$(WcwidthSourcesPackageVersion)" />
-  </ItemGroup>
+  <Import Project="$(RepositoryEngineeringDir)Package.props" />
 
   <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' AND '$(BuildingInsideVisualStudio)' != 'true'">
     <FrameworkReference

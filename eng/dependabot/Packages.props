@@ -1,0 +1,24 @@
+<Project>
+  <!-- Packages in this file have versions updated periodically by Dependabot. Versions managed by Darc/Maestro should be in ..\Package.props. -->
+  <ItemGroup>
+    <PackageReference Update="System.Diagnostics.Process" Version="4.3.0" />
+    <PackageReference Update="System.IO.Compression" Version="4.3.0" />
+    <PackageReference Update="System.Runtime.Loader" Version="4.3.0" />
+    <PackageReference Update="Microsoft.Build.Framework" Version="16.10.0" />
+    <PackageReference Update="Microsoft.Build.Utilities.Core" Version="16.10.0" />
+    <PackageReference Update="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Update="Wcwidth.Sources" Version="0.5.0" />
+    <!--Analyzers-->
+    <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.333" />
+    <!--Test dependencies-->
+    <PackageReference Update="FakeItEasy" Version="6.2.1" />
+    <PackageReference Update="FluentAssertions" Version="5.10.3" />
+    <PackageReference Update="Microsoft.DotNet.Cli.Utils" Version="6.0.100-rc.1.21423.4" />
+    <PackageReference Update="Microsoft.NET.Test.Sdk" Version="15.8.0" />
+    <PackageReference Update="xunit.abstractions" Version="2.0.3" />
+    <PackageReference Update="Newtonsoft.Json.Schema" Version="3.0.13" />
+    <PackageReference Update="Verify.XUnit" Version="14.2.0" />
+    <PackageReference Update="System.Net.Http" Version="4.3.4" />
+    <PackageReference Update="System.Security.Cryptography.X509Certificates" Version="4.3.0" />
+  </ItemGroup>
+</Project>
