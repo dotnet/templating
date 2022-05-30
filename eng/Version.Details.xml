@@ -55,13 +55,13 @@
       <Uri>https://github.com/dotnet/roslyn</Uri>
       <Sha>5886de67259d3fe055e48985ba5cefb9d089a840</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.0.0-preview1.22274.2">
+    <Dependency Name="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.0.0-preview1.22277.2">
       <Uri>https://github.com/dotnet/roslyn-analyzers</Uri>
-      <Sha>04edea1ac503805a8d9a6959ec18e20bff506bb5</Sha>
+      <Sha>b2c2cbef531dd778a6b4020a7f9fdda9d010923c</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4-beta1.22274.2">
+    <Dependency Name="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4-beta1.22277.2">
       <Uri>https://github.com/dotnet/roslyn-analyzers</Uri>
-      <Sha>04edea1ac503805a8d9a6959ec18e20bff506bb5</Sha>
+      <Sha>b2c2cbef531dd778a6b4020a7f9fdda9d010923c</Sha>
     </Dependency>
     <Dependency Name="Microsoft.Net.Compilers.Toolset" Version="4.2.0-4.22266.5">
       <Uri>https://github.com/dotnet/roslyn</Uri>
@@ -69,9 +69,9 @@
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
-    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="7.0.0-beta.22274.7">
+    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="7.0.0-beta.22276.1">
       <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>007adcd66f519c3c96fa0ecc21ed197a6da9e015</Sha>
+      <Sha>b8b67b243ba93bf9b89390c85b4dee034d3c5609</Sha>
       <SourceBuild RepoName="arcade" ManagedOnly="true" />
     </Dependency>
   </ToolsetDependencies>
