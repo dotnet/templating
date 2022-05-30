@@ -17,7 +17,7 @@ namespace Microsoft.TemplateEngine.Utils
         /// <param name="sequence">Sequence to be tested for duplicates.</param>
         /// <param name="comparer">Comparer to be used to evaluate equality. Default comparer is being used if null is passed.</param>
         /// <returns>true if sequence contains duplicates, false otherwise.</returns>
-        public static bool HasDuplicities<T>(this IEnumerable<T>? sequence, IEqualityComparer<T>? comparer = null)
+        public static bool HasDuplicates<T>(this IEnumerable<T>? sequence, IEqualityComparer<T>? comparer = null)
         {
             if (sequence == null)
             {
@@ -34,7 +34,7 @@ namespace Microsoft.TemplateEngine.Utils
         /// <param name="sequence">Sequence to be tested for duplicates.</param>
         /// <param name="comparer">Comparer to be used to evaluate equality. Default comparer is being used if null is passed.</param>
         /// <returns>Sequence of elements being duplicated in input. Each item is returned just once, even if located multiple times in original sequence. Empty sequence returned if input has no duplicates.</returns>
-        public static IEnumerable<T> GetDuplicities<T>(this IEnumerable<T>? sequence, IEqualityComparer<T>? comparer = null)
+        public static IEnumerable<T> GetDuplicates<T>(this IEnumerable<T>? sequence, IEqualityComparer<T>? comparer = null)
         {
             if (sequence == null)
             {

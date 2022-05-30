@@ -499,7 +499,7 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Multiple &apos;ISdkInfoProvider&apos; components provided by host ({0}), therefore SdkVersionConstraints cannot be properly initialized..
+        ///   Looks up a localized string similar to Multiple &apos;ISdkInfoProvider&apos; components provided by host ({0}), therefore &apos;SdkVersionConstraint&apos; cannot be properly initialized..
         /// </summary>
         internal static string SdkConstraint_Error_MismatchedProviders {
             get {
@@ -508,7 +508,7 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No &apos;ISdkInfoProvider&apos; component provided by host. SdkVersionConstraints cannot be properly initialized..
+        ///   Looks up a localized string similar to No &apos;ISdkInfoProvider&apos; component provided by host. &apos;SdkVersionConstraint&apos; cannot be properly initialized..
         /// </summary>
         internal static string SdkConstraint_Error_MissingProvider {
             get {
@@ -517,29 +517,11 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Install any of the supported SDK versions..
-        /// </summary>
-        internal static string SdkConstraint_Message_InstallSdk {
-            get {
-                return ResourceManager.GetString("SdkConstraint_Message_InstallSdk", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Running template on current dotnet SDK version ({0}) is unsupported. Supported SDK instance(s): {1}.
+        ///   Looks up a localized string similar to Running template on current .NET SDK version ({0}) is unsupported. Supported version(s): {1}.
         /// </summary>
         internal static string SdkConstraint_Message_Restricted {
             get {
                 return ResourceManager.GetString("SdkConstraint_Message_Restricted", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to You have other SDK version(s) installed that can be used to run this template. Switch to any of the following SDK(s) on your system to run this template: {0}.
-        /// </summary>
-        internal static string SdkConstraint_Message_SwitchSdk {
-            get {
-                return ResourceManager.GetString("SdkConstraint_Message_SwitchSdk", resourceCulture);
             }
         }
         
@@ -638,16 +620,7 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Run &apos;dotnet workloads search&apos; to search workloads available to be installed on your SDK..
-        /// </summary>
-        internal static string Workload_Message_CTA {
-            get {
-                return ResourceManager.GetString("Workload_Message_CTA", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Multiple &apos;IWorkloadsInfoProvider&apos; components provided by host ({0}), therefore WorkloadConstraints cannot be properly initialized..
+        ///   Looks up a localized string similar to Multiple &apos;IWorkloadsInfoProvider&apos; components provided by host ({0}), therefore &apos;WorkloadConstraint&apos; cannot be properly initialized..
         /// </summary>
         internal static string WorkloadConstraint_Error_MismatchedProviders {
             get {
@@ -656,7 +629,7 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No &apos;IWorkloadsInfoProvider&apos; component provided by host. WorkloadConstraints cannot be properly initialized..
+        ///   Looks up a localized string similar to No &apos;IWorkloadsInfoProvider&apos; component provided by host. &apos;WorkloadConstraint&apos; cannot be properly initialized..
         /// </summary>
         internal static string WorkloadConstraint_Error_MissingProvider {
             get {
@@ -665,7 +638,7 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Running template on this host is not supported. It is supported on workload(s): {0}. Currently installed optional workloads: {1}.
+        ///   Looks up a localized string similar to Running template is not supported - required optional workload(s) not installed. Supported workload(s): {0}. Currently installed optional workloads: {1}.
         /// </summary>
         internal static string WorkloadConstraint_Message_Restricted {
             get {

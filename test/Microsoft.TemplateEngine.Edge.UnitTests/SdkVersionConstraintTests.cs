@@ -127,8 +127,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             Assert.Equal(TemplateConstraintResult.Status.Restricted, evaluateResult.EvaluationStatus);
             Assert.StartsWith(
                 hasAlternativeInstalled
-                    ? "You have other SDK version(s) installed that can be used to run this template."
-                    : "Install any of the supported SDK versions.",
+                    ? "Sample CTA with alternatives"
+                    : "Sample CTA without alternatives",
                 evaluateResult.CallToAction);
         }
 
@@ -152,6 +152,12 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             public Task<string> GetCurrentVersionAsync(CancellationToken cancellationToken) => Task.FromResult(_res);
 
             public Task<IEnumerable<string>> GetInstalledVersionsAsync(CancellationToken cancellationToken) => Task.FromResult(_installed);
+
+            public string ProvideConstraintRemedySuggestion(
+                IReadOnlyList<string> supportedVersions,
+                IReadOnlyList<string> viableInstalledVersions) => viableInstalledVersions.Any()
+                ? "Sample CTA with alternatives"
+                : "Sample CTA without alternatives";
         }
     }
 }

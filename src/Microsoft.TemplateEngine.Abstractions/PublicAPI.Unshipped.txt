@@ -42,7 +42,9 @@ Microsoft.TemplateEngine.Abstractions.ITemplateInfo.PostActions.get -> System.Co
 Microsoft.TemplateEngine.Abstractions.TemplatePackage.IManagedTemplatePackage.IsLocalPackage.get -> bool
 ~Microsoft.TemplateEngine.Abstractions.Components.ISdkInfoProvider.GetCurrentVersionAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<string>
 ~Microsoft.TemplateEngine.Abstractions.Components.ISdkInfoProvider.GetInstalledVersionsAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<string>>
+~Microsoft.TemplateEngine.Abstractions.Components.ISdkInfoProvider.ProvideConstraintRemedySuggestion(System.Collections.Generic.IReadOnlyList<string> supportedVersions, System.Collections.Generic.IReadOnlyList<string> viableInstalledVersions) -> string
 ~Microsoft.TemplateEngine.Abstractions.Components.IWorkloadsInfoProvider.GetInstalledWorkloadsAsync(System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<System.Collections.Generic.IEnumerable<Microsoft.TemplateEngine.Abstractions.Components.WorkloadInfo>>
+~Microsoft.TemplateEngine.Abstractions.Components.IWorkloadsInfoProvider.ProvideConstraintRemedySuggestion(System.Collections.Generic.IReadOnlyList<string> supportedWorkloads) -> string
 ~Microsoft.TemplateEngine.Abstractions.Components.WorkloadInfo.Description.get -> string
 ~Microsoft.TemplateEngine.Abstractions.Components.WorkloadInfo.Id.get -> string
 ~Microsoft.TemplateEngine.Abstractions.Components.WorkloadInfo.WorkloadInfo(string id, string description) -> void

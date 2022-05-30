@@ -151,6 +151,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             public Guid Id { get; }
 
             public Task<IEnumerable<WorkloadInfo>> GetInstalledWorkloadsAsync(CancellationToken token) => Task.FromResult(_res);
+
+            public string ProvideConstraintRemedySuggestion(IReadOnlyList<string> supportedWorkloads) => "Sample CTA";
         }
     }
 }

@@ -33,16 +33,19 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
         {
             private readonly NuGetVersionSpecification _currentSdkVersion;
             private readonly IReadOnlyList<NuGetVersionSpecification> _installedSdkVersion;
+            private readonly Func<IReadOnlyList<string>, IReadOnlyList<string>, string> _remedySuggestionFactory;
 
             private SdkVersionConstraint(
                 IEngineEnvironmentSettings environmentSettings,
                 ITemplateConstraintFactory factory,
                 NuGetVersionSpecification currentSdkVersion,
-                IEnumerable<NuGetVersionSpecification> installedSdkVersions)
+                IEnumerable<NuGetVersionSpecification> installedSdkVersions,
+                Func<IReadOnlyList<string>, IReadOnlyList<string>, string> remedySuggestionFactory)
                 : base(environmentSettings, factory)
             {
                 _currentSdkVersion = currentSdkVersion;
                 _installedSdkVersion = installedSdkVersions.ToList();
+                _remedySuggestionFactory = remedySuggestionFactory;
             }
 
             public override string DisplayName => ".NET SDK version";
@@ -53,7 +56,7 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
                     await ExtractInstalledSdkVersionAsync(
                         environmentSettings.Components.OfType<ISdkInfoProvider>(),
                         cancellationToken).ConfigureAwait(false);
-                return new SdkVersionConstraint(environmentSettings, factory, versions.Item1, versions.Item2);
+                return new SdkVersionConstraint(environmentSettings, factory, versions.Item1, versions.Item2, versions.Item3);
             }
 
             protected override TemplateConstraintResult EvaluateInternal(string? args)
@@ -68,21 +71,20 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
                     }
                 }
 
-                string cta = LocalizableStrings.SdkConstraint_Message_InstallSdk;
-
-                string viableInstalledVersionsCsv = _installedSdkVersion.Where(installed =>
-                        supportedSdks.Any(supported => supported.CheckIfVersionIsValid(installed.ToString())))
-                    .ToCsvString();
-
-                if (!string.IsNullOrEmpty(viableInstalledVersionsCsv))
-                {
-                    cta = string.Format(LocalizableStrings.SdkConstraint_Message_SwitchSdk, viableInstalledVersionsCsv);
-                }
+                string cta = _remedySuggestionFactory(
+                    VersionSpecificationsToStrings(supportedSdks),
+                    VersionSpecificationsToStrings(_installedSdkVersion.Where(installed =>
+                        supportedSdks.Any(supported => supported.CheckIfVersionIsValid(installed.ToString())))));
 
                 return TemplateConstraintResult.CreateRestricted(
                     Type,
                     string.Format(LocalizableStrings.SdkConstraint_Message_Restricted, _currentSdkVersion.ToString(), supportedSdks.ToCsvString()),
                     cta);
+            }
+
+            private static IReadOnlyList<string> VersionSpecificationsToStrings(IEnumerable<IVersionSpecification> versions)
+            {
+                return versions.Select(v => v.ToString()).ToList();
             }
 
             //supported configuration:
@@ -93,7 +95,9 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
                 return args.ParseArrayOfConstraintStrings().Select(ConstraintsExtensions.ParseVersionSpecification);
             }
 
-            private static async Task<(NuGetVersionSpecification, IEnumerable<NuGetVersionSpecification>)> ExtractInstalledSdkVersionAsync(IEnumerable<ISdkInfoProvider> sdkInfoProviders, CancellationToken cancellationToken)
+            private static async
+                Task<(NuGetVersionSpecification, IEnumerable<NuGetVersionSpecification>, Func<IReadOnlyList<string>, IReadOnlyList<string>, string>)>
+                ExtractInstalledSdkVersionAsync(IEnumerable<ISdkInfoProvider> sdkInfoProviders, CancellationToken cancellationToken)
             {
                 List<ISdkInfoProvider> providers = sdkInfoProviders.ToList();
 
@@ -115,7 +119,7 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
                 cancellationToken.ThrowIfCancellationRequested();
                 IEnumerable<NuGetVersionSpecification> versions = (await providers[0].GetInstalledVersionsAsync(cancellationToken).ConfigureAwait(false)).Select(ParseVersion);
 
-                return (currentSdkVersion, versions);
+                return (currentSdkVersion, versions, providers[0].ProvideConstraintRemedySuggestion);
             }
 
             private static NuGetVersionSpecification ParseVersion(string version)

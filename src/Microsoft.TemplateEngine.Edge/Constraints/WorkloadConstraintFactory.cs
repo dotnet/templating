@@ -35,24 +35,30 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
         {
             private readonly HashSet<string> _installedWorkloads;
             private readonly string _installedWorkloadsString;
+            private readonly Func<IReadOnlyList<string>, string> _remedySuggestionFactory;
 
-            private WorkloadConstraint(IEngineEnvironmentSettings environmentSettings, ITemplateConstraintFactory factory, IReadOnlyList<WorkloadInfo> workloads)
+            private WorkloadConstraint(
+                IEngineEnvironmentSettings environmentSettings,
+                ITemplateConstraintFactory factory,
+                IReadOnlyList<WorkloadInfo> workloads,
+                Func<IReadOnlyList<string>, string> remedySuggestionFactory)
                 : base(environmentSettings, factory)
             {
                 _installedWorkloads = new HashSet<string>(workloads.Select(w => w.Id), StringComparer.InvariantCultureIgnoreCase);
                 _installedWorkloadsString = workloads.Select(w => $"{w.Id} \"{w.Description}\"").ToCsvString();
+                _remedySuggestionFactory = remedySuggestionFactory;
             }
 
             public override string DisplayName => "Workload";
 
             internal static async Task<WorkloadConstraint> CreateAsync(IEngineEnvironmentSettings environmentSettings, ITemplateConstraintFactory factory, CancellationToken cancellationToken)
             {
-                IReadOnlyList<WorkloadInfo> workloads =
+                (IReadOnlyList<WorkloadInfo>, Func<IReadOnlyList<string>, string>) workloadsInfo =
                     await ExtractWorkloadInfoAsync(
                         environmentSettings.Components.OfType<IWorkloadsInfoProvider>(),
                         environmentSettings.Host.Logger,
                         cancellationToken).ConfigureAwait(false);
-                return new WorkloadConstraint(environmentSettings, factory, workloads);
+                return new WorkloadConstraint(environmentSettings, factory, workloadsInfo.Item1, workloadsInfo.Item2);
             }
 
             protected override TemplateConstraintResult EvaluateInternal(string? args)
@@ -72,7 +78,8 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
                         LocalizableStrings.WorkloadConstraint_Message_Restricted,
                         string.Join(", ", supportedWorkloads),
                         string.Join(", ", _installedWorkloadsString)),
-                    LocalizableStrings.Workload_Message_CTA);
+                    _remedySuggestionFactory(supportedWorkloads)
+                    );
             }
 
             //supported configuration:
@@ -83,7 +90,7 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
                 return args.ParseArrayOfConstraintStrings();
             }
 
-            private static async Task<IReadOnlyList<WorkloadInfo>> ExtractWorkloadInfoAsync(IEnumerable<IWorkloadsInfoProvider> workloadsInfoProviders, ILogger logger, CancellationToken token)
+            private static async Task<(IReadOnlyList<WorkloadInfo>, Func<IReadOnlyList<string>, string>)> ExtractWorkloadInfoAsync(IEnumerable<IWorkloadsInfoProvider> workloadsInfoProviders, ILogger logger, CancellationToken token)
             {
                 List<IWorkloadsInfoProvider> providers = workloadsInfoProviders.ToList();
                 List<WorkloadInfo>? workloads = null;
@@ -103,18 +110,18 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
                 IEnumerable<WorkloadInfo> currentProviderWorkloads = await providers[0].GetInstalledWorkloadsAsync(token).ConfigureAwait(false);
                 workloads = currentProviderWorkloads.ToList();
 
-                if (workloads!.Select(w => w.Id).HasDuplicities(StringComparer.InvariantCultureIgnoreCase))
+                if (workloads.Select(w => w.Id).HasDuplicates(StringComparer.InvariantCultureIgnoreCase))
                 {
                     logger.LogWarning(string.Format(
                         LocalizableStrings.WorkloadConstraint_Warning_DuplicateWorkloads,
-                        workloads.Select(w => w.Id).GetDuplicities(StringComparer.InvariantCultureIgnoreCase).ToCsvString()));
+                        workloads.Select(w => w.Id).GetDuplicates(StringComparer.InvariantCultureIgnoreCase).ToCsvString()));
                     workloads = workloads
                         .GroupBy(w => w.Id, StringComparer.InvariantCultureIgnoreCase)
                         .Select(g => g.First())
                         .ToList();
                 }
 
-                return workloads!;
+                return (workloads, providers[0].ProvideConstraintRemedySuggestion);
             }
         }
     }

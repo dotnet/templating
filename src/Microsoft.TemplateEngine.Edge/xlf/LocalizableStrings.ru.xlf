@@ -252,29 +252,19 @@ Details: {1}.</source>
         <note>{0} is the provided version</note>
       </trans-unit>
       <trans-unit id="SdkConstraint_Error_MismatchedProviders">
-        <source>Multiple 'ISdkInfoProvider' components provided by host ({0}), therefore SdkVersionConstraints cannot be properly initialized.</source>
-        <target state="new">Multiple 'ISdkInfoProvider' components provided by host ({0}), therefore SdkVersionConstraints cannot be properly initialized.</target>
+        <source>Multiple 'ISdkInfoProvider' components provided by host ({0}), therefore 'SdkVersionConstraint' cannot be properly initialized.</source>
+        <target state="new">Multiple 'ISdkInfoProvider' components provided by host ({0}), therefore 'SdkVersionConstraint' cannot be properly initialized.</target>
         <note>{0} is the list of providers</note>
       </trans-unit>
       <trans-unit id="SdkConstraint_Error_MissingProvider">
-        <source>No 'ISdkInfoProvider' component provided by host. SdkVersionConstraints cannot be properly initialized.</source>
-        <target state="new">No 'ISdkInfoProvider' component provided by host. SdkVersionConstraints cannot be properly initialized.</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="SdkConstraint_Message_InstallSdk">
-        <source>Install any of the supported SDK versions.</source>
-        <target state="new">Install any of the supported SDK versions.</target>
+        <source>No 'ISdkInfoProvider' component provided by host. 'SdkVersionConstraint' cannot be properly initialized.</source>
+        <target state="new">No 'ISdkInfoProvider' component provided by host. 'SdkVersionConstraint' cannot be properly initialized.</target>
         <note />
       </trans-unit>
       <trans-unit id="SdkConstraint_Message_Restricted">
-        <source>Running template on current dotnet SDK version ({0}) is unsupported. Supported SDK instance(s): {1}</source>
-        <target state="new">Running template on current dotnet SDK version ({0}) is unsupported. Supported SDK instance(s): {1}</target>
-        <note>{0} isthe current SDK version, {1} is the list of supported SDK versions</note>
-      </trans-unit>
-      <trans-unit id="SdkConstraint_Message_SwitchSdk">
-        <source>You have other SDK version(s) installed that can be used to run this template. Switch to any of the following SDK(s) on your system to run this template: {0}</source>
-        <target state="new">You have other SDK version(s) installed that can be used to run this template. Switch to any of the following SDK(s) on your system to run this template: {0}</target>
-        <note>{0} is the csv list of supported SDKs</note>
+        <source>Running template on current .NET SDK version ({0}) is unsupported. Supported version(s): {1}</source>
+        <target state="new">Running template on current .NET SDK version ({0}) is unsupported. Supported version(s): {1}</target>
+        <note>{0} is the current SDK version, {1} is the list of supported SDK versions</note>
       </trans-unit>
       <trans-unit id="TemplateConstraintManager_Error_FailedToEvaluate">
         <source>The constraint '{0}' failed to be evaluated for the args '{1}', details: {2}</source>
@@ -338,29 +328,24 @@ Template cache will be recreated on the next run.</source>
         <note>{0} should not end with period - period is a part of the format entry.</note>
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Error_MismatchedProviders">
-        <source>Multiple 'IWorkloadsInfoProvider' components provided by host ({0}), therefore WorkloadConstraints cannot be properly initialized.</source>
-        <target state="new">Multiple 'IWorkloadsInfoProvider' components provided by host ({0}), therefore WorkloadConstraints cannot be properly initialized.</target>
+        <source>Multiple 'IWorkloadsInfoProvider' components provided by host ({0}), therefore 'WorkloadConstraint' cannot be properly initialized.</source>
+        <target state="new">Multiple 'IWorkloadsInfoProvider' components provided by host ({0}), therefore 'WorkloadConstraint' cannot be properly initialized.</target>
         <note>{0} is list of ids of providers</note>
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Error_MissingProvider">
-        <source>No 'IWorkloadsInfoProvider' component provided by host. WorkloadConstraints cannot be properly initialized.</source>
-        <target state="new">No 'IWorkloadsInfoProvider' component provided by host. WorkloadConstraints cannot be properly initialized.</target>
+        <source>No 'IWorkloadsInfoProvider' component provided by host. 'WorkloadConstraint' cannot be properly initialized.</source>
+        <target state="new">No 'IWorkloadsInfoProvider' component provided by host. 'WorkloadConstraint' cannot be properly initialized.</target>
         <note />
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Message_Restricted">
-        <source>Running template on this host is not supported. It is supported on workload(s): {0}. Currently installed optional workloads: {1}</source>
-        <target state="new">Running template on this host is not supported. It is supported on workload(s): {0}. Currently installed optional workloads: {1}</target>
+        <source>Running template is not supported - required optional workload(s) not installed. Supported workload(s): {0}. Currently installed optional workloads: {1}</source>
+        <target state="new">Running template is not supported - required optional workload(s) not installed. Supported workload(s): {0}. Currently installed optional workloads: {1}</target>
         <note>{0} is list of supported workloads. {1} is list of installed optional workloads</note>
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Warning_DuplicateWorkloads">
         <source>'IWorkloadsInfoProvider' component provided by host provided some duplicated workloads (duplicates: {0}). Duplicates will be skipped.</source>
         <target state="new">'IWorkloadsInfoProvider' component provided by host provided some duplicated workloads (duplicates: {0}). Duplicates will be skipped.</target>
         <note>{0} is the list of duplicates</note>
-      </trans-unit>
-      <trans-unit id="Workload_Message_CTA">
-        <source>Run 'dotnet workloads search' to search workloads available to be installed on your SDK.</source>
-        <target state="new">Run 'dotnet workloads search' to search workloads available to be installed on your SDK.</target>
-        <note />
       </trans-unit>
     </body>
   </file>

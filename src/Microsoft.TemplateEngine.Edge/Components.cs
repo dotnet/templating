@@ -35,7 +35,7 @@ namespace Microsoft.TemplateEngine.Edge
                 (typeof(ITemplateConstraintFactory), new SdkVersionConstraintFactory()),
             };
 
-        public static IReadOnlyList<(Type Type, IIdentifiedComponent Instance)> RecomendComponents { get; } =
+        public static IReadOnlyList<(Type Type, IIdentifiedComponent Instance)> MandatoryComponents { get; } =
             new (Type Type, IIdentifiedComponent Instance)[]
             {
                 (typeof(IMountPointFactory), new ZipFileMountPointFactory()),
