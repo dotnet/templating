@@ -36,14 +36,14 @@ namespace Microsoft.TemplateEngine.Cli
         CreateFailed = 100,
 
         /// <summary>
-        /// Missing required option(s) and/or argument(s) for the command.
+        /// Instantiation Failed - Template Authoring Error.
         /// </summary>
-        MissingRequiredOption = 101,
+        TemplateIssueDetected = 101,
 
         /// <summary>
-        /// Invalid option(s) and/or argument(s) for a command.
+        /// Missing required option(s) and/or argument(s) for the command.
         /// </summary>
-        InvalidOption = 102,
+        MissingRequiredOption = 102,
 
         /// <summary>
         /// The template or the template package was not found.
@@ -64,5 +64,10 @@ namespace Microsoft.TemplateEngine.Cli
         /// Installation/Uninstallation Failed - Processing issues.
         /// </summary>
         InstallFailed = 106,
+
+        /// <summary>
+        /// Unrecognized option(s) and/or argument(s) for a command.
+        /// </summary>
+        InvalidOption = 127,
     }
 }

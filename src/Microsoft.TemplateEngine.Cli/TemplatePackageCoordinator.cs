@@ -298,7 +298,7 @@ namespace Microsoft.TemplateEngine.Cli
                     {
                         if (!updateResult.Success)
                         {
-                            success = NewCommandStatus.CreateFailed;
+                            success = NewCommandStatus.InstallFailed;
                         }
                         await DisplayInstallResultAsync(updateResult.UpdateRequest.TemplatePackage.DisplayName, updateResult, commandArgs.ParseResult, cancellationToken).ConfigureAwait(false);
                     }

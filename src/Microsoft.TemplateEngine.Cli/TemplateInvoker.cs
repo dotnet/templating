@@ -185,7 +185,7 @@ namespace Microsoft.TemplateEngine.Cli
             catch (TemplateAuthoringException tae)
             {
                 Reporter.Error.WriteLine(tae.Message.Bold().Red());
-                return NewCommandStatus.CreateFailed;
+                return NewCommandStatus.TemplateIssueDetected;
             }
 
             string resultTemplateName = string.IsNullOrEmpty(instantiateResult.TemplateFullName) ? templateArgs.Template.Name : instantiateResult.TemplateFullName;
