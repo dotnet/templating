@@ -62,14 +62,14 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 
         [Theory]
         // basic choice
-        [InlineData("FirstChoice", "FIRST")]
+        [InlineData("FirstChoice", "FIRST", false)]
         // nonexistent choice
-        [InlineData("Invalid", "UNKNOWN")]
+        [InlineData("Invalid", "UNKNOWN", true)]
         // value not set - default used
-        [InlineData(null, "SECOND")]
+        [InlineData(null, "SECOND", false)]
         // explicit unset
-        [InlineData("", "UNKNOWN")]
-        public async void InstantiateAsync_ParamsProperlyHonored(string? parameterValue, string expectedOutput)
+        [InlineData("", "UNKNOWN", false)]
+        public async void InstantiateAsync_ParamsProperlyHonored(string? parameterValue, string expectedOutput, bool instantiateShouldFail)
         {
             //
             // Template content preparation
@@ -123,10 +123,19 @@ UNKNOWN
                 inputParameters: parameters,
                 outputPath: targetDir);
 
-            Assert.Null(res.ErrorMessage);
-            Assert.NotNull(res.OutputBaseDirectory);
-            string resultContent = _engineEnvironmentSettings.Host.FileSystem.ReadAllText(Path.Combine(res.OutputBaseDirectory!, "sourceFile")).Trim();
-            Assert.Equal(expectedOutput, resultContent);
+            if (instantiateShouldFail)
+            {
+                Assert.NotNull(res.ErrorMessage);
+                Assert.Null(res.OutputBaseDirectory);
+            }
+            else
+            {
+                Assert.Null(res.ErrorMessage);
+                Assert.NotNull(res.OutputBaseDirectory);
+                string resultContent = _engineEnvironmentSettings.Host.FileSystem
+                    .ReadAllText(Path.Combine(res.OutputBaseDirectory!, "sourceFile")).Trim();
+                Assert.Equal(expectedOutput, resultContent);
+            }
         }
     }
 }
