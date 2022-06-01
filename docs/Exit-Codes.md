@@ -8,7 +8,7 @@ Exit codes are chosen to conform to existing standards or standardization attemp
 | [70](#70) | Unexpected internal software issue. |
 | [73](#73) | Can't create output file. |
 | [100](#100) | Instantiation Failed - Processing issues. |
-| [101](#101) | Template authoring issues. |
+| [101](#101) | Invalid template or template package. |
 | [102](#102) | Missing required option(s) and/or argument(s) for the command. |
 | [103](#103) | The template or the template package was not found. |
 | [104](#104) | PostAction operation was cancelled. |
@@ -74,7 +74,7 @@ This is a semi-standardized exit code (see [EX_CANTCREAT in /usr/include/sysexit
 
 The template instantiation failed due to error(s). Caused by environment (failure to read/write template(s) or cache) or 
 
-## <a name="101"></a>101 - Template authoring issues
+## <a name="101"></a>101 - Invalid template or template package
 
 _Reserved for future usage - described behavior is yet not implemented. [Feature is tracked](https://github.com/dotnet/templating/issues/4801)_
 
@@ -92,6 +92,8 @@ Missing mandatory properties in template.json
 
 
 ## <a name="102"></a>102 - Missing required option(s) and/or argument(s) for the command
+
+_Reserved for future usage - described behavior is only partially implemented. Some cases that should fall under this exit code are now leading to code [127](#127) [Issue is tracked](https://github.com/dotnet/templating/issues/4806)_
 
 The exit code is used when one or more required options or/and arguments used for the command were not passed. Applicable to `search` command with not enough information as well.
 

@@ -36,7 +36,7 @@ namespace Microsoft.TemplateEngine.Cli
         CreateFailed = 100,
 
         /// <summary>
-        /// Instantiation Failed - Template Authoring Error.
+        /// Invalid template or template package.
         /// </summary>
         TemplateIssueDetected = 101,
 
