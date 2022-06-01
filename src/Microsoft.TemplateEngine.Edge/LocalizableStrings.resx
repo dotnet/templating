@@ -190,6 +190,9 @@
 {1} - host version (usually matches VS or SDK version)
 {2} - comma-separated list of supported hosts and their versions (example: host1, host2(1.0.0), host3([1.0.0-*]))</comment>
   </data>
+  <data name="HostConstraint_Name" xml:space="preserve">
+    <value>Template engine host</value>
+  </data>
   <data name="NuGetApiPackageManager_Error_FailedToLoadSource" xml:space="preserve">
     <value>Failed to load the NuGet source {0}.</value>
   </data>
@@ -293,6 +296,9 @@ Details: {1}.</value>
     <value>Running template on current .NET SDK version ({0}) is unsupported. Supported version(s): {1}</value>
     <comment>{0} is the current SDK version, {1} is the list of supported SDK versions</comment>
   </data>
+  <data name="SdkVersionConstraint_Name" xml:space="preserve">
+    <value>.NET SDK version</value>
+  </data>
   <data name="TemplateConstraintManager_Error_FailedToEvaluate" xml:space="preserve">
     <value>The constraint '{0}' failed to be evaluated for the args '{1}', details: {2}</value>
     <comment>{0} - constraint type
@@ -347,6 +353,10 @@ Template cache will be recreated on the next run.</value>
   <data name="WorkloadConstraint_Message_Restricted" xml:space="preserve">
     <value>Running template is not supported - required optional workload(s) not installed. Supported workload(s): {0}. Currently installed optional workloads: {1}</value>
     <comment>{0} is list of supported workloads. {1} is list of installed optional workloads</comment>
+  </data>
+  <data name="WorkloadConstraint_Name" xml:space="preserve">
+    <value>Workload</value>
+    <comment>Terminus Technicus - most likely not to be translated (https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-workload-install)</comment>
   </data>
   <data name="WorkloadConstraint_Warning_DuplicateWorkloads" xml:space="preserve">
     <value>'IWorkloadsInfoProvider' component provided by host provided some duplicated workloads (duplicates: {0}). Duplicates will be skipped.</value>

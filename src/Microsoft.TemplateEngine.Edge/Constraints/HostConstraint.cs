@@ -35,7 +35,7 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
                 : base(environmentSettings, factory)
             { }
 
-            public override string DisplayName => "Template engine host";
+            public override string DisplayName => LocalizableStrings.HostConstraint_Name;
 
             protected override TemplateConstraintResult EvaluateInternal(string? args)
             {

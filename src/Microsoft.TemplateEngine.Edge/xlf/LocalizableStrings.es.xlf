@@ -104,6 +104,11 @@
 {1} - host version (usually matches VS or SDK version)
 {2} - comma-separated list of supported hosts and their versions (example: host1, host2(1.0.0), host3([1.0.0-*]))</note>
       </trans-unit>
+      <trans-unit id="HostConstraint_Name">
+        <source>Template engine host</source>
+        <target state="new">Template engine host</target>
+        <note />
+      </trans-unit>
       <trans-unit id="NuGetApiPackageManager_Error_FailedToLoadSource">
         <source>Failed to load the NuGet source {0}.</source>
         <target state="translated">No se pudo cargar el origen de NuGet {0}</target>
@@ -266,6 +271,11 @@ Detalles: {1}.</target>
         <target state="new">Running template on current .NET SDK version ({0}) is unsupported. Supported version(s): {1}</target>
         <note>{0} is the current SDK version, {1} is the list of supported SDK versions</note>
       </trans-unit>
+      <trans-unit id="SdkVersionConstraint_Name">
+        <source>.NET SDK version</source>
+        <target state="new">.NET SDK version</target>
+        <note />
+      </trans-unit>
       <trans-unit id="TemplateConstraintManager_Error_FailedToEvaluate">
         <source>The constraint '{0}' failed to be evaluated for the args '{1}', details: {2}</source>
         <target state="translated">No se pudo evaluar la restricción “{0}” para los argumentos “{1}”, detalles: {2}</target>
@@ -341,6 +351,11 @@ La caché de las plantillas se volverá a crear en la siguiente ejecución.</tar
         <source>Running template is not supported - required optional workload(s) not installed. Supported workload(s): {0}. Currently installed optional workloads: {1}</source>
         <target state="new">Running template is not supported - required optional workload(s) not installed. Supported workload(s): {0}. Currently installed optional workloads: {1}</target>
         <note>{0} is list of supported workloads. {1} is list of installed optional workloads</note>
+      </trans-unit>
+      <trans-unit id="WorkloadConstraint_Name">
+        <source>Workload</source>
+        <target state="new">Workload</target>
+        <note>Terminus Technicus - most likely not to be translated (https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-workload-install)</note>
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Warning_DuplicateWorkloads">
         <source>'IWorkloadsInfoProvider' component provided by host provided some duplicated workloads (duplicates: {0}). Duplicates will be skipped.</source>

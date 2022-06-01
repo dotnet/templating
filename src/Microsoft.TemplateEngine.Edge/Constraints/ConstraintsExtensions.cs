@@ -12,8 +12,14 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Edge.Constraints
 {
-    internal static class ConstraintsExtensions
+    internal static class Extensions
     {
+        /// <summary>
+        /// Attempts to parse input configuration string (presumably string or json array of strings) into enumeration of strings.
+        /// </summary>
+        /// <param name="args">Input configuration string.</param>
+        /// <returns>Enumeration of parsed tokens.</returns>
+        /// <exception cref="ConfigurationException">Thrown on unexpected input - not a valid json string or array of string or an empty array.</exception>
         public static IEnumerable<string> ParseArrayOfConstraintStrings(this string? args)
         {
             JToken token = ParseConstraintJToken(args);
@@ -36,6 +42,12 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
             });
         }
 
+        /// <summary>
+        /// Attempts to parse input configuration string (presumably string or json array of strings) into enumeration of JObjects.
+        /// </summary>
+        /// <param name="args">Input configuration string.</param>
+        /// <returns>Enumeration of parsed Jobject tokens.</returns>
+        /// <exception cref="ConfigurationException">Thrown on unexpected input - not a valid json array or an empty array.</exception>
         public static IEnumerable<JObject> ParseArrayOfConstraintJObjects(this string? args)
         {
             JToken token = ParseConstraintJToken(args);

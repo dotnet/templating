@@ -49,16 +49,16 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
                 _remedySuggestionFactory = remedySuggestionFactory;
             }
 
-            public override string DisplayName => "Workload";
+            public override string DisplayName => LocalizableStrings.WorkloadConstraint_Name;
 
             internal static async Task<WorkloadConstraint> CreateAsync(IEngineEnvironmentSettings environmentSettings, ITemplateConstraintFactory factory, CancellationToken cancellationToken)
             {
-                (IReadOnlyList<WorkloadInfo>, Func<IReadOnlyList<string>, string>) workloadsInfo =
+                var workloadsInfo =
                     await ExtractWorkloadInfoAsync(
                         environmentSettings.Components.OfType<IWorkloadsInfoProvider>(),
                         environmentSettings.Host.Logger,
                         cancellationToken).ConfigureAwait(false);
-                return new WorkloadConstraint(environmentSettings, factory, workloadsInfo.Item1, workloadsInfo.Item2);
+                return new WorkloadConstraint(environmentSettings, factory, workloadsInfo.Workloads, workloadsInfo.RemedySuggestionFactory);
             }
 
             protected override TemplateConstraintResult EvaluateInternal(string? args)
@@ -90,7 +90,7 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
                 return args.ParseArrayOfConstraintStrings();
             }
 
-            private static async Task<(IReadOnlyList<WorkloadInfo>, Func<IReadOnlyList<string>, string>)> ExtractWorkloadInfoAsync(IEnumerable<IWorkloadsInfoProvider> workloadsInfoProviders, ILogger logger, CancellationToken token)
+            private static async Task<(IReadOnlyList<WorkloadInfo> Workloads, Func<IReadOnlyList<string>, string> RemedySuggestionFactory)> ExtractWorkloadInfoAsync(IEnumerable<IWorkloadsInfoProvider> workloadsInfoProviders, ILogger logger, CancellationToken token)
             {
                 List<IWorkloadsInfoProvider> providers = workloadsInfoProviders.ToList();
                 List<WorkloadInfo>? workloads = null;

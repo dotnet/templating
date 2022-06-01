@@ -48,7 +48,7 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
                 _remedySuggestionFactory = remedySuggestionFactory;
             }
 
-            public override string DisplayName => ".NET SDK version";
+            public override string DisplayName => LocalizableStrings.SdkVersionConstraint_Name;
 
             internal static async Task<SdkVersionConstraint> CreateAsync(IEngineEnvironmentSettings environmentSettings, ITemplateConstraintFactory factory, CancellationToken cancellationToken)
             {
@@ -56,7 +56,7 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
                     await ExtractInstalledSdkVersionAsync(
                         environmentSettings.Components.OfType<ISdkInfoProvider>(),
                         cancellationToken).ConfigureAwait(false);
-                return new SdkVersionConstraint(environmentSettings, factory, versions.Item1, versions.Item2, versions.Item3);
+                return new SdkVersionConstraint(environmentSettings, factory, versions.CurrentSdkVersion, versions.InstalledVersions, versions.RemedySuggestionFactory);
             }
 
             protected override TemplateConstraintResult EvaluateInternal(string? args)
@@ -92,11 +92,11 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
             // "args": [ "5.0.100", "6.0.100" ] // multiple version expression - all expressing supported versions
             private static IEnumerable<IVersionSpecification> ParseArgs(string? args)
             {
-                return args.ParseArrayOfConstraintStrings().Select(ConstraintsExtensions.ParseVersionSpecification);
+                return args.ParseArrayOfConstraintStrings().Select(Extensions.ParseVersionSpecification);
             }
 
             private static async
-                Task<(NuGetVersionSpecification, IEnumerable<NuGetVersionSpecification>, Func<IReadOnlyList<string>, IReadOnlyList<string>, string>)>
+                Task<(NuGetVersionSpecification CurrentSdkVersion, IEnumerable<NuGetVersionSpecification> InstalledVersions, Func<IReadOnlyList<string>, IReadOnlyList<string>, string> RemedySuggestionFactory)>
                 ExtractInstalledSdkVersionAsync(IEnumerable<ISdkInfoProvider> sdkInfoProviders, CancellationToken cancellationToken)
             {
                 List<ISdkInfoProvider> providers = sdkInfoProviders.ToList();

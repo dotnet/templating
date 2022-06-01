@@ -244,6 +244,15 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Template engine host.
+        /// </summary>
+        internal static string HostConstraint_Name {
+            get {
+                return ResourceManager.GetString("HostConstraint_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to load the NuGet source {0}..
         /// </summary>
         internal static string NuGetApiPackageManager_Error_FailedToLoadSource {
@@ -526,6 +535,15 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .NET SDK version.
+        /// </summary>
+        internal static string SdkVersionConstraint_Name {
+            get {
+                return ResourceManager.GetString("SdkVersionConstraint_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The constraint &apos;{0}&apos; failed to be evaluated for the args &apos;{1}&apos;, details: {2}.
         /// </summary>
         internal static string TemplateConstraintManager_Error_FailedToEvaluate {
@@ -643,6 +661,15 @@ namespace Microsoft.TemplateEngine.Edge {
         internal static string WorkloadConstraint_Message_Restricted {
             get {
                 return ResourceManager.GetString("WorkloadConstraint_Message_Restricted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Workload.
+        /// </summary>
+        internal static string WorkloadConstraint_Name {
+            get {
+                return ResourceManager.GetString("WorkloadConstraint_Name", resourceCulture);
             }
         }
         
