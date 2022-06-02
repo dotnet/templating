@@ -793,6 +793,10 @@ The header is followed by the list of parameters and their errors (might be seve
     <value>To use built-in template package, uninstall manually installed template package using:</value>
     <comment>followed by command to uninstall package</comment>
   </data>
+  <data name="TemplateListCoordinator_Error_FailedConstraints" xml:space="preserve">
+    <value>{0} template(s) are hidden because their constraints are not satisfied. To show them, use the '{1}' option.</value>
+    <comment>{0} - the count of templates that are not shown. {1} - option to be used (--ignore-constraints).</comment>
+  </data>
   <data name="Commands_Warning_DeprecatedCommand" xml:space="preserve">
     <value>Warning: use of '{0}' is deprecated. Use '{1}' instead.</value>
     <comment>{0} - deprecated command ('dotnet new --install'); {1} - new command ('dotnet new install).</comment>
@@ -801,6 +805,10 @@ The header is followed by the list of parameters and their errors (might be seve
     <value>For more information, run: </value>
     <comment>followed by command example (at new line, without quotes)</comment>
   </data>
+  <data name="TemplatePackageCoordinator_Install_ConstraintsNotice" xml:space="preserve">
+    <value>The following templates might not work because their constraints are not met:</value>
+    <comment>The sentence is followed by the list of templates with information on their constraints. Each template and each restriction is given from new line.</comment>
+  </data>
   <data name="TemplatePackageCoordinator_lnstall_Error_AlreadyInstalled_Hint" xml:space="preserve">
     <value>To reinstall the same version of the template package, use '{0}' option:</value>
     <comment>{0} - option name (--force). Followed by command example on new line.</comment>
@@ -808,5 +816,20 @@ The header is followed by the list of parameters and their errors (might be seve
   <data name="BaseCommand_ExitCodeHelp" xml:space="preserve">
     <value>For details on the exit code, refer to https://aka.ms/templating-exit-codes#{0}</value>
     <comment>{0} is the exit code</comment>
+  </data>
+  <data name="TemplateCommand_DisplayConstraintResults_Error" xml:space="preserve">
+    <value>Failed to instatiate template '{0}', the following constraints are not met:</value>
+    <comment>{0} - template name (user friendly)</comment>
+  </data>
+  <data name="TemplateCommand_DisplayConstraintResults_Hint" xml:space="preserve">
+    <value>To run the template anyway, use '{0}' option:</value>
+    <comment>{0} - additional option name (--force)</comment>
+  </data>
+  <data name="TemplateCommand_DisplayConstraintResults_Hint_TemplateNotUsable" xml:space="preserve">
+    <value>The template might not be usable.</value>
+  </data>
+  <data name="TemplateCommand_DisplayConstraintResults_Warning" xml:space="preserve">
+    <value>Warning: the following constraints for the template '{0}' are not met:</value>
+    <comment>{0} - template name (user friendly)</comment>
   </data>
 </root>

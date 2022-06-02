@@ -6,7 +6,6 @@ using System.CommandLine.Help;
 using System.CommandLine.Parsing;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Cli.Extensions;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Utils;
 
@@ -285,7 +284,7 @@ namespace Microsoft.TemplateEngine.Cli.Commands
                 preferredTemplate.NameOption,
                 preferredTemplate.OutputOption,
                 preferredTemplate.DryRunOption,
-                preferredTemplate.ForceOption,
+                TemplateCommand.ForceOption,
                 preferredTemplate.NoUpdateCheckOption
             };
 

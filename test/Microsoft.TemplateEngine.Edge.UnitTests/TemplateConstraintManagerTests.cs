@@ -5,6 +5,7 @@
 
 using FakeItEasy;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Constraints;
 using Microsoft.TemplateEngine.TestHelper;
 using Xunit;
 
@@ -195,49 +196,6 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             Assert.Equal(template, result.Single().Template);
             Assert.Equal(TemplateConstraintResult.Status.Allowed, result.Single().Result.Single(r => r.ConstraintType == "test-1").EvaluationStatus);
             Assert.Equal(TemplateConstraintResult.Status.Restricted, result.Single().Result.Single(r => r.ConstraintType == "test-2").EvaluationStatus);
-        }
-
-        private class TestConstraintFactory : ITemplateConstraintFactory
-        {
-            public TestConstraintFactory(string type)
-            {
-                Type = type;
-                Id = Guid.NewGuid();
-            }
-
-            public string Type { get; } 
-
-            public Guid Id { get; }
-
-            public Task<ITemplateConstraint> CreateTemplateConstraintAsync(IEngineEnvironmentSettings environmentSettings, CancellationToken cancellationToken)
-            {
-                return Task.FromResult((ITemplateConstraint)new TestConstraint(this));
-            }
-
-            private class TestConstraint : ITemplateConstraint
-            {
-                public TestConstraint(ITemplateConstraintFactory factory)
-                {
-                    Type = factory.Type;
-                }
-
-                public string Type { get; }
-
-                public string DisplayName => "Test Constraint";
-
-                public TemplateConstraintResult Evaluate(string? args)
-                {
-                    if (args == "yes")
-                    {
-                        return TemplateConstraintResult.CreateAllowed(Type);
-                    }
-                    else if (args == "no")
-                    {
-                        return TemplateConstraintResult.CreateRestricted(Type, "cannot run", "do smth");
-                    }
-                    return TemplateConstraintResult.CreateFailure(Type, "bad params");
-                }
-            }
         }
 
         private class FailingTestConstraintFactory : ITemplateConstraintFactory

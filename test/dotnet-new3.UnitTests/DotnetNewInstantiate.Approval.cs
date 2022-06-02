@@ -273,6 +273,33 @@ namespace Dotnet_new3.IntegrationTests
         }
 
         [Fact]
+        public Task CanInstantiateTemplate_ConditionalProcessing()
+        {
+            string workingDirectory = TestUtils.CreateTemporaryFolder();
+            string home = TestUtils.CreateTemporaryFolder("Home");
+            Helpers.InstallTestTemplate($"TemplateConditionalProcessing", _log, home, workingDirectory);
+
+            new DotnetNewCommand(_log, "TestAssets.TemplateConditionalProcessing")
+                .WithCustomHive(home)
+                .WithWorkingDirectory(workingDirectory)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And.NotHaveStdErr()
+                .And.HaveStdOutContaining("The template \"TemplateConditionalProcessing\" was created successfully.");
+
+            string[] actualFiles = Directory.GetFiles(workingDirectory);
+
+            return Task.WhenAll(
+                actualFiles.Select(
+                    async (file) =>
+                    await Verifier.VerifyFile(file, _verifySettings)
+                    .UseMethodName($"CanInstantiateTemplate_ConditionalProcessing_{Path.GetFileName(file)}")
+                    .UseExtension("txt")
+                    ));
+        }
+
+        [Fact]
         public Task DryRunRespectsTargetPathAndOutputDir()
         {
             const string _OUT_FOLDER = "folderF";
@@ -431,6 +458,41 @@ namespace Dotnet_new3.IntegrationTests
                 output.ScrubByRegex("Package *", "Package");
                 output = output.Replace(templateLocation, "%TEMPLATE LOCATION%");
             });
+        }
+
+        [Fact]
+        public Task Constraints_Error_IfTemplateIsRestricted()
+        {
+            var customHivePath = TestUtils.CreateTemporaryFolder();
+            Helpers.InstallTestTemplate("Constraints/RestrictedTemplate", _log, customHivePath);
+
+            var commandResult = new DotnetNewCommand(_log, "Constraints.RestrictedTemplate")
+                  .WithCustomHive(customHivePath)
+                  .Execute();
+
+            commandResult
+                .Should()
+                .Fail();
+
+            return Verifier.Verify(commandResult.StdErr, _verifySettings)
+                .AddScrubber(output => output.ScrubByRegex("\\-\\-debug\\:custom\\-hive [A-Za-z0-9\\-\\.\\\\\\/\\{\\}]+", "--debug:custom-hive %SETTINGS DIRECTORY%"));
+        }
+
+        [Fact]
+        public Task Constraints_CanIgnoreConstraints_WhenForceIsSpecified()
+        {
+            var customHivePath = TestUtils.CreateTemporaryFolder();
+            Helpers.InstallTestTemplate("Constraints/RestrictedTemplate", _log, customHivePath);
+
+            var commandResult = new DotnetNewCommand(_log, "Constraints.RestrictedTemplate", "--force")
+                  .WithCustomHive(customHivePath)
+                  .Execute();
+
+            commandResult
+                .Should()
+                .Pass();
+
+            return Verifier.Verify(commandResult.StdOut, _verifySettings);
         }
 
     }

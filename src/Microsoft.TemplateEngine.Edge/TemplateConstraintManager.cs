@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Constraints;
 
 namespace Microsoft.TemplateEngine.Edge
 {
@@ -46,7 +47,7 @@ namespace Microsoft.TemplateEngine.Edge
         /// <param name="templates">if given, only returns the list of constraints defined in the templates.</param>
         /// <param name="cancellationToken"></param>
         /// <returns>The list of successfully initialized <see cref="ITemplateConstraint"/>s.</returns>
-        public async Task<IReadOnlyList<ITemplateConstraint>> GetConstraintsAsync(IReadOnlyList<ITemplateInfo>? templates = null, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<ITemplateConstraint>> GetConstraintsAsync(IEnumerable<ITemplateInfo>? templates = null, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             IEnumerable<(string Type, Task<ITemplateConstraint> Task)> constraintsToInitialize;
@@ -103,7 +104,7 @@ namespace Microsoft.TemplateEngine.Edge
             if (!_templateConstrains.TryGetValue(type, out Task<ITemplateConstraint> task))
             {
                 _logger.LogDebug($"The constraint '{type}' is unknown.");
-                return TemplateConstraintResult.CreateFailure(type, string.Format(LocalizableStrings.TemplateConstraintManager_Error_UnknownType, type));
+                return TemplateConstraintResult.CreateInitializationFailure(type, string.Format(LocalizableStrings.TemplateConstraintManager_Error_UnknownType, type));
             }
 
             if (!task.IsCompleted)
@@ -130,7 +131,7 @@ namespace Microsoft.TemplateEngine.Edge
             {
                 var exception = task.Exception is AggregateException ? task.Exception.InnerException ?? task.Exception : task.Exception;
                 _logger.LogDebug($"The constraint '{type}' failed to be initialized, details: {exception}.");
-                return TemplateConstraintResult.CreateFailure(type, string.Format(LocalizableStrings.TemplateConstraintManager_Error_FailedToInitialize, type, exception.Message));
+                return TemplateConstraintResult.CreateInitializationFailure(type, string.Format(LocalizableStrings.TemplateConstraintManager_Error_FailedToInitialize, type, exception.Message));
             }
 
             try
@@ -140,7 +141,7 @@ namespace Microsoft.TemplateEngine.Edge
             catch (Exception e)
             {
                 _logger.LogDebug($"The constraint '{type}' failed to be evaluated for the args '{args}', details: {e}.");
-                return TemplateConstraintResult.CreateFailure(type, string.Format(LocalizableStrings.TemplateConstraintManager_Error_FailedToEvaluate, type, args, e.Message));
+                return TemplateConstraintResult.CreateEvaluationFailure(task.Result, string.Format(LocalizableStrings.TemplateConstraintManager_Error_FailedToEvaluate, type, args, e.Message));
             }
 
         }
@@ -152,7 +153,7 @@ namespace Microsoft.TemplateEngine.Edge
         /// <param name="templates">the list of templates to evaluate constraints for given templates.</param>
         /// <param name="cancellationToken"></param>
         /// <returns><see cref="TemplateConstraintResult"/> indicating if constraint is met, or details why the constraint is not met.</returns>
-        public async Task<IReadOnlyList<(ITemplateInfo Template, IReadOnlyList<TemplateConstraintResult> Result)>> EvaluateConstraintsAsync(IReadOnlyList<ITemplateInfo> templates, CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<(ITemplateInfo Template, IReadOnlyList<TemplateConstraintResult> Result)>> EvaluateConstraintsAsync(IEnumerable<ITemplateInfo> templates, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -197,7 +198,7 @@ namespace Microsoft.TemplateEngine.Edge
                     if (!_templateConstrains.TryGetValue(constraint.Type, out Task<ITemplateConstraint> task))
                     {
                         _logger.LogDebug($"The constraint '{constraint.Type}' is unknown.");
-                        constraintResults.Add(TemplateConstraintResult.CreateFailure(constraint.Type, string.Format(LocalizableStrings.TemplateConstraintManager_Error_UnknownType, constraint.Type)));
+                        constraintResults.Add(TemplateConstraintResult.CreateInitializationFailure(constraint.Type, string.Format(LocalizableStrings.TemplateConstraintManager_Error_UnknownType, constraint.Type)));
                         continue;
                     }
 
@@ -205,7 +206,7 @@ namespace Microsoft.TemplateEngine.Edge
                     {
                         var exception = task.Exception is AggregateException ? task.Exception.InnerException ?? task.Exception : task.Exception;
                         _logger.LogDebug($"The constraint '{constraint.Type}' failed to be initialized, details: {exception}.");
-                        constraintResults.Add(TemplateConstraintResult.CreateFailure(constraint, string.Format(LocalizableStrings.TemplateConstraintManager_Error_FailedToInitialize, constraint.Type, exception.Message)));
+                        constraintResults.Add(TemplateConstraintResult.CreateInitializationFailure(constraint.Type, string.Format(LocalizableStrings.TemplateConstraintManager_Error_FailedToInitialize, constraint.Type, exception.Message)));
                         continue;
                     }
 
@@ -216,7 +217,7 @@ namespace Microsoft.TemplateEngine.Edge
                     catch (Exception e)
                     {
                         _logger.LogDebug($"The constraint '{constraint.Type}' failed to be evaluated for the args '{constraint.Args}', details: {e}.");
-                        constraintResults.Add(TemplateConstraintResult.CreateFailure(constraint, string.Format(LocalizableStrings.TemplateConstraintManager_Error_FailedToEvaluate, constraint.Type, constraint.Args, e.Message)));
+                        constraintResults.Add(TemplateConstraintResult.CreateEvaluationFailure(_templateConstrains[constraint.Type].Result, string.Format(LocalizableStrings.TemplateConstraintManager_Error_FailedToEvaluate, constraint.Type, constraint.Args, e.Message)));
                     }
                 }
                 evaluationResult.Add((template, constraintResults));
