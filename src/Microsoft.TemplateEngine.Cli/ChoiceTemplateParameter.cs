@@ -81,7 +81,8 @@ namespace Microsoft.TemplateEngine.Cli
             };
 
             // empty string for the explicit unset option
-            option.FromAmongCaseInsensitive(Choices.Keys.Append(string.Empty).ToArray());
+            option.FromAmongCaseInsensitive(Choices.Keys.ToArray(), string.Empty);
+
             return option;
         }
 
