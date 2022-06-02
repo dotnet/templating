@@ -311,6 +311,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Should()
                 .Fail()
                 .And.HaveStdErrContaining("is not a valid value for --Platform.");
+        }
 
         [Fact]
         public Task CanInstantiateTemplate_ConditionalProcessing()
