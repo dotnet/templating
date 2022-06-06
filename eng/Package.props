@@ -3,17 +3,6 @@
   <Import Project="dependabot\Packages.props" />
   <ItemGroup>
     <PackageReference Update="System.CommandLine" Version="$(SystemCommandLinePackageVersion)" />
-    <PackageReference Update="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsLoggingPackageVersion)" />
-    <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftExtensionsLoggingConsolePackageVersion)" />
-    <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsLoggingAbstractionsPackageVersion)" />
-    <PackageReference Update="NuGet.Configuration" Version="$(NuGetConfigurationPackageVersion)" />
-    <PackageReference Update="NuGet.Credentials" Version="$(NuGetCredentialsPackageVersion)" />
-    <PackageReference Update="NuGet.Protocol" Version="$(NuGetProtocolPackageVersion)" />
-    <!--Analyzers-->
-    <PackageReference Update="Microsoft.CodeAnalysis.NetAnalyzers" Version="$(MicrosoftCodeAnalysisNetAnalyzersPackageVersion)" />
-    <PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="$(MicrosoftNetCompilersToolsetPackageVersion)" />
-    <PackageReference Update="Microsoft.CodeAnalysis.CSharp.CodeStyle" Version="$(MicrosoftCodeAnalysisCSharpCodeStylePackageVersion)" />
-    <PackageReference Update="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="$(MicrosoftCodeAnalysisPublicApiAnalyzersPackageVersion)" />
     <!--Test dependencies-->
     <PackageReference Update="xunit" Version="$(XUnitVersion)" />
   </ItemGroup>
