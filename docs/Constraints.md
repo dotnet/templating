@@ -22,8 +22,8 @@ Example `template.json`:
   // other template elements
 
   "constraints": {
-    "windows-only": {     // Custom name - not validate
-      "type": "os",    // Type of the constraint - used to match to proper Constraint component to evaluate the constraint
+    "windows-only": {    // Custom name - not validate
+      "type": "os",      // Type of the constraint - used to match to proper Constraint component to evaluate the constraint
       "args": "Windows"  // Arguments passed to the evaluating constraint component
     }
   }
