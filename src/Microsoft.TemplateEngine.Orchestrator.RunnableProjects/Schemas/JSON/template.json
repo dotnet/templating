@@ -1190,7 +1190,9 @@
                 "type": {
                   "enum": [
                     "os",
-                    "host"
+                    "host",
+                    "workload",
+                    "sdk-version"
                   ]
                 }
               }
@@ -1256,6 +1258,50 @@
                     }
                   }
                 }
+              }
+            }
+          },
+          {
+            "description": "Installed workload constraint. Allows to restrict the template to be run only on host with specific workloads installed.",
+            "properties": {
+              "type": {
+                "enum": [ "workload" ]
+              },
+              "args": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "description": "SDK version constraint. Allows to restrict the template to be run only on host with specific SDK version.",
+            "properties": {
+              "type": {
+                "enum": [ "sdk-version" ]
+              },
+              "args": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "description": "The supported version of the SDK. May be an exact version, float version or version range. Refer to https://docs.microsoft.com/en-us/nuget/concepts/package-versioning for more info."
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "description": "The supported version of the SDK. May be an exact version, float version or version range. Refer to https://docs.microsoft.com/en-us/nuget/concepts/package-versioning for more info."
+                    }
+                  }
+                ]
               }
             }
           }
