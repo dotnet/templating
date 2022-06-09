@@ -36,11 +36,11 @@
     <MicrosoftCodeAnalysisNetAnalyzersPackageVersion>7.0.0-preview1.22274.2</MicrosoftCodeAnalysisNetAnalyzersPackageVersion>
     <MicrosoftCodeAnalysisPublicApiAnalyzersPackageVersion>3.3.4-beta1.22274.2</MicrosoftCodeAnalysisPublicApiAnalyzersPackageVersion>
     <!-- Dependencies from https://github.com/dotnet/runtime -->
-    <MicrosoftNETCoreAppRefPackageVersion>7.0.0-preview.5.22301.12</MicrosoftNETCoreAppRefPackageVersion>
-    <MicrosoftNETCoreAppRuntimewinx64PackageVersion>7.0.0-preview.5.22301.12</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
-    <VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>7.0.0-preview.5.22301.12</VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>
-    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>7.0.0-preview.5.22301.12</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
-    <MicrosoftExtensionsLoggingPackageVersion>7.0.0-preview.5.22301.12</MicrosoftExtensionsLoggingPackageVersion>
-    <MicrosoftExtensionsLoggingConsolePackageVersion>7.0.0-preview.5.22301.12</MicrosoftExtensionsLoggingConsolePackageVersion>
+    <MicrosoftNETCoreAppRefPackageVersion>7.0.0-preview.5.22308.7</MicrosoftNETCoreAppRefPackageVersion>
+    <MicrosoftNETCoreAppRuntimewinx64PackageVersion>7.0.0-preview.5.22308.7</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
+    <VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>7.0.0-preview.5.22308.7</VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>
+    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>7.0.0-preview.5.22308.7</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
+    <MicrosoftExtensionsLoggingPackageVersion>7.0.0-preview.5.22308.7</MicrosoftExtensionsLoggingPackageVersion>
+    <MicrosoftExtensionsLoggingConsolePackageVersion>7.0.0-preview.5.22308.7</MicrosoftExtensionsLoggingConsolePackageVersion>
   </PropertyGroup>
 </Project>
