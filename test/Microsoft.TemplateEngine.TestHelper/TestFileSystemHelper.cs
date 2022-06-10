@@ -38,8 +38,12 @@ namespace Microsoft.TemplateEngine.TestHelper
         {
             foreach (var factory in environment.Components.OfType<IMountPointFactory>())
             {
-                if (factory.TryMount(environment, null, sourceBasePath, out IMountPoint sourceMountPoint))
+                if (factory.TryMount(environment, null, sourceBasePath, out IMountPoint? sourceMountPoint))
                 {
+                    if (sourceMountPoint is null)
+                    {
+                        throw new InvalidOperationException($"{nameof(sourceMountPoint)} cannot be null when {nameof(factory.TryMount)} is 'true'");
+                    }
                     return sourceMountPoint;
                 }
             }
