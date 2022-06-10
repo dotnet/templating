@@ -5,5 +5,6 @@
     <PackageReference Update="System.CommandLine" Version="$(SystemCommandLinePackageVersion)" />
     <!--Test dependencies-->
     <PackageReference Update="xunit" Version="$(XUnitVersion)" />
+    <PackageReference Update="Microsoft.DotNet.Cli.Utils" Version="6.0.100-rc.1.21423.4" />
   </ItemGroup>
 </Project>
