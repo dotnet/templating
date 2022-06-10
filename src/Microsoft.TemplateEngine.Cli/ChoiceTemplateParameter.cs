@@ -81,7 +81,7 @@ namespace Microsoft.TemplateEngine.Cli
             };
 
             // empty string for the explicit unset option
-            option.FromAmongCaseInsensitive(Choices.Keys.ToArray(), string.Empty);
+            option.FromAmongCaseInsensitive(Choices.Keys.ToArray(), allowedHiddenValue: string.Empty);
 
             return option;
         }
@@ -186,7 +186,7 @@ namespace Microsoft.TemplateEngine.Cli
                 parsedValues.Add(value);
             }
 
-            // Single empty value allowed as explicit unset
+            // An empty value is not allowed when multiple choice values are specified.
             if (parsedValues.Count > 1 && parsedValues.Any(string.IsNullOrEmpty))
             {
                 error = CreateParseError(string.Empty, parameter);
