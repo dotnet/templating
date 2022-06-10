@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
+using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Edge.Template
@@ -89,6 +90,10 @@ namespace Microsoft.TemplateEngine.Edge.Template
                     //resultIfParameterCreationFailed is not null when TryCreateParameterSet is false
                     return resultIfParameterCreationFailed!;
                 }
+                if (effectParams is null)
+                {
+                    throw new InvalidOperationException($"{nameof(effectParams)} cannot be null when {nameof(TryCreateParameterSet)} returns 'true'");
+                }
 
                 ICreationEffects creationEffects = await template.Generator.GetCreationEffectsAsync(
                     _environmentSettings,
@@ -120,6 +125,11 @@ namespace Microsoft.TemplateEngine.Edge.Template
                     return resultIfParameterCreationFailed!;
                 }
 
+                if (creationParams is null)
+                {
+                    throw new InvalidOperationException($"{nameof(creationParams)} cannot be null when {nameof(TryCreateParameterSet)} returns 'true'");
+                }
+
                 if (!dryRun)
                 {
                     creationResult = await template.Generator.CreateAsync(
@@ -136,25 +146,13 @@ namespace Microsoft.TemplateEngine.Edge.Template
                     outputBaseDir: targetDir,
                     creationEffects: creationEffects);
             }
-            catch (ContentGenerationException cx)
+            catch (Exception cx)
             {
-                string message = cx.Message;
-                if (cx.InnerException != null)
-                {
-                    message += Environment.NewLine + cx.InnerException;
-                }
+                string message = string.Join(Environment.NewLine, ExceptionMessages(cx));
                 return new TemplateCreationResult(
-                    status: CreationResultStatus.CreateFailed,
+                    status: cx is TemplateAuthoringException ? CreationResultStatus.TemplateIssueDetected : CreationResultStatus.CreateFailed,
                     templateName: template.Name,
                     localizedErrorMessage: string.Format(LocalizableStrings.TemplateCreator_TemplateCreationResult_Error_CreationFailed, message),
-                    outputBaseDir: targetDir);
-            }
-            catch (Exception ex)
-            {
-                return new TemplateCreationResult(
-                    status: CreationResultStatus.CreateFailed,
-                    templateName: template.Name,
-                    localizedErrorMessage: string.Format(LocalizableStrings.TemplateCreator_TemplateCreationResult_Error_CreationFailed, ex.Message),
                     outputBaseDir: targetDir);
             }
             finally
@@ -223,9 +221,13 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 }
                 else if (host.TryGetHostParamDefault(param.Name, out string? hostParamValue) && hostParamValue != null)
                 {
-                    object resolvedValue = templateInfo.Generator.ConvertParameterValueToType(_environmentSettings, param, hostParamValue, out bool valueResolutionError);
+                    object? resolvedValue = templateInfo.Generator.ConvertParameterValueToType(_environmentSettings, param, hostParamValue, out bool valueResolutionError);
                     if (!valueResolutionError)
                     {
+                        if (resolvedValue is null)
+                        {
+                            throw new InvalidOperationException($"{nameof(resolvedValue)} cannot be null when {nameof(valueResolutionError)} is 'false'.");
+                        }
                         templateParams.ResolvedValues[param] = resolvedValue;
                     }
                     else
@@ -235,9 +237,13 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 }
                 else if (param.Priority != TemplateParameterPriority.Required && param.DefaultValue != null)
                 {
-                    object resolvedValue = templateInfo.Generator.ConvertParameterValueToType(_environmentSettings, param, param.DefaultValue, out bool valueResolutionError);
+                    object? resolvedValue = templateInfo.Generator.ConvertParameterValueToType(_environmentSettings, param, param.DefaultValue, out bool valueResolutionError);
                     if (!valueResolutionError)
                     {
+                        if (resolvedValue is null)
+                        {
+                            throw new InvalidOperationException($"{nameof(resolvedValue)} cannot be null when {nameof(valueResolutionError)} is 'false'.");
+                        }
                         templateParams.ResolvedValues[param] = resolvedValue;
                     }
                     else
@@ -273,10 +279,18 @@ namespace Microsoft.TemplateEngine.Edge.Template
                     if (inputParam.Value == null)
                     {
                         if (!string.IsNullOrEmpty(paramFromTemplate.DefaultIfOptionWithoutValue))
-                        {
-                            templateParams.ResolvedValues[paramFromTemplate] = template.Generator.ConvertParameterValueToType(_environmentSettings, paramFromTemplate, paramFromTemplate.DefaultIfOptionWithoutValue, out bool valueResolutionError);
+{
+                            object? resolvedValue = template.Generator.ConvertParameterValueToType(_environmentSettings, paramFromTemplate, paramFromTemplate.DefaultIfOptionWithoutValue!, out bool valueResolutionError);
+                            if (!valueResolutionError)
+                            {
+                                if (resolvedValue is null)
+                                {
+                                    throw new InvalidOperationException($"{nameof(resolvedValue)} cannot be null when {nameof(valueResolutionError)} is 'false'.");
+                                }
+                                templateParams.ResolvedValues[paramFromTemplate] = resolvedValue;
+                            }
                             // don't fail on value resolution errors, but report them as authoring problems.
-                            if (valueResolutionError)
+                            else
                             {
                                 _logger.LogDebug($"Template {template.Identity} has an invalid DefaultIfOptionWithoutValue value for parameter {inputParam.Key}");
                             }
@@ -288,8 +302,16 @@ namespace Microsoft.TemplateEngine.Edge.Template
                     }
                     else
                     {
-                        templateParams.ResolvedValues[paramFromTemplate] = template.Generator.ConvertParameterValueToType(_environmentSettings, paramFromTemplate, inputParam.Value, out bool valueResolutionError);
-                        if (valueResolutionError)
+                        object? resolvedValue = template.Generator.ConvertParameterValueToType(_environmentSettings, paramFromTemplate, inputParam.Value, out bool valueResolutionError);
+                        if (!valueResolutionError)
+                        {
+                            if (resolvedValue is null)
+                            {
+                                throw new InvalidOperationException($"{nameof(resolvedValue)} cannot be null when {nameof(valueResolutionError)} is 'false'.");
+                            }
+                            templateParams.ResolvedValues[paramFromTemplate] = resolvedValue;
+                        }
+                        else
                         {
                             tmpParamsWithInvalidValues.Add(paramFromTemplate.Name);
                         }
@@ -318,10 +340,14 @@ namespace Microsoft.TemplateEngine.Edge.Template
             {
                 return null;
             }
-            IFile config = mountPoint!.FileInfo(info.ConfigPlace);
-            IFile? localeConfig = string.IsNullOrEmpty(info.LocaleConfigPlace) ? null : mountPoint.FileInfo(info.LocaleConfigPlace);
-            IFile? hostTemplateConfigFile = string.IsNullOrEmpty(info.HostConfigPlace) ? null : mountPoint.FileInfo(info.HostConfigPlace);
-            ITemplate template;
+            IFile? config = mountPoint!.FileInfo(info.ConfigPlace);
+            if (config == null)
+            {
+                return null;
+            }
+            IFile? localeConfig = string.IsNullOrEmpty(info.LocaleConfigPlace) ? null : mountPoint.FileInfo(info.LocaleConfigPlace!);
+            IFile? hostTemplateConfigFile = string.IsNullOrEmpty(info.HostConfigPlace) ? null : mountPoint.FileInfo(info.HostConfigPlace!);
+            ITemplate? template;
             using (Timing.Over(_environmentSettings.Host.Logger, $"Template from config {config.MountPoint.MountPointUri}{config.FullPath}"))
             {
                 if (generator!.TryGetTemplateFromConfigInfo(config, out template, localeConfig, hostTemplateConfigFile, baselineName))
@@ -335,6 +361,15 @@ namespace Microsoft.TemplateEngine.Edge.Template
             }
 
             return null;
+        }
+
+        private static IEnumerable<string> ExceptionMessages(Exception? e)
+        {
+            while (e != null)
+            {
+                yield return e.Message;
+                e = e.InnerException;
+            }
         }
 
         /// <summary>
@@ -355,7 +390,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
             {
                 if (parameter.Priority == TemplateParameterPriority.Required && !templateParams.ResolvedValues.ContainsKey(parameter))
                 {
-                    string newParamValue;
+                    string? newParamValue;
 #pragma warning disable CS0618 // Type or member is obsolete - for backward compatibility
                     while (host.OnParameterError(parameter, "", "Missing required parameter", out newParamValue)
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -365,7 +400,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
 
                     if (!string.IsNullOrEmpty(newParamValue))
                     {
-                        templateParams.ResolvedValues.Add(parameter, newParamValue);
+                        templateParams.ResolvedValues.Add(parameter, newParamValue!);
                     }
                     else
                     {

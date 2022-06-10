@@ -40,7 +40,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             IProcessor sourceRenameProcessor = SetupRenameProcessor(environmentSettings, fileRenames);
             IProcessor symbolRenameProcessor = SetupSymbolBasedRenameProcessor(environmentSettings, sourceName, ref targetDirectory, resolvedNameParamValue, parameterSet, symbolBasedFileRenames);
 
-            IDirectory sourceBaseDirectoryInfo = configFile.Parent.Parent.DirectoryInfo(sourceDirectory.TrimEnd('/'));
+            IDirectory? sourceBaseDirectoryInfo = configFile.Parent?.Parent?.DirectoryInfo(sourceDirectory.TrimEnd('/'));
+
+            if (sourceBaseDirectoryInfo is null)
+            {
+                return allRenames;
+            }
 
             foreach (IFileSystemInfo fileSystemEntry in sourceBaseDirectoryInfo.EnumerateFileSystemInfos("*", SearchOption.AllDirectories))
             {
@@ -114,8 +119,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 foreach (IReplacementTokens fileRenameToken in symbolBasedFileRenames)
                 {
-                    if (parameterSet.TryGetRuntimeValue(environmentSettings, fileRenameToken.VariableName, out object newValueObject))
+                    if (parameterSet.TryGetRuntimeValue(environmentSettings, fileRenameToken.VariableName, out object? newValueObject))
                     {
+                        if (newValueObject is null)
+                        {
+                            throw new InvalidOperationException($"{nameof(newValueObject)} cannot be null when {nameof(RuntimeValueUtil.TryGetRuntimeValue)} is 'true'");
+                        }
                         string newValue = newValueObject.ToString();
                         operations.Add(new Replacement(fileRenameToken.OriginalValue, newValue, null, true));
                     }

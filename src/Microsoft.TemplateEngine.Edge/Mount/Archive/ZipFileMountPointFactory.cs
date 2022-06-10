@@ -15,7 +15,7 @@ namespace Microsoft.TemplateEngine.Edge.Mount.Archive
 
         Guid IIdentifiedComponent.Id => FactoryId;
 
-        bool IMountPointFactory.TryMount(IEngineEnvironmentSettings environmentSettings, IMountPoint parent, string mountPointUri, out IMountPoint mountPoint)
+        bool IMountPointFactory.TryMount(IEngineEnvironmentSettings environmentSettings, IMountPoint? parent, string mountPointUri, out IMountPoint? mountPoint)
         {
             if (!Uri.TryCreate(mountPointUri, UriKind.Absolute, out var uri))
             {
@@ -51,9 +51,9 @@ namespace Microsoft.TemplateEngine.Edge.Mount.Archive
             }
             else
             {
-                IFile file = parent.Root.FileInfo(uri.LocalPath);
+                IFile? file = parent.Root.FileInfo(uri.LocalPath);
 
-                if (!file.Exists)
+                if (file == null || !file.Exists)
                 {
                     mountPoint = null;
                     return false;
