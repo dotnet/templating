@@ -33,8 +33,8 @@
     <MicrosoftNetCompilersToolsetPackageVersion>4.2.0-4.22307.8</MicrosoftNetCompilersToolsetPackageVersion>
     <MicrosoftCodeAnalysisCSharpCodeStylePackageVersion>4.2.0-4.22307.8</MicrosoftCodeAnalysisCSharpCodeStylePackageVersion>
     <!-- Dependencies from https://github.com/dotnet/roslyn-analyzers -->
-    <MicrosoftCodeAnalysisNetAnalyzersPackageVersion>7.0.0-preview1.22302.1</MicrosoftCodeAnalysisNetAnalyzersPackageVersion>
-    <MicrosoftCodeAnalysisPublicApiAnalyzersPackageVersion>3.3.4-beta1.22302.1</MicrosoftCodeAnalysisPublicApiAnalyzersPackageVersion>
+    <MicrosoftCodeAnalysisNetAnalyzersPackageVersion>7.0.0-preview1.22310.1</MicrosoftCodeAnalysisNetAnalyzersPackageVersion>
+    <MicrosoftCodeAnalysisPublicApiAnalyzersPackageVersion>3.3.4-beta1.22310.1</MicrosoftCodeAnalysisPublicApiAnalyzersPackageVersion>
     <!-- Dependencies from https://github.com/dotnet/runtime -->
     <MicrosoftNETCoreAppRefPackageVersion>7.0.0-preview.6.22305.4</MicrosoftNETCoreAppRefPackageVersion>
     <MicrosoftNETCoreAppRuntimewinx64PackageVersion>7.0.0-preview.6.22305.4</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
