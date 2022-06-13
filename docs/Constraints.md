@@ -141,15 +141,17 @@ Supported in .NET SDK and Visual Studio
 
 ## Installed Workloads
 Defines applicability of a template in the dotnet runtime with specific [workloads](https://github.com/dotnet/designs/blob/main/accepted/2020/workloads/workloads.md) installed.
-All the installed (queryable via `dotnet worload list`) as well as [extended](https://github.com/dotnet/designs/blob/main/accepted/2020/workloads/workload-manifest.md#workload-composition) workloads are inspected during evaluating of this constraint.
+All the installed (queryable via `dotnet workload list`) as well as [extended](https://github.com/dotnet/designs/blob/main/accepted/2020/workloads/workload-manifest.md#workload-composition) workloads are inspected during evaluating of this constraint.
 
 **Configuration:**
 
 - `type`: `workload`
 - `args` (string, array). Mandatory. List of names of supported workloads (running host need to have at least one of the requested workloads installed).
 
+  To see the list of instaled workloads run [`dotnet workload list`](https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-workload-list). To see the list of available workloads run [`dotnet workload search`](https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-workload-search)
+
 **Supported in**:
-   - CLI host (`dotnet new`)
+   - .NET SDK CLI (`dotnet new`)
 
 ### Examples
 
@@ -171,7 +173,8 @@ All the installed (queryable via `dotnet worload list`) as well as [extended](ht
 ```
 
 ## Current SDK Version
-Defines applicability of a template in the dotnet runtime with specific SDK version.
+Defines .NET SDK version(s) the template can be used on.
+
 Only the currently active SDK (queryable via `dotnet --version`, changeable by the [`global.json`](https://docs.microsoft.com/en-us/dotnet/core/tools/global-json)) is being considered. Other available SDKs (queryable via `dotnet --list-sdks`) are checked for possible match and result is reported in the evaluation output wuth possible remedy steps - the form of reporting is dependend on the templating host.
 
 **Configuration:**
@@ -180,7 +183,7 @@ Only the currently active SDK (queryable via `dotnet --version`, changeable by t
 - `args` (string, array). List of versions supported by the template. Syntax and match evaluation of versions are identical as in the [Template engine host](#template-engine-host) constraint.
 
 **Supported in**:
-   - CLI host (`dotnet new`)
+   - .NET SDK CLI (`dotnet new`)
 
 ### Examples
 

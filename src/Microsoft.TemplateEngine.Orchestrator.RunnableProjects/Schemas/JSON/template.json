@@ -1270,12 +1270,14 @@
               "args": {
                 "oneOf": [
                   {
-                    "type": "string"
+                    "type": "string",
+                    "description": "supported workload (running host need to have at least one of the requested workloads installed)."
                   },
                   {
                     "type": "array",
                     "items": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "supported workload (running host need to have at least one of the requested workloads installed)."
                     }
                   }
                 ]
@@ -1283,7 +1285,7 @@
             }
           },
           {
-            "description": "SDK version constraint. Allows to restrict the template to be run only on host with specific SDK version.",
+            "description": "SDK version constraint. Allows to restrict the template to be run only on specific .NET SDK version(s).",
             "properties": {
               "type": {
                 "enum": [ "sdk-version" ]
