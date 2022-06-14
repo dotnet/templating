@@ -63,7 +63,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions
             _tokens = trie;
         }
 
-        public IEvaluable Build(ref int bufferLength, ref int bufferPosition, Action<IReadOnlyList<byte>> onFault)
+        public IEvaluable Build(ref int bufferLength, ref int bufferPosition, Action<IReadOnlyList<byte>> onFault, HashSet<int> referencedVariablesIndexes = null)
         {
             Stack<ScopeIsolator> parents = new Stack<ScopeIsolator>();
             ScopeIsolator isolator = new ScopeIsolator
@@ -165,6 +165,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions
                             if (_knownTokensCount <= token && _isSymbolDereferenceInLiteralSequenceRequired)
                             {
                                 object val = _symbolValues[token - _knownTokensCount];
+                                referencedVariablesIndexes?.Add(token - _knownTokensCount);
                                 string valText = (val ?? "null").ToString();
                                 valText = _valueEncoder(valText);
                                 byte[] data = _processor.Encoding.GetBytes(valText);
@@ -220,7 +221,8 @@ namespace Microsoft.TemplateEngine.Core.Expressions
                             //Is it a variable?
                             else if (_knownTokensCount <= token)
                             {
-                                object value = _symbolValues[token - _knownTokensCount] ?? null;
+                                object value = _symbolValues[token - _knownTokensCount] ?? null; 
+                                referencedVariablesIndexes?.Add(token - _knownTokensCount);
                                 Token<TToken> t = new Token<TToken>(_literal, value);
                                 TokenScope<TToken> scope = new TokenScope<TToken>(isolator.Active, t);
 
