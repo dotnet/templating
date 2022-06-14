@@ -3,8 +3,10 @@
   <Import Project="dependabot\Packages.props" />
   <ItemGroup>
     <PackageReference Update="System.CommandLine" Version="$(SystemCommandLinePackageVersion)" />
+    <!--Analyzer dependencies-->
+    <PackageReference Update="Microsoft.CodeAnalysis.NetAnalyzers" Version="$(MicrosoftCodeAnalysisNetAnalyzersPackageVersion)" />
     <!--Test dependencies-->
     <PackageReference Update="xunit" Version="$(XUnitVersion)" />
-    <PackageReference Update="Microsoft.DotNet.Cli.Utils" Version="6.0.100-rc.1.21423.4" />
+    <PackageReference Update="Microsoft.DotNet.Cli.Utils" Version="$(MicrosoftDotNetCliUtilsVersion)" />
   </ItemGroup>
 </Project>
