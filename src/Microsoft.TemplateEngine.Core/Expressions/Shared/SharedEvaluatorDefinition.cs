@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Microsoft.Extensions.Logging;
@@ -26,10 +27,15 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
 
         public static bool Evaluate(IProcessorState processor, ref int bufferLength, ref int currentBufferPosition, out bool faulted)
         {
+            return Evaluate(processor, ref bufferLength, ref currentBufferPosition, out faulted, null);
+        }
+
+        public static bool Evaluate(IProcessorState processor, ref int bufferLength, ref int currentBufferPosition, out bool faulted, HashSet<int> referencedVariablesIndexes)
+        {
             ITokenTrie tokens = Instance.GetSymbols(processor);
             ScopeBuilder<Operators, TTokens> builder = processor.ScopeBuilder(tokens, Map, DereferenceInLiteralsSetting);
             bool isFaulted = false;
-            IEvaluable result = builder.Build(ref bufferLength, ref currentBufferPosition, x => isFaulted = true);
+            IEvaluable result = builder.Build(ref bufferLength, ref currentBufferPosition, x => isFaulted = true, referencedVariablesIndexes);
 
             if (isFaulted)
             {
@@ -51,7 +57,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
             }
         }
 
-        public static bool EvaluateFromString(ILogger logger, string text, IVariableCollection variables)
+        public static bool EvaluateFromString(ILogger logger, string text, IVariableCollection variables, HashSet<int> referencedVariablesIndexes = null)
         {
             using (MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(text)))
             using (MemoryStream res = new MemoryStream())
@@ -60,7 +66,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
                 IProcessorState state = new ProcessorState(ms, res, (int)ms.Length, (int)ms.Length, cfg, NoOperationProviders);
                 int len = (int)ms.Length;
                 int pos = 0;
-                return Evaluate(state, ref len, ref pos, out bool faulted);
+                return Evaluate(state, ref len, ref pos, out bool _, referencedVariablesIndexes);
             }
         }
 
