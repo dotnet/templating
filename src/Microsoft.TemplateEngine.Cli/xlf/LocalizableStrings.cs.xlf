@@ -639,7 +639,7 @@ Podporované sloupce: language, tags, author, type</target>
       </trans-unit>
       <trans-unit id="OptionDescriptionForce">
         <source>Forces content to be generated even if it would change existing files. If used together with --install option, allows installing template packages from the specified sources even if they would override a template package from another source.</source>
-        <target state="new">Forces content to be generated even if it would change existing files. If used together with --install option, allows installing template packages from the specified sources even if they would override a template package from another source.</target>
+        <target state="translated">Vynutí vygenerování obsahu i v případě, že by došlo ke změně existujících souborů. Pokud se použije spolu s možností --install, povolí instalaci balíčků šablon ze zadaných zdrojů, a to i v případě, že by došlo k přepsání balíčku šablony z jiného zdroje.</target>
         <note />
       </trans-unit>
       <trans-unit id="OptionDescriptionNoUpdateCheck">
