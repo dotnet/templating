@@ -33,6 +33,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
         [Fact(DisplayName = nameof(AddProjectToSolutionPostActionFindsOneProjectToAdd))]
         public void AddProjectToSolutionPostActionFindsOneProjectToAdd()
         {
+            string outputBasePath = FileSystemHelpers.GetNewVirtualizedPath(_engineEnvironmentSettings);
             IPostAction postAction = new MockPostAction()
             {
                 ActionId = AddProjectsToSolutionPostAction.ActionProcessorId,
@@ -44,14 +45,15 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
 
             ICreationResult creationResult = new MockCreationResult(primaryOutputs: new[] { new MockCreationPath(Path.GetFullPath("outputProj1.csproj")) });
 
-            Assert.True(AddProjectsToSolutionPostAction.TryGetProjectFilesToAdd(_engineEnvironmentSettings, postAction, creationResult, string.Empty, out IReadOnlyList<string> foundProjectFiles));
-            Assert.Equal(1, foundProjectFiles.Count);
-            Assert.Equal(creationResult.PrimaryOutputs[0].Path, foundProjectFiles[0]);
+            Assert.True(AddProjectsToSolutionPostAction.TryGetProjectFilesToAdd( postAction, creationResult, outputBasePath, out IReadOnlyList<string>? foundProjectFiles));
+            Assert.Equal(1, foundProjectFiles?.Count);
+            Assert.Equal(creationResult.PrimaryOutputs[0].Path, foundProjectFiles?[0]);
         }
 
         [Fact(DisplayName = nameof(AddProjectToSolutionPostActionFindsMultipleProjectsToAdd))]
         public void AddProjectToSolutionPostActionFindsMultipleProjectsToAdd()
         {
+            string outputBasePath = FileSystemHelpers.GetNewVirtualizedPath(_engineEnvironmentSettings);
             IPostAction postAction = new MockPostAction()
             {
                 ActionId = AddProjectsToSolutionPostAction.ActionProcessorId,
@@ -69,10 +71,10 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
                     new MockCreationPath(Path.GetFullPath("outputProj2.csproj"))
                 });
 
-            Assert.True(AddProjectsToSolutionPostAction.TryGetProjectFilesToAdd(_engineEnvironmentSettings, postAction, creationResult, string.Empty, out IReadOnlyList<string> foundProjectFiles));
-            Assert.Equal(2, foundProjectFiles.Count);
-            Assert.Contains(creationResult.PrimaryOutputs[0].Path, foundProjectFiles.ToList());
-            Assert.Contains(creationResult.PrimaryOutputs[2].Path, foundProjectFiles.ToList());
+            Assert.True(AddProjectsToSolutionPostAction.TryGetProjectFilesToAdd( postAction, creationResult, outputBasePath, out IReadOnlyList<string>? foundProjectFiles));
+            Assert.Equal(2, foundProjectFiles?.Count);
+            Assert.Contains(creationResult.PrimaryOutputs[0].Path, foundProjectFiles?.ToList());
+            Assert.Contains(creationResult.PrimaryOutputs[2].Path, foundProjectFiles?.ToList());
 
             Assert.DoesNotContain(creationResult.PrimaryOutputs[1].Path, foundProjectFiles.ToList());
         }
@@ -91,7 +93,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
 
             ICreationResult creationResult = new MockCreationResult(primaryOutputs: new[] { new MockCreationPath("outputProj1.csproj") });
 
-            Assert.False(AddProjectsToSolutionPostAction.TryGetProjectFilesToAdd(_engineEnvironmentSettings, postAction, creationResult, string.Empty, out IReadOnlyList<string> foundProjectFiles));
+            Assert.False(AddProjectsToSolutionPostAction.TryGetProjectFilesToAdd( postAction, creationResult, string.Empty, out IReadOnlyList<string>? foundProjectFiles));
             Assert.Null(foundProjectFiles);
         }
 
@@ -120,10 +122,10 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             string dontFindMeFullPath1 = Path.Combine(outputBasePath, creationResult.PrimaryOutputs[1].Path);
             string outputFileFullPath2 = Path.Combine(outputBasePath, creationResult.PrimaryOutputs[2].Path);
 
-            Assert.True(AddProjectsToSolutionPostAction.TryGetProjectFilesToAdd(_engineEnvironmentSettings, postAction, creationResult, outputBasePath, out IReadOnlyList<string> foundProjectFiles));
-            Assert.Equal(2, foundProjectFiles.Count);
-            Assert.Contains(outputFileFullPath0, foundProjectFiles.ToList());
-            Assert.Contains(outputFileFullPath2, foundProjectFiles.ToList());
+            Assert.True(AddProjectsToSolutionPostAction.TryGetProjectFilesToAdd( postAction, creationResult, outputBasePath, out IReadOnlyList<string>? foundProjectFiles));
+            Assert.Equal(2, foundProjectFiles?.Count);
+            Assert.Contains(outputFileFullPath0, foundProjectFiles?.ToList());
+            Assert.Contains(outputFileFullPath2, foundProjectFiles?.ToList());
 
             Assert.DoesNotContain(dontFindMeFullPath1, foundProjectFiles.ToList());
         }
@@ -148,10 +150,10 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             string outputFileFullPath0 = Path.Combine(outputBasePath, creationResult.PrimaryOutputs[0].Path);
             string outputFileFullPath1 = Path.Combine(outputBasePath, creationResult.PrimaryOutputs[1].Path);
 
-            Assert.True(AddProjectsToSolutionPostAction.TryGetProjectFilesToAdd(_engineEnvironmentSettings, postAction, creationResult, outputBasePath, out IReadOnlyList<string> foundProjectFiles));
-            Assert.Equal(2, foundProjectFiles.Count);
-            Assert.Contains(outputFileFullPath0, foundProjectFiles.ToList());
-            Assert.Contains(outputFileFullPath1, foundProjectFiles.ToList());
+            Assert.True(AddProjectsToSolutionPostAction.TryGetProjectFilesToAdd( postAction, creationResult, outputBasePath, out IReadOnlyList<string>? foundProjectFiles));
+            Assert.Equal(2, foundProjectFiles?.Count);
+            Assert.Contains(outputFileFullPath0, foundProjectFiles?.ToList());
+            Assert.Contains(outputFileFullPath1, foundProjectFiles?.ToList());
         }
     }
 }
