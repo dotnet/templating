@@ -201,16 +201,16 @@ namespace Microsoft.TemplateEngine.Edge.Template
         /// Reads the parameters from the template and the host and setup their values in the return IParameterSet.
         /// Host param values override template defaults.
         /// </summary>
-        /// <param name="templateInfo"></param>
+        /// <param name="template"></param>
         /// <param name="realName"></param>
         /// <param name="paramsWithInvalidValues"></param>
         /// <returns></returns>
         [Obsolete("This method is deprecated.")]
         //This method should become internal once Cli help logic is refactored.
-        public IParameterSet SetupDefaultParamValuesFromTemplateAndHost(ITemplate templateInfo, string realName, out IReadOnlyList<string> paramsWithInvalidValues)
+        public IParameterSet SetupDefaultParamValuesFromTemplateAndHost(ITemplate template, string realName, out IReadOnlyList<string> paramsWithInvalidValues)
         {
             ITemplateEngineHost host = _environmentSettings.Host;
-            IParameterSet templateParams = templateInfo.Generator.GetParametersForTemplate(_environmentSettings, templateInfo);
+            IParameterSet templateParams = template.Generator.GetParametersForTemplate(_environmentSettings, template);
             List<string> paramsWithInvalidValuesList = new List<string>();
 
             foreach (ITemplateParameter param in templateParams.ParameterDefinitions)
@@ -219,37 +219,9 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 {
                     templateParams.ResolvedValues[param] = realName;
                 }
-                else if (host.TryGetHostParamDefault(param.Name, out string? hostParamValue) && hostParamValue != null)
+                else
                 {
-                    object? resolvedValue = templateInfo.Generator.ConvertParameterValueToType(_environmentSettings, param, hostParamValue, out bool valueResolutionError);
-                    if (!valueResolutionError)
-                    {
-                        if (resolvedValue is null)
-                        {
-                            throw new InvalidOperationException($"{nameof(resolvedValue)} cannot be null when {nameof(valueResolutionError)} is 'false'.");
-                        }
-                        templateParams.ResolvedValues[param] = resolvedValue;
-                    }
-                    else
-                    {
-                        paramsWithInvalidValuesList.Add(param.Name);
-                    }
-                }
-                else if (param.Priority != TemplateParameterPriority.Required && param.DefaultValue != null)
-                {
-                    object? resolvedValue = templateInfo.Generator.ConvertParameterValueToType(_environmentSettings, param, param.DefaultValue, out bool valueResolutionError);
-                    if (!valueResolutionError)
-                    {
-                        if (resolvedValue is null)
-                        {
-                            throw new InvalidOperationException($"{nameof(resolvedValue)} cannot be null when {nameof(valueResolutionError)} is 'false'.");
-                        }
-                        templateParams.ResolvedValues[param] = resolvedValue;
-                    }
-                    else
-                    {
-                        paramsWithInvalidValuesList.Add(param.Name);
-                    }
+                    SetParameterDefault(host, template, templateParams, param, paramsWithInvalidValuesList);
                 }
             }
 
@@ -279,7 +251,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                     if (inputParam.Value == null)
                     {
                         if (!string.IsNullOrEmpty(paramFromTemplate.DefaultIfOptionWithoutValue))
-{
+                        {
                             object? resolvedValue = template.Generator.ConvertParameterValueToType(_environmentSettings, paramFromTemplate, paramFromTemplate.DefaultIfOptionWithoutValue!, out bool valueResolutionError);
                             if (!valueResolutionError)
                             {
@@ -372,6 +344,43 @@ namespace Microsoft.TemplateEngine.Edge.Template
             }
         }
 
+        private void SetParameterDefault(ITemplateEngineHost? host, ITemplate template, IParameterSet templateParams, ITemplateParameter parameter, List<string> paramsWithInvalidValues)
+        {
+            if (host != null && host.TryGetHostParamDefault(parameter.Name, out string? hostParamValue) && hostParamValue != null)
+            {
+                object? resolvedValue = template.Generator.ConvertParameterValueToType(_environmentSettings, parameter, hostParamValue, out bool valueResolutionError);
+                if (!valueResolutionError)
+                {
+                    if (resolvedValue is null)
+                    {
+                        throw new InvalidOperationException($"{nameof(resolvedValue)} cannot be null when {nameof(valueResolutionError)} is 'false'.");
+                    }
+                    templateParams.ResolvedValues[parameter] = resolvedValue;
+                }
+                else
+                {
+                    paramsWithInvalidValues.Add(parameter.Name);
+                }
+            }
+            // This for newly optional that does not have value set
+            else if (parameter.Priority != TemplateParameterPriority.Required && parameter.DefaultValue != null)
+            {
+                object? resolvedValue = template.Generator.ConvertParameterValueToType(_environmentSettings, parameter, parameter.DefaultValue, out bool valueResolutionError);
+                if (!valueResolutionError)
+                {
+                    if (resolvedValue is null)
+                    {
+                        throw new InvalidOperationException($"{nameof(resolvedValue)} cannot be null when {nameof(valueResolutionError)} is 'false'.");
+                    }
+                    templateParams.ResolvedValues[parameter] = resolvedValue;
+                }
+                else
+                {
+                    paramsWithInvalidValues.Add(parameter.Name);
+                }
+            }
+        }
+
         /// <summary>
         /// Checks that all required parameters are provided. If a missing one is found, a value may be provided via host.OnParameterError
         /// but it's up to the caller / UI to decide how to act.
@@ -413,6 +422,30 @@ namespace Microsoft.TemplateEngine.Edge.Template
             return anyMissingParams;
         }
 
+        private bool EvaluateConditionalParameters(ITemplate template, IParameterSet templateParams, out IReadOnlyList<string> paramsWithInvalidValues)
+        {
+            ParametersConditionsEvaluationResult result = template.Generator.EvaluateConditionalParameters(_logger, templateParams, template);
+
+            // Following two steps are possibly questionable - do we want to run defaults again and get them for parameters
+            //  that were marked as disabled or nor required by conditions? This might feel like overwritting the disabling action,
+            //  on the other hand - this way the conditionally disabled or (not-)required parameters will get exactly same behavior
+            //  (in regards of applying defaults) as if they would not be specified on input or marked as required directly in template.
+            // Tl;dr;: We prefer the behavior simulating the full reevaluation of parameters assignment after conditions evaluation.
+
+            List<string> defaultParamsWithInvalidValues = new List<string>();
+            // try get default values for disabled params
+            result.DisabledParameters.ForEach(p =>
+                SetParameterDefault(_environmentSettings.Host, template, templateParams, p, defaultParamsWithInvalidValues));
+
+            // for params that changed to optional (and are not disabled) - try get 'Default' value (as for required it's not obtained)
+            result.ParametersWithAlteredPriority
+                .Where(p => p.Priority == TemplateParameterPriority.Optional && !result.DisabledParameters.Contains(p))
+                .ForEach(p => SetParameterDefault(null, template, templateParams, p, defaultParamsWithInvalidValues));
+
+            paramsWithInvalidValues = defaultParamsWithInvalidValues;
+            return defaultParamsWithInvalidValues.Count == 0;
+        }
+
         private bool TryCreateParameterSet(ITemplate template, string realName, IReadOnlyDictionary<string, string?> inputParameters, out IParameterSet? templateParams, out TemplateCreationResult? failureResult)
         {
             // there should never be param errors here. If there are, the template is malformed, or the host gave an invalid value.
@@ -427,6 +460,13 @@ namespace Microsoft.TemplateEngine.Edge.Template
             {
                 string message = string.Join(", ", new CombinedList<string>(userParamsWithInvalidValues, defaultsWithUnresolvedInvalidValues));
                 failureResult = new TemplateCreationResult(CreationResultStatus.InvalidParamValues, template.Name, message);
+                templateParams = null;
+                return false;
+            }
+
+            if (!EvaluateConditionalParameters(template, templateParams, out var paramsWithInvalidValues))
+            {
+                failureResult = new TemplateCreationResult(CreationResultStatus.InvalidParamValues, template.Name, paramsWithInvalidValues.ToCsvString());
                 templateParams = null;
                 return false;
             }

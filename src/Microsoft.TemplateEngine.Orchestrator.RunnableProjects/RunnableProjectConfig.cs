@@ -524,6 +524,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     parameter.DisplayName = parameterSymbol.DisplayName;
                     parameter.EnableQuotelessLiterals = parameterSymbol.EnableQuotelessLiterals;
                     parameter.AllowMultipleValues = parameterSymbol.AllowMultipleValues;
+                    parameter.EnabledCondition = parameterSymbol.EnabledCondition;
+                    parameter.RequiredCondition = parameterSymbol.RequiredCondition;
                 }
 
                 parameters[symbol.Key] = parameter;
@@ -577,8 +579,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     Type = parameter.Type,
                     AllowMultipleValues = parameter.AllowMultipleValues,
                     EnableQuotelessLiterals = parameter.EnableQuotelessLiterals,
-                    Choices = localizedChoices ?? parameter.Choices
-                };
+                    Choices = localizedChoices ?? parameter.Choices,
+                    EnabledCondition = parameter.EnabledCondition,
+                    RequiredCondition = parameter.RequiredCondition,
+            };
 
                 localizedParameters.Add(parameterPair.Key, localizedParameter);
             }

@@ -34,6 +34,7 @@ Microsoft.TemplateEngine.Edge.Template.MatchInfo.AdditionalInformation -> string
 Microsoft.TemplateEngine.Edge.Template.MatchInfo.InputParameterFormat -> string!
 Microsoft.TemplateEngine.Edge.Template.MatchInfo.InputParameterName -> string!
 Microsoft.TemplateEngine.Edge.Template.MatchInfo.ParameterValue -> string!
+Microsoft.TemplateEngine.Edge.Template.TemplateCreator.SetupDefaultParamValuesFromTemplateAndHost(Microsoft.TemplateEngine.Abstractions.ITemplate! template, string! realName, out System.Collections.Generic.IReadOnlyList<string!>! paramsWithInvalidValues) -> Microsoft.TemplateEngine.Abstractions.IParameterSet!
 Microsoft.TemplateEngine.Edge.Template.TemplateEqualityComparer.Equals(Microsoft.TemplateEngine.Abstractions.ITemplateInfo! x, Microsoft.TemplateEngine.Abstractions.ITemplateInfo! y) -> bool
 Microsoft.TemplateEngine.Edge.Template.TemplateEqualityComparer.GetHashCode(Microsoft.TemplateEngine.Abstractions.ITemplateInfo! obj) -> int
 Microsoft.TemplateEngine.Edge.Template.TemplateMatchInfoEqualityComparer.Equals(Microsoft.TemplateEngine.Edge.Template.ITemplateMatchInfo! x, Microsoft.TemplateEngine.Edge.Template.ITemplateMatchInfo! y) -> bool

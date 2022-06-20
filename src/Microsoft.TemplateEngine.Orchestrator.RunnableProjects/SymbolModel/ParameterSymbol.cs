@@ -60,6 +60,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
             Choices = choicesAndDescriptions;
             AllowMultipleValues = jObject.ToBool(nameof(AllowMultipleValues));
             EnableQuotelessLiterals = jObject.ToBool(nameof(EnableQuotelessLiterals));
+            EnabledCondition = jObject.ToString(nameof(EnabledCondition));
+            RequiredCondition = jObject.ToString(nameof(RequiredCondition));
+
+            if (!string.IsNullOrEmpty(RequiredCondition) && jObject.TryGetValue(nameof(IsRequired), StringComparison.OrdinalIgnoreCase, out _))
+            {
+                throw new ArgumentException(
+                    "Parameter cannot have explicit Required property and RequiredCondition at the same time");
+            }
         }
 
         /// <summary>
@@ -87,6 +95,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
             Forms = cloneFrom.Forms.GlobalForms.Count != 0 ? cloneFrom.Forms : formsFallback;
             AllowMultipleValues = cloneFrom.AllowMultipleValues;
             EnableQuotelessLiterals = cloneFrom.EnableQuotelessLiterals;
+            EnabledCondition = cloneFrom.EnabledCondition;
+            RequiredCondition = cloneFrom.RequiredCondition;
         }
 
         /// <summary>
@@ -110,6 +120,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
 
         // If this is set, it's allowed to sepcify choice literals without quotation within conditions.
         internal bool EnableQuotelessLiterals { get; init; }
+
+        internal string EnabledCondition { get; init; }
+
+        internal string RequiredCondition { get; init; }
 
         internal IReadOnlyDictionary<string, ParameterChoice> Choices
         {

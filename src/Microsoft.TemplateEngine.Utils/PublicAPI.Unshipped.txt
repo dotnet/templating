@@ -25,6 +25,12 @@ Microsoft.TemplateEngine.Utils.DefaultTemplateEngineHost.OnPotentiallyDestructiv
 Microsoft.TemplateEngine.Utils.DefaultTemplateEngineHost.RegisterDiagnosticLogger(string! category, System.Action<string!, string![]!>! messageHandler) -> void
 Microsoft.TemplateEngine.Utils.DefaultTemplateEngineHost.Version.get -> string!
 Microsoft.TemplateEngine.Utils.DefaultTemplateEngineHost.VirtualizeDirectory(string! path) -> void
+Microsoft.TemplateEngine.Utils.DirectedGraph<T>
+Microsoft.TemplateEngine.Utils.DirectedGraph<T>.DirectedGraph(System.Collections.Generic.Dictionary<T, System.Collections.Generic.HashSet<T>!>! dependenciesMap) -> void
+Microsoft.TemplateEngine.Utils.DirectedGraph<T>.GetDependands(System.Collections.Generic.IEnumerable<T>! vertices) -> System.Collections.Generic.IEnumerable<T>!
+Microsoft.TemplateEngine.Utils.DirectedGraph<T>.GetSubGraphDependandOnVertices(System.Collections.Generic.IReadOnlyList<T>! vertices, bool includeSeedVertices = false) -> Microsoft.TemplateEngine.Utils.DirectedGraph<T>!
+Microsoft.TemplateEngine.Utils.DirectedGraph<T>.HasCycle(out System.Collections.Generic.IReadOnlyList<T>! cycle) -> bool
+Microsoft.TemplateEngine.Utils.DirectedGraph<T>.TryGetTopologicalSort(out System.Collections.Generic.IReadOnlyList<T>! sortedElements) -> bool
 Microsoft.TemplateEngine.Utils.EngineInitializationException.EngineInitializationException(string! message, string! settingsItem) -> void
 Microsoft.TemplateEngine.Utils.EngineInitializationException.EngineInitializationException(string! message, string! settingsItem, System.Exception! innerException) -> void
 Microsoft.TemplateEngine.Utils.EngineInitializationException.SettingsItem.get -> string!
@@ -46,6 +52,9 @@ override Microsoft.TemplateEngine.Utils.ExactVersionSpecification.ToString() -> 
 override Microsoft.TemplateEngine.Utils.MultiValueParameter.ToString() -> string!
 static Microsoft.TemplateEngine.Utils.ArrayExtensions.CombineArrays<T>(params T[]![]! arrayList) -> T[]!
 static Microsoft.TemplateEngine.Utils.DictionaryExtensions.CloneIfDifferentComparer<T>(this System.Collections.Generic.IReadOnlyDictionary<string!, T>! source, System.StringComparer! comparer) -> System.Collections.Generic.IReadOnlyDictionary<string!, T>!
+static Microsoft.TemplateEngine.Utils.DirectedGraph<T>.implicit operator Microsoft.TemplateEngine.Utils.DirectedGraph<T>!(System.Collections.Generic.Dictionary<T, System.Collections.Generic.HashSet<T>!>! dependenciesMap) -> Microsoft.TemplateEngine.Utils.DirectedGraph<T>!
+static Microsoft.TemplateEngine.Utils.EnumerableExtensions.AddRange<T>(this System.Collections.Generic.Queue<T>! queue, System.Collections.Generic.IEnumerable<T>! elements) -> void
+static Microsoft.TemplateEngine.Utils.EnumerableExtensions.ForEach<T>(this System.Collections.Generic.IEnumerable<T>! sequence, System.Action<T>! action) -> void
 static Microsoft.TemplateEngine.Utils.EnumerableExtensions.GetDuplicates<T>(this System.Collections.Generic.IEnumerable<T>? sequence, System.Collections.Generic.IEqualityComparer<T>? comparer = null) -> System.Collections.Generic.IEnumerable<T>!
 static Microsoft.TemplateEngine.Utils.EnumerableExtensions.HasDuplicates<T>(this System.Collections.Generic.IEnumerable<T>? sequence, System.Collections.Generic.IEqualityComparer<T>? comparer = null) -> bool
 static Microsoft.TemplateEngine.Utils.EnumerableExtensions.ToCsvString<T>(this System.Collections.Generic.IEnumerable<T>? source, bool useSpace = true) -> string!
