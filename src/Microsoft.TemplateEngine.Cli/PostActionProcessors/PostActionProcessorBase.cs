@@ -12,7 +12,10 @@ namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
     {
         protected internal New3Callbacks? Callbacks { get; set; }
 
-        protected IReadOnlyList<string> GetTargetForSource(ICreationEffects2 creationEffects, string sourcePathGlob)
+        /// <summary>
+        /// Gets absolute normalized path for a target matching <paramref name="sourcePathGlob"/>.
+        /// </summary>
+        protected static IReadOnlyList<string> GetTargetForSource(ICreationEffects2 creationEffects, string sourcePathGlob, string outputBasePath)
         {
             Glob g = Glob.Parse(sourcePathGlob);
             List<string> results = new List<string>();
@@ -23,12 +26,19 @@ namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
                 {
                     if (g.IsMatch(change.SourceRelativePath))
                     {
-                        results.Add(change.TargetRelativePath);
+                        results.Add(NormalizePath(outputBasePath, change.TargetRelativePath));
                     }
                 }
             }
-
             return results;
+        }
+
+        /// <summary>
+        /// Gets normalized absolute path of <paramref name="basePath"/> + <paramref name="relativePath"/>.
+        /// </summary>
+        protected static string NormalizePath(string basePath, string relativePath)
+        {
+            return Path.GetFullPath(Path.Combine(basePath, relativePath));
         }
     }
 }
