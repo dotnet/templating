@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions.Mount;
 
 namespace Microsoft.TemplateEngine.Abstractions
@@ -56,6 +57,16 @@ namespace Microsoft.TemplateEngine.Abstractions
         /// <param name="template">template to get parameters from.</param>
         /// <returns><see cref="IParameterSet"/> with parameters available in <paramref name="template"/>.</returns>
         IParameterSet GetParametersForTemplate(IEngineEnvironmentSettings environmentSettings, ITemplate template);
+
+        /// <summary>
+        /// Evaluates possible conditions defined on parameters within the given set of parameters.
+        /// Performs the changes on the given set of parameters as needed and returns the summary of changes performed.
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="parameters">Parameters to be evaluated and updated.</param>
+        /// <param name="template"></param>
+        /// <returns></returns>
+        ParametersConditionsEvaluationResult EvaluateConditionalParameters(ILogger logger, IParameterSet parameters, ITemplate template);
 
         /// <summary>
         /// Gets an <see cref="ITemplate"/> from the given <see cref="IFileSystemInfo" /> configuration entry.

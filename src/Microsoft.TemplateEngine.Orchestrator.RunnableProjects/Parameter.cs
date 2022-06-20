@@ -57,6 +57,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         [JsonProperty]
         internal bool IsVariable { get; set; }
 
+        [JsonProperty]
+        internal string EnabledCondition { get; set; }
+
+        [JsonProperty]
+        internal string RequiredCondition { get; set; }
+
         public override string ToString()
         {
             return $"{Name} ({Type})";

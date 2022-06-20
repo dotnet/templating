@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -17,6 +18,7 @@ using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Core.Contracts;
+using Microsoft.TemplateEngine.Core.Expressions.Cpp2;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config;
 using Microsoft.TemplateEngine.Utils;
 
@@ -159,6 +161,29 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         {
             RunnableProjectConfig templateConfig = (RunnableProjectConfig)template;
             return new ParameterSet(templateConfig);
+        }
+
+        public ParametersConditionsEvaluationResult EvaluateConditionalParameters(ILogger logger, IParameterSet parameterSet, ITemplate template)
+        {
+            List<(Parameter Parameter, object Value)> parametersWithValues =
+                parameterSet.ResolvedValues.Where(p => p.Key is Parameter)
+                .Select(p => ((p.Key as Parameter)!, p.Value)).ToList();
+
+            var variableCollection = new VariableCollection(
+                null,
+                parametersWithValues
+                    .Where(p => p.Value != null)
+                    .ToDictionary(p => p.Parameter.Name, p => p.Value));
+
+            Parameter[] variableCollectionIdxToParametersMap =
+                parametersWithValues.Where(p => p.Value != null).Select(p => p.Parameter).ToArray();
+
+            IReadOnlyList<Parameter> parameters = parametersWithValues.Select(p => p.Parameter).ToList();
+
+            var disabledParams = EvaluateEnablementConditions(parameters, parameterSet, variableCollection, variableCollectionIdxToParametersMap, logger);
+            var alteredRequirementParams = EvaluateRequirementCondition(parameters, variableCollection, logger);
+
+            return new ParametersConditionsEvaluationResult(disabledParams, alteredRequirementParams);
         }
 
         /// <summary>
@@ -616,6 +641,112 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             match = partialMatch;
             return match != null;
+        }
+
+        private IReadOnlyList<Parameter> EvaluateRequirementCondition(
+            IReadOnlyList<Parameter> parameters,
+            VariableCollection variableCollection,
+            ILogger logger
+            )
+        {
+            List<Parameter> parametersWithAlteredPriority = new List<Parameter>();
+
+            foreach (Parameter parameter in parameters)
+            {
+                if (!string.IsNullOrEmpty(parameter.RequiredCondition))
+                {
+                    bool isRequired = Cpp2StyleEvaluatorDefinition.EvaluateFromString(logger, parameter.EnabledCondition, variableCollection);
+                    var newPriority = isRequired ? TemplateParameterPriority.Required : TemplateParameterPriority.Optional;
+                    if (parameter.Priority != newPriority)
+                    {
+                        parametersWithAlteredPriority.Add(parameter);
+                        parameter.Priority = newPriority;
+                    }
+                }
+            }
+
+            return parametersWithAlteredPriority;
+        }
+
+        private IReadOnlyList<Parameter> EvaluateEnablementConditions(
+            IReadOnlyList<Parameter> parameters,
+            IParameterSet parameterSet,
+            VariableCollection variableCollection,
+            Parameter[] variableCollectionIdxToParametersMap,
+            ILogger logger)
+        {
+            List<Parameter> disabledParameters = new();
+            Dictionary<Parameter, HashSet<Parameter>> parametersDependencies = new Dictionary<Parameter, HashSet<Parameter>>();
+
+            // First parameters traversal.
+            //   - evaluate all EnabledCondition - and get the dependecies between the parameters during doing so
+            foreach (Parameter parameter in parameters)
+            {
+                if (!string.IsNullOrEmpty(parameter.EnabledCondition))
+                {
+                    HashSet<int> referencedVariablesIndexes = new HashSet<int>();
+                    if (!Cpp2StyleEvaluatorDefinition.EvaluateFromString(logger, parameter.EnabledCondition, variableCollection, referencedVariablesIndexes))
+                    {
+                        disabledParameters.Add(parameter);
+                        // Remove from input set
+                        parameterSet.ResolvedValues.Remove(parameter);
+                        // Do not remove from the variable collection though - we want to capture all dependencies between parameters in the first traversal.
+                        // Those will be bulk removed before second traversal (traversing only the required dependencies).
+                    }
+
+                    if (referencedVariablesIndexes.Any())
+                    {
+                        parametersDependencies[parameter] = new HashSet<Parameter>(
+                            referencedVariablesIndexes.Select(idx => variableCollectionIdxToParametersMap[idx]));
+                    }
+                }
+            }
+
+            // No dependencies between parameters detected - no need to process further the second evaluation
+            if (parametersDependencies.Count == 0)
+            {
+                return disabledParameters;
+            }
+
+            DirectedGraph<Parameter> parametersDependenciesGraph = new(parametersDependencies);
+            // Get the transitive closure of parameters that need to be recalculated, based on the knowledge of params that
+            DirectedGraph<Parameter> parametersToRecalculate =
+                parametersDependenciesGraph.GetSubGraphDependandOnVertices(disabledParameters, includeSeedVertices: false);
+
+            // Second traversal - for transitive dependencies of parameters that need to be disabled
+            if (parametersToRecalculate.TryGetTopologicalSort(out IReadOnlyList<Parameter> orderedParameters))
+            {
+                disabledParameters.ForEach(p => variableCollection.Remove(p.Name));
+
+                if (parametersDependenciesGraph.HasCycle(out var cycle))
+                {
+                    logger.LogWarning(
+                        $"Parameter conditions contain cyclic dependency: [{cycle.Select(p => p.Name).ToCsvString()}]. With current values of parameters it's possible to deterministically evaluate parameters - so proceeding further. However template should be reviewed as instantiation with different parameters can lead to error.");
+                }
+
+                foreach (Parameter parameter in orderedParameters)
+                {
+                    if (!Cpp2StyleEvaluatorDefinition.EvaluateFromString(logger, parameter.EnabledCondition, variableCollection))
+                    {
+                        disabledParameters.Add(parameter);
+                        // disable and remove from the collection
+                        parameterSet.ResolvedValues.Remove(parameter);
+                        variableCollection.Remove(parameter.Name);
+                    }
+                }
+            }
+            else if (parametersToRecalculate.HasCycle(out var cycle))
+            {
+                throw new TemplateAuthoringException(
+                            $"Parameter conditions contain cyclic dependency: [{cycle.Select(p => p.Name).ToCsvString()}], that is preventing deterministic evaluation", "Conditional Parameters");
+            }
+            else
+            {
+                throw new Exception(
+                    "Unexpected internal error - unable to perform topological sort of parameter dependencies that do not appear to have a cyclic dependencies");
+            }
+
+            return disabledParameters;
         }
 
         private IFile? FindBestHostTemplateConfigFile(IEngineEnvironmentSettings engineEnvironment, IFile config)

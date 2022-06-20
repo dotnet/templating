@@ -143,11 +143,11 @@ namespace Microsoft.TemplateEngine.Core
                         }
                         break;
                     case "user":
-                        variablesForSource = VariableCollectionFromParameters(environmentSettings, parameters, format);
+                        variablesForSource = VariableCollectionFromParameters(parameters, format);
 
                         if (variableConfig.FallbackFormat != null)
                         {
-                            VariableCollection variablesFallback = VariableCollectionFromParameters(environmentSettings, parameters, variableConfig.FallbackFormat);
+                            VariableCollection variablesFallback = VariableCollectionFromParameters(parameters, variableConfig.FallbackFormat);
                             variablesFallback.Parent = variablesForSource;
                             variablesForSource = variablesFallback;
                         }
@@ -174,7 +174,7 @@ namespace Microsoft.TemplateEngine.Core
             return variables;
         }
 
-        public static VariableCollection VariableCollectionFromParameters(IEngineEnvironmentSettings environmentSettings, IParameterSet parameters, string format)
+        public static VariableCollection VariableCollectionFromParameters(IParameterSet parameters, string format)
         {
             VariableCollection vc = new VariableCollection();
             foreach (ITemplateParameter param in parameters.ParameterDefinitions)
@@ -185,17 +185,10 @@ namespace Microsoft.TemplateEngine.Core
                 {
                     if (param.Priority != TemplateParameterPriority.Optional)
                     {
-                        parameters.ResolvedValues[param] = value;
+                        parameters.ResolvedValues[param] = null;
                     }
                 }
-                else if (value == null)
-                {
-                    if (param.Priority != TemplateParameterPriority.Optional)
-                    {
-                        parameters.ResolvedValues[param] = value;
-                    }
-                }
-                else
+                else if (value != null)
                 {
                     vc[key] = value;
                 }

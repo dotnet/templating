@@ -140,7 +140,6 @@ Microsoft.TemplateEngine.Edge.Template.TemplateCreator.InstantiateAsync(Microsof
 Microsoft.TemplateEngine.Edge.Template.TemplateCreator.LoadTemplate(Microsoft.TemplateEngine.Abstractions.ITemplateInfo! info, string? baselineName) -> Microsoft.TemplateEngine.Abstractions.ITemplate?
 Microsoft.TemplateEngine.Edge.Template.TemplateCreator.ReleaseMountPoints(Microsoft.TemplateEngine.Abstractions.ITemplate! template) -> void
 Microsoft.TemplateEngine.Edge.Template.TemplateCreator.ResolveUserParameters(Microsoft.TemplateEngine.Abstractions.ITemplate! template, Microsoft.TemplateEngine.Abstractions.IParameterSet! templateParams, System.Collections.Generic.IReadOnlyDictionary<string!, string?>! inputParameters, out System.Collections.Generic.IReadOnlyList<string!>! paramsWithInvalidValues) -> void
-Microsoft.TemplateEngine.Edge.Template.TemplateCreator.SetupDefaultParamValuesFromTemplateAndHost(Microsoft.TemplateEngine.Abstractions.ITemplate! templateInfo, string! realName, out System.Collections.Generic.IReadOnlyList<string!>! paramsWithInvalidValues) -> Microsoft.TemplateEngine.Abstractions.IParameterSet!
 Microsoft.TemplateEngine.Edge.Template.TemplateCreator.TemplateCreator(Microsoft.TemplateEngine.Abstractions.IEngineEnvironmentSettings! environmentSettings) -> void
 Microsoft.TemplateEngine.Edge.Template.TemplateEqualityComparer
 Microsoft.TemplateEngine.Edge.Template.TemplateEqualityComparer.TemplateEqualityComparer() -> void
