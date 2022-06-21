@@ -58,10 +58,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         internal bool IsVariable { get; set; }
 
         [JsonProperty]
-        internal string EnabledCondition { get; set; }
+        internal string IsEnabledCondition { get; set; }
 
         [JsonProperty]
-        internal string RequiredCondition { get; set; }
+        internal string IsRequiredCondition { get; set; }
 
         public override string ToString()
         {
