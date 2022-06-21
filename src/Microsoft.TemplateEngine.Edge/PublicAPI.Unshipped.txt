@@ -31,6 +31,10 @@ Microsoft.TemplateEngine.Edge.Template.FilteredTemplateEqualityComparer.Equals(M
 Microsoft.TemplateEngine.Edge.Template.FilteredTemplateEqualityComparer.GetHashCode(Microsoft.TemplateEngine.Edge.Template.IFilteredTemplateInfo! obj) -> int
 Microsoft.TemplateEngine.Edge.Template.IFilteredTemplateInfo.Info.get -> Microsoft.TemplateEngine.Abstractions.ITemplateInfo!
 Microsoft.TemplateEngine.Edge.Template.IFilteredTemplateInfo.MatchDisposition.get -> System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Edge.Template.MatchInfo>!
+Microsoft.TemplateEngine.Edge.Template.InputParameter
+Microsoft.TemplateEngine.Edge.Template.InputParameter.InputParameter(string! name, string? value) -> void
+Microsoft.TemplateEngine.Edge.Template.InputParameter.Name.get -> string!
+Microsoft.TemplateEngine.Edge.Template.InputParameter.Value.get -> string?
 Microsoft.TemplateEngine.Edge.Template.InputParametersSet
 Microsoft.TemplateEngine.Edge.Template.InputParametersSet.ContainsParameterWithName(string! name, System.StringComparison comparison = System.StringComparison.OrdinalIgnoreCase) -> bool
 Microsoft.TemplateEngine.Edge.Template.InputParametersSet.GetEnumerator() -> System.Collections.Generic.IEnumerator<Microsoft.TemplateEngine.Edge.Template.InputParameter!>!
@@ -58,5 +62,6 @@ Microsoft.TemplateEngine.Edge.TemplateConstraintManager.GetConstraintsAsync(Syst
 Microsoft.TemplateEngine.Edge.TemplateConstraintManager.TemplateConstraintManager(Microsoft.TemplateEngine.Abstractions.IEngineEnvironmentSettings! engineEnvironmentSettings) -> void
 static Microsoft.TemplateEngine.Edge.Components.MandatoryComponents.get -> System.Collections.Generic.IReadOnlyList<(System.Type! Type, Microsoft.TemplateEngine.Abstractions.IIdentifiedComponent! Instance)>!
 static Microsoft.TemplateEngine.Edge.Template.FilteredTemplateEqualityComparer.Default.get -> System.Collections.Generic.IEqualityComparer<Microsoft.TemplateEngine.Edge.Template.IFilteredTemplateInfo!>!
+static Microsoft.TemplateEngine.Edge.Template.InputParameter.implicit operator Microsoft.TemplateEngine.Edge.Template.InputParameter!(System.Collections.Generic.KeyValuePair<string!, string?> pair) -> Microsoft.TemplateEngine.Edge.Template.InputParameter!
 static Microsoft.TemplateEngine.Edge.Template.TemplateEqualityComparer.Default.get -> System.Collections.Generic.IEqualityComparer<Microsoft.TemplateEngine.Abstractions.ITemplateInfo!>!
 static Microsoft.TemplateEngine.Edge.Template.TemplateMatchInfoEqualityComparer.Default.get -> System.Collections.Generic.IEqualityComparer<Microsoft.TemplateEngine.Edge.Template.ITemplateMatchInfo!>!
