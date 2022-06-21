@@ -215,8 +215,8 @@ Usage can then look as following:
 ## Conditional Parameters
 
 [Parameter symbols in template](Reference-for-template.json.md#parameter-symbol) can be specified together with optional conditions:
-* [`Enabled Condition`](Reference-for-template.json.md#enabledCondition) - overwritting presence of input parameter. If condition is specified and evaluates to false, passed parameter value (if any) is ignored and processing works as if it was not specified. This includes application of [default values](Reference-for-template.json.md#default), [verification of mandatory parameters](Reference-for-template.json.md#isRequired), [conditional processing of sources](Conditional-processing-and-comment-syntax.md) and [replacements](Reference-for-template.json.md#replaces).
-* [`Required Condition`](Reference-for-template.json.md#requiredCondition) - dictates if parameter is mandatory or optional. After evaluation the behavior is identical as for the [`isRequired`](Reference-for-template.json.md#isRequired) config.
+* [`Is Enabled Condition`](Reference-for-template.json.md#isEnabledCondition) - overwritting presence of input parameter. If condition is specified and evaluates to false, passed parameter value (if any) is ignored and processing works as if the symbol would not exist. This includes application of [default values](Reference-for-template.json.md#default), [verification of mandatory parameters](Reference-for-template.json.md#isRequired), [conditional processing of sources](Conditional-processing-and-comment-syntax.md) and [replacements](Reference-for-template.json.md#replaces).
+* [`Is Required Condition`](Reference-for-template.json.md#isRequiredCondition) - dictates if parameter is mandatory or optional. After evaluation the behavior is identical as for the [`isRequired`](Reference-for-template.json.md#isRequired) config.
 
 ### Evaluation
 
@@ -232,18 +232,18 @@ Usage can then look as following:
     "A": {
       "type": "parameter",
       "datatype": "bool",
-      "enabledCondition": "B != false",
+      "isEnabledCondition": "B != false",
     },
     "B": {
       "type": "parameter",
       "datatype": "bool",
-      "enabledCondition": "A != true",
+      "isEnabledCondition": "A != true",
     }
 }
 ```
 
-Following input parameter values can (and will) be evaluated deterministically: `A = false; B = true`
+Following input parameter values can (and will) be evaluated deterministically: `--A false --B true`
 
-Following input parameter values cannot be evaluated deterministically (and will lead to error): `A = true; B = false`
+Following input parameter values cannot be evaluated deterministically (and will lead to error): `--A true --B false`
 
-**Applying of host and default values** - All host and default values are applied before the conditions evaluation. After the evaluation defaults are reapplied to parameters that were evaluated as disabled and to parameters that do not have host supplied values and were evaluated as optional.
+**Applying of host and default values** - All host and default values are applied before the conditions evaluation. After the evaluation defaults are reapplied to parameters that were evaluated as optional and that do not have host supplied values. After this an evaluation of presence of mandatory values takes place.
