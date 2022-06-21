@@ -653,9 +653,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             foreach (Parameter parameter in parameters)
             {
-                if (!string.IsNullOrEmpty(parameter.RequiredCondition))
+                if (!string.IsNullOrEmpty(parameter.IsRequiredCondition))
                 {
-                    bool isRequired = Cpp2StyleEvaluatorDefinition.EvaluateFromString(logger, parameter.EnabledCondition, variableCollection);
+                    bool isRequired = Cpp2StyleEvaluatorDefinition.EvaluateFromString(logger, parameter.IsEnabledCondition, variableCollection);
                     var newPriority = isRequired ? TemplateParameterPriority.Required : TemplateParameterPriority.Optional;
                     if (parameter.Priority != newPriority)
                     {
@@ -679,13 +679,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             Dictionary<Parameter, HashSet<Parameter>> parametersDependencies = new Dictionary<Parameter, HashSet<Parameter>>();
 
             // First parameters traversal.
-            //   - evaluate all EnabledCondition - and get the dependecies between the parameters during doing so
+            //   - evaluate all IsEnabledCondition - and get the dependecies between the parameters during doing so
             foreach (Parameter parameter in parameters)
             {
-                if (!string.IsNullOrEmpty(parameter.EnabledCondition))
+                if (!string.IsNullOrEmpty(parameter.IsEnabledCondition))
                 {
                     HashSet<int> referencedVariablesIndexes = new HashSet<int>();
-                    if (!Cpp2StyleEvaluatorDefinition.EvaluateFromString(logger, parameter.EnabledCondition, variableCollection, referencedVariablesIndexes))
+                    if (!Cpp2StyleEvaluatorDefinition.EvaluateFromString(logger, parameter.IsEnabledCondition, variableCollection, referencedVariablesIndexes))
                     {
                         disabledParameters.Add(parameter);
                         // Remove from input set
@@ -726,7 +726,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
                 foreach (Parameter parameter in orderedParameters)
                 {
-                    if (!Cpp2StyleEvaluatorDefinition.EvaluateFromString(logger, parameter.EnabledCondition, variableCollection))
+                    if (!Cpp2StyleEvaluatorDefinition.EvaluateFromString(logger, parameter.IsEnabledCondition, variableCollection))
                     {
                         disabledParameters.Add(parameter);
                         // disable and remove from the collection

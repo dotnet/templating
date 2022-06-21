@@ -520,8 +520,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     parameter.DisplayName = parameterSymbol.DisplayName;
                     parameter.EnableQuotelessLiterals = parameterSymbol.EnableQuotelessLiterals;
                     parameter.AllowMultipleValues = parameterSymbol.AllowMultipleValues;
-                    parameter.EnabledCondition = parameterSymbol.EnabledCondition;
-                    parameter.RequiredCondition = parameterSymbol.RequiredCondition;
+                    parameter.IsEnabledCondition = parameterSymbol.IsEnabledCondition;
+                    parameter.IsRequiredCondition = parameterSymbol.IsRequiredCondition;
                 }
 
                 parameters[baseSymbol.Name] = parameter;
@@ -576,8 +576,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     AllowMultipleValues = parameter.AllowMultipleValues,
                     EnableQuotelessLiterals = parameter.EnableQuotelessLiterals,
                     Choices = localizedChoices ?? parameter.Choices,
-                    EnabledCondition = parameter.EnabledCondition,
-                    RequiredCondition = parameter.RequiredCondition,
+                    IsEnabledCondition = parameter.IsEnabledCondition,
+                    IsRequiredCondition = parameter.IsRequiredCondition,
             };
 
                 localizedParameters.Add(parameterPair.Key, localizedParameter);
