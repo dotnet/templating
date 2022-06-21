@@ -43,7 +43,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
         /// <param name="dryRun">If true, only dry run will be performed - no actual actions will be done.</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<ITemplateCreationResult> InstantiateAsync(
+        public Task<ITemplateCreationResult> InstantiateAsync(
             ITemplateInfo templateInfo,
             string? name,
             string? fallbackName,
@@ -54,8 +54,46 @@ namespace Microsoft.TemplateEngine.Edge.Template
             bool dryRun = false,
             CancellationToken cancellationToken = default)
         {
+            return InstantiateAsync(
+                templateInfo,
+                name,
+                fallbackName,
+                outputPath,
+                (InputParametersSet)inputParameters,
+                forceCreation,
+                baselineName,
+                dryRun,
+                cancellationToken);
+        }
+
+        /// <summary>
+        /// Instantiates or dry runs the template.
+        /// </summary>
+        /// <param name="templateInfo">The template to run.</param>
+        /// <param name="name">The name to use. Will be also used as <paramref name="outputPath"/> in case it is empty and <see cref="ITemplate.IsNameAgreementWithFolderPreferred"/> for <paramref name="templateInfo"/> is set to true.</param>
+        /// <param name="fallbackName">Fallback name in case <paramref name="name"/> is null.</param>
+        /// <param name="outputPath">The output directory for instantiate template to.</param>
+        /// <param name="inputParameters">The input parameters for the template.</param>
+        /// <param name="forceCreation">If true, create the template even it overwrites existing files.</param>
+        /// <param name="baselineName">baseline configuration to use.</param>
+        /// <param name="dryRun">If true, only dry run will be performed - no actual actions will be done.</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
+        public async Task<ITemplateCreationResult> InstantiateAsync(
+            ITemplateInfo templateInfo,
+            string? name,
+            string? fallbackName,
+            string? outputPath,
+            InputParametersSet inputParameters,
+            bool forceCreation = false,
+            string? baselineName = null,
+            bool dryRun = false,
+            CancellationToken cancellationToken = default)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
+        {
             _ = templateInfo ?? throw new ArgumentNullException(nameof(templateInfo));
-            inputParameters = inputParameters ?? new Dictionary<string, string?>();
+            inputParameters = inputParameters ?? new();
             cancellationToken.ThrowIfCancellationRequested();
 
             ITemplate? template = LoadTemplate(templateInfo, baselineName);
@@ -168,13 +206,20 @@ namespace Microsoft.TemplateEngine.Edge.Template
         //This method should become internal once Cli help logic is refactored.
         public bool AnyParametersWithInvalidDefaultsUnresolved(IReadOnlyList<string> defaultParamsWithInvalidValues, IReadOnlyList<string> userParamsWithInvalidValues, IReadOnlyDictionary<string, string?> inputParameters, out IReadOnlyList<string> invalidDefaultParameters)
         {
-            invalidDefaultParameters = defaultParamsWithInvalidValues.Where(x => !inputParameters.ContainsKey(x)).ToList();
+            return AnyParametersWithInvalidDefaultsUnresolved(defaultParamsWithInvalidValues, new InputParametersSet(inputParameters), out invalidDefaultParameters);
+        }
+
+        private bool AnyParametersWithInvalidDefaultsUnresolved(IReadOnlyList<string> defaultParamsWithInvalidValues, InputParametersSet inputParameters, out IReadOnlyList<string> invalidDefaultParameters)
+        {
+            invalidDefaultParameters = defaultParamsWithInvalidValues.Where(x => !inputParameters.ContainsParameterWithName(x)).ToList();
             return invalidDefaultParameters.Count > 0;
         }
 
         [Obsolete("The method is deprecated.")]
         //This method should become internal once Cli help logic is refactored.
+#pragma warning disable SA1202 // Elements should be ordered by access
         public void ReleaseMountPoints(ITemplate template)
+#pragma warning restore SA1202 // Elements should be ordered by access
         {
             if (template == null)
             {
@@ -241,12 +286,17 @@ namespace Microsoft.TemplateEngine.Edge.Template
         //This method should become internal once Cli help logic is refactored.
         public void ResolveUserParameters(ITemplate template, IParameterSet templateParams, IReadOnlyDictionary<string, string?> inputParameters, out IReadOnlyList<string> paramsWithInvalidValues)
         {
+            ResolveUserParameters(template, templateParams, new InputParametersSet(inputParameters), out paramsWithInvalidValues);
+        }
+
+        private void ResolveUserParameters(ITemplate template, IParameterSet templateParams, InputParametersSet inputParameters, out IReadOnlyList<string> paramsWithInvalidValues)
+        {
             List<string> tmpParamsWithInvalidValues = new List<string>();
             paramsWithInvalidValues = tmpParamsWithInvalidValues;
 
-            foreach (KeyValuePair<string, string?> inputParam in inputParameters)
+            foreach (InputParameter inputParam in inputParameters)
             {
-                if (templateParams.TryGetParameterDefinition(inputParam.Key, out ITemplateParameter paramFromTemplate))
+                if (templateParams.TryGetParameterDefinition(inputParam.Name, out ITemplateParameter paramFromTemplate))
                 {
                     if (inputParam.Value == null)
                     {
@@ -264,7 +314,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                             // don't fail on value resolution errors, but report them as authoring problems.
                             else
                             {
-                                _logger.LogDebug($"Template {template.Identity} has an invalid DefaultIfOptionWithoutValue value for parameter {inputParam.Key}");
+                                _logger.LogDebug($"Template {template.Identity} has an invalid DefaultIfOptionWithoutValue value for parameter {inputParam.Name}");
                             }
                         }
                         else
@@ -300,7 +350,9 @@ namespace Microsoft.TemplateEngine.Edge.Template
         /// <param name="info">Information about template.</param>
         /// <param name="baselineName">Defines which baseline of template to load.</param>
         /// <returns>Fully loaded template or <c>null</c> if it fails to load template.</returns>
+#pragma warning disable SA1202 // Elements should be ordered by access
         public ITemplate? LoadTemplate(ITemplateInfo info, string? baselineName)
+#pragma warning restore SA1202 // Elements should be ordered by access
         {
             IGenerator? generator;
             if (!_environmentSettings.Components.TryGetComponent(info.GeneratorId, out generator))
@@ -446,7 +498,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
             return defaultParamsWithInvalidValues.Count == 0;
         }
 
-        private bool TryCreateParameterSet(ITemplate template, string realName, IReadOnlyDictionary<string, string?> inputParameters, out IParameterSet? templateParams, out TemplateCreationResult? failureResult)
+        private bool TryCreateParameterSet(ITemplate template, string realName, InputParametersSet inputParameters, out IParameterSet? templateParams, out TemplateCreationResult? failureResult)
         {
             // there should never be param errors here. If there are, the template is malformed, or the host gave an invalid value.
 #pragma warning disable CS0618 // Type or member is obsolete - temporary until the method becomes internal.
@@ -454,7 +506,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
 
             ResolveUserParameters(template, templateParams, inputParameters, out IReadOnlyList<string> userParamsWithInvalidValues);
 
-            if (AnyParametersWithInvalidDefaultsUnresolved(defaultParamsWithInvalidValues, userParamsWithInvalidValues, inputParameters, out IReadOnlyList<string> defaultsWithUnresolvedInvalidValues)
+            if (AnyParametersWithInvalidDefaultsUnresolved(defaultParamsWithInvalidValues, inputParameters, out IReadOnlyList<string> defaultsWithUnresolvedInvalidValues)
 #pragma warning restore CS0618 // Type or member is obsolete
                     || userParamsWithInvalidValues.Count > 0)
             {

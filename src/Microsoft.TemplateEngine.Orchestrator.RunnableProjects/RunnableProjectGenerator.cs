@@ -24,7 +24,7 @@ using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
-    internal partial class RunnableProjectGenerator : IGenerator
+    internal class RunnableProjectGenerator : IGenerator
     {
         internal const string HostTemplateFileConfigBaseName = ".host.json";
         internal const string TemplateConfigDirectoryName = ".template.config";
