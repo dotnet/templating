@@ -15,10 +15,10 @@ namespace Microsoft.TemplateEngine.Edge.Template
             Value = value;
         }
 
-        public static implicit operator InputParameter(KeyValuePair<string, string?> pair) => new InputParameter(pair.Key, pair.Value);
-
         public string Name { get; private set; }
 
         public string? Value { get; private set; }
+
+        public static implicit operator InputParameter(KeyValuePair<string, string?> pair) => new InputParameter(pair.Key, pair.Value);
     }
 }
