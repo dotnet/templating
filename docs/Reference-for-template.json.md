@@ -135,16 +135,18 @@ A symbol for which the config provides literal and/or default values.
 |---|---|
 |`type`|`parameter`|
 |`dataType`|	Supported values: <br />- `bool`: boolean type, possible values: `true`/`false`. <br />- `choice`: enumeration, possible values are defined in `choices` property.<br />- `float`: double-precision floating format number. Accepts any value that can be parsed by `double.TryParse()`.<br />- `int`/`integer`: 64-bit signed integer. Accepts any value that can be parsed by `long.TryParse()`.<br />- `hex`: hex number. Accepts any value that can be parsed by `long.TryParse(value.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out long convertedHex)`.<br />- `text`/`string`: string type.<br />- `<any other>`: treated as string.
-|`defaultValue`|The value assigned to the symbol if no parameter is provided by the user or host.|
-|`replaces`|The text to be replaced by the symbol value in the template files content|	 
+|<a name="defaultValue"></a>`defaultValue`|The value assigned to the symbol if no parameter is provided by the user or host.|	
+|<a name="replaces"></a>`replaces`|The text to be replaced by the symbol value in the template files content|	 
 |`fileRename`|The portion of template filenames to be replaced by the symbol value.| 
 |`description`|Human readable text describing the meaning of the symbol. This has no effect on template generation.|
-|<a name="isRequired"></a>`isRequired`|Indicates if the parameter is required or not.|
+|<a name="isRequired"></a>`isRequired`|Indicates if the parameter is required or not. <br /> Not allowed together with [`isRequired`](#isRequired) property. |
 |`choices`|Applicable only when `datatype=choice.`<br />List of available choices. Contains array of the elements: <br />- `choice`: possible value of the symbol.<br />- `description`: human readable text describing the meaning of the choice. This has no effect on template generation. <br /> If not provided, there are no valid choices for the symbol, so it can never be assigned a value.|
 |`allowMultipleValues`|Applicable only when `datatype=choice.`<br />. Enables ability to specify multiple values for single symbol.|
 |<a id="enableQuotelessLiterals"></a>`enableQuotelessLiterals`|Applicable only when `datatype=choice.`<br />. Enables ability to specify choice literals in conditions without quotation.|
 |`onlyIf`| |
 |`forms`|Defines the set of transforms that can be referenced by symbol definitions. Forms allow the specification of a "replaces"/"replacement" pair to also apply to other ways the "replaces" value may have been specified in the source by specifying a transform from the original value of "replaces" in configuration to the one that may be found in the source. [Details](https://github.com/dotnet/templating/wiki/Runnable-Project-Templates---Value-Forms)|
+|<a name="enabledCondition"></a>`enabledCondition`| Optional condition indicating whether parameter should be processed. More details in [Conditions documentation](Conditions.md#conditional-parameters). |
+|<a name="requiredCondition"></a>`requiredCondition`| Optional condition indicating whether parameter should be required. More details in [Conditions documentation](Conditions.md#conditional-parameters). <br /> Not allowed together with [`isRequired`](#isRequired) property. |
 
 ##### Examples
 Boolean optional parameter with default value `false`:

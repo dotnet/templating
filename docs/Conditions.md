@@ -1,3 +1,19 @@
+# Conditions
+
+## Table of contents
+
+* [Overview](#overview)
+  * [Generated Conditions](#generated-conditions)
+  * [Example](#example)
+* [Choice symbols](#choice-symbols)
+  * [Quoteless literals](#quoteless-literals)
+  * [Multichoice symbols](#multichoice-symbols)
+  * [Using Computed Conditions to work with Multichoice Symbols](#using-computed-conditions-to-work-with-multichoice-symbols)
+* [Conditional parameters](#conditional-parameters)
+  * [Evaluation](#evaluation)
+
+## Overview
+
 Conditions are used to drive [dynamic content genarating or replacing](Conditional-processing-and-comment-syntax.md).
 
 Conditions use C++ style of [conditional preprocessor expressions](https://docs.microsoft.com/en-us/cpp/preprocessor/hash-if-hash-elif-hash-else-and-hash-endif-directives-c-cpp?view=msvc-170). Expressions are composed from constant literals (strings, numbers, `true`, `false`), [operators](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.Core/Expressions/Cpp/Operator.cs), [symbols](https://github.com/dotnet/templating/blob/main/docs/Available-Symbols-Generators.md), brackets and whitespaces. Only single line expressions are supported. Boolean and numerical expressions are supported (nonzero value is interpreted as `true`)
@@ -7,7 +23,8 @@ Conditions use C++ style of [conditional preprocessor expressions](https://docs.
 ### Generated Conditions
 Unlike C++ preprocessor conditions, template engine allows ability for using conditional expressions that are based on results of other expressions. Specifically [Evaluate](Available-Symbols-Generators.md#evaluate) and [Computed](Reference-for-template.json.md#computed-symbol) symbols can be leveraged for this purpose.
 
-### Simplified extraction from [C# Console Application template](https://github.com/dotnet/templating/tree/main/template_feed/Microsoft.DotNet.Common.ProjectTemplates.7.0/content/ConsoleApplication-CSharp)
+### Example 
+Simplified extraction from [C# Console Application template](https://github.com/dotnet/templating/tree/main/template_feed/Microsoft.DotNet.Common.ProjectTemplates.7.0/content/ConsoleApplication-CSharp):
 
 `template.json`:
 ```json
@@ -43,7 +60,9 @@ using System;
 #endif
 ```
 
-### Choice literals
+## Choice symbols
+
+### Quoteless literals
 
 [Choice Symbol](Reference-for-template.json.md#examples) can have one of N predefined values. Those predefined values can be referenced in the conditions as quoted literals. Unquoted literals are as well supported as opt-in feature via [`enableQuotelessLiterals`](Reference-for-template.json.md#enableQuotelessLiterals). Following 2 expressions are equivalent when opted in:
 
@@ -53,7 +72,7 @@ using System;
 
 This allows for easier authoring of nested generated conditions.
 
-### Multichoice literals
+### Multichoice symbols
 
 Information about multi-choice symbols can be found in [Reference for `template.json`](Reference-for-template.json.md#multichoice-symbols-specifics)
 
@@ -192,3 +211,39 @@ Usage can then look as following:
 // This renders for desktop platforms
 #endif
 ```
+
+## Conditional Parameters
+
+[Parameter symbols in template](Reference-for-template.json.md#parameter-symbol) can be specified together with optional conditions:
+* [`Enabled Condition`](Reference-for-template.json.md#enabledCondition) - overwritting presence of input parameter. If condition is specified and evaluates to false, passed parameter value (if any) is ignored and processing works as if it was not specified. This includes application of [default values](Reference-for-template.json.md#default), [verification of mandatory parameters](Reference-for-template.json.md#isRequired), [conditional processing of sources](Conditional-processing-and-comment-syntax.md) and [replacements](Reference-for-template.json.md#replaces).
+* [`Required Condition`](Reference-for-template.json.md#requiredCondition) - dictates if parameter is mandatory or optional. After evaluation the behavior is identical as for the [`isRequired`](Reference-for-template.json.md#isRequired) config.
+
+### Evaluation
+
+**Input** - currently only other parameter symbols from the template configuration are supported within the parameter conditions. Any other variables are not replaced.
+
+**Evaluation order** - Dependencies between parameters are detected and evaluation is peformed in order that guarantees that all dependencies are evaluated prior their dependant (see [Topological Sorting](https://en.wikipedia.org/wiki/Topological_sorting) for details).
+
+ In presence of cyclic dependency the evaluation proceeds only if current input values of parameters do not lead to undeterministic result (and the cycle is indicated in warning log message). Otherwise an error is reported, indicating the cycle.
+
+ Example `template.json` with cyclic dependency:
+```json
+  "symbols": {
+    "A": {
+      "type": "parameter",
+      "datatype": "bool",
+      "enabledCondition": "B != false",
+    },
+    "B": {
+      "type": "parameter",
+      "datatype": "bool",
+      "enabledCondition": "A != true",
+    }
+}
+```
+
+Following input parameter values can (and will) be evaluated deterministically: `A = false; B = true`
+
+Following input parameter values cannot be evaluated deterministically (and will lead to error): `A = true; B = false`
+
+**Applying of host and default values** - All host and default values are applied before the conditions evaluation. After the evaluation defaults are reapplied to parameters that were evaluated as disabled and to parameters that do not have host supplied values and were evaluated as optional.
