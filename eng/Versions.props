@@ -15,32 +15,15 @@
   <!-- Package Versions -->
   <PropertyGroup>
     <!-- Pinned Package Versions - Ordered by package name -->
-    <MicrosoftBuildFrameworkPackageVersion>16.10.0</MicrosoftBuildFrameworkPackageVersion>
-    <MicrosoftBuildUtilitiesCorePackageVersion>16.10.0</MicrosoftBuildUtilitiesCorePackageVersion>
-    <NewtonsoftJsonPackageVersion>13.0.1</NewtonsoftJsonPackageVersion>
-    <SystemDiagnosticsProcessPackageVersion>4.3.0</SystemDiagnosticsProcessPackageVersion>
-    <SystemIOCompressionPackageVersion>4.3.0</SystemIOCompressionPackageVersion>
-    <SystemRuntimeLoaderPackageVersion>4.3.0</SystemRuntimeLoaderPackageVersion>
-    <WcwidthSourcesPackageVersion>0.5.0</WcwidthSourcesPackageVersion>
+    <MicrosoftDotNetCliUtilsVersion>6.0.100-rc.1.21423.4</MicrosoftDotNetCliUtilsVersion>
     <!-- Maestro-managed Package Versions - Ordered by repo name -->
     <!-- Dependencies from https://github.com/dotnet/command-line-api -->
-    <SystemCommandLinePackageVersion>2.0.0-beta4.22272.1</SystemCommandLinePackageVersion>
-    <!-- Dependencies from https://github.com/nuget/nuget.client -->
-    <NuGetCredentialsPackageVersion>6.2.0-rc.146</NuGetCredentialsPackageVersion>
-    <NuGetConfigurationPackageVersion>6.2.0-rc.146</NuGetConfigurationPackageVersion>
-    <NuGetProtocolPackageVersion>6.2.0-rc.146</NuGetProtocolPackageVersion>
-    <!-- Dependencies from https://github.com/dotnet/roslyn -->
-    <MicrosoftNetCompilersToolsetPackageVersion>4.2.0-4.22307.8</MicrosoftNetCompilersToolsetPackageVersion>
-    <MicrosoftCodeAnalysisCSharpCodeStylePackageVersion>4.2.0-4.22307.8</MicrosoftCodeAnalysisCSharpCodeStylePackageVersion>
-    <!-- Dependencies from https://github.com/dotnet/roslyn-analyzers -->
-    <MicrosoftCodeAnalysisNetAnalyzersPackageVersion>7.0.0-preview1.22302.1</MicrosoftCodeAnalysisNetAnalyzersPackageVersion>
-    <MicrosoftCodeAnalysisPublicApiAnalyzersPackageVersion>3.3.4-beta1.22302.1</MicrosoftCodeAnalysisPublicApiAnalyzersPackageVersion>
+    <SystemCommandLinePackageVersion>2.0.0-beta4.22317.8</SystemCommandLinePackageVersion>
     <!-- Dependencies from https://github.com/dotnet/runtime -->
-    <MicrosoftNETCoreAppRefPackageVersion>7.0.0-preview.6.22305.4</MicrosoftNETCoreAppRefPackageVersion>
-    <MicrosoftNETCoreAppRuntimewinx64PackageVersion>7.0.0-preview.6.22305.4</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
-    <VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>7.0.0-preview.6.22305.4</VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>
-    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>7.0.0-preview.6.22305.4</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
-    <MicrosoftExtensionsLoggingPackageVersion>7.0.0-preview.6.22305.4</MicrosoftExtensionsLoggingPackageVersion>
-    <MicrosoftExtensionsLoggingConsolePackageVersion>7.0.0-preview.6.22305.4</MicrosoftExtensionsLoggingConsolePackageVersion>
+    <MicrosoftNETCoreAppRefPackageVersion>7.0.0-preview.6.22319.5</MicrosoftNETCoreAppRefPackageVersion>
+    <MicrosoftNETCoreAppRuntimewinx64PackageVersion>7.0.0-preview.6.22319.5</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
+    <VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>7.0.0-preview.6.22319.5</VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>
+    <!-- Dependencies from https://github.com/dotnet/roslyn-analyzers -->
+    <MicrosoftCodeAnalysisNetAnalyzersPackageVersion>7.0.0-preview1.22310.1</MicrosoftCodeAnalysisNetAnalyzersPackageVersion>
   </PropertyGroup>
 </Project>

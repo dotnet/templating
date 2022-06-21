@@ -1,6 +1,7 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 using Microsoft.TemplateEngine.Utils;
@@ -12,97 +13,7 @@ namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
     {
         internal static readonly Guid ActionProcessorId = new Guid("D396686C-DE0E-4DE6-906D-291CD29FC5DE");
 
-        public Guid Id => ActionProcessorId;
-
-        public bool Process(IEngineEnvironmentSettings environment, IPostAction action, ICreationEffects creationEffects, ICreationResult templateCreationResult, string outputBasePath)
-        {
-            if (string.IsNullOrEmpty(outputBasePath))
-            {
-                Reporter.Error.WriteLine(string.Format(LocalizableStrings.AddProjToSlnPostActionUnresolvedSlnFile));
-                return false;
-            }
-
-            IReadOnlyList<string> nearestSlnFilesFound = FindSolutionFilesAtOrAbovePath(environment.Host.FileSystem, outputBasePath);
-            if (nearestSlnFilesFound.Count != 1)
-            {
-                Reporter.Error.WriteLine(LocalizableStrings.AddProjToSlnPostActionUnresolvedSlnFile);
-                return false;
-            }
-
-            IReadOnlyList<string>? projectFiles;
-
-            if (action.Args.TryGetValue("projectFiles", out string? configProjectFiles) && creationEffects is ICreationEffects2 creationEffects2)
-            {
-                JToken config = JToken.Parse(configProjectFiles);
-                List<string> allProjects = new List<string>();
-
-                if (config is JArray arr)
-                {
-                    foreach (JToken globText in arr)
-                    {
-                        if (globText.Type != JTokenType.String)
-                        {
-                            continue;
-                        }
-
-                        foreach (string path in GetTargetForSource(creationEffects2, globText.ToString()))
-                        {
-                            if (Path.GetExtension(path).EndsWith("proj", StringComparison.OrdinalIgnoreCase))
-                            {
-                                allProjects.Add(path);
-                            }
-                        }
-                    }
-                }
-                else if (config.Type == JTokenType.String)
-                {
-                    foreach (string path in GetTargetForSource(creationEffects2, config.ToString()))
-                    {
-                        if (Path.GetExtension(path).EndsWith("proj", StringComparison.OrdinalIgnoreCase))
-                        {
-                            allProjects.Add(path);
-                        }
-                    }
-                }
-
-                if (allProjects.Count == 0)
-                {
-                    Reporter.Error.WriteLine(LocalizableStrings.AddProjToSlnPostActionNoProjFiles);
-                    return false;
-                }
-
-                projectFiles = allProjects;
-            }
-            else
-            {
-                //If the author didn't opt in to the new behavior by specifying "projectFiles", use the old behavior
-                if (!TryGetProjectFilesToAdd(environment, action, templateCreationResult, outputBasePath, out projectFiles) || projectFiles == null)
-                {
-                    Reporter.Error.WriteLine(LocalizableStrings.AddProjToSlnPostActionNoProjFiles);
-                    return false;
-                }
-            }
-
-            string solutionFolder = GetSolutionFolder(action);
-            Dotnet addProjToSlnCommand = Dotnet.AddProjectsToSolution(nearestSlnFilesFound[0], projectFiles, solutionFolder);
-            addProjToSlnCommand.CaptureStdOut();
-            addProjToSlnCommand.CaptureStdErr();
-            Reporter.Output.WriteLine(string.Format(LocalizableStrings.AddProjToSlnPostActionRunning, addProjToSlnCommand.Command));
-            Dotnet.Result commandResult = addProjToSlnCommand.Execute();
-
-            if (commandResult.ExitCode != 0)
-            {
-                Reporter.Error.WriteLine(string.Format(LocalizableStrings.AddProjToSlnPostActionFailed, string.Join(" ", projectFiles), nearestSlnFilesFound[0], solutionFolder));
-                Reporter.Error.WriteCommandOutput(commandResult);
-                Reporter.Error.WriteLine(string.Empty);
-                return false;
-            }
-            else
-            {
-                Reporter.Output.WriteLine(string.Format(LocalizableStrings.AddProjToSlnPostActionSucceeded, string.Join(" ", projectFiles), nearestSlnFilesFound[0], solutionFolder));
-                return true;
-            }
-        }
+        public override Guid Id => ActionProcessorId;
 
         internal static IReadOnlyList<string> FindSolutionFilesAtOrAbovePath(IPhysicalFileSystem fileSystem, string outputBasePath)
         {
@@ -111,7 +22,7 @@ namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
 
         // The project files to add are a subset of the primary outputs, specifically the primary outputs indicated by the primaryOutputIndexes post action argument (semicolon separated)
         // If any indexes are out of range or non-numeric, this method returns false and projectFiles is set to null.
-        internal static bool TryGetProjectFilesToAdd(IEngineEnvironmentSettings environment, IPostAction actionConfig, ICreationResult templateCreationResult, string outputBasePath, out IReadOnlyList<string>? projectFiles)
+        internal static bool TryGetProjectFilesToAdd(IPostAction actionConfig, ICreationResult templateCreationResult, string outputBasePath, [NotNullWhen(true)]out IReadOnlyList<string>? projectFiles)
         {
             List<string> filesToAdd = new List<string>();
 
@@ -127,7 +38,7 @@ namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
                             return false;
                         }
 
-                        filesToAdd.Add(Path.Combine(outputBasePath, templateCreationResult.PrimaryOutputs[index].Path));
+                        filesToAdd.Add(Path.GetFullPath(templateCreationResult.PrimaryOutputs[index].Path, outputBasePath));
                     }
                     else
                     {
@@ -143,10 +54,60 @@ namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
             {
                 foreach (string pathString in templateCreationResult.PrimaryOutputs.Select(x => x.Path))
                 {
-                    filesToAdd.Add(!string.IsNullOrEmpty(outputBasePath) ? Path.Combine(outputBasePath, pathString) : pathString);
+                    filesToAdd.Add(Path.GetFullPath(pathString, outputBasePath));
                 }
 
                 projectFiles = filesToAdd;
+                return true;
+            }
+        }
+
+        protected override bool ProcessInternal(IEngineEnvironmentSettings environment, IPostAction action, ICreationEffects creationEffects, ICreationResult templateCreationResult, string outputBasePath)
+        {
+            IReadOnlyList<string> nearestSlnFilesFound = FindSolutionFilesAtOrAbovePath(environment.Host.FileSystem, outputBasePath);
+            if (nearestSlnFilesFound.Count != 1)
+            {
+                Reporter.Error.WriteLine(LocalizableStrings.PostAction_AddProjToSln_Error_NoSolutionFile);
+                return false;
+            }
+
+            IReadOnlyList<string>? projectFiles = GetConfiguredFiles(action.Args, creationEffects, "projectFiles", outputBasePath, (path) => Path.GetExtension(path).EndsWith("proj", StringComparison.OrdinalIgnoreCase));
+            if (projectFiles is null)
+            {
+                //If the author didn't opt in to the new behavior by specifying "projectFiles", use the old behavior
+                if (!TryGetProjectFilesToAdd( action, templateCreationResult, outputBasePath, out projectFiles))
+                {
+                    Reporter.Error.WriteLine(LocalizableStrings.PostAction_AddProjToSln_Error_NoProjectsToAdd);
+                    return false;
+                }
+            }
+            if (projectFiles.Count == 0)
+            {
+                Reporter.Error.WriteLine(LocalizableStrings.PostAction_AddProjToSln_Error_NoProjectsToAdd);
+                return false;
+            }
+
+            string solutionFolder = GetSolutionFolder(action);
+
+            bool succeeded = false;
+            if (Callbacks?.AddProjectsToSolution != null)
+            {
+                Reporter.Output.WriteLine(string.Format(LocalizableStrings.PostAction_AddProjToSln_Running, string.Join(" ", projectFiles), nearestSlnFilesFound[0], solutionFolder));
+                succeeded = Callbacks.AddProjectsToSolution(nearestSlnFilesFound[0], projectFiles, solutionFolder);
+            }
+
+            if (!succeeded)
+            {
+                Reporter.Error.WriteLine(LocalizableStrings.PostAction_AddProjToSln_Failed);
+                if (Callbacks?.AddProjectsToSolution == null)
+                {
+                    Reporter.Error.WriteLine(LocalizableStrings.Generic_NoCallbackError);
+                }
+                return false;
+            }
+            else
+            {
+                Reporter.Output.WriteLine(LocalizableStrings.PostAction_AddProjToSln_Succeeded);
                 return true;
             }
         }

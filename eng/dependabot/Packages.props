@@ -1,0 +1,30 @@
+<Project>
+  <!-- Packages in this file have versions updated periodically by Dependabot. Versions managed by Darc/Maestro should be in ..\Package.props. -->
+  <ItemGroup>
+    <PackageReference Update="System.Diagnostics.Process" Version="4.3.0" />
+    <PackageReference Update="System.IO.Compression" Version="4.3.0" />
+    <PackageReference Update="System.Runtime.Loader" Version="4.3.0" />
+    <PackageReference Update="Microsoft.Build.Framework" Version="17.2.0" />
+    <PackageReference Update="Microsoft.Build.Utilities.Core" Version="17.2.0" />
+    <PackageReference Update="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Update="Wcwidth.Sources" Version="0.6.0" />
+    <PackageReference Update="Microsoft.Extensions.Logging" Version="6.0.0" />
+    <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
+    <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+    <PackageReference Update="NuGet.Configuration" Version="6.2.1" />
+    <PackageReference Update="NuGet.Credentials" Version="6.2.1" />
+    <PackageReference Update="NuGet.Protocol" Version="6.2.1" />
+    <!--Analyzers-->
+    <PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="4.2.0" />
+    <PackageReference Update="Microsoft.CodeAnalysis.CSharp.CodeStyle" Version="4.2.0" />
+    <PackageReference Update="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4-beta1.22277.2" />
+    <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.435" />
+    <!--Test dependencies-->
+    <PackageReference Update="FakeItEasy" Version="7.3.1" />
+    <PackageReference Update="FluentAssertions" Version="6.7.0" />
+    <PackageReference Update="Microsoft.NET.Test.Sdk" Version="17.2.0" />
+    <PackageReference Update="xunit.abstractions" Version="2.0.3" />
+    <PackageReference Update="Newtonsoft.Json.Schema" Version="3.0.14" />
+    <PackageReference Update="Verify.XUnit" Version="14.2.0" />
+  </ItemGroup>
+</Project>

@@ -273,6 +273,47 @@ namespace Dotnet_new3.IntegrationTests
         }
 
         [Fact]
+        public Task CanInstantiateTemplate_MultiValueChoiceParameterExplicitlyUnset()
+        {
+            string home = TestUtils.CreateTemporaryFolder("Home");
+            string workingDirectory = TestUtils.CreateTemporaryFolder();
+            Helpers.InstallTestTemplate("TemplateWithMultiValueChoice", _log, home, workingDirectory);
+
+            var commandResult = new DotnetNewCommand(_log, "TestAssets.TemplateWithMultiValueChoice", "--Platform", "")
+                .WithCustomHive(home)
+                .WithWorkingDirectory(workingDirectory)
+                .Execute();
+
+            commandResult
+                .Should()
+                .Pass()
+                .And.NotHaveStdErr()
+                .And.HaveStdOutMatching("The template \"TemplateWithMultiValueChoice\" was created successfully\\.");
+
+            string resultFileContent = File.ReadAllText(Path.Combine(workingDirectory, "Test.cs"));
+
+            return Verifier.Verify(resultFileContent, _verifySettings);
+        }
+
+        [Fact]
+        public void CannotInstantiateTemplate_MultiValueChoiceParameterWithExplicitUnsetAndOtherChoice()
+        {
+            string home = TestUtils.CreateTemporaryFolder("Home");
+            string workingDirectory = TestUtils.CreateTemporaryFolder();
+            Helpers.InstallTestTemplate("TemplateWithMultiValueChoice", _log, home, workingDirectory);
+
+            var commandResult = new DotnetNewCommand(_log, "TestAssets.TemplateWithMultiValueChoice", "--Platform", "", "--Platform", "MacOS")
+                .WithCustomHive(home)
+                .WithWorkingDirectory(workingDirectory)
+                .Execute();
+
+            commandResult
+                .Should()
+                .Fail()
+                .And.HaveStdErrContaining("is not a valid value for --Platform.");
+        }
+
+        [Fact]
         public Task CanInstantiateTemplate_ConditionalProcessing()
         {
             string workingDirectory = TestUtils.CreateTemporaryFolder();
@@ -475,7 +516,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Fail();
 
             return Verifier.Verify(commandResult.StdErr, _verifySettings)
-                .AddScrubber(output => output.ScrubByRegex("\\-\\-debug\\:custom\\-hive [A-Za-z0-9\\-\\.\\\\\\/\\{\\}]+", "--debug:custom-hive %SETTINGS DIRECTORY%"));
+                .AddScrubber(output => output.ScrubByRegex("\\-\\-debug\\:custom\\-hive [A-Za-z0-9\\-\\.\\\\\\/\\{\\}\\:_]+", "--debug:custom-hive %SETTINGS DIRECTORY%"));
         }
 
         [Fact]

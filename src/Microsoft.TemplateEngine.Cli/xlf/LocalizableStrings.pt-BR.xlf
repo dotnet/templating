@@ -7,91 +7,6 @@
         <target state="translated">A ação seria executada automaticamente:</target>
         <note />
       </trans-unit>
-      <trans-unit id="AddProjToSlnPostActionFailed">
-        <source>Failed to add project(s) {0} to solution file {1}, solution folder {2}.</source>
-        <target state="translated">Falha ao adicionar arquivos {0} ao arquivo de solução {1}, pasta de soluções {2}.</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="AddProjToSlnPostActionNoProjFiles">
-        <source>Add project reference to solution action is not configured correctly in the template. Unable to determine the project files to add.</source>
-        <target state="translated">A adição de referência de projeto à ação de solução não está configurada corretamente no modelo. Não é possível determinar os arquivos de projeto a serem adicionados.</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="AddProjToSlnPostActionRunning">
-        <source>Adding project reference(s) to solution file. Running {0}</source>
-        <target state="translated">Adicionando referência(s) de projeto ao arquivo de solução. Executando {0}</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="AddProjToSlnPostActionSucceeded">
-        <source>Successfully added
-    project(s): {0}
-    to solution file: {1}
-    solution folder: {2}</source>
-        <target state="translated">Adicionado com êxito
-    projeto(s): {0}
-    para o arquivo de solução: {1}
-    pasta da solução: {2}</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="AddProjToSlnPostActionUnresolvedSlnFile">
-        <source>Unable to determine which solution file to add the reference to.</source>
-        <target state="translated">Não foi possível determinar o arquivo de projeto ao qual adicionar a referência.</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="AddRefPostActionAddPackageRef">
-        <source>Adding a package reference. Running dotnet add {0} package {1}</source>
-        <target state="translated">Adicionando uma referência de pacote. Executando o dotnet adicione {0} pacote {1}</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="AddRefPostActionAddPackageRefWithVersion">
-        <source>Adding a package reference. Running dotnet add {0} package {1} --version {2}</source>
-        <target state="translated">Adicionando uma referência de pacote. Executando o dotnet adiciona {0} pacote {1} --versão {2}</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="AddRefPostActionAddProjectRef">
-        <source>Adding a project reference. Running dotnet add {0} reference {1}</source>
-        <target state="translated">Adicionando uma referência de projeto. Executando o dotnet adicionar {0} de referência {1}</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="AddRefPostActionFailed">
-        <source>Failed to add reference {0} to project file {1}</source>
-        <target state="translated">Falha ao adicionar referência {0} ao arquivo de projeto {1}</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="AddRefPostActionFrameworkNotSupported">
-        <source>Unable to automatically add the framework reference {0} to the project. Manually edit the project file to add it.</source>
-        <target state="translated">Não é possível adicionar automaticamente a referência de estrutura {0} ao projeto. Edite manualmente o arquivo de projeto para adicioná-lo.</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="AddRefPostActionMisconfigured">
-        <source>Add reference action is not configured correctly in the template.</source>
-        <target state="translated">A ação de referência Adicionar não está configurada corretamente no modelo.</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="AddRefPostActionProjFileListHeader">
-        <source>Project files found:</source>
-        <target state="translated">Arquivos de projeto encontrados:</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="AddRefPostActionSucceeded">
-        <source>Successfully added
-    reference: {0}
-    to project file: {1}</source>
-        <target state="translated">Adicionado 
- com êxito   referência: {0}
-    arquivo de projeto: {1}</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="AddRefPostActionUnresolvedProjFile">
-        <source>Unable to determine which project file to add the reference to.</source>
-        <target state="translated">Não foi possível determinar o arquivo de projeto ao qual adicionar a referência.</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="AddRefPostActionUnsupportedRefType">
-        <source>Adding reference type {0} is not supported.</source>
-        <target state="translated">Não há suporte para adicionar o tipo de referência {0}.</target>
-        <note />
-      </trans-unit>
       <trans-unit id="AliasAssignmentCoordinator_Error_LongAlias">
         <source>Failed to assign long option alias for parameter '{0}', tried: '{1}'; '{2}'.</source>
         <target state="translated">Falha ao atribuir alias de opção longa para o parâmetro '{0}', tentado: '{1}'; '{2}'.</target>
@@ -260,7 +175,7 @@ Execute 'dotnet {1} --mostrar- aliases' sem nenhum args para mostrar todos os al
       </trans-unit>
       <trans-unit id="BaseCommand_ExitCodeHelp">
         <source>For details on the exit code, refer to https://aka.ms/templating-exit-codes#{0}</source>
-        <target state="new">For details on the exit code, refer to https://aka.ms/templating-exit-codes#{0}</target>
+        <target state="translated">Para obter detalhes sobre o código de saída, consulte https://aka.ms/templating-exit-codes#{0}</target>
         <note>{0} is the exit code</note>
       </trans-unit>
       <trans-unit id="Change">
@@ -418,11 +333,6 @@ Execute 'dotnet {1} --mostrar- aliases' sem nenhum args para mostrar todos os al
         <target state="translated">Valor Configurado: {0}</target>
         <note />
       </trans-unit>
-      <trans-unit id="CouldntDetermineFilesToRestore">
-        <source>Couldn't determine files to restore.</source>
-        <target state="translated">Não foi possível determinar os arquivos a serem restaurados.</target>
-        <note />
-      </trans-unit>
       <trans-unit id="Create">
         <source>Create</source>
         <target state="translated">Criar</target>
@@ -513,6 +423,11 @@ The header is followed by the list of parameters and their errors (might be seve
         <target state="translated">Exemplos:</target>
         <note />
       </trans-unit>
+      <trans-unit id="Generic_NoCallbackError">
+        <source>No callback is configured. Running post action is not possible.</source>
+        <target state="new">No callback is configured. Running post action is not possible.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="HostSpecificDataLoader_Warning_FailedToRead">
         <source>Failed to load dotnet CLI host data for template {0} from cache.</source>
         <target state="translated">Falha ao carregar os dados do host CLI do dotnet para o modelo {0} do cache.</target>
@@ -565,7 +480,7 @@ The header is followed by the list of parameters and their errors (might be seve
       </trans-unit>
       <trans-unit id="MissingRequiredParameter">
         <source>Mandatory option '{0}' is missing for the template '{1}'.</source>
-        <target state="needs-review-translation">O parâmetro obrigatório {0} está ausente no modelo {1}. </target>
+        <target state="translated">A opção obrigatória '{0}' está faltando para o modelo '{1}'.</target>
         <note />
       </trans-unit>
       <trans-unit id="MissingTemplateContentDetected">
@@ -586,11 +501,6 @@ The header is followed by the list of parameters and their errors (might be seve
       <trans-unit id="NoParameters">
         <source>    (No Parameters)</source>
         <target state="translated">    (Nenhum Parâmetro)</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="NoPrimaryOutputsToRestore">
-        <source>No Primary Outputs to restore.</source>
-        <target state="translated">Nenhuma Saída Primária a ser restaurada.</target>
         <note />
       </trans-unit>
       <trans-unit id="NoTemplatesFound">
@@ -746,9 +656,115 @@ The header is followed by the list of parameters and their errors (might be seve
         <target state="translated">Deseja executar esta ação [{0}(yes)|{1}(no)]?</target>
         <note />
       </trans-unit>
+      <trans-unit id="PostAction_AddProjToSln_Error_NoProjectsToAdd">
+        <source>Add project reference to solution action is not configured correctly in the template. Unable to determine the project files to add.</source>
+        <target state="new">Add project reference to solution action is not configured correctly in the template. Unable to determine the project files to add.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="PostAction_AddProjToSln_Error_NoSolutionFile">
+        <source>Unable to determine which solution file to add the reference to.</source>
+        <target state="new">Unable to determine which solution file to add the reference to.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="PostAction_AddProjToSln_Failed">
+        <source>Failed to add project(s) to a solution file.</source>
+        <target state="new">Failed to add project(s) to a solution file.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="PostAction_AddProjToSln_Running">
+        <source>Adding
+    project(s): {0}
+    to solution file: {1}
+    solution folder: {2}</source>
+        <target state="new">Adding
+    project(s): {0}
+    to solution file: {1}
+    solution folder: {2}</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="PostAction_AddProjToSln_Succeeded">
+        <source>Successfully added project(s) to a solution file.</source>
+        <target state="new">Successfully added project(s) to a solution file.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="PostAction_AddReference_AddPackageReference">
+        <source>Adding a package reference {0} to project file {1}:</source>
+        <target state="new">Adding a package reference {0} to project file {1}:</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="PostAction_AddReference_AddPackageReference_WithVersion">
+        <source>Adding a package reference {0} (version: {1}) to project file {2}:</source>
+        <target state="new">Adding a package reference {0} (version: {1}) to project file {2}:</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="PostAction_AddReference_AddProjectReference">
+        <source>Adding a project reference {0} to project file {1}:</source>
+        <target state="new">Adding a project reference {0} to project file {1}:</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="PostAction_AddReference_Error_ActionMisconfigured">
+        <source>Add reference action is not configured correctly in the template.</source>
+        <target state="new">Add reference action is not configured correctly in the template.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="PostAction_AddReference_Error_FrameworkNotSupported">
+        <source>Unable to automatically add the framework reference {0} to the project. Manually edit the project file to add it.</source>
+        <target state="new">Unable to automatically add the framework reference {0} to the project. Manually edit the project file to add it.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="PostAction_AddReference_Error_ProjFileListHeader">
+        <source>Project files found:</source>
+        <target state="new">Project files found:</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="PostAction_AddReference_Error_UnresolvedProjFile">
+        <source>Unable to determine which project file to add the reference to.</source>
+        <target state="new">Unable to determine which project file to add the reference to.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="PostAction_AddReference_Error_UnsupportedRefType">
+        <source>Adding reference type {0} is not supported.</source>
+        <target state="new">Adding reference type {0} is not supported.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="PostAction_AddReference_Failed">
+        <source>Failed to add a reference to the project file.</source>
+        <target state="new">Failed to add a reference to the project file.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="PostAction_AddReference_Succeeded">
+        <source>Successfully added a reference to the project file.</source>
+        <target state="new">Successfully added a reference to the project file.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="PostAction_ProcessStartProcessor_Error_ConfigMissingExecutable">
         <source>Failed to run the command: argument 'executable' is missing in post action configuration.</source>
         <target state="translated">Falha ao executar o comando: o argumento 'executável' está ausente na configuração pós-ação.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="PostAction_Restore_Error_FailedToDetermineProjectToRestore">
+        <source>Couldn't determine files to restore.</source>
+        <target state="new">Couldn't determine files to restore.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="PostAction_Restore_Error_NoProjectsToRestore">
+        <source>No projects are configured to restore. Check primary outputs configuration in template.json.</source>
+        <target state="new">No projects are configured to restore. Check primary outputs configuration in template.json.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="PostAction_Restore_Failed">
+        <source>Restore failed.</source>
+        <target state="new">Restore failed.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="PostAction_Restore_Running">
+        <source>Restoring {0}:</source>
+        <target state="new">Restoring {0}:</target>
+        <note>{0} - path to a project to restore</note>
+      </trans-unit>
+      <trans-unit id="PostAction_Restore_Succeeded">
+        <source>Restore succeeded.</source>
+        <target state="new">Restore succeeded.</target>
         <note />
       </trans-unit>
       <trans-unit id="ProcessingPostActions">
@@ -761,16 +777,6 @@ The header is followed by the list of parameters and their errors (might be seve
         <target state="translated">Re-execute o comando e passe --force para aceitar e criar.</target>
         <note />
       </trans-unit>
-      <trans-unit id="RestoreFailed">
-        <source>Restore failed.</source>
-        <target state="translated">Falha na restauração.</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="RestoreSucceeded">
-        <source>Restore succeeded.</source>
-        <target state="translated">A restauração foi bem-sucedida.</target>
-        <note />
-      </trans-unit>
       <trans-unit id="RunHelpForInformationAboutAcceptedParameters">
         <source>For usage information, run: </source>
         <target state="translated">Para obter informações de uso, execute: </target>
@@ -779,11 +785,6 @@ The header is followed by the list of parameters and their errors (might be seve
       <trans-unit id="RunningCommand">
         <source>Running command '{0}'...</source>
         <target state="translated">Comando em execução '{0}'...</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="RunningDotnetRestoreOn">
-        <source>Running 'dotnet restore' on {0}...</source>
-        <target state="translated">Executando 'dotnet restore' em {0}...</target>
         <note />
       </trans-unit>
       <trans-unit id="SearchTemplatesCommand">
@@ -808,22 +809,22 @@ The header is followed by the list of parameters and their errors (might be seve
       </trans-unit>
       <trans-unit id="TemplateCommand_DisplayConstraintResults_Error">
         <source>Failed to instatiate template '{0}', the following constraints are not met:</source>
-        <target state="new">Failed to instatiate template '{0}', the following constraints are not met:</target>
+        <target state="translated">Falha ao instanciar o modelo '{0}', as seguintes restrições não são atendidas:</target>
         <note>{0} - template name (user friendly)</note>
       </trans-unit>
       <trans-unit id="TemplateCommand_DisplayConstraintResults_Hint">
         <source>To run the template anyway, use '{0}' option:</source>
-        <target state="new">To run the template anyway, use '{0}' option:</target>
+        <target state="translated">Para executar o modelo de qualquer maneira, use a opção '{0}':</target>
         <note>{0} - additional option name (--force)</note>
       </trans-unit>
       <trans-unit id="TemplateCommand_DisplayConstraintResults_Hint_TemplateNotUsable">
         <source>The template might not be usable.</source>
-        <target state="new">The template might not be usable.</target>
+        <target state="translated">O modelo pode não ser utilizável.</target>
         <note />
       </trans-unit>
       <trans-unit id="TemplateCommand_DisplayConstraintResults_Warning">
         <source>Warning: the following constraints for the template '{0}' are not met:</source>
-        <target state="new">Warning: the following constraints for the template '{0}' are not met:</target>
+        <target state="translated">Aviso: as seguintes restrições para o modelo '{0}' não são atendidas:</target>
         <note>{0} - template name (user friendly)</note>
       </trans-unit>
       <trans-unit id="TemplateInformationCoordinator_DotnetNew_Description">
@@ -858,7 +859,7 @@ The header is followed by the list of parameters and their errors (might be seve
       </trans-unit>
       <trans-unit id="TemplateListCoordinator_Error_FailedConstraints">
         <source>{0} template(s) are hidden because their constraints are not satisfied. To show them, use the '{1}' option.</source>
-        <target state="new">{0} template(s) are hidden because their constraints are not satisfied. To show them, use the '{1}' option.</target>
+        <target state="translated">{0} template(s) estão ocultos porque suas restrições não são satisfeitas. Para mostrá-los, use a opção '{1}'.</target>
         <note>{0} - the count of templates that are not shown. {1} - option to be used (--ignore-constraints).</note>
       </trans-unit>
       <trans-unit id="TemplateOptions_Error_AllowedValuesForOptionList">
@@ -899,7 +900,7 @@ The header is followed by the list of parameters and their errors (might be seve
       </trans-unit>
       <trans-unit id="TemplatePackageCoordinator_Install_ConstraintsNotice">
         <source>The following templates might not work because their constraints are not met:</source>
-        <target state="new">The following templates might not work because their constraints are not met:</target>
+        <target state="translated">Os modelos a seguir podem não funcionar porque suas restrições não são atendidas:</target>
         <note>The sentence is followed by the list of templates with information on their constraints. Each template and each restriction is given from new line.</note>
       </trans-unit>
       <trans-unit id="TemplatePackageCoordinator_Install_Error_FoundNoPackagesToInstall">

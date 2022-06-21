@@ -1,5 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <!-- Shared package properties -->
-
+<Project>
+  <!-- Import references updated by Dependabot. This file is for package references updated manually or by Darc/Maestro. -->
+  <Import Project="dependabot\Packages.props" />
+  <ItemGroup>
+    <PackageReference Update="System.CommandLine" Version="$(SystemCommandLinePackageVersion)" />
+    <!--Analyzer dependencies-->
+    <PackageReference Update="Microsoft.CodeAnalysis.NetAnalyzers" Version="$(MicrosoftCodeAnalysisNetAnalyzersPackageVersion)" />
+    <!--Test dependencies-->
+    <PackageReference Update="xunit" Version="$(XUnitVersion)" />
+    <PackageReference Update="Microsoft.DotNet.Cli.Utils" Version="$(MicrosoftDotNetCliUtilsVersion)" />
+  </ItemGroup>
 </Project>

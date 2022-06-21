@@ -7,15 +7,15 @@ using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 
 namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
 {
-    internal class ProcessStartPostActionProcessor : IPostActionProcessor
+    internal class ProcessStartPostActionProcessor : PostActionProcessor2Base
     {
         internal static readonly Guid ActionProcessorId = new Guid("3A7C4B45-1F5D-4A30-959A-51B88E82B5D2");
 
-        public Guid Id => ActionProcessorId;
+        public override Guid Id => ActionProcessorId;
 
-        public bool Process(IEngineEnvironmentSettings environment, IPostAction actionConfig, ICreationEffects creationEffects, ICreationResult templateCreationResult, string outputBasePath)
+        protected override bool ProcessInternal(IEngineEnvironmentSettings environment, IPostAction actionConfig, ICreationEffects creationEffects, ICreationResult templateCreationResult, string outputBasePath)
         {
-            if (!actionConfig.Args.TryGetValue("executable", out string? executable))
+            if (!actionConfig.Args.TryGetValue("executable", out string? executable) || string.IsNullOrWhiteSpace(executable))
             {
                 Reporter.Error.WriteLine(LocalizableStrings.PostAction_ProcessStartProcessor_Error_ConfigMissingExecutable);
                 return false;
@@ -41,7 +41,12 @@ namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
 
             try
             {
-                Reporter.Output.WriteLine(string.Format(LocalizableStrings.RunningCommand, executable + " " + args));
+                string command = executable;
+                if (!string.IsNullOrWhiteSpace(args))
+                {
+                    command = command + " " + args;
+                }
+                Reporter.Output.WriteLine(string.Format(LocalizableStrings.RunningCommand, command));
                 string resolvedExecutablePath = ResolveExecutableFilePath(environment.Host.FileSystem, executable, outputBasePath);
 
                 Process? commandResult = System.Diagnostics.Process.Start(new ProcessStartInfo
