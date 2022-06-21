@@ -39,17 +39,17 @@
       <Uri>https://github.com/dotnet/runtime</Uri>
       <Sha>4822e3c3aa77eb82b2fb33c9321f923cf11ddde6</Sha>
     </Dependency>
-    <Dependency Name="NuGet.Credentials" Version="6.2.0-rc.146">
+    <Dependency Name="NuGet.Credentials" Version="6.2.1-rc.7">
       <Uri>https://github.com/nuget/nuget.client</Uri>
-      <Sha>b8a61266d9a6780cb7eb9c1942695cf813fdef0a</Sha>
+      <Sha>4be14ee6b6587a02f05337505bd840fbcbe898f6</Sha>
     </Dependency>
-    <Dependency Name="NuGet.Configuration" Version="6.2.0-rc.146">
+    <Dependency Name="NuGet.Configuration" Version="6.2.1-rc.7">
       <Uri>https://github.com/nuget/nuget.client</Uri>
-      <Sha>b8a61266d9a6780cb7eb9c1942695cf813fdef0a</Sha>
+      <Sha>4be14ee6b6587a02f05337505bd840fbcbe898f6</Sha>
     </Dependency>
-    <Dependency Name="NuGet.Protocol" Version="6.2.0-rc.146">
+    <Dependency Name="NuGet.Protocol" Version="6.2.1-rc.7">
       <Uri>https://github.com/nuget/nuget.client</Uri>
-      <Sha>b8a61266d9a6780cb7eb9c1942695cf813fdef0a</Sha>
+      <Sha>4be14ee6b6587a02f05337505bd840fbcbe898f6</Sha>
     </Dependency>
     <Dependency Name="Microsoft.DotNet.Cli.CommandLine" Version="1.0.0-preview.19208.1">
       <Uri>https://github.com/dotnet/clicommandlineparser</Uri>
