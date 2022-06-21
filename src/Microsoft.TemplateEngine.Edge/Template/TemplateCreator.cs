@@ -4,6 +4,7 @@
 #nullable enable
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -59,7 +60,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 name,
                 fallbackName,
                 outputPath,
-                (InputParametersSet)inputParameters,
+                new InputParametersSet(inputParameters),
                 forceCreation,
                 baselineName,
                 dryRun,
