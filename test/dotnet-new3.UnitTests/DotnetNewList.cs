@@ -111,7 +111,7 @@ EditorConfig file                             editorconfig               Config
 global.json file                              globaljson                 Config                
 NuGet Config                                  nugetconfig                Config                
 Razor Class Library                           razorclasslib  [C#]        Web/Razor/Library     
-Solution File                                 sln                        Solution              
+Solution File                                 sln,solution               Solution              
 Web Config                                    webconfig                  Config                
 Worker Service                                worker         [C#],F#     Common/Worker/Web     ";
 
