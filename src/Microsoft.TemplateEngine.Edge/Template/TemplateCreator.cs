@@ -479,20 +479,11 @@ namespace Microsoft.TemplateEngine.Edge.Template
         {
             ParametersConditionsEvaluationResult result = template.Generator.EvaluateConditionalParameters(_logger, templateParams, template);
 
-            // Following two steps are possibly questionable - do we want to run defaults again and get them for parameters
-            //  that were marked as disabled or nor required by conditions? This might feel like overwritting the disabling action,
-            //  on the other hand - this way the conditionally disabled or (not-)required parameters will get exactly same behavior
-            //  (in regards of applying defaults) as if they would not be specified on input or marked as required directly in template.
-            // Tl;dr;: We prefer the behavior simulating the full reevaluation of parameters assignment after conditions evaluation.
-
             List<string> defaultParamsWithInvalidValues = new List<string>();
-            // try get default values for disabled params
-            result.DisabledParameters.ForEach(p =>
-                SetParameterDefault(_environmentSettings.Host, template, templateParams, p, defaultParamsWithInvalidValues));
 
-            // for params that changed to optional (and are not disabled) - try get 'Default' value (as for required it's not obtained)
+            // for params that changed to optional - try get 'Default' value (as for required it's not obtained)
             result.ParametersWithAlteredPriority
-                .Where(p => p.Priority == TemplateParameterPriority.Optional && !result.DisabledParameters.Contains(p))
+                .Where(p => p.Priority == TemplateParameterPriority.Optional)
                 .ForEach(p => SetParameterDefault(null, template, templateParams, p, defaultParamsWithInvalidValues));
 
             paramsWithInvalidValues = defaultParamsWithInvalidValues;
