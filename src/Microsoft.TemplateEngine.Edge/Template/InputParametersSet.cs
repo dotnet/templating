@@ -34,6 +34,13 @@ namespace Microsoft.TemplateEngine.Edge.Template
             : this(dict.Select(p => (InputParameter)p).ToList()) { }
 
         /// <summary>
+        /// Indicates whether the templating engine should perform the evaluation of the IsRequiredCondition and IsEnabledCondtion
+        ///  on symbols or if it should rely on <see cref="InputParameter.IsEnabledConditionResult"/> and <see cref="InputParameter.IsRequiredConditionResult"/>
+        ///  contained within this set.
+        /// </summary>
+        public bool SkipParametersConditionsEvaluation { get; set; }
+
+        /// <summary>
         /// Checks whether this set contains parameter with given name.
         /// </summary>
         /// <param name="name"></param>

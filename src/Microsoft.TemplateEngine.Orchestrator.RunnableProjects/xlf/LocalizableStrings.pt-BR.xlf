@@ -108,6 +108,11 @@ Detalhes: {1}</target>
         <target state="translated">Variável [{0}] já adicionada com o valor [{1}]. Não é possível adicioná-lo como variável implícita com o valor de self.</target>
         <note>{0} is the choiceKey, {1} is the existing conflict value</note>
       </trans-unit>
+      <trans-unit id="RunnableProjectGenerator_Error_ExternalConditionMismatch">
+        <source>Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabledCondition or IsRequiredCondition): {0}</source>
+        <target state="new">Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabledCondition or IsRequiredCondition): {0}</target>
+        <note>{0} - csv of mismateched parameters</note>
+      </trans-unit>
       <trans-unit id="RunnableProjectGenerator_Error_ParamsCycle">
         <source>Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation</source>
         <target state="new">Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation</target>

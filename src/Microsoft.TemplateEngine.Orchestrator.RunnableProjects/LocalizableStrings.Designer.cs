@@ -242,6 +242,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabledCondition or IsRequiredCondition): {0}.
+        /// </summary>
+        internal static string RunnableProjectGenerator_Error_ExternalConditionMismatch {
+            get {
+                return ResourceManager.GetString("RunnableProjectGenerator_Error_ExternalConditionMismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation.
         /// </summary>
         internal static string RunnableProjectGenerator_Error_ParamsCycle {

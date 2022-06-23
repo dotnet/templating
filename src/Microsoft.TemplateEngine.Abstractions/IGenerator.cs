@@ -69,6 +69,19 @@ namespace Microsoft.TemplateEngine.Abstractions
         ParametersConditionsEvaluationResult EvaluateConditionalParameters(ILogger logger, IParameterSet parameters, ITemplate template);
 
         /// <summary>
+        /// Applies result of external conditions evaluation as if the evaluation was performed via <see cref="EvaluateConditionalParameters"/>.
+        /// This means removing the disabled parameters from values and templates collections and altering the requirement of parameters with
+        ///  conditional requirement.
+        /// </summary>
+        /// <param name="evaluationResult"></param>
+        /// <param name="parameterSet"></param>
+        /// <param name="template"></param>
+        void ApplyExternalEvaluationOfConditionalParameters(
+            ParametersConditionsEvaluationResult evaluationResult,
+            IParameterSet parameterSet,
+            ITemplate template);
+
+        /// <summary>
         /// Gets an <see cref="ITemplate"/> from the given <see cref="IFileSystemInfo" /> configuration entry.
         /// </summary>
         /// <param name="config">configuration file.</param>

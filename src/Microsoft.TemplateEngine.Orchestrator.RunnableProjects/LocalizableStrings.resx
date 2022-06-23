@@ -192,6 +192,10 @@ Details: {1}</value>
     <value>Variable [{0}] already added with value [{1}]. Cannot add it as implicit variable with value of self.</value>
     <comment>{0} is the choiceKey, {1} is the existing conflict value</comment>
   </data>
+  <data name="RunnableProjectGenerator_Error_ExternalConditionMismatch" xml:space="preserve">
+    <value>Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabledCondition or IsRequiredCondition): {0}</value>
+    <comment>{0} - csv of mismateched parameters</comment>
+  </data>
   <data name="RunnableProjectGenerator_Error_ParamsCycle" xml:space="preserve">
     <value>Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation</value>
     <comment>{0} - csv of the cycle</comment>

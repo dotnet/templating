@@ -92,10 +92,10 @@ UNKNOWN
             await InstantiateAsyncHelper(
                 TemplateConfigQuotelessLiteralsEnabled,
                 sourceSnippet,
-                parameters,
                 expectedOutput,
                 "ChoiceParam",
-                instantiateShouldFail);
+                instantiateShouldFail,
+                parameters);
         }
 
         private const string TemplateConfigCyclicParamsDependency = @"
@@ -156,11 +156,11 @@ C
             await InstantiateAsyncHelper(
                 TemplateConfigCyclicParamsDependency,
                 sourceSnippet,
-                parameters,
                 expectedOutput,
                 @"Failed to create template.
 Details: Parameter conditions contain cyclic dependency: [A, B, A] that is preventing deterministic evaluation",
-                instantiateShouldFail);
+                instantiateShouldFail,
+                parameters);
         }
 
         private const string TemplateConfigIsRequiredCondition = @"
@@ -231,11 +231,11 @@ C
             await InstantiateAsyncHelper(
                 TemplateConfigIsRequiredCondition,
                 sourceSnippet,
-                parameters,
                 // To make the test data more compact we have left out the newlines - let's add them back here
                 expectedOutput.Length <= 2 ? expectedOutput : expectedOutput.Replace(",", $",{Environment.NewLine}{Environment.NewLine}{Environment.NewLine}"),
                 expectedErrorMessage,
-                instantiateShouldFail);
+                instantiateShouldFail,
+                parameters);
         }
 
         private const string TemplateConfigEnabledAndRequiredConditionsTogether = @"
@@ -301,19 +301,109 @@ C
             await InstantiateAsyncHelper(
                 TemplateConfigEnabledAndRequiredConditionsTogether,
                 sourceSnippet,
-                parameters,
                 expectedOutput,
                 expectedErrorMessage,
-                instantiateShouldFail);
+                instantiateShouldFail,
+                parameters);
+        }
+
+        private const string TemplateConfigForExternalConditionsEvaluation = @"
+{
+    ""identity"": ""test.template"",
+    ""name"": ""tst"",
+    ""shortName"": ""tst"",
+    ""symbols"": {
+	    ""A"": {
+	      ""type"": ""parameter"",
+	      ""datatype"": ""string"",
+          ""isEnabledCondition"": ""A_enable"",
+          ""isRequiredCondition"": ""true"",
+	    },
+        ""B"": {
+	      ""type"": ""parameter"",
+	      ""datatype"": ""string"",
+          ""isEnabledCondition"": ""B_enable"",
+          ""isRequired"": true
+	    },
+        ""C"": {
+	      ""type"": ""parameter"",
+	      ""datatype"": ""bool""
+	    },
+        ""A_enable"": {
+	      ""type"": ""parameter"",
+	      ""datatype"": ""bool""
+	    },
+        ""B_enable"": {
+	      ""type"": ""parameter"",
+	      ""datatype"": ""bool""
+	    },
+    }
+}
+";
+
+        [Theory]
+        [InlineData(null, true, false, null, false, null, /*c_val*/ true,  "C", false, "")]
+        [InlineData(true, true, true, null, false, null, /*c_val*/ false, "A,", false, "")]
+        [InlineData(null, true, false, null, true, null, /*c_val*/ true, "", true, "B")]
+        [InlineData(null, true, true, null, false, null, /*c_val*/ true, "", true, "A")]
+        public async void InstantiateAsync_ConditionalParametersWithExternalEvaluation(
+            bool? a_val,
+            bool? a_enabled,
+            bool? a_required,
+            bool? b_val,
+            bool? b_enabled,
+            bool? b_required,
+            bool c_val,
+            string expectedOutput,
+            bool instantiateShouldFail,
+            string expectedErrorMessage)
+        {
+            //
+            // Template content preparation
+            //
+
+            string sourceSnippet = @"
+//#if( A )
+A,
+//#endif
+
+//#if( B )
+B,
+//#endif
+
+//#if( C )
+C
+//#endif
+";
+
+            InputParametersSet parameters = new InputParametersSet(
+                new[]
+                {
+                    new InputParameter("A", a_val.ToString(), a_enabled, a_required, a_val == null),
+                    new InputParameter("B", b_val.ToString(), b_enabled, b_required, b_val == null),
+                    new InputParameter("C", c_val.ToString()),
+                })
+            {
+                SkipParametersConditionsEvaluation = true
+            };
+
+            await InstantiateAsyncHelper(
+                TemplateConfigForExternalConditionsEvaluation,
+                sourceSnippet,
+                expectedOutput,
+                expectedErrorMessage,
+                instantiateShouldFail,
+                parameters2: parameters);
         }
 
         private async Task InstantiateAsyncHelper(
             string templateSnippet,
             string sourceSnippet,
-            IReadOnlyDictionary<string, string?> parameters,
             string expectedOutput,
             string expectedErrorMessage,
-            bool instantiateShouldFail)
+            bool instantiateShouldFail,
+            IReadOnlyDictionary<string, string?>? parameters1 = null,
+            InputParametersSet? parameters2 = null)
         {
             //
             // Template content preparation
@@ -344,12 +434,25 @@ C
 
             string targetDir = FileSystemHelpers.GetNewVirtualizedPath(_engineEnvironmentSettings);
 
-            var res = await creator.InstantiateAsync(
-                templateInfo: runnableConfig,
-                name: "tst",
-                fallbackName: "tst2",
-                inputParameters: parameters,
-                outputPath: targetDir);
+            ITemplateCreationResult res;
+            if (parameters1 != null)
+            {
+                res = await creator.InstantiateAsync(
+                    templateInfo: runnableConfig,
+                    name: "tst",
+                    fallbackName: "tst2",
+                    inputParameters: parameters1!,
+                    outputPath: targetDir);
+            }
+            else
+            {
+                res = await creator.InstantiateAsync(
+                    templateInfo: runnableConfig,
+                    name: "tst",
+                    fallbackName: "tst2",
+                    inputParameters: parameters2!,
+                    outputPath: targetDir);
+            }
 
             if (instantiateShouldFail)
             {
