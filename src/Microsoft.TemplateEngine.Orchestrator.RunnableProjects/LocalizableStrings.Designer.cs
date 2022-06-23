@@ -242,7 +242,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation&quot;, &quot;Conditional Parameters..
+        ///   Looks up a localized string similar to Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation.
         /// </summary>
         internal static string RunnableProjectGenerator_Error_ParamsCycle {
             get {

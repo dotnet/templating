@@ -371,6 +371,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
         }
 
+        internal void RemoveSymbol(string name)
+        {
+            _symbols.Remove(name);
+        }
+
         private static IReadOnlyList<string> JTokenStringOrArrayToCollection(JToken? token, string[] defaultSet)
         {
             if (token == null)

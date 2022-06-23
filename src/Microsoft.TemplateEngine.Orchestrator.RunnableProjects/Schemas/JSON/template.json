@@ -1100,6 +1100,14 @@
               "isRequired": {
                 "type": "boolean"
               },
+              "isRequiredCondition": {
+                "type": "string",
+                "description": "Condition indicating parameter priority"
+              },
+              "isEnabledCondition": {
+                "type": "string",
+                "description": "Condition indicating parameter visibility"
+              },
               "choices": {
                 "description": "An array listing the valid choices for a symbol whose datatype = choice. If not provided, there are no valid choices for the symbol, so it can never be assigned a value.",
                 "type": "array",

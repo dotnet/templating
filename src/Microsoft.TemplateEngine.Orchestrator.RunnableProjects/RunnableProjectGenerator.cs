@@ -179,6 +179,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             var disabledParams = EvaluateEnablementConditions(parameters, parameterSet, variableCollection, variableCollectionIdxToParametersMap, logger);
             var alteredRequirementParams = EvaluateRequirementCondition(parameters, variableCollection, logger);
 
+            // Remove the disabled symbols from the config as well (as if they was never defined on the template)
+            RunnableProjectConfig config = (RunnableProjectConfig)template;
+            disabledParams.Select(p => p.Name).ForEach(config.RemoveSymbol);
+
             return new ParametersConditionsEvaluationResult(disabledParams, alteredRequirementParams);
         }
 
