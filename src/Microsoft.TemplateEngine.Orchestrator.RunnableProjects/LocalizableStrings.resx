@@ -203,7 +203,7 @@ Details: {1}</value>
     <comment>{0} is the choiceKey, {1} is the existing conflict value</comment>
   </data>
   <data name="RunnableProjectGenerator_Error_ParamsCycle" xml:space="preserve">
-    <value>Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation", "Conditional Parameters.</value>
+    <value>Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation</value>
     <comment>{0} - csv of the cycle</comment>
   </data>
   <data name="RunnableProjectGenerator_Error_TopologicalSort" xml:space="preserve">

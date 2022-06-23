@@ -493,6 +493,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return validModel;
         }
 
+        internal void RemoveSymbol(string name)
+        {
+            _configuration.RemoveSymbol(name);
+        }
+
         private static IReadOnlyDictionary<string, Parameter> ExtractParameters(SimpleConfigModel configuration)
         {
             Dictionary<string, Parameter> parameters = new Dictionary<string, Parameter>();
