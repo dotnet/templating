@@ -247,3 +247,7 @@ Following input parameter values can (and will) be evaluated deterministically: 
 Following input parameter values cannot be evaluated deterministically (and will lead to error): `--A true --B false`
 
 **Applying of host and default values** - All host and default values are applied before the conditions evaluation. After the evaluation defaults are reapplied to parameters that were evaluated as optional and that do not have host supplied values. After this an evaluation of presence of mandatory values takes place.
+
+### Performing evaluation extenraly
+
+It is possible to supply the evaluated results of parameters conditions when instantiating template via Edge API [`TemplateCreator.InstantiateAsync`](https://github.com/JanKrivanek/templating/blob/conditional-params-v1/src/Microsoft.TemplateEngine.Edge/Template/TemplateCreator.cs#L84). This can be achieved by passing the structured `InputParametersSet` argument and setting the [`SkipParametersConditionsEvaluation`](https://github.com/JanKrivanek/templating/blob/conditional-params-v1/src/Microsoft.TemplateEngine.Edge/Template/InputParametersSet.cs#L41) property and then the actual evaluation results via individual [`InputParameter`s constructors](https://github.com/JanKrivanek/templating/blob/conditional-params-v1/src/Microsoft.TemplateEngine.Edge/Template/InputParameter.cs#L30)
