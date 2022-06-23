@@ -120,6 +120,16 @@ Detalhes: {1}</target>
         <target state="translated">Variável [{0}] já adicionada com o valor [{1}]. Não é possível adicioná-lo como variável implícita com o valor de self.</target>
         <note>{0} is the choiceKey, {1} is the existing conflict value</note>
       </trans-unit>
+      <trans-unit id="RunnableProjectGenerator_Error_ParamsCycle">
+        <source>Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation", "Conditional Parameters.</source>
+        <target state="new">Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation", "Conditional Parameters.</target>
+        <note>{0} - csv of the cycle</note>
+      </trans-unit>
+      <trans-unit id="RunnableProjectGenerator_Error_TopologicalSort">
+        <source>Unexpected internal error - unable to perform topological sort of parameter dependencies that do not appear to have a cyclic dependencies.</source>
+        <target state="new">Unexpected internal error - unable to perform topological sort of parameter dependencies that do not appear to have a cyclic dependencies.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="RunnableProjectGenerator_Exception_ConfigShouldBeFile">
         <source>Template configuration must be a file, but {0} is not a file.</source>
         <target state="translated">A configuração do modelo deve ser um arquivo, mas {0} não é um arquivo.</target>
@@ -144,6 +154,11 @@ Detalhes: {1}</target>
         <source>Localization file {0} is not compatible with base configuration {1}, and will be skipped.</source>
         <target state="translated">O arquivo de localização {0} não é compatível com a configuração base {1} e será ignorado.</target>
         <note>{0} and {1} are template configuration locations.</note>
+      </trans-unit>
+      <trans-unit id="RunnableProjectGenerator_Warning_ParamsCycle">
+        <source>Parameter conditions contain cyclic dependency: [{0}]. With current values of parameters it's possible to deterministically evaluate parameters - so proceeding further. However template should be reviewed as instantiation with different parameters can lead to error.</source>
+        <target state="new">Parameter conditions contain cyclic dependency: [{0}]. With current values of parameters it's possible to deterministically evaluate parameters - so proceeding further. However template should be reviewed as instantiation with different parameters can lead to error.</target>
+        <note>{0} - csv of the cycle</note>
       </trans-unit>
       <trans-unit id="SimpleConfigModel_AuthoringException_MergeConfiguration_FileNotFound">
         <source>Failed to load additional configuration file {0}, the file does not exist.</source>

@@ -729,8 +729,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
                 if (parametersDependenciesGraph.HasCycle(out var cycle))
                 {
-                    logger.LogWarning(
-                        $"Parameter conditions contain cyclic dependency: [{cycle.Select(p => p.Name).ToCsvString()}]. With current values of parameters it's possible to deterministically evaluate parameters - so proceeding further. However template should be reviewed as instantiation with different parameters can lead to error.");
+                    logger.LogWarning(LocalizableStrings.RunnableProjectGenerator_Warning_ParamsCycle, cycle.Select(p => p.Name).ToCsvString());
                 }
 
                 foreach (Parameter parameter in orderedParameters)
@@ -747,12 +746,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             else if (parametersToRecalculate.HasCycle(out var cycle))
             {
                 throw new TemplateAuthoringException(
-                            $"Parameter conditions contain cyclic dependency: [{cycle.Select(p => p.Name).ToCsvString()}] that is preventing deterministic evaluation", "Conditional Parameters");
+                    string.Format(
+                        LocalizableStrings.RunnableProjectGenerator_Error_ParamsCycle,
+                        cycle.Select(p => p.Name).ToCsvString()),
+                    "Conditional Parameters");
             }
             else
             {
-                throw new Exception(
-                    "Unexpected internal error - unable to perform topological sort of parameter dependencies that do not appear to have a cyclic dependencies");
+                throw new Exception(LocalizableStrings.RunnableProjectGenerator_Error_TopologicalSort);
             }
 
             return disabledParameters;

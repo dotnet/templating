@@ -260,6 +260,24 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation&quot;, &quot;Conditional Parameters..
+        /// </summary>
+        internal static string RunnableProjectGenerator_Error_ParamsCycle {
+            get {
+                return ResourceManager.GetString("RunnableProjectGenerator_Error_ParamsCycle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected internal error - unable to perform topological sort of parameter dependencies that do not appear to have a cyclic dependencies..
+        /// </summary>
+        internal static string RunnableProjectGenerator_Error_TopologicalSort {
+            get {
+                return ResourceManager.GetString("RunnableProjectGenerator_Error_TopologicalSort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Template configuration must be a file, but {0} is not a file..
         /// </summary>
         internal static string RunnableProjectGenerator_Exception_ConfigShouldBeFile {
@@ -301,6 +319,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         internal static string RunnableProjectGenerator_Warning_LocFileSkipped {
             get {
                 return ResourceManager.GetString("RunnableProjectGenerator_Warning_LocFileSkipped", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Parameter conditions contain cyclic dependency: [{0}]. With current values of parameters it&apos;s possible to deterministically evaluate parameters - so proceeding further. However template should be reviewed as instantiation with different parameters can lead to error..
+        /// </summary>
+        internal static string RunnableProjectGenerator_Warning_ParamsCycle {
+            get {
+                return ResourceManager.GetString("RunnableProjectGenerator_Warning_ParamsCycle", resourceCulture);
             }
         }
         
