@@ -158,9 +158,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         public ParametersConditionsEvaluationResult EvaluateConditionalParameters(ILogger logger, IParameterSet parameterSet, ITemplate template)
         {
+            IReadOnlyList<Parameter> parameters = parameterSet.ParameterDefinitions.Cast<Parameter>().ToList();
+
             List<(Parameter Parameter, object Value)> parametersWithValues =
-                parameterSet.ResolvedValues.Where(p => p.Key is Parameter)
-                .Select(p => ((p.Key as Parameter)!, p.Value)).ToList();
+                parameters
+                    // ensure same order between the two sets
+                    .Where(parameterSet.ResolvedValues.ContainsKey)
+                    .Select(p => (p, parameterSet.ResolvedValues[p]))
+                    .ToList();
 
             var variableCollection = new VariableCollection(
                 null,
@@ -170,8 +175,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             Parameter[] variableCollectionIdxToParametersMap =
                 parametersWithValues.Where(p => p.Value != null).Select(p => p.Parameter).ToArray();
-
-            IReadOnlyList<Parameter> parameters = parametersWithValues.Select(p => p.Parameter).ToList();
 
             var disabledParams = EvaluateEnablementConditions(parameters, parameterSet, variableCollection, variableCollectionIdxToParametersMap, logger);
             var alteredRequirementParams = EvaluateRequirementCondition(parameters, variableCollection, logger);
@@ -649,7 +652,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 if (!string.IsNullOrEmpty(parameter.IsRequiredCondition))
                 {
-                    bool isRequired = Cpp2StyleEvaluatorDefinition.EvaluateFromString(logger, parameter.IsEnabledCondition, variableCollection);
+                    bool isRequired = Cpp2StyleEvaluatorDefinition.EvaluateFromString(logger, parameter.IsRequiredCondition, variableCollection);
                     var newPriority = isRequired ? TemplateParameterPriority.Required : TemplateParameterPriority.Optional;
                     if (parameter.Priority != newPriority)
                     {
@@ -664,13 +667,19 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         private IReadOnlyList<Parameter> EvaluateEnablementConditions(
             IReadOnlyList<Parameter> parameters,
-            IParameterSet parameterSet,
+            IParameterSet parameterSet1,
             VariableCollection variableCollection,
             Parameter[] variableCollectionIdxToParametersMap,
             ILogger logger)
         {
             List<Parameter> disabledParameters = new();
             Dictionary<Parameter, HashSet<Parameter>> parametersDependencies = new Dictionary<Parameter, HashSet<Parameter>>();
+            if (!(parameterSet1 is ParameterSet parameterSet))
+            {
+                // If this is happening. it means that arch. changed (parameters set no more provided by GetParametersForTemplate),
+                //  in that case we should extend IParameterSet interface and allow parameters removal (.RemoveParamater) via interface
+                throw new Exception($"Internal error: Unexpected type od parameter set ({parameterSet1.GetType()}).");
+            }
 
             // First parameters traversal.
             //   - evaluate all IsEnabledCondition - and get the dependecies between the parameters during doing so
@@ -683,7 +692,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     {
                         disabledParameters.Add(parameter);
                         // Remove from input set
-                        parameterSet.ResolvedValues.Remove(parameter);
+                        parameterSet.RemoveParamater(parameter);
                         // Do not remove from the variable collection though - we want to capture all dependencies between parameters in the first traversal.
                         // Those will be bulk removed before second traversal (traversing only the required dependencies).
                     }
@@ -724,7 +733,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     {
                         disabledParameters.Add(parameter);
                         // disable and remove from the collection
-                        parameterSet.ResolvedValues.Remove(parameter);
+                        parameterSet.RemoveParamater(parameter);
                         variableCollection.Remove(parameter.Name);
                     }
                 }
@@ -732,7 +741,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             else if (parametersToRecalculate.HasCycle(out var cycle))
             {
                 throw new TemplateAuthoringException(
-                            $"Parameter conditions contain cyclic dependency: [{cycle.Select(p => p.Name).ToCsvString()}], that is preventing deterministic evaluation", "Conditional Parameters");
+                            $"Parameter conditions contain cyclic dependency: [{cycle.Select(p => p.Name).ToCsvString()}] that is preventing deterministic evaluation", "Conditional Parameters");
             }
             else
             {
@@ -814,6 +823,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             internal void AddParameter(ITemplateParameter param)
             {
                 _parameters[param.Name] = param;
+            }
+
+            internal void RemoveParamater(Parameter param)
+            {
+                _parameters.Remove(param.Name);
+                ResolvedValues.Remove(param);
             }
         }
     }
