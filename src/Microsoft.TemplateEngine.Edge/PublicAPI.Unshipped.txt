@@ -33,7 +33,11 @@ Microsoft.TemplateEngine.Edge.Template.IFilteredTemplateInfo.Info.get -> Microso
 Microsoft.TemplateEngine.Edge.Template.IFilteredTemplateInfo.MatchDisposition.get -> System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Edge.Template.MatchInfo>!
 Microsoft.TemplateEngine.Edge.Template.InputParameter
 Microsoft.TemplateEngine.Edge.Template.InputParameter.InputParameter(string! name, string? value) -> void
+Microsoft.TemplateEngine.Edge.Template.InputParameter.InputParameter(string! name, string? value, bool? isEnabledConditionResult, bool? isRequiredConditionResult, bool parameterNotPassed = false) -> void
+Microsoft.TemplateEngine.Edge.Template.InputParameter.IsEnabledConditionResult.get -> bool?
+Microsoft.TemplateEngine.Edge.Template.InputParameter.IsRequiredConditionResult.get -> bool?
 Microsoft.TemplateEngine.Edge.Template.InputParameter.Name.get -> string!
+Microsoft.TemplateEngine.Edge.Template.InputParameter.ParameterNotPassed.get -> bool
 Microsoft.TemplateEngine.Edge.Template.InputParameter.Value.get -> string?
 Microsoft.TemplateEngine.Edge.Template.InputParametersSet
 Microsoft.TemplateEngine.Edge.Template.InputParametersSet.ContainsParameterWithName(string! name, System.StringComparison comparison = System.StringComparison.OrdinalIgnoreCase) -> bool
@@ -41,6 +45,8 @@ Microsoft.TemplateEngine.Edge.Template.InputParametersSet.GetEnumerator() -> Sys
 Microsoft.TemplateEngine.Edge.Template.InputParametersSet.InputParametersSet() -> void
 Microsoft.TemplateEngine.Edge.Template.InputParametersSet.InputParametersSet(System.Collections.Generic.IReadOnlyDictionary<string!, string?>! dict) -> void
 Microsoft.TemplateEngine.Edge.Template.InputParametersSet.InputParametersSet(System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Edge.Template.InputParameter!>! inputParameters) -> void
+Microsoft.TemplateEngine.Edge.Template.InputParametersSet.SkipParametersConditionsEvaluation.get -> bool
+Microsoft.TemplateEngine.Edge.Template.InputParametersSet.SkipParametersConditionsEvaluation.set -> void
 Microsoft.TemplateEngine.Edge.Template.ITemplateMatchInfo.DispositionOfDefaults.get -> System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Edge.Template.MatchInfo>!
 Microsoft.TemplateEngine.Edge.Template.ITemplateMatchInfo.Info.get -> Microsoft.TemplateEngine.Abstractions.ITemplateInfo!
 Microsoft.TemplateEngine.Edge.Template.ITemplateMatchInfo.MatchDisposition.get -> System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Edge.Template.MatchInfo>!

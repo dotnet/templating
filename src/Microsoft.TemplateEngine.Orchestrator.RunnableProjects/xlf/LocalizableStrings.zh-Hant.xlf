@@ -120,6 +120,11 @@ Details: {1}</source>
         <target state="translated">已使用值 [{1}] 加入變數 [{0}]。無法將它新增為具有本身值的隱含變數。</target>
         <note>{0} is the choiceKey, {1} is the existing conflict value</note>
       </trans-unit>
+      <trans-unit id="RunnableProjectGenerator_Error_ExternalConditionMismatch">
+        <source>Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabledCondition or IsRequiredCondition): {0}</source>
+        <target state="new">Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabledCondition or IsRequiredCondition): {0}</target>
+        <note>{0} - csv of mismateched parameters</note>
+      </trans-unit>
       <trans-unit id="RunnableProjectGenerator_Error_ParamsCycle">
         <source>Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation</source>
         <target state="new">Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation</target>

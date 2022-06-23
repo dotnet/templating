@@ -295,7 +295,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
             List<string> tmpParamsWithInvalidValues = new List<string>();
             paramsWithInvalidValues = tmpParamsWithInvalidValues;
 
-            foreach (InputParameter inputParam in inputParameters)
+            foreach (InputParameter inputParam in inputParameters.Where(p => !p.ParameterNotPassed))
             {
                 if (templateParams.TryGetParameterDefinition(inputParam.Name, out ITemplateParameter paramFromTemplate))
                 {
@@ -475,9 +475,43 @@ namespace Microsoft.TemplateEngine.Edge.Template
             return anyMissingParams;
         }
 
-        private bool EvaluateConditionalParameters(ITemplate template, IParameterSet templateParams, out IReadOnlyList<string> paramsWithInvalidValues)
+        private bool EvaluateConditionalParameters(
+            InputParametersSet inputParameters,
+            ITemplate template,
+            IParameterSet templateParams,
+            out IReadOnlyList<string> paramsWithInvalidValues)
         {
-            ParametersConditionsEvaluationResult result = template.Generator.EvaluateConditionalParameters(_logger, templateParams, template);
+            ParametersConditionsEvaluationResult result;
+            if (inputParameters.SkipParametersConditionsEvaluation)
+            {
+                List<ITemplateParameter> disabledParams = new List<ITemplateParameter>();
+                List<ITemplateParameter> paramsWithChangedPriority = new List<ITemplateParameter>();
+                foreach (InputParameter inputParameter in inputParameters)
+                {
+                    if (templateParams.TryGetParameterDefinition(inputParameter.Name, out ITemplateParameter paramDefinition))
+                    {
+                        if (inputParameter.IsEnabledConditionResult.HasValue &&
+                            !inputParameter.IsEnabledConditionResult.Value)
+                        {
+                            disabledParams.Add(paramDefinition);
+                        }
+
+                        if (inputParameter.IsRequiredConditionResult.HasValue &&
+                            inputParameter.IsRequiredConditionResult.Value !=
+                            (paramDefinition.Priority == TemplateParameterPriority.Required))
+                        {
+                            paramsWithChangedPriority.Add(paramDefinition);
+                        }
+                    }
+                }
+
+                result = new(disabledParams, paramsWithChangedPriority);
+                template.Generator.ApplyExternalEvaluationOfConditionalParameters(result, templateParams, template);
+            }
+            else
+            {
+                result = template.Generator.EvaluateConditionalParameters(_logger, templateParams, template);
+            }
 
             List<string> defaultParamsWithInvalidValues = new List<string>();
 
@@ -508,7 +542,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 return false;
             }
 
-            if (!EvaluateConditionalParameters(template, templateParams, out var paramsWithInvalidValues))
+            if (!EvaluateConditionalParameters(inputParameters, template, templateParams, out var paramsWithInvalidValues))
             {
                 failureResult = new TemplateCreationResult(CreationResultStatus.InvalidParamValues, template.Name, paramsWithInvalidValues.ToCsvString());
                 templateParams = null;

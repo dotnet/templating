@@ -163,7 +163,46 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return new ParameterSet(templateConfig);
         }
 
+        public void ApplyExternalEvaluationOfConditionalParameters(
+            ParametersConditionsEvaluationResult evaluationResult, IParameterSet parameterSet, ITemplate template)
+        {
+            if (!(parameterSet is ParameterSet parameterSetInternal))
+            {
+                // If this is happening. it means that arch. changed (parameters set no more provided by GetParametersForTemplate),
+                //  in that case we should extend IParameterSet interface and allow parameters removal (.RemoveParamater) via interface
+                throw new Exception($"Internal error: Unexpected type od parameter set ({parameterSet.GetType()}).");
+            }
+
+            // Make sure external evaluation is not trying to set enabled/required flags on params without conditions
+            ErrorOutOnAttemptToEnforceExternalConditionOnParamsWithoutCondition(
+                evaluationResult.DisabledParameters.Cast<Parameter>().Where(p => string.IsNullOrEmpty(p.IsEnabledCondition)).ToList());
+            ErrorOutOnAttemptToEnforceExternalConditionOnParamsWithoutCondition(
+                evaluationResult.ParametersWithAlteredPriority.Cast<Parameter>().Where(p => string.IsNullOrEmpty(p.IsRequiredCondition)).ToList());
+
+            evaluationResult.DisabledParameters.Cast<Parameter>().ForEach(parameterSetInternal.RemoveParamater);
+            // Remove the disabled symbols from the config as well (as if they was never defined on the template)
+            RunnableProjectConfig config = (RunnableProjectConfig)template;
+            evaluationResult.DisabledParameters.Select(p => p.Name).ForEach(config.RemoveSymbol);
+
+            // Invert priorities where requested
+            evaluationResult.ParametersWithAlteredPriority.Cast<Parameter>().ForEach(p =>
+                p.Priority = (p.Priority == TemplateParameterPriority.Required
+                    ? TemplateParameterPriority.Optional
+                    : TemplateParameterPriority.Required));
+        }
+
+        private void ErrorOutOnAttemptToEnforceExternalConditionOnParamsWithoutCondition(IReadOnlyList<Parameter> offendingParameters)
+        {
+            if (offendingParameters.Any())
+            {
+                throw new Exception(
+                    string.Format(LocalizableStrings.RunnableProjectGenerator_Error_ExternalConditionMismatch, offendingParameters.ToCsvString()));
+            }
+        }
+
+#pragma warning disable SA1202 // Elements should be ordered by access
         public ParametersConditionsEvaluationResult EvaluateConditionalParameters(ILogger logger, IParameterSet parameterSet, ITemplate template)
+#pragma warning restore SA1202 // Elements should be ordered by access
         {
             IReadOnlyList<Parameter> parameters = parameterSet.ParameterDefinitions.Cast<Parameter>().ToList();
 
@@ -186,11 +225,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             var disabledParams = EvaluateEnablementConditions(parameters, parameterSet, variableCollection, variableCollectionIdxToParametersMap, logger);
             var alteredRequirementParams = EvaluateRequirementCondition(parameters, variableCollection, logger);
 
-            // Remove the disabled symbols from the config as well (as if they was never defined on the template)
-            RunnableProjectConfig config = (RunnableProjectConfig)template;
-            disabledParams.Select(p => p.Name).ForEach(config.RemoveSymbol);
-
-            return new ParametersConditionsEvaluationResult(disabledParams, alteredRequirementParams);
+            var result = new ParametersConditionsEvaluationResult(disabledParams, alteredRequirementParams);
+            ApplyExternalEvaluationOfConditionalParameters(result, parameterSet, template);
+            return result;
         }
 
         /// <summary>
@@ -663,11 +700,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 if (!string.IsNullOrEmpty(parameter.IsRequiredCondition))
                 {
                     bool isRequired = Cpp2StyleEvaluatorDefinition.EvaluateFromString(logger, parameter.IsRequiredCondition, variableCollection);
-                    var newPriority = isRequired ? TemplateParameterPriority.Required : TemplateParameterPriority.Optional;
-                    if (parameter.Priority != newPriority)
+                    if (parameter.Priority != (isRequired ? TemplateParameterPriority.Required : TemplateParameterPriority.Optional))
                     {
                         parametersWithAlteredPriority.Add(parameter);
-                        parameter.Priority = newPriority;
                     }
                 }
             }
@@ -701,8 +736,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     if (!Cpp2StyleEvaluatorDefinition.EvaluateFromString(logger, parameter.IsEnabledCondition, variableCollection, referencedVariablesIndexes))
                     {
                         disabledParameters.Add(parameter);
-                        // Remove from input set
-                        parameterSet.RemoveParamater(parameter);
                         // Do not remove from the variable collection though - we want to capture all dependencies between parameters in the first traversal.
                         // Those will be bulk removed before second traversal (traversing only the required dependencies).
                     }
@@ -740,9 +773,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 {
                     if (!Cpp2StyleEvaluatorDefinition.EvaluateFromString(logger, parameter.IsEnabledCondition, variableCollection))
                     {
-                        disabledParameters.Add(parameter);
                         // disable and remove from the collection
-                        parameterSet.RemoveParamater(parameter);
+                        disabledParameters.Add(parameter);
                         variableCollection.Remove(parameter.Name);
                     }
                 }
