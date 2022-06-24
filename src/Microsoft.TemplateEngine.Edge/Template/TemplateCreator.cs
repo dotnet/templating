@@ -508,6 +508,14 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 result = new(disabledParams, paramsWithChangedPriority);
                 template.Generator.ApplyExternalEvaluationOfConditionalParameters(result, templateParams, template);
             }
+            else if (inputParameters.Any(p => p.IsEnabledConditionResult.HasValue || p.IsRequiredConditionResult.HasValue))
+            {
+                throw new ArgumentException(string.Format(
+                    "It is not allowed to use explicit parameters conditions results when 'InputParametersSet.SkipParametersConditionsEvaluation' is not set to true. Offendning parameters: {0}",
+                    inputParameters
+                        .Where(p => p.IsEnabledConditionResult.HasValue || p.IsRequiredConditionResult.HasValue)
+                        .Select(p => p.Name).ToCsvString()));
+            }
             else
             {
                 result = template.Generator.EvaluateConditionalParameters(_logger, templateParams, template);
