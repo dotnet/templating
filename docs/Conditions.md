@@ -11,6 +11,7 @@
   * [Using Computed Conditions to work with Multichoice Symbols](#using-computed-conditions-to-work-with-multichoice-symbols)
 * [Conditional parameters](#conditional-parameters)
   * [Evaluation](#evaluation)
+  * [Performing evaluation externally](#performing-evaluation-externally)
 
 ## Overview
 
@@ -248,6 +249,10 @@ Following input parameter values cannot be evaluated deterministically (and will
 
 **Applying of host and default values** - All host and default values are applied before the conditions evaluation. After the evaluation defaults are reapplied to parameters that were evaluated as optional and that do not have host supplied values. After this an evaluation of presence of mandatory values takes place.
 
-### Performing evaluation extenraly
+### Performing evaluation externally
 
-It is possible to supply the evaluated results of parameters conditions when instantiating template via Edge API [`TemplateCreator.InstantiateAsync`](https://github.com/JanKrivanek/templating/blob/conditional-params-v1/src/Microsoft.TemplateEngine.Edge/Template/TemplateCreator.cs#L84). This can be achieved by passing the structured `InputParametersSet` argument and setting the [`SkipParametersConditionsEvaluation`](https://github.com/JanKrivanek/templating/blob/conditional-params-v1/src/Microsoft.TemplateEngine.Edge/Template/InputParametersSet.cs#L41) property and then the actual evaluation results via individual [`InputParameter`s constructors](https://github.com/JanKrivanek/templating/blob/conditional-params-v1/src/Microsoft.TemplateEngine.Edge/Template/InputParameter.cs#L30)
+It is possible to supply evaluation results of parameters conditions when instantiating template via Edge API [`TemplateCreator.InstantiateAsync`](https://github.com/JanKrivanek/templating/blob/conditional-params-v1/src/Microsoft.TemplateEngine.Edge/Template/TemplateCreator.cs#L84). Example use case is instantiation from Visual Studio host, that will leverage condition evaluator integrated within the New Project Dialog. 
+
+This can be achieved by passing the structured `InputParametersSet` argument and setting the [`SkipParametersConditionsEvaluation`](https://github.com/JanKrivanek/templating/blob/conditional-params-v1/src/Microsoft.TemplateEngine.Edge/Template/InputParametersSet.cs#L41) property to `true`. The actual evaluation results are passed via individual [`InputParameter`s constructors](https://github.com/JanKrivanek/templating/blob/conditional-params-v1/src/Microsoft.TemplateEngine.Edge/Template/InputParameter.cs#L30). 
+
+It is currently not possible to provide just partial external evaluation - meaning that the template engine evaluates either all the parameter conditions or none. If the [`SkipParametersConditionsEvaluation`](https://github.com/JanKrivanek/templating/blob/conditional-params-v1/src/Microsoft.TemplateEngine.Edge/Template/InputParametersSet.cs#L41) property is set to `true`, results of all parameter conditions are expected to be passed within the `InputParametersSet` argument. If it is set to `false` - none explicit results within `InputParametersSet` argument.
