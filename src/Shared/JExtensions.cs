@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 #endif
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 using Newtonsoft.Json;
@@ -45,26 +46,37 @@ namespace Microsoft.TemplateEngine
             return element.ToString();
         }
 
-        internal static bool ToBool(this JToken? token, string? key = null, bool defaultValue = false)
+        internal static bool TryGetValue(this JToken? token, string? key, out JToken? result)
         {
-            JToken? checkToken;
+            result = null;
 
             // determine which token to bool-ify
             if (token == null)
             {
-                return defaultValue;
+                return false;
             }
             else if (key == null)
             {
-                checkToken = token;
+                result = token;
             }
-            else if (!((JObject)token).TryGetValue(key, StringComparison.OrdinalIgnoreCase, out checkToken))
+            else if (!((JObject)token).TryGetValue(key, StringComparison.OrdinalIgnoreCase, out result))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        internal static bool ToBool(this JToken? token, string? key = null, bool defaultValue = false)
+        {
+            JToken? checkToken;
+            if (!token.TryGetValue(key, out checkToken))
             {
                 return defaultValue;
             }
 
             // do the conversion on checkToken
-            if (checkToken.Type == JTokenType.Boolean || checkToken.Type == JTokenType.String)
+            if (checkToken!.Type == JTokenType.Boolean || checkToken.Type == JTokenType.String)
             {
                 return string.Equals(checkToken.ToString(), "true", StringComparison.OrdinalIgnoreCase);
             }

@@ -1095,16 +1095,21 @@
             "properties": {
               "type": {
                 "description": "Defines the high level configuration of symbol",
-                "enum": ["parameter"]
+                "enum": [ "parameter" ]
               },
               "isRequired": {
-                "type": "boolean"
+                "oneOf": [
+                  {
+                    "type": "boolean",
+                    "description": "Flag indicating whether the parameter has to be specified on the input"
+                  },
+                  {
+                    "type": "string",
+                    "description": "Condition indicating whether the parameter has to be specified on the input"
+                  }
+                ]
               },
-              "isRequiredCondition": {
-                "type": "string",
-                "description": "Condition indicating parameter priority"
-              },
-              "isEnabledCondition": {
+              "isEnabled": {
                 "type": "string",
                 "description": "Condition indicating parameter visibility"
               },
@@ -1112,7 +1117,7 @@
                 "description": "An array listing the valid choices for a symbol whose datatype = choice. If not provided, there are no valid choices for the symbol, so it can never be assigned a value.",
                 "type": "array",
                 "items": {
-                  "required": ["choice"],
+                  "required": [ "choice" ],
                   "properties": {
                     "choice": {
                       "description": "A valid value for the symbol",

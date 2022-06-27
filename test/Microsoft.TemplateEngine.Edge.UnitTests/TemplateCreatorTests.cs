@@ -107,12 +107,12 @@ UNKNOWN
 	    ""A"": {
 	      ""type"": ""parameter"",
 	      ""datatype"": ""bool"",
-          ""isEnabledCondition"": ""!C && B != false"",
+          ""isEnabled"": ""!C && B != false"",
 	    },
         ""B"": {
 	      ""type"": ""parameter"",
 	      ""datatype"": ""bool"",
-          ""isEnabledCondition"": ""A != true || C"",
+          ""isEnabled"": ""A != true || C"",
 	    },
         ""C"": {
 	      ""type"": ""parameter"",
@@ -172,13 +172,13 @@ Details: Parameter conditions contain cyclic dependency: [A, B, A] that is preve
 	    ""A"": {
 	      ""type"": ""parameter"",
 	      ""datatype"": ""bool"",
-          ""isRequiredCondition"": ""!C && B != false"",
+          ""isRequired"": ""!C && B != false"",
           ""defaultValue"": ""false"",
 	    },
         ""B"": {
 	      ""type"": ""parameter"",
 	      ""datatype"": ""bool"",
-          ""isRequiredCondition"": ""A != true || C"",
+          ""isRequired"": ""A != true || C"",
           ""defaultValue"": ""true"",
 	    },
         ""C"": {
@@ -247,13 +247,13 @@ C
 	    ""A"": {
 	      ""type"": ""parameter"",
 	      ""datatype"": ""string"",
-          ""isEnabledCondition"": ""A_enable"",
-          ""isRequiredCondition"": ""true"",
+          ""isEnabled"": ""A_enable"",
+          ""isRequired"": ""true"",
 	    },
         ""B"": {
 	      ""type"": ""parameter"",
 	      ""datatype"": ""string"",
-          ""isEnabledCondition"": ""B_enable"",
+          ""isEnabled"": ""B_enable"",
           ""isRequired"": true
 	    },
         ""A_enable"": {
@@ -316,13 +316,13 @@ C
 	    ""A"": {
 	      ""type"": ""parameter"",
 	      ""datatype"": ""string"",
-          ""isEnabledCondition"": ""A_enable"",
-          ""isRequiredCondition"": ""true"",
+          ""isEnabled"": ""A_enable"",
+          ""isRequired"": ""true || true"",
 	    },
         ""B"": {
 	      ""type"": ""parameter"",
 	      ""datatype"": ""string"",
-          ""isEnabledCondition"": ""B_enable"",
+          ""isEnabled"": ""B_enable"",
           ""isRequired"": true
 	    },
         ""C"": {
@@ -346,6 +346,8 @@ C
         [InlineData(true, true, true, null, false, null, /*c_val*/ false, "A,", false, "")]
         [InlineData(null, true, false, null, true, null, /*c_val*/ true, "", true, "B")]
         [InlineData(null, true, true, null, false, null, /*c_val*/ true, "", true, "A")]
+        [InlineData(null, true, false, null, false, false, /*c_val*/ false, "", true, @"Failed to create template.
+Details: Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition): B (parameter)")]
         public async void InstantiateAsync_ConditionalParametersWithExternalEvaluation(
             bool? a_val,
             bool? a_enabled,

@@ -1,4 +1,4 @@
-{
+﻿{
   "author": "Test Asset",
   "classifications": [ "Test Asset" ],
   "name": "TemplateWithConditionalParameters",
@@ -7,22 +7,29 @@
   "precedence": "100",
   "identity": "TestAssets.TemplateWithConditionalParameters",
   "shortName": "TestAssets.TemplateWithConditionalParameters",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
   "symbols": {
     "A": {
       "type": "parameter",
       "datatype": "string",
       "isEnabled": "A_enabled",
+      "isRequired": "A_enabled",
       "replaces": "paramA"
     },
     "B": {
       "type": "parameter",
       "datatype": "string",
       "isEnabled": "B_enabled",
+      "isRequired": "true",
       "replaces": "paramB"
     },
     "A_enabled": {
       "type": "parameter",
-      "datatype": "bool"
+      "datatype": "bool",
+      "isRequired": true
     },
     "B_enabled": {
       "type": "parameter",

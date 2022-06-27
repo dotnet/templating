@@ -17,12 +17,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
         /// </summary>
         /// <param name="jObject"></param>
         /// <param name="defaultOverride"></param>
-        protected BaseValueSymbol(JObject jObject, string defaultOverride)
+        /// <param name="symbolConditionsSupported"></param>
+        protected BaseValueSymbol(JObject jObject, string defaultOverride, bool symbolConditionsSupported = false)
         {
             Binding = jObject.ToString(nameof(Binding));
             DefaultValue = defaultOverride ?? jObject.ToString(nameof(DefaultValue));
             FileRename = jObject.ToString(nameof(FileRename));
-            IsRequired = jObject.ToBool(nameof(IsRequired));
+            IsRequired = ParseIsRequiredField(jObject, !symbolConditionsSupported);
             Type = jObject.ToString(nameof(Type));
             Replaces = jObject.ToString(nameof(Replaces));
             DataType = jObject.ToString(nameof(DataType));
@@ -57,5 +58,33 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
         internal bool IsRequired { get; init; }
 
         internal string DataType { get; init; }
+
+        protected bool TryGetIsRequiredField(JToken token, out bool result)
+        {
+            result = false;
+            return (token.Type == JTokenType.Boolean || token.Type == JTokenType.String)
+                   &&
+                   bool.TryParse(token.ToString(), out result);
+        }
+
+        private bool ParseIsRequiredField(JToken token, bool throwOnError)
+        {
+            JToken isRequiredToken;
+            if (!token.TryGetValue(nameof(IsRequired), out isRequiredToken))
+            {
+                return false;
+            }
+
+            bool value;
+            if (
+                !TryGetIsRequiredField(isRequiredToken, out value)
+                &&
+                throwOnError)
+            {
+                throw new ArgumentException(string.Format(LocalizableStrings.Symbol_Error_IsRequiredNotABool, isRequiredToken));
+            }
+
+            return value;
+        }
     }
 }
