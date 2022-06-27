@@ -27,7 +27,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
         /// <param name="jObject">JSON to initialize the symbol with.</param>
         /// <param name="defaultOverride"></param>
         public ParameterSymbol(string name, JObject jObject, string? defaultOverride)
-            : base(name, jObject, defaultOverride)
+            : base(name, jObject, defaultOverride, true)
         {
             DefaultIfOptionWithoutValue = jObject.ToString(nameof(DefaultIfOptionWithoutValue));
             DisplayName = jObject.ToString(nameof(DisplayName)) ?? string.Empty;
@@ -65,14 +65,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
             Choices = choicesAndDescriptions;
             AllowMultipleValues = jObject.ToBool(nameof(AllowMultipleValues));
             EnableQuotelessLiterals = jObject.ToBool(nameof(EnableQuotelessLiterals));
-            IsEnabledCondition = jObject.ToString(nameof(IsEnabledCondition));
-            IsRequiredCondition = jObject.ToString(nameof(IsRequiredCondition));
-
-            if (!string.IsNullOrEmpty(IsRequiredCondition) && jObject.TryGetValue(nameof(IsRequired), StringComparison.OrdinalIgnoreCase, out _))
-            {
-                throw new ArgumentException(
-                    "Parameter cannot have explicit Required property and IsRequiredCondition at the same time");
-            }
+            IsEnabledCondition = jObject.ToString("IsEnabled");
+            IsRequiredCondition = ParseIsRequiredConditionField(jObject);
         }
 
         /// <summary>
@@ -154,6 +148,28 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
             };
 
             return symbol;
+        }
+
+        private string ParseIsRequiredConditionField(JToken token)
+        {
+            JToken isRequiredToken;
+            if (!token.TryGetValue(nameof(IsRequired), out isRequiredToken))
+            {
+                return null;
+            }
+
+            // Attribute parseable as a bool - so we do not want to present it as a condition
+            if (TryGetIsRequiredField(isRequiredToken, out _))
+            {
+                return null;
+            }
+
+            if (isRequiredToken.Type != JTokenType.String)
+            {
+                throw new ArgumentException(string.Format(LocalizableStrings.Symbol_Error_IsRequiredNotABoolOrString, isRequiredToken));
+            }
+
+            return isRequiredToken.ToString();
         }
     }
 }

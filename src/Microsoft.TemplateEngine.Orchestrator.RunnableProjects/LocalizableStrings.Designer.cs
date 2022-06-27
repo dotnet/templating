@@ -260,7 +260,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabledCondition or IsRequiredCondition): {0}.
+        ///   Looks up a localized string similar to Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition): {0}.
         /// </summary>
         internal static string RunnableProjectGenerator_Error_ExternalConditionMismatch {
             get {
@@ -382,6 +382,22 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         internal static string SymbolModel_Error_MandatoryPropertyMissing {
             get {
                 return ResourceManager.GetString("SymbolModel_Error_MandatoryPropertyMissing", resourceCulture);
+                }
+        }
+        ///   Looks up a localized string similar to Found disallowed value for IsRequired property: [{0}], expected boolean value..
+        /// </summary>
+        internal static string Symbol_Error_IsRequiredNotABool {
+            get {
+                return ResourceManager.GetString("Symbol_Error_IsRequiredNotABool", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Found disallowed value for IsRequired property: [{0}], expected boolean or string (condition) value.
+        /// </summary>
+        internal static string Symbol_Error_IsRequiredNotABoolOrString {
+            get {
+                return ResourceManager.GetString("Symbol_Error_IsRequiredNotABoolOrString", resourceCulture);
             }
         }
     }
