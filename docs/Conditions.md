@@ -216,16 +216,16 @@ Usage can then look as following:
 ## Conditional Parameters
 
 [Parameter symbols in template](Reference-for-template.json.md#parameter-symbol) can be specified together with optional conditions:
-* [`Is Enabled Condition`](Reference-for-template.json.md#isEnabledCondition) - overwritting presence of input parameter. If condition is specified and evaluates to false, passed parameter value (if any) is ignored and processing works as if the symbol would not exist. This includes application of [default values](Reference-for-template.json.md#default), [verification of mandatory parameters](Reference-for-template.json.md#isRequired), [conditional processing of sources](Conditional-processing-and-comment-syntax.md) and [replacements](Reference-for-template.json.md#replaces).
-* [`Is Required Condition`](Reference-for-template.json.md#isRequiredCondition) - dictates if parameter is mandatory or optional. After evaluation the behavior is identical as for the [`isRequired`](Reference-for-template.json.md#isRequired) config.
+* [`IsEnabled Condition`](Reference-for-template.json.md#isEnabled) - overwritting presence of input parameter. If condition is specified and evaluates to false, passed parameter value (if any) is ignored and processing works as if the symbol would not exist. This includes application of [default values](Reference-for-template.json.md#default), [verification of mandatory parameters](Reference-for-template.json.md#isRequired), [conditional processing of sources](Conditional-processing-and-comment-syntax.md) and [replacements](Reference-for-template.json.md#replaces).
+* [`IsRequired Condition`](Reference-for-template.json.md#isRequired) - dictates if parameter is mandatory or optional.
 
 ### Evaluation
 
-**Input** - currently only other parameter symbols from the template configuration are supported within the parameter conditions. Any other variables are not replaced.
+**Input** - currently only other parameter symbols from the template configuration are supported within the parameter conditions. Any other variables are not bound and replaced (they are considered part of literal string).
 
 **Evaluation order** - Dependencies between parameters are detected and evaluation is peformed in order that guarantees that all dependencies are evaluated prior their dependant (see [Topological Sorting](https://en.wikipedia.org/wiki/Topological_sorting) for details).
 
- In presence of cyclic dependency the evaluation proceeds only if current input values of parameters do not lead to undeterministic result (and the cycle is indicated in warning log message). Otherwise an error is reported, indicating the cycle.
+ In case of cyclic dependency the evaluation proceeds only if current input values of parameters do not lead to indeterministic result (and the cycle is indicated in warning log message). Otherwise an error is reported, indicating the cycle.
 
  Example `template.json` with cyclic dependency:
 ```json
@@ -233,12 +233,12 @@ Usage can then look as following:
     "A": {
       "type": "parameter",
       "datatype": "bool",
-      "isEnabledCondition": "B != false",
+      "isEnabled": "B != false",
     },
     "B": {
       "type": "parameter",
       "datatype": "bool",
-      "isEnabledCondition": "A != true",
+      "isEnabled": "A != true",
     }
 }
 ```
@@ -251,7 +251,7 @@ Following input parameter values cannot be evaluated deterministically (and will
 
 ### Performing evaluation externally
 
-It is possible to supply evaluation results of parameters conditions when instantiating template via Edge API [`TemplateCreator.InstantiateAsync`](https://github.com/JanKrivanek/templating/blob/conditional-params-v1/src/Microsoft.TemplateEngine.Edge/Template/TemplateCreator.cs#L84). Example use case is instantiation from Visual Studio host, that will leverage condition evaluator integrated within the New Project Dialog. 
+It is possible to supply evaluation results of parameters conditions when instantiating template via Edge API [`TemplateCreator.InstantiateAsync`](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.Edge/Template/TemplateCreator.cs#L84). Example use case is instantiation from Visual Studio host, that will leverage condition evaluator integrated within the New Project Dialog. 
 
 This can be achieved by passing the structured `InputParametersSet` argument and setting the [`SkipParametersConditionsEvaluation`](https://github.com/JanKrivanek/templating/blob/conditional-params-v1/src/Microsoft.TemplateEngine.Edge/Template/InputParametersSet.cs#L41) property to `true`. The actual evaluation results are passed via individual [`InputParameter`s constructors](https://github.com/JanKrivanek/templating/blob/conditional-params-v1/src/Microsoft.TemplateEngine.Edge/Template/InputParameter.cs#L30). 
 
