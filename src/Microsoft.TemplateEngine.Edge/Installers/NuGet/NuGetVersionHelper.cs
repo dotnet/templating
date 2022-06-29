@@ -9,6 +9,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
     internal static class NuGetVersionHelper
     {
+        // '*'
         private static readonly FloatRange _unspecifiedVersion = new FloatRange(NuGetVersionFloatBehavior.Major);
 
         public static bool IsSupportedVersionString(string? versionString)

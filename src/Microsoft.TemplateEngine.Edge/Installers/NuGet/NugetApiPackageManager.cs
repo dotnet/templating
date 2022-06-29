@@ -237,7 +237,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                             current : max;
                 });
 
-            // In case no package was found and we haven't been restricting versions - try prerelease as well
+            // In case no package was found and we haven't been restricting versions - try prerelease as well (so behave like '*-*')
             if (latestVersion == null && floatRange.IsUnrestricted())
             {
                 latestVersion = accumulativeSearchResults.Aggregate(
