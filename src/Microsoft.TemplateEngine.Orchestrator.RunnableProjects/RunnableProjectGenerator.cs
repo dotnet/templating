@@ -845,7 +845,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     return true;
                 }
 
-                parameter = new Parameter(name, "parameter", "string")
+                parameter = new Parameter(name, "string", string.Empty)
                 {
                     Priority = TemplateParameterPriority.Optional,
                     IsVariable = true,

@@ -58,7 +58,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         public string Type { get; internal set; }
 
         [JsonProperty]
-        public string DataType { get; internal init; }
+        public string DataType { get; internal set; }
 
         [JsonProperty]
         public string? DefaultIfOptionWithoutValue { get; set; }
