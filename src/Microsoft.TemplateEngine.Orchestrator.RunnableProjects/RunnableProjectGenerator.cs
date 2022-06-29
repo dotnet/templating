@@ -573,7 +573,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             foreach (Parameter param in parameters.ParameterDefinitions.OfType<Parameter>())
             {
                 // Add choice values to variables - to allow them to be recognizable unquoted
-                if (param.EnableQuotelessLiterals && param.IsChoice())
+                if (param.EnableQuotelessLiterals && param.IsChoice() && param.Choices != null)
                 {
                     foreach (string choiceKey in param.Choices.Keys)
                     {
@@ -830,7 +830,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 foreach (KeyValuePair<string, Parameter> p in config.Parameters)
                 {
-                    p.Value.Name = p.Key;
                     _parameters[p.Key] = p.Value;
                 }
             }
@@ -846,12 +845,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     return true;
                 }
 
-                parameter = new Parameter
+                parameter = new Parameter(name, "parameter", "string")
                 {
-                    Name = name,
                     Priority = TemplateParameterPriority.Optional,
                     IsVariable = true,
-                    Type = "string"
                 };
 
                 return true;

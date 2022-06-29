@@ -40,18 +40,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
                 p = (Parameter)existingParam;
                 p.IsVariable = true;
 
-                if (string.IsNullOrEmpty(p.DataType))
-                {
-                    p.DataType = config.DataType;
-                }
             }
             else
             {
-                p = new Parameter
+                p = new Parameter(config.VariableName, "parameter", config.DataType)
                 {
                     IsVariable = true,
-                    Name = config.VariableName,
-                    DataType = config.DataType
                 };
             }
 

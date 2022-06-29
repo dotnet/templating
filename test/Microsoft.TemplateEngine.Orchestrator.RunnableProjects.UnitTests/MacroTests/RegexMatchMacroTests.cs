@@ -37,10 +37,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
             const string sourceValue = "1234test";
             const bool expectedValue = true;
 
-            Parameter sourceParam = new Parameter
+            Parameter sourceParam = new Parameter(sourceVariable, "parameter", "datatype")
             {
                 IsVariable = true,
-                Name = sourceVariable
             };
 
             variables[sourceVariable] = sourceValue;
@@ -69,10 +68,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
             const string sourceValue = "A1234test";
             const bool expectedValue = false;
 
-            Parameter sourceParam = new Parameter
+            Parameter sourceParam = new Parameter(sourceVariable, "parameter", "datatype")
             {
                 IsVariable = true,
-                Name = sourceVariable
             };
 
             variables[sourceVariable] = sourceValue;

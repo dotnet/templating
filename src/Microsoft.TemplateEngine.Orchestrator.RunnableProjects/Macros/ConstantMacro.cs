@@ -34,19 +34,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
                 // When the param already exists, use its definition, but set IsVariable = true for consistency.
                 p = (Parameter)existingParam;
                 p.IsVariable = true;
-
-                if (string.IsNullOrEmpty(p.DataType))
-                {
-                    p.DataType = config.DataType;
-                }
             }
             else
             {
-                p = new Parameter
+                p = new Parameter(config.VariableName, "parameter", config.DataType)
                 {
                     IsVariable = true,
-                    Name = config.VariableName,
-                    DataType = config.DataType
                 };
             }
 

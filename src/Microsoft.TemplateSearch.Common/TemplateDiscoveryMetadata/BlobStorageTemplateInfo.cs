@@ -424,6 +424,25 @@ namespace Microsoft.TemplateSearch.Common
 
             [JsonProperty]
             public bool AllowMultipleValues { get; internal set; }
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(this, obj))
+                {
+                    return true;
+                }
+
+                if (obj is ITemplateParameter parameter)
+                {
+                    return Equals(parameter);
+                }
+
+                return false;
+            }
+
+            public override int GetHashCode() => (Name != null ? Name.GetHashCode() : 0);
+
+            public bool Equals(ITemplateParameter other) => !string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(other.Name) && Name == other.Name;
         }
 
         private class BlobLegacyCacheTag : ICacheTag

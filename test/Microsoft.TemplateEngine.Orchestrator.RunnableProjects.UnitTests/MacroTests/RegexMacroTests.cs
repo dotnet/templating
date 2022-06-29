@@ -43,10 +43,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
             string sourceValue = "QQQ121222112";
             string expectedValue = "QQQZZ1Z";
 
-            Parameter sourceParam = new Parameter
+            Parameter sourceParam = new Parameter(sourceVariable, "parameter", "datatype")
             {
                 IsVariable = true,
-                Name = sourceVariable
             };
 
             variables[sourceVariable] = sourceValue;
@@ -86,10 +85,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
 
             string sourceValue = "ABCAABBCC";
             string expectedValue = "ZBCZZBBCC";
-            Parameter sourceParam = new Parameter
+            Parameter sourceParam = new Parameter(sourceVariable, "parameter", "datatype")
             {
                 IsVariable = true,
-                Name = sourceVariable
             };
 
             variables[sourceVariable] = sourceValue;

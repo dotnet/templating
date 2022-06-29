@@ -44,24 +44,22 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
                 bool isUpperCase = char.IsUpper(guidFormats[i]);
                 string value = g.ToString(guidFormats[i].ToString());
                 value = isUpperCase ? value.ToUpperInvariant() : value.ToLowerInvariant();
-                Parameter pLegacy = new Parameter
+                Parameter pLegacy = new Parameter(config.VariableName + "-" + guidFormats[i], "parameter", config.DataType)
                 {
                     IsVariable = true,
-                    Name = config.VariableName + "-" + guidFormats[i],
-                    DataType = config.DataType
                 };
 
                 // Not breaking any dependencies on exact param names and on the
                 //  case insensitive matching of parameters (https://github.com/dotnet/templating/blob/7e14ef44/src/Microsoft.TemplateEngine.Orchestrator.RunnableProjects/RunnableProjectGenerator.cs#L726)
                 //  we need to introduce new parameters - with distinc naming for upper- and lower- casing replacements
-                Parameter pNew = new Parameter
+                Parameter pNew = new Parameter(
+                    config.VariableName +
+                                               (isUpperCase ? GuidMacroConfig.UpperCaseDenominator : GuidMacroConfig.LowerCaseDenominator) +
+                                               guidFormats[i],
+                    "parameter",
+                    config.DataType)
                 {
                     IsVariable = true,
-                    Name =
-                        config.VariableName +
-                        (isUpperCase ? GuidMacroConfig.UpperCaseDenominator : GuidMacroConfig.LowerCaseDenominator) +
-                        guidFormats[i],
-                    DataType = config.DataType
                 };
 
                 vars[pLegacy.Name] = value;
@@ -82,10 +80,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             }
             else
             {
-                pd = new Parameter
+                pd = new Parameter(config.VariableName, "parameter", config.DataType)
                 {
                     IsVariable = true,
-                    Name = config.VariableName
                 };
             }
             var defaultFormat = string.IsNullOrEmpty(config.DefaultFormat) ? "D" : config.DefaultFormat!;

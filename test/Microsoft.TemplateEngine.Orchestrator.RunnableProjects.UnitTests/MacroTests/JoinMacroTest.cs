@@ -53,10 +53,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
             IParameterSet parameters = new RunnableProjectGenerator.ParameterSet(config);
             ParameterSetter setter = MacroTestHelpers.TestParameterSetter(_engineEnvironmentSettings, parameters);
 
-            Parameter referenceParam = new Parameter
+            Parameter referenceParam = new Parameter(referenceSymbolName, "parameter", "datatype")
             {
                 IsVariable = true,
-                Name = referenceSymbolName
             };
 
             variables[referenceSymbolName] = referenceSymbolValue;
@@ -102,10 +101,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
             IParameterSet parameters = new RunnableProjectGenerator.ParameterSet(config);
             ParameterSetter setter = MacroTestHelpers.TestParameterSetter(_engineEnvironmentSettings, parameters);
 
-            Parameter referenceParam = new Parameter
+            Parameter referenceParam = new Parameter(referenceSymbolName, "parameter", "datatype")
             {
                 IsVariable = true,
-                Name = referenceSymbolName
             };
 
             variables[referenceSymbolName] = referenceSymbolValue;

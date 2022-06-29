@@ -187,14 +187,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
 
             //prepare parameters
             ParameterSet parameters = new ParameterSet(A.Fake<IRunnableProjectConfig>());
-            Parameter nameParameter = new Parameter()
-            {
-                Name = "name"
-            };
-            Parameter testParameter = new Parameter()
-            {
-                Name = "test"
-            };
+            Parameter nameParameter = new Parameter("name", "parameter", "datatype");
+            Parameter testParameter = new Parameter("test", "parameter", "datatype");
             parameters.AddParameter(nameParameter);
             parameters.AddParameter(testParameter);
             parameters.ResolvedValues[nameParameter] = "testName";
@@ -231,18 +225,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
 
             //prepare parameters
             ParameterSet parameters = new ParameterSet(A.Fake<IRunnableProjectConfig>());
-            Parameter nameParameter = new Parameter()
-            {
-                Name = "name"
-            };
-            Parameter intDateParameter = new Parameter()
-            {
-                Name = "date"
-            };
-            Parameter otherParameter = new Parameter()
-            {
-                Name = "other"
-            };
+            Parameter nameParameter = new Parameter("name", "parameter", "datatype");
+            Parameter intDateParameter = new Parameter("data", "parameter", "datatype");
+            Parameter otherParameter = new Parameter("other", "parameter", "datatype");
             parameters.AddParameter(nameParameter);
             parameters.AddParameter(intDateParameter);
             parameters.AddParameter(otherParameter);
@@ -285,22 +270,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
 
             //prepare parameters
             ParameterSet parameters = new ParameterSet(A.Fake<IRunnableProjectConfig>());
-            Parameter nameParameter = new Parameter()
-            {
-                Name = "name"
-            };
-            Parameter testParameterIdentity = new Parameter()
-            {
-                Name = "test{-VALUE-FORMS-}identity"
-            };
-            Parameter testParameterUC = new Parameter()
-            {
-                Name = "test{-VALUE-FORMS-}uc"
-            };
-            Parameter testParameterLC = new Parameter()
-            {
-                Name = "test{-VALUE-FORMS-}lc"
-            };
+
+            Parameter nameParameter = new Parameter("name", "parameter", "datatype");
+            Parameter testParameterIdentity = new Parameter("test{-VALUE-FORMS-}identity", "parameter", "datatype");
+            Parameter testParameterUC = new Parameter("test{-VALUE-FORMS-}uc", "parameter", "datatype");
+            Parameter testParameterLC = new Parameter("test{-VALUE-FORMS-}lc", "parameter", "datatype");
+
             parameters.AddParameter(nameParameter);
             parameters.AddParameter(testParameterIdentity);
             parameters.AddParameter(testParameterUC);
@@ -345,18 +320,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
 
             //prepare parameters
             ParameterSet parameters = new ParameterSet(A.Fake<IRunnableProjectConfig>());
-            Parameter nameParameter = new Parameter()
-            {
-                Name = "name"
-            };
-            Parameter testParameterIdentity = new Parameter()
-            {
-                Name = "test{-VALUE-FORMS-}identity"
-            };
-            Parameter testParameterLC = new Parameter()
-            {
-                Name = "test{-VALUE-FORMS-}lc"
-            };
+            Parameter nameParameter = new Parameter("name", "parameter", "datatype");
+            Parameter testParameterIdentity = new Parameter("test{-VALUE-FORMS-}identity", "parameter", "datatype");
+            Parameter testParameterLC = new Parameter("test{-VALUE-FORMS-}lc", "parameter", "datatype");
             parameters.AddParameter(nameParameter);
             parameters.AddParameter(testParameterIdentity);
             parameters.AddParameter(testParameterLC);
@@ -397,14 +363,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
 
             //prepare parameters
             ParameterSet parameters = new ParameterSet(A.Fake<IRunnableProjectConfig>());
-            Parameter nameParameter = new Parameter()
-            {
-                Name = "name"
-            };
-            Parameter testParameter = new Parameter()
-            {
-                Name = "test"
-            };
+            Parameter nameParameter = new Parameter("name", "parameter", "datatype");
+            Parameter testParameter = new Parameter("test", "parameter", "datatype");
+
             parameters.AddParameter(nameParameter);
             parameters.AddParameter(testParameter);
             parameters.ResolvedValues[nameParameter] = "testName";
@@ -441,14 +402,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
 
             //prepare parameters
             ParameterSet parameters = new ParameterSet(A.Fake<IRunnableProjectConfig>());
-            Parameter nameParameter = new Parameter()
-            {
-                Name = "name"
-            };
-            Parameter testParameter = new Parameter()
-            {
-                Name = "test"
-            };
+            Parameter nameParameter = new Parameter("name", "parameter", "datatype");
+            Parameter testParameter = new Parameter("test", "parameter", "datatype");
             parameters.AddParameter(nameParameter);
             parameters.AddParameter(testParameter);
             parameters.ResolvedValues[nameParameter] = "testName";
