@@ -226,7 +226,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             //prepare parameters
             ParameterSet parameters = new ParameterSet(A.Fake<IRunnableProjectConfig>());
             Parameter nameParameter = new Parameter("name", "parameter", "datatype");
-            Parameter intDateParameter = new Parameter("data", "parameter", "datatype");
+            Parameter intDateParameter = new Parameter("date", "parameter", "datatype");
             Parameter otherParameter = new Parameter("other", "parameter", "datatype");
             parameters.AddParameter(nameParameter);
             parameters.AddParameter(intDateParameter);
