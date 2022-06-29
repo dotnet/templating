@@ -505,15 +505,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 bool isName = baseSymbol == configuration.NameSymbol;
 
-                Parameter parameter = new Parameter
+                Parameter parameter = new Parameter(symbol.Key, baseSymbol.Type, baseSymbol.DataType)
                 {
                     DefaultValue = baseSymbol.DefaultValue ?? (!baseSymbol.IsRequired ? baseSymbol.Replaces : null),
                     IsName = isName,
                     IsVariable = true,
                     Name = baseSymbol.Name,
                     Priority = baseSymbol.IsRequired ? TemplateParameterPriority.Required : isName ? TemplateParameterPriority.Implicit : TemplateParameterPriority.Optional,
-                    Type = baseSymbol.Type,
-                    DataType = baseSymbol.DataType
                 };
 
                 if (baseSymbol is ParameterSymbol parameterSymbol)
@@ -568,16 +566,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     }
                 }
 
-                Parameter localizedParameter = new Parameter()
+                Parameter localizedParameter = new Parameter(parameter.Name, parameter.Type, parameter.DataType)
                 {
-                    Name = parameter.Name,
                     DisplayName = localization?.DisplayName ?? parameter.DisplayName,
                     Description = localization?.Description ?? parameter.Description,
                     DefaultValue = parameter.DefaultValue,
                     DefaultIfOptionWithoutValue = parameter.DefaultIfOptionWithoutValue,
-                    DataType = parameter.DataType,
                     Priority = parameter.Priority,
-                    Type = parameter.Type,
                     AllowMultipleValues = parameter.AllowMultipleValues,
                     EnableQuotelessLiterals = parameter.EnableQuotelessLiterals,
                     Choices = localizedChoices ?? parameter.Choices,

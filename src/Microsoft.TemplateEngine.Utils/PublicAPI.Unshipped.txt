@@ -47,12 +47,15 @@ Microsoft.TemplateEngine.Utils.TemplateAuthoringException.ConfigItem.get -> stri
 Microsoft.TemplateEngine.Utils.TemplateAuthoringException.TemplateAuthoringException(string! message, string! configItem) -> void
 Microsoft.TemplateEngine.Utils.TemplateAuthoringException.TemplateAuthoringException(string! message, string! configItem, System.Exception! innerException) -> void
 Microsoft.TemplateEngine.Utils.TemplateParameter.AllowMultipleValues.get -> bool
+Microsoft.TemplateEngine.Utils.TemplateParameter.Equals(Microsoft.TemplateEngine.Abstractions.ITemplateParameter! other) -> bool
 Microsoft.TemplateEngine.Utils.TemplateParameter.TemplateParameter(string! name, string! type, string! datatype, Microsoft.TemplateEngine.Abstractions.TemplateParameterPriority priority = Microsoft.TemplateEngine.Abstractions.TemplateParameterPriority.Required, bool isName = false, string? defaultValue = null, string? defaultIfOptionWithoutValue = null, string? description = null, string? displayName = null, bool allowMultipleValues = false, System.Collections.Generic.IReadOnlyDictionary<string!, Microsoft.TemplateEngine.Abstractions.ParameterChoice!>? choices = null) -> void
 Microsoft.TemplateEngine.Utils.Timing.Timing(Microsoft.Extensions.Logging.ILogger! logger, string! label) -> void
 override Microsoft.TemplateEngine.Utils.ExactVersionSpecification.ToString() -> string!
 override Microsoft.TemplateEngine.Utils.MultiValueParameter.Equals(object? obj) -> bool
 override Microsoft.TemplateEngine.Utils.MultiValueParameter.GetHashCode() -> int
 override Microsoft.TemplateEngine.Utils.MultiValueParameter.ToString() -> string!
+override Microsoft.TemplateEngine.Utils.TemplateParameter.Equals(object! obj) -> bool
+override Microsoft.TemplateEngine.Utils.TemplateParameter.GetHashCode() -> int
 static Microsoft.TemplateEngine.Utils.ArrayExtensions.CombineArrays<T>(params T[]![]! arrayList) -> T[]!
 static Microsoft.TemplateEngine.Utils.DictionaryExtensions.CloneIfDifferentComparer<T>(this System.Collections.Generic.IReadOnlyDictionary<string!, T>! source, System.StringComparer! comparer) -> System.Collections.Generic.IReadOnlyDictionary<string!, T>!
 static Microsoft.TemplateEngine.Utils.DirectedGraph<T>.implicit operator Microsoft.TemplateEngine.Utils.DirectedGraph<T>!(System.Collections.Generic.Dictionary<T, System.Collections.Generic.HashSet<T>!>! dependenciesMap) -> Microsoft.TemplateEngine.Utils.DirectedGraph<T>!

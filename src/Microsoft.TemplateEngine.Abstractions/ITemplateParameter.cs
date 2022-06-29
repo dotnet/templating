@@ -11,7 +11,7 @@ namespace Microsoft.TemplateEngine.Abstractions
     /// <summary>
     /// Template parameter definition.
     /// </summary>
-    public interface ITemplateParameter
+    public interface ITemplateParameter : IEquatable<ITemplateParameter>
     {
         [Obsolete("Use Description instead.")]
         string? Documentation { get; }

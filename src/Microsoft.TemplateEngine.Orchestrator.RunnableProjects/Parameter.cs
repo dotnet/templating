@@ -1,6 +1,9 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
+using System;
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
 using Newtonsoft.Json;
@@ -11,27 +14,39 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
     internal class Parameter : ITemplateParameter, IAllowDefaultIfOptionWithoutValue
 #pragma warning restore CS0618 // Type or member is obsolete
     {
+        public Parameter(string name, string type, string dataType)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException($"{nameof(Name)} property should not be null or whitespace", nameof(name));
+            }
+
+            this.Name = name;
+            this.Type = type;
+            this.DataType = dataType;
+        }
+
         [JsonProperty]
-        public IReadOnlyDictionary<string, ParameterChoice> Choices { get; internal set; }
+        public IReadOnlyDictionary<string, ParameterChoice>? Choices { get; internal set; }
 
         [JsonIgnore]
-        public string Documentation
+        public string? Documentation
         {
             get { return Description; }
             internal set { Description = value; }
         }
 
         [JsonProperty]
-        public string Description { get; internal set; }
+        public string? Description { get; internal set; }
 
         [JsonProperty]
-        public string DefaultValue { get; internal set; }
+        public string? DefaultValue { get; internal set; }
 
         [JsonProperty]
-        public string Name { get; internal set; }
+        public string Name { get; internal init; }
 
         [JsonProperty]
-        public string DisplayName { get; internal set; }
+        public string? DisplayName { get; internal set; }
 
         [JsonProperty]
         public bool IsName { get; internal set; }
@@ -43,10 +58,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         public string Type { get; internal set; }
 
         [JsonProperty]
-        public string DataType { get; internal set; }
+        public string DataType { get; internal init; }
 
         [JsonProperty]
-        public string DefaultIfOptionWithoutValue { get; set; }
+        public string? DefaultIfOptionWithoutValue { get; set; }
 
         [JsonProperty]
         public bool AllowMultipleValues { get; internal set; }
@@ -58,14 +73,38 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         internal bool IsVariable { get; set; }
 
         [JsonProperty]
-        internal string IsEnabledCondition { get; set; }
+        internal string? IsEnabledCondition { get; set; }
 
         [JsonProperty]
-        internal string IsRequiredCondition { get; set; }
+        internal string? IsRequiredCondition { get; set; }
 
         public override string ToString()
         {
             return $"{Name} ({Type})";
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is null)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            if (obj is ITemplateParameter parameter)
+            {
+                return Equals(parameter);
+            }
+
+            return false;
+        }
+
+        public override int GetHashCode() => Name.GetHashCode();
+
+        public bool Equals(ITemplateParameter other) => !string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(other.Name) && Name == other.Name;
     }
 }
