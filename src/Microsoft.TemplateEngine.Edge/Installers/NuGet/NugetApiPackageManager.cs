@@ -237,6 +237,20 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                             current : max;
                 });
 
+            // In case no package was found and we haven't been restricting versions - try prerelease as well
+            if (latestVersion == null && floatRange.IsUnrestricted())
+            {
+                latestVersion = accumulativeSearchResults.Aggregate(
+                    ((PackageSource, IPackageSearchMetadata)?)null,
+                    (max, current) =>
+                    {
+                        return
+                            (max == null || current.package.Identity.Version > max.Value.Item2.Identity.Version)
+                                ? current
+                                : max;
+                    });
+            }
+
             if (latestVersion == null)
             {
                 _nugetLogger.LogDebug(
