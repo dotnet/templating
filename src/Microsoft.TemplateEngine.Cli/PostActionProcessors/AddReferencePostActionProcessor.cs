@@ -68,7 +68,7 @@ namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
             bool success = true;
             foreach (string projectFile in projectsToProcess)
             {
-                success &= AddReference(environment, action, projectFile, outputBasePath);
+                success &= AddReference(environment, action, projectFile, outputBasePath, creationEffects);
 
                 if (!success)
                 {
@@ -78,7 +78,7 @@ namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
             return true;
         }
 
-        private bool AddReference(IEngineEnvironmentSettings environment, IPostAction actionConfig, string projectFile, string outputBasePath)
+        private bool AddReference(IEngineEnvironmentSettings environment, IPostAction actionConfig, string projectFile, string outputBasePath, ICreationEffects creationEffects)
         {
             if (actionConfig.Args == null || !actionConfig.Args.TryGetValue("reference", out string? referenceToAdd))
             {
@@ -102,7 +102,26 @@ namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
                     Reporter.Error.WriteLine(LocalizableStrings.Generic_NoCallbackError);
                     return false;
                 }
+
+                // replace the path to the project file in case it has been renamed
+                Glob g = Glob.Parse(referenceToAdd);
+
+                if (creationEffects.FileChanges != null)
+                {
+                    foreach (IFileChange2 change in creationEffects.FileChanges)
+                    {
+                        if (g.IsMatch(change.SourceRelativePath))
+                        {
+                            referenceToAdd = Path.GetFullPath(change.TargetRelativePath, outputBasePath);
+
+                            break;
+                        }
+                    }
+                }
+
+                // retrieve the full path in case the file has not been renamed
                 referenceToAdd = Path.GetFullPath(referenceToAdd, outputBasePath);
+
                 Reporter.Output.WriteLine(string.Format(LocalizableStrings.PostAction_AddReference_AddProjectReference, referenceToAdd, projectFile));
                 succeeded = Callbacks.AddProjectReference(projectFile, new[] { referenceToAdd });
                 if (succeeded)
