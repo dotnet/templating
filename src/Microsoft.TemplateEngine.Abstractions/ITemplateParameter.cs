@@ -108,9 +108,9 @@ namespace Microsoft.TemplateEngine.Abstractions
             // If enable condition is set - parameter is conditionally disabled (regardless if require condition is set or not)
             // Conditionally required is if and only if the only require condition is set
 
-            if ((string.IsNullOrEmpty(IsRequiredCondition) ^ PrecedenceDefinition == PrecedenceDefinition.ConditionalyRequired
+            if (!(string.IsNullOrEmpty(IsRequiredCondition) ^ PrecedenceDefinition == PrecedenceDefinition.ConditionalyRequired
                 ||
-                string.IsNullOrEmpty(IsEnabledCondition) ^ PrecedenceDefinition == PrecedenceDefinition.ConditionalyDisabled)
+                !string.IsNullOrEmpty(IsEnabledCondition) ^ PrecedenceDefinition == PrecedenceDefinition.ConditionalyDisabled)
                 &&
                 !(!string.IsNullOrEmpty(IsRequiredCondition) && !string.IsNullOrEmpty(IsEnabledCondition) && PrecedenceDefinition == PrecedenceDefinition.ConditionalyDisabled))
             {
