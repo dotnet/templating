@@ -385,6 +385,7 @@ namespace Microsoft.TemplateEngine.Mocks
                 Description = description;
                 DisplayName = displayName;
                 AllowMultipleValues = allowMultipleValues;
+                Precedence = priority.ToTemplateParameterPrecedence();
 
                 if (this.IsChoice())
                 {
@@ -400,6 +401,8 @@ namespace Microsoft.TemplateEngine.Mocks
 
             [JsonProperty]
             public TemplateParameterPriority Priority { get; }
+
+            public TemplateParameterPrecedence Precedence { get; }
 
             [JsonProperty]
             public string Type { get; }

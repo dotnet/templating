@@ -10,6 +10,8 @@ using Newtonsoft.Json;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
+    //TODO: remove all json attributes
+
 #pragma warning disable CS0618 // Type or member is obsolete
     internal class Parameter : ITemplateParameter, IAllowDefaultIfOptionWithoutValue
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -24,6 +26,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             this.Name = name;
             this.Type = type;
             this.DataType = dataType;
+            this.Precedence = TemplateParameterPrecedence.Default;
         }
 
         [JsonProperty]
@@ -53,6 +56,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         [JsonProperty]
         public TemplateParameterPriority Priority { get; internal set; }
+
+        public TemplateParameterPrecedence Precedence { get; internal set; }
 
         [JsonProperty]
         public string Type { get; internal set; }

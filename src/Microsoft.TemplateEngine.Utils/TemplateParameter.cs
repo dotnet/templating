@@ -15,6 +15,9 @@ namespace Microsoft.TemplateEngine.Utils
     public class TemplateParameter : ITemplateParameter, IAllowDefaultIfOptionWithoutValue
 #pragma warning restore CS0618 // Type or member is obsolete
     {
+        [JsonProperty(nameof(Precedence))]
+        private readonly TemplateParameterPrecedenceImpl _templateParameterPrecedence;
+
         /// <summary>
         /// Deserialization constructor.
         /// </summary>
@@ -31,10 +34,6 @@ namespace Microsoft.TemplateEngine.Utils
             Type = jObject.ToString(nameof(Type)) ?? "parameter";
             DataType = jObject.ToString(nameof(DataType)) ?? "string";
             Description = jObject.ToString(nameof(Description));
-
-            int priority = jObject.ToInt32(nameof(Priority));
-            Priority = Enum.IsDefined(typeof(TemplateParameterPriority), priority) ? (TemplateParameterPriority)priority : default;
-
             Priority = (TemplateParameterPriority)jObject.ToInt32(nameof(Priority));
 
             DefaultValue = jObject.ToString(nameof(DefaultValue));
@@ -62,6 +61,13 @@ namespace Microsoft.TemplateEngine.Utils
                 Choices = choices;
             }
 
+            JToken? precedenceToken;
+            TemplateParameterPrecedence precedence = TemplateParameterPrecedence.Default;
+            if (jObject.TryGetValue(nameof(Precedence), out precedenceToken))
+            {
+                precedence = TemplateParameterPrecedenceImpl.FromJObject(precedenceToken);
+            }
+            _templateParameterPrecedence = new TemplateParameterPrecedenceImpl(precedence);
         }
 
         public TemplateParameter(
@@ -69,6 +75,7 @@ namespace Microsoft.TemplateEngine.Utils
             string type,
             string datatype,
             TemplateParameterPriority priority = default,
+            TemplateParameterPrecedence? precedence = default,
             bool isName = false,
             string? defaultValue = null,
             string? defaultIfOptionWithoutValue = null,
@@ -87,6 +94,7 @@ namespace Microsoft.TemplateEngine.Utils
             Description = description;
             DisplayName = displayName;
             AllowMultipleValues = allowMultipleValues;
+            _templateParameterPrecedence = new TemplateParameterPrecedenceImpl(precedence ?? TemplateParameterPrecedence.Default);
 
             if (this.IsChoice())
             {
@@ -100,8 +108,11 @@ namespace Microsoft.TemplateEngine.Utils
         [JsonProperty]
         public string Name { get; }
 
+        //TODO: obsolete this
         [JsonProperty]
         public TemplateParameterPriority Priority { get; }
+
+        public TemplateParameterPrecedence Precedence => _templateParameterPrecedence;
 
         [JsonProperty]
         public string Type { get; }
@@ -148,6 +159,35 @@ namespace Microsoft.TemplateEngine.Utils
         public override int GetHashCode() => (Name != null ? Name.GetHashCode() : 0);
 
         public bool Equals(ITemplateParameter other) => !string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(other.Name) && Name == other.Name;
+
+        private class TemplateParameterPrecedenceImpl : TemplateParameterPrecedence
+        {
+            public TemplateParameterPrecedenceImpl(PrecedenceDefinition precedenceDefinition, string? isRequiredCondition, string? isEnabledCondition)
+                : base(precedenceDefinition, isRequiredCondition, isEnabledCondition)
+            { }
+
+            public TemplateParameterPrecedenceImpl(TemplateParameterPrecedence precedence)
+                : base(precedence.PrecedenceDefinition, precedence.IsRequiredCondition, precedence.IsEnabledCondition)
+            { }
+
+            [JsonProperty(nameof(PrecedenceDefinition))]
+            private PrecedenceDefinition PrecedenceDefinitionAccessor => base.PrecedenceDefinition;
+
+            [JsonProperty(nameof(IsRequiredCondition))]
+            private string? IsRequiredConditionAccessor => base.IsRequiredCondition;
+
+            [JsonProperty(nameof(IsEnabledCondition))]
+            private string? IsEnabledConditionAccessor => base.IsEnabledCondition;
+
+            public static TemplateParameterPrecedence FromJObject(JToken jObject)
+            {
+                PrecedenceDefinition precedenceDefinition = (PrecedenceDefinition)jObject.ToInt32(nameof(PrecedenceDefinition));
+                string? isRequiredCondition = jObject.ToString(nameof(IsRequiredCondition));
+                string? isEnabledCondition = jObject.ToString(nameof(IsEnabledCondition));
+
+                return new TemplateParameterPrecedence(precedenceDefinition, isRequiredCondition, isEnabledCondition);
+            }
+        }
     }
 
 }

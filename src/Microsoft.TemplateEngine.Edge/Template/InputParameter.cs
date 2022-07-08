@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.TemplateEngine.Abstractions;
 
 namespace Microsoft.TemplateEngine.Edge.Template
 {
@@ -48,4 +49,42 @@ namespace Microsoft.TemplateEngine.Edge.Template
 
         public static implicit operator InputParameter(KeyValuePair<string, string?> pair) => new InputParameter(pair.Key, pair.Value);
     }
+
+#pragma warning disable RS0016 // Add public types and members to the declared API
+#pragma warning disable SA1201 // Elements should appear in the correct order
+    public enum InputDataState
+    {
+        Present,
+        ExplicitNull,
+        NotPresent,
+    }
+
+    public class ParameterData
+    {
+        public ParameterData(
+            ITemplateParameter parameterDefinition,
+            object? value,
+            bool? isEnabledConditionResult,
+            bool? isRequiredConditionResult,
+            InputDataState inputDataState = InputDataState.Present)
+        {
+            ParameterDefinition = parameterDefinition;
+            Value = value;
+            InputDataState = inputDataState;
+            IsEnabledConditionResult = isEnabledConditionResult;
+            IsRequiredConditionResult = isRequiredConditionResult;
+        }
+
+        public ITemplateParameter ParameterDefinition { get; }
+
+        public object? Value { get; }
+
+        public InputDataState InputDataState { get; }
+
+        public bool? IsEnabledConditionResult { get; }
+
+        public bool? IsRequiredConditionResult { get; }
+    }
+#pragma warning restore RS0016 // Add public types and members to the declared API
+#pragma warning restore SA1201 // Elements should appear in the correct order
 }

@@ -321,6 +321,9 @@ namespace Microsoft.TemplateSearch.Common
 
         private class BlobTemplateParameter : ITemplateParameter
         {
+            [JsonProperty(nameof(Precedence))]
+            private readonly TemplateParameterPrecedenceImpl _templateParameterPrecedence;
+
             internal BlobTemplateParameter(ITemplateParameter parameter)
             {
                 if (parameter is null)
@@ -345,12 +348,14 @@ namespace Microsoft.TemplateSearch.Common
                 DefaultIfOptionWithoutValue = parameter.DefaultIfOptionWithoutValue;
                 Description = parameter.Description;
                 AllowMultipleValues = parameter.AllowMultipleValues;
+                _templateParameterPrecedence = new TemplateParameterPrecedenceImpl(parameter.Precedence);
             }
 
             internal BlobTemplateParameter(string name, string dataType)
             {
                 Name = name;
                 DataType = dataType;
+                _templateParameterPrecedence = new TemplateParameterPrecedenceImpl(TemplateParameterPrecedence.Default);
             }
 
             internal BlobTemplateParameter(JObject jObject)
@@ -385,6 +390,14 @@ namespace Microsoft.TemplateSearch.Common
                 DefaultIfOptionWithoutValue = jObject.ToString(nameof(DefaultIfOptionWithoutValue));
                 Description = jObject.ToString(nameof(Description));
                 AllowMultipleValues = jObject.ToBool(nameof(AllowMultipleValues));
+
+                JToken? precedenceToken;
+                TemplateParameterPrecedence precedence = TemplateParameterPrecedence.Default;
+                if (jObject.TryGetValue(nameof(Precedence), out precedenceToken))
+                {
+                    precedence = TemplateParameterPrecedenceImpl.FromJObject(precedenceToken);
+                }
+                _templateParameterPrecedence = new TemplateParameterPrecedenceImpl(precedence);
             }
 
             [JsonProperty]
@@ -398,6 +411,8 @@ namespace Microsoft.TemplateSearch.Common
 
             [JsonProperty]
             public TemplateParameterPriority Priority { get; internal set; }
+
+            public TemplateParameterPrecedence Precedence => _templateParameterPrecedence;
 
             [JsonIgnore]
             //Parameters have only "parameter" symbols.
@@ -443,6 +458,35 @@ namespace Microsoft.TemplateSearch.Common
             public override int GetHashCode() => (Name != null ? Name.GetHashCode() : 0);
 
             public bool Equals(ITemplateParameter other) => !string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(other.Name) && Name == other.Name;
+
+            private class TemplateParameterPrecedenceImpl : TemplateParameterPrecedence
+            {
+                public TemplateParameterPrecedenceImpl(PrecedenceDefinition precedenceDefinition, string? isRequiredCondition, string? isEnabledCondition)
+                    : base(precedenceDefinition, isRequiredCondition, isEnabledCondition)
+                { }
+
+                public TemplateParameterPrecedenceImpl(TemplateParameterPrecedence precedence)
+                    : base(precedence.PrecedenceDefinition, precedence.IsRequiredCondition, precedence.IsEnabledCondition)
+                { }
+
+                [JsonProperty(nameof(PrecedenceDefinition))]
+                private PrecedenceDefinition PrecedenceDefinitionAccessor => base.PrecedenceDefinition;
+
+                [JsonProperty(nameof(IsRequiredCondition))]
+                private string? IsRequiredConditionAccessor => base.IsRequiredCondition;
+
+                [JsonProperty(nameof(IsEnabledCondition))]
+                private string? IsEnabledConditionAccessor => base.IsEnabledCondition;
+
+                public static TemplateParameterPrecedence FromJObject(JToken jObject)
+                {
+                    PrecedenceDefinition precedenceDefinition = (PrecedenceDefinition)jObject.ToInt32(nameof(PrecedenceDefinition));
+                    string? isRequiredCondition = jObject.ToString(nameof(IsRequiredCondition));
+                    string? isEnabledCondition = jObject.ToString(nameof(IsEnabledCondition));
+
+                    return new TemplateParameterPrecedence(precedenceDefinition, isRequiredCondition, isEnabledCondition);
+                }
+            }
         }
 
         private class BlobLegacyCacheTag : ICacheTag

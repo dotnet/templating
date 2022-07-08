@@ -6,6 +6,12 @@
 using System;
 using System.Collections.Generic;
 
+#pragma warning disable RS0016 // Add public types and members to the declared API
+#pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable SA1201 // Elements should appear in the correct order
+#pragma warning disable SA1516 // Elements should be separated by blank line
+
 namespace Microsoft.TemplateEngine.Abstractions
 {
     /// <summary>
@@ -29,7 +35,10 @@ namespace Microsoft.TemplateEngine.Abstractions
         /// <summary>
         /// Gets parameter priority.
         /// </summary>
+        //TODO: [Obsolete("Use Precedence instead.")]
         TemplateParameterPriority Priority { get; }
+
+        TemplateParameterPrecedence Precedence { get; }
 
         /// <summary>
         /// Gets parameter type.
@@ -74,4 +83,89 @@ namespace Microsoft.TemplateEngine.Abstractions
         /// </summary>
         string? DefaultIfOptionWithoutValue { get; }
     }
+
+    public class TemplateParameterPrecedence
+    {
+        public static readonly TemplateParameterPrecedence Default =
+            new TemplateParameterPrecedence(PrecedenceDefinition.Optional, null, null);
+
+        public TemplateParameterPrecedence(PrecedenceDefinition precedenceDefinition, string? isRequiredCondition, string? isEnabledCondition)
+        {
+            PrecedenceDefinition = precedenceDefinition;
+            IsRequiredCondition = isRequiredCondition;
+            IsEnabledCondition = isEnabledCondition;
+            VerifyConditions();
+        }
+
+        public PrecedenceDefinition PrecedenceDefinition { get; }
+
+        public string? IsRequiredCondition { get; }
+
+        public string? IsEnabledCondition { get; }
+
+        private void VerifyConditions()
+        {
+            // If enable condition is set - parameter is conditionally disabled (regardless if require condition is set or not)
+            // Conditionally required is if and only if the only require condition is set
+
+            if ((string.IsNullOrEmpty(IsRequiredCondition) ^ PrecedenceDefinition == PrecedenceDefinition.ConditionalyRequired
+                ||
+                string.IsNullOrEmpty(IsEnabledCondition) ^ PrecedenceDefinition == PrecedenceDefinition.ConditionalyDisabled)
+                &&
+                !(!string.IsNullOrEmpty(IsRequiredCondition) && !string.IsNullOrEmpty(IsEnabledCondition) && PrecedenceDefinition == PrecedenceDefinition.ConditionalyDisabled))
+            {
+                // TODO: localize
+                throw new ArgumentException("Mismatched precedence definition");
+            }
+        }
+    }
+
+#pragma warning disable SA1204 // Static elements should appear before instance elements
+    public static class TemplateParameterPrecedenceExtensions
+#pragma warning restore SA1204 // Static elements should appear before instance elements
+    {
+        public static PrecedenceDefinition ToPrecedenceDefinition(this TemplateParameterPriority priority)
+        {
+            switch (priority)
+            {
+                case TemplateParameterPriority.Required:
+                    return PrecedenceDefinition.Required;
+                case TemplateParameterPriority.Optional:
+                    return PrecedenceDefinition.Optional;
+                case TemplateParameterPriority.Implicit:
+                    return PrecedenceDefinition.Implicit;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(priority), priority, null);
+            }
+        }
+
+        public static TemplateParameterPrecedence ToTemplateParameterPrecedence(this TemplateParameterPriority priority)
+        {
+            return new TemplateParameterPrecedence(priority.ToPrecedenceDefinition(), null, null);
+        }
+    }
+
+    public enum PrecedenceDefinition
+    {
+        Required,
+        ConditionalyRequired,
+        Optional,
+        Implicit,
+        ConditionalyDisabled,
+        Disabled,
+    }
+
+    public enum EvaluatedPrecedence
+    {
+        Required,
+        Optional,
+        Implicit,
+        Disabled,
+    }
+
+#pragma warning restore RS0016 // Add public types and members to the declared API
+#pragma warning restore SA1507 // Code should not contain multiple blank lines in a row
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+#pragma warning restore SA1201 // Elements should appear in the correct order
+#pragma warning restore SA1516 // Elements should be separated by blank line
 }
