@@ -112,6 +112,7 @@ namespace Microsoft.TemplateEngine.Utils
         [JsonProperty]
         public TemplateParameterPriority Priority { get; }
 
+        [JsonIgnore]
         public TemplateParameterPrecedence Precedence => _templateParameterPrecedence;
 
         [JsonProperty]
