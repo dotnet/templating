@@ -6,12 +6,9 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
-using Newtonsoft.Json;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
-    //TODO: remove all json attributes
-
 #pragma warning disable CS0618 // Type or member is obsolete
     internal class Parameter : ITemplateParameter, IAllowDefaultIfOptionWithoutValue
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -29,58 +26,42 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             this.Precedence = TemplateParameterPrecedence.Default;
         }
 
-        [JsonProperty]
         public IReadOnlyDictionary<string, ParameterChoice>? Choices { get; internal set; }
 
-        [JsonIgnore]
         public string? Documentation
         {
             get { return Description; }
             internal set { Description = value; }
         }
 
-        [JsonProperty]
         public string? Description { get; internal set; }
 
-        [JsonProperty]
         public string? DefaultValue { get; internal set; }
 
-        [JsonProperty]
         public string Name { get; internal init; }
 
-        [JsonProperty]
         public string? DisplayName { get; internal set; }
 
-        [JsonProperty]
         public bool IsName { get; internal set; }
 
-        [JsonProperty]
         public TemplateParameterPriority Priority { get; internal set; }
 
         public TemplateParameterPrecedence Precedence { get; internal set; }
 
-        [JsonProperty]
         public string Type { get; internal set; }
 
-        [JsonProperty]
         public string DataType { get; internal set; }
 
-        [JsonProperty]
         public string? DefaultIfOptionWithoutValue { get; set; }
 
-        [JsonProperty]
         public bool AllowMultipleValues { get; internal set; }
 
-        [JsonProperty]
         public bool EnableQuotelessLiterals { get; internal set; }
 
-        [JsonProperty]
         internal bool IsVariable { get; set; }
 
-        [JsonProperty]
         internal string? IsEnabledCondition { get; set; }
 
-        [JsonProperty]
         internal string? IsRequiredCondition { get; set; }
 
         public override string ToString()
