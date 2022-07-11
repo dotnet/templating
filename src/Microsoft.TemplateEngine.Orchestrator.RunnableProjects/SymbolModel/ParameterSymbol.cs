@@ -153,12 +153,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
 
         private static TemplateParameterPrecedence GetPrecedence(bool isRequired, JObject jObject)
         {
-            string isRequiredCondition = ParseIsRequiredConditionField(jObject);
+            string? isRequiredCondition = ParseIsRequiredConditionField(jObject);
 
             // Initialize IsEnabled - as a condition or a constant
-            string isEnabledCondition = null;
+            string? isEnabledCondition = null;
             bool isEnabled = true;
-            if (jObject != null && jObject.TryGetValue("IsEnabled", out JToken isEnabledToken))
+            if (jObject != null && jObject.TryGetValue("IsEnabled", out JToken? isEnabledToken))
             {
                 if (isEnabledToken!.TryParseBool(out bool enabledConst))
                 {
@@ -173,7 +173,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
             return GetPrecedence(isRequired, isEnabled, false, isRequiredCondition, isEnabledCondition);
         }
 
-        private static TemplateParameterPrecedence GetPrecedence(bool isRequired, bool isEnabled, bool isTag, string isRequiredCondition, string isEnabledCondition)
+        private static TemplateParameterPrecedence GetPrecedence(bool isRequired, bool isEnabled, bool isTag, string? isRequiredCondition, string? isEnabledCondition)
         {
             // If enable condition is set - parameter is conditionally disabled (regardless if require condition is set or not)
             // Conditionally required is if and only if the only require condition is set
@@ -206,7 +206,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
             return TemplateParameterPrecedence.Default;
         }
 
-        private static string ParseIsRequiredConditionField(JToken token)
+        private static string? ParseIsRequiredConditionField(JToken token)
         {
             JToken? isRequiredToken;
             if (!token.TryGetValue(nameof(IsRequired), out isRequiredToken))
