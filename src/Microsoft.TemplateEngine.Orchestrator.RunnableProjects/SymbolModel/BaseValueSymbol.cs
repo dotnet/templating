@@ -1,6 +1,8 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms;
@@ -8,28 +10,21 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
 {
-    internal abstract class BaseValueSymbol : ISymbolModel
+    internal abstract class BaseValueSymbol : BaseReplaceSymbol
     {
-        protected BaseValueSymbol() { }
-
         /// <summary>
         /// Initializes this instance with given JSON data.
         /// </summary>
+        /// <param name="name"></param>
         /// <param name="jObject"></param>
         /// <param name="defaultOverride"></param>
         /// <param name="symbolConditionsSupported"></param>
-        protected BaseValueSymbol(JObject jObject, string defaultOverride, bool symbolConditionsSupported = false)
+        protected BaseValueSymbol(string name, JObject jObject, string? defaultOverride, bool symbolConditionsSupported = false) : base (jObject, name)
         {
-            Binding = jObject.ToString(nameof(Binding));
             DefaultValue = defaultOverride ?? jObject.ToString(nameof(DefaultValue));
-            FileRename = jObject.ToString(nameof(FileRename));
             IsRequired = ParseIsRequiredField(jObject, !symbolConditionsSupported);
-            Type = jObject.ToString(nameof(Type));
-            Replaces = jObject.ToString(nameof(Replaces));
             DataType = jObject.ToString(nameof(DataType));
-            ReplacementContexts = SymbolModelConverter.ReadReplacementContexts(jObject);
-
-            if (!jObject.TryGetValue(nameof(Forms), StringComparison.OrdinalIgnoreCase, out JToken formsToken) || !(formsToken is JObject formsObject))
+            if (!jObject.TryGetValue(nameof(Forms), StringComparison.OrdinalIgnoreCase, out JToken? formsToken) || !(formsToken is JObject formsObject))
             {
                 // no value forms explicitly defined, use the default ("identity")
                 Forms = SymbolValueFormsModel.Default;
@@ -41,17 +36,20 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
             }
         }
 
-        public string Binding { get; init; }
+        protected BaseValueSymbol(BaseValueSymbol clone, SymbolValueFormsModel formsFallback) : base(clone)
+        {
+            DefaultValue = clone.DefaultValue;
+            Forms = clone.Forms.GlobalForms.Count != 0 ? clone.Forms : formsFallback;
+            IsRequired = clone.IsRequired;
+            DataType = clone.DataType;
+        }
 
-        public string Type { get; init; }
+        protected BaseValueSymbol(string name, string? replaces) : base(name, replaces)
+        {
+            Forms = SymbolValueFormsModel.Default;
+        }
 
-        public string Replaces { get; init; }
-
-        public string FileRename { get; init; }
-
-        public IReadOnlyList<IReplacementContext> ReplacementContexts { get; init; }
-
-        internal string DefaultValue { get; init; }
+        internal string? DefaultValue { get; init; }
 
         internal SymbolValueFormsModel Forms { get; init; }
 

@@ -22,9 +22,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
         public void EvaluateConfig(
             IEngineEnvironmentSettings environmentSettings,
             IVariableCollection vars,
-            IMacroConfig rawConfig,
-            IParameterSet parameters,
-            ParameterSetter setter)
+            IMacroConfig rawConfig)
         {
             JoinMacroConfig config = rawConfig as JoinMacroConfig;
             if (config == null)
@@ -40,18 +38,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
                     case "ref":
                         if (!vars.TryGetValue(symbol.Value, out object working))
                         {
-                            if (parameters.TryGetRuntimeValue(
-                                environmentSettings,
-                                symbol.Value,
-                                out object resolvedValue,
-                                true))
-                            {
-                                values.Add(resolvedValue.ToString());
-                            }
-                            else
-                            {
-                                values.Add(string.Empty);
-                            }
+                            values.Add(string.Empty);
                         }
                         else if (working != null && working is MultiValueParameter multiValue)
                         {
@@ -73,29 +60,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             }
 
             string result = string.Join(config.Separator, values.Where(v => !config.RemoveEmptyValues || !string.IsNullOrEmpty(v)));
-            Parameter p;
-            if (parameters.TryGetParameterDefinition(config.VariableName, out ITemplateParameter existingParam))
-            {
-                // If there is an existing parameter with this name, it must be reused so it can be referenced by name
-                // for other processing, for example: if the parameter had value forms defined for creating variants.
-                // When the param already exists, use its definition, but set IsVariable = true for consistency.
-                p = (Parameter)existingParam;
-                p.IsVariable = true;
-                if (string.IsNullOrEmpty(p.DataType))
-                {
-                    p.DataType = config.DataType;
-                }
-            }
-            else
-            {
-                p = new Parameter(config.VariableName, "parameter", config.DataType)
-                {
-                    IsVariable = true,
-                };
-            }
-
             vars[config.VariableName] = result;
-            setter(p, result);
         }
 
         public IMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IMacroConfig rawConfig)

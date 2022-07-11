@@ -19,7 +19,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 
         public string Type => "regex";
 
-        public void EvaluateConfig(IEngineEnvironmentSettings environmentSettings, IVariableCollection vars, IMacroConfig rawConfig, IParameterSet parameters, ParameterSetter setter)
+        public void EvaluateConfig(IEngineEnvironmentSettings environmentSettings, IVariableCollection vars, IMacroConfig rawConfig)
         {
             string value = null;
             RegexMacroConfig config = rawConfig as RegexMacroConfig;
@@ -31,14 +31,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 
             if (!vars.TryGetValue(config.SourceVariable, out object working))
             {
-                if (parameters.TryGetRuntimeValue(environmentSettings, config.SourceVariable, out object resolvedValue, true))
-                {
-                    value = resolvedValue.ToString();
-                }
-                else
-                {
-                    value = string.Empty;
-                }
+                value = string.Empty;
             }
             else
             {
@@ -52,31 +45,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
                     value = Regex.Replace(value, stepInfo.Key, stepInfo.Value);
                 }
             }
-
-            Parameter p;
-
-            if (parameters.TryGetParameterDefinition(config.VariableName, out ITemplateParameter existingParam))
-            {
-                // If there is an existing parameter with this name, it must be reused so it can be referenced by name
-                // for other processing, for example: if the parameter had value forms defined for creating variants.
-                // When the param already exists, use its definition, but set IsVariable = true for consistency.
-                p = (Parameter)existingParam;
-                p.IsVariable = true;
-                if (string.IsNullOrEmpty(p.DataType))
-                {
-                    p.DataType = config.DataType;
-                }
-            }
-            else
-            {
-                p = new Parameter(config.VariableName, "parameter", config.DataType)
-                {
-                    IsVariable = true,
-                };
-            }
-
             vars[config.VariableName] = value;
-            setter(p, value);
         }
 
         public IMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IMacroConfig rawConfig)

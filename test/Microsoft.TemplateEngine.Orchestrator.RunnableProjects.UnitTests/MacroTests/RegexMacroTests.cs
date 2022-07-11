@@ -36,27 +36,16 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
             RegexMacroConfig macroConfig = new RegexMacroConfig(variableName, null, sourceVariable, steps);
 
             IVariableCollection variables = new VariableCollection();
-            IRunnableProjectConfig config = A.Fake<IRunnableProjectConfig>();
-            IParameterSet parameters = new ParameterSet(config);
-            ParameterSetter setter = MacroTestHelpers.TestParameterSetter(_engineEnvironmentSettings, parameters);
 
             string sourceValue = "QQQ121222112";
             string expectedValue = "QQQZZ1Z";
 
-            Parameter sourceParam = new Parameter(sourceVariable, "parameter", "datatype")
-            {
-                IsVariable = true,
-            };
-
             variables[sourceVariable] = sourceValue;
-            setter(sourceParam, sourceValue);
 
             RegexMacro macro = new RegexMacro();
-            macro.EvaluateConfig(_engineEnvironmentSettings, variables, macroConfig, parameters, setter);
+            macro.EvaluateConfig(_engineEnvironmentSettings, variables, macroConfig);
 
-            ITemplateParameter newParam;
-            Assert.True(parameters.TryGetParameterDefinition(variableName, out newParam));
-            string newValue = (string)parameters.ResolvedValues[newParam];
+            string newValue = (string)variables[variableName];
             Assert.Equal(newValue, expectedValue);
         }
 
@@ -79,26 +68,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
             GeneratedSymbolDeferredMacroConfig deferredConfig = new GeneratedSymbolDeferredMacroConfig("RegexMacro", "string", variableName, jsonParameters);
 
             IVariableCollection variables = new VariableCollection();
-            IRunnableProjectConfig config = A.Fake<IRunnableProjectConfig>();
-            IParameterSet parameters = new ParameterSet(config);
-            ParameterSetter setter = MacroTestHelpers.TestParameterSetter(_engineEnvironmentSettings, parameters);
 
             string sourceValue = "ABCAABBCC";
             string expectedValue = "ZBCZZBBCC";
-            Parameter sourceParam = new Parameter(sourceVariable, "parameter", "datatype")
-            {
-                IsVariable = true,
-            };
-
             variables[sourceVariable] = sourceValue;
-            setter(sourceParam, sourceValue);
 
             RegexMacro macro = new RegexMacro();
             IMacroConfig realConfig = macro.CreateConfig(_engineEnvironmentSettings, deferredConfig);
-            macro.EvaluateConfig(_engineEnvironmentSettings, variables, realConfig, parameters, setter);
-            ITemplateParameter newParam;
-            Assert.True(parameters.TryGetParameterDefinition(variableName, out newParam));
-            string newValue = (string)parameters.ResolvedValues[newParam];
+            macro.EvaluateConfig(_engineEnvironmentSettings, variables, realConfig);
+            string newValue = (string)variables[variableName];
             Assert.Equal(newValue, expectedValue);
         }
     }

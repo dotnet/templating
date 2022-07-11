@@ -6,7 +6,7 @@
     <UsingToolNetFrameworkReferenceAssemblies>true</UsingToolNetFrameworkReferenceAssemblies>
     <VersionPrefix>7.0.100</VersionPrefix>
     <PreReleaseVersionLabel>preview</PreReleaseVersionLabel>
-    <PreReleaseVersionIteration>6</PreReleaseVersionIteration>
+    <PreReleaseVersionIteration>7</PreReleaseVersionIteration>
     <!-- When StabilizePackageVersion is set to 'true', this branch will produce stable outputs for 'Shipping' packages -->
     <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">false</StabilizePackageVersion>
     <DotNetFinalVersionKind Condition="'$(StabilizePackageVersion)' == 'true'">release</DotNetFinalVersionKind>
@@ -18,12 +18,12 @@
     <MicrosoftDotNetCliUtilsVersion>6.0.100-rc.1.21423.4</MicrosoftDotNetCliUtilsVersion>
     <!-- Maestro-managed Package Versions - Ordered by repo name -->
     <!-- Dependencies from https://github.com/dotnet/command-line-api -->
-    <SystemCommandLinePackageVersion>2.0.0-beta4.22317.8</SystemCommandLinePackageVersion>
+    <SystemCommandLinePackageVersion>2.0.0-beta4.22355.1</SystemCommandLinePackageVersion>
     <!-- Dependencies from https://github.com/dotnet/runtime -->
-    <MicrosoftNETCoreAppRefPackageVersion>7.0.0-preview.6.22319.5</MicrosoftNETCoreAppRefPackageVersion>
-    <MicrosoftNETCoreAppRuntimewinx64PackageVersion>7.0.0-preview.6.22319.5</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
-    <VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>7.0.0-preview.6.22319.5</VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>
+    <MicrosoftNETCoreAppRefPackageVersion>7.0.0-preview.6.22354.1</MicrosoftNETCoreAppRefPackageVersion>
+    <MicrosoftNETCoreAppRuntimewinx64PackageVersion>7.0.0-preview.6.22354.1</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
+    <VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>7.0.0-preview.6.22354.1</VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>
     <!-- Dependencies from https://github.com/dotnet/roslyn-analyzers -->
-    <MicrosoftCodeAnalysisNetAnalyzersPackageVersion>7.0.0-preview1.22310.1</MicrosoftCodeAnalysisNetAnalyzersPackageVersion>
+    <MicrosoftCodeAnalysisNetAnalyzersPackageVersion>7.0.0-preview1.22329.1</MicrosoftCodeAnalysisNetAnalyzersPackageVersion>
   </PropertyGroup>
 </Project>
