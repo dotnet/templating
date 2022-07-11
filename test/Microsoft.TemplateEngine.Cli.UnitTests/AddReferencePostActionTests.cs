@@ -3,6 +3,7 @@
 
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Cli.PostActionProcessors;
+using Microsoft.TemplateEngine.Mocks;
 using Microsoft.TemplateEngine.TestHelper;
 using Xunit;
 
@@ -147,6 +148,126 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             AddReferencePostActionProcessor actionProcessor = new AddReferencePostActionProcessor();
             IReadOnlyList<string> projFilesFound = actionProcessor.FindProjFileAtOrAbovePath(_engineEnvironmentSettings.Host.FileSystem, outputBasePath, new HashSet<string>());
             Assert.Equal(2, projFilesFound.Count);
+        }
+
+        [Fact(DisplayName = nameof(AddRefCanTargetASingleProject))]
+        public void AddRefCanTargetASingleProject()
+        {
+            AddReferencePostActionProcessor actionProcessor = new AddReferencePostActionProcessor();
+
+            string targetBasePath = _engineEnvironmentSettings.GetNewVirtualizedPath();
+            string projFileFullPath = Path.Combine(targetBasePath, "MyApp.csproj");
+            string referencedProjFileFullPath = Path.Combine(targetBasePath, "NewName.csproj");
+
+            var args = new Dictionary<string, string>() { { "targetFiles", "MyApp.csproj" }, { "referenceType", "project" }, { "reference", "./NewName.csproj" } };
+            var postAction = new MockPostAction { ActionId = AddReferencePostActionProcessor.ActionProcessorId, Args = args };
+
+            var creationEffects = new MockCreationEffects()
+                .WithFileChange(new MockFileChange("./NewName.csproj", "./NewName.csproj", ChangeKind.Create))
+                .WithFileChange(new MockFileChange("./MyApp.csproj", "./MyApp.csproj", ChangeKind.Create));
+
+            var callback = new MockAddProjectReferenceCallback();
+            actionProcessor.Callbacks = new NewCommandCallbacks { AddProjectReference = callback.AddProjectReference };
+
+            actionProcessor.Process(
+                _engineEnvironmentSettings,
+                postAction,
+                creationEffects,
+                new MockCreationResult(),
+                targetBasePath);
+
+            var call = callback.Calls.Single();
+
+            Assert.Equal(projFileFullPath, call.Item1);
+            Assert.Equal(new[] { referencedProjFileFullPath }, call.Item2);
+        }
+
+        [Fact(DisplayName = nameof(AddRefCanTargetASingleProject))]
+        public void AddRefCanTargetMultipleProjects()
+        {
+            AddReferencePostActionProcessor actionProcessor = new AddReferencePostActionProcessor();
+
+            string targetBasePath = _engineEnvironmentSettings.GetNewVirtualizedPath();
+            string projFile1FullPath = Path.Combine(targetBasePath, "MyApp.csproj");
+            string projFile2FullPath = Path.Combine(targetBasePath, "AnotherApp.csproj");
+            string referencedProjFileFullPath = Path.Combine(targetBasePath, "NewName.csproj");
+
+            var args = new Dictionary<string, string>() { { "targetFiles", "MyApp.csproj;AnotherApp.csproj" }, { "referenceType", "project" }, { "reference", "./NewName.csproj" } };
+            var postAction = new MockPostAction { ActionId = AddReferencePostActionProcessor.ActionProcessorId, Args = args };
+
+            var creationEffects = new MockCreationEffects()
+                .WithFileChange(new MockFileChange("./NewName.csproj", "./NewName.csproj", ChangeKind.Create))
+                .WithFileChange(new MockFileChange("./AnotherApp.csproj", "./AnotherApp.csproj", ChangeKind.Create))
+                .WithFileChange(new MockFileChange("./MyApp.csproj", "./MyApp.csproj", ChangeKind.Create));
+
+            var callback = new MockAddProjectReferenceCallback();
+            actionProcessor.Callbacks = new NewCommandCallbacks { AddProjectReference = callback.AddProjectReference };
+
+            actionProcessor.Process(
+                _engineEnvironmentSettings,
+                postAction,
+                creationEffects,
+                new MockCreationResult(),
+                targetBasePath);
+
+            var call1 = callback.Calls.Single(x => x.Item1 == projFile1FullPath);
+            var call2 = callback.Calls.Single(x => x.Item1 == projFile2FullPath);
+
+            Assert.Equal(projFile1FullPath, call1.Item1);
+            Assert.Equal(new[] { referencedProjFileFullPath }, call1.Item2);
+
+            Assert.Equal(projFile2FullPath, call2.Item1);
+            Assert.Equal(new[] { referencedProjFileFullPath }, call2.Item2);
+        }
+
+        [Fact(DisplayName = nameof(AddRefCanTargetASingleProject))]
+        public void AddRefCanTargetMultipleProjectsWithAnArray()
+        {
+            AddReferencePostActionProcessor actionProcessor = new AddReferencePostActionProcessor();
+
+            string targetBasePath = _engineEnvironmentSettings.GetNewVirtualizedPath();
+            string projFile1FullPath = Path.Combine(targetBasePath, "MyApp.csproj");
+            string projFile2FullPath = Path.Combine(targetBasePath, "AnotherApp.csproj");
+            string referencedProjFileFullPath = Path.Combine(targetBasePath, "NewName.csproj");
+
+            var args = new Dictionary<string, string>() { { "targetFiles", "[\"MyApp.csproj\", \"AnotherApp.csproj\"]" }, { "referenceType", "project" }, { "reference", "./NewName.csproj" } };
+            var postAction = new MockPostAction { ActionId = AddReferencePostActionProcessor.ActionProcessorId, Args = args };
+
+            var creationEffects = new MockCreationEffects()
+                .WithFileChange(new MockFileChange("./NewName.csproj", "./NewName.csproj", ChangeKind.Create))
+                .WithFileChange(new MockFileChange("./AnotherApp.csproj", "./AnotherApp.csproj", ChangeKind.Create))
+                .WithFileChange(new MockFileChange("./MyApp.csproj", "./MyApp.csproj", ChangeKind.Create));
+
+            var callback = new MockAddProjectReferenceCallback();
+            actionProcessor.Callbacks = new NewCommandCallbacks { AddProjectReference = callback.AddProjectReference };
+
+            actionProcessor.Process(
+                _engineEnvironmentSettings,
+                postAction,
+                creationEffects,
+                new MockCreationResult(),
+                targetBasePath);
+
+            var call1 = callback.Calls.Single(x => x.Item1 == projFile1FullPath);
+            var call2 = callback.Calls.Single(x => x.Item1 == projFile2FullPath);
+
+            Assert.Equal(projFile1FullPath, call1.Item1);
+            Assert.Equal(new[] { referencedProjFileFullPath }, call1.Item2);
+
+            Assert.Equal(projFile2FullPath, call2.Item1);
+            Assert.Equal(new[] { referencedProjFileFullPath }, call2.Item2);
+        }
+
+        private class MockAddProjectReferenceCallback
+        {
+            public List<(string, IReadOnlyList<string>)> Calls { get; } = new();
+
+            public bool AddProjectReference(string target, IReadOnlyList<string> references)
+            {
+                Calls.Add((target, references));
+
+                return true;
+            }
         }
     }
 }
