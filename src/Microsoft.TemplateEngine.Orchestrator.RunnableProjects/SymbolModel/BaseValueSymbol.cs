@@ -55,7 +55,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
 
         internal bool IsRequired { get; init; }
 
-        internal string DataType { get; init; }
+        internal string? DataType { get; init; }
 
         protected bool TryGetIsRequiredField(JToken token, out bool result)
         {
@@ -67,7 +67,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
 
         private bool ParseIsRequiredField(JToken token, bool throwOnError)
         {
-            JToken isRequiredToken;
+            JToken? isRequiredToken;
             if (!token.TryGetValue(nameof(IsRequired), out isRequiredToken))
             {
                 return false;
@@ -75,7 +75,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
 
             bool value;
             if (
-                !TryGetIsRequiredField(isRequiredToken, out value)
+                !TryGetIsRequiredField(isRequiredToken!, out value)
                 &&
                 throwOnError)
             {

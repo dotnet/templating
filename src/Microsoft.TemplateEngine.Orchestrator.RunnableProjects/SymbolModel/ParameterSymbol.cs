@@ -116,9 +116,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
         // If this is set, it's allowed to sepcify choice literals without quotation within conditions.
         internal bool EnableQuotelessLiterals { get; init; }
 
-        internal string IsEnabledCondition { get; init; }
+        internal string? IsEnabledCondition { get; init; }
 
-        internal string IsRequiredCondition { get; init; }
+        internal string? IsRequiredCondition { get; init; }
 
         internal IReadOnlyDictionary<string, ParameterChoice>? Choices
         {
@@ -150,21 +150,21 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
             return symbol;
         }
 
-        private string ParseIsRequiredConditionField(JToken token)
+        private string? ParseIsRequiredConditionField(JToken token)
         {
-            JToken isRequiredToken;
+            JToken? isRequiredToken;
             if (!token.TryGetValue(nameof(IsRequired), out isRequiredToken))
             {
                 return null;
             }
 
             // Attribute parseable as a bool - so we do not want to present it as a condition
-            if (TryGetIsRequiredField(isRequiredToken, out _))
+            if (TryGetIsRequiredField(isRequiredToken!, out _))
             {
                 return null;
             }
 
-            if (isRequiredToken.Type != JTokenType.String)
+            if (isRequiredToken!.Type != JTokenType.String)
             {
                 throw new ArgumentException(string.Format(LocalizableStrings.Symbol_Error_IsRequiredNotABoolOrString, isRequiredToken));
             }
