@@ -180,6 +180,35 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             Assert.Equal(new [] { referencedProjFileFullPath }, callback.References);
         }
 
+        [Fact(DisplayName = nameof(AddRefCanHandleProjectFilesWithoutRenames))]
+        public void AddRefCanHandleProjectFilesWithoutRenames()
+        {
+            AddReferencePostActionProcessor actionProcessor = new AddReferencePostActionProcessor();
+
+            string targetBasePath = _engineEnvironmentSettings.GetNewVirtualizedPath();
+            string projFileFullPath = Path.Combine(targetBasePath, "MyApp.csproj");
+            string referencedProjFileFullPath = Path.Combine(targetBasePath, "Reference.csproj");
+
+            var args = new Dictionary<string, string>() { { "targetFiles", "[\"MyApp.csproj\"]" }, { "referenceType", "project" }, { "reference", "./Reference.csproj" } };
+            var postAction = new MockPostAction { ActionId = AddReferencePostActionProcessor.ActionProcessorId, Args = args };
+
+            var creationEffects = new MockCreationEffects()
+                .WithFileChange(new MockFileChange("./MyApp.csproj", "./MyApp.csproj", ChangeKind.Create));
+
+            var callback = new MockAddProjectReferenceCallback();
+            actionProcessor.Callbacks = new NewCommandCallbacks { AddProjectReference = callback.AddProjectReference };
+
+            actionProcessor.Process(
+                _engineEnvironmentSettings,
+                postAction,
+                creationEffects,
+                new MockCreationResult(),
+                targetBasePath);
+
+            Assert.Equal(projFileFullPath, callback.Target);
+            Assert.Equal(new[] { referencedProjFileFullPath }, callback.References);
+        }
+
         private class MockAddProjectReferenceCallback
         {
             public string? Target { get; private set; }
