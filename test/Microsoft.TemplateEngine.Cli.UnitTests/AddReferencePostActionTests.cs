@@ -163,7 +163,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             var postAction = new MockPostAction { ActionId = AddReferencePostActionProcessor.ActionProcessorId, Args = args };
 
             var creationEffects = new MockCreationEffects()
-                .WithFileChange(new MockFileChange("./OldName.csproj", "./NewName.csproj", ChangeKind.Change))
+                .WithFileChange(new MockFileChange("./OldName.csproj", "./NewName.csproj", ChangeKind.Create))
                 .WithFileChange(new MockFileChange("./MyApp.csproj", "./MyApp.csproj", ChangeKind.Create));
 
             var callback = new MockAddProjectReferenceCallback();
