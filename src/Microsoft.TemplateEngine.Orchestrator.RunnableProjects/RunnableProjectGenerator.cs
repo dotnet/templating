@@ -4,6 +4,7 @@
 #nullable enable
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -869,6 +870,240 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 _parameters.Remove(param.Name);
                 ResolvedValues.Remove(param);
+            }
+        }
+
+        internal class ParameterDefinitionsSet : IParameterDefinitionsSet
+        {
+            private readonly IReadOnlyDictionary<string, ITemplateParameter> _parameters;
+
+            public ParameterDefinitionsSet(IReadOnlyDictionary<string, ITemplateParameter> parameters) => _parameters = parameters;
+
+            public IEnumerable<string> Keys => _parameters.Keys;
+
+            public IEnumerable<ITemplateParameter> Values => _parameters.Values;
+
+            public int Count => _parameters.Count;
+
+            public ITemplateParameter this[string key] => _parameters[key];
+
+            public bool ContainsKey(string key) => _parameters.ContainsKey(key);
+
+            public IEnumerator<ITemplateParameter> GetEnumerator() => _parameters.Values.GetEnumerator();
+
+            public bool TryGetValue(string key, out ITemplateParameter value) => _parameters.TryGetValue(key, out value);
+
+            IEnumerator<KeyValuePair<string, ITemplateParameter>> IEnumerable<KeyValuePair<string, ITemplateParameter>>.GetEnumerator() => _parameters.GetEnumerator();
+
+            IEnumerator IEnumerable.GetEnumerator() => _parameters.GetEnumerator();
+        }
+
+        internal class ParameterSet2 : IParameterSet2
+        {
+            public ParameterSet2(IReadOnlyDictionary<string, ITemplateParameter> parameters) => ParameterDefinitions = new ParameterDefinitionsSet(parameters);
+
+            public IParameterDefinitionsSet ParameterDefinitions { get; }
+        }
+
+        internal class ParameterSetBuilder : ParameterSet2, IParameterSetBuilder
+        {
+            private readonly Dictionary<ITemplateParameter, object> _resolvedValues = new Dictionary<ITemplateParameter, object>();
+
+            public ParameterSetBuilder(IReadOnlyDictionary<string, ITemplateParameter> parameters) : base(parameters) { }
+
+            public void SetParameterValue(ITemplateParameter parameter, object value) => _resolvedValues[parameter] = value;
+
+            public bool HasParameterValue(ITemplateParameter parameter) => _resolvedValues.ContainsKey(parameter);
+
+
+            //TODO:
+            // this should contain code from Variable Collection
+            // if (!parameters.ResolvedValues.TryGetValue(param, out object value))
+            //{
+            //    if (param.Priority != TemplateParameterPriority.Optional)
+            //    {
+            //        parameters.ResolvedValues[param] = null;
+            //    }
+            //}
+
+            public IEvaluatedParameterSet EvaluateConditionalParameters(ILogger logger)
+            {
+                IReadOnlyList<Parameter> parameters = this.ParameterDefinitions.Cast<Parameter>().ToList();
+
+                List<(Parameter Parameter, object Value)> parametersWithValues =
+                    parameters
+                        // ensure same order between the two sets
+                        .Where(this._resolvedValues.ContainsKey)
+                        .Select(p => (p, this._resolvedValues[p]))
+                        .ToList();
+
+                var variableCollection = new VariableCollection(
+                    null,
+                    parametersWithValues
+                        .Where(p => p.Value != null)
+                        .ToDictionary(p => p.Parameter.Name, p => p.Value));
+
+                Parameter[] variableCollectionIdxToParametersMap =
+                    parametersWithValues.Where(p => p.Value != null).Select(p => p.Parameter).ToArray();
+
+                var disabledParams = EvaluateEnablementConditions(parameters, variableCollection, variableCollectionIdxToParametersMap, logger);
+                var alteredRequirementParams = EvaluateRequirementCondition(parameters, variableCollection, logger);
+
+                var result = new ParametersConditionsEvaluationResult(disabledParams, alteredRequirementParams);
+                ApplyExternalEvaluationOfConditionalParameters(result, parameterSet, template);
+                return result;
+            }
+
+            private IReadOnlyList<Parameter> EvaluateEnablementConditions(
+                IReadOnlyList<Parameter> parameters,
+                VariableCollection variableCollection,
+                Parameter[] variableCollectionIdxToParametersMap,
+                ILogger logger)
+            {
+                List<Parameter> disabledParameters = new();
+                Dictionary<Parameter, HashSet<Parameter>> parametersDependencies = new Dictionary<Parameter, HashSet<Parameter>>();
+
+                // First parameters traversal.
+                //   - evaluate all IsEnabledCondition - and get the dependecies between the parameters during doing so
+                foreach (Parameter parameter in parameters)
+                {
+                    if (!string.IsNullOrEmpty(parameter.Precedence.IsEnabledCondition))
+                    {
+                        HashSet<int> referencedVariablesIndexes = new HashSet<int>();
+                        if (!Cpp2StyleEvaluatorDefinition.EvaluateFromString(logger, parameter.Precedence.IsEnabledCondition, variableCollection, referencedVariablesIndexes))
+                        {
+                            disabledParameters.Add(parameter);
+                            // Do not remove from the variable collection though - we want to capture all dependencies between parameters in the first traversal.
+                            // Those will be bulk removed before second traversal (traversing only the required dependencies).
+                        }
+
+                        if (referencedVariablesIndexes.Any())
+                        {
+                            parametersDependencies[parameter] = new HashSet<Parameter>(
+                                referencedVariablesIndexes.Select(idx => variableCollectionIdxToParametersMap[idx]));
+                        }
+                    }
+                }
+
+                // No dependencies between parameters detected - no need to process further the second evaluation
+                if (parametersDependencies.Count == 0)
+                {
+                    return disabledParameters;
+                }
+
+                DirectedGraph<Parameter> parametersDependenciesGraph = new(parametersDependencies);
+                // Get the transitive closure of parameters that need to be recalculated, based on the knowledge of params that
+                DirectedGraph<Parameter> parametersToRecalculate =
+                    parametersDependenciesGraph.GetSubGraphDependandOnVertices(disabledParameters, includeSeedVertices: false);
+
+                // Second traversal - for transitive dependencies of parameters that need to be disabled
+                if (parametersToRecalculate.TryGetTopologicalSort(out IReadOnlyList<Parameter> orderedParameters))
+                {
+                    disabledParameters.ForEach(p => variableCollection.Remove(p.Name));
+
+                    if (parametersDependenciesGraph.HasCycle(out var cycle))
+                    {
+                        logger.LogWarning(LocalizableStrings.RunnableProjectGenerator_Warning_ParamsCycle, cycle.Select(p => p.Name).ToCsvString());
+                    }
+
+                    foreach (Parameter parameter in orderedParameters)
+                    {
+                        if (!Cpp2StyleEvaluatorDefinition.EvaluateFromString(logger, parameter.Precedence.IsEnabledCondition, variableCollection))
+                        {
+                            // disable and remove from the collection
+                            disabledParameters.Add(parameter);
+                            variableCollection.Remove(parameter.Name);
+                        }
+                    }
+                }
+                else if (parametersToRecalculate.HasCycle(out var cycle))
+                {
+                    throw new TemplateAuthoringException(
+                        string.Format(
+                            LocalizableStrings.RunnableProjectGenerator_Error_ParamsCycle,
+                            cycle.Select(p => p.Name).ToCsvString()),
+                        "Conditional Parameters");
+                }
+                else
+                {
+                    throw new Exception(LocalizableStrings.RunnableProjectGenerator_Error_TopologicalSort);
+                }
+
+                return disabledParameters;
+            }
+
+            private IReadOnlyList<Parameter> EvaluateRequirementCondition(
+                IReadOnlyList<Parameter> parameters,
+                VariableCollection variableCollection,
+                ILogger logger
+            )
+            {
+                List<Parameter> parametersWithAlteredPriority = new List<Parameter>();
+
+                foreach (Parameter parameter in parameters)
+                {
+                    if (!string.IsNullOrEmpty(parameter.Precedence.IsRequiredCondition))
+                    {
+                        bool isRequired = Cpp2StyleEvaluatorDefinition.EvaluateFromString(logger, parameter.Precedence.IsRequiredCondition, variableCollection);
+                        parametersWithAlteredPriority.Add(parameter);
+                    }
+                }
+
+                return parametersWithAlteredPriority;
+            }
+        }
+
+        //TODO: this should be made public - so that template creator can call it on data from api
+        internal class EvaluatedParameterSet : ParameterSet2, IEvaluatedParameterSet
+        {
+            public EvaluatedParameterSet(IReadOnlyDictionary<string, ITemplateParameter> parameters, IEnumerable<EvaluatedParameterData> parameterData)
+                : base(parameters)
+            {
+                EvaluatedValues = parameterData.ToDictionary(d => d.ParameterDefinition, d => d);
+            }
+
+
+
+            public IReadOnlyDictionary<ITemplateParameter, EvaluatedParameterData> EvaluatedValues { get; }
+
+            public void RemoveDisabledParamsFromTemplate(ITemplate template) => throw new NotImplementedException();
+
+
+            public void ApplyExternalEvaluationOfConditionalParameters(
+            ParametersConditionsEvaluationResult evaluationResult, IParameterSet parameterSet, ITemplate template)
+            {
+                if (!(parameterSet is ParameterSet parameterSetInternal))
+                {
+                    // If this is happening. it means that arch. changed (parameters set no more provided by GetParametersForTemplate),
+                    //  in that case we should extend IParameterSet interface and allow parameters removal (.RemoveParamater) via interface
+                    throw new Exception($"Internal error: Unexpected type od parameter set ({parameterSet.GetType()}).");
+                }
+
+                // Make sure external evaluation is not trying to set enabled/required flags on params without conditions
+                ErrorOutOnAttemptToEnforceExternalConditionOnParamsWithoutCondition(
+                    evaluationResult.DisabledParameters.Cast<Parameter>().Where(p => string.IsNullOrEmpty(p.IsEnabledCondition)).ToList());
+                ErrorOutOnAttemptToEnforceExternalConditionOnParamsWithoutCondition(
+                    evaluationResult.ParametersWithAlteredPriority.Cast<Parameter>().Where(p => string.IsNullOrEmpty(p.IsRequiredCondition)).ToList());
+
+                evaluationResult.DisabledParameters.Cast<Parameter>().ForEach(parameterSetInternal.RemoveParamater);
+                // Remove the disabled symbols from the config as well (as if they was never defined on the template)
+                RunnableProjectConfig config = (RunnableProjectConfig)template;
+                evaluationResult.DisabledParameters.Select(p => p.Name).ForEach(config.RemoveSymbol);
+
+                // Invert priorities where requested
+                evaluationResult.ParametersWithAlteredPriority.Cast<Parameter>().ForEach(p =>
+                    p.Priority = (p.Priority == TemplateParameterPriority.Required
+                        ? TemplateParameterPriority.Optional
+                        : TemplateParameterPriority.Required));
+            }
+
+            private void ErrorOutOnAttemptToEnforceExternalConditionOnParamsWithoutCondition(IReadOnlyList<Parameter> offendingParameters)
+            {
+                if (offendingParameters.Any())
+                {
+                    throw new Exception(
+                        string.Format(LocalizableStrings.RunnableProjectGenerator_Error_ExternalConditionMismatch, offendingParameters.ToCsvString()));
+                }
             }
         }
     }

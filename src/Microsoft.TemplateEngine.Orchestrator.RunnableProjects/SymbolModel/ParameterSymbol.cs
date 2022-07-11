@@ -37,7 +37,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
 
             if (DataType == "choice")
             {
-                IsTag = false;
                 TagName = jObject.ToString(nameof(TagName));
 
                 foreach (JObject choiceObject in jObject.Items<JObject>(nameof(Choices)))
@@ -65,8 +64,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
             Choices = choicesAndDescriptions;
             AllowMultipleValues = jObject.ToBool(nameof(AllowMultipleValues));
             EnableQuotelessLiterals = jObject.ToBool(nameof(EnableQuotelessLiterals));
-            IsEnabledCondition = jObject.ToString("IsEnabled");
-            IsRequiredCondition = ParseIsRequiredConditionField(jObject);
+
+            this.Precedence = GetPrecedence(IsRequired, jObject);
         }
 
         /// <summary>
@@ -83,8 +82,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
             Choices = cloneFrom.Choices;
             AllowMultipleValues = cloneFrom.AllowMultipleValues;
             EnableQuotelessLiterals = cloneFrom.EnableQuotelessLiterals;
-            IsEnabledCondition = cloneFrom.IsEnabledCondition;
-            IsRequiredCondition = cloneFrom.IsRequiredCondition;
+
+            Precedence = cloneFrom.Precedence;
         }
 
         /// <summary>
@@ -116,9 +115,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
         // If this is set, it's allowed to sepcify choice literals without quotation within conditions.
         internal bool EnableQuotelessLiterals { get; init; }
 
-        internal string IsEnabledCondition { get; init; }
-
-        internal string IsRequiredCondition { get; init; }
+        internal TemplateParameterPrecedence Precedence { get; init; }
 
         internal IReadOnlyDictionary<string, ParameterChoice>? Choices
         {
@@ -139,7 +136,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
             {
                 DefaultValue = value,
                 DataType = "choice",
-                IsTag = true,
+                Precedence = GetPrecedence(false, true, true, null, null),
                 Choices = new Dictionary<string, ParameterChoice>()
                 {
                     { value, new ParameterChoice(string.Empty, string.Empty) }
@@ -150,7 +147,62 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
             return symbol;
         }
 
-        private string ParseIsRequiredConditionField(JToken token)
+        private static TemplateParameterPrecedence GetPrecedence(bool isRequired, JObject jObject)
+        {
+            string isRequiredCondition = ParseIsRequiredConditionField(jObject);
+
+            // Initialize IsEnabled - as a condition or a constant
+            string isEnabledCondition = null;
+            bool isEnabled = true;
+            if (jObject != null && jObject.TryGetValue("IsEnabled", out JToken isEnabledToken))
+            {
+                if (isEnabledToken!.TryParseBool(out bool enabledConst))
+                {
+                    isEnabled = enabledConst;
+                }
+                else if (isEnabledToken.Type == JTokenType.String)
+                {
+                    isEnabledCondition = isEnabledToken.ToString();
+                }
+            }
+
+            return GetPrecedence(isRequired, isEnabled, false, isRequiredCondition, isEnabledCondition);
+        }
+
+        private static TemplateParameterPrecedence GetPrecedence(bool isRequired, bool isEnabled, bool isTag, string isRequiredCondition, string isEnabledCondition)
+        {
+            // If enable condition is set - parameter is conditionally disabled (regardless if require condition is set or not)
+            // Conditionally required is if and only if the only require condition is set
+
+            if (!isEnabled)
+            {
+                return new TemplateParameterPrecedence(PrecedenceDefinition.Disabled);
+            }
+
+            if (!string.IsNullOrEmpty(isEnabledCondition))
+            {
+                return new TemplateParameterPrecedence(PrecedenceDefinition.ConditionalyDisabled, isRequiredCondition, isEnabledCondition);
+            }
+
+            if (isTag)
+            {
+                return new TemplateParameterPrecedence(PrecedenceDefinition.Implicit);
+            }
+
+            if (!string.IsNullOrEmpty(isRequiredCondition))
+            {
+                return new TemplateParameterPrecedence(PrecedenceDefinition.ConditionalyRequired, isRequiredCondition, null);
+            }
+
+            if (isRequired)
+            {
+                return new TemplateParameterPrecedence(PrecedenceDefinition.Required);
+            }
+
+            return TemplateParameterPrecedence.Default;
+        }
+
+        private static string ParseIsRequiredConditionField(JToken token)
         {
             JToken isRequiredToken;
             if (!token.TryGetValue(nameof(IsRequired), out isRequiredToken))
@@ -159,7 +211,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
             }
 
             // Attribute parseable as a bool - so we do not want to present it as a condition
-            if (TryGetIsRequiredField(isRequiredToken, out _))
+            if (isRequiredToken!.TryParseBool(out _))
             {
                 return null;
             }

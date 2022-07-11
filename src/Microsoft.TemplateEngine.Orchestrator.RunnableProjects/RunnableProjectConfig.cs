@@ -511,20 +511,18 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     IsName = isName,
                     IsVariable = true,
                     Name = baseSymbol.Name,
-                    Priority = baseSymbol.IsRequired ? TemplateParameterPriority.Required : isName ? TemplateParameterPriority.Implicit : TemplateParameterPriority.Optional,
+                    Precedence = new TemplateParameterPrecedence(baseSymbol.IsRequired ? PrecedenceDefinition.Required : isName ? PrecedenceDefinition.Implicit : PrecedenceDefinition.Optional),
                 };
 
                 if (baseSymbol is ParameterSymbol parameterSymbol)
                 {
-                    parameter.Priority = parameterSymbol.IsTag ? TemplateParameterPriority.Implicit : parameter.Priority;
+                    parameter.Precedence = parameterSymbol.Precedence;
                     parameter.Description = parameterSymbol.Description;
                     parameter.Choices = parameterSymbol.Choices;
                     parameter.DefaultIfOptionWithoutValue = parameterSymbol.DefaultIfOptionWithoutValue;
                     parameter.DisplayName = parameterSymbol.DisplayName;
                     parameter.EnableQuotelessLiterals = parameterSymbol.EnableQuotelessLiterals;
                     parameter.AllowMultipleValues = parameterSymbol.AllowMultipleValues;
-                    parameter.IsEnabledCondition = parameterSymbol.IsEnabledCondition;
-                    parameter.IsRequiredCondition = parameterSymbol.IsRequiredCondition;
                 }
 
                 parameters[baseSymbol.Name] = parameter;
@@ -572,13 +570,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     Description = localization?.Description ?? parameter.Description,
                     DefaultValue = parameter.DefaultValue,
                     DefaultIfOptionWithoutValue = parameter.DefaultIfOptionWithoutValue,
-                    Priority = parameter.Priority,
+                    Precedence = parameter.Precedence,
                     AllowMultipleValues = parameter.AllowMultipleValues,
                     EnableQuotelessLiterals = parameter.EnableQuotelessLiterals,
                     Choices = localizedChoices ?? parameter.Choices,
-                    IsEnabledCondition = parameter.IsEnabledCondition,
-                    IsRequiredCondition = parameter.IsRequiredCondition,
-            };
+                };
 
                 localizedParameters.Add(parameterPair.Key, localizedParameter);
             }

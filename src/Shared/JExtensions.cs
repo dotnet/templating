@@ -67,23 +67,27 @@ namespace Microsoft.TemplateEngine
             return true;
         }
 
+        internal static bool TryParseBool(this JToken token, out bool result)
+        {
+            result = false;
+            return (token.Type == JTokenType.Boolean || token.Type == JTokenType.String)
+                   &&
+                   bool.TryParse(token.ToString(), out result);
+        }
+
         internal static bool ToBool(this JToken? token, string? key = null, bool defaultValue = false)
         {
-            JToken? checkToken;
-            if (!token.TryGetValue(key, out checkToken))
+            if (!token.TryGetValue(key, out JToken? checkToken))
             {
                 return defaultValue;
             }
 
-            // do the conversion on checkToken
-            if (checkToken!.Type == JTokenType.Boolean || checkToken.Type == JTokenType.String)
+            if (checkToken!.TryParseBool(out bool result))
             {
-                return string.Equals(checkToken.ToString(), "true", StringComparison.OrdinalIgnoreCase);
+                result = defaultValue;
             }
-            else
-            {
-                return defaultValue;
-            }
+
+            return result;
         }
 
         internal static int ToInt32(this JToken? token, string? key = null, int defaultValue = 0)

@@ -35,7 +35,7 @@ namespace Microsoft.TemplateEngine.Abstractions
         /// <summary>
         /// Gets parameter priority.
         /// </summary>
-        //TODO: [Obsolete("Use Precedence instead.")]
+        [Obsolete("Use Precedence instead.")]
         TemplateParameterPriority Priority { get; }
 
         TemplateParameterPrecedence Precedence { get; }
@@ -86,10 +86,9 @@ namespace Microsoft.TemplateEngine.Abstractions
 
     public class TemplateParameterPrecedence
     {
-        public static readonly TemplateParameterPrecedence Default =
-            new TemplateParameterPrecedence(PrecedenceDefinition.Optional, null, null);
+        public static readonly TemplateParameterPrecedence Default = new TemplateParameterPrecedence(PrecedenceDefinition.Optional);
 
-        public TemplateParameterPrecedence(PrecedenceDefinition precedenceDefinition, string? isRequiredCondition, string? isEnabledCondition)
+        public TemplateParameterPrecedence(PrecedenceDefinition precedenceDefinition, string? isRequiredCondition = null, string? isEnabledCondition = null)
         {
             PrecedenceDefinition = precedenceDefinition;
             IsRequiredCondition = isRequiredCondition;
@@ -143,11 +142,31 @@ namespace Microsoft.TemplateEngine.Abstractions
         {
             return new TemplateParameterPrecedence(priority.ToPrecedenceDefinition(), null, null);
         }
+
+        public static TemplateParameterPriority ToTemplateParameterPriority(this PrecedenceDefinition precedenceDefinition)
+        {
+            switch (precedenceDefinition)
+            {
+                case PrecedenceDefinition.Required:
+                    return TemplateParameterPriority.Required;
+                case PrecedenceDefinition.Optional:
+                    return TemplateParameterPriority.Optional;
+                case PrecedenceDefinition.Implicit:
+                    return TemplateParameterPriority.Implicit;
+                case PrecedenceDefinition.ConditionalyDisabled:
+                case PrecedenceDefinition.Disabled:
+                case PrecedenceDefinition.ConditionalyRequired:
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(precedenceDefinition), precedenceDefinition, "Conversion to obsolete TemplateParameterPriority is not defined for current value");
+            }
+        }
     }
 
     public enum PrecedenceDefinition
     {
         Required,
+        // If enable condition is set - parameter is conditionally disabled (regardless if require condition is set or not)
+        // Conditionally required is if and only if the only require condition is set
         ConditionalyRequired,
         Optional,
         Implicit,

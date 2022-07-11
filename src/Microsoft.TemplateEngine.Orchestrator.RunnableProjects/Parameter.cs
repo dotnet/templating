@@ -44,7 +44,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         public bool IsName { get; internal set; }
 
-        public TemplateParameterPriority Priority { get; internal set; }
+        [Obsolete("Use Precedence instead.")]
+        public TemplateParameterPriority Priority => Precedence.PrecedenceDefinition.ToTemplateParameterPriority();
 
         public TemplateParameterPrecedence Precedence { get; internal set; }
 
@@ -59,10 +60,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         public bool EnableQuotelessLiterals { get; internal set; }
 
         internal bool IsVariable { get; set; }
-
-        internal string? IsEnabledCondition { get; set; }
-
-        internal string? IsRequiredCondition { get; set; }
 
         public override string ToString()
         {

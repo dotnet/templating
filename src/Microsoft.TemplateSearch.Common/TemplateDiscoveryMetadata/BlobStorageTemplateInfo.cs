@@ -344,7 +344,6 @@ namespace Microsoft.TemplateSearch.Common
                     Choices = new Dictionary<string, ParameterChoice>();
                 }
 
-                Priority = parameter.Priority;
                 DefaultIfOptionWithoutValue = parameter.DefaultIfOptionWithoutValue;
                 Description = parameter.Description;
                 AllowMultipleValues = parameter.AllowMultipleValues;
@@ -386,7 +385,6 @@ namespace Microsoft.TemplateSearch.Common
                     }
                     Choices = choices;
                 }
-                Priority = jObject.ToEnum<TemplateParameterPriority>(nameof(Priority));
                 DefaultIfOptionWithoutValue = jObject.ToString(nameof(DefaultIfOptionWithoutValue));
                 Description = jObject.ToString(nameof(Description));
                 AllowMultipleValues = jObject.ToBool(nameof(AllowMultipleValues));
@@ -397,6 +395,12 @@ namespace Microsoft.TemplateSearch.Common
                 {
                     precedence = TemplateParameterPrecedenceImpl.FromJObject(precedenceToken);
                 }
+                else
+                {
+                    var legacyPriority = jObject.ToEnum<TemplateParameterPriority>(nameof(Priority));
+                    precedence = legacyPriority.ToTemplateParameterPrecedence();
+                }
+
                 _templateParameterPrecedence = new TemplateParameterPrecedenceImpl(precedence);
             }
 
@@ -409,8 +413,9 @@ namespace Microsoft.TemplateSearch.Common
             [JsonProperty]
             public IReadOnlyDictionary<string, ParameterChoice>? Choices { get; internal set; }
 
-            [JsonProperty]
-            public TemplateParameterPriority Priority { get; internal set; }
+            [JsonIgnore]
+            [Obsolete("Use Precedence instead.")]
+            public TemplateParameterPriority Priority => Precedence.PrecedenceDefinition.ToTemplateParameterPriority();
 
             public TemplateParameterPrecedence Precedence => _templateParameterPrecedence;
 

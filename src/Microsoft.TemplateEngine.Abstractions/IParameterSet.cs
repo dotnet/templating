@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 
 #pragma warning disable RS0016 // Add public types and members to the declared API
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
@@ -67,14 +68,25 @@ namespace Microsoft.TemplateEngine.Abstractions
     public interface IParameterSet2
     {
         IParameterDefinitionsSet ParameterDefinitions { get; }
-        IReadOnlyDictionary<ITemplateParameter, object> ResolvedValues { get; }
+        //IReadOnlyDictionary<ITemplateParameter, object> ResolvedValues { get; }
+    }
+
+    public interface IParameterSetBuilder
+    {
+        void SetParameterValue(ITemplateParameter parameter, object value);
+
+        bool HasParameterValue(ITemplateParameter parameter);
+
+        IEvaluatedParameterSet EvaluateConditionalParameters(ILogger logger);
     }
 
 
 
     public interface IEvaluatedParameterSet : IParameterSet2
     {
-        IReadOnlyDictionary<ITemplateParameter, ParameterData> EvaluatedValues { get; }
+        IReadOnlyDictionary<ITemplateParameter, EvaluatedParameterData> EvaluatedValues { get; }
+
+        void RemoveDisabledParamsFromTemplate(ITemplate template);
     }
 
 
@@ -90,17 +102,11 @@ namespace Microsoft.TemplateEngine.Abstractions
         public ParameterData(
             ITemplateParameter parameterDefinition,
             object? value,
-            bool? isEnabledConditionResult,
-            bool? isRequiredConditionResult,
             InputDataState inputDataState = InputDataState.Set)
         {
             ParameterDefinition = parameterDefinition;
             Value = value;
             InputDataState = inputDataState;
-            IsEnabledConditionResult = isEnabledConditionResult;
-            IsRequiredConditionResult = isRequiredConditionResult;
-            VerifyConditions();
-            EvaluatedPrecedence = GetEvaluatedPrecedence();
         }
 
         public ITemplateParameter ParameterDefinition { get; }
@@ -108,7 +114,25 @@ namespace Microsoft.TemplateEngine.Abstractions
         public object? Value { get; }
 
         public InputDataState InputDataState { get; }
+    }
 
+    public class EvaluatedParameterData : ParameterData
+    {
+        public EvaluatedParameterData(
+            ITemplateParameter parameterDefinition,
+            object? value,
+            bool? isEnabledConditionResult,
+            bool? isRequiredConditionResult,
+            InputDataState inputDataState = InputDataState.Set)
+        : base(parameterDefinition, value, inputDataState)
+        {
+            IsEnabledConditionResult = isEnabledConditionResult;
+            IsRequiredConditionResult = isRequiredConditionResult;
+            VerifyConditions();
+            EvaluatedPrecedence = GetEvaluatedPrecedence();
+        }
+
+        // TODO: do those need to be exposed? (probably yes - if both are set)
         public bool? IsEnabledConditionResult { get; }
 
         public bool? IsRequiredConditionResult { get; }

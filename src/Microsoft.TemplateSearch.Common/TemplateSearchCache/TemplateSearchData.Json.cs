@@ -145,11 +145,19 @@ namespace Microsoft.TemplateSearch.Common
                             writer.WritePropertyName(nameof(ITemplateParameter.DefaultIfOptionWithoutValue));
                             writer.WriteValue(param.DefaultIfOptionWithoutValue);
                         }
-                        if (param.Priority != default)
+                        writer.WritePropertyName(nameof(ITemplateParameter.Precedence.PrecedenceDefinition));
+                        writer.WriteValue(param.Precedence.PrecedenceDefinition);
+                        if (!string.IsNullOrWhiteSpace(param.Precedence.IsEnabledCondition))
                         {
-                            writer.WritePropertyName(nameof(ITemplateParameter.Priority));
-                            writer.WriteValue(param.Priority);
+                            writer.WritePropertyName(nameof(ITemplateParameter.Precedence.IsEnabledCondition));
+                            writer.WriteValue(param.Precedence.IsEnabledCondition);
                         }
+                        if (!string.IsNullOrWhiteSpace(param.Precedence.IsRequiredCondition))
+                        {
+                            writer.WritePropertyName(nameof(ITemplateParameter.Precedence.IsRequiredCondition));
+                            writer.WriteValue(param.Precedence.IsRequiredCondition);
+                        }
+
                         if (param.Choices != null && param.Choices.Any())
                         {
                             writer.WritePropertyName(nameof(ITemplateParameter.Choices));

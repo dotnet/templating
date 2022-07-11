@@ -34,7 +34,6 @@ namespace Microsoft.TemplateEngine.Utils
             Type = jObject.ToString(nameof(Type)) ?? "parameter";
             DataType = jObject.ToString(nameof(DataType)) ?? "string";
             Description = jObject.ToString(nameof(Description));
-            Priority = (TemplateParameterPriority)jObject.ToInt32(nameof(Priority));
 
             DefaultValue = jObject.ToString(nameof(DefaultValue));
             DefaultIfOptionWithoutValue = jObject.ToString(nameof(DefaultIfOptionWithoutValue));
@@ -67,6 +66,14 @@ namespace Microsoft.TemplateEngine.Utils
             {
                 precedence = TemplateParameterPrecedenceImpl.FromJObject(precedenceToken);
             }
+            else
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                string key = nameof(Priority);
+#pragma warning restore CS0618 // Type or member is obsolete
+                var legacyPriority = (TemplateParameterPriority)jObject.ToInt32(key);
+                precedence = legacyPriority.ToTemplateParameterPrecedence();
+            }
             _templateParameterPrecedence = new TemplateParameterPrecedenceImpl(precedence);
         }
 
@@ -74,7 +81,6 @@ namespace Microsoft.TemplateEngine.Utils
             string name,
             string type,
             string datatype,
-            TemplateParameterPriority priority = default,
             TemplateParameterPrecedence? precedence = default,
             bool isName = false,
             string? defaultValue = null,
@@ -87,7 +93,6 @@ namespace Microsoft.TemplateEngine.Utils
             Name = name;
             Type = type;
             DataType = datatype;
-            Priority = priority;
             IsName = isName;
             DefaultValue = defaultValue;
             DefaultIfOptionWithoutValue = defaultIfOptionWithoutValue;
@@ -108,9 +113,9 @@ namespace Microsoft.TemplateEngine.Utils
         [JsonProperty]
         public string Name { get; }
 
-        //TODO: obsolete this
-        [JsonProperty]
-        public TemplateParameterPriority Priority { get; }
+        [JsonIgnore]
+        [Obsolete("Use Precedence instead.")]
+        public TemplateParameterPriority Priority => Precedence.PrecedenceDefinition.ToTemplateParameterPriority();
 
         [JsonIgnore]
         public TemplateParameterPrecedence Precedence => _templateParameterPrecedence;
