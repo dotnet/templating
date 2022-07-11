@@ -104,10 +104,8 @@ namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
                 }
 
                 // replace the referenced project file's name in case it has been renamed
-                Glob g = Glob.Parse(referenceToAdd);
-                var referenceNameChange = creationEffects.FileChanges.OfType<IFileChange2>().FirstOrDefault(change => g.IsMatch(change.SourceRelativePath));
-
-                string relativeProjectReference = referenceNameChange != null ? referenceNameChange.TargetRelativePath : referenceToAdd;
+                string? referenceNameChange = GetTargetForSource((ICreationEffects2)creationEffects, referenceToAdd, outputBasePath).SingleOrDefault();
+                string relativeProjectReference = referenceNameChange ?? referenceToAdd;
 
                 referenceToAdd = Path.GetFullPath(relativeProjectReference, outputBasePath);
 
