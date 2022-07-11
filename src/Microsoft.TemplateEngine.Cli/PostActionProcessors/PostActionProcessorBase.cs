@@ -71,10 +71,12 @@ namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
                 return null;
             }
 
+            targetFiles = PrepareForJsonParse(targetFiles);
+
             JToken config = JToken.Parse(targetFiles);
             if (config.Type == JTokenType.String)
             {
-                return ProcessPaths(targetFiles.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
+                return ProcessPaths(config.ToString().Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
             }
             else if (config is JArray arr)
             {
@@ -106,6 +108,16 @@ namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
                     .SelectMany(t => GetTargetForSource(creationEffects2, t, outputBasePath))
                     .Where(t => matchCriteria(t))
                     .ToArray();
+            }
+
+            string PrepareForJsonParse(string input)
+            {
+                if (!input.StartsWith('[') && !input.StartsWith('"'))
+                {
+                    return "\"" + input + "\"";
+                }
+
+                return input;
             }
 
         }
