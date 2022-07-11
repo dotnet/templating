@@ -1,30 +1,80 @@
 <Project>
-  <!-- Packages in this file have versions updated periodically by Dependabot. Versions managed by Darc/Maestro should be in ..\Package.props. -->
+
+  <!-- Packages in this file have versions updated periodically by Dependabot. Versions managed by Darc/Maestro should be in ..\Package.props.
+
+  Packages must be set to their package version property if it exists (ex. BenchmarkDotNetVersion) since source-build uses
+  these properties to override package versions if necessary. -->
+
   <ItemGroup>
     <PackageReference Update="System.Diagnostics.Process" Version="4.3.0" />
+    <PackageReference Update="System.Diagnostics.Process" Condition="'$(SystemDiagnosticsProcessVersion)' != ''" Version="$(SystemDiagnosticsProcessVersion)" />
+
     <PackageReference Update="System.IO.Compression" Version="4.3.0" />
+    <PackageReference Update="System.IO.Compression" Condition="'$(SystemIOCompressionVersion)' != ''" Version="$(SystemIOCompressionVersion)" />
+
     <PackageReference Update="System.Runtime.Loader" Version="4.3.0" />
+    <PackageReference Update="System.Runtime.Loader" Condition="'$(SystemRuntimeLoader)' != ''" Version="$(SystemRuntimeLoader)" />
+
     <PackageReference Update="Microsoft.Build.Framework" Version="17.2.0" />
+    <PackageReference Update="Microsoft.Build.Framework" Condition="'$(MicrosoftBuildFramework)' != ''" Version="$(MicrosoftBuildFramework)" />
+
     <PackageReference Update="Microsoft.Build.Utilities.Core" Version="17.2.0" />
+    <PackageReference Update="Microsoft.Build.Utilities.Core" Condition="'$(MicrosoftBuildUtilitiesCore)' != ''" Version="$(MicrosoftBuildUtilitiesCore)" />
+
     <PackageReference Update="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Update="Newtonsoft.Json" Condition="'$(NewtonsoftJson)' != ''" Version="$(NewtonsoftJson)" />
+
     <PackageReference Update="Wcwidth.Sources" Version="0.6.0" />
+    <PackageReference Update="Wcwidth.Sources" Condition="'$(WcwidthSources)' != ''" Version="$(WcwidthSources)" />
+
     <PackageReference Update="Microsoft.Extensions.Logging" Version="6.0.0" />
+    <PackageReference Update="Microsoft.Extensions.Logging" Condition="'$(MicrosoftExtensionsLogging)' != ''" Version="$(MicrosoftExtensionsLogging)" />
+
     <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
+    <PackageReference Update="Microsoft.Extensions.Logging.Console" Condition="'$(MicrosoftExtensionsLoggingConsole)' != ''" Version="$(MicrosoftExtensionsLoggingConsole)" />
+
     <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+    <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Condition="'$(MicrosoftExtensionsLoggingAbstractions)' != ''" Version="$(MicrosoftExtensionsLoggingAbstractions)" />
+
     <PackageReference Update="NuGet.Configuration" Version="6.2.1" />
+    <PackageReference Update="NuGet.Configuration" Condition="'$(NuGetConfiguration)' != ''" Version="$(NuGetConfiguration)" />
+
     <PackageReference Update="NuGet.Credentials" Version="6.2.1" />
+    <PackageReference Update="NuGet.Credentials" Condition="'$(NuGetCredentials)' != ''" Version="$(NuGetCredentials)" />
+
     <PackageReference Update="NuGet.Protocol" Version="6.2.1" />
+    <PackageReference Update="NuGet.Protocol" Condition="'$(NuGetProtocol)' != ''" Version="$(NuGetProtocol)" />
+
     <!--Analyzers-->
     <PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="4.2.0" />
+    <PackageReference Update="Microsoft.Net.Compilers.Toolset" Condition="'$(MicrosoftNetCompilersToolset)' != ''" Version="$(MicrosoftNetCompilersToolset)" />
+
     <PackageReference Update="Microsoft.CodeAnalysis.CSharp.CodeStyle" Version="4.2.0" />
+    <PackageReference Update="Microsoft.CodeAnalysis.CSharp.CodeStyle" Condition="'$(MicrosoftCodeAnalysisCSharpCodeStyle)' != ''" Version="$(MicrosoftCodeAnalysisCSharpCodeStyle)" />
+
     <PackageReference Update="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4-beta1.22277.2" />
+    <PackageReference Update="Microsoft.CodeAnalysis.PublicApiAnalyzers" Condition="'$(MicrosoftCodeAnalysisPublicApiAnalyzers)' != ''" Version="$(MicrosoftCodeAnalysisPublicApiAnalyzers)" />
+
     <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.435" />
+    <PackageReference Update="StyleCop.Analyzers" Condition="'$(StyleCopAnalyzers)' != ''" Version="$(StyleCopAnalyzers)" />
+
     <!--Test dependencies-->
     <PackageReference Update="FakeItEasy" Version="7.3.1" />
+    <PackageReference Update="FakeItEasy" Condition="'$(FakeItEasy)' != ''" Version="$(BenchmarkDotNetVersion)" />
+
     <PackageReference Update="FluentAssertions" Version="6.7.0" />
+    <PackageReference Update="FluentAssertions" Condition="'$(FluentAssertions)' != ''" Version="$(FluentAssertions)" />
+
     <PackageReference Update="Microsoft.NET.Test.Sdk" Version="17.2.0" />
+    <PackageReference Update="Microsoft.NET.Test.Sdk" Condition="'$(MicrosoftNETTestSdk)' != ''" Version="$(MicrosoftNETTestSdk)" />
+
     <PackageReference Update="xunit.abstractions" Version="2.0.3" />
+    <PackageReference Update="xunit.abstractions" Condition="'$(xunitabstractions)' != ''" Version="$(xunitabstractions)" />
+
     <PackageReference Update="Newtonsoft.Json.Schema" Version="3.0.14" />
+    <PackageReference Update="Newtonsoft.Json.Schema" Condition="'$(NewtonsoftJsonSchema)' != ''" Version="$(NewtonsoftJsonSchema)" />
+
     <PackageReference Update="Verify.XUnit" Version="17.2.1" />
+    <PackageReference Update="Verify.XUnit" Condition="'$(VerifyXUnit)' != ''" Version="$(VerifyXUnit)" />
   </ItemGroup>
 </Project>
