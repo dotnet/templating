@@ -100,7 +100,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 return Parameters.Values
                     .Where(param => param.Type.Equals("parameter", StringComparison.OrdinalIgnoreCase)
-                        && param.Priority != TemplateParameterPriority.Implicit)
+                        && param.Precedence.PrecedenceDefinition != PrecedenceDefinition.Implicit)
                     .ToList();
             }
         }

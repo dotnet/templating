@@ -121,7 +121,7 @@ namespace Microsoft.TemplateEngine.Core
 
         public static VariableCollection Root(IDictionary<string, object> values) => new VariableCollection(null, values);
 
-        public static IVariableCollection SetupVariables(IEngineEnvironmentSettings environmentSettings, IParameterSet parameters, IVariableConfig variableConfig)
+        public static IVariableCollection SetupVariables(IEngineEnvironmentSettings environmentSettings, IEvaluatedParameterSetData parameters, IVariableConfig variableConfig)
         {
             IVariableCollection variables = Root();
 
@@ -174,23 +174,16 @@ namespace Microsoft.TemplateEngine.Core
             return variables;
         }
 
-        public static VariableCollection VariableCollectionFromParameters(IParameterSet parameters, string format)
+        public static VariableCollection VariableCollectionFromParameters(IEvaluatedParameterSetData parameters, string format)
         {
             VariableCollection vc = new VariableCollection();
-            foreach (ITemplateParameter param in parameters.ParameterDefinitions)
+            foreach (ITemplateParameter param in parameters.ParameterDefinitions.AsEnumerable())
             {
                 string key = string.Format(format ?? "{0}", param.Name);
 
-                if (!parameters.ResolvedValues.TryGetValue(param, out object value))
+                if (parameters.ParametersData.TryGetValue(param, out ParameterData value) && value != null)
                 {
-                    if (param.Priority != TemplateParameterPriority.Optional)
-                    {
-                        parameters.ResolvedValues[param] = null;
-                    }
-                }
-                else if (value != null)
-                {
-                    vc[key] = value;
+                    vc[key] = value.Value;
                 }
             }
 

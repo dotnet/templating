@@ -251,20 +251,20 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition) or a failure to pass the condition results for parameters with condition(s) in template. Offending parameters: {0}.
+        /// </summary>
+        internal static string Params_Error_ExternalConditionMismatch {
+            get {
+                return ResourceManager.GetString("Params_Error_ExternalConditionMismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Variable [{0}] already added with value [{1}]. Cannot add it as implicit variable with value of self..
         /// </summary>
         internal static string RunnableProjectGenerator_CannotAddImplicitChoice {
             get {
                 return ResourceManager.GetString("RunnableProjectGenerator_CannotAddImplicitChoice", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition): {0}.
-        /// </summary>
-        internal static string RunnableProjectGenerator_Error_ExternalConditionMismatch {
-            get {
-                return ResourceManager.GetString("RunnableProjectGenerator_Error_ExternalConditionMismatch", resourceCulture);
             }
         }
         

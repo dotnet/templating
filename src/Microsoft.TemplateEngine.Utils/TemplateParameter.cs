@@ -147,6 +147,11 @@ namespace Microsoft.TemplateEngine.Utils
         [JsonProperty]
         public bool AllowMultipleValues { get; }
 
+        public override string ToString()
+        {
+            return $"{Name} ({Type})";
+        }
+
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(this, obj))

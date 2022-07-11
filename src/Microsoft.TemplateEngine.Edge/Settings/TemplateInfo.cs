@@ -310,7 +310,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     defaultValue: parameter.DefaultValue,
                     defaultIfOptionWithoutValue: parameter.DefaultIfOptionWithoutValue,
                     datatype: parameter.DataType,
-                    priority: parameter.Priority,
+                    precedence: parameter.Precedence,
                     type: parameter.Type,
                     allowMultipleValues: parameter.AllowMultipleValues,
                     choices: localizedChoices ?? parameter.Choices);

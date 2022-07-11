@@ -109,14 +109,14 @@ MyValue
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
             SimpleConfigModel configModel = SimpleConfigModel.FromJObject(JObject.FromObject(templateConfig));
             IRunnableProjectConfig runnableConfig = new RunnableProjectConfig(settings, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
-            IParameterSet parameters = new ParameterSet(runnableConfig);
+            IParameterSetBuilder parameters = RunnableProjectGenerator.GetParametersForTemplate(runnableConfig);
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
 
             //
             // Running the actual scenario: template files processing and generating output (including macros processing)
             //
 
-            await rpg.CreateAsync(settings, runnableConfig, sourceDir, parameters, targetDir, CancellationToken.None);
+            await rpg.CreateAsync(settings, runnableConfig, sourceDir, parameters.Build(), targetDir, CancellationToken.None);
 
             //
             // Veryfying the outputs
@@ -178,14 +178,14 @@ MyValue
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
             SimpleConfigModel configModel = SimpleConfigModel.FromJObject(JObject.FromObject(templateConfig));
             IRunnableProjectConfig runnableConfig = new RunnableProjectConfig(settings, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
-            IParameterSet parameters = new ParameterSet(runnableConfig);
+            IParameterSetBuilder parameters = RunnableProjectGenerator.GetParametersForTemplate(runnableConfig);
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
 
             //
             // Running the actual scenario: template files processing and generating output (including macros processing)
             //
 
-            var result = await rpg.CreateAsync(settings, runnableConfig, sourceDir, parameters, targetDir, CancellationToken.None);
+            var result = await rpg.CreateAsync(settings, runnableConfig, sourceDir, parameters.Build(), targetDir, CancellationToken.None);
 
             //
             // Veryfying the outputs
@@ -259,14 +259,14 @@ MyValue
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
             SimpleConfigModel configModel = SimpleConfigModel.FromJObject(JObject.FromObject(templateConfig));
             IRunnableProjectConfig runnableConfig = new RunnableProjectConfig(settings, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
-            IParameterSet parameters = new ParameterSet(runnableConfig);
+            IParameterSetBuilder parameters = RunnableProjectGenerator.GetParametersForTemplate(runnableConfig);
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
 
             //
             // Running the actual scenario: template files processing and generating output (including macros processing)
             //
 
-            await rpg.CreateAsync(settings, runnableConfig, sourceDir, parameters, targetDir, CancellationToken.None);
+            await rpg.CreateAsync(settings, runnableConfig, sourceDir, parameters.Build(), targetDir, CancellationToken.None);
 
             //
             // Veryfying the outputs
@@ -280,7 +280,7 @@ MyValue
             // Running the actual scenario: template files processing and generating output (including macros processing)
             //
 
-            await rpg.CreateAsync(settings, runnableConfig, sourceDir, parameters, targetDir, CancellationToken.None);
+            await rpg.CreateAsync(settings, runnableConfig, sourceDir, parameters.Build(), targetDir, CancellationToken.None);
 
             //
             // Veryfying the outputs
@@ -342,10 +342,10 @@ MyValue
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
             SimpleConfigModel configModel = SimpleConfigModel.FromJObject(JObject.FromObject(templateConfig));
             IRunnableProjectConfig runnableConfig = new RunnableProjectConfig(settings, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
-            IParameterSet parameters = new ParameterSet(runnableConfig);
+            IParameterSetBuilder parameters = RunnableProjectGenerator.GetParametersForTemplate(runnableConfig);
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
 
-            await rpg.CreateAsync(settings, runnableConfig, sourceDir, parameters, targetDir, CancellationToken.None);
+            await rpg.CreateAsync(settings, runnableConfig, sourceDir, parameters.Build(), targetDir, CancellationToken.None);
 
             //
             // Veryfying the outputs

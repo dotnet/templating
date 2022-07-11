@@ -57,6 +57,7 @@ override Microsoft.TemplateEngine.Utils.MultiValueParameter.GetHashCode() -> int
 override Microsoft.TemplateEngine.Utils.MultiValueParameter.ToString() -> string!
 override Microsoft.TemplateEngine.Utils.TemplateParameter.Equals(object! obj) -> bool
 override Microsoft.TemplateEngine.Utils.TemplateParameter.GetHashCode() -> int
+override Microsoft.TemplateEngine.Utils.TemplateParameter.ToString() -> string!
 static Microsoft.TemplateEngine.Utils.ArrayExtensions.CombineArrays<T>(params T[]![]! arrayList) -> T[]!
 static Microsoft.TemplateEngine.Utils.DictionaryExtensions.CloneIfDifferentComparer<T>(this System.Collections.Generic.IReadOnlyDictionary<string!, T>! source, System.StringComparer! comparer) -> System.Collections.Generic.IReadOnlyDictionary<string!, T>!
 static Microsoft.TemplateEngine.Utils.DirectedGraph<T>.implicit operator Microsoft.TemplateEngine.Utils.DirectedGraph<T>!(System.Collections.Generic.Dictionary<T, System.Collections.Generic.HashSet<T>!>! dependenciesMap) -> Microsoft.TemplateEngine.Utils.DirectedGraph<T>!
@@ -82,7 +83,6 @@ static Microsoft.TemplateEngine.Utils.MultiValueParameter.MultiValueSeparators.g
 static Microsoft.TemplateEngine.Utils.MultiValueParameter.TryPerformMultiValueEqual(object! x, object! y, out bool result) -> bool
 static Microsoft.TemplateEngine.Utils.ParserExtensions.ConvertToDoubleCurrentOrInvariant(object! value) -> double
 static Microsoft.TemplateEngine.Utils.ParserExtensions.DoubleTryParseСurrentOrInvariant(string? stringValue, out double doubleValue) -> bool
-static Microsoft.TemplateEngine.Utils.RuntimeValueUtil.TryGetRuntimeValue(this Microsoft.TemplateEngine.Abstractions.IParameterSet! parameters, Microsoft.TemplateEngine.Abstractions.IEngineEnvironmentSettings! environmentSettings, string! name, out object? value, bool skipEnvironmentVariableSearch = false) -> bool
 static Microsoft.TemplateEngine.Utils.TemplateParameterExtensions.IsValidMultiValueParameterValue(this string! value) -> bool
 static Microsoft.TemplateEngine.Utils.TemplateParameterExtensions.TokenizeMultiValueParameter(this string! literal) -> System.Collections.Generic.IReadOnlyList<string!>!
 override Microsoft.TemplateEngine.Utils.RangeVersionSpecification.ToString() -> string!

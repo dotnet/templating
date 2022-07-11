@@ -202,8 +202,8 @@ Details: {1}</value>
     <value>Variable [{0}] already added with value [{1}]. Cannot add it as implicit variable with value of self.</value>
     <comment>{0} is the choiceKey, {1} is the existing conflict value</comment>
   </data>
-  <data name="RunnableProjectGenerator_Error_ExternalConditionMismatch" xml:space="preserve">
-    <value>Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition): {0}</value>
+  <data name="Params_Error_ExternalConditionMismatch" xml:space="preserve">
+    <value>Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition) or a failure to pass the condition results for parameters with condition(s) in template. Offending parameters: {0}</value>
     <comment>{0} - csv of mismateched parameters</comment>
   </data>
   <data name="RunnableProjectGenerator_Error_ParamsCycle" xml:space="preserve">
@@ -260,5 +260,8 @@ Details: {1}</value>
   <data name="Symbol_Error_IsRequiredNotABoolOrString" xml:space="preserve">
     <value>Found disallowed value for IsRequired property: [{0}], expected boolean or string (condition) value</value>
     <comment>{0} - the json property</comment>
+  </data>
+  <data name="SymbolModel_Error_MandatoryPropertyMissing" xml:space="preserve">
+    <value>The symbol '{0}' of type '{1}' is incorrect: mandatory property '{2}' is not set. The symbol will be skipped.</value>
   </data>
 </root>

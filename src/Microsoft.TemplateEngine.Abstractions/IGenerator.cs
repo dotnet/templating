@@ -27,7 +27,7 @@ namespace Microsoft.TemplateEngine.Abstractions
         Task<ICreationResult> CreateAsync(
             IEngineEnvironmentSettings environmentSettings,
             ITemplate template,
-            IParameterSet parameters,
+            IEvaluatedParameterSetData parameters,
             string targetDirectory,
             CancellationToken cancellationToken);
 
@@ -43,43 +43,20 @@ namespace Microsoft.TemplateEngine.Abstractions
         Task<ICreationEffects> GetCreationEffectsAsync(
             IEngineEnvironmentSettings environmentSettings,
             ITemplate template,
-            IParameterSet parameters,
+            IEvaluatedParameterSetData parameters,
             string targetDirectory,
             CancellationToken cancellationToken);
 
         /// <summary>
-        /// Returns a <see cref="IParameterSet"/> for the given <paramref name="template"/>.
+        /// Returns a <see cref="IParameterSetBuilder"/> for the given <paramref name="template"/>.
         /// This method returns the list of input parameters that can be set by the host / Edge before running the template.
-        /// After setting the values the host should pass <see cref="IParameterSet"/> to <see cref="GetCreationEffectsAsync(IEngineEnvironmentSettings, ITemplate, IParameterSet, string, CancellationToken)"/> or <see cref="CreateAsync(IEngineEnvironmentSettings, ITemplate, IParameterSet, string, CancellationToken)"/> methods.
+        /// After setting the values the host should pass <see cref="IParameterSetBuilder"/> to <see cref="GetCreationEffectsAsync"/> or <see cref="CreateAsync"/> methods.
         /// Host may use <see cref="ConvertParameterValueToType(IEngineEnvironmentSettings, ITemplateParameter, string, out bool)"/> to convert input value to required parameter type.
         /// </summary>
         /// <param name="environmentSettings">template engine environment settings.</param>
         /// <param name="template">template to get parameters from.</param>
-        /// <returns><see cref="IParameterSet"/> with parameters available in <paramref name="template"/>.</returns>
-        IParameterSet GetParametersForTemplate(IEngineEnvironmentSettings environmentSettings, ITemplate template);
-
-        /// <summary>
-        /// Evaluates possible conditions defined on parameters within the given set of parameters.
-        /// Performs the changes on the given set of parameters as needed and returns the summary of changes performed.
-        /// </summary>
-        /// <param name="logger"></param>
-        /// <param name="parameters">Parameters to be evaluated and updated.</param>
-        /// <param name="template"></param>
-        /// <returns></returns>
-        ParametersConditionsEvaluationResult EvaluateConditionalParameters(ILogger logger, IParameterSet parameters, ITemplate template);
-
-        /// <summary>
-        /// Applies result of external conditions evaluation as if the evaluation was performed via <see cref="EvaluateConditionalParameters"/>.
-        /// This means removing the disabled parameters from values and templates collections and altering the requirement of parameters with
-        ///  conditional requirement.
-        /// </summary>
-        /// <param name="evaluationResult"></param>
-        /// <param name="parameterSet"></param>
-        /// <param name="template"></param>
-        void ApplyExternalEvaluationOfConditionalParameters(
-            ParametersConditionsEvaluationResult evaluationResult,
-            IParameterSet parameterSet,
-            ITemplate template);
+        /// <returns><see cref="IParameterSetBuilder"/> with parameters available in <paramref name="template"/>.</returns>
+        IParameterSetBuilder GetParametersForTemplate(IEngineEnvironmentSettings environmentSettings, ITemplate template);
 
         /// <summary>
         /// Gets an <see cref="ITemplate"/> from the given <see cref="IFileSystemInfo" /> configuration entry.

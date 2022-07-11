@@ -378,16 +378,13 @@ C
 //#endif
 ";
 
-            InputParametersSet parameters = new InputParametersSet(
+            List<InputDataBag> parameters = new List<InputDataBag>(
                 new[]
                 {
-                    new InputParameter("A", a_val.ToString(), a_enabled, a_required, a_val == null),
-                    new InputParameter("B", b_val.ToString(), b_enabled, b_required, b_val == null),
-                    new InputParameter("C", c_val.ToString()),
-                })
-            {
-                SkipParametersConditionsEvaluation = true
-            };
+                    new InputDataBag("A", a_val.ToString(), a_enabled, a_required),
+                    new InputDataBag("B", b_val.ToString(), b_enabled, b_required),
+                    new InputDataBag("C", c_val.ToString()),
+                });
 
             await InstantiateAsyncHelper(
                 TemplateConfigForExternalConditionsEvaluation,
@@ -405,7 +402,7 @@ C
             string expectedErrorMessage,
             bool instantiateShouldFail,
             IReadOnlyDictionary<string, string?>? parameters1 = null,
-            InputParametersSet? parameters2 = null)
+            IReadOnlyList<InputDataBag>? parameters2 = null)
         {
             //
             // Template content preparation
@@ -448,11 +445,21 @@ C
             }
             else
             {
+                var paramsDict = runnableConfig.Parameters.ToDictionary(p => p.Key, p => (ITemplateParameter)p.Value);
+                IParameterSetData data = new EvaluatedParameterSetData(
+                    new ParameterSet2(paramsDict).ParameterDefinitions,
+                    parameters2!.Select(p => new EvaluatedParameterData(
+                        paramsDict[p.Name],
+                        p.Value,
+                        p.IsEnabledConditionResult,
+                        p.IsRequiredConditionResult,
+                        p.Value == null ? InputDataState.Unset : InputDataState.Set)).ToList());
+
                 res = await creator.InstantiateAsync(
                     templateInfo: runnableConfig,
                     name: "tst",
                     fallbackName: "tst2",
-                    inputParameters: parameters2!,
+                    inputParameters: data,
                     outputPath: targetDir);
             }
 
@@ -471,6 +478,25 @@ C
                     .ReadAllText(Path.Combine(res.OutputBaseDirectory!, "sourceFile")).Trim();
                 resultContent.Should().BeEquivalentTo(expectedOutput);
             }
+        }
+
+        private class InputDataBag
+        {
+            public InputDataBag(string name, string? value, bool? isEnabledConditionResult = null, bool? isRequiredConditionResult = null)
+            {
+                Name = name;
+                Value = value;
+                IsEnabledConditionResult = isEnabledConditionResult;
+                IsRequiredConditionResult = isRequiredConditionResult;
+            }
+
+            public string Name { get; }
+
+            public string? Value { get; }
+
+            public bool? IsEnabledConditionResult { get; }
+
+            public bool? IsRequiredConditionResult { get; }
         }
     }
 }

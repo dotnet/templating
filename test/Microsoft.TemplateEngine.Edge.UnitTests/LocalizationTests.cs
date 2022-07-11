@@ -135,7 +135,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             ICreationEffects effects = await template.Generator.GetCreationEffectsAsync(
                 environmentSettings,
                 template,
-                template.Generator.GetParametersForTemplate(environmentSettings, template),
+                template.Generator.GetParametersForTemplate(environmentSettings, template).Build(),
                 Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()),
                 default);
 

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -44,23 +45,25 @@ namespace Microsoft.TemplateEngine.Edge.Template
         /// <param name="dryRun">If true, only dry run will be performed - no actual actions will be done.</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+#pragma warning disable RS0026 // Do not add multiple public overloads with optional parameters
         public Task<ITemplateCreationResult> InstantiateAsync(
             ITemplateInfo templateInfo,
             string? name,
             string? fallbackName,
             string? outputPath,
-            IReadOnlyDictionary<string, string?> inputParameters,
+            IReadOnlyDictionary<string, string?>? inputParameters,
             bool forceCreation = false,
             string? baselineName = null,
             bool dryRun = false,
             CancellationToken cancellationToken = default)
+#pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         {
             return InstantiateAsync(
                 templateInfo,
                 name,
                 fallbackName,
                 outputPath,
-                new InputParametersSet(inputParameters),
+                new ParameterSetData(templateInfo, inputParameters),
                 forceCreation,
                 baselineName,
                 dryRun,
@@ -86,7 +89,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
             string? name,
             string? fallbackName,
             string? outputPath,
-            InputParametersSet inputParameters,
+            IParameterSetData? inputParameters,
             bool forceCreation = false,
             string? baselineName = null,
             bool dryRun = false,
@@ -94,7 +97,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         {
             _ = templateInfo ?? throw new ArgumentNullException(nameof(templateInfo));
-            inputParameters = inputParameters ?? new();
+            inputParameters = inputParameters ?? new ParameterSetData(templateInfo);
             cancellationToken.ThrowIfCancellationRequested();
 
             ITemplate? template = LoadTemplate(templateInfo, baselineName);
@@ -124,7 +127,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 IComponentManager componentManager = _environmentSettings.Components;
 
                 // setup separate sets of parameters to be used for GetCreationEffects() and by CreateAsync().
-                if (!TryCreateParameterSet(template, realName!, inputParameters, out IParameterSet? effectParams, out TemplateCreationResult? resultIfParameterCreationFailed))
+                if (!TryCreateParameterSet(template, realName!, inputParameters, out IEvaluatedParameterSetData? effectParams, out TemplateCreationResult? resultIfParameterCreationFailed))
                 {
                     //resultIfParameterCreationFailed is not null when TryCreateParameterSet is false
                     return resultIfParameterCreationFailed!;
@@ -159,7 +162,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                     }
                 }
 
-                if (!TryCreateParameterSet(template, realName!, inputParameters, out IParameterSet? creationParams, out resultIfParameterCreationFailed))
+                if (!TryCreateParameterSet(template, realName!, inputParameters, out IEvaluatedParameterSetData? creationParams, out resultIfParameterCreationFailed))
                 {
                     return resultIfParameterCreationFailed!;
                 }
@@ -203,16 +206,9 @@ namespace Microsoft.TemplateEngine.Edge.Template
             }
         }
 
-        [Obsolete("The method is deprecated.")]
-        //This method should become internal once Cli help logic is refactored.
-        public bool AnyParametersWithInvalidDefaultsUnresolved(IReadOnlyList<string> defaultParamsWithInvalidValues, IReadOnlyList<string> userParamsWithInvalidValues, IReadOnlyDictionary<string, string?> inputParameters, out IReadOnlyList<string> invalidDefaultParameters)
+        private bool AnyParametersWithInvalidDefaultsUnresolved(IReadOnlyList<string> defaultParamsWithInvalidValues, IParameterSetData inputParameters, out IReadOnlyList<string> invalidDefaultParameters)
         {
-            return AnyParametersWithInvalidDefaultsUnresolved(defaultParamsWithInvalidValues, new InputParametersSet(inputParameters), out invalidDefaultParameters);
-        }
-
-        private bool AnyParametersWithInvalidDefaultsUnresolved(IReadOnlyList<string> defaultParamsWithInvalidValues, InputParametersSet inputParameters, out IReadOnlyList<string> invalidDefaultParameters)
-        {
-            invalidDefaultParameters = defaultParamsWithInvalidValues.Where(x => !inputParameters.ContainsParameterWithName(x)).ToList();
+            invalidDefaultParameters = defaultParamsWithInvalidValues.Where(x => !inputParameters.ParameterDefinitions.ContainsKey(x)).ToList();
             return invalidDefaultParameters.Count > 0;
         }
 
@@ -253,21 +249,21 @@ namespace Microsoft.TemplateEngine.Edge.Template
         /// <returns></returns>
         [Obsolete("This method is deprecated.")]
         //This method should become internal once Cli help logic is refactored.
-        public IParameterSet SetupDefaultParamValuesFromTemplateAndHost(ITemplate template, string realName, out IReadOnlyList<string> paramsWithInvalidValues)
+        public IParameterSetBuilder SetupDefaultParamValuesFromTemplateAndHost(ITemplate template, string realName, out IReadOnlyList<string> paramsWithInvalidValues)
         {
             ITemplateEngineHost host = _environmentSettings.Host;
-            IParameterSet templateParams = template.Generator.GetParametersForTemplate(_environmentSettings, template);
+            IParameterSetBuilder templateParams = template.Generator.GetParametersForTemplate(_environmentSettings, template);
             List<string> paramsWithInvalidValuesList = new List<string>();
 
-            foreach (ITemplateParameter param in templateParams.ParameterDefinitions)
+            foreach (ITemplateParameter param in templateParams.ParameterDefinitions.AsEnumerable())
             {
                 if (param.IsName)
                 {
-                    templateParams.ResolvedValues[param] = realName;
+                    templateParams.SetParameterValue(param, realName);
                 }
                 else
                 {
-                    SetParameterDefault(host, template, templateParams, param, paramsWithInvalidValuesList);
+                    SetParameterDefault(host, template, templateParams, param, param.Precedence.PrecedenceDefinition == PrecedenceDefinition.Required, paramsWithInvalidValuesList);
                 }
             }
 
@@ -285,20 +281,27 @@ namespace Microsoft.TemplateEngine.Edge.Template
         /// <param name="paramsWithInvalidValues"></param>
         [Obsolete("This method is deprecated.")]
         //This method should become internal once Cli help logic is refactored.
-        public void ResolveUserParameters(ITemplate template, IParameterSet templateParams, IReadOnlyDictionary<string, string?> inputParameters, out IReadOnlyList<string> paramsWithInvalidValues)
+        public void ResolveUserParameters(ITemplate template, IParameterSetBuilder templateParams, IReadOnlyDictionary<string, string?> inputParameters, out IReadOnlyList<string> paramsWithInvalidValues)
         {
-            ResolveUserParameters(template, templateParams, new InputParametersSet(inputParameters), out paramsWithInvalidValues);
+            ResolveUserParameters(template, templateParams, new ParameterSetData(template, inputParameters), out paramsWithInvalidValues);
         }
 
-        private void ResolveUserParameters(ITemplate template, IParameterSet templateParams, InputParametersSet inputParameters, out IReadOnlyList<string> paramsWithInvalidValues)
+        private void ResolveUserParameters(ITemplate template, IParameterSetBuilder templateParamsBuilder, IParameterSetData inputParameters, out IReadOnlyList<string> paramsWithInvalidValues)
         {
             List<string> tmpParamsWithInvalidValues = new List<string>();
             paramsWithInvalidValues = tmpParamsWithInvalidValues;
 
-            foreach (InputParameter inputParam in inputParameters.Where(p => !p.ParameterNotPassed))
+            foreach (ParameterData inputParam in inputParameters.ParametersData
+                         .Where(p => p.Value.InputDataState != Abstractions.InputDataState.Unset)
+                         .Select(p => p.Value))
             {
-                if (templateParams.TryGetParameterDefinition(inputParam.Name, out ITemplateParameter paramFromTemplate))
+                if (templateParamsBuilder.ParameterDefinitions.TryGetValue(inputParam.ParameterDefinition.Name, out ITemplateParameter paramFromTemplate))
                 {
+                    if (inputParam is EvaluatedParameterData evaluatedParameterData)
+                    {
+                        templateParamsBuilder.SetParameterEvaluation(paramFromTemplate, evaluatedParameterData);
+                    }
+
                     if (inputParam.Value == null)
                     {
                         if (!string.IsNullOrEmpty(paramFromTemplate.DefaultIfOptionWithoutValue))
@@ -310,12 +313,12 @@ namespace Microsoft.TemplateEngine.Edge.Template
                                 {
                                     throw new InvalidOperationException($"{nameof(resolvedValue)} cannot be null when {nameof(valueResolutionError)} is 'false'.");
                                 }
-                                templateParams.ResolvedValues[paramFromTemplate] = resolvedValue;
+                                templateParamsBuilder.SetParameterValue(paramFromTemplate, resolvedValue);
                             }
                             // don't fail on value resolution errors, but report them as authoring problems.
                             else
                             {
-                                _logger.LogDebug($"Template {template.Identity} has an invalid DefaultIfOptionWithoutValue value for parameter {inputParam.Name}");
+                                _logger.LogDebug($"Template {template.Identity} has an invalid DefaultIfOptionWithoutValue value for parameter {inputParam.ParameterDefinition.Name}");
                             }
                         }
                         else
@@ -325,14 +328,14 @@ namespace Microsoft.TemplateEngine.Edge.Template
                     }
                     else
                     {
-                        object? resolvedValue = template.Generator.ConvertParameterValueToType(_environmentSettings, paramFromTemplate, inputParam.Value, out bool valueResolutionError);
+                        object? resolvedValue = template.Generator.ConvertParameterValueToType(_environmentSettings, paramFromTemplate, inputParam.Value.ToString(), out bool valueResolutionError);
                         if (!valueResolutionError)
                         {
                             if (resolvedValue is null)
                             {
                                 throw new InvalidOperationException($"{nameof(resolvedValue)} cannot be null when {nameof(valueResolutionError)} is 'false'.");
                             }
-                            templateParams.ResolvedValues[paramFromTemplate] = resolvedValue;
+                            templateParamsBuilder.SetParameterValue(paramFromTemplate, resolvedValue);
                         }
                         else
                         {
@@ -397,7 +400,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
             }
         }
 
-        private void SetParameterDefault(ITemplateEngineHost? host, ITemplate template, IParameterSet templateParams, ITemplateParameter parameter, List<string> paramsWithInvalidValues)
+        private void SetParameterDefault(ITemplateEngineHost? host, ITemplate template, IParameterSetBuilder templateParams, ITemplateParameter parameter, bool isRequired, List<string> paramsWithInvalidValues)
         {
             if (host != null && host.TryGetHostParamDefault(parameter.Name, out string? hostParamValue) && hostParamValue != null)
             {
@@ -408,7 +411,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                     {
                         throw new InvalidOperationException($"{nameof(resolvedValue)} cannot be null when {nameof(valueResolutionError)} is 'false'.");
                     }
-                    templateParams.ResolvedValues[parameter] = resolvedValue;
+                    templateParams.SetParameterValue(parameter, resolvedValue);
                 }
                 else
                 {
@@ -416,7 +419,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 }
             }
             // This for newly optional that does not have value set
-            else if (parameter.Priority != TemplateParameterPriority.Required && parameter.DefaultValue != null)
+            else if (!isRequired && parameter.DefaultValue != null)
             {
                 object? resolvedValue = template.Generator.ConvertParameterValueToType(_environmentSettings, parameter, parameter.DefaultValue, out bool valueResolutionError);
                 if (!valueResolutionError)
@@ -425,7 +428,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                     {
                         throw new InvalidOperationException($"{nameof(resolvedValue)} cannot be null when {nameof(valueResolutionError)} is 'false'.");
                     }
-                    templateParams.ResolvedValues[parameter] = resolvedValue;
+                    templateParams.SetParameterValue(parameter, resolvedValue);
                 }
                 else
                 {
@@ -440,105 +443,69 @@ namespace Microsoft.TemplateEngine.Edge.Template
         /// Returns true if there are any missing params, false otherwise.
         /// </summary>
         /// <param name="templateParams"></param>
+        /// <param name="parametersBuilder"></param>
         /// <param name="missingParamNames"></param>
         /// <returns></returns>
-        private bool CheckForMissingRequiredParameters(IParameterSet templateParams, out IList<string> missingParamNames)
+        private bool CheckForMissingRequiredParameters(IEvaluatedParameterSetData templateParams, IParameterSetBuilder parametersBuilder, out IList<string> missingParamNames)
         {
             ITemplateEngineHost host = _environmentSettings.Host;
             bool anyMissingParams = false;
             missingParamNames = new List<string>();
 
-            foreach (ITemplateParameter parameter in templateParams.ParameterDefinitions)
+            foreach (EvaluatedParameterData evaluatedParameterData in templateParams.AllParametersData.Values.Where(v => v.EvaluatedPrecedence == EvaluatedPrecedence.Required && v.InputDataState == Abstractions.InputDataState.Unset))
             {
-                if (parameter.Priority == TemplateParameterPriority.Required && !templateParams.ResolvedValues.ContainsKey(parameter))
-                {
-                    string? newParamValue;
+                string? newParamValue;
 #pragma warning disable CS0618 // Type or member is obsolete - for backward compatibility
-                    while (host.OnParameterError(parameter, "", "Missing required parameter", out newParamValue)
+                while (host.OnParameterError(evaluatedParameterData.ParameterDefinition, "", "Missing required parameter", out newParamValue)
 #pragma warning restore CS0618 // Type or member is obsolete
-                        && string.IsNullOrEmpty(newParamValue))
-                    {
-                    }
+                       && string.IsNullOrEmpty(newParamValue))
+                {
+                }
 
-                    if (!string.IsNullOrEmpty(newParamValue))
-                    {
-                        templateParams.ResolvedValues.Add(parameter, newParamValue!);
-                    }
-                    else
-                    {
-                        missingParamNames.Add(parameter.Name);
-                        anyMissingParams = true;
-                    }
+                if (!string.IsNullOrEmpty(newParamValue))
+                {
+                    parametersBuilder.SetParameterValue(evaluatedParameterData.ParameterDefinition, newParamValue!);
+                }
+                else
+                {
+                    missingParamNames.Add(evaluatedParameterData.ParameterDefinition.Name);
+                    anyMissingParams = true;
                 }
             }
 
             return anyMissingParams;
         }
 
-        private bool EvaluateConditionalParameters(
-            InputParametersSet inputParameters,
+        private IEvaluatedParameterSetData EvaluateConditionalParameters(
+            IParameterSetBuilder parametersBuilder,
+            IParameterSetData inputParameters,
             ITemplate template,
-            IParameterSet templateParams,
             out IReadOnlyList<string> paramsWithInvalidValues)
         {
-            ParametersConditionsEvaluationResult result;
-            if (inputParameters.SkipParametersConditionsEvaluation)
+            if (inputParameters is not IEvaluatedParameterSetData)
             {
-                List<ITemplateParameter> disabledParams = new List<ITemplateParameter>();
-                List<ITemplateParameter> paramsWithChangedPriority = new List<ITemplateParameter>();
-                foreach (InputParameter inputParameter in inputParameters)
-                {
-                    if (templateParams.TryGetParameterDefinition(inputParameter.Name, out ITemplateParameter paramDefinition))
-                    {
-                        if (inputParameter.IsEnabledConditionResult.HasValue &&
-                            !inputParameter.IsEnabledConditionResult.Value)
-                        {
-                            disabledParams.Add(paramDefinition);
-                        }
-
-                        if (inputParameter.IsRequiredConditionResult.HasValue &&
-                            inputParameter.IsRequiredConditionResult.Value !=
-                            (paramDefinition.Priority == TemplateParameterPriority.Required))
-                        {
-                            paramsWithChangedPriority.Add(paramDefinition);
-                        }
-                    }
-                }
-
-                result = new(disabledParams, paramsWithChangedPriority);
-                template.Generator.ApplyExternalEvaluationOfConditionalParameters(result, templateParams, template);
-            }
-            else if (inputParameters.Any(p => p.IsEnabledConditionResult.HasValue || p.IsRequiredConditionResult.HasValue))
-            {
-                throw new ArgumentException(string.Format(
-                    "It is not allowed to use explicit parameters conditions results when 'InputParametersSet.SkipParametersConditionsEvaluation' is not set to true. Offendning parameters: {0}",
-                    inputParameters
-                        .Where(p => p.IsEnabledConditionResult.HasValue || p.IsRequiredConditionResult.HasValue)
-                        .Select(p => p.Name).ToCsvString()));
-            }
-            else
-            {
-                result = template.Generator.EvaluateConditionalParameters(_logger, templateParams, template);
+                parametersBuilder.EvaluateConditionalParameters(_logger);
             }
 
+            IEvaluatedParameterSetData evaluatedParameterSetData = parametersBuilder.Build();
             List<string> defaultParamsWithInvalidValues = new List<string>();
 
             // for params that changed to optional - try get 'Default' value (as for required it's not obtained)
-            result.ParametersWithAlteredPriority
-                .Where(p => p.Priority == TemplateParameterPriority.Optional)
-                .ForEach(p => SetParameterDefault(null, template, templateParams, p, defaultParamsWithInvalidValues));
+            evaluatedParameterSetData.AllParametersData.Values
+                .Where(v => v.EvaluatedPrecedence != EvaluatedPrecedence.Disabled && v.EvaluatedPrecedence != EvaluatedPrecedence.Required)
+                .ForEach(p => SetParameterDefault(null, template, parametersBuilder, p.ParameterDefinition, false, defaultParamsWithInvalidValues));
 
             paramsWithInvalidValues = defaultParamsWithInvalidValues;
-            return defaultParamsWithInvalidValues.Count == 0;
+            return evaluatedParameterSetData;
         }
 
-        private bool TryCreateParameterSet(ITemplate template, string realName, InputParametersSet inputParameters, out IParameterSet? templateParams, out TemplateCreationResult? failureResult)
+        private bool TryCreateParameterSet(ITemplate template, string realName, IParameterSetData inputParameters, out IEvaluatedParameterSetData? templateParams, out TemplateCreationResult? failureResult)
         {
             // there should never be param errors here. If there are, the template is malformed, or the host gave an invalid value.
 #pragma warning disable CS0618 // Type or member is obsolete - temporary until the method becomes internal.
-            templateParams = SetupDefaultParamValuesFromTemplateAndHost(template, realName, out IReadOnlyList<string> defaultParamsWithInvalidValues);
+            IParameterSetBuilder parameterSetBuilder = SetupDefaultParamValuesFromTemplateAndHost(template, realName, out IReadOnlyList<string> defaultParamsWithInvalidValues);
 
-            ResolveUserParameters(template, templateParams, inputParameters, out IReadOnlyList<string> userParamsWithInvalidValues);
+            ResolveUserParameters(template, parameterSetBuilder, inputParameters, out IReadOnlyList<string> userParamsWithInvalidValues);
 
             if (AnyParametersWithInvalidDefaultsUnresolved(defaultParamsWithInvalidValues, inputParameters, out IReadOnlyList<string> defaultsWithUnresolvedInvalidValues)
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -550,14 +517,16 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 return false;
             }
 
-            if (!EvaluateConditionalParameters(inputParameters, template, templateParams, out var paramsWithInvalidValues))
+            templateParams = EvaluateConditionalParameters(parameterSetBuilder, inputParameters, template, out var paramsWithInvalidValues);
+
+            if (paramsWithInvalidValues.Any())
             {
                 failureResult = new TemplateCreationResult(CreationResultStatus.InvalidParamValues, template.Name, paramsWithInvalidValues.ToCsvString());
                 templateParams = null;
                 return false;
             }
 
-            bool missingParams = CheckForMissingRequiredParameters(templateParams, out IList<string> missingParamNames);
+            bool missingParams = CheckForMissingRequiredParameters(templateParams, parameterSetBuilder, out IList<string> missingParamNames);
 
             if (missingParams)
             {
@@ -565,6 +534,8 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 templateParams = null;
                 return false;
             }
+
+            templateParams = parameterSetBuilder.Build();
 
             failureResult = null;
             return true;
