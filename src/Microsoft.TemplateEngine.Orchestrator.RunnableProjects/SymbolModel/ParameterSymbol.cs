@@ -116,6 +116,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
         internal bool EnableQuotelessLiterals { get; init; }
 
         internal TemplateParameterPrecedence Precedence { get; init; }
+        
+        internal string? IsEnabledCondition { get; init; }
+
+        internal string? IsRequiredCondition { get; init; }
 
         internal IReadOnlyDictionary<string, ParameterChoice>? Choices
         {
@@ -204,19 +208,19 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
 
         private static string ParseIsRequiredConditionField(JToken token)
         {
-            JToken isRequiredToken;
+            JToken? isRequiredToken;
             if (!token.TryGetValue(nameof(IsRequired), out isRequiredToken))
             {
                 return null;
             }
 
             // Attribute parseable as a bool - so we do not want to present it as a condition
-            if (isRequiredToken!.TryParseBool(out _))
+            if (TryGetIsRequiredField(isRequiredToken!, out _))
             {
                 return null;
             }
 
-            if (isRequiredToken.Type != JTokenType.String)
+            if (isRequiredToken!.Type != JTokenType.String)
             {
                 throw new ArgumentException(string.Format(LocalizableStrings.Symbol_Error_IsRequiredNotABoolOrString, isRequiredToken));
             }

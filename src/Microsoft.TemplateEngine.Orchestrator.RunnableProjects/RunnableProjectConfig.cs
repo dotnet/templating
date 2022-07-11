@@ -505,7 +505,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 bool isName = baseSymbol == configuration.NameSymbol;
 
-                Parameter parameter = new Parameter(symbol.Key, baseSymbol.Type, baseSymbol.DataType)
+                Parameter parameter = new Parameter(baseSymbol.Name, baseSymbol.Type, baseSymbol.DataType!)
                 {
                     DefaultValue = baseSymbol.DefaultValue ?? (!baseSymbol.IsRequired ? baseSymbol.Replaces : null),
                     IsName = isName,
