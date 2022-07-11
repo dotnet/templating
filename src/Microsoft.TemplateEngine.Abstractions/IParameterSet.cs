@@ -156,13 +156,13 @@ namespace Microsoft.TemplateEngine.Abstractions
         {
             ErrorOutOnMismatchedConditionEvaluation(
                 AllParametersData.Values.Where(p =>
-                    !(p.IsEnabledConditionResult == null ^
-                    string.IsNullOrEmpty(p.ParameterDefinition.Precedence.IsEnabledCondition))).ToList());
+                    p.IsEnabledConditionResult == null ^
+                    string.IsNullOrEmpty(p.ParameterDefinition.Precedence.IsEnabledCondition)).ToList());
 
             ErrorOutOnMismatchedConditionEvaluation(
                 AllParametersData.Values.Where(p =>
-                    !(p.IsRequiredConditionResult == null ^
-                    string.IsNullOrEmpty(p.ParameterDefinition.Precedence.IsRequiredCondition))).ToList());
+                    p.IsRequiredConditionResult == null ^
+                    string.IsNullOrEmpty(p.ParameterDefinition.Precedence.IsRequiredCondition)).ToList());
         }
 
         private void ErrorOutOnMismatchedConditionEvaluation(IReadOnlyList<EvaluatedParameterData> offendingParameters)
