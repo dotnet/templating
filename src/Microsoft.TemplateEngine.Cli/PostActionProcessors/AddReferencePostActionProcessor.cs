@@ -103,24 +103,13 @@ namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
                     return false;
                 }
 
-                // replace the path to the project file in case it has been renamed
+                // replace the referenced project file's name in case it has been renamed
                 Glob g = Glob.Parse(referenceToAdd);
+                var referenceNameChange = creationEffects.FileChanges.OfType<IFileChange2>().FirstOrDefault(change => g.IsMatch(change.SourceRelativePath));
 
-                if (creationEffects.FileChanges != null)
-                {
-                    foreach (IFileChange2 change in creationEffects.FileChanges)
-                    {
-                        if (g.IsMatch(change.SourceRelativePath))
-                        {
-                            referenceToAdd = Path.GetFullPath(change.TargetRelativePath, outputBasePath);
+                string relativeProjectReference = referenceNameChange != null ? referenceNameChange.TargetRelativePath : referenceToAdd;
 
-                            break;
-                        }
-                    }
-                }
-
-                // retrieve the full path in case the file has not been renamed
-                referenceToAdd = Path.GetFullPath(referenceToAdd, outputBasePath);
+                referenceToAdd = Path.GetFullPath(relativeProjectReference, outputBasePath);
 
                 Reporter.Output.WriteLine(string.Format(LocalizableStrings.PostAction_AddReference_AddProjectReference, referenceToAdd, projectFile));
                 succeeded = Callbacks.AddProjectReference(projectFile, new[] { referenceToAdd });
