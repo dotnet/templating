@@ -71,7 +71,7 @@ namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
                 return null;
             }
 
-            targetFiles = PrepareForJsonParse(targetFiles);
+            targetFiles = PrepareForJsonParsing(targetFiles);
 
             JToken config = JToken.Parse(targetFiles);
             if (config.Type == JTokenType.String)
@@ -110,7 +110,7 @@ namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
                     .ToArray();
             }
 
-            string PrepareForJsonParse(string input)
+            string PrepareForJsonParsing(string input)
             {
                 if (!input.StartsWith('[') && !input.StartsWith('"'))
                 {
@@ -119,7 +119,6 @@ namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
 
                 return input;
             }
-
         }
 
         protected abstract bool ProcessInternal(
