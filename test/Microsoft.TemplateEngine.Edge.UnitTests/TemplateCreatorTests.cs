@@ -346,8 +346,7 @@ C
         [InlineData(true, true, true, null, false, null, /*c_val*/ false, "A,", false, "")]
         [InlineData(null, true, false, null, true, null, /*c_val*/ true, "", true, "B")]
         [InlineData(null, true, true, null, false, null, /*c_val*/ true, "", true, "A")]
-        [InlineData(null, true, false, null, false, false, /*c_val*/ false, "", true, @"Failed to create template.
-Details: Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition): B (parameter)")]
+        [InlineData(null, true, false, null, false, false, /*c_val*/ false, "", true, @"Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition): B (parameter)")]
         public async void InstantiateAsync_ConditionalParametersWithExternalEvaluation(
             bool? a_val,
             bool? a_enabled,
@@ -381,9 +380,9 @@ C
             List<InputDataBag> parameters = new List<InputDataBag>(
                 new[]
                 {
-                    new InputDataBag("A", a_val.ToString(), a_enabled, a_required),
-                    new InputDataBag("B", b_val.ToString(), b_enabled, b_required),
-                    new InputDataBag("C", c_val.ToString()),
+                    new InputDataBag("A", a_val, a_enabled, a_required),
+                    new InputDataBag("B", b_val, b_enabled, b_required),
+                    new InputDataBag("C", c_val),
                 });
 
             await InstantiateAsyncHelper(
@@ -446,14 +445,25 @@ C
             else
             {
                 var paramsDict = runnableConfig.Parameters.ToDictionary(p => p.Key, p => (ITemplateParameter)p.Value);
-                IParameterSetData data = new EvaluatedParameterSetData(
-                    new ParameterSet2(paramsDict).ParameterDefinitions,
-                    parameters2!.Select(p => new EvaluatedParameterData(
-                        paramsDict[p.Name],
-                        p.Value,
-                        p.IsEnabledConditionResult,
-                        p.IsRequiredConditionResult,
-                        p.Value == null ? InputDataState.Unset : InputDataState.Set)).ToList());
+
+                IParameterSetData data;
+                try
+                {
+                    data = new EvaluatedParameterSetData(
+                        new ParameterSet2(paramsDict).ParameterDefinitions,
+                        parameters2!.Select(p => new EvaluatedParameterData(
+                            paramsDict[p.Name],
+                            p.Value,
+                            p.IsEnabledConditionResult,
+                            p.IsRequiredConditionResult,
+                            p.IsNull ? InputDataState.Unset : InputDataState.Set)).ToList());
+                }
+                catch (Exception e)
+                {
+                    Assert.True(instantiateShouldFail);
+                    e.Message.Should().BeEquivalentTo(e.Message);
+                    return;
+                }
 
                 res = await creator.InstantiateAsync(
                     templateInfo: runnableConfig,
@@ -482,12 +492,13 @@ C
 
         private class InputDataBag
         {
-            public InputDataBag(string name, string? value, bool? isEnabledConditionResult = null, bool? isRequiredConditionResult = null)
+            public InputDataBag(string name, bool? value, bool? isEnabledConditionResult = null, bool? isRequiredConditionResult = null)
             {
                 Name = name;
-                Value = value;
+                Value = value.ToString();
                 IsEnabledConditionResult = isEnabledConditionResult;
                 IsRequiredConditionResult = isRequiredConditionResult;
+                IsNull = value == null;
             }
 
             public string Name { get; }
@@ -497,6 +508,8 @@ C
             public bool? IsEnabledConditionResult { get; }
 
             public bool? IsRequiredConditionResult { get; }
+
+            public bool IsNull { get; }
         }
     }
 }

@@ -88,11 +88,16 @@ namespace Microsoft.TemplateEngine.Abstractions
     {
         public static readonly TemplateParameterPrecedence Default = new TemplateParameterPrecedence(PrecedenceDefinition.Optional);
 
-        public TemplateParameterPrecedence(PrecedenceDefinition precedenceDefinition, string? isRequiredCondition = null, string? isEnabledCondition = null)
+        public TemplateParameterPrecedence(
+            PrecedenceDefinition precedenceDefinition,
+            string? isRequiredCondition = null,
+            string? isEnabledCondition = null,
+            bool isRequired = false)
         {
             PrecedenceDefinition = precedenceDefinition;
             IsRequiredCondition = isRequiredCondition;
             IsEnabledCondition = isEnabledCondition;
+            IsRequired = isRequired;
             VerifyConditions();
         }
 
@@ -101,6 +106,13 @@ namespace Microsoft.TemplateEngine.Abstractions
         public string? IsRequiredCondition { get; }
 
         public string? IsEnabledCondition { get; }
+
+        public bool IsRequired { get; }
+
+        public bool CanBeRequired =>
+            PrecedenceDefinition == PrecedenceDefinition.Required ||
+            !string.IsNullOrEmpty(IsRequiredCondition) ||
+            IsRequired;
 
         private void VerifyConditions()
         {

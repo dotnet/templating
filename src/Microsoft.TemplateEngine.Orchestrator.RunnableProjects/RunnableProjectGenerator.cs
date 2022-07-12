@@ -532,7 +532,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         {
             IVariableCollection variables = VariableCollection.SetupVariables(environmentSettings, parameters, variableConfig);
 
-            foreach (Parameter param in parameters.ParameterDefinitions.OfType<Parameter>())
+            foreach (Parameter param in parameters.ParameterDefinitions.Values.OfType<Parameter>())
             {
                 // Add choice values to variables - to allow them to be recognizable unquoted
                 if (param.EnableQuotelessLiterals && param.IsChoice() && param.Choices != null)
@@ -694,7 +694,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             public void SetParameterEvaluation(ITemplateParameter parameter, EvaluatedParameterData evaluatedParameterData)
             {
+                var old = _resolvedValues[parameter];
                 _resolvedValues[parameter] = new EvalData(evaluatedParameterData);
+                if (old.InputDataState != InputDataState.Unset)
+                {
+                    _resolvedValues[parameter].Value = old.Value;
+                }
+
                 _result = null;
             }
 
@@ -830,7 +836,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     bool? isRequiredConditionResult)
                 {
                     ParameterDefinition = parameterDefinition;
-                    Value = value;
+                    _value = value;
                     IsEnabledConditionResult = isEnabledConditionResult;
                     IsRequiredConditionResult = isRequiredConditionResult;
                 }
@@ -867,7 +873,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
                 public EvaluatedParameterData ToParameterData()
                 {
-                    return new EvaluatedParameterData(this.ParameterDefinition, this.Value, this.IsEnabledConditionResult, this.IsRequiredConditionResult);
+                    return new EvaluatedParameterData(
+                        this.ParameterDefinition,
+                        this.Value,
+                        this.IsEnabledConditionResult,
+                        this.IsRequiredConditionResult,
+                        InputDataState);
                 }
             }
         }

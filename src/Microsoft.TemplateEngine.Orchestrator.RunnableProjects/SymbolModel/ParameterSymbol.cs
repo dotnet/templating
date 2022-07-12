@@ -158,7 +158,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
             // Initialize IsEnabled - as a condition or a constant
             string? isEnabledCondition = null;
             bool isEnabled = true;
-            if (jObject != null && jObject.TryGetValue("IsEnabled", out JToken? isEnabledToken))
+            if (jObject != null && jObject.TryGetValue("IsEnabled", StringComparison.OrdinalIgnoreCase, out JToken? isEnabledToken))
             {
                 if (isEnabledToken!.TryParseBool(out bool enabledConst))
                 {
@@ -185,7 +185,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
 
             if (!string.IsNullOrEmpty(isEnabledCondition))
             {
-                return new TemplateParameterPrecedence(PrecedenceDefinition.ConditionalyDisabled, isRequiredCondition, isEnabledCondition);
+                return new TemplateParameterPrecedence(PrecedenceDefinition.ConditionalyDisabled, isRequiredCondition, isEnabledCondition, isRequired);
             }
 
             if (isTag)
@@ -200,7 +200,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
 
             if (isRequired)
             {
-                return new TemplateParameterPrecedence(PrecedenceDefinition.Required);
+                return new TemplateParameterPrecedence(PrecedenceDefinition.Required, null, null, true);
             }
 
             return TemplateParameterPrecedence.Default;

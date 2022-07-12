@@ -257,7 +257,10 @@ namespace Microsoft.TemplateEngine.Abstractions
             )
             {
                 // TODO: localize
-                throw new ArgumentException("Passed parameters conditions results mismatch");
+                string format =
+                    "Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition) or a failure to pass the condition results for parameters with condition(s) in template. Offending parameter(s): {0}";
+
+                throw new ArgumentException(string.Format(format, this.ParameterDefinition.Name));
             }
         }
 
@@ -278,7 +281,7 @@ namespace Microsoft.TemplateEngine.Abstractions
                     return !IsEnabledConditionResult!.Value
                         ? EvaluatedPrecedence.Disabled
                         :
-                        IsRequiredConditionResult.HasValue && IsRequiredConditionResult.Value
+                        IsRequiredConditionResult.HasValue && IsRequiredConditionResult.Value || ParameterDefinition.Precedence.IsRequired
                             ? EvaluatedPrecedence.Required : EvaluatedPrecedence.Optional;
                 case PrecedenceDefinition.Disabled:
                     return EvaluatedPrecedence.Disabled;

@@ -181,7 +181,10 @@ namespace Microsoft.TemplateEngine.Core
             {
                 string key = string.Format(format ?? "{0}", param.Name);
 
-                if (parameters.ParametersData.TryGetValue(param, out ParameterData value) && value != null)
+                if (parameters.ParametersData.TryGetValue(param, out ParameterData value) && value is
+                    {
+                        InputDataState: InputDataState.Set
+                    })
                 {
                     vc[key] = value.Value;
                 }

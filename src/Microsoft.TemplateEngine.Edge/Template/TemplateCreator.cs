@@ -263,7 +263,13 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 }
                 else
                 {
-                    SetParameterDefault(host, template, templateParams, param, param.Precedence.PrecedenceDefinition == PrecedenceDefinition.Required, paramsWithInvalidValuesList);
+                    SetParameterDefault(
+                        host,
+                        template,
+                        templateParams,
+                        param,
+                        param.Precedence.CanBeRequired,
+                        paramsWithInvalidValuesList);
                 }
             }
 
@@ -297,11 +303,6 @@ namespace Microsoft.TemplateEngine.Edge.Template
             {
                 if (templateParamsBuilder.ParameterDefinitions.TryGetValue(inputParam.ParameterDefinition.Name, out ITemplateParameter paramFromTemplate))
                 {
-                    if (inputParam is EvaluatedParameterData evaluatedParameterData)
-                    {
-                        templateParamsBuilder.SetParameterEvaluation(paramFromTemplate, evaluatedParameterData);
-                    }
-
                     if (inputParam.Value == null)
                     {
                         if (!string.IsNullOrEmpty(paramFromTemplate.DefaultIfOptionWithoutValue))
@@ -482,7 +483,14 @@ namespace Microsoft.TemplateEngine.Edge.Template
             ITemplate template,
             out IReadOnlyList<string> paramsWithInvalidValues)
         {
-            if (inputParameters is not IEvaluatedParameterSetData)
+            if (inputParameters is IEvaluatedParameterSetData evaluatedParameterSet)
+            {
+                foreach (var evaluatedParameterData in evaluatedParameterSet.AllParametersData)
+                {
+                    parametersBuilder.SetParameterEvaluation(evaluatedParameterData.Key, evaluatedParameterData.Value);
+                }
+            }
+            else
             {
                 parametersBuilder.EvaluateConditionalParameters(_logger);
             }
@@ -490,9 +498,13 @@ namespace Microsoft.TemplateEngine.Edge.Template
             IEvaluatedParameterSetData evaluatedParameterSetData = parametersBuilder.Build();
             List<string> defaultParamsWithInvalidValues = new List<string>();
 
-            // for params that changed to optional - try get 'Default' value (as for required it's not obtained)
+            // for params that changed to optional and do not have values - try get 'Default' value (as for required it's not obtained)
             evaluatedParameterSetData.AllParametersData.Values
-                .Where(v => v.EvaluatedPrecedence != EvaluatedPrecedence.Disabled && v.EvaluatedPrecedence != EvaluatedPrecedence.Required)
+                .Where(v =>
+                    v.InputDataState != InputDataState.Set &&
+                    !string.IsNullOrEmpty(v.ParameterDefinition.Precedence.IsRequiredCondition) &&
+                    v.EvaluatedPrecedence != EvaluatedPrecedence.Disabled &&
+                    v.EvaluatedPrecedence != EvaluatedPrecedence.Required)
                 .ForEach(p => SetParameterDefault(null, template, parametersBuilder, p.ParameterDefinition, false, defaultParamsWithInvalidValues));
 
             paramsWithInvalidValues = defaultParamsWithInvalidValues;

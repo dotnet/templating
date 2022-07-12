@@ -62,7 +62,7 @@ namespace Microsoft.TemplateEngine.Utils
 
             JToken? precedenceToken;
             TemplateParameterPrecedence precedence = TemplateParameterPrecedence.Default;
-            if (jObject.TryGetValue(nameof(Precedence), out precedenceToken))
+            if (jObject.TryGetValue(nameof(Precedence), StringComparison.OrdinalIgnoreCase, out precedenceToken))
             {
                 precedence = TemplateParameterPrecedenceImpl.FromJObject(precedenceToken);
             }
@@ -173,12 +173,8 @@ namespace Microsoft.TemplateEngine.Utils
 
         private class TemplateParameterPrecedenceImpl : TemplateParameterPrecedence
         {
-            public TemplateParameterPrecedenceImpl(PrecedenceDefinition precedenceDefinition, string? isRequiredCondition, string? isEnabledCondition)
-                : base(precedenceDefinition, isRequiredCondition, isEnabledCondition)
-            { }
-
             public TemplateParameterPrecedenceImpl(TemplateParameterPrecedence precedence)
-                : base(precedence.PrecedenceDefinition, precedence.IsRequiredCondition, precedence.IsEnabledCondition)
+                : base(precedence.PrecedenceDefinition, precedence.IsRequiredCondition, precedence.IsEnabledCondition, precedence.IsRequired)
             { }
 
             [JsonProperty(nameof(PrecedenceDefinition))]
@@ -190,13 +186,17 @@ namespace Microsoft.TemplateEngine.Utils
             [JsonProperty(nameof(IsEnabledCondition))]
             private string? IsEnabledConditionAccessor => base.IsEnabledCondition;
 
+            [JsonProperty(nameof(IsRequired))]
+            private bool IsRequiredAccessor => base.IsRequired;
+
             public static TemplateParameterPrecedence FromJObject(JToken jObject)
             {
                 PrecedenceDefinition precedenceDefinition = (PrecedenceDefinition)jObject.ToInt32(nameof(PrecedenceDefinition));
                 string? isRequiredCondition = jObject.ToString(nameof(IsRequiredCondition));
                 string? isEnabledCondition = jObject.ToString(nameof(IsEnabledCondition));
+                bool isRequired = jObject.ToBool(nameof(IsRequired));
 
-                return new TemplateParameterPrecedence(precedenceDefinition, isRequiredCondition, isEnabledCondition);
+                return new TemplateParameterPrecedence(precedenceDefinition, isRequiredCondition, isEnabledCondition, isRequired);
             }
         }
     }
