@@ -209,7 +209,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             Assert.Equal(new[] { referencedProjFileFullPath }, callback.References);
         }
 
-        [Fact]
+        [Fact(DisplayName = nameof(AddRefCanTargetASingleProjectWithAJsonArray))]
         public void AddRefCanTargetASingleProjectWithAJsonArray()
         {
             AddReferencePostActionProcessor actionProcessor = new AddReferencePostActionProcessor();
@@ -237,7 +237,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             Assert.Equal(new[] { "System.Net.Json" }, callback.References);
         }
 
-        [Fact]
+        [Fact(DisplayName = nameof(AddRefCanTargetASingleProjectWithTheProjectName))]
         public void AddRefCanTargetASingleProjectWithTheProjectName()
         {
             AddReferencePostActionProcessor actionProcessor = new AddReferencePostActionProcessor();
