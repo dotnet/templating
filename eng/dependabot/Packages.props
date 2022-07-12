@@ -7,74 +7,59 @@
 
   <ItemGroup>
     <PackageReference Update="System.Diagnostics.Process" Version="4.3.0" />
-    <PackageReference Update="System.Diagnostics.Process" Condition="'$(SystemDiagnosticsProcessVersion)' != ''" Version="$(SystemDiagnosticsProcessVersion)" />
-
     <PackageReference Update="System.IO.Compression" Version="4.3.0" />
-    <PackageReference Update="System.IO.Compression" Condition="'$(SystemIOCompressionVersion)' != ''" Version="$(SystemIOCompressionVersion)" />
-
     <PackageReference Update="System.Runtime.Loader" Version="4.3.0" />
-    <PackageReference Update="System.Runtime.Loader" Condition="'$(SystemRuntimeLoader)' != ''" Version="$(SystemRuntimeLoaderVersion)" />
-
     <PackageReference Update="Microsoft.Build.Framework" Version="17.2.0" />
-    <PackageReference Update="Microsoft.Build.Framework" Condition="'$(MicrosoftBuildFramework)' != ''" Version="$(MicrosoftBuildFrameworkVersion)" />
-
     <PackageReference Update="Microsoft.Build.Utilities.Core" Version="17.2.0" />
-    <PackageReference Update="Microsoft.Build.Utilities.Core" Condition="'$(MicrosoftBuildUtilitiesCore)' != ''" Version="$(MicrosoftBuildUtilitiesCore)" />
-
     <PackageReference Update="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Update="Newtonsoft.Json" Condition="'$(NewtonsoftJson)' != ''" Version="$(NewtonsoftJsonVersion)" />
-
     <PackageReference Update="Wcwidth.Sources" Version="0.6.0" />
-    <PackageReference Update="Wcwidth.Sources" Condition="'$(WcwidthSources)' != ''" Version="$(WcwidthSourcesVersion)" />
-
     <PackageReference Update="Microsoft.Extensions.Logging" Version="6.0.0" />
-    <PackageReference Update="Microsoft.Extensions.Logging" Condition="'$(MicrosoftExtensionsLogging)' != ''" Version="$(MicrosoftExtensionsLoggingVersion)" />
-
     <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
-    <PackageReference Update="Microsoft.Extensions.Logging.Console" Condition="'$(MicrosoftExtensionsLoggingConsole)' != ''" Version="$(MicrosoftExtensionsLoggingConsoleVersion)" />
-
     <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
-    <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Condition="'$(MicrosoftExtensionsLoggingAbstractions)' != ''" Version="$(MicrosoftExtensionsLoggingAbstractionsVersion)" />
-
     <PackageReference Update="NuGet.Configuration" Version="6.2.1" />
-    <PackageReference Update="NuGet.Configuration" Condition="'$(NuGetConfiguration)' != ''" Version="$(NuGetConfigurationVersion)" />
-
     <PackageReference Update="NuGet.Credentials" Version="6.2.1" />
-    <PackageReference Update="NuGet.Credentials" Condition="'$(NuGetCredentials)' != ''" Version="$(NuGetCredentialsVersion)" />
-
     <PackageReference Update="NuGet.Protocol" Version="6.2.1" />
-    <PackageReference Update="NuGet.Protocol" Condition="'$(NuGetProtocol)' != ''" Version="$(NuGetProtocolVersion)" />
 
     <!--Analyzers-->
     <PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="4.2.0" />
-    <PackageReference Update="Microsoft.Net.Compilers.Toolset" Condition="'$(MicrosoftNetCompilersToolset)' != ''" Version="$(MicrosoftNetCompilersToolsetVersion)" />
-
     <PackageReference Update="Microsoft.CodeAnalysis.CSharp.CodeStyle" Version="4.2.0" />
-    <PackageReference Update="Microsoft.CodeAnalysis.CSharp.CodeStyle" Condition="'$(MicrosoftCodeAnalysisCSharpCodeStyle)' != ''" Version="$(MicrosoftCodeAnalysisCSharpCodeStyleVersion)" />
-
     <PackageReference Update="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4-beta1.22277.2" />
-    <PackageReference Update="Microsoft.CodeAnalysis.PublicApiAnalyzers" Condition="'$(MicrosoftCodeAnalysisPublicApiAnalyzers)' != ''" Version="$(MicrosoftCodeAnalysisPublicApiAnalyzersVersion)" />
-
     <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.435" />
-    <PackageReference Update="StyleCop.Analyzers" Condition="'$(StyleCopAnalyzers)' != ''" Version="$(StyleCopAnalyzersVersion)" />
 
     <!--Test dependencies-->
     <PackageReference Update="FakeItEasy" Version="7.3.1" />
-    <PackageReference Update="FakeItEasy" Condition="'$(FakeItEasy)' != ''" Version="$(FakeItEasyVersion)" />
-
     <PackageReference Update="FluentAssertions" Version="6.7.0" />
-    <PackageReference Update="FluentAssertions" Condition="'$(FluentAssertions)' != ''" Version="$(FluentAssertionsVersion)" />
-
     <PackageReference Update="Microsoft.NET.Test.Sdk" Version="17.2.0" />
-    <PackageReference Update="Microsoft.NET.Test.Sdk" Condition="'$(MicrosoftNETTestSdk)' != ''" Version="$(MicrosoftNETTestSdkVersion)" />
-
     <PackageReference Update="xunit.abstractions" Version="2.0.3" />
-    <PackageReference Update="xunit.abstractions" Condition="'$(xunitabstractions)' != ''" Version="$(xunitabstractionsVersion)" />
-
     <PackageReference Update="Newtonsoft.Json.Schema" Version="3.0.14" />
-    <PackageReference Update="Newtonsoft.Json.Schema" Condition="'$(NewtonsoftJsonSchema)' != ''" Version="$(NewtonsoftJsonSchemaVersion)" />
-
     <PackageReference Update="Verify.XUnit" Version="17.2.1" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(DotNetBuildFromSource)' == 'true'">
+    <PackageReference Update="System.Diagnostics.Process" Condition="'$(SystemDiagnosticsProcessVersion)' != ''" Version="$(SystemDiagnosticsProcessVersion)" />
+    <PackageReference Update="System.IO.Compression" Condition="'$(SystemIOCompressionVersion)' != ''" Version="$(SystemIOCompressionVersion)" />
+    <PackageReference Update="System.Runtime.Loader" Condition="'$(SystemRuntimeLoader)' != ''" Version="$(SystemRuntimeLoaderVersion)" />
+    <PackageReference Update="Microsoft.Build.Framework" Condition="'$(MicrosoftBuildFramework)' != ''" Version="$(MicrosoftBuildFrameworkVersion)" />
+    <PackageReference Update="Microsoft.Build.Utilities.Core" Condition="'$(MicrosoftBuildUtilitiesCore)' != ''" Version="$(MicrosoftBuildUtilitiesCore)" />
+    <PackageReference Update="Newtonsoft.Json" Condition="'$(NewtonsoftJson)' != ''" Version="$(NewtonsoftJsonVersion)" />
+    <PackageReference Update="Wcwidth.Sources" Condition="'$(WcwidthSources)' != ''" Version="$(WcwidthSourcesVersion)" />
+    <PackageReference Update="Microsoft.Extensions.Logging" Condition="'$(MicrosoftExtensionsLogging)' != ''" Version="$(MicrosoftExtensionsLoggingVersion)" />
+    <PackageReference Update="Microsoft.Extensions.Logging.Console" Condition="'$(MicrosoftExtensionsLoggingConsole)' != ''" Version="$(MicrosoftExtensionsLoggingConsoleVersion)" />
+    <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Condition="'$(MicrosoftExtensionsLoggingAbstractions)' != ''" Version="$(MicrosoftExtensionsLoggingAbstractionsVersion)" />
+    <PackageReference Update="NuGet.Configuration" Condition="'$(NuGetConfiguration)' != ''" Version="$(NuGetConfigurationVersion)" />
+    <PackageReference Update="NuGet.Credentials" Condition="'$(NuGetCredentials)' != ''" Version="$(NuGetCredentialsVersion)" />
+    <PackageReference Update="NuGet.Protocol" Condition="'$(NuGetProtocol)' != ''" Version="$(NuGetProtocolVersion)" />
+
+    <PackageReference Update="Microsoft.Net.Compilers.Toolset" Condition="'$(MicrosoftNetCompilersToolset)' != ''" Version="$(MicrosoftNetCompilersToolsetVersion)" />
+    <PackageReference Update="Microsoft.CodeAnalysis.CSharp.CodeStyle" Condition="'$(MicrosoftCodeAnalysisCSharpCodeStyle)' != ''" Version="$(MicrosoftCodeAnalysisCSharpCodeStyleVersion)" />
+    <PackageReference Update="Microsoft.CodeAnalysis.PublicApiAnalyzers" Condition="'$(MicrosoftCodeAnalysisPublicApiAnalyzers)' != ''" Version="$(MicrosoftCodeAnalysisPublicApiAnalyzersVersion)" />
+    <PackageReference Update="StyleCop.Analyzers" Condition="'$(StyleCopAnalyzers)' != ''" Version="$(StyleCopAnalyzersVersion)" />
+
+    <PackageReference Update="FakeItEasy" Condition="'$(FakeItEasy)' != ''" Version="$(FakeItEasyVersion)" />
+    <PackageReference Update="FluentAssertions" Condition="'$(FluentAssertions)' != ''" Version="$(FluentAssertionsVersion)" />
+    <PackageReference Update="Microsoft.NET.Test.Sdk" Condition="'$(MicrosoftNETTestSdk)' != ''" Version="$(MicrosoftNETTestSdkVersion)" />
+    <PackageReference Update="xunit.abstractions" Condition="'$(xunitabstractions)' != ''" Version="$(xunitabstractionsVersion)" />
+    <PackageReference Update="Newtonsoft.Json.Schema" Condition="'$(NewtonsoftJsonSchema)' != ''" Version="$(NewtonsoftJsonSchemaVersion)" />
     <PackageReference Update="Verify.XUnit" Condition="'$(VerifyXUnit)' != ''" Version="$(VerifyXUnitVersion)" />
   </ItemGroup>
 </Project>
