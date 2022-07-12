@@ -399,7 +399,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 Description = "The default name symbol",
                 DataType = "string",
-                Forms = SymbolValueFormsModel.NameForms
+                Forms = SymbolValueFormsModel.NameForms,
+                Precedence = new TemplateParameterPrecedence(PrecedenceDefinition.Implicit)
             };
         }
 
