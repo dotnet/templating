@@ -69,7 +69,7 @@ namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
             bool success = true;
             foreach (string projectFile in projectsToProcess)
             {
-                success &= AddReference(environment, action, projectFile, outputBasePath);
+                success &= AddReference(environment, action, projectFile, outputBasePath, creationEffects);
 
                 if (!success)
                 {
@@ -79,7 +79,7 @@ namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
             return true;
         }
 
-        private bool AddReference(IEngineEnvironmentSettings environment, IPostAction actionConfig, string projectFile, string outputBasePath)
+        private bool AddReference(IEngineEnvironmentSettings environment, IPostAction actionConfig, string projectFile, string outputBasePath, ICreationEffects creationEffects)
         {
             if (actionConfig.Args == null || !actionConfig.Args.TryGetValue("reference", out string? referenceToAdd))
             {
@@ -96,8 +96,11 @@ namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
 
             if (string.Equals(referenceType, "project", StringComparison.OrdinalIgnoreCase))
             {
-                // actually do the add ref
-                referenceToAdd = Path.GetFullPath(referenceToAdd, outputBasePath);
+                // replace the referenced project file's name in case it has been renamed
+                string? referenceNameChange = GetTargetForSource((ICreationEffects2)creationEffects, referenceToAdd, outputBasePath).SingleOrDefault();
+                string relativeProjectReference = referenceNameChange ?? referenceToAdd;
+
+                referenceToAdd = Path.GetFullPath(relativeProjectReference, outputBasePath);
                 Dotnet addReferenceCommand = Dotnet.AddProjectToProjectReference(projectFile, referenceToAdd);
                 addReferenceCommand.CaptureStdOut();
                 addReferenceCommand.CaptureStdErr();
