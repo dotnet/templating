@@ -20,5 +20,7 @@
 
     <Content Include="nupkg_templates\**" />
     <None Include="nupkg_templates\**" CopyToOutputDirectory="Always" />
+
+    <PackageReference Remove="Newtonsoft.Json" />
   </ItemGroup>
 </Project>
