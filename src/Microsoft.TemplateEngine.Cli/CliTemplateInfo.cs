@@ -3,6 +3,7 @@
 
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Constraints;
+using Microsoft.TemplateEngine.Abstractions.Parameters;
 using Microsoft.TemplateEngine.Abstractions.TemplatePackage;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Utils;
@@ -53,7 +54,7 @@ namespace Microsoft.TemplateEngine.Cli
         [Obsolete]
         public IReadOnlyDictionary<string, ICacheParameter> CacheParameters => _templateInfo.CacheParameters;
 
-        public IReadOnlyList<ITemplateParameter> Parameters => _templateInfo.Parameters;
+        public IParametersDefinition Parameters => _templateInfo.Parameters;
 
         public string MountPointUri => _templateInfo.MountPointUri;
 

@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions.Constraints;
+using Microsoft.TemplateEngine.Abstractions.Parameters;
 
 namespace Microsoft.TemplateEngine.Abstractions
 {
@@ -82,7 +83,7 @@ namespace Microsoft.TemplateEngine.Abstractions
         /// <summary>
         /// Gets the list of template parameters.
         /// </summary>
-        IReadOnlyList<ITemplateParameter> Parameters { get; }
+        IParametersDefinition Parameters { get; }
 
         /// <summary>
         /// Gets template mount point URI.

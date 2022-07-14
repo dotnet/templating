@@ -12,6 +12,7 @@ using Castle.Core.Internal;
 using FluentAssertions;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
+using Microsoft.TemplateEngine.Abstractions.Parameters;
 using Microsoft.TemplateEngine.Edge.Template;
 using Microsoft.TemplateEngine.Mocks;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects;
@@ -450,7 +451,7 @@ C
                 try
                 {
                     data = new EvaluatedParameterSetData(
-                        new ParameterSet2(paramsDict).ParameterDefinitions,
+                        new ParametersDefinition(paramsDict),
                         parameters2!.Select(p => new EvaluatedParameterData(
                             paramsDict[p.Name],
                             p.Value,

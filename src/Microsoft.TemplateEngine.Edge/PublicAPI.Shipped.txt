@@ -174,7 +174,6 @@ virtual Microsoft.TemplateEngine.Edge.DefaultTemplateEngineHost.TryGetHostParamD
 ~Microsoft.TemplateEngine.Edge.FilterableTemplateInfo.LocaleConfigPlace.get -> string
 ~Microsoft.TemplateEngine.Edge.FilterableTemplateInfo.MountPointUri.get -> string
 ~Microsoft.TemplateEngine.Edge.FilterableTemplateInfo.Name.get -> string
-~Microsoft.TemplateEngine.Edge.FilterableTemplateInfo.Parameters.get -> System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Abstractions.ITemplateParameter>
 ~Microsoft.TemplateEngine.Edge.FilterableTemplateInfo.ShortName.get -> string
 ~Microsoft.TemplateEngine.Edge.FilterableTemplateInfo.ShortNameList.get -> System.Collections.Generic.IReadOnlyList<string>
 ~Microsoft.TemplateEngine.Edge.FilterableTemplateInfo.ShortNameList.set -> void

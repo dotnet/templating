@@ -13,6 +13,7 @@ using FakeItEasy;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Components;
 using Microsoft.TemplateEngine.Abstractions.Mount;
+using Microsoft.TemplateEngine.Abstractions.Parameters;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.TemplateConfigTests;
 using Microsoft.TemplateEngine.TestHelper;
@@ -207,7 +208,7 @@ UNKNOWN
             IRunnableProjectConfig runnableConfig = new RunnableProjectConfig(environment, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
             IParameterSetBuilder parameters = RunnableProjectGenerator.GetParametersForTemplate(runnableConfig);
             ITemplateParameter? choiceParameter;
-            Assert.True(parameters.ParameterDefinitions.TryGetValue("ChoiceParam", out choiceParameter), "ChoiceParam expected to be extracted from template config");
+            Assert.True(parameters.TryGetValue("ChoiceParam", out choiceParameter), "ChoiceParam expected to be extracted from template config");
             parameters.SetParameterValue(choiceParameter!, "SecondChoice");
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
 
@@ -304,7 +305,7 @@ THIRD
             IRunnableProjectConfig runnableConfig = new RunnableProjectConfig(environment, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
             IParameterSetBuilder parameters = RunnableProjectGenerator.GetParametersForTemplate(runnableConfig);
             ITemplateParameter? choiceParameter;
-            Assert.True(parameters.ParameterDefinitions.TryGetValue("ChoiceParam", out choiceParameter), "ChoiceParam expected to be extracted from template config");
+            Assert.True(parameters.TryGetValue("ChoiceParam", out choiceParameter), "ChoiceParam expected to be extracted from template config");
             parameters.SetParameterValue(choiceParameter!, new MultiValueParameter(new[] { "SecondChoice", "ThirdChoice" }));
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
 
@@ -562,7 +563,7 @@ Console.WriteLine(""Hello, World!"");
             IRunnableProjectConfig runnableConfig = new RunnableProjectConfig(environment, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
             IParameterSetBuilder parameters = RunnableProjectGenerator.GetParametersForTemplate(runnableConfig);
             ITemplateParameter? choiceParameter;
-            Assert.True(parameters.ParameterDefinitions.TryGetValue("Platform", out choiceParameter), "ChoiceParam expected to be extracted from template config");
+            Assert.True(parameters.TryGetValue("Platform", out choiceParameter), "ChoiceParam expected to be extracted from template config");
             parameters.SetParameterValue(choiceParameter!, new MultiValueParameter(new[] { "MacOS", "iOS" }));
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
 

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Constraints;
+using Microsoft.TemplateEngine.Abstractions.Parameters;
 using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json.Linq;
 
@@ -76,7 +77,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     {
                         templateParameters.Add(new TemplateParameter(item));
                     }
-                    info.Parameters = templateParameters;
+                    info.Parameters = new ParametersDefinition(templateParameters);
                 }
 
                 //read tags

@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Parameters;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Utils;
 
@@ -177,7 +178,7 @@ namespace Microsoft.TemplateEngine.Core
         public static VariableCollection VariableCollectionFromParameters(IEvaluatedParameterSetData parameters, string format)
         {
             VariableCollection vc = new VariableCollection();
-            foreach (ITemplateParameter param in parameters.ParameterDefinitions.AsEnumerable())
+            foreach (ITemplateParameter param in parameters)
             {
                 string key = string.Format(format ?? "{0}", param.Name);
 

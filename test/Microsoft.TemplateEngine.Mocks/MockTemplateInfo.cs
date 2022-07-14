@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Constraints;
+using Microsoft.TemplateEngine.Abstractions.Parameters;
 using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json;
 using Xunit.Abstractions;
@@ -113,7 +114,7 @@ namespace Microsoft.TemplateEngine.Mocks
         [Obsolete("Use Parameters instead.")]
         IReadOnlyDictionary<string, ICacheParameter> ITemplateInfo.CacheParameters => throw new NotImplementedException();
 
-        public IReadOnlyList<ITemplateParameter> Parameters
+        public IParametersDefinition Parameters
         {
             get
             {
@@ -122,7 +123,7 @@ namespace Microsoft.TemplateEngine.Mocks
                 {
                     parameters.Add(param.Value);
                 }
-                return parameters;
+                return new ParametersDefinition(parameters);
             }            
         }
 

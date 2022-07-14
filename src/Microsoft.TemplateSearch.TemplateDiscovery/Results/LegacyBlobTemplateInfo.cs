@@ -3,6 +3,7 @@
 
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Constraints;
+using Microsoft.TemplateEngine.Abstractions.Parameters;
 using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json;
 
@@ -159,7 +160,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Results
         public IReadOnlyDictionary<string, string> TagsCollection { get; private set; }
 
         [JsonIgnore]
-        public IReadOnlyList<ITemplateParameter> Parameters { get; private set; }
+        public IParametersDefinition Parameters { get; private set; }
 
         [JsonIgnore]
         public string MountPointUri => string.Empty;

@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Constraints;
 using Microsoft.TemplateEngine.Abstractions.Mount;
+using Microsoft.TemplateEngine.Abstractions.Parameters;
 using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -134,7 +135,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         }
 
         [JsonProperty]
-        public IReadOnlyList<ITemplateParameter> Parameters { get; private set; } = new List<ITemplateParameter>();
+        public IParametersDefinition Parameters { get; private set; } = ParametersDefinition.Empty;
 
         [JsonProperty]
         public string MountPointUri { get; }
@@ -268,7 +269,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             return TemplateInfoReader.FromJObject(entry);
         }
 
-        private static IReadOnlyList<ITemplateParameter> LocalizeParameters(ITemplateInfo template, ILocalizationLocator? localizationInfo)
+        private static IParametersDefinition LocalizeParameters(ITemplateInfo template, ILocalizationLocator? localizationInfo)
         {
             //we would like to copy the parameters to format supported for serialization as we cannot be sure that ITemplateInfo supports serialization in needed format.
             List<ITemplateParameter> localizedParameters = new List<ITemplateParameter>();
@@ -317,7 +318,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
                 localizedParameters.Add(localizedParameter);
             }
-            return localizedParameters;
+            return new ParametersDefinition(localizedParameters);
         }
     }
 }

@@ -9,6 +9,7 @@ using System.Linq;
 using Microsoft.TemplateEngine;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Constraints;
+using Microsoft.TemplateEngine.Abstractions.Parameters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -42,7 +43,7 @@ namespace Microsoft.TemplateSearch.Common
             Identity = templateInfo.Identity;
             Name = templateInfo.Name;
             ShortNameList = templateInfo.ShortNameList;
-            Parameters = templateInfo.Parameters?.Select(p => new BlobTemplateParameter(p)).ToArray() ?? Array.Empty<BlobTemplateParameter>();
+            Parameters = new ParametersDefinition(templateInfo.Parameters?.Select(p => new BlobTemplateParameter(p)));
             Author = templateInfo.Author;
             Classifications = templateInfo.Classifications ?? Array.Empty<string>();
             Description = templateInfo.Description;
@@ -79,7 +80,7 @@ namespace Microsoft.TemplateSearch.Common
 
         [JsonProperty]
         //reading manually now to support old format
-        public IReadOnlyList<ITemplateParameter> Parameters { get; private set; } = new List<ITemplateParameter>();
+        public IParametersDefinition Parameters { get; private set; } = ParametersDefinition.Empty;
 
         [JsonIgnore]
         string ITemplateInfo.MountPointUri => throw new NotImplementedException();
@@ -305,7 +306,7 @@ namespace Microsoft.TemplateSearch.Common
             }
 
             info.TagsCollection = tags;
-            info.Parameters = templateParameters;
+            info.Parameters = new ParametersDefinition(templateParameters);
             return info;
 
         }

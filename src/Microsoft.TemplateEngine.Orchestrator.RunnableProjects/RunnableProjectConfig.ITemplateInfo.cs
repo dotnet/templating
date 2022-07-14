@@ -9,6 +9,7 @@ using System.Linq;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Constraints;
 using Microsoft.TemplateEngine.Abstractions.Mount;
+using Microsoft.TemplateEngine.Abstractions.Parameters;
 using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
@@ -94,14 +95,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
         }
 
-        IReadOnlyList<ITemplateParameter> ITemplateInfo.Parameters
+        IParametersDefinition ITemplateInfo.Parameters
         {
             get
             {
-                return Parameters.Values
+                return new ParametersDefinition(Parameters.Values
                     .Where(param => param.Type.Equals("parameter", StringComparison.OrdinalIgnoreCase)
-                        && param.Precedence.PrecedenceDefinition != PrecedenceDefinition.Implicit)
-                    .ToList();
+                        && param.Precedence.PrecedenceDefinition != PrecedenceDefinition.Implicit));
             }
         }
 

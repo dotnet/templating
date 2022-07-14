@@ -149,7 +149,6 @@ Microsoft.TemplateEngine.Abstractions.ITemplateInfo.Identity.get -> string!
 Microsoft.TemplateEngine.Abstractions.ITemplateInfo.LocaleConfigPlace.get -> string?
 Microsoft.TemplateEngine.Abstractions.ITemplateInfo.MountPointUri.get -> string!
 Microsoft.TemplateEngine.Abstractions.ITemplateInfo.Name.get -> string!
-Microsoft.TemplateEngine.Abstractions.ITemplateInfo.Parameters.get -> System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Abstractions.ITemplateParameter!>!
 Microsoft.TemplateEngine.Abstractions.ITemplateInfo.Precedence.get -> int
 Microsoft.TemplateEngine.Abstractions.ITemplateInfo.ShortName.get -> string!
 Microsoft.TemplateEngine.Abstractions.ITemplateInfo.ShortNameList.get -> System.Collections.Generic.IReadOnlyList<string!>!
