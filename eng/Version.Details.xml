@@ -23,9 +23,9 @@
       <Uri>https://github.com/dotnet/runtime</Uri>
       <Sha>1967649721058a457157d4321af3e6fceaa5441b</Sha>
     </Dependency>
-    <Dependency Name="System.CommandLine" Version="2.0.0-beta4.22355.1">
+    <Dependency Name="System.CommandLine" Version="2.0.0-beta4.22363.1">
       <Uri>https://github.com/dotnet/command-line-api</Uri>
-      <Sha>5618b2d243ccdeb5c7e50a298b33b13036b4351b</Sha>
+      <Sha>ec67fa283e6690c63731c7c51293bb21833761ec</Sha>
     </Dependency>
     <Dependency Name="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.0.0-preview1.22361.3">
       <Uri>https://github.com/dotnet/roslyn-analyzers</Uri>
