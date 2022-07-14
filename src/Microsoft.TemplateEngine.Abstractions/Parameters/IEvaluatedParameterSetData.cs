@@ -10,7 +10,7 @@ namespace Microsoft.TemplateEngine.Abstractions.Parameters;
 public interface IEvaluatedParameterSetData : IParameterSetData
 {
     /// <summary>
-    /// Data for all evaluated parameters - including disabled ones.
+    /// Data for all parameters disabled after evaluation (complement to <see cref="IParameterSetData.ParametersData"/>).
     /// </summary>
-    IReadOnlyDictionary<ITemplateParameter, EvaluatedParameterData> AllParametersData { get; }
+    IReadOnlyDictionary<ITemplateParameter, EvaluatedParameterData> EvaluatedParametersData { get; }
 }

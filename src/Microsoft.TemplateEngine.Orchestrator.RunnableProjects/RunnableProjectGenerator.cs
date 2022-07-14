@@ -319,7 +319,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         {
             // Remove the disabled symbols from the config as well (as if they was never defined on the template)
             RunnableProjectConfig config = (RunnableProjectConfig)template;
-            evaluatedParameterSetData.AllParametersData.Values
+            evaluatedParameterSetData.EvaluatedParametersData.Values
                 .Where(d => d.IsEnabledConditionResult.HasValue && !d.IsEnabledConditionResult.Value)
                 .Select(p => p.ParameterDefinition.Name)
                 .ForEach(config.RemoveSymbol);

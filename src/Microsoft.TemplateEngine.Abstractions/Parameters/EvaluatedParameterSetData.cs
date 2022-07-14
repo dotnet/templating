@@ -14,14 +14,15 @@ public class EvaluatedParameterSetData : ParametersDefinition, IEvaluatedParamet
     public EvaluatedParameterSetData(IParametersDefinition parameters, IReadOnlyList<EvaluatedParameterData> parameterData)
         : base(FilterDefinitions(parameters.AsReadonlyDictionary(), parameterData))
     {
-        AllParametersData = parameterData.ToDictionary(d => d.ParameterDefinition, d => d);
-        ParametersData = AllParametersData
-            .Where(pair => pair.Value.EvaluatedPrecedence != EvaluatedPrecedence.Disabled)
-            .ToDictionary(pair => pair.Key, pair => (ParameterData)pair.Value);
+        EvaluatedParametersData = parameterData
+            .ToDictionary(d => d.ParameterDefinition, d => d);
+        ParametersData = parameterData
+            .Where(p => p.EvaluatedPrecedence != EvaluatedPrecedence.Disabled)
+            .ToDictionary(d => d.ParameterDefinition, d => (ParameterData)d);
         this.CheckProperEvaluations();
     }
 
-    public IReadOnlyDictionary<ITemplateParameter, EvaluatedParameterData> AllParametersData { get; }
+    public IReadOnlyDictionary<ITemplateParameter, EvaluatedParameterData> EvaluatedParametersData { get; }
 
     public IReadOnlyDictionary<ITemplateParameter, ParameterData> ParametersData { get; }
 
@@ -39,12 +40,12 @@ public class EvaluatedParameterSetData : ParametersDefinition, IEvaluatedParamet
     private void CheckProperEvaluations()
     {
         ErrorOutOnMismatchedConditionEvaluation(
-            AllParametersData.Values.Where(p =>
+            EvaluatedParametersData.Values.Where(p =>
                 p.IsEnabledConditionResult == null ^
                 string.IsNullOrEmpty(p.ParameterDefinition.Precedence.IsEnabledCondition)).ToList());
 
         ErrorOutOnMismatchedConditionEvaluation(
-            AllParametersData.Values.Where(p =>
+            EvaluatedParametersData.Values.Where(p =>
                 p.IsRequiredConditionResult == null ^
                 string.IsNullOrEmpty(p.ParameterDefinition.Precedence.IsRequiredCondition)).ToList());
     }

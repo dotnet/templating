@@ -78,11 +78,11 @@ Microsoft.TemplateEngine.Abstractions.Parameters.EvaluatedParameterData.Evaluate
 Microsoft.TemplateEngine.Abstractions.Parameters.EvaluatedParameterData.IsEnabledConditionResult.get -> bool?
 Microsoft.TemplateEngine.Abstractions.Parameters.EvaluatedParameterData.IsRequiredConditionResult.get -> bool?
 Microsoft.TemplateEngine.Abstractions.Parameters.EvaluatedParameterSetData
-Microsoft.TemplateEngine.Abstractions.Parameters.EvaluatedParameterSetData.AllParametersData.get -> System.Collections.Generic.IReadOnlyDictionary<Microsoft.TemplateEngine.Abstractions.ITemplateParameter!, Microsoft.TemplateEngine.Abstractions.Parameters.EvaluatedParameterData!>!
+Microsoft.TemplateEngine.Abstractions.Parameters.EvaluatedParameterSetData.EvaluatedParametersData.get -> System.Collections.Generic.IReadOnlyDictionary<Microsoft.TemplateEngine.Abstractions.ITemplateParameter!, Microsoft.TemplateEngine.Abstractions.Parameters.EvaluatedParameterData!>!
 Microsoft.TemplateEngine.Abstractions.Parameters.EvaluatedParameterSetData.EvaluatedParameterSetData(Microsoft.TemplateEngine.Abstractions.Parameters.IParametersDefinition! parameters, System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Abstractions.Parameters.EvaluatedParameterData!>! parameterData) -> void
 Microsoft.TemplateEngine.Abstractions.Parameters.EvaluatedParameterSetData.ParametersData.get -> System.Collections.Generic.IReadOnlyDictionary<Microsoft.TemplateEngine.Abstractions.ITemplateParameter!, Microsoft.TemplateEngine.Abstractions.Parameters.ParameterData!>!
 Microsoft.TemplateEngine.Abstractions.Parameters.IEvaluatedParameterSetData
-Microsoft.TemplateEngine.Abstractions.Parameters.IEvaluatedParameterSetData.AllParametersData.get -> System.Collections.Generic.IReadOnlyDictionary<Microsoft.TemplateEngine.Abstractions.ITemplateParameter!, Microsoft.TemplateEngine.Abstractions.Parameters.EvaluatedParameterData!>!
+Microsoft.TemplateEngine.Abstractions.Parameters.IEvaluatedParameterSetData.EvaluatedParametersData.get -> System.Collections.Generic.IReadOnlyDictionary<Microsoft.TemplateEngine.Abstractions.ITemplateParameter!, Microsoft.TemplateEngine.Abstractions.Parameters.EvaluatedParameterData!>!
 Microsoft.TemplateEngine.Abstractions.Parameters.InputDataState
 Microsoft.TemplateEngine.Abstractions.Parameters.InputDataState.ExplicitNull = 2 -> Microsoft.TemplateEngine.Abstractions.Parameters.InputDataState
 Microsoft.TemplateEngine.Abstractions.Parameters.InputDataState.Set = 0 -> Microsoft.TemplateEngine.Abstractions.Parameters.InputDataState

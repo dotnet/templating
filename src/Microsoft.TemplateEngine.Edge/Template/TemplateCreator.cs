@@ -395,7 +395,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
             bool anyMissingParams = false;
             missingParamNames = new List<string>();
 
-            foreach (EvaluatedParameterData evaluatedParameterData in templateParams.AllParametersData.Values.Where(v => v.EvaluatedPrecedence == EvaluatedPrecedence.Required && v.InputDataState == InputDataState.Unset))
+            foreach (EvaluatedParameterData evaluatedParameterData in templateParams.EvaluatedParametersData.Values.Where(v => v.EvaluatedPrecedence == EvaluatedPrecedence.Required && v.InputDataState == InputDataState.Unset))
             {
                 string? newParamValue;
 #pragma warning disable CS0618 // Type or member is obsolete - for backward compatibility
@@ -427,7 +427,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
         {
             if (inputParameters is IEvaluatedParameterSetData evaluatedParameterSet)
             {
-                foreach (var evaluatedParameterData in evaluatedParameterSet.AllParametersData)
+                foreach (var evaluatedParameterData in evaluatedParameterSet.EvaluatedParametersData)
                 {
                     parametersBuilder.SetParameterEvaluation(evaluatedParameterData.Key, evaluatedParameterData.Value);
                 }
@@ -441,7 +441,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
             List<string> defaultParamsWithInvalidValues = new List<string>();
 
             // for params that changed to optional and do not have values - try get 'Default' value (as for required it's not obtained)
-            evaluatedParameterSetData.AllParametersData.Values
+            evaluatedParameterSetData.EvaluatedParametersData.Values
                 .Where(v =>
                     v.InputDataState != InputDataState.Set &&
                     !string.IsNullOrEmpty(v.ParameterDefinition.Precedence.IsRequiredCondition) &&
