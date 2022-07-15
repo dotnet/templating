@@ -71,32 +71,39 @@ namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
                 return null;
             }
 
-            targetFiles = PrepareForJsonParsing(targetFiles);
-
-            JToken config = JToken.Parse(targetFiles);
-            if (config.Type == JTokenType.String)
+            // try to parse the argument as json; if it is not valid json, use it as a string
+            if (JTokenExtensions.TryParse(targetFiles, out JToken? config))
             {
-                return ProcessPaths(config.ToString().Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
-            }
-            else if (config is JArray arr)
-            {
-                List<string> parts = new List<string>();
-
-                foreach (JToken token in arr)
+                if (config == null)
                 {
-                    if (token.Type != JTokenType.String)
+                    return null;
+                }
+
+                if (config.Type == JTokenType.String)
+                {
+                    return ProcessPaths(config.ToString().Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
+                }
+                else if (config is JArray arr)
+                {
+                    List<string> parts = new List<string>();
+
+                    foreach (JToken token in arr)
                     {
-                        continue;
+                        if (token.Type != JTokenType.String)
+                        {
+                            continue;
+                        }
+                        parts.Add(token.ToString());
                     }
-                    parts.Add(token.ToString());
-                }
 
-                if (parts.Count > 0)
-                {
-                    return ProcessPaths(parts);
+                    if (parts.Count > 0)
+                    {
+                        return ProcessPaths(parts);
+                    }
                 }
             }
-            return null;
+
+            return ProcessPaths(targetFiles.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries));
 
             IReadOnlyList<string> ProcessPaths(IReadOnlyList<string> paths)
             {
@@ -108,16 +115,6 @@ namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
                     .SelectMany(t => GetTargetForSource(creationEffects2, t, outputBasePath))
                     .Where(t => matchCriteria(t))
                     .ToArray();
-            }
-
-            string PrepareForJsonParsing(string input)
-            {
-                if (!input.StartsWith('[') && !input.StartsWith('"'))
-                {
-                    return "\"" + input + "\"";
-                }
-
-                return input;
             }
         }
 
