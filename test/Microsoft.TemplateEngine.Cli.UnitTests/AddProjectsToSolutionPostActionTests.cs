@@ -1,6 +1,8 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Cli.PostActionProcessors;
 using Microsoft.TemplateEngine.Mocks;
@@ -76,7 +78,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             Assert.Contains(creationResult.PrimaryOutputs[0].Path, foundProjectFiles?.ToList());
             Assert.Contains(creationResult.PrimaryOutputs[2].Path, foundProjectFiles?.ToList());
 
-            Assert.DoesNotContain(creationResult.PrimaryOutputs[1].Path, foundProjectFiles.ToList());
+            Assert.DoesNotContain(creationResult.PrimaryOutputs[1].Path, foundProjectFiles?.ToList());
         }
 
         [Fact(DisplayName = nameof(AddProjectToSolutionPostActionDoesntFindProjectOutOfRange))]
@@ -126,8 +128,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests
             Assert.Equal(2, foundProjectFiles?.Count);
             Assert.Contains(outputFileFullPath0, foundProjectFiles?.ToList());
             Assert.Contains(outputFileFullPath2, foundProjectFiles?.ToList());
-
-            Assert.DoesNotContain(dontFindMeFullPath1, foundProjectFiles.ToList());
+            Assert.DoesNotContain(dontFindMeFullPath1, foundProjectFiles?.ToList());
         }
 
         [Fact(DisplayName = nameof(AddProjectToSolutionPostActionWithoutPrimaryOutputIndexesWithOutputBasePath))]
