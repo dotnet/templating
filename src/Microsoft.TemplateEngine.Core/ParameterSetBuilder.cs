@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
@@ -16,7 +17,9 @@ using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Core
 {
-    public class ParameterSetBuilder : ParametersDefinition, IParameterSetBuilder
+#pragma warning disable CS0618 // Type or member is obsolete
+    public class ParameterSetBuilder : ParametersDefinition, IParameterSetBuilder, IParameterSet
+#pragma warning restore CS0618 // Type or member is obsolete
     {
         private readonly Dictionary<ITemplateParameter, EvalData> _resolvedValues;
         private IEvaluatedParameterSetData? _result;
@@ -29,9 +32,29 @@ namespace Microsoft.TemplateEngine.Core
         internal ParameterSetBuilder(IParametersDefinition parameters) : this(parameters.AsReadonlyDictionary())
         { }
 
-        public static IParameterSetBuilder CreateWithDefaults(ITemplateInfo templateInfo, string? name, IEngineEnvironmentSettings environment, out IReadOnlyList<string> paramsWithInvalidValues)
+        public IEnumerable<ITemplateParameter> ParameterDefinitions => this;
+
+        public IDictionary<ITemplateParameter, object> ResolvedValues =>
+            _resolvedValues
+                .Where(p => p.Value.Value != null)
+                .ToDictionary(k => k.Key, k => k.Value.Value!);
+
+#pragma warning disable RS0027 // Public API with optional parameter(s) should have the most parameters amongst its public overloads
+        public static IParameterSetBuilder CreateWithDefaults(IParametersDefinition parametersDefinition, IEngineEnvironmentSettings environment, string? name = null)
+#pragma warning restore RS0027 // Public API with optional parameter(s) should have the most parameters amongst its public overloads
         {
-            IParameterSetBuilder templateParams = new ParameterSetBuilder(templateInfo.Parameters);
+            var result = CreateWithDefaults(parametersDefinition, name, environment, out IReadOnlyList<string> errors);
+            if (errors.Any())
+            {
+                throw new Exception("Parameters with errors encountered: " + errors.ToCsvString());
+            }
+
+            return result;
+        }
+
+        public static IParameterSetBuilder CreateWithDefaults(IParametersDefinition parametersDefinition, string? name, IEngineEnvironmentSettings environment, out IReadOnlyList<string> paramsWithInvalidValues)
+        {
+            IParameterSetBuilder templateParams = new ParameterSetBuilder(parametersDefinition);
             List<string> paramsWithInvalidValuesList = new List<string>();
 
             foreach (ITemplateParameter param in templateParams)
@@ -50,7 +73,6 @@ namespace Microsoft.TemplateEngine.Core
                         param,
                         environment,
                         true,
-                        templateInfo,
                         param.Precedence.CanBeRequired,
                         paramsWithInvalidValuesList);
                 }
@@ -59,6 +81,8 @@ namespace Microsoft.TemplateEngine.Core
             paramsWithInvalidValues = paramsWithInvalidValuesList;
             return templateParams;
         }
+
+        public bool TryGetParameterDefinition(string name, out ITemplateParameter parameter) => this.TryGetParameterDefinition(name, out parameter);
 
         public void SetParameterValue(ITemplateParameter parameter, object value)
         {

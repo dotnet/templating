@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.TemplatePackage;
+using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Edge.Template;
 using Microsoft.TemplateEngine.TestHelper;
@@ -135,7 +136,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             ICreationEffects effects = await template.Generator.GetCreationEffectsAsync(
                 environmentSettings,
                 template,
-                template.Generator.GetParametersForTemplate(environmentSettings, template).Build(),
+                ParameterSetBuilder.CreateWithDefaults(template.Parameters, environmentSettings).Build(),
                 Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()),
                 default);
 

@@ -253,7 +253,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
         //This method should become internal once Cli help logic is refactored.
         public IParameterSetBuilder SetupDefaultParamValuesFromTemplateAndHost(ITemplate template, string realName, out IReadOnlyList<string> paramsWithInvalidValues)
         {
-            return ParameterSetBuilder.CreateWithDefaults(template, realName, _environmentSettings, out paramsWithInvalidValues);
+            return ParameterSetBuilder.CreateWithDefaults(template.Parameters, realName, _environmentSettings, out paramsWithInvalidValues);
         }
 
         /// <summary>
@@ -447,7 +447,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                     !string.IsNullOrEmpty(v.ParameterDefinition.Precedence.IsRequiredCondition) &&
                     v.EvaluatedPrecedence != EvaluatedPrecedence.Disabled &&
                     v.EvaluatedPrecedence != EvaluatedPrecedence.Required)
-                .ForEach(p => ParameterConverter.SetParameterDefault(parametersBuilder, p.ParameterDefinition, _environmentSettings, false, template, false, defaultParamsWithInvalidValues));
+                .ForEach(p => ParameterConverter.SetParameterDefault(parametersBuilder, p.ParameterDefinition, _environmentSettings, false, false, defaultParamsWithInvalidValues));
 
             paramsWithInvalidValues = defaultParamsWithInvalidValues;
             return evaluatedParameterSetData;

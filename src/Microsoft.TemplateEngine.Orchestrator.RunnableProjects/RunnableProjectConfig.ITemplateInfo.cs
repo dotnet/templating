@@ -95,11 +95,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
         }
 
-        IParametersDefinition ITemplateInfo.Parameters
+        public IParametersDefinition Parameters
         {
             get
             {
-                return new ParametersDefinition(Parameters.Values
+                return new ParametersDefinition(_parameters.Values
                     .Where(param => param.Type.Equals("parameter", StringComparison.OrdinalIgnoreCase)
                         && param.Precedence.PrecedenceDefinition != PrecedenceDefinition.Implicit));
             }

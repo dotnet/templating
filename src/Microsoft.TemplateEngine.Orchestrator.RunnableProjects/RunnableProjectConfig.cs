@@ -59,6 +59,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         private readonly IFile? _sourceFile;
         private readonly IFile? _localeConfigFile;
         private readonly IFile? _hostConfigFile;
+        private readonly IReadOnlyDictionary<string, Parameter> _parameters;
 
         private IReadOnlyList<FileSourceMatchInfo>? _sources;
         private IGlobalRunConfig? _operationConfig;
@@ -88,7 +89,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             CheckGeneratorVersionRequiredByTemplate();
             PerformTemplateValidation();
             Identity = _configuration.Identity!;
-            Parameters = ExtractParameters(_configuration);
+            _parameters = ExtractParameters(_configuration);
 
             if (_localeConfigFile != null)
             {
@@ -98,7 +99,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     if (VerifyLocalizationModel(locModel))
                     {
                         _configuration.Localize(locModel);
-                        Parameters = LocalizeParameters(locModel, Parameters);
+                        _parameters = LocalizeParameters(locModel, _parameters);
                     }
                 }
                 catch (Exception ex)
@@ -120,7 +121,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             _configuration = configuration;
             Identity = configuration.Identity ?? throw new ArgumentException($"{nameof(configuration)} should have identity set.");
             _sourceFile = configurationFile;
-            Parameters = ExtractParameters(configuration);
+            _parameters = ExtractParameters(configuration);
         }
 
         public string Identity { get; }
@@ -341,9 +342,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
         }
 
-        public IReadOnlyDictionary<string, Parameter> Parameters { get; private init; }
-
-        internal Parameter NameParameter => Parameters.Values.First(p => p.IsName);
+        internal Parameter NameParameter => _parameters.Values.First(p => p.IsName);
 
         internal IReadOnlyList<IReplacementTokens> SymbolFilenameReplacements
         {

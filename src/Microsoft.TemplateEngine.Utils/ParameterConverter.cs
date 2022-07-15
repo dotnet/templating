@@ -83,7 +83,7 @@ namespace Microsoft.TemplateEngine.Utils
             return literal;
         }
 
-        public static void SetParameterDefault(IParameterSetBuilder templateParams, ITemplateParameter parameter, IEngineEnvironmentSettings environment, bool useHostDefaults, ITemplateInfo templateInfo, bool isRequired, List<string> paramsWithInvalidValues)
+        public static void SetParameterDefault(IParameterSetBuilder templateParams, ITemplateParameter parameter, IEngineEnvironmentSettings environment, bool useHostDefaults, bool isRequired, List<string> paramsWithInvalidValues)
         {
             ITemplateEngineHost host = environment.Host;
             if (useHostDefaults && host.TryGetHostParamDefault(parameter.Name, out string? hostParamValue) && hostParamValue != null)

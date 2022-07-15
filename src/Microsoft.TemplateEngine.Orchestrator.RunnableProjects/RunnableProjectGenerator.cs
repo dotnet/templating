@@ -47,6 +47,32 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return ParameterConverter.ConvertParameterValueToType(environmentSettings.Host, parameter, untypedValue, out valueResolutionError);
         }
 
+        [Obsolete("Replaced by CreateAsync with IEvaluatedParameterSetData", false)]
+        public Task<ICreationResult> CreateAsync(
+            IEngineEnvironmentSettings environmentSettings,
+            ITemplate template,
+            IParameterSet parameters,
+            string targetDirectory,
+            CancellationToken cancellationToken)
+        {
+            var builder = (IParameterSetBuilder)parameters;
+            builder.EvaluateConditionalParameters(environmentSettings.Host.Logger);
+            return CreateAsync(environmentSettings, template, builder.Build(), targetDirectory, cancellationToken);
+        }
+
+        [Obsolete("Replaced by GetCreationEffectsAsync with IEvaluatedParameterSetData", false)]
+        public Task<ICreationEffects> GetCreationEffectsAsync(
+            IEngineEnvironmentSettings environmentSettings,
+            ITemplate template,
+            IParameterSet parameters,
+            string targetDirectory,
+            CancellationToken cancellationToken)
+        {
+            var builder = (IParameterSetBuilder)parameters;
+            builder.EvaluateConditionalParameters(environmentSettings.Host.Logger);
+            return GetCreationEffectsAsync(environmentSettings, template, builder.Build(), targetDirectory, cancellationToken);
+        }
+
         public Task<ICreationResult> CreateAsync(
             IEngineEnvironmentSettings environmentSettings,
             ITemplate templateData,
@@ -163,10 +189,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return new CreationEffects2(changes, GetCreationResult(environmentSettings.Host.Logger, templateConfig, variables));
         }
 
-        public IParameterSetBuilder GetParametersForTemplate(IEngineEnvironmentSettings environmentSettings, ITemplate template)
+        [Obsolete("Replaced by ParameterSetBuilder", false)]
+        public IParameterSet GetParametersForTemplate(IEngineEnvironmentSettings environmentSettings, ITemplate template)
         {
-            RunnableProjectConfig templateConfig = (RunnableProjectConfig)template;
-            return GetParametersForTemplate(templateConfig);
+            return (IParameterSet)ParameterSetBuilder.CreateWithDefaults(template.Parameters, environmentSettings);
         }
 
         /// <summary>
@@ -308,11 +334,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return false;
         }
 
-        internal static IParameterSetBuilder GetParametersForTemplate(IRunnableProjectConfig templateConfig)
-        {
-            return new ParameterSetBuilder(templateConfig.Parameters.ToDictionary(p => p.Key, p => (ITemplateParameter)p.Value));
-        }
-
         // In the future the RunableProjectConfig should be refactored so that it doesn't access symbols for information that should be possible
         //  to be disabled (so file renames, operation configs etc - those use parameterSymbols, but instead should look into PrameterSet)
         private static void RemoveDisabledParamsFromTemplate(ITemplate template, IEvaluatedParameterSetData evaluatedParameterSetData)
@@ -409,213 +430,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
 
             return null;
-        }
-
-        internal class ParameterSetBuilder : ParametersDefinition, IParameterSetBuilder
-        {
-            private readonly Dictionary<ITemplateParameter, EvalData> _resolvedValues;
-            private IEvaluatedParameterSetData? _result;
-
-            public ParameterSetBuilder(IReadOnlyDictionary<string, ITemplateParameter> parameters) : base(parameters)
-            {
-                _resolvedValues = parameters.ToDictionary(p => p.Value, p => new EvalData(p.Value));
-            }
-
-            public void SetParameterValue(ITemplateParameter parameter, object value)
-            {
-                _resolvedValues[parameter].Value = value;
-                _result = null;
-            }
-
-            public void SetParameterEvaluation(ITemplateParameter parameter, EvaluatedParameterData evaluatedParameterData)
-            {
-                var old = _resolvedValues[parameter];
-                _resolvedValues[parameter] = new EvalData(evaluatedParameterData);
-                if (old.InputDataState != InputDataState.Unset)
-                {
-                    _resolvedValues[parameter].Value = old.Value;
-                }
-
-                _result = null;
-            }
-
-            public bool HasParameterValue(ITemplateParameter parameter) => _resolvedValues[parameter].InputDataState != InputDataState.Unset;
-
-            public void EvaluateConditionalParameters(ILogger logger)
-            {
-                List<EvalData> evaluatedParameters = _resolvedValues.Values.ToList();
-
-                var variableCollection = new VariableCollection(
-                    null,
-                    evaluatedParameters
-                        .Where(p => p.Value != null)
-                        .ToDictionary(p => p.ParameterDefinition.Name, p => p.Value));
-
-                EvalData[] variableCollectionIdxToParametersMap =
-                    evaluatedParameters.Where(p => p.Value != null).Select(p => p).ToArray();
-
-                EvaluateEnablementConditions(evaluatedParameters, variableCollection, variableCollectionIdxToParametersMap, logger);
-                EvaluateRequirementCondition(evaluatedParameters, variableCollection, logger);
-            }
-
-            public IEvaluatedParameterSetData Build()
-            {
-                if (_result == null)
-                {
-                    _result = new EvaluatedParameterSetData(
-                        this,
-                        _resolvedValues.Select(p => p.Value.ToParameterData()).ToList());
-                }
-
-                return _result!;
-            }
-
-            private void EvaluateEnablementConditions(
-                IReadOnlyList<EvalData> parameters,
-                VariableCollection variableCollection,
-                EvalData[] variableCollectionIdxToParametersMap,
-                ILogger logger)
-            {
-                Dictionary<EvalData, HashSet<EvalData>> parametersDependencies = new();
-
-                // First parameters traversal.
-                //   - evaluate all IsEnabledCondition - and get the dependecies between the parameters during doing so
-                foreach (EvalData parameter in parameters)
-                {
-                    if (!string.IsNullOrEmpty(parameter.ParameterDefinition.Precedence.IsEnabledCondition))
-                    {
-                        HashSet<int> referencedVariablesIndexes = new HashSet<int>();
-                        // Do not remove from the variable collection though - we want to capture all dependencies between parameters in the first traversal.
-                        // Those will be bulk removed before second traversal (traversing only the required dependencies).
-                        parameter.IsEnabledConditionResult =
-                            Cpp2StyleEvaluatorDefinition.EvaluateFromString(logger, parameter.ParameterDefinition.Precedence.IsEnabledCondition, variableCollection, referencedVariablesIndexes);
-
-                        if (referencedVariablesIndexes.Any())
-                        {
-                            parametersDependencies[parameter] = new HashSet<EvalData>(
-                                referencedVariablesIndexes.Select(idx => variableCollectionIdxToParametersMap[idx]));
-                        }
-                    }
-                }
-
-                // No dependencies between parameters detected - no need to process further the second evaluation
-                if (parametersDependencies.Count == 0)
-                {
-                    return;
-                }
-
-                DirectedGraph<EvalData> parametersDependenciesGraph = new(parametersDependencies);
-                // Get the transitive closure of parameters that need to be recalculated, based on the knowledge of params that
-                IReadOnlyList<EvalData> disabledParameters = parameters.Where(p => p.IsEnabledConditionResult.HasValue && !p.IsEnabledConditionResult.Value).ToList();
-                DirectedGraph<EvalData> parametersToRecalculate =
-                    parametersDependenciesGraph.GetSubGraphDependandOnVertices(disabledParameters, includeSeedVertices: false);
-
-                // Second traversal - for transitive dependencies of parameters that need to be disabled
-                if (parametersToRecalculate.TryGetTopologicalSort(out IReadOnlyList<EvalData> orderedParameters))
-                {
-                    disabledParameters.ForEach(p => variableCollection.Remove(p.ParameterDefinition.Name));
-
-                    if (parametersDependenciesGraph.HasCycle(out var cycle))
-                    {
-                        logger.LogWarning(LocalizableStrings.RunnableProjectGenerator_Warning_ParamsCycle, cycle.Select(p => p.ParameterDefinition.Name).ToCsvString());
-                    }
-
-                    foreach (EvalData parameter in orderedParameters)
-                    {
-                        bool isEnabled = Cpp2StyleEvaluatorDefinition.EvaluateFromString(logger, parameter.ParameterDefinition.Precedence.IsEnabledCondition, variableCollection);
-                        parameter.IsEnabledConditionResult = isEnabled;
-                        if (!isEnabled)
-                        {
-                            variableCollection.Remove(parameter.ParameterDefinition.Name);
-                        }
-                    }
-                }
-                else if (parametersToRecalculate.HasCycle(out var cycle))
-                {
-                    throw new TemplateAuthoringException(
-                        string.Format(
-                            LocalizableStrings.RunnableProjectGenerator_Error_ParamsCycle,
-                            cycle.Select(p => p.ParameterDefinition.Name).ToCsvString()),
-                        "Conditional Parameters");
-                }
-                else
-                {
-                    throw new Exception(LocalizableStrings.RunnableProjectGenerator_Error_TopologicalSort);
-                }
-            }
-
-            private void EvaluateRequirementCondition(
-                IReadOnlyList<EvalData> parameters,
-                VariableCollection variableCollection,
-                ILogger logger
-            )
-            {
-                foreach (EvalData parameter in parameters)
-                {
-                    if (!string.IsNullOrEmpty(parameter.ParameterDefinition.Precedence.IsRequiredCondition))
-                    {
-                        parameter.IsRequiredConditionResult =
-                            Cpp2StyleEvaluatorDefinition.EvaluateFromString(logger, parameter.ParameterDefinition.Precedence.IsRequiredCondition, variableCollection);
-                    }
-                }
-            }
-
-            private class EvalData
-            {
-                private object? _value;
-
-                public EvalData(
-                    ITemplateParameter parameterDefinition,
-                    object? value,
-                    bool? isEnabledConditionResult,
-                    bool? isRequiredConditionResult)
-                {
-                    ParameterDefinition = parameterDefinition;
-                    _value = value;
-                    IsEnabledConditionResult = isEnabledConditionResult;
-                    IsRequiredConditionResult = isRequiredConditionResult;
-                }
-
-                public EvalData(ITemplateParameter parameterDefinition)
-                {
-                    ParameterDefinition = parameterDefinition;
-                }
-
-                public EvalData(EvaluatedParameterData other)
-                    : this(other.ParameterDefinition, other.Value, other.IsEnabledConditionResult, other.IsRequiredConditionResult)
-                { }
-
-                public ITemplateParameter ParameterDefinition { get; }
-
-                public object? Value
-                {
-                    get { return _value; }
-
-                    set
-                    {
-                        _value = value;
-                        InputDataState = (value == null) ? InputDataState.ExplicitNull : InputDataState.Set;
-                    }
-                }
-
-                public InputDataState InputDataState { get; private set; } = InputDataState.Unset;
-
-                public bool? IsEnabledConditionResult { get; set; }
-
-                public bool? IsRequiredConditionResult { get; set; }
-
-                public override string ToString() => $"{ParameterDefinition}: {Value?.ToString() ?? "<null>"}";
-
-                public EvaluatedParameterData ToParameterData()
-                {
-                    return new EvaluatedParameterData(
-                        this.ParameterDefinition,
-                        this.Value,
-                        this.IsEnabledConditionResult,
-                        this.IsRequiredConditionResult,
-                        InputDataState);
-                }
-            }
         }
     }
 }

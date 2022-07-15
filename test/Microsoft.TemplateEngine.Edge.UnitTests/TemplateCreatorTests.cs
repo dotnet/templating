@@ -445,15 +445,15 @@ C
             }
             else
             {
-                var paramsDict = runnableConfig.Parameters.ToDictionary(p => p.Key, p => (ITemplateParameter)p.Value);
+                var parameters = runnableConfig.Parameters;
 
                 IParameterSetData data;
                 try
                 {
                     data = new EvaluatedParameterSetData(
-                        new ParametersDefinition(paramsDict),
+                        parameters,
                         parameters2!.Select(p => new EvaluatedParameterData(
-                            paramsDict[p.Name],
+                            parameters[p.Name],
                             p.Value,
                             p.IsEnabledConditionResult,
                             p.IsRequiredConditionResult,

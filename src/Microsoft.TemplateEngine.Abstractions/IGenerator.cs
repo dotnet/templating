@@ -1,6 +1,7 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,6 +17,52 @@ namespace Microsoft.TemplateEngine.Abstractions
     /// </summary>
     public interface IGenerator : IIdentifiedComponent
     {
+        /// <summary>
+        /// Generates the <paramref name="template"/> with given parameters.
+        /// </summary>
+        /// <param name="environmentSettings">template engine environment settings.</param>
+        /// <param name="template">template to generate.</param>
+        /// <param name="parameters">template parameters.</param>
+        /// <param name="targetDirectory">target output directory to generate template to.</param>
+        /// <param name="cancellationToken">cancellation token.</param>
+        /// <returns><see cref="ICreationResult"/> containing post actions and primary outputs after template generation.</returns>
+        [Obsolete("Replaced by CreateAsync with IEvaluatedParameterSetData", false)]
+        Task<ICreationResult> CreateAsync(
+            IEngineEnvironmentSettings environmentSettings,
+            ITemplate template,
+            IParameterSet parameters,
+            string targetDirectory,
+            CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Dry runs the <paramref name="template"/> with given parameters.
+        /// </summary>
+        /// <param name="environmentSettings">template engine environment settings.</param>
+        /// <param name="template">template to dry run.</param>
+        /// <param name="parameters">template parameters.</param>
+        /// <param name="targetDirectory">target output directory to generate template to.</param>
+        /// <param name="cancellationToken">cancellation token.</param>
+        /// <returns><see cref="ICreationEffects"/> containing file changes, post actions and primary outputs that would have been done after template generation.</returns>
+        [Obsolete("Replaced by GetCreationEffectsAsync with IEvaluatedParameterSetData", false)]
+        Task<ICreationEffects> GetCreationEffectsAsync(
+            IEngineEnvironmentSettings environmentSettings,
+            ITemplate template,
+            IParameterSet parameters,
+            string targetDirectory,
+            CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Returns a <see cref="IParameterSet"/> for the given <paramref name="template"/>.
+        /// This method returns the list of input parameters that can be set by the host / Edge before running the template.
+        /// After setting the values the host should pass <see cref="IParameterSet"/> to <see cref="GetCreationEffectsAsync(IEngineEnvironmentSettings, ITemplate, IParameterSet, string, CancellationToken)"/> or <see cref="CreateAsync(IEngineEnvironmentSettings, ITemplate, IParameterSet, string, CancellationToken)"/> methods.
+        /// Host may use <see cref="ConvertParameterValueToType(IEngineEnvironmentSettings, ITemplateParameter, string, out bool)"/> to convert input value to required parameter type.
+        /// </summary>
+        /// <param name="environmentSettings">template engine environment settings.</param>
+        /// <param name="template">template to get parameters from.</param>
+        /// <returns><see cref="IParameterSet"/> with parameters available in <paramref name="template"/>.</returns>
+        [Obsolete("Replaced by ParameterSetBuilder", false)]
+        IParameterSet GetParametersForTemplate(IEngineEnvironmentSettings environmentSettings, ITemplate template);
+
         /// <summary>
         /// Generates the <paramref name="template"/> with given parameters.
         /// </summary>
@@ -47,17 +94,6 @@ namespace Microsoft.TemplateEngine.Abstractions
             IEvaluatedParameterSetData parameters,
             string targetDirectory,
             CancellationToken cancellationToken);
-
-        /// <summary>
-        /// Returns a <see cref="IParameterSetBuilder"/> for the given <paramref name="template"/>.
-        /// This method returns the list of input parameters that can be set by the host / Edge before running the template.
-        /// After setting the values the host should pass <see cref="IParameterSetBuilder"/> to <see cref="GetCreationEffectsAsync"/> or <see cref="CreateAsync"/> methods.
-        /// Host may use <see cref="ConvertParameterValueToType(IEngineEnvironmentSettings, ITemplateParameter, string, out bool)"/> to convert input value to required parameter type.
-        /// </summary>
-        /// <param name="environmentSettings">template engine environment settings.</param>
-        /// <param name="template">template to get parameters from.</param>
-        /// <returns><see cref="IParameterSetBuilder"/> with parameters available in <paramref name="template"/>.</returns>
-        IParameterSetBuilder GetParametersForTemplate(IEngineEnvironmentSettings environmentSettings, ITemplate template);
 
         /// <summary>
         /// Gets an <see cref="ITemplate"/> from the given <see cref="IFileSystemInfo" /> configuration entry.
