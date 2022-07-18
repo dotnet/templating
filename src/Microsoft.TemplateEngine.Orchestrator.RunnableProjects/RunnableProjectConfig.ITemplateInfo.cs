@@ -100,8 +100,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             get
             {
                 return new ParametersDefinition(_parameters.Values
-                    .Where(param => param.Type.Equals("parameter", StringComparison.OrdinalIgnoreCase)
-                        && param.Precedence.PrecedenceDefinition != PrecedenceDefinition.Implicit));
+                    .Where(param => param.Type.Equals("parameter", StringComparison.OrdinalIgnoreCase)));
+//                        && param.Precedence.PrecedenceDefinition != PrecedenceDefinition.Implicit));
             }
         }
 
