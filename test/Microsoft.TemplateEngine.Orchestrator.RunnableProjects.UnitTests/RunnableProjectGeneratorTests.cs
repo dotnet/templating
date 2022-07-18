@@ -450,18 +450,19 @@ Console.WriteLine(""Hello, World!"");
             IMountPoint? sourceMountPoint = TestFileSystemHelper.CreateMountPoint(environment, sourceBasePath);
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
             SimpleConfigModel configModel = SimpleConfigModel.FromJObject(JObject.Parse(templateConfig));
-            IRunnableProjectConfig runnableConfig = new RunnableProjectConfig(environment, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
-            IParameterSet parameters = new ParameterSet(runnableConfig);
-            ITemplateParameter choiceParameter;
-            Assert.True(parameters.TryGetParameterDefinition("Platform", out choiceParameter), "ChoiceParam expected to be extracted from template config");
-            parameters.ResolvedValues[choiceParameter] = new MultiValueParameter(new[] { "android", "iOS" });
+            RunnableProjectConfig runnableConfig = new RunnableProjectConfig(environment, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
+            IParameterSetBuilder parameters = ParameterSetBuilder.CreateWithDefaults(runnableConfig.Parameters, environment);
+
+            ITemplateParameter? choiceParameter;
+            Assert.True(parameters.TryGetValue("Platform", out choiceParameter), "ChoiceParam expected to be extracted from template config");
+            parameters.SetParameterValue(choiceParameter!, new MultiValueParameter(new[] { "android", "iOS" }));
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
 
             //
             // Running the actual scenario: template files processing and generating output (including macros processing)
             //
 
-            await rpg.CreateAsync(environment, runnableConfig, sourceDir, parameters, targetDir, CancellationToken.None);
+            await rpg.CreateAsync(environment, runnableConfig, sourceDir, parameters.Build(), targetDir, CancellationToken.None);
 
             //
             // Veryfying the outputs

@@ -384,6 +384,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
                 return ResourceManager.GetString("SymbolModel_Error_MandatoryPropertyMissing", resourceCulture);
                 }
         }
+
+        /// <summary>
         ///   Looks up a localized string similar to Found disallowed value for IsRequired property: [{0}], expected boolean value..
         /// </summary>
         internal static string Symbol_Error_IsRequiredNotABool {

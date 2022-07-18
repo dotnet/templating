@@ -115,15 +115,15 @@ Details: {1}</source>
         <target state="translated">{0} 解析ローカライズ ファイルを読み取ることができませんでした。それ以降の処理からはスキップされます。</target>
         <note />
       </trans-unit>
+      <trans-unit id="Params_Error_ExternalConditionMismatch">
+        <source>Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition) or a failure to pass the condition results for parameters with condition(s) in template. Offending parameters: {0}</source>
+        <target state="new">Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition) or a failure to pass the condition results for parameters with condition(s) in template. Offending parameters: {0}</target>
+        <note>{0} - csv of mismateched parameters</note>
+      </trans-unit>
       <trans-unit id="RunnableProjectGenerator_CannotAddImplicitChoice">
         <source>Variable [{0}] already added with value [{1}]. Cannot add it as implicit variable with value of self.</source>
         <target state="translated">変数 [{0}] は既に値 [{1}] と共に追加されています。値が self の暗黙的な変数として追加することはできません。</target>
         <note>{0} is the choiceKey, {1} is the existing conflict value</note>
-      </trans-unit>
-      <trans-unit id="RunnableProjectGenerator_Error_ExternalConditionMismatch">
-        <source>Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition): {0}</source>
-        <target state="new">Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition): {0}</target>
-        <note>{0} - csv of mismateched parameters</note>
       </trans-unit>
       <trans-unit id="RunnableProjectGenerator_Error_ParamsCycle">
         <source>Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation</source>
@@ -189,6 +189,16 @@ Details: {1}</source>
         <source>The symbol '{0}' of type '{1}' is incorrect: mandatory property '{2}' is not set. The symbol will be skipped.</source>
         <target state="translated">種類 '{0}' のシンボル '{1}' が正しくありません。 必須プロパティ '{2}' が設定されていません。シンボルはスキップされます。</target>
         <note />
+      </trans-unit>
+      <trans-unit id="Symbol_Error_IsRequiredNotABool">
+        <source>Found disallowed value for IsRequired property: [{0}], expected boolean value.</source>
+        <target state="new">Found disallowed value for IsRequired property: [{0}], expected boolean value.</target>
+        <note>{0} - the json property</note>
+      </trans-unit>
+      <trans-unit id="Symbol_Error_IsRequiredNotABoolOrString">
+        <source>Found disallowed value for IsRequired property: [{0}], expected boolean or string (condition) value</source>
+        <target state="new">Found disallowed value for IsRequired property: [{0}], expected boolean or string (condition) value</target>
+        <note>{0} - the json property</note>
       </trans-unit>
     </body>
   </file>

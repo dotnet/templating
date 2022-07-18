@@ -115,15 +115,15 @@ détails : {1}</target>
         <target state="translated">Échec de la lecture du fichier de localisation d’analyse {0}, il sera ignoré lors d’un traitement ultérieur.</target>
         <note />
       </trans-unit>
+      <trans-unit id="Params_Error_ExternalConditionMismatch">
+        <source>Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition) or a failure to pass the condition results for parameters with condition(s) in template. Offending parameters: {0}</source>
+        <target state="new">Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition) or a failure to pass the condition results for parameters with condition(s) in template. Offending parameters: {0}</target>
+        <note>{0} - csv of mismateched parameters</note>
+      </trans-unit>
       <trans-unit id="RunnableProjectGenerator_CannotAddImplicitChoice">
         <source>Variable [{0}] already added with value [{1}]. Cannot add it as implicit variable with value of self.</source>
         <target state="translated">La variable [{0}] a déjà été ajoutée avec la valeur [{1}]. Impossible de l’ajouter en tant que variable implicite avec la valeur de lui-même.</target>
         <note>{0} is the choiceKey, {1} is the existing conflict value</note>
-      </trans-unit>
-      <trans-unit id="RunnableProjectGenerator_Error_ExternalConditionMismatch">
-        <source>Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition): {0}</source>
-        <target state="new">Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition): {0}</target>
-        <note>{0} - csv of mismateched parameters</note>
       </trans-unit>
       <trans-unit id="RunnableProjectGenerator_Error_ParamsCycle">
         <source>Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation</source>
@@ -189,6 +189,16 @@ détails : {1}</target>
         <source>The symbol '{0}' of type '{1}' is incorrect: mandatory property '{2}' is not set. The symbol will be skipped.</source>
         <target state="translated">Le symbole « {0} » de type « {1} » est incorrect : la propriété obligatoire « {2} » n’est pas définie. Le symbole sera ignoré.</target>
         <note />
+      </trans-unit>
+      <trans-unit id="Symbol_Error_IsRequiredNotABool">
+        <source>Found disallowed value for IsRequired property: [{0}], expected boolean value.</source>
+        <target state="new">Found disallowed value for IsRequired property: [{0}], expected boolean value.</target>
+        <note>{0} - the json property</note>
+      </trans-unit>
+      <trans-unit id="Symbol_Error_IsRequiredNotABoolOrString">
+        <source>Found disallowed value for IsRequired property: [{0}], expected boolean or string (condition) value</source>
+        <target state="new">Found disallowed value for IsRequired property: [{0}], expected boolean or string (condition) value</target>
+        <note>{0} - the json property</note>
       </trans-unit>
     </body>
   </file>

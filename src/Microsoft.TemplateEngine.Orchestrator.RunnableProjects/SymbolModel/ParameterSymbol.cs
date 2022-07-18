@@ -82,14 +82,16 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
             Choices = cloneFrom.Choices;
             AllowMultipleValues = cloneFrom.AllowMultipleValues;
             EnableQuotelessLiterals = cloneFrom.EnableQuotelessLiterals;
-
             Precedence = cloneFrom.Precedence;
         }
 
         /// <summary>
         /// Creates a default instance of <see cref="ParameterSymbol"/>.
         /// </summary>
-        public ParameterSymbol(string name, string? replaces = null) : base (name, replaces) { }
+        public ParameterSymbol(string name, string? replaces = null) : base(name, replaces)
+        {
+            Precedence = TemplateParameterPrecedence.Default;
+        }
 
         internal override string Type => TypeName;
 
@@ -116,7 +118,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
         internal bool EnableQuotelessLiterals { get; init; }
 
         internal TemplateParameterPrecedence Precedence { get; init; }
-        
+
         internal string? IsEnabledCondition { get; init; }
 
         internal string? IsRequiredCondition { get; init; }
@@ -215,7 +217,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
             }
 
             // Attribute parseable as a bool - so we do not want to present it as a condition
-            if (TryGetIsRequiredField(isRequiredToken!, out _))
+            if (isRequiredToken!.TryParseBool(out _))
             {
                 return null;
             }
