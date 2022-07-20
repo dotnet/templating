@@ -1532,7 +1532,32 @@ There";
             IProcessor processor = SetupCStyleNoCommentsProcessor(vc);
 
             //Changes should be made
-            bool changed = processor.Run(input, output, 28);
+            bool changed = processor.Run(input, output, 50);
+            Verify(Encoding.UTF8, output, changed, value, expected);
+        }
+
+#pragma warning disable xUnit1004 // Test methods should not be skipped
+        [Fact(Skip = "https://github.com/dotnet/templating/issues/4988")]
+#pragma warning restore xUnit1004 // Test methods should not be skipped
+        public void VerifyXMLConditionAtEnd()
+        {
+            string value = @"Hello
+<!--#if (B)
+bar
+#endif -->
+";
+            string expected = @"Hello
+";
+
+            byte[] valueBytes = Encoding.UTF8.GetBytes(value);
+            MemoryStream input = new MemoryStream(valueBytes);
+            MemoryStream output = new MemoryStream();
+
+            VariableCollection vc = new VariableCollection();
+            IProcessor processor = SetupXmlStyleProcessor(vc);
+
+            //Changes should be made
+            bool changed = processor.Run(input, output, 50);
             Verify(Encoding.UTF8, output, changed, value, expected);
         }
 
