@@ -15,13 +15,15 @@ using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config;
 using Microsoft.TemplateEngine.TestHelper;
 using Microsoft.TemplateEngine.Utils;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
 {
     public class RunnableProjectGeneratorTests : IClassFixture<EnvironmentSettingsHelper>
     {
-        private EnvironmentSettingsHelper _environmentSettingsHelper;
+        private readonly EnvironmentSettingsHelper _environmentSettingsHelper;
 
         public RunnableProjectGeneratorTests(EnvironmentSettingsHelper environmentSettingsHelper)
         {
@@ -35,9 +37,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             // Template content preparation
             //
 
-            Guid inputTestGuid = new Guid("12aa8f4e-a4aa-4ac1-927c-94cb99485ef1");
+            Guid inputTestGuid = new("12aa8f4e-a4aa-4ac1-927c-94cb99485ef1");
             string contentFileNamePrefix = "content - ";
-            TemplateConfigModel config = new TemplateConfigModel()
+            TemplateConfigModel config = new()
             {
                 Identity = "test",
                 Guids = new List<Guid>()
@@ -46,9 +48,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
                 }
             };
 
-            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>();
-            // template.json
-            templateSourceFiles.Add(TestFileSystemHelper.DefaultConfigRelativePath, config.ToJObject().ToString());
+            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>
+            {
+                // template.json
+                { TestFileSystemHelper.DefaultConfigRelativePath, config.ToJObject().ToString() }
+            };
 
             //content
             foreach (string guidFormat in GuidMacroConfig.DefaultFormats.Select(c => c.ToString()))
@@ -63,12 +67,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             IEngineEnvironmentSettings environment = _environmentSettingsHelper.CreateEnvironment();
             string sourceBasePath = FileSystemHelpers.GetNewVirtualizedPath(environment);
             string targetDir = FileSystemHelpers.GetNewVirtualizedPath(environment);
-            RunnableProjectGenerator rpg = new RunnableProjectGenerator();
+            RunnableProjectGenerator rpg = new();
 
             TestFileSystemHelper.WriteTemplateSource(environment, sourceBasePath, templateSourceFiles);
             IMountPoint? sourceMountPoint = TestFileSystemHelper.CreateMountPoint(environment, sourceBasePath);
-            RunnableProjectConfig runnableConfig = new RunnableProjectConfig(environment, rpg, config, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
-            ParameterSetData parametersData = new ParameterSetData(runnableConfig);
+            RunnableProjectConfig runnableConfig = new(environment, rpg, config, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
+            ParameterSetData parametersData = new(runnableConfig);
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
 
             //
@@ -85,9 +89,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             foreach (string guidFormat in GuidMacroConfig.DefaultFormats.Select(c => c.ToString()))
             {
                 string resultContent = environment.Host.FileSystem.ReadAllText(Path.Combine(targetDir, contentFileNamePrefix + guidFormat));
-                Guid resultGuid;
                 Assert.True(
-                    Guid.TryParseExact(resultContent, guidFormat, out resultGuid),
+                    Guid.TryParseExact(resultContent, guidFormat, out Guid resultGuid),
                     $"Expected the result conent ({resultContent}) to be parseable by Guid format '{guidFormat}'");
 
                 if (expectedResultGuid == Guid.Empty)
@@ -180,12 +183,13 @@ UNKNOWN
 //#endif
 ";
 
-            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>();
-            // template.json
-            templateSourceFiles.Add(TestFileSystemHelper.DefaultConfigRelativePath, templateConfig);
-
-            //content
-            templateSourceFiles.Add("sourcFile", sourceSnippet);
+            Dictionary<string, string?> templateSourceFiles = new()
+            {
+                // template.json
+                { TestFileSystemHelper.DefaultConfigRelativePath, templateConfig },
+                //content
+                { "sourcFile", sourceSnippet }
+            };
 
             //
             // Dependencies preparation and mounting
@@ -197,10 +201,10 @@ UNKNOWN
 
             TestFileSystemHelper.WriteTemplateSource(environment, sourceBasePath, templateSourceFiles);
             IMountPoint? sourceMountPoint = TestFileSystemHelper.CreateMountPoint(environment, sourceBasePath);
-            RunnableProjectGenerator rpg = new RunnableProjectGenerator();
+            RunnableProjectGenerator rpg = new();
             TemplateConfigModel configModel = TemplateConfigModel.FromString(templateConfig);
-            RunnableProjectConfig runnableConfig = new RunnableProjectConfig(environment, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
-            ParameterSetData parametersData = new ParameterSetData(
+            RunnableProjectConfig runnableConfig = new(environment, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
+            ParameterSetData parametersData = new(
                 runnableConfig,
                 new Dictionary<string, string?>() { { "ChoiceParam", "SecondChoice" } });
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
@@ -276,12 +280,14 @@ SECOND
 THIRD
 ";
 
-            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>();
-            // template.json
-            templateSourceFiles.Add(TestFileSystemHelper.DefaultConfigRelativePath, templateConfig);
+            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>
+            {
+                // template.json
+                { TestFileSystemHelper.DefaultConfigRelativePath, templateConfig },
 
-            //content
-            templateSourceFiles.Add("sourcFile", sourceSnippet);
+                //content
+                { "sourcFile", sourceSnippet }
+            };
 
             //
             // Dependencies preparation and mounting
@@ -293,10 +299,10 @@ THIRD
 
             TestFileSystemHelper.WriteTemplateSource(environment, sourceBasePath, templateSourceFiles);
             IMountPoint? sourceMountPoint = TestFileSystemHelper.CreateMountPoint(environment, sourceBasePath);
-            RunnableProjectGenerator rpg = new RunnableProjectGenerator();
+            RunnableProjectGenerator rpg = new();
             TemplateConfigModel configModel = TemplateConfigModel.FromString(templateConfig);
-            RunnableProjectConfig runnableConfig = new RunnableProjectConfig(environment, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
-            ParameterSetData parametersData = new ParameterSetData(
+            RunnableProjectConfig runnableConfig = new(environment, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
+            ParameterSetData parametersData = new(
                 runnableConfig,
                 new Dictionary<string, object?>() { { "ChoiceParam", new MultiValueParameter(new[] { "SecondChoice", "ThirdChoice" }) } });
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
@@ -422,12 +428,14 @@ Console.WriteLine(""Hello, World!"");
 // Plats: android, iOS
 ";
 
-            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>();
-            // template.json
-            templateSourceFiles.Add(TestFileSystemHelper.DefaultConfigRelativePath, templateConfig);
+            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>
+            {
+                // template.json
+                { TestFileSystemHelper.DefaultConfigRelativePath, templateConfig },
 
-            //content
-            templateSourceFiles.Add("sourcFile", sourceSnippet);
+                //content
+                { "sourcFile", sourceSnippet }
+            };
 
             //
             // Dependencies preparation and mounting
@@ -439,10 +447,10 @@ Console.WriteLine(""Hello, World!"");
 
             TestFileSystemHelper.WriteTemplateSource(environment, sourceBasePath, templateSourceFiles);
             IMountPoint? sourceMountPoint = TestFileSystemHelper.CreateMountPoint(environment, sourceBasePath);
-            RunnableProjectGenerator rpg = new RunnableProjectGenerator();
+            RunnableProjectGenerator rpg = new();
             TemplateConfigModel configModel = TemplateConfigModel.FromString(templateConfig);
-            RunnableProjectConfig runnableConfig = new RunnableProjectConfig(environment, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
-            ParameterSetData parametersData = new ParameterSetData(
+            RunnableProjectConfig runnableConfig = new(environment, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
+            ParameterSetData parametersData = new(
                 runnableConfig,
                 new Dictionary<string, object?>() { { "Platform", new MultiValueParameter(new[] { "android", "iOS" }) } });
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
@@ -532,12 +540,14 @@ Console.WriteLine(""Hello, World!"");
 // This file is generated for platfrom: MacOS, iOS
 ";
 
-            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>();
-            // template.json
-            templateSourceFiles.Add(TestFileSystemHelper.DefaultConfigRelativePath, templateConfig);
+            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>
+            {
+                // template.json
+                { TestFileSystemHelper.DefaultConfigRelativePath, templateConfig },
 
-            //content
-            templateSourceFiles.Add("sourcFile", sourceSnippet);
+                //content
+                { "sourcFile", sourceSnippet }
+            };
 
             //
             // Dependencies preparation and mounting
@@ -549,10 +559,10 @@ Console.WriteLine(""Hello, World!"");
 
             TestFileSystemHelper.WriteTemplateSource(environment, sourceBasePath, templateSourceFiles);
             IMountPoint? sourceMountPoint = TestFileSystemHelper.CreateMountPoint(environment, sourceBasePath);
-            RunnableProjectGenerator rpg = new RunnableProjectGenerator();
+            RunnableProjectGenerator rpg = new();
             TemplateConfigModel configModel = TemplateConfigModel.FromString(templateConfig);
-            RunnableProjectConfig runnableConfig = new RunnableProjectConfig(environment, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
-            ParameterSetData parametersData = new ParameterSetData(
+            RunnableProjectConfig runnableConfig = new(environment, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
+            ParameterSetData parametersData = new(
                 runnableConfig,
                 new Dictionary<string, object?>() { { "Platform", new MultiValueParameter(new[] { "MacOS", "iOS" }) } });
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
@@ -617,12 +627,14 @@ This text ensures that buffer is long enough even considering very-very-long env
 foo
 ";
 
-            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>();
-            // template.json
-            templateSourceFiles.Add(TestFileSystemHelper.DefaultConfigRelativePath, JsonConvert.SerializeObject(templateConfig, Formatting.Indented));
+            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>
+            {
+                // template.json
+                { TestFileSystemHelper.DefaultConfigRelativePath, JsonConvert.SerializeObject(templateConfig, Formatting.Indented) },
 
-            //content
-            templateSourceFiles.Add("sourceFile.md", sourceSnippet);
+                //content
+                { "sourceFile.md", sourceSnippet }
+            };
 
             //
             // Dependencies preparation and mounting
@@ -633,12 +645,13 @@ foo
 
             TestFileSystemHelper.WriteTemplateSource(settings, sourceBasePath, templateSourceFiles);
             IMountPoint? sourceMountPoint = TestFileSystemHelper.CreateMountPoint(settings, sourceBasePath);
-            RunnableProjectGenerator rpg = new RunnableProjectGenerator();
-            SimpleConfigModel configModel = SimpleConfigModel.FromJObject(JObject.FromObject(templateConfig));
-            IRunnableProjectConfig runnableConfig = new RunnableProjectConfig(settings, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
-            IParameterSet parameters = new ParameterSet(runnableConfig);
-            parameters.TryGetParameterDefinition("A", out ITemplateParameter aParam);
-            parameters.ResolvedValues[aParam] = true;
+            RunnableProjectGenerator rpg = new();
+
+            TemplateConfigModel configModel = TemplateConfigModel.FromJObject(JObject.FromObject(templateConfig));
+            RunnableProjectConfig runnableConfig = new(settings, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
+            ParameterSetData parameters = new(
+                runnableConfig,
+                new Dictionary<string, object?>() { { "A", true } });
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
 
             //
@@ -700,12 +713,14 @@ This text ensures that buffer is long enough even considering very-very-long env
 foo
 ";
 
-            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>();
-            // template.json
-            templateSourceFiles.Add(TestFileSystemHelper.DefaultConfigRelativePath, JsonConvert.SerializeObject(templateConfig, Formatting.Indented));
+            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>
+            {
+                // template.json
+                { TestFileSystemHelper.DefaultConfigRelativePath, JsonConvert.SerializeObject(templateConfig, Formatting.Indented) },
 
-            //content
-            templateSourceFiles.Add("sourceFile.yaml", sourceSnippet);
+                //content
+                { "sourceFile.yaml", sourceSnippet }
+            };
 
             //
             // Dependencies preparation and mounting
@@ -716,12 +731,12 @@ foo
 
             TestFileSystemHelper.WriteTemplateSource(settings, sourceBasePath, templateSourceFiles);
             IMountPoint? sourceMountPoint = TestFileSystemHelper.CreateMountPoint(settings, sourceBasePath);
-            RunnableProjectGenerator rpg = new RunnableProjectGenerator();
-            SimpleConfigModel configModel = SimpleConfigModel.FromJObject(JObject.FromObject(templateConfig));
-            IRunnableProjectConfig runnableConfig = new RunnableProjectConfig(settings, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
-            IParameterSet parameters = new ParameterSet(runnableConfig);
-            parameters.TryGetParameterDefinition("A", out ITemplateParameter aParam);
-            parameters.ResolvedValues[aParam] = true;
+            RunnableProjectGenerator rpg = new();
+            TemplateConfigModel configModel = TemplateConfigModel.FromJObject(JObject.FromObject(templateConfig));
+            RunnableProjectConfig runnableConfig = new(settings, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
+            ParameterSetData parameters = new(
+                runnableConfig,
+                new Dictionary<string, object?>() { { "A", true } });
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
 
             //

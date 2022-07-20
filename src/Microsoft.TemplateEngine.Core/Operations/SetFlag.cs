@@ -1,6 +1,8 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.TemplateEngine.Core.Contracts;
@@ -10,11 +12,9 @@ namespace Microsoft.TemplateEngine.Core.Operations
     public class SetFlag : IOperationProvider
     {
         public static readonly string OperationName = "flags";
-
-        private readonly string _id;
         private readonly bool _initialState;
 
-        public SetFlag(string name, ITokenConfig on, ITokenConfig off, ITokenConfig onNoEmit, ITokenConfig offNoEmit, string id, bool initialState, bool? @default = null)
+        public SetFlag(string name, ITokenConfig on, ITokenConfig off, ITokenConfig onNoEmit, ITokenConfig offNoEmit, string? id, bool initialState, bool? @default = null)
         {
             Name = name;
             On = on;
@@ -22,11 +22,11 @@ namespace Microsoft.TemplateEngine.Core.Operations
             OnNoEmit = onNoEmit;
             OffNoEmit = offNoEmit;
             Default = @default;
-            _id = id;
+            Id = id;
             _initialState = initialState;
         }
 
-        public string Id => _id;
+        public string? Id { get; private set; }
 
         public string Name { get; }
 
@@ -55,25 +55,24 @@ namespace Microsoft.TemplateEngine.Core.Operations
                 processorState.Config.Flags[Name] = Default.Value;
             }
 
-            return new Impl(this, tokens, _id, _initialState);
+            return new Impl(this, tokens, Id, _initialState);
         }
 
         private class Impl : IOperation
         {
             private readonly SetFlag _owner;
-            private readonly string _id;
 
-            public Impl(SetFlag owner, IReadOnlyList<IToken> tokens, string id, bool initialState)
+            public Impl(SetFlag owner, IReadOnlyList<IToken> tokens, string? id, bool initialState)
             {
                 _owner = owner;
                 Tokens = tokens;
-                _id = id;
+                Id = id;
                 IsInitialStateOn = string.IsNullOrEmpty(id) || initialState;
             }
 
             public IReadOnlyList<IToken> Tokens { get; }
 
-            public string Id => _id;
+            public string? Id { get; private set; }
 
             public bool IsInitialStateOn { get; }
 
@@ -96,7 +95,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
                 else
                 {
                     // consume the entire line when not emitting. Otherwise the newlines on the falg tokens get emitted
-                    processor.SeekForwardThrough(processor.EncodingConfig.LineEndings, ref bufferLength, ref currentBufferPosition);
+                    processor.SeekBufferForwardThrough(processor.EncodingConfig.LineEndings, ref bufferLength, ref currentBufferPosition);
                 }
 
                 //Only turn the flag in question back on if it's the "flags" flag.

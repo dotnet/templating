@@ -1,0 +1,26 @@
+Microsoft.TemplateEngine.Core.Matching.OperationTerminal.Operation.get -> Microsoft.TemplateEngine.Core.Contracts.IOperation!
+Microsoft.TemplateEngine.Core.Matching.OperationTerminal.OperationTerminal(Microsoft.TemplateEngine.Core.Contracts.IOperation! operation, int token, int tokenLength, int start = 0, int end = -1) -> void
+Microsoft.TemplateEngine.Core.Matching.TerminalLocation<T>
+Microsoft.TemplateEngine.Core.Matching.TerminalLocation<T>.Terminal.get -> T!
+Microsoft.TemplateEngine.Core.Matching.TerminalLocation<T>.TerminalLocation(T! terminal, int location) -> void
+Microsoft.TemplateEngine.Core.Operations.Conditional.Conditional(Microsoft.TemplateEngine.Core.Operations.ConditionalTokens! tokenVariants, bool wholeLine, bool trimWhitespace, Microsoft.TemplateEngine.Core.Operations.ConditionEvaluator! evaluator, string! id, bool initialState) -> void
+Microsoft.TemplateEngine.Core.Operations.Conditional.Evaluator.get -> Microsoft.TemplateEngine.Core.Operations.ConditionEvaluator!
+Microsoft.TemplateEngine.Core.Operations.Conditional.GetOperation(System.Text.Encoding! encoding, Microsoft.TemplateEngine.Core.Contracts.IProcessorState! processorState) -> Microsoft.TemplateEngine.Core.Contracts.IOperation!
+Microsoft.TemplateEngine.Core.Operations.Conditional.Id.get -> string!
+Microsoft.TemplateEngine.Core.Operations.Conditional.Tokens.get -> Microsoft.TemplateEngine.Core.Operations.ConditionalTokens!
+Microsoft.TemplateEngine.Core.Operations.SetFlag.GetOperation(System.Text.Encoding! encoding, Microsoft.TemplateEngine.Core.Contracts.IProcessorState! processorState) -> Microsoft.TemplateEngine.Core.Contracts.IOperation!
+Microsoft.TemplateEngine.Core.Operations.SetFlag.Id.get -> string?
+Microsoft.TemplateEngine.Core.Operations.SetFlag.Name.get -> string!
+Microsoft.TemplateEngine.Core.Operations.SetFlag.Off.get -> Microsoft.TemplateEngine.Core.Contracts.ITokenConfig!
+Microsoft.TemplateEngine.Core.Operations.SetFlag.OffNoEmit.get -> Microsoft.TemplateEngine.Core.Contracts.ITokenConfig!
+Microsoft.TemplateEngine.Core.Operations.SetFlag.On.get -> Microsoft.TemplateEngine.Core.Contracts.ITokenConfig!
+Microsoft.TemplateEngine.Core.Operations.SetFlag.OnNoEmit.get -> Microsoft.TemplateEngine.Core.Contracts.ITokenConfig!
+Microsoft.TemplateEngine.Core.Operations.SetFlag.SetFlag(string! name, Microsoft.TemplateEngine.Core.Contracts.ITokenConfig! on, Microsoft.TemplateEngine.Core.Contracts.ITokenConfig! off, Microsoft.TemplateEngine.Core.Contracts.ITokenConfig! onNoEmit, Microsoft.TemplateEngine.Core.Contracts.ITokenConfig! offNoEmit, string? id, bool initialState, bool? default = null) -> void
+Microsoft.TemplateEngine.Core.Util.ProcessorState.SeekBufferForwardThrough(Microsoft.TemplateEngine.Core.Contracts.ITokenTrie! trie, ref int bufferLength, ref int currentBufferPosition) -> void
+Microsoft.TemplateEngine.Core.Util.ProcessorState.SeekBufferForwardUntil(Microsoft.TemplateEngine.Core.Contracts.ITokenTrie! trie, ref int bufferLength, ref int currentBufferPosition) -> void
+Microsoft.TemplateEngine.Core.Util.ProcessorState.SeekBufferForwardWhile(Microsoft.TemplateEngine.Core.Contracts.ITokenTrie! trie, ref int bufferLength, ref int currentBufferPosition) -> void
+Microsoft.TemplateEngine.Core.Util.ProcessorState.SeekTargetBackUntil(Microsoft.TemplateEngine.Core.Contracts.ITokenTrie! match) -> void
+Microsoft.TemplateEngine.Core.Util.ProcessorState.SeekTargetBackUntil(Microsoft.TemplateEngine.Core.Contracts.ITokenTrie! match, bool consume) -> void
+Microsoft.TemplateEngine.Core.Util.ProcessorState.SeekTargetBackWhile(Microsoft.TemplateEngine.Core.Contracts.ITokenTrie! match) -> void
+static readonly Microsoft.TemplateEngine.Core.Operations.Conditional.OperationName -> string!
+static readonly Microsoft.TemplateEngine.Core.Operations.SetFlag.OperationName -> string!

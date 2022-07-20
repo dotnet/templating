@@ -18,25 +18,25 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
     {
         IDirectory? ITemplate.TemplateSourceRoot => TemplateSourceRoot;
 
-        string ITemplateInfo.Identity => _configuration.Identity ?? _configuration.Name ?? throw new TemplateValidationException("Template configuration should have name defined");
+        string ITemplateInfo.Identity => ConfigurationModel.Identity ?? ConfigurationModel.Name ?? throw new TemplateValidationException("Template configuration should have name defined");
 
         Guid ITemplateInfo.GeneratorId => _generator.Id;
 
-        string? ITemplateInfo.Author => _configuration.Author;
+        string? ITemplateInfo.Author => ConfigurationModel.Author;
 
-        string? ITemplateInfo.Description => _configuration.Description;
+        string? ITemplateInfo.Description => ConfigurationModel.Description;
 
-        IReadOnlyList<string> ITemplateInfo.Classifications => _configuration.Classifications;
+        IReadOnlyList<string> ITemplateInfo.Classifications => ConfigurationModel.Classifications;
 
-        string? ITemplateInfo.DefaultName => _configuration.DefaultName;
+        string? ITemplateInfo.DefaultName => ConfigurationModel.DefaultName;
 
         IGenerator ITemplate.Generator => _generator;
 
-        string? ITemplateInfo.GroupIdentity => _configuration.GroupIdentity;
+        string? ITemplateInfo.GroupIdentity => ConfigurationModel.GroupIdentity;
 
-        int ITemplateInfo.Precedence => _configuration.Precedence;
+        int ITemplateInfo.Precedence => ConfigurationModel.Precedence;
 
-        string ITemplateInfo.Name => _configuration.Name ?? throw new TemplateValidationException("Template configuration should have name defined");
+        string ITemplateInfo.Name => ConfigurationModel.Name ?? throw new TemplateValidationException("Template configuration should have name defined");
 
         [Obsolete]
         string ITemplateInfo.ShortName
@@ -52,14 +52,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
         }
 
-        IReadOnlyList<string> ITemplateInfo.ShortNameList => _configuration.ShortNameList ?? new List<string>();
+        IReadOnlyList<string> ITemplateInfo.ShortNameList => ConfigurationModel.ShortNameList ?? new List<string>();
 
         [Obsolete]
         IReadOnlyDictionary<string, ICacheTag> ITemplateInfo.Tags
         {
             get
             {
-                Dictionary<string, ICacheTag> tags = new Dictionary<string, ICacheTag>();
+                Dictionary<string, ICacheTag> tags = new();
                 foreach (KeyValuePair<string, string> tag in ((ITemplateInfo)this).TagsCollection)
                 {
                     tags[tag.Key] = new CacheTag(null, null, new Dictionary<string, ParameterChoice> { { tag.Value, new ParameterChoice(null, null) } }, tag.Value);
@@ -78,7 +78,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         {
             get
             {
-                Dictionary<string, ICacheParameter> cacheParameters = new Dictionary<string, ICacheParameter>();
+                Dictionary<string, ICacheParameter> cacheParameters = new();
                 foreach (ITemplateParameter parameter in ((ITemplateInfo)this).ParameterDefinitions.Where(TemplateParameterExtensions.IsChoice))
                 {
                     cacheParameters[parameter.Name] = new CacheParameter()
@@ -118,21 +118,21 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         string? ITemplateInfo.LocaleConfigPlace => _localeConfigFile?.FullPath;
 
         //read in simple template model instead
-        bool ITemplate.IsNameAgreementWithFolderPreferred => _configuration.PreferNameDirectory;
+        bool ITemplate.IsNameAgreementWithFolderPreferred => ConfigurationModel.PreferNameDirectory;
 
         string? ITemplateInfo.HostConfigPlace => _hostConfigFile?.FullPath;
 
         //read in simple template model instead
-        string? ITemplateInfo.ThirdPartyNotices => _configuration.ThirdPartyNotices;
+        string? ITemplateInfo.ThirdPartyNotices => ConfigurationModel.ThirdPartyNotices;
 
-        IReadOnlyDictionary<string, IBaselineInfo> ITemplateInfo.BaselineInfo => _configuration.BaselineInfo;
+        IReadOnlyDictionary<string, IBaselineInfo> ITemplateInfo.BaselineInfo => ConfigurationModel.BaselineInfo;
 
-        IReadOnlyDictionary<string, string> ITemplateInfo.TagsCollection => _configuration.Tags;
+        IReadOnlyDictionary<string, string> ITemplateInfo.TagsCollection => ConfigurationModel.Tags;
 
         bool ITemplateInfo.HasScriptRunningPostActions { get; set; }
 
-        IReadOnlyList<Guid> ITemplateInfo.PostActions => _configuration.PostActionModels.Select(pam => pam.ActionId).ToArray();
+        IReadOnlyList<Guid> ITemplateInfo.PostActions => ConfigurationModel.PostActionModels.Select(pam => pam.ActionId).ToArray();
 
-        IReadOnlyList<TemplateConstraintInfo> ITemplateInfo.Constraints => _configuration.Constraints;
+        IReadOnlyList<TemplateConstraintInfo> ITemplateInfo.Constraints => ConfigurationModel.Constraints;
     }
 }

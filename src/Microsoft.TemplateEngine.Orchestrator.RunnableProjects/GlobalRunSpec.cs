@@ -33,8 +33,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             IReadOnlyList<KeyValuePair<string, IGlobalRunConfig>> fileGlobConfigs,
             IReadOnlyList<string> ignoreFileNames)
         {
-            List<IOperationConfig> operationConfigReaders = new List<IOperationConfig>(componentManager.OfType<IOperationConfig>());
-            Dictionary<string, IOperationConfig> operationConfigLookup = new Dictionary<string, IOperationConfig>();
+            List<IOperationConfig> operationConfigReaders = new(componentManager.OfType<IOperationConfig>());
+            Dictionary<string, IOperationConfig> operationConfigLookup = new();
 
             foreach (IOperationConfig opConfig in operationConfigReaders)
             {
@@ -46,7 +46,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             RootVariableCollection = variables;
             IgnoreFileNames = ignoreFileNames;
             Operations = ResolveOperations(globalConfig, templateRoot, variables);
-            List<KeyValuePair<IPathMatcher, IRunSpec>> specials = new List<KeyValuePair<IPathMatcher, IRunSpec>>();
+            List<KeyValuePair<IPathMatcher, IRunSpec>> specials = new();
 
             if (fileGlobConfigs != null)
             {
@@ -59,7 +59,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                         specialOps = ResolveOperations(specialEntry.Value, templateRoot, variables);
                     }
 
-                    RunSpec spec = new RunSpec(specialOps, specialEntry.Value?.VariableSetup.FallbackFormat);
+                    RunSpec spec = new(specialOps, specialEntry.Value?.VariableSetup.FallbackFormat);
                     specials.Add(new KeyValuePair<IPathMatcher, IRunSpec>(new GlobbingPatternMatcher(specialEntry.Key), spec));
                 }
             }
@@ -90,40 +90,17 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         internal void SetupFileSource(FileSourceMatchInfo source)
         {
-            FileSourceHierarchicalPathMatcher matcher = new FileSourceHierarchicalPathMatcher(source);
+            FileSourceHierarchicalPathMatcher matcher = new(source);
             Include = new List<IPathMatcher>() { new FileSourceStateMatcher(FileDispositionStates.Include, matcher) };
             Exclude = new List<IPathMatcher>() { new FileSourceStateMatcher(FileDispositionStates.Exclude, matcher) };
             CopyOnly = new List<IPathMatcher>() { new FileSourceStateMatcher(FileDispositionStates.CopyOnly, matcher) };
             Rename = source.Renames ?? new Dictionary<string, string>(StringComparer.Ordinal);
         }
 
-        // Returns a list of operations which contains the custom operations and the default operations.
-        // If there are custom Conditional operations, don't include the default Conditionals.
-        //
-        // Note: we may need a more robust filtering mechanism in the future.
-        private IReadOnlyList<IOperationProvider> ResolveOperations(IGlobalRunConfig runConfig, IDirectory templateRoot, IVariableCollection variables)
-        {
-            IReadOnlyList<IOperationProvider> customOperations = SetupCustomOperations(runConfig.CustomOperations, templateRoot, variables);
-            IReadOnlyList<IOperationProvider> defaultOperations = SetupOperations(templateRoot.MountPoint.EnvironmentSettings, variables, runConfig);
-
-            List<IOperationProvider> operations = new List<IOperationProvider>(customOperations);
-
-            if (customOperations.Any(x => x is Conditional))
-            {
-                operations.AddRange(defaultOperations.Where(op => !(op is Conditional)));
-            }
-            else
-            {
-                operations.AddRange(defaultOperations);
-            }
-
-            return operations;
-        }
-
-        private IReadOnlyList<IOperationProvider> SetupOperations(IEngineEnvironmentSettings environmentSettings, IVariableCollection variables, IGlobalRunConfig runConfig)
+        private static IReadOnlyList<IOperationProvider> SetupOperations(IEngineEnvironmentSettings environmentSettings, IVariableCollection variables, IGlobalRunConfig runConfig)
         {
             // default operations
-            List<IOperationProvider> operations = new List<IOperationProvider>();
+            List<IOperationProvider> operations = new();
             operations.AddRange(runConfig.Operations);
 
             // replacements
@@ -147,10 +124,33 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return operations;
         }
 
+        // Returns a list of operations which contains the custom operations and the default operations.
+        // If there are custom Conditional operations, don't include the default Conditionals.
+        //
+        // Note: we may need a more robust filtering mechanism in the future.
+        private IReadOnlyList<IOperationProvider> ResolveOperations(IGlobalRunConfig runConfig, IDirectory templateRoot, IVariableCollection variables)
+        {
+            IReadOnlyList<IOperationProvider> customOperations = SetupCustomOperations(runConfig.CustomOperations, templateRoot, variables);
+            IReadOnlyList<IOperationProvider> defaultOperations = GlobalRunSpec.SetupOperations(templateRoot.MountPoint.EnvironmentSettings, variables, runConfig);
+
+            List<IOperationProvider> operations = new(customOperations);
+
+            if (customOperations.Any(x => x is Conditional))
+            {
+                operations.AddRange(defaultOperations.Where(op => op is not Conditional));
+            }
+            else
+            {
+                operations.AddRange(defaultOperations);
+            }
+
+            return operations;
+        }
+
         private IReadOnlyList<IOperationProvider> SetupCustomOperations(IReadOnlyList<CustomOperationModel> customModel, IDirectory templateRoot, IVariableCollection variables)
         {
             ITemplateEngineHost host = templateRoot.MountPoint.EnvironmentSettings.Host;
-            List<IOperationProvider> customOperations = new List<IOperationProvider>();
+            List<IOperationProvider> customOperations = new();
 
             foreach (CustomOperationModel opModel in customModel)
             {
@@ -160,7 +160,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 if (string.IsNullOrEmpty(condition)
                     || Cpp2StyleEvaluatorDefinition.EvaluateFromString(host.Logger, condition, variables))
                 {
-                    IOperationConfig realConfigObject;
                     if (opType == null)
                     {
                         continue;
@@ -169,14 +168,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     {
                         continue;
                     }
-                    if (_operationConfigLookup.TryGetValue(opType, out realConfigObject))
+                    if (_operationConfigLookup.TryGetValue(opType, out IOperationConfig realConfigObject))
                     {
                         customOperations.AddRange(
                             realConfigObject.ConfigureFromJson(opModel.Configuration, templateRoot));
                     }
                     else
                     {
-                        host.Logger.LogWarning($"Operation type = [{opType}] from configuration is unknown.");
+                        host.Logger.LogWarning("Operation type = [{0}] from configuration is unknown.", opType);
                     }
                 }
             }
@@ -218,34 +217,34 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 return true;
             }
 
-            public void SeekBackUntil(ITokenTrie match)
+            public void SeekTargetBackUntil(ITokenTrie match)
             {
                 throw new NotImplementedException();
             }
 
-            public void SeekBackUntil(ITokenTrie match, bool consume)
+            public void SeekTargetBackUntil(ITokenTrie match, bool consume)
             {
                 throw new NotImplementedException();
             }
 
-            public void SeekBackWhile(ITokenTrie match)
+            public void SeekTargetBackWhile(ITokenTrie match)
             {
                 throw new NotImplementedException();
             }
 
             public void Write(byte[] buffer, int offset, int count) => throw new NotImplementedException();
 
-            public void SeekForwardUntil(ITokenTrie trie, ref int bufferLength, ref int currentBufferPosition)
+            public void SeekBufferForwardUntil(ITokenTrie trie, ref int bufferLength, ref int currentBufferPosition)
             {
                 throw new NotImplementedException();
             }
 
-            public void SeekForwardThrough(ITokenTrie trie, ref int bufferLength, ref int currentBufferPosition)
+            public void SeekBufferForwardThrough(ITokenTrie trie, ref int bufferLength, ref int currentBufferPosition)
             {
                 throw new NotImplementedException();
             }
 
-            public void SeekForwardWhile(ITokenTrie trie, ref int bufferLength, ref int currentBufferPosition)
+            public void SeekBufferForwardWhile(ITokenTrie trie, ref int bufferLength, ref int currentBufferPosition)
             {
                 throw new NotImplementedException();
             }

@@ -1,1 +1,10 @@
-﻿
+﻿Microsoft.TemplateEngine.Core.Contracts.IOperation.Id.get -> string?
+Microsoft.TemplateEngine.Core.Contracts.IOperation.Tokens.get -> System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Core.Contracts.IToken?>!
+Microsoft.TemplateEngine.Core.Contracts.IOperationProvider.Id.get -> string?
+Microsoft.TemplateEngine.Core.Contracts.IProcessorState.SeekBufferForwardThrough(Microsoft.TemplateEngine.Core.Contracts.ITokenTrie! trie, ref int bufferLength, ref int currentBufferPosition) -> void
+Microsoft.TemplateEngine.Core.Contracts.IProcessorState.SeekBufferForwardUntil(Microsoft.TemplateEngine.Core.Contracts.ITokenTrie! trie, ref int bufferLength, ref int currentBufferPosition) -> void
+Microsoft.TemplateEngine.Core.Contracts.IProcessorState.SeekBufferForwardWhile(Microsoft.TemplateEngine.Core.Contracts.ITokenTrie! trie, ref int bufferLength, ref int currentBufferPosition) -> void
+Microsoft.TemplateEngine.Core.Contracts.IProcessorState.SeekTargetBackUntil(Microsoft.TemplateEngine.Core.Contracts.ITokenTrie! match) -> void
+Microsoft.TemplateEngine.Core.Contracts.IProcessorState.SeekTargetBackUntil(Microsoft.TemplateEngine.Core.Contracts.ITokenTrie! match, bool consume) -> void
+Microsoft.TemplateEngine.Core.Contracts.IProcessorState.SeekTargetBackWhile(Microsoft.TemplateEngine.Core.Contracts.ITokenTrie! match) -> void
+Microsoft.TemplateEngine.Core.Contracts.ITokenTrie.AddToken(Microsoft.TemplateEngine.Core.Contracts.IToken? token, int index) -> void

@@ -1,6 +1,5 @@
 ﻿#nullable enable
 abstract Microsoft.TemplateEngine.Core.Expressions.Shared.SharedEvaluatorDefinition<TSelf, TTokens>.DereferenceInLiterals.get -> bool
-Microsoft.TemplateEngine.Core.CommonOperations
 Microsoft.TemplateEngine.Core.Expressions.BinaryScope<TOperator>
 Microsoft.TemplateEngine.Core.Expressions.BinaryScope<TOperator>.IsFull.get -> bool
 Microsoft.TemplateEngine.Core.Expressions.BinaryScope<TOperator>.IsIndivisible.get -> bool
@@ -333,11 +332,6 @@ override Microsoft.TemplateEngine.Core.TokenConfig.GetHashCode() -> int
 ~Microsoft.TemplateEngine.Core.Expressions.UnaryScope<TOperator>.Parent.set -> void
 ~Microsoft.TemplateEngine.Core.Expressions.UnaryScope<TOperator>.TryAccept(Microsoft.TemplateEngine.Core.Expressions.IEvaluable child) -> bool
 ~Microsoft.TemplateEngine.Core.Expressions.UnaryScope<TOperator>.UnaryScope(Microsoft.TemplateEngine.Core.Expressions.IEvaluable parent, TOperator operator, System.Func<object, object> evaluate) -> void
-~Microsoft.TemplateEngine.Core.Matching.OperationTerminal.Operation.get -> Microsoft.TemplateEngine.Core.Contracts.IOperation
-~Microsoft.TemplateEngine.Core.Matching.OperationTerminal.OperationTerminal(Microsoft.TemplateEngine.Core.Contracts.IOperation operation, int token, int tokenLength, int start = 0, int end = -1) -> void
-~Microsoft.TemplateEngine.Core.Matching.TerminalLocation<T>
-~Microsoft.TemplateEngine.Core.Matching.TerminalLocation<T>.Terminal.get -> T
-~Microsoft.TemplateEngine.Core.Matching.TerminalLocation<T>.TerminalLocation(T terminal, int location) -> void
 ~Microsoft.TemplateEngine.Core.Matching.Trie<T>
 ~Microsoft.TemplateEngine.Core.Matching.Trie<T>.AddPath(byte[] path, T terminal) -> void
 ~Microsoft.TemplateEngine.Core.Matching.Trie<T>.NextNodes.get -> System.Collections.Generic.Dictionary<byte, Microsoft.TemplateEngine.Core.Matching.TrieNode<T>>
@@ -355,11 +349,6 @@ override Microsoft.TemplateEngine.Core.TokenConfig.GetHashCode() -> int
 ~Microsoft.TemplateEngine.Core.Operations.BalancedNesting.BalancedNesting(Microsoft.TemplateEngine.Core.Contracts.ITokenConfig startToken, Microsoft.TemplateEngine.Core.Contracts.ITokenConfig realEndToken, Microsoft.TemplateEngine.Core.Contracts.ITokenConfig pseudoEndToken, string id, string resetFlag, bool initialState) -> void
 ~Microsoft.TemplateEngine.Core.Operations.BalancedNesting.GetOperation(System.Text.Encoding encoding, Microsoft.TemplateEngine.Core.Contracts.IProcessorState processorState) -> Microsoft.TemplateEngine.Core.Contracts.IOperation
 ~Microsoft.TemplateEngine.Core.Operations.BalancedNesting.Id.get -> string
-~Microsoft.TemplateEngine.Core.Operations.Conditional.Conditional(Microsoft.TemplateEngine.Core.Operations.ConditionalTokens tokenVariants, bool wholeLine, bool trimWhitespace, Microsoft.TemplateEngine.Core.Operations.ConditionEvaluator evaluator, string id, bool initialState) -> void
-~Microsoft.TemplateEngine.Core.Operations.Conditional.Evaluator.get -> Microsoft.TemplateEngine.Core.Operations.ConditionEvaluator
-~Microsoft.TemplateEngine.Core.Operations.Conditional.GetOperation(System.Text.Encoding encoding, Microsoft.TemplateEngine.Core.Contracts.IProcessorState processorState) -> Microsoft.TemplateEngine.Core.Contracts.IOperation
-~Microsoft.TemplateEngine.Core.Operations.Conditional.Id.get -> string
-~Microsoft.TemplateEngine.Core.Operations.Conditional.Tokens.get -> Microsoft.TemplateEngine.Core.Operations.ConditionalTokens
 ~Microsoft.TemplateEngine.Core.Operations.ConditionalTokens.ActionableElseIfTokens.get -> System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Core.Contracts.ITokenConfig>
 ~Microsoft.TemplateEngine.Core.Operations.ConditionalTokens.ActionableElseIfTokens.set -> void
 ~Microsoft.TemplateEngine.Core.Operations.ConditionalTokens.ActionableElseTokens.get -> System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Core.Contracts.ITokenConfig>
@@ -416,14 +405,6 @@ Microsoft.TemplateEngine.Core.Operations.MarkupTokens.OpenOpenElementToken.get -
 ~Microsoft.TemplateEngine.Core.Operations.ReplacementTokens.OriginalValue.get -> Microsoft.TemplateEngine.Core.Contracts.ITokenConfig
 ~Microsoft.TemplateEngine.Core.Operations.ReplacementTokens.ReplacementTokens(string identity, Microsoft.TemplateEngine.Core.Contracts.ITokenConfig originalValue) -> void
 ~Microsoft.TemplateEngine.Core.Operations.ReplacementTokens.VariableName.get -> string
-~Microsoft.TemplateEngine.Core.Operations.SetFlag.GetOperation(System.Text.Encoding encoding, Microsoft.TemplateEngine.Core.Contracts.IProcessorState processorState) -> Microsoft.TemplateEngine.Core.Contracts.IOperation
-~Microsoft.TemplateEngine.Core.Operations.SetFlag.Id.get -> string
-~Microsoft.TemplateEngine.Core.Operations.SetFlag.Name.get -> string
-~Microsoft.TemplateEngine.Core.Operations.SetFlag.Off.get -> Microsoft.TemplateEngine.Core.Contracts.ITokenConfig
-~Microsoft.TemplateEngine.Core.Operations.SetFlag.OffNoEmit.get -> Microsoft.TemplateEngine.Core.Contracts.ITokenConfig
-~Microsoft.TemplateEngine.Core.Operations.SetFlag.On.get -> Microsoft.TemplateEngine.Core.Contracts.ITokenConfig
-~Microsoft.TemplateEngine.Core.Operations.SetFlag.OnNoEmit.get -> Microsoft.TemplateEngine.Core.Contracts.ITokenConfig
-~Microsoft.TemplateEngine.Core.Operations.SetFlag.SetFlag(string name, Microsoft.TemplateEngine.Core.Contracts.ITokenConfig on, Microsoft.TemplateEngine.Core.Contracts.ITokenConfig off, Microsoft.TemplateEngine.Core.Contracts.ITokenConfig onNoEmit, Microsoft.TemplateEngine.Core.Contracts.ITokenConfig offNoEmit, string id, bool initialState, bool? default = null) -> void
 ~Microsoft.TemplateEngine.Core.TokenConfig.After.get -> string
 ~Microsoft.TemplateEngine.Core.TokenConfig.Before.get -> string
 ~Microsoft.TemplateEngine.Core.TokenConfig.Equals(Microsoft.TemplateEngine.Core.Contracts.ITokenConfig other) -> bool
@@ -460,12 +441,6 @@ Microsoft.TemplateEngine.Core.Util.ProcessorState.Encoding.get -> System.Text.En
 Microsoft.TemplateEngine.Core.Util.ProcessorState.EncodingConfig.get -> Microsoft.TemplateEngine.Core.Contracts.IEncodingConfig!
 Microsoft.TemplateEngine.Core.Util.ProcessorState.Inject(System.IO.Stream! staged) -> void
 Microsoft.TemplateEngine.Core.Util.ProcessorState.ProcessorState(System.IO.Stream! source, System.IO.Stream! target, int bufferSize, int flushThreshold, Microsoft.TemplateEngine.Core.Contracts.IEngineConfig! config, System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Core.Contracts.IOperationProvider!>! operationProviders) -> void
-Microsoft.TemplateEngine.Core.Util.ProcessorState.SeekBackUntil(Microsoft.TemplateEngine.Core.Contracts.ITokenTrie! match) -> void
-Microsoft.TemplateEngine.Core.Util.ProcessorState.SeekBackUntil(Microsoft.TemplateEngine.Core.Contracts.ITokenTrie! match, bool consume) -> void
-Microsoft.TemplateEngine.Core.Util.ProcessorState.SeekBackWhile(Microsoft.TemplateEngine.Core.Contracts.ITokenTrie! match) -> void
-Microsoft.TemplateEngine.Core.Util.ProcessorState.SeekForwardThrough(Microsoft.TemplateEngine.Core.Contracts.ITokenTrie! trie, ref int bufferLength, ref int currentBufferPosition) -> void
-Microsoft.TemplateEngine.Core.Util.ProcessorState.SeekForwardUntil(Microsoft.TemplateEngine.Core.Contracts.ITokenTrie! trie, ref int bufferLength, ref int currentBufferPosition) -> void
-Microsoft.TemplateEngine.Core.Util.ProcessorState.SeekForwardWhile(Microsoft.TemplateEngine.Core.Contracts.ITokenTrie! trie, ref int bufferLength, ref int currentBufferPosition) -> void
 ~Microsoft.TemplateEngine.Core.Util.Token.Token(byte[] token, int index, int start = 0, int end = -1) -> void
 ~Microsoft.TemplateEngine.Core.Util.Token.Value.get -> byte[]
 ~Microsoft.TemplateEngine.Core.Util.TokenTrie.AddToken(byte[] literalToken) -> int
@@ -492,9 +467,6 @@ Microsoft.TemplateEngine.Core.Util.ProcessorState.SeekForwardWhile(Microsoft.Tem
 ~override Microsoft.TemplateEngine.Core.Expressions.VisualBasic.VisualBasicStyleEvaluatorDefintion.GetSymbols(Microsoft.TemplateEngine.Core.Contracts.IProcessorState processor) -> Microsoft.TemplateEngine.Core.Contracts.ITokenTrie
 ~override Microsoft.TemplateEngine.Core.Expressions.VisualBasic.VisualBasicStyleEvaluatorDefintion.NullTokenValue.get -> string
 ~override Microsoft.TemplateEngine.Core.TokenConfig.Equals(object obj) -> bool
-~static Microsoft.TemplateEngine.Core.CommonOperations.ConsumeWholeLine(this Microsoft.TemplateEngine.Core.Contracts.IProcessorState processor, ref int bufferLength, ref int currentBufferPosition) -> void
-~static Microsoft.TemplateEngine.Core.CommonOperations.TrimWhitespace(this Microsoft.TemplateEngine.Core.Contracts.IProcessorState processor, bool forward, bool backward, ref int bufferLength, ref int currentBufferPosition) -> void
-~static Microsoft.TemplateEngine.Core.CommonOperations.WhitespaceHandler(this Microsoft.TemplateEngine.Core.Contracts.IProcessorState processor, ref int bufferLength, ref int currentBufferPosition, bool wholeLine = false, bool trim = false, bool trimForward = false, bool trimBackward = false) -> void
 ~static Microsoft.TemplateEngine.Core.Expressions.Converter.TryConvert<T>(object source, out T result) -> bool
 ~static Microsoft.TemplateEngine.Core.Expressions.Cpp.CppStyleEvaluatorDefinition.Evaluate(Microsoft.TemplateEngine.Core.Contracts.IProcessorState processor, ref int bufferLength, ref int currentBufferPosition, out bool faulted) -> bool
 ~static Microsoft.TemplateEngine.Core.Expressions.ScopeBuilderHelper.ScopeBuilder<TOperator, TToken>(this Microsoft.TemplateEngine.Core.Contracts.IProcessorState processor, Microsoft.TemplateEngine.Core.Contracts.ITokenTrie tokens, Microsoft.TemplateEngine.Core.Expressions.IOperatorMap<TOperator, TToken> operatorMap, bool dereferenceInLiterals = false) -> Microsoft.TemplateEngine.Core.Expressions.ScopeBuilder<TOperator, TToken>
@@ -521,12 +493,10 @@ Microsoft.TemplateEngine.Core.Util.ProcessorState.SeekForwardWhile(Microsoft.Tem
 ~static Microsoft.TemplateEngine.Core.Util.Processor.Create(Microsoft.TemplateEngine.Core.Util.EngineConfig config, params Microsoft.TemplateEngine.Core.Contracts.IOperationProvider[] operations) -> Microsoft.TemplateEngine.Core.Contracts.IProcessor
 ~static Microsoft.TemplateEngine.Core.Util.Processor.Create(Microsoft.TemplateEngine.Core.Util.EngineConfig config, System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Core.Contracts.IOperationProvider> operations) -> Microsoft.TemplateEngine.Core.Contracts.IProcessor
 ~static readonly Microsoft.TemplateEngine.Core.Operations.BalancedNesting.OperationName -> string
-~static readonly Microsoft.TemplateEngine.Core.Operations.Conditional.OperationName -> string
 ~static readonly Microsoft.TemplateEngine.Core.Operations.ExpandVariables.OperationName -> string
 ~static readonly Microsoft.TemplateEngine.Core.Operations.Include.OperationName -> string
 ~static readonly Microsoft.TemplateEngine.Core.Operations.Region.OperationName -> string
 ~static readonly Microsoft.TemplateEngine.Core.Operations.Replacement.OperationName -> string
-~static readonly Microsoft.TemplateEngine.Core.Operations.SetFlag.OperationName -> string
 ~virtual Microsoft.TemplateEngine.Core.Util.Orchestrator.RunSpecLoader(System.IO.Stream runSpec) -> Microsoft.TemplateEngine.Core.Contracts.IGlobalRunSpec
 Microsoft.TemplateEngine.Core.Util.Orchestrator.GetFileChanges(string! runSpecPath, Microsoft.TemplateEngine.Abstractions.Mount.IDirectory! sourceDir, string! targetDir) -> System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Abstractions.IFileChange2!>!
 Microsoft.TemplateEngine.Core.Util.Orchestrator.GetFileChanges(Microsoft.TemplateEngine.Core.Contracts.IGlobalRunSpec! spec, Microsoft.TemplateEngine.Abstractions.Mount.IDirectory! sourceDir, string! targetDir) -> System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Abstractions.IFileChange2!>!

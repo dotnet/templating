@@ -1,12 +1,15 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System;
+
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Core.Util;
 
@@ -31,33 +34,27 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
         // must be > the highest token type index
         private const int TokenTypeModulus = 10;
-
-        private readonly ConditionEvaluator _evaluator;
-        private readonly bool _wholeLine;
-        private readonly bool _trimWhitespace;
-        private readonly ConditionalTokens _tokens;
-        private readonly string _id;
-        private bool _initialState;
+        private readonly bool _initialState;
 
         public Conditional(ConditionalTokens tokenVariants, bool wholeLine, bool trimWhitespace, ConditionEvaluator evaluator, string id, bool initialState)
         {
-            _trimWhitespace = trimWhitespace;
-            _wholeLine = wholeLine;
-            _evaluator = evaluator;
-            _tokens = tokenVariants;
-            _id = id;
+            TrimWhitespace = trimWhitespace;
+            WholeLine = wholeLine;
+            Evaluator = evaluator;
+            Tokens = tokenVariants;
+            Id = id;
             _initialState = initialState;
         }
 
-        public string Id => _id;
+        public string Id { get; private set; }
 
-        public bool WholeLine => _wholeLine;
+        public bool WholeLine { get; private set; }
 
-        public bool TrimWhitespace => _trimWhitespace;
+        public bool TrimWhitespace { get; private set; }
 
-        public ConditionEvaluator Evaluator => _evaluator;
+        public ConditionEvaluator Evaluator { get; private set; }
 
-        public ConditionalTokens Tokens => _tokens;
+        public ConditionalTokens Tokens { get; private set; }
 
         /// <summary>
         /// Returns the numner of elements in the longest of the token variant lists.
@@ -79,23 +76,23 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
         public IOperation GetOperation(Encoding encoding, IProcessorState processorState)
         {
-            TokenTrie trie = new TokenTrie();
+            TokenTrie trie = new();
 
-            List<IToken> tokens = new List<IToken>(TokenTypeModulus * LongestTokenVariantListSize);
+            List<IToken?> tokens = new(TokenTypeModulus * LongestTokenVariantListSize);
             for (int i = 0; i < tokens.Capacity; i++)
             {
                 tokens.Add(null);
             }
 
-            AddTokensOfTypeToTokenListAndTrie(trie, tokens, Tokens.IfTokens, IfTokenBaseIndex, encoding);
-            AddTokensOfTypeToTokenListAndTrie(trie, tokens, Tokens.ElseTokens, ElseTokenBaseIndex, encoding);
-            AddTokensOfTypeToTokenListAndTrie(trie, tokens, Tokens.ElseIfTokens, ElseIfTokenBaseIndex, encoding);
-            AddTokensOfTypeToTokenListAndTrie(trie, tokens, Tokens.EndIfTokens, EndTokenBaseIndex, encoding);
-            AddTokensOfTypeToTokenListAndTrie(trie, tokens, Tokens.ActionableIfTokens, IfTokenActionableBaseIndex, encoding);
-            AddTokensOfTypeToTokenListAndTrie(trie, tokens, Tokens.ActionableElseTokens, ElseTokenActionableBaseIndex, encoding);
-            AddTokensOfTypeToTokenListAndTrie(trie, tokens, Tokens.ActionableElseIfTokens, ElseIfTokenActionableBaseIndex, encoding);
+            Conditional.AddTokensOfTypeToTokenListAndTrie(trie, tokens, Tokens.IfTokens, IfTokenBaseIndex, encoding);
+            Conditional.AddTokensOfTypeToTokenListAndTrie(trie, tokens, Tokens.ElseTokens, ElseTokenBaseIndex, encoding);
+            Conditional.AddTokensOfTypeToTokenListAndTrie(trie, tokens, Tokens.ElseIfTokens, ElseIfTokenBaseIndex, encoding);
+            Conditional.AddTokensOfTypeToTokenListAndTrie(trie, tokens, Tokens.EndIfTokens, EndTokenBaseIndex, encoding);
+            Conditional.AddTokensOfTypeToTokenListAndTrie(trie, tokens, Tokens.ActionableIfTokens, IfTokenActionableBaseIndex, encoding);
+            Conditional.AddTokensOfTypeToTokenListAndTrie(trie, tokens, Tokens.ActionableElseTokens, ElseTokenActionableBaseIndex, encoding);
+            Conditional.AddTokensOfTypeToTokenListAndTrie(trie, tokens, Tokens.ActionableElseIfTokens, ElseIfTokenActionableBaseIndex, encoding);
 
-            return new Impl(this, tokens, trie, _id, _initialState);
+            return new Impl(this, tokens, trie, Id, _initialState);
         }
 
         /// <summary>
@@ -119,7 +116,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
         /// <param name="tokensOfType"></param>
         /// <param name="typeRemainder"></param>
         /// <param name="encoding"></param>
-        private void AddTokensOfTypeToTokenListAndTrie(ITokenTrie trie, List<IToken> tokenMasterList, IReadOnlyList<ITokenConfig> tokensOfType, int typeRemainder, Encoding encoding)
+        private static void AddTokensOfTypeToTokenListAndTrie(ITokenTrie trie, List<IToken?> tokenMasterList, IReadOnlyList<ITokenConfig> tokensOfType, int typeRemainder, Encoding encoding)
         {
             int tokenIndex = typeRemainder;
 
@@ -134,52 +131,67 @@ namespace Microsoft.TemplateEngine.Core.Operations
         private class Impl : IOperation
         {
             private readonly Conditional _definition;
-            private readonly Stack<EvaluationState> _pendingCompletion = new Stack<EvaluationState>();
+            private readonly Stack<EvaluationState> _pendingCompletion = new();
             private readonly ITokenTrie _trie;
-            private readonly string _id;
-            private EvaluationState _current;
+            private EvaluationState? _current;
 
-            public Impl(Conditional definition, IReadOnlyList<IToken> tokens, ITokenTrie trie, string id, bool initialState)
+            public Impl(Conditional definition, IReadOnlyList<IToken?> tokens, ITokenTrie trie, string id, bool initialState)
             {
                 _trie = trie;
                 _definition = definition;
                 Tokens = tokens;
-                _id = id;
+                Id = id;
                 IsInitialStateOn = string.IsNullOrEmpty(id) || initialState;
             }
 
-            public string Id => _id;
+            public string Id { get; private set; }
 
-            public IReadOnlyList<IToken> Tokens { get; }
+            public IReadOnlyList<IToken?> Tokens { get; }
 
             public bool IsInitialStateOn { get; }
 
-            public int HandleMatch(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int token)
+            public int HandleMatch(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int tokenIndex)
             {
-                bool flag;
-                if (processor.Config.Flags.TryGetValue(OperationName, out flag) && !flag)
+                ILogger logger = processor.Config.Logger;
+                logger.LogTrace("{0}.{1}, {2}: {3}, {4}: {5}, {6}: {7}", nameof(Conditional), nameof(HandleMatch), nameof(bufferLength), bufferLength, nameof(currentBufferPosition), currentBufferPosition, nameof(tokenIndex), tokenIndex);
+
+                if (processor.Config.Flags.TryGetValue(OperationName, out bool flag) && !flag)
                 {
-                    processor.Write(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
-                    return Tokens[token].Length;
+                    IToken? currentToken = Tokens[tokenIndex];
+                    if (currentToken == null)
+                    {
+                        throw new InvalidOperationException($"Token with index {tokenIndex} is null.");
+                    }
+
+                    logger.LogTrace("Flag for operation name {0} is unset", OperationName);
+                    logger.LogTrace("Writing token {0} and stop processing", processor.Encoding.GetString(currentToken.Value));
+                    processor.Write(currentToken.Value, currentToken.Start, currentToken.Length);
+                    return currentToken.Length;
                 }
 
                 // conditional has not started, or this is the "if"
-                if (_current != null || IsTokenIndexOfType(token, IfTokenBaseIndex) || IsTokenIndexOfType(token, IfTokenActionableBaseIndex))
+                if (_current != null || IsTokenIndexOfType(tokenIndex, IfTokenBaseIndex) || IsTokenIndexOfType(tokenIndex, IfTokenActionableBaseIndex))
                 {
-                    if (_definition._wholeLine)
+                    logger.LogDebug("Starting condition");
+                    if (_definition.WholeLine)
                     {
-                        processor.SeekBackUntil(processor.EncodingConfig.LineEndings);
+                        logger.LogTrace("Seeking back target until line end");
+                        processor.SeekTargetBackUntil(processor.EncodingConfig.LineEndings);
                     }
-                    else if (_definition._trimWhitespace)
+                    else if (_definition.TrimWhitespace)
                     {
+                        logger.LogTrace("Triming source whitespace");
                         processor.TrimWhitespace(false, true, ref bufferLength, ref currentBufferPosition);
+                        logger.LogTrace("Current buffer position: {0}", currentBufferPosition);
+                        logger.LogTrace("Current buffer length: {0}", bufferLength);
                     }
                 }
 
             BEGIN:
                 //Got the "if" token...
-                if (IsTokenIndexOfType(token, IfTokenBaseIndex) || IsTokenIndexOfType(token, IfTokenActionableBaseIndex))
+                if (IsTokenIndexOfType(tokenIndex, IfTokenBaseIndex) || IsTokenIndexOfType(tokenIndex, IfTokenActionableBaseIndex))
                 {
+                    logger.LogTrace("Got 'if' token");
                     if (_current == null)
                     {
                         _current = new EvaluationState(this);
@@ -195,12 +207,18 @@ namespace Microsoft.TemplateEngine.Core.Operations
                     //  this block will not be terminated until the corresponding endif is found
                     if (_current.Evaluate(processor, ref bufferLength, ref currentBufferPosition))
                     {
+                        logger.LogTrace("'if' condition evaluated to 'true'");
+                        logger.LogTrace("Current buffer position: {0}", currentBufferPosition);
+                        logger.LogTrace("Current buffer length: {0}", bufferLength);
                         if (_definition.WholeLine)
                         {
-                            processor.SeekForwardThrough(processor.EncodingConfig.LineEndings, ref bufferLength, ref currentBufferPosition);
+                            logger.LogTrace("Seeking forward until line end");
+                            processor.SeekBufferForwardThrough(processor.EncodingConfig.LineEndings, ref bufferLength, ref currentBufferPosition);
+                            logger.LogTrace("Current buffer position: {0}", currentBufferPosition);
+                            logger.LogTrace("Current buffer length: {0}", bufferLength);
                         }
 
-                        if (IsTokenIndexOfType(token, IfTokenActionableBaseIndex))
+                        if (IsTokenIndexOfType(tokenIndex, IfTokenActionableBaseIndex))
                         {
                             // "Actionable" if token, so enable the flag operation(s)
                             _current.ToggleActionableOperations(true, processor);
@@ -211,8 +229,13 @@ namespace Microsoft.TemplateEngine.Core.Operations
                     }
                     else
                     {
+                        logger.LogTrace("'if' condition evaluated to 'false', skipping to next token at same level.");
+                        logger.LogTrace("Current buffer position: {0}", currentBufferPosition);
+                        logger.LogTrace("Current buffer length: {0}", bufferLength);
                         // if (false_condition) was found. Skip to the next token of the if-elseif-elseif-...elseif-else-endif
-                        SeekToNextTokenAtSameLevel(processor, ref bufferLength, ref currentBufferPosition, out token);
+                        SeekToNextTokenAtSameLevel(processor, ref bufferLength, ref currentBufferPosition, out tokenIndex);
+                        logger.LogTrace("Current buffer position: {0}", currentBufferPosition);
+                        logger.LogTrace("Current buffer length: {0}", bufferLength);
                         goto BEGIN;
                     }
                 }
@@ -220,13 +243,22 @@ namespace Microsoft.TemplateEngine.Core.Operations
                 // If we've got an unbalanced statement, emit the token
                 if (_current == null)
                 {
-                    processor.Write(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
-                    return Tokens[token].Length;
+                    IToken? currentToken = Tokens[tokenIndex];
+                    if (currentToken == null)
+                    {
+                        throw new InvalidOperationException($"Token with index {tokenIndex} is null.");
+                    }
+
+                    logger.LogTrace("unbalanced statement");
+                    logger.LogTrace("Writing token {0} and stop processing", processor.Encoding.GetString(currentToken.Value));
+                    processor.Write(currentToken.Value, currentToken.Start, currentToken.Length);
+                    return currentToken.Length;
                 }
 
                 //Got the endif token, exit to the parent "if" scope if it exists
-                if (IsTokenIndexOfType(token, EndTokenBaseIndex))
+                if (IsTokenIndexOfType(tokenIndex, EndTokenBaseIndex))
                 {
+                    logger.LogTrace("Got 'endif' token");
                     if (_pendingCompletion.Count > 0)
                     {
                         _current = _pendingCompletion.Pop();
@@ -239,13 +271,19 @@ namespace Microsoft.TemplateEngine.Core.Operations
                         _current = null;
                     }
 
-                    if (_definition._wholeLine)
+                    if (_definition.WholeLine)
                     {
-                        processor.SeekForwardThrough(processor.EncodingConfig.LineEndings, ref bufferLength, ref currentBufferPosition);
+                        logger.LogTrace("Seeking forward until line end");
+                        processor.SeekBufferForwardThrough(processor.EncodingConfig.LineEndings, ref bufferLength, ref currentBufferPosition);
+                        logger.LogTrace("Current buffer position: {0}", currentBufferPosition);
+                        logger.LogTrace("Current buffer length: {0}", bufferLength);
                     }
-                    else if (_definition._trimWhitespace)
+                    else if (_definition.TrimWhitespace)
                     {
+                        logger.LogTrace("Trimming whitespace");
                         processor.TrimWhitespace(true, false, ref bufferLength, ref currentBufferPosition);
+                        logger.LogTrace("Current buffer position: {0}", currentBufferPosition);
+                        logger.LogTrace("Current buffer length: {0}", bufferLength);
                     }
 
                     return 0;
@@ -253,10 +291,14 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
                 if (_current.BranchTaken)
                 {
-                    processor.SeekBackUntil(processor.EncodingConfig.LineEndings, true);
+                    logger.LogTrace("Branch taken, skiiping target back until line end");
+                    processor.SeekTargetBackUntil(processor.EncodingConfig.LineEndings, true);
                     //A previous branch was taken. Skip to the endif token.
                     // NOTE: this can probably use the new method SeekToNextTokenAtSameLevel() - they do almost the same thing.
-                    SkipToMatchingEndif(processor, ref bufferLength, ref currentBufferPosition, ref token);
+                    logger.LogTrace("Branch taken, skipping until 'endif'");
+                    SkipToMatchingEndif(processor, ref bufferLength, ref currentBufferPosition, ref tokenIndex);
+                    logger.LogTrace("Current buffer position: {0}", currentBufferPosition);
+                    logger.LogTrace("Current buffer length: {0}", bufferLength);
 
                     if (_pendingCompletion.Count > 0)
                     {
@@ -270,31 +312,43 @@ namespace Microsoft.TemplateEngine.Core.Operations
                         _current = null;
                     }
 
-                    if (_definition._wholeLine)
+                    if (_definition.WholeLine)
                     {
-                        processor.SeekForwardUntil(processor.EncodingConfig.LineEndings, ref bufferLength, ref currentBufferPosition);
+                        logger.LogTrace("Seeking forward until line end");
+                        processor.SeekBufferForwardUntil(processor.EncodingConfig.LineEndings, ref bufferLength, ref currentBufferPosition);
+                        logger.LogTrace("Current buffer position: {0}", currentBufferPosition);
+                        logger.LogTrace("Current buffer length: {0}", bufferLength);
                     }
-                    else if (_definition._trimWhitespace)
+                    else if (_definition.TrimWhitespace)
                     {
+                        logger.LogTrace("Trimming whitespace");
                         processor.TrimWhitespace(true, false, ref bufferLength, ref currentBufferPosition);
+                        logger.LogTrace("Current buffer position: {0}", currentBufferPosition);
+                        logger.LogTrace("Current buffer length: {0}", bufferLength);
                     }
-
                     return 0;
                 }
 
                 //We have an "elseif" and haven't taken a previous branch
-                if (IsTokenIndexOfType(token, ElseIfTokenBaseIndex) || IsTokenIndexOfType(token, ElseIfTokenActionableBaseIndex))
+                if (IsTokenIndexOfType(tokenIndex, ElseIfTokenBaseIndex) || IsTokenIndexOfType(tokenIndex, ElseIfTokenActionableBaseIndex))
                 {
+                    logger.LogDebug("Got 'elseif' token");
                     // 8-19 attempt to make the same as if() handling
                     //
                     if (_current.Evaluate(processor, ref bufferLength, ref currentBufferPosition))
                     {
+                        logger.LogTrace("'elseif' condition evaluated to 'true'");
+                        logger.LogTrace("Current buffer position: {0}", currentBufferPosition);
+                        logger.LogTrace("Current buffer length: {0}", bufferLength);
                         if (_definition.WholeLine)
                         {
-                            processor.SeekForwardThrough(processor.EncodingConfig.LineEndings, ref bufferLength, ref currentBufferPosition);
+                            logger.LogTrace("Seeking forward until line end");
+                            processor.SeekBufferForwardThrough(processor.EncodingConfig.LineEndings, ref bufferLength, ref currentBufferPosition);
+                            logger.LogTrace("Current buffer position: {0}", currentBufferPosition);
+                            logger.LogTrace("Current buffer length: {0}", bufferLength);
                         }
 
-                        if (IsTokenIndexOfType(token, ElseIfTokenActionableBaseIndex))
+                        if (IsTokenIndexOfType(tokenIndex, ElseIfTokenActionableBaseIndex))
                         {
                             // the elseif branch is taken.
                             _current.ToggleActionableOperations(true, processor);
@@ -304,7 +358,12 @@ namespace Microsoft.TemplateEngine.Core.Operations
                     }
                     else
                     {
-                        SeekToNextTokenAtSameLevel(processor, ref bufferLength, ref currentBufferPosition, out token);
+                        logger.LogTrace("'if' condition evaluated to 'false', skipping to next token at same level.");
+                        logger.LogTrace("Current buffer position: {0}", currentBufferPosition);
+                        logger.LogTrace("Current buffer length: {0}", bufferLength);
+                        SeekToNextTokenAtSameLevel(processor, ref bufferLength, ref currentBufferPosition, out tokenIndex);
+                        logger.LogTrace("Current buffer position: {0}", currentBufferPosition);
+                        logger.LogTrace("Current buffer length: {0}", bufferLength);
 
                         // In the original version this was conditional on SeekToToken() succeeding.
                         // Not sure if it should be conditional. It should never fail, unless the template is malformed.
@@ -314,20 +373,24 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
                 //We have an "else" token and haven't taken any other branches, return control
                 //  after setting that a branch has been taken
-                if (IsTokenIndexOfType(token, ElseTokenBaseIndex) || IsTokenIndexOfType(token, ElseTokenActionableBaseIndex))
+                if (IsTokenIndexOfType(tokenIndex, ElseTokenBaseIndex) || IsTokenIndexOfType(tokenIndex, ElseTokenActionableBaseIndex))
                 {
-                    if (IsTokenIndexOfType(token, ElseTokenActionableBaseIndex))
+                    logger.LogTrace("Got 'else' token");
+                    if (IsTokenIndexOfType(tokenIndex, ElseTokenActionableBaseIndex))
                     {
                         _current.ToggleActionableOperations(true, processor);
                     }
 
                     _current.BranchTaken = true;
-                    processor.WhitespaceHandler(ref bufferLength, ref currentBufferPosition, wholeLine: _definition._wholeLine, trim: _definition._trimWhitespace);
+                    logger.LogTrace("handling whitespaces");
+                    processor.WhitespaceHandler(ref bufferLength, ref currentBufferPosition, wholeLine: _definition.WholeLine, trim: _definition.TrimWhitespace);
+                    logger.LogTrace("Current buffer position: {0}", currentBufferPosition);
+                    logger.LogTrace("Current buffer length: {0}", bufferLength);
                     return 0;
                 }
                 else
                 {
-                    Debug.Assert(true, "Unknown token index: " + token);
+                    Debug.Assert(true, "Unknown token index: " + tokenIndex);
                     return 0;   // TODO: revisit. Not sure what's best here.
                 }
             }
@@ -358,7 +421,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
             {
                 if (_definition.WholeLine)
                 {
-                    processor.SeekForwardThrough(processor.EncodingConfig.LineEndings, ref bufferLength, ref currentBufferPosition);
+                    processor.SeekBufferForwardThrough(processor.EncodingConfig.LineEndings, ref bufferLength, ref currentBufferPosition);
                 }
 
                 bool seekSucceeded = SeekToToken(processor, ref bufferLength, ref currentBufferPosition, out token);
@@ -461,8 +524,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
                 internal bool Evaluate(IProcessorState processor, ref int bufferLength, ref int currentBufferPosition)
                 {
-                    bool faulted;
-                    BranchTaken = _impl._definition._evaluator(processor, ref bufferLength, ref currentBufferPosition, out faulted);
+                    BranchTaken = _impl._definition.Evaluator(processor, ref bufferLength, ref currentBufferPosition, out bool faulted);
                     return BranchTaken;
                 }
             }

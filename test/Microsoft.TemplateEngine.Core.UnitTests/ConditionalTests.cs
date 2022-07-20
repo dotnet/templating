@@ -1,6 +1,8 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Core.Expressions.Cpp;
@@ -14,7 +16,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
 {
     public partial class ConditionalTests : TestBase, IClassFixture<EnvironmentSettingsHelper>
     {
-        private IEngineEnvironmentSettings _engineEnvironmentSettings;
+        private readonly IEngineEnvironmentSettings _engineEnvironmentSettings;
 
         public ConditionalTests(EnvironmentSettingsHelper environmentSettingsHelper)
         {
@@ -36,7 +38,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
                 // It lets BalanceNesting know it's been reset
                 string commentFixingResetId = "Reset pseudo comment fixer";
 
-                ConditionalTokens tokenVariants = new ConditionalTokens
+                ConditionalTokens tokenVariants = new()
                 {
                     EndIfTokens = new[] { "#endif", "<!--#endif" }.TokenConfigs(),
                     ActionableIfTokens = new[] { "<!--#if" }.TokenConfigs(),
@@ -47,7 +49,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
 
                 IOperationProvider[] operations =
                 {
-                    new Conditional(tokenVariants, true, true, CppStyleEvaluatorDefinition.Evaluate, null, true),
+                    new Conditional(tokenVariants, true, true, CppStyleEvaluatorDefinition.Evaluate, "testId", true),
                     new BalancedNesting("<!--".TokenConfig(), "-->".TokenConfig(), "-- >".TokenConfig(), commentFixingOperationId, commentFixingResetId, false)
                 };
 
@@ -70,7 +72,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
                 // Tt lets BalanceNesting know it's been reset
                 string commentFixingResetId = "Reset pseudo comment fixer";
 
-                ConditionalTokens tokenVariants = new ConditionalTokens
+                ConditionalTokens tokenVariants = new()
                 {
                     EndIfTokens = new[] { "#endif", "@*#endif" }.TokenConfigs(),
                     ActionableIfTokens = new[] { "@*#if" }.TokenConfigs(),
@@ -81,7 +83,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
 
                 IOperationProvider[] operations =
                 {
-                    new Conditional(tokenVariants, true, true, CppStyleEvaluatorDefinition.Evaluate, null, true),
+                    new Conditional(tokenVariants, true, true, CppStyleEvaluatorDefinition.Evaluate, "testId", true),
                     new BalancedNesting("@*".TokenConfig(), "*@".TokenConfig(), "* @".TokenConfig(), commentFixingOperationId, commentFixingResetId, false)
                 };
 
@@ -102,7 +104,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
                 string replaceOperationId = "Replacement (//) ()";
                 string uncommentOperationId = "Uncomment (////) -> (//)";
 
-                ConditionalTokens tokenVariants = new ConditionalTokens
+                ConditionalTokens tokenVariants = new()
                 {
                     IfTokens = new[] { "//#if", "//#check" }.TokenConfigs(),
                     ElseTokens = new[] { "//#else", "//#otherwise" }.TokenConfigs(),
@@ -116,7 +118,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
 
                 IOperationProvider[] operations =
                 {
-                    new Conditional(tokenVariants, true, true, CppStyleEvaluatorDefinition.Evaluate, null, true),
+                    new Conditional(tokenVariants, true, true, CppStyleEvaluatorDefinition.Evaluate, "testId", true),
                     new Replacement("////".TokenConfig(), "//", uncommentOperationId, false),
                     new Replacement("//".TokenConfig(), string.Empty, replaceOperationId, false)
                 };
@@ -133,7 +135,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
                 string replaceOperationId = "Replacement: (//) ()";
                 string uncommentOperationId = "Uncomment (////) -> (//)";
 
-                ConditionalTokens tokenVariants = new ConditionalTokens
+                ConditionalTokens tokenVariants = new()
                 {
                     IfTokens = new[] { "//#if" }.TokenConfigs(),
                     ElseTokens = new[] { "//#else" }.TokenConfigs(),
@@ -147,7 +149,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
 
                 IOperationProvider[] operations =
                 {
-                    new Conditional(tokenVariants, true, true, CppStyleEvaluatorDefinition.Evaluate, null, true),
+                    new Conditional(tokenVariants, true, true, CppStyleEvaluatorDefinition.Evaluate, "testId", true),
                     new Replacement("////".TokenConfig(), "//", uncommentOperationId, false),
                     new Replacement("//".TokenConfig(), string.Empty, replaceOperationId, false)
                 };
@@ -160,7 +162,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
         {
             get
             {
-                ConditionalTokens tokenVariants = new ConditionalTokens
+                ConditionalTokens tokenVariants = new()
                 {
                     IfTokens = new[] { "#if" }.TokenConfigs(),
                     ElseTokens = new[] { "#else" }.TokenConfigs(),
@@ -170,7 +172,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
 
                 IOperationProvider[] operations =
                 {
-                    new Conditional(tokenVariants, true, true, CppStyleEvaluatorDefinition.Evaluate, null, true)
+                    new Conditional(tokenVariants, true, true, CppStyleEvaluatorDefinition.Evaluate, "testId", true)
                 };
 
                 return operations;
@@ -181,7 +183,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
         {
             get
             {
-                ConditionalTokens tokenVariants = new ConditionalTokens
+                ConditionalTokens tokenVariants = new()
                 {
                     IfTokens = new[] { "#If" }.TokenConfigs(),
                     ElseTokens = new[] { "#Else" }.TokenConfigs(),
@@ -191,7 +193,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
 
                 IOperationProvider[] operations =
                 {
-                    new Conditional(tokenVariants, true, true, VisualBasicStyleEvaluatorDefintion.Evaluate, null, true)
+                    new Conditional(tokenVariants, true, true, VisualBasicStyleEvaluatorDefintion.Evaluate, "testId", true)
                 };
 
                 return operations;
@@ -205,7 +207,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
                 string uncommentOperationId = "Uncomment (hash line): (##) -> (#)";
                 string replaceOperationId = "Replacement (hash line): (#) -> ()";
 
-                ConditionalTokens tokens = new ConditionalTokens
+                ConditionalTokens tokens = new()
                 {
                     IfTokens = new[] { "#if" }.TokenConfigs(),
                     ElseTokens = new[] { "#else" }.TokenConfigs(),
@@ -219,7 +221,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
 
                 IOperationProvider[] operations =
                 {
-                    new Conditional(tokens, true, true, CppStyleEvaluatorDefinition.Evaluate, null, true),
+                    new Conditional(tokens, true, true, CppStyleEvaluatorDefinition.Evaluate, "testId", true),
                     new Replacement("##".TokenConfig(), "#", uncommentOperationId, false),
                     new Replacement("#".TokenConfig(), "", replaceOperationId, false),
                 };
@@ -235,7 +237,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
                 string uncommentOperationId = "Uncomment (bat rem): (rem rem) -> (rem)";
                 string replaceOperationId = "Replacement (bat rem): (rem) -> ()";
 
-                ConditionalTokens tokens = new ConditionalTokens
+                ConditionalTokens tokens = new()
                 {
                     IfTokens = new[] { "rem #if" }.TokenConfigs(),
                     ElseTokens = new[] { "rem #else" }.TokenConfigs(),
@@ -249,7 +251,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
 
                 IOperationProvider[] operations =
                 {
-                    new Conditional(tokens, true, true, CppStyleEvaluatorDefinition.Evaluate, null, true),
+                    new Conditional(tokens, true, true, CppStyleEvaluatorDefinition.Evaluate, "testId", true),
                     new Replacement("rem rem".TokenConfig(), "rem", uncommentOperationId, false),
                     new Replacement("rem".TokenConfig(), "", replaceOperationId, false)
                 };
@@ -265,7 +267,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
                 string reduceCommentOperationId = "Reduce comment (line): (-#-#) -> (-#)";
                 string uncommentOperationId = "Uncomment (line): (-#) -> ()";
 
-                ConditionalTokens tokens = new ConditionalTokens
+                ConditionalTokens tokens = new()
                 {
                     IfTokens = new[] { "-#if" }.TokenConfigs(),
                     ElseTokens = new[] { "-#else" }.TokenConfigs(),
@@ -279,7 +281,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
 
                 IOperationProvider[] operations =
                 {
-                    new Conditional(tokens, true, true, CppStyleEvaluatorDefinition.Evaluate, null, true),
+                    new Conditional(tokens, true, true, CppStyleEvaluatorDefinition.Evaluate, "testId", true),
                     new Replacement("-#-#".TokenConfig(), "-#", reduceCommentOperationId, false),
                     new Replacement("-#".TokenConfig(), "", uncommentOperationId, false),
                 };
@@ -303,7 +305,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
                 // It lets BalanceNesting know it's been reset
                 string commentFixingResetId = "Reset pseudo comment fixer";
 
-                ConditionalTokens tokenVariants = new ConditionalTokens
+                ConditionalTokens tokenVariants = new()
                 {
                     EndIfTokens = new[] { "#endif", "{/*#endif" }.TokenConfigs(),
                     ActionableIfTokens = new[] { "{/*#if" }.TokenConfigs(),
@@ -314,7 +316,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
 
                 IOperationProvider[] operations =
                 {
-                    new Conditional(tokenVariants, true, true, CppStyleEvaluatorDefinition.Evaluate, null, true),
+                    new Conditional(tokenVariants, true, true, CppStyleEvaluatorDefinition.Evaluate, "testId", true),
                     new BalancedNesting("{/*".TokenConfig(), "*/}".TokenConfig(), "*/ }".TokenConfig(), commentFixingOperationId, commentFixingResetId, false)
                 };
 
@@ -387,7 +389,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
         /// </summary>
         private IProcessor SetupTestProcessor(IOperationProvider[] operations, VariableCollection vc)
         {
-            EngineConfig cfg = new EngineConfig(_engineEnvironmentSettings.Host.Logger, vc);
+            EngineConfig cfg = new(_engineEnvironmentSettings.Host.Logger, vc);
             return Processor.Create(cfg, operations);
         }
     }

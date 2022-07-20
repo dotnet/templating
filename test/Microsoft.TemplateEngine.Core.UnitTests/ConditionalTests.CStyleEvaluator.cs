@@ -1658,8 +1658,7 @@ There";
         {
             string value = @"#ifdef
 GAGA
-#endif
-";
+#endif";
             string expected = varName == "def" && varValue ? @"GAGA
 " : "";
 

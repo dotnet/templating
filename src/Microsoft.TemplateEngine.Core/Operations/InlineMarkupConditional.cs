@@ -15,13 +15,12 @@ namespace Microsoft.TemplateEngine.Core.Operations
 {
     public class InlineMarkupConditional : IOperationProvider
     {
-        private readonly string _id;
         private readonly bool _initialState;
 
         public InlineMarkupConditional(MarkupTokens tokens, bool wholeLine, bool trimWhitespace, ConditionEvaluator evaluator, string variableFormat, string id, bool initialState)
         {
             Tokens = tokens;
-            _id = id;
+            Id = id;
             Evaluator = evaluator;
             WholeLine = wholeLine;
             TrimWhitespace = trimWhitespace;
@@ -31,7 +30,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
         public ConditionEvaluator Evaluator { get; }
 
-        public string Id => _id;
+        public string Id { get; private set; }
 
         public MarkupTokens Tokens { get; }
 
@@ -43,9 +42,9 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
         public IOperation GetOperation(Encoding encoding, IProcessorState processorState)
         {
-            TokenTrie structureTrie = new TokenTrie();
-            TokenTrie closeConditionTrie = new TokenTrie();
-            TokenTrie scanBackTrie = new TokenTrie();
+            TokenTrie structureTrie = new();
+            TokenTrie closeConditionTrie = new();
+            TokenTrie scanBackTrie = new();
 
             IToken openOpenElementTokenBytes = Tokens.OpenOpenElementToken.ToToken(processorState.Encoding);
             scanBackTrie.AddToken(openOpenElementTokenBytes);
@@ -62,7 +61,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
             }
 
             closeConditionTrie.AddToken(Tokens.CloseConditionExpression.ToToken(processorState.Encoding));
-            MarkupTokenMapping mapping = new MarkupTokenMapping(
+            MarkupTokenMapping mapping = new(
                 openOpenElementToken,
                 openCloseElementToken,
                 closeCloseElementToken,
@@ -72,7 +71,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
             );
 
             IReadOnlyList<IToken> start = new[] { Tokens.OpenConditionExpression.ToToken(processorState.Encoding) };
-            return new Impl(this, start, structureTrie, closeConditionTrie, scanBackTrie, mapping, _id, _initialState);
+            return new Impl(this, start, structureTrie, closeConditionTrie, scanBackTrie, mapping, Id, _initialState);
         }
 
         private class Impl : IOperation
@@ -103,28 +102,26 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
             public int HandleMatch(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int token)
             {
-                bool flag;
-                if (processor.Config.Flags.TryGetValue(Conditional.OperationName, out flag) && !flag)
+                if (processor.Config.Flags.TryGetValue(Conditional.OperationName, out bool flag) && !flag)
                 {
                     processor.Write(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
                     return Tokens[token].Length;
                 }
 
-                List<byte> conditionBytes = new List<byte>();
+                List<byte> conditionBytes = new();
                 ScanToCloseCondition(processor, conditionBytes, ref bufferLength, ref currentBufferPosition);
                 byte[] condition = conditionBytes.ToArray();
-                EngineConfig adjustedConfig = new EngineConfig(processor.Config.Logger, processor.Config.Whitespaces, processor.Config.LineEndings, processor.Config.Variables, _definition.VariableFormat);
+                EngineConfig adjustedConfig = new(processor.Config.Logger, processor.Config.Whitespaces, processor.Config.LineEndings, processor.Config.Variables, _definition.VariableFormat);
                 IProcessorState localState = new ProcessorState(new MemoryStream(condition), new MemoryStream(), conditionBytes.Count, int.MaxValue, adjustedConfig, Array.Empty<IOperationProvider>());
                 int pos = 0;
                 int len = conditionBytes.Count;
 
-                bool faulted;
-                bool value = _definition.Evaluator(localState, ref len, ref pos, out faulted);
+                bool value = _definition.Evaluator(localState, ref len, ref pos, out bool faulted);
 
                 if (faulted)
                 {
                     processor.Write(Tokens[0].Value, Tokens[0].Start, Tokens[0].Length);
-                    MemoryStream fragment = new MemoryStream();
+                    MemoryStream fragment = new();
                     fragment.Write(condition, 0, condition.Length);
                     fragment.Write(_closeConditionTrie.Tokens[0].Value, _closeConditionTrie.Tokens[0].Start, _closeConditionTrie.Tokens[0].Length);
                     fragment.Write(processor.CurrentBuffer, currentBufferPosition, bufferLength - currentBufferPosition);
@@ -141,7 +138,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
                     return 0;
                 }
 
-                processor.SeekBackUntil(_scanBackTrie, true);
+                processor.SeekTargetBackUntil(_scanBackTrie, true);
                 FindEnd(processor, ref bufferLength, ref currentBufferPosition);
                 processor.WhitespaceHandler(ref bufferLength, ref currentBufferPosition, _definition.WholeLine, _definition.TrimWhitespace);
                 return 0;
@@ -173,8 +170,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
                             return;
                         }
 
-                        int token;
-                        if (_structureTrie.GetOperation(processorState.CurrentBuffer, bufferLength, ref currentBufferPosition, out token))
+                        if (_structureTrie.GetOperation(processorState.CurrentBuffer, bufferLength, ref currentBufferPosition, out int token))
                         {
                             if (inComment)
                             {
@@ -252,8 +248,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
                             return;
                         }
 
-                        int token;
-                        if (_closeConditionTrie.GetOperation(processorState.CurrentBuffer, bufferLength, ref currentBufferPosition, out token))
+                        if (_closeConditionTrie.GetOperation(processorState.CurrentBuffer, bufferLength, ref currentBufferPosition, out int token))
                         {
                             conditionBytes.AddRange(processorState.CurrentBuffer.Skip(previousPosition).Take(currentBufferPosition - previousPosition - _closeConditionTrie.Tokens[token].Length));
                             return;

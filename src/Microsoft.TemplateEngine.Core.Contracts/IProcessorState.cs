@@ -24,17 +24,17 @@ namespace Microsoft.TemplateEngine.Core.Contracts
 
         bool AdvanceBuffer(int bufferPosition);
 
-        void SeekForwardUntil(ITokenTrie trie, ref int bufferLength, ref int currentBufferPosition);
+        void SeekBufferForwardUntil(ITokenTrie trie, ref int bufferLength, ref int currentBufferPosition);
 
-        void SeekForwardThrough(ITokenTrie trie, ref int bufferLength, ref int currentBufferPosition);
+        void SeekBufferForwardThrough(ITokenTrie trie, ref int bufferLength, ref int currentBufferPosition);
 
-        void SeekForwardWhile(ITokenTrie trie, ref int bufferLength, ref int currentBufferPosition);
+        void SeekBufferForwardWhile(ITokenTrie trie, ref int bufferLength, ref int currentBufferPosition);
 
-        void SeekBackUntil(ITokenTrie match);
+        void SeekTargetBackUntil(ITokenTrie match);
 
-        void SeekBackUntil(ITokenTrie match, bool consume);
+        void SeekTargetBackUntil(ITokenTrie match, bool consume);
 
-        void SeekBackWhile(ITokenTrie match);
+        void SeekTargetBackWhile(ITokenTrie match);
 
         void Write(byte[] buffer, int offset, int count);
 
