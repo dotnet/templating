@@ -10,21 +10,12 @@ using Microsoft.TemplateEngine.Edge;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Mocks;
 using Microsoft.TemplateEngine.TestHelper;
-using VerifyXunit;
-using Xunit;
 
 namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
 {
     [UsesVerify]
-    public class TemplateCommandTests : IClassFixture<VerifyFixture>
-    {   
-        private readonly VerifyFixture _verifySettings;
-
-        public TemplateCommandTests(VerifyFixture verifySettings)
-        {
-            _verifySettings = verifySettings;
-        }
-
+    public class TemplateCommandTests
+    {
         [Fact]
         public Task CannotCreateCommandForInvalidParameter()
         {
@@ -66,12 +57,12 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
                 Assert.Equal(2, e.ParameterErrors.Count);
                 Assert.Equal(templateGroup.Templates.Single(), e.Template);
 
-                return Verifier.Verify(e.Message, _verifySettings.Settings);
+                return Verifier.Verify(e.Message);
             }
 
             Assert.True(false, "should not land here");
             return Task.FromResult(1);
-            
+
         }
 
         [Fact]

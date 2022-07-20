@@ -23,7 +23,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Should()
                 .Fail();
 
-            return Verifier.Verify(commandResult.StdErr, _verifySettings)
+            return Verifier.Verify(commandResult.StdErr)
                 .AddScrubber(output =>
                 {
                     output.ScrubByRegex("   Microsoft\\.DotNet\\.Common\\.ItemTemplates::[A-Za-z0-9.-]+", "   Microsoft.DotNet.Common.ItemTemplates::%VERSION%");
@@ -42,7 +42,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Should()
                 .Pass();
 
-            return Verifier.Verify(commandResult.StdOut, _verifySettings)
+            return Verifier.Verify(commandResult.StdOut)
                 .AddScrubber(output =>
                 {
                     output.ScrubByRegex("   Microsoft.DotNet.Common.ItemTemplates::[A-Za-z0-9.-]+", "   Microsoft.DotNet.Common.ItemTemplates::%VERSION%");
@@ -61,7 +61,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Should()
                 .Fail();
 
-            return Verifier.Verify(commandResult.StdErr, _verifySettings)
+            return Verifier.Verify(commandResult.StdErr)
                 .AddScrubber(output =>
                 {
                     output.ScrubByRegex("   Microsoft\\.DotNet\\.Common\\.ItemTemplates::[A-Za-z0-9.-]+", "   Microsoft.DotNet.Common.ItemTemplates::%VERSION%");
@@ -82,7 +82,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Should()
                 .Pass();
 
-            return Verifier.Verify(commandResult.StdOut, _verifySettings)
+            return Verifier.Verify(commandResult.StdOut)
                 .UseTextForParameters("common")
                 .DisableRequireUniquePrefix();
         }
@@ -99,7 +99,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Should()
                 .Pass();
 
-            return Verifier.Verify(commandResult.StdOut, _verifySettings);
+            return Verifier.Verify(commandResult.StdOut);
         }
 
         [Fact]
@@ -115,10 +115,10 @@ namespace Dotnet_new3.IntegrationTests
                 .Should()
                 .Pass();
 
-            return Verifier.Verify(commandResult.StdOut, _verifySettings)
+            return Verifier.Verify(commandResult.StdOut)
                 .AddScrubber(output => output.ScrubAndReplace(testTemplateLocation, "%TEMPLATE FOLDER%"));
         }
-        
+
         [Fact]
         public Task CanInstallSameSourceTwice_Folder_WhenSourceIsSpecified()
         {
@@ -137,7 +137,7 @@ namespace Dotnet_new3.IntegrationTests
                  .Execute();
 
             commandResult.Should().Pass();
-            return Verifier.Verify(commandResult.StdOut, _verifySettings)
+            return Verifier.Verify(commandResult.StdOut)
                 .AddScrubber(output => output.ScrubAndReplace(basicFSharp, "%TEMPLATE FOLDER%"));
         }
 
@@ -159,7 +159,7 @@ namespace Dotnet_new3.IntegrationTests
                  .Execute();
 
             commandResult.Should().Pass();
-            return Verifier.Verify(commandResult.StdOut, _verifySettings);
+            return Verifier.Verify(commandResult.StdOut);
         }
 
         [Fact]
@@ -184,7 +184,7 @@ namespace Dotnet_new3.IntegrationTests
                  .Execute();
 
             commandResult.Should().Fail();
-            return Verifier.Verify(commandResult.StdErr, _verifySettings);
+            return Verifier.Verify(commandResult.StdErr);
         }
 
         [Fact]
@@ -215,7 +215,7 @@ namespace Dotnet_new3.IntegrationTests
            .Execute();
 
             commandResult.Should().Fail();
-            return Verifier.Verify(commandResult.StdErr, _verifySettings)
+            return Verifier.Verify(commandResult.StdErr)
                 .AddScrubber(output => output.ScrubAndReplace(basicFSharp, "%TEMPLATE FOLDER%"));
         }
 

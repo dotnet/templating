@@ -14,14 +14,12 @@ using Xunit.Abstractions;
 namespace Dotnet_new3.IntegrationTests
 {
     [UsesVerify]
-    public class DotnetNewDebugOptions : IClassFixture<VerifySettingsFixture>
+    public class DotnetNewDebugOptions
     {
-        private readonly VerifySettings _verifySettings;
         private readonly ITestOutputHelper _log;
 
-        public DotnetNewDebugOptions(VerifySettingsFixture verifySettings, ITestOutputHelper log)
+        public DotnetNewDebugOptions(ITestOutputHelper log)
         {
-            _verifySettings = verifySettings.Settings;
             _log = log;
         }
 
@@ -83,7 +81,7 @@ namespace Dotnet_new3.IntegrationTests
 
             commandResult.Should().ExitWith(0).And.NotHaveStdErr();
 
-            return Verifier.Verify(commandResult.StdOut, _verifySettings)
+            return Verifier.Verify(commandResult.StdOut)
                 .AddScrubber(output =>
                 {
                     string finalOutput = output.ToString();

@@ -12,17 +12,15 @@ using Xunit.Abstractions;
 namespace Dotnet_new3.IntegrationTests
 {
     [UsesVerify]
-    public class AllWebProjectsWork : IClassFixture<WebProjectsFixture>, IClassFixture<VerifySettingsFixture>
+    public class AllWebProjectsWork : IClassFixture<WebProjectsFixture>
     {
         private readonly WebProjectsFixture _fixture;
         private readonly ITestOutputHelper _log;
-        private readonly VerifySettings _verifySettings;
 
-        public AllWebProjectsWork(WebProjectsFixture fixture, VerifySettingsFixture verifySettings, ITestOutputHelper log)
+        public AllWebProjectsWork(WebProjectsFixture fixture, ITestOutputHelper log)
         {
             _fixture = fixture;
             _log = log;
-            _verifySettings = verifySettings.Settings;
         }
 
         [Theory]
@@ -81,7 +79,7 @@ namespace Dotnet_new3.IntegrationTests
                .And
                .NotHaveStdErr();
 
-            return Verifier.Verify(commandResult.StdOut, _verifySettings);
+            return Verifier.Verify(commandResult.StdOut);
         }
 
         [Fact]
@@ -98,7 +96,7 @@ namespace Dotnet_new3.IntegrationTests
                .And
                .NotHaveStdErr();
 
-            return Verifier.Verify(commandResult.StdOut, _verifySettings);
+            return Verifier.Verify(commandResult.StdOut);
         }
 
         [Theory]
@@ -117,7 +115,7 @@ namespace Dotnet_new3.IntegrationTests
                .And
                .NotHaveStdErr();
 
-            return Verifier.Verify(commandResult.StdOut, _verifySettings)
+            return Verifier.Verify(commandResult.StdOut)
                 .UseTextForParameters("common")
                 .DisableRequireUniquePrefix();
         }
@@ -143,5 +141,5 @@ namespace Dotnet_new3.IntegrationTests
         }
 
         internal string BaseWorkingDirectory { get; private set; }
-    } 
+    }
 }

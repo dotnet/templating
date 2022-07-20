@@ -12,14 +12,12 @@ using Xunit.Abstractions;
 namespace Dotnet_new3.IntegrationTests
 {
     [UsesVerify]
-    public class DotnetNew3CompleteTests : IClassFixture<VerifySettingsFixture>
+    public class DotnetNew3CompleteTests
     {
-        private readonly VerifySettings _verifySettings;
         private readonly ITestOutputHelper _log;
 
-        public DotnetNew3CompleteTests(VerifySettingsFixture verifySettings, ITestOutputHelper log)
+        public DotnetNew3CompleteTests(ITestOutputHelper log)
         {
-            _verifySettings = verifySettings.Settings;
             _log = log;
         }
 
@@ -36,7 +34,7 @@ namespace Dotnet_new3.IntegrationTests
                 .ExitWith(0)
                 .And.NotHaveStdErr();
 
-            return Verifier.Verify(commandResult.StdOut, _verifySettings);
+            return Verifier.Verify(commandResult.StdOut);
         }
 
 #pragma warning disable xUnit1004 // Test methods should not be skipped
