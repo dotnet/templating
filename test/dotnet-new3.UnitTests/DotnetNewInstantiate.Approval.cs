@@ -27,7 +27,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Fail()
                 .And.NotHaveStdOut();
 
-            return Verifier.Verify(commandResult.StdErr);
+            return Verify(commandResult.StdErr);
         }
 
         [Fact]
@@ -43,7 +43,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Fail()
                 .And.NotHaveStdOut();
 
-            return Verifier.Verify(commandResult.StdErr);
+            return Verify(commandResult.StdErr);
         }
 
         [Fact]
@@ -59,7 +59,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Fail()
                 .And.NotHaveStdOut();
 
-            return Verifier.Verify(commandResult.StdErr);
+            return Verify(commandResult.StdErr);
         }
 
         [Fact]
@@ -80,7 +80,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Fail()
                 .And.NotHaveStdOut();
 
-            return Verifier.Verify(commandResult.StdErr);
+            return Verify(commandResult.StdErr);
         }
 
         [Fact]
@@ -101,7 +101,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Fail()
                 .And.NotHaveStdOut();
 
-            return Verifier.Verify(commandResult.StdErr)
+            return Verify(commandResult.StdErr)
                 .AddScrubber(output =>
                 {
                     //package locaions are machine specific so we cannot use them in approval tests
@@ -129,7 +129,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Should().Fail()
                 .And.NotHaveStdOut();
 
-            return Verifier.Verify(commandResult.StdErr);
+            return Verify(commandResult.StdErr);
         }
 
         [Fact]
@@ -147,7 +147,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Fail()
                 .And.NotHaveStdOut();
 
-            return Verifier.Verify(commandResult.StdErr);
+            return Verify(commandResult.StdErr);
         }
 
         [Fact]
@@ -165,7 +165,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Fail()
                 .And.NotHaveStdOut();
 
-            return Verifier.Verify(commandResult.StdErr);
+            return Verify(commandResult.StdErr);
         }
 
         [Fact]
@@ -183,7 +183,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Fail()
                 .And.NotHaveStdOut();
 
-            return Verifier.Verify(commandResult.StdErr);
+            return Verify(commandResult.StdErr);
         }
 
         [Fact]
@@ -201,7 +201,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Fail()
                 .And.NotHaveStdOut();
 
-            return Verifier.Verify(commandResult.StdErr);
+            return Verify(commandResult.StdErr);
         }
 
         [Fact]
@@ -224,7 +224,7 @@ namespace Dotnet_new3.IntegrationTests
                 .And.HaveStdErrContaining(templateOneLocation)
                 .And.HaveStdErrContaining(templateTwoLocation);
 
-            return Verifier.Verify(commandResult.StdErr)
+            return Verify(commandResult.StdErr)
                 .AddScrubber(output =>
                 {
                     //package locaions are machine specific so we cannot use them in approval tests
@@ -265,7 +265,7 @@ namespace Dotnet_new3.IntegrationTests
 
             string resultFileContent = File.ReadAllText(Path.Combine(workingDirectory, "Test.cs"));
 
-            return Verifier.Verify(resultFileContent)
+            return Verify(resultFileContent)
                 .DisableRequireUniquePrefix();
         }
 
@@ -289,7 +289,7 @@ namespace Dotnet_new3.IntegrationTests
 
             string resultFileContent = File.ReadAllText(Path.Combine(workingDirectory, "Test.cs"));
 
-            return Verifier.Verify(resultFileContent);
+            return Verify(resultFileContent);
         }
 
         [Fact]
@@ -390,7 +390,7 @@ namespace Dotnet_new3.IntegrationTests
 
             string[] expectedFiles = new[] { $"{_OUT_FOLDER}.name.txt", $"{_OUT_FOLDER}/{_OUT_FOLDER}.cs" };
 
-            return Verifier.Verify(commandResult.StdOut)
+            return Verify(commandResult.StdOut)
                 .AddScrubber(output =>
                 {
                     //unify directory separators
@@ -433,7 +433,7 @@ namespace Dotnet_new3.IntegrationTests
                 commandResult.Should().HaveStdErrContaining(file);
             }
 
-            return Verifier.Verify(commandResult.StdErr)
+            return Verify(commandResult.StdErr)
                 .AddScrubber(output =>
                 {
                     //unify directory separators
@@ -464,7 +464,7 @@ namespace Dotnet_new3.IntegrationTests
                 .ExitWith(0)
                 .And.NotHaveStdErr();
 
-            return Verifier.Verify(commandResult.StdOut)
+            return Verify(commandResult.StdOut)
             .AddScrubber(output =>
             {
                 //output contains path to host.json file - it is machine-specific.
@@ -495,7 +495,7 @@ namespace Dotnet_new3.IntegrationTests
                 .ExitWith(0)
                 .And.NotHaveStdErr();
 
-            return Verifier.Verify(commandResult.StdOut)
+            return Verify(commandResult.StdOut)
             .AddScrubber(output =>
             {
                 output.ScrubByRegex("'Microsoft\\.DotNet\\.Common\\.ItemTemplates::[A-Za-z0-9.-]+' is available in", "'Microsoft.DotNet.Common.ItemTemplates::%VERSION%' is available in");
@@ -520,7 +520,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Fail()
                 .And.NotHaveStdOut();
 
-            return Verifier.Verify(commandResult.StdErr)
+            return Verify(commandResult.StdErr)
             .AddScrubber(output =>
             {
                 //removes the delimiter line as we don't know the length of last columns containing paths above
@@ -545,7 +545,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Should()
                 .Fail();
 
-            return Verifier.Verify(commandResult.StdErr)
+            return Verify(commandResult.StdErr)
                 .AddScrubber(output => output.ScrubByRegex("\\-\\-debug\\:custom\\-hive [A-Za-z0-9\\-\\.\\\\\\/\\{\\}\\:_]+", "--debug:custom-hive %SETTINGS DIRECTORY%"));
         }
 
@@ -563,7 +563,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Should()
                 .Pass();
 
-            return Verifier.Verify(commandResult.StdOut);
+            return Verify(commandResult.StdOut);
         }
 
         [Fact]

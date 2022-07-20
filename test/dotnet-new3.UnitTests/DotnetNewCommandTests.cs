@@ -35,7 +35,7 @@ namespace Dotnet_new3.IntegrationTests
             commandResult.Should()
                 .ExitWith(0).And.NotHaveStdErr();
 
-            return Verifier.Verify(commandResult.StdOut);
+            return Verify(commandResult.StdOut);
         }
 
         [Fact]

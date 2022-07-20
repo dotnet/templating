@@ -79,7 +79,7 @@ namespace Dotnet_new3.IntegrationTests
                .And
                .NotHaveStdErr();
 
-            return Verifier.Verify(commandResult.StdOut);
+            return Verify(commandResult.StdOut);
         }
 
         [Fact]
@@ -96,7 +96,7 @@ namespace Dotnet_new3.IntegrationTests
                .And
                .NotHaveStdErr();
 
-            return Verifier.Verify(commandResult.StdOut);
+            return Verify(commandResult.StdOut);
         }
 
         [Theory]
@@ -115,7 +115,7 @@ namespace Dotnet_new3.IntegrationTests
                .And
                .NotHaveStdErr();
 
-            return Verifier.Verify(commandResult.StdOut)
+            return Verify(commandResult.StdOut)
                 .UseTextForParameters("common")
                 .DisableRequireUniquePrefix();
         }
