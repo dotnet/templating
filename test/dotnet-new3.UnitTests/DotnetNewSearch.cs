@@ -11,16 +11,14 @@ using Xunit.Abstractions;
 namespace Dotnet_new3.IntegrationTests
 {
     [UsesVerify]
-    public class DotnetNewSearch : IClassFixture<SharedHomeDirectory>, IClassFixture<VerifySettingsFixture>
+    public class DotnetNewSearch : IClassFixture<SharedHomeDirectory>
     {
         private readonly SharedHomeDirectory _sharedHome;
-        private readonly VerifySettings _verifySettings;
         private readonly ITestOutputHelper _log;
 
-        public DotnetNewSearch(SharedHomeDirectory sharedHome, VerifySettingsFixture verifySettings, ITestOutputHelper log)
+        public DotnetNewSearch(SharedHomeDirectory sharedHome, ITestOutputHelper log)
         {
             _sharedHome = sharedHome;
-            _verifySettings = verifySettings.Settings;
             _log = log;
         }
 
@@ -64,7 +62,7 @@ namespace Dotnet_new3.IntegrationTests
 
             commandResult.Should().Fail();
 
-            return Verifier.Verify(commandResult.StdErr, _verifySettings)
+            return Verifier.Verify(commandResult.StdErr)
                 .UseTextForParameters("common")
                 .DisableRequireUniquePrefix();
         }
@@ -480,7 +478,7 @@ namespace Dotnet_new3.IntegrationTests
 
             // rows can be shrunk: ML.NET Console App for Training and ML.NET Console App for Train...
             // in this case ML.NET Console App for Training < ML.NET Console App for Train...
-            // therefore use custom comparer 
+            // therefore use custom comparer
             var nameComparer = new ShrinkAwareOrdinalStringComparer();
             var downloadCountComparer = new DownloadCountComparer();
 
@@ -779,7 +777,7 @@ namespace Dotnet_new3.IntegrationTests
         {
             const string deprecationMessage =
 @"Warning: use of 'dotnet-new3 new3 --search' is deprecated. Use 'dotnet-new3 new3 search' instead.
-For more information, run: 
+For more information, run:
    dotnet-new3 new3 search -h";
 
             var commandResult = new DotnetNewCommand(_log, "--search", "console")

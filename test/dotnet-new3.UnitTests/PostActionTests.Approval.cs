@@ -35,7 +35,7 @@ namespace Dotnet_new3.IntegrationTests
                 .ExitWith(0)
                 .And.NotHaveStdErr();
 
-            return Verifier.Verify(commandResult.StdOut, _verifySettings)
+            return Verifier.Verify(commandResult.StdOut)
                 .UniqueForOSPlatform()
                 .ScrubInlineGuids()
                 .AddScrubber(output =>
@@ -65,7 +65,7 @@ namespace Dotnet_new3.IntegrationTests
                 .ExitWith(0)
                 .And.NotHaveStdErr();
 
-            return Verifier.Verify(commandResult.StdOut, _verifySettings)
+            return Verifier.Verify(commandResult.StdOut)
                 .UniqueForOSPlatform();
         }
 
@@ -87,7 +87,7 @@ namespace Dotnet_new3.IntegrationTests
                 .ExitWith(0)
                 .And.NotHaveStdErr();
 
-            return Verifier.Verify(commandResult.StdOut, _verifySettings)
+            return Verifier.Verify(commandResult.StdOut)
                 .UniqueForOSPlatform()
                 .ScrubInlineGuids()
                 .AddScrubber(output =>
@@ -116,7 +116,7 @@ namespace Dotnet_new3.IntegrationTests
                 .ExitWith(0)
                 .And.NotHaveStdErr();
 
-            return Verifier.Verify(commandResult.StdOut, _verifySettings)
+            return Verifier.Verify(commandResult.StdOut)
                 .UniqueForOSPlatform()
                 .ScrubInlineGuids()
                 .AddScrubber(output =>
@@ -154,7 +154,7 @@ namespace Dotnet_new3.IntegrationTests
                 .ExitWith(0)
                 .And.NotHaveStdErr();
 
-            return Verifier.Verify(commandResult.StdOut, _verifySettings)
+            return Verifier.Verify(commandResult.StdOut)
                 .UniqueForOSPlatform()
                 .ScrubInlineGuids()
                 .AddScrubber(output =>
@@ -184,7 +184,7 @@ namespace Dotnet_new3.IntegrationTests
                 .ExitWith(0)
                 .And.NotHaveStdErr();
 
-            return Verifier.Verify(commandResult.StdOut, _verifySettings);
+            return Verifier.Verify(commandResult.StdOut);
         }
 
         [Fact]
@@ -208,7 +208,7 @@ namespace Dotnet_new3.IntegrationTests
             Assert.False(File.Exists(Path.Combine(workingDirectory, "MyProject.csproj")));
             Assert.False(File.Exists(Path.Combine(workingDirectory, "Program.cs")));
 
-            return Verifier.Verify(commandResult.StdOut, _verifySettings);
+            return Verifier.Verify(commandResult.StdOut);
         }
 
         [Fact]
@@ -228,7 +228,7 @@ namespace Dotnet_new3.IntegrationTests
             commandResult
                 .Should().Fail();
 
-            return Verifier.Verify(commandResult.StdOut + Environment.NewLine + commandResult.StdErr, _verifySettings);
+            return Verifier.Verify(commandResult.StdOut + Environment.NewLine + commandResult.StdErr);
         }
 
         [Fact]
@@ -249,7 +249,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Should()
                 .Fail();
 
-            return Verifier.Verify(commandResult.StdOut + Environment.NewLine + commandResult.StdErr, _verifySettings)
+            return Verifier.Verify(commandResult.StdOut + Environment.NewLine + commandResult.StdErr)
                 .UniqueForOSPlatform();
         }
     }

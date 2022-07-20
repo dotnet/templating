@@ -12,15 +12,8 @@ using Xunit;
 namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
 {
     [UsesVerify]
-    public partial class TabCompletionTests : IClassFixture<VerifyFixture>
+    public partial class TabCompletionTests
     {
-        private readonly VerifyFixture _verifySettings;
-
-        public TabCompletionTests (VerifyFixture verifySettings)
-        {
-            _verifySettings = verifySettings;
-        }
-
         [Fact]
         public Task RootCommand_GetAllSuggestions()
         {
@@ -30,7 +23,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
             var parseResult = ParserFactory.CreateParser(myCommand).Parse("new ");
             var result = parseResult.GetCompletions().ToArray();
 
-            return Verifier.Verify(result, _verifySettings.Settings);
+            return Verifier.Verify(result);
         }
 
         [Fact]
@@ -42,7 +35,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
             var parseResult = myCommand.Parse("new c");
             var result = parseResult.GetCompletions().ToArray();
 
-            return Verifier.Verify(result, _verifySettings.Settings);
+            return Verifier.Verify(result);
         }
 
         [Fact]
@@ -54,7 +47,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
             var parseResult = myCommand.Parse("new install ");
             var result = parseResult.GetCompletions().ToArray();
 
-            return Verifier.Verify(result, _verifySettings.Settings);
+            return Verifier.Verify(result);
         }
 
         [Fact]
@@ -66,7 +59,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
             var parseResult = myCommand.Parse("new uninstall ");
             var result = parseResult.GetCompletions().ToArray();
 
-            return Verifier.Verify(result, _verifySettings.Settings);
+            return Verifier.Verify(result);
         }
 
         [Fact]
@@ -78,7 +71,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
             var parseResult = myCommand.Parse("new update ");
             var result = parseResult.GetCompletions().ToArray();
 
-            return Verifier.Verify(result, _verifySettings.Settings);
+            return Verifier.Verify(result);
         }
 
         [Fact]
@@ -90,7 +83,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
             var parseResult = myCommand.Parse("new list ");
             var result = parseResult.GetCompletions().ToArray();
 
-            return Verifier.Verify(result, _verifySettings.Settings);
+            return Verifier.Verify(result);
         }
 
         [Fact]
@@ -102,7 +95,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
             var parseResult = myCommand.Parse("new search ");
             var result = parseResult.GetCompletions().ToArray();
 
-            return Verifier.Verify(result, _verifySettings.Settings);
+            return Verifier.Verify(result);
         }
 
         [Fact]
@@ -114,7 +107,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
             var parseResult = myCommand.Parse("new create ");
             var result = parseResult.GetCompletions().ToArray();
 
-            return Verifier.Verify(result, _verifySettings.Settings);
+            return Verifier.Verify(result);
         }
 
         [Fact]
@@ -126,7 +119,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
             var parseResult = myCommand.Parse("new console ");
             var result = parseResult.GetCompletions().ToArray();
 
-            return Verifier.Verify(result, _verifySettings.Settings);
+            return Verifier.Verify(result);
         }
     }
 }
