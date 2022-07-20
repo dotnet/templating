@@ -63,7 +63,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
             StringWriter output = new StringWriter();
             Reporter reporter = new Reporter(new AnsiConsole(output));
             Assert.False(InstantiateCommand.VerifyMatchingTemplates(settings, matchingTemplates, reporter, out _));
-            return Verifier.Verify(output.ToString());
+            return Verify(output.ToString());
         }
 
         [Fact]

@@ -34,7 +34,7 @@ namespace Dotnet_new3.IntegrationTests
                 .ExitWith(0)
                 .And.NotHaveStdErr();
 
-            return Verifier.Verify(commandResult.StdOut);
+            return Verify(commandResult.StdOut);
         }
 
 #pragma warning disable xUnit1004 // Test methods should not be skipped

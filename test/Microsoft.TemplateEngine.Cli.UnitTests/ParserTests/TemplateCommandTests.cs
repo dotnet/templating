@@ -57,7 +57,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
                 Assert.Equal(2, e.ParameterErrors.Count);
                 Assert.Equal(templateGroup.Templates.Single(), e.Template);
 
-                return Verifier.Verify(e.Message);
+                return Verify(e.Message);
             }
 
             Assert.True(false, "should not land here");

@@ -62,7 +62,7 @@ namespace Dotnet_new3.IntegrationTests
 
             commandResult.Should().Fail();
 
-            return Verifier.Verify(commandResult.StdErr)
+            return Verify(commandResult.StdErr)
                 .UseTextForParameters("common")
                 .DisableRequireUniquePrefix();
         }
