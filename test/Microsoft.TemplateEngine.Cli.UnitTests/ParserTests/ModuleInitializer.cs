@@ -11,8 +11,8 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
         public static void Init()
         {
             VerifierSettings.DerivePathInfo(
-                (sourceFile, projectDirectory, type, method) => new(
-                    directory: Path.Combine(projectDirectory, "Approvals"),
+                (_, _, type, method) => new(
+                    directory: "Approvals",
                     typeName: type.Name,
                     methodName: method.Name));
         }
