@@ -1,6 +1,7 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.IO.Compression;
 using FluentAssertions;
 using Microsoft.NET.TestFramework.Assertions;
@@ -344,6 +345,32 @@ namespace Dotnet_new3.IntegrationTests
                 .Pass()
                 .And.NotHaveStdErr()
                 .And.HaveStdOutContaining("File actions would have been taken:");
+        }
+
+        [Fact]
+        public void CannotInstantiateTemplateWhenFolderIsRemoved()
+        {
+            string home = TestUtils.CreateTemporaryFolder("Home");
+            string workingDir = TestUtils.CreateTemporaryFolder();
+            string templateLocation = Path.Combine(workingDir, "template");
+            TestUtils.DirectoryCopy(TestUtils.GetTestTemplateLocation("TemplateWithSourceName"), templateLocation, true);
+            new DotnetNewCommand(_log, "install", templateLocation)
+                .WithCustomHive(home)
+                .WithWorkingDirectory(workingDir)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And.NotHaveStdErr();
+
+            Directory.Delete(templateLocation, true);
+            // Template should be removed from the template list, and it's unknown template now.
+            // On initiation error "No templates found matching:" should appear.
+            new DotnetNewCommand(_log, "TestAssets.TemplateWithSourceName")
+                .WithCustomHive(home)
+                .Execute()
+                .Should()
+                .Fail()
+                .And.HaveStdErrContaining("No templates found matching: 'TestAssets.TemplateWithSourceName'.");
         }
     }
 }

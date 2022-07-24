@@ -650,5 +650,38 @@ Worker Service                                worker         [C#],F#     Common/
                     .And.NotHaveStdErrContaining($"Unrecognized command or argument(s): '{arg}'");
             }
         }
+
+        [Fact]
+        public void DonnotShowTemplateWhenFolderIsRemoved()
+        {
+            string home = TestUtils.CreateTemporaryFolder("Home");
+            string workingDir = TestUtils.CreateTemporaryFolder();
+            string templateLocation = Path.Combine(workingDir, "template");
+            TestUtils.DirectoryCopy(TestUtils.GetTestTemplateLocation("TemplateWithSourceName"), templateLocation, true);
+            new DotnetNewCommand(_log, "install", templateLocation)
+                .WithCustomHive(home)
+                .WithWorkingDirectory(workingDir)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And.NotHaveStdErr();
+            new DotnetNewCommand(_log, "list")
+                .WithCustomHive(home)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And.NotHaveStdErr()
+                .And.HaveStdOutContaining($"These templates matched your input:")
+                .And.HaveStdOutMatching("TemplateWithSourceName\\s+TestAssets\\.TemplateWithSourceName\\s+Test Asset");
+
+            Directory.Delete(templateLocation, true);
+            new DotnetNewCommand(_log, "list")
+                .WithCustomHive(home)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And.NotHaveStdErr()
+                .And.NotHaveStdOutMatching("TemplateWithSourceName\\s+TestAssets\\.TemplateWithSourceName\\s+Test Asset");
+        }
     }
 }
