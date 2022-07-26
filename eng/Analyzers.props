@@ -7,7 +7,6 @@
   </PropertyGroup>
   <ItemGroup Condition="'$(EnableAnalyzers)' == 'true'">
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Net.Compilers.Toolset" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeStyle" PrivateAssets="all" />
     <PackageReference Include="StyleCop.Analyzers" PrivateAssets="all" />
     <PackageReference Condition="'$(EnablePublicApiAnalyzer)' == 'true'" Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />

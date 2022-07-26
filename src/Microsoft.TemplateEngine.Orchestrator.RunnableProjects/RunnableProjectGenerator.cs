@@ -26,7 +26,7 @@ using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
-    internal class RunnableProjectGenerator : IGenerator
+    public sealed class RunnableProjectGenerator : IGenerator
     {
         internal const string HostTemplateFileConfigBaseName = ".host.json";
         internal const string TemplateConfigDirectoryName = ".template.config";
@@ -36,19 +36,19 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         internal const string GeneratorVersion = "1.0.0.0";
         private static readonly Guid GeneratorId = new Guid("0C434DF7-E2CB-4DEE-B216-D7C58C8EB4B3");
 
-        public Guid Id => GeneratorId;
+        Guid IIdentifiedComponent.Id => GeneratorId;
 
         /// <summary>
         /// Converts the raw, string version of a parameter to a strongly typed value. If the parameter has a datatype specified, use that. Otherwise attempt to infer the type.
         /// Throws a TemplateParamException if the conversion fails for any reason.
         /// </summary>
-        public object? ConvertParameterValueToType(IEngineEnvironmentSettings environmentSettings, ITemplateParameter parameter, string untypedValue, out bool valueResolutionError)
+        object? IGenerator.ConvertParameterValueToType(IEngineEnvironmentSettings environmentSettings, ITemplateParameter parameter, string untypedValue, out bool valueResolutionError)
         {
             return ParameterConverter.ConvertParameterValueToType(environmentSettings.Host, parameter, untypedValue, out valueResolutionError);
         }
 
         [Obsolete("Replaced by CreateAsync with IEvaluatedParameterSetData", false)]
-        public Task<ICreationResult> CreateAsync(
+        Task<ICreationResult> IGenerator.CreateAsync(
             IEngineEnvironmentSettings environmentSettings,
             ITemplate template,
             IParameterSet parameters,
@@ -57,11 +57,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         {
             var builder = (IParameterSetBuilder)parameters;
             builder.EvaluateConditionalParameters(environmentSettings.Host.Logger);
-            return CreateAsync(environmentSettings, template, builder.Build(), targetDirectory, cancellationToken);
+            return ((IGenerator)this).CreateAsync(environmentSettings, template, builder.Build(), targetDirectory, cancellationToken);
         }
 
         [Obsolete("Replaced by GetCreationEffectsAsync with IEvaluatedParameterSetData", false)]
-        public Task<ICreationEffects> GetCreationEffectsAsync(
+        Task<ICreationEffects> IGenerator.GetCreationEffectsAsync(
             IEngineEnvironmentSettings environmentSettings,
             ITemplate template,
             IParameterSet parameters,
@@ -70,10 +70,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         {
             var builder = (IParameterSetBuilder)parameters;
             builder.EvaluateConditionalParameters(environmentSettings.Host.Logger);
-            return GetCreationEffectsAsync(environmentSettings, template, builder.Build(), targetDirectory, cancellationToken);
+            return ((IGenerator)this).GetCreationEffectsAsync(environmentSettings, template, builder.Build(), targetDirectory, cancellationToken);
         }
 
-        public Task<ICreationResult> CreateAsync(
+        Task<ICreationResult> IGenerator.CreateAsync(
             IEngineEnvironmentSettings environmentSettings,
             ITemplate templateData,
             IEvaluatedParameterSetData parameters,
@@ -95,40 +95,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 cancellationToken);
         }
 
-        public async Task<ICreationResult> CreateAsync(
-            IEngineEnvironmentSettings environmentSettings,
-            IRunnableProjectConfig runnableProjectConfig,
-            IDirectory templateSourceRoot,
-            IEvaluatedParameterSetData parameters,
-            string targetDirectory,
-            CancellationToken cancellationToken)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            // RemoveDisabledParamsFromTemplate((ITemplate)runnableProjectConfig, parameters);
-
-            IVariableCollection variables = SetupVariables(environmentSettings, parameters, runnableProjectConfig.OperationConfig.VariableSetup);
-            await runnableProjectConfig.EvaluateBindSymbolsAsync(environmentSettings, variables, cancellationToken).ConfigureAwait(false);
-
-            cancellationToken.ThrowIfCancellationRequested();
-            ProcessMacros(environmentSettings, runnableProjectConfig.OperationConfig, variables);
-            runnableProjectConfig.Evaluate(variables);
-
-            IOrchestrator basicOrchestrator = new Core.Util.Orchestrator(environmentSettings.Host.Logger, environmentSettings.Host.FileSystem);
-            RunnableProjectOrchestrator orchestrator = new RunnableProjectOrchestrator(basicOrchestrator);
-
-            GlobalRunSpec runSpec = new GlobalRunSpec(templateSourceRoot, environmentSettings.Components, variables, runnableProjectConfig.OperationConfig, runnableProjectConfig.SpecialOperationConfig, runnableProjectConfig.IgnoreFileNames);
-
-            foreach (FileSourceMatchInfo source in runnableProjectConfig.Sources)
-            {
-                runSpec.SetupFileSource(source);
-                string target = Path.Combine(targetDirectory, source.Target);
-                orchestrator.Run(runSpec, templateSourceRoot.DirectoryInfo(source.Source), target);
-            }
-
-            return GetCreationResult(environmentSettings.Host.Logger, runnableProjectConfig, variables);
-        }
-
         /// <summary>
         /// Performs the dry-run of the template instantiation to evaluate the primary outputs, post actions to be applied and file changes to be made when executing the template with specified parameters.
         /// </summary>
@@ -138,7 +104,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         /// <param name="targetDirectory">the output path for the template.</param>
         /// <param name="cancellationToken">cancellationToken.</param>
         /// <returns>the primary outputs, post actions and file changes that will be made when executing the template with specified parameters.</returns>
-        public async Task<ICreationEffects> GetCreationEffectsAsync(
+        async Task<ICreationEffects> IGenerator.GetCreationEffectsAsync(
             IEngineEnvironmentSettings environmentSettings,
             ITemplate templateData,
             IEvaluatedParameterSetData parameters,
@@ -190,7 +156,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         }
 
         [Obsolete("Replaced by ParameterSetBuilder", false)]
-        public IParameterSet GetParametersForTemplate(IEngineEnvironmentSettings environmentSettings, ITemplate template)
+        IParameterSet IGenerator.GetParametersForTemplate(IEngineEnvironmentSettings environmentSettings, ITemplate template)
         {
             return (IParameterSet)ParameterSetBuilder.CreateWithDefaults(template.Parameters, environmentSettings);
         }
@@ -201,7 +167,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         /// <param name="source">the mount point to scan for the templates.</param>
         /// <param name="localizations">found localization definitions.</param>
         /// <returns>the list of found templates and list of found localizations via <paramref name="localizations"/>.</returns>
-        public IList<ITemplate> GetTemplatesAndLangpacksFromDir(IMountPoint source, out IList<ILocalizationLocator> localizations)
+        IList<ITemplate> IGenerator.GetTemplatesAndLangpacksFromDir(IMountPoint source, out IList<ILocalizationLocator> localizations)
         {
             _ = source ?? throw new ArgumentNullException(nameof(source));
 
@@ -290,7 +256,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         /// <param name="hostTemplateConfigFile">the template host configuration entry, should be a file.</param>
         /// <param name="baselineName">the baseline to load.</param>
         /// <returns>true when template can be loaded, false otherwise. The loaded template is returned in <paramref name="template"/>.</returns>
-        public bool TryGetTemplateFromConfigInfo(IFileSystemInfo templateFileConfig, out ITemplate? template, IFileSystemInfo? localeFileConfig = null, IFile? hostTemplateConfigFile = null, string? baselineName = null)
+        bool IGenerator.TryGetTemplateFromConfigInfo(IFileSystemInfo templateFileConfig, out ITemplate? template, IFileSystemInfo? localeFileConfig, IFile? hostTemplateConfigFile, string? baselineName)
         {
             _ = templateFileConfig ?? throw new ArgumentNullException(nameof(templateFileConfig));
             ILogger logger = templateFileConfig.MountPoint.EnvironmentSettings.Host.LoggerFactory.CreateLogger<RunnableProjectGenerator>();
@@ -332,6 +298,40 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
             template = null;
             return false;
+        }
+
+        internal async Task<ICreationResult> CreateAsync(
+            IEngineEnvironmentSettings environmentSettings,
+            IRunnableProjectConfig runnableProjectConfig,
+            IDirectory templateSourceRoot,
+            IEvaluatedParameterSetData parameters,
+            string targetDirectory,
+            CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            // RemoveDisabledParamsFromTemplate((ITemplate)runnableProjectConfig, parameters);
+
+            IVariableCollection variables = SetupVariables(environmentSettings, parameters, runnableProjectConfig.OperationConfig.VariableSetup);
+            await runnableProjectConfig.EvaluateBindSymbolsAsync(environmentSettings, variables, cancellationToken).ConfigureAwait(false);
+
+            cancellationToken.ThrowIfCancellationRequested();
+            ProcessMacros(environmentSettings, runnableProjectConfig.OperationConfig, variables);
+            runnableProjectConfig.Evaluate(variables);
+
+            IOrchestrator basicOrchestrator = new Core.Util.Orchestrator(environmentSettings.Host.Logger, environmentSettings.Host.FileSystem);
+            RunnableProjectOrchestrator orchestrator = new RunnableProjectOrchestrator(basicOrchestrator);
+
+            GlobalRunSpec runSpec = new GlobalRunSpec(templateSourceRoot, environmentSettings.Components, variables, runnableProjectConfig.OperationConfig, runnableProjectConfig.SpecialOperationConfig, runnableProjectConfig.IgnoreFileNames);
+
+            foreach (FileSourceMatchInfo source in runnableProjectConfig.Sources)
+            {
+                runSpec.SetupFileSource(source);
+                string target = Path.Combine(targetDirectory, source.Target);
+                orchestrator.Run(runSpec, templateSourceRoot.DirectoryInfo(source.Source), target);
+            }
+
+            return GetCreationResult(environmentSettings.Host.Logger, runnableProjectConfig, variables);
         }
 
         // In the future the RunableProjectConfig should be refactored so that it doesn't access symbols for information that should be possible
