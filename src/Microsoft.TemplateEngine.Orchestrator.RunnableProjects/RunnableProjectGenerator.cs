@@ -105,7 +105,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            RemoveDisabledParamsFromTemplate((ITemplate)runnableProjectConfig, parameters);
+            // RemoveDisabledParamsFromTemplate((ITemplate)runnableProjectConfig, parameters);
 
             IVariableCollection variables = SetupVariables(environmentSettings, parameters, runnableProjectConfig.OperationConfig.VariableSetup);
             await runnableProjectConfig.EvaluateBindSymbolsAsync(environmentSettings, variables, cancellationToken).ConfigureAwait(false);
