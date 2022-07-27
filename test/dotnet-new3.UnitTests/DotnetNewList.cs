@@ -571,8 +571,8 @@ namespace Dotnet_new3.IntegrationTests
         [InlineData("foo list bar", "foo", "bar")]
         [InlineData("foo --list bar --language F#", "foo", "bar")]
         [InlineData("foo --list --columns-all bar", "foo", "bar")]
-        [InlineData("foo --list --columns-all --framework net7.0 bar", "bar|net7.0|foo", "--framework")]
-        [InlineData("foo --list --columns-all -other-param --framework net7.0 bar", "bar|--framework|net7.0|foo", "-other-param")]
+        [InlineData("foo --list --columns-all --framework net6.0 bar", "bar|net6.0|foo", "--framework")]
+        [InlineData("foo --list --columns-all -other-param --framework net6.0 bar", "bar|--framework|net6.0|foo", "-other-param")]
         public void CannotShowListOnParseError(string command, string invalidArguments, string validArguments)
         {
             var commandResult = new DotnetNewCommand(_log, command.Split())
