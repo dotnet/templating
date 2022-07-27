@@ -5,12 +5,11 @@
 
 using System;
 using System.Collections.Generic;
-using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
+namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
 {
-    internal abstract class BaseValueSymbol : BaseReplaceSymbol
+    public abstract class BaseValueSymbol : BaseReplaceSymbol
     {
         /// <summary>
         /// Initializes this instance with given JSON data.
@@ -18,7 +17,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
         /// <param name="name"></param>
         /// <param name="jObject"></param>
         /// <param name="defaultOverride"></param>
-        protected BaseValueSymbol(string name, JObject jObject, string? defaultOverride) : base (jObject, name)
+        private protected BaseValueSymbol(string name, JObject jObject, string? defaultOverride) : base (jObject, name)
         {
             DefaultValue = defaultOverride ?? jObject.ToString(nameof(DefaultValue));
             IsRequired = jObject.ToBool(nameof(IsRequired));
@@ -35,7 +34,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
             }
         }
 
-        protected BaseValueSymbol(BaseValueSymbol clone, SymbolValueFormsModel formsFallback) : base(clone)
+        private protected BaseValueSymbol(BaseValueSymbol clone, SymbolValueFormsModel formsFallback) : base(clone)
         {
             DefaultValue = clone.DefaultValue;
             Forms = clone.Forms.GlobalForms.Count != 0 ? clone.Forms : formsFallback;
@@ -43,18 +42,34 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
             DataType = clone.DataType;
         }
 
-        protected BaseValueSymbol(string name, string? replaces) : base(name, replaces)
+        private protected BaseValueSymbol(string name, string? replaces) : base(name, replaces)
         {
             Forms = SymbolValueFormsModel.Default;
         }
 
-        internal string? DefaultValue { get; init; }
+        /// <summary>
+        /// Gets default value of the symbol.
+        /// Corresponds to "defaultValue" JSON property.
+        /// </summary>
+        public string? DefaultValue { get; internal init; }
 
-        internal SymbolValueFormsModel Forms { get; init; }
+        /// <summary>
+        /// Gets the forms defined for the symbol
+        /// Corresponds to "forms" JSON property.
+        /// </summary>
+        public SymbolValueFormsModel Forms { get; internal init; }
 
-        internal bool IsRequired { get; init; }
+        /// <summary>
+        /// Specifies if the symbol is required.
+        /// Corresponds to "isRequired" JSON property.
+        /// </summary>
+        public bool IsRequired { get; internal init; }
 
-        internal string? DataType { get; init; }
+        /// <summary>
+        /// Gets the data type of the symbol.
+        /// Corresponds to "datatype" JSON property.
+        /// </summary>
+        public string? DataType { get; internal init; }
 
     }
 }

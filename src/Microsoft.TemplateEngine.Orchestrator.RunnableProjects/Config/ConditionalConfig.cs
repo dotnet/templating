@@ -11,7 +11,7 @@ using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config
+namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig
 {
     internal class ConditionalConfig : IOperationConfig
     {
@@ -19,22 +19,23 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config
 
         public Guid Id => new Guid("3E8BCBF0-D631-45BA-A12D-FBF1DE03AA38");
 
-        public IEnumerable<IOperationProvider> ConfigureFromJObject(JObject rawConfiguration, IDirectory templateRoot)
+        public IEnumerable<IOperationProvider> ConfigureFromJson(string rawConfiguration, IDirectory templateRoot)
         {
-            string commentStyle = rawConfiguration.ToString("style");
+            JObject json = JObject.Parse(rawConfiguration);
+            string commentStyle = json.ToString("style");
             IEnumerable<IOperationProvider> operations = null;
 
             if (string.IsNullOrEmpty(commentStyle) || string.Equals(commentStyle, "custom", StringComparison.OrdinalIgnoreCase))
             {
-                operations = ConditionalCustomConfig.ConfigureFromJObject(rawConfiguration);
+                operations = ConditionalCustomConfig.ConfigureFromJObject(json);
             }
             else if (string.Equals(commentStyle, "line", StringComparison.OrdinalIgnoreCase))
             {
-                operations = ConditionalLineCommentConfig.ConfigureFromJObject(rawConfiguration);
+                operations = ConditionalLineCommentConfig.ConfigureFromJObject(json);
             }
             else if (string.Equals(commentStyle, "block", StringComparison.OrdinalIgnoreCase))
             {
-                operations = ConditionalBlockCommentConfig.ConfigureFromJObject(rawConfiguration);
+                operations = ConditionalBlockCommentConfig.ConfigureFromJObject(json);
             }
             else
             {

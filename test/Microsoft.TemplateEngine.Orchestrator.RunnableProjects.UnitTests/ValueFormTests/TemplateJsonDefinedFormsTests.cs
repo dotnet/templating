@@ -5,6 +5,7 @@ using System.Linq;
 using FakeItEasy;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Core.Contracts;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config;
 using Microsoft.TemplateEngine.TestHelper;
 using Newtonsoft.Json.Linq;
@@ -40,7 +41,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Value
 }
 ";
             JObject configObj = JObject.Parse(templateJson);
-            SimpleConfigModel configModel = SimpleConfigModel.FromJObject(configObj);
+            TemplateConfigModel configModel = TemplateConfigModel.FromJObject(configObj);
             IGlobalRunConfig runConfig = null;
 
             try
@@ -83,7 +84,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Value
 }
 ";
             JObject configObj = JObject.Parse(templateJson);
-            SimpleConfigModel configModel = SimpleConfigModel.FromJObject(configObj);
+            TemplateConfigModel configModel = TemplateConfigModel.FromJObject(configObj);
             IGlobalRunConfig runConfig = null;
 
             try

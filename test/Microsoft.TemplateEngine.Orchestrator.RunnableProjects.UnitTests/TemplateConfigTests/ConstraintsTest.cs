@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Microsoft.TemplateEngine.TestHelper;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -54,7 +55,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
                 }
             };
 
-            var model = SimpleConfigModel.FromJObject(JObject.FromObject(json));
+            var model = TemplateConfigModel.FromJObject(JObject.FromObject(json));
 
             Assert.Equal(4, model.Constraints.Count);
             Assert.Equal("con1", model.Constraints[0].Type);
@@ -85,7 +86,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
 
             List<(LogLevel, string)> loggedMessages = new List<(LogLevel, string)>();
             InMemoryLoggerProvider loggerProvider = new InMemoryLoggerProvider(loggedMessages);
-            var model = SimpleConfigModel.FromJObject(JObject.FromObject(json), loggerProvider.CreateLogger("test"));
+            var model = TemplateConfigModel.FromJObject(JObject.FromObject(json), loggerProvider.CreateLogger("test"));
             Assert.Empty(model.Constraints);
             Assert.Single(loggedMessages);
             Assert.Equal($"Constraint definition '{JObject.FromObject(new { args = "arg" }).ToString()}' does not contain mandatory property 'type'.", loggedMessages.Single().Item2);
@@ -105,7 +106,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
 
             List<(LogLevel, string)> loggedMessages = new List<(LogLevel, string)>();
             InMemoryLoggerProvider loggerProvider = new InMemoryLoggerProvider(loggedMessages);
-            var model = SimpleConfigModel.FromJObject(JObject.FromObject(json), loggerProvider.CreateLogger("test"));
+            var model = TemplateConfigModel.FromJObject(JObject.FromObject(json), loggerProvider.CreateLogger("test"));
             Assert.Empty(model.Constraints);
             Assert.Single(loggedMessages);
             Assert.Equal("'constraints' should contain objects.", loggedMessages.Single().Item2);

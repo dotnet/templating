@@ -10,7 +10,7 @@ using Microsoft.TemplateEngine.Core.Operations;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config
+namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig
 {
     internal class FlagsConfig : IOperationConfig
     {
@@ -25,16 +25,17 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config
 
         public Guid Id => new Guid("A1E27A4B-9608-47F1-B3B8-F70DF62DC521");
 
-        public IEnumerable<IOperationProvider> ConfigureFromJObject(JObject rawConfiguration, IDirectory templateRoot)
+        public IEnumerable<IOperationProvider> ConfigureFromJson(string rawConfiguration, IDirectory templateRoot)
         {
-            string flag = rawConfiguration.ToString("name");
-            string on = rawConfiguration.ToString("on") ?? string.Empty;
-            string off = rawConfiguration.ToString("off") ?? string.Empty;
-            string onNoEmit = rawConfiguration.ToString("onNoEmit") ?? string.Empty;
-            string offNoEmit = rawConfiguration.ToString("offNoEmit") ?? string.Empty;
-            string defaultStr = rawConfiguration.ToString("default");
-            string id = rawConfiguration.ToString("id");
-            bool onByDefault = rawConfiguration.ToBool("onByDefault");
+            JObject json = JObject.Parse(rawConfiguration);
+            string flag = json.ToString("name");
+            string on = json.ToString("on") ?? string.Empty;
+            string off = json.ToString("off") ?? string.Empty;
+            string onNoEmit = json.ToString("onNoEmit") ?? string.Empty;
+            string offNoEmit = json.ToString("offNoEmit") ?? string.Empty;
+            string defaultStr = json.ToString("default");
+            string id = json.ToString("id");
+            bool onByDefault = json.ToBool("onByDefault");
             bool? @default = null;
 
             if (defaultStr != null)

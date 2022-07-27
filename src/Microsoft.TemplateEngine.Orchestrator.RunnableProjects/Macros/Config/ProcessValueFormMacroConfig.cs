@@ -2,8 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
-using Microsoft.TemplateEngine.Core.Contracts;
-using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config
 {

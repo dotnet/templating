@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 #endif
 using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
@@ -136,6 +137,20 @@ namespace Microsoft.TemplateEngine
             return result;
         }
 
+        internal static IReadOnlyList<string> ToStringReadOnlyList(this JObject jObject, string propertyName, IReadOnlyList<string>? defaultValue = null)
+        {
+            if (defaultValue == null)
+            {
+                defaultValue = Array.Empty<string>();
+            }
+            JToken? token = jObject.Get<JToken>(propertyName);
+            if (token == null)
+            {
+                return defaultValue;
+            }
+            return token.JTokenStringOrArrayToCollection(defaultValue) ?? defaultValue;
+        }
+
         internal static IEnumerable<JProperty> PropertiesOf(this JToken? token, string? key = null)
         {
             JObject? obj = token as JObject;
@@ -208,6 +223,19 @@ namespace Microsoft.TemplateEngine
             foreach (JProperty property in token.PropertiesOf(propertyName))
             {
                 result[property.Name] = property.Value;
+            }
+
+            return result;
+        }
+
+        // Leaves the values as JTokens serialized to strings
+        internal static IReadOnlyDictionary<string, string> ToJTokenStringDictionary(this JToken token, StringComparer? comparaer = null, string? propertyName = null)
+        {
+            Dictionary<string, string> result = new Dictionary<string, string>(comparaer ?? StringComparer.Ordinal);
+
+            foreach (JProperty property in token.PropertiesOf(propertyName))
+            {
+                result[property.Name] = property.Value.ToString(Formatting.None);
             }
 
             return result;
@@ -328,7 +356,7 @@ namespace Microsoft.TemplateEngine
             }
         }
 
-        internal static IReadOnlyList<string> JTokenStringOrArrayToCollection(this JToken? token, string[] defaultSet)
+        internal static IReadOnlyList<string> JTokenStringOrArrayToCollection(this JToken? token, IReadOnlyList<string> defaultSet)
         {
             if (token == null)
             {

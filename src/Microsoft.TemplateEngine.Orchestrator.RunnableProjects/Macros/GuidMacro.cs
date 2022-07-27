@@ -71,12 +71,17 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             {
                 throw new InvalidCastException("Couldn't cast the rawConfig as a GeneratedSymbolDeferredMacroConfig");
             }
+            string? format = null;
+            string? defaultFormat = null;
+            if (deferredConfig.Parameters.TryGetValue("format", out string? formatToken))
+            {
+                format = JToken.Parse(formatToken).ToString();
+            }
 
-            deferredConfig.Parameters.TryGetValue("format", out JToken? formatToken);
-            string? format = formatToken?.ToString();
-
-            deferredConfig.Parameters.TryGetValue("defaultFormat", out JToken defaultFormatToken);
-            string? defaultFormat = defaultFormatToken?.ToString();
+            if (deferredConfig.Parameters.TryGetValue("defaultFormat", out string? defaultFormatToken))
+            {
+                defaultFormat = JToken.Parse(defaultFormatToken).ToString();
+            }
 
             IMacroConfig realConfig = new GuidMacroConfig(deferredConfig.VariableName, deferredConfig.DataType, format, defaultFormat);
             return realConfig;

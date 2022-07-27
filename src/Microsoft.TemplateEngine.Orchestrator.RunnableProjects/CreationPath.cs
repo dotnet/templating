@@ -9,6 +9,7 @@ using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Core.Expressions.Cpp2;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
@@ -26,7 +27,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         public string Path { get; }
 
-        internal static IReadOnlyList<ICreationPath> ListFromModel(ILogger logger, IReadOnlyList<ICreationPathModel> modelList, IVariableCollection rootVariableCollection)
+        internal static IReadOnlyList<ICreationPath> ListFromModel(ILogger logger, IReadOnlyList<PrimaryOutputModel> modelList, IVariableCollection rootVariableCollection)
         {
             List<ICreationPath> pathList = new List<ICreationPath>();
 
@@ -35,15 +36,18 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 rootVariableCollection = new VariableCollection();
             }
 
-            foreach (ICreationPathModel model in modelList)
+            foreach (PrimaryOutputModel model in modelList)
             {
                 // Note: this check is probably superfluous. The Model has evaluation info.
                 // OTOH: this is probaby a cleaner way to do it.
                 if (string.IsNullOrEmpty(model.Condition)
                     || Cpp2StyleEvaluatorDefinition.EvaluateFromString(logger, model.Condition, rootVariableCollection))
                 {
-                    ICreationPath path = new CreationPath(model.PathResolved);
-                    pathList.Add(path);
+                    if (model.PathResolved != null)
+                    {
+                        ICreationPath path = new CreationPath(model.PathResolved);
+                        pathList.Add(path);
+                    }
                 }
             }
 

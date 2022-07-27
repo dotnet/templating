@@ -71,10 +71,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
         {
             string variableName = "myString";
             string sourceVariable = "sourceString";
+            string sourceVariableConfig = JToken.FromObject(sourceVariable).ToString(Newtonsoft.Json.Formatting.None);
+            string toLowerConfig = JToken.FromObject(false).ToString(Newtonsoft.Json.Formatting.None);
 
-            Dictionary<string, JToken> jsonParameters = new Dictionary<string, JToken>();
-            jsonParameters.Add("source", sourceVariable);
-            jsonParameters.Add("toLower", false);
+            Dictionary<string, string> jsonParameters = new Dictionary<string, string>();
+            jsonParameters.Add("source", sourceVariableConfig);
+            jsonParameters.Add("toLower", toLowerConfig);
             GeneratedSymbolDeferredMacroConfig deferredConfig = new GeneratedSymbolDeferredMacroConfig("CaseChangeMacro", null, variableName, jsonParameters);
 
             CaseChangeMacro macro = new CaseChangeMacro();

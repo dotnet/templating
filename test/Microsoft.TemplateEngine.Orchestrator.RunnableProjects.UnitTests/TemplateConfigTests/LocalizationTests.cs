@@ -11,6 +11,7 @@ using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Microsoft.TemplateEngine.TestHelper;
 using Newtonsoft.Json;
 using Xunit;
@@ -320,7 +321,7 @@ false,
 
             using IMountPoint mountPoint = GetMountPointForPath(tempFolder, environmentSettings);
 
-            SimpleConfigModel baseConfig = new SimpleConfigModel()
+            TemplateConfigModel baseConfig = new TemplateConfigModel()
             {
                 Identity = "Test",
                 PostActionModels = new List<PostActionModel>
@@ -352,7 +353,7 @@ false,
         [Fact]
         public void CanValidatePostActionWithDefaultInstructionLocalization()
         {
-            SimpleConfigModel baseConfig = new SimpleConfigModel()
+            TemplateConfigModel baseConfig = new TemplateConfigModel()
             {
                 Identity = "Test",
                 PostActionModels = new List<PostActionModel>
@@ -388,7 +389,7 @@ false,
         [Fact]
         public void CannotValidatePostActionWithExtraInstructionLocalization()
         {
-            SimpleConfigModel baseConfig = new SimpleConfigModel()
+            TemplateConfigModel baseConfig = new TemplateConfigModel()
             {
                 Identity = "Test",
                 PostActionModels = new List<PostActionModel>
@@ -436,7 +437,7 @@ false,
         [Fact]
         public void CannotValidateExtraPostActionLocalization()
         {
-            SimpleConfigModel baseConfig = new SimpleConfigModel()
+            TemplateConfigModel baseConfig = new TemplateConfigModel()
             {
                 Identity = "Test",
                 PostActionModels = new List<PostActionModel>

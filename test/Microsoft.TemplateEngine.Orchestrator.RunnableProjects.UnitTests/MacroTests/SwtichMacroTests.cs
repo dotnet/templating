@@ -74,10 +74,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
                 }
             ]";
 
-            Dictionary<string, JToken> jsonParameters = new Dictionary<string, JToken>();
-            jsonParameters.Add("evaluator", evaluator);
-            jsonParameters.Add("datatype", dataType);
-            jsonParameters.Add("cases", JArray.Parse(switchCases));
+            Dictionary<string, string> jsonParameters = new Dictionary<string, string>();
+            jsonParameters.Add("evaluator", JToken.FromObject(evaluator).ToString(Newtonsoft.Json.Formatting.None));
+            jsonParameters.Add("datatype", JToken.FromObject(dataType).ToString(Newtonsoft.Json.Formatting.None));
+            jsonParameters.Add("cases", switchCases);
 
             GeneratedSymbolDeferredMacroConfig deferredConfig = new GeneratedSymbolDeferredMacroConfig("SwitchMacro", null, variableName, jsonParameters);
 

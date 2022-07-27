@@ -3,11 +3,12 @@
 
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms
 {
-    internal class DefaultSafeNameValueFormModel : IValueForm
+    internal class DefaultSafeNameValueFormModel : ISerializableValueForm
     {
         internal const string FormName = "safe_name";
         private readonly string _name;
@@ -31,7 +32,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms
             return new DefaultSafeNameValueFormModel(name);
         }
 
-        public virtual string Process(IReadOnlyDictionary<string, IValueForm> forms, string value)
+        public virtual string Process(string value, IReadOnlyDictionary<string, IValueForm> forms)
         {
             string workingValue = Regex.Replace(value, @"(^\s+|\s+$)", "");
             workingValue = Regex.Replace(workingValue, @"(((?<=\.)|^)(?=\d)|\W)", "_");

@@ -31,7 +31,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             }
 
             ConditionEvaluator evaluator = EvaluatorSelector.Select(config.Evaluator, Cpp2StyleEvaluatorDefinition.Evaluate);
-
             byte[] data = Encoding.UTF8.GetBytes(config.Value);
             int len = data.Length;
             int pos = 0;

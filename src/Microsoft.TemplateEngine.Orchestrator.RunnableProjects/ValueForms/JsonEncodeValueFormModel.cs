@@ -2,12 +2,13 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms
 {
-    internal class JsonEncodeValueFormModel : IValueForm
+    internal class JsonEncodeValueFormModel : ISerializableValueForm
     {
         internal JsonEncodeValueFormModel()
         {
@@ -27,7 +28,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms
             return new JsonEncodeValueFormModel(name);
         }
 
-        public string Process(IReadOnlyDictionary<string, IValueForm> forms, string value)
+        public string Process(string value, IReadOnlyDictionary<string, IValueForm> forms)
         {
             return JsonConvert.SerializeObject(value);
         }

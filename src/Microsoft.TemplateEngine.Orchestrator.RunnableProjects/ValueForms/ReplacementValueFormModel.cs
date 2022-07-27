@@ -3,11 +3,12 @@
 
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms
 {
-    internal class ReplacementValueFormModel : IValueForm
+    internal class ReplacementValueFormModel : ISerializableValueForm
     {
         private readonly Regex _match;
         private readonly string _replacment;
@@ -32,7 +33,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms
             return new ReplacementValueFormModel(name, configuration.ToString("pattern"), configuration.ToString("replacement"));
         }
 
-        public string Process(IReadOnlyDictionary<string, IValueForm> forms, string value)
+        public string Process(string value, IReadOnlyDictionary<string, IValueForm> forms)
         {
             return _match.Replace(value, _replacment);
         }

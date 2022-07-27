@@ -72,13 +72,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
             string referenceSymbolValue = "referenceValue";
             string constantValue = "constantValue";
 
-            Dictionary<string, JToken> jsonParameters = new Dictionary<string, JToken>();
+            Dictionary<string, string> jsonParameters = new Dictionary<string, string>();
             string symbols =
                 $"[ {{\"type\":\"const\" , \"value\":\"{constantValue}\"  }}, {{\"type\":\"ref\" , \"value\":\"{referenceSymbolName}\"  }} ]";
-            jsonParameters.Add("symbols", JArray.Parse(symbols));
+            jsonParameters.Add("symbols", (symbols));
             if (!string.IsNullOrEmpty(separator))
             {
-                jsonParameters.Add("separator", separator);
+                jsonParameters.Add("separator", JToken.FromObject(separator).ToString(Newtonsoft.Json.Formatting.None));
             }
 
             GeneratedSymbolDeferredMacroConfig deferredConfig = new GeneratedSymbolDeferredMacroConfig("JoinMacro", null, variableName, jsonParameters);

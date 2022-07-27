@@ -11,7 +11,7 @@ using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config
+namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig
 {
     internal class IncludeConfig : IOperationConfig
     {
@@ -19,12 +19,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config
 
         public Guid Id => new Guid("3FAE1942-7257-4247-B44D-2DDE07CB4A4A");
 
-        public IEnumerable<IOperationProvider> ConfigureFromJObject(JObject rawConfiguration, IDirectory templateRoot)
+        public IEnumerable<IOperationProvider> ConfigureFromJson(string rawConfiguration, IDirectory templateRoot)
         {
-            string startToken = rawConfiguration.ToString("start");
-            string endToken = rawConfiguration.ToString("end");
-            string id = rawConfiguration.ToString("id");
-            bool onByDefault = rawConfiguration.ToBool("onByDefault");
+            JObject json = JObject.Parse(rawConfiguration);
+            string startToken = json.ToString("start");
+            string endToken = json.ToString("end");
+            string id = json.ToString("id");
+            bool onByDefault = json.ToBool("onByDefault");
 
             yield return new Include(startToken.TokenConfig(), endToken.TokenConfig(), x => templateRoot.FileInfo(x).OpenRead(), id, onByDefault);
         }

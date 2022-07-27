@@ -13,6 +13,7 @@ using FakeItEasy;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Components;
 using Microsoft.TemplateEngine.Abstractions.Mount;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.TemplateConfigTests;
 using Microsoft.TemplateEngine.TestHelper;
@@ -42,7 +43,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
 
             Guid inputTestGuid = new Guid("12aa8f4e-a4aa-4ac1-927c-94cb99485ef1");
             string contentFileNamePrefix = "content - ";
-            SimpleConfigModel config = new SimpleConfigModel()
+            TemplateConfigModel config = new TemplateConfigModel()
             {
                 Identity = "test",
                 Guids = new List<Guid>()
@@ -203,7 +204,7 @@ UNKNOWN
             TestFileSystemHelper.WriteTemplateSource(environment, sourceBasePath, templateSourceFiles);
             IMountPoint? sourceMountPoint = TestFileSystemHelper.CreateMountPoint(environment, sourceBasePath);
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
-            SimpleConfigModel configModel = SimpleConfigModel.FromJObject(JObject.Parse(templateConfig));
+            TemplateConfigModel configModel = TemplateConfigModel.FromString(templateConfig);
             IRunnableProjectConfig runnableConfig = new RunnableProjectConfig(environment, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
             IParameterSet parameters = new ParameterSet(runnableConfig);
             ITemplateParameter choiceParameter;
@@ -300,7 +301,7 @@ THIRD
             TestFileSystemHelper.WriteTemplateSource(environment, sourceBasePath, templateSourceFiles);
             IMountPoint? sourceMountPoint = TestFileSystemHelper.CreateMountPoint(environment, sourceBasePath);
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
-            SimpleConfigModel configModel = SimpleConfigModel.FromJObject(JObject.Parse(templateConfig));
+            TemplateConfigModel configModel = TemplateConfigModel.FromString(templateConfig);
             IRunnableProjectConfig runnableConfig = new RunnableProjectConfig(environment, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
             IParameterSet parameters = new ParameterSet(runnableConfig);
             ITemplateParameter choiceParameter;
@@ -447,7 +448,7 @@ Console.WriteLine(""Hello, World!"");
             TestFileSystemHelper.WriteTemplateSource(environment, sourceBasePath, templateSourceFiles);
             IMountPoint? sourceMountPoint = TestFileSystemHelper.CreateMountPoint(environment, sourceBasePath);
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
-            SimpleConfigModel configModel = SimpleConfigModel.FromJObject(JObject.Parse(templateConfig));
+            TemplateConfigModel configModel = TemplateConfigModel.FromString(templateConfig);
             IRunnableProjectConfig runnableConfig = new RunnableProjectConfig(environment, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
             IParameterSet parameters = new ParameterSet(runnableConfig);
             ITemplateParameter choiceParameter;
@@ -558,7 +559,7 @@ Console.WriteLine(""Hello, World!"");
             TestFileSystemHelper.WriteTemplateSource(environment, sourceBasePath, templateSourceFiles);
             IMountPoint? sourceMountPoint = TestFileSystemHelper.CreateMountPoint(environment, sourceBasePath);
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
-            SimpleConfigModel configModel = SimpleConfigModel.FromJObject(JObject.Parse(templateConfig));
+            TemplateConfigModel configModel = TemplateConfigModel.FromString(templateConfig);
             IRunnableProjectConfig runnableConfig = new RunnableProjectConfig(environment, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
             IParameterSet parameters = new ParameterSet(runnableConfig);
             ITemplateParameter choiceParameter;

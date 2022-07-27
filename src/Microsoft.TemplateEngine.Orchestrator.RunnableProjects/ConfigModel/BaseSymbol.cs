@@ -8,11 +8,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml.Linq;
 
-namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
+namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
 {
-    internal abstract class BaseSymbol
+    public abstract class BaseSymbol
     {
-        protected BaseSymbol(string name)
+        private protected BaseSymbol(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -21,20 +21,22 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
             Name = name;
         }
 
-        protected BaseSymbol(BaseSymbol clone)
+        private protected BaseSymbol(BaseSymbol clone)
         {
             Name = clone.Name;
         }
 
         /// <summary>
         /// Gets the name of the symbol.
+        /// Correpsonds to key that defines the symbol in "symbols" JSON object.
         /// </summary>
-        internal string Name { get; }
+        public string Name { get; }
 
         /// <summary>
         /// Gets the type of the symbol.
+        /// Correpsonds to "type" JSON property.
         /// </summary>
-        internal abstract string Type { get; }
+        public abstract string Type { get; }
 
     }
 }

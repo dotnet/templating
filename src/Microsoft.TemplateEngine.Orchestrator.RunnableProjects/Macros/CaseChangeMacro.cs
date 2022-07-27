@@ -47,17 +47,17 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
                 throw new InvalidCastException("Couldn't cast the rawConfig as a GeneratedSymbolDeferredMacroConfig");
             }
 
-            if (!deferredConfig.Parameters.TryGetValue("source", out JToken sourceVarToken))
+            if (!deferredConfig.Parameters.TryGetValue("source", out string sourceVarToken))
             {
                 throw new ArgumentNullException("source");
             }
-            string sourceVariable = sourceVarToken.ToString();
+            string sourceVariable = JToken.Parse(sourceVarToken).ToString();
 
             bool lowerCase = true;
             List<KeyValuePair<string, string>> replacementSteps = new List<KeyValuePair<string, string>>();
-            if (deferredConfig.Parameters.TryGetValue("toLower", out JToken stepListToken))
+            if (deferredConfig.Parameters.TryGetValue("toLower", out string stepListToken))
             {
-                lowerCase = stepListToken.ToBool(defaultValue: true);
+                lowerCase = JToken.Parse(stepListToken).ToBool(defaultValue: true);
             }
 
             IMacroConfig realConfig = new CaseChangeMacroConfig(deferredConfig.VariableName, deferredConfig.DataType, sourceVariable, lowerCase);

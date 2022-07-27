@@ -13,7 +13,7 @@ using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config
+namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig
 {
     internal class ReplacementConfig : IOperationConfig
     {
@@ -21,14 +21,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config
 
         public Guid Id => new Guid("62DB7F1F-A10E-46F0-953F-A28A03A81CD1");
 
-        public IEnumerable<IOperationProvider> ConfigureFromJObject(JObject rawConfiguration, IDirectory templateRoot)
+        public IEnumerable<IOperationProvider> ConfigureFromJson(string rawConfiguration, IDirectory templateRoot)
         {
-            string original = rawConfiguration.ToString("original");
-            string replacement = rawConfiguration.ToString("replacement");
-            string id = rawConfiguration.ToString("id");
-            bool onByDefault = rawConfiguration.ToBool("onByDefault");
+            JObject json = JObject.Parse(rawConfiguration);
+            string original = json.ToString("original");
+            string replacement = json.ToString("replacement");
+            string id = json.ToString("id");
+            bool onByDefault = json.ToBool("onByDefault");
 
-            JArray onlyIf = rawConfiguration.Get<JArray>("onlyIf");
+            JArray onlyIf = json.Get<JArray>("onlyIf");
             TokenConfig coreConfig = original.TokenConfigBuilder();
 
             if (onlyIf != null)

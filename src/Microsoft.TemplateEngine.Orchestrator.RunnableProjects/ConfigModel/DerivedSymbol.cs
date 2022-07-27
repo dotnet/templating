@@ -8,11 +8,30 @@ using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
+namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
 {
-    internal class DerivedSymbol : BaseValueSymbol
+    /// <summary>
+    /// Defines the symbol of type "derived".
+    /// </summary>
+    public sealed class DerivedSymbol : BaseValueSymbol
     {
         internal const string TypeName = "derived";
+
+        internal DerivedSymbol(string name, string valueTransform, string valueSource) : base(name, null)
+        {
+            if (string.IsNullOrWhiteSpace(valueTransform))
+            {
+                throw new ArgumentException($"'{nameof(valueTransform)}' cannot be null or whitespace.", nameof(valueTransform));
+            }
+
+            if (string.IsNullOrWhiteSpace(valueSource))
+            {
+                throw new ArgumentException($"'{nameof(valueSource)}' cannot be null or whitespace.", nameof(valueSource));
+            }
+
+            ValueTransform = valueTransform;
+            ValueSource = valueSource;
+        }
 
         internal DerivedSymbol(string name, JObject jObject, string defaultOverride)
             : base(name, jObject, defaultOverride)
@@ -34,10 +53,17 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel
             ValueSource = valueSource!;
         }
 
-        internal override string Type => TypeName;
+        /// <inheritdoc/>
+        public override string Type => TypeName;
 
-        internal string ValueTransform { get; init; }
+        /// <summary>
+        /// Defines the transformation to be applied to <see cref="ValueSource"/> (value form).
+        /// </summary>
+        public string ValueTransform { get; }
 
-        internal string ValueSource { get; init; }
+        /// <summary>
+        /// Defines the variable to be transformed.
+        /// </summary>
+        public string ValueSource { get; }
     }
 }

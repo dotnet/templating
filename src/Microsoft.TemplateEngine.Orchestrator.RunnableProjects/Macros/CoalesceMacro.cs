@@ -27,21 +27,33 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             }
 
             string sourceVariableName = null;
-            if (deferredConfig.Parameters.TryGetValue("sourceVariableName", out JToken sourceVariableToken) && sourceVariableToken.Type == JTokenType.String)
+            if (deferredConfig.Parameters.TryGetValue("sourceVariableName", out string sourceVariableToken))
             {
-                sourceVariableName = sourceVariableToken.ToString();
+                JToken token = JToken.Parse(sourceVariableToken);
+                if (token.Type == JTokenType.String)
+                {
+                    sourceVariableName = token.ToString();
+                }
             }
 
             string defaultValue = null;
-            if (deferredConfig.Parameters.TryGetValue("defaultValue", out JToken defaultValueToken) && defaultValueToken.Type == JTokenType.String)
+            if (deferredConfig.Parameters.TryGetValue("defaultValue", out string defaultValueToken))
             {
-                defaultValue = defaultValueToken.ToString();
+                JToken token = JToken.Parse(defaultValueToken);
+                if (token.Type == JTokenType.String)
+                {
+                    defaultValue = token.ToString();
+                }
             }
 
             string fallbackVariableName = null;
-            if (deferredConfig.Parameters.TryGetValue("fallbackVariableName", out JToken fallbackVariableNameToken) && fallbackVariableNameToken.Type == JTokenType.String)
+            if (deferredConfig.Parameters.TryGetValue("fallbackVariableName", out string fallbackVariableNameToken))
             {
-                fallbackVariableName = fallbackVariableNameToken.ToString();
+                JToken token = JToken.Parse(fallbackVariableNameToken);
+                if (token.Type == JTokenType.String)
+                {
+                    fallbackVariableName = token.ToString();
+                }
             }
 
             IMacroConfig realConfig = new CoalesceMacroConfig(deferredConfig.VariableName, deferredConfig.DataType, sourceVariableName, defaultValue, fallbackVariableName);

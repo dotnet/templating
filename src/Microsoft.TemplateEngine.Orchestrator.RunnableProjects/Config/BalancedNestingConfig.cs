@@ -10,7 +10,7 @@ using Microsoft.TemplateEngine.Core.Operations;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config
+namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig
 {
     internal class BalancedNestingConfig : IOperationConfig
     {
@@ -18,14 +18,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config
 
         public Guid Id => new Guid("3147965A-08E5-4523-B869-02C8E9A8AAA1");
 
-        public IEnumerable<IOperationProvider> ConfigureFromJObject(JObject rawConfiguration, IDirectory templateRoot)
+        public IEnumerable<IOperationProvider> ConfigureFromJson(string rawConfiguration, IDirectory templateRoot)
         {
-            string startToken = rawConfiguration.ToString("startToken");
-            string realEndToken = rawConfiguration.ToString("realEndToken");
-            string pseudoEndToken = rawConfiguration.ToString("pseudoEndToken");
-            string id = rawConfiguration.ToString("id");
-            string resetFlag = rawConfiguration.ToString("resetFlag");
-            bool onByDefault = rawConfiguration.ToBool("onByDefault");
+            JObject json = JObject.Parse(rawConfiguration);
+            string startToken = json.ToString("startToken");
+            string realEndToken = json.ToString("realEndToken");
+            string pseudoEndToken = json.ToString("pseudoEndToken");
+            string id = json.ToString("id");
+            string resetFlag = json.ToString("resetFlag");
+            bool onByDefault = json.ToBool("onByDefault");
 
             yield return new BalancedNesting(startToken.TokenConfig(), realEndToken.TokenConfig(), pseudoEndToken.TokenConfig(), id, resetFlag, onByDefault);
         }

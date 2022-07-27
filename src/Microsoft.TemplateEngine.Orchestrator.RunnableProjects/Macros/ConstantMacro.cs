@@ -36,12 +36,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
                 throw new InvalidCastException("Couldn't cast the rawConfig as a GeneratedSymbolDeferredMacroConfig");
             }
 
-            if (!deferredConfig.Parameters.TryGetValue("value", out JToken valueToken))
+            if (!deferredConfig.Parameters.TryGetValue("value", out string valueToken))
             {
                 throw new ArgumentNullException("value");
             }
 
-            string value = valueToken.ToString();
+            string value = JToken.Parse(valueToken).ToString();
             IMacroConfig realConfig = new ConstantMacroConfig(deferredConfig.DataType, deferredConfig.VariableName, value);
             return realConfig;
         }

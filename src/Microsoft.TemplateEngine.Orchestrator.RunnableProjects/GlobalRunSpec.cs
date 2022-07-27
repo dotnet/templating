@@ -15,7 +15,8 @@ using Microsoft.TemplateEngine.Core.Expressions.Cpp2;
 using Microsoft.TemplateEngine.Core.Operations;
 using Microsoft.TemplateEngine.Core.Util;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
-using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
@@ -153,12 +154,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return operations;
         }
 
-        private static IReadOnlyList<IOperationProvider> SetupCustomOperations(IReadOnlyList<ICustomOperationModel> customModel, IDirectory templateRoot, IVariableCollection variables)
+        private static IReadOnlyList<IOperationProvider> SetupCustomOperations(IReadOnlyList<CustomOperationModel> customModel, IDirectory templateRoot, IVariableCollection variables)
         {
             ITemplateEngineHost host = templateRoot.MountPoint.EnvironmentSettings.Host;
             List<IOperationProvider> customOperations = new List<IOperationProvider>();
 
-            foreach (ICustomOperationModel opModelUntyped in customModel)
+            foreach (CustomOperationModel opModelUntyped in customModel)
             {
                 CustomOperationModel opModel = opModelUntyped as CustomOperationModel;
                 if (opModel == null)
@@ -177,7 +178,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     if (_operationConfigLookup.TryGetValue(opType, out realConfigObject))
                     {
                         customOperations.AddRange(
-                            realConfigObject.ConfigureFromJObject(opModel.Configuration, templateRoot));
+                            realConfigObject.ConfigureFromJson(opModel.Configuration, templateRoot));
                     }
                     else
                     {

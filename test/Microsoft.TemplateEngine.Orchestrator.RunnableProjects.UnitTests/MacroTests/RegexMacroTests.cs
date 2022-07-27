@@ -54,8 +54,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
         {
             string variableName = "myRegex";
             string sourceVariable = "originalValue";
-            Dictionary<string, JToken> jsonParameters = new Dictionary<string, JToken>();
-            jsonParameters.Add("source", sourceVariable);
+            Dictionary<string, string> jsonParameters = new Dictionary<string, string>();
+            jsonParameters.Add("source", JToken.FromObject(sourceVariable).ToString(Newtonsoft.Json.Formatting.None));
 
             string jsonSteps = @"[
                 { 
@@ -63,7 +63,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
                     'replacement': 'Z'
                 }
             ]";
-            jsonParameters.Add("steps", JArray.Parse(jsonSteps));
+            jsonParameters.Add("steps", jsonSteps);
 
             GeneratedSymbolDeferredMacroConfig deferredConfig = new GeneratedSymbolDeferredMacroConfig("RegexMacro", "string", variableName, jsonParameters);
 

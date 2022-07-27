@@ -3,14 +3,14 @@
 
 using System;
 using System.Collections.Generic;
-using Microsoft.TemplateEngine.Core.Contracts;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config
 {
     internal class GeneratedSymbolDeferredMacroConfig : IMacroConfig
     {
-        internal GeneratedSymbolDeferredMacroConfig(string type, string dataType, string variableName, Dictionary<string, JToken> parameters)
+        internal GeneratedSymbolDeferredMacroConfig(string type, string dataType, string variableName, Dictionary<string, string> parameters)
         {
             DataType = dataType;
             Type = type;
@@ -28,6 +28,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config
 
         internal string DataType { get; }
 
-        internal IReadOnlyDictionary<string, JToken> Parameters { get; private set; }
+        internal IReadOnlyDictionary<string, string> Parameters { get; private set; }
     }
 }

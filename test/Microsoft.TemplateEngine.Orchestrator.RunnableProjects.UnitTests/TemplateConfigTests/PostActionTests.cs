@@ -6,6 +6,7 @@ using Castle.Core.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Core.Contracts;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Microsoft.TemplateEngine.TestHelper;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -102,7 +103,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
         [InlineData(false, false, 0, null, null)]
         public void TestPostActionConditioning(bool condition1, bool condition2, int expectedActionCount, string[] firstResult, string[] secondResult)
         {
-            SimpleConfigModel configModel = SimpleConfigModel.FromJObject( TestTemplateJson);
+            TemplateConfigModel configModel = TemplateConfigModel.FromJObject( TestTemplateJson);
             IVariableCollection vc = new VariableCollection
             {
                 ["ActionOneCondition"] = condition1,
@@ -139,7 +140,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
         [InlineData(false, true, 1, "BeOS", "Default instructions (action 2)", null)]
         public void TestPostActionInstructionsConditioning(bool condition1, bool condition2, int expectedActionCount, string operatingSystemValue, string firstInstruction, string secondInstruction)
         {
-            SimpleConfigModel configModel = SimpleConfigModel.FromJObject(TestTemplateJson);
+            TemplateConfigModel configModel = TemplateConfigModel.FromJObject(TestTemplateJson);
             IVariableCollection vc = new VariableCollection
             {
                 ["ActionOneCondition"] = condition1,

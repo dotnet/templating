@@ -41,22 +41,22 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             int low;
             int high;
 
-            if (!deferredConfig.Parameters.TryGetValue("low", out JToken lowToken))
+            if (!deferredConfig.Parameters.TryGetValue("low", out string lowToken))
             {
                 throw new ArgumentNullException("low");
             }
             else
             {
-                low = lowToken.Value<int>();
+                low = JToken.Parse(lowToken).Value<int>();
             }
 
-            if (!deferredConfig.Parameters.TryGetValue("high", out JToken highToken))
+            if (!deferredConfig.Parameters.TryGetValue("high", out string highToken))
             {
                 high = int.MaxValue;
             }
             else
             {
-                high = highToken.Value<int>();
+                high = JToken.Parse(highToken).Value<int>();
             }
 
             IMacroConfig realConfig = new RandomMacroConfig(deferredConfig.VariableName, deferredConfig.DataType, low, high);

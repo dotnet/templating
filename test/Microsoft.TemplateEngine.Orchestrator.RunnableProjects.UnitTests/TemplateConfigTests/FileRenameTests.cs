@@ -12,6 +12,7 @@ using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Core.Operations;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Microsoft.TemplateEngine.TestHelper;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -99,7 +100,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
   }
 }
 ";
-            SimpleConfigModel configModel = SimpleConfigModel.FromJObject(JObject.Parse(configContent));
+            TemplateConfigModel configModel = TemplateConfigModel.FromJObject(JObject.Parse(configContent));
             IEngineEnvironmentSettings environment = _environmentSettingsHelper.CreateEnvironment();
             RunnableProjectConfig runnableConfig =
                 new RunnableProjectConfig(environment, A.Fake<IGenerator>(), configModel);
@@ -152,7 +153,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
     }
   }
 }";
-            SimpleConfigModel configModel = SimpleConfigModel.FromJObject(JObject.Parse(configContent));
+            TemplateConfigModel configModel = TemplateConfigModel.FromJObject(JObject.Parse(configContent));
             IEngineEnvironmentSettings environment = _environmentSettingsHelper.CreateEnvironment();
             RunnableProjectConfig runnableConfig =
                 new RunnableProjectConfig(environment, A.Fake<IGenerator>(), configModel);

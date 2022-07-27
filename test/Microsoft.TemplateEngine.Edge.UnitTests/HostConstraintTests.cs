@@ -12,7 +12,7 @@ using FakeItEasy;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Constraints;
 using Microsoft.TemplateEngine.Edge.Constraints;
-using Microsoft.TemplateEngine.Orchestrator.RunnableProjects;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
@@ -54,7 +54,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 }
             };
 
-            var configModel = SimpleConfigModel.FromJObject(JObject.FromObject(config));
+            var configModel = TemplateConfigModel.FromJObject(JObject.FromObject(config));
             IEngineEnvironmentSettings settings = A.Fake<IEngineEnvironmentSettings>();
             A.CallTo(() => settings.Host.HostIdentifier).Returns("host1");
             A.CallTo(() => settings.Host.Version).Returns("2.0.0");
@@ -99,7 +99,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 }
             };
 
-            var configModel = SimpleConfigModel.FromJObject(JObject.FromObject(config));
+            var configModel = TemplateConfigModel.FromJObject(JObject.FromObject(config));
             IEngineEnvironmentSettings settings = A.Fake<IEngineEnvironmentSettings>();
             A.CallTo(() => settings.Host.HostIdentifier).Returns("host2");
             A.CallTo(() => settings.Host.Version).Returns("2.0.0");
@@ -147,7 +147,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 }
             };
 
-            var configModel = SimpleConfigModel.FromJObject(JObject.FromObject(config));
+            var configModel = TemplateConfigModel.FromJObject(JObject.FromObject(config));
 
             IEngineEnvironmentSettings settings = A.Fake<IEngineEnvironmentSettings>();
             A.CallTo(() => settings.Host.HostIdentifier).Returns("host3");
@@ -180,7 +180,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 }
             };
 
-            var configModel = SimpleConfigModel.FromJObject(JObject.FromObject(config));
+            var configModel = TemplateConfigModel.FromJObject(JObject.FromObject(config));
 
             IEngineEnvironmentSettings settings = A.Fake<IEngineEnvironmentSettings>();
             A.CallTo(() => settings.Host.HostIdentifier).Returns("host3");
@@ -230,7 +230,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 }
             };
 
-            var configModel = SimpleConfigModel.FromJObject(JObject.FromObject(config));
+            var configModel = TemplateConfigModel.FromJObject(JObject.FromObject(config));
             IEngineEnvironmentSettings settings = A.Fake<IEngineEnvironmentSettings>();
             A.CallTo(() => settings.Host.HostIdentifier).Returns("host1");
             A.CallTo(() => settings.Host.Version).Returns(hostVersion);
@@ -280,7 +280,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 }
             };
 
-            var configModel = SimpleConfigModel.FromJObject(JObject.FromObject(config));
+            var configModel = TemplateConfigModel.FromJObject(JObject.FromObject(config));
             IEngineEnvironmentSettings settings = A.Fake<IEngineEnvironmentSettings>();
             A.CallTo(() => settings.Host.HostIdentifier).Returns(hostName);
             A.CallTo(() => settings.Host.Version).Returns(hostVersion);

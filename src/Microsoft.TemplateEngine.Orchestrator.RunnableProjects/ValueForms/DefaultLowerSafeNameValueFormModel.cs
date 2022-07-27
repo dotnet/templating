@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms
@@ -24,9 +25,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms
 
         public override string Identifier => _name ?? FormName;
 
-        public override string Process(IReadOnlyDictionary<string, IValueForm> forms, string value)
+        public override string Process(string value, IReadOnlyDictionary<string, IValueForm> forms)
         {
-            return base.Process(forms, value).ToLowerInvariant();
+            return base.Process(value, forms).ToLowerInvariant();
         }
 
         public override IValueForm FromJObject(string name, JObject configuration)

@@ -59,11 +59,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
         public void TestRandomDeferredConfig(int low, int? high)
         {
             string variableName = "myRnd";
-            Dictionary<string, JToken> jsonParameters = new Dictionary<string, JToken>();
-            jsonParameters.Add("low", low);
+            Dictionary<string, string> jsonParameters = new Dictionary<string, string>();
+            jsonParameters.Add("low", JToken.FromObject(low).ToString(Newtonsoft.Json.Formatting.None));
             if (high.HasValue)
             {
-                jsonParameters.Add("high", high);
+                jsonParameters.Add("high", JToken.FromObject(high).ToString(Newtonsoft.Json.Formatting.None));
             }
 
             GeneratedSymbolDeferredMacroConfig deferredConfig = new GeneratedSymbolDeferredMacroConfig("RandomMacro", null, variableName, jsonParameters);

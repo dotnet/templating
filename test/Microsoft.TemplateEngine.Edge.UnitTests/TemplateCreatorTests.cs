@@ -13,6 +13,7 @@ using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Edge.Template;
 using Microsoft.TemplateEngine.Mocks;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Microsoft.TemplateEngine.TestHelper;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -104,7 +105,7 @@ UNKNOWN
             IMountPoint? sourceMountPoint = TestFileSystemHelper.CreateMountPoint(environment, sourceBasePath);
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
             // cannot use SimpleConfigModel dirrectly - due to missing easy way of creating ParameterSymbols
-            SimpleConfigModel configModel = SimpleConfigModel.FromJObject(JObject.Parse(TemplateConfigQuotelessLiteralsEnabled));
+            TemplateConfigModel configModel = TemplateConfigModel.FromJObject(JObject.Parse(TemplateConfigQuotelessLiteralsEnabled));
             var runnableConfig = new RunnableProjectConfig(environment, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
 
             TemplateCreator creator = new TemplateCreator(_engineEnvironmentSettings);

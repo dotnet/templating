@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Core.Operations;
-using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
@@ -82,7 +82,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
         [Fact(DisplayName = nameof(TestCustomConditionalSetupNoStyleSpecification))]
         public void TestCustomConditionalSetupNoStyleSpecification()
         {
-            IEnumerable<IOperationProvider> ops = new ConditionalConfig().ConfigureFromJObject(CustomConditionalSetupNoStyleSpecification, null);
+            IEnumerable<IOperationProvider> ops = new ConditionalConfig().ConfigureFromJson(CustomConditionalSetupNoStyleSpecification.ToString(), null);
             IList<IOperationProvider> operations = new List<IOperationProvider>(ops);
 
             Assert.Equal(1, operations.Count);
@@ -111,7 +111,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
         [Fact(DisplayName = nameof(TestCustomConditionalSetupExplicitStyleSpecification))]
         public void TestCustomConditionalSetupExplicitStyleSpecification()
         {
-            IEnumerable<IOperationProvider> ops = new ConditionalConfig().ConfigureFromJObject(CustomConditionalSetupExplicitStyleSpecification, null);
+            IEnumerable<IOperationProvider> ops = new ConditionalConfig().ConfigureFromJson(CustomConditionalSetupExplicitStyleSpecification.ToString(), null);
             IList<IOperationProvider> operations = new List<IOperationProvider>(ops);
 
             Assert.Equal(1, operations.Count);
@@ -140,7 +140,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
         [Fact(DisplayName = nameof(TestLineCommentConditionalSetup))]
         public void TestLineCommentConditionalSetup()
         {
-            IEnumerable<IOperationProvider> ops = new ConditionalConfig().ConfigureFromJObject(LineConditionalSetup, null);
+            IEnumerable<IOperationProvider> ops = new ConditionalConfig().ConfigureFromJson(LineConditionalSetup.ToString(), null);
             IList<IOperationProvider> operations = new List<IOperationProvider>(ops);
 
             Assert.Equal(3, operations.Count);
@@ -179,7 +179,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
         [Fact(DisplayName = nameof(TestBlockCommentConditionalSetup))]
         public void TestBlockCommentConditionalSetup()
         {
-            IEnumerable<IOperationProvider> ops = new ConditionalConfig().ConfigureFromJObject(BlockConditionalSetup, null);
+            IEnumerable<IOperationProvider> ops = new ConditionalConfig().ConfigureFromJson(BlockConditionalSetup.ToString(), null);
             IList<IOperationProvider> operations = new List<IOperationProvider>(ops);
 
             Assert.Equal(2, operations.Count);  // conditional & pseudo comment balancer

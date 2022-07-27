@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms;
 using Newtonsoft.Json.Linq;
 
@@ -10,13 +12,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
     internal static class ValueFormRegistry
     {
-        private static readonly IReadOnlyDictionary<string, IValueForm> FormLookup = SetupFormLookup();
+        private static readonly IReadOnlyDictionary<string, ISerializableValueForm> FormLookup = SetupFormLookup();
 
         internal static IReadOnlyDictionary<string, IValueForm> AllForms
         {
             get
             {
-                return FormLookup;
+                return FormLookup.ToDictionary(x => x.Key, x => (IValueForm)x.Value);
             }
         }
 
@@ -24,7 +26,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         {
             string identifier = obj.ToString("identifier");
 
-            if (!FormLookup.TryGetValue(identifier, out IValueForm value))
+            if (!FormLookup.TryGetValue(identifier, out ISerializableValueForm value))
             {
                 return FormLookup[IdentityValueForm.FormName].FromJObject(name, obj);
             }
@@ -32,10 +34,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return value.FromJObject(name, obj);
         }
 
-        private static IReadOnlyDictionary<string, IValueForm> SetupFormLookup()
+        private static IReadOnlyDictionary<string, ISerializableValueForm> SetupFormLookup()
         {
-            Dictionary<string, IValueForm> lookup = new Dictionary<string, IValueForm>(StringComparer.OrdinalIgnoreCase);
-            IValueForm x = new ReplacementValueFormModel();
+            Dictionary<string, ISerializableValueForm> lookup = new Dictionary<string, ISerializableValueForm>(StringComparer.OrdinalIgnoreCase);
+            ISerializableValueForm x = new ReplacementValueFormModel();
             lookup[x.Identifier] = x;
             x = new ChainValueFormModel();
             lookup[x.Identifier] = x;

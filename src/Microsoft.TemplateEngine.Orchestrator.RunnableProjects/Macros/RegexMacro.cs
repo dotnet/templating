@@ -57,16 +57,16 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
                 throw new InvalidCastException("Couldn't cast the rawConfig as a GeneratedSymbolDeferredMacroConfig");
             }
 
-            if (!deferredConfig.Parameters.TryGetValue("source", out JToken sourceVarToken))
+            if (!deferredConfig.Parameters.TryGetValue("source", out string sourceVarToken))
             {
                 throw new ArgumentNullException("source");
             }
-            string sourceVariable = sourceVarToken.ToString();
+            string sourceVariable = JToken.Parse(sourceVarToken).ToString();
 
             List<KeyValuePair<string, string>> replacementSteps = new List<KeyValuePair<string, string>>();
-            if (deferredConfig.Parameters.TryGetValue("steps", out JToken stepListToken))
+            if (deferredConfig.Parameters.TryGetValue("steps", out string stepListToken))
             {
-                JArray stepList = (JArray)stepListToken;
+                JArray stepList = JToken.Parse(stepListToken) as JArray;
                 foreach (JToken step in stepList)
                 {
                     JObject map = (JObject)step;

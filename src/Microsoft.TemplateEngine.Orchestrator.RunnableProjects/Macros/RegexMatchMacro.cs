@@ -57,19 +57,19 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
                 throw new InvalidCastException("Couldn't cast the rawConfig as a GeneratedSymbolDeferredMacroConfig");
             }
 
-            if (!deferredConfig.Parameters.TryGetValue("source", out JToken sourceVarToken))
+            if (!deferredConfig.Parameters.TryGetValue("source", out string sourceVarToken))
             {
                 throw new ArgumentNullException("source");
             }
 
-            string sourceVariable = sourceVarToken.ToString();
+            string sourceVariable = JToken.Parse(sourceVarToken).ToString();
 
-            if (!deferredConfig.Parameters.TryGetValue("pattern", out JToken patternToken))
+            if (!deferredConfig.Parameters.TryGetValue("pattern", out string patternToken))
             {
                 throw new ArgumentNullException("pattern");
             }
 
-            string pattern = patternToken.ToString();
+            string pattern = JToken.Parse(patternToken).ToString();
 
             //Warn the user if they explicitly specify something other than "bool" for DataType for this macro
             if (deferredConfig.DataType != null

@@ -72,21 +72,21 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             }
 
             string evaluator = null;
-            if (deferredConfig.Parameters.TryGetValue("evaluator", out JToken evaluatorToken))
+            if (deferredConfig.Parameters.TryGetValue("evaluator", out string evaluatorToken))
             {
-                evaluator = evaluatorToken.ToString();
+                evaluator = JToken.Parse(evaluatorToken).ToString();
             }
 
             string dataType = null;
-            if (deferredConfig.Parameters.TryGetValue("datatype", out JToken dataTypeToken))
+            if (deferredConfig.Parameters.TryGetValue("datatype", out string dataTypeToken))
             {
-                dataType = dataTypeToken.ToString();
+                dataType = JToken.Parse(dataTypeToken).ToString();
             }
 
             List<KeyValuePair<string, string>> switchList = new List<KeyValuePair<string, string>>();
-            if (deferredConfig.Parameters.TryGetValue("cases", out JToken switchListToken))
+            if (deferredConfig.Parameters.TryGetValue("cases", out string switchListToken))
             {
-                JArray switchJArray = (JArray)switchListToken;
+                JArray switchJArray = JToken.Parse(switchListToken) as JArray;
                 foreach (JToken switchInfo in switchJArray)
                 {
                     JObject map = (JObject)switchInfo;

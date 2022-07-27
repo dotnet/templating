@@ -12,8 +12,8 @@ using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config;
-using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.TemplateConfigTests;
 using Microsoft.TemplateEngine.TestHelper;
 using Microsoft.TemplateEngine.Utils;
@@ -99,7 +99,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             string contentFileNamePrefix = "content - ";
             JObject choiceParam = JObject.Parse(paramDefintion);
             choiceParam["AllowMultipleValues"] = isMultichoice;
-            SimpleConfigModel config = new SimpleConfigModel()
+            TemplateConfigModel config = new TemplateConfigModel()
             {
                 Identity = "test",
                 Name = "name",

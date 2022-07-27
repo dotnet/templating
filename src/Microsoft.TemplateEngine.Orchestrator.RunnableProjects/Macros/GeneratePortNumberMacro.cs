@@ -44,27 +44,43 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             int low;
             int high;
 
-            if (!deferredConfig.Parameters.TryGetValue("low", out JToken lowToken) || lowToken.Type != JTokenType.Integer)
+            if (!deferredConfig.Parameters.TryGetValue("low", out string lowToken))
             {
                 low = LowPortDefault;
             }
             else
             {
-                low = lowToken.Value<int>();
-                if (low < LowPortDefault)
+                JToken token = JToken.Parse(lowToken);
+                if (token.Type == JTokenType.Integer)
+                {
+                    low = token.Value<int>();
+                    if (low < LowPortDefault)
+                    {
+                        low = LowPortDefault;
+                    }
+                }
+                else
                 {
                     low = LowPortDefault;
                 }
             }
 
-            if (!deferredConfig.Parameters.TryGetValue("high", out JToken highToken) || highToken.Type != JTokenType.Integer)
+            if (!deferredConfig.Parameters.TryGetValue("high", out string highToken))
             {
                 high = HighPortDefault;
             }
             else
             {
-                high = highToken.Value<int>();
-                if (high > HighPortDefault)
+                JToken token = JToken.Parse(highToken);
+                if (token.Type == JTokenType.Integer)
+                {
+                    high = token.Value<int>();
+                    if (high > HighPortDefault)
+                    {
+                        high = HighPortDefault;
+                    }
+                }
+                else
                 {
                     high = HighPortDefault;
                 }
@@ -77,9 +93,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             }
 
             int fallback = 0;
-            if (deferredConfig.Parameters.TryGetValue("fallback", out JToken fallbackToken) && fallbackToken.Type == JTokenType.Integer)
+            if (deferredConfig.Parameters.TryGetValue("fallback", out string fallbackToken))
             {
-                fallback = fallbackToken.ToInt32();
+                JToken token = JToken.Parse(fallbackToken);
+                if (token.Type == JTokenType.Integer)
+                {
+                    fallback = token.ToInt32();
+                }
             }
 
             IMacroConfig realConfig = new GeneratePortNumberConfig(deferredConfig.VariableName, deferredConfig.DataType, fallback, low, high);

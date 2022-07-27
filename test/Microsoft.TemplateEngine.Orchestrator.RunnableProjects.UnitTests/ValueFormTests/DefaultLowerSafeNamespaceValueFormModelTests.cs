@@ -3,6 +3,8 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms;
 using Xunit;
 
@@ -25,7 +27,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Value
         public void LowerSafeNamespaceWorksAsExpected(string input, string expected)
         {
             var model = new DefaultLowerSafeNamespaceValueFormModel();
-            string actual = model.Process(null, input);
+            string actual = model.Process(input, new Dictionary<string, IValueForm>());
             Assert.Equal(expected, actual);
         }
     }

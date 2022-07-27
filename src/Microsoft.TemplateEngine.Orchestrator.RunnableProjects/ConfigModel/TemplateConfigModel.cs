@@ -15,18 +15,17 @@ using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Constraints;
 using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Core.Contracts;
-using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms;
 using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
+namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
 {
     /// <summary>
     /// The class represents model of template.json.
     /// </summary>
-    internal class SimpleConfigModel
+    public sealed class TemplateConfigModel
     {
         private const string NameSymbolName = "name";
         private readonly ILogger? _logger;
@@ -38,12 +37,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         private string? _description;
         private string? _sourceName;
 
-        internal SimpleConfigModel()
+        internal TemplateConfigModel()
         {
             Symbols = Array.Empty<BaseSymbol>();
         }
 
-        private SimpleConfigModel(JObject source, ILogger? logger, ISimpleConfigModifiers? configModifiers = null, string? filename = null)
+        private TemplateConfigModel(JObject source, ILogger? logger, ISimpleConfigModifiers? configModifiers = null, string? filename = null)
         {
             _logger = logger;
 
@@ -65,38 +64,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             ThirdPartyNotices = source.ToString(nameof(ThirdPartyNotices));
             PreferNameDirectory = source.ToBool(nameof(PreferNameDirectory));
 
-            ShortNameList = JTokenStringOrArrayToCollection(source.Get<JToken>("ShortName"), Array.Empty<string>());
+            ShortNameList = source.ToStringReadOnlyList("ShortName");
             Forms = SetupValueFormMapForTemplate(source);
 
             var sources = new List<ExtendedFileSource>();
             Sources = sources;
             foreach (JObject item in source.Items<JObject>(nameof(Sources)))
             {
-                ExtendedFileSource src = new ExtendedFileSource();
+                ExtendedFileSource src = ExtendedFileSource.FromJObject(item);
                 sources.Add(src);
-                src.CopyOnly = item.Get<JToken>(nameof(src.CopyOnly));
-                src.Exclude = item.Get<JToken>(nameof(src.Exclude));
-                src.Include = item.Get<JToken>(nameof(src.Include));
-                src.Condition = item.ToString(nameof(src.Condition));
-                src.Rename = item.Get<JObject>(nameof(src.Rename))?.ToStringDictionary().ToDictionary(x => x.Key, x => x.Value);
-
-                List<SourceModifier> modifiers = new List<SourceModifier>();
-                src.Modifiers = modifiers;
-                foreach (JObject entry in item.Items<JObject>(nameof(src.Modifiers)))
-                {
-                    SourceModifier modifier = new SourceModifier
-                    {
-                        Condition = entry.ToString(nameof(modifier.Condition)),
-                        CopyOnly = entry.Get<JToken>(nameof(modifier.CopyOnly)),
-                        Exclude = entry.Get<JToken>(nameof(modifier.Exclude)),
-                        Include = entry.Get<JToken>(nameof(modifier.Include)),
-                        Rename = entry.Get<JObject>(nameof(modifier.Rename))
-                    };
-                    modifiers.Add(modifier);
-                }
-
-                src.Source = item.ToString(nameof(src.Source));
-                src.Target = item.ToString(nameof(src.Target));
             }
 
             IBaselineInfo? baseline = null;
@@ -168,7 +144,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
             _symbols = symbols;
             _postActions = PostActionModel.LoadListFromJArray(source.Get<JArray>("PostActions"), _logger, filename);
-            PrimaryOutputs = CreationPathModel.ListFromJArray(source.Get<JArray>(nameof(PrimaryOutputs)));
+            PrimaryOutputs = PrimaryOutputModel.ListFromJArray(source.Get<JArray>(nameof(PrimaryOutputs)));
 
             // Custom operations at the global level
             JToken? globalCustomConfigData = source[nameof(GlobalCustomOperations)];
@@ -179,7 +155,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             // Custom operations for specials
             IReadOnlyDictionary<string, JToken> allSpecialOpsConfig = source.ToJTokenDictionary(StringComparer.OrdinalIgnoreCase, nameof(SpecialCustomOperations));
-            List<ICustomFileGlobModel> specialCustomSetup = new List<ICustomFileGlobModel>();
+            List<CustomFileGlobModel> specialCustomSetup = new List<CustomFileGlobModel>();
 
             foreach (KeyValuePair<string, JToken> globConfigKeyValue in allSpecialOpsConfig)
             {
@@ -213,6 +189,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             Constraints = constraints;
         }
 
+        /// <summary>
+        /// Gets the template author ("author" JSON property).
+        /// </summary>
         public string? Author
         {
             get
@@ -220,14 +199,20 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 return _author;
             }
 
-            init
+            internal init
             {
                 _author = value;
             }
         }
 
-        public string? DefaultName { get; init; }
+        /// <summary>
+        /// Gets the default name for the template ("defaultName" JSON property).
+        /// </summary>
+        public string? DefaultName { get; internal init; }
 
+        /// <summary>
+        /// Gets the description of the template ("description" JSON property).
+        /// </summary>
         public string? Description
         {
             get
@@ -235,16 +220,26 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 return _description;
             }
 
-            init
+            internal init
             {
                 _description = value;
             }
         }
 
-        public string? GroupIdentity { get; init; }
+        /// <summary>
+        /// Gets the group identity of the template ("groupIdentity" JSON property).
+        /// This allows multiple templates to be displayed as one, with the the decision for which one to use based on <see cref="Precedence"/> and other parameters added by user for the instantiation.
+        /// </summary>
+        public string? GroupIdentity { get; internal init; }
 
-        public int Precedence { get; init; }
+        /// <summary>
+        /// Gets the precedence of the template in a group ("precedence" JSON property).
+        /// </summary>
+        public int Precedence { get; internal init; }
 
+        /// <summary>
+        /// Gets the template name ("name" JSON property).
+        /// </summary>
         public string? Name
         {
             get
@@ -252,16 +247,25 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 return _name;
             }
 
-            init
+            internal init
             {
                 _name = value;
             }
         }
 
-        public string? ThirdPartyNotices { get; init; }
+        /// <summary>
+        /// Gets the link to 3rd party notices ("thirdPartyNotices" JSON property).
+        /// </summary>
+        public string? ThirdPartyNotices { get; internal init; }
 
-        public bool PreferNameDirectory { get; init; }
+        /// <summary>
+        /// Indicates whether to create a directory for the template if name is specified but an output directory is not set (instead of creating the content directly in the current directory) ("preferNameDirectory" JSON property).
+        /// </summary>
+        public bool PreferNameDirectory { get; internal init; }
 
+        /// <summary>
+        /// Gets the collection of template tags ("tags" JSON property).
+        /// </summary>
         public IReadOnlyDictionary<string, string> Tags
         {
             get
@@ -269,14 +273,20 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 return _tags;
             }
 
-            init
+            internal init
             {
                 _tags = value;
             }
         }
 
-        public IReadOnlyList<string> ShortNameList { get; init; } = Array.Empty<string>();
+        /// <summary>
+        /// Gets the list of template short names ("shortName" JSON property).
+        /// </summary>
+        public IReadOnlyList<string> ShortNameList { get; internal init; } = Array.Empty<string>();
 
+        /// <summary>
+        /// Gets the list of post actions defined for the template ("postActions" JSON property).
+        /// </summary>
         public IReadOnlyList<PostActionModel> PostActionModels
         {
             get
@@ -284,32 +294,53 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 return _postActions;
             }
 
-            init
+            internal init
             {
                 _postActions = value;
             }
         }
 
-        public IReadOnlyList<ICreationPathModel> PrimaryOutputs { get; init; } = Array.Empty<ICreationPathModel>();
+        /// <summary>
+        /// Gets the list of template primary outputs ("primaryOutputs" JSON property).
+        /// </summary>
+        public IReadOnlyList<PrimaryOutputModel> PrimaryOutputs { get; internal init; } = Array.Empty<PrimaryOutputModel>();
 
-        public string? GeneratorVersions { get; init; }
+        /// <summary>
+        /// Gets version expression which defines which generator versions is supported by the template ("generatorVersions" JSON property).
+        /// </summary>
+        public string? GeneratorVersions { get; internal init; }
 
-        public IReadOnlyDictionary<string, IBaselineInfo> BaselineInfo { get; init; } = new Dictionary<string, IBaselineInfo>();
+        /// <summary>
+        /// Gets the list of baselines defined for the template ("baselines" JSON property).
+        /// </summary>
+        public IReadOnlyDictionary<string, IBaselineInfo> BaselineInfo { get; internal init; } = new Dictionary<string, IBaselineInfo>();
 
-        public string? Identity { get; init; }
+        /// <summary>
+        /// Gets the template identity ("identity" JSON property) - a unique name for this template.
+        /// </summary>
+        public string? Identity { get; internal init; }
 
-        internal IReadOnlyList<string> Classifications { get; init; } = Array.Empty<string>();
+        /// <summary>
+        /// Gets the list of classifications of the template ("classifications" JSON property).
+        /// </summary>
+        public IReadOnlyList<string> Classifications { get; internal init; } = Array.Empty<string>();
 
-        internal IReadOnlyList<Guid> Guids { get; init; } = Array.Empty<Guid>();
+        /// <summary>
+        /// Gets the list of guids defined in the template ("guids" JSON property).
+        /// </summary>
+        public IReadOnlyList<Guid> Guids { get; internal init; } = Array.Empty<Guid>();
 
-        internal string? SourceName
+        /// <summary>
+        /// Gets the source name defined in the template ("sourceName" JSON property).
+        /// </summary>
+        public string? SourceName
         {
             get
             {
                 return _sourceName;
             }
 
-            init
+            internal init
             {
                 _sourceName = value;
                 NameSymbol = SetupDefaultNameSymbol(value);
@@ -317,11 +348,20 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
         }
 
-        internal IReadOnlyList<ExtendedFileSource> Sources { get; init; } = Array.Empty<ExtendedFileSource>();
+        /// <summary>
+        /// Gets the list of sources defined in the template ("sources" JSON property).
+        /// </summary>
+        public IReadOnlyList<ExtendedFileSource> Sources { get; internal init; } = Array.Empty<ExtendedFileSource>();
 
-        internal IReadOnlyList<TemplateConstraintInfo> Constraints { get; init; } = Array.Empty<TemplateConstraintInfo>();
+        /// <summary>
+        /// Gets the list of constraints defined in the template ("constraints" JSON property).
+        /// </summary>
+        public IReadOnlyList<TemplateConstraintInfo> Constraints { get; internal init; } = Array.Empty<TemplateConstraintInfo>();
 
-        internal IEnumerable<BaseSymbol> Symbols
+        /// <summary>
+        /// Gets the list of symbols defined in the template ("symbols" JSON property).
+        /// </summary>
+        public IEnumerable<BaseSymbol> Symbols
 
         {
             get
@@ -329,7 +369,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 return _symbols.Values;
             }
 
-            init
+            internal init
             {
                 _symbols = value.ToDictionary(s => s.Name, s => s);
                 _symbols[NameSymbolName] = NameSymbol;
@@ -343,21 +383,73 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
         }
 
-        internal IReadOnlyDictionary<string, IValueForm> Forms { get; init; } = new Dictionary<string, IValueForm>();
+        /// <summary>
+        /// Gets the list of forms defined in the template ("forms" JSON property).
+        /// </summary>
+        public IReadOnlyDictionary<string, IValueForm> Forms { get; internal init; } = new Dictionary<string, IValueForm>();
 
-        internal string? PlaceholderFilename { get; init; }
+        /// <summary>
+        /// Gets the placeholder filename defined in the template ("placeholderFilename" JSON property).
+        /// </summary>
+        public string? PlaceholderFilename { get; internal init; }
 
-        internal ICustomFileGlobModel? GlobalCustomOperations { get; init; }
+        /// <summary>
+        /// Gets the list of global custom operations defined for the template ("globalCustomOperations" JSON property).
+        /// </summary>
+        public CustomFileGlobModel? GlobalCustomOperations { get; internal init; }
 
-        internal IReadOnlyList<ICustomFileGlobModel> SpecialCustomOperations { get; init; } = Array.Empty<ICustomFileGlobModel>();
+        /// <summary>
+        /// Gets the list of custom operations defined for the template for specific files ("specialCustomOperations" JSON property).
+        /// </summary>
+        public IReadOnlyList<CustomFileGlobModel> SpecialCustomOperations { get; internal init; } = Array.Empty<CustomFileGlobModel>();
 
         internal BaseSymbol NameSymbol { get; private set; } = SetupDefaultNameSymbol(null);
 
         private static IReadOnlyList<BindSymbol> ImplicitBindSymbols { get; } = SetupImplicitBindSymbols();
 
-        internal static SimpleConfigModel FromJObject(JObject source, ILogger? logger = null, ISimpleConfigModifiers? configModifiers = null, string? filename = null)
+        /// <summary>
+        /// Creates <see cref="TemplateConfigModel"/> from stream <paramref name="content"/>.
+        /// </summary>
+        /// <param name="content">The stream containing template configuration in JSON format.</param>
+        /// <param name="logger">The logger to use for reporting errors/messages.</param>
+        /// <param name="filename">The filepath of template configuration (optional, used for logging).</param>
+        public static TemplateConfigModel FromStream(Stream content, ILogger? logger = null, string? filename = null)
         {
-            return new SimpleConfigModel(source, logger, configModifiers, filename);
+            using (TextReader tr = new StreamReader(content, System.Text.Encoding.UTF8, true))
+            {
+                return FromTextReader(tr, logger, filename);
+            }
+        }
+
+        /// <summary>
+        /// Creates <see cref="TemplateConfigModel"/> from string <paramref name="content"/>.
+        /// </summary>
+        /// <param name="content">The string containing template configuration in JSON format.</param>
+        /// <param name="logger">The logger to use for reporting errors/messages.</param>
+        /// <param name="filename">The filepath of template configuration (optional, used for logging).</param>
+        public static TemplateConfigModel FromString(string content, ILogger? logger = null, string? filename = null)
+        {
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                return new TemplateConfigModel();
+            }
+            using (TextReader tr = new StringReader(content))
+            {
+                return FromTextReader(tr, logger, filename);
+            }
+        }
+
+        internal static TemplateConfigModel FromTextReader(TextReader content, ILogger? logger = null, string? filename = null)
+        {
+            using (JsonReader r = new JsonTextReader(content))
+            {
+                return new TemplateConfigModel(JObject.Load(r), logger, null, filename);
+            }
+        }
+
+        internal static TemplateConfigModel FromJObject(JObject source, ILogger? logger = null, ISimpleConfigModifiers? configModifiers = null, string? filename = null)
+        {
+            return new TemplateConfigModel(source, logger, configModifiers, filename);
         }
 
         //TODO: create convertors to get proper json format if needed.
@@ -367,7 +459,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         }
 
         /// <summary>
-        /// Localizes this <see cref="SimpleConfigModel"/> with given localization model.
+        /// Localizes this <see cref="TemplateConfigModel"/> with given localization model.
         /// </summary>
         /// <param name="locModel">Localization model containing the localized strings.</param>
         /// <remarks>This method works on a best-effort basis. If the given model is invalid or incompatible,
@@ -386,22 +478,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     postAction.Localize(postActionLocModel);
                 }
             }
-        }
-
-        private static IReadOnlyList<string> JTokenStringOrArrayToCollection(JToken? token, string[] defaultSet)
-        {
-            if (token == null)
-            {
-                return defaultSet;
-            }
-
-            if (token.Type == JTokenType.String)
-            {
-                string tokenValue = token.ToString();
-                return new List<string>() { tokenValue };
-            }
-
-            return token.ArrayAsStrings();
         }
 
         private static BaseSymbol SetupDefaultNameSymbol(string? sourceName)
@@ -453,12 +529,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     continue;
                 }
 
-                BaselineInfo baseline = new BaselineInfo
-                {
-                    Description = obj.ToString(nameof(baseline.Description)),
-                    DefaultOverrides = obj.Get<JObject>(nameof(baseline.DefaultOverrides))?.ToStringDictionary() ?? new Dictionary<string, string>()
-                };
-
+                var defaultOverrides = obj.Get<JObject>(nameof(IBaselineInfo.DefaultOverrides))?.ToStringDictionary() ?? new Dictionary<string, string>();
+                BaselineCacheInfo baseline = new BaselineCacheInfo(defaultOverrides, description: obj.ToString(nameof(IBaselineInfo.Description)));
                 allBaselines[property.Name] = baseline;
             }
 

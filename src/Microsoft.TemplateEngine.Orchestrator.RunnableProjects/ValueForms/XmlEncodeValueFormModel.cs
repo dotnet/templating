@@ -4,11 +4,12 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms
 {
-    internal class XmlEncodeValueFormModel : IValueForm
+    internal class XmlEncodeValueFormModel : ISerializableValueForm
     {
         private static readonly XmlWriterSettings Settings = new XmlWriterSettings { ConformanceLevel = ConformanceLevel.Fragment };
 
@@ -30,7 +31,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms
             return new XmlEncodeValueFormModel(name);
         }
 
-        public string Process(IReadOnlyDictionary<string, IValueForm> forms, string value)
+        public string Process(string value, IReadOnlyDictionary<string, IValueForm> forms)
         {
             StringBuilder output = new StringBuilder();
             using (XmlWriter w = XmlWriter.Create(output, Settings))

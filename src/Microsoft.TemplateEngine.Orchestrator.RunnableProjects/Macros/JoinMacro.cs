@@ -71,20 +71,20 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             }
 
             string separator = string.Empty;
-            if (deferredConfig.Parameters.TryGetValue("separator", out JToken separatorToken))
+            if (deferredConfig.Parameters.TryGetValue("separator", out string separatorToken))
             {
-                separator = separatorToken?.ToString();
+                separator = JToken.Parse(separatorToken).ToString();
+            }
+            bool removeEmptyValues = false;
+            if (deferredConfig.Parameters.TryGetValue("removeEmptyValues", out string removeEmptyValuesToken))
+            {
+                removeEmptyValues = JToken.Parse(removeEmptyValuesToken).ToBool();
             }
 
-            bool removeEmptyValues =
-                deferredConfig.Parameters.TryGetValue("removeEmptyValues", out JToken removeEmptyValuesToken) &&
-                removeEmptyValuesToken != null &&
-                removeEmptyValuesToken.ToBool();
-
             List<KeyValuePair<string, string>> symbolsList = new List<KeyValuePair<string, string>>();
-            if (deferredConfig.Parameters.TryGetValue("symbols", out JToken symbolsToken))
+            if (deferredConfig.Parameters.TryGetValue("symbols", out string symbolsToken))
             {
-                JArray switchJArray = (JArray)symbolsToken;
+                JArray switchJArray = JToken.Parse(symbolsToken) as JArray;
                 foreach (JToken switchInfo in switchJArray)
                 {
                     JObject map = (JObject)switchInfo;

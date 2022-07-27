@@ -10,6 +10,7 @@ using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Mocks;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Microsoft.TemplateEngine.TestHelper;
 using Microsoft.TemplateEngine.Utils;
 using Xunit;
@@ -27,7 +28,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
         private IEngineEnvironmentSettings _environmentSettings;
 
         private IDictionary<string, string> _sourceFiles;
-        private readonly SimpleConfigModel _configModel;
+        private readonly TemplateConfigModel _configModel;
         private string _sourceBaseDir;
 
         private IMountPoint _sourceMountPoint;
@@ -52,7 +53,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             _configFile = TestFileSystemHelper.DefaultConfigRelativePath;
         }
 
-        public TestTemplateSetup(IEngineEnvironmentSettings environment, string sourceBaseDir, IDictionary<string, string> sourceFiles, SimpleConfigModel configModel)
+        public TestTemplateSetup(IEngineEnvironmentSettings environment, string sourceBaseDir, IDictionary<string, string> sourceFiles, TemplateConfigModel configModel)
         {
             _environmentSettings = environment;
             _sourceFiles = sourceFiles;

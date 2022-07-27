@@ -3,6 +3,8 @@
 
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Core.Contracts;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
@@ -18,6 +20,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         public IReadOnlyList<IReplacementTokens> Replacements { get; set; }
 
-        public IReadOnlyList<ICustomOperationModel> CustomOperations { get; set; }
+        public IReadOnlyList<CustomOperationModel> CustomOperations { get; set; }
     }
 }

@@ -41,16 +41,16 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
                 throw new InvalidCastException("Couldn't cast the rawConfig as a GeneratedSymbolDeferredMacroConfig");
             }
 
-            if (!deferredConfig.Parameters.TryGetValue("format", out JToken formatToken))
+            if (!deferredConfig.Parameters.TryGetValue("format", out string formatToken))
             {
                 throw new ArgumentNullException("format");
             }
-            string format = formatToken.ToString();
+            string format = JToken.Parse(formatToken).ToString();
 
             bool utc;
-            if (deferredConfig.Parameters.TryGetValue("utc", out JToken utcToken))
+            if (deferredConfig.Parameters.TryGetValue("utc", out string utcToken))
             {
-                utc = utcToken.ToBool();
+                utc = JToken.Parse(utcToken).ToBool();
             }
             else
             {

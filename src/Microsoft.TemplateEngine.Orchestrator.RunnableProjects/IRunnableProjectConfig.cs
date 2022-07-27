@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Core.Contracts;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
@@ -27,7 +28,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         IReadOnlyList<PostActionModel> PostActionModels { get; }
 
-        IReadOnlyList<ICreationPathModel> PrimaryOutputs { get; }
+        IReadOnlyList<PrimaryOutputModel> PrimaryOutputs { get; }
 
         void Evaluate(IVariableCollection rootVariableCollection);
 

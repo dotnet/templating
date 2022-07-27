@@ -18,18 +18,17 @@ using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Core.Expressions.Cpp2;
 using Microsoft.TemplateEngine.Core.Operations;
-using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config;
-using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel;
-using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig;
 using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json.Linq;
-using static Microsoft.TemplateEngine.Orchestrator.RunnableProjects.RunnableProjectGenerator;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
     /// <summary>
-    /// The class maps template.json configuration read in <see cref="SimpleConfigModel"/> to runnable configuration.
+    /// The class maps template.json configuration read in <see cref="TemplateConfigModel"/> to runnable configuration.
     /// </summary>
     internal partial class RunnableProjectConfig : IRunnableProjectConfig
     {
@@ -47,12 +46,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         };
 
         private static readonly string[] CopyOnlyPatternDefaults = new[] { "**/node_modules/**" };
-        private static readonly Dictionary<string, string> RenameDefaults = new Dictionary<string, string>(StringComparer.Ordinal);
         private static readonly string[] DefaultPlaceholderFilenames = new[] { "-.-", "_._" };
         private readonly IEngineEnvironmentSettings _settings;
         private readonly ILogger<RunnableProjectConfig> _logger;
 
-        private readonly SimpleConfigModel _configuration;
+        private readonly TemplateConfigModel _configuration;
         private readonly Dictionary<Guid, string> _guidToGuidPrefixMap = new Dictionary<Guid, string>();
 
         private readonly IGenerator _generator;
@@ -79,9 +77,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 configModifiers = new SimpleConfigModifiers(baselineName!);
             }
-            _configuration = SimpleConfigModel.FromJObject (
+            _configuration = TemplateConfigModel.FromJObject (
                 MergeAdditionalConfiguration(templateFile.ReadJObjectFromIFile(), templateFile),
-                _settings.Host.LoggerFactory.CreateLogger<SimpleConfigModel>(),
+                _settings.Host.LoggerFactory.CreateLogger<TemplateConfigModel>(),
                 configModifiers,
                 templateFile.GetDisplayPath());
 
@@ -112,7 +110,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         /// <summary>
         /// Test constructor.
         /// </summary>
-        internal RunnableProjectConfig(IEngineEnvironmentSettings settings, IGenerator generator, SimpleConfigModel configuration, IFile? configurationFile = null)
+        internal RunnableProjectConfig(IEngineEnvironmentSettings settings, IGenerator generator, TemplateConfigModel configuration, IFile? configurationFile = null)
         {
             _settings = settings;
             _logger = _settings.Host.LoggerFactory.CreateLogger<RunnableProjectConfig>();
@@ -127,7 +125,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         public IReadOnlyList<PostActionModel> PostActionModels => _configuration.PostActionModels;
 
-        public IReadOnlyList<ICreationPathModel> PrimaryOutputs => _configuration.PrimaryOutputs;
+        public IReadOnlyList<PrimaryOutputModel> PrimaryOutputs => _configuration.PrimaryOutputs;
 
         public IFile SourceFile => _sourceFile ?? throw new InvalidOperationException("Source file is not initialized, are you using test constructor?");
 
@@ -149,14 +147,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
                     foreach (ExtendedFileSource source in _configuration.Sources)
                     {
-                        IReadOnlyList<string> includePattern = JTokenAsFilenameToReadOrArrayToCollection(source.Include, SourceFile, IncludePatternDefaults);
-                        IReadOnlyList<string> excludePattern = JTokenAsFilenameToReadOrArrayToCollection(source.Exclude, SourceFile, ExcludePatternDefaults);
-                        IReadOnlyList<string> copyOnlyPattern = JTokenAsFilenameToReadOrArrayToCollection(source.CopyOnly, SourceFile, CopyOnlyPatternDefaults);
+                        IReadOnlyList<string> includePattern = TryReadConfigFromFile(source.Include, SourceFile, IncludePatternDefaults);
+                        IReadOnlyList<string> excludePattern = TryReadConfigFromFile(source.Exclude, SourceFile, ExcludePatternDefaults);
+                        IReadOnlyList<string> copyOnlyPattern = TryReadConfigFromFile(source.CopyOnly, SourceFile, CopyOnlyPatternDefaults);
                         FileSourceEvaluable topLevelEvaluable = new FileSourceEvaluable(includePattern, excludePattern, copyOnlyPattern);
-                        IReadOnlyDictionary<string, string> renamePatterns = new Dictionary<string, string>(source.Rename ?? RenameDefaults, StringComparer.Ordinal);
+                        IReadOnlyDictionary<string, string> renamePatterns = source.Rename;
                         FileSourceMatchInfo matchInfo = new FileSourceMatchInfo(
-                            source.Source ?? "./",
-                            source.Target ?? "./",
+                            source.Source,
+                            source.Target,
                             topLevelEvaluable,
                             renamePatterns,
                             new List<FileSourceEvaluable>());
@@ -300,7 +298,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     // put the custom configs first in the list
                     HashSet<string> processedGlobs = new HashSet<string>();
 
-                    foreach (ICustomFileGlobModel customGlobModel in _configuration.SpecialCustomOperations)
+                    foreach (CustomFileGlobModel customGlobModel in _configuration.SpecialCustomOperations)
                     {
                         if (customGlobModel.ConditionResult)
                         {
@@ -357,7 +355,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
         }
 
-        internal SimpleConfigModel ConfigurationModel => _configuration;
+        internal TemplateConfigModel ConfigurationModel => _configuration;
 
         public void Evaluate(IVariableCollection rootVariableCollection)
         {
@@ -378,7 +376,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             // evaluate the file glob (specials) conditions
             // the result is needed for SpecialOperationConfig
-            foreach (ICustomFileGlobModel fileGlobModel in _configuration.SpecialCustomOperations)
+            foreach (CustomFileGlobModel fileGlobModel in _configuration.SpecialCustomOperations)
             {
                 fileGlobModel.EvaluateCondition(_settings.Host.Logger, rootVariableCollection);
             }
@@ -388,14 +386,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             _sources = EvaluateSources(rootVariableCollection, resolvedNameParamValue);
 
             // evaluate the conditions and resolve the paths for the PrimaryOutputs
-            foreach (ICreationPathModel pathModel in _configuration.PrimaryOutputs)
+            foreach (PrimaryOutputModel pathModel in _configuration.PrimaryOutputs)
             {
                 pathModel.EvaluateCondition(_settings.Host.Logger, rootVariableCollection);
 
                 if (pathModel.ConditionResult)
                 {
                     pathModel.PathResolved = FileRenameGenerator.ApplyRenameToPrimaryOutput(
-                        pathModel.PathOriginal,
+                        pathModel.Path,
                         _settings,
                         _configuration.SourceName,
                         resolvedNameParamValue,
@@ -493,7 +491,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return validModel;
         }
 
-        private static IReadOnlyDictionary<string, Parameter> ExtractParameters(SimpleConfigModel configuration)
+        private static IReadOnlyDictionary<string, Parameter> ExtractParameters(TemplateConfigModel configuration)
         {
             Dictionary<string, Parameter> parameters = new Dictionary<string, Parameter>();
             foreach (BaseValueSymbol baseSymbol in configuration.Symbols.OfType<BaseValueSymbol>())
@@ -626,32 +624,30 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         //          If so, read that files content as the exclude list.
         //          Otherwise returns an array containing the string value as its only entry.
         // Otherwise, interpret the token as an array and return the content.
-        private static IReadOnlyList<string> JTokenAsFilenameToReadOrArrayToCollection(JToken token, IFile sourceFile, string[] defaultSet)
+        private static IReadOnlyList<string> TryReadConfigFromFile(IReadOnlyList<string> configs, IFile sourceFile, string[] defaultSet)
         {
-            if (token == null)
+            if (configs == null || !configs.Any())
             {
                 return defaultSet;
             }
-
-            if (token.Type == JTokenType.String)
+            if (configs.Count == 1)
             {
-                string tokenValue = token.ToString();
-                if ((tokenValue.IndexOfAny(Path.GetInvalidPathChars()) != -1)
-                    || (!sourceFile.Parent?.FileInfo(tokenValue)?.Exists ?? true))
+                string singleConfig = configs[0];
+                if ((singleConfig.IndexOfAny(Path.GetInvalidPathChars()) != -1)
+                    || (!sourceFile.Parent?.FileInfo(singleConfig)?.Exists ?? true))
                 {
-                    return new List<string>(new[] { tokenValue });
+                    return configs;
                 }
                 else
                 {
-                    using (Stream excludeList = sourceFile.Parent!.FileInfo(tokenValue)!.OpenRead())
+                    using (Stream excludeList = sourceFile.Parent!.FileInfo(singleConfig)!.OpenRead())
                     using (TextReader reader = new StreamReader(excludeList, Encoding.UTF8, true, 4096, true))
                     {
                         return reader.ReadToEnd().Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
                     }
                 }
             }
-
-            return token.ArrayAsStrings();
+            return configs;
         }
 
         private IReadOnlyList<IReplacementTokens> ProduceSymbolFilenameReplacements()
@@ -668,10 +664,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 {
                     foreach (string formName in p.Forms.GlobalForms)
                     {
-                        if (_configuration.Forms.TryGetValue(formName, out IValueForm valueForm))
+                        if (_configuration.Forms.TryGetValue(formName, out IValueForm valueForm) && p.FileRename != null)
                         {
                             string symbolName = symbol.Name + "{-VALUE-FORMS-}" + formName;
-                            string processedFileReplacement = valueForm.Process(_configuration.Forms, p.FileRename);
+                            string processedFileReplacement = valueForm.Process(p.FileRename, _configuration.Forms);
                             GenerateFileReplacementsForSymbol(processedFileReplacement, symbolName, filenameReplacements);
                         }
                         else
@@ -691,7 +687,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return filenameReplacements;
         }
 
-        private IGlobalRunConfig ProduceOperationSetup(SpecialOperationConfigParams defaultModel, bool generateMacros, ICustomFileGlobModel? customGlobModel = null)
+        private IGlobalRunConfig ProduceOperationSetup(SpecialOperationConfigParams defaultModel, bool generateMacros, CustomFileGlobModel? customGlobModel = null)
         {
             List<IOperationProvider> operations = new List<IOperationProvider>();
 
@@ -722,12 +718,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
 
             List<IMacroConfig>? macros = null;
-            List<IMacroConfig> computedMacros = new List<IMacroConfig>();
+            List<IMacroConfig>? computedMacros = new List<IMacroConfig>();
             List<IReplacementTokens> macroGeneratedReplacements = new List<IReplacementTokens>();
 
             if (generateMacros)
             {
-                macros = ProduceMacroConfig(computedMacros);
+                macros = ProduceMacroConfig();
+                computedMacros = ProduceComputedMacroConfig();
             }
 
             foreach (BaseSymbol symbol in _configuration.Symbols)
@@ -753,7 +750,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                                 string symbolName = sourceVariable + "{-VALUE-FORMS-}" + formName;
                                 if (!string.IsNullOrWhiteSpace(replaceSymbol.Replaces))
                                 {
-                                    string processedReplacement = valueForm.Process(_configuration.Forms, baseValueSymbol.Replaces);
+                                    string processedReplacement = valueForm.Process(replaceSymbol.Replaces!, _configuration.Forms);
                                     GenerateReplacementsForSymbol(replaceSymbol, processedReplacement, symbolName, macroGeneratedReplacements);
                                 }
                                 if (generateMacros)
@@ -785,21 +782,21 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 }
             }
 
-            IReadOnlyList<ICustomOperationModel> customOperationConfig;
+            IReadOnlyList<CustomOperationModel> customOperationConfig;
             if (customGlobModel != null && customGlobModel.Operations != null)
             {
                 customOperationConfig = customGlobModel.Operations;
             }
             else
             {
-                customOperationConfig = new List<ICustomOperationModel>();
+                customOperationConfig = new List<CustomOperationModel>();
             }
 
             foreach (IOperationProvider p in operations.ToList())
             {
                 if (!string.IsNullOrEmpty(p.Id))
                 {
-                    string prefix = (customGlobModel == null || string.IsNullOrEmpty(customGlobModel.FlagPrefix)) ? defaultModel.FlagPrefix : customGlobModel.FlagPrefix;
+                    string? prefix = (customGlobModel == null || string.IsNullOrEmpty(customGlobModel.FlagPrefix)) ? defaultModel.FlagPrefix : customGlobModel.FlagPrefix;
                     string on = $"{prefix}+:{p.Id}";
                     string off = $"{prefix}-:{p.Id}";
                     string onNoEmit = $"{prefix}+:{p.Id}:noEmit";
@@ -825,7 +822,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             TokenConfig replacementConfig = replaces.TokenConfigBuilder();
             if (symbol.ReplacementContexts.Count > 0)
             {
-                foreach (IReplacementContext context in symbol.ReplacementContexts)
+                foreach (ReplacementContext context in symbol.ReplacementContexts)
                 {
                     TokenConfig builder = replacementConfig;
                     if (!string.IsNullOrEmpty(context.OnlyIfAfter))
@@ -853,7 +850,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             filenameReplacements.Add(new ReplacementTokens(sourceVariable, replacementConfig));
         }
 
-        private List<IMacroConfig> ProduceMacroConfig(List<IMacroConfig> computedMacroConfigs)
+        private List<IMacroConfig> ProduceMacroConfig()
         {
             List<IMacroConfig> generatedMacroConfigs = new List<IMacroConfig>();
 
@@ -869,37 +866,41 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 }
             }
 
-            foreach (BaseSymbol symbol in _configuration.Symbols)
+            foreach (GeneratedSymbol symbol in _configuration.Symbols.OfType<GeneratedSymbol>())
             {
-                if (symbol is ComputedSymbol computed)
+                string type = symbol.Generator;
+                string variableName = symbol.Name;
+                Dictionary<string, string> configParams = new Dictionary<string, string>();
+
+                foreach (KeyValuePair<string, string> parameter in symbol.Parameters)
                 {
-                    string value = computed.Value;
-                    string? evaluator = computed.Evaluator;
-                    computedMacroConfigs.Add(new EvaluateMacroConfig(symbol.Name, "bool", value, evaluator));
+                    configParams.Add(parameter.Key, parameter.Value);
                 }
-                else if (symbol is GeneratedSymbol generated)
+
+                string? dataType = symbol.DataType;
+
+                if (string.Equals(dataType, "choice", StringComparison.OrdinalIgnoreCase))
                 {
-                    string type = generated.Generator;
-                    string variableName = symbol.Name;
-                    Dictionary<string, JToken> configParams = new Dictionary<string, JToken>();
-
-                    foreach (KeyValuePair<string, JToken> parameter in generated.Parameters)
-                    {
-                        configParams.Add(parameter.Key, parameter.Value);
-                    }
-
-                    string? dataType = generated.DataType;
-
-                    if (string.Equals(dataType, "choice", StringComparison.OrdinalIgnoreCase))
-                    {
-                        dataType = "string";
-                    }
-
-                    generatedMacroConfigs.Add(new GeneratedSymbolDeferredMacroConfig(type, dataType, variableName, configParams));
+                    dataType = "string";
                 }
+
+                generatedMacroConfigs.Add(new GeneratedSymbolDeferredMacroConfig(type, dataType, variableName, configParams));
             }
 
             return generatedMacroConfigs;
+        }
+
+        private List<IMacroConfig> ProduceComputedMacroConfig()
+        {
+            List<IMacroConfig> computedMacroConfigs = new List<IMacroConfig>();
+            foreach (ComputedSymbol symbol in _configuration.Symbols.OfType<ComputedSymbol>())
+            {
+                string value = symbol.Value;
+                string? evaluator = symbol.Evaluator;
+                computedMacroConfigs.Add(new EvaluateMacroConfig(symbol.Name, "bool", value, evaluator));
+            }
+
+            return computedMacroConfigs;
         }
 
         private List<FileSourceMatchInfo> EvaluateSources(IVariableCollection rootVariableCollection, object resolvedNameParamValue)
@@ -913,44 +914,44 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             foreach (ExtendedFileSource source in _configuration.Sources)
             {
-                if (!string.IsNullOrEmpty(source.Condition) && !Cpp2StyleEvaluatorDefinition.EvaluateFromString(_settings.Host.Logger, source.Condition, rootVariableCollection))
+                if (!source.EvaluateCondition(_settings.Host.Logger, rootVariableCollection))
                 {
                     continue;
                 }
 
-                IReadOnlyList<string> topIncludePattern = JTokenAsFilenameToReadOrArrayToCollection(source.Include, SourceFile, IncludePatternDefaults).ToList();
-                IReadOnlyList<string> topExcludePattern = JTokenAsFilenameToReadOrArrayToCollection(source.Exclude, SourceFile, ExcludePatternDefaults).ToList();
-                IReadOnlyList<string> topCopyOnlyPattern = JTokenAsFilenameToReadOrArrayToCollection(source.CopyOnly, SourceFile, CopyOnlyPatternDefaults).ToList();
+                IReadOnlyList<string> topIncludePattern = TryReadConfigFromFile(source.Include, SourceFile, IncludePatternDefaults).ToList();
+                IReadOnlyList<string> topExcludePattern = TryReadConfigFromFile(source.Exclude, SourceFile, ExcludePatternDefaults).ToList();
+                IReadOnlyList<string> topCopyOnlyPattern = TryReadConfigFromFile(source.CopyOnly, SourceFile, CopyOnlyPatternDefaults).ToList();
                 FileSourceEvaluable topLevelPatterns = new FileSourceEvaluable(topIncludePattern, topExcludePattern, topCopyOnlyPattern);
 
-                Dictionary<string, string> fileRenamesFromSource = new Dictionary<string, string>(source.Rename ?? RenameDefaults, StringComparer.Ordinal);
+                Dictionary<string, string> fileRenamesFromSource = source.Rename.ToDictionary(x => x.Key, x => x.Value);
                 List<FileSourceEvaluable> modifierList = new List<FileSourceEvaluable>();
 
                 if (source.Modifiers != null)
                 {
                     foreach (SourceModifier modifier in source.Modifiers)
                     {
-                        if (string.IsNullOrEmpty(modifier.Condition) || Cpp2StyleEvaluatorDefinition.EvaluateFromString(_settings.Host.Logger, modifier.Condition, rootVariableCollection))
+                        if (modifier.EvaluateCondition(_settings.Host.Logger, rootVariableCollection))
                         {
-                            IReadOnlyList<string> modifierIncludes = JTokenAsFilenameToReadOrArrayToCollection(modifier.Include, SourceFile, Array.Empty<string>());
-                            IReadOnlyList<string> modifierExcludes = JTokenAsFilenameToReadOrArrayToCollection(modifier.Exclude, SourceFile, Array.Empty<string>());
-                            IReadOnlyList<string> modifierCopyOnly = JTokenAsFilenameToReadOrArrayToCollection(modifier.CopyOnly, SourceFile, Array.Empty<string>());
+                            IReadOnlyList<string> modifierIncludes = TryReadConfigFromFile(modifier.Include, SourceFile, Array.Empty<string>());
+                            IReadOnlyList<string> modifierExcludes = TryReadConfigFromFile(modifier.Exclude, SourceFile, Array.Empty<string>());
+                            IReadOnlyList<string> modifierCopyOnly = TryReadConfigFromFile(modifier.CopyOnly, SourceFile, Array.Empty<string>());
                             FileSourceEvaluable modifierPatterns = new FileSourceEvaluable(modifierIncludes, modifierExcludes, modifierCopyOnly);
                             modifierList.Add(modifierPatterns);
 
                             if (modifier.Rename != null)
                             {
-                                foreach (JProperty property in modifier.Rename.Properties())
+                                foreach (KeyValuePair<string, string> property in modifier.Rename)
                                 {
-                                    fileRenamesFromSource[property.Name] = property.Value.Value<string>() ?? string.Empty;
+                                    fileRenamesFromSource[property.Key] = property.Value;
                                 }
                             }
                         }
                     }
                 }
 
-                string sourceDirectory = source.Source ?? "./";
-                string targetDirectory = source.Target ?? "./";
+                string sourceDirectory = source.Source;
+                string targetDirectory = source.Target;
                 IReadOnlyDictionary<string, string> allRenamesForSource = AugmentRenames(SourceFile, sourceDirectory, ref targetDirectory, resolvedNameParamValue, rootVariableCollection, fileRenamesFromSource);
 
                 FileSourceMatchInfo sourceMatcher = new FileSourceMatchInfo(

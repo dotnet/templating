@@ -12,7 +12,7 @@ using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Components;
 using Microsoft.TemplateEngine.Abstractions.Constraints;
 using Microsoft.TemplateEngine.Edge.Constraints;
-using Microsoft.TemplateEngine.Orchestrator.RunnableProjects;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Microsoft.TemplateEngine.TestHelper;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -41,7 +41,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 }
             };
 
-            var configModel = SimpleConfigModel.FromJObject(JObject.FromObject(config));
+            var configModel = TemplateConfigModel.FromJObject(JObject.FromObject(config));
             IWorkloadsInfoProvider workloadInfoProvider = new WorkloadsInfoProviderMock(workloads); //A.Fake<IWorkloadsInfoProvider>();
             IEngineEnvironmentSettings settings = A.Fake<IEngineEnvironmentSettings>();
             A.CallTo(() => settings.Components.OfType<IWorkloadsInfoProvider>()).Returns(new[] { workloadInfoProvider });
@@ -73,7 +73,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 }
             };
 
-            var configModel = SimpleConfigModel.FromJObject(JObject.FromObject(config));
+            var configModel = TemplateConfigModel.FromJObject(JObject.FromObject(config));
             IWorkloadsInfoProvider workloadInfoProviderA = A.Fake<IWorkloadsInfoProvider>();
             A.CallTo(() => workloadInfoProviderA
                     .GetInstalledWorkloadsAsync(A<CancellationToken>._))
@@ -115,7 +115,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 }
             };
 
-            var configModel = SimpleConfigModel.FromJObject(JObject.FromObject(config));
+            var configModel = TemplateConfigModel.FromJObject(JObject.FromObject(config));
             IWorkloadsInfoProvider workloadInfoProviderA = A.Fake<IWorkloadsInfoProvider>();
             A.CallTo(() => workloadInfoProviderA
                     .GetInstalledWorkloadsAsync(A<CancellationToken>._))

@@ -4,11 +4,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms
 {
-    internal class KebabCaseValueFormModel : IValueForm
+    internal class KebabCaseValueFormModel : ISerializableValueForm
     {
         internal KebabCaseValueFormModel()
         {
@@ -28,7 +29,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms
             return new KebabCaseValueFormModel(name);
         }
 
-        public string Process(IReadOnlyDictionary<string, IValueForm> forms, string value)
+        public string Process(string value, IReadOnlyDictionary<string, IValueForm> forms)
         {
             if (value is null)
             {

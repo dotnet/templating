@@ -4,13 +4,12 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
-using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel;
 using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
+namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
 {
-    internal class SymbolModelConverter
+    internal sealed class SymbolModelConverter
     {
         // Note: Only ParameterSymbol has a Description property, this it's the only one that gets localization
         // TODO: change how localization gets merged in, don't do it here.
@@ -38,33 +37,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 logger.LogWarning(ex.Message);
                 return null;
-            }
-        }
-
-        internal static IReadOnlyList<IReplacementContext> ReadReplacementContexts(JObject jObject)
-        {
-            JArray onlyIf = jObject.Get<JArray>("onlyIf");
-
-            if (onlyIf != null)
-            {
-                List<IReplacementContext> contexts = new List<IReplacementContext>();
-                foreach (JToken entry in onlyIf.Children())
-                {
-                    if (!(entry is JObject x))
-                    {
-                        continue;
-                    }
-
-                    string before = entry.ToString("before");
-                    string after = entry.ToString("after");
-                    contexts.Add(new ReplacementContext(before, after));
-                }
-
-                return contexts;
-            }
-            else
-            {
-                return Array.Empty<IReplacementContext>();
             }
         }
     }

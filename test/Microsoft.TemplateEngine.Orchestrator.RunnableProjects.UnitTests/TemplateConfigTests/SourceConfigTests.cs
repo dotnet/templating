@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Microsoft.TemplateEngine.TestHelper;
 using NuGet.Protocol;
 using Xunit;
@@ -24,19 +25,19 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
         public void SourceConfigExcludesAreOverriddenByIncludes()
         {
             string sourceBasePath = FileSystemHelpers.GetNewVirtualizedPath(_engineEnvironmentSettings);
-            SimpleConfigModel config = new SimpleConfigModel()
+            TemplateConfigModel config = new TemplateConfigModel()
             {
                 Identity = "test",
                 Sources = new List<ExtendedFileSource>()
                 { 
                     new ExtendedFileSource()
                     {
-                        Exclude = "**/*.config",
+                        Exclude = new [] { "**/*.config" },
                         Modifiers = new List<SourceModifier>()
                         {
                             new SourceModifier()
                             {
-                                Include = "core.config"
+                                Include = new [] { "core.config" }
 
                             }
                         }
@@ -65,19 +66,19 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
         {
             string sourceBasePath = FileSystemHelpers.GetNewVirtualizedPath(_engineEnvironmentSettings);
 
-            SimpleConfigModel config = new SimpleConfigModel()
+            TemplateConfigModel config = new TemplateConfigModel()
             {
                 Identity = "test",
                 Sources = new List<ExtendedFileSource>()
                 {
                     new ExtendedFileSource()
                     {
-                        Include = "**/*.txt",
+                        Include = new [] { "**/*.txt" },
                         Modifiers = new List<SourceModifier>()
                         {
                             new SourceModifier()
                             {
-                                CopyOnly = "copy.me"
+                                CopyOnly = new [] { "copy.me" },
                             }
                         }
                     }
@@ -111,19 +112,19 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
         public void CopyOnlyWithParentIncludeActuallyCopiesFile()
         {
             string sourceBasePath = FileSystemHelpers.GetNewVirtualizedPath(_engineEnvironmentSettings);
-            SimpleConfigModel config = new SimpleConfigModel()
+            TemplateConfigModel config = new TemplateConfigModel()
             {
                 Identity = "test",
                 Sources = new List<ExtendedFileSource>()
                 {
                     new ExtendedFileSource()
                     {
-                        Include = "**/*.me",
+                        Include = new [] { "**/*.me" },
                         Modifiers = new List<SourceModifier>()
                         {
                             new SourceModifier()
                             {
-                                CopyOnly = "copy.me"
+                                CopyOnly = new [] { "copy.me" }
                             }
                         }
                     }
@@ -155,19 +156,19 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
         public void CopyOnlyWithWildcardAndParentIncludeActuallyCopiesFile()
         {
             string sourceBasePath = FileSystemHelpers.GetNewVirtualizedPath(_engineEnvironmentSettings);
-            SimpleConfigModel config = new SimpleConfigModel()
+            TemplateConfigModel config = new TemplateConfigModel()
             {
                 Identity = "test",
                 Sources = new List<ExtendedFileSource>()
                 {
                     new ExtendedFileSource()
                     {
-                        Include = "*copy.me",
+                        Include = new [] { "*copy.me" },
                         Modifiers = new List<SourceModifier>()
                         {
                             new SourceModifier()
                             {
-                                CopyOnly = "**/*.me"
+                                CopyOnly = new [] { "**/*.me" }
                             }
                         }
                     }
@@ -199,7 +200,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
         public void IncludeModifierOverridesPreviousExcludeModifierTemplateTest()
         {
             string sourceBasePath = FileSystemHelpers.GetNewVirtualizedPath(_engineEnvironmentSettings);
-            SimpleConfigModel config = new SimpleConfigModel()
+            TemplateConfigModel config = new TemplateConfigModel()
             {
                 Identity = "test",
                 Sources = new List<ExtendedFileSource>()
@@ -210,11 +211,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
                         {
                             new SourceModifier()
                             {
-                                Exclude = "*.xyz",
+                                Exclude = new [] { "*.xyz" }
                             },
                             new SourceModifier()
                             {
-                                Include = "include.xyz"
+                                Include = new [] { "include.xyz" }
                             }
                         }
                     }
@@ -249,7 +250,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
         {
             string sourceBasePath = FileSystemHelpers.GetNewVirtualizedPath(_engineEnvironmentSettings);
 
-            SimpleConfigModel config = new SimpleConfigModel()
+            TemplateConfigModel config = new TemplateConfigModel()
             {
                 Identity = "test",
                 Sources = new List<ExtendedFileSource>()
@@ -260,11 +261,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
                         {
                             new SourceModifier()
                             {
-                                Include = "*.xyz"
+                                Include = new [] { "*.xyz" }
                             },
                             new SourceModifier()
                             {
-                                Exclude = "exclude.xyz",
+                                Exclude = new [] { "exclude.xyz" }
                             },
                         }
                     }

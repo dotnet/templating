@@ -15,6 +15,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions
     {
         string Key { get; }
 
-        IEnumerable<IOperationProvider> ConfigureFromJObject(JObject rawConfiguration, IDirectory templateRoot);
+        IEnumerable<IOperationProvider> ConfigureFromJson(string rawConfiguration, IDirectory templateRoot);
     }
 }

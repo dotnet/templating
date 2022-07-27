@@ -6,12 +6,13 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Utilities;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms
 {
-    internal class DefaultSafeNamespaceValueFormModel : IValueForm
+    internal class DefaultSafeNamespaceValueFormModel : ISerializableValueForm
     {
         internal const string FormName = "safe_namespace";
         private readonly string? _name;
@@ -35,7 +36,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms
             return new DefaultSafeNamespaceValueFormModel(name);
         }
 
-        public virtual string Process(IReadOnlyDictionary<string, IValueForm>? forms, string value)
+        public virtual string Process(string value, IReadOnlyDictionary<string, IValueForm> forms)
         {
             const char invalidCharacterReplacement = '_';
 

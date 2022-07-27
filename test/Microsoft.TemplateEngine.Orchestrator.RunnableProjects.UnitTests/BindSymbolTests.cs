@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Components;
 using Microsoft.TemplateEngine.Abstractions.Mount;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Microsoft.TemplateEngine.TestHelper;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -107,7 +108,7 @@ MyValue
             TestFileSystemHelper.WriteTemplateSource(settings, sourceBasePath, templateSourceFiles);
             IMountPoint? sourceMountPoint = TestFileSystemHelper.CreateMountPoint(settings, sourceBasePath);
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
-            SimpleConfigModel configModel = SimpleConfigModel.FromJObject(JObject.FromObject(templateConfig));
+            TemplateConfigModel configModel = TemplateConfigModel.FromJObject(JObject.FromObject(templateConfig));
             IRunnableProjectConfig runnableConfig = new RunnableProjectConfig(settings, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
             IParameterSet parameters = new ParameterSet(runnableConfig);
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
@@ -176,7 +177,7 @@ MyValue
             TestFileSystemHelper.WriteTemplateSource(settings, sourceBasePath, templateSourceFiles);
             IMountPoint? sourceMountPoint = TestFileSystemHelper.CreateMountPoint(settings, sourceBasePath);
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
-            SimpleConfigModel configModel = SimpleConfigModel.FromJObject(JObject.FromObject(templateConfig));
+            TemplateConfigModel configModel = TemplateConfigModel.FromJObject(JObject.FromObject(templateConfig));
             IRunnableProjectConfig runnableConfig = new RunnableProjectConfig(settings, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
             IParameterSet parameters = new ParameterSet(runnableConfig);
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
@@ -257,7 +258,7 @@ MyValue
             TestFileSystemHelper.WriteTemplateSource(settings, sourceBasePath, templateSourceFiles);
             IMountPoint? sourceMountPoint = TestFileSystemHelper.CreateMountPoint(settings, sourceBasePath);
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
-            SimpleConfigModel configModel = SimpleConfigModel.FromJObject(JObject.FromObject(templateConfig));
+            TemplateConfigModel configModel = TemplateConfigModel.FromJObject(JObject.FromObject(templateConfig));
             IRunnableProjectConfig runnableConfig = new RunnableProjectConfig(settings, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
             IParameterSet parameters = new ParameterSet(runnableConfig);
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
@@ -340,7 +341,7 @@ MyValue
             TestFileSystemHelper.WriteTemplateSource(settings, sourceBasePath, templateSourceFiles);
             IMountPoint? sourceMountPoint = TestFileSystemHelper.CreateMountPoint(settings, sourceBasePath);
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
-            SimpleConfigModel configModel = SimpleConfigModel.FromJObject(JObject.FromObject(templateConfig));
+            TemplateConfigModel configModel = TemplateConfigModel.FromJObject(JObject.FromObject(templateConfig));
             IRunnableProjectConfig runnableConfig = new RunnableProjectConfig(settings, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
             IParameterSet parameters = new ParameterSet(runnableConfig);
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
@@ -410,7 +411,7 @@ MyValue
             TestFileSystemHelper.WriteTemplateSource(settings, sourceBasePath, templateSourceFiles);
             IMountPoint? sourceMountPoint = TestFileSystemHelper.CreateMountPoint(settings, sourceBasePath);
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
-            SimpleConfigModel configModel = SimpleConfigModel.FromJObject(JObject.FromObject(templateConfig));
+            TemplateConfigModel configModel = TemplateConfigModel.FromJObject(JObject.FromObject(templateConfig));
             IRunnableProjectConfig runnableConfig = new RunnableProjectConfig(settings, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
             IParameterSet parameters = new ParameterSet(runnableConfig);
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;

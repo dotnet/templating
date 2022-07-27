@@ -2,11 +2,12 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms
 {
-    internal class IdentityValueForm : IValueForm
+    internal class IdentityValueForm : ISerializableValueForm
     {
         internal const string FormName = "identity";
 
@@ -28,7 +29,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms
             return new IdentityValueForm(name);
         }
 
-        public string Process(IReadOnlyDictionary<string, IValueForm> forms, string value)
+        public string Process(string value, IReadOnlyDictionary<string, IValueForm> forms)
         {
             return value;
         }

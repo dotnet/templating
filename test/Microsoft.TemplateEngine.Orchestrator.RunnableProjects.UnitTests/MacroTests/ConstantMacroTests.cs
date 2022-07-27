@@ -45,8 +45,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
         {
             string variableName = "myConstant";
             string value = "1048576";
-            Dictionary<string, JToken> jsonParameters = new Dictionary<string, JToken>();
-            jsonParameters.Add("value", value);
+            string valueConfig = JToken.FromObject(value).ToString(Newtonsoft.Json.Formatting.None);
+            Dictionary<string, string> jsonParameters = new Dictionary<string, string>();
+            jsonParameters.Add("value", valueConfig);
             GeneratedSymbolDeferredMacroConfig deferredConfig = new GeneratedSymbolDeferredMacroConfig("ConstantMacro", null, variableName, jsonParameters);
 
             IVariableCollection variables = new VariableCollection();

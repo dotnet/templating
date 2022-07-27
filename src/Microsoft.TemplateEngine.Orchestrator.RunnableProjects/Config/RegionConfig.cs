@@ -10,7 +10,7 @@ using Microsoft.TemplateEngine.Core.Operations;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 using Newtonsoft.Json.Linq;
 
-namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config
+namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig
 {
     internal class RegionConfig : IOperationConfig
     {
@@ -18,15 +18,16 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config
 
         public Guid Id => new Guid("3D33B3BF-F40E-43EB-A14D-F40516F880CD");
 
-        public IEnumerable<IOperationProvider> ConfigureFromJObject(JObject rawConfiguration, IDirectory templateRoot)
+        public IEnumerable<IOperationProvider> ConfigureFromJson(string rawConfiguration, IDirectory templateRoot)
         {
-            string id = rawConfiguration.ToString("id");
-            string start = rawConfiguration.ToString("start");
-            string end = rawConfiguration.ToString("end");
-            bool include = rawConfiguration.ToBool("include");
-            bool regionTrim = rawConfiguration.ToBool("trim");
-            bool regionWholeLine = rawConfiguration.ToBool("wholeLine");
-            bool onByDefault = rawConfiguration.ToBool("onByDefault");
+            JObject json = JObject.Parse(rawConfiguration);
+            string id = json.ToString("id");
+            string start = json.ToString("start");
+            string end = json.ToString("end");
+            bool include = json.ToBool("include");
+            bool regionTrim = json.ToBool("trim");
+            bool regionWholeLine = json.ToBool("wholeLine");
+            bool onByDefault = json.ToBool("onByDefault");
 
             yield return new Region(start.TokenConfig(), end.TokenConfig(), include, regionWholeLine, regionTrim, id, onByDefault);
         }

@@ -3,11 +3,12 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms
 {
-    internal class FirstUpperCaseInvariantValueFormModel : IValueForm
+    internal class FirstUpperCaseInvariantValueFormModel : ISerializableValueForm
     {
         internal FirstUpperCaseInvariantValueFormModel()
         {
@@ -27,7 +28,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms
             return new FirstUpperCaseValueFormModel(name);
         }
 
-        public string Process(IReadOnlyDictionary<string, IValueForm> forms, string value)
+        public string Process(string value, IReadOnlyDictionary<string, IValueForm> forms)
         {
             switch (value)
             {
