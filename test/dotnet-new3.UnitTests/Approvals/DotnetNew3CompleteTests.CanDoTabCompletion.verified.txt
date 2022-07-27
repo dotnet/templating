@@ -1,4 +1,6 @@
-﻿classlib
+﻿buildprops
+buildtargets
+classlib
 console
 editorconfig
 gitignore
