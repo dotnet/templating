@@ -1,6 +1,8 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,19 +18,19 @@ namespace Microsoft.TemplateEngine.Core
     {
         private static readonly IEnumerable<string> NoKeys = Array.Empty<string>();
         private readonly IDictionary<string, object> _values;
-        private IVariableCollection _parent;
+        private IVariableCollection? _parent;
 
         public VariableCollection()
             : this(null)
         {
         }
 
-        public VariableCollection(VariableCollection parent)
+        public VariableCollection(VariableCollection? parent)
             : this(parent, new Dictionary<string, object>())
         {
         }
 
-        public VariableCollection(IVariableCollection parent, IDictionary<string, object> values)
+        public VariableCollection(IVariableCollection? parent, IDictionary<string, object> values)
         {
             _parent = parent;
             _values = values ?? new Dictionary<string, object>();
@@ -39,9 +41,9 @@ namespace Microsoft.TemplateEngine.Core
             }
         }
 
-        public event KeysChangedEventHander KeysChanged;
+        public event KeysChangedEventHander? KeysChanged;
 
-        public event ValueReadEventHander ValueRead;
+        public event ValueReadEventHander? ValueRead;
 
         public int Count => Keys.Count;
 
@@ -49,7 +51,7 @@ namespace Microsoft.TemplateEngine.Core
 
         public ICollection<string> Keys => _values.Keys.Union(_parent?.Keys ?? NoKeys).ToList();
 
-        public IVariableCollection Parent
+        public IVariableCollection? Parent
         {
             get { return _parent; }
 
@@ -92,33 +94,7 @@ namespace Microsoft.TemplateEngine.Core
             }
         }
 
-        public static VariableCollection Environment(IEngineEnvironmentSettings environmentSettings) => Environment(environmentSettings, null, true, true, "{0}");
-
-        public static VariableCollection Environment(IEngineEnvironmentSettings environmentSettings, string formatString) => Environment(environmentSettings, null, true, true, formatString);
-
-        public static VariableCollection Environment(IEngineEnvironmentSettings environmentSettings, VariableCollection parent) => Environment(environmentSettings, parent, true, true, "{0}");
-
-        public static VariableCollection Environment(IEngineEnvironmentSettings environmentSettings, VariableCollection parent, string formatString) => Environment(environmentSettings, parent, true, true, formatString);
-
-        public static VariableCollection Environment(IEngineEnvironmentSettings environmentSettings, bool changeCase, bool upperCase) => Environment(environmentSettings, null, changeCase, upperCase, "{0}");
-
-        public static VariableCollection Environment(IEngineEnvironmentSettings environmentSettings, bool changeCase, bool upperCase, string formatString) => Environment(environmentSettings, null, changeCase, upperCase, formatString);
-
-        public static VariableCollection Environment(IEngineEnvironmentSettings environmentSettings, VariableCollection parent, bool changeCase, bool upperCase, string formatString)
-        {
-            VariableCollection vc = new VariableCollection(parent);
-            IReadOnlyDictionary<string, string> variables = environmentSettings.Environment.GetEnvironmentVariables();
-
-            foreach (KeyValuePair<string, string> entry in variables)
-            {
-                string name = string.Format(formatString, !changeCase ? entry.Key : upperCase ? entry.Key.ToUpperInvariant() : entry.Key.ToLowerInvariant());
-                vc[name] = entry.Value;
-            }
-
-            return vc;
-        }
-
-        public static VariableCollection Root() => Root(null);
+        public static VariableCollection Root() => Root(new Dictionary<string, object>());
 
         public static VariableCollection Root(IDictionary<string, object> values) => new VariableCollection(null, values);
 
@@ -130,19 +106,12 @@ namespace Microsoft.TemplateEngine.Core
 
             foreach (KeyValuePair<string, string> source in variableConfig.Sources)
             {
-                VariableCollection variablesForSource = null;
+                VariableCollection? variablesForSource = null;
                 string format = source.Value;
 
                 switch (source.Key)
                 {
-                    case "environment":
-                        variablesForSource = Environment(environmentSettings, format);
-
-                        if (variableConfig.FallbackFormat != null)
-                        {
-                            variablesForSource = Environment(environmentSettings, variablesForSource, variableConfig.FallbackFormat);
-                        }
-                        break;
+                    //may be extended for other categories in future if needed.
                     case "user":
                         variablesForSource = VariableCollectionFromParameters(parameters, format);
 
@@ -154,8 +123,10 @@ namespace Microsoft.TemplateEngine.Core
                         }
                         break;
                 }
-
-                collections[source.Key] = variablesForSource;
+                if (variablesForSource != null)
+                {
+                    collections[source.Key] = variablesForSource;
+                }
             }
 
             foreach (string order in variableConfig.Order)
@@ -173,24 +144,6 @@ namespace Microsoft.TemplateEngine.Core
             }
 
             return variables;
-        }
-
-        public static VariableCollection VariableCollectionFromParameters(IParameterSetData parameters, string format)
-        {
-            VariableCollection vc = new VariableCollection();
-            foreach (ITemplateParameter param in parameters)
-            {
-                string key = string.Format(format ?? "{0}", param.Name);
-
-                if (parameters.ParametersData.TryGetValue(param, out ParameterData value) &&
-                    value.IsEnabled &&
-                    !(value.Value == null || value.Value is string str && string.IsNullOrEmpty(str)))
-                {
-                    vc[key] = value.Value;
-                }
-            }
-
-            return vc;
         }
 
         public void Add(KeyValuePair<string, object> item)
@@ -275,6 +228,24 @@ namespace Microsoft.TemplateEngine.Core
             }
 
             return _parent?.TryGetValue(key, out value) ?? false;
+        }
+
+        private static VariableCollection VariableCollectionFromParameters(IParameterSet parameters, string format)
+        {
+            VariableCollection vc = new VariableCollection();
+            foreach (ITemplateParameter param in parameters)
+            {
+                string key = string.Format(format ?? "{0}", param.Name);
+
+                if (parameters.ParametersData.TryGetValue(param, out ParameterData value) &&
+                    value.IsEnabled &&
+                    !(value.Value == null || value.Value is string str && string.IsNullOrEmpty(str)))
+                {
+                    vc[key] = value.Value;
+                }
+            }
+
+            return vc;
         }
 
         private void OnKeysChanged()

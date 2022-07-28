@@ -6,9 +6,9 @@
       <Sha>4e0a5ed9d8e2379f79c578197329c3d60b725a73</Sha>
       <SourceBuild RepoName="source-build-externals" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="7.0.0-alpha.1.22371.2">
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="7.0.0-alpha.1.22377.2">
       <Uri>https://github.com/dotnet/source-build-reference-packages</Uri>
-      <Sha>3d0f9fa840fd71d18bfbc37215b7beda90d9b1d7</Sha>
+      <Sha>50dcdcdf7c919c748571747a5130a499d3ac9874</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
     <Dependency Name="VS.Redist.Common.NetCore.SharedFramework.x64.7.0" Version="7.0.0-rc.1.22374.4">
@@ -33,9 +33,9 @@
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
-    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="7.0.0-beta.22372.1">
+    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="7.0.0-beta.22377.15">
       <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>11672d906390046e77a34b6406d9e02229fd7e45</Sha>
+      <Sha>7df67590fb080663ada77f269a8b132ef127a039</Sha>
       <SourceBuild RepoName="arcade" ManagedOnly="true" />
     </Dependency>
   </ToolsetDependencies>
