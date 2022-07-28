@@ -4,6 +4,7 @@
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using FluentAssertions;
 using Microsoft.NET.TestFramework.Assertions;
 using Microsoft.NET.TestFramework.Commands;
 using Microsoft.TemplateEngine.TestHelper;
@@ -186,6 +187,8 @@ Restore succeeded\.",
         [InlineData("Solution File", "solution")]
         [InlineData("Dotnet local tool manifest file", "tool-manifest")]
         [InlineData("Web Config", "webconfig")]
+        [InlineData("MSBuild Directory.Build.props file", "buildprops")]
+        [InlineData("MSBuild Directory.Build.targets file", "buildtargets")]
         public void AllCommonItemsCreate(string expectedTemplateName, string templateShortName)
         {
             string workingDir = TestUtils.CreateTemporaryFolder();
@@ -201,6 +204,50 @@ Restore succeeded\.",
 
             Directory.Delete(workingDir, true);
         }
+
+        private static void InstanciateAndAssert(ITestOutputHelper log, SharedHomeDirectory root, string templateName, string templateShortName, string[] templateArgs, Action<string> assertGivenWorkingDirectory)
+        {
+            string workingDir = TestUtils.CreateTemporaryFolder();
+            var allArgs = new List<string>( 1 + templateArgs.Length )
+            {
+                templateShortName
+            };
+            allArgs.AddRange(templateArgs);
+            new DotnetNewCommand(log, allArgs.ToArray())
+                .WithCustomHive(root.HomeDirectory)
+                .WithWorkingDirectory(workingDir)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And.NotHaveStdErr()
+                .And.HaveStdOut($@"The template ""{templateName}"" was created successfully.");
+            assertGivenWorkingDirectory(workingDir);
+            Directory.Delete(workingDir, true);
+        }
+
+        private static void HasImport(string filePath) => File.ReadAllText(filePath).Should().Contain("<Import");
+
+        [Fact]
+        public void BuildPropsTemplateCalculatesInclude() =>
+            InstanciateAndAssert(
+                _log,
+                _fixture,
+                "MSBuild Directory.Build.props file",
+                "msbuildprops",
+                new [] { "--inherit" },
+                workingDir => HasImport(Path.Combine(workingDir, "Directory.Build.props"))
+            );
+
+        [Fact]
+        public void BuildTargetsTemplateCalculatesInclude() =>
+            InstanciateAndAssert(
+                _log,
+                _fixture,
+                "MSBuild Directory.Build.targets file",
+                "msbuildtargets",
+                new [] { "--inherit" },
+                workingDir => HasImport(Path.Combine(workingDir, "Directory.Build.targets"))
+            );
 
         [Fact]
         public void EditorConfigTests()
@@ -730,7 +777,7 @@ class Program
         }
 
         [Theory]
-        //creates all possible combinations for supported templates, language versions and frameworks 
+        //creates all possible combinations for supported templates, language versions and frameworks
         [MemberData(nameof(FileScopedNamespacesSupport_Data))]
         public void FileScopedNamespacesSupport(string name, bool pass, string? framework, string? langVersion, bool supportsFeature)
         {
