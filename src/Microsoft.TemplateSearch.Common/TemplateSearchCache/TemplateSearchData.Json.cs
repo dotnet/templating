@@ -123,7 +123,9 @@ namespace Microsoft.TemplateSearch.Common
 
                 if (value.TemplateInfo.ParametersDefinition.Any())
                 {
-                    writer.WritePropertyName(nameof(ITemplateInfo.ParametersDefinition));
+#pragma warning disable CS0618 // Type or member is obsolete
+                    writer.WritePropertyName(nameof(ITemplateInfo.Parameters));
+#pragma warning restore CS0618 // Type or member is obsolete
                     writer.WriteStartArray();
                     foreach (ITemplateParameter param in value.TemplateInfo.ParametersDefinition)
                     {
