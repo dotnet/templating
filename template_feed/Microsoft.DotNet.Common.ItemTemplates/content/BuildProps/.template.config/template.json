@@ -12,21 +12,15 @@
     "type": "item",
     "language": "MSBuild"
   },
-  "sources": [
-    {
-      "source": "./",
-      "target": "./"
-    }
-  ],
   "identity": "Microsoft.Standard.QuickStarts.DirectoryProps",
+  "groupIdentity": "msbuilddirectoryprops",
+  "precedence": 0,
   "shortName": "buildprops",
   "symbols": {
     "inherit": {
       "type": "parameter",
       "datatype": "bool",
-      "defaultValue": "false",
-      "defaultIfOptionWithoutValue": "true",
-      "displayName": "inherit",
+      "displayName": "Inherit",
       "description": "If true, adds an Import for any Directory.Build.props in the parent directory. Directory.Build.props don't inherit by default, so doing this allows you to build up a set of customizations folder-by-folder."
     }
   }
