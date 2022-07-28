@@ -98,7 +98,7 @@ namespace Microsoft.TemplateEngine.Core
 
         public static VariableCollection Root(IDictionary<string, object> values) => new VariableCollection(null, values);
 
-        public static IVariableCollection SetupVariables(IEngineEnvironmentSettings environmentSettings, IParameterSetData parameters, IVariableConfig variableConfig)
+        public static IVariableCollection SetupVariables(IParameterSetData parameters, IVariableConfig variableConfig)
         {
             IVariableCollection variables = Root();
 
@@ -230,7 +230,7 @@ namespace Microsoft.TemplateEngine.Core
             return _parent?.TryGetValue(key, out value) ?? false;
         }
 
-        private static VariableCollection VariableCollectionFromParameters(IParameterSet parameters, string format)
+        private static VariableCollection VariableCollectionFromParameters(IParameterSetData parameters, string format)
         {
             VariableCollection vc = new VariableCollection();
             foreach (ITemplateParameter param in parameters)

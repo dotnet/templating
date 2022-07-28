@@ -132,6 +132,6 @@ namespace Microsoft.TemplateEngine.Abstractions
         /// <param name="variables">Dictionary of variables to be substituted within the expression.</param>
         /// <param name="referencedVariablesKeys">Keys of variables that have been substituted within the expression.</param>
         /// <returns></returns>
-        bool EvaluateFromString(ILogger logger, string text, IDictionary<string, object?> variables, HashSet<string>? referencedVariablesKeys = null);
+        bool EvaluateFromString(ILogger logger, string text, IDictionary<string, object> variables, HashSet<string>? referencedVariablesKeys = null);
     }
 }

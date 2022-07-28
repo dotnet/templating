@@ -47,7 +47,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return ParameterConverter.ConvertParameterValueToType(environmentSettings.Host, parameter, untypedValue, out valueResolutionError);
         }
 
-        bool IGenerator.EvaluateFromString(ILogger logger, string text, IDictionary<string, object?> variables, HashSet<string>? referencedVariablesKeys)
+        bool IGenerator.EvaluateFromString(ILogger logger, string text, IDictionary<string, object> variables, HashSet<string>? referencedVariablesKeys)
         {
             VariableCollection variableCollection = new VariableCollection(null, variables);
             return Cpp2StyleEvaluatorDefinition.EvaluateFromString(logger, text, variableCollection, referencedVariablesKeys);

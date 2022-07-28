@@ -33,10 +33,10 @@ namespace Microsoft.TemplateEngine.Edge.Template
 
         public IEnumerable<ITemplateParameter> ParameterDefinitions => this;
 
-        public IDictionary<ITemplateParameter, object> ResolvedValues =>
+        public IDictionary<ITemplateParameter, object?> ResolvedValues =>
             _resolvedValues
                 .Where(p => p.Value.Value != null)
-                .ToDictionary(k => k.Key, k => k.Value.Value!);
+                .ToDictionary(k => k.Key, k => k.Value.Value);
 
         public static IParameterSetBuilder CreateWithDefaults(IGenerator generator, IParametersDefinition parametersDefinition, IEngineEnvironmentSettings environment, string? name = null)
         {
@@ -185,8 +185,8 @@ namespace Microsoft.TemplateEngine.Edge.Template
                     .Where(p => p.Value != null)
                     .ToDictionary(p => p.ParameterDefinition.Name, p => p);
 
-            IDictionary<string, object?> variableCollection =
-                variables.ToDictionary(p => p.Key, p => p.Value.Value);
+            IDictionary<string, object> variableCollection =
+                variables.ToDictionary(p => p.Key, p => p.Value.Value!);
 
             EvaluateEnablementConditions(generator, evaluatedParameters, variableCollection, variables, logger);
             EvaluateRequirementCondition(generator, evaluatedParameters, variableCollection, logger);
@@ -195,7 +195,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
         private static void EvaluateEnablementConditions(
             IGenerator generator,
             IReadOnlyList<EvalData> parameters,
-            IDictionary<string, object?> variableCollection,
+            IDictionary<string, object> variableCollection,
             Dictionary<string, EvalData> variables,
             ILogger logger)
         {
@@ -270,7 +270,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
         private static void EvaluateRequirementCondition(
             IGenerator generator,
             IReadOnlyList<EvalData> parameters,
-            IDictionary<string, object?> variableCollection,
+            IDictionary<string, object> variableCollection,
             ILogger logger
         )
         {
