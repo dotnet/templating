@@ -151,6 +151,24 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition) or a failure to pass the condition results for parameters with condition(s) in template. Offending parameters: {0}..
+        /// </summary>
+        internal static string EvaluatedInputDataSet_Error_MismatchedConditions {
+            get {
+                return ResourceManager.GetString("EvaluatedInputDataSet_Error_MismatchedConditions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition) or a failure to pass the condition results for parameters with condition(s) in template. Offending parameter(s): {0}..
+        /// </summary>
+        internal static string EvaluatedInputParameterData_Error_ConditionsInvalid {
+            get {
+                return ResourceManager.GetString("EvaluatedInputParameterData_Error_ConditionsInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The folder {0} doesn&apos;t exist..
         /// </summary>
         internal static string FolderInstaller_InstallResult_Error_FolderDoesNotExist {

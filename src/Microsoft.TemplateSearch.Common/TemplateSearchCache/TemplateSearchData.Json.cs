@@ -121,11 +121,11 @@ namespace Microsoft.TemplateSearch.Common
                     writer.WriteEndObject();
                 }
 
-                if (value.TemplateInfo.Parameters.Any())
+                if (value.TemplateInfo.ParametersDefinition.Any())
                 {
-                    writer.WritePropertyName(nameof(ITemplateInfo.Parameters));
+                    writer.WritePropertyName(nameof(ITemplateInfo.ParametersDefinition));
                     writer.WriteStartArray();
-                    foreach (ITemplateParameter param in value.TemplateInfo.Parameters)
+                    foreach (ITemplateParameter param in value.TemplateInfo.ParametersDefinition)
                     {
                         writer.WriteStartObject();
                         writer.WritePropertyName(nameof(ITemplateParameter.Name));

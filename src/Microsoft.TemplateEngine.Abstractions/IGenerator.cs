@@ -26,7 +26,7 @@ namespace Microsoft.TemplateEngine.Abstractions
         /// <param name="targetDirectory">target output directory to generate template to.</param>
         /// <param name="cancellationToken">cancellation token.</param>
         /// <returns><see cref="ICreationResult"/> containing post actions and primary outputs after template generation.</returns>
-        [Obsolete("Replaced by CreateAsync with IEvaluatedParameterSetData", false)]
+        [Obsolete("Replaced by CreateAsync with IParameterSetData", false)]
         Task<ICreationResult> CreateAsync(
             IEngineEnvironmentSettings environmentSettings,
             ITemplate template,
@@ -43,7 +43,7 @@ namespace Microsoft.TemplateEngine.Abstractions
         /// <param name="targetDirectory">target output directory to generate template to.</param>
         /// <param name="cancellationToken">cancellation token.</param>
         /// <returns><see cref="ICreationEffects"/> containing file changes, post actions and primary outputs that would have been done after template generation.</returns>
-        [Obsolete("Replaced by GetCreationEffectsAsync with IEvaluatedParameterSetData", false)]
+        [Obsolete("Replaced by GetCreationEffectsAsync with IParameterSetData", false)]
         Task<ICreationEffects> GetCreationEffectsAsync(
             IEngineEnvironmentSettings environmentSettings,
             ITemplate template,
@@ -75,7 +75,7 @@ namespace Microsoft.TemplateEngine.Abstractions
         Task<ICreationResult> CreateAsync(
             IEngineEnvironmentSettings environmentSettings,
             ITemplate template,
-            IEvaluatedParameterSetData parameters,
+            IParameterSetData parameters,
             string targetDirectory,
             CancellationToken cancellationToken);
 
@@ -91,7 +91,7 @@ namespace Microsoft.TemplateEngine.Abstractions
         Task<ICreationEffects> GetCreationEffectsAsync(
             IEngineEnvironmentSettings environmentSettings,
             ITemplate template,
-            IEvaluatedParameterSetData parameters,
+            IParameterSetData parameters,
             string targetDirectory,
             CancellationToken cancellationToken);
 
@@ -123,5 +123,15 @@ namespace Microsoft.TemplateEngine.Abstractions
         /// <param name="valueResolutionError">true if value could not be converted, false otherwise.</param>
         /// <returns>the converted <paramref name="untypedValue"/> value to the type of <paramref name="parameter"/> or null if the value cannot be converted.</returns>
         object? ConvertParameterValueToType(IEngineEnvironmentSettings environmentSettings, ITemplateParameter parameter, string untypedValue, out bool valueResolutionError);
+
+        /// <summary>
+        /// Evaluates expression string with the provided variables and returns the result.
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="text"></param>
+        /// <param name="variables">Dictionary of variables to be substituted within the expression.</param>
+        /// <param name="referencedVariablesKeys">Keys of variables that have been substituted within the expression.</param>
+        /// <returns></returns>
+        bool EvaluateFromString(ILogger logger, string text, IDictionary<string, object?> variables, HashSet<string>? referencedVariablesKeys = null);
     }
 }

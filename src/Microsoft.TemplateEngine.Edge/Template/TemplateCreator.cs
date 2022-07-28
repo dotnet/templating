@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
@@ -14,7 +15,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Abstractions.Parameters;
-using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Utils;
 
@@ -65,7 +65,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 name,
                 fallbackName,
                 outputPath,
-                new ParameterSetData(templateInfo, inputParameters),
+                new InputDataSet(templateInfo, inputParameters),
                 forceCreation,
                 baselineName,
                 dryRun,
@@ -91,7 +91,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
             string? name,
             string? fallbackName,
             string? outputPath,
-            IParameterSetData? inputParameters,
+            IInputDataSet? inputParameters,
             bool forceCreation = false,
             string? baselineName = null,
             bool dryRun = false,
@@ -99,7 +99,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
 #pragma warning restore RS0026 // Do not add multiple public overloads with optional parameters
         {
             _ = templateInfo ?? throw new ArgumentNullException(nameof(templateInfo));
-            inputParameters = inputParameters ?? new ParameterSetData(templateInfo);
+            inputParameters = inputParameters ?? new InputDataSet(templateInfo);
             cancellationToken.ThrowIfCancellationRequested();
 
             ITemplate? template = LoadTemplate(templateInfo, baselineName);
@@ -129,7 +129,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 IComponentManager componentManager = _environmentSettings.Components;
 
                 // setup separate sets of parameters to be used for GetCreationEffects() and by CreateAsync().
-                if (!TryCreateParameterSet(template, realName!, inputParameters, out IEvaluatedParameterSetData? effectParams, out TemplateCreationResult? resultIfParameterCreationFailed))
+                if (!TryCreateParameterSet(template, realName!, inputParameters, out IParameterSetData? effectParams, out TemplateCreationResult? resultIfParameterCreationFailed))
                 {
                     //resultIfParameterCreationFailed is not null when TryCreateParameterSet is false
                     return resultIfParameterCreationFailed!;
@@ -164,7 +164,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                     }
                 }
 
-                if (!TryCreateParameterSet(template, realName!, inputParameters, out IEvaluatedParameterSetData? creationParams, out resultIfParameterCreationFailed))
+                if (!TryCreateParameterSet(template, realName!, inputParameters, out IParameterSetData? creationParams, out resultIfParameterCreationFailed))
                 {
                     return resultIfParameterCreationFailed!;
                 }
@@ -208,7 +208,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
             }
         }
 
-        private bool AnyParametersWithInvalidDefaultsUnresolved(IReadOnlyList<string> defaultParamsWithInvalidValues, IParameterSetData inputParameters, out IReadOnlyList<string> invalidDefaultParameters)
+        private bool AnyParametersWithInvalidDefaultsUnresolved(IReadOnlyList<string> defaultParamsWithInvalidValues, IInputDataSet inputParameters, out IReadOnlyList<string> invalidDefaultParameters)
         {
             invalidDefaultParameters = defaultParamsWithInvalidValues.Where(x => !inputParameters.ContainsKey(x)).ToList();
             return invalidDefaultParameters.Count > 0;
@@ -251,9 +251,9 @@ namespace Microsoft.TemplateEngine.Edge.Template
         /// <returns></returns>
         [Obsolete("This method is deprecated.")]
         //This method should become internal once Cli help logic is refactored.
-        public IParameterSetBuilder SetupDefaultParamValuesFromTemplateAndHost(ITemplate template, string realName, out IReadOnlyList<string> paramsWithInvalidValues)
+        public IParameterSet SetupDefaultParamValuesFromTemplateAndHost(ITemplate template, string realName, out IReadOnlyList<string> paramsWithInvalidValues)
         {
-            return ParameterSetBuilder.CreateWithDefaults(template.Parameters, realName, _environmentSettings, out paramsWithInvalidValues);
+            return (IParameterSet)SetupDefaultParamValuesFromTemplateAndHostInternal(template, realName, out paramsWithInvalidValues);
         }
 
         /// <summary>
@@ -266,18 +266,28 @@ namespace Microsoft.TemplateEngine.Edge.Template
         /// <param name="paramsWithInvalidValues"></param>
         [Obsolete("This method is deprecated.")]
         //This method should become internal once Cli help logic is refactored.
-        public void ResolveUserParameters(ITemplate template, IParameterSetBuilder templateParams, IReadOnlyDictionary<string, string?> inputParameters, out IReadOnlyList<string> paramsWithInvalidValues)
+        public void ResolveUserParameters(ITemplate template, IParameterSet templateParams, IReadOnlyDictionary<string, string?> inputParameters, out IReadOnlyList<string> paramsWithInvalidValues)
         {
-            ResolveUserParameters(template, templateParams, new ParameterSetData(template, inputParameters), out paramsWithInvalidValues);
+            ResolveUserParameters(template, new LegacyParamSetWrapper(templateParams), InputDataSet.FromLegacyParameterSet(templateParams), out paramsWithInvalidValues);
         }
 
-        private void ResolveUserParameters(ITemplate template, IParameterSetBuilder templateParamsBuilder, IParameterSetData inputParameters, out IReadOnlyList<string> paramsWithInvalidValues)
+        private IParameterSetBuilder SetupDefaultParamValuesFromTemplateAndHostInternal(ITemplate template, string realName, out IReadOnlyList<string> paramsWithInvalidValues)
+        {
+            return ParameterSetBuilder.CreateWithDefaults(template.Generator, template.ParametersDefinition, realName, _environmentSettings, out paramsWithInvalidValues);
+        }
+
+        private void ResolveUserParameters(ITemplate template, IParameterSetBuilder templateParamsBuilder, IInputDataSet inputParameters, out IReadOnlyList<string> paramsWithInvalidValues)
         {
             List<string> tmpParamsWithInvalidValues = new List<string>();
             paramsWithInvalidValues = tmpParamsWithInvalidValues;
 
-            foreach (ParameterData inputParam in inputParameters.ParametersData
-                         .Where(p => p.Value.InputDataState != InputDataState.Unset)
+            foreach (InputParameterData inputParam in inputParameters.ParametersData
+                         .Where(p => p.Value.InputDataState != InputDataState.Unset &&
+                                     !(p.Value is EvaluatedInputParameterData
+                                         {
+                                             IsEnabledConditionResult: false
+                                         })
+                                     )
                          .Select(p => p.Value))
             {
                 if (templateParamsBuilder.TryGetValue(inputParam.ParameterDefinition.Name, out ITemplateParameter paramFromTemplate))
@@ -293,7 +303,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                                 {
                                     throw new InvalidOperationException($"{nameof(resolvedValue)} cannot be null when {nameof(valueResolutionError)} is 'false'.");
                                 }
-                                templateParamsBuilder.SetParameterValue(paramFromTemplate, resolvedValue);
+                                templateParamsBuilder.SetParameterValue(paramFromTemplate, resolvedValue, DataSource.DefaultIfNoValue);
                             }
                             // don't fail on value resolution errors, but report them as authoring problems.
                             else
@@ -315,7 +325,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                             {
                                 throw new InvalidOperationException($"{nameof(resolvedValue)} cannot be null when {nameof(valueResolutionError)} is 'false'.");
                             }
-                            templateParamsBuilder.SetParameterValue(paramFromTemplate, resolvedValue);
+                            templateParamsBuilder.SetParameterValue(paramFromTemplate, resolvedValue, DataSource.Host);
                         }
                         else
                         {
@@ -389,25 +399,28 @@ namespace Microsoft.TemplateEngine.Edge.Template
         /// <param name="parametersBuilder"></param>
         /// <param name="missingParamNames"></param>
         /// <returns></returns>
-        private bool CheckForMissingRequiredParameters(IEvaluatedParameterSetData templateParams, IParameterSetBuilder parametersBuilder, out IList<string> missingParamNames)
+        private bool CheckForMissingRequiredParameters(IEvaluatedInputDataSet templateParams, IParameterSetBuilder parametersBuilder, out IList<string> missingParamNames)
         {
             ITemplateEngineHost host = _environmentSettings.Host;
             bool anyMissingParams = false;
             missingParamNames = new List<string>();
 
-            foreach (EvaluatedParameterData evaluatedParameterData in templateParams.EvaluatedParametersData.Values.Where(v => v.EvaluatedPrecedence == EvaluatedPrecedence.Required && v.InputDataState == InputDataState.Unset))
+            foreach (EvaluatedInputParameterData evaluatedParameterData in templateParams.ParametersData.Values.Where(v => v.EvaluatedPrecedence == EvaluatedPrecedence.Required && v.InputDataState == InputDataState.Unset))
             {
                 string? newParamValue;
+                const int _MAX_RETRIES = 3;
+                int retries = 0;
 #pragma warning disable CS0618 // Type or member is obsolete - for backward compatibility
                 while (host.OnParameterError(evaluatedParameterData.ParameterDefinition, "", "Missing required parameter", out newParamValue)
 #pragma warning restore CS0618 // Type or member is obsolete
-                       && string.IsNullOrEmpty(newParamValue))
+                       && string.IsNullOrEmpty(newParamValue)
+                       && ++retries < _MAX_RETRIES)
                 {
                 }
 
                 if (!string.IsNullOrEmpty(newParamValue))
                 {
-                    parametersBuilder.SetParameterValue(evaluatedParameterData.ParameterDefinition, newParamValue!);
+                    parametersBuilder.SetParameterValue(evaluatedParameterData.ParameterDefinition, newParamValue!, DataSource.HostOnError);
                 }
                 else
                 {
@@ -419,45 +432,61 @@ namespace Microsoft.TemplateEngine.Edge.Template
             return anyMissingParams;
         }
 
-        private IEvaluatedParameterSetData EvaluateConditionalParameters(
+        private IEvaluatedInputDataSet? EvaluateConditionalParameters(
             IParameterSetBuilder parametersBuilder,
-            IParameterSetData inputParameters,
+            IInputDataSet inputParameters,
             ITemplate template,
-            out IReadOnlyList<string> paramsWithInvalidValues)
+            out IReadOnlyList<string> paramsWithInvalidValues,
+            out bool isExternalEvaluationInvalid)
         {
-            if (inputParameters is IEvaluatedParameterSetData evaluatedParameterSet)
+            if (inputParameters is IEvaluatedInputDataSet evaluatedParameterSet)
             {
-                foreach (var evaluatedParameterData in evaluatedParameterSet.EvaluatedParametersData)
+                foreach (var evaluatedParameterData in evaluatedParameterSet.ParametersData)
                 {
                     parametersBuilder.SetParameterEvaluation(evaluatedParameterData.Key, evaluatedParameterData.Value);
+                }
+
+                if (!parametersBuilder.CheckIsParametersEvaluationCorrect(template.Generator, _logger, out paramsWithInvalidValues))
+                {
+                    _logger.LogInformation(
+                        "Parameters conditions ('IsEnbaled', 'IsRequired') evaluation supplied by host didn't match validation against internal evaluation for following parameters: [{0}]. Host requested to continue in such case: {1}",
+                        paramsWithInvalidValues.ToCsvString(),
+                        evaluatedParameterSet.ContinueOnMismatchedEvaluations);
+
+                    if (!evaluatedParameterSet.ContinueOnMismatchedEvaluations)
+                    {
+                        isExternalEvaluationInvalid = true;
+                        return null;
+                    }
                 }
             }
             else
             {
-                parametersBuilder.EvaluateConditionalParameters(_logger);
+                parametersBuilder.EvaluateConditionalParameters(template.Generator, _logger);
             }
 
-            IEvaluatedParameterSetData evaluatedParameterSetData = parametersBuilder.Build();
+            isExternalEvaluationInvalid = false;
+            IEvaluatedInputDataSet evaluatedParameterSetData = parametersBuilder.Build();
             List<string> defaultParamsWithInvalidValues = new List<string>();
 
             // for params that changed to optional and do not have values - try get 'Default' value (as for required it's not obtained)
-            evaluatedParameterSetData.EvaluatedParametersData.Values
+            evaluatedParameterSetData.ParametersData.Values
                 .Where(v =>
                     v.InputDataState != InputDataState.Set &&
                     !string.IsNullOrEmpty(v.ParameterDefinition.Precedence.IsRequiredCondition) &&
                     v.EvaluatedPrecedence != EvaluatedPrecedence.Disabled &&
                     v.EvaluatedPrecedence != EvaluatedPrecedence.Required)
-                .ForEach(p => ParameterConverter.SetParameterDefault(parametersBuilder, p.ParameterDefinition, _environmentSettings, false, false, defaultParamsWithInvalidValues));
+                .ForEach(p => ParameterSetBuilder.SetParameterDefault(template.Generator, parametersBuilder, p.ParameterDefinition, _environmentSettings, false, false, defaultParamsWithInvalidValues));
 
             paramsWithInvalidValues = defaultParamsWithInvalidValues;
             return evaluatedParameterSetData;
         }
 
-        private bool TryCreateParameterSet(ITemplate template, string realName, IParameterSetData inputParameters, out IEvaluatedParameterSetData? templateParams, out TemplateCreationResult? failureResult)
+        private bool TryCreateParameterSet(ITemplate template, string realName, IInputDataSet inputParameters, out IParameterSetData? templateParams, out TemplateCreationResult? failureResult)
         {
             // there should never be param errors here. If there are, the template is malformed, or the host gave an invalid value.
 #pragma warning disable CS0618 // Type or member is obsolete - temporary until the method becomes internal.
-            IParameterSetBuilder parameterSetBuilder = SetupDefaultParamValuesFromTemplateAndHost(template, realName, out IReadOnlyList<string> defaultParamsWithInvalidValues);
+            IParameterSetBuilder parameterSetBuilder = SetupDefaultParamValuesFromTemplateAndHostInternal(template, realName, out IReadOnlyList<string> defaultParamsWithInvalidValues);
 
             ResolveUserParameters(template, parameterSetBuilder, inputParameters, out IReadOnlyList<string> userParamsWithInvalidValues);
 
@@ -471,16 +500,15 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 return false;
             }
 
-            templateParams = EvaluateConditionalParameters(parameterSetBuilder, inputParameters, template, out var paramsWithInvalidValues);
-
+            IEvaluatedInputDataSet? evaluatedParams = EvaluateConditionalParameters(parameterSetBuilder, inputParameters, template, out var paramsWithInvalidValues, out bool isExternalEvaluationInvalid);
             if (paramsWithInvalidValues.Any())
             {
-                failureResult = new TemplateCreationResult(CreationResultStatus.InvalidParamValues, template.Name, paramsWithInvalidValues.ToCsvString());
+                failureResult = new TemplateCreationResult(isExternalEvaluationInvalid ? CreationResultStatus.CondtionsEvaluationMismatch : CreationResultStatus.InvalidParamValues, template.Name, paramsWithInvalidValues.ToCsvString());
                 templateParams = null;
                 return false;
             }
 
-            bool missingParams = CheckForMissingRequiredParameters(templateParams, parameterSetBuilder, out IList<string> missingParamNames);
+            bool missingParams = CheckForMissingRequiredParameters(evaluatedParams!, parameterSetBuilder, out IList<string> missingParamNames);
 
             if (missingParams)
             {
@@ -489,10 +517,36 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 return false;
             }
 
-            templateParams = parameterSetBuilder.Build();
+            templateParams = parameterSetBuilder.Build().ToParameterSetData();
 
             failureResult = null;
             return true;
+        }
+
+        /// <summary>
+        /// This class is to be used solely to hold backward compatibility of <see cref="ResolveUserParameters"/> method.
+        ///  Hence only the base and <see cref="SetParameterValue"/> are implemented - no other methods are called in scope of <see cref="ResolveUserParameters"/>.
+        /// </summary>
+        [Obsolete("Proxy for obsolete ResolveUserParameters method", false)]
+        private class LegacyParamSetWrapper : ParametersDefinition, IParameterSetBuilder
+        {
+            private readonly IParameterSet _parameterSet;
+
+            public LegacyParamSetWrapper(IParameterSet parameterSet)
+                : base(parameterSet.ParameterDefinitions) => _parameterSet = parameterSet;
+
+            public bool CheckIsParametersEvaluationCorrect(IGenerator generator, ILogger logger, out IReadOnlyList<string> paramsWithInvalidEvaluations) =>
+                throw new NotImplementedException();
+
+            public IEvaluatedInputDataSet Build() => throw new NotImplementedException();
+
+            public void EvaluateConditionalParameters(IGenerator generator, ILogger logger) => throw new NotImplementedException();
+
+            public bool HasParameterValue(ITemplateParameter parameter) => throw new NotImplementedException();
+
+            public void SetParameterEvaluation(ITemplateParameter parameter, EvaluatedInputParameterData evaluatedParameterData) => throw new NotImplementedException();
+
+            public void SetParameterValue(ITemplateParameter parameter, object value, DataSource dataSource) => _parameterSet.ResolvedValues[parameter] = value;
         }
     }
 }

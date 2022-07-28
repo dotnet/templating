@@ -42,7 +42,6 @@ Microsoft.TemplateEngine.Utils.MultiValueParameter
 Microsoft.TemplateEngine.Utils.MultiValueParameter.Equals(Microsoft.TemplateEngine.Utils.MultiValueParameter! other) -> bool
 Microsoft.TemplateEngine.Utils.MultiValueParameter.MultiValueParameter(System.Collections.Generic.IReadOnlyList<string!>! values) -> void
 Microsoft.TemplateEngine.Utils.MultiValueParameter.Values.get -> System.Collections.Generic.IReadOnlyList<string!>!
-Microsoft.TemplateEngine.Utils.ParameterConverter
 Microsoft.TemplateEngine.Utils.PhysicalFileSystem.PathRelativeTo(string! target, string! relativeTo) -> string!
 Microsoft.TemplateEngine.Utils.TemplateAuthoringException.ConfigItem.get -> string!
 Microsoft.TemplateEngine.Utils.TemplateAuthoringException.TemplateAuthoringException(string! message, string! configItem) -> void
@@ -82,9 +81,6 @@ static Microsoft.TemplateEngine.Utils.Glob.Parse(string! pattern, bool canBeName
 static Microsoft.TemplateEngine.Utils.ListExtensions.GroupBy<TElement, TKey>(this System.Collections.Generic.IEnumerable<TElement>! elements, System.Func<TElement, TKey?>! grouper, System.Func<TElement, bool>! hasGroupKey, System.Collections.Generic.IEqualityComparer<TKey?>? comparer = null) -> System.Collections.Generic.IEnumerable<System.Linq.IGrouping<TKey?, TElement>!>!
 static Microsoft.TemplateEngine.Utils.MultiValueParameter.MultiValueSeparators.get -> char[]!
 static Microsoft.TemplateEngine.Utils.MultiValueParameter.TryPerformMultiValueEqual(object! x, object! y, out bool result) -> bool
-static Microsoft.TemplateEngine.Utils.ParameterConverter.ConvertParameterValueToType(Microsoft.TemplateEngine.Abstractions.ITemplateEngineHost! host, Microsoft.TemplateEngine.Abstractions.ITemplateParameter! parameter, string! untypedValue, out bool valueResolutionError) -> object?
-static Microsoft.TemplateEngine.Utils.ParameterConverter.InferTypeAndConvertLiteral(string! literal) -> object?
-static Microsoft.TemplateEngine.Utils.ParameterConverter.SetParameterDefault(Microsoft.TemplateEngine.Abstractions.Parameters.IParameterSetBuilder! templateParams, Microsoft.TemplateEngine.Abstractions.ITemplateParameter! parameter, Microsoft.TemplateEngine.Abstractions.IEngineEnvironmentSettings! environment, bool useHostDefaults, bool isRequired, System.Collections.Generic.List<string!>! paramsWithInvalidValues) -> void
 static Microsoft.TemplateEngine.Utils.ParserExtensions.ConvertToDoubleCurrentOrInvariant(object! value) -> double
 static Microsoft.TemplateEngine.Utils.ParserExtensions.DoubleTryParseСurrentOrInvariant(string? stringValue, out double doubleValue) -> bool
 static Microsoft.TemplateEngine.Utils.TemplateParameterExtensions.IsValidMultiValueParameterValue(this string! value) -> bool

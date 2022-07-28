@@ -19,12 +19,12 @@ namespace Microsoft.TemplateEngine.Cli.TemplateResolution
             NoMismatch,
 
             /// <summary>
-            /// The parameter name is not defined in <see cref="ITemplateInfo.Parameters"/>.
+            /// The parameter name is not defined in <see cref="ITemplateInfo.ParametersDefinition"/>.
             /// </summary>
             InvalidName,
 
             /// <summary>
-            ///  The parameter value is different format that is supported by <see cref="ITemplateInfo.Parameters"/> parameter.
+            ///  The parameter value is different format that is supported by <see cref="ITemplateInfo.ParametersDefinition"/> parameter.
             /// </summary>
             InvalidValue,
         }

@@ -69,7 +69,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 }
 
                 //read parameters
-                JArray? parametersArray = entry.Get<JArray>(nameof(Parameters));
+                JArray? parametersArray = entry.Get<JArray>("Parameters");
                 if (parametersArray != null)
                 {
                     List<ITemplateParameter> templateParameters = new List<ITemplateParameter>();
@@ -77,7 +77,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     {
                         templateParameters.Add(new TemplateParameter(item));
                     }
-                    info.Parameters = new ParametersDefinition(templateParameters);
+                    info.ParametersDefinition = new ParametersDefinition(templateParameters);
                 }
 
                 //read tags

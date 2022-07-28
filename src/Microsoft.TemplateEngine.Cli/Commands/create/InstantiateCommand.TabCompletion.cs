@@ -7,6 +7,7 @@ using System.CommandLine.Parsing;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Edge;
 using Microsoft.TemplateEngine.Edge.Settings;
+using Microsoft.TemplateEngine.Edge.Template;
 
 namespace Microsoft.TemplateEngine.Cli.Commands
 {
@@ -71,6 +72,9 @@ namespace Microsoft.TemplateEngine.Cli.Commands
                                 ////
                                 //// - we'll need to assign all the parameters (and defaults) and evaluate the enabled conditions
 
+                                //// TemplateCreator tc = new TemplateCreator(environmentSettings);
+                                //// ITemplate? t = tc.LoadTemplate(template, null);
+
                                 //// Get parameterset, localize them
                                 ////
                                 //// Do not bind! untill we see any have the 'IsEnabled' condition - and put those last
@@ -79,7 +83,7 @@ namespace Microsoft.TemplateEngine.Cli.Commands
                                 //// get parameters without enablement condition - first get those that are required, then conditionaly required, then optional
                                 //// then do a topological sort of rest of parameters and evaluate enablement conditions on the fly - get them in order
 
-                                //template.Parameters[0].Priority
+                                //template.ParametersDefinition[0].Priority
 
                                 distinctCompletions.Add(completion);
                             }

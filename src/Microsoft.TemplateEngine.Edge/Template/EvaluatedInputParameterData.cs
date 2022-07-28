@@ -1,33 +1,35 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System;
+using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Parameters;
 
-namespace Microsoft.TemplateEngine.Abstractions.Parameters;
+namespace Microsoft.TemplateEngine.Edge.Template;
 
-public class EvaluatedParameterData : ParameterData
+public class EvaluatedInputParameterData : InputParameterData
 {
     /// <summary>
-    /// Constructor for <see cref="EvaluatedParameterData"/> type, that allows specification of results of external evaluation of conditions.
+    /// Constructor for <see cref="EvaluatedInputDataSet"/> type, that allows specification of results of external evaluation of conditions.
     /// </summary>
     /// <param name="parameterDefinition"></param>
     /// <param name="value">A stringified value of parameter or null for explicit unset. It's possible to indicate missing of parameter on input via <see cref="InputDataState"/> argument.</param>
+    /// <param name="dataSource"></param>
     /// <param name="isEnabledConditionResult"></param>
     /// <param name="isRequiredConditionResult"></param>
     /// <param name="inputDataState">
     /// InputDataState.Unset indicates a situation that parameter was not specified on input (distinct situation from explicit null).
-    ///  This would normally be achieved by not passing the parameter at all into the <see cref="EvaluatedParameterSetData"/>, however then it would not be possible
+    ///  This would normally be achieved by not passing the parameter at all into the <see cref="EvaluatedInputParameterData"/>, however then it would not be possible
     ///  to specify the results of conditions calculations.
     /// </param>
-    public EvaluatedParameterData(
+    public EvaluatedInputParameterData(
         ITemplateParameter parameterDefinition,
         object? value,
+        DataSource dataSource,
         bool? isEnabledConditionResult,
         bool? isRequiredConditionResult,
         InputDataState inputDataState = InputDataState.Set)
-        : base(parameterDefinition, value, inputDataState)
+        : base(parameterDefinition, value, dataSource, inputDataState)
     {
         IsEnabledConditionResult = isEnabledConditionResult;
         IsRequiredConditionResult = isRequiredConditionResult;
@@ -35,8 +37,8 @@ public class EvaluatedParameterData : ParameterData
         EvaluatedPrecedence = GetEvaluatedPrecedence();
     }
 
-    public EvaluatedParameterData(EvaluatedParameterData old, object? newData)
-        : base(old.ParameterDefinition, newData, newData == null ? InputDataState.ExplicitNull : InputDataState.Set)
+    public EvaluatedInputParameterData(EvaluatedInputParameterData old, object? newData)
+        : base(old.ParameterDefinition, newData, old.DataSource, newData == null ? InputDataState.ExplicitNull : InputDataState.Set)
     {
         IsEnabledConditionResult = old.IsEnabledConditionResult;
         IsRequiredConditionResult = old.IsRequiredConditionResult;
@@ -57,11 +59,7 @@ public class EvaluatedParameterData : ParameterData
             string.IsNullOrEmpty(ParameterDefinition.Precedence.IsRequiredCondition) ^ !IsRequiredConditionResult.HasValue
         )
         {
-            // TODO: localize
-            string format =
-                "Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition) or a failure to pass the condition results for parameters with condition(s) in template. Offending parameter(s): {0}";
-
-            throw new ArgumentException(string.Format(format, this.ParameterDefinition.Name));
+            throw new ArgumentException(string.Format(LocalizableStrings.EvaluatedInputParameterData_Error_ConditionsInvalid, this.ParameterDefinition.Name));
         }
     }
 

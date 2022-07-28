@@ -108,13 +108,13 @@ namespace Microsoft.TemplateEngine.Mocks
 
         public IReadOnlyList<string> ShortNameList => _shortNameList;
 
-        [Obsolete("Use Parameters instead.")]
+        [Obsolete("Use ParametersDefinition instead.")]
         IReadOnlyDictionary<string, ICacheTag> ITemplateInfo.Tags => throw new NotImplementedException();
 
-        [Obsolete("Use Parameters instead.")]
+        [Obsolete("Use ParametersDefinition instead.")]
         IReadOnlyDictionary<string, ICacheParameter> ITemplateInfo.CacheParameters => throw new NotImplementedException();
 
-        public IParametersDefinition Parameters
+        public IParametersDefinition ParametersDefinition
         {
             get
             {
@@ -126,6 +126,9 @@ namespace Microsoft.TemplateEngine.Mocks
                 return new ParametersDefinition(parameters);
             }            
         }
+
+        [Obsolete("Use ParametersDefinition instead.")]
+        public IReadOnlyList<ITemplateParameter> Parameters => ParametersDefinition;
 
         public string MountPointUri => "FakeMountPoint";
 
@@ -345,7 +348,7 @@ namespace Microsoft.TemplateEngine.Mocks
             }
             if (_parameters.Any())
             {
-                _ = sb.Append("Parameters:" + string.Join(",", _parameters) + ";");
+                _ = sb.Append("ParametersDefinition:" + string.Join(",", _parameters) + ";");
             }
             if (_baselineInfo.Any())
             {

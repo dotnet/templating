@@ -75,14 +75,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             TestFileSystemHelper.WriteTemplateSource(environment, sourceBasePath, templateSourceFiles);
             IMountPoint? sourceMountPoint = TestFileSystemHelper.CreateMountPoint(environment, sourceBasePath);
             RunnableProjectConfig runnableConfig = new RunnableProjectConfig(environment, rpg, config, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
-            IParameterSetBuilder parameters = ParameterSetBuilder.CreateWithDefaults(runnableConfig.Parameters, environment);
+            ParameterSetData parametersData = new ParameterSetData(runnableConfig);
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
 
             //
             // Running the actual scenario: template files processing and generating output (including macros processing)
             //
 
-            await rpg.CreateAsync(environment, runnableConfig, sourceDir, parameters.Build(), targetDir, CancellationToken.None);
+            await rpg.CreateAsync(environment, runnableConfig, sourceDir, parametersData, targetDir, CancellationToken.None);
 
             //
             // Veryfying the outputs
@@ -207,17 +207,16 @@ UNKNOWN
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
             SimpleConfigModel configModel = SimpleConfigModel.FromJObject(JObject.Parse(templateConfig));
             RunnableProjectConfig runnableConfig = new RunnableProjectConfig(environment, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
-            IParameterSetBuilder parameters = ParameterSetBuilder.CreateWithDefaults(runnableConfig.Parameters, environment);
-            ITemplateParameter? choiceParameter;
-            Assert.True(parameters.TryGetValue("ChoiceParam", out choiceParameter), "ChoiceParam expected to be extracted from template config");
-            parameters.SetParameterValue(choiceParameter!, "SecondChoice");
+            ParameterSetData parametersData = new ParameterSetData(
+                runnableConfig,
+                new Dictionary<string, string?>() { { "ChoiceParam", "SecondChoice" } });
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
 
             //
             // Running the actual scenario: template files processing and generating output (including macros processing)
             //
 
-            await rpg.CreateAsync(environment, runnableConfig, sourceDir, parameters.Build(), targetDir, CancellationToken.None);
+            await rpg.CreateAsync(environment, runnableConfig, sourceDir, parametersData, targetDir, CancellationToken.None);
 
             //
             // Veryfying the outputs
@@ -304,17 +303,16 @@ THIRD
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
             SimpleConfigModel configModel = SimpleConfigModel.FromJObject(JObject.Parse(templateConfig));
             RunnableProjectConfig runnableConfig = new RunnableProjectConfig(environment, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
-            IParameterSetBuilder parameters = ParameterSetBuilder.CreateWithDefaults(runnableConfig.Parameters, environment);
-            ITemplateParameter? choiceParameter;
-            Assert.True(parameters.TryGetValue("ChoiceParam", out choiceParameter), "ChoiceParam expected to be extracted from template config");
-            parameters.SetParameterValue(choiceParameter!, new MultiValueParameter(new[] { "SecondChoice", "ThirdChoice" }));
+            ParameterSetData parametersData = new ParameterSetData(
+                runnableConfig,
+                new Dictionary<string, object?>() { { "ChoiceParam", new MultiValueParameter(new[] { "SecondChoice", "ThirdChoice" }) } });
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
 
             //
             // Running the actual scenario: template files processing and generating output (including macros processing)
             //
 
-            await rpg.CreateAsync(environment, runnableConfig, sourceDir, parameters.Build(), targetDir, CancellationToken.None);
+            await rpg.CreateAsync(environment, runnableConfig, sourceDir, parametersData, targetDir, CancellationToken.None);
 
             //
             // Veryfying the outputs
@@ -451,18 +449,16 @@ Console.WriteLine(""Hello, World!"");
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
             SimpleConfigModel configModel = SimpleConfigModel.FromJObject(JObject.Parse(templateConfig));
             RunnableProjectConfig runnableConfig = new RunnableProjectConfig(environment, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
-            IParameterSetBuilder parameters = ParameterSetBuilder.CreateWithDefaults(runnableConfig.Parameters, environment);
-
-            ITemplateParameter? choiceParameter;
-            Assert.True(parameters.TryGetValue("Platform", out choiceParameter), "ChoiceParam expected to be extracted from template config");
-            parameters.SetParameterValue(choiceParameter!, new MultiValueParameter(new[] { "android", "iOS" }));
+            ParameterSetData parametersData = new ParameterSetData(
+                runnableConfig,
+                new Dictionary<string, object?>() { { "Platform", new MultiValueParameter(new[] { "android", "iOS" }) } });
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
 
             //
             // Running the actual scenario: template files processing and generating output (including macros processing)
             //
 
-            await rpg.CreateAsync(environment, runnableConfig, sourceDir, parameters.Build(), targetDir, CancellationToken.None);
+            await rpg.CreateAsync(environment, runnableConfig, sourceDir, parametersData, targetDir, CancellationToken.None);
 
             //
             // Veryfying the outputs
@@ -563,17 +559,16 @@ Console.WriteLine(""Hello, World!"");
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
             SimpleConfigModel configModel = SimpleConfigModel.FromJObject(JObject.Parse(templateConfig));
             RunnableProjectConfig runnableConfig = new RunnableProjectConfig(environment, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
-            IParameterSetBuilder parameters = ParameterSetBuilder.CreateWithDefaults(runnableConfig.Parameters, environment);
-            ITemplateParameter? choiceParameter;
-            Assert.True(parameters.TryGetValue("Platform", out choiceParameter), "ChoiceParam expected to be extracted from template config");
-            parameters.SetParameterValue(choiceParameter!, new MultiValueParameter(new[] { "MacOS", "iOS" }));
+            ParameterSetData parametersData = new ParameterSetData(
+                runnableConfig,
+                new Dictionary<string, object?>() { { "Platform", new MultiValueParameter(new[] { "MacOS", "iOS" }) } });
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
 
             //
             // Running the actual scenario: template files processing and generating output (including macros processing)
             //
 
-            await rpg.CreateAsync(environment, runnableConfig, sourceDir, parameters.Build(), targetDir, CancellationToken.None);
+            await rpg.CreateAsync(environment, runnableConfig, sourceDir, parametersData, targetDir, CancellationToken.None);
 
             //
             // Veryfying the outputs

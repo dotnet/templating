@@ -69,7 +69,7 @@ namespace Microsoft.TemplateEngine.Abstractions
         [Obsolete("Templates support multiple short names, use ShortNameList instead")]
         string ShortName { get; }
 
-        [Obsolete("For choice parameters, use Parameters instead. For template tags, use IReadOnlyDictionary<string, string> TagsCollection instead.")]
+        [Obsolete("For choice parameters, use ParametersDefinition instead. For template tags, use IReadOnlyDictionary<string, string> TagsCollection instead.")]
         IReadOnlyDictionary<string, ICacheTag> Tags { get; }
 
         /// <summary>
@@ -77,13 +77,19 @@ namespace Microsoft.TemplateEngine.Abstractions
         /// </summary>
         IReadOnlyDictionary<string, string> TagsCollection { get; }
 
-        [Obsolete("Use Parameters instead.")]
+        [Obsolete("Use ParametersDefinition instead.")]
         IReadOnlyDictionary<string, ICacheParameter> CacheParameters { get; }
 
         /// <summary>
         /// Gets the list of template parameters.
         /// </summary>
-        IParametersDefinition Parameters { get; }
+        IParametersDefinition ParametersDefinition { get; }
+
+        /// <summary>
+        /// Gets the list of template parameters.
+        /// </summary>
+        [Obsolete("Use ParametersDefinition instead.", false)]
+        IReadOnlyList<ITemplateParameter> Parameters { get; }
 
         /// <summary>
         /// Gets template mount point URI.

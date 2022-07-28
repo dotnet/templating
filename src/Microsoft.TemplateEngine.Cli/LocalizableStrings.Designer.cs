@@ -938,7 +938,7 @@ namespace Microsoft.TemplateEngine.Cli {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to     (No Parameters).
+        ///   Looks up a localized string similar to     (No ParametersDefinition).
         /// </summary>
         internal static string NoParameters {
             get {

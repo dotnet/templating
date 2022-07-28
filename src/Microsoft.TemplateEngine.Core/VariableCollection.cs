@@ -175,17 +175,16 @@ namespace Microsoft.TemplateEngine.Core
             return variables;
         }
 
-        public static VariableCollection VariableCollectionFromParameters(IEvaluatedParameterSetData parameters, string format)
+        public static VariableCollection VariableCollectionFromParameters(IParameterSetData parameters, string format)
         {
             VariableCollection vc = new VariableCollection();
             foreach (ITemplateParameter param in parameters)
             {
                 string key = string.Format(format ?? "{0}", param.Name);
 
-                if (parameters.ParametersData.TryGetValue(param, out ParameterData value) && value is
-                    {
-                        InputDataState: InputDataState.Set
-                    })
+                if (parameters.ParametersData.TryGetValue(param, out ParameterData value) &&
+                    value.IsEnabled &&
+                    !(value.Value == null || value.Value is string str && string.IsNullOrEmpty(str)))
                 {
                     vc[key] = value.Value;
                 }

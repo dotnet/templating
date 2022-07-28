@@ -314,13 +314,13 @@ C
     ""name"": ""tst"",
     ""shortName"": ""tst"",
     ""symbols"": {
-	    ""A"": {
+	    ""parA"": {
 	      ""type"": ""parameter"",
 	      ""datatype"": ""string"",
           ""isEnabled"": ""A_enable"",
           ""isRequired"": ""true || true"",
 	    },
-        ""B"": {
+        ""parB"": {
 	      ""type"": ""parameter"",
 	      ""datatype"": ""string"",
           ""isEnabled"": ""B_enable"",
@@ -344,9 +344,9 @@ C
 
         [Theory]
         [InlineData(null, true, false, null, false, null, /*c_val*/ true,  "C", false, "")]
-        [InlineData(true, true, true, null, false, null, /*c_val*/ false, "A,", false, "")]
-        [InlineData(null, true, false, null, true, null, /*c_val*/ true, "", true, "B")]
-        [InlineData(null, true, true, null, false, null, /*c_val*/ true, "", true, "A")]
+        [InlineData(true, true, true, null, false, null, /*c_val*/ false, "parA,", false, "")]
+        [InlineData(null, true, false, null, true, null, /*c_val*/ true, "", true, "parB")]
+        [InlineData(null, true, true, null, false, null, /*c_val*/ true, "", true, "parA")]
         [InlineData(null, true, false, null, false, false, /*c_val*/ false, "", true, @"Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition): B (parameter)")]
         public async void InstantiateAsync_ConditionalParametersWithExternalEvaluation(
             bool? a_val,
@@ -365,12 +365,12 @@ C
             //
 
             string sourceSnippet = @"
-//#if( A )
-A,
+//#if( parA )
+parA,
 //#endif
 
-//#if( B )
-B,
+//#if( parB )
+parB,
 //#endif
 
 //#if( C )
@@ -381,8 +381,8 @@ C
             List<InputDataBag> parameters = new List<InputDataBag>(
                 new[]
                 {
-                    new InputDataBag("A", a_val, a_enabled, a_required),
-                    new InputDataBag("B", b_val, b_enabled, b_required),
+                    new InputDataBag("parA", a_val, a_enabled, a_required),
+                    new InputDataBag("parB", b_val, b_enabled, b_required),
                     new InputDataBag("C", c_val),
                 });
 
@@ -445,19 +445,23 @@ C
             }
             else
             {
-                var parameters = runnableConfig.Parameters;
+                var parameters = runnableConfig.ParametersDefinition;
 
-                IParameterSetData data;
+                IInputDataSet data;
                 try
                 {
-                    data = new EvaluatedParameterSetData(
+                    data = new EvaluatedInputDataSet(
                         parameters,
-                        parameters2!.Select(p => new EvaluatedParameterData(
+                        parameters2!.Select(p => new EvaluatedInputParameterData(
                             parameters[p.Name],
                             p.Value,
+                            DataSource.Host,
                             p.IsEnabledConditionResult,
                             p.IsRequiredConditionResult,
-                            p.IsNull ? InputDataState.Unset : InputDataState.Set)).ToList());
+                            p.IsNull ? InputDataState.Unset : InputDataState.Set)).ToList())
+                    {
+                        ContinueOnMismatchedEvaluations = true
+                    };
                 }
                 catch (Exception e)
                 {

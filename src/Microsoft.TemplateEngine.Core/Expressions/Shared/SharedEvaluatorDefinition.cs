@@ -31,12 +31,12 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
             return Evaluate(processor, ref bufferLength, ref currentBufferPosition, out faulted, null);
         }
 
-        public static bool Evaluate(IProcessorState processor, ref int bufferLength, ref int currentBufferPosition, out bool faulted, HashSet<int> referencedVariablesIndexes)
+        public static bool Evaluate(IProcessorState processor, ref int bufferLength, ref int currentBufferPosition, out bool faulted, HashSet<string> referencedVariablesKeys)
         {
             ITokenTrie tokens = Instance.GetSymbols(processor);
             ScopeBuilder<Operators, TTokens> builder = processor.ScopeBuilder(tokens, Map, DereferenceInLiteralsSetting);
             bool isFaulted = false;
-            IEvaluable result = builder.Build(ref bufferLength, ref currentBufferPosition, x => isFaulted = true, referencedVariablesIndexes);
+            IEvaluable result = builder.Build(ref bufferLength, ref currentBufferPosition, x => isFaulted = true, referencedVariablesKeys);
 
             if (isFaulted)
             {
@@ -58,7 +58,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
             }
         }
 
-        public static bool EvaluateFromString(ILogger logger, string text, IVariableCollection variables, HashSet<int> referencedVariablesIndexes = null)
+        public static bool EvaluateFromString(ILogger logger, string text, IVariableCollection variables, HashSet<string> referencedVariablesKeys = null)
         {
             using (MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(text)))
             using (MemoryStream res = new MemoryStream())
@@ -67,7 +67,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
                 IProcessorState state = new ProcessorState(ms, res, (int)ms.Length, (int)ms.Length, cfg, NoOperationProviders);
                 int len = (int)ms.Length;
                 int pos = 0;
-                return Evaluate(state, ref len, ref pos, out bool _, referencedVariablesIndexes);
+                return Evaluate(state, ref len, ref pos, out bool _, referencedVariablesKeys);
             }
         }
 

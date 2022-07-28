@@ -296,7 +296,7 @@ namespace Dotnet_new3.IntegrationTests
         }
 
         [Fact]
-        public Task CanInstantiateTemplate_WithConditionalParameters_DisabledBehaveLikeNotEverDefinedInTemplate()
+        public Task CanInstantiateTemplate_WithConditionalParameters_DisabledBehaveLikeNotSpecified()
         {
             string home = TestUtils.CreateTemporaryFolder("Home");
             string workingDirectory = TestUtils.CreateTemporaryFolder();
@@ -309,9 +309,9 @@ namespace Dotnet_new3.IntegrationTests
                     "true",
                     "--B_enabled",
                     "false",
-                    "--A",
+                    "--paramA",
                     "true",
-                    "--B",
+                    "--paramB",
                     "true")
                 .WithCustomHive(home)
                 .WithWorkingDirectory(workingDirectory)

@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Core.Expressions.Cpp2;
@@ -58,16 +59,23 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
         {
             VariableCollection vc = new VariableCollection
             {
+                ["FIRST_IF2"] = false,
+                ["FIRST_IF3"] = false,
+                ["FIRST_IF0"] = false,
                 ["FIRST_IF"] = false,
                 ["BB"] = false,
-                ["SECOND_IF"] = false
+                ["0SECOND_IF"] = false,
+                ["SECOND_IF"] = false,
+                ["5SECOND_IF"] = false,
+                ["BB2"] = false,
+                ["BB3"] = false,
+                
             };
-            HashSet<int> indexes = new HashSet<int>();
-            bool result = Cpp2StyleEvaluatorDefinition.EvaluateFromString(_logger, "FIRST_IF == SECOND_IF && !FIRST_IF", vc, indexes);
+            HashSet<string> keys = new HashSet<string>();
+            bool result = Cpp2StyleEvaluatorDefinition.EvaluateFromString(_logger, "FIRST_IF == SECOND_IF && !FIRST_IF", vc, keys);
             Assert.True(result);
-            Assert.Equal(2, indexes.Count);
-            Assert.Contains(0, indexes);
-            Assert.Contains(2, indexes);
+            Assert.Equal(2, keys.Count);
+            Assert.True(keys.SequenceEqual(new[] { "FIRST_IF", "SECOND_IF" }));
         }
 
         [Fact(DisplayName = nameof(VerifyCpp2EvaluatorBitShiftAddEquals))]

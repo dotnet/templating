@@ -47,6 +47,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return ParameterConverter.ConvertParameterValueToType(environmentSettings.Host, parameter, untypedValue, out valueResolutionError);
         }
 
+        bool IGenerator.EvaluateFromString(ILogger logger, string text, IDictionary<string, object?> variables, HashSet<string>? referencedVariablesKeys)
+        {
+            VariableCollection variableCollection = new VariableCollection(null, variables);
+            return Cpp2StyleEvaluatorDefinition.EvaluateFromString(logger, text, variableCollection, referencedVariablesKeys);
+        }
+
         [Obsolete("Replaced by CreateAsync with IEvaluatedParameterSetData", false)]
         Task<ICreationResult> IGenerator.CreateAsync(
             IEngineEnvironmentSettings environmentSettings,
@@ -55,9 +61,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             string targetDirectory,
             CancellationToken cancellationToken)
         {
-            var builder = (IParameterSetBuilder)parameters;
-            builder.EvaluateConditionalParameters(environmentSettings.Host.Logger);
-            return ((IGenerator)this).CreateAsync(environmentSettings, template, builder.Build(), targetDirectory, cancellationToken);
+            return ((IGenerator)this).CreateAsync(environmentSettings, template, ParameterSetData.FromLegacyParameterSet(parameters), targetDirectory, cancellationToken);
         }
 
         [Obsolete("Replaced by GetCreationEffectsAsync with IEvaluatedParameterSetData", false)]
@@ -68,15 +72,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             string targetDirectory,
             CancellationToken cancellationToken)
         {
-            var builder = (IParameterSetBuilder)parameters;
-            builder.EvaluateConditionalParameters(environmentSettings.Host.Logger);
-            return ((IGenerator)this).GetCreationEffectsAsync(environmentSettings, template, builder.Build(), targetDirectory, cancellationToken);
+            return ((IGenerator)this).GetCreationEffectsAsync(environmentSettings, template, ParameterSetData.FromLegacyParameterSet(parameters), targetDirectory, cancellationToken);
         }
 
         Task<ICreationResult> IGenerator.CreateAsync(
             IEngineEnvironmentSettings environmentSettings,
             ITemplate templateData,
-            IEvaluatedParameterSetData parameters,
+            IParameterSetData parameters,
             string targetDirectory,
             CancellationToken cancellationToken)
         {
@@ -107,7 +109,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         async Task<ICreationEffects> IGenerator.GetCreationEffectsAsync(
             IEngineEnvironmentSettings environmentSettings,
             ITemplate templateData,
-            IEvaluatedParameterSetData parameters,
+            IParameterSetData parameters,
             string targetDirectory,
             CancellationToken cancellationToken)
         {
@@ -117,8 +119,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 throw new InvalidOperationException($"{nameof(templateData.TemplateSourceRoot)} cannot be null to continue.");
             }
-
-            // RemoveDisabledParamsFromTemplate(templateData, parameters);
 
             IVariableCollection variables = SetupVariables(environmentSettings, parameters, templateConfig.OperationConfig.VariableSetup);
             await templateConfig.EvaluateBindSymbolsAsync(environmentSettings, variables, cancellationToken).ConfigureAwait(false);
@@ -158,7 +158,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         [Obsolete("Replaced by ParameterSetBuilder", false)]
         IParameterSet IGenerator.GetParametersForTemplate(IEngineEnvironmentSettings environmentSettings, ITemplate template)
         {
-            return (IParameterSet)ParameterSetBuilder.CreateWithDefaults(template.Parameters, environmentSettings);
+            throw new NotImplementedException();
+            // return (IParameterSet)ParameterSetBuilder.CreateWithDefaults(template.ParametersDefinition, environmentSettings);
         }
 
         /// <summary>
@@ -304,13 +305,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             IEngineEnvironmentSettings environmentSettings,
             IRunnableProjectConfig runnableProjectConfig,
             IDirectory templateSourceRoot,
-            IEvaluatedParameterSetData parameters,
+            IParameterSetData parameters,
             string targetDirectory,
             CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-
-            // RemoveDisabledParamsFromTemplate((ITemplate)runnableProjectConfig, parameters);
 
             IVariableCollection variables = SetupVariables(environmentSettings, parameters, runnableProjectConfig.OperationConfig.VariableSetup);
             await runnableProjectConfig.EvaluateBindSymbolsAsync(environmentSettings, variables, cancellationToken).ConfigureAwait(false);
@@ -334,19 +333,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return GetCreationResult(environmentSettings.Host.Logger, runnableProjectConfig, variables);
         }
 
-        // In the future the RunableProjectConfig should be refactored so that it doesn't access symbols for information that should be possible
-        //  to be disabled (so file renames, operation configs etc - those use parameterSymbols, but instead should look into PrameterSet)
-        private static void RemoveDisabledParamsFromTemplate(ITemplate template, IEvaluatedParameterSetData evaluatedParameterSetData)
-        {
-            // Remove the disabled symbols from the config as well (as if they was never defined on the template)
-            RunnableProjectConfig config = (RunnableProjectConfig)template;
-            evaluatedParameterSetData.EvaluatedParametersData.Values
-                .Where(d => d.IsEnabledConditionResult.HasValue && !d.IsEnabledConditionResult.Value)
-                .Select(p => p.ParameterDefinition.Name)
-                .ForEach(config.RemoveSymbol);
-        }
-
-        private static IVariableCollection SetupVariables(IEngineEnvironmentSettings environmentSettings, IEvaluatedParameterSetData parameters, IVariableConfig variableConfig)
+        private static IVariableCollection SetupVariables(IEngineEnvironmentSettings environmentSettings, IParameterSetData parameters, IVariableConfig variableConfig)
         {
             IVariableCollection variables = VariableCollection.SetupVariables(environmentSettings, parameters, variableConfig);
 

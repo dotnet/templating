@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Parameters;
 using Microsoft.TemplateEngine.Abstractions.TemplatePackage;
 using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Edge.Settings;
@@ -56,7 +57,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         {
             _ = LoadHostWithLocalizationTemplates(locale, out _, out ITemplateInfo localizationTemplate);
 
-            ITemplateParameter symbol = localizationTemplate.Parameters?.FirstOrDefault(p => p.Name == symbolName);
+            ITemplateParameter symbol = localizationTemplate.ParametersDefinition?.FirstOrDefault(p => p.Name == symbolName);
             Assert.NotNull(symbol);
             Assert.Equal(expectedDisplayName, symbol.DisplayName);
         }
@@ -69,7 +70,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         {
             _ = LoadHostWithLocalizationTemplates(locale, out _, out ITemplateInfo localizationTemplate);
 
-            ITemplateParameter symbol = localizationTemplate.Parameters?.FirstOrDefault(p => p.Name == symbolName);
+            ITemplateParameter symbol = localizationTemplate.ParametersDefinition?.FirstOrDefault(p => p.Name == symbolName);
             Assert.NotNull(symbol);
             Assert.Equal(expectedDisplayName, symbol.DisplayName);
         }
@@ -82,7 +83,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         {
             _ = LoadHostWithLocalizationTemplates(locale, out _, out ITemplateInfo localizationTemplate);
 
-            ITemplateParameter symbol = localizationTemplate.Parameters?.FirstOrDefault(p => p.Name == "someSymbol");
+            ITemplateParameter symbol = localizationTemplate.ParametersDefinition?.FirstOrDefault(p => p.Name == "someSymbol");
             Assert.NotNull(symbol);
             Assert.Equal(expectedDescription, symbol.Description);
         }
@@ -100,7 +101,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         {
             _ = LoadHostWithLocalizationTemplates(locale, out _, out ITemplateInfo localizationTemplate);
 
-            ITemplateParameter symbol = localizationTemplate.Parameters?.FirstOrDefault(p => p.Name == "someChoice");
+            ITemplateParameter symbol = localizationTemplate.ParametersDefinition?.FirstOrDefault(p => p.Name == "someChoice");
             Assert.NotNull(symbol);
             Assert.Equal(symbolDesc, symbol.Description);
 
@@ -136,7 +137,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             ICreationEffects effects = await template.Generator.GetCreationEffectsAsync(
                 environmentSettings,
                 template,
-                ParameterSetBuilder.CreateWithDefaults(template.Parameters, environmentSettings).Build(),
+                new ParameterSetData(template),
                 Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()),
                 default);
 

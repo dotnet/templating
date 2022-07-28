@@ -1,11 +1,11 @@
 
-// value of A: paramA
-// value of B: paramB
+// value of paramA: placeholderA
+// value of paramB: placeholderB
 
-//#if( A )
+//#if( paramA )
 	// A is enabled
 //#endif
 
-//#if( B )
+//#if( paramB )
 	// B is enabled
 //#endif

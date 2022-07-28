@@ -51,7 +51,10 @@ namespace Microsoft.TemplateEngine.Edge
 
         public IReadOnlyDictionary<string, ICacheParameter> CacheParameters { get; private set; }
 
-        public IParametersDefinition Parameters { get; private set; }
+        public IParametersDefinition ParametersDefinition { get; private set; }
+
+        [Obsolete("Use ParametersDefinition instead.")]
+        public IReadOnlyList<ITemplateParameter> Parameters => ParametersDefinition;
 
         public string MountPointUri { get; private set; }
 
@@ -91,7 +94,7 @@ namespace Microsoft.TemplateEngine.Edge
                 ShortName = source.ShortName,
                 Tags = source.Tags,
                 CacheParameters = source.CacheParameters,
-                Parameters = source.Parameters,
+                ParametersDefinition = source.ParametersDefinition,
                 MountPointUri = source.MountPointUri,
                 ConfigPlace = source.ConfigPlace,
                 LocaleConfigPlace = source.LocaleConfigPlace,

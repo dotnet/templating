@@ -64,7 +64,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 {
                     tags[tag.Key] = new CacheTag(null, null, new Dictionary<string, ParameterChoice> { { tag.Value, new ParameterChoice(null, null) } }, tag.Value);
                 }
-                foreach (ITemplateParameter parameter in ((ITemplateInfo)this).Parameters.Where(TemplateParameterExtensions.IsChoice))
+                foreach (ITemplateParameter parameter in ((ITemplateInfo)this).ParametersDefinition.Where(TemplateParameterExtensions.IsChoice))
                 {
                     IReadOnlyDictionary<string, ParameterChoice> choices = parameter.Choices ?? new Dictionary<string, ParameterChoice>();
                     tags[parameter.Name] = new CacheTag(parameter.DisplayName, parameter.Description, choices, parameter.DefaultValue);
@@ -79,7 +79,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             get
             {
                 Dictionary<string, ICacheParameter> cacheParameters = new Dictionary<string, ICacheParameter>();
-                foreach (ITemplateParameter parameter in ((ITemplateInfo)this).Parameters.Where(TemplateParameterExtensions.IsChoice))
+                foreach (ITemplateParameter parameter in ((ITemplateInfo)this).ParametersDefinition.Where(TemplateParameterExtensions.IsChoice))
                 {
                     cacheParameters[parameter.Name] = new CacheParameter()
                     {
@@ -95,7 +95,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
         }
 
-        public IParametersDefinition Parameters
+        public IParametersDefinition ParametersDefinition
         {
             get
             {
@@ -104,6 +104,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 //                        && param.Precedence.PrecedenceDefinition != PrecedenceDefinition.Implicit));
             }
         }
+
+        [Obsolete("Use ParametersDefinition instead.")]
+        public IReadOnlyList<ITemplateParameter> Parameters => ParametersDefinition;
 
         IFileSystemInfo ITemplate.Configuration => SourceFile;
 

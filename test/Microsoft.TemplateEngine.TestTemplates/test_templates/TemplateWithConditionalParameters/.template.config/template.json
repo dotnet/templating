@@ -8,17 +8,19 @@
   "identity": "TestAssets.TemplateWithConditionalParameters",
   "shortName": "TestAssets.TemplateWithConditionalParameters",
   "symbols": {
-    "A": {
+    "paramA": {
       "type": "parameter",
       "datatype": "string",
       "isEnabled": "A_enabled",
-      "replaces": "paramA"
+      "isRequired": true,
+      "replaces": "placeholderA"
     },
-    "B": {
+    "paramB": {
       "type": "parameter",
       "datatype": "string",
       "isEnabled": "B_enabled",
-      "replaces": "paramB"
+      "isRequired": true,
+      "replaces": "placeholderB"
     },
     "A_enabled": {
       "type": "parameter",

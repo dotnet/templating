@@ -104,7 +104,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             Description = localizationInfo?.Description ?? template.Description;
 
             Name = localizationInfo?.Name ?? template.Name;
-            Parameters = LocalizeParameters(template, localizationInfo);
+            ParametersDefinition = LocalizeParameters(template, localizationInfo);
 
             if (template.GeneratorId == RunnableProjectGeneratorId && HostConfigPlace != null)
             {
@@ -134,8 +134,12 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             }
         }
 
-        [JsonProperty]
-        public IParametersDefinition Parameters { get; private set; } = ParametersDefinition.Empty;
+        [JsonProperty("Parameters")]
+        public IParametersDefinition ParametersDefinition { get; private set; } = Abstractions.Parameters.ParametersDefinition.Empty;
+
+        [JsonIgnore]
+        [Obsolete("Use ParametersDefinition instead.")]
+        public IReadOnlyList<ITemplateParameter> Parameters => ParametersDefinition;
 
         [JsonProperty]
         public string MountPointUri { get; }
@@ -197,7 +201,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     {
                         tags[tag.Key] = new CacheTag(null, null, new Dictionary<string, ParameterChoice> { { tag.Value, new ParameterChoice(null, null) } }, tag.Value);
                     }
-                    foreach (ITemplateParameter parameter in Parameters.Where(TemplateParameterExtensions.IsChoice))
+                    foreach (ITemplateParameter parameter in ParametersDefinition.Where(TemplateParameterExtensions.IsChoice))
                     {
                         IReadOnlyDictionary<string, ParameterChoice> choices = parameter.Choices ?? new Dictionary<string, ParameterChoice>();
                         tags[parameter.Name] = new CacheTag(parameter.DisplayName, parameter.Documentation, choices, parameter.DefaultValue);
@@ -217,7 +221,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 if (_cacheParameters == null)
                 {
                     Dictionary<string, ICacheParameter> cacheParameters = new Dictionary<string, ICacheParameter>();
-                    foreach (ITemplateParameter parameter in Parameters.Where(p => !p.IsChoice()))
+                    foreach (ITemplateParameter parameter in ParametersDefinition.Where(p => !p.IsChoice()))
                     {
                         cacheParameters[parameter.Name] = new CacheParameter()
                         {
@@ -274,7 +278,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             //we would like to copy the parameters to format supported for serialization as we cannot be sure that ITemplateInfo supports serialization in needed format.
             List<ITemplateParameter> localizedParameters = new List<ITemplateParameter>();
 
-            foreach (ITemplateParameter parameter in template.Parameters)
+            foreach (ITemplateParameter parameter in template.ParametersDefinition)
             {
                 IParameterSymbolLocalizationModel? localization = null;
                 Dictionary<string, ParameterChoice>? localizedChoices = null;

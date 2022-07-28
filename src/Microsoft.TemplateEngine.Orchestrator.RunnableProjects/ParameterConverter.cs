@@ -1,6 +1,8 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -11,7 +13,7 @@ using Microsoft.TemplateEngine.Abstractions.Parameters;
 
 namespace Microsoft.TemplateEngine.Utils
 {
-    public static class ParameterConverter
+    internal static class ParameterConverter
     {
         public static object? ConvertParameterValueToType(
             ITemplateEngineHost host,
@@ -81,44 +83,6 @@ namespace Microsoft.TemplateEngine.Utils
             }
 
             return literal;
-        }
-
-        public static void SetParameterDefault(IParameterSetBuilder templateParams, ITemplateParameter parameter, IEngineEnvironmentSettings environment, bool useHostDefaults, bool isRequired, List<string> paramsWithInvalidValues)
-        {
-            ITemplateEngineHost host = environment.Host;
-            if (useHostDefaults && host.TryGetHostParamDefault(parameter.Name, out string? hostParamValue) && hostParamValue != null)
-            {
-                object? resolvedValue = ParameterConverter.ConvertParameterValueToType(host, parameter, hostParamValue, out bool valueResolutionError);
-                if (!valueResolutionError)
-                {
-                    if (resolvedValue is null)
-                    {
-                        throw new InvalidOperationException($"{nameof(resolvedValue)} cannot be null when {nameof(valueResolutionError)} is 'false'.");
-                    }
-                    templateParams.SetParameterValue(parameter, resolvedValue);
-                }
-                else
-                {
-                    paramsWithInvalidValues.Add(parameter.Name);
-                }
-            }
-            // This for newly optional that does not have value set
-            else if (!isRequired && parameter.DefaultValue != null)
-            {
-                object? resolvedValue = ParameterConverter.ConvertParameterValueToType(host, parameter, parameter.DefaultValue, out bool valueResolutionError);
-                if (!valueResolutionError)
-                {
-                    if (resolvedValue is null)
-                    {
-                        throw new InvalidOperationException($"{nameof(resolvedValue)} cannot be null when {nameof(valueResolutionError)} is 'false'.");
-                    }
-                    templateParams.SetParameterValue(parameter, resolvedValue);
-                }
-                else
-                {
-                    paramsWithInvalidValues.Add(parameter.Name);
-                }
-            }
         }
 
         /// <summary>
