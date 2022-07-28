@@ -122,7 +122,7 @@ namespace Microsoft.TemplateEngine.Core
 
         public static VariableCollection Root(IDictionary<string, object> values) => new VariableCollection(null, values);
 
-        public static IVariableCollection SetupVariables(IEngineEnvironmentSettings environmentSettings, IEvaluatedParameterSetData parameters, IVariableConfig variableConfig)
+        public static IVariableCollection SetupVariables(IEngineEnvironmentSettings environmentSettings, IParameterSetData parameters, IVariableConfig variableConfig)
         {
             IVariableCollection variables = Root();
 
