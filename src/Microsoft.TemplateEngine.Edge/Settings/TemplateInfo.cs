@@ -134,7 +134,9 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             }
         }
 
-        [JsonProperty("Parameters")]
+#pragma warning disable CS0618 // Type or member is obsolete
+        [JsonProperty(nameof(Parameters))]
+#pragma warning restore CS0618 // Type or member is obsolete
         public IParametersDefinition ParametersDefinition { get; private set; } = Abstractions.Parameters.ParametersDefinition.Empty;
 
         [JsonIgnore]

@@ -69,7 +69,9 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 }
 
                 //read parameters
-                JArray? parametersArray = entry.Get<JArray>("Parameters");
+#pragma warning disable CS0618 // Type or member is obsolete
+                JArray? parametersArray = entry.Get<JArray>(nameof(Parameters));
+#pragma warning restore CS0618 // Type or member is obsolete
                 if (parametersArray != null)
                 {
                     List<ITemplateParameter> templateParameters = new List<ITemplateParameter>();
