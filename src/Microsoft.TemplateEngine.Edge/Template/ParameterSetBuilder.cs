@@ -331,7 +331,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
             {
                 _value = value;
                 _dataSource = source;
-                InputDataState = (value == null) ? InputDataState.ExplicitNull : InputDataState.Set;
+                InputDataState = InputDataStateUtil.GetInputDataState(value);
             }
 
             public override string ToString() => $"{ParameterDefinition}: {Value?.ToString() ?? "<null>"}";

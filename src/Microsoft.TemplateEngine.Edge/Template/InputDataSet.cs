@@ -31,7 +31,7 @@ public class InputDataSet : ParametersDefinition, IInputDataSet
         {
             object? value = null;
             bool isSet = inputParameters != null && inputParameters.TryGetValue(p.Name, out value);
-            return new InputParameterData(p, value, isSet ? DataSource.Host : DataSource.NoSource, isSet ? GetInputDataState(value) : InputDataState.Unset);
+            return new InputParameterData(p, value, isSet ? DataSource.Host : DataSource.NoSource, isSet ? InputDataStateUtil.GetInputDataState(value) : InputDataState.Unset);
         });
     }
 
@@ -42,7 +42,7 @@ public class InputDataSet : ParametersDefinition, IInputDataSet
     {
         IParametersDefinition parametersDefinition = new ParametersDefinition(parameterSet.ParameterDefinitions);
         IReadOnlyList<InputParameterData> data = parameterSet.ResolvedValues.Select(p =>
-                new InputParameterData(p.Key, p.Value, DataSource.Host, GetInputDataState(p.Value)))
+                new InputParameterData(p.Key, p.Value, DataSource.Host, InputDataStateUtil.GetInputDataState(p.Value)))
             .ToList();
         return new InputDataSet(parametersDefinition, data);
     }
@@ -53,12 +53,5 @@ public class InputDataSet : ParametersDefinition, IInputDataSet
             this,
             ParametersData.Values.Select(d => new ParameterData(d.ParameterDefinition, d.Value, d.DataSource, !(d is EvaluatedInputParameterData ed && ed.IsEnabledConditionResult == false)))
                 .ToList());
-    }
-
-    private static InputDataState GetInputDataState(object? value)
-    {
-        return value == null || value is string str && string.IsNullOrEmpty(str)
-            ? InputDataState.ExplicitNull
-            : InputDataState.Set;
     }
 }

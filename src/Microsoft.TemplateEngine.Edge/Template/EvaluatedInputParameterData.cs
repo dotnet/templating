@@ -37,14 +37,6 @@ public class EvaluatedInputParameterData : InputParameterData
         EvaluatedPrecedence = GetEvaluatedPrecedence();
     }
 
-    public EvaluatedInputParameterData(EvaluatedInputParameterData old, object? newData)
-        : base(old.ParameterDefinition, newData, old.DataSource, newData == null ? InputDataState.ExplicitNull : InputDataState.Set)
-    {
-        IsEnabledConditionResult = old.IsEnabledConditionResult;
-        IsRequiredConditionResult = old.IsRequiredConditionResult;
-        EvaluatedPrecedence = old.EvaluatedPrecedence;
-    }
-
     public bool? IsEnabledConditionResult { get; }
 
     public bool? IsRequiredConditionResult { get; }

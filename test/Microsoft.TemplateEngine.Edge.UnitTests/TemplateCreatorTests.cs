@@ -500,7 +500,7 @@ C
             public InputDataBag(string name, bool? value, bool? isEnabledConditionResult = null, bool? isRequiredConditionResult = null)
             {
                 Name = name;
-                Value = value.ToString();
+                Value = value == null ? null : value.ToString();
                 IsEnabledConditionResult = isEnabledConditionResult;
                 IsRequiredConditionResult = isRequiredConditionResult;
                 IsNull = value == null;

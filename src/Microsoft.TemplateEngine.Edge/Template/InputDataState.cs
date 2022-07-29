@@ -20,5 +20,22 @@ public enum InputDataState
     /// In CLI this is represented by option with explicit null string ('dotnet new mytemplate --myoptionA ""').
     /// In TemplateCreator this is represented by explicit null value.
     /// </summary>
-    ExplicitNull
+    ExplicitEmpty
+}
+
+public static class InputDataStateUtil
+{
+    /// <summary>
+    /// Tags the input value with <see cref="InputDataState"/> based on it's definition.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static InputDataState GetInputDataState(object? value)
+    {
+        // This is not and extension method as it's reach would be too broad (applicable to object)
+
+        return value == null || value is string str && string.IsNullOrEmpty(str)
+            ? InputDataState.ExplicitEmpty
+            : InputDataState.Set;
+    }
 }
