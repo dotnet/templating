@@ -238,8 +238,7 @@ namespace Microsoft.TemplateEngine.Core
                 string key = string.Format(format ?? "{0}", param.Name);
 
                 if (parameters.ParametersData.TryGetValue(param, out ParameterData value) &&
-                    value.IsEnabled &&
-                    !(value.Value == null || value.Value is string str && string.IsNullOrEmpty(str)))
+                    value.IsEnabled && value.Value != null)
                 {
                     vc[key] = value.Value;
                 }
