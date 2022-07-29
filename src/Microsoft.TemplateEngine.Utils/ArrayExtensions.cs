@@ -20,7 +20,7 @@ namespace Microsoft.TemplateEngine.Utils
             foreach (T[] arg in arrayList)
             {
                 Array.Copy(arg, 0, combinedArray, nextIndex, arg.Length);
-				
+
                 nextIndex += arg.Length;
             }
 
