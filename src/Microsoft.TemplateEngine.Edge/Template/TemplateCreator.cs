@@ -211,7 +211,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
 
         private bool AnyParametersWithInvalidDefaultsUnresolved(IReadOnlyList<string> defaultParamsWithInvalidValues, InputDataSet inputParameters, out IReadOnlyList<string> invalidDefaultParameters)
         {
-            invalidDefaultParameters = defaultParamsWithInvalidValues.Where(x => !inputParameters.ContainsKey(x)).ToList();
+            invalidDefaultParameters = defaultParamsWithInvalidValues.Where(x => !inputParameters.ParametersDefinition.ContainsKey(x)).ToList();
             return invalidDefaultParameters.Count > 0;
         }
 
@@ -282,7 +282,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
             List<string> tmpParamsWithInvalidValues = new List<string>();
             paramsWithInvalidValues = tmpParamsWithInvalidValues;
 
-            foreach (InputParameterData inputParam in inputParameters.ParametersData
+            foreach (InputParameterData inputParam in inputParameters
                          .Where(p => p.Value.InputDataState != InputDataState.Unset &&
                                      !(p.Value is EvaluatedInputParameterData
                                          {
@@ -406,7 +406,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
             bool anyMissingParams = false;
             missingParamNames = new List<string>();
 
-            foreach (EvaluatedInputParameterData evaluatedParameterData in templateParams.ParametersData.Values.Where(v => v.GetEvaluatedPrecedence() == EvaluatedPrecedence.Required && v.InputDataState == InputDataState.Unset))
+            foreach (InputParameterData evaluatedParameterData in templateParams.Values.Where(v => v.GetEvaluatedPrecedence() == EvaluatedPrecedence.Required && v.InputDataState == InputDataState.Unset))
             {
                 string? newParamValue;
                 const int _MAX_RETRIES = 3;
@@ -448,7 +448,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
             }
 
             bool isEvaluatedExternally = false;
-            foreach (EvaluatedInputParameterData evaluatedParameterData in inputParameters.ParametersData.Values.OfType<EvaluatedInputParameterData>())
+            foreach (EvaluatedInputParameterData evaluatedParameterData in inputParameters.Values.OfType<EvaluatedInputParameterData>())
             {
                 isEvaluatedExternally = true;
                 parametersBuilder.SetParameterEvaluation(evaluatedParameterData.ParameterDefinition, evaluatedParameterData);
@@ -480,7 +480,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
             List<string> defaultParamsWithInvalidValues = new List<string>();
 
             // for params that changed to optional and do not have values - try get 'Default' value (as for required it's not obtained)
-            evaluatedParameterSetData.ParametersData.Values
+            evaluatedParameterSetData.Values
                 .Where(v =>
                     v.InputDataState != InputDataState.Set &&
                     !string.IsNullOrEmpty(v.ParameterDefinition.Precedence.IsRequiredCondition) &&

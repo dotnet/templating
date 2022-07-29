@@ -41,7 +41,13 @@ public class EvaluatedInputParameterData : InputParameterData
         IsRequiredConditionResult = isRequiredConditionResult;
     }
 
+    /// <summary>
+    /// Externally (by the host) supplied result of the IsEnabledCondition on the template parameter.
+    /// </summary>
     public bool? IsEnabledConditionResult { get; }
 
+    /// <summary>
+    /// Externally (by the host) supplied result of the IsRequiredCondition on the template parameter.
+    /// </summary>
     public bool? IsRequiredConditionResult { get; }
 }

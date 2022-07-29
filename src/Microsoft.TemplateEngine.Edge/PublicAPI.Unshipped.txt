@@ -37,11 +37,18 @@ Microsoft.TemplateEngine.Edge.Template.FilteredTemplateEqualityComparer.GetHashC
 Microsoft.TemplateEngine.Edge.Template.IFilteredTemplateInfo.Info.get -> Microsoft.TemplateEngine.Abstractions.ITemplateInfo!
 Microsoft.TemplateEngine.Edge.Template.IFilteredTemplateInfo.MatchDisposition.get -> System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Edge.Template.MatchInfo>!
 Microsoft.TemplateEngine.Edge.Template.InputDataSet
+Microsoft.TemplateEngine.Edge.Template.InputDataSet.ContainsKey(Microsoft.TemplateEngine.Abstractions.ITemplateParameter! key) -> bool
 Microsoft.TemplateEngine.Edge.Template.InputDataSet.ContinueOnMismatchedConditionsEvaluation.get -> bool
 Microsoft.TemplateEngine.Edge.Template.InputDataSet.ContinueOnMismatchedConditionsEvaluation.init -> void
+Microsoft.TemplateEngine.Edge.Template.InputDataSet.Count.get -> int
+Microsoft.TemplateEngine.Edge.Template.InputDataSet.GetEnumerator() -> System.Collections.Generic.IEnumerator<System.Collections.Generic.KeyValuePair<Microsoft.TemplateEngine.Abstractions.ITemplateParameter!, Microsoft.TemplateEngine.Edge.Template.InputParameterData!>>!
 Microsoft.TemplateEngine.Edge.Template.InputDataSet.InputDataSet(Microsoft.TemplateEngine.Abstractions.ITemplateInfo! templateInfo, System.Collections.Generic.IReadOnlyDictionary<string!, string?>? inputParameters = null) -> void
 Microsoft.TemplateEngine.Edge.Template.InputDataSet.InputDataSet(Microsoft.TemplateEngine.Abstractions.Parameters.IParametersDefinition! parameters, System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Edge.Template.InputParameterData!>! parameterData) -> void
-Microsoft.TemplateEngine.Edge.Template.InputDataSet.ParametersData.get -> System.Collections.Generic.IReadOnlyDictionary<Microsoft.TemplateEngine.Abstractions.ITemplateParameter!, Microsoft.TemplateEngine.Edge.Template.InputParameterData!>!
+Microsoft.TemplateEngine.Edge.Template.InputDataSet.Keys.get -> System.Collections.Generic.IEnumerable<Microsoft.TemplateEngine.Abstractions.ITemplateParameter!>!
+Microsoft.TemplateEngine.Edge.Template.InputDataSet.ParametersDefinition.get -> Microsoft.TemplateEngine.Abstractions.Parameters.ParametersDefinition!
+Microsoft.TemplateEngine.Edge.Template.InputDataSet.this[Microsoft.TemplateEngine.Abstractions.ITemplateParameter! key].get -> Microsoft.TemplateEngine.Edge.Template.InputParameterData!
+Microsoft.TemplateEngine.Edge.Template.InputDataSet.TryGetValue(Microsoft.TemplateEngine.Abstractions.ITemplateParameter! key, out Microsoft.TemplateEngine.Edge.Template.InputParameterData! value) -> bool
+Microsoft.TemplateEngine.Edge.Template.InputDataSet.Values.get -> System.Collections.Generic.IEnumerable<Microsoft.TemplateEngine.Edge.Template.InputParameterData!>!
 Microsoft.TemplateEngine.Edge.Template.InputDataState
 Microsoft.TemplateEngine.Edge.Template.InputDataState.ExplicitEmpty = 2 -> Microsoft.TemplateEngine.Edge.Template.InputDataState
 Microsoft.TemplateEngine.Edge.Template.InputDataState.Set = 0 -> Microsoft.TemplateEngine.Edge.Template.InputDataState
@@ -50,7 +57,7 @@ Microsoft.TemplateEngine.Edge.Template.InputDataStateUtil
 Microsoft.TemplateEngine.Edge.Template.InputParameterData
 Microsoft.TemplateEngine.Edge.Template.InputParameterData.DataSource.get -> Microsoft.TemplateEngine.Abstractions.Parameters.DataSource
 Microsoft.TemplateEngine.Edge.Template.InputParameterData.InputDataState.get -> Microsoft.TemplateEngine.Edge.Template.InputDataState
-Microsoft.TemplateEngine.Edge.Template.InputParameterData.InputParameterData(Microsoft.TemplateEngine.Abstractions.ITemplateParameter! parameterDefinition, object? value, Microsoft.TemplateEngine.Abstractions.Parameters.DataSource dataSource, Microsoft.TemplateEngine.Edge.Template.InputDataState inputDataState = Microsoft.TemplateEngine.Edge.Template.InputDataState.Set) -> void
+Microsoft.TemplateEngine.Edge.Template.InputParameterData.InputParameterData(Microsoft.TemplateEngine.Abstractions.ITemplateParameter! parameterDefinition, object? value, Microsoft.TemplateEngine.Abstractions.Parameters.DataSource dataSource = Microsoft.TemplateEngine.Abstractions.Parameters.DataSource.Host, Microsoft.TemplateEngine.Edge.Template.InputDataState inputDataState = Microsoft.TemplateEngine.Edge.Template.InputDataState.Set) -> void
 Microsoft.TemplateEngine.Edge.Template.InputParameterData.ParameterDefinition.get -> Microsoft.TemplateEngine.Abstractions.ITemplateParameter!
 Microsoft.TemplateEngine.Edge.Template.InputParameterData.Value.get -> object?
 Microsoft.TemplateEngine.Edge.Template.ITemplateMatchInfo.DispositionOfDefaults.get -> System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Edge.Template.MatchInfo>!

@@ -5,10 +5,14 @@ using System.Collections.Generic;
 
 namespace Microsoft.TemplateEngine.Abstractions.Parameters;
 
-public interface IParameterSetData : IParametersDefinition
+/// <summary>
+/// Data model for bound and merged dataset to be used to substitute and evaluate active sections within templates.
+///  Data are possibly merged from multiple sources (default values in definition, values supplied by host, user, etc.).
+/// </summary>
+public interface IParameterSetData : IReadOnlyDictionary<ITemplateParameter, ParameterData>
 {
     /// <summary>
-    /// Data for enabled parameters.
+    /// Descriptors for the parameters - inferred from the template.
     /// </summary>
-    IReadOnlyDictionary<ITemplateParameter, ParameterData> ParametersData { get; }
+    IParametersDefinition ParametersDefinition { get; }
 }

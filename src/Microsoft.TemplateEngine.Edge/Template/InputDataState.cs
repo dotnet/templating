@@ -3,6 +3,9 @@
 
 namespace Microsoft.TemplateEngine.Edge.Template;
 
+/// <summary>
+/// Enumeration indicating how should the engine treat incoming value (as ignored, explicitly unset or standard value).
+/// </summary>
 public enum InputDataState
 {
     /// <summary>

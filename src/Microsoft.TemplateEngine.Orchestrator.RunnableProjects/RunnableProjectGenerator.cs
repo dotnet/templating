@@ -337,7 +337,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         {
             IVariableCollection variables = VariableCollection.SetupVariables(parameters, variableConfig);
 
-            foreach (Parameter param in parameters.Values.OfType<Parameter>())
+            foreach (Parameter param in parameters.ParametersDefinition.OfType<Parameter>())
             {
                 // Add choice values to variables - to allow them to be recognizable unquoted
                 if (param.EnableQuotelessLiterals && param.IsChoice() && param.Choices != null)

@@ -16,8 +16,8 @@ internal static class InputDataSetExtensions
     public static IParameterSetData ToParameterSetData(this InputDataSet inputData)
     {
         return new ParameterSetData(
-            inputData,
-            inputData.ParametersData.Values.Select(d => new ParameterData(d.ParameterDefinition, d.Value, d.DataSource, !(d is EvaluatedInputParameterData ed && ed.IsEnabledConditionResult == false)))
+            inputData.ParametersDefinition,
+            inputData.Values.Select(d => new ParameterData(d.ParameterDefinition, d.Value, d.DataSource, !(d is EvaluatedInputParameterData ed && ed.IsEnabledConditionResult == false)))
                 .ToList());
     }
 
@@ -33,26 +33,26 @@ internal static class InputDataSetExtensions
 
     public static void VerifyInputData(this InputDataSet inputData)
     {
-        if (inputData.ParametersData.Values.OfType<EvaluatedInputParameterData>().Any())
+        if (inputData.Values.OfType<EvaluatedInputParameterData>().Any())
         {
             ErrorOutOnMismatchedConditionEvaluation(
-                inputData.ParametersData.Values.Where(p =>
+                inputData.Values.Where(p =>
                     !(p is EvaluatedInputParameterData evaluated && evaluated.IsEnabledConditionResult != null) ^
                     string.IsNullOrEmpty(p.ParameterDefinition.Precedence.IsEnabledCondition)).ToList());
 
             ErrorOutOnMismatchedConditionEvaluation(
-                inputData.ParametersData.Values.Where(p =>
+                inputData.Values.Where(p =>
                     !(p is EvaluatedInputParameterData evaluated && evaluated.IsRequiredConditionResult != null) ^
                     string.IsNullOrEmpty(p.ParameterDefinition.Precedence.IsRequiredCondition)).ToList());
         }
 
-        inputData.ParametersData.Values.ForEach(VerifyConditions);
-        inputData.ParametersData.Values.ForEach(VerifyInputState);
+        inputData.Values.ForEach(VerifyConditions);
+        inputData.Values.ForEach(VerifyInputState);
     }
 
     public static bool HasConditions(this InputDataSet inputData)
     {
-        return inputData.Values.Any(p =>
+        return inputData.ParametersDefinition.Any(p =>
             !string.IsNullOrEmpty(p.Precedence.IsRequiredCondition) ||
             !string.IsNullOrEmpty(p.Precedence.IsEnabledCondition));
     }

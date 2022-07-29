@@ -233,11 +233,11 @@ namespace Microsoft.TemplateEngine.Core
         private static VariableCollection VariableCollectionFromParameters(IParameterSetData parameters, string format)
         {
             VariableCollection vc = new VariableCollection();
-            foreach (ITemplateParameter param in parameters)
+            foreach (ITemplateParameter param in parameters.ParametersDefinition)
             {
                 string key = string.Format(format ?? "{0}", param.Name);
 
-                if (parameters.ParametersData.TryGetValue(param, out ParameterData value) &&
+                if (parameters.TryGetValue(param, out ParameterData value) &&
                     value.IsEnabled && value.Value != null)
                 {
                     vc[key] = value.Value;
