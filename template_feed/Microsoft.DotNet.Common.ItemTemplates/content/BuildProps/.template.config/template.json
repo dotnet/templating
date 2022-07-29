@@ -12,7 +12,7 @@
     "type": "item"
   },
   "identity": "Microsoft.Standard.QuickStarts.DirectoryProps",
-  "groupIdentity": "msbuilddirectoryprops",
+  "groupIdentity": "MSBuildDirectoryPropsFile",
   "precedence": 0,
   "shortName": "buildprops",
   "symbols": {
