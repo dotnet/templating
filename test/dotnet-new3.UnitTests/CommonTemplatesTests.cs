@@ -83,6 +83,7 @@ namespace Dotnet_new3.IntegrationTests
 
             new DotnetNewCommand(_log, args.ToArray())
                 .WithCustomHive(_fixture.HomeDirectory)
+                .WithDebug()
                 .WithWorkingDirectory(workingDir)
                 .Execute()
                 .Should()
@@ -92,6 +93,8 @@ namespace Dotnet_new3.IntegrationTests
 $@"The template ""{expectedTemplateName}"" was created successfully\.
 
 Processing post-creation actions\.\.\.
+.*
+.*
 Restoring {finalProjectName}:
 .*
 Restore succeeded\.",
@@ -351,6 +354,7 @@ Restore succeeded\.",
 
             new DotnetNewCommand(_log, args.ToArray())
                 .WithCustomHive(_fixture.HomeDirectory)
+                .WithDebug()
                 .WithWorkingDirectory(workingDir)
                 .Execute()
                 .Should()
@@ -561,6 +565,7 @@ class Program
 
             new DotnetNewCommand(_log, args.ToArray())
                 .WithCustomHive(_fixture.HomeDirectory)
+                .WithDebug()
                 .WithWorkingDirectory(workingDir)
                 .Execute()
                 .Should()
@@ -663,6 +668,7 @@ class Program
 
             new DotnetNewCommand(_log, args.ToArray())
                 .WithCustomHive(_fixture.HomeDirectory)
+                .WithDebug()
                 .WithWorkingDirectory(workingDir)
                 .Execute()
                 .Should()
@@ -750,6 +756,7 @@ class Program
 
             new DotnetNewCommand(_log, args.ToArray())
                 .WithCustomHive(_fixture.HomeDirectory)
+                .WithDebug()
                 .WithWorkingDirectory(workingDir)
                 .Execute()
                 .Should()

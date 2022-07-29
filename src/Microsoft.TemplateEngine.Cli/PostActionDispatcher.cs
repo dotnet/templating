@@ -4,6 +4,8 @@
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Cli.PostActionProcessors;
 using Microsoft.TemplateEngine.Edge.Template;
+using Microsoft.TemplateEngine.Utils;
+using NuGet.Protocol.Plugins;
 
 namespace Microsoft.TemplateEngine.Cli
 {
@@ -95,80 +97,86 @@ namespace Microsoft.TemplateEngine.Cli
             }
 
             PostActionExecutionStatus result = PostActionExecutionStatus.Success;
-            foreach (IPostAction action in postActions)
+            using (Timing.Over(_environment.Host.Logger, "Overall Post Action"))
             {
-                if (isDryRun)
+                foreach (IPostAction action in postActions)
                 {
-                    Reporter.Output.WriteLine(LocalizableStrings.ActionWouldHaveBeenTakenAutomatically);
-                    if (!string.IsNullOrWhiteSpace(action.Description))
+                    using (Timing.Over(_environment.Host.Logger, "Post Action"))
                     {
-                        Reporter.Output.WriteLine(action.Description.Indent());
-                    }
-                    continue;
-                }
-
-                IPostActionProcessor? actionProcessor = null;
-                _environment.Components.TryGetComponent(action.ActionId, out actionProcessor);
-
-                if (actionProcessor == null)
-                {
-                    Reporter.Error.WriteLine(string.Format(LocalizableStrings.PostActionDispatcher_Error_NotSupported, action.ActionId));
-                    if (!string.IsNullOrWhiteSpace(action.Description))
-                    {
-                        Reporter.Error.WriteLine(string.Format(LocalizableStrings.PostActionDescription, action.Description));
-                    }
-                    // The host doesn't know how to handle this action, just display manual instructions.
-                    DisplayInstructionsForAction(action, useErrorOutput: true);
-                    result |= PostActionExecutionStatus.Failure;
-                }
-                else if (actionProcessor is ProcessStartPostActionProcessor)
-                {
-                    if (canRunScripts == AllowRunScripts.No)
-                    {
-                        Reporter.Error.WriteLine(LocalizableStrings.PostActionDispatcher_Error_RunScriptNotAllowed);
-                        if (!string.IsNullOrWhiteSpace(action.Description))
+                        if (isDryRun)
                         {
-                            Reporter.Error.WriteLine(string.Format(LocalizableStrings.PostActionDescription, action.Description));
+                            Reporter.Output.WriteLine(LocalizableStrings.ActionWouldHaveBeenTakenAutomatically);
+                            if (!string.IsNullOrWhiteSpace(action.Description))
+                            {
+                                Reporter.Output.WriteLine(action.Description.Indent());
+                            }
+                            continue;
                         }
-                        DisplayInstructionsForAction(action, useErrorOutput: true);
-                        result |= PostActionExecutionStatus.Cancelled;
-                    }
-                    else if (canRunScripts == AllowRunScripts.Yes)
-                    {
-                        result |= ProcessAction(creationResult.CreationEffects, creationResult.CreationResult!, creationResult.OutputBaseDirectory, action, actionProcessor);
-                    }
-                    else if (canRunScripts == AllowRunScripts.Prompt)
-                    {
-                        // Ask the user if they want to run the action.
-                        // If they do, run it, and return the result.
-                        // Otherwise return cancelled, indicating the action was not run.
-                        if (AskUserIfActionShouldRun(action))
+
+                        IPostActionProcessor? actionProcessor = null;
+                        _environment.Components.TryGetComponent(action.ActionId, out actionProcessor);
+
+                        if (actionProcessor == null)
+                        {
+                            Reporter.Error.WriteLine(string.Format(LocalizableStrings.PostActionDispatcher_Error_NotSupported, action.ActionId));
+                            if (!string.IsNullOrWhiteSpace(action.Description))
+                            {
+                                Reporter.Error.WriteLine(string.Format(LocalizableStrings.PostActionDescription, action.Description));
+                            }
+                            // The host doesn't know how to handle this action, just display manual instructions.
+                            DisplayInstructionsForAction(action, useErrorOutput: true);
+                            result |= PostActionExecutionStatus.Failure;
+                        }
+                        else if (actionProcessor is ProcessStartPostActionProcessor)
+                        {
+                            if (canRunScripts == AllowRunScripts.No)
+                            {
+                                Reporter.Error.WriteLine(LocalizableStrings.PostActionDispatcher_Error_RunScriptNotAllowed);
+                                if (!string.IsNullOrWhiteSpace(action.Description))
+                                {
+                                    Reporter.Error.WriteLine(string.Format(LocalizableStrings.PostActionDescription, action.Description));
+                                }
+                                DisplayInstructionsForAction(action, useErrorOutput: true);
+                                result |= PostActionExecutionStatus.Cancelled;
+                            }
+                            else if (canRunScripts == AllowRunScripts.Yes)
+                            {
+                                result |= ProcessAction(creationResult.CreationEffects, creationResult.CreationResult!, creationResult.OutputBaseDirectory, action, actionProcessor);
+                            }
+                            else if (canRunScripts == AllowRunScripts.Prompt)
+                            {
+                                // Ask the user if they want to run the action.
+                                // If they do, run it, and return the result.
+                                // Otherwise return cancelled, indicating the action was not run.
+                                if (AskUserIfActionShouldRun(action))
+                                {
+                                    result |= ProcessAction(creationResult.CreationEffects, creationResult.CreationResult!, creationResult.OutputBaseDirectory, action, actionProcessor);
+                                }
+                                else
+                                {
+                                    result |= PostActionExecutionStatus.Cancelled;
+                                }
+                            }
+                            // no trailing else - no other cases.
+                        }
+                        else // other post action
                         {
                             result |= ProcessAction(creationResult.CreationEffects, creationResult.CreationResult!, creationResult.OutputBaseDirectory, action, actionProcessor);
                         }
-                        else
+                        if (result != PostActionExecutionStatus.Success)
                         {
-                            result |= PostActionExecutionStatus.Cancelled;
+                            if (action.ContinueOnError)
+                            {
+                                result ^= PostActionExecutionStatus.Failure;
+                            }
+                            else
+                            {
+                                break;
+                            }
                         }
-                    }
-                    // no trailing else - no other cases.
-                }
-                else // other post action
-                {
-                    result |= ProcessAction(creationResult.CreationEffects, creationResult.CreationResult!, creationResult.OutputBaseDirectory, action, actionProcessor);
-                }
-                if (result != PostActionExecutionStatus.Success)
-                {
-                    if (action.ContinueOnError)
-                    {
-                        result ^= PostActionExecutionStatus.Failure;
-                    }
-                    else
-                    {
-                        break;
+                        Reporter.Output.WriteLine();
                     }
                 }
-                Reporter.Output.WriteLine();
             }
             return result;
         }

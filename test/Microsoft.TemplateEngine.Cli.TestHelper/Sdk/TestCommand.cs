@@ -58,17 +58,21 @@ namespace Microsoft.NET.TestFramework.Commands
 
         public virtual CommandResult Execute(IEnumerable<string> args)
         {
+            var swCommand = Stopwatch.StartNew();
             var command = CreateCommandSpec(args)
                 .ToCommand()
                 .CaptureStdOut()
                 .CaptureStdErr();
+            Log.WriteLine($"Start command execution: {command.CommandName} {command.CommandArgs}");
 
             if (CommandOutputHandler != null)
             {
                 command.OnOutputLine(CommandOutputHandler);
             }
-
+            var swProcess = Stopwatch.StartNew();
             var result = ((Command)command).Execute(ProcessStartedHandler);
+            swProcess.Stop();
+            Log.WriteLine($"Process execution duration: {swProcess.ElapsedMilliseconds} ms");
 
             Log.WriteLine($"> {result.StartInfo.FileName} {result.StartInfo.Arguments}");
             Log.WriteLine(result.StdOut);
@@ -84,7 +88,8 @@ namespace Microsoft.NET.TestFramework.Commands
             {
                 Log.WriteLine($"Exit Code: {result.ExitCode}");
             }
-
+            swCommand.Stop();
+            Log.WriteLine($"End command execution: Elapsed {swCommand.ElapsedMilliseconds} ms");
             return result;
         }
 
