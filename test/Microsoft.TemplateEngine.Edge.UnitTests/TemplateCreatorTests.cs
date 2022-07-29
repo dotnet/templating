@@ -447,10 +447,10 @@ C
             {
                 var parameters = runnableConfig.ParametersDefinition;
 
-                IInputDataSet data;
+                InputDataSet data;
                 try
                 {
-                    data = new EvaluatedInputDataSet(
+                    data = new InputDataSet(
                         parameters,
                         parameters2!.Select(p => new EvaluatedInputParameterData(
                             parameters[p.Name],
@@ -460,8 +460,15 @@ C
                             p.IsRequiredConditionResult,
                             p.IsNull ? InputDataState.Unset : InputDataState.Set)).ToList())
                     {
-                        ContinueOnMismatchedEvaluations = true
+                        ContinueOnMismatchedConditionsEvaluation = true
                     };
+
+                    res = await creator.InstantiateAsync(
+                        templateInfo: runnableConfig,
+                        name: "tst",
+                        fallbackName: "tst2",
+                        inputParameters: data,
+                        outputPath: targetDir);
                 }
                 catch (Exception e)
                 {
@@ -469,13 +476,6 @@ C
                     e.Message.Should().BeEquivalentTo(e.Message);
                     return;
                 }
-
-                res = await creator.InstantiateAsync(
-                    templateInfo: runnableConfig,
-                    name: "tst",
-                    fallbackName: "tst2",
-                    inputParameters: data,
-                    outputPath: targetDir);
             }
 
             if (instantiateShouldFail)

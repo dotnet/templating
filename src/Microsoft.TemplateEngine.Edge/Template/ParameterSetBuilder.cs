@@ -21,7 +21,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
 #pragma warning restore CS0618 // Type or member is obsolete
     {
         private readonly Dictionary<ITemplateParameter, EvalData> _resolvedValues;
-        private IEvaluatedInputDataSet? _result;
+        private InputDataSet? _result;
 
         internal ParameterSetBuilder(IReadOnlyDictionary<string, ITemplateParameter> parameters) : base(parameters)
         {
@@ -128,11 +128,11 @@ namespace Microsoft.TemplateEngine.Edge.Template
             RunDatasetEvaluation(evaluatedParameters, generator, logger);
         }
 
-        public IEvaluatedInputDataSet Build()
+        public InputDataSet Build()
         {
             if (_result == null)
             {
-                _result = new EvaluatedInputDataSet(
+                _result = new InputDataSet(
                     this,
                     _resolvedValues.Select(p => p.Value.ToParameterData()).ToList());
             }

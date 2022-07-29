@@ -20,5 +20,5 @@ internal interface IParameterSetBuilder : IParametersDefinition
 
     bool CheckIsParametersEvaluationCorrect(IGenerator generator, ILogger logger, out IReadOnlyList<string> paramsWithInvalidEvaluations);
 
-    IEvaluatedInputDataSet Build();
+    InputDataSet Build();
 }

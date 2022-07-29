@@ -10,7 +10,7 @@ using Microsoft.TemplateEngine.Edge.Template;
 
 namespace Microsoft.TemplateEngine.Edge.Template;
 
-public class InputDataSet : ParametersDefinition, IInputDataSet
+public class InputDataSet : ParametersDefinition
 {
     public InputDataSet(IParametersDefinition parameters, IReadOnlyList<InputParameterData> parameterData)
         : base(parameters.AsReadonlyDictionary())
@@ -35,23 +35,7 @@ public class InputDataSet : ParametersDefinition, IInputDataSet
         });
     }
 
+    public bool ContinueOnMismatchedConditionsEvaluation { get; init; }
+
     public IReadOnlyDictionary<ITemplateParameter, InputParameterData> ParametersData { get; }
-
-    [Obsolete("IParameterSet should not be used - it is replaced with IParameterSetData", false)]
-    public static IInputDataSet FromLegacyParameterSet(IParameterSet parameterSet)
-    {
-        IParametersDefinition parametersDefinition = new ParametersDefinition(parameterSet.ParameterDefinitions);
-        IReadOnlyList<InputParameterData> data = parameterSet.ResolvedValues.Select(p =>
-                new InputParameterData(p.Key, p.Value, DataSource.Host, InputDataStateUtil.GetInputDataState(p.Value)))
-            .ToList();
-        return new InputDataSet(parametersDefinition, data);
-    }
-
-    public IParameterSetData ToParameterSetData()
-    {
-        return new ParameterSetData(
-            this,
-            ParametersData.Values.Select(d => new ParameterData(d.ParameterDefinition, d.Value, d.DataSource, !(d is EvaluatedInputParameterData ed && ed.IsEnabledConditionResult == false)))
-                .ToList());
-    }
 }
