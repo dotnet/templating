@@ -233,7 +233,7 @@ Restore succeeded\.",
                 _log,
                 _fixture,
                 "MSBuild Directory.Build.props file",
-                "msbuildprops",
+                "buildprops",
                 new [] { "--inherit" },
                 workingDir => HasImport(Path.Combine(workingDir, "Directory.Build.props"))
             );
@@ -244,7 +244,7 @@ Restore succeeded\.",
                 _log,
                 _fixture,
                 "MSBuild Directory.Build.targets file",
-                "msbuildtargets",
+                "buildtargets",
                 new [] { "--inherit" },
                 workingDir => HasImport(Path.Combine(workingDir, "Directory.Build.targets"))
             );
