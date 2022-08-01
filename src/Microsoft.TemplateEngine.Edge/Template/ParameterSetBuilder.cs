@@ -112,8 +112,16 @@ namespace Microsoft.TemplateEngine.Edge.Template
         {
             List<EvalData> evaluatedParameters = _resolvedValues.Values.ToList();
             List<EvalData> clonedParameters = evaluatedParameters.Select(v => v.Clone()).ToList();
-            RunDatasetEvaluation(clonedParameters, generator, logger);
             List<string> invalidParams = new List<string>();
+            try
+            {
+                RunDatasetEvaluation(clonedParameters, generator, logger);
+            }
+            catch (Exception e)
+            {
+                logger.LogInformation(e, "Cross-check evaluation of host provided condition evaluations failed.");
+                invalidParams.Add(e.Message);
+            }
 
             foreach (var pair in evaluatedParameters.Zip(clonedParameters, (a, b) => (a, b)))
             {

@@ -159,7 +159,7 @@ C
                 sourceSnippet,
                 expectedOutput,
                 @"Failed to create template.
-Details: Parameter conditions contain cyclic dependency: [A, B, A] that is preventing deterministic evaluation",
+Details: Parameter conditions contain cyclic dependency: [A, B, A] that is preventing deterministic evaluation.",
                 instantiateShouldFail,
                 parameters);
         }
@@ -184,7 +184,8 @@ Details: Parameter conditions contain cyclic dependency: [A, B, A] that is preve
 	    },
         ""C"": {
 	      ""type"": ""parameter"",
-	      ""datatype"": ""bool""
+	      ""datatype"": ""bool"",
+          ""defaultValue"": ""false"",
 	    },
     }
 }
@@ -196,8 +197,8 @@ Details: Parameter conditions contain cyclic dependency: [A, B, A] that is preve
         [InlineData(null, null, true, "C", true, "B")]
         [InlineData(null, true, false, "C", true, "A")]
         [InlineData(null, null, false, "C", true, "A, B")]
-        [InlineData(null, null, null, "B,", false, null)]
-        [InlineData(null, true, null, "B,", false, null)]
+        [InlineData(null, null, null, "B,", true, "A, B")]
+        [InlineData(null, true, null, "B,", true, "A")]
         [InlineData(null, false, null, "", false, null)]
         [InlineData(false, false, false, "", false, null)]
         [InlineData(true, false, true, "A,C", false, null)]
