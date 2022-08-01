@@ -83,6 +83,7 @@ namespace Dotnet_new3.IntegrationTests
 
             new DotnetNewCommand(_log, args.ToArray())
                 .WithCustomHive(_fixture.HomeDirectory)
+                .WithDebug()
                 .WithWorkingDirectory(workingDir)
                 .Execute()
                 .Should()
@@ -92,6 +93,8 @@ namespace Dotnet_new3.IntegrationTests
 $@"The template ""{expectedTemplateName}"" was created successfully\.
 
 Processing post-creation actions\.\.\.
+.*
+.*
 Restoring {finalProjectName}:
 .*
 Restore succeeded\.",
@@ -183,6 +186,7 @@ Restore succeeded\.",
         [InlineData("global.json file", "globaljson")]
         [InlineData("NuGet Config", "nugetconfig")]
         [InlineData("Solution File", "sln")]
+        [InlineData("Solution File", "solution")]
         [InlineData("Dotnet local tool manifest file", "tool-manifest")]
         [InlineData("Web Config", "webconfig")]
         public void AllCommonItemsCreate(string expectedTemplateName, string templateShortName)
@@ -350,6 +354,7 @@ Restore succeeded\.",
 
             new DotnetNewCommand(_log, args.ToArray())
                 .WithCustomHive(_fixture.HomeDirectory)
+                .WithDebug()
                 .WithWorkingDirectory(workingDir)
                 .Execute()
                 .Should()
@@ -560,6 +565,7 @@ class Program
 
             new DotnetNewCommand(_log, args.ToArray())
                 .WithCustomHive(_fixture.HomeDirectory)
+                .WithDebug()
                 .WithWorkingDirectory(workingDir)
                 .Execute()
                 .Should()
@@ -662,6 +668,7 @@ class Program
 
             new DotnetNewCommand(_log, args.ToArray())
                 .WithCustomHive(_fixture.HomeDirectory)
+                .WithDebug()
                 .WithWorkingDirectory(workingDir)
                 .Execute()
                 .Should()
@@ -749,6 +756,7 @@ class Program
 
             new DotnetNewCommand(_log, args.ToArray())
                 .WithCustomHive(_fixture.HomeDirectory)
+                .WithDebug()
                 .WithWorkingDirectory(workingDir)
                 .Execute()
                 .Should()
