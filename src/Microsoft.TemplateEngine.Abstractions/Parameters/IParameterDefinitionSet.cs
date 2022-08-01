@@ -5,7 +5,10 @@ using System.Collections.Generic;
 
 namespace Microsoft.TemplateEngine.Abstractions.Parameters;
 
-public interface IParametersDefinition : IReadOnlyList<ITemplateParameter>
+/// <summary>
+/// The set of descriptors of template parameters extracted from the template.
+/// </summary>
+public interface IParameterDefinitionSet : IReadOnlyList<ITemplateParameter>
 {
     //
     // Following methods are taken from the IReadOnlyDictionary<TKey, TValue>

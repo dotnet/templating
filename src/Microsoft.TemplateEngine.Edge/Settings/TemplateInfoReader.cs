@@ -79,7 +79,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     {
                         templateParameters.Add(new TemplateParameter(item));
                     }
-                    info.ParametersDefinition = new ParametersDefinition(templateParameters);
+                    info.ParameterDefinitions = new ParameterDefinitions(templateParameters);
                 }
 
                 //read tags

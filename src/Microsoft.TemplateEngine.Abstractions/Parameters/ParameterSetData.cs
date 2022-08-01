@@ -18,21 +18,28 @@ public class ParameterSetData : IParameterSetData
     /// </summary>
     /// <param name="parameters"></param>
     /// <param name="parameterData"></param>
-    public ParameterSetData(IParametersDefinition parameters, IReadOnlyList<ParameterData> parameterData)
+    public ParameterSetData(IParameterDefinitionSet parameters, IReadOnlyList<ParameterData> parameterData)
     {
-        ParametersDefinition = new ParametersDefinition(parameters.AsReadonlyDictionary());
+        ParametersDefinition = new ParameterDefinitions(parameters.AsReadonlyDictionary());
         _parametersData = parameterData.ToDictionary(d => d.ParameterDefinition, d => d);
     }
 
-#pragma warning disable RS0027 // Public API with optional parameter(s) should have the most parameters amongst its public overloads
+    /// <summary>
+    /// Creates new instance of the <see cref="ParameterSetData"/> data type, not initialized with any actual instantiation data.
+    /// To be used for compatibility purposes in places where old dictionary parameter set was used.
+    /// </summary>
+    /// <param name="templateInfo"></param>
+    public ParameterSetData(ITemplateInfo templateInfo)
+        : this(templateInfo, (IReadOnlyDictionary<string, object?>?)null)
+    { }
+
     /// <summary>
     /// Creates new instance of the <see cref="ParameterSetData"/> data type.
     /// To be used for compatibility purposes in places where old dictionary parameter set was used.
     /// </summary>
     /// <param name="templateInfo"></param>
     /// <param name="inputParameters"></param>
-    public ParameterSetData(ITemplateInfo templateInfo, IReadOnlyDictionary<string, string?>? inputParameters = null)
-#pragma warning restore RS0027 // Public API with optional parameter(s) should have the most parameters amongst its public overloads
+    public ParameterSetData(ITemplateInfo templateInfo, IReadOnlyDictionary<string, string?>? inputParameters)
         : this(templateInfo, inputParameters?.ToDictionary(p => p.Key, p => (object?)p.Value))
     { }
 
@@ -44,17 +51,17 @@ public class ParameterSetData : IParameterSetData
     /// <param name="inputParameters"></param>
     public ParameterSetData(ITemplateInfo templateInfo, IReadOnlyDictionary<string, object?>? inputParameters)
     {
-        ParametersDefinition = new ParametersDefinition(templateInfo.ParametersDefinition);
-        _parametersData = templateInfo.ParametersDefinition.ToDictionary(p => p, p =>
+        ParametersDefinition = new ParameterDefinitions(templateInfo.ParameterDefinitions);
+        _parametersData = templateInfo.ParameterDefinitions.ToDictionary(p => p, p =>
         {
             object? value = null;
             bool isSet = inputParameters != null && inputParameters.TryGetValue(p.Name, out value);
-            return new ParameterData(p, value, isSet ? DataSource.Host : DataSource.NoSource);
+            return new ParameterData(p, value, isSet ? DataSource.User : DataSource.NoSource);
         });
     }
 
     /// <inheritdoc/>
-    public IParametersDefinition ParametersDefinition { get; }
+    public IParameterDefinitionSet ParametersDefinition { get; }
 
     /// <inheritdoc/>
     public int Count => _parametersData.Count;
@@ -76,9 +83,9 @@ public class ParameterSetData : IParameterSetData
     [Obsolete("IParameterSet should not be used - it is replaced with IParameterSetData", false)]
     public static IParameterSetData FromLegacyParameterSet(IParameterSet parameterSet)
     {
-        IParametersDefinition parametersDefinition = new ParametersDefinition(parameterSet.ParameterDefinitions);
+        IParameterDefinitionSet parametersDefinition = new ParameterDefinitions(parameterSet.ParameterDefinitions);
         IReadOnlyList<ParameterData> data = parameterSet.ResolvedValues.Select(p =>
-                new ParameterData(p.Key, p.Value, DataSource.Host))
+                new ParameterData(p.Key, p.Value, DataSource.User))
             .ToList();
         return new ParameterSetData(parametersDefinition, data);
     }

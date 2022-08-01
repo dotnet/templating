@@ -61,11 +61,11 @@ namespace Microsoft.TemplateSearch.Common
         public IReadOnlyDictionary<string, string> TagsCollection => TemplateInfo.TagsCollection;
 
         /// <inheritdoc/>
-        public IParametersDefinition ParametersDefinition => TemplateInfo.ParametersDefinition;
+        public IParameterDefinitionSet ParameterDefinitions => TemplateInfo.ParameterDefinitions;
 
         /// <inheritdoc/>
-        [Obsolete("Use ParametersDefinition instead.")]
-        public IReadOnlyList<ITemplateParameter> Parameters => ParametersDefinition;
+        [Obsolete("Use ParameterDefinitions instead.")]
+        public IReadOnlyList<ITemplateParameter> Parameters => ParameterDefinitions;
 
         /// <inheritdoc/>
         public int Precedence => TemplateInfo.Precedence;

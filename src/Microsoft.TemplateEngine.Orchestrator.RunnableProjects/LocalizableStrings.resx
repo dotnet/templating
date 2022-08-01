@@ -202,17 +202,6 @@ Details: {1}</value>
     <value>Variable [{0}] already added with value [{1}]. Cannot add it as implicit variable with value of self.</value>
     <comment>{0} is the choiceKey, {1} is the existing conflict value</comment>
   </data>
-  <data name="Params_Error_ExternalConditionMismatch" xml:space="preserve">
-    <value>Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition) or a failure to pass the condition results for parameters with condition(s) in template. Offending parameters: {0}</value>
-    <comment>{0} - csv of mismateched parameters</comment>
-  </data>
-  <data name="RunnableProjectGenerator_Error_ParamsCycle" xml:space="preserve">
-    <value>Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation</value>
-    <comment>{0} - csv of the cycle</comment>
-  </data>
-  <data name="RunnableProjectGenerator_Error_TopologicalSort" xml:space="preserve">
-    <value>Unexpected internal error - unable to perform topological sort of parameter dependencies that do not appear to have a cyclic dependencies.</value>
-  </data>
   <data name="RunnableProjectGenerator_Exception_ConfigShouldBeFile" xml:space="preserve">
     <value>Template configuration must be a file, but {0} is not a file.</value>
     <comment>{0} is template configuration location.</comment>
@@ -231,10 +220,6 @@ Details: {1}</value>
   <data name="RunnableProjectGenerator_Warning_LocFileSkipped" xml:space="preserve">
     <value>Localization file {0} is not compatible with base configuration {1}, and will be skipped.</value>
     <comment>{0} and {1} are template configuration locations.</comment>
-  </data>
-  <data name="RunnableProjectGenerator_Warning_ParamsCycle" xml:space="preserve">
-    <value>Parameter conditions contain cyclic dependency: [{0}]. With current values of parameters it's possible to deterministically evaluate parameters - so proceeding further. However template should be reviewed as instantiation with different parameters can lead to error.</value>
-    <comment>{0} - csv of the cycle</comment>
   </data>
   <data name="SimpleConfigModel_AuthoringException_MergeConfiguration_FileNotFound" xml:space="preserve">
     <value>Failed to load additional configuration file {0}, the file does not exist.</value>

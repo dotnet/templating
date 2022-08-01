@@ -176,7 +176,7 @@
     <value>(No Items)</value>
   </data>
   <data name="NoParameters" xml:space="preserve">
-    <value>    (No ParametersDefinition)</value>
+    <value>    (No Parameters)</value>
   </data>
   <data name="NoTemplatesMatchingInputParameters" xml:space="preserve">
     <value>No templates found matching: {0}.</value>

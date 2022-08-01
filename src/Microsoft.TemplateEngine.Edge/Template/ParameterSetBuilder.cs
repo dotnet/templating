@@ -16,8 +16,9 @@ using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Edge.Template
 {
+    internal class ParameterSetBuilder : ParameterDefinitions, IParameterSetBuilder,
 #pragma warning disable CS0618 // Type or member is obsolete
-    internal class ParameterSetBuilder : ParametersDefinition, IParameterSetBuilder, IParameterSet
+        IParameterSet
 #pragma warning restore CS0618 // Type or member is obsolete
     {
         private readonly Dictionary<ITemplateParameter, EvalData> _resolvedValues;
@@ -28,28 +29,21 @@ namespace Microsoft.TemplateEngine.Edge.Template
             _resolvedValues = parameters.ToDictionary(p => p.Value, p => new EvalData(p.Value));
         }
 
-        internal ParameterSetBuilder(IParametersDefinition parameters) : this(parameters.AsReadonlyDictionary())
+        internal ParameterSetBuilder(IParameterDefinitionSet parameters) : this(parameters.AsReadonlyDictionary())
         { }
 
-        public IEnumerable<ITemplateParameter> ParameterDefinitions => this;
-
-        public IDictionary<ITemplateParameter, object?> ResolvedValues =>
-            _resolvedValues
-                .Where(p => p.Value.Value != null)
-                .ToDictionary(k => k.Key, k => k.Value.Value);
-
-        public static IParameterSetBuilder CreateWithDefaults(IGenerator generator, IParametersDefinition parametersDefinition, IEngineEnvironmentSettings environment, string? name = null)
+        public static IParameterSetBuilder CreateWithDefaults(IGenerator generator, IParameterDefinitionSet parametersDefinition, IEngineEnvironmentSettings environment, string? name = null)
         {
             var result = CreateWithDefaults(generator, parametersDefinition, name, environment, out IReadOnlyList<string> errors);
             if (errors.Any())
             {
-                throw new Exception("ParametersDefinition with errors encountered: " + errors.ToCsvString());
+                throw new Exception("ParameterDefinitions with errors encountered: " + errors.ToCsvString());
             }
 
             return result;
         }
 
-        public static IParameterSetBuilder CreateWithDefaults(IGenerator generator, IParametersDefinition parametersDefinition, string? name, IEngineEnvironmentSettings environment, out IReadOnlyList<string> paramsWithInvalidValues)
+        public static IParameterSetBuilder CreateWithDefaults(IGenerator generator, IParameterDefinitionSet parametersDefinition, string? name, IEngineEnvironmentSettings environment, out IReadOnlyList<string> paramsWithInvalidValues)
         {
             IParameterSetBuilder templateParams = new ParameterSetBuilder(parametersDefinition);
             List<string> paramsWithInvalidValuesList = new List<string>();
@@ -65,9 +59,8 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 }
                 else
                 {
-                    SetParameterDefault(
+                    templateParams.SetParameterDefault(
                         generator,
-                        templateParams,
                         param,
                         environment,
                         true,
@@ -80,7 +73,20 @@ namespace Microsoft.TemplateEngine.Edge.Template
             return templateParams;
         }
 
-        public bool TryGetParameterDefinition(string name, out ITemplateParameter parameter) => TryGetValue(name, out parameter);
+        #region MyRegion IParameterSet members
+        //We want all IParameterSet members in single region - hence not following recommended ordering
+#pragma warning disable SA1201 // Elements should appear in the correct order
+        IEnumerable<ITemplateParameter> IParameterSet.ParameterDefinitions => this;
+#pragma warning restore SA1201 // Elements should appear in the correct order
+
+        IDictionary<ITemplateParameter, object?> IParameterSet.ResolvedValues =>
+            _resolvedValues
+                .Where(p => p.Value.Value != null)
+                .ToDictionary(k => k.Key, k => k.Value.Value);
+
+        bool IParameterSet.TryGetParameterDefinition(string name, out ITemplateParameter parameter) => TryGetValue(name, out parameter);
+
+        #endregion /MyRegion IParameterSet members
 
         public void SetParameterValue(ITemplateParameter parameter, object value, DataSource dataSource)
         {
@@ -122,16 +128,15 @@ namespace Microsoft.TemplateEngine.Edge.Template
             return invalidParams.Count == 0;
         }
 
-        public void EvaluateConditionalParameters(IGenerator generator, ILogger logger)
-        {
-            List<EvalData> evaluatedParameters = _resolvedValues.Values.ToList();
-            RunDatasetEvaluation(evaluatedParameters, generator, logger);
-        }
-
-        public InputDataSet Build()
+        public InputDataSet Build(bool evaluateConditions, IGenerator generator, ILogger logger)
         {
             if (_result == null)
             {
+                if (evaluateConditions)
+                {
+                    this.EvaluateConditionalParameters(generator, logger);
+                }
+
                 _result = new InputDataSet(
                     this,
                     _resolvedValues.Select(p => p.Value.ToParameterData()).ToList());
@@ -140,7 +145,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
             return _result!;
         }
 
-        internal static void SetParameterDefault(IGenerator generator, IParameterSetBuilder templateParams, ITemplateParameter parameter, IEngineEnvironmentSettings environment, bool useHostDefaults, bool isRequired, List<string> paramsWithInvalidValues)
+        public void SetParameterDefault(IGenerator generator, ITemplateParameter parameter, IEngineEnvironmentSettings environment, bool useHostDefaults, bool isRequired, List<string> paramsWithInvalidValues)
         {
             ITemplateEngineHost host = environment.Host;
             if (useHostDefaults && host.TryGetHostParamDefault(parameter.Name, out string? hostParamValue) && hostParamValue != null)
@@ -152,7 +157,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                     {
                         throw new InvalidOperationException($"{nameof(resolvedValue)} cannot be null when {nameof(valueResolutionError)} is 'false'.");
                     }
-                    templateParams.SetParameterValue(parameter, resolvedValue, DataSource.HostDefault);
+                    this.SetParameterValue(parameter, resolvedValue, DataSource.HostDefault);
                 }
                 else
                 {
@@ -169,7 +174,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                     {
                         throw new InvalidOperationException($"{nameof(resolvedValue)} cannot be null when {nameof(valueResolutionError)} is 'false'.");
                     }
-                    templateParams.SetParameterValue(parameter, resolvedValue, DataSource.Default);
+                    this.SetParameterValue(parameter, resolvedValue, DataSource.Default);
                 }
                 else
                 {
@@ -210,8 +215,14 @@ namespace Microsoft.TemplateEngine.Edge.Template
                     HashSet<string> referencedVariablesKeys = new HashSet<string>();
                     // Do not remove from the variable collection though - we want to capture all dependencies between parameters in the first traversal.
                     // Those will be bulk removed before second traversal (traversing only the required dependencies).
-                    parameter.IsEnabledConditionResult =
-                        generator.EvaluateFromString(logger, parameter.ParameterDefinition.Precedence.IsEnabledCondition!, variableCollection, referencedVariablesKeys);
+                    parameter.IsEnabledConditionResult = EvaluateParameterCondition(
+                        parameter.ParameterDefinition.Precedence.IsEnabledCondition!,
+                        parameter.ParameterDefinition.Name,
+                        "IsEnabled",
+                        generator,
+                        variableCollection,
+                        referencedVariablesKeys,
+                        logger);
 
                     if (referencedVariablesKeys.Any())
                     {
@@ -239,13 +250,19 @@ namespace Microsoft.TemplateEngine.Edge.Template
 
                 if (parametersDependenciesGraph.HasCycle(out var cycle))
                 {
-                    var format = "Parameter conditions contain cyclic dependency: [{0}]. With current values of parameters it's possible to deterministically evaluate parameters - so proceeding further. However template should be reviewed as instantiation with different parameters can lead to error.";
-                    logger.LogWarning(format, cycle.Select(p => p.ParameterDefinition.Name).ToCsvString());
+                    logger.LogWarning(LocalizableStrings.ConditionEvaluation_Warning_CyclicDependency, cycle.Select(p => p.ParameterDefinition.Name).ToCsvString());
                 }
 
                 foreach (EvalData parameter in orderedParameters)
                 {
-                    bool isEnabled = generator.EvaluateFromString(logger, parameter.ParameterDefinition.Precedence.IsEnabledCondition!, variableCollection);
+                    bool isEnabled = EvaluateParameterCondition(
+                        parameter.ParameterDefinition.Precedence.IsEnabledCondition!,
+                        parameter.ParameterDefinition.Name,
+                        "IsEnabled",
+                        generator,
+                        variableCollection,
+                        null,
+                        logger);
                     parameter.IsEnabledConditionResult = isEnabled;
                     if (!isEnabled)
                     {
@@ -257,14 +274,38 @@ namespace Microsoft.TemplateEngine.Edge.Template
             {
                 throw new TemplateAuthoringException(
                     string.Format(
-                        "Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation",
+                        LocalizableStrings.ConditionEvaluation_Error_CyclicDependency,
                         cycle.Select(p => p.ParameterDefinition.Name).ToCsvString()),
-                    "Conditional ParametersDefinition");
+                    "Conditional ParameterDefinitions");
             }
             else
             {
-                throw new Exception("Unexpected internal error - unable to perform topological sort of parameter dependencies that do not appear to have a cyclic dependencies.");
+                throw new Exception(LocalizableStrings.ConditionEvaluation_Error_TopologicalSort);
             }
+        }
+
+        private static bool EvaluateParameterCondition(
+            string condition,
+            string parameterName,
+            string conditionName,
+            IGenerator generator,
+            IDictionary<string, object> variableCollection,
+            HashSet<string>? referencedVariablesKeys,
+            ILogger logger)
+        {
+            if (!generator.TryEvaluateFromString(logger, condition, variableCollection, out bool result, out string evaluationError, referencedVariablesKeys))
+            {
+                throw new TemplateAuthoringException(
+                    string.Format(
+                        LocalizableStrings.ConditionEvaluation_Error_MismatchedCondition,
+                        conditionName,
+                        parameterName,
+                        condition,
+                        evaluationError),
+                    parameterName);
+            }
+
+            return result;
         }
 
         private static void EvaluateRequirementCondition(
@@ -278,10 +319,22 @@ namespace Microsoft.TemplateEngine.Edge.Template
             {
                 if (!string.IsNullOrEmpty(parameter.ParameterDefinition.Precedence.IsRequiredCondition))
                 {
-                    parameter.IsRequiredConditionResult =
-                        generator.EvaluateFromString(logger, parameter.ParameterDefinition.Precedence.IsRequiredCondition!, variableCollection);
+                    parameter.IsRequiredConditionResult = EvaluateParameterCondition(
+                        parameter.ParameterDefinition.Precedence.IsRequiredCondition!,
+                        parameter.ParameterDefinition.Name,
+                        "IsRequired",
+                        generator,
+                        variableCollection,
+                        null,
+                        logger);
                 }
             }
+        }
+
+        private void EvaluateConditionalParameters(IGenerator generator, ILogger logger)
+        {
+            List<EvalData> evaluatedParameters = _resolvedValues.Values.ToList();
+            RunDatasetEvaluation(evaluatedParameters, generator, logger);
         }
 
         private class EvalData

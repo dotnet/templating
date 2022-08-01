@@ -17,7 +17,7 @@ namespace Microsoft.TemplateEngine.Abstractions.Parameters
         /// <summary>
         /// Those are values supplied by the host. This usually means value(s) was/were set by user.
         /// </summary>
-        Host,
+        User,
 
         /// <summary>
         /// Value obtained via <see cref="ITemplateEngineHost.TryGetHostParamDefault"/>.
@@ -43,5 +43,12 @@ namespace Microsoft.TemplateEngine.Abstractions.Parameters
         /// This corresponds to Name implicit parameter value.
         /// </summary>
         NameParameter,
+
+        /// <summary>
+        /// To be used in case host uses advanced object model to supply values to TemplateCreator or Generator and
+        ///  wants to indicate that it used some custom logic of inferring value for parameter
+        ///  (e.g. custom Host calculated value of parameter based on current context and supplied the value to template engine).
+        /// </summary>
+        HostOther,
     }
 }

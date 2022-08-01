@@ -9,7 +9,7 @@ namespace Microsoft.TemplateEngine.Abstractions
     /// <summary>
     /// Defines a set of template parameters.
     /// </summary>
-    [Obsolete("Replaced by IParametersDefinition", false)]
+    [Obsolete("Replaced by IParameterSetData", false)]
     public interface IParameterSet
     {
         /// <summary>

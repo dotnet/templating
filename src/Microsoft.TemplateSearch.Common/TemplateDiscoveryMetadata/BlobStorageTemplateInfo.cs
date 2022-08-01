@@ -43,7 +43,7 @@ namespace Microsoft.TemplateSearch.Common
             Identity = templateInfo.Identity;
             Name = templateInfo.Name;
             ShortNameList = templateInfo.ShortNameList;
-            ParametersDefinition = new ParametersDefinition(templateInfo.ParametersDefinition?.Select(p => new BlobTemplateParameter(p)));
+            ParameterDefinitions = new ParameterDefinitions(templateInfo.ParameterDefinitions?.Select(p => new BlobTemplateParameter(p)));
             Author = templateInfo.Author;
             Classifications = templateInfo.Classifications ?? Array.Empty<string>();
             Description = templateInfo.Description;
@@ -80,11 +80,11 @@ namespace Microsoft.TemplateSearch.Common
 
         [JsonProperty(nameof(Parameters))]
         //reading manually now to support old format
-        public IParametersDefinition ParametersDefinition { get; private set; } = TemplateEngine.Abstractions.Parameters.ParametersDefinition.Empty;
+        public IParameterDefinitionSet ParameterDefinitions { get; private set; } = TemplateEngine.Abstractions.Parameters.ParameterDefinitions.Empty;
 
         [JsonIgnore]
-        [Obsolete("Use ParametersDefinition instead.")]
-        public IReadOnlyList<ITemplateParameter> Parameters => ParametersDefinition;
+        [Obsolete("Use ParameterDefinitions instead.")]
+        public IReadOnlyList<ITemplateParameter> Parameters => ParameterDefinitions;
 
         [JsonIgnore]
         string ITemplateInfo.MountPointUri => throw new NotImplementedException();
@@ -310,7 +310,7 @@ namespace Microsoft.TemplateSearch.Common
             }
 
             info.TagsCollection = tags;
-            info.ParametersDefinition = new ParametersDefinition(templateParameters);
+            info.ParameterDefinitions = new ParameterDefinitions(templateParameters);
             return info;
 
         }
@@ -425,7 +425,7 @@ namespace Microsoft.TemplateSearch.Common
             public TemplateParameterPrecedence Precedence => _templateParameterPrecedence;
 
             [JsonIgnore]
-            //ParametersDefinition have only "parameter" symbols.
+            //ParameterDefinitions have only "parameter" symbols.
             string ITemplateParameter.Type => "parameter";
 
             [JsonIgnore]

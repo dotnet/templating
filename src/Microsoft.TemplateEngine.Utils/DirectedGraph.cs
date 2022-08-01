@@ -31,8 +31,6 @@ namespace Microsoft.TemplateEngine.Utils
 
         private bool IsEmpty => _dependenciesMap.Count == 0;
 
-        //public static explicit operator DirectedGraph<T>(Dictionary<T, HashSet<T>?> dependenciesMap) => new DirectedGraph<T>(DeepCopy(dependenciesMap));
-
         public static implicit operator DirectedGraph<T>(Dictionary<T, HashSet<T>> dependenciesMap) => new DirectedGraph<T>(dependenciesMap);
 
         /// <summary>

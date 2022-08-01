@@ -72,7 +72,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
                 
             };
             HashSet<string> keys = new HashSet<string>();
-            bool result = Cpp2StyleEvaluatorDefinition.EvaluateFromString(_logger, "FIRST_IF == SECOND_IF && !FIRST_IF", vc, keys);
+            bool result = Cpp2StyleEvaluatorDefinition.EvaluateFromString(_logger, "FIRST_IF == SECOND_IF && !FIRST_IF", vc, out string _, keys);
             Assert.True(result);
             Assert.Equal(2, keys.Count);
             Assert.True(keys.SequenceEqual(new[] { "FIRST_IF", "SECOND_IF" }));

@@ -47,10 +47,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return ParameterConverter.ConvertParameterValueToType(environmentSettings.Host, parameter, untypedValue, out valueResolutionError);
         }
 
-        bool IGenerator.EvaluateFromString(ILogger logger, string text, IDictionary<string, object> variables, HashSet<string>? referencedVariablesKeys)
+        bool IGenerator.TryEvaluateFromString(ILogger logger, string text, IDictionary<string, object> variables, out bool result, out string evaluationError, HashSet<string>? referencedVariablesKeys)
         {
             VariableCollection variableCollection = new VariableCollection(null, variables);
-            return Cpp2StyleEvaluatorDefinition.EvaluateFromString(logger, text, variableCollection, referencedVariablesKeys);
+            result = Cpp2StyleEvaluatorDefinition.EvaluateFromString(logger, text, variableCollection, out evaluationError, referencedVariablesKeys);
+            return string.IsNullOrEmpty(evaluationError);
         }
 
         [Obsolete("Replaced by CreateAsync with IEvaluatedParameterSetData", false)]
@@ -155,11 +156,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return new CreationEffects2(changes, GetCreationResult(environmentSettings.Host.Logger, templateConfig, variables));
         }
 
-        [Obsolete("Replaced by ParameterSetBuilder", false)]
+        [Obsolete("Replaced by ParameterSetBuilder.CreateWithDefaults", true)]
         IParameterSet IGenerator.GetParametersForTemplate(IEngineEnvironmentSettings environmentSettings, ITemplate template)
         {
-            throw new NotImplementedException();
-            // return (IParameterSet)ParameterSetBuilder.CreateWithDefaults(template.ParametersDefinition, environmentSettings);
+            throw new NotImplementedException("Replaced by ParameterSetBuilder.CreateWithDefaults");
         }
 
         /// <summary>

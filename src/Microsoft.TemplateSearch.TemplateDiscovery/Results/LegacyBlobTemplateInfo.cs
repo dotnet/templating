@@ -25,7 +25,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Results
             BaselineInfo = templateInfo.BaselineInfo;
 
             //new properties - not written to json
-            ParametersDefinition = templateInfo.ParametersDefinition;
+            ParameterDefinitions = templateInfo.ParameterDefinitions;
             TagsCollection = templateInfo.TagsCollection;
             PostActions = templateInfo.PostActions;
 
@@ -42,7 +42,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Results
                     Dictionary<string, string> choices = new Dictionary<string, string>() { { tag.Value, string.Empty } };
                     tags[tag.Key] = new BlobLegacyCacheTag(null, choices, tag.Value, null);
                 }
-                foreach (ITemplateParameter choiceParam in ParametersDefinition.Where(param => param.IsChoice()))
+                foreach (ITemplateParameter choiceParam in ParameterDefinitions.Where(param => param.IsChoice()))
                 {
                     Dictionary<string, string> choices = new Dictionary<string, string>();
                     if (choiceParam.Choices != null)
@@ -64,7 +64,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Results
             else
             {
                 Dictionary<string, ICacheParameter> cacheParameters = new Dictionary<string, ICacheParameter>();
-                foreach (ITemplateParameter param in ParametersDefinition.Where(param => !param.IsChoice()))
+                foreach (ITemplateParameter param in ParameterDefinitions.Where(param => !param.IsChoice()))
                 {
                     cacheParameters[param.Name] = new BlobLegacyCacheParameter(param.Description, param.DataType, param.DefaultValue, param.DefaultIfOptionWithoutValue);
                 }
@@ -160,11 +160,11 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Results
         public IReadOnlyDictionary<string, string> TagsCollection { get; private set; }
 
         [JsonIgnore]
-        public IParametersDefinition ParametersDefinition { get; private set; }
+        public IParameterDefinitionSet ParameterDefinitions { get; private set; }
 
         [JsonIgnore]
-        [Obsolete("Use ParametersDefinition instead.")]
-        public IReadOnlyList<ITemplateParameter> Parameters => ParametersDefinition;
+        [Obsolete("Use ParameterDefinitions instead.")]
+        public IReadOnlyList<ITemplateParameter> Parameters => ParameterDefinitions;
 
         [JsonIgnore]
         public string MountPointUri => string.Empty;

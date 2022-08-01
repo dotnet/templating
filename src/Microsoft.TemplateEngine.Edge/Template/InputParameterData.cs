@@ -22,7 +22,7 @@ public class InputParameterData
     public InputParameterData(
         ITemplateParameter parameterDefinition,
         object? value,
-        DataSource dataSource = DataSource.Host,
+        DataSource dataSource = DataSource.User,
         InputDataState inputDataState = InputDataState.Set)
     {
         ParameterDefinition = parameterDefinition;
@@ -42,7 +42,7 @@ public class InputParameterData
     public object? Value { get; }
 
     /// <summary>
-    /// Source of the parameter value. If supplied by the host - leave the default value of <see cref="DataSource.Host"/>.
+    /// Source of the parameter value. If supplied by the host - leave the default value of <see cref="DataSource.User"/>.
     /// </summary>
     public DataSource DataSource { get; }
 

@@ -8,7 +8,7 @@ using Microsoft.TemplateEngine.Abstractions.Parameters;
 
 namespace Microsoft.TemplateEngine.Edge.Template;
 
-internal interface IParameterSetBuilder : IParametersDefinition
+internal interface IParameterSetBuilder : IParameterDefinitionSet
 {
     void SetParameterValue(ITemplateParameter parameter, object value, DataSource dataSource);
 
@@ -16,9 +16,15 @@ internal interface IParameterSetBuilder : IParametersDefinition
 
     bool HasParameterValue(ITemplateParameter parameter);
 
-    void EvaluateConditionalParameters(IGenerator generator, ILogger logger);
-
     bool CheckIsParametersEvaluationCorrect(IGenerator generator, ILogger logger, out IReadOnlyList<string> paramsWithInvalidEvaluations);
 
-    InputDataSet Build();
+    InputDataSet Build(bool evaluateConditions, IGenerator generator, ILogger logger);
+
+    void SetParameterDefault(
+        IGenerator generator,
+        ITemplateParameter parameter,
+        IEngineEnvironmentSettings environment,
+        bool useHostDefaults,
+        bool isRequired,
+        List<string> paramsWithInvalidValues);
 }

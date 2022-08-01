@@ -319,11 +319,11 @@ namespace Microsoft.TemplateEngine.Cli
             switch (precedence.PrecedenceDefinition)
             {
                 case PrecedenceDefinition.ConditionalyRequired:
-                    return "Required if: " + precedence.IsRequiredCondition;
+                    return string.Format(HelpStrings.Text_RequiredCondition, precedence.IsRequiredCondition);
                 case PrecedenceDefinition.ConditionalyDisabled:
-                    return "Enabled if: " + precedence.IsEnabledCondition;
+                    return string.Format(HelpStrings.Text_EnabledCondition, precedence.IsEnabledCondition);
                 case PrecedenceDefinition.Disabled:
-                    return "Enabled: *false*";
+                    return HelpStrings.Text_Disabled;
                 case PrecedenceDefinition.Required:
                 case PrecedenceDefinition.Optional:
                 case PrecedenceDefinition.Implicit:

@@ -121,13 +121,13 @@ namespace Microsoft.TemplateSearch.Common
                     writer.WriteEndObject();
                 }
 
-                if (value.TemplateInfo.ParametersDefinition.Any())
+                if (value.TemplateInfo.ParameterDefinitions.Any())
                 {
 #pragma warning disable CS0618 // Type or member is obsolete
                     writer.WritePropertyName(nameof(ITemplateInfo.Parameters));
 #pragma warning restore CS0618 // Type or member is obsolete
                     writer.WriteStartArray();
-                    foreach (ITemplateParameter param in value.TemplateInfo.ParametersDefinition)
+                    foreach (ITemplateParameter param in value.TemplateInfo.ParameterDefinitions)
                     {
                         writer.WriteStartObject();
                         writer.WritePropertyName(nameof(ITemplateParameter.Name));

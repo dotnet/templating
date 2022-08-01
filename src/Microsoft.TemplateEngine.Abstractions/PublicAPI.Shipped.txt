@@ -89,6 +89,7 @@ Microsoft.TemplateEngine.Abstractions.Installer.TemplatePackageData.TemplatePack
 Microsoft.TemplateEngine.Abstractions.Installer.UninstallResult
 Microsoft.TemplateEngine.Abstractions.Installer.UpdateRequest
 Microsoft.TemplateEngine.Abstractions.Installer.UpdateResult
+Microsoft.TemplateEngine.Abstractions.IParameterSet
 Microsoft.TemplateEngine.Abstractions.IParameterSymbolLocalizationModel
 Microsoft.TemplateEngine.Abstractions.IParameterSymbolLocalizationModel.Choices.get -> System.Collections.Generic.IReadOnlyDictionary<string!, Microsoft.TemplateEngine.Abstractions.ParameterChoiceLocalizationModel!>!
 Microsoft.TemplateEngine.Abstractions.IParameterSymbolLocalizationModel.Description.get -> string?

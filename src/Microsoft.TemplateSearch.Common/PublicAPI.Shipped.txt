@@ -37,6 +37,7 @@ Microsoft.TemplateSearch.Common.TemplateSearchData.Description.get -> string?
 Microsoft.TemplateSearch.Common.TemplateSearchData.GroupIdentity.get -> string?
 Microsoft.TemplateSearch.Common.TemplateSearchData.Identity.get -> string!
 Microsoft.TemplateSearch.Common.TemplateSearchData.Name.get -> string!
+Microsoft.TemplateSearch.Common.TemplateSearchData.Parameters.get -> System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Abstractions.ITemplateParameter!>!
 Microsoft.TemplateSearch.Common.TemplateSearchData.Precedence.get -> int
 Microsoft.TemplateSearch.Common.TemplateSearchData.ShortNameList.get -> System.Collections.Generic.IReadOnlyList<string!>!
 Microsoft.TemplateSearch.Common.TemplateSearchData.TagsCollection.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!

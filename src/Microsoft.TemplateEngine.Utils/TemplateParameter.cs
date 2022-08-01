@@ -71,8 +71,12 @@ namespace Microsoft.TemplateEngine.Utils
 #pragma warning disable CS0618 // Type or member is obsolete
                 string key = nameof(Priority);
 #pragma warning restore CS0618 // Type or member is obsolete
+#pragma warning disable CS0618 // Type or member is obsolete
                 var legacyPriority = (TemplateParameterPriority)jObject.ToInt32(key);
+#pragma warning restore CS0618 // Type or member is obsolete
+#pragma warning disable CS0618 // Type or member is obsolete
                 precedence = legacyPriority.ToTemplateParameterPrecedence();
+#pragma warning restore CS0618 // Type or member is obsolete
             }
             _templateParameterPrecedence = new TemplateParameterPrecedenceImpl(precedence);
         }

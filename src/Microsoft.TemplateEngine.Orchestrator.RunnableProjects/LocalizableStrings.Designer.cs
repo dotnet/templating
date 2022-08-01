@@ -251,38 +251,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition) or a failure to pass the condition results for parameters with condition(s) in template. Offending parameters: {0}.
-        /// </summary>
-        internal static string Params_Error_ExternalConditionMismatch {
-            get {
-                return ResourceManager.GetString("Params_Error_ExternalConditionMismatch", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Variable [{0}] already added with value [{1}]. Cannot add it as implicit variable with value of self..
         /// </summary>
         internal static string RunnableProjectGenerator_CannotAddImplicitChoice {
             get {
                 return ResourceManager.GetString("RunnableProjectGenerator_CannotAddImplicitChoice", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation.
-        /// </summary>
-        internal static string RunnableProjectGenerator_Error_ParamsCycle {
-            get {
-                return ResourceManager.GetString("RunnableProjectGenerator_Error_ParamsCycle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unexpected internal error - unable to perform topological sort of parameter dependencies that do not appear to have a cyclic dependencies..
-        /// </summary>
-        internal static string RunnableProjectGenerator_Error_TopologicalSort {
-            get {
-                return ResourceManager.GetString("RunnableProjectGenerator_Error_TopologicalSort", resourceCulture);
             }
         }
         
@@ -332,15 +305,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Parameter conditions contain cyclic dependency: [{0}]. With current values of parameters it&apos;s possible to deterministically evaluate parameters - so proceeding further. However template should be reviewed as instantiation with different parameters can lead to error..
-        /// </summary>
-        internal static string RunnableProjectGenerator_Warning_ParamsCycle {
-            get {
-                return ResourceManager.GetString("RunnableProjectGenerator_Warning_ParamsCycle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Failed to load additional configuration file {0}, the file does not exist..
         /// </summary>
         internal static string SimpleConfigModel_AuthoringException_MergeConfiguration_FileNotFound {
@@ -377,15 +341,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The symbol &apos;{0}&apos; of type &apos;{1}&apos; is incorrect: mandatory property &apos;{2}&apos; is not set. The symbol will be skipped..
-        /// </summary>
-        internal static string SymbolModel_Error_MandatoryPropertyMissing {
-            get {
-                return ResourceManager.GetString("SymbolModel_Error_MandatoryPropertyMissing", resourceCulture);
-                }
-        }
-
-        /// <summary>
         ///   Looks up a localized string similar to Found disallowed value for IsRequired property: [{0}], expected boolean value..
         /// </summary>
         internal static string Symbol_Error_IsRequiredNotABool {
@@ -400,6 +355,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         internal static string Symbol_Error_IsRequiredNotABoolOrString {
             get {
                 return ResourceManager.GetString("Symbol_Error_IsRequiredNotABoolOrString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The symbol &apos;{0}&apos; of type &apos;{1}&apos; is incorrect: mandatory property &apos;{2}&apos; is not set. The symbol will be skipped..
+        /// </summary>
+        internal static string SymbolModel_Error_MandatoryPropertyMissing {
+            get {
+                return ResourceManager.GetString("SymbolModel_Error_MandatoryPropertyMissing", resourceCulture);
             }
         }
     }

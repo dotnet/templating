@@ -23,10 +23,10 @@ public class InputDataSet : IReadOnlyDictionary<ITemplateParameter, InputParamet
     /// </summary>
     /// <param name="parameters"></param>
     /// <param name="parameterData"></param>
-    public InputDataSet(IParametersDefinition parameters, IReadOnlyList<InputParameterData> parameterData)
+    public InputDataSet(IParameterDefinitionSet parameters, IReadOnlyList<InputParameterData> parameterData)
     {
         _parametersData = parameterData.ToDictionary(d => d.ParameterDefinition, d => d);
-        ParametersDefinition = new ParametersDefinition(parameters.AsReadonlyDictionary());
+        ParameterDefinitions = new ParameterDefinitions(parameters.AsReadonlyDictionary());
     }
 
 #pragma warning disable RS0027 // Public API with optional parameter(s) should have the most parameters amongst its public overloads
@@ -43,13 +43,13 @@ public class InputDataSet : IReadOnlyDictionary<ITemplateParameter, InputParamet
 
     private InputDataSet(ITemplateInfo templateInfo, IReadOnlyDictionary<string, object?>? inputParameters)
     {
-        _parametersData = templateInfo.ParametersDefinition.ToDictionary(p => p, p =>
+        _parametersData = templateInfo.ParameterDefinitions.ToDictionary(p => p, p =>
         {
             object? value = null;
             bool isSet = inputParameters != null && inputParameters.TryGetValue(p.Name, out value);
-            return new InputParameterData(p, value, isSet ? DataSource.Host : DataSource.NoSource, isSet ? InputDataStateUtil.GetInputDataState(value) : InputDataState.Unset);
+            return new InputParameterData(p, value, isSet ? DataSource.User : DataSource.NoSource, isSet ? InputDataStateUtil.GetInputDataState(value) : InputDataState.Unset);
         });
-        ParametersDefinition = new ParametersDefinition(templateInfo.ParametersDefinition);
+        ParameterDefinitions = new ParameterDefinitions(templateInfo.ParameterDefinitions);
     }
 
     /// <summary>
@@ -61,7 +61,7 @@ public class InputDataSet : IReadOnlyDictionary<ITemplateParameter, InputParamet
     /// <summary>
     /// Descriptors of the parameters.
     /// </summary>
-    public ParametersDefinition ParametersDefinition { get; }
+    public ParameterDefinitions ParameterDefinitions { get; }
 
     /// <inheritdoc/>
     public IEnumerable<ITemplateParameter> Keys => _parametersData.Keys;

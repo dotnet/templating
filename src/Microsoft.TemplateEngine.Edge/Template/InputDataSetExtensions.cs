@@ -16,7 +16,7 @@ internal static class InputDataSetExtensions
     public static IParameterSetData ToParameterSetData(this InputDataSet inputData)
     {
         return new ParameterSetData(
-            inputData.ParametersDefinition,
+            inputData.ParameterDefinitions,
             inputData.Values.Select(d => new ParameterData(d.ParameterDefinition, d.Value, d.DataSource, !(d is EvaluatedInputParameterData ed && ed.IsEnabledConditionResult == false)))
                 .ToList());
     }
@@ -24,9 +24,9 @@ internal static class InputDataSetExtensions
     [Obsolete("IParameterSet should not be used - it is replaced with IParameterSetData", false)]
     public static InputDataSet ToInputDataSet(this IParameterSet parameterSet)
     {
-        IParametersDefinition parametersDefinition = new ParametersDefinition(parameterSet.ParameterDefinitions);
+        IParameterDefinitionSet parametersDefinition = new ParameterDefinitions(parameterSet.ParameterDefinitions);
         IReadOnlyList<InputParameterData> data = parameterSet.ResolvedValues.Select(p =>
-                new InputParameterData(p.Key, p.Value, DataSource.Host, InputDataStateUtil.GetInputDataState(p.Value)))
+                new InputParameterData(p.Key, p.Value, DataSource.User, InputDataStateUtil.GetInputDataState(p.Value)))
             .ToList();
         return new InputDataSet(parametersDefinition, data);
     }
@@ -52,7 +52,7 @@ internal static class InputDataSetExtensions
 
     public static bool HasConditions(this InputDataSet inputData)
     {
-        return inputData.ParametersDefinition.Any(p =>
+        return inputData.ParameterDefinitions.Any(p =>
             !string.IsNullOrEmpty(p.Precedence.IsRequiredCondition) ||
             !string.IsNullOrEmpty(p.Precedence.IsEnabledCondition));
     }

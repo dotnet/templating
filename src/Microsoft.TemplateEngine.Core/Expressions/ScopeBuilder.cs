@@ -67,6 +67,15 @@ namespace Microsoft.TemplateEngine.Core.Expressions
             _tokens = trie;
         }
 
+        /// <summary>
+        /// Traverses the given buffer position and creates an evaluable expression.
+        /// If non-null bag for variable references is passed, it will be populated with references of variables used within the evaluable expression.
+        /// </summary>
+        /// <param name="bufferLength"></param>
+        /// <param name="bufferPosition"></param>
+        /// <param name="onFault"></param>
+        /// <param name="referencedVariablesKeys">If passed (if not null) it will be populated with references to variables used within the inspected expression.</param>
+        /// <returns></returns>
         public IEvaluable Build(ref int bufferLength, ref int bufferPosition, Action<IReadOnlyList<byte>> onFault, HashSet<string> referencedVariablesKeys = null)
         {
             Stack<ScopeIsolator> parents = new Stack<ScopeIsolator>();

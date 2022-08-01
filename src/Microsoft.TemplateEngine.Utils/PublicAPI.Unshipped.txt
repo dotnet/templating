@@ -43,6 +43,7 @@ Microsoft.TemplateEngine.Utils.MultiValueParameter.Equals(Microsoft.TemplateEngi
 Microsoft.TemplateEngine.Utils.MultiValueParameter.MultiValueParameter(System.Collections.Generic.IReadOnlyList<string!>! values) -> void
 Microsoft.TemplateEngine.Utils.MultiValueParameter.Values.get -> System.Collections.Generic.IReadOnlyList<string!>!
 Microsoft.TemplateEngine.Utils.PhysicalFileSystem.PathRelativeTo(string! target, string! relativeTo) -> string!
+Microsoft.TemplateEngine.Utils.RuntimeValueUtil
 Microsoft.TemplateEngine.Utils.TemplateAuthoringException.ConfigItem.get -> string!
 Microsoft.TemplateEngine.Utils.TemplateAuthoringException.TemplateAuthoringException(string! message, string! configItem) -> void
 Microsoft.TemplateEngine.Utils.TemplateAuthoringException.TemplateAuthoringException(string! message, string! configItem, System.Exception! innerException) -> void
@@ -83,6 +84,7 @@ static Microsoft.TemplateEngine.Utils.MultiValueParameter.MultiValueSeparators.g
 static Microsoft.TemplateEngine.Utils.MultiValueParameter.TryPerformMultiValueEqual(object! x, object! y, out bool result) -> bool
 static Microsoft.TemplateEngine.Utils.ParserExtensions.ConvertToDoubleCurrentOrInvariant(object! value) -> double
 static Microsoft.TemplateEngine.Utils.ParserExtensions.DoubleTryParseСurrentOrInvariant(string? stringValue, out double doubleValue) -> bool
+static Microsoft.TemplateEngine.Utils.RuntimeValueUtil.TryGetRuntimeValue(this Microsoft.TemplateEngine.Abstractions.IParameterSet! parameters, Microsoft.TemplateEngine.Abstractions.IEngineEnvironmentSettings! environmentSettings, string! name, out object? value, bool skipEnvironmentVariableSearch = false) -> bool
 static Microsoft.TemplateEngine.Utils.TemplateParameterExtensions.IsValidMultiValueParameterValue(this string! value) -> bool
 static Microsoft.TemplateEngine.Utils.TemplateParameterExtensions.TokenizeMultiValueParameter(this string! literal) -> System.Collections.Generic.IReadOnlyList<string!>!
 override Microsoft.TemplateEngine.Utils.RangeVersionSpecification.ToString() -> string!

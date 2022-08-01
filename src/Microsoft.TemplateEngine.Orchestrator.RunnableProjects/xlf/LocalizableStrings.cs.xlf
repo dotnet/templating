@@ -115,25 +115,10 @@ Podrobnosti: {1}</target>
         <target state="translated">Nepodařilo se přečíst soubor pro analýzu lokalizace {0}. Bude vynechán z dalšího zpracování.</target>
         <note />
       </trans-unit>
-      <trans-unit id="Params_Error_ExternalConditionMismatch">
-        <source>Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition) or a failure to pass the condition results for parameters with condition(s) in template. Offending parameters: {0}</source>
-        <target state="new">Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition) or a failure to pass the condition results for parameters with condition(s) in template. Offending parameters: {0}</target>
-        <note>{0} - csv of mismateched parameters</note>
-      </trans-unit>
       <trans-unit id="RunnableProjectGenerator_CannotAddImplicitChoice">
         <source>Variable [{0}] already added with value [{1}]. Cannot add it as implicit variable with value of self.</source>
         <target state="translated">Proměnná [{0}] se už přidala s hodnotou [{1}]. Nedá se přidat jako implicitní proměnná s vlastní hodnotou.</target>
         <note>{0} is the choiceKey, {1} is the existing conflict value</note>
-      </trans-unit>
-      <trans-unit id="RunnableProjectGenerator_Error_ParamsCycle">
-        <source>Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation</source>
-        <target state="new">Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation</target>
-        <note>{0} - csv of the cycle</note>
-      </trans-unit>
-      <trans-unit id="RunnableProjectGenerator_Error_TopologicalSort">
-        <source>Unexpected internal error - unable to perform topological sort of parameter dependencies that do not appear to have a cyclic dependencies.</source>
-        <target state="new">Unexpected internal error - unable to perform topological sort of parameter dependencies that do not appear to have a cyclic dependencies.</target>
-        <note />
       </trans-unit>
       <trans-unit id="RunnableProjectGenerator_Exception_ConfigShouldBeFile">
         <source>Template configuration must be a file, but {0} is not a file.</source>
@@ -159,11 +144,6 @@ Podrobnosti: {1}</target>
         <source>Localization file {0} is not compatible with base configuration {1}, and will be skipped.</source>
         <target state="translated">Soubor lokalizace {0} není kompatibilní se základní konfigurací {1} a bude vynechán.</target>
         <note>{0} and {1} are template configuration locations.</note>
-      </trans-unit>
-      <trans-unit id="RunnableProjectGenerator_Warning_ParamsCycle">
-        <source>Parameter conditions contain cyclic dependency: [{0}]. With current values of parameters it's possible to deterministically evaluate parameters - so proceeding further. However template should be reviewed as instantiation with different parameters can lead to error.</source>
-        <target state="new">Parameter conditions contain cyclic dependency: [{0}]. With current values of parameters it's possible to deterministically evaluate parameters - so proceeding further. However template should be reviewed as instantiation with different parameters can lead to error.</target>
-        <note>{0} - csv of the cycle</note>
       </trans-unit>
       <trans-unit id="SimpleConfigModel_AuthoringException_MergeConfiguration_FileNotFound">
         <source>Failed to load additional configuration file {0}, the file does not exist.</source>

@@ -445,7 +445,7 @@ C
             }
             else
             {
-                var parameters = runnableConfig.ParametersDefinition;
+                var parameters = runnableConfig.ParameterDefinitions;
 
                 InputDataSet data;
                 try
@@ -455,7 +455,7 @@ C
                         parameters2!.Select(p => new EvaluatedInputParameterData(
                             parameters[p.Name],
                             p.Value,
-                            DataSource.Host,
+                            DataSource.User,
                             p.IsEnabledConditionResult,
                             p.IsRequiredConditionResult,
                             p.IsNull ? InputDataState.Unset : InputDataState.Set)).ToList())

@@ -14,5 +14,5 @@ public interface IParameterSetData : IReadOnlyDictionary<ITemplateParameter, Par
     /// <summary>
     /// Descriptors for the parameters - inferred from the template.
     /// </summary>
-    IParametersDefinition ParametersDefinition { get; }
+    IParameterDefinitionSet ParametersDefinition { get; }
 }

@@ -54,10 +54,10 @@ namespace Microsoft.TemplateEngine.Cli
         [Obsolete]
         public IReadOnlyDictionary<string, ICacheParameter> CacheParameters => _templateInfo.CacheParameters;
 
-        public IParametersDefinition ParametersDefinition => _templateInfo.ParametersDefinition;
+        public IParameterDefinitionSet ParameterDefinitions => _templateInfo.ParameterDefinitions;
 
-        [Obsolete("Use ParametersDefinition instead.")]
-        public IReadOnlyList<ITemplateParameter> Parameters => ParametersDefinition;
+        [Obsolete("Use ParameterDefinitions instead.")]
+        public IReadOnlyList<ITemplateParameter> Parameters => ParameterDefinitions;
 
         public string MountPointUri => _templateInfo.MountPointUri;
 
@@ -91,7 +91,7 @@ namespace Microsoft.TemplateEngine.Cli
                 if (_parameters == null )
                 {
                     Dictionary<string, CliTemplateParameter> parameters = new();
-                    foreach (ITemplateParameter parameter in ParametersDefinition.Where(param => param.Type == "parameter"))
+                    foreach (ITemplateParameter parameter in ParameterDefinitions.Where(param => param.Type == "parameter"))
                     {
                         if (parameters.ContainsKey(parameter.Name))
                         {

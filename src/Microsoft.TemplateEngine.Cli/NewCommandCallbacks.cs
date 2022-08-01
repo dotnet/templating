@@ -19,14 +19,14 @@ namespace Microsoft.TemplateEngine.Cli
 
         /// <summary>
         /// Callback to be executed to restore a project.
-        /// ParametersDefinition: <br/>
+        /// Parameters: <br/>
         /// - path to project to restore (string) - absolute path. <br/>
         /// </summary>
         public Func<string, bool>? RestoreProject { get; init; }
 
         /// <summary>
         /// Callback to be executed to add reference to a project.
-        /// ParametersDefinition: <br/>
+        /// Parameters: <br/>
         /// - path to project to add references to (string) - absolute path <br/>
         /// - paths to projects(s) to reference (IReadOnlyList&lt;string&gt;) - absolute paths.
         /// </summary>
@@ -34,7 +34,7 @@ namespace Microsoft.TemplateEngine.Cli
 
         /// <summary>
         /// Callback to be executed to add package reference to a project.
-        /// ParametersDefinition: <br/>
+        /// Parameters: <br/>
         /// - project path (string) - absolute path <br/>
         /// - package name (string) <br/>
         /// - package version (string, optional).
@@ -43,7 +43,7 @@ namespace Microsoft.TemplateEngine.Cli
 
         /// <summary>
         /// Callback to be executed to add projects to solution.
-        /// ParametersDefinition: <br/>
+        /// Parameters: <br/>
         /// - solution path (string) - absolute path <br/>
         /// - projects to add (IReadOnlyList&lt;string&gt;) - absolute paths<br/>
         /// - target folder in solution (string).

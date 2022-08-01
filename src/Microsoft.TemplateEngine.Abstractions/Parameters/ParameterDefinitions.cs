@@ -8,20 +8,20 @@ using System.Text;
 
 namespace Microsoft.TemplateEngine.Abstractions.Parameters
 {
-    public class ParametersDefinition : IParametersDefinition
+    public class ParameterDefinitions : IParameterDefinitionSet
     {
-        public static readonly IParametersDefinition Empty = new ParametersDefinition((IEnumerable<ITemplateParameter>?)null);
+        public static readonly IParameterDefinitionSet Empty = new ParameterDefinitions((IEnumerable<ITemplateParameter>?)null);
 
         private readonly IReadOnlyDictionary<string, ITemplateParameter> _parameters;
 
-        public ParametersDefinition(IReadOnlyDictionary<string, ITemplateParameter>? parameters) =>
+        public ParameterDefinitions(IReadOnlyDictionary<string, ITemplateParameter>? parameters) =>
             _parameters = parameters ?? new Dictionary<string, ITemplateParameter>();
 
-        public ParametersDefinition(IEnumerable<ITemplateParameter>? parameters)
+        public ParameterDefinitions(IEnumerable<ITemplateParameter>? parameters)
             : this(parameters?.ToDictionary(p => p.Name, p => p))
         { }
 
-        public ParametersDefinition(IParametersDefinition other) : this(other.AsReadonlyDictionary())
+        public ParameterDefinitions(IParameterDefinitionSet other) : this(other.AsReadonlyDictionary())
         { }
 
         public IEnumerable<string> Keys => _parameters.Keys;

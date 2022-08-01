@@ -60,7 +60,7 @@ namespace Microsoft.TemplateEngine.Abstractions
         /// <param name="environmentSettings">template engine environment settings.</param>
         /// <param name="template">template to get parameters from.</param>
         /// <returns><see cref="IParameterSet"/> with parameters available in <paramref name="template"/>.</returns>
-        [Obsolete("Replaced by ParameterSetBuilder", false)]
+        [Obsolete("Replaced by ParameterSetBuilder.CreateWithDefaults", true)]
         IParameterSet GetParametersForTemplate(IEngineEnvironmentSettings environmentSettings, ITemplate template);
 
         /// <summary>
@@ -125,13 +125,17 @@ namespace Microsoft.TemplateEngine.Abstractions
         object? ConvertParameterValueToType(IEngineEnvironmentSettings environmentSettings, ITemplateParameter parameter, string untypedValue, out bool valueResolutionError);
 
         /// <summary>
-        /// Evaluates expression string with the provided variables and returns the result.
+        /// Attempts to evaluate expression string with the provided variables and returns the result.
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="text"></param>
         /// <param name="variables">Dictionary of variables to be substituted within the expression.</param>
-        /// <param name="referencedVariablesKeys">Keys of variables that have been substituted within the expression.</param>
+        /// <param name="result">The evaluation result (false in case evaluation failed).</param>
+        /// <param name="evaluationError">Evaluation error message in case evaluation failed.</param>
+        /// <param name="referencedVariablesKeys">
+        /// Keys of variables that have been substituted within the expression.
+        /// If passed as null, the referenced variable keys are not obtained and stored anywhere.</param>
         /// <returns></returns>
-        bool EvaluateFromString(ILogger logger, string text, IDictionary<string, object> variables, HashSet<string>? referencedVariablesKeys = null);
+        bool TryEvaluateFromString(ILogger logger, string text, IDictionary<string, object> variables, out bool result, out string evaluationError, HashSet<string>? referencedVariablesKeys = null);
     }
 }
