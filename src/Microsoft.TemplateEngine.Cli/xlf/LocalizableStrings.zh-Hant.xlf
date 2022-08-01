@@ -500,7 +500,7 @@ The header is followed by the list of parameters and their errors (might be seve
       </trans-unit>
       <trans-unit id="NoParameters">
         <source>    (No Parameters)</source>
-        <target state="needs-review-translation">    (無任何參數)</target>
+        <target state="translated">    (無任何參數)</target>
         <note />
       </trans-unit>
       <trans-unit id="NoTemplatesFound">
