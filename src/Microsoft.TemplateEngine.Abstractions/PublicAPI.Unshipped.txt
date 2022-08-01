@@ -65,7 +65,6 @@ Microsoft.TemplateEngine.Abstractions.IParameterSet.ParameterDefinitions.get -> 
 Microsoft.TemplateEngine.Abstractions.IParameterSet.ResolvedValues.get -> System.Collections.Generic.IDictionary<Microsoft.TemplateEngine.Abstractions.ITemplateParameter!, object?>!
 Microsoft.TemplateEngine.Abstractions.IParameterSet.TryGetParameterDefinition(string! name, out Microsoft.TemplateEngine.Abstractions.ITemplateParameter! parameter) -> bool
 Microsoft.TemplateEngine.Abstractions.ITemplateInfo.ParameterDefinitions.get -> Microsoft.TemplateEngine.Abstractions.Parameters.IParameterDefinitionSet!
-Microsoft.TemplateEngine.Abstractions.ITemplateInfo.Parameters.get -> System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Abstractions.ITemplateParameter!>!
 Microsoft.TemplateEngine.Abstractions.ITemplateParameter.Precedence.get -> Microsoft.TemplateEngine.Abstractions.TemplateParameterPrecedence!
 Microsoft.TemplateEngine.Abstractions.Mount.IDirectory.EnumerateDirectories(string! pattern, System.IO.SearchOption searchOption) -> System.Collections.Generic.IEnumerable<Microsoft.TemplateEngine.Abstractions.Mount.IDirectory!>!
 Microsoft.TemplateEngine.Abstractions.Mount.IDirectory.EnumerateFiles(string! pattern, System.IO.SearchOption searchOption) -> System.Collections.Generic.IEnumerable<Microsoft.TemplateEngine.Abstractions.Mount.IFile!>!

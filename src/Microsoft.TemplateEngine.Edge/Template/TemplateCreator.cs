@@ -53,7 +53,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
             string? name,
             string? fallbackName,
             string? outputPath,
-            IReadOnlyDictionary<string, string?>? inputParameters,
+            IReadOnlyDictionary<string, string?> inputParameters,
             bool forceCreation = false,
             string? baselineName = null,
             bool dryRun = false,
