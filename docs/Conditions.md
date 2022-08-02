@@ -184,11 +184,11 @@ Usage can then look as following:
 
 `Program.cs`
 ```C#
-#if IsAndroidOnly
-// This renders for android only
-#elseif IsMobile
-// This renders for rest of mobile platforms
-#else
-// This renders for desktop platforms
-#endif
+//#if IsAndroidOnly
+This renders for android only
+//#elseif IsMobile
+This renders for rest of mobile platforms
+//#else
+This renders for desktop platforms
+//#endif
 ```

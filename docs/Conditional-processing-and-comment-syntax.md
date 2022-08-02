@@ -29,11 +29,11 @@ In these file types you can use a preprocessor directive.
 In this sample, according to the value of the `IndividualB2CAuth` and `OrganizationalAuth` the appropriate service is added.
  
 ```
-#if (IndividualB2CAuth)
+//#if (IndividualB2CAuth)
     services.AddAzureAdB2CBearerAuthentication();
-#elseif (OrganizationalAuth)
+//#elseif (OrganizationalAuth)
     services.AddAzureAdBearerAuthentication();
-#endif
+//#endif
 
 ```
 
@@ -49,16 +49,16 @@ namespace MyProject.Con
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
-#if( addMethod )
+//#if( addMethod )
             HelloWordAgain();
-#endif		
+//#endif		
     }
 		
-#if( addMethod )
+//#if( addMethod )
         static void HelloWordAgain() {
             Console.WriteLine("Hello World Again!");
         }
-#endif		
+//#endif		
     }
 }
 ```
@@ -73,7 +73,7 @@ In this sample, using the parameter symbol `addMethod` we include the definition
 #include <iostream>
 
 using namespace std;
-#if( addMethod )
+//#if( addMethod )
 
 class HelloClass
 {
@@ -88,16 +88,16 @@ public:
 		cout << "Hello World Again!";
 	}
 };
-#endif
+//#endif
 
 int main()
 {
 	cout << "Hello World!";
 
-#if( addMethod )
+//#if( addMethod )
 	HelloClass *hello = new HelloClass();
 	hello->HelloWordAgain();
-#endif
+//#endif
 
     return 0;
 }
@@ -110,18 +110,18 @@ In this sample, using the parameter symbol `addMethod` we include the definition
 ```fsharp
 open System
 
-#if( addMethod )
+//#if( addMethod )
 
 let helloWorldAgain =
     printfn "HelloAgain"
-#endif		
+//#endif		
 
 [<EntryPoint>]
 let main argv =
     printfn "Hello World from F#!"
-#if( addMethod )
+//#if( addMethod )
 	helloWorldAgain
-#endif		
+//#endif		
     0 // return an integer exit code
 
 ```
