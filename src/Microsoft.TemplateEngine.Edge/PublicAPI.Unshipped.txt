@@ -42,10 +42,11 @@ Microsoft.TemplateEngine.Edge.Template.InputDataSet.ContinueOnMismatchedConditio
 Microsoft.TemplateEngine.Edge.Template.InputDataSet.ContinueOnMismatchedConditionsEvaluation.init -> void
 Microsoft.TemplateEngine.Edge.Template.InputDataSet.Count.get -> int
 Microsoft.TemplateEngine.Edge.Template.InputDataSet.GetEnumerator() -> System.Collections.Generic.IEnumerator<System.Collections.Generic.KeyValuePair<Microsoft.TemplateEngine.Abstractions.ITemplateParameter!, Microsoft.TemplateEngine.Edge.Template.InputParameterData!>>!
-Microsoft.TemplateEngine.Edge.Template.InputDataSet.InputDataSet(Microsoft.TemplateEngine.Abstractions.ITemplateInfo! templateInfo, System.Collections.Generic.IReadOnlyDictionary<string!, string?>? inputParameters = null) -> void
+Microsoft.TemplateEngine.Edge.Template.InputDataSet.InputDataSet(Microsoft.TemplateEngine.Abstractions.ITemplateInfo! templateInfo) -> void
+Microsoft.TemplateEngine.Edge.Template.InputDataSet.InputDataSet(Microsoft.TemplateEngine.Abstractions.ITemplateInfo! templateInfo, System.Collections.Generic.IReadOnlyDictionary<string!, string?>! inputParameters) -> void
 Microsoft.TemplateEngine.Edge.Template.InputDataSet.InputDataSet(Microsoft.TemplateEngine.Abstractions.Parameters.IParameterDefinitionSet! parameters, System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Edge.Template.InputParameterData!>! parameterData) -> void
 Microsoft.TemplateEngine.Edge.Template.InputDataSet.Keys.get -> System.Collections.Generic.IEnumerable<Microsoft.TemplateEngine.Abstractions.ITemplateParameter!>!
-Microsoft.TemplateEngine.Edge.Template.InputDataSet.ParameterDefinitions.get -> Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitions!
+Microsoft.TemplateEngine.Edge.Template.InputDataSet.ParameterDefinitionSet.get -> Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitionSet!
 Microsoft.TemplateEngine.Edge.Template.InputDataSet.this[Microsoft.TemplateEngine.Abstractions.ITemplateParameter! key].get -> Microsoft.TemplateEngine.Edge.Template.InputParameterData!
 Microsoft.TemplateEngine.Edge.Template.InputDataSet.TryGetValue(Microsoft.TemplateEngine.Abstractions.ITemplateParameter! key, out Microsoft.TemplateEngine.Edge.Template.InputParameterData! value) -> bool
 Microsoft.TemplateEngine.Edge.Template.InputDataSet.Values.get -> System.Collections.Generic.IEnumerable<Microsoft.TemplateEngine.Edge.Template.InputParameterData!>!

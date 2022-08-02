@@ -51,7 +51,7 @@ public class TemplateParameterPrecedence
     public string? IsEnabledCondition { get; }
 
     /// <summary>
-    /// Indicates whether parameter is uncodnitionaly required.
+    /// Indicates whether parameter is unconditionally required.
     /// </summary>
     public bool IsRequired { get; }
 

@@ -56,7 +56,7 @@ namespace Microsoft.TemplateEngine.Cli
 
         public IParameterDefinitionSet ParameterDefinitions => _templateInfo.ParameterDefinitions;
 
-        [Obsolete("Use ParameterDefinitions instead.")]
+        [Obsolete("Use ParameterDefinitionSet instead.")]
         public IReadOnlyList<ITemplateParameter> Parameters => ParameterDefinitions;
 
         public string MountPointUri => _templateInfo.MountPointUri;

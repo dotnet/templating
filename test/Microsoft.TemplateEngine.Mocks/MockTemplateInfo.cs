@@ -108,10 +108,10 @@ namespace Microsoft.TemplateEngine.Mocks
 
         public IReadOnlyList<string> ShortNameList => _shortNameList;
 
-        [Obsolete("Use ParameterDefinitions instead.")]
+        [Obsolete("Use ParameterDefinitionSet instead.")]
         IReadOnlyDictionary<string, ICacheTag> ITemplateInfo.Tags => throw new NotImplementedException();
 
-        [Obsolete("Use ParameterDefinitions instead.")]
+        [Obsolete("Use ParameterDefinitionSet instead.")]
         IReadOnlyDictionary<string, ICacheParameter> ITemplateInfo.CacheParameters => throw new NotImplementedException();
 
         public IParameterDefinitionSet ParameterDefinitions
@@ -123,11 +123,11 @@ namespace Microsoft.TemplateEngine.Mocks
                 {
                     parameters.Add(param.Value);
                 }
-                return new ParameterDefinitions(parameters);
+                return new ParameterDefinitionSet(parameters);
             }            
         }
 
-        [Obsolete("Use ParameterDefinitions instead.")]
+        [Obsolete("Use ParameterDefinitionSet instead.")]
         public IReadOnlyList<ITemplateParameter> Parameters => ParameterDefinitions;
 
         public string MountPointUri => "FakeMountPoint";
@@ -362,7 +362,7 @@ namespace Microsoft.TemplateEngine.Mocks
             }
             if (_parameters.Any())
             {
-                _ = sb.Append("ParameterDefinitions:" + string.Join(",", _parameters) + ";");
+                _ = sb.Append("ParameterDefinitionSet:" + string.Join(",", _parameters) + ";");
             }
             if (_baselineInfo.Any())
             {

@@ -20,7 +20,7 @@ public class ParameterSetData : IParameterSetData
     /// <param name="parameterData"></param>
     public ParameterSetData(IParameterDefinitionSet parameters, IReadOnlyList<ParameterData> parameterData)
     {
-        ParametersDefinition = new ParameterDefinitions(parameters.AsReadonlyDictionary());
+        ParametersDefinition = new ParameterDefinitionSet(parameters.AsReadonlyDictionary());
         _parametersData = parameterData.ToDictionary(d => d.ParameterDefinition, d => d);
     }
 
@@ -51,7 +51,7 @@ public class ParameterSetData : IParameterSetData
     /// <param name="inputParameters"></param>
     public ParameterSetData(ITemplateInfo templateInfo, IReadOnlyDictionary<string, object?>? inputParameters)
     {
-        ParametersDefinition = new ParameterDefinitions(templateInfo.ParameterDefinitions);
+        ParametersDefinition = new ParameterDefinitionSet(templateInfo.ParameterDefinitions);
         _parametersData = templateInfo.ParameterDefinitions.ToDictionary(p => p, p =>
         {
             object? value = null;
@@ -83,7 +83,7 @@ public class ParameterSetData : IParameterSetData
     [Obsolete("IParameterSet should not be used - it is replaced with IParameterSetData", false)]
     public static IParameterSetData FromLegacyParameterSet(IParameterSet parameterSet)
     {
-        IParameterDefinitionSet parametersDefinition = new ParameterDefinitions(parameterSet.ParameterDefinitions);
+        IParameterDefinitionSet parametersDefinition = new ParameterDefinitionSet(parameterSet.ParameterDefinitions);
         IReadOnlyList<ParameterData> data = parameterSet.ResolvedValues.Select(p =>
                 new ParameterData(p.Key, p.Value, DataSource.User))
             .ToList();

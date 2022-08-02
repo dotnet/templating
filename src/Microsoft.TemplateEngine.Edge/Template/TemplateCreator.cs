@@ -266,7 +266,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
 
         private bool AnyParametersWithInvalidDefaultsUnresolved(IReadOnlyList<string> defaultParamsWithInvalidValues, InputDataSet inputParameters, out IReadOnlyList<string> invalidDefaultParameters)
         {
-            invalidDefaultParameters = defaultParamsWithInvalidValues.Where(x => !inputParameters.ParameterDefinitions.ContainsKey(x)).ToList();
+            invalidDefaultParameters = defaultParamsWithInvalidValues.Where(x => !inputParameters.ParameterDefinitionSet.ContainsKey(x)).ToList();
             return invalidDefaultParameters.Count > 0;
         }
 
@@ -533,7 +533,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
         ///  Hence only the base and <see cref="SetParameterValue"/> are implemented - no other methods are called in scope of <see cref="ResolveUserParameters"/>.
         /// </summary>
         [Obsolete("Proxy for obsolete ResolveUserParameters method", false)]
-        private class LegacyParamSetWrapper : ParameterDefinitions, IParameterSetBuilder
+        private class LegacyParamSetWrapper : ParameterDefinitionSet, IParameterSetBuilder
         {
             private readonly IParameterSet _parameterSet;
 

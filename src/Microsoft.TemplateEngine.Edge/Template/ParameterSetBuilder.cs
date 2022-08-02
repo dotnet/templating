@@ -16,7 +16,7 @@ using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Edge.Template
 {
-    internal class ParameterSetBuilder : ParameterDefinitions, IParameterSetBuilder,
+    internal class ParameterSetBuilder : ParameterDefinitionSet, IParameterSetBuilder,
 #pragma warning disable CS0618 // Type or member is obsolete
         IParameterSet
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -37,7 +37,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
             var result = CreateWithDefaults(generator, parametersDefinition, name, environment, out IReadOnlyList<string> errors);
             if (errors.Any())
             {
-                throw new Exception("ParameterDefinitions with errors encountered: " + errors.ToCsvString());
+                throw new Exception("ParameterDefinitionSet with errors encountered: " + errors.ToCsvString());
             }
 
             return result;
@@ -284,7 +284,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                     string.Format(
                         LocalizableStrings.ConditionEvaluation_Error_CyclicDependency,
                         cycle.Select(p => p.ParameterDefinition.Name).ToCsvString()),
-                    "Conditional ParameterDefinitions");
+                    "Conditional ParameterDefinitionSet");
             }
             else
             {

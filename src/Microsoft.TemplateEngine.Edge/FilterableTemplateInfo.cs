@@ -53,7 +53,7 @@ namespace Microsoft.TemplateEngine.Edge
 
         public IParameterDefinitionSet ParameterDefinitions { get; private set; }
 
-        [Obsolete("Use ParameterDefinitions instead.")]
+        [Obsolete("Use ParameterDefinitionSet instead.")]
         public IReadOnlyList<ITemplateParameter> Parameters => ParameterDefinitions;
 
         public string MountPointUri { get; private set; }

@@ -82,7 +82,7 @@ namespace Microsoft.TemplateEngine.Cli.Commands
                                 //// get parameters without enablement condition - first get those that are required, then conditionaly required, then optional
                                 //// then do a topological sort of rest of parameters and evaluate enablement conditions on the fly - get them in order
 
-                                //template.ParameterDefinitions[0].Priority
+                                //template.ParameterDefinitionSet[0].Priority
 
                                 distinctCompletions.Add(completion);
                             }

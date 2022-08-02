@@ -26,19 +26,26 @@ public class InputDataSet : IReadOnlyDictionary<ITemplateParameter, InputParamet
     public InputDataSet(IParameterDefinitionSet parameters, IReadOnlyList<InputParameterData> parameterData)
     {
         _parametersData = parameterData.ToDictionary(d => d.ParameterDefinition, d => d);
-        ParameterDefinitions = new ParameterDefinitions(parameters.AsReadonlyDictionary());
+        ParameterDefinitionSet = new ParameterDefinitionSet(parameters.AsReadonlyDictionary());
     }
 
-#pragma warning disable RS0027 // Public API with optional parameter(s) should have the most parameters amongst its public overloads
+    /// <summary>
+    /// Creates new instance of the <see cref="InputDataSet"/> type.
+    /// To be used to convert legacy parameters dictionaries into this datamodel.
+    /// </summary>
+    /// <param name="templateInfo"></param>
+    public InputDataSet(ITemplateInfo templateInfo)
+        : this(templateInfo, (IReadOnlyDictionary<string, object?>?)null)
+    { }
+
     /// <summary>
     /// Creates new instance of the <see cref="InputDataSet"/> type.
     /// To be used to convert legacy parameters dictionaries into this datamodel.
     /// </summary>
     /// <param name="templateInfo"></param>
     /// <param name="inputParameters"></param>
-    public InputDataSet(ITemplateInfo templateInfo, IReadOnlyDictionary<string, string?>? inputParameters = null)
-#pragma warning restore RS0027 // Public API with optional parameter(s) should have the most parameters amongst its public overloads
-        : this(templateInfo, inputParameters?.ToDictionary(p => p.Key, p => (object?)p.Value))
+    public InputDataSet(ITemplateInfo templateInfo, IReadOnlyDictionary<string, string?> inputParameters)
+        : this(templateInfo, inputParameters.ToDictionary(p => p.Key, p => (object?)p.Value))
     { }
 
     private InputDataSet(ITemplateInfo templateInfo, IReadOnlyDictionary<string, object?>? inputParameters)
@@ -49,7 +56,7 @@ public class InputDataSet : IReadOnlyDictionary<ITemplateParameter, InputParamet
             bool isSet = inputParameters != null && inputParameters.TryGetValue(p.Name, out value);
             return new InputParameterData(p, value, isSet ? DataSource.User : DataSource.NoSource, isSet ? InputDataStateUtil.GetInputDataState(value) : InputDataState.Unset);
         });
-        ParameterDefinitions = new ParameterDefinitions(templateInfo.ParameterDefinitions);
+        ParameterDefinitionSet = new ParameterDefinitionSet(templateInfo.ParameterDefinitions);
     }
 
     /// <summary>
@@ -61,7 +68,7 @@ public class InputDataSet : IReadOnlyDictionary<ITemplateParameter, InputParamet
     /// <summary>
     /// Descriptors of the parameters.
     /// </summary>
-    public ParameterDefinitions ParameterDefinitions { get; }
+    public ParameterDefinitionSet ParameterDefinitionSet { get; }
 
     /// <inheritdoc/>
     public IEnumerable<ITemplateParameter> Keys => _parametersData.Keys;

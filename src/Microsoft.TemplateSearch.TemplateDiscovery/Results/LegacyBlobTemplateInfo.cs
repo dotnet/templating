@@ -163,7 +163,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Results
         public IParameterDefinitionSet ParameterDefinitions { get; private set; }
 
         [JsonIgnore]
-        [Obsolete("Use ParameterDefinitions instead.")]
+        [Obsolete("Use ParameterDefinitionSet instead.")]
         public IReadOnlyList<ITemplateParameter> Parameters => ParameterDefinitions;
 
         [JsonIgnore]

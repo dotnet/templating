@@ -43,7 +43,7 @@ namespace Microsoft.TemplateSearch.Common
             Identity = templateInfo.Identity;
             Name = templateInfo.Name;
             ShortNameList = templateInfo.ShortNameList;
-            ParameterDefinitions = new ParameterDefinitions(templateInfo.ParameterDefinitions?.Select(p => new BlobTemplateParameter(p)));
+            ParameterDefinitions = new ParameterDefinitionSet(templateInfo.ParameterDefinitions?.Select(p => new BlobTemplateParameter(p)));
             Author = templateInfo.Author;
             Classifications = templateInfo.Classifications ?? Array.Empty<string>();
             Description = templateInfo.Description;
@@ -80,10 +80,10 @@ namespace Microsoft.TemplateSearch.Common
 
         [JsonProperty(nameof(Parameters))]
         //reading manually now to support old format
-        public IParameterDefinitionSet ParameterDefinitions { get; private set; } = TemplateEngine.Abstractions.Parameters.ParameterDefinitions.Empty;
+        public IParameterDefinitionSet ParameterDefinitions { get; private set; } = TemplateEngine.Abstractions.Parameters.ParameterDefinitionSet.Empty;
 
         [JsonIgnore]
-        [Obsolete("Use ParameterDefinitions instead.")]
+        [Obsolete("Use ParameterDefinitionSet instead.")]
         public IReadOnlyList<ITemplateParameter> Parameters => ParameterDefinitions;
 
         [JsonIgnore]
@@ -310,7 +310,7 @@ namespace Microsoft.TemplateSearch.Common
             }
 
             info.TagsCollection = tags;
-            info.ParameterDefinitions = new ParameterDefinitions(templateParameters);
+            info.ParameterDefinitions = new ParameterDefinitionSet(templateParameters);
             return info;
 
         }
@@ -413,7 +413,7 @@ namespace Microsoft.TemplateSearch.Common
             public TemplateParameterPrecedence Precedence { get; }
 
             [JsonIgnore]
-            //ParameterDefinitions have only "parameter" symbols.
+            //ParameterDefinitionSet have only "parameter" symbols.
             string ITemplateParameter.Type => "parameter";
 
             [JsonIgnore]

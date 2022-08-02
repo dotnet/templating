@@ -9,35 +9,35 @@ using System.Text;
 namespace Microsoft.TemplateEngine.Abstractions.Parameters
 {
     /// <inheritdoc />
-    public class ParameterDefinitions : IParameterDefinitionSet
+    public class ParameterDefinitionSet : IParameterDefinitionSet
     {
         /// <summary>
         /// Empty descriptor set.
         /// </summary>
-        public static readonly IParameterDefinitionSet Empty = new ParameterDefinitions((IEnumerable<ITemplateParameter>?)null);
+        public static readonly IParameterDefinitionSet Empty = new ParameterDefinitionSet((IEnumerable<ITemplateParameter>?)null);
 
         private readonly IReadOnlyDictionary<string, ITemplateParameter> _parameters;
 
         /// <summary>
-        /// Initializes new instance of the <see cref="ParameterDefinitions"/> type.
+        /// Initializes new instance of the <see cref="ParameterDefinitionSet"/> type.
         /// </summary>
         /// <param name="parameters"></param>
-        public ParameterDefinitions(IReadOnlyDictionary<string, ITemplateParameter>? parameters) =>
+        public ParameterDefinitionSet(IReadOnlyDictionary<string, ITemplateParameter>? parameters) =>
             _parameters = parameters ?? new Dictionary<string, ITemplateParameter>();
 
         /// <summary>
-        /// Initializes new instance of the <see cref="ParameterDefinitions"/> type.
+        /// Initializes new instance of the <see cref="ParameterDefinitionSet"/> type.
         /// </summary>
         /// <param name="parameters"></param>
-        public ParameterDefinitions(IEnumerable<ITemplateParameter>? parameters)
+        public ParameterDefinitionSet(IEnumerable<ITemplateParameter>? parameters)
             : this(parameters?.ToDictionary(p => p.Name, p => p))
         { }
 
         /// <summary>
-        /// Initializes new instance of the <see cref="ParameterDefinitions"/> type.
+        /// Initializes new instance of the <see cref="ParameterDefinitionSet"/> type.
         /// </summary>
         /// <param name="other">Instance to be cloned.</param>
-        public ParameterDefinitions(IParameterDefinitionSet other) : this(other.AsReadonlyDictionary())
+        public ParameterDefinitionSet(IParameterDefinitionSet other) : this(other.AsReadonlyDictionary())
         { }
 
         /// <inheritdoc />

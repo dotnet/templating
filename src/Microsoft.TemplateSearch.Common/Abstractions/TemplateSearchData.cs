@@ -64,7 +64,7 @@ namespace Microsoft.TemplateSearch.Common
         public IParameterDefinitionSet ParameterDefinitions => TemplateInfo.ParameterDefinitions;
 
         /// <inheritdoc/>
-        [Obsolete("Use ParameterDefinitions instead.")]
+        [Obsolete("Use ParameterDefinitionSet instead.")]
         public IReadOnlyList<ITemplateParameter> Parameters => ParameterDefinitions;
 
         /// <inheritdoc/>

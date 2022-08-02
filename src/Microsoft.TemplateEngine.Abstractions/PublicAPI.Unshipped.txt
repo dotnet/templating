@@ -107,19 +107,19 @@ Microsoft.TemplateEngine.Abstractions.Parameters.ParameterData.IsEnabled.get -> 
 Microsoft.TemplateEngine.Abstractions.Parameters.ParameterData.ParameterData(Microsoft.TemplateEngine.Abstractions.ITemplateParameter! parameterDefinition, object? value, Microsoft.TemplateEngine.Abstractions.Parameters.DataSource source, bool isEnabled = true) -> void
 Microsoft.TemplateEngine.Abstractions.Parameters.ParameterData.ParameterDefinition.get -> Microsoft.TemplateEngine.Abstractions.ITemplateParameter!
 Microsoft.TemplateEngine.Abstractions.Parameters.ParameterData.Value.get -> object?
-Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitions
-Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitions.AsReadonlyDictionary() -> System.Collections.Generic.IReadOnlyDictionary<string!, Microsoft.TemplateEngine.Abstractions.ITemplateParameter!>!
-Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitions.ContainsKey(string! key) -> bool
-Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitions.Count.get -> int
-Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitions.GetEnumerator() -> System.Collections.Generic.IEnumerator<Microsoft.TemplateEngine.Abstractions.ITemplateParameter!>!
-Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitions.Keys.get -> System.Collections.Generic.IEnumerable<string!>!
-Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitions.ParameterDefinitions(Microsoft.TemplateEngine.Abstractions.Parameters.IParameterDefinitionSet! other) -> void
-Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitions.ParameterDefinitions(System.Collections.Generic.IEnumerable<Microsoft.TemplateEngine.Abstractions.ITemplateParameter!>? parameters) -> void
-Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitions.ParameterDefinitions(System.Collections.Generic.IReadOnlyDictionary<string!, Microsoft.TemplateEngine.Abstractions.ITemplateParameter!>? parameters) -> void
-Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitions.this[int index].get -> Microsoft.TemplateEngine.Abstractions.ITemplateParameter!
-Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitions.this[string! key].get -> Microsoft.TemplateEngine.Abstractions.ITemplateParameter!
-Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitions.TryGetValue(string! key, out Microsoft.TemplateEngine.Abstractions.ITemplateParameter! value) -> bool
-Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitions.Values.get -> System.Collections.Generic.IEnumerable<Microsoft.TemplateEngine.Abstractions.ITemplateParameter!>!
+Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitionSet
+Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitionSet.AsReadonlyDictionary() -> System.Collections.Generic.IReadOnlyDictionary<string!, Microsoft.TemplateEngine.Abstractions.ITemplateParameter!>!
+Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitionSet.ContainsKey(string! key) -> bool
+Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitionSet.Count.get -> int
+Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitionSet.GetEnumerator() -> System.Collections.Generic.IEnumerator<Microsoft.TemplateEngine.Abstractions.ITemplateParameter!>!
+Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitionSet.Keys.get -> System.Collections.Generic.IEnumerable<string!>!
+Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitionSet.ParameterDefinitionSet(Microsoft.TemplateEngine.Abstractions.Parameters.IParameterDefinitionSet! other) -> void
+Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitionSet.ParameterDefinitionSet(System.Collections.Generic.IEnumerable<Microsoft.TemplateEngine.Abstractions.ITemplateParameter!>? parameters) -> void
+Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitionSet.ParameterDefinitionSet(System.Collections.Generic.IReadOnlyDictionary<string!, Microsoft.TemplateEngine.Abstractions.ITemplateParameter!>? parameters) -> void
+Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitionSet.this[int index].get -> Microsoft.TemplateEngine.Abstractions.ITemplateParameter!
+Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitionSet.this[string! key].get -> Microsoft.TemplateEngine.Abstractions.ITemplateParameter!
+Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitionSet.TryGetValue(string! key, out Microsoft.TemplateEngine.Abstractions.ITemplateParameter! value) -> bool
+Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitionSet.Values.get -> System.Collections.Generic.IEnumerable<Microsoft.TemplateEngine.Abstractions.ITemplateParameter!>!
 Microsoft.TemplateEngine.Abstractions.Parameters.ParameterSetData
 Microsoft.TemplateEngine.Abstractions.Parameters.ParameterSetData.ContainsKey(Microsoft.TemplateEngine.Abstractions.ITemplateParameter! key) -> bool
 Microsoft.TemplateEngine.Abstractions.Parameters.ParameterSetData.Count.get -> int
@@ -244,7 +244,7 @@ static Microsoft.TemplateEngine.Abstractions.Parameters.ParameterSetData.FromLeg
 static Microsoft.TemplateEngine.Abstractions.TemplateParameterPrecedenceExtensions.ToPrecedenceDefinition(this Microsoft.TemplateEngine.Abstractions.TemplateParameterPriority priority) -> Microsoft.TemplateEngine.Abstractions.PrecedenceDefinition
 static Microsoft.TemplateEngine.Abstractions.TemplateParameterPrecedenceExtensions.ToTemplateParameterPrecedence(this Microsoft.TemplateEngine.Abstractions.TemplateParameterPriority priority) -> Microsoft.TemplateEngine.Abstractions.TemplateParameterPrecedence!
 static Microsoft.TemplateEngine.Abstractions.TemplateParameterPrecedenceExtensions.ToTemplateParameterPriority(this Microsoft.TemplateEngine.Abstractions.PrecedenceDefinition precedenceDefinition) -> Microsoft.TemplateEngine.Abstractions.TemplateParameterPriority
-static readonly Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitions.Empty -> Microsoft.TemplateEngine.Abstractions.Parameters.IParameterDefinitionSet!
+static readonly Microsoft.TemplateEngine.Abstractions.Parameters.ParameterDefinitionSet.Empty -> Microsoft.TemplateEngine.Abstractions.Parameters.IParameterDefinitionSet!
 static readonly Microsoft.TemplateEngine.Abstractions.TemplateParameterPrecedence.Default -> Microsoft.TemplateEngine.Abstractions.TemplateParameterPrecedence!
 virtual Microsoft.TemplateEngine.Abstractions.Installer.InstallerOperationResult.TemplatePackage.get -> Microsoft.TemplateEngine.Abstractions.TemplatePackage.IManagedTemplatePackage?
 override Microsoft.TemplateEngine.Abstractions.Installer.InstallRequest.ToString() -> string!

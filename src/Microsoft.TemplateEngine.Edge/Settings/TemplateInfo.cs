@@ -137,10 +137,10 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 #pragma warning disable CS0618 // Type or member is obsolete
         [JsonProperty(nameof(Parameters))]
 #pragma warning restore CS0618 // Type or member is obsolete
-        public IParameterDefinitionSet ParameterDefinitions { get; private set; } = Abstractions.Parameters.ParameterDefinitions.Empty;
+        public IParameterDefinitionSet ParameterDefinitions { get; private set; } = Abstractions.Parameters.ParameterDefinitionSet.Empty;
 
         [JsonIgnore]
-        [Obsolete("Use ParameterDefinitions instead.")]
+        [Obsolete("Use ParameterDefinitionSet instead.")]
         public IReadOnlyList<ITemplateParameter> Parameters => ParameterDefinitions;
 
         [JsonProperty]
@@ -324,7 +324,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
                 localizedParameters.Add(localizedParameter);
             }
-            return new ParameterDefinitions(localizedParameters);
+            return new ParameterDefinitionSet(localizedParameters);
         }
     }
 }

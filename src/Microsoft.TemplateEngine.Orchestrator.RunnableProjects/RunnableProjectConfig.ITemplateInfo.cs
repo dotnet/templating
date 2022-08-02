@@ -99,12 +99,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         {
             get
             {
-                return new ParameterDefinitions(_parameters.Values
+                return new ParameterDefinitionSet(_parameters.Values
                     .Where(param => param.Type.Equals("parameter", StringComparison.OrdinalIgnoreCase)));
             }
         }
 
-        [Obsolete("Use ParameterDefinitions instead.")]
+        [Obsolete("Use ParameterDefinitionSet instead.")]
         public IReadOnlyList<ITemplateParameter> Parameters => ParameterDefinitions;
 
         IFileSystemInfo ITemplate.Configuration => SourceFile;
