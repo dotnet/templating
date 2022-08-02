@@ -2,21 +2,16 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VerifyTests;
 
-namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
+namespace Microsoft.TemplateEngine.IDE.IntegrationTests
 {
-    public class VerifyFixture : IDisposable
+    public class VerifySettingsFixture : IDisposable
     {
-        public VerifyFixture()
+        public VerifySettingsFixture()
         {
             Settings = new VerifySettings();
             Settings.UseDirectory("Approvals");
-            VerifyDiffPlex.Initialize(OutputType.Compact);
         }
 
         internal VerifySettings Settings { get; }
