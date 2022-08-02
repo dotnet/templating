@@ -75,21 +75,6 @@ public class ParameterSetData : IParameterSetData
     /// <inheritdoc/>
     public ParameterData this[ITemplateParameter key] => _parametersData[key];
 
-    /// <summary>
-    /// Creates instance of <see cref="IParameterSetData"/> from the legacy <see cref="IParameterSet"/>.
-    /// </summary>
-    /// <param name="parameterSet">Legacy parameterset to be converted.</param>
-    /// <returns></returns>
-    [Obsolete("IParameterSet should not be used - it is replaced with IParameterSetData", false)]
-    public static IParameterSetData FromLegacyParameterSet(IParameterSet parameterSet)
-    {
-        IParameterDefinitionSet parametersDefinition = new ParameterDefinitionSet(parameterSet.ParameterDefinitions);
-        IReadOnlyList<ParameterData> data = parameterSet.ResolvedValues.Select(p =>
-                new ParameterData(p.Key, p.Value, DataSource.User))
-            .ToList();
-        return new ParameterSetData(parametersDefinition, data);
-    }
-
     /// <inheritdoc/>
     public IEnumerator<KeyValuePair<ITemplateParameter, ParameterData>> GetEnumerator() => _parametersData.GetEnumerator();
 

@@ -62,7 +62,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             string targetDirectory,
             CancellationToken cancellationToken)
         {
-            return ((IGenerator)this).CreateAsync(environmentSettings, template, ParameterSetData.FromLegacyParameterSet(parameters), targetDirectory, cancellationToken);
+            return ((IGenerator)this).CreateAsync(environmentSettings, template, parameters.ToParameterSetData(), targetDirectory, cancellationToken);
         }
 
         [Obsolete("Replaced by GetCreationEffectsAsync with IEvaluatedParameterSetData", false)]
@@ -73,7 +73,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             string targetDirectory,
             CancellationToken cancellationToken)
         {
-            return ((IGenerator)this).GetCreationEffectsAsync(environmentSettings, template, ParameterSetData.FromLegacyParameterSet(parameters), targetDirectory, cancellationToken);
+            return ((IGenerator)this).GetCreationEffectsAsync(environmentSettings, template, parameters.ToParameterSetData(), targetDirectory, cancellationToken);
         }
 
         Task<ICreationResult> IGenerator.CreateAsync(
