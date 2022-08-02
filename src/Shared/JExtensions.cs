@@ -7,10 +7,12 @@ using System.Collections.Generic;
 using System.IO;
 #endif
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Xml.Linq;
 
 #nullable enable
 
@@ -227,6 +229,21 @@ namespace Microsoft.TemplateEngine
             }
 
             return result;
+        }
+
+        internal static TemplateParameterPrecedence ToTemplateParameterPrecedence(this JToken jObject, string? key)
+        {
+            if (!jObject.TryGetValue(key, out JToken? checkToken))
+            {
+                return TemplateParameterPrecedence.Default;
+            }
+
+            PrecedenceDefinition precedenceDefinition = (PrecedenceDefinition)checkToken.ToInt32(nameof(PrecedenceDefinition));
+            string? isRequiredCondition = checkToken.ToString(nameof(TemplateParameterPrecedence.IsRequiredCondition));
+            string? isEnabledCondition = checkToken.ToString(nameof(TemplateParameterPrecedence.IsEnabledCondition));
+            bool isRequired = checkToken.ToBool(nameof(TemplateParameterPrecedence.IsRequired));
+
+            return new TemplateParameterPrecedence(precedenceDefinition, isRequiredCondition, isEnabledCondition, isRequired);
         }
 
         internal static IReadOnlyList<string> ArrayAsStrings(this JToken? token, string? propertyName = null)
