@@ -55,7 +55,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 if (!variableCollection.ContainsKey(bindSymbol.Name) && bindSymbol.DefaultValue != null)
                 {
-                    variableCollection[bindSymbol.Name] = RunnableProjectGenerator.InferTypeAndConvertLiteral(bindSymbol.DefaultValue);
+                    variableCollection[bindSymbol.Name] = ParameterConverter.InferTypeAndConvertLiteral(bindSymbol.DefaultValue);
                 }
             }
 

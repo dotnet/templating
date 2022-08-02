@@ -6,7 +6,6 @@ using System.CommandLine.Help;
 using System.CommandLine.Parsing;
 using FakeItEasy;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Cli.Commands;
 using Microsoft.TemplateEngine.Edge;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Mocks;
