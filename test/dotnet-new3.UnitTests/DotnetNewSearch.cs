@@ -777,7 +777,7 @@ namespace Dotnet_new3.IntegrationTests
         {
             const string deprecationMessage =
 @"Warning: use of 'dotnet-new3 new3 --search' is deprecated. Use 'dotnet-new3 new3 search' instead.
-For more information, run:
+For more information, run: 
    dotnet-new3 new3 search -h";
 
             var commandResult = new DotnetNewCommand(_log, "--search", "console")
