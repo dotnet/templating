@@ -447,7 +447,7 @@ Author: Me
             HelpContext helpContext = new HelpContext(new HelpBuilder(LocalizationResources.Instance, maxWidth: 50), myCommand, sw);
 
             InstantiateCommand.ShowTemplateSpecificOptions(new[] { templateCommand1, templateCommand2 }, helpContext);
-            return Verifier.Verify(sw.ToString(), _verifySettings.Settings);
+            return Verifier.Verify(sw.ToString());
         }
     }
 }

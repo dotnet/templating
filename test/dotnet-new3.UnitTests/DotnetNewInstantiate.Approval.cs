@@ -592,7 +592,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Should()
                 .Fail();
 
-            return Verifier.Verify(commandResult.FormatOutputStreams(), _verifySettings)
+            return Verifier.Verify(commandResult.FormatOutputStreams())
                 .UniqueForOSPlatform()
                 .ScrubInlineGuids();
                 
