@@ -13,7 +13,7 @@
   "symbols/skipRestore/description": "Jeśli ta opcja jest określona, pomija automatyczne przywracanie projektu podczas tworzenia.",
   "symbols/skipRestore/displayName": "Pomiń przywracanie",
   "symbols/UseProgramMain/description": "Określa, czy wygenerować jawną klasę Program i metodę Main zamiast instrukcji najwyższego poziomu.",
-  "symbols/UseProgramMain/displayName": "Nie używaj instrukcji najwyższego poziomu",
+  "symbols/UseProgramMain/displayName": "Do not use _top-level statements",
   "postActions/restore/description": "Przywróć pakiety NuGet wymagane przez ten projekt.",
   "postActions/restore/manualInstructions/default/text": "Uruchom polecenie \"dotnet restore\"",
   "postActions/open-file/description": "Otwiera plik Program.cs w edytorze"
