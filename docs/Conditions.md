@@ -216,8 +216,8 @@ Usage can then look as following:
 ## Conditional Parameters
 
 [Parameter symbols in template](Reference-for-template.json.md#parameter-symbol) can be specified together with optional conditions:
-* [`IsEnabled Condition`](Reference-for-template.json.md#isEnabled) - overwritting presence of input parameter. If condition is specified and evaluates to false (or a `false` constant is passed), passed parameter value (if any) is ignored and processing works as if the parameter value was not passed. This includes application of [default values](Reference-for-template.json.md#default), [verification of mandatory parameters](Reference-for-template.json.md#isRequired), [conditional processing of sources](Conditional-processing-and-comment-syntax.md) and [replacements](Reference-for-template.json.md#replaces).
-* [`IsRequired Condition`](Reference-for-template.json.md#isRequired) - dictates if parameter is mandatory or optional.
+* [`IsEnabled Condition`](Reference-for-template.json.md#isEnabled) - defines presence of input parameter. If condition is specified and evaluates to false (or a `false` constant is passed), passed parameter value (if any) is ignored and processing works without the parameter. This includes [conditional processing of sources](Conditional-processing-and-comment-syntax.md) and [replacements](Reference-for-template.json.md#replaces). [Verification of mandatory parameters](Reference-for-template.json.md#isRequired) does not consider disabled parameters (even if marked as required).
+* [`IsRequired Condition`](Reference-for-template.json.md#isRequired) - defines if parameter is mandatory or optional.
 
 ### Evaluation
 
@@ -225,7 +225,7 @@ Usage can then look as following:
 
 **Evaluation order** - Dependencies between parameters are detected and evaluation is peformed in order that guarantees that all dependencies are evaluated prior their dependant (see [Topological Sorting](https://en.wikipedia.org/wiki/Topological_sorting) for details).
 
- In case of cyclic dependency the evaluation proceeds only if current input values of parameters do not lead to indeterministic result (and the cycle is indicated in warning log message). Otherwise an error is reported, indicating the cycle.
+ In case of cyclic dependency the evaluation proceeds only if current input values of parameters do not lead to indeterministic result (and the cycle is indicated in warning log message). That means order of evaluation or number of reevaluations should not have impact on the result of evaluation. Otherwise an error is reported, indicating the cycle.
 
  Example `template.json` with cyclic dependency:
 ```json
@@ -234,11 +234,13 @@ Usage can then look as following:
       "type": "parameter",
       "datatype": "bool",
       "isEnabled": "B != false",
+      "defaultValue": false
     },
     "B": {
       "type": "parameter",
       "datatype": "bool",
       "isEnabled": "A != true",
+      "defaultValue": true
     }
 }
 ```
@@ -251,10 +253,4 @@ Following input parameter values cannot be evaluated deterministically (and will
 
 ### Performing evaluation externally
 
-It is possible to supply evaluation results of parameters conditions when instantiating template via Edge API [`TemplateCreator.InstantiateAsync`](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.Edge/Template/TemplateCreator.cs#L89). Example use case is instantiation from Visual Studio host, that will leverage condition evaluator integrated within the New Project Dialog. 
-
-This can be achieved by passing the structured [`InputDataSet`](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.Edge/Template/InputDataSet.cs) argument that is populated with [`EvaluatedInputParameterData`](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.Edge/Template/EvaluatedInputParameterData.cs) objects for evaluated parameters. 
-
-It is currently not possible to provide just partial external evaluation - meaning that the template engine evaluates either all the parameter conditions or none. If the [`InputDataSet`](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.Edge/Template/InputDataSet.cs) collection contains at least one [`EvaluatedInputParameterData`](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.Edge/Template/EvaluatedInputParameterData.cs) element, results of all parameter conditions are expected to be passed.
-
-Template engine cross checks externally passed evaluations. If it encounteres mismatch between externally passed result and internal evaluation result a failed `ITemplateCreationResult` is returned from `InstantiateAsync` API. Failure is indicated by [`CondtionsEvaluationMismatch`](https://github.com/dotnet/templating/blob/6f2da67d94a86fa752e336f2611797f9483e44f9/src/Microsoft.TemplateEngine.Edge/Template/CreationResultStatus.cs#L61) in [`Status`](https://github.com/dotnet/templating/blob/6f2da67d94a86fa752e336f2611797f9483e44f9/src/Microsoft.TemplateEngine.Edge/Template/ITemplateCreationResult.cs#L41) property.
+Users of Edge API can supply evaluation results of parameters conditions when instantiating template via `TemplateCreator`. More details are in [Inside the Template Engine](api/Inside-the-Template-Engine.md#supplying-parameters-conditions-results) document.
