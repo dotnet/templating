@@ -25,7 +25,7 @@ Conditions use C++ style of [conditional preprocessor expressions](https://docs.
 Unlike C++ preprocessor conditions, template engine allows ability for using conditional expressions that are based on results of other expressions. Specifically [Evaluate](Available-Symbols-Generators.md#evaluate) and [Computed](Reference-for-template.json.md#computed-symbol) symbols can be leveraged for this purpose.
 
 ### Example 
-Simplified extraction from [C# Console Application template](https://github.com/dotnet/templating/tree/main/template_feed/Microsoft.DotNet.Common.ProjectTemplates.7.0/content/ConsoleApplication-CSharp):
+(other related sample in [GeneratorTest.json](https://github.com/dotnet/templating/blob/main/test/Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests/SchemaTests/GeneratorTest.json#L82-L84)):
 
 `template.json`:
 ```json
@@ -216,7 +216,7 @@ Usage can then look as following:
 ## Conditional Parameters
 
 [Parameter symbols in template](Reference-for-template.json.md#parameter-symbol) can be specified together with optional conditions:
-* [`IsEnabled Condition`](Reference-for-template.json.md#isEnabled) - overwritting presence of input parameter. If condition is specified and evaluates to false, passed parameter value (if any) is ignored and processing works as if the symbol would not exist. This includes application of [default values](Reference-for-template.json.md#default), [verification of mandatory parameters](Reference-for-template.json.md#isRequired), [conditional processing of sources](Conditional-processing-and-comment-syntax.md) and [replacements](Reference-for-template.json.md#replaces).
+* [`IsEnabled Condition`](Reference-for-template.json.md#isEnabled) - overwritting presence of input parameter. If condition is specified and evaluates to false (or a `false` constant is passed), passed parameter value (if any) is ignored and processing works as if the parameter value was not passed. This includes application of [default values](Reference-for-template.json.md#default), [verification of mandatory parameters](Reference-for-template.json.md#isRequired), [conditional processing of sources](Conditional-processing-and-comment-syntax.md) and [replacements](Reference-for-template.json.md#replaces).
 * [`IsRequired Condition`](Reference-for-template.json.md#isRequired) - dictates if parameter is mandatory or optional.
 
 ### Evaluation
@@ -247,12 +247,14 @@ Following input parameter values can (and will) be evaluated deterministically: 
 
 Following input parameter values cannot be evaluated deterministically (and will lead to error): `--A true --B false`
 
-**Applying of host and default values** - All host and default values are applied before the conditions evaluation. After the evaluation defaults are reapplied to parameters that were evaluated as optional and that do not have host supplied values. After this an evaluation of presence of mandatory values takes place.
+**Applying user, host and default values** - All user passed, host and default values are applied before the conditions evaluation. After the evaluation defaults are reapplied to parameters that were evaluated as optional and that do not have user/host supplied values. After this an evaluation of presence of mandatory values takes place.
 
 ### Performing evaluation externally
 
-It is possible to supply evaluation results of parameters conditions when instantiating template via Edge API [`TemplateCreator.InstantiateAsync`](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.Edge/Template/TemplateCreator.cs#L84). Example use case is instantiation from Visual Studio host, that will leverage condition evaluator integrated within the New Project Dialog. 
+It is possible to supply evaluation results of parameters conditions when instantiating template via Edge API [`TemplateCreator.InstantiateAsync`](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.Edge/Template/TemplateCreator.cs#L89). Example use case is instantiation from Visual Studio host, that will leverage condition evaluator integrated within the New Project Dialog. 
 
-This can be achieved by passing the structured `InputParametersSet` argument and setting the [`SkipParametersConditionsEvaluation`](https://github.com/JanKrivanek/templating/blob/conditional-params-v1/src/Microsoft.TemplateEngine.Edge/Template/InputParametersSet.cs#L41) property to `true`. The actual evaluation results are passed via individual [`InputParameter`s constructors](https://github.com/JanKrivanek/templating/blob/conditional-params-v1/src/Microsoft.TemplateEngine.Edge/Template/InputParameter.cs#L30). 
+This can be achieved by passing the structured [`InputDataSet`](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.Edge/Template/InputDataSet.cs) argument that is populated with [`EvaluatedInputParameterData`](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.Edge/Template/EvaluatedInputParameterData.cs) objects for evaluated parameters. 
 
-It is currently not possible to provide just partial external evaluation - meaning that the template engine evaluates either all the parameter conditions or none. If the [`SkipParametersConditionsEvaluation`](https://github.com/JanKrivanek/templating/blob/conditional-params-v1/src/Microsoft.TemplateEngine.Edge/Template/InputParametersSet.cs#L41) property is set to `true`, results of all parameter conditions are expected to be passed within the `InputParametersSet` argument. If it is set to `false` - none explicit results within `InputParametersSet` argument.
+It is currently not possible to provide just partial external evaluation - meaning that the template engine evaluates either all the parameter conditions or none. If the [`InputDataSet`](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.Edge/Template/InputDataSet.cs) collection contains at least one [`EvaluatedInputParameterData`](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.Edge/Template/EvaluatedInputParameterData.cs) element, results of all parameter conditions are expected to be passed.
+
+Template engine cross checks externally passed evaluations. If it encounteres mismatch between externally passed result and internal evaluation result a failed `ITemplateCreationResult` is returned from `InstantiateAsync` API. Failure is indicated by [`CondtionsEvaluationMismatch`](https://github.com/dotnet/templating/blob/6f2da67d94a86fa752e336f2611797f9483e44f9/src/Microsoft.TemplateEngine.Edge/Template/CreationResultStatus.cs#L61) in [`Status`](https://github.com/dotnet/templating/blob/6f2da67d94a86fa752e336f2611797f9483e44f9/src/Microsoft.TemplateEngine.Edge/Template/ITemplateCreationResult.cs#L41) property.
