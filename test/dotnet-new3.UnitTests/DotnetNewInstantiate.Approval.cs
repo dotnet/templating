@@ -322,7 +322,7 @@ namespace Dotnet_new3.IntegrationTests
 
             string resultFileContent = File.ReadAllText(Path.Combine(workingDirectory, "Test.cs"));
 
-            return Verifier.Verify(resultFileContent, _verifySettings);
+            return Verify(resultFileContent);
         }
 
         [Fact]
@@ -364,7 +364,7 @@ namespace Dotnet_new3.IntegrationTests
             return Task.WhenAll(
                 actualFiles.Select(
                     async (file) =>
-                    await Verifier.VerifyFile(file)
+                    await VerifyFile(file)
                     .UseMethodName($"CanInstantiateTemplate_ConditionalProcessing_{Path.GetFileName(file)}")
                     .UseExtension("txt")
                     ));
@@ -592,7 +592,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Should()
                 .Fail();
 
-            return Verifier.Verify(commandResult.FormatOutputStreams())
+            return Verify(commandResult.FormatOutputStreams())
                 .UniqueForOSPlatform()
                 .ScrubInlineGuids();
                 
