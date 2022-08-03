@@ -15,6 +15,7 @@ using Xunit;
 namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
 {
     [UsesVerify]
+    [Collection("Verify Tests")]
     public partial class HelpTests
     {
         [Fact]

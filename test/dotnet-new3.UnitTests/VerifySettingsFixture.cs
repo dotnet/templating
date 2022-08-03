@@ -1,16 +1,15 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System.Runtime.CompilerServices;
+using System;
+using VerifyTests;
 
-namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
+namespace Dotnet_new3.IntegrationTests
 {
-    public class ModuleInitializer
+    public class VerifySettingsFixture : IDisposable
     {
-        [ModuleInitializer]
-        public static void Init()
+        public VerifySettingsFixture()
         {
-            // Customization of storage of .verified comparison files (see https://github.com/VerifyTests/Verify/blob/main/docs/naming.md#derivepathinfo).
             VerifierSettings.DerivePathInfo(
                 (_, _, type, method) => new(
                     directory: "Approvals",
@@ -20,5 +19,7 @@ namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
             // Customize diff output of verifier
             VerifyDiffPlex.Initialize(OutputType.Compact);
         }
+
+        public void Dispose() { }
     }
 }

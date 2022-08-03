@@ -9,6 +9,7 @@ using Xunit;
 namespace Dotnet_new3.IntegrationTests
 {
     [UsesVerify]
+    [Collection("Verify Tests")]
     public partial class DotnetNewInstallTests
     {
         [Fact]

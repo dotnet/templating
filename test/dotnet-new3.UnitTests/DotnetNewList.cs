@@ -11,6 +11,7 @@ using Xunit.Abstractions;
 namespace Dotnet_new3.IntegrationTests
 {
     [UsesVerify]
+    [Collection("Verify Tests")]
     public partial class DotnetNewList : IClassFixture<SharedHomeDirectory>
     {
         private readonly SharedHomeDirectory _sharedHome;

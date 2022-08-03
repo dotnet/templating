@@ -12,6 +12,7 @@ using Xunit.Abstractions;
 namespace Dotnet_new3.IntegrationTests
 {
     [UsesVerify]
+    [Collection("Verify Tests")]
     public class AllWebProjectsWork : IClassFixture<WebProjectsFixture>
     {
         private readonly WebProjectsFixture _fixture;
