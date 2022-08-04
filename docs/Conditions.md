@@ -216,8 +216,8 @@ Usage can then look as following:
 ## Conditional Parameters
 
 [Parameter symbols in template](Reference-for-template.json.md#parameter-symbol) can be specified together with optional conditions:
-* [`IsEnabled Condition`](Reference-for-template.json.md#isEnabled) - defines presence of input parameter. If condition is specified and evaluates to false (or a `false` constant is passed), passed parameter value (if any) is ignored and processing works without the parameter. This includes [conditional processing of sources](Conditional-processing-and-comment-syntax.md) and [replacements](Reference-for-template.json.md#replaces). [Verification of mandatory parameters](Reference-for-template.json.md#isRequired) does not consider disabled parameters (even if marked as required).
-* [`IsRequired Condition`](Reference-for-template.json.md#isRequired) - defines if parameter is mandatory or optional.
+* [`IsEnabled Condition`](Reference-for-template.json.md#isEnabled) - Used to determine when (or if) this symbol should be used. If this condition is specified and evaluates to `false` (or a `false` constant is passed), then this parameter is treated as if it does not exist. This applies to the use of [conditional processing of sources](Conditional-processing-and-comment-syntax.md) and [replacements](Reference-for-template.json.md#replaces). [Verification of mandatory parameters](Reference-for-template.json.md#isRequired) does not consider disabled parameters (even if marked as required).
+* [`IsRequired Condition`](Reference-for-template.json.md#isRequired) - defines if parameter is required or optional.
 
 ### Evaluation
 
@@ -249,7 +249,7 @@ Following input parameter values can (and will) be evaluated deterministically: 
 
 Following input parameter values cannot be evaluated deterministically (and will lead to error): `--A true --B false`
 
-**Applying user, host and default values** - All user passed, host and default values are applied before the conditions evaluation. After the evaluation defaults are reapplied to parameters that were evaluated as optional and that do not have user/host supplied values. After this an evaluation of presence of mandatory values takes place.
+**Applying user, host and default values** - All user-provided, host-provided and default values are applied before the conditions are evaluated. After the evaluation default values are reapplied to parameters that were evaluated as optional and that do not have user-/host-provided values. After this an evaluation of presence of required values takes place.
 
 ### Performing evaluation externally
 
