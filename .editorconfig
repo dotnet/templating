@@ -204,6 +204,7 @@ end_of_line = crlf
 
 [*/obj/*/External/**/*]
 generated_code = true
+dotnet_diagnostic.IDE0005.severity = none
 dotnet_analyzer_diagnostic.severity = none
 
 [*.txt]
