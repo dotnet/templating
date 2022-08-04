@@ -12,10 +12,14 @@ using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.IDE.IntegrationTests.Utils;
 using Microsoft.TemplateEngine.TestHelper;
 using Microsoft.TemplateEngine.Utils;
+using VerifyTests;
+using VerifyXunit;
 using Xunit;
 
 namespace Microsoft.TemplateEngine.IDE.IntegrationTests
 {
+    [UsesVerify]
+    [Collection("Verify Tests")]
     public class BasicTests : IClassFixture<PackageManager>
     {
         private PackageManager _packageManager;
@@ -171,6 +175,28 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
 
             Assert.NotEmpty(result1);
             Assert.Equal(result1.Count, result2.Count);
+        }
+
+        [Fact]
+        internal async Task SourceNameForms_BasicTest()
+        {
+            using Bootstrapper bootstrapper = BootstrapperFactory.GetBootstrapper();
+            string templateLocation = TestUtils.GetTestTemplateLocation("SourceNameForms");
+            await bootstrapper.InstallTemplateAsync(templateLocation).ConfigureAwait(false);
+
+            string output = TestUtils.CreateTemporaryFolder();
+
+            var foundTemplates = await bootstrapper.GetTemplatesAsync(new[] { WellKnownSearchFilters.NameFilter("TestAssets.SourceNameForms") }).ConfigureAwait(false);
+            var result = await bootstrapper.CreateAsync(foundTemplates[0].Info, "MyApp.1", output, new Dictionary<string, string>()).ConfigureAwait(false);
+
+            Assert.Equal(Edge.Template.CreationResultStatus.Success, result.Status);
+
+            string targetFile = Path.Combine(output, "myapp.12.cs");
+            Assert.True(File.Exists(targetFile));
+            string targetFile2 = Path.Combine(output, "MyApp.1.cs");
+            Assert.True(File.Exists(targetFile2));
+
+            await Verifier.Verify(File.ReadAllText(targetFile2));
         }
     }
 }

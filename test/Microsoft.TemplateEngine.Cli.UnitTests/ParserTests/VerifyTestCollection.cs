@@ -6,20 +6,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using VerifyTests;
+using Xunit;
 
 namespace Microsoft.TemplateEngine.Cli.UnitTests.ParserTests
 {
-    public class VerifyFixture : IDisposable
+    [CollectionDefinition("Verify Tests")]
+    public class VerifyTestCollection : IClassFixture<VerifySettingsFixture>
     {
-        public VerifyFixture()
-        {
-            Settings = new VerifySettings();
-            Settings.UseDirectory("Approvals");
-        }
-
-        internal VerifySettings Settings { get; }
-
-        public void Dispose() { }
+        //intentionally empty
+        //defines test class collection to share the fixture
+        //usage [Collection("Verify Tests")] on the test class.
     }
 }

@@ -1010,12 +1010,20 @@
             "required": ["binding"],
             "properties": {
               "type": {
-                "description": "Defines a symbol that has its value provided by the host",
-                "enum": ["bind"]
+                "description": "The symbol binds value from external sources.",
+                "enum": [ "bind" ]
               },
               "binding": {
-                "description": "The name of the host property to take the value from",
+                "description": "The source and the name of parameter to take the value from. The syntax is: <external source>:<parameter name>. Well known external sources are: host - a value that is defined by the template engine host; env - environment variable.",
                 "type": "string"
+              },
+              "defaultValue": {
+                "description": "The value assigned to the symbol if no value was provided from external source(s).",
+                "type": "string"
+              },
+              "fileRename": {
+                "type": "string",
+                "description": "Defines the portion of file names which will be replaced by symbol value."
               }
             }
           },
@@ -1095,16 +1103,37 @@
             "properties": {
               "type": {
                 "description": "Defines the high level configuration of symbol",
-                "enum": ["parameter"]
+                "enum": [ "parameter" ]
               },
               "isRequired": {
-                "type": "boolean"
+                "oneOf": [
+                  {
+                    "type": "boolean",
+                    "description": "Flag indicating whether the parameter has to be specified on the input"
+                  },
+                  {
+                    "type": "string",
+                    "description": "Condition indicating whether the parameter has to be specified on the input"
+                  }
+                ]
+              },
+              "isEnabled": {
+                "oneOf": [
+                  {
+                    "type": "boolean",
+                    "description": "Flag indicating parameter visibility"
+                  },
+                  {
+                    "type": "string",
+                    "description": "Condition indicating parameter visibility"
+                  }
+                ]
               },
               "choices": {
                 "description": "An array listing the valid choices for a symbol whose datatype = choice. If not provided, there are no valid choices for the symbol, so it can never be assigned a value.",
                 "type": "array",
                 "items": {
-                  "required": ["choice"],
+                  "required": [ "choice" ],
                   "properties": {
                     "choice": {
                       "description": "A valid value for the symbol",

@@ -32,6 +32,7 @@
     <PackageReference Update="xunit.abstractions" Version="2.0.3" />
     <PackageReference Update="Newtonsoft.Json.Schema" Version="3.0.14" />
     <PackageReference Update="Verify.XUnit" Version="17.2.1" />
+    <PackageReference Update="Verify.DiffPlex" Version="1.3.0" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(DotNetBuildFromSource)' == 'true'">
@@ -60,5 +61,6 @@
     <PackageReference Update="xunit.abstractions" Condition="'$(xunitabstractionsVersion)' != ''" Version="$(xunitabstractionsVersion)" />
     <PackageReference Update="Newtonsoft.Json.Schema" Condition="'$(NewtonsoftJsonSchemaVersion)' != ''" Version="$(NewtonsoftJsonSchemaVersion)" />
     <PackageReference Update="Verify.XUnit" Condition="'$(VerifyXUnitVersion)' != ''" Version="$(VerifyXUnitVersion)" />
+    <PackageReference Update="Verify.DiffPlex" Condition="'$(VerifyDiffPlexVersion)' != ''" Version="$(VerifyDiffPlexVersion)" />
   </ItemGroup>
 </Project>

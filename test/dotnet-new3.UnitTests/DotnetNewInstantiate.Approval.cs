@@ -12,6 +12,7 @@ using Xunit;
 namespace Dotnet_new3.IntegrationTests
 {
     [UsesVerify]
+    [Collection("Verify Tests")]
     public partial class DotnetNewInstantiate
     {
         [Fact]
@@ -27,7 +28,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Fail()
                 .And.NotHaveStdOut();
 
-            return Verifier.Verify(commandResult.StdErr, _verifySettings);
+            return Verify(commandResult.StdErr);
         }
 
         [Fact]
@@ -43,7 +44,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Fail()
                 .And.NotHaveStdOut();
 
-            return Verifier.Verify(commandResult.StdErr, _verifySettings);
+            return Verify(commandResult.StdErr);
         }
 
         [Fact]
@@ -59,7 +60,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Fail()
                 .And.NotHaveStdOut();
 
-            return Verifier.Verify(commandResult.StdErr, _verifySettings);
+            return Verify(commandResult.StdErr);
         }
 
         [Fact]
@@ -80,7 +81,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Fail()
                 .And.NotHaveStdOut();
 
-            return Verifier.Verify(commandResult.StdErr, _verifySettings);
+            return Verify(commandResult.StdErr);
         }
 
         [Fact]
@@ -101,7 +102,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Fail()
                 .And.NotHaveStdOut();
 
-            return Verifier.Verify(commandResult.StdErr, _verifySettings)
+            return Verify(commandResult.StdErr)
                 .AddScrubber(output =>
                 {
                     //package locaions are machine specific so we cannot use them in approval tests
@@ -129,7 +130,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Should().Fail()
                 .And.NotHaveStdOut();
 
-            return Verifier.Verify(commandResult.StdErr, _verifySettings);
+            return Verify(commandResult.StdErr);
         }
 
         [Fact]
@@ -147,7 +148,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Fail()
                 .And.NotHaveStdOut();
 
-            return Verifier.Verify(commandResult.StdErr, _verifySettings);
+            return Verify(commandResult.StdErr);
         }
 
         [Fact]
@@ -165,7 +166,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Fail()
                 .And.NotHaveStdOut();
 
-            return Verifier.Verify(commandResult.StdErr, _verifySettings);
+            return Verify(commandResult.StdErr);
         }
 
         [Fact]
@@ -183,7 +184,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Fail()
                 .And.NotHaveStdOut();
 
-            return Verifier.Verify(commandResult.StdErr, _verifySettings);
+            return Verify(commandResult.StdErr);
         }
 
         [Fact]
@@ -201,7 +202,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Fail()
                 .And.NotHaveStdOut();
 
-            return Verifier.Verify(commandResult.StdErr, _verifySettings);
+            return Verify(commandResult.StdErr);
         }
 
         [Fact]
@@ -224,7 +225,7 @@ namespace Dotnet_new3.IntegrationTests
                 .And.HaveStdErrContaining(templateOneLocation)
                 .And.HaveStdErrContaining(templateTwoLocation);
 
-            return Verifier.Verify(commandResult.StdErr, _verifySettings)
+            return Verify(commandResult.StdErr)
                 .AddScrubber(output =>
                 {
                     //package locaions are machine specific so we cannot use them in approval tests
@@ -265,11 +266,8 @@ namespace Dotnet_new3.IntegrationTests
 
             string resultFileContent = File.ReadAllText(Path.Combine(workingDirectory, "Test.cs"));
 
-            var settings = new VerifySettings();
-            settings.UseDirectory("Approvals");
-            settings.DisableRequireUniquePrefix();
-
-            return Verifier.Verify(resultFileContent, settings);
+            return Verify(resultFileContent)
+                .DisableRequireUniquePrefix();
         }
 
         [Fact]
@@ -292,7 +290,40 @@ namespace Dotnet_new3.IntegrationTests
 
             string resultFileContent = File.ReadAllText(Path.Combine(workingDirectory, "Test.cs"));
 
-            return Verifier.Verify(resultFileContent, _verifySettings);
+            return Verify(resultFileContent);
+        }
+
+        [Fact]
+        public Task CanInstantiateTemplate_WithConditionalParameters_DisabledBehaveLikeNotSpecified()
+        {
+            string home = TestUtils.CreateTemporaryFolder("Home");
+            string workingDirectory = TestUtils.CreateTemporaryFolder();
+            Helpers.InstallTestTemplate("TemplateWithConditionalParameters", _log, home, workingDirectory);
+
+            var commandResult = new DotnetNewCommand(
+                    _log,
+                    "TestAssets.TemplateWithConditionalParameters",
+                    "--A_enabled",
+                    "true",
+                    "--B_enabled",
+                    "false",
+                    "--paramA",
+                    "true",
+                    "--paramB",
+                    "true")
+                .WithCustomHive(home)
+                .WithWorkingDirectory(workingDirectory)
+                .Execute();
+
+            commandResult
+                .Should()
+                .Pass()
+                .And.NotHaveStdErr()
+                .And.HaveStdOutMatching("The template \"TemplateWithConditionalParameters\" was created successfully\\.");
+
+            string resultFileContent = File.ReadAllText(Path.Combine(workingDirectory, "Test.cs"));
+
+            return Verify(resultFileContent);
         }
 
         [Fact]
@@ -334,7 +365,7 @@ namespace Dotnet_new3.IntegrationTests
             return Task.WhenAll(
                 actualFiles.Select(
                     async (file) =>
-                    await Verifier.VerifyFile(file, _verifySettings)
+                    await VerifyFile(file)
                     .UseMethodName($"CanInstantiateTemplate_ConditionalProcessing_{Path.GetFileName(file)}")
                     .UseExtension("txt")
                     ));
@@ -360,7 +391,7 @@ namespace Dotnet_new3.IntegrationTests
 
             string[] expectedFiles = new[] { $"{_OUT_FOLDER}.name.txt", $"{_OUT_FOLDER}/{_OUT_FOLDER}.cs" };
 
-            return Verifier.Verify(commandResult.StdOut, _verifySettings)
+            return Verify(commandResult.StdOut)
                 .AddScrubber(output =>
                 {
                     //unify directory separators
@@ -403,7 +434,7 @@ namespace Dotnet_new3.IntegrationTests
                 commandResult.Should().HaveStdErrContaining(file);
             }
 
-            return Verifier.Verify(commandResult.StdErr, _verifySettings)
+            return Verify(commandResult.StdErr)
                 .AddScrubber(output =>
                 {
                     //unify directory separators
@@ -434,7 +465,7 @@ namespace Dotnet_new3.IntegrationTests
                 .ExitWith(0)
                 .And.NotHaveStdErr();
 
-            return Verifier.Verify(commandResult.StdOut, _verifySettings)
+            return Verify(commandResult.StdOut)
             .AddScrubber(output =>
             {
                 //output contains path to host.json file - it is machine-specific.
@@ -465,14 +496,14 @@ namespace Dotnet_new3.IntegrationTests
                 .ExitWith(0)
                 .And.NotHaveStdErr();
 
-            return Verifier.Verify(commandResult.StdOut, _verifySettings)
+            return Verify(commandResult.StdOut)
             .AddScrubber(output =>
             {
                 output.ScrubByRegex("'Microsoft\\.DotNet\\.Common\\.ItemTemplates::[A-Za-z0-9.-]+' is available in", "'Microsoft.DotNet.Common.ItemTemplates::%VERSION%' is available in");
                 output.ScrubByRegex("install Microsoft\\.DotNet\\.Common\\.ItemTemplates::[A-Za-z0-9.-]+", "install Microsoft.DotNet.Common.ItemTemplates::%VERSION%");
             });
         }
-        
+
         [Fact]
         public Task CanShowError_OnTemplatesWithSameShortName()
         {
@@ -490,7 +521,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Fail()
                 .And.NotHaveStdOut();
 
-            return Verifier.Verify(commandResult.StdErr, _verifySettings)
+            return Verify(commandResult.StdErr)
             .AddScrubber(output =>
             {
                 //removes the delimiter line as we don't know the length of last columns containing paths above
@@ -515,7 +546,7 @@ namespace Dotnet_new3.IntegrationTests
                 .Should()
                 .Fail();
 
-            return Verifier.Verify(commandResult.StdErr, _verifySettings)
+            return Verify(commandResult.StdErr)
                 .AddScrubber(output => output.ScrubByRegex("\\-\\-debug\\:custom\\-hive [A-Za-z0-9\\-\\.\\\\\\/\\{\\}\\:_]+", "--debug:custom-hive %SETTINGS DIRECTORY%"));
         }
 
@@ -533,7 +564,39 @@ namespace Dotnet_new3.IntegrationTests
                 .Should()
                 .Pass();
 
-            return Verifier.Verify(commandResult.StdOut, _verifySettings);
+            return Verify(commandResult.StdOut);
+        }
+
+        [Fact]
+        public Task CannotInstantiateTemplateWhenFolderIsRemoved()
+        {
+            string home = TestUtils.CreateTemporaryFolder("Home");
+            string workingDir = TestUtils.CreateTemporaryFolder();
+            string templateLocation = Path.Combine(workingDir, "template");
+            TestUtils.DirectoryCopy(TestUtils.GetTestTemplateLocation("TemplateWithSourceName"), templateLocation, true);
+
+            new DotnetNewCommand(_log, "install", templateLocation)
+                .WithCustomHive(home)
+                .WithWorkingDirectory(workingDir)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And.NotHaveStdErr();
+
+            Directory.Delete(templateLocation, true);
+            // Template should be removed from the template list, and it's unknown template now.
+            var commandResult = new DotnetNewCommand(_log, "TestAssets.TemplateWithSourceName")
+                .WithCustomHive(home)
+                .Execute();
+
+            commandResult
+                .Should()
+                .Fail();
+
+            return Verify(commandResult.FormatOutputStreams())
+                .UniqueForOSPlatform()
+                .ScrubInlineGuids();
+                
         }
 
     }
