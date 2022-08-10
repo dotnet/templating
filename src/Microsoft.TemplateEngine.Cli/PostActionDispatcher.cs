@@ -5,7 +5,6 @@ using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Cli.PostActionProcessors;
 using Microsoft.TemplateEngine.Edge.Template;
 using Microsoft.TemplateEngine.Utils;
-using NuGet.Protocol.Plugins;
 
 namespace Microsoft.TemplateEngine.Cli
 {
