@@ -93,7 +93,6 @@ $@"The template ""{expectedTemplateName}"" was created successfully\.
 
 Processing post-creation actions\.\.\.
 .*
-.*
 Restoring {finalProjectName}:
 .*
 Restore succeeded\.",
