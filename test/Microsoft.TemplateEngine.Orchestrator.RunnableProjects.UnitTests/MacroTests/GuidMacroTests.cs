@@ -9,6 +9,7 @@ using System.Linq;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Core.Contracts;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config;
 using Microsoft.TemplateEngine.TestHelper;
@@ -58,15 +59,16 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
         private static void ValidateGuidMacroCreatedParametersWithResolvedValues(string variableName, IVariableCollection variables)
         {
             Assert.True(variables.ContainsKey(variableName));
-
-            Guid paramValue = Guid.Parse((string)variables[variableName]);
+            Assert.NotNull(variables[variableName]);
+            Guid paramValue = Guid.Parse((string)variables[variableName]!);
 
             // check that all the param name variants were created, and their values all resolve to the same guid.
             string guidFormats = GuidMacroConfig.DefaultFormats;
             for (int i = 0; i < guidFormats.Length; ++i)
             {
                 string otherFormatVariableName = variableName + "-" + guidFormats[i];
-                Guid testValue = Guid.Parse((string)variables[otherFormatVariableName]);
+                Assert.NotNull(variables[otherFormatVariableName]);
+                Guid testValue = Guid.Parse((string)variables[otherFormatVariableName]!);
                 Assert.Equal(paramValue, testValue);
 
                 // Test the new formats - that distinguish upper and lower case by tags that are
@@ -76,8 +78,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
                     (char.IsUpper(guidFormats[i]) ? GuidMacroConfig.UpperCaseDenominator : GuidMacroConfig.LowerCaseDenominator) +
                     guidFormats[i];
 
-                string resolvedValue = (string)variables[otherFormatVariableName];
-                testValue = Guid.Parse((string)variables[otherFormatVariableName]);
+                string resolvedValue = (string)variables[otherFormatVariableName]!;
+                testValue = Guid.Parse((string)variables[otherFormatVariableName]!);
                 Assert.Equal(paramValue, testValue);
                 Assert.Equal(char.IsUpper(guidFormats[i]), char.IsUpper(resolvedValue.First(char.IsLetter)));
             }
@@ -98,13 +100,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
             guidMacro.EvaluateConfig(_engineEnvironmentSettings, variables, macroConfigUpper);
 
             Assert.True(variables.ContainsKey(paramNameLower));
-            Assert.All(((string)variables[paramNameLower]).ToCharArray(), (c) =>
+            Assert.NotNull(variables[paramNameLower]);
+            Assert.All(((string)variables[paramNameLower]!).ToCharArray(), (c) =>
             {
                 Assert.True(char.IsLower(c) || char.IsDigit(c));
             });
 
             Assert.True(variables.ContainsKey(paramNameUpper));
-            Assert.All(((string)variables[paramNameUpper]).ToCharArray(), (c) =>
+            Assert.NotNull(variables[paramNameUpper]);
+            Assert.All(((string)variables[paramNameUpper]!).ToCharArray(), (c) =>
             {
                 Assert.True(char.IsUpper(c) || char.IsDigit(c));
             });

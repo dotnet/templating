@@ -17,8 +17,9 @@ using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Core.Expressions.Cpp2;
 using Microsoft.TemplateEngine.Core.Operations;
-using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Config;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.SymbolModel;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms;
 using Microsoft.TemplateEngine.Utils;
@@ -27,7 +28,7 @@ using Newtonsoft.Json.Linq;
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
     /// <summary>
-    /// The class maps template.json configuration read in <see cref="SimpleConfigModel"/> to runnable configuration.
+    /// The class maps template.json configuration read in <see cref="TemplateConfigModel"/> to runnable configuration.
     /// </summary>
     internal partial class RunnableProjectConfig : IRunnableProjectConfig
     {
@@ -50,7 +51,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         private readonly IEngineEnvironmentSettings _settings;
         private readonly ILogger<RunnableProjectConfig> _logger;
 
-        private readonly SimpleConfigModel _configuration;
+        private readonly TemplateConfigModel _configuration;
         private readonly Dictionary<Guid, string> _guidToGuidPrefixMap = new Dictionary<Guid, string>();
 
         private readonly IGenerator _generator;
@@ -78,9 +79,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 configModifiers = new SimpleConfigModifiers(baselineName!);
             }
-            _configuration = SimpleConfigModel.FromJObject (
+            _configuration = TemplateConfigModel.FromJObject (
                 MergeAdditionalConfiguration(templateFile.ReadJObjectFromIFile(), templateFile),
-                _settings.Host.LoggerFactory.CreateLogger<SimpleConfigModel>(),
+                _settings.Host.LoggerFactory.CreateLogger<TemplateConfigModel>(),
                 configModifiers,
                 templateFile.GetDisplayPath());
 
@@ -111,7 +112,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         /// <summary>
         /// Test constructor.
         /// </summary>
-        internal RunnableProjectConfig(IEngineEnvironmentSettings settings, IGenerator generator, SimpleConfigModel configuration, IFile? configurationFile = null)
+        internal RunnableProjectConfig(IEngineEnvironmentSettings settings, IGenerator generator, TemplateConfigModel configuration, IFile? configurationFile = null)
         {
             _settings = settings;
             _logger = _settings.Host.LoggerFactory.CreateLogger<RunnableProjectConfig>();
@@ -126,7 +127,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         public IReadOnlyList<PostActionModel> PostActionModels => _configuration.PostActionModels;
 
-        public IReadOnlyList<ICreationPathModel> PrimaryOutputs => _configuration.PrimaryOutputs;
+        public IReadOnlyList<PrimaryOutputModel> PrimaryOutputs => _configuration.PrimaryOutputs;
 
         public IFile SourceFile => _sourceFile ?? throw new InvalidOperationException("Source file is not initialized, are you using test constructor?");
 
@@ -299,7 +300,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     // put the custom configs first in the list
                     HashSet<string> processedGlobs = new HashSet<string>();
 
-                    foreach (ICustomFileGlobModel customGlobModel in _configuration.SpecialCustomOperations)
+                    foreach (CustomFileGlobModel customGlobModel in _configuration.SpecialCustomOperations)
                     {
                         if (customGlobModel.ConditionResult)
                         {
@@ -354,7 +355,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
         }
 
-        internal SimpleConfigModel ConfigurationModel => _configuration;
+        internal TemplateConfigModel ConfigurationModel => _configuration;
 
         public void Evaluate(IVariableCollection rootVariableCollection)
         {
@@ -375,17 +376,17 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             // evaluate the file glob (specials) conditions
             // the result is needed for SpecialOperationConfig
-            foreach (ICustomFileGlobModel fileGlobModel in _configuration.SpecialCustomOperations)
+            foreach (CustomFileGlobModel fileGlobModel in _configuration.SpecialCustomOperations)
             {
                 fileGlobModel.EvaluateCondition(_settings.Host.Logger, rootVariableCollection);
             }
 
-            rootVariableCollection.TryGetValue(NameParameter.Name, out object resolvedNameParamValue);
+            rootVariableCollection.TryGetValue(NameParameter.Name, out object? resolvedNameParamValue);
 
             _sources = EvaluateSources(rootVariableCollection, resolvedNameParamValue);
 
             // evaluate the conditions and resolve the paths for the PrimaryOutputs
-            foreach (ICreationPathModel pathModel in _configuration.PrimaryOutputs)
+            foreach (PrimaryOutputModel pathModel in _configuration.PrimaryOutputs)
             {
                 pathModel.EvaluateCondition(_settings.Host.Logger, rootVariableCollection);
 
@@ -490,7 +491,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return validModel;
         }
 
-        private static IReadOnlyDictionary<string, Parameter> ExtractParameters(SimpleConfigModel configuration)
+        private static IReadOnlyDictionary<string, Parameter> ExtractParameters(TemplateConfigModel configuration)
         {
             Dictionary<string, Parameter> parameters = new Dictionary<string, Parameter>();
             foreach (BaseValueSymbol baseSymbol in configuration.Symbols.OfType<BaseValueSymbol>())
@@ -683,7 +684,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return filenameReplacements;
         }
 
-        private IGlobalRunConfig ProduceOperationSetup(SpecialOperationConfigParams defaultModel, bool generateMacros, ICustomFileGlobModel? customGlobModel = null)
+        private IGlobalRunConfig ProduceOperationSetup(SpecialOperationConfigParams defaultModel, bool generateMacros, CustomFileGlobModel? customGlobModel = null)
         {
             List<IOperationProvider> operations = new List<IOperationProvider>();
 
@@ -777,14 +778,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 }
             }
 
-            IReadOnlyList<ICustomOperationModel> customOperationConfig;
+            IReadOnlyList<CustomOperationModel> customOperationConfig;
             if (customGlobModel != null && customGlobModel.Operations != null)
             {
                 customOperationConfig = customGlobModel.Operations;
             }
             else
             {
-                customOperationConfig = new List<ICustomOperationModel>();
+                customOperationConfig = new List<CustomOperationModel>();
             }
 
             foreach (IOperationProvider p in operations.ToList())
@@ -817,7 +818,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             TokenConfig replacementConfig = replaces.TokenConfigBuilder();
             if (symbol.ReplacementContexts.Count > 0)
             {
-                foreach (IReplacementContext context in symbol.ReplacementContexts)
+                foreach (ReplacementContext context in symbol.ReplacementContexts)
                 {
                     TokenConfig builder = replacementConfig;
                     if (!string.IsNullOrEmpty(context.OnlyIfAfter))
@@ -894,7 +895,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return generatedMacroConfigs;
         }
 
-        private List<FileSourceMatchInfo> EvaluateSources(IVariableCollection rootVariableCollection, object resolvedNameParamValue)
+        private List<FileSourceMatchInfo> EvaluateSources(IVariableCollection rootVariableCollection, object? resolvedNameParamValue)
         {
             if (SourceFile == null)
             {
@@ -977,7 +978,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return sources;
         }
 
-        private IReadOnlyDictionary<string, string> AugmentRenames(IFileSystemInfo configFile, string sourceDirectory, ref string targetDirectory, object resolvedNameParamValue, IVariableCollection variables, Dictionary<string, string> fileRenames)
+        private IReadOnlyDictionary<string, string> AugmentRenames(
+            IFileSystemInfo configFile,
+            string sourceDirectory,
+            ref string targetDirectory,
+            object? resolvedNameParamValue,
+            IVariableCollection variables,
+            Dictionary<string, string> fileRenames)
         {
             return FileRenameGenerator.AugmentFileRenames(_settings, _configuration.SourceName, configFile, sourceDirectory, ref targetDirectory, resolvedNameParamValue, variables, fileRenames, SymbolFilenameReplacements);
         }
