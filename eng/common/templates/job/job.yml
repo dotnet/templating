@@ -219,7 +219,7 @@ jobs:
         testResultsFormat: 'xUnit'
         testResultsFiles: '*.xml' 
         searchFolder: '$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)'
-        testRunTitle: ${{ coalesce(parameters.testRunTitle, parameters.name, '$(System.JobName)') }}-xunit
+        testRunTitle: ${{ coalesce(parameters.testRunTitle, parameters.name, '$(System.JobName)', '$(_BuildConfig)') }}-xunit
         mergeTestResults: ${{ parameters.mergeTestResults }}
       continueOnError: true
       condition: always()
@@ -234,7 +234,27 @@ jobs:
         mergeTestResults: ${{ parameters.mergeTestResults }}
       continueOnError: true
       condition: always()
-    
+
+  - task: CopyFiles@2	
+        displayName: Gather artifacts	
+        inputs:	
+          SourceFolder: '$(Build.SourcesDirectory)/artifacts'	
+          Contents: |	
+           log/$(_BuildConfig)/**/*	
+           TestResults/$(_BuildConfig)/**/*	
+          TargetFolder: '$(Build.ArtifactStagingDirectory)'	
+        continueOnError: true	
+        condition: always()
+
+  - task: PublishBuildArtifacts@1	
+        displayName: Publish Logs to VSTS	
+        inputs:	
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'	
+          ArtifactName: ${{ coalesce(parameters.enablePublishBuildArtifacts.artifactName, '$(Agent.Os)_$(Agent.JobName)' ) }}-TMP	
+          publishLocation: Container	
+        continueOnError: true	
+        condition: always()
+
   - ${{ if and(eq(parameters.enablePublishBuildAssets, true), ne(parameters.enablePublishUsingPipelines, 'true'), eq(parameters.runAsPublic, 'false'), ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
     - task: CopyFiles@2
       displayName: Gather Asset Manifests
