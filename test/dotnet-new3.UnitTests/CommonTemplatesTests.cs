@@ -92,9 +92,9 @@ namespace Dotnet_new3.IntegrationTests
 $@"The template ""{expectedTemplateName}"" was created successfully\.
 
 Processing post-creation actions\.\.\.
-.*
+.+
 Restoring {finalProjectName}:
-.*
+.+
 Restore succeeded\.",
                 RegexOptions.Singleline);
 
