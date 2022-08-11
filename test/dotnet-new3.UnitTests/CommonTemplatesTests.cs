@@ -55,7 +55,7 @@ namespace Dotnet_new3.IntegrationTests
                 "VB" => "vbproj",
                 _ => "csproj"
             };
-            string finalProjectName = Regex.Escape(Path.Combine(workingDir, $"{workingDirName}.{extension}"));
+            string finalProjectName = Path.Combine(workingDir, $"{workingDirName}.{extension}");
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 //on OSX path in restore starts from /private for some reason
@@ -88,15 +88,10 @@ namespace Dotnet_new3.IntegrationTests
                 .Should()
                 .ExitWith(0)
                 .And.NotHaveStdErr()
-                .And.HaveStdOutMatching(
-$@"The template ""{expectedTemplateName}"" was created successfully\.
-
-Processing post-creation actions\.\.\.
-.+
-Restoring {finalProjectName}:
-.+
-Restore succeeded\.",
-                RegexOptions.Singleline);
+                .And.HaveStdOutContaining($@"The template ""{expectedTemplateName}"" was created successfully.")
+                .And.HaveStdOutContaining("Processing post-creation actions...")
+                .And.HaveStdOutContaining($"Restoring {finalProjectName}:")
+                .And.HaveStdOutContaining("Restore succeeded.");
 
             new DotnetCommand(_log, "restore")
                 .WithWorkingDirectory(workingDir)
