@@ -2,10 +2,11 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
-using System.IO;
 
 namespace Microsoft.TemplateEngine.Core.Contracts
 {
+    public delegate void StreamWriteAction(byte[] buffer, int offset, int count);
+
     public interface IOperation
     {
         IReadOnlyList<IToken> Tokens { get; }
@@ -14,6 +15,6 @@ namespace Microsoft.TemplateEngine.Core.Contracts
 
         bool IsInitialStateOn { get; }
 
-        int HandleMatch(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int token, Stream target);
+        int HandleMatch(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int token, StreamWriteAction targetWriteAction);
     }
 }

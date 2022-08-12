@@ -65,12 +65,12 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
             public bool IsInitialStateOn { get; }
 
-            public int HandleMatch(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int token, Stream target)
+            public int HandleMatch(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int token, StreamWriteAction targetWriteAction)
             {
                 bool flag;
                 if (processor.Config.Flags.TryGetValue(OperationName, out flag) && !flag)
                 {
-                    target.Write(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
+                    targetWriteAction(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
                     return Tokens[token].Length;
                 }
 
@@ -147,7 +147,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
                     nBytesToWrite = totalBytesRead - bom.Length;
                 }
 
-                target.Write(composite, offset, nBytesToWrite);
+                targetWriteAction(composite, offset, nBytesToWrite);
                 return nBytesToWrite;
             }
         }
