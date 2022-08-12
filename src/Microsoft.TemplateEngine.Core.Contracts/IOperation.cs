@@ -5,8 +5,6 @@ using System.Collections.Generic;
 
 namespace Microsoft.TemplateEngine.Core.Contracts
 {
-    public delegate void StreamWriteAction(byte[] buffer, int offset, int count);
-
     public interface IOperation
     {
         IReadOnlyList<IToken> Tokens { get; }
@@ -15,6 +13,6 @@ namespace Microsoft.TemplateEngine.Core.Contracts
 
         bool IsInitialStateOn { get; }
 
-        int HandleMatch(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int token, StreamWriteAction targetWriteAction);
+        int HandleMatch(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int token);
     }
 }

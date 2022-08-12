@@ -228,7 +228,7 @@ namespace Microsoft.TemplateEngine.Core.Util
                             CurrentSequenceNumber += handoffBufferPosition - CurrentBufferPosition;
                             CurrentBufferPosition = handoffBufferPosition;
                             posedPosition = handoffBufferPosition;
-                            int bytesWritten = operation.HandleMatch(this, CurrentBufferLength, ref posedPosition, terminal.Terminal.Token, _target.Write);
+                            int bytesWritten = operation.HandleMatch(this, CurrentBufferLength, ref posedPosition, terminal.Terminal.Token);
                             bytesWrittenSinceLastFlush += bytesWritten;
 
                             CurrentSequenceNumber += posedPosition - CurrentBufferPosition;
@@ -315,7 +315,7 @@ namespace Microsoft.TemplateEngine.Core.Util
                             CurrentSequenceNumber += handoffBufferPosition - CurrentBufferPosition;
                             CurrentBufferPosition = handoffBufferPosition;
                             posedPosition = handoffBufferPosition;
-                            int bytesWritten = operation.HandleMatch(this, CurrentBufferLength, ref posedPosition, terminal.Terminal.Token, _target.Write);
+                            int bytesWritten = operation.HandleMatch(this, CurrentBufferLength, ref posedPosition, terminal.Terminal.Token);
                             bytesWrittenSinceLastFlush += bytesWritten;
 
                             CurrentSequenceNumber += posedPosition - CurrentBufferPosition;
@@ -460,6 +460,8 @@ namespace Microsoft.TemplateEngine.Core.Util
                 _target.SetLength(_bomSize);
             }
         }
+
+        public void Write(byte[] buffer, int offset, int count) => _target.Write(buffer, offset, count);
 
         public void SeekForwardThrough(ITokenTrie trie, ref int bufferLength, ref int currentBufferPosition)
         {

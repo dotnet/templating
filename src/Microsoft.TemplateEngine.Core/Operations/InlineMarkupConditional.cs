@@ -95,12 +95,12 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
             public bool IsInitialStateOn { get; }
 
-            public int HandleMatch(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int token, StreamWriteAction targetWriteAction)
+            public int HandleMatch(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int token)
             {
                 bool flag;
                 if (processor.Config.Flags.TryGetValue(Conditional.OperationName, out flag) && !flag)
                 {
-                    targetWriteAction(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
+                    processor.Write(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
                     return Tokens[token].Length;
                 }
 
@@ -117,7 +117,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
                 if (faulted)
                 {
-                    targetWriteAction(Tokens[0].Value, Tokens[0].Start, Tokens[0].Length);
+                    processor.Write(Tokens[0].Value, Tokens[0].Start, Tokens[0].Length);
                     MemoryStream fragment = new MemoryStream();
                     fragment.Write(condition, 0, condition.Length);
                     fragment.Write(_closeConditionTrie.Tokens[0].Value, _closeConditionTrie.Tokens[0].Start, _closeConditionTrie.Tokens[0].Length);

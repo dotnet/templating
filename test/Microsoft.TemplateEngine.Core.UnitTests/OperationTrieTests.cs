@@ -114,7 +114,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
 
             public bool IsInitialStateOn { get; }
 
-            public int HandleMatch(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int token, StreamWriteAction targetWriteAction)
+            public int HandleMatch(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int token)
             {
                 return _onMatch?.Invoke(processor, bufferLength, ref currentBufferPosition, token) ?? 0;
             }

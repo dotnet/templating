@@ -69,12 +69,12 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
             public bool IsInitialStateOn { get; }
 
-            public int HandleMatch(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int token, StreamWriteAction targetWriteAction)
+            public int HandleMatch(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int token)
             {
                 bool flag;
                 if (processor.Config.Flags.TryGetValue(Region.OperationName, out flag) && !flag)
                 {
-                    targetWriteAction(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
+                    processor.Write(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
                     return Tokens[token].Length;
                 }
 
