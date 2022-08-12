@@ -457,7 +457,6 @@
     <Rule Id="IDE0052" Action="Hidden" />       <!-- RemoveUnreadMembers -->
     <Rule Id="IDE0053" Action="Hidden" />       <!-- UseExpressionBodyForLambdaExpressions -->
     <Rule Id="IDE0054" Action="Hidden" />       <!-- UseCompoundAssignment -->
-    <Rule Id="IDE0055" Action="Hidden" />       <!-- Formatting -->
     <Rule Id="IDE0056" Action="Hidden" />       <!-- UseIndexOperator -->
     <Rule Id="IDE0057" Action="Hidden" />       <!-- UseRangeOperator -->
     <Rule Id="IDE0058" Action="Hidden" />       <!-- ExpressionValueIsUnused -->
