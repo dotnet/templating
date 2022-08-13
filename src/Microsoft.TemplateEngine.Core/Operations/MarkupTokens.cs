@@ -7,7 +7,15 @@ namespace Microsoft.TemplateEngine.Core.Operations
 {
     public class MarkupTokens
     {
-        public MarkupTokens(ITokenConfig openOpenElementToken, ITokenConfig openCloseElementToken, ITokenConfig closeElementTagToken, ITokenConfig selfClosingElementEndToken, ITokenConfig openConditionExpression, ITokenConfig closeConditionExpression)
+        public MarkupTokens(
+            ITokenConfig openOpenElementToken,
+            ITokenConfig openCloseElementToken,
+            ITokenConfig closeElementTagToken,
+            ITokenConfig selfClosingElementEndToken,
+            ITokenConfig openConditionExpression,
+            ITokenConfig closeConditionExpression,
+            ITokenConfig openCommnetToken,
+            ITokenConfig closeCommentToken)
         {
             OpenOpenElementToken = openOpenElementToken;
             OpenCloseElementToken = openCloseElementToken;
@@ -15,6 +23,8 @@ namespace Microsoft.TemplateEngine.Core.Operations
             SelfClosingElementEndToken = selfClosingElementEndToken;
             OpenConditionExpression = openConditionExpression;
             CloseConditionExpression = closeConditionExpression;
+            OpenCommnetToken = openCommnetToken;
+            CloseCommentToken = closeCommentToken;
         }
 
         public ITokenConfig CloseConditionExpression { get; }
@@ -28,5 +38,9 @@ namespace Microsoft.TemplateEngine.Core.Operations
         public ITokenConfig OpenOpenElementToken { get; }
 
         public ITokenConfig SelfClosingElementEndToken { get; }
+
+        public ITokenConfig OpenCommnetToken { get; }
+
+        public ITokenConfig CloseCommentToken { get; }
     }
 }

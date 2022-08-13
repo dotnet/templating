@@ -3,14 +3,22 @@
 
 namespace Microsoft.TemplateEngine.Core.Operations
 {
-    public class MarkupTokenMapping
+    internal class MarkupTokenMapping
     {
-        public MarkupTokenMapping(int openOpenElementToken, int openCloseElementToken, int closeCloseElementToken, int selfClosingElementEndToken)
+        public MarkupTokenMapping(
+            int openOpenElementToken,
+            int openCloseElementToken,
+            int closeCloseElementToken,
+            int selfClosingElementEndToken,
+            int openCommentToken,
+            int closeCommentToken)
         {
             OpenOpenElementToken = openOpenElementToken;
             OpenCloseElementToken = openCloseElementToken;
             CloseElementTagToken = closeCloseElementToken;
             SelfClosingElementEndToken = selfClosingElementEndToken;
+            OpenCommentToken = openCommentToken;
+            CloseCommentToken = closeCommentToken;
         }
 
         public int CloseElementTagToken { get; }
@@ -20,5 +28,9 @@ namespace Microsoft.TemplateEngine.Core.Operations
         public int OpenOpenElementToken { get; }
 
         public int SelfClosingElementEndToken { get; }
+
+        public int OpenCommentToken { get; }
+
+        public int CloseCommentToken { get; }
     }
 }
