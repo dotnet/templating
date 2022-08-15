@@ -164,6 +164,8 @@ dotnet_code_quality.ca1822.api_surface = private, internal
 dotnet_code_quality.ca2208.api_surface = public
 dotnet_diagnostic.CS1591.severity = suggestion
 dotnet_diagnostic.IDE0005.severity = warning
+# Fix formating
+dotnet_diagnostic.IDE0055.severity = warning
 dotnet_diagnostic.IDE0240.severity = warning
 
 # License header
