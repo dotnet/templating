@@ -51,7 +51,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
             proxy.Flush();
             ms.Position.Should().Be(0);
             bytes.Should().AllBeEquivalentTo(0);
-            
+
             proxy.FlushToTarget();
             ms.Position.Should().Be(numBytesFirstBatch + numBytesSecondBatch);
             bytes.AsSpan(0, numBytesFirstBatch + numBytesSecondBatch).ToArray()
