@@ -78,7 +78,7 @@ namespace Microsoft.TemplateEngine.Core.Util
             _bomSize = bom.Length;
             CurrentBufferPosition = _bomSize;
             CurrentSequenceNumber = _bomSize;
-            _target.Write(bom, 0, _bomSize);
+            this.Write(bom, 0, _bomSize);
 
             bool explicitOnConfigurationRequired = false;
             Dictionary<Encoding, Trie<OperationTerminal>> byEncoding = TrieLookup.GetOrAdd(operationProviders, x => new Dictionary<Encoding, Trie<OperationTerminal>>());
