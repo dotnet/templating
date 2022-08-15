@@ -44,7 +44,7 @@ namespace Microsoft.TemplateEngine.TestHelper
                 string codeBaseRoot = new FileInfo(codebase).Directory.Parent.Parent.Parent.Parent.Parent.FullName;
                 return codeBaseRoot;
             }
-        }   
+        }
 
         private static string GetTestArtifactLocation(string artifactLocation)
         {
