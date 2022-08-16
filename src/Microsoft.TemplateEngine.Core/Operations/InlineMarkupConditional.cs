@@ -52,7 +52,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
             int openOpenElementToken = structureTrie.AddToken(openOpenElementTokenBytes);
             int openCloseElementToken = structureTrie.AddToken(Tokens.OpenCloseElementToken.ToToken(processorState.Encoding));
             int closeCloseElementToken = structureTrie.AddToken(Tokens.CloseElementTagToken.ToToken(processorState.Encoding));
-            int openCommnetToken = structureTrie.AddToken(Tokens.OpenCommnetToken.ToToken(processorState.Encoding));
+            int openCommentToken = structureTrie.AddToken(Tokens.OpenCommentToken.ToToken(processorState.Encoding));
             int closeCommentToken = structureTrie.AddToken(Tokens.CloseCommentToken.ToToken(processorState.Encoding));
 
             int selfClosingElementEndToken = -1;
@@ -67,7 +67,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
                 openCloseElementToken,
                 closeCloseElementToken,
                 selfClosingElementEndToken,
-                openCommnetToken,
+                openCommentToken,
                 closeCommentToken
             );
 

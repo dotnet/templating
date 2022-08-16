@@ -397,7 +397,7 @@ Microsoft.TemplateEngine.Core.Operations.InlineMarkupConditional.VariableFormat.
 Microsoft.TemplateEngine.Core.Operations.MarkupTokens.CloseConditionExpression.get -> Microsoft.TemplateEngine.Core.Contracts.ITokenConfig!
 Microsoft.TemplateEngine.Core.Operations.MarkupTokens.CloseElementTagToken.get -> Microsoft.TemplateEngine.Core.Contracts.ITokenConfig!
 Microsoft.TemplateEngine.Core.Operations.MarkupTokens.OpenCloseElementToken.get -> Microsoft.TemplateEngine.Core.Contracts.ITokenConfig!
-Microsoft.TemplateEngine.Core.Operations.MarkupTokens.OpenCommnetToken.get -> Microsoft.TemplateEngine.Core.Contracts.ITokenConfig!
+Microsoft.TemplateEngine.Core.Operations.MarkupTokens.OpenCommentToken.get -> Microsoft.TemplateEngine.Core.Contracts.ITokenConfig!
 Microsoft.TemplateEngine.Core.Operations.MarkupTokens.OpenConditionExpression.get -> Microsoft.TemplateEngine.Core.Contracts.ITokenConfig!
 Microsoft.TemplateEngine.Core.Operations.MarkupTokens.OpenOpenElementToken.get -> Microsoft.TemplateEngine.Core.Contracts.ITokenConfig!
 ~Microsoft.TemplateEngine.Core.Operations.MarkupTokens.SelfClosingElementEndToken.get -> Microsoft.TemplateEngine.Core.Contracts.ITokenConfig

@@ -16,7 +16,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
             ITokenConfig selfClosingElementEndToken,
             ITokenConfig openConditionExpression,
             ITokenConfig closeConditionExpression,
-            ITokenConfig openCommnetToken,
+            ITokenConfig openCommentToken,
             ITokenConfig closeCommentToken)
         {
             OpenOpenElementToken = openOpenElementToken;
@@ -25,7 +25,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
             SelfClosingElementEndToken = selfClosingElementEndToken;
             OpenConditionExpression = openConditionExpression;
             CloseConditionExpression = closeConditionExpression;
-            OpenCommnetToken = openCommnetToken;
+            OpenCommentToken = openCommentToken;
             CloseCommentToken = closeCommentToken;
         }
 
@@ -41,7 +41,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
         public ITokenConfig SelfClosingElementEndToken { get; }
 
-        public ITokenConfig OpenCommnetToken { get; }
+        public ITokenConfig OpenCommentToken { get; }
 
         public ITokenConfig CloseCommentToken { get; }
     }
