@@ -124,7 +124,7 @@ stages:
       - ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
         - job: OSX
           pool:
-            vmImage: 'macOS-latest'
+            vmImage: 'macOS-12'
           strategy:
             matrix:
               debug_configuration:
