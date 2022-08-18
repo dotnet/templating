@@ -123,6 +123,7 @@ stages:
 
       - ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
         - job: OSX
+          timeoutInMinutes: 90
           pool:
             vmImage: 'macOS-12'
           strategy:
