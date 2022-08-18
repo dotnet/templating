@@ -43,11 +43,21 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             using var settingsLock = await globalSettings2.LockAsync(cts2.Token).ConfigureAwait(false);
         }
 
-#pragma warning disable xUnit1004 // Test methods should not be skipped
-        [Fact(Skip = "Randomly failing see https://github.com/dotnet/templating/issues/3336")]
-#pragma warning restore xUnit1004 // Test methods should not be skipped
-        public async Task TestFileWatcher()
+        public static IEnumerable<object[]> TestData()
         {
+            var list = new List<string>();
+            for (int i = 0; i < 1000; i++)
+            {
+                list.Add(i.ToString());
+            }
+            return list.Select(i => new object[] { i });
+        }
+
+        [Theory]
+        [MemberData(nameof(TestData))]
+        public async Task TestFileWatcher(string index)
+        {
+            Console.WriteLine(index);
             var envSettings = _helper.CreateEnvironment();
             var settingsFile = Path.Combine(_helper.CreateTemporaryFolder(), "settings.json");
             using var globalSettings1 = new GlobalSettings(envSettings, settingsFile);
