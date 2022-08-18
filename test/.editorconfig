@@ -1,0 +1,485 @@
+# NOTE: Requires **VS2019 16.3** or later
+
+# Microsoft.Analyzers.TemplateEngine.Tests
+# Description: dotnet/templating repo tests analyzer rules
+
+# Code files
+[*.{cs,vb}]
+
+# Ensure minimum API surface is respected
+dotnet_diagnostic.BCL0001.severity = none
+
+# AppContext default value expected to be true
+dotnet_diagnostic.BCL0010.severity = none
+
+# AppContext default value defined in if statement with incorrect pattern
+dotnet_diagnostic.BCL0011.severity = none
+
+# AppContext default value defined in if statement at root of switch case
+dotnet_diagnostic.BCL0012.severity = none
+
+# Invalid SR.Format call
+dotnet_diagnostic.BCL0020.severity = none
+
+# Mark attributes with AttributeUsageAttribute
+dotnet_diagnostic.CA1018.severity = none
+# Do not declare protected member in sealed type
+dotnet_diagnostic.CA1047.severity = none
+
+# Declare types in namespaces
+dotnet_diagnostic.CA1050.severity = none
+
+# Static holder types should be Static or NotInheritable
+dotnet_diagnostic.CA1052.severity = none
+# Do not declare event fields as virtual
+dotnet_diagnostic.CA1070.severity = none
+
+# Avoid using cref tags with a prefix
+dotnet_diagnostic.CA1200.severity = none
+
+# P/Invokes should not be visible
+dotnet_diagnostic.CA1401.severity = none
+
+# Validate platform compatibility
+dotnet_diagnostic.CA1416.severity = none
+
+# Do not use 'OutAttribute' on string parameters for P/Invokes
+dotnet_diagnostic.CA1417.severity = none
+
+# Use nameof to express symbol names
+dotnet_diagnostic.CA1507.severity = none
+# Parameter names should match base declaration
+dotnet_diagnostic.CA1725.severity = none
+
+# Use literals where appropriate
+dotnet_diagnostic.CA1802.severity = none
+
+# Do not initialize unnecessarily
+dotnet_diagnostic.CA1805.severity = none
+
+# Initialize reference type static fields inline
+dotnet_diagnostic.CA1810.severity = none
+# Remove empty Finalizers
+dotnet_diagnostic.CA1821.severity = none
+
+# Avoid unused private fields
+dotnet_diagnostic.CA1823.severity = none
+
+# Mark assemblies with NeutralResourcesLanguageAttribute
+dotnet_diagnostic.CA1824.severity = none
+
+# Avoid zero-length array allocations.
+dotnet_diagnostic.CA1825.severity = none
+
+# Do not use Enumerable methods on indexable collections. Instead use the collection directly
+dotnet_diagnostic.CA1826.severity = none
+
+# Do not use Count() or LongCount() when Any() can be used
+dotnet_diagnostic.CA1827.severity = none
+
+# Do not use CountAsync() or LongCountAsync() when AnyAsync() can be used
+dotnet_diagnostic.CA1828.severity = none
+
+# Use Length/Count property instead of Count() when available
+dotnet_diagnostic.CA1829.severity = none
+
+# Prefer strongly-typed Append and Insert method overloads on StringBuilder.
+dotnet_diagnostic.CA1830.severity = none
+
+# Use AsSpan or AsMemory instead of Range-based indexers when appropriate
+dotnet_diagnostic.CA1831.severity = none
+
+# Use AsSpan or AsMemory instead of Range-based indexers when appropriate
+dotnet_diagnostic.CA1832.severity = none
+
+# Use AsSpan or AsMemory instead of Range-based indexers when appropriate
+dotnet_diagnostic.CA1833.severity = none
+
+# Consider using 'StringBuilder.Append(char)' when applicable.
+dotnet_diagnostic.CA1834.severity = none
+
+# Prefer the 'Memory'-based overloads for 'ReadAsync' and 'WriteAsync'
+dotnet_diagnostic.CA1835.severity = none
+
+# Prefer IsEmpty over Count
+dotnet_diagnostic.CA1836.severity = none
+
+# Use 'Environment.ProcessId'
+dotnet_diagnostic.CA1837.severity = none
+
+# Avoid 'StringBuilder' parameters for P/Invokes
+dotnet_diagnostic.CA1838.severity = none
+
+# Use 'Environment.ProcessPath'
+dotnet_diagnostic.CA1839.severity = none
+
+# Use 'Environment.CurrentManagedThreadId'
+dotnet_diagnostic.CA1840.severity = none
+
+# Consider calling ConfigureAwait on the awaited task
+dotnet_diagnostic.CA2007.severity = none
+
+# Do not create tasks without passing a TaskScheduler
+dotnet_diagnostic.CA2008.severity = none
+
+# Do not call ToImmutableCollection on an ImmutableCollection value
+dotnet_diagnostic.CA2009.severity = none
+
+# Avoid infinite recursion
+dotnet_diagnostic.CA2011.severity = none
+
+# Use ValueTasks correctly
+dotnet_diagnostic.CA2012.severity = none
+
+# Do not use ReferenceEquals with value types
+dotnet_diagnostic.CA2013.severity = none
+
+# Do not use stackalloc in loops.
+dotnet_diagnostic.CA2014.severity = none
+
+# Do not define finalizers for types derived from MemoryManager<T>
+dotnet_diagnostic.CA2015.severity = none
+
+# Forward the 'CancellationToken' parameter to methods that take one
+dotnet_diagnostic.CA2016.severity = none
+# Rethrow to preserve stack details.
+dotnet_diagnostic.CA2200.severity = none
+
+# Initialize value type static fields inline
+dotnet_diagnostic.CA2207.severity = none
+
+# Instantiate argument exceptions correctly
+dotnet_diagnostic.CA2208.severity = none
+# Implement serialization constructors
+dotnet_diagnostic.CA2229.severity = none
+
+# Provide correct arguments to formatting methods
+dotnet_diagnostic.CA2241.severity = none
+
+# Test for NaN correctly
+dotnet_diagnostic.CA2242.severity = none
+
+# Do not assign a property to itself.
+dotnet_diagnostic.CA2245.severity = none
+
+# Argument passed to TaskCompletionSource constructor should be TaskCreationOptions enum instead of TaskContinuationOptions enum.
+dotnet_diagnostic.CA2247.severity = none
+
+# Provide correct 'enum' argument to 'Enum.HasFlag'
+dotnet_diagnostic.CA2248.severity = none
+
+# Consider using 'string.Contains' instead of 'string.IndexOf'
+dotnet_diagnostic.CA2249.severity = none
+# Do Not Add Schema By URL
+dotnet_diagnostic.CA3061.severity = none
+
+# Insecure DTD processing in XML
+dotnet_diagnostic.CA3075.severity = none
+
+# Insecure XSLT script processing.
+dotnet_diagnostic.CA3076.severity = none
+
+# Insecure Processing in API Design, XmlDocument and XmlTextReader
+dotnet_diagnostic.CA3077.severity = none
+
+# Mark Verb Handlers With Validate Antiforgery Token
+dotnet_diagnostic.CA3147.severity = none
+
+# Do Not Use Weak Cryptographic Algorithms
+dotnet_diagnostic.CA5350.severity = none
+
+# Do Not Use Broken Cryptographic Algorithms
+dotnet_diagnostic.CA5351.severity = none
+
+# Do Not Disable Certificate Validation
+dotnet_diagnostic.CA5359.severity = none
+
+# Do Not Call Dangerous Methods In Deserialization
+dotnet_diagnostic.CA5360.severity = none
+
+# Do Not Disable SChannel Use of Strong Crypto
+dotnet_diagnostic.CA5361.severity = none
+
+# Do Not Disable Request Validation
+dotnet_diagnostic.CA5363.severity = none
+
+# Do Not Use Deprecated Security Protocols
+dotnet_diagnostic.CA5364.severity = none
+
+# Do Not Disable HTTP Header Checking
+dotnet_diagnostic.CA5365.severity = none
+
+# Set ViewStateUserKey For Classes Derived From Page
+dotnet_diagnostic.CA5368.severity = none
+
+# Use XmlReader For Validating Reader
+dotnet_diagnostic.CA5370.severity = none
+
+# Do not use obsolete key derivation function
+dotnet_diagnostic.CA5373.severity = none
+
+# Do Not Use XslTransform
+dotnet_diagnostic.CA5374.severity = none
+
+# Use SharedAccessProtocol HttpsOnly
+dotnet_diagnostic.CA5376.severity = none
+
+# Use Container Level Access Policy
+dotnet_diagnostic.CA5377.severity = none
+
+# Do not disable ServicePointManagerSecurityProtocols
+dotnet_diagnostic.CA5378.severity = none
+
+# Do Not Use Weak Key Derivation Function Algorithm
+dotnet_diagnostic.CA5379.severity = none
+
+# Do Not Add Certificates To Root Store
+dotnet_diagnostic.CA5380.severity = none
+
+# Ensure Certificates Are Not Added To Root Store
+dotnet_diagnostic.CA5381.severity = none
+
+# Do Not Use Digital Signature Algorithm (DSA)
+dotnet_diagnostic.CA5384.severity = none
+
+# Use Rivest–Shamir–Adleman (RSA) Algorithm With Sufficient Key Size
+dotnet_diagnostic.CA5385.severity = none
+
+# Do not use insecure randomness
+dotnet_diagnostic.CA5394.severity = none
+# UseIsNullCheck
+dotnet_diagnostic.IDE0041.severity = silent
+
+# ValidateFormatString
+dotnet_diagnostic.IDE0043.severity = silent
+# MakeLocalFunctionStatic
+dotnet_diagnostic.IDE0062.severity = silent
+
+# FileHeaderMismatch
+dotnet_diagnostic.IDE0073.severity = silent
+
+# ConvertTypeOfToNameOf
+dotnet_diagnostic.IDE0082.severity = silent
+# Nullable type symbol should not be preceded by a space
+dotnet_diagnostic.SA1018.severity = none
+
+# Increment symbol should not be preceded by a space
+dotnet_diagnostic.SA1020.severity = none
+
+# Keyword followed by span or blank line
+dotnet_diagnostic.SA1026.severity = none
+
+# Tabs and spaces should be used correctly
+dotnet_diagnostic.SA1027.severity = none
+
+# Code should not contain trailing whitespace
+dotnet_diagnostic.SA1028.severity = none
+
+# Query clause should follow previous clause
+dotnet_diagnostic.SA1102.severity = none
+
+# Query clauses spanning multiple lines should begin on own line
+dotnet_diagnostic.SA1105.severity = none
+# Comma should be on the same line as previous parameter
+dotnet_diagnostic.SA1113.severity = none
+
+# Parameter should begin on the line after the previous parameter
+dotnet_diagnostic.SA1115.severity = none
+
+# Use built-in type alias
+dotnet_diagnostic.SA1121.severity = none
+
+# Do not use default value type constructor
+dotnet_diagnostic.SA1129.severity = none
+# Use tuple syntax
+dotnet_diagnostic.SA1141.severity = none
+
+# Refer to tuple elements by name
+dotnet_diagnostic.SA1142.severity = none
+
+# Elements should appear in the correct order
+dotnet_diagnostic.SA1201.severity = none
+
+# Elements should be ordered by access
+dotnet_diagnostic.SA1202.severity = none
+
+# Constants should appear before fields
+dotnet_diagnostic.SA1203.severity = none
+
+# Static elements should appear before instance elements
+dotnet_diagnostic.SA1204.severity = none
+
+# Partial elements should declare an access modifier
+dotnet_diagnostic.SA1205.severity = none
+
+# Keyword ordering
+dotnet_diagnostic.SA1206.severity = none
+# A get accessor appears after a set accessor within a property or indexer
+dotnet_diagnostic.SA1212.severity = none
+
+# Readonly fields should appear before non-readonly fields
+dotnet_diagnostic.SA1214.severity = none
+
+# Interface names should begin with I
+dotnet_diagnostic.SA1302.severity = none
+# Member should declare an access modifer
+dotnet_diagnostic.SA1400.severity = none
+
+# Code analysis suppression should have justification
+dotnet_diagnostic.SA1404.severity = none
+
+# Remove delegate parens when possible
+dotnet_diagnostic.SA1410.severity = none
+
+# Attribute constructor shouldn't use unnecessary parenthesis
+dotnet_diagnostic.SA1411.severity = none
+
+# Code should not contain blank lines at start of file
+dotnet_diagnostic.SA1517.severity = none
+
+# Test classes must be public
+dotnet_diagnostic.xUnit1000.severity = warning
+
+# Fact methods cannot have parameters
+dotnet_diagnostic.xUnit1001.severity = warning
+
+# Test methods cannot have multiple Fact or Theory attributes
+dotnet_diagnostic.xUnit1002.severity = warning
+
+# Theory methods must have test data
+dotnet_diagnostic.xUnit1003.severity = warning
+
+# Test methods should not be skipped
+dotnet_diagnostic.xUnit1004.severity = warning
+
+# Fact methods should not have test data
+dotnet_diagnostic.xUnit1005.severity = warning
+
+# Theory methods should have parameters
+dotnet_diagnostic.xUnit1006.severity = warning
+
+# ClassData must point at a valid class
+dotnet_diagnostic.xUnit1007.severity = warning
+
+# Test data attribute should only be used on a Theory
+dotnet_diagnostic.xUnit1008.severity = warning
+
+# InlineData must match the number of method parameters
+dotnet_diagnostic.xUnit1009.severity = warning
+
+# The value is not convertible to the method parameter type
+dotnet_diagnostic.xUnit1010.severity = warning
+
+# There is no matching method parameter
+dotnet_diagnostic.xUnit1011.severity = warning
+
+# Null should not be used for value type parameters
+dotnet_diagnostic.xUnit1012.severity = warning
+
+# Public methods should be marked as test
+dotnet_diagnostic.xUnit1013.severity = warning
+
+# MemberData should use nameof operator for member name
+dotnet_diagnostic.xUnit1014.severity = warning
+
+# MemberData must reference an existing member
+dotnet_diagnostic.xUnit1015.severity = warning
+
+# MemberData must reference a public member
+dotnet_diagnostic.xUnit1016.severity = warning
+
+# MemberData must reference a static member
+dotnet_diagnostic.xUnit1017.severity = warning
+
+# MemberData must reference a valid member kind
+dotnet_diagnostic.xUnit1018.severity = warning
+
+# MemberData must reference a member providing a valid data type
+dotnet_diagnostic.xUnit1019.severity = warning
+
+# MemberData must reference a property with a getter
+dotnet_diagnostic.xUnit1020.severity = warning
+
+# MemberData should not have parameters if the referenced member is not a method
+dotnet_diagnostic.xUnit1021.severity = warning
+
+# Theory methods cannot have a parameter array
+dotnet_diagnostic.xUnit1022.severity = warning
+
+# Theory methods cannot have default parameter values
+dotnet_diagnostic.xUnit1023.severity = warning
+
+# Test methods cannot have overloads
+dotnet_diagnostic.xUnit1024.severity = warning
+
+# InlineData should be unique within the Theory it belongs to
+dotnet_diagnostic.xUnit1025.severity = warning
+
+# Theory methods should use all of their parameters
+dotnet_diagnostic.xUnit1026.severity = warning
+
+# Constants and literals should be the expected argument
+dotnet_diagnostic.xUnit2000.severity = warning
+
+# Do not use invalid equality check
+dotnet_diagnostic.xUnit2001.severity = warning
+
+# Do not use null check on value type
+dotnet_diagnostic.xUnit2002.severity = warning
+
+# Do not use equality check to test for null value
+dotnet_diagnostic.xUnit2003.severity = warning
+
+# Do not use equality check to test for boolean conditions
+dotnet_diagnostic.xUnit2004.severity = warning
+
+# Do not use identity check on value type
+dotnet_diagnostic.xUnit2005.severity = warning
+
+# Do not use invalid string equality check
+dotnet_diagnostic.xUnit2006.severity = warning
+
+# Do not use typeof expression to check the type
+dotnet_diagnostic.xUnit2007.severity = warning
+
+# Do not use boolean check to match on regular expressions
+dotnet_diagnostic.xUnit2008.severity = warning
+
+# Do not use boolean check to check for substrings
+dotnet_diagnostic.xUnit2009.severity = warning
+
+# Do not use boolean check to check for string equality
+dotnet_diagnostic.xUnit2010.severity = warning
+
+# Do not use empty collection check
+dotnet_diagnostic.xUnit2011.severity = warning
+
+# Do not use Enumerable.Any() to check if a value exists in a collection
+dotnet_diagnostic.xUnit2012.severity = warning
+
+# Do not use equality check to check for collection size.
+dotnet_diagnostic.xUnit2013.severity = none
+
+# Do not use throws check to check for asynchronously thrown exception
+dotnet_diagnostic.xUnit2014.severity = warning
+
+# Do not use typeof expression to check the exception type
+dotnet_diagnostic.xUnit2015.severity = warning
+
+# Keep precision in the allowed range when asserting equality of doubles or decimals
+dotnet_diagnostic.xUnit2016.severity = warning
+
+# Do not use Contains() to check if a value exists in a collection
+dotnet_diagnostic.xUnit2017.severity = none
+
+# Do not compare an object's exact type to an abstract class or interface
+dotnet_diagnostic.xUnit2018.severity = warning
+
+# Do not use obsolete throws check to check for asynchronously thrown exception
+dotnet_diagnostic.xUnit2019.severity = warning
+
+# Test case classes must derive directly or indirectly from Xunit.LongLivedMarshalByRefObject
+dotnet_diagnostic.xUnit3000.severity = warning
+
+# Classes that implement Xunit.Abstractions.IXunitSerializable must have a public parameterless constructor
+dotnet_diagnostic.xUnit3001.severity = warning
