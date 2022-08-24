@@ -621,6 +621,9 @@ dotnet_diagnostic.SA1202.severity = none
 # Constants should appear before fields
 dotnet_diagnostic.SA1203.severity = none
 
+# Readonly fields should appear before non-readonly fields
+dotnet_diagnostic.SA1214.severity = none
+
 # C++ Files
 [*.{cpp,h,in}]
 curly_bracket_next_line = true
