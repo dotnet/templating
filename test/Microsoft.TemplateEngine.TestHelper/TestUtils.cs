@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.TemplateEngine.TestHelper
 {
-    public class TestUtils
+    public static class TestUtils
     {
         public static string CreateTemporaryFolder(string name = "")
         {
@@ -111,7 +111,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
             DirectoryInfo[] dirs = dir.GetDirectories();
 
-            // If the destination directory doesn't exist, create it.       
+            // If the destination directory doesn't exist, create it.
             Directory.CreateDirectory(destDirName);
 
             // Get the files in the directory and copy them to the new location.
