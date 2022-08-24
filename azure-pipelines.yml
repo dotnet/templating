@@ -125,7 +125,7 @@ stages:
         - job: OSX
           timeoutInMinutes: 90
           pool:
-            vmImage: 'macos-10.15'
+            vmImage: 'macOS-12'
           strategy:
             matrix:
               debug_configuration:

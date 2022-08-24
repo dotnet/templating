@@ -157,35 +157,37 @@ namespace Microsoft.TemplateEngine.Cli
             }
 
             ITemplateCreationResult instantiateResult;
-
-            try
+            using (Timing.Over(_environmentSettings.Host.Logger, "Instantiation"))
             {
-                instantiateResult = await _templateCreator.InstantiateAsync(
-                    templateArgs.Template,
-                    templateArgs.Name,
-                    fallbackName,
-                    templateArgs.OutputPath,
-                    templateArgs.TemplateParameters,
-                    templateArgs.IsForceFlagSpecified,
-                    templateArgs.BaselineName,
-                    templateArgs.IsDryRun,
-                    cancellationToken)
-                    .ConfigureAwait(false);
-            }
-            catch (ContentGenerationException cx)
-            {
-                Reporter.Error.WriteLine(cx.Message.Bold().Red());
-                if (cx.InnerException != null)
+                try
                 {
-                    Reporter.Error.WriteLine(cx.InnerException.Message.Bold().Red());
+                    instantiateResult = await _templateCreator.InstantiateAsync(
+                        templateArgs.Template,
+                        templateArgs.Name,
+                        fallbackName,
+                        templateArgs.OutputPath,
+                        templateArgs.TemplateParameters,
+                        templateArgs.IsForceFlagSpecified,
+                        templateArgs.BaselineName,
+                        templateArgs.IsDryRun,
+                        cancellationToken)
+                        .ConfigureAwait(false);
                 }
+                catch (ContentGenerationException cx)
+                {
+                    Reporter.Error.WriteLine(cx.Message.Bold().Red());
+                    if (cx.InnerException != null)
+                    {
+                        Reporter.Error.WriteLine(cx.InnerException.Message.Bold().Red());
+                    }
 
-                return NewCommandStatus.CreateFailed;
-            }
-            catch (TemplateAuthoringException tae)
-            {
-                Reporter.Error.WriteLine(tae.Message.Bold().Red());
-                return NewCommandStatus.TemplateIssueDetected;
+                    return NewCommandStatus.CreateFailed;
+                }
+                catch (TemplateAuthoringException tae)
+                {
+                    Reporter.Error.WriteLine(tae.Message.Bold().Red());
+                    return NewCommandStatus.TemplateIssueDetected;
+                }
             }
 
             string resultTemplateName = string.IsNullOrEmpty(instantiateResult.TemplateFullName) ? templateArgs.Template.Name : instantiateResult.TemplateFullName;
@@ -214,8 +216,10 @@ namespace Microsoft.TemplateEngine.Cli
                     {
                         Reporter.Output.WriteLine(string.Format(LocalizableStrings.ThirdPartyNotices, templateArgs.Template.ThirdPartyNotices));
                     }
-
-                    return HandlePostActions(instantiateResult, templateArgs);
+                    using (Timing.Over(_environmentSettings.Host.Logger, "Handle Post Action"))
+                    {
+                        return HandlePostActions(instantiateResult, templateArgs);
+                    }
                 case CreationResultStatus.CreateFailed:
                     Reporter.Error.WriteLine(string.Format(LocalizableStrings.CreateFailed, resultTemplateName, instantiateResult.ErrorMessage).Bold().Red());
                     return NewCommandStatus.CreateFailed;
