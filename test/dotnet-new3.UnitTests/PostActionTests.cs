@@ -24,7 +24,7 @@ namespace Dotnet_new3.IntegrationTests
         }
 
         [Theory]
-        [InlineData("PostActions/RestoreNuGet/Basic", "TestAssets.PostActions.RestoreNuGet.Basic")]
+        [InlineData("PostActions/RestoreNuGet/Basic", "TestAssets.PostActions.RestoreNuGet.Basic", "./MyProject")]
         [InlineData("PostActions/RestoreNuGet/BasicWithFiles", "TestAssets.PostActions.RestoreNuGet.BasicWithFiles")]
         [InlineData("PostActions/RestoreNuGet/CustomSourcePath", "TestAssets.PostActions.RestoreNuGet.CustomSourcePath")]
         [InlineData("PostActions/RestoreNuGet/CustomSourcePathFiles", "TestAssets.PostActions.RestoreNuGet.CustomSourcePathFiles")]
@@ -54,6 +54,41 @@ namespace Dotnet_new3.IntegrationTests
 
             new DotnetCommand(_log, "build", "--no-restore")
                 .WithWorkingDirectory(Path.Combine(workingDirectory, targetSubfolder))
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And
+                .NotHaveStdErr()
+                .And.HaveStdOutContaining("Build succeeded.")
+                .And.HaveStdOutContaining("MyProject");
+        }
+
+        [Fact]
+        public void Restore_WithName()
+        {
+            string templateLocation = "PostActions/RestoreNuGet/Basic";
+            string expectedTemplateName = "TestAssets.PostActions.RestoreNuGet.Basic";
+            string home = TestUtils.CreateTemporaryFolder("Home");
+            string workingDirectory = TestUtils.CreateTemporaryFolder();
+            Helpers.InstallTestTemplate(templateLocation, _log, workingDirectory, home);
+
+            new DotnetNewCommand(_log, expectedTemplateName, "-n", "MyProject")
+                .WithCustomHive(home)
+                .WithWorkingDirectory(workingDirectory)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And.NotHaveStdErr()
+                .And.HaveStdOutContaining($"The template \"{expectedTemplateName}\" was created successfully.")
+                .And.HaveStdOutContaining("Restore succeeded.")
+                .And.NotHaveStdOutContaining("Manual instructions: Run 'dotnet restore'")
+                .And.HaveStdOutContaining(Path.Combine(workingDirectory, "MyProject", "MyProject.csproj"));
+
+            Assert.True(File.Exists(Path.Combine(workingDirectory, "MyProject", $"MyProject.csproj")));
+            Assert.True(File.Exists(Path.Combine(workingDirectory, "MyProject", $"Program.cs")));
+
+            new DotnetCommand(_log, "build", "MyProject", "--no-restore")
+                .WithWorkingDirectory(workingDirectory)
                 .Execute()
                 .Should()
                 .ExitWith(0)
@@ -660,6 +695,40 @@ namespace Dotnet_new3.IntegrationTests
                 .ExitWith(0)
                 .And.NotHaveStdErr()
                 .And.HaveStdOutContaining($"The template \"{templateName}\" was created successfully.")
+                .And.HaveStdOutContaining("Adding project reference(s) to solution file. Running dotnet sln")
+                .And.HaveStdOutContaining("Successfully added")
+                .And.HaveStdOutContaining("solution folder: src")
+                .And.NotHaveStdOutContaining("Manual instructions: Add the generated files to solution manually.");
+
+            Assert.Contains("MyProject.csproj", File.ReadAllText(Path.Combine(workingDirectory, "MySolution.sln")));
+        }
+
+        [Fact]
+        public void AddProjectToSolution_WithName()
+        {
+            string templateLocation = "PostActions/AddProjectToSolution/Basic";
+            string expectedTemplateName = "TestAssets.PostActions.AddProjectToSolution.Basic";
+            string home = TestUtils.CreateTemporaryFolder("Home");
+            string workingDirectory = TestUtils.CreateTemporaryFolder();
+            Helpers.InstallTestTemplate(templateLocation, _log, workingDirectory, home);
+
+            //creating solution file to add to
+            new DotnetNewCommand(_log, "sln", "-n", "MySolution")
+                .WithCustomHive(home)
+                .WithWorkingDirectory(workingDirectory)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And.NotHaveStdErr();
+
+            new DotnetNewCommand(_log, expectedTemplateName, "-n", "MyProject")
+                .WithCustomHive(home)
+                .WithWorkingDirectory(workingDirectory)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And.NotHaveStdErr()
+                .And.HaveStdOutContaining($"The template \"{expectedTemplateName}\" was created successfully.")
                 .And.HaveStdOutContaining("Adding project reference(s) to solution file. Running dotnet sln")
                 .And.HaveStdOutContaining("Successfully added")
                 .And.HaveStdOutContaining("solution folder: src")

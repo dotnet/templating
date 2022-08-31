@@ -17,7 +17,7 @@
   ],
   "postActions": [
     {
-      "description": "Adding Reference to Newtonsoft.Json NuGet package",
+      "description": "Add the reference to Project2 in Project1",
       "actionId": "B17581D1-C5C9-4489-8F0A-004BE667B814",
       "continueOnError": false,
       "manualInstructions": [
