@@ -5,7 +5,7 @@ using System;
 using Microsoft.Build.Utilities;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.TemplateEngine.Tasks.Utilities
+namespace Microsoft.TemplateEngine.Authoring.Tasks.Utilities
 {
     /// <summary>
     /// Implements an ILogger that passes the logs to the wrapped TaskLoggingHelper.

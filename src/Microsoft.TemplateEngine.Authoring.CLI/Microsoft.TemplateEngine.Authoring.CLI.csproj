@@ -3,13 +3,13 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>$(NETCoreTargetFramework)</TargetFramework>
-    <Description>A tool that can be used to localize template.json files.</Description>
+    <Description>A dotnet CLI tool with commands for template authoring.</Description>
     <IsPackable>true</IsPackable>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 
     <PackAsTool>true</PackAsTool>
-    <ToolCommandName>dotnet-template-localizer</ToolCommandName>
+    <ToolCommandName>dotnet-template-authoring</ToolCommandName>
   </PropertyGroup>
 
   <ItemGroup>

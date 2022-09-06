@@ -3,9 +3,9 @@
 
 using System.CommandLine;
 using Microsoft.Extensions.Logging;
-using Microsoft.TemplateEngine.TemplateLocalizer.Commands.Export;
+using Microsoft.TemplateEngine.Authoring.CLI.Commands;
 
-namespace Microsoft.TemplateEngine.TemplateLocalizer
+namespace Microsoft.TemplateEngine.Authoring.CLI
 {
     internal sealed class Program
     {
@@ -14,8 +14,8 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer
             using ILoggerFactory loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
             ILogger logger = loggerFactory.CreateLogger<Program>();
 
-            RootCommand rootCommand = new("dotnet-template-localizer");
-            rootCommand.AddCommand(new ExportCommand(loggerFactory));
+            RootCommand rootCommand = new("dotnet-template-authoring");
+            rootCommand.AddCommand(new LocalizeCommand(loggerFactory));
 
             return await rootCommand.InvokeAsync(args).ConfigureAwait(false);
         }
