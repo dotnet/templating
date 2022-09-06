@@ -8,7 +8,7 @@ using Microsoft.TemplateEngine.Tests;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Microsoft.TemplateEngine.Tasks.IntegrationTests
+namespace Microsoft.TemplateEngine.Authoring.Tasks.IntegrationTests
 {
     public class LocalizeTemplateTests : TestBase
     {
@@ -26,7 +26,7 @@ namespace Microsoft.TemplateEngine.Tasks.IntegrationTests
             TestUtils.DirectoryCopy("Resources/BasicTemplatePackage", tmpDir, true);
             TestUtils.SetupNuGetConfigForPackagesLocation(tmpDir, ShippingPackagesLocation);
 
-            new DotnetCommand(_log, "add", "TemplatePackage.csproj", "package", "Microsoft.TemplateEngine.Tasks", "--prerelease")
+            new DotnetCommand(_log, "add", "TemplatePackage.csproj", "package", "Microsoft.TemplateEngine.Authoring.Tasks", "--prerelease")
               .WithWorkingDirectory(tmpDir)
               .Execute()
               .Should()
@@ -54,7 +54,7 @@ namespace Microsoft.TemplateEngine.Tasks.IntegrationTests
             TestUtils.DirectoryCopy("Resources/TemplatePackageEnDe", tmpDir, true);
             TestUtils.SetupNuGetConfigForPackagesLocation(tmpDir, ShippingPackagesLocation);
 
-            new DotnetCommand(_log, "add", "TemplatePackage.csproj", "package", "Microsoft.TemplateEngine.Tasks", "--prerelease")
+            new DotnetCommand(_log, "add", "TemplatePackage.csproj", "package", "Microsoft.TemplateEngine.Authoring.Tasks", "--prerelease")
               .WithWorkingDirectory(tmpDir)
               .Execute()
               .Should()
@@ -83,7 +83,7 @@ namespace Microsoft.TemplateEngine.Tasks.IntegrationTests
             TestUtils.DirectoryCopy("Resources/TemplatePackagePartiallyLocalized", tmpDir, true);
             TestUtils.SetupNuGetConfigForPackagesLocation(tmpDir, ShippingPackagesLocation);
 
-            new DotnetCommand(_log, "add", "TemplatePackage.csproj", "package", "Microsoft.TemplateEngine.Tasks", "--prerelease")
+            new DotnetCommand(_log, "add", "TemplatePackage.csproj", "package", "Microsoft.TemplateEngine.Authoring.Tasks", "--prerelease")
               .WithWorkingDirectory(tmpDir)
               .Execute()
               .Should()
@@ -113,7 +113,7 @@ namespace Microsoft.TemplateEngine.Tasks.IntegrationTests
             TestUtils.DirectoryCopy("Resources/InvalidTemplatePackage", tmpDir, true);
             TestUtils.SetupNuGetConfigForPackagesLocation(tmpDir, ShippingPackagesLocation);
 
-            new DotnetCommand(_log, "add", "TemplatePackage.csproj", "package", "Microsoft.TemplateEngine.Tasks", "--prerelease")
+            new DotnetCommand(_log, "add", "TemplatePackage.csproj", "package", "Microsoft.TemplateEngine.Authoring.Tasks", "--prerelease")
               .WithWorkingDirectory(tmpDir)
               .Execute()
               .Should()

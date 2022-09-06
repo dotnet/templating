@@ -4,7 +4,7 @@
 using Microsoft.Build.Utilities;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.TemplateEngine.Tasks.Utilities
+namespace Microsoft.TemplateEngine.Authoring.Tasks.Utilities
 {
     /// <summary>
     /// An <see cref="ILoggerProvider"/> that creates <see cref="ILogger"/>s which passes

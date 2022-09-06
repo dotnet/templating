@@ -6,7 +6,7 @@ using System.CommandLine.Binding;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Microsoft.TemplateEngine.TemplateLocalizer.Commands
+namespace Microsoft.TemplateEngine.Authoring.CLI.Commands
 {
     /// <summary>
     /// Represents a <see cref="System.CommandLine.Command"/> together with its handler.

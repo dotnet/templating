@@ -1,14 +1,12 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System.Globalization;
 using Microsoft.TemplateEngine.TestHelper.Commands;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Microsoft.TemplateEngine.TemplateLocalizer.IntegrationTests
+namespace Microsoft.TemplateEngine.Authoring.CLI.IntegrationTests
 {
     public class ExportCommandFailureTests : IDisposable
     {
@@ -148,7 +146,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.IntegrationTests
         {
             string filePath = Path.Combine(_workingDirectory, Path.GetRandomFileName() + ".json");
             await File.WriteAllTextAsync(filePath, templateJsonContent);
-            return new BasicCommand(_log, "dotnet", Path.GetFullPath("Microsoft.TemplateEngine.TemplateLocalizer.dll"), "export", filePath);
+            return new BasicCommand(_log, "dotnet", Path.GetFullPath("Microsoft.TemplateEngine.Authoring.CLI.dll"), "localize", "export", filePath);
         }
     }
 }

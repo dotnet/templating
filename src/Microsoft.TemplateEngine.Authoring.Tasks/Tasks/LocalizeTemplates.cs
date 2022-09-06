@@ -9,10 +9,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Build.Framework;
 using Microsoft.Extensions.Logging;
-using Microsoft.TemplateEngine.Tasks.Utilities;
+using Microsoft.TemplateEngine.Authoring.Tasks.Utilities;
 using Microsoft.TemplateEngine.TemplateLocalizer.Core;
 
-namespace Microsoft.TemplateEngine.Tasks
+namespace Microsoft.TemplateEngine.Authoring.Tasks
 {
     /// <summary>
     /// A task that exposes template localization functionality of
@@ -132,7 +132,7 @@ namespace Microsoft.TemplateEngine.Tasks
         /// in the case that <paramref name="path"/> points to a directory. This parameter has no effect
         /// if <paramref name="path"/> points to a file.</param>
         /// <returns>A path for each of the found "template.json" files.</returns>
-        private IEnumerable<string> GetTemplateJsonFiles(string path, bool searchSubdirectories)
+        private static IEnumerable<string> GetTemplateJsonFiles(string path, bool searchSubdirectories)
         {
             if (string.IsNullOrEmpty(path))
             {
@@ -187,7 +187,7 @@ namespace Microsoft.TemplateEngine.Tasks
                 return _cancellationTokenSource;
             }
 
-            CancellationTokenSource cts = new CancellationTokenSource();
+            CancellationTokenSource cts = new();
             if (Interlocked.CompareExchange(ref _cancellationTokenSource, cts, null) != null)
             {
                 // Reference was already set. This instance is not needed.

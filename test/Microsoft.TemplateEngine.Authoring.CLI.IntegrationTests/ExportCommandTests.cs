@@ -6,15 +6,15 @@ using Microsoft.TemplateEngine.Tests;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
-namespace Microsoft.TemplateEngine.TemplateLocalizer.IntegrationTests
+namespace Microsoft.TemplateEngine.Authoring.CLI.IntegrationTests
 {
     public class ExportCommandTests : TestBase, IDisposable
     {
-        private string _workingDirectory;
+        private readonly string _workingDirectory;
 
         public ExportCommandTests()
         {
-            _workingDirectory = Path.Combine(Path.GetTempPath(), "Microsoft.TemplateEngine.TemplateLocalizer.IntegrationTests", Path.GetRandomFileName());
+            _workingDirectory = Path.Combine(Path.GetTempPath(), "Microsoft.TemplateEngine.Authoring.CLI.IntegrationTests", Path.GetRandomFileName());
             Directory.CreateDirectory(_workingDirectory);
         }
 
@@ -29,7 +29,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.IntegrationTests
             string[] exportedFiles = await RunTemplateLocalizer(
                 GetTestTemplateJsonContent(),
                 _workingDirectory,
-                args: new string[] { "export", _workingDirectory })
+                args: new string[] { "localize", "export", _workingDirectory })
                 .ConfigureAwait(false);
 
             Assert.True(exportedFiles.Length > 0);
@@ -44,7 +44,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.IntegrationTests
         public async Task LocFilesAreExportedFirstTime()
         {
             string testTemplate = GetTestTemplateInTempDir("TemplateWithSourceName");
-            int runResult = await Program.Main(new[] { "export", testTemplate }).ConfigureAwait(false);
+            int runResult = await Program.Main(new[] { "localize", "export", testTemplate }).ConfigureAwait(false);
             Assert.Equal(0, runResult);
             string[] exportedFiles;
             string expectedExportDirectory = Path.Combine(testTemplate, ".template.config", "localize");
@@ -69,7 +69,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.IntegrationTests
         public async Task EnglishLocFilesAreOverwritten()
         {
             string testTemplate = GetTestTemplateInTempDir("TemplateWithSourceName");
-            int runResult = await Program.Main(new[] { "export", testTemplate }).ConfigureAwait(false);
+            int runResult = await Program.Main(new[] { "localize", "export", testTemplate }).ConfigureAwait(false);
             Assert.Equal(0, runResult);
             string expectedExportDirectory = Path.Combine(testTemplate, ".template.config", "localize");
             string enLocFile = Path.Combine(expectedExportDirectory, "templatestrings.en.json");
@@ -88,7 +88,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.IntegrationTests
             templateJsonContent.Property("author")!.Value = "New Author";
             File.WriteAllText(baseConfig, templateJsonContent.ToString());
 
-            runResult = await Program.Main(new[] { "export", testTemplate }).ConfigureAwait(false);
+            runResult = await Program.Main(new[] { "localize", "export", testTemplate }).ConfigureAwait(false);
             Assert.Equal(0, runResult);
             Assert.True(File.Exists(enLocFile));
             Assert.True(File.Exists(deLocFile));
@@ -107,7 +107,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.IntegrationTests
             templateJsonContent.AddFirst(new JProperty("authoringLanguage", "de"));
             File.WriteAllText(baseConfig, templateJsonContent.ToString());
 
-            int runResult = await Program.Main(new[] { "export", testTemplate }).ConfigureAwait(false);
+            int runResult = await Program.Main(new[] { "localize", "export", testTemplate }).ConfigureAwait(false);
             Assert.Equal(0, runResult);
             string expectedExportDirectory = Path.Combine(testTemplate, ".template.config", "localize");
             string enLocFile = Path.Combine(expectedExportDirectory, "templatestrings.en.json");
@@ -125,7 +125,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.IntegrationTests
             templateJsonContent.Property("author")!.Value = "New Author";
             File.WriteAllText(baseConfig, templateJsonContent.ToString());
 
-            runResult = await Program.Main(new[] { "export", testTemplate }).ConfigureAwait(false);
+            runResult = await Program.Main(new[] { "localize", "export", testTemplate }).ConfigureAwait(false);
             Assert.Equal(0, runResult);
             Assert.True(File.Exists(enLocFile));
             Assert.True(File.Exists(deLocFile));
@@ -141,7 +141,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.IntegrationTests
             string[] exportedFiles = await RunTemplateLocalizer(
                 GetTestTemplateJsonContent(),
                 _workingDirectory,
-                args: new string[] { "export", _workingDirectory, "--dry-run" })
+                args: new string[] { "localize", "export", _workingDirectory, "--dry-run" })
                 .ConfigureAwait(false);
 
             Assert.Empty(exportedFiles);
@@ -153,7 +153,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.IntegrationTests
             string[] exportedFiles = await RunTemplateLocalizer(
                 GetTestTemplateJsonContent(),
                 _workingDirectory,
-                args: new string[] { "export", _workingDirectory, "--language", "tr", "de" })
+                args: new string[] { "localize", "export", _workingDirectory, "--language", "tr", "de" })
                 .ConfigureAwait(false);
 
             Assert.Equal(2, exportedFiles.Length);
@@ -172,7 +172,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.IntegrationTests
             await File.WriteAllTextAsync(Path.Combine(_workingDirectory, "subdir", "template.json"), templateJson).ConfigureAwait(false);
             await File.WriteAllTextAsync(Path.Combine(_workingDirectory, "subdir2", "template.json"), templateJson).ConfigureAwait(false);
 
-            int runResult = await Program.Main(new string[] { "export", _workingDirectory, "--language", "es" }).ConfigureAwait(false);
+            int runResult = await Program.Main(new string[] { "localize", "export", _workingDirectory, "--language", "es" }).ConfigureAwait(false);
             // Error: no templates found under the given folder.
             Assert.NotEqual(0, runResult);
 
@@ -190,7 +190,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.IntegrationTests
             await File.WriteAllTextAsync(Path.Combine(_workingDirectory, "subdir", ".template.config", "template.json"), templateJson).ConfigureAwait(false);
             await File.WriteAllTextAsync(Path.Combine(_workingDirectory, ".template.config", "template.json"), templateJson).ConfigureAwait(false);
 
-            int runResult = await Program.Main(new string[] { "export", _workingDirectory, "--language", "es", "--recursive" }).ConfigureAwait(false);
+            int runResult = await Program.Main(new string[] { "localize", "export", _workingDirectory, "--language", "es", "--recursive" }).ConfigureAwait(false);
             Assert.Equal(0, runResult);
 
             Assert.True(File.Exists(Path.Combine(_workingDirectory, "subdir", ".template.config", "localize", "templatestrings.es.json")));
@@ -204,7 +204,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.IntegrationTests
 
             await File.WriteAllTextAsync(Path.Combine(_workingDirectory, "subdir", "template.json"), GetTestTemplateJsonContent()).ConfigureAwait(false);
 
-            int runResult = await Program.Main(new string[] { "export", _workingDirectory, "--language", "es", "--recursive" }).ConfigureAwait(false);
+            int runResult = await Program.Main(new string[] { "localize", "export", _workingDirectory, "--language", "es", "--recursive" }).ConfigureAwait(false);
             // Error: no templates found under the given folder.
             Assert.NotEqual(0, runResult);
 
