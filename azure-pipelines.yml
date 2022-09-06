@@ -154,7 +154,7 @@ stages:
         - job: Linux
           pool:
             ${{ if eq(variables['System.TeamProject'], 'public') }}:
-              vmImage: ubuntu-18.04 
+              vmImage: ubuntu-latest 
             ${{ if eq(variables['System.TeamProject'], 'internal') }}:
               name: NetCore1ESPool-Svc-Internal
               demands: ImageOverride -equals Build.Ubuntu.1804.Amd64
