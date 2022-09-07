@@ -18,7 +18,7 @@
     <MicrosoftDotNetCliUtilsVersion>6.0.100-rc.1.21423.4</MicrosoftDotNetCliUtilsVersion>
     <!-- Maestro-managed Package Versions - Ordered by repo name -->
     <!-- Dependencies from https://github.com/dotnet/command-line-api -->
-    <SystemCommandLinePackageVersion>2.0.0-beta4.22452.1</SystemCommandLinePackageVersion>
+    <SystemCommandLinePackageVersion>2.0.0-beta4.22456.1</SystemCommandLinePackageVersion>
     <!-- Dependencies from https://github.com/dotnet/runtime -->
     <MicrosoftNETCoreAppRefPackageVersion>7.0.0-rc.1.22414.6</MicrosoftNETCoreAppRefPackageVersion>
     <MicrosoftNETCoreAppRuntimewinx64PackageVersion>7.0.0-rc.1.22414.6</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
