@@ -46,7 +46,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         public static IEnumerable<object[]> TestData()
         {
             var list = new List<string>();
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < 3000; i++)
             {
                 list.Add(i.ToString());
             }
@@ -60,8 +60,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             Console.WriteLine(index);
             var envSettings = _helper.CreateEnvironment();
             var settingsFile = Path.Combine(_helper.CreateTemporaryFolder(), "settings.json");
-            using var globalSettings1 = new GlobalSettings(envSettings, settingsFile);
-            using var globalSettings2 = new GlobalSettings(envSettings, settingsFile);
+            var globalSettings1 = new GlobalSettings(envSettings, settingsFile);
+            var globalSettings2 = new GlobalSettings(envSettings, settingsFile);
             var taskSource = new TaskCompletionSource<TemplatePackageData>();
             globalSettings2.SettingsChanged += async () => taskSource.TrySetResult((await globalSettings2.GetInstalledTemplatePackagesAsync(default).ConfigureAwait(false)).Single());
             var mutex = await globalSettings1.LockAsync(default).ConfigureAwait(false);
@@ -74,9 +74,15 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             mutex.Dispose();
             var timeoutTask = Task.Delay(1000);
             var firstFinishedTask = await Task.WhenAny(timeoutTask, taskSource.Task).ConfigureAwait(false);
-            Assert.Equal(taskSource.Task, firstFinishedTask);
+            if (!taskSource.Task.IsCompleted)
+            {
+                throw new TimeoutException("Get installed template packages didn't finish in 1000 milliseconds.");
+            }
+            //Assert.Equal(taskSource.Task, firstFinishedTask);
 
             var newData2 = taskSource.Task.Result;
+            globalSettings1.Dispose();
+            globalSettings2.Dispose();
             Assert.Equal(newData.InstallerId, newData2.InstallerId);
             Assert.Equal(newData.MountPointUri, newData2.MountPointUri);
             Assert.Equal(newData.Details["a"], newData2.Details["a"]);
