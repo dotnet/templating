@@ -14,7 +14,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
     [Collection("Verify Tests")]
     public class BasicTests : BootstrapperTestBase, IClassFixture<PackageManager>
     {
-        private PackageManager _packageManager;
+        private readonly PackageManager _packageManager;
 
         public BasicTests(PackageManager packageManager)
         {
