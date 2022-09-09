@@ -163,10 +163,31 @@ dotnet_code_quality.ca1802.api_surface = private, internal
 dotnet_code_quality.ca1822.api_surface = private, internal
 dotnet_code_quality.ca2208.api_surface = public
 dotnet_diagnostic.CS1591.severity = suggestion
-dotnet_diagnostic.IDE0005.severity = warning
-# Fix formating
-dotnet_diagnostic.IDE0055.severity = warning
-dotnet_diagnostic.IDE0240.severity = warning
+dotnet_analyzer_diagnostic.category-Style.severity = warning
+#Use explicit type instead of var
+dotnet_diagnostic.IDE0008.severity = suggestion
+#Add missing cases to switch statement
+dotnet_diagnostic.IDE0010.severity = suggestion
+#Use expression body for constructors
+dotnet_diagnostic.IDE0021.severity = suggestion
+#Use expression body for methods
+dotnet_diagnostic.IDE0022.severity = suggestion
+#Use auto-implemented property
+dotnet_diagnostic.IDE0032.severity = suggestion
+#Use conditional expression for return
+dotnet_diagnostic.IDE0046.severity = suggestion
+#Remove unnecessary expression value
+dotnet_diagnostic.IDE0058.severity = suggestion
+#Add missing cases to switch expression
+dotnet_diagnostic.IDE0072.severity = suggestion
+#Simplify new expression
+dotnet_diagnostic.IDE0090.severity = suggestion
+#namespace should match folder
+dotnet_diagnostic.IDE0130.severity = suggestion
+#file-scoped namespaces
+dotnet_diagnostic.IDE0160.severity = suggestion
+#top-level-statements
+dotnet_diagnostic.IDE0210.severity = suggestion
 
 # License header
 file_header_template = Licensed to the .NET Foundation under one or more agreements.\nThe .NET Foundation licenses this file to you under the MIT license.
@@ -401,21 +422,6 @@ dotnet_diagnostic.CA5385.severity = warning
 # Do not use insecure randomness
 dotnet_diagnostic.CA5394.severity = warning
 
-# UseIsNullCheck
-dotnet_diagnostic.IDE0041.severity = warning
-
-# ValidateFormatString
-dotnet_diagnostic.IDE0043.severity = warning
-
-# MakeLocalFunctionStatic
-dotnet_diagnostic.IDE0062.severity = warning
-
-# FileHeaderMismatch
-dotnet_diagnostic.IDE0073.severity = warning
-
-# ConvertTypeOfToNameOf
-dotnet_diagnostic.IDE0082.severity = warning
-
 dotnet_diagnostic.RS0041.severity = suggestion
 
 # XML comments
@@ -481,8 +487,14 @@ dotnet_diagnostic.SA1142.severity = warning
 # Using directive should appear within a namespace declaration
 dotnet_diagnostic.SA1200.severity = none
 
+dotnet_diagnostic.SA1304.severity = none
+dotnet_diagnostic.SA1307.severity = none
+dotnet_diagnostic.SA1308.severity = none
+
 # Field names should not begin with underscore
 dotnet_diagnostic.SA1309.severity = none
+
+dotnet_diagnostic.SA1311.severity = none
 
 # Type parameter names should begin with T
 dotnet_diagnostic.SA1314.severity = none
