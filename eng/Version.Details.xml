@@ -27,10 +27,6 @@
       <Uri>https://github.com/dotnet/command-line-api</Uri>
       <Sha>4b605851d45131db2374ba711f2443040521d702</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.0.0-preview1.22452.2">
-      <Uri>https://github.com/dotnet/roslyn-analyzers</Uri>
-      <Sha>a26d1a203d0116aa769bce0fd3a917cc70d88a66</Sha>
-    </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
     <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="7.0.0-beta.22458.5">
