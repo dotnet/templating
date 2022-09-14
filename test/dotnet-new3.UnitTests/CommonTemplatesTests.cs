@@ -105,16 +105,9 @@ namespace Dotnet_new3.IntegrationTests
                 .Should()
                 .ExitWith(0)
                 .And.NotHaveStdErr()
-                .And.HaveStdOutMatching(
-$@"The template ""{expectedTemplateName}"" was created successfully\.
-
-Processing post-creation actions\.\.\.
-Running 'dotnet restore' on ({finalProjectName})\.\.\.
-  Determining projects to restore\.\.\.
-(.*$\n)*  Restored ({finalProjectName}) \(in \d{{1,5}}(\.\d{{1,5}}){{0,1}} \w*\)\.
-
-Restore succeeded\.",
-                RegexOptions.Multiline);
+                .And.HaveStdOutContaining($"The template \"{expectedTemplateName}\" was created successfully.")
+                .And.HaveStdOutContaining("Processing post-creation actions...")
+                .And.HaveStdOutContaining("Restore succeeded.");
 
             new DotnetCommand(_log, "restore")
                 .WithWorkingDirectory(workingDir)
