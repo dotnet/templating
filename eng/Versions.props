@@ -9,7 +9,8 @@
     <UsingToolNetFrameworkReferenceAssemblies>true</UsingToolNetFrameworkReferenceAssemblies>
     <VersionPrefix>7.0.100</VersionPrefix>
     <PreReleaseVersionLabel>rtm</PreReleaseVersionLabel>
-    <PreReleaseVersionIteration></PreReleaseVersionIteration>
+    <PreReleaseVersionIteration>
+    </PreReleaseVersionIteration>
     <!-- When StabilizePackageVersion is set to 'true', this branch will produce stable outputs for 'Shipping' packages -->
     <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">false</StabilizePackageVersion>
     <DotNetFinalVersionKind Condition="'$(StabilizePackageVersion)' == 'true'">release</DotNetFinalVersionKind>
@@ -23,9 +24,9 @@
     <!-- Dependencies from https://github.com/dotnet/command-line-api -->
     <SystemCommandLinePackageVersion>2.0.0-beta4.22402.1</SystemCommandLinePackageVersion>
     <!-- Dependencies from https://github.com/dotnet/runtime -->
-    <MicrosoftNETCoreAppRefPackageVersion>7.0.0-rc.2.22463.21</MicrosoftNETCoreAppRefPackageVersion>
-    <MicrosoftNETCoreAppRuntimewinx64PackageVersion>7.0.0-rc.2.22463.21</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
-    <VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>7.0.0-rc.2.22463.21</VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>
+    <MicrosoftNETCoreAppRefPackageVersion>7.0.0-rc.2.22464.1</MicrosoftNETCoreAppRefPackageVersion>
+    <MicrosoftNETCoreAppRuntimewinx64PackageVersion>7.0.0-rc.2.22464.1</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
+    <VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>7.0.0-rc.2.22464.1</VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>
     <!-- Dependencies from https://github.com/dotnet/roslyn-analyzers -->
     <MicrosoftCodeAnalysisNetAnalyzersPackageVersion>7.0.0-preview1.22452.2</MicrosoftCodeAnalysisNetAnalyzersPackageVersion>
   </PropertyGroup>
