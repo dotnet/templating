@@ -60,7 +60,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 new Dictionary<string, string>() { { "a", "b" } });
             await globalSettings1.SetInstalledTemplatePackagesAsync(new[] { newData }, default).ConfigureAwait(false);
             mutex.Dispose();
-            var timeoutTask = Task.Delay(3000);
+            var timeoutTask = Task.Delay(1000);
             var firstFinishedTask = await Task.WhenAny(timeoutTask, taskSource.Task).ConfigureAwait(false);
             Assert.Equal(taskSource.Task, firstFinishedTask);
 
