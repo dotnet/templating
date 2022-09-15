@@ -55,6 +55,9 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.IntegrationTests
 
             // Assert verification files created
             Directory.Exists(expectationsDir).Should().BeTrue();
+
+            _log.WriteLine("Files in expectations dir [{0}]: {1}", expectationsDir, string.Join(",", Directory.GetFiles(expectationsDir)));
+
             File.Exists(Path.Combine(expectationsDir, "console.console.csproj.received.csproj")).Should().BeTrue();
             File.Exists(Path.Combine(expectationsDir, "console.console.csproj.verified.csproj")).Should().BeTrue();
             File.Exists(Path.Combine(expectationsDir, "console.Program.cs.received.cs")).Should().BeTrue();
