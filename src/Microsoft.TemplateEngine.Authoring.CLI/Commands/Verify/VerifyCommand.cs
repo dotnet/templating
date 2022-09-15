@@ -98,6 +98,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
             AddOption(_newCommandPathOption);
             AddOption(_templateOutputPathOption);
             AddOption(_expectationsDirectoryOption);
+            AddOption(_disableDiffToolOption);
             AddOption(_disableDefaultExcludePatternsOption);
             AddOption(_excludePatternOption);
             AddOption(_verifyCommandOutputOption);
