@@ -51,7 +51,7 @@ stages:
         ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
           MirrorBranch: 'main'
           LclPackageId: 'LCL-JUNO-PROD-TMPLTNGMAIN'
-        condition: eq(or(variables['Build.SourceBranch'], format('{0}{1}', 'refs/heads/', variables['OneLocBuildBranch'] )), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+        condition: or(eq(variables['Build.SourceBranch'], format('{0}{1}', 'refs/heads/', variables['OneLocBuildBranch'] )), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
   - template: /eng/common/templates/jobs/jobs.yml
     parameters:
       enableMicrobuild: true
