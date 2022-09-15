@@ -1,15 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <TargetFramework>$(NETCoreTargetFramework)</TargetFramework>
-    <Description>A dotnet CLI tool with commands for template authoring.</Description>
+    <Description>A dotnet templating verification engine.</Description>
     <IsPackable>true</IsPackable>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 
     <PackAsTool>true</PackAsTool>
-    <ToolCommandName>dotnet-template-authoring</ToolCommandName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,7 +22,6 @@
   <ItemGroup>
     <ProjectReference Include="$(SrcDir)Microsoft.TemplateEngine.TemplateLocalizer.Core\Microsoft.TemplateEngine.TemplateLocalizer.Core.csproj" />
     <ProjectReference Include="..\..\test\Microsoft.TemplateEngine.TestHelper\Microsoft.TemplateEngine.TestHelper.csproj" />
-    <ProjectReference Include="..\Microsoft.TemplateEngine.Authoring.TemplateVerifier\Microsoft.TemplateEngine.Authoring.TemplateVerifier.csproj" />
     <ProjectReference Include="..\Microsoft.TemplateEngine.Utils\Microsoft.TemplateEngine.Utils.csproj" />
   </ItemGroup>
 
