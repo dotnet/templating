@@ -4,12 +4,12 @@
     <body>
       <trans-unit id="ConditionEvaluation_Error_CyclicDependency">
         <source>Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation.</source>
-        <target state="translated">Les conditions de paramètre contiennent une dépendance cyclique : [{0}] qui empêche l'évaluation déterministe.</target>
+        <target state="new">Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation.</target>
         <note>{0} is the dependency chain</note>
       </trans-unit>
       <trans-unit id="ConditionEvaluation_Error_MismatchedCondition">
         <source>Failed to evaluate condition {0} on parameter {1} (condition text: {2}, evaluation error: {3}) - condition might be malformed or referenced parameters do not have default nor explicit values.</source>
-        <target state="needs-review-translation">Échec de l'évaluation de la condition {0} sur le paramètre {1} (texte de la condition : {2}, erreur d'évaluation : {3}) – la condition est peut-être incorrecte.</target>
+        <target state="new">Failed to evaluate condition {0} on parameter {1} (condition text: {2}, evaluation error: {3}) - condition might be malformed or referenced parameters do not have default nor explicit values.</target>
         <note>{0} is the condition type
 {1} is parameter name
 {2} is condition text
@@ -17,72 +17,72 @@
       </trans-unit>
       <trans-unit id="ConditionEvaluation_Error_TopologicalSort">
         <source>Unexpected internal error - unable to perform topological sort of parameter dependencies that do not appear to have a cyclic dependencies.</source>
-        <target state="translated">Erreur interne inattendue – impossible d'effectuer un tri topologique des dépendances de paramètres qui ne semblent pas avoir de dépendances cycliques.</target>
+        <target state="new">Unexpected internal error - unable to perform topological sort of parameter dependencies that do not appear to have a cyclic dependencies.</target>
         <note />
       </trans-unit>
       <trans-unit id="ConditionEvaluation_Warning_CyclicDependency">
         <source>Parameter conditions contain cyclic dependency: [{0}]. With current values of parameters it's possible to deterministically evaluate parameters - so proceeding further. However template should be reviewed as instantiation with different parameters can lead to error.</source>
-        <target state="translated">Les conditions de paramètre contiennent une dépendance cyclique : [{0}]. Avec les valeurs actuelles des paramètres, il est possible d'évaluer les paramètres de manière déterministe – donc aller plus loin. Cependant, le modèle doit être revu car l'instanciation avec des paramètres différents peut entraîner des erreurs.</target>
+        <target state="new">Parameter conditions contain cyclic dependency: [{0}]. With current values of parameters it's possible to deterministically evaluate parameters - so proceeding further. However template should be reviewed as instantiation with different parameters can lead to error.</target>
         <note>{0} is the dependency chain</note>
       </trans-unit>
       <trans-unit id="Constaint_Error_ArgumentHasEmptyString">
         <source>'{0}' should not contain empty items</source>
-        <target state="translated">« {0} » ne doit pas contenir d’éléments vides</target>
+        <target state="new">'{0}' should not contain empty items</target>
         <note>{0} is JSON configuration for constraint</note>
       </trans-unit>
       <trans-unit id="Constraint_Error_ArgumentsNotSpecified">
         <source>Argument(s) were not specified. At least one argument should be specified.</source>
-        <target state="translated">Le ou les arguments n’ont pas été spécifiés. Au moins un argument doit être spécifié.</target>
+        <target state="new">Argument(s) were not specified. At least one argument should be specified.</target>
         <note />
       </trans-unit>
       <trans-unit id="Constraint_Error_ArrayHasNoObjects">
         <source>'{0}' does not contain valid items.</source>
-        <target state="translated">'{0}' ne contient pas d’éléments valides.</target>
+        <target state="new">'{0}' does not contain valid items.</target>
         <note>{0} is JSON configuration for constraint</note>
       </trans-unit>
       <trans-unit id="Constraint_Error_InvalidJson">
         <source>'{0}' is not a valid JSON.</source>
-        <target state="translated">'{0}' n'est pas une JSON valide.</target>
+        <target state="new">'{0}' is not a valid JSON.</target>
         <note>{0} is JSON configuration for constraint</note>
       </trans-unit>
       <trans-unit id="Constraint_Error_InvalidJsonArray_Objects">
         <source>'{0}' should be an array of objects.</source>
-        <target state="translated">'{0}' doit être un groupe d’objets.</target>
+        <target state="new">'{0}' should be an array of objects.</target>
         <note>{0} is JSON configuration for constraint</note>
       </trans-unit>
       <trans-unit id="Constraint_Error_InvalidJsonType_Array">
         <source>'{0}' is not a valid JSON array.</source>
-        <target state="translated">'{0}' n’est pas un groupe JSON valide.</target>
+        <target state="new">'{0}' is not a valid JSON array.</target>
         <note>{0} is JSON configuration for constraint</note>
       </trans-unit>
       <trans-unit id="Constraint_Error_InvalidJsonType_StringOrArray">
         <source>'{0}' is not a valid JSON string or array.</source>
-        <target state="translated">'{0}' n’est pas un tableau ou un groupe JSON valide.</target>
+        <target state="new">'{0}' is not a valid JSON string or array.</target>
         <note>{0} is JSON configuration for constraint</note>
       </trans-unit>
       <trans-unit id="Constraint_Error_InvalidVersion">
         <source>'{0}' is not a valid version or version range.</source>
-        <target state="translated">'{0}' n’est pas une version valide ou une plage de version.</target>
+        <target state="new">'{0}' is not a valid version or version range.</target>
         <note>{0} is version range specified in JSON configuration</note>
       </trans-unit>
       <trans-unit id="Constraint_WrongConfigurationCTA">
         <source>Check the constraint configuration in template.json.</source>
-        <target state="translated">Vérifiez la configuration de contrainte dans le modèle .json.</target>
+        <target state="new">Check the constraint configuration in template.json.</target>
         <note />
       </trans-unit>
       <trans-unit id="EnvironmentVariablesBindSource_Name">
         <source>Environment variables</source>
-        <target state="translated">Variables d'environnement</target>
+        <target state="new">Environment variables</target>
         <note />
       </trans-unit>
       <trans-unit id="EvaluatedInputDataSet_Error_MismatchedConditions">
         <source>Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition) or a failure to pass the condition results for parameters with condition(s) in template. Offending parameters: {0}.</source>
-        <target state="translated">Tentative de réussite du résultat de l'évaluation externe des conditions de paramètres pour le ou les paramètres dont la condition appropriée n'est pas définie dans le modèle (attributs IsEnabled ou IsRequired non renseignés avec la condition) ou échec de la transmission des résultats de la condition pour les paramètres avec condition(s) dans modèle. Paramètres incriminés : {0}.</target>
+        <target state="new">Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition) or a failure to pass the condition results for parameters with condition(s) in template. Offending parameters: {0}.</target>
         <note />
       </trans-unit>
       <trans-unit id="EvaluatedInputParameterData_Error_ConditionsInvalid">
         <source>Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition) or a failure to pass the condition results for parameters with condition(s) in template. Offending parameter(s): {0}.</source>
-        <target state="translated">Tentative de réussite du résultat de l'évaluation externe des conditions de paramètres pour le ou les paramètres dont la condition appropriée n'est pas définie dans le modèle (attributs IsEnabled ou IsRequired non renseignés avec la condition) ou échec de la transmission des résultats de la condition pour les paramètres avec condition(s) dans modèle. Paramètre(s) incriminé(s) : {0}.</target>
+        <target state="new">Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition) or a failure to pass the condition results for parameters with condition(s) in template. Offending parameter(s): {0}.</target>
         <note />
       </trans-unit>
       <trans-unit id="FolderInstaller_InstallResult_Error_FolderDoesNotExist">
@@ -92,7 +92,7 @@
       </trans-unit>
       <trans-unit id="Generic_Constraint_WrongConfigurationCTA">
         <source>Check the constraint configuration in template.json.</source>
-        <target state="translated">Vérifiez la configuration de contrainte dans le modèle .json.</target>
+        <target state="new">Check the constraint configuration in template.json.</target>
         <note />
       </trans-unit>
       <trans-unit id="Generic_LatestVersion">
@@ -122,7 +122,7 @@
       </trans-unit>
       <trans-unit id="GlobalSettingsTemplatePackagesProvider_Info_PackageAlreadyInstalled">
         <source>{0} is already installed, it will be replaced with {1}.</source>
-        <target state="translated">{0} est déjà installé, il sera remplacé par {1}.</target>
+        <target state="new">{0} is already installed, it will be replaced with {1}.</target>
         <note />
       </trans-unit>
       <trans-unit id="GlobalSettingsTemplatePackagesProvider_Info_PackageUninstalled">
@@ -132,24 +132,24 @@
       </trans-unit>
       <trans-unit id="HostConstraint_Error_MissingMandatoryProperty">
         <source>'{0}' does not have mandatory property '{1}'.</source>
-        <target state="translated">'{0}' n’a pas de propriété obligatoire '{1}'.</target>
+        <target state="new">'{0}' does not have mandatory property '{1}'.</target>
         <note>{0} is JSON configuration, {1} mandatory JSON property name</note>
       </trans-unit>
       <trans-unit id="HostConstraint_Message_Restricted">
         <source>Running template on {0} (version: {1}) is not supported, supported hosts is/are: {2}.</source>
-        <target state="translated">L’exécution du modèle sur {0} (version : {1}) n’est pas prise en charge, les hôtes pris en charge sont : {2}.</target>
+        <target state="new">Running template on {0} (version: {1}) is not supported, supported hosts is/are: {2}.</target>
         <note>{0} - host name ("dotnetcli", "ide"..)
 {1} - host version (usually matches VS or SDK version)
 {2} - comma-separated list of supported hosts and their versions (example: host1, host2(1.0.0), host3([1.0.0-*]))</note>
       </trans-unit>
       <trans-unit id="HostConstraint_Name">
         <source>Template engine host</source>
-        <target state="translated">Hôte du moteur de modèle</target>
+        <target state="new">Template engine host</target>
         <note />
       </trans-unit>
       <trans-unit id="HostParametersBindSource_Name">
         <source>Host defined parameters</source>
-        <target state="translated">Paramètres définis par l’hôte</target>
+        <target state="new">Host defined parameters</target>
         <note />
       </trans-unit>
       <trans-unit id="NuGetApiPackageManager_Error_FailedToLoadSource">
@@ -275,18 +275,18 @@ Détails : {1}.</target>
       </trans-unit>
       <trans-unit id="OSConstraint_Error_InvalidOSName">
         <source>'{0}' is not a valid operating system name. Allowed values are: {1}.</source>
-        <target state="translated">'{0}' n’est pas un nom de système d’exploitation valide. Les valeurs autorisées sont : {1}.</target>
+        <target state="new">'{0}' is not a valid operating system name. Allowed values are: {1}.</target>
         <note>{0} - OS name in configuration
 {1} - comma-separated list of allowed operating system names</note>
       </trans-unit>
       <trans-unit id="OSConstraint_Message_Restricted">
         <source>Running template on {0} is not supported, supported OS is/are: {1}.</source>
-        <target state="translated">L’exécution du modèle sur {0} n’est pas prise en charge, le ou les systèmes d’exploitation pris en charge sont : {1}.</target>
+        <target state="new">Running template on {0} is not supported, supported OS is/are: {1}.</target>
         <note>{0} - name of the executing operating system, {1} - comma separated list of supported operating systems.</note>
       </trans-unit>
       <trans-unit id="OSConstraint_Name">
         <source>Operating System</source>
-        <target state="translated">Système d'exploitation</target>
+        <target state="new">Operating System</target>
         <note>this is name of constraint that will appear in the UI</note>
       </trans-unit>
       <trans-unit id="Scanner_Error_TemplatePackageLocationIsNotSupported">
@@ -296,45 +296,45 @@ Détails : {1}.</target>
       </trans-unit>
       <trans-unit id="SdkConstraint_Error_InvalidVersion">
         <source>'{0}' is not a valid semver version.</source>
-        <target state="translated">« {0} » n’est pas une version SemVer valide.</target>
+        <target state="new">'{0}' is not a valid semver version.</target>
         <note>{0} is the provided version</note>
       </trans-unit>
       <trans-unit id="SdkConstraint_Error_MismatchedProviders">
         <source>Multiple 'ISdkInfoProvider' components provided by host ({0}), therefore 'SdkVersionConstraint' cannot be properly initialized.</source>
-        <target state="translated">Plusieurs composants « ISdkInfoProvider » fournis par l’hôte ({0}), par conséquent, « SdkVersionConstraint » ne peut pas être initialisé correctement.</target>
+        <target state="new">Multiple 'ISdkInfoProvider' components provided by host ({0}), therefore 'SdkVersionConstraint' cannot be properly initialized.</target>
         <note>{0} is the list of providers</note>
       </trans-unit>
       <trans-unit id="SdkConstraint_Error_MissingProvider">
         <source>No 'ISdkInfoProvider' component provided by host. 'SdkVersionConstraint' cannot be properly initialized.</source>
-        <target state="translated">Aucun composant « ISdkInfoProvider » fourni par l’hôte. « SdkVersionConstraint » ne peut pas être initialisé correctement.</target>
+        <target state="new">No 'ISdkInfoProvider' component provided by host. 'SdkVersionConstraint' cannot be properly initialized.</target>
         <note />
       </trans-unit>
       <trans-unit id="SdkConstraint_Message_Restricted">
         <source>Running template on current .NET SDK version ({0}) is unsupported. Supported version(s): {1}</source>
-        <target state="translated">L’exécution du modèle sur la version actuelle du SDK .NET ({0}) n’est pas prise en charge. Versions prises en charge : {1}</target>
+        <target state="new">Running template on current .NET SDK version ({0}) is unsupported. Supported version(s): {1}</target>
         <note>{0} is the current SDK version, {1} is the list of supported SDK versions</note>
       </trans-unit>
       <trans-unit id="SdkVersionConstraint_Name">
         <source>.NET SDK version</source>
-        <target state="translated">Version du Kit de développement logiciel (SDK) .NET</target>
+        <target state="new">.NET SDK version</target>
         <note />
       </trans-unit>
       <trans-unit id="TemplateConstraintManager_Error_FailedToEvaluate">
         <source>The constraint '{0}' failed to be evaluated for the args '{1}', details: {2}</source>
-        <target state="translated">La contrainte '{0}' n’a pas pu être évaluée pour les arguments '{1} ', détails : {2}</target>
+        <target state="new">The constraint '{0}' failed to be evaluated for the args '{1}', details: {2}</target>
         <note>{0} - constraint type
 {1} - arguments (in JSON format)
 {2} - reason of failure (has the period).</note>
       </trans-unit>
       <trans-unit id="TemplateConstraintManager_Error_FailedToInitialize">
         <source>The constraint '{0}' failed to initialize: {1}</source>
-        <target state="translated">La contrainte '{0}' n’a pas pu s'initialiser : {1}</target>
+        <target state="new">The constraint '{0}' failed to initialize: {1}</target>
         <note>{0} is constraint type
 {1} - reason of failure (has the period).</note>
       </trans-unit>
       <trans-unit id="TemplateConstraintManager_Error_UnknownType">
         <source>The constraint '{0}' is unknown.</source>
-        <target state="translated">La contrainte '{0}' est inconnue.</target>
+        <target state="new">The constraint '{0}' is unknown.</target>
         <note>{0} is constraint type</note>
       </trans-unit>
       <trans-unit id="TemplateCreator_TemplateCreationResult_Error_CouldNotLoadTemplate">
@@ -362,8 +362,8 @@ Détails : {0}.</target>
       <trans-unit id="TemplatePackageManager_Error_FailedToGetTemplatePackages">
         <source>Failed to retrieve template packages from provider '{0}'.
 Details: {1}</source>
-        <target state="translated">Échec de la récupération des packages de modèles à partir du fournisseur '{0}'.
-Détails : {1}</target>
+        <target state="new">Failed to retrieve template packages from provider '{0}'.
+Details: {1}</target>
         <note>{0} - provider name (not localized). Last line should not end with a period - period is already included in {1}.</note>
       </trans-unit>
       <trans-unit id="TemplatePackageManager_Error_FailedToScan">
@@ -376,33 +376,33 @@ Détails : {1}</target>
       <trans-unit id="TemplatePackageManager_Error_FailedToStoreCache">
         <source>Failed to store template cache, details: {0}
 Template cache will be recreated on the next run.</source>
-        <target state="translated">Échec du stockage du cache de modèles. Détails : {0}
-Le cache de modèles sera recréé lors de la prochaine exécution.</target>
+        <target state="new">Failed to store template cache, details: {0}
+Template cache will be recreated on the next run.</target>
         <note>{0} should not end with period - period is a part of the format entry.</note>
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Error_MismatchedProviders">
         <source>Multiple 'IWorkloadsInfoProvider' components provided by host ({0}), therefore 'WorkloadConstraint' cannot be properly initialized.</source>
-        <target state="translated">Plusieurs composants « IWorkloadsInfoProvider » fournis par l’hôte ({0}). « WorkloadConstraint » ne peut donc pas être initialisé correctement.</target>
+        <target state="new">Multiple 'IWorkloadsInfoProvider' components provided by host ({0}), therefore 'WorkloadConstraint' cannot be properly initialized.</target>
         <note>{0} is list of ids of providers</note>
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Error_MissingProvider">
         <source>No 'IWorkloadsInfoProvider' component provided by host. 'WorkloadConstraint' cannot be properly initialized.</source>
-        <target state="translated">Aucun composant « IWorkloadsInfoProvider » fourni par l’hôte. « WorkloadConstraint » ne peut pas être correctement initialisé.</target>
+        <target state="new">No 'IWorkloadsInfoProvider' component provided by host. 'WorkloadConstraint' cannot be properly initialized.</target>
         <note />
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Message_Restricted">
         <source>Running template is not supported - required optional workload(s) not installed. Supported workload(s): {0}. Currently installed optional workloads: {1}</source>
-        <target state="translated">L’exécution du modèle n’est pas prise en charge. Les charges de travail facultatives requises ne sont pas installées. Charges de travail prises en charge : {0}. Charges de travail facultatives actuellement installées : {1}</target>
+        <target state="new">Running template is not supported - required optional workload(s) not installed. Supported workload(s): {0}. Currently installed optional workloads: {1}</target>
         <note>{0} is list of supported workloads. {1} is list of installed optional workloads</note>
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Name">
         <source>Workload</source>
-        <target state="translated">Charge de travail</target>
+        <target state="new">Workload</target>
         <note>Terminus Technicus - most likely not to be translated (https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-workload-install)</note>
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Warning_DuplicateWorkloads">
         <source>'IWorkloadsInfoProvider' component provided by host provided some duplicated workloads (duplicates: {0}). Duplicates will be skipped.</source>
-        <target state="translated">Le composant « IWorkloadsInfoProvider » fourni par l’hôte a fourni des charges de travail dupliquées (doublons : {0}). Les doublons seront ignorés.</target>
+        <target state="new">'IWorkloadsInfoProvider' component provided by host provided some duplicated workloads (duplicates: {0}). Duplicates will be skipped.</target>
         <note>{0} is the list of duplicates</note>
       </trans-unit>
     </body>

@@ -4,12 +4,12 @@
     <body>
       <trans-unit id="ConditionEvaluation_Error_CyclicDependency">
         <source>Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation.</source>
-        <target state="translated">參數條件包含迴圈相依性: [{0}]，導致無法進行確定性評估。</target>
+        <target state="new">Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation.</target>
         <note>{0} is the dependency chain</note>
       </trans-unit>
       <trans-unit id="ConditionEvaluation_Error_MismatchedCondition">
         <source>Failed to evaluate condition {0} on parameter {1} (condition text: {2}, evaluation error: {3}) - condition might be malformed or referenced parameters do not have default nor explicit values.</source>
-        <target state="needs-review-translation">無法評估參數 {1} 的條件 {0} (條件文字: {2}，評估錯誤: {3}) - 條件的格式可能不正確。</target>
+        <target state="new">Failed to evaluate condition {0} on parameter {1} (condition text: {2}, evaluation error: {3}) - condition might be malformed or referenced parameters do not have default nor explicit values.</target>
         <note>{0} is the condition type
 {1} is parameter name
 {2} is condition text
@@ -17,72 +17,72 @@
       </trans-unit>
       <trans-unit id="ConditionEvaluation_Error_TopologicalSort">
         <source>Unexpected internal error - unable to perform topological sort of parameter dependencies that do not appear to have a cyclic dependencies.</source>
-        <target state="translated">未預期的內部錯誤 - 無法執行似乎沒有迴圈相依性的參數相依性拓撲排序。</target>
+        <target state="new">Unexpected internal error - unable to perform topological sort of parameter dependencies that do not appear to have a cyclic dependencies.</target>
         <note />
       </trans-unit>
       <trans-unit id="ConditionEvaluation_Warning_CyclicDependency">
         <source>Parameter conditions contain cyclic dependency: [{0}]. With current values of parameters it's possible to deterministically evaluate parameters - so proceeding further. However template should be reviewed as instantiation with different parameters can lead to error.</source>
-        <target state="translated">參數條件包含迴圈相依性: [{0}]。使用目前的參數值，可以確定性地評估參數，所以繼續進行。不過，應該檢閱範本，因為使用不同參數具現化可能會導致錯誤。</target>
+        <target state="new">Parameter conditions contain cyclic dependency: [{0}]. With current values of parameters it's possible to deterministically evaluate parameters - so proceeding further. However template should be reviewed as instantiation with different parameters can lead to error.</target>
         <note>{0} is the dependency chain</note>
       </trans-unit>
       <trans-unit id="Constaint_Error_ArgumentHasEmptyString">
         <source>'{0}' should not contain empty items</source>
-        <target state="translated">'{0}' 不應包含空白項目</target>
+        <target state="new">'{0}' should not contain empty items</target>
         <note>{0} is JSON configuration for constraint</note>
       </trans-unit>
       <trans-unit id="Constraint_Error_ArgumentsNotSpecified">
         <source>Argument(s) were not specified. At least one argument should be specified.</source>
-        <target state="translated">未指定引數。至少應該指定一個引數。</target>
+        <target state="new">Argument(s) were not specified. At least one argument should be specified.</target>
         <note />
       </trans-unit>
       <trans-unit id="Constraint_Error_ArrayHasNoObjects">
         <source>'{0}' does not contain valid items.</source>
-        <target state="translated">'{0}' 不包含有效的項目。</target>
+        <target state="new">'{0}' does not contain valid items.</target>
         <note>{0} is JSON configuration for constraint</note>
       </trans-unit>
       <trans-unit id="Constraint_Error_InvalidJson">
         <source>'{0}' is not a valid JSON.</source>
-        <target state="translated">'{0}' 是無效的 JSON。</target>
+        <target state="new">'{0}' is not a valid JSON.</target>
         <note>{0} is JSON configuration for constraint</note>
       </trans-unit>
       <trans-unit id="Constraint_Error_InvalidJsonArray_Objects">
         <source>'{0}' should be an array of objects.</source>
-        <target state="translated">'{0}' 應為物件陣列。</target>
+        <target state="new">'{0}' should be an array of objects.</target>
         <note>{0} is JSON configuration for constraint</note>
       </trans-unit>
       <trans-unit id="Constraint_Error_InvalidJsonType_Array">
         <source>'{0}' is not a valid JSON array.</source>
-        <target state="translated">'{0}' 不是有效的 JSON 陣列。</target>
+        <target state="new">'{0}' is not a valid JSON array.</target>
         <note>{0} is JSON configuration for constraint</note>
       </trans-unit>
       <trans-unit id="Constraint_Error_InvalidJsonType_StringOrArray">
         <source>'{0}' is not a valid JSON string or array.</source>
-        <target state="translated">'{0}' 不是有效的 JSON 字串或陣列。</target>
+        <target state="new">'{0}' is not a valid JSON string or array.</target>
         <note>{0} is JSON configuration for constraint</note>
       </trans-unit>
       <trans-unit id="Constraint_Error_InvalidVersion">
         <source>'{0}' is not a valid version or version range.</source>
-        <target state="translated">'{0}' 不是有效的版本或版本範圍。</target>
+        <target state="new">'{0}' is not a valid version or version range.</target>
         <note>{0} is version range specified in JSON configuration</note>
       </trans-unit>
       <trans-unit id="Constraint_WrongConfigurationCTA">
         <source>Check the constraint configuration in template.json.</source>
-        <target state="translated">檢查 template.json 中的限制式設定。</target>
+        <target state="new">Check the constraint configuration in template.json.</target>
         <note />
       </trans-unit>
       <trans-unit id="EnvironmentVariablesBindSource_Name">
         <source>Environment variables</source>
-        <target state="translated">環境變數</target>
+        <target state="new">Environment variables</target>
         <note />
       </trans-unit>
       <trans-unit id="EvaluatedInputDataSet_Error_MismatchedConditions">
         <source>Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition) or a failure to pass the condition results for parameters with condition(s) in template. Offending parameters: {0}.</source>
-        <target state="translated">嘗試針對未在範本 (IsEnabled 或 IsRequired 屬性未填入條件) 中設定適當條件的參數傳遞參數條件的外部評估結果，或無法為範本中具有條件的參數傳遞條件結果。違規參數: {0}。</target>
+        <target state="new">Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition) or a failure to pass the condition results for parameters with condition(s) in template. Offending parameters: {0}.</target>
         <note />
       </trans-unit>
       <trans-unit id="EvaluatedInputParameterData_Error_ConditionsInvalid">
         <source>Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition) or a failure to pass the condition results for parameters with condition(s) in template. Offending parameter(s): {0}.</source>
-        <target state="translated">嘗試針對未在範本 (IsEnabled 或 IsRequired 屬性未填入條件) 中設定適當條件的參數傳遞參數條件的外部評估結果，或無法為範本中具有條件的參數傳遞條件結果。違規參數: {0}。</target>
+        <target state="new">Attempt to pass result of external evaluation of parameters conditions for parameter(s) that do not have appropriate condition set in template (IsEnabled or IsRequired attributes not populated with condition) or a failure to pass the condition results for parameters with condition(s) in template. Offending parameter(s): {0}.</target>
         <note />
       </trans-unit>
       <trans-unit id="FolderInstaller_InstallResult_Error_FolderDoesNotExist">
@@ -92,7 +92,7 @@
       </trans-unit>
       <trans-unit id="Generic_Constraint_WrongConfigurationCTA">
         <source>Check the constraint configuration in template.json.</source>
-        <target state="translated">檢查 template.json 中的限制式設定。</target>
+        <target state="new">Check the constraint configuration in template.json.</target>
         <note />
       </trans-unit>
       <trans-unit id="Generic_LatestVersion">
@@ -122,7 +122,7 @@
       </trans-unit>
       <trans-unit id="GlobalSettingsTemplatePackagesProvider_Info_PackageAlreadyInstalled">
         <source>{0} is already installed, it will be replaced with {1}.</source>
-        <target state="translated">{0} 已安裝，將會以 {1} 取代。</target>
+        <target state="new">{0} is already installed, it will be replaced with {1}.</target>
         <note />
       </trans-unit>
       <trans-unit id="GlobalSettingsTemplatePackagesProvider_Info_PackageUninstalled">
@@ -132,24 +132,24 @@
       </trans-unit>
       <trans-unit id="HostConstraint_Error_MissingMandatoryProperty">
         <source>'{0}' does not have mandatory property '{1}'.</source>
-        <target state="translated">'{0}' 沒有強制屬性 '{1}'。</target>
+        <target state="new">'{0}' does not have mandatory property '{1}'.</target>
         <note>{0} is JSON configuration, {1} mandatory JSON property name</note>
       </trans-unit>
       <trans-unit id="HostConstraint_Message_Restricted">
         <source>Running template on {0} (version: {1}) is not supported, supported hosts is/are: {2}.</source>
-        <target state="translated">不支援在 {0} (版本: {1}) 上執行範本，支援的主機為: {2}。</target>
+        <target state="new">Running template on {0} (version: {1}) is not supported, supported hosts is/are: {2}.</target>
         <note>{0} - host name ("dotnetcli", "ide"..)
 {1} - host version (usually matches VS or SDK version)
 {2} - comma-separated list of supported hosts and their versions (example: host1, host2(1.0.0), host3([1.0.0-*]))</note>
       </trans-unit>
       <trans-unit id="HostConstraint_Name">
         <source>Template engine host</source>
-        <target state="translated">範本引擎主機</target>
+        <target state="new">Template engine host</target>
         <note />
       </trans-unit>
       <trans-unit id="HostParametersBindSource_Name">
         <source>Host defined parameters</source>
-        <target state="translated">主機定義的參數</target>
+        <target state="new">Host defined parameters</target>
         <note />
       </trans-unit>
       <trans-unit id="NuGetApiPackageManager_Error_FailedToLoadSource">
@@ -275,18 +275,18 @@ Details: {1}.</source>
       </trans-unit>
       <trans-unit id="OSConstraint_Error_InvalidOSName">
         <source>'{0}' is not a valid operating system name. Allowed values are: {1}.</source>
-        <target state="translated">'{0}' 不是有效的作業系統名稱。允許的值為: {1}。</target>
+        <target state="new">'{0}' is not a valid operating system name. Allowed values are: {1}.</target>
         <note>{0} - OS name in configuration
 {1} - comma-separated list of allowed operating system names</note>
       </trans-unit>
       <trans-unit id="OSConstraint_Message_Restricted">
         <source>Running template on {0} is not supported, supported OS is/are: {1}.</source>
-        <target state="translated">不支援在 {0} 上執行範本，支援的作業系統為: {1}。</target>
+        <target state="new">Running template on {0} is not supported, supported OS is/are: {1}.</target>
         <note>{0} - name of the executing operating system, {1} - comma separated list of supported operating systems.</note>
       </trans-unit>
       <trans-unit id="OSConstraint_Name">
         <source>Operating System</source>
-        <target state="translated">作業系統</target>
+        <target state="new">Operating System</target>
         <note>this is name of constraint that will appear in the UI</note>
       </trans-unit>
       <trans-unit id="Scanner_Error_TemplatePackageLocationIsNotSupported">
@@ -296,45 +296,45 @@ Details: {1}.</source>
       </trans-unit>
       <trans-unit id="SdkConstraint_Error_InvalidVersion">
         <source>'{0}' is not a valid semver version.</source>
-        <target state="translated">'{0}' 不是有效的 SemVer 版本。</target>
+        <target state="new">'{0}' is not a valid semver version.</target>
         <note>{0} is the provided version</note>
       </trans-unit>
       <trans-unit id="SdkConstraint_Error_MismatchedProviders">
         <source>Multiple 'ISdkInfoProvider' components provided by host ({0}), therefore 'SdkVersionConstraint' cannot be properly initialized.</source>
-        <target state="translated">主機 ({0}) 提供多個 'ISdkInfoProvider' 元件，因此無法正確初始化 'SdkVersionConstraint'。</target>
+        <target state="new">Multiple 'ISdkInfoProvider' components provided by host ({0}), therefore 'SdkVersionConstraint' cannot be properly initialized.</target>
         <note>{0} is the list of providers</note>
       </trans-unit>
       <trans-unit id="SdkConstraint_Error_MissingProvider">
         <source>No 'ISdkInfoProvider' component provided by host. 'SdkVersionConstraint' cannot be properly initialized.</source>
-        <target state="translated">主機未提供 'ISdkInfoProvider' 元件。無法正確初始化 'SdkVersionConstraint'。</target>
+        <target state="new">No 'ISdkInfoProvider' component provided by host. 'SdkVersionConstraint' cannot be properly initialized.</target>
         <note />
       </trans-unit>
       <trans-unit id="SdkConstraint_Message_Restricted">
         <source>Running template on current .NET SDK version ({0}) is unsupported. Supported version(s): {1}</source>
-        <target state="translated">不支援在目前的 .NET SDK 版本 ({0}) 上執行範本。支援的版本: {1}</target>
+        <target state="new">Running template on current .NET SDK version ({0}) is unsupported. Supported version(s): {1}</target>
         <note>{0} is the current SDK version, {1} is the list of supported SDK versions</note>
       </trans-unit>
       <trans-unit id="SdkVersionConstraint_Name">
         <source>.NET SDK version</source>
-        <target state="translated">.NET SDK 版本</target>
+        <target state="new">.NET SDK version</target>
         <note />
       </trans-unit>
       <trans-unit id="TemplateConstraintManager_Error_FailedToEvaluate">
         <source>The constraint '{0}' failed to be evaluated for the args '{1}', details: {2}</source>
-        <target state="translated">無法為引數 '{1}' 評估限制式 '{0}'，詳細資料: {2}</target>
+        <target state="new">The constraint '{0}' failed to be evaluated for the args '{1}', details: {2}</target>
         <note>{0} - constraint type
 {1} - arguments (in JSON format)
 {2} - reason of failure (has the period).</note>
       </trans-unit>
       <trans-unit id="TemplateConstraintManager_Error_FailedToInitialize">
         <source>The constraint '{0}' failed to initialize: {1}</source>
-        <target state="translated">限制式 '{0}' 無法初始化: {1}</target>
+        <target state="new">The constraint '{0}' failed to initialize: {1}</target>
         <note>{0} is constraint type
 {1} - reason of failure (has the period).</note>
       </trans-unit>
       <trans-unit id="TemplateConstraintManager_Error_UnknownType">
         <source>The constraint '{0}' is unknown.</source>
-        <target state="translated">限制式 '{0}' 不明。</target>
+        <target state="new">The constraint '{0}' is unknown.</target>
         <note>{0} is constraint type</note>
       </trans-unit>
       <trans-unit id="TemplateCreator_TemplateCreationResult_Error_CouldNotLoadTemplate">
@@ -362,8 +362,8 @@ Details: {0}</source>
       <trans-unit id="TemplatePackageManager_Error_FailedToGetTemplatePackages">
         <source>Failed to retrieve template packages from provider '{0}'.
 Details: {1}</source>
-        <target state="translated">無法從提供者'{0}'撷取模板套件。
-詳細資料: {1}</target>
+        <target state="new">Failed to retrieve template packages from provider '{0}'.
+Details: {1}</target>
         <note>{0} - provider name (not localized). Last line should not end with a period - period is already included in {1}.</note>
       </trans-unit>
       <trans-unit id="TemplatePackageManager_Error_FailedToScan">
@@ -376,33 +376,33 @@ Details: {1}</source>
       <trans-unit id="TemplatePackageManager_Error_FailedToStoreCache">
         <source>Failed to store template cache, details: {0}
 Template cache will be recreated on the next run.</source>
-        <target state="translated">無法儲存範本快取{0}
-詳細資料: 範本快取下次執行時將重新建立。</target>
+        <target state="new">Failed to store template cache, details: {0}
+Template cache will be recreated on the next run.</target>
         <note>{0} should not end with period - period is a part of the format entry.</note>
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Error_MismatchedProviders">
         <source>Multiple 'IWorkloadsInfoProvider' components provided by host ({0}), therefore 'WorkloadConstraint' cannot be properly initialized.</source>
-        <target state="translated">主機 ({0}) 提供多個 'IWorkloadsInfoProvider' 元件，因此無法正確初始化 'WorkloadConstraint'。</target>
+        <target state="new">Multiple 'IWorkloadsInfoProvider' components provided by host ({0}), therefore 'WorkloadConstraint' cannot be properly initialized.</target>
         <note>{0} is list of ids of providers</note>
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Error_MissingProvider">
         <source>No 'IWorkloadsInfoProvider' component provided by host. 'WorkloadConstraint' cannot be properly initialized.</source>
-        <target state="translated">主機未提供 'IWorkloadsInfoProvider' 元件。無法正確初始化 'WorkloadConstraint'。</target>
+        <target state="new">No 'IWorkloadsInfoProvider' component provided by host. 'WorkloadConstraint' cannot be properly initialized.</target>
         <note />
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Message_Restricted">
         <source>Running template is not supported - required optional workload(s) not installed. Supported workload(s): {0}. Currently installed optional workloads: {1}</source>
-        <target state="translated">不支援執行中的範本 - 未安裝必要的選用工作負載。支援的工作負載: {0}。目前安裝的選用工作負載: {1}</target>
+        <target state="new">Running template is not supported - required optional workload(s) not installed. Supported workload(s): {0}. Currently installed optional workloads: {1}</target>
         <note>{0} is list of supported workloads. {1} is list of installed optional workloads</note>
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Name">
         <source>Workload</source>
-        <target state="translated">工作負載</target>
+        <target state="new">Workload</target>
         <note>Terminus Technicus - most likely not to be translated (https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-workload-install)</note>
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Warning_DuplicateWorkloads">
         <source>'IWorkloadsInfoProvider' component provided by host provided some duplicated workloads (duplicates: {0}). Duplicates will be skipped.</source>
-        <target state="translated">主機提供的 'IWorkloadsInfoProvider' 元件提供了一些重複的工作負載 (重複: {0})。將略過重複項目。</target>
+        <target state="new">'IWorkloadsInfoProvider' component provided by host provided some duplicated workloads (duplicates: {0}). Duplicates will be skipped.</target>
         <note>{0} is the list of duplicates</note>
       </trans-unit>
     </body>

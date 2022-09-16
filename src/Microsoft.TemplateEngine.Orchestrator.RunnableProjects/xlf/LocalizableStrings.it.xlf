@@ -15,7 +15,7 @@
       </trans-unit>
       <trans-unit id="Authoring_InvalidMultichoiceSymbol">
         <source>Choice parameter {0} is invalid. It allows multiple values ('AllowMultipleValues=true'), while some of the configured choices contain separator characters ({1}). Invalid choices: {2}</source>
-        <target state="translated">Il parametro di scelta {0} non è valido. Consente più valori ('AllowMultipleValues=true'), mentre alcune delle scelte configurate contengono caratteri separatori ({1}). Scelte non valide: {2}</target>
+        <target state="new">Choice parameter {0} is invalid. It allows multiple values ('AllowMultipleValues=true'), while some of the configured choices contain separator characters ({1}). Invalid choices: {2}</target>
         <note>{0} is the offending symbol name, {1} is a set of separator characters, {2} is a csv list of offending choice values</note>
       </trans-unit>
       <trans-unit id="Authoring_InvalidPostActionLocalizationIndex">
@@ -100,12 +100,12 @@ Dettagli: {1}</target>
       </trans-unit>
       <trans-unit id="BindSymbolEvaluator_Warning_EvaluationError">
         <source>Failed to evaluate bind symbol '{0}', it will be skipped.</source>
-        <target state="translated">Non è stato possibile valutare il simbolo di associazione '{0}'. Verrà ignorato.</target>
+        <target state="new">Failed to evaluate bind symbol '{0}', it will be skipped.</target>
         <note>{0} - name of the symbol in configuration that cannot be evaluated</note>
       </trans-unit>
       <trans-unit id="BindSymbolEvaluator_Warning_ValueAvailableFromMultipleSources">
         <source>Failed to evaluate binding '{0}', its value is available from multiple sources: {1}. Use the prefixed value ({2}) in template configuration instead.</source>
-        <target state="translated">Impossibile valutare l'associazione '{0}'. Il relativo valore è disponibile da più origini: {1}. Usare invece il valore con prefisso ({2}) nella configurazione del modello.</target>
+        <target state="new">Failed to evaluate binding '{0}', its value is available from multiple sources: {1}. Use the prefixed value ({2}) in template configuration instead.</target>
         <note>{0} - binding from template.json configuration
 {1} - the comma separated list of sources (localized values) which define the binding
 {2} - the comma separated list of prefixes that can be used to define the source of the value</note>
@@ -117,7 +117,7 @@ Dettagli: {1}</target>
       </trans-unit>
       <trans-unit id="RunnableProjectGenerator_CannotAddImplicitChoice">
         <source>Variable [{0}] already added with value [{1}]. Cannot add it as implicit variable with value of self.</source>
-        <target state="translated">La variabile [{0}] è già stata aggiunta con il valore [{1}]. Non è possibile aggiungerla come variabile implicita con valore self.</target>
+        <target state="new">Variable [{0}] already added with value [{1}]. Cannot add it as implicit variable with value of self.</target>
         <note>{0} is the choiceKey, {1} is the existing conflict value</note>
       </trans-unit>
       <trans-unit id="RunnableProjectGenerator_Exception_ConfigShouldBeFile">
@@ -157,27 +157,27 @@ Dettagli: {1}</target>
       </trans-unit>
       <trans-unit id="SimpleConfigModel_Error_Constraints_InvalidSyntax">
         <source>'{0}' should contain objects.</source>
-        <target state="translated">'{0}' deve contenere oggetti.</target>
+        <target state="new">'{0}' should contain objects.</target>
         <note>{0} is name of JSON property </note>
       </trans-unit>
       <trans-unit id="SimpleConfigModel_Error_Constraints_MissingType">
         <source>Constraint definition '{0}' does not contain mandatory property '{1}'.</source>
-        <target state="translated">La definizione del vincolo '{0}' non contiene proprietà obbligatorie '{1}'.</target>
+        <target state="new">Constraint definition '{0}' does not contain mandatory property '{1}'.</target>
         <note>{0} - JSON with constraint defintion, {1} - missing property.</note>
       </trans-unit>
       <trans-unit id="SymbolModel_Error_MandatoryPropertyMissing">
         <source>The symbol '{0}' of type '{1}' is incorrect: mandatory property '{2}' is not set. The symbol will be skipped.</source>
-        <target state="translated">Il simbolo '{0}' di tipo '{1}' non è corretto: la proprietà obbligatoria '{2}' non è impostata. Il simbolo verrà ignorato.</target>
+        <target state="new">The symbol '{0}' of type '{1}' is incorrect: mandatory property '{2}' is not set. The symbol will be skipped.</target>
         <note />
       </trans-unit>
       <trans-unit id="Symbol_Error_IsRequiredNotABool">
         <source>Found disallowed value for IsRequired property: [{0}], expected boolean value.</source>
-        <target state="translated">Trovato valore non consentito per la proprietà IsRequired: [{0}], valore booleano previsto.</target>
+        <target state="new">Found disallowed value for IsRequired property: [{0}], expected boolean value.</target>
         <note>{0} - the json property</note>
       </trans-unit>
       <trans-unit id="Symbol_Error_IsRequiredNotABoolOrString">
         <source>Found disallowed value for IsRequired property: [{0}], expected boolean or string (condition) value</source>
-        <target state="translated">Trovato valore non consentito per la proprietà IsRequired: [{0}], valore booleano o stringa (condizione) previsto</target>
+        <target state="new">Found disallowed value for IsRequired property: [{0}], expected boolean or string (condition) value</target>
         <note>{0} - the json property</note>
       </trans-unit>
     </body>

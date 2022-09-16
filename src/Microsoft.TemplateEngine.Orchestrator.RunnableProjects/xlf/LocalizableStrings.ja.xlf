@@ -15,7 +15,7 @@
       </trans-unit>
       <trans-unit id="Authoring_InvalidMultichoiceSymbol">
         <source>Choice parameter {0} is invalid. It allows multiple values ('AllowMultipleValues=true'), while some of the configured choices contain separator characters ({1}). Invalid choices: {2}</source>
-        <target state="translated">選択肢パラメーターの {0} が無効です。複数の値 ('AllowMultipleValues=true') が許可されていますが、構成された選択肢の一部に区切り文字 ({1}) が含まれています。無効な選択肢: {2}</target>
+        <target state="new">Choice parameter {0} is invalid. It allows multiple values ('AllowMultipleValues=true'), while some of the configured choices contain separator characters ({1}). Invalid choices: {2}</target>
         <note>{0} is the offending symbol name, {1} is a set of separator characters, {2} is a csv list of offending choice values</note>
       </trans-unit>
       <trans-unit id="Authoring_InvalidPostActionLocalizationIndex">
@@ -35,7 +35,7 @@
       </trans-unit>
       <trans-unit id="Authoring_ManualInstructionIdIsNotUnique">
         <source>'id' of the manual instruction '{0}' at index {1} is not unique. Only the first manual instruction that uses this id will be localized.</source>
-        <target state="translated">インデックス {1} の手動手順 {0} の 'ID' が一意ではありません。この ID を使用する最初の手動手順のみがローカライズされます。</target>
+        <target state="translated">インデックス {1} の手動手順 "{0}" の 'ID' が一意ではありません。この ID を使用する最初の手動手順のみがローカライズされます。</target>
         <note>{0} is any identifier string that user provided in the file. Such as: "myInstruction", "firstInstruction", "instruction1" etc.
 {1} is a whole number representing the zero-based index of the manual instruction. Such as "5", or "0".</note>
       </trans-unit>
@@ -100,12 +100,12 @@ Details: {1}</source>
       </trans-unit>
       <trans-unit id="BindSymbolEvaluator_Warning_EvaluationError">
         <source>Failed to evaluate bind symbol '{0}', it will be skipped.</source>
-        <target state="translated">バインド シンボル '{0}' を評価できませんでした。スキップされます。</target>
+        <target state="new">Failed to evaluate bind symbol '{0}', it will be skipped.</target>
         <note>{0} - name of the symbol in configuration that cannot be evaluated</note>
       </trans-unit>
       <trans-unit id="BindSymbolEvaluator_Warning_ValueAvailableFromMultipleSources">
         <source>Failed to evaluate binding '{0}', its value is available from multiple sources: {1}. Use the prefixed value ({2}) in template configuration instead.</source>
-        <target state="translated">バインド '{0}' を評価できませんでした。その値は複数のソースから使用できます: {1}。代わりに、テンプレート構成でプレフィックス値 ({2}) を使用してください。</target>
+        <target state="new">Failed to evaluate binding '{0}', its value is available from multiple sources: {1}. Use the prefixed value ({2}) in template configuration instead.</target>
         <note>{0} - binding from template.json configuration
 {1} - the comma separated list of sources (localized values) which define the binding
 {2} - the comma separated list of prefixes that can be used to define the source of the value</note>
@@ -117,7 +117,7 @@ Details: {1}</source>
       </trans-unit>
       <trans-unit id="RunnableProjectGenerator_CannotAddImplicitChoice">
         <source>Variable [{0}] already added with value [{1}]. Cannot add it as implicit variable with value of self.</source>
-        <target state="translated">変数 [{0}] は既に値 [{1}] と共に追加されています。値が self の暗黙的な変数として追加することはできません。</target>
+        <target state="new">Variable [{0}] already added with value [{1}]. Cannot add it as implicit variable with value of self.</target>
         <note>{0} is the choiceKey, {1} is the existing conflict value</note>
       </trans-unit>
       <trans-unit id="RunnableProjectGenerator_Exception_ConfigShouldBeFile">
@@ -157,27 +157,27 @@ Details: {1}</source>
       </trans-unit>
       <trans-unit id="SimpleConfigModel_Error_Constraints_InvalidSyntax">
         <source>'{0}' should contain objects.</source>
-        <target state="translated">'{0}' にオブジェクトを含める必要があります。</target>
+        <target state="new">'{0}' should contain objects.</target>
         <note>{0} is name of JSON property </note>
       </trans-unit>
       <trans-unit id="SimpleConfigModel_Error_Constraints_MissingType">
         <source>Constraint definition '{0}' does not contain mandatory property '{1}'.</source>
-        <target state="translated">制約定義 '{0}' に必須のプロパティ '{1}'が含まれていません。</target>
+        <target state="new">Constraint definition '{0}' does not contain mandatory property '{1}'.</target>
         <note>{0} - JSON with constraint defintion, {1} - missing property.</note>
       </trans-unit>
       <trans-unit id="SymbolModel_Error_MandatoryPropertyMissing">
         <source>The symbol '{0}' of type '{1}' is incorrect: mandatory property '{2}' is not set. The symbol will be skipped.</source>
-        <target state="translated">種類 '{0}' のシンボル '{1}' が正しくありません。 必須プロパティ '{2}' が設定されていません。シンボルはスキップされます。</target>
+        <target state="new">The symbol '{0}' of type '{1}' is incorrect: mandatory property '{2}' is not set. The symbol will be skipped.</target>
         <note />
       </trans-unit>
       <trans-unit id="Symbol_Error_IsRequiredNotABool">
         <source>Found disallowed value for IsRequired property: [{0}], expected boolean value.</source>
-        <target state="translated">IsRequired プロパティの許可されていない値が見つかりました: [{0}]。ブール値が必要です。</target>
+        <target state="new">Found disallowed value for IsRequired property: [{0}], expected boolean value.</target>
         <note>{0} - the json property</note>
       </trans-unit>
       <trans-unit id="Symbol_Error_IsRequiredNotABoolOrString">
         <source>Found disallowed value for IsRequired property: [{0}], expected boolean or string (condition) value</source>
-        <target state="translated">IsRequired プロパティの許可されていない値が見つかりました: [{0}]、ブール値または文字列 (条件) 値が必要です</target>
+        <target state="new">Found disallowed value for IsRequired property: [{0}], expected boolean or string (condition) value</target>
         <note>{0} - the json property</note>
       </trans-unit>
     </body>

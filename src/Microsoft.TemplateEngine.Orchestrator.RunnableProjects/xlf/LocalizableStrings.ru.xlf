@@ -4,28 +4,28 @@
     <body>
       <trans-unit id="Authoring_InvalidJsonElementInLocalizationFile">
         <source>Localization file should only contain elements with type 'string'. Remove elements that are not strings.</source>
-        <target state="translated">Файл локализации должен содержать только элементы типа \"строка\". Удалите элементы, которые не являются строками.</target>
+        <target state="translated">Файл локализации должен содержать только элементы типа "строка". Удалите элементы, которые не являются строками.</target>
         <note />
       </trans-unit>
       <trans-unit id="Authoring_InvalidManualInstructionLocalizationIndex">
         <source>In localization file under the post action with id '{1}', there are localized strings for manual instruction(s) with ids '{0}'. These manual instructions do not exist in the template.json file and should be removed from localization file.</source>
-        <target state="translated">В файле локализации под операцией POST с идентификатором \"{1}\" имеются локализованные строки для инструкций для выполнения вручную с идентификаторами \"{0}\". Эти инструкции не существуют в файле template.json и должны быть удалены из файла локализации.</target>
+        <target state="translated">В файле локализации под операцией POST с идентификатором "{1}" имеются локализованные строки для инструкций для выполнения вручную с идентификаторами "{0}". Эти инструкции не существуют в файле template.json и должны быть удалены из файла локализации.</target>
         <note>{0} is a list of single-word identifier strings separated by comma. Such as "myManualInstruction, someUserPickedText, instruction3".
 {1} is a single-word identifier string. Such as "myPostAction".</note>
       </trans-unit>
       <trans-unit id="Authoring_InvalidMultichoiceSymbol">
         <source>Choice parameter {0} is invalid. It allows multiple values ('AllowMultipleValues=true'), while some of the configured choices contain separator characters ({1}). Invalid choices: {2}</source>
-        <target state="translated">Недопустимый параметр {0} выбора. Допускается несколько значений (\"AllowMultipleValues=true\"), в то время как некоторые из настроенных вариантов выбора содержат знаки разделения ({1}). Недопустимые варианты выбора: {2}</target>
+        <target state="new">Choice parameter {0} is invalid. It allows multiple values ('AllowMultipleValues=true'), while some of the configured choices contain separator characters ({1}). Invalid choices: {2}</target>
         <note>{0} is the offending symbol name, {1} is a set of separator characters, {2} is a csv list of offending choice values</note>
       </trans-unit>
       <trans-unit id="Authoring_InvalidPostActionLocalizationIndex">
         <source>Post action(s) with id(s) '{0}' specified in the localization file do not exist in the template.json file. Remove the localized strings from the localization file.</source>
-        <target state="translated">Операции POST с идентификатором \"{0}\", указанные в файле локализации, не существуют в файле template.json. Удалите локализованные строки из файла локализации.</target>
+        <target state="translated">Операции POST с идентификатором "{0}", указанные в файле локализации, не существуют в файле template.json. Удалите локализованные строки из файла локализации.</target>
         <note>{0} is a list of single-word identifier strings separated by comma. Such as "myManualInstruction, someUserPickedText, instruction3".</note>
       </trans-unit>
       <trans-unit id="Authoring_InvalidRegex">
         <source>'{0}' could not be parsed as a regular expression</source>
-        <target state="translated">Не удалось проанализировать \"{0}\" как регулярное выражение</target>
+        <target state="translated">Не удалось проанализировать "{0}" как регулярное выражение</target>
         <note />
       </trans-unit>
       <trans-unit id="Authoring_MalformedPostActionManualInstructions">
@@ -35,13 +35,13 @@
       </trans-unit>
       <trans-unit id="Authoring_ManualInstructionIdIsNotUnique">
         <source>'id' of the manual instruction '{0}' at index {1} is not unique. Only the first manual instruction that uses this id will be localized.</source>
-        <target state="translated">Идентификатор инструкции для выполнения вручную \"{0}\" по индексу {1} не является уникальным. Будет локализована только первая инструкция, использующая этот идентификатор.</target>
+        <target state="translated">Идентификатор инструкции для выполнения вручную "{0}" по индексу {1} не является уникальным. Будет локализована только первая инструкция, использующая этот идентификатор.</target>
         <note>{0} is any identifier string that user provided in the file. Such as: "myInstruction", "firstInstruction", "instruction1" etc.
 {1} is a whole number representing the zero-based index of the manual instruction. Such as "5", or "0".</note>
       </trans-unit>
       <trans-unit id="Authoring_MissingValue">
         <source>Missing '{0}'.</source>
-        <target state="translated">Отсутствует \"{0}\".</target>
+        <target state="translated">Отсутствует "{0}".</target>
         <note />
       </trans-unit>
       <trans-unit id="Authoring_NonBoolDataTypeForRegexMatch">
@@ -51,29 +51,29 @@
       </trans-unit>
       <trans-unit id="Authoring_PostActionIdIsNotUnique">
         <source>[{0}]: id of the post action '{1}' at index '{2}' is not unique. Only the first post action that uses this id will be localized.</source>
-        <target state="translated">[{0}]: идентификатор операции POST \"{1}\" по индексу \"{2}\" не является уникальным. Будет локализована только первая операция POST, использующая этот идентификатор.</target>
+        <target state="translated">[{0}]: идентификатор операции POST "{1}" по индексу "{2}" не является уникальным. Будет локализована только первая операция POST, использующая этот идентификатор.</target>
         <note>{0} is any identifier string that user provided in the file. Such as "myPostAction", "firstPostAction", "postAction1" etc.
 {1} is a number representing the zero-based index of the post action. Such as "5", or "0".</note>
       </trans-unit>
       <trans-unit id="Authoring_PostActionMustHaveActionId">
         <source>[{0}]: Post action at index '{1}' should have an 'actionId' to declare the action to be executed.</source>
-        <target state="translated">[{0}]: операция POST по индексу \"{1}\" должна иметь \"actionId\", чтобы объявить выполняемое действие.</target>
+        <target state="translated">[{0}]: операция POST по индексу "{1}" должна иметь "actionId", чтобы объявить выполняемое действие.</target>
         <note>{0} is a whole number representing the zero-based index of the post action. Such as "5" or "0".
 Do not localize: actionId</note>
       </trans-unit>
       <trans-unit id="Authoring_SourceDoesNotExist">
         <source>Source '{0}' in template does not exist.</source>
-        <target state="translated">Источник \"{0}\" в шаблоне не существует.</target>
+        <target state="translated">Источник "{0}" в шаблоне не существует.</target>
         <note />
       </trans-unit>
       <trans-unit id="Authoring_SourceIsOutsideInstallSource">
         <source>Source location '{0}' is outside the specified install source location.</source>
-        <target state="translated">Исходное расположение \"{0}\" находится за пределами указанного расположения источника установки.</target>
+        <target state="translated">Исходное расположение "{0}" находится за пределами указанного расположения источника установки.</target>
         <note />
       </trans-unit>
       <trans-unit id="Authoring_SourceMustBeDirectory">
         <source>Source must be a directory, but '{0}' is a file.</source>
-        <target state="translated">Источником должен быть каталог, но \"{0}\" является файлом.</target>
+        <target state="translated">Источником должен быть каталог, но "{0}" является файлом.</target>
         <note />
       </trans-unit>
       <trans-unit id="Authoring_TemplateMissingCommonInformation">
@@ -100,12 +100,12 @@ Details: {1}</source>
       </trans-unit>
       <trans-unit id="BindSymbolEvaluator_Warning_EvaluationError">
         <source>Failed to evaluate bind symbol '{0}', it will be skipped.</source>
-        <target state="translated">Не удалось вычислить символ привязки "{0}". Он будет пропущен.</target>
+        <target state="new">Failed to evaluate bind symbol '{0}', it will be skipped.</target>
         <note>{0} - name of the symbol in configuration that cannot be evaluated</note>
       </trans-unit>
       <trans-unit id="BindSymbolEvaluator_Warning_ValueAvailableFromMultipleSources">
         <source>Failed to evaluate binding '{0}', its value is available from multiple sources: {1}. Use the prefixed value ({2}) in template configuration instead.</source>
-        <target state="translated">Не удалось вычислить привязку "{0}". Ее значение доступно из нескольких источников: {1}. Вместо этого используйте значение с префиксом ({2}) в конфигурации шаблона.</target>
+        <target state="new">Failed to evaluate binding '{0}', its value is available from multiple sources: {1}. Use the prefixed value ({2}) in template configuration instead.</target>
         <note>{0} - binding from template.json configuration
 {1} - the comma separated list of sources (localized values) which define the binding
 {2} - the comma separated list of prefixes that can be used to define the source of the value</note>
@@ -117,7 +117,7 @@ Details: {1}</source>
       </trans-unit>
       <trans-unit id="RunnableProjectGenerator_CannotAddImplicitChoice">
         <source>Variable [{0}] already added with value [{1}]. Cannot add it as implicit variable with value of self.</source>
-        <target state="translated">Переменная [{0}] уже добавлена со значением [{1}]. Не удается добавить ее как неявную переменную со своим значением.</target>
+        <target state="new">Variable [{0}] already added with value [{1}]. Cannot add it as implicit variable with value of self.</target>
         <note>{0} is the choiceKey, {1} is the existing conflict value</note>
       </trans-unit>
       <trans-unit id="RunnableProjectGenerator_Exception_ConfigShouldBeFile">
@@ -152,32 +152,32 @@ Details: {1}</source>
       </trans-unit>
       <trans-unit id="SimpleConfigModel_AuthoringException_MergeConfiguration_InvalidFileName">
         <source>Failed to load additional configuration file {0}. Additional configuration file names must end with '.{1}'.</source>
-        <target state="translated">Не удалось загрузить дополнительный файл конфигурации {0}. Имена дополнительных файлов конфигурации должны заканчиваться на \".{1}\".</target>
+        <target state="translated">Не удалось загрузить дополнительный файл конфигурации {0}. Имена дополнительных файлов конфигурации должны заканчиваться на ".{1}".</target>
         <note />
       </trans-unit>
       <trans-unit id="SimpleConfigModel_Error_Constraints_InvalidSyntax">
         <source>'{0}' should contain objects.</source>
-        <target state="translated">\"{0}\" должны содержать объекты.</target>
+        <target state="new">'{0}' should contain objects.</target>
         <note>{0} is name of JSON property </note>
       </trans-unit>
       <trans-unit id="SimpleConfigModel_Error_Constraints_MissingType">
         <source>Constraint definition '{0}' does not contain mandatory property '{1}'.</source>
-        <target state="translated">Определение ограничения \"{0}\" не содержит обязательного свойства \"{1}\".</target>
+        <target state="new">Constraint definition '{0}' does not contain mandatory property '{1}'.</target>
         <note>{0} - JSON with constraint defintion, {1} - missing property.</note>
       </trans-unit>
       <trans-unit id="SymbolModel_Error_MandatoryPropertyMissing">
         <source>The symbol '{0}' of type '{1}' is incorrect: mandatory property '{2}' is not set. The symbol will be skipped.</source>
-        <target state="translated">Неверный символ "{0}" типа "{1}": обязательное свойство "{2}" не настроено. Символ будет пропущен.</target>
+        <target state="new">The symbol '{0}' of type '{1}' is incorrect: mandatory property '{2}' is not set. The symbol will be skipped.</target>
         <note />
       </trans-unit>
       <trans-unit id="Symbol_Error_IsRequiredNotABool">
         <source>Found disallowed value for IsRequired property: [{0}], expected boolean value.</source>
-        <target state="translated">Обнаружено неразрешенное значение свойства IsRequired: [{0}], ожидается логическое значение.</target>
+        <target state="new">Found disallowed value for IsRequired property: [{0}], expected boolean value.</target>
         <note>{0} - the json property</note>
       </trans-unit>
       <trans-unit id="Symbol_Error_IsRequiredNotABoolOrString">
         <source>Found disallowed value for IsRequired property: [{0}], expected boolean or string (condition) value</source>
-        <target state="translated">Обнаружено неразрешенное значение свойства IsRequired: [{0}], ожидается логическое значение или строка (условие).</target>
+        <target state="new">Found disallowed value for IsRequired property: [{0}], expected boolean or string (condition) value</target>
         <note>{0} - the json property</note>
       </trans-unit>
     </body>
