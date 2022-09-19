@@ -9,7 +9,7 @@
       </trans-unit>
       <trans-unit id="ConditionEvaluation_Error_MismatchedCondition">
         <source>Failed to evaluate condition {0} on parameter {1} (condition text: {2}, evaluation error: {3}) - condition might be malformed or referenced parameters do not have default nor explicit values.</source>
-        <target state="needs-review-translation">Falha ao avaliar a condição {0} no parâmetro {1} (texto da condição: {2}, erro de avaliação: {3}) - a condição pode estar malformada.</target>
+        <target state="translated">Falha ao avaliar a condição {0} no parâmetro {1} (texto da condição: {2}, erro de avaliação: {3}) - a condição pode estar malformada ou os parâmetros referenciados não possuem valores padrão nem explícitos.</target>
         <note>{0} is the condition type
 {1} is parameter name
 {2} is condition text
@@ -362,8 +362,8 @@ Detalhes: {0}</target>
       <trans-unit id="TemplatePackageManager_Error_FailedToGetTemplatePackages">
         <source>Failed to retrieve template packages from provider '{0}'.
 Details: {1}</source>
-        <target state="translated">Falha ao recuperar os pacotes de modelos do provedor '{0}'.
-Detalhes: {1}</target>
+        <target state="new">Failed to retrieve template packages from provider '{0}'.
+Details: {1}</target>
         <note>{0} - provider name (not localized). Last line should not end with a period - period is already included in {1}.</note>
       </trans-unit>
       <trans-unit id="TemplatePackageManager_Error_FailedToScan">
@@ -376,8 +376,8 @@ Detalhes: {1}</target>
       <trans-unit id="TemplatePackageManager_Error_FailedToStoreCache">
         <source>Failed to store template cache, details: {0}
 Template cache will be recreated on the next run.</source>
-        <target state="translated">Falha ao armazenar o cache do modelo, detalhes: {0}
-O cache do modelo será recriado na próxima execução.</target>
+        <target state="new">Failed to store template cache, details: {0}
+Template cache will be recreated on the next run.</target>
         <note>{0} should not end with period - period is a part of the format entry.</note>
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Error_MismatchedProviders">
