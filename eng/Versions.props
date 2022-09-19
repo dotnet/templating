@@ -27,7 +27,7 @@
     <!-- Dependencies from https://github.com/dotnet/runtime -->
     <MicrosoftNETCoreAppRefPackageVersion>6.0.10</MicrosoftNETCoreAppRefPackageVersion>
     <MicrosoftNETCoreAppRuntimewinx64PackageVersion>6.0.10</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
-    <VSRedistCommonNetCoreSharedFrameworkx6460PackageVersion>6.0.10-servicing.22465.6</VSRedistCommonNetCoreSharedFrameworkx6460PackageVersion>
+    <VSRedistCommonNetCoreSharedFrameworkx6460PackageVersion>6.0.10-servicing.22466.14</VSRedistCommonNetCoreSharedFrameworkx6460PackageVersion>
     <MicrosoftExtensionsLoggingAbstractionsPackageVersion>6.0.2</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
     <MicrosoftExtensionsLoggingPackageVersion>6.0.0</MicrosoftExtensionsLoggingPackageVersion>
     <MicrosoftExtensionsLoggingConsolePackageVersion>6.0.0</MicrosoftExtensionsLoggingConsolePackageVersion>
