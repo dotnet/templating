@@ -362,7 +362,7 @@ Details: {0}.</target>
       <trans-unit id="TemplatePackageManager_Error_FailedToGetTemplatePackages">
         <source>Failed to retrieve template packages from provider '{0}'.
 Details: {1}</source>
-        <target state="new">Failed to retrieve template packages from provider '{0}'.
+        <target state="translated">Fehler beim Abrufen von Vorlagenpaketen vom Anbieter „{0}“.
 Details: {1}</target>
         <note>{0} - provider name (not localized). Last line should not end with a period - period is already included in {1}.</note>
       </trans-unit>
@@ -376,8 +376,8 @@ Details: {1}.</target>
       <trans-unit id="TemplatePackageManager_Error_FailedToStoreCache">
         <source>Failed to store template cache, details: {0}
 Template cache will be recreated on the next run.</source>
-        <target state="new">Failed to store template cache, details: {0}
-Template cache will be recreated on the next run.</target>
+        <target state="translated">Fehler beim Speichern des Vorlagencaches. Details: {0}
+Der Vorlagencache wird bei der nächsten Ausführung neu erstellt.</target>
         <note>{0} should not end with period - period is a part of the format entry.</note>
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Error_MismatchedProviders">
