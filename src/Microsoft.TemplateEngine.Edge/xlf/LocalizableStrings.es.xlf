@@ -9,7 +9,7 @@
       </trans-unit>
       <trans-unit id="ConditionEvaluation_Error_MismatchedCondition">
         <source>Failed to evaluate condition {0} on parameter {1} (condition text: {2}, evaluation error: {3}) - condition might be malformed or referenced parameters do not have default nor explicit values.</source>
-        <target state="needs-review-translation">No se ha podido evaluar la condición {0} en el parámetro {1} (texto de condición: {2}, error de evaluación: {3}): la condición podría tener un formato incorrecto.</target>
+        <target state="translated">No se pudo evaluar la condición {0} del parámetro {1} (texto de la condición: {2}, error de evaluación: {3}): la condición podría estar mal formada o los parámetros referenciados no tienen valores predeterminados ni explícitos.</target>
         <note>{0} is the condition type
 {1} is parameter name
 {2} is condition text
@@ -362,7 +362,7 @@ Detalles: {0}.</target>
       <trans-unit id="TemplatePackageManager_Error_FailedToGetTemplatePackages">
         <source>Failed to retrieve template packages from provider '{0}'.
 Details: {1}</source>
-        <target state="translated">No se pudieron recuperar los paquetes de plantillas del proveedor '{0}'.
+        <target state="translated">No se pudieron recuperar los paquetes de plantillas del proveedor “{0}”.
 Detalles: {1}</target>
         <note>{0} - provider name (not localized). Last line should not end with a period - period is already included in {1}.</note>
       </trans-unit>

@@ -9,7 +9,7 @@
       </trans-unit>
       <trans-unit id="ConditionEvaluation_Error_MismatchedCondition">
         <source>Failed to evaluate condition {0} on parameter {1} (condition text: {2}, evaluation error: {3}) - condition might be malformed or referenced parameters do not have default nor explicit values.</source>
-        <target state="needs-review-translation">Non è stato possibile valutare la condizione {0} nel parametro {1} (testo della condizione: {2}, errore di valutazione: {3}). Il formato della condizione potrebbe non essere valido.</target>
+        <target state="translated">Non è stato possibile valutare la condizione {0} nel parametro {1} (testo della condizione: {2}, errore di valutazione: {3}). La condizione potrebbe essere in formato non corretto o i parametri a cui viene fatto riferimento non hanno valori predefiniti né espliciti.</target>
         <note>{0} is the condition type
 {1} is parameter name
 {2} is condition text
@@ -362,8 +362,8 @@ Dettagli: {0}.</target>
       <trans-unit id="TemplatePackageManager_Error_FailedToGetTemplatePackages">
         <source>Failed to retrieve template packages from provider '{0}'.
 Details: {1}</source>
-        <target state="translated">Non è stato possibile recuperare i pacchetti di modelli dal provider '{0}'.
-Dettagli: {1}</target>
+        <target state="new">Failed to retrieve template packages from provider '{0}'.
+Details: {1}</target>
         <note>{0} - provider name (not localized). Last line should not end with a period - period is already included in {1}.</note>
       </trans-unit>
       <trans-unit id="TemplatePackageManager_Error_FailedToScan">
@@ -376,8 +376,8 @@ Dettagli: {1}</target>
       <trans-unit id="TemplatePackageManager_Error_FailedToStoreCache">
         <source>Failed to store template cache, details: {0}
 Template cache will be recreated on the next run.</source>
-        <target state="translated">Non è stato possibile archiviare la cache dei modelli. Dettagli: {0}
-La cache dei modelli verrà ricreata alla prossima esecuzione.</target>
+        <target state="new">Failed to store template cache, details: {0}
+Template cache will be recreated on the next run.</target>
         <note>{0} should not end with period - period is a part of the format entry.</note>
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Error_MismatchedProviders">

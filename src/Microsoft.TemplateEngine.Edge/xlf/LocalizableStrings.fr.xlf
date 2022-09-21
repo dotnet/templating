@@ -9,7 +9,7 @@
       </trans-unit>
       <trans-unit id="ConditionEvaluation_Error_MismatchedCondition">
         <source>Failed to evaluate condition {0} on parameter {1} (condition text: {2}, evaluation error: {3}) - condition might be malformed or referenced parameters do not have default nor explicit values.</source>
-        <target state="needs-review-translation">Échec de l'évaluation de la condition {0} sur le paramètre {1} (texte de la condition : {2}, erreur d'évaluation : {3}) – la condition est peut-être incorrecte.</target>
+        <target state="translated">Nous n’avons pas pu évaluer la condition {0} sur le paramètre {1} (texte de condition : {2}, erreur d’évaluation : {3}) - la condition est peut-être incorrecte ou les paramètres référencés n’ont pas de valeurs par défaut ni explicites.</target>
         <note>{0} is the condition type
 {1} is parameter name
 {2} is condition text
@@ -362,8 +362,8 @@ Détails : {0}.</target>
       <trans-unit id="TemplatePackageManager_Error_FailedToGetTemplatePackages">
         <source>Failed to retrieve template packages from provider '{0}'.
 Details: {1}</source>
-        <target state="translated">Échec de la récupération des packages de modèles à partir du fournisseur '{0}'.
-Détails : {1}</target>
+        <target state="new">Failed to retrieve template packages from provider '{0}'.
+Details: {1}</target>
         <note>{0} - provider name (not localized). Last line should not end with a period - period is already included in {1}.</note>
       </trans-unit>
       <trans-unit id="TemplatePackageManager_Error_FailedToScan">
@@ -376,8 +376,8 @@ Détails : {1}</target>
       <trans-unit id="TemplatePackageManager_Error_FailedToStoreCache">
         <source>Failed to store template cache, details: {0}
 Template cache will be recreated on the next run.</source>
-        <target state="translated">Échec du stockage du cache de modèles. Détails : {0}
-Le cache de modèles sera recréé lors de la prochaine exécution.</target>
+        <target state="new">Failed to store template cache, details: {0}
+Template cache will be recreated on the next run.</target>
         <note>{0} should not end with period - period is a part of the format entry.</note>
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Error_MismatchedProviders">

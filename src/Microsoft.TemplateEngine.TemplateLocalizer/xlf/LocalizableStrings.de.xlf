@@ -24,7 +24,7 @@
       </trans-unit>
       <trans-unit id="command_export_help_templatePath_description">
         <source>Specifies the path to the template.json file. If a directory is given, template.json file will be searched within the directory. If --recursive options is specified, all the template.json files under the given directory and its subdirectories will be taken as input.</source>
-        <target state="translated">Gibt den Pfad zur Datei template.json an. Wenn ein Verzeichnis angegeben wird, wird die template.json-Datei in diesem Verzeichnis gesucht. Wenn die Option \"--recursive\" angegeben ist, werden alle template.json-Dateien unter dem angegebenen Verzeichnis und seinen Unterverzeichnissen als Eingabe betrachtet.</target>
+        <target state="translated">Gibt den Pfad zur Datei template.json an. Wenn ein Verzeichnis angegeben wird, wird die template.json-Datei in diesem Verzeichnis gesucht. Wenn die Option "--recursive" angegeben ist, werden alle template.json-Dateien unter dem angegebenen Verzeichnis und seinen Unterverzeichnissen als Eingabe betrachtet.</target>
         <note>Do not localize: "template.json", "--recursive"</note>
       </trans-unit>
       <trans-unit id="command_export_log_cancelled">
@@ -41,7 +41,7 @@
         <source>Generating localization files for a template.json has failed.
 Reason: {0}.
 File Path: {1}.</source>
-        <target state="translated">Fehler beim Generieren von Lokalisierungsdateien für eine Datei \"template.json\".
+        <target state="translated">Fehler beim Generieren von Lokalisierungsdateien für eine Datei "template.json".
 Ursache: {0}.
 Dateipfad: {1}.</target>
         <note>{0} is a sentence such as "Json property should contain a field 'ID'"
