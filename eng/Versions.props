@@ -24,6 +24,6 @@
     <MicrosoftNETCoreAppRuntimewinx64PackageVersion>7.0.0-rc.1.22414.6</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
     <VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>7.0.0-rc.1.22414.6</VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>
     <!-- Dependencies from https://github.com/dotnet/roslyn-analyzers -->
-    <MicrosoftCodeAnalysisNetAnalyzersPackageVersion>7.0.0-preview1.22452.2</MicrosoftCodeAnalysisNetAnalyzersPackageVersion>
+    <MicrosoftCodeAnalysisNetAnalyzersPackageVersion>7.0.0-preview1.22466.1</MicrosoftCodeAnalysisNetAnalyzersPackageVersion>
   </PropertyGroup>
 </Project>
