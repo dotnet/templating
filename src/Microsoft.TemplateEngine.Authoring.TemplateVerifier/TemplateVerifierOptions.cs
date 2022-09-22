@@ -3,13 +3,34 @@
 
 using System.Text;
 using Microsoft.Extensions.Options;
-using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
 {
-    public delegate void ScrubTemplateFileContent(string filename, StringBuilder content);
+    public class ScrubbersDefinition
+    {
+        public ScrubbersDefinition() { }
 
-    public delegate Task VerifyFileContent(string filename, AsyncLazy<string> content, Task defaultVarifierAction);
+        public ScrubbersDefinition(Action<StringBuilder> scrubber, string? extension = null)
+        {
+            this.AddScrubber(scrubber, extension);
+        }
+
+        public Dictionary<string, Action<StringBuilder>> ScrubersByExtension { get; private set; } = new Dictionary<string, Action<StringBuilder>>();
+
+        public Action<StringBuilder>? GeneralScrubber { get; private set; }
+
+        public void AddScrubber(Action<StringBuilder> scrubber, string? extension = null)
+        {
+            if (extension == null)
+            {
+                GeneralScrubber += scrubber;
+            }
+            else
+            {
+                ScrubersByExtension[extension] = scrubber;
+            }
+        }
+    }
 
     public class TemplateVerifierOptions : IOptions<TemplateVerifierOptions>
     {
@@ -71,14 +92,19 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
         public string? OutputDirectory { get; init; }
 
         /// <summary>
-        /// Gets the delegate that performs custom scrubbing of template output contents before verifications.
+        /// Gets the Verifier expectations directory naming convention - by indicating which scenarios should be differentiated.
         /// </summary>
-        public ScrubTemplateFileContent? CustomScrubber { get; init; }
+        public UniqueForOption? UniqueFor { get; init; }
+
+        /// <summary>
+        /// Gets the delegates that perform custom scrubbing of template output contents before verifications.
+        /// </summary>
+        public ScrubbersDefinition? CustomScrubbers { get; init; }
 
         /// <summary>
         /// Gets the delegate that performs custom verification of template output contents.
         /// </summary>
-        public VerifyFileContent? CustomVerifier { get; init; }
+        public Func<string, Task>? CustomVerifyDirectory { get; init; }
 
         TemplateVerifierOptions IOptions<TemplateVerifierOptions>.Value => this;
     }

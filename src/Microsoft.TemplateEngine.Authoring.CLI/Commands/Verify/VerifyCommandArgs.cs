@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Text.RegularExpressions;
+using Microsoft.TemplateEngine.Authoring.TemplateVerifier;
 
 namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
 {
@@ -21,7 +22,8 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
             bool? disableDefaultVerificationExcludePatterns,
             IEnumerable<string>? verificationExcludePatterns,
             bool? verifyCommandOutput,
-            bool isCommandExpectedToFail)
+            bool isCommandExpectedToFail,
+            IEnumerable<string>? uniqueForOptions)
         {
             TemplateName = templateName;
             TemplatePath = templatePath;
@@ -34,6 +36,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
             VerificationExcludePatterns = verificationExcludePatterns;
             VerifyCommandOutput = verifyCommandOutput;
             IsCommandExpectedToFail = isCommandExpectedToFail;
+            UniqueFor = FromOptionTokens(uniqueForOptions);
         }
 
         /// <summary>
@@ -93,6 +96,11 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
         /// </summary>
         public bool IsCommandExpectedToFail { get; init; }
 
+        /// <summary>
+        /// Gets the Verifier expectations directory naming convention - by indicating which scenarios should be differentiated.
+        /// </summary>
+        public UniqueForOption? UniqueFor { get; init; }
+
         public static IEnumerable<string> TokenizeJoinedArgs(string? joinedArgs)
         {
             if (string.IsNullOrEmpty(joinedArgs))
@@ -127,6 +135,23 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
             {
                 return input;
             }
+        }
+
+        private static UniqueForOption? FromOptionTokens(IEnumerable<string>? tokens)
+        {
+            if (tokens == null)
+            {
+                return null;
+            }
+
+            UniqueForOption result = UniqueForOption.None;
+
+            foreach (string token in tokens)
+            {
+                result |= Enum.Parse<UniqueForOption>(token, true);
+            }
+
+            return result;
         }
     }
 }

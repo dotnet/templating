@@ -3,7 +3,7 @@
 
 using System.Diagnostics;
 using System.Reflection;
-using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -102,6 +102,17 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             await VerifyResult(_options, commandResult).ConfigureAwait(false);
         }
 
+        private static string EncodeArgsAsPath(IEnumerable<string>? args)
+        {
+            if (args == null || !args.Any())
+            {
+                return string.Empty;
+            }
+
+            Regex r = new Regex(string.Format("[{0}]", Regex.Escape(new string(Path.GetInvalidFileNameChars()))));
+            return r.Replace(string.Join('#', args), string.Empty);
+        }
+
         private static void DummyMethod()
         { }
 
@@ -128,119 +139,125 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
 
             List<Glob> globs = exclusionsList.Select(pattern => Glob.Parse(pattern)).ToList();
 
-            IEnumerable<string> filesToVerify =
-                Directory.EnumerateFiles(commandResult.StartInfo.WorkingDirectory, "*", SearchOption.AllDirectories);
             if (_options.VerifyCommandOutput ?? false)
             {
-                filesToVerify = filesToVerify.Concat(SpecialFiles.FileNames);
-            }
-
-            List<string> verificationErrors = new List<string>();
-
-            // run verification
-            foreach (string filePath in filesToVerify)
-            {
-                if (globs.Any(g => g.IsMatch(filePath)))
+                if (Directory.Exists(Path.Combine(commandResult.StartInfo.WorkingDirectory, SpecialFiles.StandardStreamsDir)))
                 {
-                    continue;
+                    throw new TemplateVerificationException(
+                        string.Format(
+                            "Folder [{0}] not expected to exist in the template output - cannot verify stdout/stderr in such case",
+                            SpecialFiles.StandardStreamsDir),
+                        TemplateVerificationErrorCode.InternalError);
                 }
 
-                //TODO: this wont be needed
-                VerifierSettings.DerivePathInfo(
-                    (sourceFile, projectDirectory, type, method) => new(
-                        directory: args.ExpectationsDirectory ?? "VerifyExpectations",
-                        typeName: args.TemplateName,
-                        //TODO: would this actually be needed - then we'd need to encode relative path to file here as well
-                        // (as single template can have multiple files with same name)
-                        methodName: Path.GetFileName(filePath)));
-                try
-                {
-                    SettingsTask defaultVerifyTask;
+                Directory.CreateDirectory(Path.Combine(commandResult.StartInfo.WorkingDirectory, SpecialFiles.StandardStreamsDir));
 
-                    if (SpecialFiles.IsSpecialFile(filePath))
-                    {
-                        defaultVerifyTask = Verifier.Verify(SpecialFiles.IsStdOut(filePath) ? commandResult.StdOut : commandResult.StdErr);
-                    }
-                    else
-                    {
-                        defaultVerifyTask = Verifier.VerifyFile(filePath);
-                    }
+                await File.WriteAllTextAsync(
+                    Path.Combine(commandResult.StartInfo.WorkingDirectory, SpecialFiles.StandardStreamsDir, SpecialFiles.StdOut),
+                    commandResult.StdOut)
+                    .ConfigureAwait(false);
 
-                    if (_options.CustomScrubber != null)
-                    {
-                        defaultVerifyTask = defaultVerifyTask.AddScrubber(sb => _options.CustomScrubber(filePath, sb));
-                    }
-
-                    if (_options.DisableDiffTool ?? false)
-                    {
-                        defaultVerifyTask = defaultVerifyTask.DisableDiff();
-                    }
-
-                    Task verifyTask = _options.CustomVerifier != null
-                        ? _options.CustomVerifier(filePath, GetVerificationContent(filePath, commandResult), defaultVerifyTask)
-                        : defaultVerifyTask;
-
-                    await verifyTask.ConfigureAwait(false);
-                }
-                //TODO: VerifyException is not public now - so either use reflection or get the Verify package updated
-                //catch (VerifyException e)
-                //{
-                //    throw;
-                //}
-                catch (Exception e)
-                {
-                    if (e.GetType().Name == "VerifyException")
-                    {
-                        verificationErrors.Add(e.Message);
-                    }
-                    else
-                    {
-                        _logger.LogError(e, "Error encountered");
-                        throw;
-                    }
-                }
+                await File.WriteAllTextAsync(
+                        Path.Combine(commandResult.StartInfo.WorkingDirectory, SpecialFiles.StandardStreamsDir, SpecialFiles.StdErr),
+                        commandResult.StdErr)
+                    .ConfigureAwait(false);
             }
 
-            if (verificationErrors.Any())
-            {
-                string doubleNewLine = Environment.NewLine + Environment.NewLine;
-                throw new TemplateVerificationException(
-                    "Verification Failed." + doubleNewLine + string.Join(doubleNewLine, verificationErrors),
-                    TemplateVerificationErrorCode.VerificationFailed);
-            }
-        }
+            Verifier.DerivePathInfo(
+                (sourceFile, projectDirectory, type, method) => new(
+                    directory: args.ExpectationsDirectory ?? "VerifyExpectations",
+                    typeName: args.TemplateName,
+                    methodName: EncodeArgsAsPath(args.TemplateSpecificArgs)));
 
-        private AsyncLazy<string> GetVerificationContent(string filePath, CommandResult commandResult)
-        {
-            return new AsyncLazy<string>(async () =>
+            try
             {
-                string content;
-                if (SpecialFiles.IsSpecialFile(filePath))
+                SettingsTask defaultVerifyTask = Verifier.VerifyDirectory(
+                    commandResult.StartInfo.WorkingDirectory,
+                    (filePath) => !globs.Any(g => g.IsMatch(filePath)));
+
+                if (_options.CustomScrubbers != null)
                 {
-                    content = SpecialFiles.IsStdOut(filePath) ? commandResult.StdOut : commandResult.StdErr;
+                    if (_options.CustomScrubbers.GeneralScrubber != null)
+                    {
+                        defaultVerifyTask = defaultVerifyTask.AddScrubber(_options.CustomScrubbers.GeneralScrubber);
+                    }
+
+                    foreach (var pair in _options.CustomScrubbers.ScrubersByExtension)
+                    {
+                        defaultVerifyTask = defaultVerifyTask.AddScrubber(pair.Key, pair.Value);
+                    }
+                }
+
+                if ((_options.UniqueFor ?? UniqueForOption.None) != UniqueForOption.None)
+                {
+                    foreach (UniqueForOption value in Enum.GetValues(typeof(UniqueForOption)))
+                    {
+                        if ((_options.UniqueFor & value) == value)
+                        {
+                            switch (value)
+                            {
+                                case UniqueForOption.None:
+                                    break;
+                                case UniqueForOption.Architecture:
+                                    defaultVerifyTask = defaultVerifyTask.UniqueForArchitecture();
+                                    break;
+                                case UniqueForOption.OsPlatform:
+                                    defaultVerifyTask = defaultVerifyTask.UniqueForOSPlatform();
+                                    break;
+                                case UniqueForOption.Runtime:
+                                    defaultVerifyTask = defaultVerifyTask.UniqueForRuntime();
+                                    break;
+                                case UniqueForOption.RuntimeAndVersion:
+                                    defaultVerifyTask = defaultVerifyTask.UniqueForRuntimeAndVersion();
+                                    break;
+                                case UniqueForOption.TargetFramework:
+                                    defaultVerifyTask = defaultVerifyTask.UniqueForTargetFramework();
+                                    break;
+                                case UniqueForOption.TargetFrameworkAndVersion:
+                                    defaultVerifyTask = defaultVerifyTask.UniqueForTargetFrameworkAndVersion();
+                                    break;
+                                default:
+                                    throw new ArgumentOutOfRangeException();
+                            }
+                        }
+                    }
+                }
+
+                if (_options.DisableDiffTool ?? false)
+                {
+                    defaultVerifyTask = defaultVerifyTask.DisableDiff();
+                }
+
+                Task verifyTask = _options.CustomVerifyDirectory != null
+                    ? _options.CustomVerifyDirectory(commandResult.StartInfo.WorkingDirectory)
+                    : defaultVerifyTask;
+
+                await verifyTask.ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                if (e is TemplateVerificationException)
+                {
+                    throw;
+                }
+                if (e.GetType().Name == "VerifyException")
+                {
+                    throw new TemplateVerificationException(e.Message, TemplateVerificationErrorCode.VerificationFailed);
                 }
                 else
                 {
-                    content = await File.ReadAllTextAsync(filePath).ConfigureAwait(false);
+                    _logger.LogError(e, "Unexpected error encountered");
+                    throw;
                 }
-
-                if (_options.CustomScrubber != null)
-                {
-                    StringBuilder sb = new StringBuilder(content);
-                    _options.CustomScrubber(filePath, sb);
-                    content = sb.ToString();
-                }
-
-                return content;
-            });
+            }
         }
 
         private static class SpecialFiles
         {
+            public const string StandardStreamsDir = "std-streams";
+            public const string StdOut = "stdout.txt";
+            public const string StdErr = "stderr.txt";
             public static readonly string[] FileNames = { StdOut, StdErr };
-
-            private const string StdOut = "StdOut";
-            private const string StdErr = "StdErr";
 
             public static bool IsSpecialFile(string filePath)
             {

@@ -3,6 +3,7 @@
 
 using System.CommandLine;
 using System.CommandLine.Binding;
+using System.CommandLine.Parsing;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Authoring.TemplateVerifier;
@@ -89,6 +90,14 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
             Description = "If set to true - 'dotnet new' command is expected to return nonzero return code.",
         };
 
+        private readonly Option<IEnumerable<string>> _uniqueForOption = new("--unique-for")
+        {
+            //TODO: localize
+            Description = "Sets the Verifier expectations directory naming convention - by indicating which scenarios should be differentiated.",
+            Arity = new ArgumentArity(0, 999),
+            AllowMultipleArgumentsPerToken = true,
+        };
+
         public VerifyCommand(ILoggerFactory loggerFactory)
             : base(CommandName, "Runs the template with specified arguments and compares the result with expectations files (or creates those if yet don't exist).", loggerFactory)
         {
@@ -103,6 +112,12 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
             AddOption(_excludePatternOption);
             AddOption(_verifyCommandOutputOption);
             AddOption(_isCommandExpectedToFailOption);
+            FromAmongCaseInsensitive(
+                _uniqueForOption,
+                System.Enum.GetNames(typeof(UniqueForOption))
+                    .Where(v => !v.Equals(UniqueForOption.None.ToString(), StringComparison.OrdinalIgnoreCase))
+                    .ToArray());
+            AddOption(_uniqueForOption);
         }
 
         protected override async Task<int> ExecuteAsync(VerifyCommandArgs args, CancellationToken cancellationToken = default)
@@ -124,7 +139,8 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
                         ExpectationsDirectory = args.ExpectationsDirectory,
                         OutputDirectory = args.OutputDirectory,
                         VerifyCommandOutput = args.VerifyCommandOutput,
-                        IsCommandExpectedToFail = args.IsCommandExpectedToFail
+                        IsCommandExpectedToFail = args.IsCommandExpectedToFail,
+                        UniqueFor = args.UniqueFor,
                     },
                     Logger
                 );
@@ -141,6 +157,29 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
         }
 
         protected override BinderBase<VerifyCommandArgs> GetModelBinder() => new VerifyModelBinder(this);
+
+        /// <summary>
+        /// Case insensitive version for <see cref="System.CommandLine.OptionExtensions.FromAmong{TOption}(TOption, string[])"/>.
+        /// </summary>
+        private static void FromAmongCaseInsensitive(Option<IEnumerable<string>> option, string[]? allowedValues = null, string? allowedHiddenValue = null)
+        {
+            allowedValues ??= Array.Empty<string>();
+            option.AddValidator(optionResult => ValidateAllowedValues(optionResult, allowedValues, allowedHiddenValue));
+            option.AddCompletions(allowedValues);
+        }
+
+        private static void ValidateAllowedValues(OptionResult optionResult, string[] allowedValues, string? allowedHiddenValue = null)
+        {
+            var invalidArguments = optionResult.Tokens.Where(token => !allowedValues.Append(allowedHiddenValue).Contains(token.Value, StringComparer.OrdinalIgnoreCase)).ToList();
+            if (invalidArguments.Any())
+            {
+                //TODO: localize
+                optionResult.ErrorMessage = string.Format(
+                    "Argument(s) {0} are not recognized. Must be one of: {1}.",
+                    string.Join(", ", invalidArguments.Select(arg => $"'{arg.Value}'")),
+                    string.Join(", ", allowedValues.Select(allowedValue => $"'{allowedValue}'")));
+            }
+        }
 
         private class VerifyModelBinder : BinderBase<VerifyCommandArgs>
         {
@@ -164,7 +203,8 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
                     disableDefaultVerificationExcludePatterns: bindingContext.ParseResult.GetValueForOption(_verifyCommand._disableDefaultExcludePatternsOption),
                     verificationExcludePatterns: bindingContext.ParseResult.GetValueForOption(_verifyCommand._excludePatternOption),
                     verifyCommandOutput: bindingContext.ParseResult.GetValueForOption(_verifyCommand._verifyCommandOutputOption),
-                    isCommandExpectedToFail: bindingContext.ParseResult.GetValueForOption(_verifyCommand._isCommandExpectedToFailOption));
+                    isCommandExpectedToFail: bindingContext.ParseResult.GetValueForOption(_verifyCommand._isCommandExpectedToFailOption),
+                    uniqueForOptions: bindingContext.ParseResult.GetValueForOption(_verifyCommand._uniqueForOption));
             }
         }
     }
