@@ -25,6 +25,5 @@
     <!-- Dependencies from https://github.com/dotnet/runtime -->
     <MicrosoftNETCoreAppRefPackageVersion>7.0.0-rc.1.22414.6</MicrosoftNETCoreAppRefPackageVersion>
     <MicrosoftNETCoreAppRuntimewinx64PackageVersion>7.0.0-rc.1.22414.6</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
-    <VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>7.0.0-rc.1.22414.6</VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>
   </PropertyGroup>
 </Project>
