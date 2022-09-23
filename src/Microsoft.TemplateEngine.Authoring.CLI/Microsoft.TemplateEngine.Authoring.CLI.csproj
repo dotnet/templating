@@ -22,7 +22,6 @@
 
   <ItemGroup>
     <ProjectReference Include="$(SrcDir)Microsoft.TemplateEngine.TemplateLocalizer.Core\Microsoft.TemplateEngine.TemplateLocalizer.Core.csproj" />
-    <ProjectReference Include="..\..\test\Microsoft.TemplateEngine.TestHelper\Microsoft.TemplateEngine.TestHelper.csproj" />
     <ProjectReference Include="..\Microsoft.TemplateEngine.Authoring.TemplateVerifier\Microsoft.TemplateEngine.Authoring.TemplateVerifier.csproj" />
     <ProjectReference Include="..\Microsoft.TemplateEngine.Utils\Microsoft.TemplateEngine.Utils.csproj" />
   </ItemGroup>

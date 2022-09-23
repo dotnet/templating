@@ -17,11 +17,14 @@
     <PackageReference Include="System.CommandLine" />
     <PackageReference Include="Verify.Xunit" Version="18.0.0-beta.18" />
     <PackageReference Include="Verify.DiffPlex" Version="1.3.0" />
+    <PackageReference Include="FluentAssertions" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(TargetFramework) == $(NETCoreTargetFramework)">
+    <PackageReference Include="Microsoft.DotNet.Cli.Utils" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="$(SrcDir)Microsoft.TemplateEngine.TemplateLocalizer.Core\Microsoft.TemplateEngine.TemplateLocalizer.Core.csproj" />
-    <ProjectReference Include="..\..\test\Microsoft.TemplateEngine.TestHelper\Microsoft.TemplateEngine.TestHelper.csproj" />
     <ProjectReference Include="..\Microsoft.TemplateEngine.Utils\Microsoft.TemplateEngine.Utils.csproj" />
   </ItemGroup>
 
