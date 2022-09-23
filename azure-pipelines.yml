@@ -67,10 +67,11 @@ stages:
         timeoutInMinutes: 90
         pool:
           ${{ if eq(variables['System.TeamProject'], 'public') }}:
-            vmImage: windows-2019
+            name: NetCore-Public
+            vmImage: 1es-windows-2019-open
           ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-            name: NetCore1ESPool-Svc-Internal
-            demands: ImageOverride -equals build.windows.10.amd64.vs2019
+            name: NetCore1ESPool-Internal
+            demands: ImageOverride -equals windows.vs2019.amd64
         variables:
         - _InternalBuildArgs: ''
 
@@ -156,8 +157,8 @@ stages:
             ${{ if eq(variables['System.TeamProject'], 'public') }}:
               vmImage: ubuntu-latest 
             ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-              name: NetCore1ESPool-Svc-Internal
-              demands: ImageOverride -equals Build.Ubuntu.1804.Amd64
+              name: NetCore1ESPool-Internal
+              demands: ImageOverride -equals Build.Ubuntu.2204.Amd64
           strategy:
             matrix:
               debug_configuration:
