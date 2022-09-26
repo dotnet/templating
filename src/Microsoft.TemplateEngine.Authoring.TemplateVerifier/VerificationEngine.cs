@@ -85,16 +85,32 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
 
             if (_options.IsCommandExpectedToFail ?? false)
             {
-                commandResult.Should().Fail();
+                if (commandResult.ExitCode == 0)
+                {
+                    throw new TemplateVerificationException(
+                        "Template instantiation expected to fail but it passed.",
+                        TemplateVerificationErrorCode.VerificationFailed);
+                }
             }
             else
             {
-                var assertion = commandResult.Should().Pass();
+                if (commandResult.ExitCode != 0)
+                {
+                    throw new TemplateVerificationException(
+                        string.Format("Template instantiation expected to pass but it had exit code {0}.", commandResult.ExitCode),
+                        TemplateVerificationErrorCode.VerificationFailed);
+                }
+
                 // We do not expect stderr in passing command.
                 // However if verification of stdout and stderr is opted-in - we will let that verification validate the stderr content
-                if (!(_options.VerifyCommandOutput ?? false))
+                if (!(_options.VerifyCommandOutput ?? false) && !string.IsNullOrEmpty(commandResult.StdErr))
                 {
-                    assertion.And.NotHaveStdErr();
+                    throw new TemplateVerificationException(
+                        string.Format(
+                            "Template instantiation expected not to have any stderr output, but stderr output was encountered:{0}{1}",
+                            Environment.NewLine,
+                            commandResult.StdErr),
+                        TemplateVerificationErrorCode.VerificationFailed);
                 }
             }
 
