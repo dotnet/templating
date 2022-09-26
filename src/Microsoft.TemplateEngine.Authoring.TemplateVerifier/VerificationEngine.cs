@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.DotNet.Cli.Utils;
 using Microsoft.Extensions.Logging;
@@ -131,6 +132,125 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
         private static void DummyMethod()
         { }
 
+        private static async IAsyncEnumerable<(string FilePath, string ScrubbedContent)> GetVerificationContent(string contentDir, List<Glob> globs, ScrubbersDefinition? scrubbers)
+        {
+            foreach (string filePath in Directory.EnumerateFiles(contentDir, "*", SearchOption.AllDirectories))
+            {
+                if (globs.Any(g => g.IsMatch(filePath)))
+                {
+                    continue;
+                }
+
+                string content = await File.ReadAllTextAsync(filePath).ConfigureAwait(false);
+
+                if (scrubbers != null)
+                {
+                    string extension = Path.GetExtension(filePath);
+
+                    if (string.IsNullOrEmpty(extension) || !scrubbers.ScrubersByExtension.TryGetValue(extension, out Action<StringBuilder>? scrubber))
+                    {
+                        scrubber = scrubbers.GeneralScrubber;
+                    }
+
+                    if (scrubber != null)
+                    {
+                        var sb = new StringBuilder(content);
+                        scrubber(sb);
+                        content = sb.ToString();
+                    }
+                }
+
+                yield return new(filePath, content);
+            }
+        }
+
+        private static Task CreateVerificationTask(string contentDir, TemplateVerifierOptions options)
+        {
+            List<string> exclusionsList = (options.DisableDefaultVerificationExcludePatterns ?? false)
+                ? new()
+                : new(_defaultVerificationExcludePatterns);
+
+            if (options.VerificationExcludePatterns != null)
+            {
+                exclusionsList.AddRange(options.VerificationExcludePatterns);
+            }
+
+            List<Glob> globs = exclusionsList.Select(pattern => Glob.Parse(pattern)).ToList();
+
+            SettingsTask defaultVerifyTask = Verifier.VerifyDirectory(
+                contentDir,
+                (filePath) => !globs.Any(g => g.IsMatch(filePath)));
+
+            if (options.CustomScrubbers != null)
+            {
+                if (options.CustomScrubbers.GeneralScrubber != null)
+                {
+                    defaultVerifyTask = defaultVerifyTask.AddScrubber(options.CustomScrubbers.GeneralScrubber);
+                }
+
+                foreach (var pair in options.CustomScrubbers.ScrubersByExtension)
+                {
+                    defaultVerifyTask = defaultVerifyTask.AddScrubber(pair.Key, pair.Value);
+                }
+            }
+
+            if (options.CustomDirectoryVerifier != null)
+            {
+                return options.CustomDirectoryVerifier(
+                    contentDir,
+                    new Lazy<IAsyncEnumerable<(string FilePath, string ScrubbedContent)>>(
+                        GetVerificationContent(contentDir, globs, options.CustomScrubbers)));
+            }
+
+            Verifier.DerivePathInfo(
+                (sourceFile, projectDirectory, type, method) => new(
+                    directory: options.ExpectationsDirectory ?? "VerifyExpectations",
+                    typeName: options.TemplateName,
+                    methodName: EncodeArgsAsPath(options.TemplateSpecificArgs)));
+
+            if ((options.UniqueFor ?? UniqueForOption.None) != UniqueForOption.None)
+            {
+                foreach (UniqueForOption value in Enum.GetValues(typeof(UniqueForOption)))
+                {
+                    if ((options.UniqueFor & value) == value)
+                    {
+                        switch (value)
+                        {
+                            case UniqueForOption.None:
+                                break;
+                            case UniqueForOption.Architecture:
+                                defaultVerifyTask = defaultVerifyTask.UniqueForArchitecture();
+                                break;
+                            case UniqueForOption.OsPlatform:
+                                defaultVerifyTask = defaultVerifyTask.UniqueForOSPlatform();
+                                break;
+                            case UniqueForOption.Runtime:
+                                defaultVerifyTask = defaultVerifyTask.UniqueForRuntime();
+                                break;
+                            case UniqueForOption.RuntimeAndVersion:
+                                defaultVerifyTask = defaultVerifyTask.UniqueForRuntimeAndVersion();
+                                break;
+                            case UniqueForOption.TargetFramework:
+                                defaultVerifyTask = defaultVerifyTask.UniqueForTargetFramework();
+                                break;
+                            case UniqueForOption.TargetFrameworkAndVersion:
+                                defaultVerifyTask = defaultVerifyTask.UniqueForTargetFrameworkAndVersion();
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+                    }
+                }
+            }
+
+            if (options.DisableDiffTool ?? false)
+            {
+                defaultVerifyTask = defaultVerifyTask.DisableDiff();
+            }
+
+            return defaultVerifyTask;
+        }
+
         private async Task VerifyResult(TemplateVerifierOptions args, CommandResult commandResult)
         {
             // Customize diff output of verifier
@@ -142,17 +262,6 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             var v = DummyMethod;
             MethodInfo mi = v.Method;
             a.Before(mi);
-
-            List<string> exclusionsList = (args.DisableDefaultVerificationExcludePatterns ?? false)
-                ? new()
-                : new(_defaultVerificationExcludePatterns);
-
-            if (args.VerificationExcludePatterns != null)
-            {
-                exclusionsList.AddRange(args.VerificationExcludePatterns);
-            }
-
-            List<Glob> globs = exclusionsList.Select(pattern => Glob.Parse(pattern)).ToList();
 
             if (_options.VerifyCommandOutput ?? false)
             {
@@ -168,85 +277,20 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
                 Directory.CreateDirectory(Path.Combine(commandResult.StartInfo.WorkingDirectory, SpecialFiles.StandardStreamsDir));
 
                 await File.WriteAllTextAsync(
-                    Path.Combine(commandResult.StartInfo.WorkingDirectory, SpecialFiles.StandardStreamsDir, SpecialFiles.StdOut),
+                    Path.Combine(commandResult.StartInfo.WorkingDirectory, SpecialFiles.StandardStreamsDir, SpecialFiles.StdOut + (_options.StandardOutputFileExtension ?? SpecialFiles.DefaultExtension)),
                     commandResult.StdOut)
                     .ConfigureAwait(false);
 
                 await File.WriteAllTextAsync(
-                        Path.Combine(commandResult.StartInfo.WorkingDirectory, SpecialFiles.StandardStreamsDir, SpecialFiles.StdErr),
+                        Path.Combine(commandResult.StartInfo.WorkingDirectory, SpecialFiles.StandardStreamsDir, SpecialFiles.StdErr + (_options.StandardOutputFileExtension ?? SpecialFiles.DefaultExtension)),
                         commandResult.StdErr)
                     .ConfigureAwait(false);
             }
 
-            Verifier.DerivePathInfo(
-                (sourceFile, projectDirectory, type, method) => new(
-                    directory: args.ExpectationsDirectory ?? "VerifyExpectations",
-                    typeName: args.TemplateName,
-                    methodName: EncodeArgsAsPath(args.TemplateSpecificArgs)));
+            Task verifyTask = CreateVerificationTask(commandResult.StartInfo.WorkingDirectory, args);
 
             try
             {
-                SettingsTask defaultVerifyTask = Verifier.VerifyDirectory(
-                    commandResult.StartInfo.WorkingDirectory,
-                    (filePath) => !globs.Any(g => g.IsMatch(filePath)));
-
-                if (_options.CustomScrubbers != null)
-                {
-                    if (_options.CustomScrubbers.GeneralScrubber != null)
-                    {
-                        defaultVerifyTask = defaultVerifyTask.AddScrubber(_options.CustomScrubbers.GeneralScrubber);
-                    }
-
-                    foreach (var pair in _options.CustomScrubbers.ScrubersByExtension)
-                    {
-                        defaultVerifyTask = defaultVerifyTask.AddScrubber(pair.Key, pair.Value);
-                    }
-                }
-
-                if ((_options.UniqueFor ?? UniqueForOption.None) != UniqueForOption.None)
-                {
-                    foreach (UniqueForOption value in Enum.GetValues(typeof(UniqueForOption)))
-                    {
-                        if ((_options.UniqueFor & value) == value)
-                        {
-                            switch (value)
-                            {
-                                case UniqueForOption.None:
-                                    break;
-                                case UniqueForOption.Architecture:
-                                    defaultVerifyTask = defaultVerifyTask.UniqueForArchitecture();
-                                    break;
-                                case UniqueForOption.OsPlatform:
-                                    defaultVerifyTask = defaultVerifyTask.UniqueForOSPlatform();
-                                    break;
-                                case UniqueForOption.Runtime:
-                                    defaultVerifyTask = defaultVerifyTask.UniqueForRuntime();
-                                    break;
-                                case UniqueForOption.RuntimeAndVersion:
-                                    defaultVerifyTask = defaultVerifyTask.UniqueForRuntimeAndVersion();
-                                    break;
-                                case UniqueForOption.TargetFramework:
-                                    defaultVerifyTask = defaultVerifyTask.UniqueForTargetFramework();
-                                    break;
-                                case UniqueForOption.TargetFrameworkAndVersion:
-                                    defaultVerifyTask = defaultVerifyTask.UniqueForTargetFrameworkAndVersion();
-                                    break;
-                                default:
-                                    throw new ArgumentOutOfRangeException();
-                            }
-                        }
-                    }
-                }
-
-                if (_options.DisableDiffTool ?? false)
-                {
-                    defaultVerifyTask = defaultVerifyTask.DisableDiff();
-                }
-
-                Task verifyTask = _options.CustomVerifyDirectory != null
-                    ? _options.CustomVerifyDirectory(commandResult.StartInfo.WorkingDirectory)
-                    : defaultVerifyTask;
-
                 await verifyTask.ConfigureAwait(false);
             }
             catch (Exception e)
@@ -270,18 +314,10 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
         private static class SpecialFiles
         {
             public const string StandardStreamsDir = "std-streams";
-            public const string StdOut = "stdout.txt";
-            public const string StdErr = "stderr.txt";
+            public const string StdOut = "stdout";
+            public const string StdErr = "stderr";
+            public const string DefaultExtension = ".txt";
             public static readonly string[] FileNames = { StdOut, StdErr };
-
-            public static bool IsSpecialFile(string filePath)
-            {
-                return FileNames.Contains(filePath, StringComparer.OrdinalIgnoreCase);
-            }
-
-            public static bool IsStdOut(string filePath) => filePath.Equals(StdOut, StringComparison.OrdinalIgnoreCase);
-
-            public static bool IsStdErr(string filePath) => filePath.Equals(StdErr, StringComparison.OrdinalIgnoreCase);
         }
 
         private class LoggerProxy : ITestOutputHelper
