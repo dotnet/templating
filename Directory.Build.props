@@ -4,7 +4,7 @@
     <Import Project="$(RepositoryEngineeringDir)Analyzers.props" />
 
     <PropertyGroup>
-        <LangVersion>10.0</LangVersion>
+        <LangVersion>preview</LangVersion>
         <NETCoreTargetFramework>net7.0</NETCoreTargetFramework>
         <NETStandardTargetFramework>netstandard2.0</NETStandardTargetFramework>
         <NETFullTargetFramework>net472</NETFullTargetFramework>
