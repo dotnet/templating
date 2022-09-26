@@ -10,7 +10,8 @@ schedules:
   always: true
 
 pool:
-    name: Hosted Ubuntu 1604
+    name: NetCore1ESPool-Svc-Internal
+    demands: ImageOverride -equals Build.Ubuntu.2204.Amd64
 
 steps:
 - checkout: self
