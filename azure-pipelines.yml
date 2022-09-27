@@ -39,15 +39,20 @@ variables:
 stages:
 - stage: build
   displayName: Build
+  variables:
+    OneLocBuildBranch: '5332/merge'
   jobs:
-  - job: Investigation
-    steps:
-      variables:
-        ReleaseBranch: 'release/7.0.1xx'
-        FormatStr: format('{0}{1}', 'refs/heads/', $(ReleaseBranch))
-        IsTrue: eq(variables['Build.SourceBranch'], format('{0}{1}', 'refs/heads/', $(FormatStr)))
-      - script: echo $(FormatStr)
-      - script: echo $(IsTrue)
+  - template: /eng/test.yml
+    parameters:
+      MirrorRepo: templating
+      LclSource: lclFilesfromPackage
+      ${{ if eq(variables['Build.SourceBranch'], format('{0}{1}', 'refs/pull/', variables['OneLocBuildBranch'])) }}:
+        MirrorBranch: $(OneLocBuildBranch)
+        LclPackageId: 'LCL-JUNO-PROD-TEMPLATING'
+      ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
+        MirrorBranch: 'main'
+        LclPackageId: 'LCL-JUNO-PROD-TMPLTNGMAIN'
+      condition: or(eq(variables['Build.SourceBranch'], format('{0}{1}', 'refs/pull/', variables['OneLocBuildBranch'] )), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
   - ${{ if and( ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
     - template: /eng/common/templates/job/onelocbuild.yml
       parameters:
