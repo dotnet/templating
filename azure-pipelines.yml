@@ -40,6 +40,14 @@ stages:
 - stage: build
   displayName: Build
   jobs:
+  - job: Investigation
+    steps:
+      variables:
+        ReleaseBranch: 'release/7.0.1xx'
+        FormatStr: format('{0}{1}', 'refs/heads/', $(ReleaseBranch))
+        IsTrue: eq(variables['Build.SourceBranch'], format('{0}{1}', 'refs/heads/', $(FormatStr)))
+      - script: echo $(FormatStr)
+      - script: echo $(IsTrue)
   - ${{ if and( ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
     - template: /eng/common/templates/job/onelocbuild.yml
       parameters:
