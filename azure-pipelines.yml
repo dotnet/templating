@@ -122,7 +122,7 @@ stages:
       - job: Linux
         pool:
           ${{ if eq(variables['System.TeamProject'], 'public') }}:
-            name: NetCore-Public
+            name: NetCore-Svc-Public
             demands: ImageOverride -equals Build.Ubuntu.2204.Amd64.Open
           ${{ if eq(variables['System.TeamProject'], 'internal') }}:
             name: NetCore1ESPool-Internal
