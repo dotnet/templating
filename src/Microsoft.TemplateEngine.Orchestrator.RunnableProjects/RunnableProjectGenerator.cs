@@ -21,15 +21,110 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
     public sealed class RunnableProjectGenerator : IGenerator
     {
-        internal const string HostTemplateFileConfigBaseName = ".host.json";
         internal const string TemplateConfigDirectoryName = ".template.config";
         internal const string TemplateConfigFileName = "template.json";
-        internal const string LocalizationFilePrefix = "templatestrings.";
-        internal const string LocalizationFileExtension = ".json";
+
         internal const string GeneratorVersion = "1.0.0.0";
         private static readonly Guid GeneratorId = new("0C434DF7-E2CB-4DEE-B216-D7C58C8EB4B3");
 
+        /// <inheritdoc/>
         Guid IIdentifiedComponent.Id => GeneratorId;
+
+        /// <inheritdoc/>
+        IReadOnlyList<ITemplate> IGenerator.GetTemplatesFromMountPoint(IMountPoint source)
+        {
+            _ = source ?? throw new ArgumentNullException(nameof(source));
+
+            ILogger logger = source.EnvironmentSettings.Host.LoggerFactory.CreateLogger<RunnableProjectGenerator>();
+            IDirectory folder = source.Root;
+            List<ITemplate> templateList = new();
+
+            foreach (IFile file in folder.EnumerateFiles(TemplateConfigFileName, SearchOption.AllDirectories))
+            {
+                logger.LogDebug($"Found {TemplateConfigFileName} at {file.GetDisplayPath()}.");
+                try
+                {
+                    templateList.Add(new ScannedTemplateInfo(source.EnvironmentSettings, this, file));
+
+                }
+                catch (TemplateValidationException)
+                {
+                    //do nothing
+                    //template validation prints all required information
+                }
+                catch (NotSupportedException ex)
+                {
+                    //do not print stack trace for this type.
+                    logger.LogError(LocalizableStrings.Authoring_TemplateNotInstalled_Message, file.GetDisplayPath(), ex.Message);
+                }
+                catch (TemplateAuthoringException ex)
+                {
+                    //do not print stack trace for this type.
+                    logger.LogError(LocalizableStrings.Authoring_TemplateNotInstalled_Message, file.GetDisplayPath(), ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    //unexpected error - print details
+                    logger.LogError(LocalizableStrings.Authoring_TemplateNotInstalled_Message, file.GetDisplayPath(), ex);
+                }
+            }
+            return templateList;
+        }
+
+        /// <inheritdoc/>
+        bool IGenerator.TryLoadTemplateFromTemplateInfo(IEngineEnvironmentSettings settings, ITemplateInfo config, out ITemplate? template, string? baselineName)
+        {
+            template = null;
+            IMountPoint? mountPoint = null;
+            IFile? configFile = null;
+            try
+            {
+                if (!settings.TryGetMountPoint(config.MountPointUri, out mountPoint))
+                {
+                    return false;
+                }
+                if (mountPoint == null)
+                {
+                    throw new InvalidOperationException($"{nameof(mountPoint)} is null after {nameof(EngineEnvironmentSettingsExtensions.TryGetMountPoint)} returned true.");
+                }
+                configFile = mountPoint.FileInfo(config.ConfigPlace);
+                if (configFile == null)
+                {
+                    return false;
+                }
+                IFile? localeConfig = string.IsNullOrWhiteSpace(config.LocaleConfigPlace) ? null : mountPoint.FileInfo(config.LocaleConfigPlace!);
+                IFile? hostTemplateConfigFile = string.IsNullOrWhiteSpace(config.HostConfigPlace) ? null : mountPoint.FileInfo(config.HostConfigPlace!);
+
+                var templateConfiguration = new RunnableProjectConfig(settings, this, configFile, hostTemplateConfigFile, localeConfig, baselineName);
+                template = templateConfiguration;
+                return true;
+            }
+            catch (InvalidOperationException)
+            {
+                throw;
+            }
+            catch (TemplateValidationException)
+            {
+                //do nothing
+                //template validation prints all required information
+            }
+            catch (NotSupportedException ex)
+            {
+                //do not print stack trace for this type.
+                settings.Host.Logger.LogError(LocalizableStrings.Authoring_TemplateNotInstalled_Message, configFile?.GetDisplayPath(), ex.Message);
+            }
+            catch (TemplateAuthoringException ex)
+            {
+                //do not print stack trace for this type.
+                settings.Host.Logger.LogError(LocalizableStrings.Authoring_TemplateNotInstalled_Message, configFile?.GetDisplayPath(), ex.Message);
+            }
+            catch (Exception ex)
+            {
+                //unexpected error - print details
+                settings.Host.Logger.LogError(LocalizableStrings.Authoring_TemplateNotInstalled_Message, configFile?.GetDisplayPath(), ex);
+            }
+            return false;
+        }
 
         /// <summary>
         /// Converts the raw, string version of a parameter to a strongly typed value. If the parameter has a datatype specified, use that. Otherwise attempt to infer the type.
@@ -40,6 +135,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return ParameterConverter.ConvertParameterValueToType(environmentSettings.Host, parameter, untypedValue, out valueResolutionError);
         }
 
+        /// <inheritdoc/>
         bool IGenerator.TryEvaluateFromString(ILogger logger, string text, IDictionary<string, object> variables, out bool result, out string evaluationError, HashSet<string>? referencedVariablesKeys)
         {
             VariableCollection variableCollection = new VariableCollection(null, variables);
@@ -47,59 +143,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return string.IsNullOrEmpty(evaluationError);
         }
 
-        [Obsolete("Replaced by CreateAsync with IEvaluatedParameterSetData", false)]
-        Task<ICreationResult> IGenerator.CreateAsync(
-            IEngineEnvironmentSettings environmentSettings,
-            ITemplate template,
-            IParameterSet parameters,
-            string targetDirectory,
-            CancellationToken cancellationToken)
-        {
-            return ((IGenerator)this).CreateAsync(environmentSettings, template, parameters.ToParameterSetData(), targetDirectory, cancellationToken);
-        }
-
-        [Obsolete("Replaced by GetCreationEffectsAsync with IEvaluatedParameterSetData", false)]
-        Task<ICreationEffects> IGenerator.GetCreationEffectsAsync(
-            IEngineEnvironmentSettings environmentSettings,
-            ITemplate template,
-            IParameterSet parameters,
-            string targetDirectory,
-            CancellationToken cancellationToken)
-        {
-            return ((IGenerator)this).GetCreationEffectsAsync(environmentSettings, template, parameters.ToParameterSetData(), targetDirectory, cancellationToken);
-        }
-
-        Task<ICreationResult> IGenerator.CreateAsync(
-            IEngineEnvironmentSettings environmentSettings,
-            ITemplate templateData,
-            IParameterSetData parameters,
-            string targetDirectory,
-            CancellationToken cancellationToken)
-        {
-            RunnableProjectConfig templateConfig = (RunnableProjectConfig)templateData;
-
-            if (templateData.TemplateSourceRoot is null)
-            {
-                throw new InvalidOperationException($"{nameof(templateData.TemplateSourceRoot)} cannot be null to continue.");
-            }
-            return CreateAsync(
-                environmentSettings,
-                templateConfig,
-                templateData.TemplateSourceRoot,
-                parameters,
-                targetDirectory,
-                cancellationToken);
-        }
-
-        /// <summary>
-        /// Performs the dry-run of the template instantiation to evaluate the primary outputs, post actions to be applied and file changes to be made when executing the template with specified parameters.
-        /// </summary>
-        /// <param name="environmentSettings">environment settings.</param>
-        /// <param name="templateData">the template to be executed.</param>
-        /// <param name="parameters">the parameters to be used on template execution.</param>
-        /// <param name="targetDirectory">the output path for the template.</param>
-        /// <param name="cancellationToken">cancellationToken.</param>
-        /// <returns>the primary outputs, post actions and file changes that will be made when executing the template with specified parameters.</returns>
+        /// <inheritdoc/>
         async Task<ICreationEffects> IGenerator.GetCreationEffectsAsync(
             IEngineEnvironmentSettings environmentSettings,
             ITemplate templateData,
@@ -108,7 +152,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            RunnableProjectConfig templateConfig = (RunnableProjectConfig)templateData;
+            if (templateData is not IRunnableProjectConfig templateConfig)
+            {
+                throw new InvalidOperationException($"Load template using {nameof(IGenerator.TryLoadTemplateFromTemplateInfo)} to use this method.");
+            }
             if (templateData.TemplateSourceRoot is null)
             {
                 throw new InvalidOperationException($"{nameof(templateData.TemplateSourceRoot)} cannot be null to continue.");
@@ -123,10 +170,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             IOrchestrator basicOrchestrator = new Core.Util.Orchestrator(environmentSettings.Host.Logger, environmentSettings.Host.FileSystem);
             RunnableProjectOrchestrator orchestrator = new RunnableProjectOrchestrator(basicOrchestrator);
 
-            GlobalRunSpec runSpec = new GlobalRunSpec(templateData.TemplateSourceRoot, environmentSettings.Components, variables, templateConfig.OperationConfig, templateConfig.SpecialOperationConfig, templateConfig.IgnoreFileNames);
+            GlobalRunSpec runSpec = new GlobalRunSpec(templateData.TemplateSourceRoot, environmentSettings.Components, variables, templateConfig);
             List<IFileChange2> changes = new List<IFileChange2>();
 
-            foreach (FileSourceMatchInfo source in templateConfig.Sources)
+            foreach (FileSourceMatchInfo source in templateConfig.EvaluatedSources)
             {
                 runSpec.SetupFileSource(source);
                 string target = Path.Combine(targetDirectory, source.Target);
@@ -155,6 +202,57 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return new CreationEffects2(changes, GetCreationResult(environmentSettings.Host.Logger, templateConfig, variables));
         }
 
+        /// <inheritdoc/>
+        Task<ICreationResult> IGenerator.CreateAsync(
+    IEngineEnvironmentSettings environmentSettings,
+    ITemplate templateData,
+    IParameterSetData parameters,
+    string targetDirectory,
+    CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (templateData is not RunnableProjectConfig templateConfig)
+            {
+                throw new InvalidOperationException($"Load template using {nameof(IGenerator.TryLoadTemplateFromTemplateInfo)} to use this method.");
+            }
+            if (templateData.TemplateSourceRoot is null)
+            {
+                throw new InvalidOperationException($"{nameof(templateData.TemplateSourceRoot)} cannot be null to continue.");
+            }
+
+            return CreateAsync(
+                environmentSettings,
+                templateConfig,
+                templateData.TemplateSourceRoot,
+                parameters,
+                targetDirectory,
+                cancellationToken);
+        }
+
+        #region Obsolete members
+
+        [Obsolete("Replaced by CreateAsync with IEvaluatedParameterSetData", false)]
+        Task<ICreationResult> IGenerator.CreateAsync(
+            IEngineEnvironmentSettings environmentSettings,
+            ITemplate template,
+            IParameterSet parameters,
+            string targetDirectory,
+            CancellationToken cancellationToken)
+        {
+            return ((IGenerator)this).CreateAsync(environmentSettings, template, parameters.ToParameterSetData(), targetDirectory, cancellationToken);
+        }
+
+        [Obsolete("Replaced by GetCreationEffectsAsync with IEvaluatedParameterSetData", false)]
+        Task<ICreationEffects> IGenerator.GetCreationEffectsAsync(
+            IEngineEnvironmentSettings environmentSettings,
+            ITemplate template,
+            IParameterSet parameters,
+            string targetDirectory,
+            CancellationToken cancellationToken)
+        {
+            return ((IGenerator)this).GetCreationEffectsAsync(environmentSettings, template, parameters.ToParameterSetData(), targetDirectory, cancellationToken);
+        }
+
         [Obsolete("Replaced by ParameterSetBuilder.CreateWithDefaults", true)]
         IParameterSet IGenerator.GetParametersForTemplate(IEngineEnvironmentSettings environmentSettings, ITemplate template)
         {
@@ -167,84 +265,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         /// <param name="source">the mount point to scan for the templates.</param>
         /// <param name="localizations">found localization definitions.</param>
         /// <returns>the list of found templates and list of found localizations via <paramref name="localizations"/>.</returns>
+        [Obsolete]
         IList<ITemplate> IGenerator.GetTemplatesAndLangpacksFromDir(IMountPoint source, out IList<ILocalizationLocator> localizations)
         {
             _ = source ?? throw new ArgumentNullException(nameof(source));
+            IReadOnlyList<ITemplate> result = (this as IGenerator).GetTemplatesFromMountPoint(source);
 
-            ILogger logger = source.EnvironmentSettings.Host.LoggerFactory.CreateLogger<RunnableProjectGenerator>();
-
-            IDirectory folder = source.Root;
-            IList<ITemplate> templateList = new List<ITemplate>();
-            localizations = new List<ILocalizationLocator>();
-
-            foreach (IFile file in folder.EnumerateFiles(TemplateConfigFileName, SearchOption.AllDirectories))
-            {
-                logger.LogDebug($"Found {TemplateConfigFileName} at {file.GetDisplayPath()}.");
-                try
-                {
-                    IFile? hostConfigFile = FindBestHostTemplateConfigFile(source.EnvironmentSettings, file);
-                    logger.LogDebug($"Found *{HostTemplateFileConfigBaseName} at {hostConfigFile?.GetDisplayPath()}.");
-
-                    // issue here: we need to pass locale as parameter
-                    // consider passing current locale file here if exists
-                    // tracking issue: https://github.com/dotnet/templating/issues/3255
-                    var templateConfiguration = new RunnableProjectConfig(source.EnvironmentSettings, this, file, hostConfigFile);
-
-                    IDirectory? localizeFolder = file.Parent?.DirectoryInfo("localize");
-                    if (localizeFolder != null && localizeFolder.Exists)
-                    {
-                        foreach (IFile locFile in localizeFolder.EnumerateFiles(LocalizationFilePrefix + "*" + LocalizationFileExtension, SearchOption.AllDirectories))
-                        {
-                            string locale = locFile.Name.Substring(LocalizationFilePrefix.Length, locFile.Name.Length - LocalizationFilePrefix.Length - LocalizationFileExtension.Length);
-
-                            try
-                            {
-                                ILocalizationModel locModel = LocalizationModelDeserializer.Deserialize(locFile);
-                                if (templateConfiguration.VerifyLocalizationModel(locModel, locFile))
-                                {
-                                    localizations.Add(new LocalizationLocator(
-                                        locale,
-                                        locFile.FullPath,
-                                        templateConfiguration.Identity,
-                                        locModel.Author ?? string.Empty,
-                                        locModel.Name ?? string.Empty,
-                                        locModel.Description ?? string.Empty,
-                                        locModel.ParameterSymbols));
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                logger.LogWarning(LocalizableStrings.LocalizationModelDeserializer_Error_FailedToParse, locFile.GetDisplayPath());
-                                logger.LogDebug("Details: {0}", ex);
-                            }
-                        }
-                    }
-                    templateList.Add(templateConfiguration);
-
-                }
-                catch (TemplateValidationException)
-                {
-                    //do nothing
-                    //template validation prints all required information
-                }
-                catch (NotSupportedException ex)
-                {
-                    //do not print stack trace for this type.
-                    logger.LogError(LocalizableStrings.Authoring_TemplateNotInstalled_Message, file.GetDisplayPath(), ex.Message);
-                }
-                catch (TemplateAuthoringException ex)
-                {
-                    //do not print stack trace for this type.
-                    logger.LogError(LocalizableStrings.Authoring_TemplateNotInstalled_Message, file.GetDisplayPath(), ex.Message);
-                }
-                catch (Exception ex)
-                {
-                    //unexpected error - print details
-                    logger.LogError(LocalizableStrings.Authoring_TemplateNotInstalled_Message, file.GetDisplayPath(), ex);
-                }
-            }
-
-            return templateList;
+            List<ITemplate> templates = result.ToList();
+            localizations = result.SelectMany(t => t.Localizations?.Values ?? Array.Empty<ILocalizationLocator>()).ToList();
+            return templates;
         }
 
         /// <summary>
@@ -256,6 +285,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         /// <param name="hostTemplateConfigFile">the template host configuration entry, should be a file.</param>
         /// <param name="baselineName">the baseline to load.</param>
         /// <returns>true when template can be loaded, false otherwise. The loaded template is returned in <paramref name="template"/>.</returns>
+        [Obsolete]
         bool IGenerator.TryGetTemplateFromConfigInfo(IFileSystemInfo templateFileConfig, out ITemplate? template, IFileSystemInfo? localeFileConfig, IFile? hostTemplateConfigFile, string? baselineName)
         {
             _ = templateFileConfig ?? throw new ArgumentNullException(nameof(templateFileConfig));
@@ -300,6 +330,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return false;
         }
 
+        #endregion
+
         internal async Task<ICreationResult> CreateAsync(
             IEngineEnvironmentSettings environmentSettings,
             IRunnableProjectConfig runnableProjectConfig,
@@ -320,9 +352,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             IOrchestrator basicOrchestrator = new Core.Util.Orchestrator(environmentSettings.Host.Logger, environmentSettings.Host.FileSystem);
             RunnableProjectOrchestrator orchestrator = new RunnableProjectOrchestrator(basicOrchestrator);
 
-            GlobalRunSpec runSpec = new GlobalRunSpec(templateSourceRoot, environmentSettings.Components, variables, runnableProjectConfig.OperationConfig, runnableProjectConfig.SpecialOperationConfig, runnableProjectConfig.IgnoreFileNames);
+            GlobalRunSpec runSpec = new GlobalRunSpec(templateSourceRoot, environmentSettings.Components, variables, runnableProjectConfig);
 
-            foreach (FileSourceMatchInfo source in runnableProjectConfig.Sources)
+            foreach (FileSourceMatchInfo source in runnableProjectConfig.EvaluatedSources)
             {
                 runSpec.SetupFileSource(source);
                 string target = Path.Combine(targetDirectory, source.Target);
@@ -390,37 +422,5 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 primaryOutputs: CreationPath.ListFromModel(logger, runnableProjectConfig.PrimaryOutputs, variables));
         }
 
-        private IFile? FindBestHostTemplateConfigFile(IEngineEnvironmentSettings engineEnvironment, IFile config)
-        {
-            IDictionary<string, IFile> allHostFilesForTemplate = new Dictionary<string, IFile>();
-
-            if (config.Parent is null)
-            {
-                return null;
-            }
-
-            foreach (IFile hostFile in config.Parent.EnumerateFiles($"*{HostTemplateFileConfigBaseName}", SearchOption.TopDirectoryOnly))
-            {
-                allHostFilesForTemplate.Add(hostFile.Name, hostFile);
-            }
-
-            string preferredHostFileName = string.Concat(engineEnvironment.Host.HostIdentifier, HostTemplateFileConfigBaseName);
-            if (allHostFilesForTemplate.TryGetValue(preferredHostFileName, out IFile preferredHostFile))
-            {
-                return preferredHostFile;
-            }
-
-            foreach (string fallbackHostName in engineEnvironment.Host.FallbackHostTemplateConfigNames)
-            {
-                string fallbackHostFileName = string.Concat(fallbackHostName, HostTemplateFileConfigBaseName);
-
-                if (allHostFilesForTemplate.TryGetValue(fallbackHostFileName, out IFile fallbackHostFile))
-                {
-                    return fallbackHostFile;
-                }
-            }
-
-            return null;
-        }
     }
 }

@@ -194,19 +194,13 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
             foreach (IGenerator generator in _environmentSettings.Components.OfType<IGenerator>())
             {
-                IList<ITemplate> templateList = generator.GetTemplatesAndLangpacksFromDir(source.MountPoint, out IList<ILocalizationLocator> localizationInfo);
-
-                foreach (ILocalizationLocator locator in localizationInfo)
-                {
-                    localizationLocators.Add(locator);
-                }
-
+                IReadOnlyList<ITemplate> templateList = generator.GetTemplatesFromMountPoint(source.MountPoint);
                 foreach (ITemplate template in templateList)
                 {
                     templates.Add(template);
                 }
 
-                source.FoundTemplates |= templateList.Count > 0 || localizationInfo.Count > 0;
+                source.FoundTemplates |= templateList.Count > 0;
             }
 
             return new ScanResult(source.MountPoint, templates, localizationLocators, Array.Empty<(string, Type, IIdentifiedComponent)>());

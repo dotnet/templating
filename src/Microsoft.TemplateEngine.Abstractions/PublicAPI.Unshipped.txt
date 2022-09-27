@@ -1,1 +1,14 @@
-﻿
+﻿Microsoft.TemplateEngine.Abstractions.IGenerator.GetTemplatesFromMountPoint(Microsoft.TemplateEngine.Abstractions.Mount.IMountPoint! source) -> System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Abstractions.ITemplate!>!
+Microsoft.TemplateEngine.Abstractions.IGenerator.TryLoadTemplateFromTemplateInfo(Microsoft.TemplateEngine.Abstractions.IEngineEnvironmentSettings! settings, Microsoft.TemplateEngine.Abstractions.ITemplateInfo! config, out Microsoft.TemplateEngine.Abstractions.ITemplate? template, string? baselineName = null) -> bool
+Microsoft.TemplateEngine.Abstractions.ITemplate.Localizations.get -> System.Collections.Generic.IReadOnlyDictionary<string!, Microsoft.TemplateEngine.Abstractions.ILocalizationLocator!>?
+Microsoft.TemplateEngine.Abstractions.ITemplate.ValidationErrors.get -> System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Abstractions.IValidationEntry!>!
+Microsoft.TemplateEngine.Abstractions.IValidationEntry
+Microsoft.TemplateEngine.Abstractions.IValidationEntry.Code.get -> string!
+Microsoft.TemplateEngine.Abstractions.IValidationEntry.ErrorMessage.get -> string!
+Microsoft.TemplateEngine.Abstractions.IValidationEntry.FileName.get -> string?
+Microsoft.TemplateEngine.Abstractions.IValidationEntry.Severity.get -> Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel
+Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel
+Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel.Error = 1 -> Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel
+Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel.Info = 3 -> Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel
+Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel.None = 0 -> Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel
+Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel.Warning = 2 -> Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel

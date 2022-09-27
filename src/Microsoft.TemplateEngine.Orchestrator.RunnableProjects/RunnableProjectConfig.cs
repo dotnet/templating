@@ -26,14 +26,13 @@ using Newtonsoft.Json.Linq;
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
     /// <summary>
-    /// The class maps template.json configuration read in <see cref="TemplateConfigModel"/> to runnable configuration.
+    /// The class represent the template ready to be run.
     /// </summary>
-    internal partial class RunnableProjectConfig : IRunnableProjectConfig
+    internal partial class RunnableProjectConfig : DirectoryBasedTemplate, IRunnableProjectConfig
     {
-        private const string AdditionalConfigFilesIndicator = "AdditionalConfigFiles";
-        private static readonly string[] IncludePatternDefaults = new[] { "**/*" };
+        protected static readonly string[] IncludePatternDefaults = new[] { "**/*" };
 
-        private static readonly string[] ExcludePatternDefaults = new[]
+        protected static readonly string[] ExcludePatternDefaults = new[]
         {
             "**/[Bb]in/**",
             "**/[Oo]bj/**",
@@ -43,271 +42,94 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             "**/*.lock.json"
         };
 
-        private static readonly string[] CopyOnlyPatternDefaults = new[] { "**/node_modules/**" };
+        protected static readonly string[] CopyOnlyPatternDefaults = new[] { "**/node_modules/**" };
         private static readonly string[] DefaultPlaceholderFilenames = new[] { "-.-", "_._" };
-        private readonly IEngineEnvironmentSettings _settings;
-        private readonly ILogger<RunnableProjectConfig> _logger;
+        private readonly Dictionary<Guid, string> _guidToGuidPrefixMap = new();
 
-        private readonly TemplateConfigModel _configuration;
-        private readonly Dictionary<Guid, string> _guidToGuidPrefixMap = new Dictionary<Guid, string>();
-
-        private readonly IGenerator _generator;
-        private readonly IFile? _sourceFile;
         private readonly IFile? _localeConfigFile;
         private readonly IFile? _hostConfigFile;
-        private readonly IReadOnlyDictionary<string, Parameter> _parameters;
 
-        private IReadOnlyList<FileSourceMatchInfo>? _sources;
         private IGlobalRunConfig? _operationConfig;
-        private IReadOnlyList<KeyValuePair<string, IGlobalRunConfig>>? _specialOperationConfig;
+        private IReadOnlyList<(string, IGlobalRunConfig)>? _specialOperationConfig;
         private IReadOnlyList<IReplacementTokens>? _symbolFilenameReplacements;
+        private IReadOnlyList<FileSourceMatchInfo>? _evaluatedSources;
 
         internal RunnableProjectConfig(IEngineEnvironmentSettings settings, IGenerator generator, IFile templateFile, IFile? hostConfigFile = null, IFile? localeConfigFile = null, string? baselineName = null)
+            : base(settings, generator, templateFile, baselineName)
         {
-            _settings = settings;
-            _logger = _settings.Host.LoggerFactory.CreateLogger<RunnableProjectConfig>();
-            _generator = generator;
-            _sourceFile = templateFile;
             _hostConfigFile = hostConfigFile;
             _localeConfigFile = localeConfigFile;
-
-            ISimpleConfigModifiers? configModifiers = null;
-            if (!string.IsNullOrWhiteSpace(baselineName))
-            {
-                configModifiers = new SimpleConfigModifiers(baselineName!);
-            }
-            _configuration = TemplateConfigModel.FromJObject(
-                MergeAdditionalConfiguration(templateFile.ReadJObjectFromIFile(), templateFile),
-                _settings.Host.LoggerFactory.CreateLogger<TemplateConfigModel>(),
-                configModifiers,
-                templateFile.GetDisplayPath());
-
-            CheckGeneratorVersionRequiredByTemplate();
-            PerformTemplateValidation();
-            Identity = _configuration.Identity!;
-            _parameters = ExtractParameters(_configuration);
 
             if (_localeConfigFile != null)
             {
                 try
                 {
                     ILocalizationModel locModel = LocalizationModelDeserializer.Deserialize(_localeConfigFile);
-                    if (VerifyLocalizationModel(locModel))
+                    if (VerifyLocalizationModel(locModel, _localeConfigFile))
                     {
-                        _configuration.Localize(locModel);
-                        _parameters = LocalizeParameters(locModel, _parameters);
+                        ConfigModel.Localize(locModel);
                     }
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(LocalizableStrings.LocalizationModelDeserializer_Error_FailedToParse, _localeConfigFile.GetDisplayPath());
-                    _logger.LogDebug("Details: {0}", ex);
+                    Logger.LogWarning(LocalizableStrings.LocalizationModelDeserializer_Error_FailedToParse, _localeConfigFile.GetDisplayPath());
+                    Logger.LogDebug("Details: {0}", ex);
                 }
             }
         }
 
         /// <summary>
         /// Test constructor.
+        /// Loads the template based on <paramref name="configuration"/> instead of reading it from file.
         /// </summary>
-        internal RunnableProjectConfig(IEngineEnvironmentSettings settings, IGenerator generator, TemplateConfigModel configuration, IFile? configurationFile = null)
+        internal RunnableProjectConfig(IEngineEnvironmentSettings settings, IGenerator generator, TemplateConfigModel configuration, IMountPoint sourceMountPoint)
+            : base(settings, generator, configuration, sourceMountPoint)
         {
-            _settings = settings;
-            _logger = _settings.Host.LoggerFactory.CreateLogger<RunnableProjectConfig>();
-            _generator = generator;
-            _configuration = configuration;
-            Identity = configuration.Identity ?? throw new ArgumentException($"{nameof(configuration)} should have identity set.");
-            _sourceFile = configurationFile;
-            _parameters = ExtractParameters(configuration);
         }
 
-        public string Identity { get; }
+        IReadOnlyList<PostActionModel> IRunnableProjectConfig.PostActionModels => ConfigModel.PostActionModels;
 
-        public IReadOnlyList<PostActionModel> PostActionModels => _configuration.PostActionModels;
+        IReadOnlyList<PrimaryOutputModel> IRunnableProjectConfig.PrimaryOutputs => ConfigModel.PrimaryOutputs;
 
-        public IReadOnlyList<PrimaryOutputModel> PrimaryOutputs => _configuration.PrimaryOutputs;
+        IReadOnlyList<string> IRunnableProjectConfig.IgnoreFileNames => !string.IsNullOrWhiteSpace(ConfigModel.PlaceholderFilename) ? new[] { ConfigModel.PlaceholderFilename! } : DefaultPlaceholderFilenames;
 
-        public IFile SourceFile => _sourceFile ?? throw new InvalidOperationException("Source file is not initialized, are you using test constructor?");
-
-        public IDirectory? TemplateSourceRoot => SourceFile.Parent?.Parent;
-
-        public IReadOnlyList<string> IgnoreFileNames => !string.IsNullOrWhiteSpace(_configuration.PlaceholderFilename) ? new[] { _configuration.PlaceholderFilename! } : DefaultPlaceholderFilenames;
-
-        public IReadOnlyList<FileSourceMatchInfo> Sources
-        {
-            get
-            {
-                if (_sources == null)
-                {
-                    if (SourceFile == null)
-                    {
-                        throw new NotSupportedException($"{nameof(SourceFile)} should be set for sources processing.");
-                    }
-                    List<FileSourceMatchInfo> sources = new List<FileSourceMatchInfo>();
-
-                    foreach (ExtendedFileSource source in _configuration.Sources)
-                    {
-                        IReadOnlyList<string> includePattern = TryReadConfigFromFile(source.Include, SourceFile, IncludePatternDefaults);
-                        IReadOnlyList<string> excludePattern = TryReadConfigFromFile(source.Exclude, SourceFile, ExcludePatternDefaults);
-                        IReadOnlyList<string> copyOnlyPattern = TryReadConfigFromFile(source.CopyOnly, SourceFile, CopyOnlyPatternDefaults);
-                        FileSourceEvaluable topLevelEvaluable = new FileSourceEvaluable(includePattern, excludePattern, copyOnlyPattern);
-                        IReadOnlyDictionary<string, string> renamePatterns = source.Rename;
-                        FileSourceMatchInfo matchInfo = new FileSourceMatchInfo(
-                            source.Source,
-                            source.Target,
-                            topLevelEvaluable,
-                            renamePatterns,
-                            new List<FileSourceEvaluable>());
-                        sources.Add(matchInfo);
-                    }
-
-                    if (sources.Count == 0)
-                    {
-                        IReadOnlyList<string> includePattern = IncludePatternDefaults;
-                        IReadOnlyList<string> excludePattern = ExcludePatternDefaults;
-                        IReadOnlyList<string> copyOnlyPattern = CopyOnlyPatternDefaults;
-                        FileSourceEvaluable topLevelEvaluable = new FileSourceEvaluable(includePattern, excludePattern, copyOnlyPattern);
-
-                        FileSourceMatchInfo matchInfo = new FileSourceMatchInfo(
-                            "./",
-                            "./",
-                            topLevelEvaluable,
-                            new Dictionary<string, string>(StringComparer.Ordinal),
-                            new List<FileSourceEvaluable>());
-                        sources.Add(matchInfo);
-                    }
-
-                    _sources = sources;
-                }
-
-                return _sources;
-            }
-        }
-
+        /// <summary>
+        /// Gets the global operation config. This operation config is applied to all the files in the template.
+        /// </summary>
         public IGlobalRunConfig OperationConfig
         {
             get
             {
-                if (_operationConfig == null)
-                {
-                    SpecialOperationConfigParams defaultOperationParams = new SpecialOperationConfigParams(string.Empty, "//", "C++", ConditionalType.CLineComments);
-                    _operationConfig = ProduceOperationSetup(defaultOperationParams, true, _configuration.GlobalCustomOperations);
-                }
-
+                _operationConfig ??= ProduceOperationSetup(OperationConfigDefault.DefaultGlobalConfig, generateMacros: true, ConfigModel.GlobalCustomOperations);
                 return _operationConfig;
             }
         }
 
-        public IReadOnlyList<KeyValuePair<string, IGlobalRunConfig>> SpecialOperationConfig
+        /// <summary>
+        /// Gets the operation config for specific globs.
+        /// </summary>
+        public IReadOnlyList<(string, IGlobalRunConfig)> SpecialOperationConfig
         {
             get
             {
                 if (_specialOperationConfig == null)
                 {
-                    List<SpecialOperationConfigParams> defaultSpecials = new List<SpecialOperationConfigParams>
-                    {
-                        new SpecialOperationConfigParams("**/*.js", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.es", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.es6", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.ts", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.json", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.jsonld", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.hjson", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.json5", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.geojson", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.topojson", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.bowerrc", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.npmrc", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.job", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.postcssrc", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.babelrc", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.csslintrc", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.eslintrc", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.jade-lintrc", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.pug-lintrc", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.jshintrc", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.stylelintrc", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.yarnrc", "//", "C++", ConditionalType.CLineComments),
-                        new SpecialOperationConfigParams("**/*.css.min", "/*", "C++", ConditionalType.CBlockComments),
-                        new SpecialOperationConfigParams("**/*.css", "/*", "C++", ConditionalType.CBlockComments),
-                        new SpecialOperationConfigParams("**/*.cshtml", "@*", "C++", ConditionalType.Razor),
-                        new SpecialOperationConfigParams("**/*.razor", "@*", "C++", ConditionalType.Razor),
-                        new SpecialOperationConfigParams("**/*.vbhtml", "@*", "VB", ConditionalType.Razor),
-                        new SpecialOperationConfigParams("**/*.cs", "//", "C++", ConditionalType.CNoComments),
-                        new SpecialOperationConfigParams("**/*.fs", "//", "C++", ConditionalType.CNoComments),
-                        new SpecialOperationConfigParams("**/*.c", "//", "C++", ConditionalType.CNoComments),
-                        new SpecialOperationConfigParams("**/*.cpp", "//", "C++", ConditionalType.CNoComments),
-                        new SpecialOperationConfigParams("**/*.cxx", "//", "C++", ConditionalType.CNoComments),
-                        new SpecialOperationConfigParams("**/*.h", "//", "C++", ConditionalType.CNoComments),
-                        new SpecialOperationConfigParams("**/*.hpp", "//", "C++", ConditionalType.CNoComments),
-                        new SpecialOperationConfigParams("**/*.hxx", "//", "C++", ConditionalType.CNoComments),
-                        new SpecialOperationConfigParams("**/*.cake", "//", "C++", ConditionalType.CNoComments),
-                        new SpecialOperationConfigParams("**/*.*proj", "<!--/", "MSBUILD", ConditionalType.MSBuild),
-                        new SpecialOperationConfigParams("**/*.*proj.user", "<!--/", "MSBUILD", ConditionalType.MSBuild),
-                        new SpecialOperationConfigParams("**/*.pubxml", "<!--/", "MSBUILD", ConditionalType.MSBuild),
-                        new SpecialOperationConfigParams("**/*.pubxml.user", "<!--/", "MSBUILD", ConditionalType.MSBuild),
-                        new SpecialOperationConfigParams("**/*.msbuild", "<!--/", "MSBUILD", ConditionalType.MSBuild),
-                        new SpecialOperationConfigParams("**/*.targets", "<!--/", "MSBUILD", ConditionalType.MSBuild),
-                        new SpecialOperationConfigParams("**/*.props", "<!--/", "MSBUILD", ConditionalType.MSBuild),
-                        new SpecialOperationConfigParams("**/*.svg", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.*htm", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.*html", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.md", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.jsp", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.asp", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.aspx", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/app.config", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/web.config", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/web.*.config", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/packages.config", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/nuget.config", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.nuspec", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.xslt", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.xsd", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.vsixmanifest", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.vsct", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.storyboard", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.axml", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.plist", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.xib", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.strings", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.bat", "rem --:", "C++", ConditionalType.RemLineComment),
-                        new SpecialOperationConfigParams("**/*.cmd", "rem --:", "C++", ConditionalType.RemLineComment),
-                        new SpecialOperationConfigParams("**/nginx.conf", "#--", "C++", ConditionalType.HashSignLineComment),
-                        new SpecialOperationConfigParams("**/robots.txt", "#--", "C++", ConditionalType.HashSignLineComment),
-                        new SpecialOperationConfigParams("**/*.sh", "#--", "C++", ConditionalType.HashSignLineComment),
-                        new SpecialOperationConfigParams("**/*.haml", "-#", "C++", ConditionalType.HamlLineComment),
-                        new SpecialOperationConfigParams("**/*.jsx", "{/*", "C++", ConditionalType.JsxBlockComment),
-                        new SpecialOperationConfigParams("**/*.tsx", "{/*", "C++", ConditionalType.JsxBlockComment),
-                        new SpecialOperationConfigParams("**/*.xml", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.resx", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.bas", "'", "VB", ConditionalType.VB),
-                        new SpecialOperationConfigParams("**/*.vb", "'", "VB", ConditionalType.VB),
-                        new SpecialOperationConfigParams("**/*.xaml", "<!--", "C++", ConditionalType.Xml),
-                        new SpecialOperationConfigParams("**/*.sln", "#-", "C++", ConditionalType.HashSignLineComment),
-                        new SpecialOperationConfigParams("**/*.yaml", "#-", "C++", ConditionalType.HashSignLineComment),
-                        new SpecialOperationConfigParams("**/*.yml", "#-", "C++", ConditionalType.HashSignLineComment),
-                        new SpecialOperationConfigParams("**/Dockerfile", "#-", "C++", ConditionalType.HashSignLineComment),
-                        new SpecialOperationConfigParams("**/.editorconfig", "#-", "C++", ConditionalType.HashSignLineComment),
-                        new SpecialOperationConfigParams("**/.gitattributes", "#-", "C++", ConditionalType.HashSignLineComment),
-                        new SpecialOperationConfigParams("**/.gitignore", "#-", "C++", ConditionalType.HashSignLineComment),
-                        new SpecialOperationConfigParams("**/.dockerignore", "#-", "C++", ConditionalType.HashSignLineComment)
-                    };
-                    List<KeyValuePair<string, IGlobalRunConfig>> specialOperationConfig = new List<KeyValuePair<string, IGlobalRunConfig>>();
+                    List<(string Glob, IGlobalRunConfig Config)> specialOperationConfig = new();
 
                     // put the custom configs first in the list
-                    HashSet<string> processedGlobs = new HashSet<string>();
+                    HashSet<string> processedGlobs = new();
 
-                    foreach (CustomFileGlobModel customGlobModel in _configuration.SpecialCustomOperations)
+                    foreach (CustomFileGlobModel customGlobModel in ConfigModel.SpecialCustomOperations)
                     {
                         if (customGlobModel.ConditionResult)
                         {
                             // only add the special if the condition is true
-                            SpecialOperationConfigParams defaultParams = defaultSpecials.FirstOrDefault(x => x.Glob == customGlobModel.Glob);
+                            OperationConfigDefault defaultParams = OperationConfigDefault.DefaultSpecialConfig.FirstOrDefault(x => x.Glob == customGlobModel.Glob);
 
-                            defaultParams ??= SpecialOperationConfigParams.Defaults;
+                            defaultParams ??= OperationConfigDefault.Default;
 
-                            IGlobalRunConfig runConfig = ProduceOperationSetup(defaultParams, false, customGlobModel);
-                            specialOperationConfig.Add(new KeyValuePair<string, IGlobalRunConfig>(customGlobModel.Glob, runConfig));
+                            IGlobalRunConfig runConfig = ProduceOperationSetup(defaultModel: defaultParams, generateMacros: false, customGlobModel: customGlobModel);
+                            specialOperationConfig.Add((customGlobModel.Glob, runConfig));
                         }
 
                         // mark this special as already processed, so it doesn't get included with the defaults
@@ -316,7 +138,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     }
 
                     // add the remaining default configs in the order specified above
-                    foreach (SpecialOperationConfigParams defaultParams in defaultSpecials)
+                    foreach (OperationConfigDefault defaultParams in OperationConfigDefault.DefaultSpecialConfig)
                     {
                         if (processedGlobs.Contains(defaultParams.Glob))
                         {
@@ -325,7 +147,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                         }
 
                         IGlobalRunConfig runConfig = ProduceOperationSetup(defaultParams, false, null);
-                        specialOperationConfig.Add(new KeyValuePair<string, IGlobalRunConfig>(defaultParams.Glob, runConfig));
+                        specialOperationConfig.Add((defaultParams.Glob, runConfig));
                     }
 
                     _specialOperationConfig = specialOperationConfig;
@@ -335,8 +157,43 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
         }
 
-        internal Parameter NameParameter => _parameters.Values.First(p => p.IsName);
+        #region ITemplate members definition
 
+        [Obsolete]
+        public override IFileSystemInfo? LocaleConfiguration => _localeConfigFile;
+
+        public override IReadOnlyDictionary<string, ILocalizationLocator>? Localizations => throw new NotSupportedException($"{nameof(Localizations)} are not loaded during template instantiation.");
+
+        public override string? LocaleConfigPlace => _localeConfigFile?.FullPath;
+
+        public override string? HostConfigPlace => _hostConfigFile?.FullPath;
+
+        #endregion
+
+        /// <summary>
+        /// Gets the evaluated sources for the template.
+        /// <see cref="Evaluate(IVariableCollection)"/> should be called prior to getting this property.
+        /// </summary>
+        public IReadOnlyList<FileSourceMatchInfo> EvaluatedSources
+        {
+            get
+            {
+                if (_evaluatedSources == null)
+                {
+                    throw new InvalidOperationException($"The sources were not evaluated yet. Call {nameof(Evaluate)} prior to accessing {nameof(EvaluatedSources)}");
+                }
+                return _evaluatedSources;
+            }
+        }
+
+        /// <summary>
+        /// Gets the name parameter of the template.
+        /// </summary>
+        internal ITemplateParameter NameParameter => Parameters.First(p => p.IsName);
+
+        /// <summary>
+        /// Gets the filename replacements based on symbols ("fileRename").
+        /// </summary>
         internal IReadOnlyList<IReplacementTokens> SymbolFilenameReplacements
         {
             get
@@ -346,8 +203,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
         }
 
-        internal TemplateConfigModel ConfigurationModel => _configuration;
-
+        /// <summary>
+        /// Evaluates the conditions in template configurations: computed symbols, conditions in special custom operations, in sources anr primary outputs.
+        /// File renames are also applied at this step.
+        /// </summary>
+        /// <param name="rootVariableCollection"></param>
         public void Evaluate(IVariableCollection rootVariableCollection)
         {
             bool stable = false;
@@ -356,9 +216,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             while (!stable)
             {
                 stable = true;
-                foreach (ComputedSymbol symbol in _configuration.Symbols.OfType<ComputedSymbol>())
+                foreach (ComputedSymbol symbol in ConfigModel.Symbols.OfType<ComputedSymbol>())
                 {
-                    bool value = Cpp2StyleEvaluatorDefinition.EvaluateFromString(_settings.Host.Logger, symbol.Value, rootVariableCollection);
+                    bool value = Cpp2StyleEvaluatorDefinition.EvaluateFromString(EngineEnvironmentSettings.Host.Logger, symbol.Value, rootVariableCollection);
                     stable &= computed.TryGetValue(symbol.Name, out bool currentValue) && currentValue == value;
                     rootVariableCollection[symbol.Name] = value;
                     computed[symbol.Name] = value;
@@ -367,26 +227,25 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             // evaluate the file glob (specials) conditions
             // the result is needed for SpecialOperationConfig
-            foreach (CustomFileGlobModel fileGlobModel in _configuration.SpecialCustomOperations)
+            foreach (CustomFileGlobModel fileGlobModel in ConfigModel.SpecialCustomOperations)
             {
-                fileGlobModel.EvaluateCondition(_settings.Host.Logger, rootVariableCollection);
+                fileGlobModel.EvaluateCondition(Logger, rootVariableCollection);
             }
 
             rootVariableCollection.TryGetValue(NameParameter.Name, out object? resolvedNameParamValue);
-
-            _sources = EvaluateSources(rootVariableCollection, resolvedNameParamValue);
+            _evaluatedSources = EvaluateSources(rootVariableCollection, resolvedNameParamValue);
 
             // evaluate the conditions and resolve the paths for the PrimaryOutputs
-            foreach (PrimaryOutputModel pathModel in _configuration.PrimaryOutputs)
+            foreach (PrimaryOutputModel pathModel in ConfigModel.PrimaryOutputs)
             {
-                pathModel.EvaluateCondition(_settings.Host.Logger, rootVariableCollection);
+                pathModel.EvaluateCondition(Logger, rootVariableCollection);
 
                 if (pathModel.ConditionResult)
                 {
                     pathModel.PathResolved = FileRenameGenerator.ApplyRenameToPrimaryOutput(
                         pathModel.Path,
-                        _settings,
-                        _configuration.SourceName,
+                        EngineEnvironmentSettings,
+                        ConfigModel.SourceName,
                         resolvedNameParamValue,
                         rootVariableCollection,
                         SymbolFilenameReplacements);
@@ -394,9 +253,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
         }
 
+        /// <summary>
+        /// Evaluates the bind symbols.
+        /// The evaluated bind symbols are written to <paramref name="variableCollection"/>.
+        /// </summary>
         public Task EvaluateBindSymbolsAsync(IEngineEnvironmentSettings settings, IVariableCollection variableCollection, CancellationToken cancellationToken)
         {
-            var bindSymbols = _configuration.Symbols.OfType<BindSymbol>();
+            IEnumerable<BindSymbol> bindSymbols = ConfigModel.Symbols.OfType<BindSymbol>();
             if (!bindSymbols.Any())
             {
                 return Task.FromResult(0);
@@ -406,210 +269,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return bindSymbolEvaluator.EvaluateBindedSymbolsAsync(bindSymbols, variableCollection, cancellationToken);
         }
 
-        /// <summary>
-        /// Verifies that the given localization model was correctly constructed
-        /// to localize this SimpleConfigModel.
-        /// </summary>
-        /// <param name="locModel">The localization model to be verified.</param>
-        /// <param name="localeFile">localization file (optional), needed to get file name for logging.</param>
-        /// <returns>True if the verification succeeds. False otherwise.
-        /// Check logs for details in case of a failed verification.</returns>
-        internal bool VerifyLocalizationModel(ILocalizationModel locModel, IFile? localeFile = null)
-        {
-            bool validModel = true;
-            localeFile ??= _localeConfigFile;
-            List<string> errorMessages = new List<string>();
-            int unusedPostActionLocs = locModel.PostActions.Count;
-            foreach (var postAction in PostActionModels)
-            {
-                if (postAction.Id == null || !locModel.PostActions.TryGetValue(postAction.Id, out IPostActionLocalizationModel postActionLocModel))
-                {
-                    // Post action with no localization model.
-                    continue;
-                }
-
-                unusedPostActionLocs--;
-
-                // Validate manual instructions.
-                bool instructionUsesDefaultKey = postAction.ManualInstructionInfo.Count == 1 && postAction.ManualInstructionInfo[0].Id == null &&
-                    postActionLocModel.Instructions.ContainsKey(PostActionModel.DefaultIdForSingleManualInstruction);
-                if (instructionUsesDefaultKey)
-                {
-                    // Just one manual instruction using the default key. No issues. Continue.
-                    continue;
-                }
-
-                int unusedManualInstructionLocs = postActionLocModel.Instructions.Count;
-                foreach (var instruction in postAction.ManualInstructionInfo)
-                {
-                    if (instruction.Id != null && postActionLocModel.Instructions.ContainsKey(instruction.Id))
-                    {
-                        unusedManualInstructionLocs--;
-                    }
-                }
-
-                if (unusedManualInstructionLocs > 0)
-                {
-                    // Localizations provide more translations than the number of manual instructions we have.
-                    string excessInstructionLocalizationIds = string.Join(
-                        ", ",
-                        postActionLocModel.Instructions.Keys.Where(k => !postAction.ManualInstructionInfo.Any(i => i.Id == k)));
-
-                    errorMessages.Add(string.Format(LocalizableStrings.Authoring_InvalidManualInstructionLocalizationIndex, excessInstructionLocalizationIds, postAction.Id));
-                    validModel = false;
-                }
-            }
-
-            if (unusedPostActionLocs > 0)
-            {
-                // Localizations provide more translations than the number of post actions we have.
-                string excessPostActionLocalizationIds = string.Join(", ", locModel.PostActions.Keys.Where(k => !PostActionModels.Any(p => p.Id == k)).Select(k => k.ToString()));
-                errorMessages.Add(string.Format(LocalizableStrings.Authoring_InvalidPostActionLocalizationIndex, excessPostActionLocalizationIds));
-                validModel = false;
-            }
-
-            if (errorMessages.Any())
-            {
-                _logger.LogDebug($"Localization file {localeFile?.GetDisplayPath()} is not compatible with base configuration {_sourceFile?.GetDisplayPath()}");
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.AppendLine(string.Format(LocalizableStrings.RunnableProjectGenerator_Warning_LocFileSkipped, localeFile?.GetDisplayPath(), _sourceFile?.GetDisplayPath()));
-                foreach (string errorMessage in errorMessages)
-                {
-                    stringBuilder.AppendLine("  " + errorMessage);
-                }
-                _logger.LogWarning(stringBuilder.ToString());
-            }
-            return validModel;
-        }
-
-        private static IReadOnlyDictionary<string, Parameter> ExtractParameters(TemplateConfigModel configuration)
-        {
-            Dictionary<string, Parameter> parameters = new Dictionary<string, Parameter>();
-            foreach (BaseValueSymbol baseSymbol in configuration.Symbols.OfType<BaseValueSymbol>())
-            {
-                bool isName = baseSymbol == configuration.NameSymbol;
-
-                Parameter parameter = new Parameter(baseSymbol.Name, baseSymbol.Type, baseSymbol.DataType!)
-                {
-                    DefaultValue = baseSymbol.DefaultValue ?? (!baseSymbol.IsRequired ? baseSymbol.Replaces : null),
-                    IsName = isName,
-                    IsVariable = true,
-                    Name = baseSymbol.Name,
-                    Precedence = new TemplateParameterPrecedence(baseSymbol.IsRequired ? PrecedenceDefinition.Required : isName ? PrecedenceDefinition.Implicit : PrecedenceDefinition.Optional),
-                };
-
-                if (baseSymbol is ParameterSymbol parameterSymbol)
-                {
-                    parameter.Precedence = parameterSymbol.Precedence;
-                    parameter.Description = parameterSymbol.Description;
-                    parameter.Choices = parameterSymbol.Choices;
-                    parameter.DefaultIfOptionWithoutValue = parameterSymbol.DefaultIfOptionWithoutValue;
-                    parameter.DisplayName = parameterSymbol.DisplayName;
-                    parameter.EnableQuotelessLiterals = parameterSymbol.EnableQuotelessLiterals;
-                    parameter.AllowMultipleValues = parameterSymbol.AllowMultipleValues;
-                }
-
-                parameters[baseSymbol.Name] = parameter;
-            }
-
-            return parameters;
-        }
-
-        private static IReadOnlyDictionary<string, Parameter> LocalizeParameters(ILocalizationModel localizationModel, IReadOnlyDictionary<string, Parameter> parameters)
-        {
-            Dictionary<string, Parameter> localizedParameters = new();
-
-            foreach (var parameterPair in parameters)
-            {
-                Dictionary<string, ParameterChoice>? localizedChoices = null;
-
-                Parameter parameter = parameterPair.Value;
-                if (!localizationModel.ParameterSymbols.TryGetValue(parameter.Name, out IParameterSymbolLocalizationModel? localization))
-                {
-                    // There is no localization for this parameter. Use the parameter as is.
-                    localizedParameters.Add(parameterPair.Key, parameter);
-                    continue;
-                }
-                if (parameter.IsChoice() && parameter.Choices != null)
-                {
-                    localizedChoices = new Dictionary<string, ParameterChoice>();
-                    foreach (KeyValuePair<string, ParameterChoice> templateChoice in parameter.Choices)
-                    {
-                        ParameterChoice localizedChoice = new ParameterChoice(
-                            templateChoice.Value.DisplayName,
-                            templateChoice.Value.Description);
-
-                        if (localization.Choices.TryGetValue(templateChoice.Key, out ParameterChoiceLocalizationModel locModel))
-                        {
-                            localizedChoice.Localize(locModel);
-                        }
-                        localizedChoices.Add(templateChoice.Key, localizedChoice);
-                    }
-                }
-
-                Parameter localizedParameter = new Parameter(parameter.Name, parameter.Type, parameter.DataType)
-                {
-                    DisplayName = localization?.DisplayName ?? parameter.DisplayName,
-                    Description = localization?.Description ?? parameter.Description,
-                    DefaultValue = parameter.DefaultValue,
-                    DefaultIfOptionWithoutValue = parameter.DefaultIfOptionWithoutValue,
-                    Precedence = parameter.Precedence,
-                    AllowMultipleValues = parameter.AllowMultipleValues,
-                    EnableQuotelessLiterals = parameter.EnableQuotelessLiterals,
-                    Choices = localizedChoices ?? parameter.Choices,
-                };
-
-                localizedParameters.Add(parameterPair.Key, localizedParameter);
-            }
-
-            return localizedParameters;
-        }
-
-        /// <summary>
-        /// Checks the <paramref name="primarySource"/> for additional configuration files.
-        /// If found, merges them all together.
-        /// Returns the merged JObject (or the original if there was nothing to merge).
-        /// Additional files must be in the same folder as the template file.
-        /// </summary>
-        /// <exception cref="TemplateAuthoringException">when additional files configuration is invalid.</exception>
-        private static JObject MergeAdditionalConfiguration(JObject primarySource, IFileSystemInfo primarySourceConfig)
-        {
-            IReadOnlyList<string> otherFiles = primarySource.ArrayAsStrings(AdditionalConfigFilesIndicator);
-
-            if (!otherFiles.Any())
-            {
-                return primarySource;
-            }
-
-            JObject combinedSource = (JObject)primarySource.DeepClone();
-
-            foreach (string partialConfigFileName in otherFiles)
-            {
-                if (!partialConfigFileName.EndsWith("." + RunnableProjectGenerator.TemplateConfigFileName))
-                {
-                    throw new TemplateAuthoringException(string.Format(LocalizableStrings.SimpleConfigModel_AuthoringException_MergeConfiguration_InvalidFileName, partialConfigFileName, RunnableProjectGenerator.TemplateConfigFileName), partialConfigFileName);
-                }
-
-                IFile? partialConfigFile = primarySourceConfig.Parent?.EnumerateFiles(partialConfigFileName, SearchOption.TopDirectoryOnly).FirstOrDefault(x => string.Equals(x.Name, partialConfigFileName));
-
-                if (partialConfigFile == null)
-                {
-                    throw new TemplateAuthoringException(string.Format(LocalizableStrings.SimpleConfigModel_AuthoringException_MergeConfiguration_FileNotFound, partialConfigFileName), partialConfigFileName);
-                }
-
-                JObject partialConfigJson = partialConfigFile.ReadJObjectFromIFile();
-                combinedSource.Merge(partialConfigJson);
-            }
-
-            return combinedSource;
-        }
-
         // If the token is a string:
         //      check if its a valid file in the same directory as the sourceFile.
         //          If so, read that files content as the exclude list.
         //          Otherwise returns an array containing the string value as its only entry.
         // Otherwise, interpret the token as an array and return the content.
-        private static IReadOnlyList<string> TryReadConfigFromFile(IReadOnlyList<string> configs, IFile sourceFile, string[] defaultSet)
+        private static IReadOnlyList<string> TryReadConfigFromFile(IReadOnlyList<string> configs, IFile? sourceFile, string[] defaultSet)
         {
             if (configs == null || !configs.Any())
             {
@@ -619,13 +284,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 string singleConfig = configs[0];
                 if ((singleConfig.IndexOfAny(Path.GetInvalidPathChars()) != -1)
-                    || (!sourceFile.Parent?.FileInfo(singleConfig)?.Exists ?? true))
+                    || (!sourceFile?.Parent?.FileInfo(singleConfig)?.Exists ?? true))
                 {
                     return configs;
                 }
                 else
                 {
-                    using (Stream excludeList = sourceFile.Parent!.FileInfo(singleConfig)!.OpenRead())
+                    using (Stream excludeList = sourceFile!.Parent!.FileInfo(singleConfig)!.OpenRead())
                     using (TextReader reader = new StreamReader(excludeList, Encoding.UTF8, true, 4096, true))
                     {
                         return reader.ReadToEnd().Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
@@ -638,12 +303,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         private IReadOnlyList<IReplacementTokens> ProduceSymbolFilenameReplacements()
         {
             List<IReplacementTokens> filenameReplacements = new();
-            if (!_configuration.Symbols.Any())
+            if (!ConfigModel.Symbols.Any())
             {
                 return filenameReplacements;
             }
 
-            foreach (BaseReplaceSymbol symbol in _configuration.Symbols.OfType<BaseReplaceSymbol>())
+            foreach (BaseReplaceSymbol symbol in ConfigModel.Symbols.OfType<BaseReplaceSymbol>())
             {
                 if (symbol is BaseValueSymbol p)
                 {
@@ -651,10 +316,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     {
                         foreach (string formName in p.Forms.GlobalForms)
                         {
-                            if (_configuration.Forms.TryGetValue(formName, out IValueForm valueForm))
+                            if (ConfigModel.Forms.TryGetValue(formName, out IValueForm valueForm))
                             {
                                 string symbolName = symbol.Name + "{-VALUE-FORMS-}" + formName;
-                                string processedFileReplacement = valueForm.Process(symbol.FileRename!, _configuration.Forms);
+                                string processedFileReplacement = valueForm.Process(symbol.FileRename!, ConfigModel.Forms);
                                 if (!string.IsNullOrEmpty(processedFileReplacement))
                                 {
                                     GenerateFileReplacementsForSymbol(processedFileReplacement!, symbolName, filenameReplacements);
@@ -662,7 +327,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                             }
                             else
                             {
-                                _settings.Host.Logger.LogDebug($"Unable to find a form called '{formName}'");
+                                Logger.LogDebug($"Unable to find a form called '{formName}'");
                             }
                         }
                     }
@@ -678,7 +343,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return filenameReplacements;
         }
 
-        private IGlobalRunConfig ProduceOperationSetup(SpecialOperationConfigParams defaultModel, bool generateMacros, CustomFileGlobModel? customGlobModel = null)
+        private IGlobalRunConfig ProduceOperationSetup(OperationConfigDefault defaultModel, bool generateMacros, CustomFileGlobModel? customGlobModel = null)
         {
             List<IOperationProvider> operations = new List<IOperationProvider>();
 
@@ -709,13 +374,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 computedMacros = ProduceComputedMacroConfig();
             }
 
-            foreach (BaseSymbol symbol in _configuration.Symbols)
+            foreach (BaseSymbol symbol in ConfigModel.Symbols)
             {
                 if (symbol is DerivedSymbol derivedSymbol)
                 {
                     if (generateMacros)
                     {
-                        macros?.Add(new ProcessValueFormMacroConfig(derivedSymbol.ValueSource, symbol.Name, derivedSymbol.DataType, derivedSymbol.ValueTransform, _configuration.Forms));
+                        macros?.Add(new ProcessValueFormMacroConfig(derivedSymbol.ValueSource, symbol.Name, derivedSymbol.DataType, derivedSymbol.ValueTransform, ConfigModel.Forms));
                     }
                 }
 
@@ -727,12 +392,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     {
                         foreach (string formName in baseValueSymbol.Forms.GlobalForms)
                         {
-                            if (_configuration.Forms.TryGetValue(formName, out IValueForm valueForm))
+                            if (ConfigModel.Forms.TryGetValue(formName, out IValueForm valueForm))
                             {
                                 string symbolName = sourceVariable + "{-VALUE-FORMS-}" + formName;
                                 if (!string.IsNullOrWhiteSpace(replaceSymbol.Replaces))
                                 {
-                                    string processedReplacement = valueForm.Process(baseValueSymbol.Replaces!, _configuration.Forms);
+                                    string processedReplacement = valueForm.Process(baseValueSymbol.Replaces!, ConfigModel.Forms);
                                     if (!string.IsNullOrEmpty(processedReplacement))
                                     {
                                         GenerateReplacementsForSymbol(replaceSymbol, processedReplacement!, symbolName, macroGeneratedReplacements);
@@ -740,12 +405,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                                 }
                                 if (generateMacros)
                                 {
-                                    macros?.Add(new ProcessValueFormMacroConfig(sourceVariable, symbolName, "string", formName, _configuration.Forms));
+                                    macros?.Add(new ProcessValueFormMacroConfig(sourceVariable, symbolName, "string", formName, ConfigModel.Forms));
                                 }
                             }
                             else
                             {
-                                _settings.Host.Logger.LogDebug($"Unable to find a form called '{formName}'");
+                                Logger.LogDebug($"Unable to find a form called '{formName}'");
                             }
                         }
                     }
@@ -830,10 +495,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         {
             List<IMacroConfig> generatedMacroConfigs = new List<IMacroConfig>();
 
-            if (_configuration.Guids != null)
+            if (ConfigModel.Guids != null)
             {
                 int guidCount = 0;
-                foreach (Guid guid in _configuration.Guids)
+                foreach (Guid guid in ConfigModel.Guids)
                 {
                     int id = guidCount++;
                     string replacementId = "guid" + id;
@@ -842,7 +507,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 }
             }
 
-            foreach (GeneratedSymbol symbol in _configuration.Symbols.OfType<GeneratedSymbol>())
+            foreach (GeneratedSymbol symbol in ConfigModel.Symbols.OfType<GeneratedSymbol>())
             {
                 string type = symbol.Generator;
                 string variableName = symbol.Name;
@@ -869,7 +534,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         private List<IMacroConfig> ProduceComputedMacroConfig()
         {
             List<IMacroConfig> computedMacroConfigs = new List<IMacroConfig>();
-            foreach (ComputedSymbol symbol in _configuration.Symbols.OfType<ComputedSymbol>())
+            foreach (ComputedSymbol symbol in ConfigModel.Symbols.OfType<ComputedSymbol>())
             {
                 string value = symbol.Value;
                 string? evaluator = symbol.Evaluator;
@@ -881,23 +546,18 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         private List<FileSourceMatchInfo> EvaluateSources(IVariableCollection rootVariableCollection, object? resolvedNameParamValue)
         {
-            if (SourceFile == null)
-            {
-                throw new NotSupportedException($"{nameof(SourceFile)} should be set for sources processing.");
-            }
-
             List<FileSourceMatchInfo> sources = new List<FileSourceMatchInfo>();
 
-            foreach (ExtendedFileSource source in _configuration.Sources)
+            foreach (ExtendedFileSource source in ConfigModel.Sources)
             {
-                if (!source.EvaluateCondition(_settings.Host.Logger, rootVariableCollection))
+                if (!source.EvaluateCondition(Logger, rootVariableCollection))
                 {
                     continue;
                 }
 
-                IReadOnlyList<string> topIncludePattern = TryReadConfigFromFile(source.Include, SourceFile, IncludePatternDefaults).ToList();
-                IReadOnlyList<string> topExcludePattern = TryReadConfigFromFile(source.Exclude, SourceFile, ExcludePatternDefaults).ToList();
-                IReadOnlyList<string> topCopyOnlyPattern = TryReadConfigFromFile(source.CopyOnly, SourceFile, CopyOnlyPatternDefaults).ToList();
+                IReadOnlyList<string> topIncludePattern = TryReadConfigFromFile(source.Include, ConfigFile, IncludePatternDefaults).ToList();
+                IReadOnlyList<string> topExcludePattern = TryReadConfigFromFile(source.Exclude, ConfigFile, ExcludePatternDefaults).ToList();
+                IReadOnlyList<string> topCopyOnlyPattern = TryReadConfigFromFile(source.CopyOnly, ConfigFile, CopyOnlyPatternDefaults).ToList();
                 FileSourceEvaluable topLevelPatterns = new FileSourceEvaluable(topIncludePattern, topExcludePattern, topCopyOnlyPattern);
 
                 Dictionary<string, string> fileRenamesFromSource = source.Rename.ToDictionary(x => x.Key, x => x.Value);
@@ -907,11 +567,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 {
                     foreach (SourceModifier modifier in source.Modifiers)
                     {
-                        if (modifier.EvaluateCondition(_settings.Host.Logger, rootVariableCollection))
+                        if (modifier.EvaluateCondition(Logger, rootVariableCollection))
                         {
-                            IReadOnlyList<string> modifierIncludes = TryReadConfigFromFile(modifier.Include, SourceFile, Array.Empty<string>());
-                            IReadOnlyList<string> modifierExcludes = TryReadConfigFromFile(modifier.Exclude, SourceFile, Array.Empty<string>());
-                            IReadOnlyList<string> modifierCopyOnly = TryReadConfigFromFile(modifier.CopyOnly, SourceFile, Array.Empty<string>());
+                            IReadOnlyList<string> modifierIncludes = TryReadConfigFromFile(modifier.Include, ConfigFile, Array.Empty<string>());
+                            IReadOnlyList<string> modifierExcludes = TryReadConfigFromFile(modifier.Exclude, ConfigFile, Array.Empty<string>());
+                            IReadOnlyList<string> modifierCopyOnly = TryReadConfigFromFile(modifier.CopyOnly, ConfigFile, Array.Empty<string>());
                             FileSourceEvaluable modifierPatterns = new FileSourceEvaluable(modifierIncludes, modifierExcludes, modifierCopyOnly);
                             modifierList.Add(modifierPatterns);
 
@@ -928,7 +588,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
                 string sourceDirectory = source.Source;
                 string targetDirectory = source.Target;
-                IReadOnlyDictionary<string, string> allRenamesForSource = AugmentRenames(SourceFile, sourceDirectory, ref targetDirectory, resolvedNameParamValue, rootVariableCollection, fileRenamesFromSource);
+                IReadOnlyDictionary<string, string> allRenamesForSource = AugmentRenames(sourceDirectory, ref targetDirectory, resolvedNameParamValue, rootVariableCollection, fileRenamesFromSource);
 
                 FileSourceMatchInfo sourceMatcher = new FileSourceMatchInfo(
                     sourceDirectory,
@@ -939,7 +599,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 sources.Add(sourceMatcher);
             }
 
-            if (_configuration.Sources.Count == 0)
+            if (ConfigModel.Sources.Count == 0)
             {
                 IReadOnlyList<string> includePattern = IncludePatternDefaults;
                 IReadOnlyList<string> excludePattern = ExcludePatternDefaults;
@@ -948,7 +608,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
                 string targetDirectory = string.Empty;
                 Dictionary<string, string> fileRenamesFromSource = new Dictionary<string, string>(StringComparer.Ordinal);
-                IReadOnlyDictionary<string, string> allRenamesForSource = AugmentRenames(SourceFile, "./", ref targetDirectory, resolvedNameParamValue, rootVariableCollection, fileRenamesFromSource);
+                IReadOnlyDictionary<string, string> allRenamesForSource = AugmentRenames("./", ref targetDirectory, resolvedNameParamValue, rootVariableCollection, fileRenamesFromSource);
 
                 FileSourceMatchInfo sourceMatcher = new FileSourceMatchInfo(
                     "./",
@@ -963,220 +623,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         }
 
         private IReadOnlyDictionary<string, string> AugmentRenames(
-            IFileSystemInfo configFile,
             string sourceDirectory,
             ref string targetDirectory,
             object? resolvedNameParamValue,
             IVariableCollection variables,
             Dictionary<string, string> fileRenames)
-        {
-            return FileRenameGenerator.AugmentFileRenames(_settings, _configuration.SourceName, configFile, sourceDirectory, ref targetDirectory, resolvedNameParamValue, variables, fileRenames, SymbolFilenameReplacements);
-        }
-
-        private void CheckGeneratorVersionRequiredByTemplate()
-        {
-            if (string.IsNullOrWhiteSpace(_configuration.GeneratorVersions))
-            {
-                return;
-            }
-
-            string allowedGeneratorVersions = _configuration.GeneratorVersions!;
-
-            if (!VersionStringHelpers.TryParseVersionSpecification(allowedGeneratorVersions, out IVersionSpecification? versionChecker))
-            {
-                throw new NotSupportedException(string.Format(LocalizableStrings.RunnableProjectGenerator_Exception_TemplateVersionNotSupported, allowedGeneratorVersions, RunnableProjectGenerator.GeneratorVersion));
-            }
-
-            if (versionChecker is null)
-            {
-                throw new InvalidOperationException($"{nameof(versionChecker)} cannot be null when {nameof(VersionStringHelpers.TryParseVersionSpecification)} is 'true'");
-            }
-
-            if (!versionChecker.CheckIfVersionIsValid(RunnableProjectGenerator.GeneratorVersion))
-            {
-                throw new NotSupportedException(string.Format(LocalizableStrings.RunnableProjectGenerator_Exception_TemplateVersionNotSupported, allowedGeneratorVersions, RunnableProjectGenerator.GeneratorVersion));
-            }
-        }
-
-        /// <summary>
-        /// The method validates loaded cpnfiguration. The errors and warnings are printed using logger.
-        /// The warning messages is mainly only for template authoring, and should be used for template validation, so for now they are logged in debug level only.
-        /// https://github.com/dotnet/templating/issues/2623.
-        /// </summary>
-        /// <exception cref="TemplateValidationException">in case of validation fails.</exception>
-#pragma warning disable SA1202 // Elements should be ordered by access
-        internal void PerformTemplateValidation()
-#pragma warning restore SA1202 // Elements should be ordered by access
-        {
-            //Do some basic checks...
-            List<string> errorMessages = new List<string>();
-            List<string> warningMessages = new List<string>();
-
-            #region Errors
-            if (string.IsNullOrWhiteSpace(_configuration.Identity))
-            {
-                errorMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "identity"));
-            }
-
-            if (string.IsNullOrWhiteSpace(_configuration.Name))
-            {
-                errorMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "name"));
-            }
-
-            if ((_configuration.ShortNameList?.Count ?? 0) == 0)
-            {
-                errorMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "shortName"));
-            }
-
-            var invalidMultichoices =
-                _configuration.Symbols
-                    .OfType<ParameterSymbol>()
-                    .Where(p => p.AllowMultipleValues)
-                    .Where(p => p.Choices.Any(c => !c.Key.IsValidMultiValueParameterValue()));
-            errorMessages.AddRange(
-                invalidMultichoices.Select(p =>
-                    string.Format(
-                        LocalizableStrings.Authoring_InvalidMultichoiceSymbol,
-                        p.DisplayName,
-                        string.Join(", ", MultiValueParameter.MultiValueSeparators.Select(c => $"'{c}'")),
-                        string.Join(
-                            ", ",
-                            p.Choices.Where(c => !c.Key.IsValidMultiValueParameterValue())
-                                .Select(c => $"{{{c.Key}}}")))));
-
-            errorMessages.AddRange(ValidateTemplateSourcePaths());
-            #endregion
-
-            #region Warnings
-            //TODO: the warning messages should be transferred to validate subcommand, as they are not useful for final user, but useful for template author.
-            //https://github.com/dotnet/templating/issues/2623
-            if (string.IsNullOrWhiteSpace(_configuration.SourceName))
-            {
-                warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "sourceName"));
-            }
-
-            if (string.IsNullOrWhiteSpace(_configuration.Author))
-            {
-                warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "author"));
-            }
-
-            if (string.IsNullOrWhiteSpace(_configuration.GroupIdentity))
-            {
-                warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "groupIdentity"));
-            }
-
-            if (string.IsNullOrWhiteSpace(_configuration.GeneratorVersions))
-            {
-                warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "generatorVersions"));
-            }
-
-            if (_configuration.Precedence == 0)
-            {
-                warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "precedence"));
-            }
-
-            if ((_configuration.Classifications?.Count ?? 0) == 0)
-            {
-                warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "classifications"));
-            }
-
-            if (_configuration.PostActionModels != null && _configuration.PostActionModels.Any(x => x.ManualInstructionInfo == null || x.ManualInstructionInfo.Count == 0))
-            {
-                warningMessages.Add(string.Format(LocalizableStrings.Authoring_MalformedPostActionManualInstructions));
-            }
-            #endregion
-
-            if (warningMessages.Count > 0)
-            {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.AppendLine(string.Format(LocalizableStrings.Authoring_TemplateMissingCommonInformation, SourceFile.GetDisplayPath()));
-                foreach (string message in warningMessages)
-                {
-                    stringBuilder.AppendLine("  " + message);
-                }
-                _logger.LogDebug(stringBuilder.ToString());
-            }
-
-            if (errorMessages.Count > 0)
-            {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.AppendLine(string.Format(LocalizableStrings.Authoring_TemplateNotInstalled, SourceFile.GetDisplayPath()));
-                foreach (string message in errorMessages)
-                {
-                    stringBuilder.AppendLine("  " + message);
-                }
-                _logger.LogError(stringBuilder.ToString());
-                throw new TemplateValidationException(string.Format(LocalizableStrings.RunnableProjectGenerator_Exception_TemplateValidationFailed, SourceFile.GetDisplayPath()));
-            }
-        }
-
-        /// <summary>
-        /// The method checks if all the sources are valid.
-        /// Example: the source directory should exist, should not be a file, should be accessible via mount point.
-        /// </summary>
-        /// <returns>list of found errors.</returns>
-#pragma warning disable SA1202 // Elements should be ordered by access
-        internal IEnumerable<string> ValidateTemplateSourcePaths()
-#pragma warning restore SA1202 // Elements should be ordered by access
-        {
-            List<string> errors = new List<string>();
-            if (TemplateSourceRoot == null)
-            {
-                errors.Add(LocalizableStrings.Authoring_TemplateRootOutsideInstallSource);
-            }
-            // check if any sources get out of the mount point
-            foreach (FileSourceMatchInfo source in Sources)
-            {
-                try
-                {
-                    IFile? file = TemplateSourceRoot?.FileInfo(source.Source);
-                    //template source root should not be a file
-                    if (file?.Exists ?? false)
-                    {
-                        errors.Add(string.Format(LocalizableStrings.Authoring_SourceMustBeDirectory, source.Source));
-                    }
-                    else
-                    {
-                        IDirectory? sourceRoot = TemplateSourceRoot?.DirectoryInfo(source.Source);
-                        if (sourceRoot is null)
-                        {
-                            errors.Add(string.Format(LocalizableStrings.Authoring_SourceIsOutsideInstallSource, source.Source));
-                        }
-                        else if (!sourceRoot.Exists)
-                        {
-                            errors.Add(string.Format(LocalizableStrings.Authoring_SourceDoesNotExist, source.Source));
-                        }
-                    }
-                }
-                catch
-                {
-                    // outside the mount point root
-                    // TODO: after the null ref exception in DirectoryInfo is fixed, change how this check works.
-                    errors.Add(string.Format(LocalizableStrings.Authoring_SourceIsOutsideInstallSource, source.Source));
-                }
-            }
-            return errors;
-        }
-
-        private class SpecialOperationConfigParams
-        {
-            internal SpecialOperationConfigParams(string glob, string flagPrefix, string evaluatorName, ConditionalType type)
-            {
-                EvaluatorName = evaluatorName;
-                Glob = glob;
-                FlagPrefix = flagPrefix;
-                ConditionalStyle = type;
-            }
-
-            internal static SpecialOperationConfigParams Defaults { get; } = new SpecialOperationConfigParams(string.Empty, string.Empty, "C++", ConditionalType.None);
-
-            internal string Glob { get; }
-
-            internal string EvaluatorName { get; }
-
-            internal string FlagPrefix { get; }
-
-            internal ConditionalType ConditionalStyle { get; }
-        }
+            => FileRenameGenerator.AugmentFileRenames(EngineEnvironmentSettings, ConfigModel.SourceName, TemplateSourceRoot, sourceDirectory, ref targetDirectory, resolvedNameParamValue, variables, fileRenames, SymbolFilenameReplacements);
     }
 }

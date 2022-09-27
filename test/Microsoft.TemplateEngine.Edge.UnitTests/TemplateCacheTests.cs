@@ -63,11 +63,14 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 foreach (string locale in availableLocales)
                 {
                     ILocalizationLocator locator = A.Fake<ILocalizationLocator>();
+#pragma warning disable CS0618 // Type or member is obsolete
                     A.CallTo(() => locator.Identity).Returns("testIdentity");
+#pragma warning restore CS0618 // Type or member is obsolete
                     A.CallTo(() => locator.Locale).Returns(locale);
                     A.CallTo(() => locator.Name).Returns(locale + " name");
                     locators.Add(locator);
                 }
+                A.CallTo(() => template.Localizations).Returns(locators.ToDictionary(l => l.Locale, l => l));
                 IMountPoint mountPoint = A.Fake<IMountPoint>();
                 A.CallTo(() => mountPoint.MountPointUri).Returns("testMount");
 

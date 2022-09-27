@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Constraints;
+using Microsoft.TemplateEngine.Abstractions.Parameters;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms;
 using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json;
@@ -36,7 +37,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
             Symbols = Array.Empty<BaseSymbol>();
         }
 
-        private TemplateConfigModel(JObject source, ILogger? logger, ISimpleConfigModifiers? configModifiers = null, string? filename = null)
+        private TemplateConfigModel(JObject source, ILogger? logger, string? baselineName = null, string? filename = null)
         {
             _logger = logger;
 
@@ -72,9 +73,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
             IBaselineInfo? baseline = null;
             BaselineInfo = BaselineInfoFromJObject(source.PropertiesOf("baselines"));
 
-            if (!string.IsNullOrEmpty(configModifiers?.BaselineName))
+            if (!string.IsNullOrEmpty(baselineName))
             {
-                BaselineInfo.TryGetValue(configModifiers!.BaselineName, out baseline);
+                BaselineInfo.TryGetValue(baselineName!, out baseline);
             }
 
             Dictionary<string, BaseSymbol> symbols = new(StringComparer.Ordinal);
@@ -405,9 +406,38 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
             }
         }
 
-        internal static TemplateConfigModel FromJObject(JObject source, ILogger? logger = null, ISimpleConfigModifiers? configModifiers = null, string? filename = null)
+        internal static TemplateConfigModel FromJObject(JObject source, ILogger? logger = null, string? baselineName = null, string? filename = null)
         {
-            return new TemplateConfigModel(source, logger, configModifiers, filename);
+            return new TemplateConfigModel(source, logger, baselineName, filename);
+        }
+
+        internal IParameterDefinitionSet ExtractParameters()
+        {
+            Dictionary<string, Parameter> parameters = new Dictionary<string, Parameter>();
+            foreach (ParameterSymbol parameterSymbol in Symbols.OfType<ParameterSymbol>())
+            {
+                bool isName = parameterSymbol == NameSymbol;
+
+                Parameter parameter = new Parameter(parameterSymbol.Name, parameterSymbol.Type, parameterSymbol.DataType!)
+                {
+                    DefaultValue = parameterSymbol.DefaultValue ?? (!parameterSymbol.IsRequired ? parameterSymbol.Replaces : null),
+                    IsName = isName,
+                    IsVariable = true,
+                    Name = parameterSymbol.Name,
+                    Precedence = new TemplateParameterPrecedence(parameterSymbol.IsRequired ? PrecedenceDefinition.Required : isName ? PrecedenceDefinition.Implicit : PrecedenceDefinition.Optional),
+                };
+
+                parameter.Precedence = parameterSymbol.Precedence;
+                parameter.Description = parameterSymbol.Description;
+                parameter.Choices = parameterSymbol.Choices;
+                parameter.DefaultIfOptionWithoutValue = parameterSymbol.DefaultIfOptionWithoutValue;
+                parameter.DisplayName = parameterSymbol.DisplayName;
+                parameter.EnableQuotelessLiterals = parameterSymbol.EnableQuotelessLiterals;
+                parameter.AllowMultipleValues = parameterSymbol.AllowMultipleValues;
+                parameters[parameterSymbol.Name] = parameter;
+            }
+
+            return new ParameterDefinitionSet(parameters.Values);
         }
 
         /// <summary>

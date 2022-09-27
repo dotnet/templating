@@ -12,29 +12,30 @@ using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
-    internal partial class RunnableProjectConfig : ITemplate
+    //this partial class contains the implememntation of ITemplate interface.
+    internal abstract partial class DirectoryBasedTemplate : ITemplate
     {
-        IDirectory? ITemplate.TemplateSourceRoot => TemplateSourceRoot;
+        IDirectory ITemplate.TemplateSourceRoot => TemplateSourceRoot;
 
-        string ITemplateInfo.Identity => _configuration.Identity ?? _configuration.Name ?? throw new TemplateValidationException("Template configuration should have name defined");
+        string ITemplateInfo.Identity => TemplateIdentity;
 
-        Guid ITemplateInfo.GeneratorId => _generator.Id;
+        Guid ITemplateInfo.GeneratorId => Generator.Id;
 
-        string? ITemplateInfo.Author => _configuration.Author;
+        string? ITemplateInfo.Author => ConfigModel.Author;
 
-        string? ITemplateInfo.Description => _configuration.Description;
+        string? ITemplateInfo.Description => ConfigModel.Description;
 
-        IReadOnlyList<string> ITemplateInfo.Classifications => _configuration.Classifications;
+        IReadOnlyList<string> ITemplateInfo.Classifications => ConfigModel.Classifications;
 
-        string? ITemplateInfo.DefaultName => _configuration.DefaultName;
+        string? ITemplateInfo.DefaultName => ConfigModel.DefaultName;
 
-        IGenerator ITemplate.Generator => _generator;
+        IGenerator ITemplate.Generator => Generator;
 
-        string? ITemplateInfo.GroupIdentity => _configuration.GroupIdentity;
+        string? ITemplateInfo.GroupIdentity => ConfigModel.GroupIdentity;
 
-        int ITemplateInfo.Precedence => _configuration.Precedence;
+        int ITemplateInfo.Precedence => ConfigModel.Precedence;
 
-        string ITemplateInfo.Name => _configuration.Name ?? throw new TemplateValidationException("Template configuration should have name defined");
+        string ITemplateInfo.Name => ConfigModel.Name ?? throw new TemplateValidationException("Template configuration should have name defined");
 
         [Obsolete]
         string ITemplateInfo.ShortName
@@ -50,7 +51,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
         }
 
-        IReadOnlyList<string> ITemplateInfo.ShortNameList => _configuration.ShortNameList ?? new List<string>();
+        IReadOnlyList<string> ITemplateInfo.ShortNameList => ConfigModel.ShortNameList ?? new List<string>();
 
         [Obsolete]
         IReadOnlyDictionary<string, ICacheTag> ITemplateInfo.Tags
@@ -93,38 +94,47 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
         }
 
-        public IParameterDefinitionSet ParameterDefinitions => new ParameterDefinitionSet(_parameters.Values
-                    .Where(param => param.Type.Equals("parameter", StringComparison.OrdinalIgnoreCase)));
+        public IParameterDefinitionSet ParameterDefinitions => Parameters;
 
         [Obsolete("Use ParameterDefinitionSet instead.")]
-        public IReadOnlyList<ITemplateParameter> Parameters => ParameterDefinitions;
+        IReadOnlyList<ITemplateParameter> ITemplateInfo.Parameters => ParameterDefinitions;
 
-        IFileSystemInfo ITemplate.Configuration => SourceFile;
+        IFileSystemInfo ITemplate.Configuration => ConfigFile ?? throw new InvalidOperationException($"{nameof(ConfigFile)} should be set in order to continue");
 
-        string ITemplateInfo.MountPointUri => SourceFile.MountPoint.MountPointUri;
+        string ITemplateInfo.MountPointUri => ConfigFile?.MountPoint.MountPointUri ?? throw new InvalidOperationException($"{nameof(ConfigFile)} should be set in order to continue");
 
-        string ITemplateInfo.ConfigPlace => SourceFile.FullPath;
-
-        IFileSystemInfo? ITemplate.LocaleConfiguration => _localeConfigFile;
-
-        string? ITemplateInfo.LocaleConfigPlace => _localeConfigFile?.FullPath;
+        string ITemplateInfo.ConfigPlace => ConfigFile?.FullPath ?? throw new InvalidOperationException($"{nameof(ConfigFile)} should be set in order to continue");
 
         //read in simple template model instead
-        bool ITemplate.IsNameAgreementWithFolderPreferred => _configuration.PreferNameDirectory;
-
-        string? ITemplateInfo.HostConfigPlace => _hostConfigFile?.FullPath;
+        bool ITemplate.IsNameAgreementWithFolderPreferred => ConfigModel.PreferNameDirectory;
 
         //read in simple template model instead
-        string? ITemplateInfo.ThirdPartyNotices => _configuration.ThirdPartyNotices;
+        string? ITemplateInfo.ThirdPartyNotices => ConfigModel.ThirdPartyNotices;
 
-        IReadOnlyDictionary<string, IBaselineInfo> ITemplateInfo.BaselineInfo => _configuration.BaselineInfo;
+        IReadOnlyDictionary<string, IBaselineInfo> ITemplateInfo.BaselineInfo => ConfigModel.BaselineInfo;
 
-        IReadOnlyDictionary<string, string> ITemplateInfo.TagsCollection => _configuration.Tags;
+        IReadOnlyDictionary<string, string> ITemplateInfo.TagsCollection => ConfigModel.Tags;
 
         bool ITemplateInfo.HasScriptRunningPostActions { get; set; }
 
-        IReadOnlyList<Guid> ITemplateInfo.PostActions => _configuration.PostActionModels.Select(pam => pam.ActionId).ToArray();
+        IReadOnlyList<Guid> ITemplateInfo.PostActions => ConfigModel.PostActionModels.Select(pam => pam.ActionId).ToArray();
 
-        IReadOnlyList<TemplateConstraintInfo> ITemplateInfo.Constraints => _configuration.Constraints;
+        IReadOnlyList<TemplateConstraintInfo> ITemplateInfo.Constraints => ConfigModel.Constraints;
+
+        public IReadOnlyList<IValidationEntry> ValidationErrors => throw new NotImplementedException();
+
+        public abstract IReadOnlyDictionary<string, ILocalizationLocator>? Localizations { get; }
+
+        public abstract string? LocaleConfigPlace { get; }
+
+        public abstract string? HostConfigPlace { get; }
+
+        [Obsolete]
+        public abstract IFileSystemInfo? LocaleConfiguration { get; }
+
+        public void Dispose()
+        {
+            SourceMountPoint?.Dispose();
+        }
     }
 }

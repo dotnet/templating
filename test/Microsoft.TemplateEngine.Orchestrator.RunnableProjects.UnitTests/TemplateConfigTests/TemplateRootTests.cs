@@ -1,23 +1,24 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
-using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Microsoft.TemplateEngine.TestHelper;
-using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.TemplateConfigTests
 {
     public class TemplateRootTests : IClassFixture<EnvironmentSettingsHelper>
     {
-        private readonly IEngineEnvironmentSettings _engineEnvironmentSettings;
+        private readonly EnvironmentSettingsHelper _engineEnvironmentSettingsHelper;
 
         public TemplateRootTests(EnvironmentSettingsHelper environmentSettingsHelper)
         {
-            _engineEnvironmentSettings = environmentSettingsHelper.CreateEnvironment(hostIdentifier: GetType().Name, virtualize: true);
+            _engineEnvironmentSettingsHelper = environmentSettingsHelper;
         }
 
         private static string TemplateConfigWithSourcePlaceholder
@@ -68,34 +69,36 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
         }
 
         [Theory(DisplayName = nameof(CheckTemplateRootRelativeToInstallPath))]
-        [InlineData("template.json", false)]
+        [InlineData("template.json", false, "The template root is outside the specified install source location.")]
         [InlineData(".template.config/template.json", true)]
         [InlineData("content/.template.config/template.json", true)]
         [InlineData("src/content/.template.config/template.json", true)]
-        public void CheckTemplateRootRelativeToInstallPath(string pathToTemplateJson, bool shouldAllPathsBeValid)
+        public void CheckTemplateRootRelativeToInstallPath(string pathToTemplateJson, bool shouldAllPathsBeValid, string? expectedErrorMessage = null)
         {
-            TemplateConfigModel baseConfig = TemplateConfigModel.FromJObject(JObject.Parse(BasicTemplateConfig));
-            RunnableProjectGenerator generator = new();
+            IEngineEnvironmentSettings environmentSettings = _engineEnvironmentSettingsHelper.CreateEnvironment(virtualize: true);
+            RunnableProjectGenerator generator = new RunnableProjectGenerator();
 
-            string sourcePath = _engineEnvironmentSettings.GetTempVirtualizedPath();
+            string sourcePath = environmentSettings.GetTempVirtualizedPath();
             IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>
             {
                 { pathToTemplateJson, BasicTemplateConfig }
             };
-            _engineEnvironmentSettings.WriteTemplateSource(sourcePath, templateSourceFiles);
+            environmentSettings.WriteTemplateSource(sourcePath, templateSourceFiles);
 
-            using IMountPoint mountPoint = _engineEnvironmentSettings.MountPath(sourcePath);
+            using IMountPoint mountPoint = environmentSettings.MountPath(sourcePath);
             IFile? templateConfigFile = mountPoint.FileInfo(pathToTemplateJson);
             Assert.NotNull(templateConfigFile);
-            RunnableProjectConfig templateModel = new RunnableProjectConfig(_engineEnvironmentSettings, generator, baseConfig, templateConfigFile);
 
             if (shouldAllPathsBeValid)
             {
+                using RunnableProjectConfig templateModel = new RunnableProjectConfig(environmentSettings, generator, templateConfigFile);
                 Assert.Empty(templateModel.ValidateTemplateSourcePaths());
             }
             else
             {
-                Assert.NotEmpty(templateModel.ValidateTemplateSourcePaths());
+                Assert.NotNull(expectedErrorMessage);
+                Exception e = Assert.Throws<TemplateValidationException>(() => new RunnableProjectConfig(environmentSettings, generator, templateConfigFile));
+                Assert.Contains(expectedErrorMessage, e.Message);
             }
         }
 
@@ -104,36 +107,41 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
         [InlineData(true, "things/")]
         [InlineData(true, "things/stuff/")]
         [InlineData(true, "./")]
-        [InlineData(false, "../")] // outside the mount point, combining throws and is caught.
-        [InlineData(false, "foo/")] // not valid because the path doesn't exist under the root.
-        public void CheckTemplateSourcesRelativeToTemplateRoot(bool shouldAllPathsBeValid, string source)
+        [InlineData(false, "../", "Source location '../' is outside the specified install source location.")] // outside the mount point, combining throws and is caught.
+        [InlineData(false, "foo/", "Source 'foo/' in template does not exist.")] // not valid because the path doesn't exist under the root.
+        public void CheckTemplateSourcesRelativeToTemplateRoot(bool shouldAllPathsBeValid, string source, string? expectedErrorMessage = null)
         {
+            List<(LogLevel Level, string Message)> loggedMessages = new();
+            InMemoryLoggerProvider loggerProvider = new(loggedMessages);
+            IEngineEnvironmentSettings environmentSettings = _engineEnvironmentSettingsHelper.CreateEnvironment(virtualize: true, addLoggerProviders: new[] { loggerProvider });
             string templateConfig = string.Format(TemplateConfigWithSourcePlaceholder, source);
-            TemplateConfigModel baseConfig = TemplateConfigModel.FromJObject(JObject.Parse(templateConfig));
-            RunnableProjectGenerator generator = new RunnableProjectGenerator();
+            RunnableProjectGenerator generator = new();
 
             const string pathToTemplateConfig = ".template.config/template.json";
-            string sourcePath = _engineEnvironmentSettings.GetTempVirtualizedPath();
+            string sourcePath = environmentSettings.GetTempVirtualizedPath();
             IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>
             {
                 { pathToTemplateConfig, templateConfig },
-                { "things/stuff/_._", string.Empty } // directories under the root - valid source locations.
+                // directories under the root - valid source locations.
+                { "things/stuff/_._", string.Empty }
             };
-            _engineEnvironmentSettings.WriteTemplateSource(sourcePath, templateSourceFiles);
 
-            using IMountPoint mountPoint = _engineEnvironmentSettings.MountPath(sourcePath);
+            environmentSettings.WriteTemplateSource(sourcePath, templateSourceFiles);
+
+            using IMountPoint mountPoint = environmentSettings.MountPath(sourcePath);
             IFile? templateConfigFile = mountPoint.FileInfo(pathToTemplateConfig);
             Assert.NotNull(templateConfigFile);
 
-            RunnableProjectConfig templateModel = new RunnableProjectConfig(_engineEnvironmentSettings, generator, baseConfig, templateConfigFile);
-
             if (shouldAllPathsBeValid)
             {
+                using RunnableProjectConfig templateModel = new RunnableProjectConfig(environmentSettings, generator, templateConfigFile);
                 Assert.Empty(templateModel.ValidateTemplateSourcePaths());
             }
             else
             {
-                Assert.NotEmpty(templateModel.ValidateTemplateSourcePaths());
+                Assert.NotNull(expectedErrorMessage);
+                Assert.Throws<TemplateValidationException>(() => new RunnableProjectConfig(environmentSettings, generator, templateConfigFile));
+                Assert.Contains(expectedErrorMessage, loggedMessages.Single(m => m.Level == LogLevel.Error).Message);
             }
         }
 
@@ -144,27 +152,28 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
         [InlineData(true, "../")] // outside the template root, but in the mount point
         [InlineData(true, "../../")] // outside the template root, but in the mount point
         [InlineData(true, "../../../")] // outside the template root, but at the mount point root
-        [InlineData(false, "../../../../")] // outside the mount point
-        [InlineData(false, "foo/")] // not valid because the path doesn't exist under the root
-        [InlineData(false, "../../../Other/")] // doesn't exist
-        [InlineData(false, "../../../../Other/")] // outside the mount point
+        [InlineData(false, "../../../../", "Source location '../../../../' is outside the specified install source location.")]
+        [InlineData(false, "foo/", "Source 'foo/' in template does not exist.")]
+        [InlineData(false, "../../../Other/", "Source '../../../Other/' in template does not exist.")]
+        [InlineData(false, "../../../../Other/", "Source location '../../../../Other/' is outside the specified install source location.")]
         [InlineData(true, "../../../MountRoot/")]
-        [InlineData(false, "../../../MountRoot/Other")] // directory doesn't exist
+        [InlineData(false, "../../../MountRoot/Other", "Source '../../../MountRoot/Other' in template does not exist.")]
         [InlineData(true, "../../../ExistingDir/")]
         [InlineData(true, "../../../MountRoot/Subdir")]
-        public void CheckTemplateSourcesRelativeToTemplateRootMultipleDirsUnderMountPoint(bool shouldAllPathsBeValid, string source)
+        public void CheckTemplateSourcesRelativeToTemplateRootMultipleDirsUnderMountPoint(bool shouldAllPathsBeValid, string source, string? expectedErrorMessage = null)
         {
+            List<(LogLevel Level, string Message)> loggedMessages = new();
+            InMemoryLoggerProvider loggerProvider = new(loggedMessages);
+            IEngineEnvironmentSettings environmentSettings = _engineEnvironmentSettingsHelper.CreateEnvironment(virtualize: true, addLoggerProviders: new[] { loggerProvider });
+
             string templateConfig = string.Format(TemplateConfigWithSourcePlaceholder, source);
-            TemplateConfigModel baseConfig = TemplateConfigModel.FromJObject(JObject.Parse(templateConfig));
             RunnableProjectGenerator generator = new RunnableProjectGenerator();
 
             const string pathFromMountPointRootToTemplateRoot = "MountRoot/Stuff/TemplateRoot/";
             string pathToTemplateConfig = pathFromMountPointRootToTemplateRoot + ".template.config/template.json";
 
-            string sourcePath = _engineEnvironmentSettings.GetTempVirtualizedPath();
-
+            string sourcePath = environmentSettings.GetTempVirtualizedPath();
             string sampleContentDir = pathFromMountPointRootToTemplateRoot + "things/stuff/_._";
-
             IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>
             {
                 { pathToTemplateConfig, templateConfig },
@@ -173,21 +182,22 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
                 { "MountRoot/Subdir/_._", string.Empty }
             };
 
-            _engineEnvironmentSettings.WriteTemplateSource(sourcePath, templateSourceFiles);
+            environmentSettings.WriteTemplateSource(sourcePath, templateSourceFiles);
 
-            using IMountPoint mountPoint = _engineEnvironmentSettings.MountPath(sourcePath);
+            using IMountPoint mountPoint = environmentSettings.MountPath(sourcePath);
             IFile? templateConfigFile = mountPoint.FileInfo(pathToTemplateConfig);
             Assert.NotNull(templateConfigFile);
 
-            RunnableProjectConfig templateModel = new RunnableProjectConfig(_engineEnvironmentSettings, generator, baseConfig, templateConfigFile);
-
             if (shouldAllPathsBeValid)
             {
+                using RunnableProjectConfig templateModel = new RunnableProjectConfig(environmentSettings, generator, templateConfigFile);
                 Assert.Empty(templateModel.ValidateTemplateSourcePaths());
             }
             else
             {
-                Assert.NotEmpty(templateModel.ValidateTemplateSourcePaths());
+                Assert.NotNull(expectedErrorMessage);
+                Assert.Throws<TemplateValidationException>(() => new RunnableProjectConfig(environmentSettings, generator, templateConfigFile));
+                Assert.Contains(expectedErrorMessage, loggedMessages.Single(m => m.Level == LogLevel.Error).Message);
             }
         }
     }

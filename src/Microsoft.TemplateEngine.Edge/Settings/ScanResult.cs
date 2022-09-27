@@ -21,7 +21,9 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         {
             MountPoint = mountPoint;
             Templates = templates;
+#pragma warning disable CS0618 // Type or member is obsolete
             Localizations = localizations;
+#pragma warning restore CS0618 // Type or member is obsolete
             Components = components;
         }
 
@@ -41,6 +43,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         /// <summary>
         /// All template localizations found inside mountpoint.
         /// </summary>
+        [Obsolete("Use ITemplate.Localizations instead.")]
         public IReadOnlyList<ILocalizationLocator> Localizations { get; }
 
         /// <summary>
@@ -51,6 +54,13 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         /// <summary>
         /// Disposes <see cref="MountPoint"/> that was scanned.
         /// </summary>
-        public void Dispose() => MountPoint.Dispose();
+        public void Dispose()
+        {
+            foreach (ITemplate template in Templates)
+            {
+                template.Dispose();
+            }
+            MountPoint.Dispose();
+        }
     }
 }

@@ -12,13 +12,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
     internal interface IRunnableProjectConfig
     {
-        IReadOnlyList<KeyValuePair<string, IGlobalRunConfig>> SpecialOperationConfig { get; }
+        IReadOnlyList<(string Glob, IGlobalRunConfig Config)> SpecialOperationConfig { get; }
 
         IGlobalRunConfig OperationConfig { get; }
 
-        IReadOnlyList<FileSourceMatchInfo> Sources { get; }
-
-        string Identity { get; }
+        IReadOnlyList<FileSourceMatchInfo> EvaluatedSources { get; }
 
         IReadOnlyList<string> IgnoreFileNames { get; }
 

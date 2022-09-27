@@ -31,7 +31,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 }
                 foreach (ITemplate template in scanResult.Templates)
                 {
-                    templateDeduplicationDictionary[template.Identity] = (template, GetBestLocalizationLocatorMatch(scanResult.Localizations, template.Identity));
+                    templateDeduplicationDictionary[template.Identity] = (template, GetBestLocalizationLocatorMatch(template));
                 }
             }
 
@@ -107,21 +107,25 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         [JsonProperty]
         public Dictionary<string, DateTime> MountPointsInfo { get; }
 
-        private ILocalizationLocator? GetBestLocalizationLocatorMatch(IReadOnlyList<ILocalizationLocator> localizations, string identity)
+        private ILocalizationLocator? GetBestLocalizationLocatorMatch(ITemplate template)
         {
-            IEnumerable<ILocalizationLocator> localizationsForTemplate = localizations.Where(locator => locator.Identity.Equals(identity, StringComparison.OrdinalIgnoreCase));
-
-            if (!localizations.Any())
+            if (template.Localizations is null)
             {
                 return null;
             }
-            IEnumerable<string> availableLocalizations = localizationsForTemplate.Select(locator => locator.Locale);
+
+            if (!template.Localizations.Any())
+            {
+                return null;
+            }
+
+            IEnumerable<string> availableLocalizations = template.Localizations.Keys;
             string? bestMatch = GetBestLocaleMatch(availableLocalizations);
             if (string.IsNullOrWhiteSpace(bestMatch))
             {
                 return null;
             }
-            return localizationsForTemplate.FirstOrDefault(locator => locator.Locale == bestMatch);
+            return template.Localizations[bestMatch!];
         }
 
         /// <remarks>see https://source.dot.net/#System.Private.CoreLib/ResourceFallbackManager.cs.</remarks>
