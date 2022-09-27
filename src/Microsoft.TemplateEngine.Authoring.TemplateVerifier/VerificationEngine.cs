@@ -28,7 +28,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
         };
 
         private readonly TemplateVerifierOptions _options;
-        private readonly /*ILogger<VerificationEngine>*/ILogger _logger;
+        private readonly ILogger _logger;
 
         public VerificationEngine(IOptions<TemplateVerifierOptions> optionsAccessor, ILogger logger)
         {
@@ -43,6 +43,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
 
         public async Task Execute(CancellationToken cancellationToken = default)
         {
+            //TODO: add functionality for uninstalled templates from a local folder
             if (!string.IsNullOrEmpty(_options.TemplatePath))
             {
                 throw new TemplateVerificationException("Custom template path not yet supported.", TemplateVerificationErrorCode.InternalError);
@@ -50,14 +51,14 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
 
             if (string.IsNullOrEmpty(_options.TemplateName))
             {
-                throw new TemplateVerificationException("Template name not supplied - but custom template path is not yet supported.", TemplateVerificationErrorCode.InternalError);
+                throw new TemplateVerificationException(LocalizableStrings.engine_error_templateNameMandatory, TemplateVerificationErrorCode.InternalError);
             }
 
             // Create temp folder and instantiate there
             string workingDir = _options.OutputDirectory ?? Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
             if (Directory.Exists(workingDir) && Directory.EnumerateFileSystemEntries(workingDir).Any())
             {
-                throw new TemplateVerificationException("Working directory already exists and is not empty.", TemplateVerificationErrorCode.WorkingDirectoryExists);
+                throw new TemplateVerificationException(LocalizableStrings.engine_error_workDirExists, TemplateVerificationErrorCode.WorkingDirectoryExists);
             }
 
             Directory.CreateDirectory(workingDir);
@@ -89,7 +90,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
                 if (commandResult.ExitCode == 0)
                 {
                     throw new TemplateVerificationException(
-                        "Template instantiation expected to fail but it passed.",
+                        LocalizableStrings.engine_error_unexpectedPass,
                         TemplateVerificationErrorCode.VerificationFailed);
                 }
             }
@@ -98,8 +99,8 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
                 if (commandResult.ExitCode != 0)
                 {
                     throw new TemplateVerificationException(
-                        string.Format("Template instantiation expected to pass but it had exit code {0}.", commandResult.ExitCode),
-                        TemplateVerificationErrorCode.VerificationFailed);
+                        string.Format(LocalizableStrings.engine_error_unexpectedFail, commandResult.ExitCode),
+                        TemplateVerificationErrorCode.InstantiationFailed);
                 }
 
                 // We do not expect stderr in passing command.
@@ -108,10 +109,10 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
                 {
                     throw new TemplateVerificationException(
                         string.Format(
-                            "Template instantiation expected not to have any stderr output, but stderr output was encountered:{0}{1}",
+                            LocalizableStrings.engine_error_unexpectedStdErr,
                             Environment.NewLine,
                             commandResult.StdErr),
-                        TemplateVerificationErrorCode.VerificationFailed);
+                        TemplateVerificationErrorCode.InstantiationFailed);
                 }
             }
 
@@ -269,7 +270,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
                 {
                     throw new TemplateVerificationException(
                         string.Format(
-                            "Folder [{0}] not expected to exist in the template output - cannot verify stdout/stderr in such case",
+                            LocalizableStrings.engine_error_stdOutFolderExists,
                             SpecialFiles.StandardStreamsDir),
                         TemplateVerificationErrorCode.InternalError);
                 }
@@ -305,7 +306,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
                 }
                 else
                 {
-                    _logger.LogError(e, "Unexpected error encountered");
+                    _logger.LogError(e, LocalizableStrings.engine_error_unexpected);
                     throw;
                 }
             }

@@ -63,6 +63,76 @@ Do not localize: "template.json"</note>
         <target state="translated">在路径“{0}”下未找到“template.json”文件。</target>
         <note>Do not localize: "template.json"</note>
       </trans-unit>
+      <trans-unit id="command_verify_error_failed">
+        <source>Verification Failed.</source>
+        <target state="new">Verification Failed.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="command_verify_error_unrecognizedArguments">
+        <source>Argument(s) {0} are not recognized. Must be one of: {1}.</source>
+        <target state="new">Argument(s) {0} are not recognized. Must be one of: {1}.</target>
+        <note>{0} and {1} is both a list of arguments</note>
+      </trans-unit>
+      <trans-unit id="command_verify_help_customExcludes_description">
+        <source>Specifies pattern(s) defining files to be excluded from verification.</source>
+        <target state="new">Specifies pattern(s) defining files to be excluded from verification.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="command_verify_help_description">
+        <source>Runs the template with specified arguments and compares the result with expectations files (and create expectations changes suggestions).</source>
+        <target state="new">Runs the template with specified arguments and compares the result with expectations files (and create expectations changes suggestions).</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="command_verify_help_disableDefaultExcludes_description">
+        <source>If set to true - all template output files will be verified, unless --exclude-pattern option is used.</source>
+        <target state="new">If set to true - all template output files will be verified, unless --exclude-pattern option is used.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="command_verify_help_disableDiffTool_description">
+        <source>If set to true - the diff tool won't be automatically started by the Verifier on verification failures.</source>
+        <target state="new">If set to true - the diff tool won't be automatically started by the Verifier on verification failures.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="command_verify_help_expectFailure_description">
+        <source>If set to true - 'dotnet new' command is expected to return nonzero return code.</source>
+        <target state="new">If set to true - 'dotnet new' command is expected to return nonzero return code.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="command_verify_help_expectationsDirPath_description">
+        <source>Specifies path to directory with expectation files.</source>
+        <target state="new">Specifies path to directory with expectation files.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="command_verify_help_newCommandPath_description">
+        <source>Specifies path to custom assembly implementing the new command.</source>
+        <target state="new">Specifies path to custom assembly implementing the new command.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="command_verify_help_outputPath_description">
+        <source>Specifies path to target directory to output the generated template.</source>
+        <target state="new">Specifies path to target directory to output the generated template.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="command_verify_help_templateName_description">
+        <source>Name of template to be verified. Can be already installed template or template within local path specified with -p/--template-path option.</source>
+        <target state="new">Name of template to be verified. Can be already installed template or template within local path specified with -p/--template-path option.</target>
+        <note>Do not translate the '-p/--template-path'</note>
+      </trans-unit>
+      <trans-unit id="command_verify_help_templatePath_description">
+        <source>Specifies path to the directory with template to be verified.</source>
+        <target state="new">Specifies path to the directory with template to be verified.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="command_verify_help_uniqueFor_description">
+        <source>Sets the Verifier expectations directory naming convention - by indicating which scenarios should be differentiated.</source>
+        <target state="new">Sets the Verifier expectations directory naming convention - by indicating which scenarios should be differentiated.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="command_verify_help_verifyOutputs_description">
+        <source>If set to true - 'dotnet new' command standard output and error contents will be verified along with the produced template files.</source>
+        <target state="new">If set to true - 'dotnet new' command standard output and error contents will be verified along with the produced template files.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="generic_log_commandExecutionFailed">
         <source>"{0}" command has encountered an error. See the logs for more details.</source>
         <target state="translated">“{0}”命令遇到错误。如需了解详细信息，请参阅日志。</target>

@@ -17,8 +17,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
         private readonly Argument<string> _templateNameArgument = new("-n")
         {
             Name = "template-short-name",
-            //TODO: localize
-            Description = "Name of already installed template to be verified.",
+            Description = LocalizableStrings.command_verify_help_templateName_description,
             // 0 for case where only path is specified
             Arity = new ArgumentArity(1, 1)
         };
@@ -32,14 +31,12 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
         private readonly Option<string> _templatePathOption = new("-p")
         {
             Name = "--template-path",
-            //TODO: localize
-            Description = "Specifies path to the directory with template to be verified.",
+            Description = LocalizableStrings.command_verify_help_templatePath_description,
         };
 
         private readonly Option<string> _newCommandPathOption = new("--new-command-assembly")
         {
-            //TODO: localize
-            Description = "Specifies path to custom assembly implementing the new command.",
+            Description = LocalizableStrings.command_verify_help_newCommandPath_description,
             //TODO: do we have better way of distinguishing options that might rarely be needed?
             // if not - we should probably add a link to more detailed help in the command description (mentioning that online help has additional options)
             IsHidden = true
@@ -48,58 +45,50 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
         private readonly Option<string> _templateOutputPathOption = new("-o")
         {
             Name = "--output",
-            //TODO: localize
-            Description = "Specifies path to target directory to output the generated template.",
+            Description = LocalizableStrings.command_verify_help_outputPath_description,
         };
 
         private readonly Option<string> _expectationsDirectoryOption = new("-d")
         {
             Name = "--expectations-directory",
-            //TODO: localize
-            Description = "Specifies path to directory with expectation files.",
+            Description = LocalizableStrings.command_verify_help_expectationsDirPath_description,
         };
 
         private readonly Option<bool> _disableDiffToolOption = new("--disable-diff-tool")
         {
-            //TODO: localize
-            Description = "If set to true - the diff tool won't be automatically started by the Verifier on verification failures.",
+            Description = LocalizableStrings.command_verify_help_disableDiffTool_description,
         };
 
         private readonly Option<bool> _disableDefaultExcludePatternsOption = new("--disable-default-exclude-patterns")
         {
-            //TODO: localize
-            Description = "If set to true - all template output files will be verified, unless --exclude-pattern option is used.",
+            Description = LocalizableStrings.command_verify_help_disableDefaultExcludes_description,
         };
 
         private readonly Option<IEnumerable<string>> _excludePatternOption = new("--exclude-pattern")
         {
-            //TODO: localize
-            Description = "Specifies pattern(s) defining files to be excluded from verification.",
+            Description = LocalizableStrings.command_verify_help_customExcludes_description,
             Arity = new ArgumentArity(0, 999)
         };
 
         private readonly Option<bool> _verifyCommandOutputOption = new("--verify-std")
         {
-            //TODO: localize
-            Description = "If set to true - 'dotnet new' command standard output and error contents will be verified along with the produced template files.",
+            Description = LocalizableStrings.command_verify_help_verifyOutputs_description,
         };
 
         private readonly Option<bool> _isCommandExpectedToFailOption = new("--fail-expected")
         {
-            //TODO: localize
-            Description = "If set to true - 'dotnet new' command is expected to return nonzero return code.",
+            Description = LocalizableStrings.command_verify_help_expectFailure_description,
         };
 
         private readonly Option<IEnumerable<string>> _uniqueForOption = new("--unique-for")
         {
-            //TODO: localize
-            Description = "Sets the Verifier expectations directory naming convention - by indicating which scenarios should be differentiated.",
+            Description = LocalizableStrings.command_verify_help_uniqueFor_description,
             Arity = new ArgumentArity(0, 999),
             AllowMultipleArgumentsPerToken = true,
         };
 
         public VerifyCommand(ILoggerFactory loggerFactory)
-            : base(CommandName, "Runs the template with specified arguments and compares the result with expectations files (or creates those if yet don't exist).", loggerFactory)
+            : base(CommandName, LocalizableStrings.command_verify_help_description, loggerFactory)
         {
             AddArgument(_templateNameArgument);
             AddOption(_remainingArguments);
@@ -149,7 +138,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
             }
             catch (Exception e)
             {
-                Reporter.Error.WriteLine("Verification Failed.");
+                Reporter.Error.WriteLine(LocalizableStrings.command_verify_error_failed);
                 Logger.LogError(e.Message);
                 TemplateVerificationException? ex = e as TemplateVerificationException;
                 return (int)(ex?.TemplateVerificationErrorCode ?? TemplateVerificationErrorCode.InternalError);
@@ -173,9 +162,8 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
             var invalidArguments = optionResult.Tokens.Where(token => !allowedValues.Append(allowedHiddenValue).Contains(token.Value, StringComparer.OrdinalIgnoreCase)).ToList();
             if (invalidArguments.Any())
             {
-                //TODO: localize
                 optionResult.ErrorMessage = string.Format(
-                    "Argument(s) {0} are not recognized. Must be one of: {1}.",
+                    LocalizableStrings.command_verify_error_unrecognizedArguments,
                     string.Join(", ", invalidArguments.Select(arg => $"'{arg.Value}'")),
                     string.Join(", ", allowedValues.Select(allowedValue => $"'{allowedValue}'")));
             }

@@ -162,6 +162,132 @@ namespace Microsoft.TemplateEngine.Authoring.CLI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Verification Failed..
+        /// </summary>
+        internal static string command_verify_error_failed {
+            get {
+                return ResourceManager.GetString("command_verify_error_failed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Argument(s) {0} are not recognized. Must be one of: {1}..
+        /// </summary>
+        internal static string command_verify_error_unrecognizedArguments {
+            get {
+                return ResourceManager.GetString("command_verify_error_unrecognizedArguments", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specifies pattern(s) defining files to be excluded from verification..
+        /// </summary>
+        internal static string command_verify_help_customExcludes_description {
+            get {
+                return ResourceManager.GetString("command_verify_help_customExcludes_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Runs the template with specified arguments and compares the result with expectations files (and create expectations changes suggestions)..
+        /// </summary>
+        internal static string command_verify_help_description {
+            get {
+                return ResourceManager.GetString("command_verify_help_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If set to true - all template output files will be verified, unless --exclude-pattern option is used..
+        /// </summary>
+        internal static string command_verify_help_disableDefaultExcludes_description {
+            get {
+                return ResourceManager.GetString("command_verify_help_disableDefaultExcludes_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If set to true - the diff tool won&apos;t be automatically started by the Verifier on verification failures..
+        /// </summary>
+        internal static string command_verify_help_disableDiffTool_description {
+            get {
+                return ResourceManager.GetString("command_verify_help_disableDiffTool_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specifies path to directory with expectation files..
+        /// </summary>
+        internal static string command_verify_help_expectationsDirPath_description {
+            get {
+                return ResourceManager.GetString("command_verify_help_expectationsDirPath_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If set to true - &apos;dotnet new&apos; command is expected to return nonzero return code..
+        /// </summary>
+        internal static string command_verify_help_expectFailure_description {
+            get {
+                return ResourceManager.GetString("command_verify_help_expectFailure_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specifies path to custom assembly implementing the new command..
+        /// </summary>
+        internal static string command_verify_help_newCommandPath_description {
+            get {
+                return ResourceManager.GetString("command_verify_help_newCommandPath_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specifies path to target directory to output the generated template..
+        /// </summary>
+        internal static string command_verify_help_outputPath_description {
+            get {
+                return ResourceManager.GetString("command_verify_help_outputPath_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name of template to be verified. Can be already installed template or template within local path specified with -p/--template-path option..
+        /// </summary>
+        internal static string command_verify_help_templateName_description {
+            get {
+                return ResourceManager.GetString("command_verify_help_templateName_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specifies path to the directory with template to be verified..
+        /// </summary>
+        internal static string command_verify_help_templatePath_description {
+            get {
+                return ResourceManager.GetString("command_verify_help_templatePath_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sets the Verifier expectations directory naming convention - by indicating which scenarios should be differentiated..
+        /// </summary>
+        internal static string command_verify_help_uniqueFor_description {
+            get {
+                return ResourceManager.GetString("command_verify_help_uniqueFor_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If set to true - &apos;dotnet new&apos; command standard output and error contents will be verified along with the produced template files..
+        /// </summary>
+        internal static string command_verify_help_verifyOutputs_description {
+            get {
+                return ResourceManager.GetString("command_verify_help_verifyOutputs_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &quot;{0}&quot; command has encountered an error. See the logs for more details..
         /// </summary>
         internal static string generic_log_commandExecutionFailed {

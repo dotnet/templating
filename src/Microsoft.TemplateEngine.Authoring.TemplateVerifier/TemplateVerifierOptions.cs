@@ -1,57 +1,13 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System.Text;
 using Microsoft.Extensions.Options;
 
 namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
 {
     /// <summary>
-    /// Delegate signature for performing custom directory content verifications.
-    /// Expectable verification failures should be signaled with <see cref="TemplateVerificationException"/>.
-    /// API provider can either perform content enumeration, skipping and scrubbing by themselves (then the second argument can be ignored)
-    /// or the <see cref="contentFetcher"/> can be awaited to get the content of files - filtered by exclusion patterns and scrubbed by scrubbers.
+    /// Configuration bag for the <see cref="VerificationEngine"/> class.
     /// </summary>
-    /// <param name="contentDirectory"></param>
-    /// <param name="contentFetcher"></param>
-    /// <returns></returns>
-    public delegate Task VerifyDirectory(string contentDirectory, Lazy<IAsyncEnumerable<(string FilePath, string ScrubbedContent)>> contentFetcher);
-
-    public class ScrubbersDefinition
-    {
-        public static readonly ScrubbersDefinition Empty = new();
-
-        public ScrubbersDefinition() { }
-
-        public ScrubbersDefinition(Action<StringBuilder> scrubber, string? extension = null)
-        {
-            this.AddScrubber(scrubber, extension);
-        }
-
-        public Dictionary<string, Action<StringBuilder>> ScrubersByExtension { get; private set; } = new Dictionary<string, Action<StringBuilder>>();
-
-        public Action<StringBuilder>? GeneralScrubber { get; private set; }
-
-        public ScrubbersDefinition AddScrubber(Action<StringBuilder> scrubber, string? extension = null)
-        {
-            if (object.ReferenceEquals(this, Empty))
-            {
-                return new ScrubbersDefinition().AddScrubber(scrubber, extension);
-            }
-
-            if (extension == null)
-            {
-                GeneralScrubber += scrubber;
-            }
-            else
-            {
-                ScrubersByExtension[extension] = scrubber;
-            }
-
-            return this;
-        }
-    }
-
     public class TemplateVerifierOptions : IOptions<TemplateVerifierOptions>
     {
         /// <summary>

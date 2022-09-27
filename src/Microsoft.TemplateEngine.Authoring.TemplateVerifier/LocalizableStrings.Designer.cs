@@ -61,11 +61,65 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to aaa.
+        ///   Looks up a localized string similar to Folder [{0}] not expected to exist in the template output - cannot verify stdout/stderr in such case..
         /// </summary>
-        internal static string aaa {
+        internal static string engine_error_stdOutFolderExists {
             get {
-                return ResourceManager.GetString("aaa", resourceCulture);
+                return ResourceManager.GetString("engine_error_stdOutFolderExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Template name is mandatory, but was not supplied..
+        /// </summary>
+        internal static string engine_error_templateNameMandatory {
+            get {
+                return ResourceManager.GetString("engine_error_templateNameMandatory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected error encountered..
+        /// </summary>
+        internal static string engine_error_unexpected {
+            get {
+                return ResourceManager.GetString("engine_error_unexpected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Template instantiation expected to pass but it had exit code {0}..
+        /// </summary>
+        internal static string engine_error_unexpectedFail {
+            get {
+                return ResourceManager.GetString("engine_error_unexpectedFail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Template instantiation expected to fail but it passed..
+        /// </summary>
+        internal static string engine_error_unexpectedPass {
+            get {
+                return ResourceManager.GetString("engine_error_unexpectedPass", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Template instantiation expected not to have any stderr output, but stderr output was encountered:{0}{1}.
+        /// </summary>
+        internal static string engine_error_unexpectedStdErr {
+            get {
+                return ResourceManager.GetString("engine_error_unexpectedStdErr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Working directory already exists and is not empty..
+        /// </summary>
+        internal static string engine_error_workDirExists {
+            get {
+                return ResourceManager.GetString("engine_error_workDirExists", resourceCulture);
             }
         }
     }

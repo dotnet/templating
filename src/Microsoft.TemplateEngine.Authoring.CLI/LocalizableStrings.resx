@@ -161,6 +161,50 @@ Do not localize: "template.json"</comment>
     <value>Failed to find "template.json" file under the path "{0}".</value>
     <comment>Do not localize: "template.json"</comment>
   </data>
+  <data name="command_verify_error_failed" xml:space="preserve">
+    <value>Verification Failed.</value>
+  </data>
+  <data name="command_verify_error_unrecognizedArguments" xml:space="preserve">
+    <value>Argument(s) {0} are not recognized. Must be one of: {1}.</value>
+    <comment>{0} and {1} is both a list of arguments</comment>
+  </data>
+  <data name="command_verify_help_customExcludes_description" xml:space="preserve">
+    <value>Specifies pattern(s) defining files to be excluded from verification.</value>
+  </data>
+  <data name="command_verify_help_description" xml:space="preserve">
+    <value>Runs the template with specified arguments and compares the result with expectations files (and create expectations changes suggestions).</value>
+  </data>
+  <data name="command_verify_help_disableDefaultExcludes_description" xml:space="preserve">
+    <value>If set to true - all template output files will be verified, unless --exclude-pattern option is used.</value>
+  </data>
+  <data name="command_verify_help_disableDiffTool_description" xml:space="preserve">
+    <value>If set to true - the diff tool won't be automatically started by the Verifier on verification failures.</value>
+  </data>
+  <data name="command_verify_help_expectationsDirPath_description" xml:space="preserve">
+    <value>Specifies path to directory with expectation files.</value>
+  </data>
+  <data name="command_verify_help_expectFailure_description" xml:space="preserve">
+    <value>If set to true - 'dotnet new' command is expected to return nonzero return code.</value>
+  </data>
+  <data name="command_verify_help_newCommandPath_description" xml:space="preserve">
+    <value>Specifies path to custom assembly implementing the new command.</value>
+  </data>
+  <data name="command_verify_help_outputPath_description" xml:space="preserve">
+    <value>Specifies path to target directory to output the generated template.</value>
+  </data>
+  <data name="command_verify_help_templateName_description" xml:space="preserve">
+    <value>Name of template to be verified. Can be already installed template or template within local path specified with -p/--template-path option.</value>
+    <comment>Do not translate the '-p/--template-path'</comment>
+  </data>
+  <data name="command_verify_help_templatePath_description" xml:space="preserve">
+    <value>Specifies path to the directory with template to be verified.</value>
+  </data>
+  <data name="command_verify_help_uniqueFor_description" xml:space="preserve">
+    <value>Sets the Verifier expectations directory naming convention - by indicating which scenarios should be differentiated.</value>
+  </data>
+  <data name="command_verify_help_verifyOutputs_description" xml:space="preserve">
+    <value>If set to true - 'dotnet new' command standard output and error contents will be verified along with the produced template files.</value>
+  </data>
   <data name="generic_log_commandExecutionFailed" xml:space="preserve">
     <value>"{0}" command has encountered an error. See the logs for more details.</value>
     <comment>{0} will be replaced by the command name. Such as: "export" command has encountered an error.</comment>
