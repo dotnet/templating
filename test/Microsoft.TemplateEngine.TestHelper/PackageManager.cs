@@ -23,6 +23,9 @@ namespace Microsoft.TemplateEngine.TestHelper
         private static readonly SemaphoreSlim Semaphore = new SemaphoreSlim(1, 1);
         private readonly string _packageLocation = TestUtils.CreateTemporaryFolder("packages");
         private readonly ConcurrentDictionary<string, string> _installedPackages = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+#pragma warning disable IDE0044 // Add readonly modifier
+        private volatile Mutex _packMutex = new Mutex(false, "PackMutex");
+#pragma warning restore IDE0044 // Add readonly modifier
 
         public async Task<string> GetNuGetPackage(string templatePackName, string? version = null, NuGetVersion? minimumVersion = null, ILogger? logger = null)
         {
@@ -83,13 +86,11 @@ namespace Microsoft.TemplateEngine.TestHelper
             {
                 throw new ArgumentException($"{projectPath} doesn't exist", nameof(projectPath));
             }
-            lock (string.Intern(absolutePath.ToLowerInvariant()))
-            {
-                if (_installedPackages.TryGetValue(absolutePath, out string? packagePath))
-                {
-                    return packagePath;
-                }
 
+            _packMutex.WaitOne();
+            var isFound = _installedPackages.TryGetValue(absolutePath, out string? packagePath);
+            if (!isFound)
+            {
                 var info = new ProcessStartInfo("dotnet", $"pack {absolutePath} -o {_packageLocation}")
                 {
                     UseShellExecute = false,
@@ -118,11 +119,13 @@ namespace Microsoft.TemplateEngine.TestHelper
                         $"{Environment.NewLine}StdErr: {stdErr}.");
                 }
 
-                string createdPackagePath = Directory.GetFiles(_packageLocation).Aggregate(
+                packagePath = Directory.GetFiles(_packageLocation).Aggregate(
                     (latest, current) => (latest == null) ? current : File.GetCreationTimeUtc(current) > File.GetCreationTimeUtc(latest) ? current : latest);
-                _installedPackages[absolutePath] = createdPackagePath;
-                return createdPackagePath;
+                _installedPackages[absolutePath] = packagePath;
             }
+            _packMutex.ReleaseMutex();
+
+            return packagePath!;
         }
 
         public void Dispose() => Directory.Delete(_packageLocation, true);
