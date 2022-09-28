@@ -45,8 +45,6 @@ stages:
       parameters:
         MirrorRepo: templating
         LclSource: lclFilesfromPackage
-        MirrorBranch: $(OneLocBuildBranch)
-        LclPackageId: 'LCL-JUNO-PROD-TEMPLATING'
         ${{ if eq(variables['Build.SourceBranch'], format('{0}{1}', 'refs/heads/', variables['OneLocBuildBranch'])) }}:
           MirrorBranch: $(OneLocBuildBranch)
           LclPackageId: 'LCL-JUNO-PROD-TEMPLATING'
