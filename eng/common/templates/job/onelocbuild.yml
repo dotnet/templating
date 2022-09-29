@@ -55,6 +55,10 @@ jobs:
       
 
   steps:
+    - script: echo $(Build.SourceBranch)
+    - script: echo $(OneLocBuildBranch)
+    - script: echo ${{ parameters.MirrorBranch }}
+    - script: echo ${{ parameters.LclPackageId }}
     - task: Powershell@2
       inputs:
         filePath: $(Build.SourcesDirectory)/eng/common/generate-locproject.ps1
