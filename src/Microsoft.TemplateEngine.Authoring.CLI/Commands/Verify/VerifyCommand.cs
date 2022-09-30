@@ -4,8 +4,8 @@
 using System.CommandLine;
 using System.CommandLine.Binding;
 using System.CommandLine.Parsing;
-using Microsoft.DotNet.Cli.Utils;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.TemplateEngine.Authoring.TemplateVerifier;
 
 namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
@@ -14,9 +14,8 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
     {
         private const string CommandName = "verify";
 
-        private readonly Argument<string> _templateNameArgument = new("-n")
+        private readonly Argument<string> _templateNameArgument = new("template-short-name")
         {
-            Name = "template-short-name",
             Description = LocalizableStrings.command_verify_help_templateName_description,
             // 0 for case where only path is specified
             Arity = new ArgumentArity(1, 1)
@@ -28,9 +27,8 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
             Arity = new ArgumentArity(0, 1)
         };
 
-        private readonly Option<string> _templatePathOption = new("-p")
+        private readonly Option<string> _templatePathOption = new(new[] { "-p", "--template-path" })
         {
-            Name = "--template-path",
             Description = LocalizableStrings.command_verify_help_templatePath_description,
         };
 
@@ -42,15 +40,13 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
             IsHidden = true
         };
 
-        private readonly Option<string> _templateOutputPathOption = new("-o")
+        private readonly Option<string> _templateOutputPathOption = new(new[] { "-o", "--output" })
         {
-            Name = "--output",
             Description = LocalizableStrings.command_verify_help_outputPath_description,
         };
 
-        private readonly Option<string> _expectationsDirectoryOption = new("-d")
+        private readonly Option<string> _expectationsDirectoryOption = new(new[] { "-d", "--expectations-directory" })
         {
-            Name = "--expectations-directory",
             Description = LocalizableStrings.command_verify_help_expectationsDirPath_description,
         };
 
@@ -80,7 +76,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
             Description = LocalizableStrings.command_verify_help_expectFailure_description,
         };
 
-        private readonly Option<IEnumerable<string>> _uniqueForOption = new("--unique-for")
+        private readonly Option<IEnumerable<UniqueForOption>> _uniqueForOption = new("--unique-for")
         {
             Description = LocalizableStrings.command_verify_help_uniqueFor_description,
             Arity = new ArgumentArity(0, 999),
@@ -116,9 +112,8 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
             try
             {
                 VerificationEngine engine = new VerificationEngine(
-                    new TemplateVerifierOptions()
+                    new TemplateVerifierOptions(templateName: args.TemplateName)
                     {
-                        TemplateName = args.TemplateName,
                         TemplatePath = args.TemplatePath,
                         TemplateSpecificArgs = args.TemplateSpecificArgs,
                         DisableDiffTool = args.DisableDiffTool,
@@ -131,14 +126,14 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
                         IsCommandExpectedToFail = args.IsCommandExpectedToFail,
                         UniqueFor = args.UniqueFor,
                     },
-                    Logger
+                    LoggerFactory ?? NullLoggerFactory.Instance
                 );
                 await engine.Execute(cancellationToken).ConfigureAwait(false);
                 return 0;
             }
             catch (Exception e)
             {
-                Reporter.Error.WriteLine(LocalizableStrings.command_verify_error_failed);
+                Logger.LogError(LocalizableStrings.command_verify_error_failed);
                 Logger.LogError(e.Message);
                 TemplateVerificationException? ex = e as TemplateVerificationException;
                 return (int)(ex?.TemplateVerificationErrorCode ?? TemplateVerificationErrorCode.InternalError);
@@ -150,7 +145,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
         /// <summary>
         /// Case insensitive version for <see cref="System.CommandLine.OptionExtensions.FromAmong{TOption}(TOption, string[])"/>.
         /// </summary>
-        private static void FromAmongCaseInsensitive(Option<IEnumerable<string>> option, string[]? allowedValues = null, string? allowedHiddenValue = null)
+        private static void FromAmongCaseInsensitive(Option option, string[]? allowedValues = null, string? allowedHiddenValue = null)
         {
             allowedValues ??= Array.Empty<string>();
             option.AddValidator(optionResult => ValidateAllowedValues(optionResult, allowedValues, allowedHiddenValue));

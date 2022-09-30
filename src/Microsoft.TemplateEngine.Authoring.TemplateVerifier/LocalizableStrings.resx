@@ -117,28 +117,28 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="engine_error_stdOutFolderExists" xml:space="preserve">
-    <value>Folder [{0}] not expected to exist in the template output - cannot verify stdout/stderr in such case.</value>
+  <data name="VerificationEngine_Error_StdOutFolderExists" xml:space="preserve">
+    <value>The folder [{0}] should not exist in the template output - cannot verify stdout/stderr in such case.</value>
     <comment>{0} is a folder path</comment>
   </data>
-  <data name="engine_error_templateNameMandatory" xml:space="preserve">
+  <data name="VerificationEngine_Error_TemplateNameMandatory" xml:space="preserve">
     <value>Template name is mandatory, but was not supplied.</value>
   </data>
-  <data name="engine_error_unexpected" xml:space="preserve">
+  <data name="VerificationEngine_Error_Unexpected" xml:space="preserve">
     <value>Unexpected error encountered.</value>
   </data>
-  <data name="engine_error_unexpectedFail" xml:space="preserve">
-    <value>Template instantiation expected to pass but it had exit code {0}.</value>
+  <data name="VerificationEngine_Error_UnexpectedFail" xml:space="preserve">
+    <value>Template instantiation expected to pass but it had exit code '{0}'.</value>
     <comment>{0} is an exit code number</comment>
   </data>
-  <data name="engine_error_unexpectedPass" xml:space="preserve">
+  <data name="VerificationEngine_Error_UnexpectedPass" xml:space="preserve">
     <value>Template instantiation expected to fail but it passed.</value>
   </data>
-  <data name="engine_error_unexpectedStdErr" xml:space="preserve">
+  <data name="VerificationEngine_Error_UnexpectedStdErr" xml:space="preserve">
     <value>Template instantiation expected not to have any stderr output, but stderr output was encountered:{0}{1}</value>
     <comment>{0} is newline, {1} is the standard error content</comment>
   </data>
-  <data name="engine_error_workDirExists" xml:space="preserve">
-    <value>Working directory already exists and is not empty.</value>
+  <data name="VerificationEngine_Error_WorkDirExists" xml:space="preserve">
+    <value>The working directory already exists and is not empty.</value>
   </data>
 </root>

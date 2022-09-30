@@ -68,7 +68,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{B794BF86
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TemplateEngine.Authoring.TemplateVerifier", "src\Microsoft.TemplateEngine.Authoring.TemplateVerifier\Microsoft.TemplateEngine.Authoring.TemplateVerifier.csproj", "{12764D81-61A7-437A-90B6-9F245E43F457}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TemplateEngine.Authoring.TemplateVerifier.Tests", "test\Microsoft.TemplateEngine.Authoring.TemplateVerifier.Tests\Microsoft.TemplateEngine.Authoring.TemplateVerifier.Tests.csproj", "{DFB18A1E-4C70-48D3-B57A-FA81B405EA04}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TemplateEngine.Authoring.TemplateVerifier.Tests", "test\Microsoft.TemplateEngine.Authoring.TemplateVerifier.Tests\Microsoft.TemplateEngine.Authoring.TemplateVerifier.Tests.csproj", "{DFB18A1E-4C70-48D3-B57A-FA81B405EA04}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TemplateEngine.Authoring.CLI.Tests", "test\Microsoft.TemplateEngine.Authoring.CLI.Tests\Microsoft.TemplateEngine.Authoring.CLI.Tests.csproj", "{F1860546-A949-4A16-ACB2-0C4C3CA2C970}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -416,6 +418,18 @@ Global
 		{DFB18A1E-4C70-48D3-B57A-FA81B405EA04}.Release|x64.Build.0 = Release|Any CPU
 		{DFB18A1E-4C70-48D3-B57A-FA81B405EA04}.Release|x86.ActiveCfg = Release|Any CPU
 		{DFB18A1E-4C70-48D3-B57A-FA81B405EA04}.Release|x86.Build.0 = Release|Any CPU
+		{F1860546-A949-4A16-ACB2-0C4C3CA2C970}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1860546-A949-4A16-ACB2-0C4C3CA2C970}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1860546-A949-4A16-ACB2-0C4C3CA2C970}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F1860546-A949-4A16-ACB2-0C4C3CA2C970}.Debug|x64.Build.0 = Debug|Any CPU
+		{F1860546-A949-4A16-ACB2-0C4C3CA2C970}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F1860546-A949-4A16-ACB2-0C4C3CA2C970}.Debug|x86.Build.0 = Debug|Any CPU
+		{F1860546-A949-4A16-ACB2-0C4C3CA2C970}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1860546-A949-4A16-ACB2-0C4C3CA2C970}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1860546-A949-4A16-ACB2-0C4C3CA2C970}.Release|x64.ActiveCfg = Release|Any CPU
+		{F1860546-A949-4A16-ACB2-0C4C3CA2C970}.Release|x64.Build.0 = Release|Any CPU
+		{F1860546-A949-4A16-ACB2-0C4C3CA2C970}.Release|x86.ActiveCfg = Release|Any CPU
+		{F1860546-A949-4A16-ACB2-0C4C3CA2C970}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -449,6 +463,7 @@ Global
 		{2FFDBB61-8AE8-468B-87D3-0D907D7C2FFE} = {8B498D0C-F488-4B38-8A7D-B20BF9DB6F60}
 		{12764D81-61A7-437A-90B6-9F245E43F457} = {B794BF86-4185-4DCE-AC86-C27D5D966B9B}
 		{DFB18A1E-4C70-48D3-B57A-FA81B405EA04} = {8B498D0C-F488-4B38-8A7D-B20BF9DB6F60}
+		{F1860546-A949-4A16-ACB2-0C4C3CA2C970} = {8B498D0C-F488-4B38-8A7D-B20BF9DB6F60}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6EA1A508-6033-4538-BF98-7F71B4E297AD}

@@ -1,25 +1,20 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#if NET
-
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using Microsoft.DotNet.Cli.Utils;
-using Xunit.Abstractions;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.Commands
 {
-    public abstract class TestCommand
+    internal abstract class TestCommand
     {
-        protected TestCommand(ITestOutputHelper log)
+        protected TestCommand(ILogger log)
         {
             Log = log;
         }
 
-        public ITestOutputHelper Log { get; }
+        public ILogger Log { get; }
 
         public string? WorkingDirectory { get; set; }
 
@@ -75,19 +70,18 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.Commands
 
             var result = ((Command)command).Execute(ProcessStartedHandler);
 
-            Log.WriteLine($"> {result.StartInfo.FileName} {result.StartInfo.Arguments}");
-            Log.WriteLine(result.StdOut);
+            Log.LogInformation($"> {result.StartInfo.FileName} {result.StartInfo.Arguments}");
+            Log.LogInformation(result.StdOut);
 
             if (!string.IsNullOrEmpty(result.StdErr))
             {
-                Log.WriteLine("");
-                Log.WriteLine("StdErr:");
-                Log.WriteLine(result.StdErr);
+                Log.LogInformation("StdErr:");
+                Log.LogInformation(result.StdErr);
             }
 
             if (result.ExitCode != 0)
             {
-                Log.WriteLine($"Exit Code: {result.ExitCode}");
+                Log.LogInformation($"Exit Code: {result.ExitCode}");
             }
 
             return result;
@@ -122,4 +116,3 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.Commands
         }
     }
 }
-#endif

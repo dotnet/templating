@@ -7,7 +7,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier;
 /// Delegate signature for performing custom directory content verifications.
 /// Expectable verification failures should be signaled with <see cref="TemplateVerificationException"/>.
 /// API provider can either perform content enumeration, skipping and scrubbing by themselves (then the second argument can be ignored)
-/// or the <see cref="contentFetcher"/> can be awaited to get the content of files - filtered by exclusion patterns and scrubbed by scrubbers.
+/// or the contentFetcher can be awaited to get the content of files - filtered by exclusion patterns and scrubbed by scrubbers.
 /// </summary>
 /// <param name="contentDirectory"></param>
 /// <param name="contentFetcher"></param>

@@ -11,9 +11,15 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
     public class TemplateVerifierOptions : IOptions<TemplateVerifierOptions>
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="TemplateVerifierOptions"/> class.
+        /// </summary>
+        /// <param name="templateName"></param>
+        public TemplateVerifierOptions(string templateName) => TemplateName = templateName;
+
+        /// <summary>
         /// Gets the name of locally installed template.
         /// </summary>
-        public string? TemplateName { get; init; }
+        public string TemplateName { get; init; }
 
         /// <summary>
         /// Gets the path to template.json file or containing directory.

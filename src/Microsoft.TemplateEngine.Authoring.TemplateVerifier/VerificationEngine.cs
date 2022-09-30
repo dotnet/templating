@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.TemplateEngine.Authoring.TemplateVerifier.Commands;
 using Microsoft.TemplateEngine.Utils;
-using Xunit.Abstractions;
 
 namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
 {
@@ -29,6 +28,14 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
 
         private readonly TemplateVerifierOptions _options;
         private readonly ILogger _logger;
+        private readonly ILoggerFactory? _loggerFactory;
+
+        static VerificationEngine()
+        {
+            // Customize diff output of verifier
+            VerifyDiffPlex.Initialize(OutputType.Compact);
+            VerifierSettings.UseSplitModeForUniqueDirectory();
+        }
 
         public VerificationEngine(IOptions<TemplateVerifierOptions> optionsAccessor, ILogger logger)
         {
@@ -41,6 +48,12 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             _logger = logger;
         }
 
+        public VerificationEngine(TemplateVerifierOptions options, ILoggerFactory loggerFactory)
+        : this(options, loggerFactory.CreateLogger(typeof(VerificationEngine)))
+        {
+            _loggerFactory = loggerFactory;
+        }
+
         public async Task Execute(CancellationToken cancellationToken = default)
         {
             //TODO: add functionality for uninstalled templates from a local folder
@@ -49,48 +62,14 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
                 throw new TemplateVerificationException("Custom template path not yet supported.", TemplateVerificationErrorCode.InternalError);
             }
 
-            if (string.IsNullOrEmpty(_options.TemplateName))
-            {
-                throw new TemplateVerificationException(LocalizableStrings.engine_error_templateNameMandatory, TemplateVerificationErrorCode.InternalError);
-            }
-
-            // Create temp folder and instantiate there
-            string workingDir = _options.OutputDirectory ?? Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            if (Directory.Exists(workingDir) && Directory.EnumerateFileSystemEntries(workingDir).Any())
-            {
-                throw new TemplateVerificationException(LocalizableStrings.engine_error_workDirExists, TemplateVerificationErrorCode.WorkingDirectoryExists);
-            }
-
-            Directory.CreateDirectory(workingDir);
-
-            List<string> cmdArgs = new();
-            if (!string.IsNullOrEmpty(_options.DotnetNewCommandAssemblyPath))
-            {
-                cmdArgs.Add(_options.DotnetNewCommandAssemblyPath);
-            }
-            cmdArgs.Add("new");
-            cmdArgs.Add(_options.TemplateName);
-            if (_options.TemplateSpecificArgs != null)
-            {
-                cmdArgs.AddRange(_options.TemplateSpecificArgs);
-            }
-            cmdArgs.Add("--debug:ephemeral-hive");
-            // let's make sure the template outputs are named deterministically
-            cmdArgs.Add("-n");
-            cmdArgs.Add(_options.TemplateName);
-
-            // TODO: export and use impl from sdk
-            CommandResult commandResult =
-                new DotnetCommand(new LoggerProxy(_logger), "dotnet", cmdArgs.ToArray())
-                    .WithWorkingDirectory(workingDir)
-                    .Execute();
+            CommandResult commandResult = RunDotnetNewCommand(_options, _loggerFactory, _logger);
 
             if (_options.IsCommandExpectedToFail ?? false)
             {
                 if (commandResult.ExitCode == 0)
                 {
                     throw new TemplateVerificationException(
-                        LocalizableStrings.engine_error_unexpectedPass,
+                        LocalizableStrings.VerificationEngine_Error_UnexpectedPass,
                         TemplateVerificationErrorCode.VerificationFailed);
                 }
             }
@@ -99,7 +78,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
                 if (commandResult.ExitCode != 0)
                 {
                     throw new TemplateVerificationException(
-                        string.Format(LocalizableStrings.engine_error_unexpectedFail, commandResult.ExitCode),
+                        string.Format(LocalizableStrings.VerificationEngine_Error_UnexpectedFail, commandResult.ExitCode),
                         TemplateVerificationErrorCode.InstantiationFailed);
                 }
 
@@ -109,7 +88,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
                 {
                     throw new TemplateVerificationException(
                         string.Format(
-                            LocalizableStrings.engine_error_unexpectedStdErr,
+                            LocalizableStrings.VerificationEngine_Error_UnexpectedStdErr,
                             Environment.NewLine,
                             commandResult.StdErr),
                         TemplateVerificationErrorCode.InstantiationFailed);
@@ -128,6 +107,133 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
 
             Regex r = new Regex(string.Format("[{0}]", Regex.Escape(new string(Path.GetInvalidFileNameChars()))));
             return r.Replace(string.Join('#', args), string.Empty);
+        }
+
+        private static CommandResult RunDotnetNewCommand(TemplateVerifierOptions options, ILoggerFactory? loggerFactory, ILogger logger)
+        {
+            //TODO: add functionality for uninstalled templates from a local folder
+            if (!string.IsNullOrEmpty(options.TemplatePath))
+            {
+                throw new TemplateVerificationException("Custom template path not yet supported.", TemplateVerificationErrorCode.InternalError);
+            }
+
+            // Create temp folder and instantiate there
+            string workingDir = options.OutputDirectory ?? Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            if (Directory.Exists(workingDir) && Directory.EnumerateFileSystemEntries(workingDir).Any())
+            {
+                throw new TemplateVerificationException(LocalizableStrings.VerificationEngine_Error_WorkDirExists, TemplateVerificationErrorCode.WorkingDirectoryExists);
+            }
+
+            Directory.CreateDirectory(workingDir);
+
+            List<string> cmdArgs = new();
+            if (!string.IsNullOrEmpty(options.DotnetNewCommandAssemblyPath))
+            {
+                cmdArgs.Add(options.DotnetNewCommandAssemblyPath);
+            }
+            cmdArgs.Add("new");
+            cmdArgs.Add(options.TemplateName);
+            if (options.TemplateSpecificArgs != null)
+            {
+                cmdArgs.AddRange(options.TemplateSpecificArgs);
+            }
+            cmdArgs.Add("--debug:ephemeral-hive");
+            // let's make sure the template outputs are named deterministically
+            cmdArgs.Add("-n");
+            cmdArgs.Add(options.TemplateName);
+
+            // TODO: export and use impl from sdk
+            return new DotnetCommand(loggerFactory?.CreateLogger(typeof(DotnetCommand)) ?? logger, "dotnet", cmdArgs.ToArray())
+                    .WithWorkingDirectory(workingDir)
+                    .Execute();
+        }
+
+        private static Task CreateVerificationTask(CommandResult commandResult, TemplateVerifierOptions options)
+        {
+            string contentDir = commandResult.StartInfo.WorkingDirectory;
+
+            List<string> exclusionsList = (options.DisableDefaultVerificationExcludePatterns ?? false)
+                ? new()
+                : new(_defaultVerificationExcludePatterns);
+
+            if (options.VerificationExcludePatterns != null)
+            {
+                exclusionsList.AddRange(options.VerificationExcludePatterns);
+            }
+
+            List<Glob> globs = exclusionsList.Select(pattern => Glob.Parse(pattern)).ToList();
+
+            if (options.CustomDirectoryVerifier != null)
+            {
+                return options.CustomDirectoryVerifier(
+                    contentDir,
+                    new Lazy<IAsyncEnumerable<(string FilePath, string ScrubbedContent)>>(
+                        GetVerificationContent(contentDir, globs, options.CustomScrubbers)));
+            }
+
+            VerifySettings verifySettings = new();
+
+            if (options.CustomScrubbers != null)
+            {
+                if (options.CustomScrubbers.GeneralScrubber != null)
+                {
+                    verifySettings.AddScrubber(options.CustomScrubbers.GeneralScrubber);
+                }
+
+                foreach (var pair in options.CustomScrubbers.ScrubersByExtension)
+                {
+                    verifySettings.AddScrubber(pair.Key, pair.Value);
+                }
+            }
+
+            verifySettings.UseTypeName(options.TemplateName);
+            verifySettings.UseDirectory(options.ExpectationsDirectory ?? "VerifyExpectations");
+            verifySettings.UseMethodName(EncodeArgsAsPath(options.TemplateSpecificArgs));
+
+            if ((options.UniqueFor ?? UniqueForOption.None) != UniqueForOption.None)
+            {
+                foreach (UniqueForOption value in Enum.GetValues(typeof(UniqueForOption)))
+                {
+                    if ((options.UniqueFor & value) == value)
+                    {
+                        switch (value)
+                        {
+                            case UniqueForOption.None:
+                                break;
+                            case UniqueForOption.Architecture:
+                                verifySettings.UniqueForArchitecture();
+                                break;
+                            case UniqueForOption.OsPlatform:
+                                verifySettings.UniqueForOSPlatform();
+                                break;
+                            case UniqueForOption.Runtime:
+                                verifySettings.UniqueForRuntime();
+                                break;
+                            case UniqueForOption.RuntimeAndVersion:
+                                verifySettings.UniqueForRuntimeAndVersion();
+                                break;
+                            case UniqueForOption.TargetFramework:
+                                verifySettings.UniqueForTargetFramework();
+                                break;
+                            case UniqueForOption.TargetFrameworkAndVersion:
+                                verifySettings.UniqueForTargetFrameworkAndVersion();
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+                    }
+                }
+            }
+
+            if (options.DisableDiffTool ?? false)
+            {
+                verifySettings.DisableDiff();
+            }
+
+            return Verifier.VerifyDirectory(
+                contentDir,
+                (filePath) => !globs.Any(g => g.IsMatch(filePath)),
+                settings: verifySettings);
         }
 
         private static void DummyMethod()
@@ -165,98 +271,8 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             }
         }
 
-        private static Task CreateVerificationTask(string contentDir, TemplateVerifierOptions options)
-        {
-            List<string> exclusionsList = (options.DisableDefaultVerificationExcludePatterns ?? false)
-                ? new()
-                : new(_defaultVerificationExcludePatterns);
-
-            if (options.VerificationExcludePatterns != null)
-            {
-                exclusionsList.AddRange(options.VerificationExcludePatterns);
-            }
-
-            List<Glob> globs = exclusionsList.Select(pattern => Glob.Parse(pattern)).ToList();
-
-            SettingsTask defaultVerifyTask = Verifier.VerifyDirectory(
-                contentDir,
-                (filePath) => !globs.Any(g => g.IsMatch(filePath)));
-
-            if (options.CustomScrubbers != null)
-            {
-                if (options.CustomScrubbers.GeneralScrubber != null)
-                {
-                    defaultVerifyTask = defaultVerifyTask.AddScrubber(options.CustomScrubbers.GeneralScrubber);
-                }
-
-                foreach (var pair in options.CustomScrubbers.ScrubersByExtension)
-                {
-                    defaultVerifyTask = defaultVerifyTask.AddScrubber(pair.Key, pair.Value);
-                }
-            }
-
-            if (options.CustomDirectoryVerifier != null)
-            {
-                return options.CustomDirectoryVerifier(
-                    contentDir,
-                    new Lazy<IAsyncEnumerable<(string FilePath, string ScrubbedContent)>>(
-                        GetVerificationContent(contentDir, globs, options.CustomScrubbers)));
-            }
-
-            Verifier.DerivePathInfo(
-                (sourceFile, projectDirectory, type, method) => new(
-                    directory: options.ExpectationsDirectory ?? "VerifyExpectations",
-                    typeName: options.TemplateName,
-                    methodName: EncodeArgsAsPath(options.TemplateSpecificArgs)));
-
-            if ((options.UniqueFor ?? UniqueForOption.None) != UniqueForOption.None)
-            {
-                foreach (UniqueForOption value in Enum.GetValues(typeof(UniqueForOption)))
-                {
-                    if ((options.UniqueFor & value) == value)
-                    {
-                        switch (value)
-                        {
-                            case UniqueForOption.None:
-                                break;
-                            case UniqueForOption.Architecture:
-                                defaultVerifyTask = defaultVerifyTask.UniqueForArchitecture();
-                                break;
-                            case UniqueForOption.OsPlatform:
-                                defaultVerifyTask = defaultVerifyTask.UniqueForOSPlatform();
-                                break;
-                            case UniqueForOption.Runtime:
-                                defaultVerifyTask = defaultVerifyTask.UniqueForRuntime();
-                                break;
-                            case UniqueForOption.RuntimeAndVersion:
-                                defaultVerifyTask = defaultVerifyTask.UniqueForRuntimeAndVersion();
-                                break;
-                            case UniqueForOption.TargetFramework:
-                                defaultVerifyTask = defaultVerifyTask.UniqueForTargetFramework();
-                                break;
-                            case UniqueForOption.TargetFrameworkAndVersion:
-                                defaultVerifyTask = defaultVerifyTask.UniqueForTargetFrameworkAndVersion();
-                                break;
-                            default:
-                                throw new ArgumentOutOfRangeException();
-                        }
-                    }
-                }
-            }
-
-            if (options.DisableDiffTool ?? false)
-            {
-                defaultVerifyTask = defaultVerifyTask.DisableDiff();
-            }
-
-            return defaultVerifyTask;
-        }
-
         private async Task VerifyResult(TemplateVerifierOptions args, CommandResult commandResult)
         {
-            // Customize diff output of verifier
-            VerifyDiffPlex.Initialize(OutputType.Compact);
-
             UsesVerifyAttribute a = new UsesVerifyAttribute();
             // https://github.com/VerifyTests/Verify/blob/d8cbe38f527d6788ecadd6205c82803bec3cdfa6/src/Verify.Xunit/Verifier.cs#L10
             //  need to simulate execution from tests
@@ -270,7 +286,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
                 {
                     throw new TemplateVerificationException(
                         string.Format(
-                            LocalizableStrings.engine_error_stdOutFolderExists,
+                            LocalizableStrings.VerificationEngine_Error_StdOutFolderExists,
                             SpecialFiles.StandardStreamsDir),
                         TemplateVerificationErrorCode.InternalError);
                 }
@@ -288,7 +304,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
                     .ConfigureAwait(false);
             }
 
-            Task verifyTask = CreateVerificationTask(commandResult.StartInfo.WorkingDirectory, args);
+            Task verifyTask = CreateVerificationTask(commandResult, args);
 
             try
             {
@@ -306,7 +322,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
                 }
                 else
                 {
-                    _logger.LogError(e, LocalizableStrings.engine_error_unexpected);
+                    _logger.LogError(e, LocalizableStrings.VerificationEngine_Error_Unexpected);
                     throw;
                 }
             }
@@ -319,17 +335,6 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             public const string StdErr = "stderr";
             public const string DefaultExtension = ".txt";
             public static readonly string[] FileNames = { StdOut, StdErr };
-        }
-
-        private class LoggerProxy : ITestOutputHelper
-        {
-            private readonly ILogger _logger;
-
-            public LoggerProxy(ILogger logger) => _logger = logger;
-
-            public void WriteLine(string message) => _logger.LogInformation(message);
-
-            public void WriteLine(string format, params object[] args) => _logger.LogInformation(format, args);
         }
     }
 }

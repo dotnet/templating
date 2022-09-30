@@ -189,7 +189,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Runs the template with specified arguments and compares the result with expectations files (and create expectations changes suggestions)..
+        ///   Looks up a localized string similar to Runs the template with specified arguments and compares the result with expectations files..
         /// </summary>
         internal static string command_verify_help_description {
             get {
@@ -216,7 +216,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Specifies path to directory with expectation files..
+        ///   Looks up a localized string similar to Specifies path to the directory with expectation files..
         /// </summary>
         internal static string command_verify_help_expectationsDirPath_description {
             get {
@@ -225,7 +225,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to If set to true - &apos;dotnet new&apos; command is expected to return nonzero return code..
+        ///   Looks up a localized string similar to If set to true - &apos;dotnet new&apos; command is expected to return non-zero return code..
         /// </summary>
         internal static string command_verify_help_expectFailure_description {
             get {
@@ -234,7 +234,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Specifies path to custom assembly implementing the new command..
+        ///   Looks up a localized string similar to Specifies the path to custom assembly implementing &apos;dotnet new&apos; command..
         /// </summary>
         internal static string command_verify_help_newCommandPath_description {
             get {
@@ -243,7 +243,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Specifies path to target directory to output the generated template..
+        ///   Looks up a localized string similar to Specifies the path to target directory to output the generated template to..
         /// </summary>
         internal static string command_verify_help_outputPath_description {
             get {
@@ -252,7 +252,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Name of template to be verified. Can be already installed template or template within local path specified with -p/--template-path option..
+        ///   Looks up a localized string similar to Name of the template to be verified. Can be already installed template or a template within local path specified with -p/--template-path option..
         /// </summary>
         internal static string command_verify_help_templateName_description {
             get {
@@ -261,7 +261,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Specifies path to the directory with template to be verified..
+        ///   Looks up a localized string similar to Specifies the path to the directory with template to be verified..
         /// </summary>
         internal static string command_verify_help_templatePath_description {
             get {
@@ -270,7 +270,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sets the Verifier expectations directory naming convention - by indicating which scenarios should be differentiated..
+        ///   Looks up a localized string similar to Sets the Verifier expectations directory naming convention, by indicating which scenarios should be differentiated..
         /// </summary>
         internal static string command_verify_help_uniqueFor_description {
             get {

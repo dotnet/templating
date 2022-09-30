@@ -61,65 +61,65 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Folder [{0}] not expected to exist in the template output - cannot verify stdout/stderr in such case..
+        ///   Looks up a localized string similar to The folder [{0}] should not exist in the template output - cannot verify stdout/stderr in such case..
         /// </summary>
-        internal static string engine_error_stdOutFolderExists {
+        internal static string VerificationEngine_Error_StdOutFolderExists {
             get {
-                return ResourceManager.GetString("engine_error_stdOutFolderExists", resourceCulture);
+                return ResourceManager.GetString("VerificationEngine_Error_StdOutFolderExists", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Template name is mandatory, but was not supplied..
         /// </summary>
-        internal static string engine_error_templateNameMandatory {
+        internal static string VerificationEngine_Error_TemplateNameMandatory {
             get {
-                return ResourceManager.GetString("engine_error_templateNameMandatory", resourceCulture);
+                return ResourceManager.GetString("VerificationEngine_Error_TemplateNameMandatory", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Unexpected error encountered..
         /// </summary>
-        internal static string engine_error_unexpected {
+        internal static string VerificationEngine_Error_Unexpected {
             get {
-                return ResourceManager.GetString("engine_error_unexpected", resourceCulture);
+                return ResourceManager.GetString("VerificationEngine_Error_Unexpected", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Template instantiation expected to pass but it had exit code {0}..
+        ///   Looks up a localized string similar to Template instantiation expected to pass but it had exit code &apos;{0}&apos;..
         /// </summary>
-        internal static string engine_error_unexpectedFail {
+        internal static string VerificationEngine_Error_UnexpectedFail {
             get {
-                return ResourceManager.GetString("engine_error_unexpectedFail", resourceCulture);
+                return ResourceManager.GetString("VerificationEngine_Error_UnexpectedFail", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Template instantiation expected to fail but it passed..
         /// </summary>
-        internal static string engine_error_unexpectedPass {
+        internal static string VerificationEngine_Error_UnexpectedPass {
             get {
-                return ResourceManager.GetString("engine_error_unexpectedPass", resourceCulture);
+                return ResourceManager.GetString("VerificationEngine_Error_UnexpectedPass", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Template instantiation expected not to have any stderr output, but stderr output was encountered:{0}{1}.
         /// </summary>
-        internal static string engine_error_unexpectedStdErr {
+        internal static string VerificationEngine_Error_UnexpectedStdErr {
             get {
-                return ResourceManager.GetString("engine_error_unexpectedStdErr", resourceCulture);
+                return ResourceManager.GetString("VerificationEngine_Error_UnexpectedStdErr", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Working directory already exists and is not empty..
+        ///   Looks up a localized string similar to The working directory already exists and is not empty..
         /// </summary>
-        internal static string engine_error_workDirExists {
+        internal static string VerificationEngine_Error_WorkDirExists {
             get {
-                return ResourceManager.GetString("engine_error_workDirExists", resourceCulture);
+                return ResourceManager.GetString("VerificationEngine_Error_WorkDirExists", resourceCulture);
             }
         }
     }

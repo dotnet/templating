@@ -1,18 +1,15 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#if NET
-using System.Collections.Generic;
-using System.Linq;
-using Xunit.Abstractions;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.Commands
 {
-    public class BasicCommand : TestCommand
+    internal class BasicCommand : TestCommand
     {
         private readonly string _processName;
 
-        public BasicCommand(ITestOutputHelper log, string processName, params string[] args) : base(log)
+        public BasicCommand(ILogger log, string processName, params string[] args) : base(log)
         {
             _processName = processName;
             Arguments.AddRange(args.Where(a => !string.IsNullOrWhiteSpace(a)));
@@ -30,4 +27,3 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.Commands
         }
     }
 }
-#endif

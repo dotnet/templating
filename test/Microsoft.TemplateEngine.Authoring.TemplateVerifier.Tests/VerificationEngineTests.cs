@@ -1,12 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-//using FluentAssertions;
-//using Microsoft.TemplateEngine.Authoring.TemplateVerifier;
-//using Microsoft.TemplateEngine.TestHelper;
-//using Microsoft.TemplateEngine.TestHelper.Commands;
-//using Xunit.Abstractions;
-
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.TestHelper;
@@ -30,9 +24,8 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.Tests
             string expectationsDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName().Replace(".", string.Empty));
             string templateDir = "path with spaces";
 
-            TemplateVerifierOptions options = new TemplateVerifierOptions()
+            TemplateVerifierOptions options = new TemplateVerifierOptions(templateName: "console")
             {
-                TemplateName = "console",
                 TemplateSpecificArgs = new string[] { "--use-program-main", "-o", templateDir, "--no-restore" },
                 DisableDiffTool = true,
                 ExpectationsDirectory = expectationsDir,
@@ -55,33 +48,24 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.Tests
 
             // Assert verification files created
             Directory.Exists(expectationsDir).Should().BeTrue();
-            Directory.GetDirectories(expectationsDir).Length.Should().Be(1);
-            //for simplicity move to the created dir
-            expectationsDir = Directory.GetDirectories(expectationsDir).Single();
-            File.Exists(Path.Combine(expectationsDir, templateDir, "console.received.csproj")).Should().BeTrue();
-            File.Exists(Path.Combine(expectationsDir, templateDir, "Program.received.cs")).Should().BeTrue();
-            File.Exists(Path.Combine(expectationsDir, "std-streams", "stdout.received.txt")).Should().BeTrue();
-            File.Exists(Path.Combine(expectationsDir, "std-streams", "stderr.received.txt")).Should().BeTrue();
+            Directory.GetDirectories(expectationsDir).Length.Should().Be(2);
+            //for simplicity move to the received dir
+            expectationsDir = Directory.GetDirectories(expectationsDir).Single(d => d.EndsWith(".received", StringComparison.Ordinal));
+            File.Exists(Path.Combine(expectationsDir, templateDir, "console.csproj")).Should().BeTrue();
+            File.Exists(Path.Combine(expectationsDir, templateDir, "Program.cs")).Should().BeTrue();
+            File.Exists(Path.Combine(expectationsDir, "std-streams", "stdout.txt")).Should().BeTrue();
+            File.Exists(Path.Combine(expectationsDir, "std-streams", "stderr.txt")).Should().BeTrue();
             Directory.GetFiles(expectationsDir, "*", SearchOption.AllDirectories).Length.Should().Be(4);
 
-            File.ReadAllText(Path.Combine(expectationsDir, templateDir, "console.received.csproj").UnixifyLineBreaks()).Should()
+            File.ReadAllText(Path.Combine(expectationsDir, templateDir, "console.csproj").UnixifyLineBreaks()).Should()
                 .BeEquivalentTo(File.ReadAllText(Path.Combine(workingDir, templateDir, "console.csproj")).UnixifyLineBreaks());
-            File.ReadAllText(Path.Combine(expectationsDir, templateDir, "Program.received.cs").UnixifyLineBreaks()).Should()
+            File.ReadAllText(Path.Combine(expectationsDir, templateDir, "Program.cs").UnixifyLineBreaks()).Should()
                 .BeEquivalentTo(File.ReadAllText(Path.Combine(workingDir, templateDir, "Program.cs")).UnixifyLineBreaks());
 
             // Accept changes
-            File.Move(
-                Path.Combine(expectationsDir, templateDir, "console.received.csproj"),
-                Path.Combine(expectationsDir, templateDir, "console.verified.csproj"));
-            File.Move(
-                Path.Combine(expectationsDir, templateDir, "Program.received.cs"),
-                Path.Combine(expectationsDir, templateDir, "Program.verified.cs"));
-            File.Move(
-                Path.Combine(expectationsDir, "std-streams", "stdout.received.txt"),
-                Path.Combine(expectationsDir, "std-streams", "stdout.verified.txt"));
-            File.Move(
-                Path.Combine(expectationsDir, "std-streams", "stderr.received.txt"),
-                Path.Combine(expectationsDir, "std-streams", "stderr.verified.txt"));
+            string verifiedDir = expectationsDir.Replace(".received", ".verified", StringComparison.Ordinal);
+            Directory.Delete(verifiedDir, false);
+            Directory.Move(expectationsDir, verifiedDir);
 
             //reset the expectations dir to where it was before previous run
             expectationsDir = Path.GetDirectoryName(expectationsDir)!;
@@ -89,9 +73,8 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.Tests
             // And run again same scenario - verification should succeed now
             string workingDir2 = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
 
-            TemplateVerifierOptions options2 = new TemplateVerifierOptions()
+            TemplateVerifierOptions options2 = new TemplateVerifierOptions(templateName: "console")
             {
-                TemplateName = "console",
                 TemplateSpecificArgs = new string[] { "--use-program-main", "-o", templateDir, "--no-restore" },
                 DisableDiffTool = true,
                 ExpectationsDirectory = expectationsDir,
@@ -117,9 +100,8 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.Tests
             string workingDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName().Replace(".", string.Empty));
             string templateDir = "path with spaces";
 
-            TemplateVerifierOptions options = new TemplateVerifierOptions()
+            TemplateVerifierOptions options = new TemplateVerifierOptions(templateName: "console")
             {
-                TemplateName = "console",
                 TemplateSpecificArgs = new string[] { "--use-program-main", "-o", templateDir, "--no-restore" },
                 DisableDiffTool = true,
                 OutputDirectory = workingDir,

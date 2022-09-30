@@ -1,16 +1,15 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#if NET
-using Xunit.Abstractions;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.Commands
 {
-    public class DotnetCommand : TestCommand
+    internal class DotnetCommand : TestCommand
     {
         private readonly string commandName;
 
-        public DotnetCommand(ITestOutputHelper log, string commandName, params string[] args) : base(log)
+        public DotnetCommand(ILogger log, string commandName, params string[] args) : base(log)
         {
             Arguments.Add(commandName);
             Arguments.AddRange(args);
@@ -44,4 +43,3 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.Commands
         }
     }
 }
-#endif

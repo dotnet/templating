@@ -12,7 +12,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
     internal sealed class VerifyCommandArgs
     {
         public VerifyCommandArgs(
-            string? templateName,
+            string templateName,
             string? templatePath,
             string? templateSpecificArgs,
             string? dotnetNewCommandAssemblyPath,
@@ -23,7 +23,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
             IEnumerable<string>? verificationExcludePatterns,
             bool? verifyCommandOutput,
             bool isCommandExpectedToFail,
-            IEnumerable<string>? uniqueForOptions)
+            IEnumerable<UniqueForOption>? uniqueForOptions)
         {
             TemplateName = templateName;
             TemplatePath = templatePath;
@@ -36,13 +36,13 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
             VerificationExcludePatterns = verificationExcludePatterns;
             VerifyCommandOutput = verifyCommandOutput;
             IsCommandExpectedToFail = isCommandExpectedToFail;
-            UniqueFor = FromOptionTokens(uniqueForOptions);
+            UniqueFor = uniqueForOptions?.Aggregate((a, b) => a | b);
         }
 
         /// <summary>
         /// Gets the name of locally installed template.
         /// </summary>
-        public string? TemplateName { get; init; }
+        public string TemplateName { get; init; }
 
         /// <summary>
         /// Gets the path to template.json file or containing directory.
@@ -135,23 +135,6 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
             {
                 return input;
             }
-        }
-
-        private static UniqueForOption? FromOptionTokens(IEnumerable<string>? tokens)
-        {
-            if (tokens == null)
-            {
-                return null;
-            }
-
-            UniqueForOption result = UniqueForOption.None;
-
-            foreach (string token in tokens)
-            {
-                result |= Enum.Parse<UniqueForOption>(token, true);
-            }
-
-            return result;
         }
     }
 }
