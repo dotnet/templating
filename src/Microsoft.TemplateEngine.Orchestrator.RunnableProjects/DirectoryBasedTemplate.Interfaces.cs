@@ -3,16 +3,21 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Constraints;
+using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Abstractions.Parameters;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Localization;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Validation;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
-    internal abstract partial class DirectoryBasedTemplate : ITemplateMetadata, ITemplateLocator
+    internal abstract partial class DirectoryBasedTemplate : ITemplateMetadata, ITemplateLocator, ITemplateValidationInfo, IValidationInfo
     {
-        string ITemplateMetadata.Identity => TemplateIdentity;
+        string ITemplateMetadata.Identity => ConfigurationModel.Identity;
 
         Guid ITemplateLocator.GeneratorId => Generator.Id;
 
@@ -48,6 +53,25 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         IReadOnlyList<TemplateConstraintInfo> ITemplateMetadata.Constraints => ConfigurationModel.Constraints;
 
-        public IReadOnlyList<IValidationEntry> ValidationErrors => throw new NotImplementedException();
+        public bool IsValid => !ValidationErrors.Any(e => e.Severity == IValidationEntry.SeverityLevel.Error);
+
+        public IReadOnlyList<IValidationEntry> ValidationErrors => _validationErrors;
+
+        TemplateConfigModel ITemplateValidationInfo.ConfigModel => ConfigurationModel;
+
+        IDirectory ITemplateValidationInfo.TemplateSourceRoot => TemplateSourceRoot;
+
+        IFile? ITemplateValidationInfo.ConfigFile => ConfigFile;
+
+        IReadOnlyDictionary<CultureInfo, TemplateLocalizationInfo> ITemplateValidationInfo.Localizations => Localizations;
+
+        IReadOnlyDictionary<string, IFile> ITemplateValidationInfo.HostFiles => HostFiles;
+
+        internal abstract IReadOnlyDictionary<CultureInfo, TemplateLocalizationInfo> Localizations { get; }
+
+        internal abstract IReadOnlyDictionary<string, IFile> HostFiles { get; }
+
+        public void AddValidationError(IValidationEntry validationEntry) => _validationErrors.Add(validationEntry);
+
     }
 }
