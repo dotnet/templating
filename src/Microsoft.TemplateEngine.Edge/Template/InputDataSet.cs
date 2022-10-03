@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,7 +44,7 @@ public class InputDataSet : IReadOnlyDictionary<ITemplateParameter, InputParamet
     /// <param name="templateInfo"></param>
     /// <param name="inputParameters"></param>
     public InputDataSet(ITemplateInfo templateInfo, IReadOnlyDictionary<string, string?> inputParameters)
-        : this(templateInfo, inputParameters.ToDictionary(p => p.Key, p => (object?)p.Value))
+        : this(templateInfo, inputParameters.ToDictionary(p => p.Key, p => (object?)p.Value, StringComparer.OrdinalIgnoreCase))
     { }
 
     private InputDataSet(ITemplateInfo templateInfo, IReadOnlyDictionary<string, object?>? inputParameters)

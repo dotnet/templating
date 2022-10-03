@@ -119,6 +119,41 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 parameters1: parameters);
         }
 
+        [Theory]
+        [InlineData("paramA", "paramA", true, "Line to be generated")]
+        [InlineData("paramA", "paramA", false, "")]
+        // parameters in content file are case sensitive
+        [InlineData("PARAMa", "paramA", true, "")]
+        [InlineData("PARAMa", "paramA", false, "")]
+        // parameters in param collection are case insensitive
+        [InlineData("paramA", "PARAMa", true, "Line to be generated")]
+        [InlineData("paramA", "PARAMa", false, "")]
+        // but still the content is case sensitive in regards to original template
+        [InlineData("PARAMa", "PARAMa", true, "")]
+        [InlineData("PARAMa", "PARAMa", false, "")]
+        public async void InstantiateAsync_CaseInsesitiveParameters(string parameNameInContent, string paramNameInParamsCollection, bool paramValue, string expectedOutput)
+        {
+            const string conditionalContentFmt = @"
+#if ( {0} )
+Line to be generated
+#endif
+";
+
+            IReadOnlyDictionary<string, string?> parameters = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase)
+            {
+                { paramNameInParamsCollection, paramValue.ToString() }
+            };
+
+            await InstantiateAsyncHelper(
+                TemplateConfigBooleanParam,
+                string.Format(conditionalContentFmt, parameNameInContent),
+                expectedOutput,
+                string.Empty,
+                false,
+                sourceExtension: ".cs",
+                parameters1: parameters);
+        }
+
         private const string TemplateConfigQuotelessLiteralsEnabled = @"
 {
     ""identity"": ""test.template"",
