@@ -47,7 +47,7 @@ stages:
         LclSource: lclFilesfromPackage
         LclPackageId: 'LCL-JUNO-PROD-TEMPLATING'
         MirrorBranch: $(OneLocBuildBranch)
-        JobNameSuffix: $(OneLocBuildBranch)
+        JobNameSuffix: 'release'
         condition: eq(variables['Build.SourceBranch'], format('{0}{1}', 'refs/heads/', variables['OneLocBuildBranch'] ))
     - template: /eng/common/templates/job/onelocbuild.yml
       parameters:
