@@ -40,21 +40,22 @@ stages:
 - stage: build
   displayName: Build
   jobs:
-  - ${{ if and( ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-    - ${{ if eq(variables['Build.SourceBranch'], format('{0}{1}', 'refs/heads/', variables['OneLocBuildBranch'] )) }}:
-      - template: /eng/common/templates/job/onelocbuild.yml
-        parameters:
-          MirrorRepo: templating
-          LclSource: lclFilesfromPackage
-          LclPackageId: 'LCL-JUNO-PROD-TEMPLATING'
-          MirrorBranch: $(OneLocBuildBranch)
-    - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
-      - template: /eng/common/templates/job/onelocbuild.yml
-        parameters:
-          MirrorRepo: templating
-          LclSource: lclFilesfromPackage
-          LclPackageId: 'LCL-JUNO-PROD-TMPLTNGMAIN'
-          MirrorBranch: 'main'
+  - template: /eng/common/templates/job/onelocbuild.yml
+    parameters:
+      MirrorRepo: templating
+      LclSource: lclFilesfromPackage
+      LclPackageId: 'LCL-JUNO-PROD-TEMPLATING'
+      MirrorBranch: $(OneLocBuildBranch)
+      JobNameSuffix: $(OneLocBuildBranch)
+      condition: eq(variables['Build.SourceBranch'], format('{0}{1}', 'refs/heads/', variables['OneLocBuildBranch'] ))
+  - template: /eng/common/templates/job/onelocbuild.yml
+    parameters:
+      MirrorRepo: templating
+      LclSource: lclFilesfromPackage
+      LclPackageId: 'LCL-JUNO-PROD-TMPLTNGMAIN'
+      MirrorBranch: 'main'
+      JobNameSuffix: 'main'
+      condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
   - template: /eng/common/templates/jobs/jobs.yml
     parameters:
       enableMicrobuild: true
