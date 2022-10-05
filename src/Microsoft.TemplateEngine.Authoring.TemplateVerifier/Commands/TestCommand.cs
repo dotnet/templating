@@ -75,8 +75,8 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.Commands
 
             if (!string.IsNullOrEmpty(result.StdErr))
             {
-                Log.LogInformation("StdErr:");
-                Log.LogInformation(result.StdErr);
+                Log.LogWarning("StdErr:");
+                Log.LogWarning(result.StdErr);
             }
 
             if (result.ExitCode != 0)

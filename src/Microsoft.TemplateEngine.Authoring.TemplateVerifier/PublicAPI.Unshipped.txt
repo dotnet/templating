@@ -5,6 +5,7 @@ Microsoft.TemplateEngine.Authoring.TemplateVerifier.ScrubbersDefinition.Scrubber
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.ScrubbersDefinition.ScrubbersDefinition(System.Action<System.Text.StringBuilder!>! scrubber, string? extension = null) -> void
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.ScrubbersDefinition.ScrubersByExtension.get -> System.Collections.Generic.Dictionary<string!, System.Action<System.Text.StringBuilder!>!>!
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerificationErrorCode
+Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerificationErrorCode.InstallFailed = 106 -> Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerificationErrorCode
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerificationErrorCode.InstantiationFailed = 100 -> Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerificationErrorCode
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerificationErrorCode.InternalError = 70 -> Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerificationErrorCode
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerificationErrorCode.TemplateDoesNotExist = 103 -> Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerificationErrorCode

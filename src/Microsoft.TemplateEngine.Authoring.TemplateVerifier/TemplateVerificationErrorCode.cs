@@ -39,5 +39,10 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
         /// The template instantiation failed and results were not created.
         /// </summary>
         InstantiationFailed = 100,
+
+        /// <summary>
+        /// Installation/Uninstallation Failed - Processing issues.
+        /// </summary>
+        InstallFailed = 106,
     }
 }

@@ -4,7 +4,6 @@
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using Microsoft.DotNet.Cli.Utils;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.TemplateEngine.Authoring.TemplateVerifier.Commands;
@@ -29,6 +28,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
         private readonly TemplateVerifierOptions _options;
         private readonly ILogger _logger;
         private readonly ILoggerFactory? _loggerFactory;
+        private readonly ICommandRunner _commandRunner = new CommandRunner();
 
         static VerificationEngine()
         {
@@ -54,15 +54,15 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             _loggerFactory = loggerFactory;
         }
 
+        internal VerificationEngine(TemplateVerifierOptions options, ICommandRunner commandRunner, ILogger logger)
+        : this(options, logger)
+        {
+            _commandRunner = commandRunner;
+        }
+
         public async Task Execute(CancellationToken cancellationToken = default)
         {
-            //TODO: add functionality for uninstalled templates from a local folder
-            if (!string.IsNullOrEmpty(_options.TemplatePath))
-            {
-                throw new TemplateVerificationException("Custom template path not yet supported.", TemplateVerificationErrorCode.InternalError);
-            }
-
-            CommandResult commandResult = RunDotnetNewCommand(_options, _loggerFactory, _logger);
+            CommandResultData commandResult = RunDotnetNewCommand(_options, _commandRunner, _loggerFactory, _logger);
 
             if (_options.IsCommandExpectedToFail ?? false)
             {
@@ -109,14 +109,8 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             return r.Replace(string.Join('#', args), string.Empty);
         }
 
-        private static CommandResult RunDotnetNewCommand(TemplateVerifierOptions options, ILoggerFactory? loggerFactory, ILogger logger)
+        private static CommandResultData RunDotnetNewCommand(TemplateVerifierOptions options, ICommandRunner commandRunner, ILoggerFactory? loggerFactory, ILogger logger)
         {
-            //TODO: add functionality for uninstalled templates from a local folder
-            if (!string.IsNullOrEmpty(options.TemplatePath))
-            {
-                throw new TemplateVerificationException("Custom template path not yet supported.", TemplateVerificationErrorCode.InternalError);
-            }
-
             // Create temp folder and instantiate there
             string workingDir = options.OutputDirectory ?? Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
             if (Directory.Exists(workingDir) && Directory.EnumerateFileSystemEntries(workingDir).Any())
@@ -125,33 +119,74 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             }
 
             Directory.CreateDirectory(workingDir);
+            ILogger commandLogger = loggerFactory?.CreateLogger(typeof(DotnetCommand)) ?? logger;
+            string? customHiveLocation = null;
+
+            if (!string.IsNullOrEmpty(options.TemplatePath))
+            {
+                customHiveLocation = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName(), "home");
+                var installCommand =
+                    new DotnetCommand(commandLogger, "new", "install", options.TemplatePath)
+                        .WithCustomHive(customHiveLocation)
+                        .WithWorkingDirectory(workingDir);
+
+                CommandResultData installCommandResult = commandRunner.RunCommand(installCommand);
+
+                if (installCommandResult.ExitCode != 0)
+                {
+                    throw new TemplateVerificationException(
+                        string.Format(LocalizableStrings.VerificationEngine_Error_InstallUnexpectedFail, installCommandResult.ExitCode),
+                        TemplateVerificationErrorCode.InstantiationFailed);
+                }
+            }
 
             List<string> cmdArgs = new();
             if (!string.IsNullOrEmpty(options.DotnetNewCommandAssemblyPath))
             {
                 cmdArgs.Add(options.DotnetNewCommandAssemblyPath);
             }
-            cmdArgs.Add("new");
             cmdArgs.Add(options.TemplateName);
             if (options.TemplateSpecificArgs != null)
             {
                 cmdArgs.AddRange(options.TemplateSpecificArgs);
             }
-            cmdArgs.Add("--debug:ephemeral-hive");
-            // let's make sure the template outputs are named deterministically
-            cmdArgs.Add("-n");
-            cmdArgs.Add(options.TemplateName);
 
-            // TODO: export and use impl from sdk
-            return new DotnetCommand(loggerFactory?.CreateLogger(typeof(DotnetCommand)) ?? logger, "dotnet", cmdArgs.ToArray())
-                    .WithWorkingDirectory(workingDir)
-                    .Execute();
+            if (!string.IsNullOrEmpty(customHiveLocation))
+            {
+                cmdArgs.Add("--debug:custom-hive");
+                cmdArgs.Add(customHiveLocation);
+            }
+            else
+            {
+                cmdArgs.Add("--debug:ephemeral-hive");
+            }
+
+            // let's make sure the template outputs are named and placed deterministically
+            if (!cmdArgs.Select(arg => arg.Trim())
+                    .Any(arg => new[] { "-n", "--name" }.Contains(arg, StringComparer.OrdinalIgnoreCase)))
+            {
+                cmdArgs.Add("-n");
+                cmdArgs.Add(options.TemplateName);
+            }
+            if (!cmdArgs.Select(arg => arg.Trim())
+                    .Any(arg => new[] { "-o", "--output" }.Contains(arg, StringComparer.OrdinalIgnoreCase)))
+            {
+                cmdArgs.Add("-o");
+                cmdArgs.Add(options.TemplateName);
+            }
+
+            var command = new DotnetCommand(loggerFactory?.CreateLogger(typeof(DotnetCommand)) ?? logger, "new", cmdArgs.ToArray())
+                    .WithWorkingDirectory(workingDir);
+            var result = commandRunner.RunCommand(command);
+            if (!string.IsNullOrEmpty(customHiveLocation))
+            {
+                Directory.Delete(customHiveLocation, true);
+            }
+            return result;
         }
 
-        private static Task CreateVerificationTask(CommandResult commandResult, TemplateVerifierOptions options)
+        private static Task CreateVerificationTask(string contentDir, TemplateVerifierOptions options)
         {
-            string contentDir = commandResult.StartInfo.WorkingDirectory;
-
             List<string> exclusionsList = (options.DisableDefaultVerificationExcludePatterns ?? false)
                 ? new()
                 : new(_defaultVerificationExcludePatterns);
@@ -271,7 +306,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             }
         }
 
-        private async Task VerifyResult(TemplateVerifierOptions args, CommandResult commandResult)
+        private async Task VerifyResult(TemplateVerifierOptions args, CommandResultData commandResultData)
         {
             UsesVerifyAttribute a = new UsesVerifyAttribute();
             // https://github.com/VerifyTests/Verify/blob/d8cbe38f527d6788ecadd6205c82803bec3cdfa6/src/Verify.Xunit/Verifier.cs#L10
@@ -282,7 +317,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
 
             if (_options.VerifyCommandOutput ?? false)
             {
-                if (Directory.Exists(Path.Combine(commandResult.StartInfo.WorkingDirectory, SpecialFiles.StandardStreamsDir)))
+                if (Directory.Exists(Path.Combine(commandResultData.WorkingDirectory, SpecialFiles.StandardStreamsDir)))
                 {
                     throw new TemplateVerificationException(
                         string.Format(
@@ -291,20 +326,20 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
                         TemplateVerificationErrorCode.InternalError);
                 }
 
-                Directory.CreateDirectory(Path.Combine(commandResult.StartInfo.WorkingDirectory, SpecialFiles.StandardStreamsDir));
+                Directory.CreateDirectory(Path.Combine(commandResultData.WorkingDirectory, SpecialFiles.StandardStreamsDir));
 
                 await File.WriteAllTextAsync(
-                    Path.Combine(commandResult.StartInfo.WorkingDirectory, SpecialFiles.StandardStreamsDir, SpecialFiles.StdOut + (_options.StandardOutputFileExtension ?? SpecialFiles.DefaultExtension)),
-                    commandResult.StdOut)
+                    Path.Combine(commandResultData.WorkingDirectory, SpecialFiles.StandardStreamsDir, SpecialFiles.StdOut + (_options.StandardOutputFileExtension ?? SpecialFiles.DefaultExtension)),
+                    commandResultData.StdOut)
                     .ConfigureAwait(false);
 
                 await File.WriteAllTextAsync(
-                        Path.Combine(commandResult.StartInfo.WorkingDirectory, SpecialFiles.StandardStreamsDir, SpecialFiles.StdErr + (_options.StandardOutputFileExtension ?? SpecialFiles.DefaultExtension)),
-                        commandResult.StdErr)
+                        Path.Combine(commandResultData.WorkingDirectory, SpecialFiles.StandardStreamsDir, SpecialFiles.StdErr + (_options.StandardOutputFileExtension ?? SpecialFiles.DefaultExtension)),
+                        commandResultData.StdErr)
                     .ConfigureAwait(false);
             }
 
-            Task verifyTask = CreateVerificationTask(commandResult, args);
+            Task verifyTask = CreateVerificationTask(commandResultData.WorkingDirectory, args);
 
             try
             {

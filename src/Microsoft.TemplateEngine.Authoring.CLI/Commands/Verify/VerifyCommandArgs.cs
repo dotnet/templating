@@ -36,7 +36,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
             VerificationExcludePatterns = verificationExcludePatterns;
             VerifyCommandOutput = verifyCommandOutput;
             IsCommandExpectedToFail = isCommandExpectedToFail;
-            UniqueFor = uniqueForOptions?.Aggregate((a, b) => a | b);
+            UniqueFor = uniqueForOptions?.Aggregate(UniqueForOption.None, (a, b) => a | b);
         }
 
         /// <summary>
