@@ -44,5 +44,10 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
         /// Installation/Uninstallation Failed - Processing issues.
         /// </summary>
         InstallFailed = 106,
+
+        /// <summary>
+        /// Unrecognized option(s) and/or argument(s) for a command.
+        /// </summary>
+        InvalidOption = 127,
     }
 }

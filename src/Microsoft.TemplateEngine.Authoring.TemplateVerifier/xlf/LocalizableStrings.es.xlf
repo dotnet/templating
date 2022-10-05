@@ -7,6 +7,11 @@
         <target state="new">Template installation expected to pass but it had exit code '{0}'.</target>
         <note />
       </trans-unit>
+      <trans-unit id="VerificationEngine_Error_ScrubberExtension">
+        <source>File extension passed to scrubber should not start with dot.</source>
+        <target state="new">File extension passed to scrubber should not start with dot.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="VerificationEngine_Error_StdOutFolderExists">
         <source>The folder [{0}] should not exist in the template output - cannot verify stdout/stderr in such case.</source>
         <target state="new">The folder [{0}] should not exist in the template output - cannot verify stdout/stderr in such case.</target>

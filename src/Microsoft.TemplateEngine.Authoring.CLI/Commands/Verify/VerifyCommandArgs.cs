@@ -11,6 +11,12 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
     /// </summary>
     internal sealed class VerifyCommandArgs
     {
+        public VerifyCommandArgs(string templateName, string? templateSpecificArgs)
+        {
+            TemplateName = templateName;
+            TemplateSpecificArgs = TokenizeJoinedArgs(templateSpecificArgs);
+        }
+
         public VerifyCommandArgs(
             string templateName,
             string? templatePath,
@@ -24,10 +30,9 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
             bool? verifyCommandOutput,
             bool isCommandExpectedToFail,
             IEnumerable<UniqueForOption>? uniqueForOptions)
+        : this(templateName, templateSpecificArgs)
         {
-            TemplateName = templateName;
             TemplatePath = templatePath;
-            TemplateSpecificArgs = TokenizeJoinedArgs(templateSpecificArgs);
             DotnetNewCommandAssemblyPath = dotnetNewCommandAssemblyPath;
             ExpectationsDirectory = expectationsDirectory;
             OutputDirectory = outputDirectory;
@@ -36,7 +41,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
             VerificationExcludePatterns = verificationExcludePatterns;
             VerifyCommandOutput = verifyCommandOutput;
             IsCommandExpectedToFail = isCommandExpectedToFail;
-            UniqueFor = uniqueForOptions?.Aggregate(UniqueForOption.None, (a, b) => a | b);
+            UniqueFor = ToUniqueForOptionFlags(uniqueForOptions);
         }
 
         /// <summary>
@@ -118,6 +123,11 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
                 .Select(m => m.Value)
                 .Select(RemoveEnclosingQuotation)
                 .Where(s => !string.IsNullOrWhiteSpace(s));
+        }
+
+        public static UniqueForOption? ToUniqueForOptionFlags(IEnumerable<UniqueForOption>? uniqueForOptions)
+        {
+            return uniqueForOptions?.Aggregate(UniqueForOption.None, (a, b) => a | b);
         }
 
         private static string RemoveEnclosingQuotation(string input)

@@ -70,6 +70,15 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to File extension passed to scrubber should not start with dot..
+        /// </summary>
+        internal static string VerificationEngine_Error_ScrubberExtension {
+            get {
+                return ResourceManager.GetString("VerificationEngine_Error_ScrubberExtension", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The folder [{0}] should not exist in the template output - cannot verify stdout/stderr in such case..
         /// </summary>
         internal static string VerificationEngine_Error_StdOutFolderExists {

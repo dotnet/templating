@@ -29,6 +29,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
         private readonly ILogger _logger;
         private readonly ILoggerFactory? _loggerFactory;
         private readonly ICommandRunner _commandRunner = new CommandRunner();
+        private readonly IFileSystem _fileSystem = new PhysicalFileSystem();
 
         static VerificationEngine()
         {
@@ -96,6 +97,92 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             }
 
             await VerifyResult(_options, commandResult).ConfigureAwait(false);
+        }
+
+        internal static Task CreateVerificationTask(string contentDir, TemplateVerifierOptions options, IFileSystem fileSystem)
+        {
+            List<string> exclusionsList = (options.DisableDefaultVerificationExcludePatterns ?? false)
+                ? new()
+                : new(_defaultVerificationExcludePatterns);
+
+            if (options.VerificationExcludePatterns != null)
+            {
+                exclusionsList.AddRange(options.VerificationExcludePatterns);
+            }
+
+            List<Glob> globs = exclusionsList.Select(pattern => Glob.Parse(pattern)).ToList();
+
+            if (options.CustomDirectoryVerifier != null)
+            {
+                return options.CustomDirectoryVerifier(
+                    contentDir,
+                    new Lazy<IAsyncEnumerable<(string FilePath, string ScrubbedContent)>>(
+                        GetVerificationContent(contentDir, globs, options.CustomScrubbers, fileSystem)));
+            }
+
+            VerifySettings verifySettings = new();
+
+            if (options.CustomScrubbers != null)
+            {
+                if (options.CustomScrubbers.GeneralScrubber != null)
+                {
+                    verifySettings.AddScrubber(options.CustomScrubbers.GeneralScrubber);
+                }
+
+                foreach (var pair in options.CustomScrubbers.ScrubersByExtension)
+                {
+                    verifySettings.AddScrubber(pair.Key, pair.Value);
+                }
+            }
+
+            verifySettings.UseTypeName(options.TemplateName);
+            verifySettings.UseDirectory(options.ExpectationsDirectory ?? "VerifyExpectations");
+            verifySettings.UseMethodName(EncodeArgsAsPath(options.TemplateSpecificArgs));
+
+            if ((options.UniqueFor ?? UniqueForOption.None) != UniqueForOption.None)
+            {
+                foreach (UniqueForOption value in Enum.GetValues(typeof(UniqueForOption)))
+                {
+                    if ((options.UniqueFor & value) == value)
+                    {
+                        switch (value)
+                        {
+                            case UniqueForOption.None:
+                                break;
+                            case UniqueForOption.Architecture:
+                                verifySettings.UniqueForArchitecture();
+                                break;
+                            case UniqueForOption.OsPlatform:
+                                verifySettings.UniqueForOSPlatform();
+                                break;
+                            case UniqueForOption.Runtime:
+                                verifySettings.UniqueForRuntime();
+                                break;
+                            case UniqueForOption.RuntimeAndVersion:
+                                verifySettings.UniqueForRuntimeAndVersion();
+                                break;
+                            case UniqueForOption.TargetFramework:
+                                verifySettings.UniqueForTargetFramework();
+                                break;
+                            case UniqueForOption.TargetFrameworkAndVersion:
+                                verifySettings.UniqueForTargetFrameworkAndVersion();
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+                    }
+                }
+            }
+
+            if (options.DisableDiffTool ?? false)
+            {
+                verifySettings.DisableDiff();
+            }
+
+            return Verifier.VerifyDirectory(
+                contentDir,
+                (filePath) => !globs.Any(g => g.IsMatch(filePath)),
+                settings: verifySettings);
         }
 
         private static string EncodeArgsAsPath(IEnumerable<string>? args)
@@ -185,119 +272,48 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             return result;
         }
 
-        private static Task CreateVerificationTask(string contentDir, TemplateVerifierOptions options)
-        {
-            List<string> exclusionsList = (options.DisableDefaultVerificationExcludePatterns ?? false)
-                ? new()
-                : new(_defaultVerificationExcludePatterns);
-
-            if (options.VerificationExcludePatterns != null)
-            {
-                exclusionsList.AddRange(options.VerificationExcludePatterns);
-            }
-
-            List<Glob> globs = exclusionsList.Select(pattern => Glob.Parse(pattern)).ToList();
-
-            if (options.CustomDirectoryVerifier != null)
-            {
-                return options.CustomDirectoryVerifier(
-                    contentDir,
-                    new Lazy<IAsyncEnumerable<(string FilePath, string ScrubbedContent)>>(
-                        GetVerificationContent(contentDir, globs, options.CustomScrubbers)));
-            }
-
-            VerifySettings verifySettings = new();
-
-            if (options.CustomScrubbers != null)
-            {
-                if (options.CustomScrubbers.GeneralScrubber != null)
-                {
-                    verifySettings.AddScrubber(options.CustomScrubbers.GeneralScrubber);
-                }
-
-                foreach (var pair in options.CustomScrubbers.ScrubersByExtension)
-                {
-                    verifySettings.AddScrubber(pair.Key, pair.Value);
-                }
-            }
-
-            verifySettings.UseTypeName(options.TemplateName);
-            verifySettings.UseDirectory(options.ExpectationsDirectory ?? "VerifyExpectations");
-            verifySettings.UseMethodName(EncodeArgsAsPath(options.TemplateSpecificArgs));
-
-            if ((options.UniqueFor ?? UniqueForOption.None) != UniqueForOption.None)
-            {
-                foreach (UniqueForOption value in Enum.GetValues(typeof(UniqueForOption)))
-                {
-                    if ((options.UniqueFor & value) == value)
-                    {
-                        switch (value)
-                        {
-                            case UniqueForOption.None:
-                                break;
-                            case UniqueForOption.Architecture:
-                                verifySettings.UniqueForArchitecture();
-                                break;
-                            case UniqueForOption.OsPlatform:
-                                verifySettings.UniqueForOSPlatform();
-                                break;
-                            case UniqueForOption.Runtime:
-                                verifySettings.UniqueForRuntime();
-                                break;
-                            case UniqueForOption.RuntimeAndVersion:
-                                verifySettings.UniqueForRuntimeAndVersion();
-                                break;
-                            case UniqueForOption.TargetFramework:
-                                verifySettings.UniqueForTargetFramework();
-                                break;
-                            case UniqueForOption.TargetFrameworkAndVersion:
-                                verifySettings.UniqueForTargetFrameworkAndVersion();
-                                break;
-                            default:
-                                throw new ArgumentOutOfRangeException();
-                        }
-                    }
-                }
-            }
-
-            if (options.DisableDiffTool ?? false)
-            {
-                verifySettings.DisableDiff();
-            }
-
-            return Verifier.VerifyDirectory(
-                contentDir,
-                (filePath) => !globs.Any(g => g.IsMatch(filePath)),
-                settings: verifySettings);
-        }
-
         private static void DummyMethod()
         { }
 
-        private static async IAsyncEnumerable<(string FilePath, string ScrubbedContent)> GetVerificationContent(string contentDir, List<Glob> globs, ScrubbersDefinition? scrubbers)
+        private static async IAsyncEnumerable<(string FilePath, string ScrubbedContent)> GetVerificationContent(
+            string contentDir,
+            List<Glob> globs,
+            ScrubbersDefinition? scrubbers,
+            IFileSystem fileSystem)
         {
-            foreach (string filePath in Directory.EnumerateFiles(contentDir, "*", SearchOption.AllDirectories))
+            foreach (string filePath in fileSystem.EnumerateFiles(contentDir, "*", SearchOption.AllDirectories))
             {
                 if (globs.Any(g => g.IsMatch(filePath)))
                 {
                     continue;
                 }
 
-                string content = await File.ReadAllTextAsync(filePath).ConfigureAwait(false);
+                string content = await fileSystem.ReadAllTextAsync(filePath).ConfigureAwait(false);
 
                 if (scrubbers != null)
                 {
                     string extension = Path.GetExtension(filePath);
-
-                    if (string.IsNullOrEmpty(extension) || !scrubbers.ScrubersByExtension.TryGetValue(extension, out Action<StringBuilder>? scrubber))
+                    // This is to get the same behavior as Verify.NET
+                    if (extension.Length > 0)
                     {
-                        scrubber = scrubbers.GeneralScrubber;
+                        extension = extension[1..];
+                    }
+                    StringBuilder? sb = null;
+
+                    if (!string.IsNullOrEmpty(extension) && scrubbers.ScrubersByExtension.TryGetValue(extension, out Action<StringBuilder>? scrubber))
+                    {
+                        sb = new StringBuilder(content);
+                        scrubber(sb);
                     }
 
-                    if (scrubber != null)
+                    if (scrubbers.GeneralScrubber != null)
                     {
-                        var sb = new StringBuilder(content);
-                        scrubber(sb);
+                        sb = sb ?? new StringBuilder(content);
+                        scrubbers.GeneralScrubber(sb);
+                    }
+
+                    if (sb != null)
+                    {
                         content = sb.ToString();
                     }
                 }
@@ -317,7 +333,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
 
             if (_options.VerifyCommandOutput ?? false)
             {
-                if (Directory.Exists(Path.Combine(commandResultData.WorkingDirectory, SpecialFiles.StandardStreamsDir)))
+                if (_fileSystem.DirectoryExists(Path.Combine(commandResultData.WorkingDirectory, SpecialFiles.StandardStreamsDir)))
                 {
                     throw new TemplateVerificationException(
                         string.Format(
@@ -326,20 +342,20 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
                         TemplateVerificationErrorCode.InternalError);
                 }
 
-                Directory.CreateDirectory(Path.Combine(commandResultData.WorkingDirectory, SpecialFiles.StandardStreamsDir));
+                _fileSystem.CreateDirectory(Path.Combine(commandResultData.WorkingDirectory, SpecialFiles.StandardStreamsDir));
 
-                await File.WriteAllTextAsync(
+                await _fileSystem.WriteAllTextAsync(
                     Path.Combine(commandResultData.WorkingDirectory, SpecialFiles.StandardStreamsDir, SpecialFiles.StdOut + (_options.StandardOutputFileExtension ?? SpecialFiles.DefaultExtension)),
                     commandResultData.StdOut)
                     .ConfigureAwait(false);
 
-                await File.WriteAllTextAsync(
+                await _fileSystem.WriteAllTextAsync(
                         Path.Combine(commandResultData.WorkingDirectory, SpecialFiles.StandardStreamsDir, SpecialFiles.StdErr + (_options.StandardOutputFileExtension ?? SpecialFiles.DefaultExtension)),
                         commandResultData.StdErr)
                     .ConfigureAwait(false);
             }
 
-            Task verifyTask = CreateVerificationTask(commandResultData.WorkingDirectory, args);
+            Task verifyTask = CreateVerificationTask(commandResultData.WorkingDirectory, args, _fileSystem);
 
             try
             {

@@ -120,6 +120,9 @@
   <data name="VerificationEngine_Error_InstallUnexpectedFail" xml:space="preserve">
     <value>Template installation expected to pass but it had exit code '{0}'.</value>
   </data>
+  <data name="VerificationEngine_Error_ScrubberExtension" xml:space="preserve">
+    <value>File extension passed to scrubber should not start with dot.</value>
+  </data>
   <data name="VerificationEngine_Error_StdOutFolderExists" xml:space="preserve">
     <value>The folder [{0}] should not exist in the template output - cannot verify stdout/stderr in such case.</value>
     <comment>{0} is a folder path</comment>

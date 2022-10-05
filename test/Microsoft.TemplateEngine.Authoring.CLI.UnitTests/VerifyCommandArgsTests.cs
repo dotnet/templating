@@ -4,7 +4,7 @@
 using FluentAssertions;
 using Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify;
 
-namespace Microsoft.TemplateEngine.Authoring.CLI.Tests
+namespace Microsoft.TemplateEngine.Authoring.CLI.UnitTests
 {
     public class VerifyCommandArgsTests
     {

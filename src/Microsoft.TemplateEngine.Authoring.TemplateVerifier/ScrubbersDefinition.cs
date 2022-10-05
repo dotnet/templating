@@ -27,13 +27,18 @@ public class ScrubbersDefinition
             return new ScrubbersDefinition().AddScrubber(scrubber, extension);
         }
 
-        if (extension == null)
+        if (string.IsNullOrWhiteSpace(extension))
         {
             GeneralScrubber += scrubber;
         }
+        // This is to get the same behavior as Verify.NET
+        else if (extension.Trim().StartsWith('.'))
+        {
+            throw new TemplateVerificationException(LocalizableStrings.VerificationEngine_Error_ScrubberExtension, TemplateVerificationErrorCode.InvalidOption);
+        }
         else
         {
-            ScrubersByExtension[extension] = scrubber;
+            ScrubersByExtension[extension.Trim()] = scrubber;
         }
 
         return this;

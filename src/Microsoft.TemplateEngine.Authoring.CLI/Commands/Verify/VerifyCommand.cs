@@ -105,6 +105,23 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
             AddOption(_uniqueForOption);
         }
 
+        internal static VerifyCommandArgs ExtractArguments(VerifyCommand verifyCommand, ParseResult parseResult)
+        {
+            return new VerifyCommandArgs(
+                templateName: parseResult.GetValueForArgument(verifyCommand._templateNameArgument),
+                templateSpecificArgs: parseResult.GetValueForOption(verifyCommand._remainingArguments),
+                templatePath: parseResult.GetValueForOption(verifyCommand._templatePathOption),
+                dotnetNewCommandAssemblyPath: parseResult.GetValueForOption(verifyCommand._newCommandPathOption),
+                expectationsDirectory: parseResult.GetValueForOption(verifyCommand._expectationsDirectoryOption),
+                outputDirectory: parseResult.GetValueForOption(verifyCommand._templateOutputPathOption),
+                disableDiffTool: parseResult.GetValueForOption(verifyCommand._disableDiffToolOption),
+                disableDefaultVerificationExcludePatterns: parseResult.GetValueForOption(verifyCommand._disableDefaultExcludePatternsOption),
+                verificationExcludePatterns: parseResult.GetValueForOption(verifyCommand._excludePatternOption),
+                verifyCommandOutput: parseResult.GetValueForOption(verifyCommand._verifyCommandOutputOption),
+                isCommandExpectedToFail: parseResult.GetValueForOption(verifyCommand._isCommandExpectedToFailOption),
+                uniqueForOptions: parseResult.GetValueForOption(verifyCommand._uniqueForOption));
+        }
+
         protected override async Task<int> ExecuteAsync(VerifyCommandArgs args, CancellationToken cancellationToken = default)
         {
             Logger.LogInformation("Running the verification of {templateName}.", args.TemplateName);
@@ -175,19 +192,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
 
             protected override VerifyCommandArgs GetBoundValue(BindingContext bindingContext)
             {
-                return new VerifyCommandArgs(
-                    templateName: bindingContext.ParseResult.GetValueForArgument(_verifyCommand._templateNameArgument),
-                    templateSpecificArgs: bindingContext.ParseResult.GetValueForOption(_verifyCommand._remainingArguments),
-                    templatePath: bindingContext.ParseResult.GetValueForOption(_verifyCommand._templatePathOption),
-                    dotnetNewCommandAssemblyPath: bindingContext.ParseResult.GetValueForOption(_verifyCommand._newCommandPathOption),
-                    expectationsDirectory: bindingContext.ParseResult.GetValueForOption(_verifyCommand._expectationsDirectoryOption),
-                    outputDirectory: bindingContext.ParseResult.GetValueForOption(_verifyCommand._templateOutputPathOption),
-                    disableDiffTool: bindingContext.ParseResult.GetValueForOption(_verifyCommand._disableDiffToolOption),
-                    disableDefaultVerificationExcludePatterns: bindingContext.ParseResult.GetValueForOption(_verifyCommand._disableDefaultExcludePatternsOption),
-                    verificationExcludePatterns: bindingContext.ParseResult.GetValueForOption(_verifyCommand._excludePatternOption),
-                    verifyCommandOutput: bindingContext.ParseResult.GetValueForOption(_verifyCommand._verifyCommandOutputOption),
-                    isCommandExpectedToFail: bindingContext.ParseResult.GetValueForOption(_verifyCommand._isCommandExpectedToFailOption),
-                    uniqueForOptions: bindingContext.ParseResult.GetValueForOption(_verifyCommand._uniqueForOption));
+                return VerifyCommand.ExtractArguments(_verifyCommand, bindingContext.ParseResult);
             }
         }
     }
