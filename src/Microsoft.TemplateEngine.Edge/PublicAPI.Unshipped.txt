@@ -1,3 +1,5 @@
+﻿Microsoft.TemplateEngine.Edge.Settings.ScanResult.ScanResult(Microsoft.TemplateEngine.Abstractions.Mount.IMountPoint! mountPoint, System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Abstractions.IScanTemplateInfo!>! templates, System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Abstractions.ILocalizationLocator!>! localizations, System.Collections.Generic.IReadOnlyList<(string! AssemblyPath, System.Type! InterfaceType, Microsoft.TemplateEngine.Abstractions.IIdentifiedComponent! Instance)>! components) -> void
+Microsoft.TemplateEngine.Edge.Settings.ScanResult.Templates.get -> System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Abstractions.IScanTemplateInfo!>!
 ﻿Microsoft.TemplateEngine.Edge.DefaultEnvironment.DefaultEnvironment(System.Collections.Generic.IReadOnlyDictionary<string!, string!>! environmentVariables) -> void
 Microsoft.TemplateEngine.Edge.Settings.ITemplateInfoHostJsonCache.HostData.get -> string?
 Microsoft.TemplateEngine.Edge.VirtualEnvironment

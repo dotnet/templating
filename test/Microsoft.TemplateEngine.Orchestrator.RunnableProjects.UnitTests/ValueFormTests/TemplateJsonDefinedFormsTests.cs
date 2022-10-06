@@ -44,6 +44,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Value
 
             GlobalRunConfig? runConfig = null;
 
+            IGlobalRunConfig? globalRunConfig = null;
             try
             {
                 runConfig = new RunnableProjectConfig(environmentSettings, A.Fake<IGenerator>(), model, A.Fake<IDirectory>()).GlobalOperationConfig;
@@ -84,6 +85,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Value
 
             GlobalRunConfig? runConfig = null;
 
+            IGlobalRunConfig? globalRunConfig = null;
             try
             {
                 runConfig = new RunnableProjectConfig(environmentSettings, A.Fake<IGenerator>(), model, A.Fake<IDirectory>()).GlobalOperationConfig;

@@ -4,9 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Mount;
+using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -14,31 +17,33 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 {
     internal class TemplateCache
     {
-        private readonly ILogger _logger;
+        private static readonly Guid RunnableProjectGeneratorId = new("0C434DF7-E2CB-4DEE-B216-D7C58C8EB4B3");
 
-        public TemplateCache(ScanResult?[] scanResults, Dictionary<string, DateTime> mountPoints, ILogger logger)
+        public TemplateCache(ScanResult?[] scanResults, Dictionary<string, DateTime> mountPoints, IEngineEnvironmentSettings environmentSettings)
         {
-            _logger = logger;
             // We need this dictionary to de-duplicate templates that have same identity
             // notice that IEnumerable<ScanResult> that we get in is order by priority which means
             // last template with same Identity wins, others are ignored...
-            var templateDeduplicationDictionary = new Dictionary<string, (ITemplate Template, ILocalizationLocator? Localization)>();
-            foreach (var scanResult in scanResults)
+            var templateDeduplicationDictionary = new Dictionary<string, (IMountPoint, IScanTemplateInfo)>();
+            foreach (ScanResult? scanResult in scanResults)
             {
                 if (scanResult == null)
                 {
                     continue;
                 }
-                foreach (ITemplate template in scanResult.Templates)
+                foreach (IScanTemplateInfo template in scanResult.Templates)
                 {
-                    templateDeduplicationDictionary[template.Identity] = (template, GetBestLocalizationLocatorMatch(scanResult.Localizations, template.Identity));
+                    templateDeduplicationDictionary[template.Identity] = (scanResult.MountPoint, template);
                 }
             }
 
             var templates = new List<TemplateInfo>();
-            foreach (var newTemplate in templateDeduplicationDictionary.Values)
+            foreach ((IMountPoint mountPoint, IScanTemplateInfo newTemplate) in templateDeduplicationDictionary.Values)
             {
-                templates.Add(new TemplateInfo(newTemplate.Template, newTemplate.Localization, logger));
+                ILocalizationLocator? loc = GetBestLocalizationLocatorMatch(newTemplate);
+                (string, JObject?)? hostFile = GetBestHostConfigMatch(newTemplate, environmentSettings, mountPoint);
+
+                templates.Add(new TemplateInfo(newTemplate, loc, hostFile));
             }
 
             Version = Settings.TemplateInfo.CurrentVersion;
@@ -47,9 +52,8 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             MountPointsInfo = mountPoints;
         }
 
-        public TemplateCache(JObject? contentJobject, ILogger logger)
+        public TemplateCache(JObject? contentJobject)
         {
-            _logger = logger;
             if (contentJobject != null && contentJobject.TryGetValue(nameof(Version), StringComparison.OrdinalIgnoreCase, out JToken? versionToken))
             {
                 Version = versionToken.ToString();
@@ -107,21 +111,25 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         [JsonProperty]
         public Dictionary<string, DateTime> MountPointsInfo { get; }
 
-        private ILocalizationLocator? GetBestLocalizationLocatorMatch(IReadOnlyList<ILocalizationLocator> localizations, string identity)
+        private ILocalizationLocator? GetBestLocalizationLocatorMatch(IScanTemplateInfo template)
         {
-            IEnumerable<ILocalizationLocator> localizationsForTemplate = localizations.Where(locator => locator.Identity.Equals(identity, StringComparison.OrdinalIgnoreCase));
-
-            if (!localizations.Any())
+            if (template.Localizations is null)
             {
                 return null;
             }
-            IEnumerable<string> availableLocalizations = localizationsForTemplate.Select(locator => locator.Locale);
+
+            if (!template.Localizations.Any())
+            {
+                return null;
+            }
+
+            IEnumerable<string> availableLocalizations = template.Localizations.Keys;
             string? bestMatch = GetBestLocaleMatch(availableLocalizations);
             if (string.IsNullOrWhiteSpace(bestMatch))
             {
                 return null;
             }
-            return localizationsForTemplate.FirstOrDefault(locator => locator.Locale == bestMatch);
+            return template.Localizations[bestMatch!];
         }
 
         /// <remarks>see https://source.dot.net/#System.Private.CoreLib/ResourceFallbackManager.cs.</remarks>
@@ -139,5 +147,58 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             while (currentCulture.Name != CultureInfo.InvariantCulture.Name);
             return null;
         }
+
+        private (string, JObject?)? GetBestHostConfigMatch(IScanTemplateInfo newTemplate, IEngineEnvironmentSettings settings, IMountPoint mountPoint)
+        {
+            if (newTemplate.HostConfigFiles.TryGetValue(settings.Host.HostIdentifier, out string? preferredHostFilePath))
+            {
+                return (preferredHostFilePath, ReadHostFile(newTemplate, preferredHostFilePath, settings, mountPoint));
+            }
+
+            foreach (string fallbackHostName in settings.Host.FallbackHostTemplateConfigNames)
+            {
+                if (newTemplate.HostConfigFiles.TryGetValue(fallbackHostName, out string? fallbackHostFilePAth))
+                {
+                    return (preferredHostFilePath, ReadHostFile(newTemplate, fallbackHostFilePAth, settings, mountPoint));
+                }
+            }
+            return null;
+        }
+
+        private JObject? ReadHostFile(IScanTemplateInfo template, string path, IEngineEnvironmentSettings settings, IMountPoint mountPoint)
+        {
+            if (template.GeneratorId != RunnableProjectGeneratorId)
+            {
+                return null;
+            }
+            settings.Host.Logger.LogDebug($"Start loading host config {template.MountPointUri}{path}");
+            try
+            {
+                IFile? hostFile = mountPoint.FileInfo(path);
+                if (hostFile == null || !hostFile.Exists)
+                {
+                    throw new FileNotFoundException($"Host file {hostFile?.GetDisplayPath()} does not exist.");
+                }
+                using (var sr = new StreamReader(hostFile.OpenRead()))
+                using (var jsonTextReader = new JsonTextReader(sr))
+                {
+                    return JObject.Load(jsonTextReader);
+                }
+            }
+            catch (Exception e)
+            {
+                settings.Host.Logger.LogWarning(
+                    e,
+                    LocalizableStrings.TemplateInfo_Warning_FailedToReadHostData,
+                    template.MountPointUri,
+                    path);
+            }
+            finally
+            {
+                settings.Host.Logger.LogDebug($"End loading host config {template.MountPointUri}{path}");
+            }
+            return null;
+        }
+
     }
 }
