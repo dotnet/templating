@@ -8,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Abstractions.Parameters;
 using Microsoft.TemplateEngine.Utils;
 
@@ -97,7 +96,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
             inputParameters ??= new InputDataSet(templateInfo);
             cancellationToken.ThrowIfCancellationRequested();
 
-            ITemplate? template = LoadTemplate(templateInfo, baselineName);
+            using ITemplate? template = LoadTemplate(templateInfo, baselineName);
             if (template == null)
             {
                 return new TemplateCreationResult(CreationResultStatus.NotFound, templateInfo.Name, LocalizableStrings.TemplateCreator_TemplateCreationResult_Error_CouldNotLoadTemplate);
@@ -196,9 +195,6 @@ namespace Microsoft.TemplateEngine.Edge.Template
             }
             finally
             {
-#pragma warning disable CS0618 // Type or member is obsolete - temporary until the method becomes internal.
-                ReleaseMountPoints(template);
-#pragma warning restore CS0618 // Type or member is obsolete
                 contentGeneratorBlock.Dispose();
             }
         }
@@ -207,19 +203,6 @@ namespace Microsoft.TemplateEngine.Edge.Template
         //This method should become internal once Cli help logic is refactored.
         public void ReleaseMountPoints(ITemplate template)
         {
-            if (template == null)
-            {
-                return;
-            }
-
-            template.LocaleConfiguration?.MountPoint.Dispose();
-
-            template.Configuration?.MountPoint.Dispose();
-
-            if (template.TemplateSourceRoot != null && template.TemplateSourceRoot != template.Configuration)
-            {
-                template.TemplateSourceRoot.MountPoint.Dispose();
-            }
         }
 
         /// <summary>
@@ -338,20 +321,9 @@ namespace Microsoft.TemplateEngine.Edge.Template
             {
                 return null;
             }
-            if (!_environmentSettings.TryGetMountPoint(info.MountPointUri, out IMountPoint? mountPoint))
+            using (Timing.Over(_environmentSettings.Host.Logger, $"Template from config {info.MountPointUri}{info.ConfigPlace}"))
             {
-                return null;
-            }
-            IFile? config = mountPoint!.FileInfo(info.ConfigPlace);
-            if (config == null)
-            {
-                return null;
-            }
-            IFile? localeConfig = string.IsNullOrEmpty(info.LocaleConfigPlace) ? null : mountPoint.FileInfo(info.LocaleConfigPlace!);
-            IFile? hostTemplateConfigFile = string.IsNullOrEmpty(info.HostConfigPlace) ? null : mountPoint.FileInfo(info.HostConfigPlace!);
-            using (Timing.Over(_environmentSettings.Host.Logger, $"Template from config {config.MountPoint.MountPointUri}{config.FullPath}"))
-            {
-                if (generator!.TryGetTemplateFromConfigInfo(config, out ITemplate? template, localeConfig, hostTemplateConfigFile, baselineName))
+                if (generator!.TryLoadTemplateFromTemplateInfo(_environmentSettings, ToITemplateLocator(info), out ITemplate? template, baselineName))
                 {
                     return template;
                 }
@@ -371,6 +343,15 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 yield return e.Message;
                 e = e.InnerException;
             }
+        }
+
+        private static IExtendedTemplateLocator ToITemplateLocator(ITemplateInfo templateInfo)
+        {
+            return new TemplateLocator(templateInfo.GeneratorId, templateInfo.MountPointUri, templateInfo.ConfigPlace)
+            {
+                LocaleConfigPlace = templateInfo.LocaleConfigPlace,
+                HostConfigPlace = templateInfo.HostConfigPlace,
+            };
         }
 
         /// <summary>
@@ -543,6 +524,26 @@ namespace Microsoft.TemplateEngine.Edge.Template
             public void SetParameterEvaluation(ITemplateParameter parameter, EvaluatedInputParameterData evaluatedParameterData) => throw new NotImplementedException();
 
             public void SetParameterValue(ITemplateParameter parameter, object value, DataSource dataSource) => _parameterSet.ResolvedValues[parameter] = value;
+        }
+
+        private class TemplateLocator : IExtendedTemplateLocator
+        {
+            public TemplateLocator(Guid generatorId, string mountPointUri, string configPlace)
+            {
+                GeneratorId = generatorId;
+                MountPointUri = mountPointUri;
+                ConfigPlace = configPlace;
+            }
+
+            public Guid GeneratorId { get; }
+
+            public string MountPointUri { get; }
+
+            public string ConfigPlace { get; }
+
+            public string? LocaleConfigPlace { get; init; }
+
+            public string? HostConfigPlace { get; init; }
         }
     }
 }

@@ -4,6 +4,7 @@
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Edge;
 using Microsoft.TemplateEngine.Edge.Settings;
+using Microsoft.TemplateEngine.Utils;
 using Microsoft.TemplateSearch.Common;
 using Microsoft.TemplateSearch.Common.Abstractions;
 using Microsoft.TemplateSearch.TemplateDiscovery.AdditionalData;
@@ -379,7 +380,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
 #pragma warning restore CS0612 // Type or member is obsolete
                     }
 
-                    return scanResult.Templates.Select(t => new TemplateSearchData(t, t.ProduceAdditionalData(additionalDataProducers, environmentSettings)));
+                    return scanResult.Templates.Select(t => new TemplateSearchData(t.ToITemplateInfo(), t.ProduceAdditionalData(additionalDataProducers, environmentSettings)));
                 }
                 return Array.Empty<TemplateSearchData>();
             }

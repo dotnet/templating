@@ -8,7 +8,6 @@ using System.Linq;
 #endif
 using System.Globalization;
 using FakeItEasy;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Constraints;
 using Microsoft.TemplateEngine.Abstractions.Mount;
@@ -43,6 +42,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         [InlineData("invariant", null)]
         public void PicksCorrectLocator(string currentCulture, string? expectedLocator)
         {
+            IEngineEnvironmentSettings environmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
             CultureInfo persistedCulture = CultureInfo.CurrentUICulture;
             try
             {
@@ -57,23 +57,26 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 }
                 string[] availableLocales = new[] { "cs", "de", "en", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr", "zh-Hans", "zh-Hant" };
 
-                ITemplate template = A.Fake<ITemplate>();
+                IScanTemplateInfo template = A.Fake<IScanTemplateInfo>();
                 A.CallTo(() => template.Identity).Returns("testIdentity");
                 List<ILocalizationLocator> locators = new List<ILocalizationLocator>();
                 foreach (string locale in availableLocales)
                 {
                     ILocalizationLocator locator = A.Fake<ILocalizationLocator>();
+#pragma warning disable CS0618 // Type or member is obsolete
                     A.CallTo(() => locator.Identity).Returns("testIdentity");
+#pragma warning restore CS0618 // Type or member is obsolete
                     A.CallTo(() => locator.Locale).Returns(locale);
                     A.CallTo(() => locator.Name).Returns(locale + " name");
                     locators.Add(locator);
                 }
+                A.CallTo(() => template.Localizations).Returns(locators.ToDictionary(l => l.Locale, l => l));
                 IMountPoint mountPoint = A.Fake<IMountPoint>();
                 A.CallTo(() => mountPoint.MountPointUri).Returns("testMount");
 
                 ScanResult result = new ScanResult(mountPoint, new[] { template }, locators, Array.Empty<(string AssemblyPath, Type InterfaceType, IIdentifiedComponent Instance)>());
 
-                TemplateCache templateCache = new TemplateCache(new[] { result }, new Dictionary<string, DateTime>(), NullLogger.Instance);
+                TemplateCache templateCache = new TemplateCache(new[] { result }, new Dictionary<string, DateTime>(), environmentSettings);
 
                 Assert.Equal(currentCulture, templateCache.Locale);
                 Assert.Equal("testIdentity", templateCache.TemplateInfo.Single().Identity);
@@ -94,7 +97,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             Guid postAction1 = Guid.NewGuid();
             Guid postAction2 = Guid.NewGuid();
 
-            ITemplate template = A.Fake<ITemplate>();
+            IScanTemplateInfo template = A.Fake<IScanTemplateInfo>();
             A.CallTo(() => template.Identity).Returns("testIdentity");
             A.CallTo(() => template.Name).Returns("testName");
             A.CallTo(() => template.ShortNameList).Returns(new[] { "testShort" });
@@ -105,10 +108,10 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             A.CallTo(() => mountPoint.MountPointUri).Returns("testMount");
 
             ScanResult result = new ScanResult(mountPoint, new[] { template }, Array.Empty<ILocalizationLocator>(), Array.Empty<(string AssemblyPath, Type InterfaceType, IIdentifiedComponent Instance)>());
-            TemplateCache templateCache = new TemplateCache(new[] { result }, new Dictionary<string, DateTime>(), NullLogger.Instance);
+            TemplateCache templateCache = new TemplateCache(new[] { result }, new Dictionary<string, DateTime>(), environmentSettings);
 
             WriteObject(environmentSettings.Host.FileSystem, paths.TemplateCacheFile, templateCache);
-            var readCache = new TemplateCache(ReadObject(environmentSettings.Host.FileSystem, paths.TemplateCacheFile), NullLogger.Instance);
+            var readCache = new TemplateCache(ReadObject(environmentSettings.Host.FileSystem, paths.TemplateCacheFile));
 
             Assert.Single(readCache.TemplateInfo);
             var readTemplate = readCache.TemplateInfo[0];
@@ -124,7 +127,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             TemplateConstraintInfo constraintInfo1 = new TemplateConstraintInfo("t1", null);
             TemplateConstraintInfo constraintInfo2 = new TemplateConstraintInfo("t1", "{[ \"one\", \"two\"]}");
 
-            ITemplate template = A.Fake<ITemplate>();
+            IScanTemplateInfo template = A.Fake<IScanTemplateInfo>();
             A.CallTo(() => template.Identity).Returns("testIdentity");
             A.CallTo(() => template.Name).Returns("testName");
             A.CallTo(() => template.ShortNameList).Returns(new[] { "testShort" });
@@ -135,10 +138,10 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             A.CallTo(() => mountPoint.MountPointUri).Returns("testMount");
 
             ScanResult result = new ScanResult(mountPoint, new[] { template }, Array.Empty<ILocalizationLocator>(), Array.Empty<(string AssemblyPath, Type InterfaceType, IIdentifiedComponent Instance)>());
-            TemplateCache templateCache = new TemplateCache(new[] { result }, new Dictionary<string, DateTime>(), NullLogger.Instance);
+            TemplateCache templateCache = new TemplateCache(new[] { result }, new Dictionary<string, DateTime>(), environmentSettings);
 
             WriteObject(environmentSettings.Host.FileSystem, paths.TemplateCacheFile, templateCache);
-            var readCache = new TemplateCache(ReadObject(environmentSettings.Host.FileSystem, paths.TemplateCacheFile), NullLogger.Instance);
+            var readCache = new TemplateCache(ReadObject(environmentSettings.Host.FileSystem, paths.TemplateCacheFile));
 
             Assert.Single(readCache.TemplateInfo);
             var readTemplate = readCache.TemplateInfo[0];

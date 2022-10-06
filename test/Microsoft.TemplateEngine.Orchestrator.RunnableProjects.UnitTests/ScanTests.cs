@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
@@ -50,7 +51,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
 
             using IMountPoint mountPoint = environmentSettings.MountPath(sourceBasePath);
             RunnableProjectGenerator generator = new RunnableProjectGenerator();
-            var templates = (generator as IGenerator).GetTemplatesAndLangpacksFromDir(mountPoint, out _);
+            IReadOnlyList<IScanTemplateInfo>? templates = (generator as IGenerator).GetTemplatesFromMountPoint(mountPoint);
 
             Assert.Single(templates);
             var template = templates[0];

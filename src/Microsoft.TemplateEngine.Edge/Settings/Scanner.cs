@@ -187,28 +187,21 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         private ScanResult ScanMountPointForTemplatesAndLangpacks(MountPointScanSource source)
         {
             _ = source ?? throw new ArgumentNullException(nameof(source));
-            // look for things to install
 
-            var templates = new List<ITemplate>();
-            var localizationLocators = new List<ILocalizationLocator>();
-
+            var templates = new List<IScanTemplateInfo>();
             foreach (IGenerator generator in _environmentSettings.Components.OfType<IGenerator>())
             {
-                IList<ITemplate> templateList = generator.GetTemplatesAndLangpacksFromDir(source.MountPoint, out IList<ILocalizationLocator> localizationInfo);
-
-                foreach (ILocalizationLocator locator in localizationInfo)
-                {
-                    localizationLocators.Add(locator);
-                }
-
-                foreach (ITemplate template in templateList)
+                IReadOnlyList<IScanTemplateInfo> templateList = generator.GetTemplatesFromMountPoint(source.MountPoint);
+                foreach (IScanTemplateInfo template in templateList)
                 {
                     templates.Add(template);
                 }
 
-                source.FoundTemplates |= templateList.Count > 0 || localizationInfo.Count > 0;
+                source.FoundTemplates |= templateList.Count > 0;
             }
 
+            //backward compatibility
+            var localizationLocators = templates.SelectMany(t => t.Localizations.Values).ToList();
             return new ScanResult(source.MountPoint, templates, localizationLocators, Array.Empty<(string, Type, IIdentifiedComponent)>());
         }
 
