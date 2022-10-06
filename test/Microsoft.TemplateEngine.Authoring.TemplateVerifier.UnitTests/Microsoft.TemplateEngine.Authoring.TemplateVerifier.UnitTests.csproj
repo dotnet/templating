@@ -15,4 +15,10 @@
     <PackageReference Include="FakeItEasy" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Expectations\*" />
+    <Content Include="Expectations\**\*" />
+    <None Include="Expectations\**\*" CopyToOutputDirectory="PreserveNewest " />
+  </ItemGroup>
+
 </Project>

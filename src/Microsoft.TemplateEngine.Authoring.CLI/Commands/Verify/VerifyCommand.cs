@@ -128,24 +128,29 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
 
             try
             {
-                VerificationEngine engine = new VerificationEngine(
-                    new TemplateVerifierOptions(templateName: args.TemplateName)
-                    {
-                        TemplatePath = args.TemplatePath,
-                        TemplateSpecificArgs = args.TemplateSpecificArgs,
-                        DisableDiffTool = args.DisableDiffTool,
-                        DisableDefaultVerificationExcludePatterns = args.DisableDefaultVerificationExcludePatterns,
-                        VerificationExcludePatterns = args.VerificationExcludePatterns,
-                        DotnetNewCommandAssemblyPath = args.DotnetNewCommandAssemblyPath,
-                        ExpectationsDirectory = args.ExpectationsDirectory,
-                        OutputDirectory = args.OutputDirectory,
-                        VerifyCommandOutput = args.VerifyCommandOutput,
-                        IsCommandExpectedToFail = args.IsCommandExpectedToFail,
-                        UniqueFor = args.UniqueFor,
-                    },
-                    LoggerFactory ?? NullLoggerFactory.Instance
-                );
-                await engine.Execute(cancellationToken).ConfigureAwait(false);
+                VerificationEngine engine = new VerificationEngine(LoggerFactory ?? NullLoggerFactory.Instance);
+                TemplateVerifierOptions options = new(templateName: args.TemplateName)
+                {
+                    TemplatePath = args.TemplatePath,
+                    TemplateSpecificArgs = args.TemplateSpecificArgs,
+                    DisableDiffTool = args.DisableDiffTool,
+                    DisableDefaultVerificationExcludePatterns = args.DisableDefaultVerificationExcludePatterns,
+                    VerificationExcludePatterns = args.VerificationExcludePatterns,
+                    DotnetNewCommandAssemblyPath = args.DotnetNewCommandAssemblyPath,
+                    ExpectationsDirectory = args.ExpectationsDirectory,
+                    OutputDirectory = args.OutputDirectory,
+                    VerifyCommandOutput = args.VerifyCommandOutput,
+                    IsCommandExpectedToFail = args.IsCommandExpectedToFail,
+                    UniqueFor = args.UniqueFor,
+                };
+                await engine.Execute(
+                    options,
+                    cancellationToken,
+                    // We explicitly pass a path - so that the engine then process it and gets the current executing dir
+                    // and treats it as a code base of caller of API (as in case of CLI usage we do not want to store
+                    // expectation files in CLI sources dir)
+                    Path.Combine(Environment.CurrentDirectory, "_")
+                    ).ConfigureAwait(false);
                 return 0;
             }
             catch (Exception e)

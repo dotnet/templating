@@ -34,8 +34,8 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.IntegrationTests
                 UniqueFor = UniqueForOption.OsPlatform | UniqueForOption.OsPlatform,
             };
 
-            VerificationEngine engine = new VerificationEngine(options, _log);
-            Func<Task> executeTask = () => engine.Execute();
+            VerificationEngine engine = new VerificationEngine(_log);
+            Func<Task> executeTask = () => engine.Execute(options);
             await executeTask
                 .Should()
                 .ThrowAsync<TemplateVerificationException>()
@@ -83,8 +83,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.IntegrationTests
                 UniqueFor = UniqueForOption.OsPlatform | UniqueForOption.OsPlatform,
             };
 
-            VerificationEngine engine2 = new VerificationEngine(options2, _log);
-            Func<Task> executeTask2 = () => engine2.Execute();
+            Func<Task> executeTask2 = () => engine.Execute(options2);
             await executeTask2
                 .Should()
                 .NotThrowAsync();
@@ -111,7 +110,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.IntegrationTests
             }
                 .WithCustomScrubbers(
                     ScrubbersDefinition.Empty
-                        .AddScrubber(sb => sb.Replace("Donut", "Veggies"), ".txt")
+                        .AddScrubber(sb => sb.Replace("Donut", "Veggies"), "txt")
                         .AddScrubber(sb => sb.Replace(DateTime.UtcNow.ToString("yyyy-MM-dd"), "2000-01-01"))
                 )
                 .WithCustomDirectoryVerifier(
@@ -139,8 +138,8 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.IntegrationTests
                     }
                     );
 
-            VerificationEngine engine = new VerificationEngine(options, _log);
-            Func<Task> executeTask = () => engine.Execute();
+            VerificationEngine engine = new VerificationEngine(_log);
+            Func<Task> executeTask = () => engine.Execute(options);
             await executeTask
                 .Should()
                 .NotThrowAsync();

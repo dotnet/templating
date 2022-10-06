@@ -17,7 +17,7 @@
 
     <Compile Remove="TestTemplate\*" />
     <Content Include="TestTemplate\**\*" Exclude="TestTemplate\**\bin\**;TestTemplate\**\obj\**" />
-    <None Include="TestTemplate\**\*" CopyToOutputDirectory="Always" />
+    <None Include="TestTemplate\**\*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   
 </Project>

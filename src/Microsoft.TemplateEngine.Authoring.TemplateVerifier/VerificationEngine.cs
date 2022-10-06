@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
@@ -25,7 +26,6 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             "*.exe",
         };
 
-        private readonly TemplateVerifierOptions _options;
         private readonly ILogger _logger;
         private readonly ILoggerFactory? _loggerFactory;
         private readonly ICommandRunner _commandRunner = new CommandRunner();
@@ -38,34 +38,38 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             VerifierSettings.UseSplitModeForUniqueDirectory();
         }
 
-        public VerificationEngine(IOptions<TemplateVerifierOptions> optionsAccessor, ILogger logger)
+        public VerificationEngine(ILogger logger)
+        {
+            _logger = logger;
+        }
+
+        public VerificationEngine(ILoggerFactory loggerFactory)
+        : this(loggerFactory.CreateLogger(typeof(VerificationEngine)))
+        {
+            _loggerFactory = loggerFactory;
+        }
+
+        internal VerificationEngine(ICommandRunner commandRunner, ILogger logger)
+        : this(logger)
+        {
+            _commandRunner = commandRunner;
+        }
+
+        public async Task Execute(
+            IOptions<TemplateVerifierOptions> optionsAccessor,
+            CancellationToken cancellationToken = default,
+            [CallerFilePath] string sourceFile = "")
         {
             if (optionsAccessor == null)
             {
                 throw new ArgumentNullException(nameof(optionsAccessor));
             }
 
-            _options = optionsAccessor.Value;
-            _logger = logger;
-        }
+            TemplateVerifierOptions options = optionsAccessor.Value;
 
-        public VerificationEngine(TemplateVerifierOptions options, ILoggerFactory loggerFactory)
-        : this(options, loggerFactory.CreateLogger(typeof(VerificationEngine)))
-        {
-            _loggerFactory = loggerFactory;
-        }
+            CommandResultData commandResult = RunDotnetNewCommand(options, _commandRunner, _loggerFactory, _logger);
 
-        internal VerificationEngine(TemplateVerifierOptions options, ICommandRunner commandRunner, ILogger logger)
-        : this(options, logger)
-        {
-            _commandRunner = commandRunner;
-        }
-
-        public async Task Execute(CancellationToken cancellationToken = default)
-        {
-            CommandResultData commandResult = RunDotnetNewCommand(_options, _commandRunner, _loggerFactory, _logger);
-
-            if (_options.IsCommandExpectedToFail ?? false)
+            if (options.IsCommandExpectedToFail ?? false)
             {
                 if (commandResult.ExitCode == 0)
                 {
@@ -85,7 +89,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
 
                 // We do not expect stderr in passing command.
                 // However if verification of stdout and stderr is opted-in - we will let that verification validate the stderr content
-                if (!(_options.VerifyCommandOutput ?? false) && !string.IsNullOrEmpty(commandResult.StdErr))
+                if (!(options.VerifyCommandOutput ?? false) && !string.IsNullOrEmpty(commandResult.StdErr))
                 {
                     throw new TemplateVerificationException(
                         string.Format(
@@ -96,10 +100,15 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
                 }
             }
 
-            await VerifyResult(_options, commandResult).ConfigureAwait(false);
+            await VerifyResult(options, commandResult, string.IsNullOrEmpty(sourceFile) ? string.Empty : Path.GetDirectoryName(sourceFile)!)
+                .ConfigureAwait(false);
         }
 
-        internal static Task CreateVerificationTask(string contentDir, TemplateVerifierOptions options, IFileSystem fileSystem)
+        internal static Task CreateVerificationTask(
+            string contentDir,
+            string callerDir,
+            TemplateVerifierOptions options,
+            IFileSystem fileSystem)
         {
             List<string> exclusionsList = (options.DisableDefaultVerificationExcludePatterns ?? false)
                 ? new()
@@ -136,7 +145,12 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             }
 
             verifySettings.UseTypeName(options.TemplateName);
-            verifySettings.UseDirectory(options.ExpectationsDirectory ?? "VerifyExpectations");
+            string expectationsDir = options.ExpectationsDirectory ?? "VerifyExpectations";
+            if (!string.IsNullOrEmpty(callerDir) && !Path.IsPathRooted(expectationsDir))
+            {
+                expectationsDir = Path.Combine(callerDir, expectationsDir);
+            }
+            verifySettings.UseDirectory(expectationsDir);
             verifySettings.UseMethodName(EncodeArgsAsPath(options.TemplateSpecificArgs));
 
             if ((options.UniqueFor ?? UniqueForOption.None) != UniqueForOption.None)
@@ -322,7 +336,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             }
         }
 
-        private async Task VerifyResult(TemplateVerifierOptions args, CommandResultData commandResultData)
+        private async Task VerifyResult(TemplateVerifierOptions args, CommandResultData commandResultData, string callerDir)
         {
             UsesVerifyAttribute a = new UsesVerifyAttribute();
             // https://github.com/VerifyTests/Verify/blob/d8cbe38f527d6788ecadd6205c82803bec3cdfa6/src/Verify.Xunit/Verifier.cs#L10
@@ -331,7 +345,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             MethodInfo mi = v.Method;
             a.Before(mi);
 
-            if (_options.VerifyCommandOutput ?? false)
+            if (args.VerifyCommandOutput ?? false)
             {
                 if (_fileSystem.DirectoryExists(Path.Combine(commandResultData.WorkingDirectory, SpecialFiles.StandardStreamsDir)))
                 {
@@ -345,17 +359,17 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
                 _fileSystem.CreateDirectory(Path.Combine(commandResultData.WorkingDirectory, SpecialFiles.StandardStreamsDir));
 
                 await _fileSystem.WriteAllTextAsync(
-                    Path.Combine(commandResultData.WorkingDirectory, SpecialFiles.StandardStreamsDir, SpecialFiles.StdOut + (_options.StandardOutputFileExtension ?? SpecialFiles.DefaultExtension)),
+                    Path.Combine(commandResultData.WorkingDirectory, SpecialFiles.StandardStreamsDir, SpecialFiles.StdOut + (args.StandardOutputFileExtension ?? SpecialFiles.DefaultExtension)),
                     commandResultData.StdOut)
                     .ConfigureAwait(false);
 
                 await _fileSystem.WriteAllTextAsync(
-                        Path.Combine(commandResultData.WorkingDirectory, SpecialFiles.StandardStreamsDir, SpecialFiles.StdErr + (_options.StandardOutputFileExtension ?? SpecialFiles.DefaultExtension)),
+                        Path.Combine(commandResultData.WorkingDirectory, SpecialFiles.StandardStreamsDir, SpecialFiles.StdErr + (args.StandardOutputFileExtension ?? SpecialFiles.DefaultExtension)),
                         commandResultData.StdErr)
                     .ConfigureAwait(false);
             }
 
-            Task verifyTask = CreateVerificationTask(commandResultData.WorkingDirectory, args, _fileSystem);
+            Task verifyTask = CreateVerificationTask(commandResultData.WorkingDirectory, callerDir, args, _fileSystem);
 
             try
             {

@@ -59,8 +59,8 @@ Microsoft.TemplateEngine.Authoring.TemplateVerifier.UniqueForOption.RuntimeAndVe
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.UniqueForOption.TargetFramework = 16 -> Microsoft.TemplateEngine.Authoring.TemplateVerifier.UniqueForOption
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.UniqueForOption.TargetFrameworkAndVersion = 32 -> Microsoft.TemplateEngine.Authoring.TemplateVerifier.UniqueForOption
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.VerificationEngine
-Microsoft.TemplateEngine.Authoring.TemplateVerifier.VerificationEngine.Execute(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
-Microsoft.TemplateEngine.Authoring.TemplateVerifier.VerificationEngine.VerificationEngine(Microsoft.Extensions.Options.IOptions<Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions!>! optionsAccessor, Microsoft.Extensions.Logging.ILogger! logger) -> void
-Microsoft.TemplateEngine.Authoring.TemplateVerifier.VerificationEngine.VerificationEngine(Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions! options, Microsoft.Extensions.Logging.ILoggerFactory! loggerFactory) -> void
+Microsoft.TemplateEngine.Authoring.TemplateVerifier.VerificationEngine.Execute(Microsoft.Extensions.Options.IOptions<Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions!>! optionsAccessor, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken), string! sourceFile = "") -> System.Threading.Tasks.Task!
+Microsoft.TemplateEngine.Authoring.TemplateVerifier.VerificationEngine.VerificationEngine(Microsoft.Extensions.Logging.ILogger! logger) -> void
+Microsoft.TemplateEngine.Authoring.TemplateVerifier.VerificationEngine.VerificationEngine(Microsoft.Extensions.Logging.ILoggerFactory! loggerFactory) -> void
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.VerifyDirectory
 static readonly Microsoft.TemplateEngine.Authoring.TemplateVerifier.ScrubbersDefinition.Empty -> Microsoft.TemplateEngine.Authoring.TemplateVerifier.ScrubbersDefinition!
