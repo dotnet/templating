@@ -22,6 +22,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config
             2049, // NFS
             3659, // apple-sasl / PasswordServer [Apple addition]
             4045, // lockd
+            4190, // ManageSieve [Apple addition]
             5060, // SIP
             5061, // SIPS
             6000, // X11
@@ -31,10 +32,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config
             6667, // Standard IRC [Apple addition]
             6668, // Alternate IRC [Apple addition]
             6669, // Alternate IRC [Apple addition]
+            6679, // Alternate IRC SSL [Apple addition]
             6697, // IRC+SSL [Apple addition]
             10080, // amanda
-            4190, // ManageSieve [Apple addition]
-            6679, // Alternate IRC SSL [Apple addition]
         };
 
         internal GeneratePortNumberConfig(string variableName, string? dataType, int fallback, int low, int high)
