@@ -119,7 +119,6 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.UnitTests
                 IsCommandExpectedToFail = true,
                 OutputDirectory = workingDir,
                 VerifyCommandOutput = true,
-                UniqueFor = UniqueForOption.OsPlatform | UniqueForOption.OsPlatform,
             };
 
             VerificationEngine engine = new VerificationEngine(commandRunner, _log);
@@ -144,7 +143,6 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.UnitTests
                 IsCommandExpectedToFail = false,
                 OutputDirectory = workingDir,
                 VerifyCommandOutput = true,
-                UniqueFor = UniqueForOption.OsPlatform | UniqueForOption.OsPlatform,
             };
 
             VerificationEngine engine = new VerificationEngine(commandRunner, _log);
