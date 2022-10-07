@@ -10,4 +10,14 @@
     <ProjectReference Include="$(TestDir)Microsoft.TemplateEngine.TestHelper\Microsoft.TemplateEngine.TestHelper.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="TestTemplate\*" />
+    <Content Include="TestTemplate\**\*" Exclude="TestTemplate\**\bin\**;TestTemplate\**\obj\**" />
+    <None Include="TestTemplate\**\*" CopyToOutputDirectory="PreserveNewest" />
+
+    <Compile Remove="Expectations\**\*" />
+    <Content Include="Expectations\**\*" />
+    <None Include="Expectations\**\*" CopyToOutputDirectory="Never" />
+  </ItemGroup>
+
 </Project>

@@ -146,5 +146,33 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.IntegrationTests
 
             Directory.Delete(workingDir, true);
         }
+
+        [Fact]
+        public async void VerificationEngineSampleDogfoodTest()
+        {
+            string workingDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName().Replace(".", string.Empty));
+            string templateShortName = "TestAssets.SampleTestTemplate";
+
+            //get the template location
+            string executingAssemblyPath = this.GetType().Assembly.Location;
+            string templateLocation = Path.Combine(Path.GetDirectoryName(executingAssemblyPath)!, "TestTemplate");
+
+            TemplateVerifierOptions options = new TemplateVerifierOptions(templateName: templateShortName)
+            {
+                TemplateSpecificArgs = new string[] { "--paramB", "true" },
+                TemplatePath = templateLocation,
+                ExpectationsDirectory = "Expectations",
+                OutputDirectory = workingDir,
+                VerifyCommandOutput = true,
+                UniqueFor = UniqueForOption.RuntimeAndVersion,
+            }
+                .WithCustomScrubbers(
+                    ScrubbersDefinition.Empty
+                        .AddScrubber(sb => sb.Replace("B is enabled", "*******"))
+                );
+
+            VerificationEngine engine = new VerificationEngine(_log);
+            await engine.Execute(options);
+        }
     }
 }

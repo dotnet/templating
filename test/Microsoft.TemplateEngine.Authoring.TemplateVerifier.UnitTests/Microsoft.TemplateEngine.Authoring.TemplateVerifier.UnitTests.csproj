@@ -16,9 +16,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Expectations\*" />
+    <Compile Remove="Expectations\**\*" />
     <Content Include="Expectations\**\*" />
-    <None Include="Expectations\**\*" CopyToOutputDirectory="PreserveNewest " />
+    <None Include="Expectations\**\*" CopyToOutputDirectory="Never" />
   </ItemGroup>
 
 </Project>
