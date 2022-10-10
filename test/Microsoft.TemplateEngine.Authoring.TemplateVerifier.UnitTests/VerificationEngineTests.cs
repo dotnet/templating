@@ -33,9 +33,10 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.UnitTests
                 { "out.dll", "a1 b2" }
             };
 
-            IFileSystem fileSystem = A.Fake<IFileSystem>();
+            IPhysicalFileSystemEx fileSystem = A.Fake<IPhysicalFileSystemEx>();
             A.CallTo(() => fileSystem.EnumerateFiles(verifyLocation, "*", SearchOption.AllDirectories)).Returns(files.Keys);
-            A.CallTo(() => fileSystem.ReadAllTextAsync(A<string>._)).ReturnsLazily((string fileName) => Task.FromResult(files[fileName]));
+            A.CallTo(() => fileSystem.ReadAllTextAsync(A<string>._, A<CancellationToken>._))
+                .ReturnsLazily((string fileName, CancellationToken _) => Task.FromResult(files[fileName]));
 
             Dictionary<string, string> resultContents = new Dictionary<string, string>();
 

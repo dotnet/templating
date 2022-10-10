@@ -5,12 +5,13 @@ using FluentAssertions;
 using Microsoft.TemplateEngine.Authoring.TemplateVerifier;
 using Microsoft.TemplateEngine.TestHelper;
 using Microsoft.TemplateEngine.TestHelper.Commands;
+using Microsoft.TemplateEngine.Tests;
 using Xunit.Abstractions;
 
 namespace Microsoft.TemplateEngine.Authoring.CLI.IntegrationTests
 {
     [UsesVerify]
-    public class VerifyCommandTests
+    public class VerifyCommandTests : TestBase
     {
         private readonly ITestOutputHelper _log;
 
@@ -132,7 +133,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.IntegrationTests
 
             //get the template location
             string executingAssemblyPath = this.GetType().Assembly.Location;
-            string templateLocation = Path.Combine(Path.GetDirectoryName(executingAssemblyPath)!, "TestTemplate");
+            string templateLocation = Path.Combine(TestTemplatesLocation, "TestTemplate");
 
             var cmd = new BasicCommand(
                 _log,

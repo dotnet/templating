@@ -29,7 +29,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
         private readonly ILogger _logger;
         private readonly ILoggerFactory? _loggerFactory;
         private readonly ICommandRunner _commandRunner = new CommandRunner();
-        private readonly IFileSystem _fileSystem = new PhysicalFileSystem();
+        private readonly IPhysicalFileSystemEx _fileSystem = new PhysicalFileSystemEx();
 
         static VerificationEngine()
         {
@@ -108,7 +108,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             string contentDir,
             string callerDir,
             TemplateVerifierOptions options,
-            IFileSystem fileSystem)
+            IPhysicalFileSystemEx fileSystem)
         {
             List<string> exclusionsList = (options.DisableDefaultVerificationExcludePatterns ?? false)
                 ? new()
@@ -293,7 +293,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             string contentDir,
             List<Glob> globs,
             ScrubbersDefinition? scrubbers,
-            IFileSystem fileSystem)
+            IPhysicalFileSystemEx fileSystem)
         {
             foreach (string filePath in fileSystem.EnumerateFiles(contentDir, "*", SearchOption.AllDirectories))
             {

@@ -14,10 +14,6 @@
 
   <ItemGroup>
     <Compile Include="..\Shared\**\*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)" />
-
-    <Compile Remove="TestTemplate\*" />
-    <Content Include="TestTemplate\**\*" Exclude="TestTemplate\**\bin\**;TestTemplate\**\obj\**" />
-    <None Include="TestTemplate\**\*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   
 </Project>
