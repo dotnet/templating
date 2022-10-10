@@ -1,19 +1,12 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.TemplateFiltering;
 using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.IDE.IntegrationTests.Utils;
 using Microsoft.TemplateEngine.TestHelper;
 using Microsoft.TemplateEngine.Utils;
-using VerifyXunit;
-using Xunit;
 
 namespace Microsoft.TemplateEngine.IDE.IntegrationTests
 {
@@ -48,8 +41,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
                 new FileChange ("bar/bar.cs", "test/test.cs", ChangeKind.Create),
             };
             IFileChangeComparer comparer = new IFileChangeComparer();
-            Assert.NotNull(result.CreationEffects?.FileChanges);
-
+            Assert.NotNull(result.CreationEffects);
             Assert.Equal(
                 expectedFileChanges.OrderBy(s => s, comparer),
                 result.CreationEffects.FileChanges.OrderBy(s => s, comparer),
@@ -95,7 +87,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
                 new FileChange ("Program.cs", "Program.cs", ChangeKind.Create),
             };
             IFileChangeComparer comparer = new IFileChangeComparer();
-            Assert.NotNull(result.CreationEffects?.FileChanges);
+            Assert.NotNull(result.CreationEffects);
             Assert.Equal(
                 expectedFileChanges.OrderBy(s => s, comparer),
                 result.CreationEffects.FileChanges.OrderBy(s => s, comparer),

@@ -69,7 +69,7 @@ stages:
           ${{ if eq(variables['System.TeamProject'], 'public') }}:
             vmImage: windows-2019
           ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-            name: NetCore1ESPool-Internal
+            name: NetCore1ESPool-Svc-Internal
             demands: ImageOverride -equals build.windows.10.amd64.vs2019
         variables:
         - _InternalBuildArgs: ''
@@ -154,9 +154,9 @@ stages:
         - job: Linux
           pool:
             ${{ if eq(variables['System.TeamProject'], 'public') }}:
-              vmImage: ubuntu-18.04 
+              vmImage: ubuntu-latest 
             ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-              name: NetCore1ESPool-Internal
+              name: NetCore1ESPool-Svc-Internal
               demands: ImageOverride -equals Build.Ubuntu.1804.Amd64
           strategy:
             matrix:
