@@ -4,6 +4,7 @@
 using System.CommandLine;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Authoring.CLI.Commands;
+using Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify;
 
 namespace Microsoft.TemplateEngine.Authoring.CLI
 {
@@ -12,10 +13,10 @@ namespace Microsoft.TemplateEngine.Authoring.CLI
         internal static async Task<int> Main(string[] args)
         {
             using ILoggerFactory loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
-            ILogger logger = loggerFactory.CreateLogger<Program>();
 
             RootCommand rootCommand = new("dotnet-template-authoring");
             rootCommand.AddCommand(new LocalizeCommand(loggerFactory));
+            rootCommand.AddCommand(new VerifyCommand(loggerFactory));
 
             return await rootCommand.InvokeAsync(args).ConfigureAwait(false);
         }
