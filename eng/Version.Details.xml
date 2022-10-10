@@ -27,9 +27,9 @@
       <Uri>https://github.com/dotnet/command-line-api</Uri>
       <Sha>4b605851d45131db2374ba711f2443040521d702</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.0.0-preview1.22501.1">
+    <Dependency Name="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.0.0-preview1.22504.1">
       <Uri>https://github.com/dotnet/roslyn-analyzers</Uri>
-      <Sha>7916ed7e9bf5efa57a35c2a493df53e10c16bd07</Sha>
+      <Sha>846a766f73caa82608db6fee9f2860004298449f</Sha>
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
