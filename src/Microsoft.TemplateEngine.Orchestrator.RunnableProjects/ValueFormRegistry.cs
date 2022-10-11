@@ -1,8 +1,6 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,13 +37,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         private static readonly IValueFormFactory DefaultForm = new IdentityValueFormFactory();
 
-        internal static IReadOnlyDictionary<string, IValueFormFactory> FormLookup
-        {
-            get
-            {
-                return AllForms.ToDictionary(ff => ff.Identifier, ff => ff, StringComparer.OrdinalIgnoreCase);
-            }
-        }
+        internal static IReadOnlyDictionary<string, IValueFormFactory> FormLookup => AllForms.ToDictionary(ff => ff.Identifier, ff => ff, StringComparer.OrdinalIgnoreCase);
 
         internal static IValueForm GetForm(string name, JObject? obj)
         {

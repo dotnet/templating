@@ -1,8 +1,6 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System;
 using Newtonsoft.Json.Linq;
 
@@ -22,7 +20,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
             DefaultValue = defaultOverride ?? jObject.ToString(nameof(DefaultValue));
             IsRequired = ParseIsRequiredField(jObject, !symbolConditionsSupported);
             DataType = jObject.ToString(nameof(DataType));
-            if (!jObject.TryGetValue(nameof(Forms), StringComparison.OrdinalIgnoreCase, out JToken? formsToken) || !(formsToken is JObject formsObject))
+            if (!jObject.TryGetValue(nameof(Forms), StringComparison.OrdinalIgnoreCase, out JToken? formsToken) || formsToken is not JObject formsObject)
             {
                 // no value forms explicitly defined, use the default ("identity")
                 Forms = SymbolValueFormsModel.Default;
@@ -81,15 +79,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
 
         private bool ParseIsRequiredField(JToken token, bool throwOnError)
         {
-            JToken? isRequiredToken;
-            if (!token.TryGetValue(nameof(IsRequired), out isRequiredToken))
+            if (!token.TryGetValue(nameof(IsRequired), out JToken? isRequiredToken))
             {
                 return false;
             }
 
-            bool value;
             if (
-                !TryGetIsRequiredField(isRequiredToken!, out value)
+                !TryGetIsRequiredField(isRequiredToken!, out bool value)
                 &&
                 throwOnError)
             {

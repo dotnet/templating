@@ -32,11 +32,13 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Results
                                 r =>
                                 {
                                     PackToTemplateEntry packToTemplateEntry = new PackToTemplateEntry(
-                                            r.Version ?? "",
-                                            r.Templates.Select(t => new TemplateIdentificationEntry(t.Identity, t.GroupIdentity)).ToList());
-                                    packToTemplateEntry.TotalDownloads = r.TotalDownloads;
-                                    packToTemplateEntry.Owners = r.Owners;
-                                    packToTemplateEntry.Verified = r.Verified;
+                                            r.Version ?? string.Empty,
+                                            r.Templates.Select(t => new TemplateIdentificationEntry(t.Identity, t.GroupIdentity)).ToList())
+                                    {
+                                        TotalDownloads = r.TotalDownloads,
+                                        Owners = r.Owners,
+                                        Verified = r.Verified
+                                    };
                                     return packToTemplateEntry;
                                 });
 

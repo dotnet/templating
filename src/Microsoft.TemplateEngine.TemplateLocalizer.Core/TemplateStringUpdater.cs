@@ -43,7 +43,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
         {
             if (!dryRun)
             {
-                Directory.CreateDirectory(targetDirectory);
+                _ = Directory.CreateDirectory(targetDirectory);
             }
 
             foreach (string language in languages)
@@ -80,7 +80,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
                     .ConfigureAwait(false)
                     ?? new Dictionary<string, string>();
             }
-            catch (IOException ex) when (ex is DirectoryNotFoundException || ex is FileNotFoundException)
+            catch (IOException ex) when (ex is DirectoryNotFoundException or FileNotFoundException)
             {
                 // templatestrings.json file doesn't exist. It will be created from scratch.
                 return new();
@@ -100,7 +100,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
             ILogger logger,
             CancellationToken cancellationToken)
         {
-            JsonWriterOptions writerOptions = new JsonWriterOptions()
+            JsonWriterOptions writerOptions = new()
             {
                 // Allow unescaped characters in the strings. This allows writing "aren't" instead of "aren\u0027t".
                 // This is only considered unsafe in a context where symbols may be interpreted as special characters.
@@ -114,8 +114,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
 
             foreach (TemplateString templateString in templateStrings)
             {
-                string? localizedText = null;
-                if (!forceUpdate && (existingStrings?.TryGetValue(templateString.LocalizationKey, out localizedText) ?? false))
+                if (!forceUpdate && (existingStrings?.TryGetValue(templateString.LocalizationKey, out string? localizedText) ?? false))
                 {
                     logger.LogDebug(LocalizableStrings.stringUpdater_log_localizedStringAlreadyExists, templateString.LocalizationKey);
                 }
@@ -146,10 +145,10 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
             }
 
             logger.LogDebug(LocalizableStrings.stringUpdater_log_openingTemplatesJson, filePath);
-            using FileStream fileStream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            using FileStream fileStream = new(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
             await TruncateFileWhilePreservingBom(fileStream, cancellationToken).ConfigureAwait(false);
 
-            using Utf8JsonWriter jsonWriter = new Utf8JsonWriter(fileStream, writerOptions);
+            using Utf8JsonWriter jsonWriter = new(fileStream, writerOptions);
 
             jsonWriter.WriteStartObject();
 
@@ -173,7 +172,8 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
         private static async Task TruncateFileWhilePreservingBom(FileStream fileStream, CancellationToken cancellationToken)
         {
             byte[] preamble = new byte[Utf8Bom.Length];
-            int offset = 0, read = 0;
+            int offset = 0;
+            int read;
             // Read bytes from the stream until we fill the preamble array or hit EOF.
             do
             {

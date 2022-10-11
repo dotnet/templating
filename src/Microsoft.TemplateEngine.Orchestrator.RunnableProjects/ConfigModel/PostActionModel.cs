@@ -1,11 +1,10 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Localization;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
@@ -39,15 +38,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
         /// </summary>
         public string? Description
         {
-            get
-            {
-                return _description;
-            }
+            get => _description;
 
-            internal init
-            {
-                _description = value;
-            }
+            internal init => _description = value;
         }
 
         /// <summary>
@@ -129,7 +122,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
             return localizedPostActions;
         }
 
-        internal void Localize(IPostActionLocalizationModel locModel)
+        internal void Localize(PostActionLocalizationModel locModel)
         {
             _description = locModel.Description ?? Description;
 

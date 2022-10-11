@@ -1,8 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System.Runtime.InteropServices;
 using FakeItEasy;
 using Microsoft.TemplateEngine.Abstractions;
@@ -42,10 +40,10 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 
             var host = A.Fake<ITemplateEngineHost>();
             A.CallTo(() => host.HostIdentifier).Returns("hostID");
-            A.CallTo(() => host.Version).Returns("");
+            A.CallTo(() => host.Version).Returns(string.Empty);
             Assert.Throws<ArgumentException>(() => new DefaultPathInfo(environment, host));
 
-            A.CallTo(() => host.HostIdentifier).Returns("");
+            A.CallTo(() => host.HostIdentifier).Returns(string.Empty);
             A.CallTo(() => host.Version).Returns("ver");
             Assert.Throws<ArgumentException>(() => new DefaultPathInfo(environment, host));
         }

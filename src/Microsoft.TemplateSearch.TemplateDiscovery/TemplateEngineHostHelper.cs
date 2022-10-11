@@ -27,13 +27,10 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
                 hostVersion = DefaultHostVersion;
             }
 
-            if (preferences == null)
-            {
-                preferences = DefaultPreferences;
-            }
+            preferences ??= DefaultPreferences;
 
             var builtIns = new List<(Type, IIdentifiedComponent)>();
-            builtIns.AddRange(TemplateEngine.Edge.Components.AllComponents);
+            builtIns.AddRange(Components.AllComponents);
             builtIns.AddRange(TemplateEngine.Orchestrator.RunnableProjects.Components.AllComponents);
 
             // use "dotnetcli" as a fallback host so the correct host specific files are read.

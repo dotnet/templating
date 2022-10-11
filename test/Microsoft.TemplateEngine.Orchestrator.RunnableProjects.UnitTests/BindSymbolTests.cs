@@ -1,8 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,7 +24,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
 {
     public class BindSymbolTests : IClassFixture<EnvironmentSettingsHelper>
     {
-        private EnvironmentSettingsHelper _environmentSettingsHelper;
+        private readonly EnvironmentSettingsHelper _environmentSettingsHelper;
 
         public BindSymbolTests(EnvironmentSettingsHelper environmentSettingsHelper)
         {
@@ -72,26 +70,26 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
                 }
             };
 
-            string sourceSnippet = @"
-%R1%
-%R2%
-%R3%
-%R4%
-";
+            string sourceSnippet = """
+            %R1%
+            %R2%
+            %R3%
+            %R4%
+            """;
 
-            string expectedSnippet = @"
-TestHost
-MyValue
-TestHost
-MyValue
-";
+            string expectedSnippet = """
+            TestHost
+            MyValue
+            TestHost
+            MyValue
+            """;
 
-            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>();
-            // template.json
-            templateSourceFiles.Add(TestFileSystemHelper.DefaultConfigRelativePath, JsonConvert.SerializeObject(templateConfig, Formatting.Indented));
-
-            //content
-            templateSourceFiles.Add("sourceFile", sourceSnippet);
+            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>
+            {
+                // template.json
+                { TestFileSystemUtils.DefaultConfigRelativePath, JsonConvert.SerializeObject(templateConfig, Formatting.Indented) },
+                { "sourceFile", sourceSnippet }
+            };
 
             //
             // Dependencies preparation and mounting
@@ -102,14 +100,14 @@ MyValue
 
             IEngineEnvironmentSettings settings = _environmentSettingsHelper.CreateEnvironment(hostIdentifier: "TestHost", virtualize: true, environment: environment);
             ((TestHost)settings.Host).HostParamDefaults["HostIdentifier"] = "TestHost";
-            string sourceBasePath = FileSystemHelpers.GetNewVirtualizedPath(settings);
-            string targetDir = FileSystemHelpers.GetNewVirtualizedPath(settings);
+            string sourceBasePath = settings.GetTempVirtualizedPath();
+            string targetDir = settings.GetTempVirtualizedPath();
 
-            TestFileSystemHelper.WriteTemplateSource(settings, sourceBasePath, templateSourceFiles);
-            IMountPoint? sourceMountPoint = TestFileSystemHelper.CreateMountPoint(settings, sourceBasePath);
+            TestFileSystemUtils.WriteTemplateSource(settings, sourceBasePath, templateSourceFiles);
+            using IMountPoint sourceMountPoint = settings.MountPath(sourceBasePath);
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
             TemplateConfigModel configModel = TemplateConfigModel.FromJObject(JObject.FromObject(templateConfig));
-            RunnableProjectConfig runnableConfig = new RunnableProjectConfig(settings, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
+            RunnableProjectConfig runnableConfig = new RunnableProjectConfig(settings, rpg, configModel, sourceMountPoint.Root);
             ParameterSetData parametersData = new ParameterSetData(runnableConfig);
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
 
@@ -154,13 +152,14 @@ MyValue
                 }
             };
 
-            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>();
-            // template.json
-            templateSourceFiles.Add(TestFileSystemHelper.DefaultConfigRelativePath, JsonConvert.SerializeObject(templateConfig, Formatting.Indented));
-
-            //content
-            templateSourceFiles.Add("_R1_.cs", "");
-            templateSourceFiles.Add("_R2_.cs", "");
+            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>
+            {
+                // template.json
+                { TestFileSystemUtils.DefaultConfigRelativePath, JsonConvert.SerializeObject(templateConfig, Formatting.Indented) },
+                //content
+                { "_R1_.cs", string.Empty },
+                { "_R2_.cs", string.Empty }
+            };
 
             //
             // Dependencies preparation and mounting
@@ -171,14 +170,14 @@ MyValue
 
             IEngineEnvironmentSettings settings = _environmentSettingsHelper.CreateEnvironment(hostIdentifier: "TestHost", virtualize: true, environment: environment);
             ((TestHost)settings.Host).HostParamDefaults["HostIdentifier"] = "TestHost";
-            string sourceBasePath = FileSystemHelpers.GetNewVirtualizedPath(settings);
-            string targetDir = FileSystemHelpers.GetNewVirtualizedPath(settings);
+            string sourceBasePath = settings.GetTempVirtualizedPath();
+            string targetDir = settings.GetTempVirtualizedPath();
 
-            TestFileSystemHelper.WriteTemplateSource(settings, sourceBasePath, templateSourceFiles);
-            IMountPoint? sourceMountPoint = TestFileSystemHelper.CreateMountPoint(settings, sourceBasePath);
+            TestFileSystemUtils.WriteTemplateSource(settings, sourceBasePath, templateSourceFiles);
+            using IMountPoint sourceMountPoint = settings.MountPath(sourceBasePath);
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
             TemplateConfigModel configModel = TemplateConfigModel.FromJObject(JObject.FromObject(templateConfig));
-            RunnableProjectConfig runnableConfig = new RunnableProjectConfig(settings, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
+            RunnableProjectConfig runnableConfig = new RunnableProjectConfig(settings, rpg, configModel, sourceMountPoint.Root);
             ParameterSetData parametersData = new ParameterSetData(runnableConfig);
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
 
@@ -186,7 +185,7 @@ MyValue
             // Running the actual scenario: template files processing and generating output (including macros processing)
             //
 
-            var result = await rpg.CreateAsync(settings, runnableConfig, sourceDir, parametersData, targetDir, CancellationToken.None);
+            _ = await rpg.CreateAsync(settings, runnableConfig, sourceDir, parametersData, targetDir, CancellationToken.None);
 
             //
             // Veryfying the outputs
@@ -240,26 +239,27 @@ MyValue
 
             string sourceSnippet = @"%VAL%";
 
-            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>();
-            // template.json
-            templateSourceFiles.Add(TestFileSystemHelper.DefaultConfigRelativePath, JsonConvert.SerializeObject(templateConfig, Formatting.Indented));
-
-            //content
-            templateSourceFiles.Add("sourceFile", sourceSnippet);
+            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>
+            {
+                // template.json
+                { TestFileSystemUtils.DefaultConfigRelativePath, JsonConvert.SerializeObject(templateConfig, Formatting.Indented) },
+                //content
+                { "sourceFile", sourceSnippet }
+            };
 
             //
             // Dependencies preparation and mounting
             //
             IEngineEnvironmentSettings settings = _environmentSettingsHelper.CreateEnvironment(hostIdentifier: "TestHost", virtualize: true);
             ((TestHost)settings.Host).HostParamDefaults["HostIdentifier"] = "TestHost";
-            string sourceBasePath = FileSystemHelpers.GetNewVirtualizedPath(settings);
-            string targetDir = FileSystemHelpers.GetNewVirtualizedPath(settings);
+            string sourceBasePath = settings.GetTempVirtualizedPath();
+            string targetDir = settings.GetTempVirtualizedPath();
 
-            TestFileSystemHelper.WriteTemplateSource(settings, sourceBasePath, templateSourceFiles);
-            IMountPoint? sourceMountPoint = TestFileSystemHelper.CreateMountPoint(settings, sourceBasePath);
+            TestFileSystemUtils.WriteTemplateSource(settings, sourceBasePath, templateSourceFiles);
+            using IMountPoint sourceMountPoint = settings.MountPath(sourceBasePath);
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
             TemplateConfigModel configModel = TemplateConfigModel.FromJObject(JObject.FromObject(templateConfig));
-            RunnableProjectConfig runnableConfig = new RunnableProjectConfig(settings, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
+            RunnableProjectConfig runnableConfig = new RunnableProjectConfig(settings, rpg, configModel, sourceMountPoint.Root);
             ParameterSetData parametersData = new ParameterSetData(runnableConfig);
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
 
@@ -314,12 +314,13 @@ MyValue
 
             string sourceSnippet = @"%VAL%";
 
-            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>();
-            // template.json
-            templateSourceFiles.Add(TestFileSystemHelper.DefaultConfigRelativePath, JsonConvert.SerializeObject(templateConfig, Formatting.Indented));
-
-            //content
-            templateSourceFiles.Add("sourceFile", sourceSnippet);
+            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>
+            {
+                // template.json
+                { TestFileSystemUtils.DefaultConfigRelativePath, JsonConvert.SerializeObject(templateConfig, Formatting.Indented) },
+                //content
+                { "sourceFile", sourceSnippet }
+            };
 
             //
             // Dependencies preparation and mounting
@@ -327,22 +328,22 @@ MyValue
 
             var additionalComponents = new[]
             {
-                (typeof(IBindSymbolSource), (IIdentifiedComponent)new TestBindSymbolSource(Guid.NewGuid())),
-                (typeof(IBindSymbolSource), (IIdentifiedComponent)new TestBindSymbolSource(Guid.NewGuid()))
+                (typeof(IBindSymbolSource), new TestBindSymbolSource(Guid.NewGuid())),
+                (typeof(IBindSymbolSource), new TestBindSymbolSource(Guid.NewGuid()) as IIdentifiedComponent)
             };
 
             List<(LogLevel, string)> loggedMessages = new List<(LogLevel, string)>();
             InMemoryLoggerProvider loggerProvider = new InMemoryLoggerProvider(loggedMessages);
 
             IEngineEnvironmentSettings settings = _environmentSettingsHelper.CreateEnvironment(hostIdentifier: "TestHost", virtualize: true, additionalComponents: additionalComponents, addLoggerProviders: new[] { loggerProvider });
-            string sourceBasePath = FileSystemHelpers.GetNewVirtualizedPath(settings);
-            string targetDir = FileSystemHelpers.GetNewVirtualizedPath(settings);
+            string sourceBasePath = settings.GetTempVirtualizedPath();
+            string targetDir = settings.GetTempVirtualizedPath();
 
-            TestFileSystemHelper.WriteTemplateSource(settings, sourceBasePath, templateSourceFiles);
-            IMountPoint? sourceMountPoint = TestFileSystemHelper.CreateMountPoint(settings, sourceBasePath);
+            TestFileSystemUtils.WriteTemplateSource(settings, sourceBasePath, templateSourceFiles);
+            using IMountPoint sourceMountPoint = settings.MountPath(sourceBasePath);
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
             TemplateConfigModel configModel = TemplateConfigModel.FromJObject(JObject.FromObject(templateConfig));
-            RunnableProjectConfig runnableConfig = new RunnableProjectConfig(settings, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
+            RunnableProjectConfig runnableConfig = new RunnableProjectConfig(settings, rpg, configModel, sourceMountPoint.Root);
             ParameterSetData parametersData = new ParameterSetData(runnableConfig);
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
 
@@ -384,12 +385,13 @@ MyValue
 
             string sourceSnippet = @"%VAL%";
 
-            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>();
-            // template.json
-            templateSourceFiles.Add(TestFileSystemHelper.DefaultConfigRelativePath, JsonConvert.SerializeObject(templateConfig, Formatting.Indented));
-
-            //content
-            templateSourceFiles.Add("sourceFile", sourceSnippet);
+            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>
+            {
+                // template.json
+                { TestFileSystemUtils.DefaultConfigRelativePath, JsonConvert.SerializeObject(templateConfig, Formatting.Indented) },
+                //content
+                { "sourceFile", sourceSnippet }
+            };
 
             //
             // Dependencies preparation and mounting
@@ -405,14 +407,14 @@ MyValue
             InMemoryLoggerProvider loggerProvider = new InMemoryLoggerProvider(loggedMessages);
 
             IEngineEnvironmentSettings settings = _environmentSettingsHelper.CreateEnvironment(hostIdentifier: "TestHost", virtualize: true, additionalComponents: additionalComponents, addLoggerProviders: new[] { loggerProvider });
-            string sourceBasePath = FileSystemHelpers.GetNewVirtualizedPath(settings);
-            string targetDir = FileSystemHelpers.GetNewVirtualizedPath(settings);
+            string sourceBasePath = settings.GetTempVirtualizedPath();
+            string targetDir = settings.GetTempVirtualizedPath();
 
-            TestFileSystemHelper.WriteTemplateSource(settings, sourceBasePath, templateSourceFiles);
-            IMountPoint? sourceMountPoint = TestFileSystemHelper.CreateMountPoint(settings, sourceBasePath);
+            TestFileSystemUtils.WriteTemplateSource(settings, sourceBasePath, templateSourceFiles);
+            using IMountPoint sourceMountPoint = settings.MountPath(sourceBasePath);
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
             TemplateConfigModel configModel = TemplateConfigModel.FromJObject(JObject.FromObject(templateConfig));
-            RunnableProjectConfig runnableConfig = new RunnableProjectConfig(settings, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
+            RunnableProjectConfig runnableConfig = new RunnableProjectConfig(settings, rpg, configModel, sourceMountPoint.Root);
             ParameterSetData parametersData = new ParameterSetData(runnableConfig);
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
 
@@ -426,7 +428,7 @@ MyValue
             Assert.Equal("%VAL%", resultContent);
 
             var warningMessages = loggedMessages.Where(log => log.Item1 == LogLevel.Warning).Select(log => log.Item2);
-            Assert.Equal(1, warningMessages.Count());
+            Assert.Single(warningMessages);
             Assert.Contains(string.Format(LocalizableStrings.BindSymbolEvaluator_Warning_EvaluationError, "notPrefixed"), warningMessages);
             Assert.False(symbolSource.GetBoundValueAsync_WasCalled);
         }
@@ -467,24 +469,25 @@ MyValue
                 }
             };
 
-            string sourceSnippet = @"
-%R1%
-%R2%
-%R3%
-";
+            string sourceSnippet = """
+            %R1%
+            %R2%
+            %R3%
+            """;
 
-            string expectedSnippet = @"
-TestHost
-MyValue
-expectedDefValue
-";
+            string expectedSnippet = """
+            TestHost
+            MyValue
+            expectedDefValue
+            """;
 
-            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>();
-            // template.json
-            templateSourceFiles.Add(TestFileSystemHelper.DefaultConfigRelativePath, JsonConvert.SerializeObject(templateConfig, Formatting.Indented));
-
-            //content
-            templateSourceFiles.Add("sourceFile", sourceSnippet);
+            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>
+            {
+                // template.json
+                { TestFileSystemUtils.DefaultConfigRelativePath, JsonConvert.SerializeObject(templateConfig, Formatting.Indented) },
+                //content
+                { "sourceFile", sourceSnippet }
+            };
 
             //
             // Dependencies preparation and mounting
@@ -495,14 +498,14 @@ expectedDefValue
 
             IEngineEnvironmentSettings settings = _environmentSettingsHelper.CreateEnvironment(hostIdentifier: "TestHost", virtualize: true, environment: environment);
             ((TestHost)settings.Host).HostParamDefaults["HostIdentifier"] = "TestHost";
-            string sourceBasePath = FileSystemHelpers.GetNewVirtualizedPath(settings);
-            string targetDir = FileSystemHelpers.GetNewVirtualizedPath(settings);
+            string sourceBasePath = settings.GetTempVirtualizedPath();
+            string targetDir = settings.GetTempVirtualizedPath();
 
-            TestFileSystemHelper.WriteTemplateSource(settings, sourceBasePath, templateSourceFiles);
-            IMountPoint? sourceMountPoint = TestFileSystemHelper.CreateMountPoint(settings, sourceBasePath);
+            TestFileSystemUtils.WriteTemplateSource(settings, sourceBasePath, templateSourceFiles);
+            using IMountPoint sourceMountPoint = settings.MountPath(sourceBasePath);
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
             TemplateConfigModel configModel = TemplateConfigModel.FromJObject(JObject.FromObject(templateConfig));
-            RunnableProjectConfig runnableConfig = new RunnableProjectConfig(settings, rpg, configModel, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
+            RunnableProjectConfig runnableConfig = new RunnableProjectConfig(settings, rpg, configModel, sourceMountPoint.Root);
             ParameterSetData parametersData = new ParameterSetData(runnableConfig);
             IDirectory sourceDir = sourceMountPoint!.DirectoryInfo("/")!;
 

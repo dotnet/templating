@@ -23,25 +23,25 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig
         public IEnumerable<IOperationProvider> ConfigureFromJson(string configuration, IDirectory templateRoot)
         {
             JObject rawConfiguration = JObject.Parse(configuration);
-            string original = rawConfiguration.ToString("original");
-            string replacement = rawConfiguration.ToString("replacement");
-            string id = rawConfiguration.ToString("id");
+            string? original = rawConfiguration.ToString("original");
+            string? replacement = rawConfiguration.ToString("replacement");
+            string? id = rawConfiguration.ToString("id");
             bool onByDefault = rawConfiguration.ToBool("onByDefault");
 
-            JArray onlyIf = rawConfiguration.Get<JArray>("onlyIf");
+            JArray? onlyIf = rawConfiguration.Get<JArray>("onlyIf");
             TokenConfig coreConfig = original.TokenConfigBuilder();
 
             if (onlyIf != null)
             {
                 foreach (JToken entry in onlyIf.Children())
                 {
-                    if (!(entry is JObject x))
+                    if (entry is not JObject)
                     {
                         continue;
                     }
 
-                    string before = entry.ToString("before");
-                    string after = entry.ToString("after");
+                    string? before = entry.ToString("before");
+                    string? after = entry.ToString("after");
                     TokenConfig entryConfig = coreConfig;
 
                     if (!string.IsNullOrEmpty(before))
@@ -63,10 +63,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig
             }
         }
 
-        internal static IOperationProvider Setup(IEngineEnvironmentSettings environmentSettings, IReplacementTokens tokens, IVariableCollection variables)
+        internal static IOperationProvider? Setup(IEngineEnvironmentSettings environmentSettings, IReplacementTokens tokens, IVariableCollection variables)
         {
             if (variables.TryGetValue(tokens.VariableName, out object newValueObject))
             {
+                if (newValueObject is null)
+                {
+                    return null;
+                }
                 string newValue = newValueObject.ToString();
                 return new Replacement(tokens.OriginalValue, newValue, null, true);
             }

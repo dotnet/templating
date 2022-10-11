@@ -24,23 +24,22 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             IVariableCollection vars,
             IMacroConfig rawConfig)
         {
-            JoinMacroConfig config = rawConfig as JoinMacroConfig;
-            if (config == null)
+            if (rawConfig is not JoinMacroConfig config)
             {
                 throw new InvalidCastException("Couldn't cast the rawConfig as ConcatenationMacroConfig");
             }
 
-            List<string> values = new List<string>();
-            foreach (KeyValuePair<string, string> symbol in config.Symbols)
+            List<string?> values = new();
+            foreach (KeyValuePair<string?, string?> symbol in config.Symbols)
             {
                 switch (symbol.Key)
                 {
                     case "ref":
-                        if (!vars.TryGetValue(symbol.Value, out object working))
+                        if (string.IsNullOrEmpty(symbol.Value) || !vars.TryGetValue(symbol.Value!, out object working))
                         {
                             values.Add(string.Empty);
                         }
-                        else if (working != null && working is MultiValueParameter multiValue)
+                        else if (working is not null and MultiValueParameter multiValue)
                         {
                             values.AddRange(multiValue.Values);
                         }
@@ -65,12 +64,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 
         public IMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IMacroConfig rawConfig)
         {
-            if (!(rawConfig is GeneratedSymbolDeferredMacroConfig deferredConfig))
+            if (rawConfig is not GeneratedSymbolDeferredMacroConfig deferredConfig)
             {
                 throw new InvalidCastException("Couldn't cast the rawConfig as a GeneratedSymbolDeferredMacroConfig");
             }
 
-            string separator = string.Empty;
+            string? separator = string.Empty;
             if (deferredConfig.Parameters.TryGetValue("separator", out JToken separatorToken))
             {
                 separator = separatorToken?.ToString();
@@ -81,16 +80,16 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
                 removeEmptyValuesToken != null &&
                 removeEmptyValuesToken.ToBool();
 
-            List<KeyValuePair<string, string>> symbolsList = new List<KeyValuePair<string, string>>();
+            List<KeyValuePair<string?, string?>> symbolsList = new();
             if (deferredConfig.Parameters.TryGetValue("symbols", out JToken symbolsToken))
             {
                 JArray switchJArray = (JArray)symbolsToken;
                 foreach (JToken switchInfo in switchJArray)
                 {
                     JObject map = (JObject)switchInfo;
-                    string condition = map.ToString("type");
-                    string value = map.ToString("value");
-                    symbolsList.Add(new KeyValuePair<string, string>(condition, value));
+                    string? condition = map.ToString("type");
+                    string? value = map.ToString("value");
+                    symbolsList.Add(new KeyValuePair<string?, string?>(condition, value));
                 }
             }
 

@@ -68,8 +68,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
                 closeCloseElementToken,
                 selfClosingElementEndToken,
                 openCommentToken,
-                closeCommentToken
-            );
+                closeCommentToken);
 
             IReadOnlyList<IToken> start = new[] { Tokens.OpenConditionExpression.ToToken(processorState.Encoding) };
             return new Impl(this, start, structureTrie, closeConditionTrie, scanBackTrie, mapping, _id, _initialState);
@@ -103,10 +102,9 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
             public int HandleMatch(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int token)
             {
-                bool flag;
-                if (processor.Config.Flags.TryGetValue(Conditional.OperationName, out flag) && !flag)
+                if (processor.Config.Flags.TryGetValue(Conditional.OperationName, out bool flag) && !flag)
                 {
-                    processor.Write(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
+                    processor.WriteToTarget(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
                     return Tokens[token].Length;
                 }
 
@@ -118,12 +116,11 @@ namespace Microsoft.TemplateEngine.Core.Operations
                 int pos = 0;
                 int len = conditionBytes.Count;
 
-                bool faulted;
-                bool value = _definition.Evaluator(localState, ref len, ref pos, out faulted);
+                bool value = _definition.Evaluator(localState, ref len, ref pos, out bool faulted);
 
                 if (faulted)
                 {
-                    processor.Write(Tokens[0].Value, Tokens[0].Start, Tokens[0].Length);
+                    processor.WriteToTarget(Tokens[0].Value, Tokens[0].Start, Tokens[0].Length);
                     MemoryStream fragment = new MemoryStream();
                     fragment.Write(condition, 0, condition.Length);
                     fragment.Write(_closeConditionTrie.Tokens[0].Value, _closeConditionTrie.Tokens[0].Start, _closeConditionTrie.Tokens[0].Length);
@@ -141,7 +138,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
                     return 0;
                 }
 
-                processor.SeekBackUntil(_scanBackTrie, true);
+                processor.SeekTargetBackUntil(_scanBackTrie, true);
                 FindEnd(processor, ref bufferLength, ref currentBufferPosition);
                 processor.WhitespaceHandler(ref bufferLength, ref currentBufferPosition, _definition.WholeLine, _definition.TrimWhitespace);
                 return 0;
@@ -173,8 +170,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
                             return;
                         }
 
-                        int token;
-                        if (_structureTrie.GetOperation(processorState.CurrentBuffer, bufferLength, ref currentBufferPosition, out token))
+                        if (_structureTrie.GetOperation(processorState.CurrentBuffer, bufferLength, ref currentBufferPosition, out int token))
                         {
                             if (inComment)
                             {
@@ -252,8 +248,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
                             return;
                         }
 
-                        int token;
-                        if (_closeConditionTrie.GetOperation(processorState.CurrentBuffer, bufferLength, ref currentBufferPosition, out token))
+                        if (_closeConditionTrie.GetOperation(processorState.CurrentBuffer, bufferLength, ref currentBufferPosition, out int token))
                         {
                             conditionBytes.AddRange(processorState.CurrentBuffer.Skip(previousPosition).Take(currentBufferPosition - previousPosition - _closeConditionTrie.Tokens[token].Length));
                             return;

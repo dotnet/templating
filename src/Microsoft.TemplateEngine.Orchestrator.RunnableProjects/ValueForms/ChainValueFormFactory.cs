@@ -1,8 +1,6 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
@@ -15,14 +13,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms
         internal ChainValueFormFactory()
             : base(FormIdentifier) { }
 
-        protected override string? Process(string? value, IReadOnlyList<string>? steps, IReadOnlyDictionary<string, IValueForm> otherForms)
+        protected override string Process(string value, IReadOnlyList<string>? steps, IReadOnlyDictionary<string, IValueForm> otherForms)
         {
             if (steps == null)
             {
                 return value;
             }
 
-            string? result = value;
+            string result = value;
             foreach (string step in steps)
             {
                 result = otherForms[step].Process(result, otherForms);

@@ -1,8 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +10,7 @@ using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Serialization;
 using Microsoft.TemplateEngine.TestHelper;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -27,57 +26,57 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             _environmentSettingsHelper = environmentSettingsHelper;
         }
 
-        private const string InvalidMultiChoiceDefinition = @"
-{
-    ""type"": ""parameter"",
-    ""description"": ""sample switch"",
-    ""datatype"": ""choice"",
-    ""allowMultipleValues"": true,
-    ""choices"": [
-    {
-        ""choice"": ""First|Choice"",
-        ""description"": ""First Sample Choice""
+        private const string InvalidMultiChoiceDefinition = /*lang=json,strict*/ """
+            {
+                "type": "parameter",
+                "description": "sample switch",
+                "datatype": "choice",
+                "allowMultipleValues": true,
+                "choices": [
+                {
+                    "choice": "First|Choice",
+                    "description": "First Sample Choice"
 
-    },
-    {
-        ""choice"": ""SecondChoice"",
-        ""description"": ""Second Sample Choice""
-    },
-    {
-        ""choice"": ""ThirdChoice"",
-        ""description"": ""Third Sample Choice""
+                },
+                {
+                    "choice": "SecondChoice",
+                    "description": "Second Sample Choice"
+                },
+                {
+                    "choice": "ThirdChoice",
+                    "description": "Third Sample Choice"
 
-    }
-    ],
-    ""defaultValue "": ""ThirdChoice ""
-}
-";
+                }
+                ],
+                "defaultValue ": "ThirdChoice "
+            }
+            """;
 
-        private const string ValidChoiceDefinition = @"
-{
-    ""type"": ""parameter"",
-    ""description"": ""sample switch"",
-    ""datatype"": ""choice"",
-    ""allowMultipleValues"": true,
-    ""choices"": [
-    {
-        ""choice"": ""FirstChoice"",
-        ""description"": ""First Sample Choice""
+        private const string ValidChoiceDefinition = /*lang=json,strict*/ """
+            {
+                "type": "parameter",
+                "description": "sample switch",
+                "datatype": "choice",
+                "allowMultipleValues": true,
+                "choices": [
+                {
+                    "choice": "FirstChoice",
+                    "description": "First Sample Choice"
 
-    },
-    {
-        ""choice"": ""SecondChoice"",
-        ""description"": ""Second Sample Choice""
-    },
-    {
-        ""choice"": ""ThirdChoice"",
-        ""description"": ""Third Sample Choice""
+                },
+                {
+                    "choice": "SecondChoice",
+                    "description": "Second Sample Choice"
+                },
+                {
+                    "choice": "ThirdChoice",
+                    "description": "Third Sample Choice"
 
-    }
-    ],
-    ""defaultValue "": ""ThirdChoice ""
-}
-";
+                }
+                ],
+                "defaultValue ": "ThirdChoice "
+            }
+            """;
 
         [Theory]
         [InlineData(ValidChoiceDefinition, false, true)]
@@ -94,20 +93,21 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             string contentFileNamePrefix = "content - ";
             JObject choiceParam = JObject.Parse(paramDefintion);
             choiceParam["AllowMultipleValues"] = isMultichoice;
-            TemplateConfigModel config = new TemplateConfigModel()
+            TemplateConfigModel config = new TemplateConfigModel("test")
             {
-                Identity = "test",
                 Name = "name",
                 ShortNameList = new[] { "shortName" },
                 Symbols = new[]
                 {
-                    new ParameterSymbol( "ParamA", choiceParam, null)
+                    new ParameterSymbol("ParamA", choiceParam, null)
                 }
             };
 
-            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>();
-            // template.json
-            templateSourceFiles.Add(TestFileSystemHelper.DefaultConfigRelativePath, config.ToJObject().ToString());
+            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>
+            {
+                // template.json
+                { TestFileSystemUtils.DefaultConfigRelativePath, config.ToJsonString() }
+            };
 
             //content
             foreach (string guidFormat in GuidMacroConfig.DefaultFormats.Select(c => c.ToString()))
@@ -122,13 +122,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             List<(LogLevel, string)> loggedMessages = new List<(LogLevel, string)>();
             InMemoryLoggerProvider loggerProvider = new InMemoryLoggerProvider(loggedMessages);
             IEngineEnvironmentSettings environment = _environmentSettingsHelper.CreateEnvironment(addLoggerProviders: new[] { loggerProvider });
-            string sourceBasePath = FileSystemHelpers.GetNewVirtualizedPath(environment);
-            string targetDir = FileSystemHelpers.GetNewVirtualizedPath(environment);
+            string sourceBasePath = environment.GetTempVirtualizedPath();
+            string targetDir = environment.GetTempVirtualizedPath();
             RunnableProjectGenerator rpg = new RunnableProjectGenerator();
 
-            TestFileSystemHelper.WriteTemplateSource(environment, sourceBasePath, templateSourceFiles);
-            IMountPoint? sourceMountPoint = TestFileSystemHelper.CreateMountPoint(environment, sourceBasePath);
-            RunnableProjectConfig runnableConfig = new RunnableProjectConfig(environment, rpg, config, sourceMountPoint.FileInfo(TestFileSystemHelper.DefaultConfigRelativePath));
+            TestFileSystemUtils.WriteTemplateSource(environment, sourceBasePath, templateSourceFiles);
+            using IMountPoint sourceMountPoint = environment.MountPath(sourceBasePath);
+            RunnableProjectConfig runnableConfig = new RunnableProjectConfig(environment, rpg, config, sourceMountPoint.Root);
 
             if (expectedToBeValid)
             {

@@ -19,7 +19,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
     internal partial class TemplateInfo : ITemplateInfo, ITemplateInfoHostJsonCache
     {
         internal const string CurrentVersion = "1.0.0.7";
-        private static readonly Guid RunnableProjectGeneratorId = new Guid("0C434DF7-E2CB-4DEE-B216-D7C58C8EB4B3");
+        private static readonly Guid RunnableProjectGeneratorId = new("0C434DF7-E2CB-4DEE-B216-D7C58C8EB4B3");
 
 #pragma warning disable CS0618 // Type or member is obsolete
         private IReadOnlyDictionary<string, ICacheTag>? _tags;
@@ -46,7 +46,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             {
                 throw new ArgumentException($"'{nameof(shortNames)}' should contain at least one entry.", nameof(shortNames));
             }
-            if (shortNames.Any(name => string.IsNullOrWhiteSpace(name)))
+            if (shortNames.Any(string.IsNullOrWhiteSpace))
             {
                 throw new ArgumentException($"'{nameof(shortNames)}' should not contain empty values.", nameof(shortNames));
             }
@@ -135,7 +135,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 #pragma warning disable CS0618 // Type or member is obsolete
         [JsonProperty(nameof(Parameters))]
 #pragma warning restore CS0618 // Type or member is obsolete
-        public IParameterDefinitionSet ParameterDefinitions { get; private set; } = Abstractions.Parameters.ParameterDefinitionSet.Empty;
+        public IParameterDefinitionSet ParameterDefinitions { get; private set; } = ParameterDefinitionSet.Empty;
 
         [JsonIgnore]
         [Obsolete("Use ParameterDefinitionSet instead.")]

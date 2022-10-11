@@ -15,7 +15,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
 {
     public class LookaroundTests : TestBase, IClassFixture<EnvironmentSettingsHelper>
     {
-        private IEngineEnvironmentSettings _engineEnvironmentSettings;
+        private readonly IEngineEnvironmentSettings _engineEnvironmentSettings;
 
         public LookaroundTests(EnvironmentSettingsHelper environmentSettingsHelper)
         {
@@ -258,7 +258,7 @@ color:red;";
 
             IOperationProvider[] operations =
             {
-                new Replacement("".TokenConfigBuilder().OnlyIfAfter("foo").OnlyIfBefore("baz"), "bar", null, true)
+                new Replacement(string.Empty.TokenConfigBuilder().OnlyIfAfter("foo").OnlyIfBefore("baz"), "bar", null, true)
             };
             EngineConfig cfg = new EngineConfig(_engineEnvironmentSettings.Host.Logger, VariableCollection.Root());
             IProcessor processor = Processor.Create(cfg, operations);

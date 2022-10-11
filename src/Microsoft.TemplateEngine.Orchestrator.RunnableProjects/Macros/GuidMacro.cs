@@ -1,8 +1,6 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Core.Contracts;
@@ -20,23 +18,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 
         public void EvaluateConfig(IEngineEnvironmentSettings environmentSettings, IVariableCollection vars, IMacroConfig rawConfig)
         {
-            var config = rawConfig as GuidMacroConfig;
-
-            if (config == null)
+            if (rawConfig is not GuidMacroConfig config)
             {
                 throw new InvalidCastException("Couldn't cast the rawConfig as GuidMacroConfig");
             }
 
-            string guidFormats;
-            if (!string.IsNullOrEmpty(config.Format))
-            {
-                guidFormats = config.Format!;
-            }
-            else
-            {
-                guidFormats = GuidMacroConfig.DefaultFormats;
-            }
-
+            string guidFormats = !string.IsNullOrEmpty(config.Format) ? config.Format! : GuidMacroConfig.DefaultFormats;
             Guid g = Guid.NewGuid();
 
             for (int i = 0; i < guidFormats.Length; ++i)
@@ -65,9 +52,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 
         public IMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IMacroConfig rawConfig)
         {
-            var deferredConfig = rawConfig as GeneratedSymbolDeferredMacroConfig;
-
-            if (deferredConfig == null)
+            if (rawConfig is not GeneratedSymbolDeferredMacroConfig deferredConfig)
             {
                 throw new InvalidCastException("Couldn't cast the rawConfig as a GeneratedSymbolDeferredMacroConfig");
             }

@@ -16,9 +16,9 @@ namespace Microsoft.TemplateEngine.Utils
         private static readonly IReadOnlyList<(Type Type, IIdentifiedComponent Instance)> NoComponents = Array.Empty<(Type Type, IIdentifiedComponent Instance)>();
         private readonly IReadOnlyDictionary<string, string> _hostDefaults;
         private readonly IReadOnlyList<(Type InterfaceType, IIdentifiedComponent Instance)> _hostBuiltInComponents;
-        private Dictionary<string, Action<string, string[]>> _diagnosticLoggers;
-        private ILoggerFactory _loggerFactory;
-        private ILogger _logger;
+        private readonly Dictionary<string, Action<string, string[]>> _diagnosticLoggers;
+        private readonly ILoggerFactory _loggerFactory;
+        private readonly ILogger _logger;
 
         public DefaultTemplateEngineHost(string hostIdentifier, string version)
                     : this(hostIdentifier, version, null)
@@ -102,6 +102,8 @@ namespace Microsoft.TemplateEngine.Utils
                 case "HostIdentifier":
                     value = HostIdentifier;
                     return true;
+                default:
+                    break;
             }
 
             return _hostDefaults.TryGetValue(paramName, out value);

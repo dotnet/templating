@@ -1,8 +1,6 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,6 +9,7 @@ using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Constraints;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Localization;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms;
 using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json;
@@ -33,17 +32,28 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
         private string? _description;
         private string? _sourceName;
 
-        internal TemplateConfigModel()
+        internal TemplateConfigModel(string identity)
         {
+            if (string.IsNullOrWhiteSpace(identity))
+            {
+                throw new ArgumentException($"'{nameof(identity)}' cannot be null or whitespace.", nameof(identity));
+            }
+
+            Identity = identity;
             Symbols = Array.Empty<BaseSymbol>();
         }
 
-        private TemplateConfigModel(JObject source, ILogger? logger, ISimpleConfigModifiers? configModifiers = null, string? filename = null)
+        private TemplateConfigModel(JObject source, ILogger? logger, string? baselineName = null, string? filename = null)
         {
             _logger = logger;
 
-            //TODO: improve validation not to allow null values here
-            Identity = source.ToString(nameof(Identity));
+            string? identity = source.ToString(nameof(Identity));
+            if (string.IsNullOrWhiteSpace(identity))
+            {
+                throw new TemplateAuthoringException($"'identity' is missing or is an empty string.", "identity");
+            }
+
+            Identity = identity!;
             Name = source.ToString(nameof(Name));
 
             Author = source.ToString(nameof(Author));
@@ -74,9 +84,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
             IBaselineInfo? baseline = null;
             BaselineInfo = BaselineInfoFromJObject(source.PropertiesOf("baselines"));
 
-            if (!string.IsNullOrEmpty(configModifiers?.BaselineName))
+            if (!string.IsNullOrEmpty(baselineName))
             {
-                BaselineInfo.TryGetValue(configModifiers!.BaselineName, out baseline);
+                BaselineInfo.TryGetValue(baselineName!, out baseline);
             }
 
             Dictionary<string, BaseSymbol> symbols = new(StringComparer.Ordinal);
@@ -190,15 +200,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
         /// </summary>
         public string? Author
         {
-            get
-            {
-                return _author;
-            }
+            get => _author;
 
-            internal init
-            {
-                _author = value;
-            }
+            internal init => _author = value;
         }
 
         /// <summary>
@@ -211,15 +215,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
         /// </summary>
         public string? Description
         {
-            get
-            {
-                return _description;
-            }
+            get => _description;
 
-            internal init
-            {
-                _description = value;
-            }
+            internal init => _description = value;
         }
 
         /// <summary>
@@ -238,15 +236,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
         /// </summary>
         public string? Name
         {
-            get
-            {
-                return _name;
-            }
+            get => _name;
 
-            internal init
-            {
-                _name = value;
-            }
+            internal init => _name = value;
         }
 
         /// <summary>
@@ -264,15 +256,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
         /// </summary>
         public IReadOnlyDictionary<string, string> Tags
         {
-            get
-            {
-                return _tags;
-            }
+            get => _tags;
 
-            internal init
-            {
-                _tags = value;
-            }
+            internal init => _tags = value;
         }
 
         /// <summary>
@@ -285,15 +271,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
         /// </summary>
         public IReadOnlyList<PostActionModel> PostActionModels
         {
-            get
-            {
-                return _postActions;
-            }
+            get => _postActions;
 
-            internal init
-            {
-                _postActions = value;
-            }
+            internal init => _postActions = value;
         }
 
         /// <summary>
@@ -314,7 +294,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
         /// <summary>
         /// Gets the template identity ("identity" JSON property) - a unique name for this template.
         /// </summary>
-        public string? Identity { get; internal init; }
+        public string Identity { get; }
 
         /// <summary>
         /// Gets the list of classifications of the template ("classifications" JSON property).
@@ -331,10 +311,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
         /// </summary>
         public string? SourceName
         {
-            get
-            {
-                return _sourceName;
-            }
+            get => _sourceName;
 
             internal init
             {
@@ -360,10 +337,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
         public IEnumerable<BaseSymbol> Symbols
 
         {
-            get
-            {
-                return _symbols.Values;
-            }
+            get => _symbols.Values;
 
             internal init
             {
@@ -427,8 +401,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
         {
             if (string.IsNullOrWhiteSpace(content))
             {
-                return new TemplateConfigModel();
+                throw new ArgumentException($"'{nameof(content)}' cannot be null or whitespace.", nameof(content));
             }
+
             using (TextReader tr = new StringReader(content))
             {
                 return FromTextReader(tr, logger, filename);
@@ -443,15 +418,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
             }
         }
 
-        internal static TemplateConfigModel FromJObject(JObject source, ILogger? logger = null, ISimpleConfigModifiers? configModifiers = null, string? filename = null)
+        internal static TemplateConfigModel FromJObject(JObject source, ILogger? logger = null, string? baselineName = null, string? filename = null)
         {
-            return new TemplateConfigModel(source, logger, configModifiers, filename);
-        }
-
-        //TODO: create convertors to get proper json format if needed.
-        internal JObject ToJObject()
-        {
-            return JObject.FromObject(this);
+            return new TemplateConfigModel(source, logger, baselineName, filename);
         }
 
         /// <summary>
@@ -459,21 +428,57 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
         /// </summary>
         /// <param name="locModel">Localization model containing the localized strings.</param>
         /// <remarks>This method works on a best-effort basis. If the given model is invalid or incompatible,
-        /// erroneous data will be skipped. No errors will be logged. Use <see cref="Localize(ILocalizationModel)"/>
+        /// erroneous data will be skipped. No errors will be logged. Use <see cref="Localize(LocalizationModel)"/>
         /// to validate localization models before calling this method.</remarks>
-        internal void Localize(ILocalizationModel locModel)
+        internal void Localize(LocalizationModel locModel)
         {
             _author = locModel.Author ?? Author;
             _name = locModel.Name ?? Name;
             _description = locModel.Description ?? Description;
 
-            foreach (var postAction in _postActions)
+            foreach (ParameterSymbol symbol in Symbols.OfType<ParameterSymbol>())
             {
-                if (postAction.Id != null && locModel.PostActions.TryGetValue(postAction.Id, out IPostActionLocalizationModel postActionLocModel))
+                if (locModel.ParameterSymbols.TryGetValue(symbol.Name, out IParameterSymbolLocalizationModel symbolLocModel))
+                {
+                    symbol.Localize(symbolLocModel);
+                }
+            }
+
+            foreach (PostActionModel postAction in _postActions)
+            {
+                if (postAction.Id != null && locModel.PostActions.TryGetValue(postAction.Id, out PostActionLocalizationModel postActionLocModel))
                 {
                     postAction.Localize(postActionLocModel);
                 }
             }
+        }
+
+        /// <summary>
+        /// Extracts parameters from the model.
+        /// </summary>
+        internal IEnumerable<Parameter> ExtractParameters()
+        {
+            Dictionary<string, Parameter> parameters = new();
+            foreach (ParameterSymbol parameterSymbol in Symbols.OfType<ParameterSymbol>())
+            {
+                bool isName = parameterSymbol == NameSymbol;
+                Parameter parameter = new(parameterSymbol.Name, type: parameterSymbol.Type, parameterSymbol.DataType!)
+                {
+                    DefaultValue = parameterSymbol.DefaultValue ?? (!parameterSymbol.IsRequired ? parameterSymbol.Replaces : null),
+                    IsName = isName,
+                    Name = parameterSymbol.Name,
+                    Precedence = parameterSymbol.Precedence,
+                    Description = parameterSymbol.Description,
+                    Choices = parameterSymbol.Choices,
+                    DefaultIfOptionWithoutValue = parameterSymbol.DefaultIfOptionWithoutValue,
+                    DisplayName = parameterSymbol.DisplayName,
+                    EnableQuotelessLiterals = parameterSymbol.EnableQuotelessLiterals,
+                    AllowMultipleValues = parameterSymbol.AllowMultipleValues,
+                };
+                parameters[parameterSymbol.Name] = parameter;
+            }
+
+            return parameters.Values;
         }
 
         private static BaseSymbol SetupDefaultNameSymbol(string? sourceName)
@@ -484,7 +489,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
                 Description = "The default name symbol",
                 DataType = "string",
                 Forms = SymbolValueFormsModel.NameForms,
-                Precedence = new TemplateParameterPrecedence(PrecedenceDefinition.Implicit)
+                Precedence = new TemplateParameterPrecedence(PrecedenceDefinition.Implicit),
+                IsImplicit = true,
             };
         }
 
@@ -521,9 +527,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
 
             foreach (JProperty property in baselineJProperties)
             {
-                JObject? obj = property.Value as JObject;
-
-                if (obj == null)
+                if (property.Value is not JObject obj)
                 {
                     continue;
                 }
@@ -545,7 +549,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
             }
             //on Windows we implicitly bind OS to avoid likely breaking change.
             //this environment variable is commonly used in conditions when using run script post action.
-            return new[] { new BindSymbol("OS", "env:OS") };
+            return new[]
+            {
+                new BindSymbol("OS", "env:OS")
+                {
+                    IsImplicit = true,
+                }
+            };
         }
     }
 }

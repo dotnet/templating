@@ -1,20 +1,15 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Core.Expressions.Cpp2;
 using Microsoft.TemplateEngine.Core.Operations;
-using Microsoft.TemplateEngine.Core.Util;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig;
@@ -29,9 +24,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             IDirectory templateRoot,
             IComponentManager componentManager,
             IVariableCollection variables,
-            IGlobalRunConfig globalConfig,
-            IReadOnlyList<KeyValuePair<string, IGlobalRunConfig>> fileGlobConfigs,
-            IReadOnlyList<string> ignoreFileNames)
+            IRunnableProjectConfig configuration)
         {
             List<IOperationConfig> operationConfigReaders = new List<IOperationConfig>(componentManager.OfType<IOperationConfig>());
             Dictionary<string, IOperationConfig> operationConfigLookup = new Dictionary<string, IOperationConfig>();
@@ -44,23 +37,23 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             _operationConfigLookup = operationConfigLookup;
 
             RootVariableCollection = variables;
-            IgnoreFileNames = ignoreFileNames;
-            Operations = ResolveOperations(globalConfig, templateRoot, variables);
+            IgnoreFileNames = configuration.IgnoreFileNames;
+            Operations = ResolveOperations(configuration.GlobalOperationConfig, templateRoot, variables);
             List<KeyValuePair<IPathMatcher, IRunSpec>> specials = new List<KeyValuePair<IPathMatcher, IRunSpec>>();
 
-            if (fileGlobConfigs != null)
+            if (configuration.SpecialOperationConfig != null)
             {
-                foreach (KeyValuePair<string, IGlobalRunConfig> specialEntry in fileGlobConfigs)
+                foreach ((string glob, IGlobalRunConfig runConfig) in configuration.SpecialOperationConfig)
                 {
                     IReadOnlyList<IOperationProvider> specialOps = Array.Empty<IOperationProvider>();
 
-                    if (specialEntry.Value != null)
+                    if (runConfig != null)
                     {
-                        specialOps = ResolveOperations(specialEntry.Value, templateRoot, variables);
+                        specialOps = ResolveOperations(runConfig, templateRoot, variables);
                     }
 
-                    RunSpec spec = new RunSpec(specialOps, specialEntry.Value?.VariableSetup.FallbackFormat);
-                    specials.Add(new KeyValuePair<IPathMatcher, IRunSpec>(new GlobbingPatternMatcher(specialEntry.Key), spec));
+                    RunSpec spec = new(specialOps, runConfig?.VariableSetup.FallbackFormat);
+                    specials.Add(new KeyValuePair<IPathMatcher, IRunSpec>(new GlobbingPatternMatcher(glob), spec));
                 }
             }
 
@@ -110,7 +103,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             if (customOperations.Any(x => x is Conditional))
             {
-                operations.AddRange(defaultOperations.Where(op => !(op is Conditional)));
+                operations.AddRange(defaultOperations.Where(op => op is not Conditional));
             }
             else
             {
@@ -160,7 +153,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 if (string.IsNullOrEmpty(condition)
                     || Cpp2StyleEvaluatorDefinition.EvaluateFromString(host.Logger, condition, variables))
                 {
-                    IOperationConfig realConfigObject;
                     if (opType == null)
                     {
                         continue;
@@ -169,7 +161,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     {
                         continue;
                     }
-                    if (_operationConfigLookup.TryGetValue(opType, out realConfigObject))
+                    if (_operationConfigLookup.TryGetValue(opType, out IOperationConfig realConfigObject))
                     {
                         customOperations.AddRange(
                             realConfigObject.ConfigureFromJson(opModel.Configuration, templateRoot));
@@ -182,78 +174,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
 
             return customOperations;
-        }
-
-        internal class ProcessorState : IProcessorState
-        {
-            internal ProcessorState(IEngineEnvironmentSettings environmentSettings, IVariableCollection vars, byte[] buffer, Encoding encoding)
-            {
-                Config = new EngineConfig(environmentSettings.Host.Logger, vars);
-                CurrentBuffer = buffer;
-                CurrentBufferPosition = 0;
-                Encoding = encoding;
-                EncodingConfig = new EncodingConfig(Config, encoding);
-            }
-
-            public IEngineConfig Config { get; }
-
-            public byte[] CurrentBuffer { get; private set; }
-
-            public int CurrentBufferLength => CurrentBuffer.Length;
-
-            public int CurrentBufferPosition { get; }
-
-            public Encoding Encoding { get; set; }
-
-            public IEncodingConfig EncodingConfig { get; }
-
-            public int CurrentSequenceNumber => throw new NotImplementedException();
-
-            public bool AdvanceBuffer(int bufferPosition)
-            {
-                byte[] tmp = new byte[CurrentBufferLength - bufferPosition];
-                Buffer.BlockCopy(CurrentBuffer, bufferPosition, tmp, 0, CurrentBufferLength - bufferPosition);
-                CurrentBuffer = tmp;
-
-                return true;
-            }
-
-            public void SeekBackUntil(ITokenTrie match)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void SeekBackUntil(ITokenTrie match, bool consume)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void SeekBackWhile(ITokenTrie match)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void Write(byte[] buffer, int offset, int count) => throw new NotImplementedException();
-
-            public void SeekForwardUntil(ITokenTrie trie, ref int bufferLength, ref int currentBufferPosition)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void SeekForwardThrough(ITokenTrie trie, ref int bufferLength, ref int currentBufferPosition)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void SeekForwardWhile(ITokenTrie trie, ref int bufferLength, ref int currentBufferPosition)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void Inject(Stream staged)
-            {
-                throw new NotImplementedException();
-            }
         }
     }
 }

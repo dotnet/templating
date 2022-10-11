@@ -1,8 +1,6 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
@@ -30,8 +28,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         public string? Documentation
         {
-            get { return Description; }
-            internal set { Description = value; }
+            get => Description;
+            internal set => Description = value;
         }
 
         public string? Description { get; internal set; }
@@ -58,8 +56,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         public bool AllowMultipleValues { get; internal set; }
 
         public bool EnableQuotelessLiterals { get; internal set; }
-
-        internal bool IsVariable { get; set; }
 
         public override string ToString()
         {

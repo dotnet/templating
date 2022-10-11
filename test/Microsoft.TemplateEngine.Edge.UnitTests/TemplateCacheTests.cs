@@ -1,8 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 #if !NET6_0_OR_GREATER
 using System;
 using System.Collections.Generic;
@@ -25,7 +23,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 {
     public class TemplateCacheTests : IClassFixture<EnvironmentSettingsHelper>
     {
-        private EnvironmentSettingsHelper _environmentSettingsHelper;
+        private readonly EnvironmentSettingsHelper _environmentSettingsHelper;
 
         public TemplateCacheTests(EnvironmentSettingsHelper environmentSettingsHelper)
         {
@@ -54,7 +52,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 }
                 else
                 {
-                    currentCulture = "";
+                    currentCulture = string.Empty;
                     CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
                 }
                 string[] availableLocales = new[] { "cs", "de", "en", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr", "zh-Hans", "zh-Hant" };
@@ -79,7 +77,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 
                 Assert.Equal(currentCulture, templateCache.Locale);
                 Assert.Equal("testIdentity", templateCache.TemplateInfo.Single().Identity);
-                Assert.Equal(string.IsNullOrEmpty(expectedLocator) ? "" : expectedLocator + " name", templateCache.TemplateInfo.Single().Name);
+                Assert.Equal(string.IsNullOrEmpty(expectedLocator) ? string.Empty : expectedLocator + " name", templateCache.TemplateInfo.Single().Name);
             }
             finally
             {

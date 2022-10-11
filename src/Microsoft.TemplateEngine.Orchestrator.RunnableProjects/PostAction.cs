@@ -1,8 +1,6 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
@@ -34,14 +32,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         public IReadOnlyDictionary<string, string> Args { get; } = new Dictionary<string, string>();
 
-        internal static List<IPostAction> ListFromModel(ILogger logger, IReadOnlyList<PostActionModel> modelList, IVariableCollection rootVariableCollection)
+        internal static List<IPostAction> Evaluate(ILogger logger, IReadOnlyList<PostActionModel> modelList, IVariableCollection rootVariableCollection)
         {
-            List<IPostAction> actionList = new List<IPostAction>();
+            List<IPostAction> actionList = new();
 
-            if (rootVariableCollection == null)
-            {
-                rootVariableCollection = new VariableCollection();
-            }
+            rootVariableCollection ??= new VariableCollection();
 
             foreach (PostActionModel model in modelList)
             {

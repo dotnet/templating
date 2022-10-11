@@ -1,8 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
@@ -14,17 +12,17 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
     public static class Components
     {
-        private static readonly CaseChangeMacro CaseChange = new CaseChangeMacro();
-        private static readonly GeneratePortNumberMacro GeneratePortNumberMacro = new GeneratePortNumberMacro();
-        private static readonly CoalesceMacro CoalesceMacro = new CoalesceMacro();
-        private static readonly ConstantMacro ConstantMacro = new ConstantMacro();
-        private static readonly GuidMacro GuidMacro = new GuidMacro();
-        private static readonly SwitchMacro SwitchMacro = new SwitchMacro();
-        private static readonly RegexMatchMacro RegexMatchMacro = new RegexMatchMacro();
-        private static readonly RegexMacro RegexMacro = new RegexMacro();
-        private static readonly RandomMacro RandomMacro = new RandomMacro();
-        private static readonly NowMacro NowMacro = new NowMacro();
-        private static readonly JoinMacro JoinMacro = new JoinMacro();
+        private static readonly CaseChangeMacro CaseChange = new();
+        private static readonly GeneratePortNumberMacro GeneratePortNumberMacro = new();
+        private static readonly CoalesceMacro CoalesceMacro = new();
+        private static readonly ConstantMacro ConstantMacro = new();
+        private static readonly GuidMacro GuidMacro = new();
+        private static readonly SwitchMacro SwitchMacro = new();
+        private static readonly RegexMatchMacro RegexMatchMacro = new();
+        private static readonly RegexMacro RegexMacro = new();
+        private static readonly RandomMacro RandomMacro = new();
+        private static readonly NowMacro NowMacro = new();
+        private static readonly JoinMacro JoinMacro = new();
 
         public static IReadOnlyList<(Type Type, IIdentifiedComponent Instance)> AllComponents { get; } =
             new (Type Type, IIdentifiedComponent Instance)[]

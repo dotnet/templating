@@ -9,7 +9,7 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
 {
     public sealed class GlobalSettingsTemplatePackageProviderFactory : ITemplatePackageProviderFactory, IPrioritizedComponent
     {
-        internal static readonly Guid FactoryId = new Guid("{3AACE22E-E978-4BAF-8BC1-568B290A238C}");
+        internal static readonly Guid FactoryId = new("{3AACE22E-E978-4BAF-8BC1-568B290A238C}");
 
         Guid IIdentifiedComponent.Id => FactoryId;
 

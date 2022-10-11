@@ -1,13 +1,15 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Mount;
+using Microsoft.TemplateEngine.Abstractions.Parameters;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Serialization;
 using Microsoft.TemplateEngine.TestHelper;
 using Xunit;
 
@@ -15,20 +17,21 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
 {
     public class SourceConfigTests : IClassFixture<EnvironmentSettingsHelper>
     {
-        private IEngineEnvironmentSettings _engineEnvironmentSettings;
+        private readonly IEngineEnvironmentSettings _engineEnvironmentSettings;
 
         public SourceConfigTests(EnvironmentSettingsHelper environmentSettingsHelper)
         {
             _engineEnvironmentSettings = environmentSettingsHelper.CreateEnvironment(hostIdentifier: this.GetType().Name, virtualize: false);
         }
 
-        [Fact(DisplayName = nameof(SourceConfigExcludesAreOverriddenByIncludes))]
-        public void SourceConfigExcludesAreOverriddenByIncludes()
+        [Fact]
+        public async Task SourceConfigExcludesAreOverriddenByIncludes()
         {
-            string sourceBasePath = FileSystemHelpers.GetNewVirtualizedPath(_engineEnvironmentSettings);
-            TemplateConfigModel config = new TemplateConfigModel()
+            string sourceBasePath = _engineEnvironmentSettings.GetTempVirtualizedPath();
+            TemplateConfigModel config = new("test")
             {
-                Identity = "test",
+                Name = "test",
+                ShortNameList = new[] { "test" },
                 Sources = new List<ExtendedFileSource>()
                 {
                     new ExtendedFileSource()
@@ -39,37 +42,47 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
                             new SourceModifier()
                             {
                                 Include = new[] { "core.config" }
-
                             }
                         }
                     }
                 }
             };
 
-            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>();
-            // config
-            templateSourceFiles.Add(TestFileSystemHelper.DefaultConfigRelativePath, config.ToJObject().ToString());
-            // content
-            templateSourceFiles.Add("core.config", null);
-            templateSourceFiles.Add("full.config", null);
-            TestTemplateSetup setup = new TestTemplateSetup(_engineEnvironmentSettings, sourceBasePath, templateSourceFiles, config);
-            setup.WriteSource();
+            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>
+            {
+                // config
+                { TestFileSystemUtils.DefaultConfigRelativePath, config.ToJsonString() },
+                // content
+                { "core.config", null },
+                { "full.config", null }
+            };
 
-            string targetDir = FileSystemHelpers.GetNewVirtualizedPath(_engineEnvironmentSettings);
-            setup.InstantiateTemplate(targetDir);
+            _engineEnvironmentSettings.WriteTemplateSource(sourceBasePath, templateSourceFiles);
+            string targetDir = _engineEnvironmentSettings.GetTempVirtualizedPath();
 
+            RunnableProjectGenerator generator = new();
+
+            using IMountPoint mountPoint = _engineEnvironmentSettings.MountPath(sourceBasePath);
+            IFile? templateConfigFile = mountPoint.FileInfo(TestFileSystemUtils.DefaultConfigRelativePath);
+            Assert.NotNull(templateConfigFile);
+
+            ITemplate template = new RunnableProjectConfig(_engineEnvironmentSettings, generator, templateConfigFile);
+            ParameterSetData parameters = new(template);
+
+            ICreationResult result = await (generator as IGenerator).CreateAsync(_engineEnvironmentSettings, template, parameters, targetDir, default).ConfigureAwait(false);
             Assert.True(_engineEnvironmentSettings.Host.FileSystem.FileExists(Path.Combine(targetDir, "core.config")));
             Assert.False(_engineEnvironmentSettings.Host.FileSystem.FileExists(Path.Combine(targetDir, "full.config")));
         }
 
-        [Fact(DisplayName = nameof(CopyOnlyWithoutIncludeDoesntActuallyCopyFile))]
-        public void CopyOnlyWithoutIncludeDoesntActuallyCopyFile()
+        [Fact]
+        public async Task CopyOnlyWithoutIncludeDoesntActuallyCopyFile()
         {
-            string sourceBasePath = FileSystemHelpers.GetNewVirtualizedPath(_engineEnvironmentSettings);
+            string sourceBasePath = _engineEnvironmentSettings.GetTempVirtualizedPath();
 
-            TemplateConfigModel config = new TemplateConfigModel()
+            TemplateConfigModel config = new("test")
             {
-                Identity = "test",
+                Name = "test",
+                ShortNameList = new[] { "test" },
                 Sources = new List<ExtendedFileSource>()
                 {
                     new ExtendedFileSource()
@@ -86,36 +99,43 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
                 }
             };
 
-            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>();
-            templateSourceFiles.Add(TestFileSystemHelper.DefaultConfigRelativePath, config.ToJObject().ToString());
-            templateSourceFiles.Add("something.txt", null);
-            templateSourceFiles.Add("copy.me", null);
-            TestTemplateSetup setup = new TestTemplateSetup(_engineEnvironmentSettings, sourceBasePath, templateSourceFiles, config);
-            setup.WriteSource();
-
-            string targetDir = FileSystemHelpers.GetNewVirtualizedPath(_engineEnvironmentSettings);
-            IReadOnlyDictionary<string, IReadOnlyList<IFileChange2>> allChanges = setup.GetFileChanges(targetDir);
-
-            // one source, should cause one set of changes
-            Assert.Equal(1, allChanges.Count);
-
-            if (!allChanges.TryGetValue("./", out IReadOnlyList<IFileChange2>? changes))
+            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>
             {
-                Assert.True(false, "no changes for source './'");
-            }
+                { TestFileSystemUtils.DefaultConfigRelativePath, config.ToJsonString() },
+                { "something.txt", null },
+                { "copy.me", null }
+            };
 
-            Assert.Equal(1, changes?.Count);
-            Assert.Equal(ChangeKind.Create, changes?[0].ChangeKind);
-            Assert.True(string.Equals(changes?[0].TargetRelativePath, "something.txt"), "didn't copy the correct file");
+            _engineEnvironmentSettings.WriteTemplateSource(sourceBasePath, templateSourceFiles);
+            string targetDir = _engineEnvironmentSettings.GetTempVirtualizedPath();
+
+            RunnableProjectGenerator generator = new();
+
+            using IMountPoint mountPoint = _engineEnvironmentSettings.MountPath(sourceBasePath);
+            IFile? templateConfigFile = mountPoint.FileInfo(TestFileSystemUtils.DefaultConfigRelativePath);
+            Assert.NotNull(templateConfigFile);
+
+            ITemplate template = new RunnableProjectConfig(_engineEnvironmentSettings, generator, templateConfigFile);
+            ParameterSetData parameters = new(template);
+
+            ICreationEffects result = await (generator as IGenerator).GetCreationEffectsAsync(_engineEnvironmentSettings, template, parameters, targetDir, default).ConfigureAwait(false);
+            IEnumerable<IFileChange2> changes = result.FileChanges.Cast<IFileChange2>();
+            Assert.All(result.FileChanges.Cast<IFileChange2>(), c => c.SourceRelativePath.StartsWith("./"));
+
+            Assert.Equal(1, result.FileChanges.Count);
+
+            Assert.Equal(ChangeKind.Create, result.FileChanges.Single().ChangeKind);
+            Assert.True(string.Equals(result.FileChanges.Single().TargetRelativePath, "./something.txt"), "didn't copy the correct file");
         }
 
-        [Fact(DisplayName = nameof(CopyOnlyWithParentIncludeActuallyCopiesFile))]
-        public void CopyOnlyWithParentIncludeActuallyCopiesFile()
+        [Fact]
+        public async Task CopyOnlyWithParentIncludeActuallyCopiesFile()
         {
-            string sourceBasePath = FileSystemHelpers.GetNewVirtualizedPath(_engineEnvironmentSettings);
-            TemplateConfigModel config = new TemplateConfigModel()
+            string sourceBasePath = _engineEnvironmentSettings.GetTempVirtualizedPath();
+            TemplateConfigModel config = new TemplateConfigModel("test")
             {
-                Identity = "test",
+                Name = "test",
+                ShortNameList = new[] { "test" },
                 Sources = new List<ExtendedFileSource>()
                 {
                     new ExtendedFileSource()
@@ -132,34 +152,40 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
                 }
             };
 
-            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>();
-            templateSourceFiles.Add(TestFileSystemHelper.DefaultConfigRelativePath, config.ToJObject().ToString());
-            templateSourceFiles.Add("copy.me", null);
-            TestTemplateSetup setup = new TestTemplateSetup(_engineEnvironmentSettings, sourceBasePath, templateSourceFiles, config);
-            setup.WriteSource();
-
-            string targetDir = FileSystemHelpers.GetNewVirtualizedPath(_engineEnvironmentSettings);
-            IReadOnlyDictionary<string, IReadOnlyList<IFileChange2>> allChanges = setup.GetFileChanges(targetDir);
-
-            Assert.Equal(1, allChanges.Count);
-
-            if (!allChanges.TryGetValue("./", out IReadOnlyList<IFileChange2>? changes))
+            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>
             {
-                Assert.True(false, "no changes for source './'");
-            }
+                { TestFileSystemUtils.DefaultConfigRelativePath, config.ToJsonString() },
+                { "copy.me", null }
+            };
+            _engineEnvironmentSettings.WriteTemplateSource(sourceBasePath, templateSourceFiles);
 
-            Assert.Equal(1, changes?.Count);
-            Assert.Equal(ChangeKind.Create, changes?[0].ChangeKind);
-            Assert.True(string.Equals(changes?[0].TargetRelativePath, "copy.me"), "didn't copy the correct file");
+            string targetDir = _engineEnvironmentSettings.GetTempVirtualizedPath();
+            RunnableProjectGenerator generator = new();
+
+            using IMountPoint mountPoint = _engineEnvironmentSettings.MountPath(sourceBasePath);
+            IFile? templateConfigFile = mountPoint.FileInfo(TestFileSystemUtils.DefaultConfigRelativePath);
+            Assert.NotNull(templateConfigFile);
+
+            ITemplate template = new RunnableProjectConfig(_engineEnvironmentSettings, generator, templateConfigFile);
+            ParameterSetData parameters = new(template);
+
+            ICreationEffects result = await (generator as IGenerator).GetCreationEffectsAsync(_engineEnvironmentSettings, template, parameters, targetDir, default).ConfigureAwait(false);
+            IEnumerable<IFileChange2> changes = result.FileChanges.Cast<IFileChange2>();
+            Assert.All(result.FileChanges.Cast<IFileChange2>(), c => c.SourceRelativePath.StartsWith("./"));
+
+            Assert.Equal(1, result.FileChanges.Count);
+            Assert.Equal(ChangeKind.Create, result.FileChanges.Single().ChangeKind);
+            Assert.True(string.Equals(result.FileChanges.Single().TargetRelativePath, "./copy.me"), "didn't copy the correct file");
         }
 
-        [Fact(DisplayName = nameof(CopyOnlyWithWildcardAndParentIncludeActuallyCopiesFile))]
-        public void CopyOnlyWithWildcardAndParentIncludeActuallyCopiesFile()
+        [Fact]
+        public async Task CopyOnlyWithWildcardAndParentIncludeActuallyCopiesFile()
         {
-            string sourceBasePath = FileSystemHelpers.GetNewVirtualizedPath(_engineEnvironmentSettings);
-            TemplateConfigModel config = new TemplateConfigModel()
+            string sourceBasePath = _engineEnvironmentSettings.GetTempVirtualizedPath();
+            TemplateConfigModel config = new TemplateConfigModel("test")
             {
-                Identity = "test",
+                Name = "test",
+                ShortNameList = new[] { "test" },
                 Sources = new List<ExtendedFileSource>()
                 {
                     new ExtendedFileSource()
@@ -176,34 +202,40 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
                 }
             };
 
-            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>();
-            templateSourceFiles.Add(TestFileSystemHelper.DefaultConfigRelativePath, config.ToJObject().ToString());
-            templateSourceFiles.Add("copy.me", null);
-            TestTemplateSetup setup = new TestTemplateSetup(_engineEnvironmentSettings, sourceBasePath, templateSourceFiles, config);
-            setup.WriteSource();
-
-            string targetDir = FileSystemHelpers.GetNewVirtualizedPath(_engineEnvironmentSettings);
-            IReadOnlyDictionary<string, IReadOnlyList<IFileChange2>> allChanges = setup.GetFileChanges(targetDir);
-
-            Assert.Equal(1, allChanges.Count);
-
-            if (!allChanges.TryGetValue("./", out IReadOnlyList<IFileChange2>? changes))
+            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>
             {
-                Assert.True(false, "no changes for source './'");
-            }
+                { TestFileSystemUtils.DefaultConfigRelativePath, config.ToJsonString() },
+                { "copy.me", null }
+            };
+            _engineEnvironmentSettings.WriteTemplateSource(sourceBasePath, templateSourceFiles);
 
-            Assert.Equal(1, changes?.Count);
-            Assert.Equal(ChangeKind.Create, changes?[0].ChangeKind);
-            Assert.True(string.Equals(changes?[0].TargetRelativePath, "copy.me"), "didn't copy the correct file");
+            string targetDir = _engineEnvironmentSettings.GetTempVirtualizedPath();
+            RunnableProjectGenerator generator = new();
+
+            using IMountPoint mountPoint = _engineEnvironmentSettings.MountPath(sourceBasePath);
+            IFile? templateConfigFile = mountPoint.FileInfo(TestFileSystemUtils.DefaultConfigRelativePath);
+            Assert.NotNull(templateConfigFile);
+
+            ITemplate template = new RunnableProjectConfig(_engineEnvironmentSettings, generator, templateConfigFile);
+            ParameterSetData parameters = new(template);
+
+            ICreationEffects result = await (generator as IGenerator).GetCreationEffectsAsync(_engineEnvironmentSettings, template, parameters, targetDir, default).ConfigureAwait(false);
+            IEnumerable<IFileChange2> changes = result.FileChanges.Cast<IFileChange2>();
+            Assert.All(result.FileChanges.Cast<IFileChange2>(), c => c.SourceRelativePath.StartsWith("./"));
+
+            Assert.Equal(1, result.FileChanges.Count);
+            Assert.Equal(ChangeKind.Create, result.FileChanges.Single().ChangeKind);
+            Assert.True(string.Equals(result.FileChanges.Single().TargetRelativePath, "./copy.me"), "didn't copy the correct file");
         }
 
-        [Fact(DisplayName = nameof(IncludeModifierOverridesPreviousExcludeModifierTemplateTest))]
-        public void IncludeModifierOverridesPreviousExcludeModifierTemplateTest()
+        [Fact]
+        public async Task IncludeModifierOverridesPreviousExcludeModifierTemplateTest()
         {
-            string sourceBasePath = FileSystemHelpers.GetNewVirtualizedPath(_engineEnvironmentSettings);
-            TemplateConfigModel config = new TemplateConfigModel()
+            string sourceBasePath = _engineEnvironmentSettings.GetTempVirtualizedPath();
+            TemplateConfigModel config = new TemplateConfigModel("test")
             {
-                Identity = "test",
+                Name = "test",
+                ShortNameList = new[] { "test" },
                 Sources = new List<ExtendedFileSource>()
                 {
                     new ExtendedFileSource()
@@ -223,37 +255,44 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
                 }
             };
 
-            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>();
-            templateSourceFiles.Add(TestFileSystemHelper.DefaultConfigRelativePath, config.ToJObject().ToString());
-            templateSourceFiles.Add("other.xyz", null);
-            templateSourceFiles.Add("include.xyz", null);
-            templateSourceFiles.Add("exclude.xyz", null);
-            TestTemplateSetup setup = new TestTemplateSetup(_engineEnvironmentSettings, sourceBasePath, templateSourceFiles, config);
-            setup.WriteSource();
-
-            string targetDir = FileSystemHelpers.GetNewVirtualizedPath(_engineEnvironmentSettings);
-            IReadOnlyDictionary<string, IReadOnlyList<IFileChange2>> allChanges = setup.GetFileChanges(targetDir);
-
-            Assert.Equal(1, allChanges.Count);
-
-            if (!allChanges.TryGetValue("./", out IReadOnlyList<IFileChange2>? changes))
+            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>
             {
-                Assert.True(false, "no changes for source './'");
-            }
+                { TestFileSystemUtils.DefaultConfigRelativePath, config.ToJsonString() },
+                { "other.xyz", null },
+                { "include.xyz", null },
+                { "exclude.xyz", null }
+            };
 
-            Assert.Equal(1, changes?.Count);
-            Assert.Equal(ChangeKind.Create, changes?[0].ChangeKind);
-            Assert.True(string.Equals(changes?[0].TargetRelativePath, "include.xyz"), "include modifier didn't properly override exclude modifier");
+            _engineEnvironmentSettings.WriteTemplateSource(sourceBasePath, templateSourceFiles);
+
+            string targetDir = _engineEnvironmentSettings.GetTempVirtualizedPath();
+            RunnableProjectGenerator generator = new();
+
+            using IMountPoint mountPoint = _engineEnvironmentSettings.MountPath(sourceBasePath);
+            IFile? templateConfigFile = mountPoint.FileInfo(TestFileSystemUtils.DefaultConfigRelativePath);
+            Assert.NotNull(templateConfigFile);
+
+            ITemplate template = new RunnableProjectConfig(_engineEnvironmentSettings, generator, templateConfigFile);
+            ParameterSetData parameters = new(template);
+
+            ICreationEffects result = await (generator as IGenerator).GetCreationEffectsAsync(_engineEnvironmentSettings, template, parameters, targetDir, default).ConfigureAwait(false);
+            IEnumerable<IFileChange2> changes = result.FileChanges.Cast<IFileChange2>();
+            Assert.All(result.FileChanges.Cast<IFileChange2>(), c => c.SourceRelativePath.StartsWith("./"));
+
+            Assert.Equal(1, result.FileChanges.Count);
+            Assert.Equal(ChangeKind.Create, result.FileChanges.Single().ChangeKind);
+            Assert.True(string.Equals(result.FileChanges.Single().TargetRelativePath, "./include.xyz"), "include modifier didn't properly override exclude modifier");
         }
 
-        [Fact(DisplayName = nameof(ExcludeModifierOverridesPreviousIncludeModifierTemplateTest))]
-        public void ExcludeModifierOverridesPreviousIncludeModifierTemplateTest()
+        [Fact]
+        public async Task ExcludeModifierOverridesPreviousIncludeModifierTemplateTest()
         {
-            string sourceBasePath = FileSystemHelpers.GetNewVirtualizedPath(_engineEnvironmentSettings);
+            string sourceBasePath = _engineEnvironmentSettings.GetTempVirtualizedPath();
 
-            TemplateConfigModel config = new TemplateConfigModel()
+            TemplateConfigModel config = new TemplateConfigModel("test")
             {
-                Identity = "test",
+                Name = "test",
+                ShortNameList = new[] { "test" },
                 Sources = new List<ExtendedFileSource>()
                 {
                     new ExtendedFileSource()
@@ -273,33 +312,36 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
                 }
             };
 
-            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>();
-            templateSourceFiles.Add(TestFileSystemHelper.DefaultConfigRelativePath, config.ToJObject().ToString());
-            templateSourceFiles.Add("other.xyz", null);
-            templateSourceFiles.Add("include.xyz", null);
-            templateSourceFiles.Add("exclude.xyz", null);
-            TestTemplateSetup setup = new TestTemplateSetup(_engineEnvironmentSettings, sourceBasePath, templateSourceFiles, config);
-            setup.WriteSource();
-
-            string targetDir = FileSystemHelpers.GetNewVirtualizedPath(_engineEnvironmentSettings);
-            IReadOnlyDictionary<string, IReadOnlyList<IFileChange2>> allChanges = setup.GetFileChanges(targetDir);
-
-            Assert.Equal(1, allChanges.Count);
-
-            if (!allChanges.TryGetValue("./", out IReadOnlyList<IFileChange2>? changes))
+            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>
             {
-                Assert.True(false, "no changes for source './'");
-            }
+                { TestFileSystemUtils.DefaultConfigRelativePath, config.ToJsonString() },
+                { "other.xyz", null },
+                { "include.xyz", null },
+                { "exclude.xyz", null }
+            };
 
-            Assert.Equal(2, changes?.Count);
+            _engineEnvironmentSettings.WriteTemplateSource(sourceBasePath, templateSourceFiles);
 
-            IFileChange2? includeXyzChangeInfo = changes?.FirstOrDefault(x => string.Equals(x.TargetRelativePath, "include.xyz"));
-            Assert.NotNull(includeXyzChangeInfo);
-            Assert.Equal(ChangeKind.Create, includeXyzChangeInfo?.ChangeKind);
+            string targetDir = _engineEnvironmentSettings.GetTempVirtualizedPath();
+            RunnableProjectGenerator generator = new();
 
-            IFileChange2? otherXyzChangeInfo = changes?.FirstOrDefault(x => string.Equals(x.TargetRelativePath, "other.xyz"));
-            Assert.NotNull(otherXyzChangeInfo);
-            Assert.Equal(ChangeKind.Create, otherXyzChangeInfo?.ChangeKind);
+            using IMountPoint mountPoint = _engineEnvironmentSettings.MountPath(sourceBasePath);
+            IFile? templateConfigFile = mountPoint.FileInfo(TestFileSystemUtils.DefaultConfigRelativePath);
+            Assert.NotNull(templateConfigFile);
+
+            ITemplate template = new RunnableProjectConfig(_engineEnvironmentSettings, generator, templateConfigFile);
+            ParameterSetData parameters = new(template);
+
+            ICreationEffects result = await (generator as IGenerator).GetCreationEffectsAsync(_engineEnvironmentSettings, template, parameters, targetDir, default).ConfigureAwait(false);
+            IEnumerable<IFileChange2> changes = result.FileChanges.Cast<IFileChange2>();
+            Assert.All(result.FileChanges.Cast<IFileChange2>(), c => c.SourceRelativePath.StartsWith("./"));
+
+            Assert.Equal(2, result.FileChanges.Count);
+            IFileChange2 includeXyzChangeInfo = changes.Single(x => string.Equals(x.TargetRelativePath, "./include.xyz"));
+            Assert.Equal(ChangeKind.Create, includeXyzChangeInfo.ChangeKind);
+
+            IFileChange2 otherXyzChangeInfo = changes.Single(x => string.Equals(x.TargetRelativePath, "./other.xyz"));
+            Assert.Equal(ChangeKind.Create, otherXyzChangeInfo.ChangeKind);
         }
     }
 }

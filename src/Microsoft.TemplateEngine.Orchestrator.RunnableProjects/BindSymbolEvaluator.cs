@@ -1,8 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -80,7 +78,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
             cancellationToken.ThrowIfCancellationRequested();
 
-            foreach (var task in tasksToRun.Where(t => t.Task.IsFaulted || t.Task.IsCompleted && t.Task.Result == null))
+            foreach (var task in tasksToRun.Where(t => t.Task.IsFaulted || (t.Task.IsCompleted && t.Task.Result == null)))
             {
                 _logger.LogWarning(LocalizableStrings.BindSymbolEvaluator_Warning_EvaluationError, task.Symbol.Name);
             }
@@ -174,8 +172,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 _logger.LogDebug(
                     "The following values were retrieved for binding '{0}': {1}.",
                     binding,
-                    string.Join(", ", successfulTasks.Select(t => $"{t.Source.DisplayName} (priority: {t.Source.Priority}): '{t.Value}'"))
-                );
+                    string.Join(", ", successfulTasks.Select(t => $"{t.Source.DisplayName} (priority: {t.Source.Priority}): '{t.Value}'")));
                 var highestPriority = successfulTasks.Max(t => t.Source.Priority);
                 var highestPrioTasks = successfulTasks.Where(t => t.Source.Priority == highestPriority);
                 if (highestPrioTasks.Count() > 1)

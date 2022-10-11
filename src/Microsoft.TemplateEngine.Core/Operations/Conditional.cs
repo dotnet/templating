@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Microsoft.TemplateEngine.Core.Contracts;
@@ -37,7 +36,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
         private readonly bool _trimWhitespace;
         private readonly ConditionalTokens _tokens;
         private readonly string _id;
-        private bool _initialState;
+        private readonly bool _initialState;
 
         public Conditional(ConditionalTokens tokenVariants, bool wholeLine, bool trimWhitespace, ConditionEvaluator evaluator, string id, bool initialState)
         {
@@ -156,10 +155,9 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
             public int HandleMatch(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int token)
             {
-                bool flag;
-                if (processor.Config.Flags.TryGetValue(OperationName, out flag) && !flag)
+                if (processor.Config.Flags.TryGetValue(OperationName, out bool flag) && !flag)
                 {
-                    processor.Write(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
+                    processor.WriteToTarget(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
                     return Tokens[token].Length;
                 }
 
@@ -168,7 +166,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
                 {
                     if (_definition._wholeLine)
                     {
-                        processor.SeekBackUntil(processor.EncodingConfig.LineEndings);
+                        processor.SeekTargetBackUntil(processor.EncodingConfig.LineEndings);
                     }
                     else if (_definition._trimWhitespace)
                     {
@@ -197,7 +195,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
                     {
                         if (_definition.WholeLine)
                         {
-                            processor.SeekForwardThrough(processor.EncodingConfig.LineEndings, ref bufferLength, ref currentBufferPosition);
+                            processor.SeekSourceForwardUntil(processor.EncodingConfig.LineEndings, ref bufferLength, ref currentBufferPosition, consumeToken: true);
                         }
 
                         if (IsTokenIndexOfType(token, IfTokenActionableBaseIndex))
@@ -220,7 +218,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
                 // If we've got an unbalanced statement, emit the token
                 if (_current == null)
                 {
-                    processor.Write(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
+                    processor.WriteToTarget(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
                     return Tokens[token].Length;
                 }
 
@@ -241,7 +239,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
                     if (_definition._wholeLine)
                     {
-                        processor.SeekForwardThrough(processor.EncodingConfig.LineEndings, ref bufferLength, ref currentBufferPosition);
+                        processor.SeekSourceForwardUntil(processor.EncodingConfig.LineEndings, ref bufferLength, ref currentBufferPosition, consumeToken: true);
                     }
                     else if (_definition._trimWhitespace)
                     {
@@ -253,7 +251,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
                 if (_current.BranchTaken)
                 {
-                    processor.SeekBackUntil(processor.EncodingConfig.LineEndings, true);
+                    processor.SeekTargetBackUntil(processor.EncodingConfig.LineEndings, true);
                     //A previous branch was taken. Skip to the endif token.
                     // NOTE: this can probably use the new method SeekToNextTokenAtSameLevel() - they do almost the same thing.
                     SkipToMatchingEndif(processor, ref bufferLength, ref currentBufferPosition, ref token);
@@ -272,7 +270,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
                     if (_definition._wholeLine)
                     {
-                        processor.SeekForwardUntil(processor.EncodingConfig.LineEndings, ref bufferLength, ref currentBufferPosition);
+                        processor.SeekSourceForwardUntil(processor.EncodingConfig.LineEndings, ref bufferLength, ref currentBufferPosition, consumeToken: false);
                     }
                     else if (_definition._trimWhitespace)
                     {
@@ -291,7 +289,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
                     {
                         if (_definition.WholeLine)
                         {
-                            processor.SeekForwardThrough(processor.EncodingConfig.LineEndings, ref bufferLength, ref currentBufferPosition);
+                            processor.SeekSourceForwardUntil(processor.EncodingConfig.LineEndings, ref bufferLength, ref currentBufferPosition, consumeToken: true);
                         }
 
                         if (IsTokenIndexOfType(token, ElseIfTokenActionableBaseIndex))
@@ -358,7 +356,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
             {
                 if (_definition.WholeLine)
                 {
-                    processor.SeekForwardThrough(processor.EncodingConfig.LineEndings, ref bufferLength, ref currentBufferPosition);
+                    processor.SeekSourceForwardUntil(processor.EncodingConfig.LineEndings, ref bufferLength, ref currentBufferPosition, consumeToken: true);
                 }
 
                 bool seekSucceeded = SeekToToken(processor, ref bufferLength, ref currentBufferPosition, out token);
@@ -443,8 +441,8 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
                 public bool BranchTaken
                 {
-                    get { return _branchTaken; }
-                    set { _branchTaken |= value; }
+                    get => _branchTaken;
+                    set => _branchTaken |= value;
                 }
 
                 public bool ActionableOperationsEnabled { get; private set; }
@@ -461,8 +459,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
                 internal bool Evaluate(IProcessorState processor, ref int bufferLength, ref int currentBufferPosition)
                 {
-                    bool faulted;
-                    BranchTaken = _impl._definition._evaluator(processor, ref bufferLength, ref currentBufferPosition, out faulted);
+                    BranchTaken = _impl._definition._evaluator(processor, ref bufferLength, ref currentBufferPosition, out bool faulted);
                     return BranchTaken;
                 }
             }

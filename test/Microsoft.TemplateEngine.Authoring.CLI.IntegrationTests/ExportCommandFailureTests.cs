@@ -11,7 +11,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.IntegrationTests
     {
         private readonly ITestOutputHelper _log;
 
-        private string _workingDirectory;
+        private readonly string _workingDirectory;
 
         public ExportCommandFailureTests(ITestOutputHelper log)
         {

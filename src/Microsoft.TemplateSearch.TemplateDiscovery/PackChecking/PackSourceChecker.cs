@@ -287,8 +287,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
             Dictionary<string, FilteredPackageInfo> filteredPackages,
             ScanningStats scanningStats,
             string? oldTemplatePackageVersion,
-            string? oldNonTemplatePackageVersion
-            )
+            string? oldNonTemplatePackageVersion)
         {
             IEnumerable<TemplateSearchData> foundTemplates = TryGetTemplatesInPack(sourceInfo, _additionalDataProducers);
             Verbose.WriteLine($"{sourceInfo.Name}::{sourceInfo.Version} is processed");
@@ -316,7 +315,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
                 {
                     if (string.IsNullOrWhiteSpace(oldTemplatePackageVersion))
                     {
-                        scanningStats.BecameTemplatePacks.Add((newCache[sourceInfo.Name]));
+                        scanningStats.BecameTemplatePacks.Add(newCache[sourceInfo.Name]);
                     }
                 }
             }
@@ -447,9 +446,9 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
             }
 
             Console.WriteLine($"   updated: {scanningStats.UpdatedTemplatePacks.Count}");
-            foreach (var package in scanningStats.UpdatedTemplatePacks)
+            foreach (var (updatedPackage, oldVersion) in scanningStats.UpdatedTemplatePacks)
             {
-                Console.WriteLine($"      {package.Package.Name}, {package.OldVersion} --> {package.Package.Version}");
+                Console.WriteLine($"      {updatedPackage.Name}, {oldVersion} --> {updatedPackage.Version}");
             }
 
             Console.WriteLine($"   removed: {scanningStats.RemovedTemplatePacks.Count}");

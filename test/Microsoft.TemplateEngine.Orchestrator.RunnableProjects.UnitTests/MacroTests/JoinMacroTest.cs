@@ -16,7 +16,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
 {
     public class JoinMacroTest : IClassFixture<EnvironmentSettingsHelper>
     {
-        private IEngineEnvironmentSettings _engineEnvironmentSettings;
+        private readonly IEngineEnvironmentSettings _engineEnvironmentSettings;
 
         public JoinMacroTest(EnvironmentSettingsHelper environmentSettingsHelper)
         {
@@ -38,17 +38,19 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
             string referenceEmptySymbolName = "referenceEmptySymbol";
             string constantValue = "constantValue";
 
-            List<KeyValuePair<string, string>> definitions = new List<KeyValuePair<string, string>>
+            List<KeyValuePair<string?, string?>> definitions = new()
             {
-                new KeyValuePair<string, string>("const", constantValue),
-                new KeyValuePair<string, string>("ref", referenceEmptySymbolName),
-                new KeyValuePair<string, string>("ref", referenceSymbolName)
+                new KeyValuePair<string?, string?>("const", constantValue),
+                new KeyValuePair<string?, string?>("ref", referenceEmptySymbolName),
+                new KeyValuePair<string?, string?>("ref", referenceSymbolName)
             };
 
             JoinMacroConfig macroConfig = new JoinMacroConfig(variableName, null, definitions, separator, removeEmptyValues);
 
-            IVariableCollection variables = new VariableCollection();
-            variables[referenceSymbolName] = referenceSymbolValue;
+            IVariableCollection variables = new VariableCollection
+            {
+                [referenceSymbolName] = referenceSymbolValue
+            };
 
             JoinMacro macro = new JoinMacro();
             macro.EvaluateConfig(_engineEnvironmentSettings, variables, macroConfig);
@@ -82,8 +84,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
 
             GeneratedSymbolDeferredMacroConfig deferredConfig = new GeneratedSymbolDeferredMacroConfig("JoinMacro", null, variableName, jsonParameters);
 
-            IVariableCollection variables = new VariableCollection();
-            variables[referenceSymbolName] = referenceSymbolValue;
+            IVariableCollection variables = new VariableCollection
+            {
+                [referenceSymbolName] = referenceSymbolValue
+            };
 
             JoinMacro macro = new JoinMacro();
             IMacroConfig realConfig = macro.CreateConfig(_engineEnvironmentSettings, deferredConfig);

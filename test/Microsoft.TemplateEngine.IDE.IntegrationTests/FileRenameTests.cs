@@ -1,23 +1,17 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.IDE.IntegrationTests.Utils;
 using Microsoft.TemplateEngine.Mocks;
 using Microsoft.TemplateEngine.TestHelper;
 using Microsoft.TemplateEngine.Utils;
-using Xunit;
 
 namespace Microsoft.TemplateEngine.IDE.IntegrationTests
 {
     public class FileRenameTests : BootstrapperTestBase, IClassFixture<PackageManager>
     {
-        private PackageManager _packageManager;
+        private readonly PackageManager _packageManager;
 
         public FileRenameTests(PackageManager packageManager)
         {
@@ -45,7 +39,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             {
                 "TemplateWithSourceName",
                 "--name baz",
-                 new MockCreationEffects()
+                new MockCreationEffects()
                     .WithPrimaryOutputs("baz.cs", "baz/baz.cs")
                     .WithFileChange(new MockFileChange("bar/bar.cs", "baz/baz.cs", ChangeKind.Create))
                     .WithFileChange(new MockFileChange("bar.cs", "baz.cs", ChangeKind.Create))
@@ -56,7 +50,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             {
                 "TemplateWithUnspecifiedSourceName",
                 "--name baz",
-                 new MockCreationEffects()
+                new MockCreationEffects()
                     .WithPrimaryOutputs("bar.cs", "bar/bar.cs")
                     .WithFileChange(new MockFileChange("bar/bar.cs", "bar/bar.cs", ChangeKind.Create))
                     .WithFileChange(new MockFileChange("bar.cs", "bar.cs", ChangeKind.Create))
@@ -69,7 +63,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             {
                 "TemplateWithSourceNameAndCustomSourcePath",
                 "--name bar",
-                 new MockCreationEffects()
+                new MockCreationEffects()
                     .WithPrimaryOutputs("bar.name.txt", "bar/bar.cs")
                     .WithFileChange(new MockFileChange("Custom/Path/foo/foo.cs", "bar/bar.cs", ChangeKind.Create))
                     .WithFileChange(new MockFileChange("Custom/Path/foo.name.txt", "bar.name.txt", ChangeKind.Create))
@@ -80,7 +74,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             {
                 "TemplateWithSourceNameAndCustomTargetPath",
                 "--name bar",
-                 new MockCreationEffects()
+                new MockCreationEffects()
                     .WithPrimaryOutputs("Custom/Path/bar.name.txt", "Custom/Path/bar/bar.cs")
                     .WithFileChange(new MockFileChange("foo/foo.cs", "Custom/Path/bar/bar.cs", ChangeKind.Create))
                     .WithFileChange(new MockFileChange("foo.name.txt", "Custom/Path/bar.name.txt", ChangeKind.Create))
@@ -91,7 +85,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             {
                 "TemplateWithSourceNameAndCustomSourceAndTargetPaths",
                 "--name bar",
-                 new MockCreationEffects()
+                new MockCreationEffects()
                     .WithPrimaryOutputs("Target/Output/bar/bar.cs", "Target/Output/bar.name.txt")
                     .WithFileChange(new MockFileChange("Src/Custom/Path/foo/foo.cs", "Target/Output/bar/bar.cs", ChangeKind.Create))
                     .WithFileChange(new MockFileChange("Src/Custom/Path/foo.name.txt", "Target/Output/bar.name.txt", ChangeKind.Create))
@@ -102,7 +96,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             {
                 "TemplateWithSourcePathOutsideConfigRoot",
                 "--name baz",
-                 new MockCreationEffects()
+                new MockCreationEffects()
                     .WithPrimaryOutputs("blah/MountPointRoot/mount.baz.cs", "blah/MountPointRoot/baz/baz.baz.cs", "blah/MountPointRoot/baz/bar/bar.baz.cs")
                     .WithFileChange(new MockFileChange("../../../MountPointRoot/mount.foo.cs", "blah/MountPointRoot/mount.baz.cs", ChangeKind.Create))
                     .WithFileChange(new MockFileChange("../../../MountPointRoot/foo/foo.foo.cs", "blah/MountPointRoot/baz/baz.baz.cs", ChangeKind.Create))
@@ -114,7 +108,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             {
                 "TemplateWithSourceNameInTargetPathGetsRenamed",
                 "--name baz",
-                 new MockCreationEffects()
+                new MockCreationEffects()
                     .WithPrimaryOutputs("bar/baz/baz.cs")
                     .WithFileChange(new MockFileChange("foo.cs", "bar/baz/baz.cs", ChangeKind.Create))
                     .Without("bar/foo/")
@@ -124,7 +118,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             {
                 "TemplateWithDerivedSymbolFileRename",
                 "--name Last.Part.Is.For.Rename",
-                 new MockCreationEffects()
+                new MockCreationEffects()
                     .WithPrimaryOutputs("Rename.cs")
                     .WithFileChange(new MockFileChange("Application1.cs", "Rename.cs", ChangeKind.Create))
                     .Without("Application1.cs")
@@ -134,7 +128,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             {
                 "TemplateWithMultipleRenamesOnSameFile",
                 "--fooRename base --barRename ball",
-                 new MockCreationEffects()
+                new MockCreationEffects()
                     .WithPrimaryOutputs("ballandbase.txt", "baseball.txt")
                     .WithFileChange(new MockFileChange("foobar.txt", "baseball.txt", ChangeKind.Create))
                     .WithFileChange(new MockFileChange("barandfoo.txt", "ballandbase.txt", ChangeKind.Create))
@@ -145,7 +139,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             {
                 "TemplateWithMultipleRenamesOnSameFileHandlesOverlap",
                 "--fooRename pin --oobRename ball",
-                 new MockCreationEffects()
+                new MockCreationEffects()
                     .WithPrimaryOutputs("pinb.txt")
                     .WithFileChange(new MockFileChange("foob.txt", "pinb.txt", ChangeKind.Create))
                     .Without("foob.txt", "fball.txt")
@@ -155,7 +149,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             {
                 "TemplateWithMultipleRenamesOnSameFileHandlesInducedOverlap",
                 "--fooRename bar --barRename baz",
-                 new MockCreationEffects()
+                new MockCreationEffects()
                     .WithPrimaryOutputs("bar.txt")
                     .WithFileChange(new MockFileChange("foo.txt", "bar.txt", ChangeKind.Create))
                     .Without("foo.txt", "baz.txt")
@@ -166,7 +160,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
                 "TemplateWithCaseSensitiveNameBasedRenames",
                 "--name NewName",
                 new MockCreationEffects()
-                    .WithPrimaryOutputs("Norenamepart/FileNorenamepart.txt", "Norenamepart/FileYesNewName.txt", "YesNewName/FileNorenamepart.txt", "YesNewName/FileYesNewName.txt" )
+                    .WithPrimaryOutputs("Norenamepart/FileNorenamepart.txt", "Norenamepart/FileYesNewName.txt", "YesNewName/FileNorenamepart.txt", "YesNewName/FileYesNewName.txt")
                     .WithFileChange(new MockFileChange("Norenamepart/FileNorenamepart.txt", "Norenamepart/FileNorenamepart.txt", ChangeKind.Create))
                     .WithFileChange(new MockFileChange("Norenamepart/FileYesRenamePart.txt", "Norenamepart/FileYesNewName.txt", ChangeKind.Create))
                     .WithFileChange(new MockFileChange("YesRenamePart/FileNorenamepart.txt", "YesNewName/FileNorenamepart.txt", ChangeKind.Create))
@@ -188,7 +182,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             {
                 "TemplateWithSourceBasedRenames",
                 "--barRename NewName",
-                 new MockCreationEffects()
+                new MockCreationEffects()
                     .WithPrimaryOutputs("baz.cs", "NewName.cs")
                     .WithFileChange(new MockFileChange("foo.cs", "baz.cs", ChangeKind.Create))
                     .WithFileChange(new MockFileChange("foo.cs", "NewName.cs", ChangeKind.Create))

@@ -7,7 +7,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config
 {
     internal class ConstantMacroConfig : IMacroConfig
     {
-        internal ConstantMacroConfig(string dataType, string variableName, string value)
+        internal ConstantMacroConfig(string? dataType, string variableName, string value)
         {
             DataType = dataType;
             VariableName = variableName;
@@ -19,7 +19,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config
 
         public string Type { get; private set; }
 
-        internal string DataType { get; }
+        internal string? DataType { get; }
 
         internal string Value { get; private set; }
     }

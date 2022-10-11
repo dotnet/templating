@@ -41,17 +41,24 @@ stages:
   displayName: Build
   jobs:
   - ${{ if and( ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-    - template: /eng/common/templates/job/onelocbuild.yml
-      parameters:
-        MirrorRepo: templating
-        LclSource: lclFilesfromPackage
-        ${{ if eq(variables['Build.SourceBranch'], format('{0}{1}', 'refs/heads/', variables['OneLocBuildBranch'])) }}:
-          MirrorBranch: $(OneLocBuildBranch)
+    - ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/release/') }}:
+      - template: /eng/common/templates/job/onelocbuild.yml
+        parameters:
+          MirrorRepo: templating
+          LclSource: lclFilesfromPackage
           LclPackageId: 'LCL-JUNO-PROD-TEMPLATING'
-        ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
-          MirrorBranch: 'main'
+          MirrorBranch: $(OneLocBuildBranch)
+          JobNameSuffix: '_release'
+          condition: eq(variables['Build.SourceBranch'], format('{0}{1}', 'refs/heads/', variables['OneLocBuildBranch'] ))
+    - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
+      - template: /eng/common/templates/job/onelocbuild.yml
+        parameters:
+          MirrorRepo: templating
+          LclSource: lclFilesfromPackage
           LclPackageId: 'LCL-JUNO-PROD-TMPLTNGMAIN'
-        condition: eq(or(variables['Build.SourceBranch'], format('{0}{1}', 'refs/heads/', variables['OneLocBuildBranch'] )), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+          MirrorBranch: 'main'
+          JobNameSuffix: '_main'
+          condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
   - template: /eng/common/templates/jobs/jobs.yml
     parameters:
       enableMicrobuild: true
@@ -67,10 +74,11 @@ stages:
         timeoutInMinutes: 90
         pool:
           ${{ if eq(variables['System.TeamProject'], 'public') }}:
-            vmImage: windows-2019
+            name: NetCore-Public
+            vmImage: 1es-windows-2019-open
           ${{ if eq(variables['System.TeamProject'], 'internal') }}:
             name: NetCore1ESPool-Internal
-            demands: ImageOverride -equals build.windows.10.amd64.vs2019
+            demands: ImageOverride -equals windows.vs2019.amd64
         variables:
         - _InternalBuildArgs: ''
 
@@ -154,10 +162,10 @@ stages:
         - job: Linux
           pool:
             ${{ if eq(variables['System.TeamProject'], 'public') }}:
-              vmImage: ubuntu-18.04 
+              vmImage: ubuntu-latest 
             ${{ if eq(variables['System.TeamProject'], 'internal') }}:
               name: NetCore1ESPool-Internal
-              demands: ImageOverride -equals Build.Ubuntu.1804.Amd64
+              demands: ImageOverride -equals Build.Ubuntu.2204.Amd64
           strategy:
             matrix:
               debug_configuration:

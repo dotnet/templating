@@ -1,8 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -61,8 +59,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             Assert.Equal("con4", model.Constraints[3].Type);
 
             Assert.Equal("\"arg\"", model.Constraints[0].Args);
-            Assert.Equal("[\"one\",\"two\",\"three\"]", model.Constraints[1].Args);
-            Assert.Equal("{\"one\":\"one\",\"two\":\"two\"}", model.Constraints[2].Args);
+            Assert.Equal("""["one","two","three"]""", model.Constraints[1].Args);
+            Assert.Equal(/*lang=json,strict*/ """{"one":"one","two":"two"}""", model.Constraints[2].Args);
             Assert.Null(model.Constraints[3].Args);
         }
 
@@ -86,7 +84,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             var model = TemplateConfigModel.FromJObject(JObject.FromObject(json), loggerProvider.CreateLogger("test"));
             Assert.Empty(model.Constraints);
             Assert.Single(loggedMessages);
-            Assert.Equal($"Constraint definition '{JObject.FromObject(new { args = "arg" }).ToString()}' does not contain mandatory property 'type'.", loggedMessages.Single().Item2);
+            Assert.Equal($"Constraint definition '{JObject.FromObject(new { args = "arg" })}' does not contain mandatory property 'type'.", loggedMessages.Single().Item2);
         }
 
         [Fact]

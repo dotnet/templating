@@ -1,8 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
@@ -44,7 +42,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms
 
             public string Name { get; }
 
-            public abstract string? Process(string? value, IReadOnlyDictionary<string, IValueForm> otherForms);
+            public abstract string Process(string value, IReadOnlyDictionary<string, IValueForm> otherForms);
         }
     }
 

@@ -22,33 +22,21 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig
         public IEnumerable<IOperationProvider> ConfigureFromJson(string configuration, IDirectory templateRoot)
         {
             JObject rawConfiguration = JObject.Parse(configuration);
-            string commentStyle = rawConfiguration.ToString("style");
-            IEnumerable<IOperationProvider> operations = null;
-
-            if (string.IsNullOrEmpty(commentStyle) || string.Equals(commentStyle, "custom", StringComparison.OrdinalIgnoreCase))
-            {
-                operations = ConditionalCustomConfig.ConfigureFromJObject(rawConfiguration);
-            }
-            else if (string.Equals(commentStyle, "line", StringComparison.OrdinalIgnoreCase))
-            {
-                operations = ConditionalLineCommentConfig.ConfigureFromJObject(rawConfiguration);
-            }
-            else if (string.Equals(commentStyle, "block", StringComparison.OrdinalIgnoreCase))
-            {
-                operations = ConditionalBlockCommentConfig.ConfigureFromJObject(rawConfiguration);
-            }
-            else
-            {
-                throw new TemplateAuthoringException($"Template authoring error. Invalid comment style [{commentStyle}].", "style");
-            }
-
+            string? commentStyle = rawConfiguration.ToString("style");
+            IEnumerable<IOperationProvider> operations = string.IsNullOrEmpty(commentStyle) || string.Equals(commentStyle, "custom", StringComparison.OrdinalIgnoreCase)
+                ? ConditionalCustomConfig.ConfigureFromJObject(rawConfiguration)
+                : string.Equals(commentStyle, "line", StringComparison.OrdinalIgnoreCase)
+                    ? ConditionalLineCommentConfig.ConfigureFromJObject(rawConfiguration)
+                    : string.Equals(commentStyle, "block", StringComparison.OrdinalIgnoreCase)
+                                    ? (IEnumerable<IOperationProvider>)ConditionalBlockCommentConfig.ConfigureFromJObject(rawConfiguration)
+                                    : throw new TemplateAuthoringException($"Template authoring error. Invalid comment style [{commentStyle}].", "style");
             foreach (IOperationProvider op in operations)
             {
                 yield return op;
             }
         }
 
-        internal static IReadOnlyList<IOperationProvider> ConditionalSetup(ConditionalType style, string evaluatorType, bool wholeLine, bool trimWhiteSpace, string id)
+        internal static IReadOnlyList<IOperationProvider> ConditionalSetup(ConditionalType style, EvaluatorType evaluatorType, bool wholeLine, bool trimWhiteSpace, string? id)
         {
             List<IOperationProvider> setup;
 
@@ -96,7 +84,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig
                     break;
                 case ConditionalType.VB:
                     setup = ConditionalLineCommentConfig.GenerateConditionalSetup(
-                        "",
+                        string.Empty,
                         new ConditionalKeywords
                         {
                             IfKeywords = new[] { "If" },
@@ -107,7 +95,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig
                         },
                         new ConditionalOperationOptions
                         {
-                            EvaluatorType = "VB",
+                            EvaluatorType = EvaluatorType.VB,
                             WholeLine = true
                         });
                     break;
@@ -119,7 +107,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig
         }
 
         // Nice to have: Generalize this type of setup similarly to Line, Block, & Custom
-        internal static List<IOperationProvider> MSBuildConditionalSetup(string evaluatorType, bool wholeLine, bool trimWhiteSpace, string id)
+        internal static List<IOperationProvider> MSBuildConditionalSetup(EvaluatorType evaluatorType, bool wholeLine, bool trimWhiteSpace, string id)
         {
             ConditionEvaluator evaluator = EvaluatorSelector.Select(evaluatorType);
             IOperationProvider conditional = new InlineMarkupConditional(
@@ -137,8 +125,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig
                 evaluator,
                 "$({0})",
                 id,
-                true
-            );
+                true);
 
             return new List<IOperationProvider>()
             {
@@ -147,7 +134,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig
         }
 
         // Nice to have: Generalize this type of setup similarly to Line, Block, & Custom
-        internal static List<IOperationProvider> CStyleNoCommentsConditionalSetup(string evaluatorType, bool wholeLine, bool trimWhiteSpace, string id)
+        internal static List<IOperationProvider> CStyleNoCommentsConditionalSetup(EvaluatorType evaluatorType, bool wholeLine, bool trimWhiteSpace, string? id)
         {
             ConditionalKeywords defaultKeywords = new ConditionalKeywords();
 

@@ -23,7 +23,7 @@ namespace Microsoft.TemplateEngine.Edge.Mount.Archive
             Parent = parent;
             EnvironmentSettings = environmentSettings;
             Archive = archive;
-            Root = new ZipFileDirectory(this, "/", "");
+            Root = new ZipFileDirectory(this, "/", string.Empty);
         }
 
         public IDirectory Root { get; }

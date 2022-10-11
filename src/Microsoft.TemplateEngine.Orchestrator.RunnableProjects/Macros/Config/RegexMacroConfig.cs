@@ -8,7 +8,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config
 {
     internal class RegexMacroConfig : IMacroConfig
     {
-        internal RegexMacroConfig(string variableName, string dataType, string sourceVariable, IList<KeyValuePair<string, string>> steps)
+        internal RegexMacroConfig(string variableName, string? dataType, string sourceVariable, IList<KeyValuePair<string?, string?>> steps)
         {
             DataType = dataType;
             VariableName = variableName;
@@ -21,11 +21,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config
 
         public string Type { get; private set; }
 
-        internal string DataType { get; }
+        internal string? DataType { get; }
 
         internal string SourceVariable { get; private set; }
 
         // Regex -> Replacement
-        internal IList<KeyValuePair<string, string>> Steps { get; private set; }
+        internal IList<KeyValuePair<string?, string?>> Steps { get; private set; }
     }
 }

@@ -2,11 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Text;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Core.Contracts;
-using Microsoft.TemplateEngine.Core.Expressions.Cpp2;
-using Microsoft.TemplateEngine.Core.Operations;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config;
 
@@ -15,30 +12,23 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
     // Symbol.type = "computed" is the only thing that becomes an evaluate macro.
     internal class EvaluateMacro : IMacro
     {
-        internal const string DefaultEvaluator = "C++";
+        internal const EvaluatorType DefaultEvaluator = EvaluatorType.CPP2;
 
         public Guid Id => new Guid("BB625F71-6404-4550-98AF-B2E546F46C5F");
 
         public string Type => "evaluate";
 
-        public void EvaluateConfig(IEngineEnvironmentSettings environmentSettings, IVariableCollection vars, IMacroConfig rawConfig)
+        public void EvaluateConfig(IEngineEnvironmentSettings environmentSettings, IVariableCollection variableCollection, IMacroConfig rawConfig)
         {
-            EvaluateMacroConfig config = rawConfig as EvaluateMacroConfig;
-
-            if (config == null)
+            if (rawConfig is not EvaluateMacroConfig config)
             {
                 throw new InvalidCastException("Couldn't cast the rawConfig as EvaluateMacroConfig");
             }
 
-            ConditionEvaluator evaluator = EvaluatorSelector.Select(config.Evaluator, Cpp2StyleEvaluatorDefinition.Evaluate);
+            ConditionStringEvaluator evaluator = EvaluatorSelector.SelectStringEvaluator(EvaluatorSelector.ParseEvaluatorName(config.Evaluator, DefaultEvaluator));
+            bool result = evaluator(environmentSettings.Host.Logger, config.Value, variableCollection);
 
-            byte[] data = Encoding.UTF8.GetBytes(config.Value);
-            int len = data.Length;
-            int pos = 0;
-            IProcessorState state = new GlobalRunSpec.ProcessorState(environmentSettings, vars, data, Encoding.UTF8);
-            bool result = evaluator(state, ref len, ref pos, out bool faulted);
-
-            vars[config.VariableName] = result;
+            variableCollection[config.VariableName] = result;
         }
     }
 }

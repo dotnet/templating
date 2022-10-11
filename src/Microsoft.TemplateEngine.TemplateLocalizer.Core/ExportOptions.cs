@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
 {
-    public struct ExportOptions : IEquatable<ExportOptions>
+    public readonly struct ExportOptions : IEquatable<ExportOptions>
     {
         /// <summary>
         /// Creates an instance of <see cref="ExportOptions"/>.
@@ -73,7 +73,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
 
         public override bool Equals(object obj)
         {
-            if (!(obj is ExportOptions other))
+            if (obj is not ExportOptions other)
             {
                 return false;
             }
@@ -83,8 +83,8 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
 
         public override int GetHashCode()
         {
-            return unchecked(((17 * 23 + DryRun.GetHashCode()) * 23
-                + (TargetDirectory?.GetHashCode() ?? 0)) * 23
+            return unchecked((((((17 * 23) + DryRun.GetHashCode()) * 23)
+                + (TargetDirectory?.GetHashCode() ?? 0)) * 23)
                 + (Languages?.GetHashCode() ?? 0));
         }
 

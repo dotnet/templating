@@ -73,6 +73,14 @@ dotnet_naming_symbols.static_fields.applicable_accessibilities = private, intern
 dotnet_naming_style.static_prefix_style.required_prefix = s_
 dotnet_naming_style.static_prefix_style.capitalization = camel_case
 
+# static readonly fields should begin with upper-case letter
+dotnet_naming_rule.static_readonly_fields_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.static_readonly_fields_should_be_pascal_case.symbols  = static_readonly_fields
+dotnet_naming_rule.static_readonly_fields_should_be_pascal_case.style    = pascal_case_style
+dotnet_naming_symbols.static_readonly_fields.applicable_kinds   = field
+dotnet_naming_symbols.static_readonly_fields.required_modifiers = static, readonly
+dotnet_naming_symbols.static_readonly_fields.applicable_accessibilities = private, internal, private_protected
+
 # internal and private fields should be _camelCase
 dotnet_naming_rule.camel_case_for_private_internal_fields.severity = suggestion
 dotnet_naming_rule.camel_case_for_private_internal_fields.symbols  = private_internal_fields
@@ -163,10 +171,31 @@ dotnet_code_quality.ca1802.api_surface = private, internal
 dotnet_code_quality.ca1822.api_surface = private, internal
 dotnet_code_quality.ca2208.api_surface = public
 dotnet_diagnostic.CS1591.severity = suggestion
-dotnet_diagnostic.IDE0005.severity = warning
-# Fix formating
-dotnet_diagnostic.IDE0055.severity = warning
-dotnet_diagnostic.IDE0240.severity = warning
+dotnet_analyzer_diagnostic.category-Style.severity = warning
+#Use explicit type instead of var
+dotnet_diagnostic.IDE0008.severity = suggestion
+#Add missing cases to switch statement
+dotnet_diagnostic.IDE0010.severity = suggestion
+#Use expression body for constructors
+dotnet_diagnostic.IDE0021.severity = suggestion
+#Use expression body for methods
+dotnet_diagnostic.IDE0022.severity = suggestion
+#Use auto-implemented property
+dotnet_diagnostic.IDE0032.severity = suggestion
+#Use conditional expression for return
+dotnet_diagnostic.IDE0046.severity = suggestion
+#Remove unnecessary expression value
+dotnet_diagnostic.IDE0058.severity = suggestion
+#Add missing cases to switch expression
+dotnet_diagnostic.IDE0072.severity = suggestion
+#Simplify new expression
+dotnet_diagnostic.IDE0090.severity = suggestion
+#namespace should match folder
+dotnet_diagnostic.IDE0130.severity = suggestion
+#file-scoped namespaces
+dotnet_diagnostic.IDE0160.severity = suggestion
+#top-level-statements
+dotnet_diagnostic.IDE0210.severity = suggestion
 
 # License header
 file_header_template = Licensed to the .NET Foundation under one or more agreements.\nThe .NET Foundation licenses this file to you under the MIT license.
@@ -401,21 +430,6 @@ dotnet_diagnostic.CA5385.severity = warning
 # Do not use insecure randomness
 dotnet_diagnostic.CA5394.severity = warning
 
-# UseIsNullCheck
-dotnet_diagnostic.IDE0041.severity = warning
-
-# ValidateFormatString
-dotnet_diagnostic.IDE0043.severity = warning
-
-# MakeLocalFunctionStatic
-dotnet_diagnostic.IDE0062.severity = warning
-
-# FileHeaderMismatch
-dotnet_diagnostic.IDE0073.severity = warning
-
-# ConvertTypeOfToNameOf
-dotnet_diagnostic.IDE0082.severity = warning
-
 dotnet_diagnostic.RS0041.severity = suggestion
 
 # XML comments
@@ -424,20 +438,11 @@ dotnet_diagnostic.SA0001.severity = none
 # Single line comment should begin with a space
 dotnet_diagnostic.SA1005.severity = none
 
-# Opening parenthesis should not be preceded by a space
-dotnet_diagnostic.SA1008.severity = none
-
-# Closing parenthesis should not be followed by a space
-dotnet_diagnostic.SA1009.severity = none
-
 # Prefix local calls with this
 dotnet_diagnostic.SA1101.severity = none
 
 # Block statements should not contain embedded comments
 dotnet_diagnostic.SA1108.severity = none
-
-# Closing parenthesis should be on line of last parameter
-dotnet_diagnostic.SA1111.severity = none
 
 # Parameter should not span multiple lines
 dotnet_diagnostic.SA1118.severity = none
@@ -447,9 +452,6 @@ dotnet_diagnostic.SA1119.severity = none
 
 # Comments should contain text
 dotnet_diagnostic.SA1120.severity = none
-
-# Use string.Empty for empty strings
-dotnet_diagnostic.SA1122.severity = none
 
 # Region should not be located within a code element
 dotnet_diagnostic.SA1123.severity = none
@@ -463,15 +465,6 @@ dotnet_diagnostic.SA1127.severity = none
 # Put constructor initializers on their own line
 dotnet_diagnostic.SA1128.severity = none
 
-# Constant values should appear on the right-hand side of comparisons
-dotnet_diagnostic.SA1131.severity = none
-
-# Elements should have the same indentation
-dotnet_diagnostic.SA1137.severity = none
-
-# Use literal suffix notation instead of casting
-dotnet_diagnostic.SA1139.severity = none
-
 # Use tuple syntax
 dotnet_diagnostic.SA1141.severity = warning
 
@@ -481,11 +474,11 @@ dotnet_diagnostic.SA1142.severity = warning
 # Using directive should appear within a namespace declaration
 dotnet_diagnostic.SA1200.severity = none
 
+# Variable names must not be prefixed
+dotnet_diagnostic.SA1308.severity = none
+
 # Field names should not begin with underscore
 dotnet_diagnostic.SA1309.severity = none
-
-# Type parameter names should begin with T
-dotnet_diagnostic.SA1314.severity = none
 
 # Tuple element names should use correct casing
 dotnet_diagnostic.SA1316.severity = warning
@@ -494,13 +487,7 @@ dotnet_diagnostic.SA1316.severity = warning
 dotnet_diagnostic.SA1402.severity = none
 
 # Debug.Assert should provide message text
-dotnet_diagnostic.SA1405.severity = none
-
-# Arithmetic expressions should declare precedence
-dotnet_diagnostic.SA1407.severity = none
-
-# Conditional expressions should declare precedence
-dotnet_diagnostic.SA1408.severity = none
+dotnet_diagnostic.SA1405.severity = silent
 
 # Use trailing comma in multi-line initializers
 dotnet_diagnostic.SA1413.severity = none
@@ -585,12 +572,6 @@ dotnet_diagnostic.xUnit1004.severity = warning
 
 # Do not use invalid equality check
 dotnet_diagnostic.xUnit2001.severity = warning
-
-# Do not use equality check to check for collection size.
-dotnet_diagnostic.xUnit2013.severity = none
-
-# Do not use Contains() to check if a value exists in a collection
-dotnet_diagnostic.xUnit2017.severity = none
 
 # Do not use obsolete throws check to check for asynchronously thrown exception
 dotnet_diagnostic.xUnit2019.severity = warning

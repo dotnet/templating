@@ -1,8 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,6 +14,7 @@ using Microsoft.TemplateEngine.Abstractions.Parameters;
 using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Core.Expressions.Cpp2;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Localization;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig;
 using Microsoft.TemplateEngine.Utils;
 
@@ -29,7 +28,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         internal const string LocalizationFilePrefix = "templatestrings.";
         internal const string LocalizationFileExtension = ".json";
         internal const string GeneratorVersion = "1.0.0.0";
-        private static readonly Guid GeneratorId = new Guid("0C434DF7-E2CB-4DEE-B216-D7C58C8EB4B3");
+        private static readonly Guid GeneratorId = new("0C434DF7-E2CB-4DEE-B216-D7C58C8EB4B3");
 
         Guid IIdentifiedComponent.Id => GeneratorId;
 
@@ -116,19 +115,19 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 throw new InvalidOperationException($"{nameof(templateData.TemplateSourceRoot)} cannot be null to continue.");
             }
 
-            IVariableCollection variables = SetupVariables(parameters, templateConfig.OperationConfig.VariableSetup);
+            IVariableCollection variables = SetupVariables(parameters, templateConfig.GlobalOperationConfig.VariableSetup);
             await templateConfig.EvaluateBindSymbolsAsync(environmentSettings, variables, cancellationToken).ConfigureAwait(false);
             cancellationToken.ThrowIfCancellationRequested();
-            ProcessMacros(environmentSettings, templateConfig.OperationConfig, variables);
+            ProcessMacros(environmentSettings, templateConfig.GlobalOperationConfig, variables);
             templateConfig.Evaluate(variables);
 
             IOrchestrator basicOrchestrator = new Core.Util.Orchestrator(environmentSettings.Host.Logger, environmentSettings.Host.FileSystem);
             RunnableProjectOrchestrator orchestrator = new RunnableProjectOrchestrator(basicOrchestrator);
 
-            GlobalRunSpec runSpec = new GlobalRunSpec(templateData.TemplateSourceRoot, environmentSettings.Components, variables, templateConfig.OperationConfig, templateConfig.SpecialOperationConfig, templateConfig.IgnoreFileNames);
+            GlobalRunSpec runSpec = new GlobalRunSpec(templateData.TemplateSourceRoot, environmentSettings.Components, variables, templateConfig);
             List<IFileChange2> changes = new List<IFileChange2>();
 
-            foreach (FileSourceMatchInfo source in templateConfig.Sources)
+            foreach (FileSourceMatchInfo source in templateConfig.EvaluatedSources)
             {
                 runSpec.SetupFileSource(source);
                 string target = Path.Combine(targetDirectory, source.Target);
@@ -154,7 +153,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 #pragma warning restore CS0618 // Type or member is obsolete
             }
 
-            return new CreationEffects2(changes, GetCreationResult(environmentSettings.Host.Logger, templateConfig, variables));
+            return new CreationEffects2(changes, GetCreationResult(templateConfig));
         }
 
         [Obsolete("Replaced by ParameterSetBuilder.CreateWithDefaults", true)]
@@ -201,13 +200,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
                             try
                             {
-                                ILocalizationModel locModel = LocalizationModelDeserializer.Deserialize(locFile);
+                                LocalizationModel locModel = LocalizationModelDeserializer.Deserialize(locFile);
                                 if (templateConfiguration.VerifyLocalizationModel(locModel, locFile))
                                 {
                                     localizations.Add(new LocalizationLocator(
                                         locale,
                                         locFile.FullPath,
-                                        templateConfiguration.Identity,
+                                        templateConfiguration.ConfigurationModel.Identity,
                                         locModel.Author ?? string.Empty,
                                         locModel.Name ?? string.Empty,
                                         locModel.Description ?? string.Empty,
@@ -312,19 +311,19 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            IVariableCollection variables = SetupVariables(parameters, runnableProjectConfig.OperationConfig.VariableSetup);
+            IVariableCollection variables = SetupVariables(parameters, runnableProjectConfig.GlobalOperationConfig.VariableSetup);
             await runnableProjectConfig.EvaluateBindSymbolsAsync(environmentSettings, variables, cancellationToken).ConfigureAwait(false);
 
             cancellationToken.ThrowIfCancellationRequested();
-            ProcessMacros(environmentSettings, runnableProjectConfig.OperationConfig, variables);
+            ProcessMacros(environmentSettings, runnableProjectConfig.GlobalOperationConfig, variables);
             runnableProjectConfig.Evaluate(variables);
 
             IOrchestrator basicOrchestrator = new Core.Util.Orchestrator(environmentSettings.Host.Logger, environmentSettings.Host.FileSystem);
             RunnableProjectOrchestrator orchestrator = new RunnableProjectOrchestrator(basicOrchestrator);
 
-            GlobalRunSpec runSpec = new GlobalRunSpec(templateSourceRoot, environmentSettings.Components, variables, runnableProjectConfig.OperationConfig, runnableProjectConfig.SpecialOperationConfig, runnableProjectConfig.IgnoreFileNames);
+            GlobalRunSpec runSpec = new GlobalRunSpec(templateSourceRoot, environmentSettings.Components, variables, runnableProjectConfig);
 
-            foreach (FileSourceMatchInfo source in runnableProjectConfig.Sources)
+            foreach (FileSourceMatchInfo source in runnableProjectConfig.EvaluatedSources)
             {
                 runSpec.SetupFileSource(source);
                 string target = Path.Combine(targetDirectory, source.Target);
@@ -337,7 +336,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 orchestrator.Run(runSpec, sourceDirectory, target);
             }
 
-            return GetCreationResult(environmentSettings.Host.Logger, runnableProjectConfig, variables);
+            return GetCreationResult(runnableProjectConfig);
         }
 
         private static IVariableCollection SetupVariables(IParameterSetData parameters, IVariableConfig variableConfig)
@@ -354,8 +353,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                         if (
                             variables.TryGetValue(choiceKey, out object? existingValueObj) &&
                             existingValueObj is string existingValue &&
-                            !string.Equals(choiceKey, existingValue, StringComparison.CurrentCulture)
-                        )
+                            !string.Equals(choiceKey, existingValue, StringComparison.CurrentCulture))
                         {
                             throw new InvalidOperationException(string.Format(LocalizableStrings.RunnableProjectGenerator_CannotAddImplicitChoice, choiceKey, existingValue));
                         }
@@ -381,16 +379,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             if (runConfig.ComputedMacros != null)
             {
-                macroProcessor = macroProcessor ?? new MacrosOperationConfig();
+                macroProcessor ??= new MacrosOperationConfig();
                 macroProcessor.ProcessMacros(environmentSettings, runConfig.ComputedMacros, variableCollection);
             }
         }
 
-        private static ICreationResult GetCreationResult(ILogger logger, IRunnableProjectConfig runnableProjectConfig, IVariableCollection variables)
+        private static ICreationResult GetCreationResult(IRunnableProjectConfig runnableProjectConfig)
         {
-            return new CreationResult(
-                postActions: PostAction.ListFromModel(logger, runnableProjectConfig.PostActionModels, variables),
-                primaryOutputs: CreationPath.ListFromModel(logger, runnableProjectConfig.PrimaryOutputs, variables));
+            return new CreationResult(runnableProjectConfig.PostActions, runnableProjectConfig.PrimaryOutputs);
         }
 
         private IFile? FindBestHostTemplateConfigFile(IEngineEnvironmentSettings engineEnvironment, IFile config)

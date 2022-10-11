@@ -28,12 +28,12 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.UnitTests
             new("..postactions.1.description", "postActions[1].description", "Opens Class1.cs in the editor")
         };
 
-        private string _workingDirectory;
+        private readonly string _workingDirectory;
 
         public StringUpdaterTests()
         {
             _workingDirectory = Path.Combine(Path.GetTempPath(), "Microsoft.TemplateEngine.TemplateLocalizer.Core.UnitTests", Path.GetRandomFileName());
-            Directory.CreateDirectory(_workingDirectory);
+            _ = Directory.CreateDirectory(_workingDirectory);
         }
 
         public void Dispose()
@@ -52,7 +52,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.UnitTests
             Assert.True(File.Exists(expectedFilename));
 
             // Only the specified language file should be generated (no more than 1 file in the directory).
-            Assert.Single(Directory.EnumerateFileSystemEntries(_workingDirectory));
+            _ = Assert.Single(Directory.EnumerateFileSystemEntries(_workingDirectory));
 
             Dictionary<string, string> resultStrings = await ReadTemplateStringsFromJsonFile(expectedFilename, cts.Token).ConfigureAwait(false);
 
@@ -60,7 +60,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core.UnitTests
             Assert.True(InputStrings.All(i => resultStrings.TryGetValue(i.LocalizationKey, out var value) && value == i.Value));
             Assert.All(InputStrings, i =>
             {
-                Assert.Contains(i.LocalizationKey, (IDictionary<string, string>)resultStrings);
+                _ = Assert.Contains(i.LocalizationKey, (IDictionary<string, string>)resultStrings);
                 Assert.Equal(i.Value, resultStrings[i.LocalizationKey]);
             });
         }

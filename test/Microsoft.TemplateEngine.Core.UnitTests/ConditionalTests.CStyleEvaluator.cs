@@ -1,6 +1,8 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#nullable enable
+
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -1447,14 +1449,7 @@ There";
         {
             if (!string.IsNullOrEmpty(culture))
             {
-                if (culture == "invariant")
-                {
-                    CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
-                }
-                else
-                {
-                    CultureInfo.CurrentCulture = new CultureInfo(culture);
-                }
+                CultureInfo.CurrentCulture = culture == "invariant" ? CultureInfo.InvariantCulture : new CultureInfo(culture);
             }
 
             byte[] valueBytes = Encoding.UTF8.GetBytes(value);
@@ -1633,10 +1628,9 @@ There";
         {
             string value = @"#ifdef
 GAGA
-#endif
-";
+#endif";
             string expected = varName == "def" && varValue ? @"GAGA
-" : "";
+" : string.Empty;
 
             byte[] valueBytes = Encoding.UTF8.GetBytes(value);
             MemoryStream input = new MemoryStream(valueBytes);
@@ -1648,6 +1642,28 @@ GAGA
             };
             IProcessor processor = SetupCStyleNoCommentsProcessor(vc);
             processor.Run(input, output, 999);
+            Verify(Encoding.UTF8, output, true, value, expected);
+        }
+
+        [Fact]
+        public void VerifyTheScopeAfterLongConditionIsNotLost()
+        {
+            //the buffer size is selected in the way so after processing the condition, the buffer is in the end and should be read
+            //for trie, the last know position is 4 and it misses the buffer window after condition processing.
+            string value = """
+                #ifdef false
+                Long text, long text, long text, long text, long text, long text, long text, long text, long text, long text, long text, long text, long tex
+                #endif
+                Long test after condition, Long test after condition,Long test after condition, Long test after condition,Long test after condition
+                """;
+            string expected = "Long test after condition, Long test after condition,Long test after condition, Long test after condition,Long test after condition";
+            byte[] valueBytes = Encoding.UTF8.GetBytes(value);
+            using MemoryStream input = new(valueBytes);
+            using MemoryStream output = new();
+
+            VariableCollection vc = new();
+            IProcessor processor = SetupCStyleNoCommentsProcessor(vc);
+            processor.Run(input, output, 20);
             Verify(Encoding.UTF8, output, true, value, expected);
         }
     }

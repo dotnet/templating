@@ -1,8 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
@@ -41,7 +39,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
                 List<ReplacementContext> contexts = new List<ReplacementContext>();
                 foreach (JToken entry in onlyIf.Children())
                 {
-                    if (!(entry is JObject x))
+                    if (entry is not JObject)
                     {
                         continue;
                     }

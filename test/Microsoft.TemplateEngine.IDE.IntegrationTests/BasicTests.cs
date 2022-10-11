@@ -1,19 +1,12 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.TemplateFiltering;
 using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.IDE.IntegrationTests.Utils;
 using Microsoft.TemplateEngine.TestHelper;
 using Microsoft.TemplateEngine.Utils;
-using VerifyXunit;
-using Xunit;
 
 namespace Microsoft.TemplateEngine.IDE.IntegrationTests
 {
@@ -21,7 +14,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
     [Collection("Verify Tests")]
     public class BasicTests : BootstrapperTestBase, IClassFixture<PackageManager>
     {
-        private PackageManager _packageManager;
+        private readonly PackageManager _packageManager;
 
         public BasicTests(PackageManager packageManager)
         {
@@ -44,8 +37,8 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
 
             var expectedFileChanges = new FileChange[]
             {
-                new FileChange ("bar.cs", "test.cs", ChangeKind.Create),
-                new FileChange ("bar/bar.cs", "test/test.cs", ChangeKind.Create),
+                new FileChange("bar.cs", "test.cs", ChangeKind.Create),
+                new FileChange("bar/bar.cs", "test/test.cs", ChangeKind.Create),
             };
             IFileChangeComparer comparer = new IFileChangeComparer();
             Assert.NotNull(result.CreationEffects?.FileChanges);
@@ -91,8 +84,8 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
 
             var expectedFileChanges = new FileChange[]
             {
-                new FileChange ("Company.ConsoleApplication1.csproj", "test.csproj", ChangeKind.Create),
-                new FileChange ("Program.cs", "Program.cs", ChangeKind.Create),
+                new FileChange("Company.ConsoleApplication1.csproj", "test.csproj", ChangeKind.Create),
+                new FileChange("Program.cs", "Program.cs", ChangeKind.Create),
             };
             IFileChangeComparer comparer = new IFileChangeComparer();
             Assert.NotNull(result.CreationEffects?.FileChanges);

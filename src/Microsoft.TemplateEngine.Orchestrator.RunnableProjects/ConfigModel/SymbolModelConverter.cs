@@ -1,8 +1,6 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json.Linq;
@@ -17,21 +15,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
         {
             try
             {
-                switch (jObject.ToString(nameof(BaseSymbol.Type)))
+                return jObject.ToString(nameof(BaseSymbol.Type)) switch
                 {
-                    case ParameterSymbol.TypeName:
-                        return new ParameterSymbol(name, jObject, defaultOverride);
-                    case DerivedSymbol.TypeName:
-                        return new DerivedSymbol(name, jObject, defaultOverride);
-                    case ComputedSymbol.TypeName:
-                        return new ComputedSymbol(name, jObject);
-                    case BindSymbol.TypeName:
-                        return new BindSymbol(name, jObject);
-                    case GeneratedSymbol.TypeName:
-                        return new GeneratedSymbol(name, jObject);
-                    default:
-                        return null;
-                }
+                    ParameterSymbol.TypeName => new ParameterSymbol(name, jObject, defaultOverride),
+                    DerivedSymbol.TypeName => new DerivedSymbol(name, jObject, defaultOverride),
+                    ComputedSymbol.TypeName => new ComputedSymbol(name, jObject),
+                    BindSymbol.TypeName => new BindSymbol(name, jObject),
+                    GeneratedSymbol.TypeName => new GeneratedSymbol(name, jObject),
+                    _ => null,
+                };
             }
             catch (TemplateAuthoringException ex)
             {

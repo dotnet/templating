@@ -7,7 +7,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config
 {
     internal class RegexMatchMacroConfig : IMacroConfig
     {
-        internal RegexMatchMacroConfig(string variableName, string dataType, string sourceVariable, string pattern)
+        internal RegexMatchMacroConfig(string variableName, string? dataType, string sourceVariable, string pattern)
         {
             DataType = dataType ?? "bool";
             VariableName = variableName;
@@ -20,7 +20,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config
 
         public string Type { get; }
 
-        internal string DataType { get; }
+        internal string? DataType { get; }
 
         internal string SourceVariable { get; }
 

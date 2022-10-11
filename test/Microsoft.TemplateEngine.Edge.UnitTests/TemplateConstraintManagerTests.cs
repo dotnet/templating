@@ -1,8 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using FakeItEasy;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Constraints;
@@ -13,7 +11,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 {
     public class TemplateConstraintManagerTests : IClassFixture<EnvironmentSettingsHelper>
     {
-        private EnvironmentSettingsHelper _environmentSettingsHelper;
+        private readonly EnvironmentSettingsHelper _environmentSettingsHelper;
 
         public TemplateConstraintManagerTests(EnvironmentSettingsHelper environmentSettingsHelper)
         {
@@ -170,8 +168,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 {
                     var constraintManager = new TemplateConstraintManager(engineEnvironmentSettings);
                     constraints = await constraintManager.GetConstraintsAsync(new[] { templateInfo }, default).ConfigureAwait(false);
-                }
-            );
+                });
             var completedTask = await Task.WhenAny(constraintsTask, Task.Delay(10000)).ConfigureAwait(false);
 
             Assert.Equal(completedTask, constraintsTask);

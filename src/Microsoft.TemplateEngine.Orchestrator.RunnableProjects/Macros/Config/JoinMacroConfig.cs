@@ -8,7 +8,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config
 {
     internal class JoinMacroConfig : IMacroConfig
     {
-        internal JoinMacroConfig(string variableName, string dataType, IList<KeyValuePair<string, string>> symbols, string separator, bool removeEmptyValues)
+        internal JoinMacroConfig(string variableName, string? dataType, IList<KeyValuePair<string?, string?>> symbols, string? separator, bool removeEmptyValues)
         {
             VariableName = variableName;
             Type = "join";
@@ -22,12 +22,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config
 
         public string Type { get; private set; }
 
-        internal string DataType { get; private set; }
+        internal string? DataType { get; private set; }
 
         // type -> value
-        internal IList<KeyValuePair<string, string>> Symbols { get; private set; }
+        internal IList<KeyValuePair<string?, string?>> Symbols { get; private set; }
 
-        internal string Separator { get; private set; }
+        internal string? Separator { get; private set; }
 
         internal bool RemoveEmptyValues { get; private set; }
     }

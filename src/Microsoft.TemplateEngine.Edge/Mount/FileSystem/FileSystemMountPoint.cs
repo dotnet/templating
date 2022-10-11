@@ -14,15 +14,15 @@ namespace Microsoft.TemplateEngine.Edge.Mount.FileSystem
     /// </summary>
     internal class FileSystemMountPoint : IMountPoint
     {
-        private SettingsFilePaths _paths;
+        private readonly SettingsFilePaths _paths;
 
-        internal FileSystemMountPoint(IEngineEnvironmentSettings environmentSettings, IMountPoint? parent, string mountPointUri, string mountPointRootPath)
+        internal FileSystemMountPoint(IEngineEnvironmentSettings environmentSettings, string mountPointUri, string mountPointRootPath)
         {
             MountPointUri = mountPointUri;
             MountPointRootPath = mountPointRootPath;
             EnvironmentSettings = environmentSettings;
             _paths = new SettingsFilePaths(environmentSettings);
-            Root = new FileSystemDirectory(this, "/", "", MountPointRootPath);
+            Root = new FileSystemDirectory(this, "/", string.Empty, MountPointRootPath);
         }
 
         public IDirectory Root { get; }

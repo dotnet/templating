@@ -1,8 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json.Linq;
@@ -29,8 +27,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
         /// Defines the relative path to the file after the template is instantiated.
         /// </summary>
         public string Path { get; }
-
-        internal string? PathResolved { get; set; }
 
         internal static IReadOnlyList<PrimaryOutputModel> ListFromJArray(JArray? jsonData)
         {

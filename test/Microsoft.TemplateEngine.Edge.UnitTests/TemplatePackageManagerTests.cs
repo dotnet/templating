@@ -13,7 +13,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 {
     public class TemplatePackageManagerTests : TestBase, IClassFixture<EnvironmentSettingsHelper>
     {
-        private EnvironmentSettingsHelper _environmentSettingsHelper;
+        private readonly EnvironmentSettingsHelper _environmentSettingsHelper;
 
         public TemplatePackageManagerTests(EnvironmentSettingsHelper environmentSettingsHelper)
         {
@@ -271,12 +271,12 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         private void AssertMountPointsWereOpened(IEnumerable<string> mountPoints, IEngineEnvironmentSettings environmentSettings)
         {
             string[] expectedScannedDirectories = mountPoints
-                .Select(f => Path.GetFullPath(f))
+                .Select(Path.GetFullPath)
                 .OrderBy(x => x)
                 .ToArray();
             string[] actualScannedDirectories = ((MonitoredFileSystem)environmentSettings.Host.FileSystem).FilesOpened
                 .Where((f) => Path.GetExtension(f) == ".nupkg") // Filter to only check for .nupkgs, and ignore templatecache.json and others...
-                .Select(f => Path.GetFullPath(f))
+                .Select(Path.GetFullPath)
                 .OrderBy(x => x)
                 .ToArray();
 
@@ -292,7 +292,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 
         private class FakeFactory : ITemplatePackageProviderFactory
         {
-            private static List<WeakReference<DefaultTemplatePackageProvider>> allCreatedProviders = new List<WeakReference<DefaultTemplatePackageProvider>>();
+            private static readonly List<WeakReference<DefaultTemplatePackageProvider>> AllCreatedProviders = new List<WeakReference<DefaultTemplatePackageProvider>>();
 
             public string DisplayName => nameof(FakeFactory);
 
@@ -310,7 +310,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 
             public static void TriggerChanged()
             {
-                foreach (var provider in allCreatedProviders)
+                foreach (var provider in AllCreatedProviders)
                 {
                     if (provider.TryGetTarget(out var actualProvider))
                     {
@@ -322,7 +322,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             public ITemplatePackageProvider CreateProvider(IEngineEnvironmentSettings settings)
             {
                 var defaultTemplatePackageProvider = new DefaultTemplatePackageProvider(this, settings, NuPkgs, Folders);
-                allCreatedProviders.Add(new WeakReference<DefaultTemplatePackageProvider>(defaultTemplatePackageProvider));
+                AllCreatedProviders.Add(new WeakReference<DefaultTemplatePackageProvider>(defaultTemplatePackageProvider));
                 return defaultTemplatePackageProvider;
             }
         }
@@ -359,7 +359,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 
         private class FakeFactoryWithPriority : ITemplatePackageProviderFactory, IPrioritizedComponent
         {
-            private static List<WeakReference<DefaultTemplatePackageProvider>> allCreatedProviders = new List<WeakReference<DefaultTemplatePackageProvider>>();
+            private static readonly List<WeakReference<DefaultTemplatePackageProvider>> AllCreatedProviders = new();
 
             public string DisplayName => nameof(FakeFactory);
 
@@ -377,7 +377,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 
             public static void TriggerChanged()
             {
-                foreach (var provider in allCreatedProviders)
+                foreach (var provider in AllCreatedProviders)
                 {
                     if (provider.TryGetTarget(out var actualProvider))
                     {
@@ -391,14 +391,11 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             public ITemplatePackageProvider CreateProvider(IEngineEnvironmentSettings settings)
             {
                 var defaultTemplatePackageProvider = new DefaultTemplatePackageProvider(this, settings, NuPkgs, Folders);
-                allCreatedProviders.Add(new WeakReference<DefaultTemplatePackageProvider>(defaultTemplatePackageProvider));
+                AllCreatedProviders.Add(new WeakReference<DefaultTemplatePackageProvider>(defaultTemplatePackageProvider));
                 return defaultTemplatePackageProvider;
             }
 
-            public int Priority
-            {
-                get => StaticPriority;
-            }
+            public int Priority => StaticPriority;
         }
     }
 }

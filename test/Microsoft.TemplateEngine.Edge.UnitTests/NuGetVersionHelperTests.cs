@@ -1,8 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using Microsoft.TemplateEngine.Edge.Installers.NuGet;
 using NuGet.Versioning;
 using Xunit;
@@ -53,8 +51,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         public void TryParseFloatRangeMatchingTest(string versionString, string pattern, bool isMatch)
         {
             NuGetVersion version = new NuGetVersion(versionString);
-            FloatRange floatRange;
-            Assert.True(NuGetVersionHelper.TryParseFloatRangeEx(pattern, out floatRange));
+            Assert.True(NuGetVersionHelper.TryParseFloatRangeEx(pattern, out FloatRange floatRange));
             Assert.Equal(isMatch, floatRange.Satisfies(version));
         }
     }

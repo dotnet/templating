@@ -12,8 +12,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig
 {
     internal class MacrosOperationConfig
     {
-        private static IReadOnlyDictionary<string, IMacro> _macroObjects;
-        private static IReadOnlyDictionary<string, IDeferredMacro> _deferredMacroObjects;
+        private static IReadOnlyDictionary<string, IMacro>? s_macroObjects;
+        private static IReadOnlyDictionary<string, IDeferredMacro>? s_deferredMacroObjects;
 
         // Warning: if there are unknown macro "types", they are quietly ignored here.
         // This applies to both the regular and deferred macros.
@@ -34,7 +34,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig
                     continue;
                 }
 
-                if (_macroObjects.TryGetValue(config.Type, out IMacro macroObject))
+                if (s_macroObjects!.TryGetValue(config.Type, out IMacro macroObject))
                 {
                     macroObject.EvaluateConfig(environmentSettings, variables, config);
                 }
@@ -47,8 +47,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig
             //  be held in a particular state to influence the production of other values
             foreach (GeneratedSymbolDeferredMacroConfig deferredConfig in deferredConfigList)
             {
-                IDeferredMacro deferredMacroObject;
-                if (_deferredMacroObjects.TryGetValue(deferredConfig.Type, out deferredMacroObject))
+                if (s_deferredMacroObjects!.TryGetValue(deferredConfig.Type, out IDeferredMacro deferredMacroObject))
                 {
                     deferredConfigs.Add(Tuple.Create((IMacro)deferredMacroObject, deferredMacroObject.CreateConfig(environmentSettings, deferredConfig)));
                 }
@@ -64,7 +63,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig
 
         private static void EnsureMacros(IComponentManager componentManager)
         {
-            if (_macroObjects == null)
+            if (s_macroObjects == null)
             {
                 Dictionary<string, IMacro> macroObjects = new Dictionary<string, IMacro>();
 
@@ -73,13 +72,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig
                     macroObjects[macro.Type] = macro;
                 }
 
-                _macroObjects = macroObjects;
+                s_macroObjects = macroObjects;
             }
         }
 
         private static void EnsureDeferredMacros(IComponentManager componentManager)
         {
-            if (_deferredMacroObjects == null)
+            if (s_deferredMacroObjects == null)
             {
                 Dictionary<string, IDeferredMacro> deferredMacroObjects = new Dictionary<string, IDeferredMacro>();
 
@@ -88,7 +87,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig
                     deferredMacroObjects[deferredMacro.Type] = deferredMacro;
                 }
 
-                _deferredMacroObjects = deferredMacroObjects;
+                s_deferredMacroObjects = deferredMacroObjects;
             }
         }
     }

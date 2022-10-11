@@ -17,9 +17,9 @@ namespace Microsoft.TemplateEngine.Edge
         private readonly IReadOnlyDictionary<string, string> _hostDefaults;
         private readonly IReadOnlyList<(Type InterfaceType, IIdentifiedComponent Instance)> _hostBuiltInComponents;
         [Obsolete]
-        private Dictionary<string, Action<string, string[]>> _diagnosticLoggers = new Dictionary<string, Action<string, string[]>>();
-        private ILoggerFactory _loggerFactory;
-        private ILogger _logger;
+        private readonly Dictionary<string, Action<string, string[]>> _diagnosticLoggers = new Dictionary<string, Action<string, string[]>>();
+        private readonly ILoggerFactory _loggerFactory;
+        private readonly ILogger _logger;
 
         public DefaultTemplateEngineHost(
             string hostIdentifier,
@@ -36,10 +36,7 @@ namespace Microsoft.TemplateEngine.Edge
             _hostBuiltInComponents = builtIns ?? NoComponents;
             FallbackHostTemplateConfigNames = fallbackHostTemplateConfigNames ?? new List<string>();
 
-            if (loggerFactory == null)
-            {
-                loggerFactory = NullLoggerFactory.Instance;
-            }
+            loggerFactory ??= NullLoggerFactory.Instance;
             _loggerFactory = loggerFactory;
             _logger = _loggerFactory.CreateLogger("Template Engine") ?? NullLogger.Instance;
         }

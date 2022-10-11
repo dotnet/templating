@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using Microsoft.TemplateEngine.Core.Contracts;
 
@@ -71,10 +70,9 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
             public int HandleMatch(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int token)
             {
-                bool flag;
-                if (processor.Config.Flags.TryGetValue(Region.OperationName, out flag) && !flag)
+                if (processor.Config.Flags.TryGetValue(Region.OperationName, out bool flag) && !flag)
                 {
-                    processor.Write(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
+                    processor.WriteToTarget(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
                     return Tokens[token].Length;
                 }
 

@@ -72,7 +72,6 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
         /// <param name="logger"></param>
         /// <param name="text">The string to be inspected and turned into expression.</param>
         /// <param name="variables">Variables to be substituted within the expression.</param>
-        /// <param name="referencedVariablesKeys">If passed (if not null) it will be populated with references to variables used within the inspected expression.</param>
         /// <returns></returns>
         public static bool EvaluateFromString(ILogger logger, string text, IVariableCollection variables)
         {
@@ -142,10 +141,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
 
         private static int? AttemptComparableComparison(object left, object right)
         {
-            IComparable ls = left as IComparable;
-            IComparable rs = right as IComparable;
-
-            if (ls == null || rs == null)
+            if (left is not IComparable ls || right is not IComparable rs)
             {
                 return null;
             }
@@ -165,10 +161,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
 
         private static int? AttemptLexographicComparison(object left, object right)
         {
-            string ls = left as string;
-            string rs = right as string;
-
-            if (ls == null || rs == null)
+            if (left is not string ls || right is not string rs)
             {
                 return null;
             }
@@ -210,8 +203,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
 
             if (lv == null)
             {
-                string ls = left as string;
-                if (ls == null || !Version.TryParse(ls, out lv))
+                if (left is not string ls || !Version.TryParse(ls, out lv))
                 {
                     return null;
                 }
@@ -221,8 +213,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
 
             if (rv == null)
             {
-                string rs = right as string;
-                if (rs == null || !Version.TryParse(rs, out rv))
+                if (right is not string rs || !Version.TryParse(rs, out rv))
                 {
                     return null;
                 }

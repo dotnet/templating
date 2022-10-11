@@ -1,8 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System;
 using System.IO;
 using Microsoft.TemplateEngine.Abstractions;
@@ -15,7 +13,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
 {
     public class ScanTests : IClassFixture<EnvironmentSettingsHelper>
     {
-        private EnvironmentSettingsHelper _environmentSettingsHelper;
+        private readonly EnvironmentSettingsHelper _environmentSettingsHelper;
 
         public ScanTests(EnvironmentSettingsHelper environmentSettingsHelper)
         {
@@ -43,14 +41,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
                 }
             };
             IEngineEnvironmentSettings environmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
-            string sourceBasePath = environmentSettings.GetNewVirtualizedPath();
+            string sourceBasePath = environmentSettings.GetTempVirtualizedPath();
 
             string templateConfigDir = Path.Combine(sourceBasePath, RunnableProjectGenerator.TemplateConfigDirectoryName);
             string filePath = Path.Combine(templateConfigDir, RunnableProjectGenerator.TemplateConfigFileName);
             environmentSettings.Host.FileSystem.CreateDirectory(templateConfigDir);
             environmentSettings.Host.FileSystem.WriteAllText(filePath, JsonConvert.SerializeObject(jsonToBe));
 
-            IMountPoint mountPoint = environmentSettings.MountPath(sourceBasePath);
+            using IMountPoint mountPoint = environmentSettings.MountPath(sourceBasePath);
             RunnableProjectGenerator generator = new RunnableProjectGenerator();
             var templates = (generator as IGenerator).GetTemplatesAndLangpacksFromDir(mountPoint, out _);
 

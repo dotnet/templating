@@ -1,8 +1,6 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System.Text;
 using System.Xml;
 
@@ -11,13 +9,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms
     internal class XmlEncodeValueFormFactory : ActionableValueFormFactory
     {
         internal const string FormIdentifier = "xmlEncode";
-        private static readonly XmlWriterSettings Settings = new XmlWriterSettings { ConformanceLevel = ConformanceLevel.Fragment };
+        private static readonly XmlWriterSettings Settings = new() { ConformanceLevel = ConformanceLevel.Fragment };
 
         internal XmlEncodeValueFormFactory() : base(FormIdentifier) { }
 
-        protected override string? Process(string? value)
+        protected override string Process(string value)
         {
-            StringBuilder output = new StringBuilder();
+            StringBuilder output = new();
             using (XmlWriter w = XmlWriter.Create(output, Settings))
             {
                 w.WriteString(value);

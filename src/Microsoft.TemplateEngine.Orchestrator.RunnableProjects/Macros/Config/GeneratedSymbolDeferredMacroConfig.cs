@@ -10,7 +10,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config
 {
     internal class GeneratedSymbolDeferredMacroConfig : IMacroConfig
     {
-        internal GeneratedSymbolDeferredMacroConfig(string type, string dataType, string variableName, Dictionary<string, JToken> parameters)
+        internal GeneratedSymbolDeferredMacroConfig(string type, string? dataType, string variableName, Dictionary<string, JToken> parameters)
         {
             DataType = dataType;
             Type = type;
@@ -26,7 +26,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config
 
         internal Guid Id => new Guid("12CA34F3-A1B7-4859-B08C-172483C9B0FD");
 
-        internal string DataType { get; }
+        internal string? DataType { get; }
 
         internal IReadOnlyDictionary<string, JToken> Parameters { get; private set; }
     }

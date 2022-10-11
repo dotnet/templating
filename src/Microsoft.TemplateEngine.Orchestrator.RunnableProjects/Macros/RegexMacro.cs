@@ -20,26 +20,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 
         public void EvaluateConfig(IEngineEnvironmentSettings environmentSettings, IVariableCollection vars, IMacroConfig rawConfig)
         {
-            string value = null;
-            RegexMacroConfig config = rawConfig as RegexMacroConfig;
-
-            if (config == null)
+            if (rawConfig is not RegexMacroConfig config)
             {
                 throw new InvalidCastException("Couldn't cast the rawConfig as RegexMacroConfig");
             }
 
-            if (!vars.TryGetValue(config.SourceVariable, out object working))
-            {
-                value = string.Empty;
-            }
-            else
-            {
-                value = working?.ToString() ?? "";
-            }
-
+            string value = !vars.TryGetValue(config.SourceVariable, out object working) ? string.Empty : working?.ToString() ?? string.Empty;
             if (config.Steps != null)
             {
-                foreach (KeyValuePair<string, string> stepInfo in config.Steps)
+                foreach (KeyValuePair<string?, string?> stepInfo in config.Steps)
                 {
                     value = Regex.Replace(value, stepInfo.Key, stepInfo.Value);
                 }
@@ -49,9 +38,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 
         public IMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IMacroConfig rawConfig)
         {
-            GeneratedSymbolDeferredMacroConfig deferredConfig = rawConfig as GeneratedSymbolDeferredMacroConfig;
-
-            if (deferredConfig == null)
+            if (rawConfig is not GeneratedSymbolDeferredMacroConfig deferredConfig)
             {
                 throw new InvalidCastException("Couldn't cast the rawConfig as a GeneratedSymbolDeferredMacroConfig");
             }
@@ -62,16 +49,16 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             }
             string sourceVariable = sourceVarToken.ToString();
 
-            List<KeyValuePair<string, string>> replacementSteps = new List<KeyValuePair<string, string>>();
+            List<KeyValuePair<string?, string?>> replacementSteps = new();
             if (deferredConfig.Parameters.TryGetValue("steps", out JToken stepListToken))
             {
                 JArray stepList = (JArray)stepListToken;
                 foreach (JToken step in stepList)
                 {
                     JObject map = (JObject)step;
-                    string regex = map.ToString("regex");
-                    string replaceWith = map.ToString("replacement");
-                    replacementSteps.Add(new KeyValuePair<string, string>(regex, replaceWith));
+                    string? regex = map.ToString("regex");
+                    string? replaceWith = map.ToString("replacement");
+                    replacementSteps.Add(new KeyValuePair<string?, string?>(regex, replaceWith));
                 }
             }
 

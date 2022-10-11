@@ -1,8 +1,6 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System.Collections.Generic;
 using FakeItEasy;
 using Microsoft.TemplateEngine.Abstractions.Mount;
@@ -22,16 +20,16 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
         {
             get
             {
-                string configString = @"
-{
-             ""actionableIf"": [ ""<!--#if"" ],
-             ""actionableElse"": [ ""#else"", ""<!--#else"" ],
-             ""actionableElseif"": [ ""#elseif"", ""<!--#elseif"" ],
-             ""endif"": [ ""#endif"", ""<!--#endif"" ],
-             ""trim"" : ""true"",
-             ""wholeLine"": ""true"",
-}
-";
+                string configString = /*lang=json*/ """
+                {
+                             "actionableIf": [ "<!--#if" ],
+                             "actionableElse": [ "#else", "<!--#else" ],
+                             "actionableElseif": [ "#elseif", "<!--#elseif" ],
+                             "endif": [ "#endif", "<!--#endif" ],
+                             "trim" : "true",
+                             "wholeLine": "true",
+                }
+                """;
                 return JObject.Parse(configString);
             }
         }
@@ -40,16 +38,17 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
         {
             get
             {
-                string configString = @"
-{
-             ""style"": ""custom"",
-             ""actionableIf"": [ ""<!--#if"" ],
-             ""actionableElse"": [ ""#else"", ""<!--#else"" ],
-             ""actionableElseif"": [ ""#elseif"", ""<!--#elseif"" ],
-             ""endif"": [ ""#endif"", ""<!--#endif"" ],
-             ""trim"" : ""true"",
-             ""wholeLine"": ""true"",
-}";
+                string configString = /*lang=json*/ """
+                {
+                             "style": "custom",
+                             "actionableIf": [ "<!--#if" ],
+                             "actionableElse": [ "#else", "<!--#else" ],
+                             "actionableElseif": [ "#elseif", "<!--#elseif" ],
+                             "endif": [ "#endif", "<!--#endif" ],
+                             "trim" : "true",
+                             "wholeLine": "true",
+                }
+                """;
                 return JObject.Parse(configString);
             }
         }
@@ -58,12 +57,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
         {
             get
             {
-                string configString = @"
-{
-        ""style"": ""line"",
-        ""token"": ""//""
-}
-";
+                string configString = /*lang=json,strict*/ """
+                {
+                        "style": "line",
+                        "token": "//"
+                }
+                """;
                 return JObject.Parse(configString);
             }
         }
@@ -72,13 +71,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
         {
             get
             {
-                string configString = @"
-{
-        ""style"": ""block"",
-        ""startToken"": ""/*"",
-        ""endToken"": ""*/"",
-        ""pseudoEndToken"": ""* /""
-}";
+                string configString = /*lang=json,strict*/ """
+                {
+                        "style": "block",
+                        "startToken": "/*",
+                        "endToken": "*/",
+                        "pseudoEndToken": "* /"
+                }
+                """;
                 return JObject.Parse(configString);
             }
         }

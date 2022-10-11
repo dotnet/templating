@@ -7,7 +7,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config
 {
     internal class RandomMacroConfig : IMacroConfig
     {
-        internal RandomMacroConfig(string variableName, string dataType, int low, int? high)
+        internal RandomMacroConfig(string variableName, string? dataType, int low, int? high)
         {
             DataType = dataType;
             VariableName = variableName;
@@ -20,7 +20,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config
 
         public string Type { get; private set; }
 
-        internal string DataType { get; }
+        internal string? DataType { get; }
 
         internal int Low { get; private set; }
 

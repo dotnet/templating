@@ -1,8 +1,6 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Core.Contracts;
@@ -20,9 +18,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 
         public void EvaluateConfig(IEngineEnvironmentSettings environmentSettings, IVariableCollection vars, IMacroConfig rawConfig)
         {
-            NowMacroConfig? config = rawConfig as NowMacroConfig;
-
-            if (config == null)
+            if (rawConfig is not NowMacroConfig config)
             {
                 throw new InvalidCastException("Couldn't cast the rawConfig as NowMacroConfig");
             }
@@ -34,9 +30,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 
         public IMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IMacroConfig rawConfig)
         {
-            GeneratedSymbolDeferredMacroConfig? deferredConfig = rawConfig as GeneratedSymbolDeferredMacroConfig;
-
-            if (deferredConfig == null)
+            if (rawConfig is not GeneratedSymbolDeferredMacroConfig deferredConfig)
             {
                 throw new InvalidCastException("Couldn't cast the rawConfig as a GeneratedSymbolDeferredMacroConfig");
             }
@@ -47,16 +41,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             }
             string format = formatToken.ToString();
 
-            bool utc;
-            if (deferredConfig.Parameters.TryGetValue("utc", out JToken utcToken))
-            {
-                utc = utcToken.ToBool();
-            }
-            else
-            {
-                utc = false;
-            }
-
+            bool utc = deferredConfig.Parameters.TryGetValue("utc", out JToken utcToken) && utcToken.ToBool();
             IMacroConfig realConfig = new NowMacroConfig(deferredConfig.VariableName, format, utc);
             return realConfig;
         }

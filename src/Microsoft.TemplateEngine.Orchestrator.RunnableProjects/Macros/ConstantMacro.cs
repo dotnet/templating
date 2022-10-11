@@ -18,20 +18,19 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 
         public void EvaluateConfig(IEngineEnvironmentSettings environmentSettings, IVariableCollection vars, IMacroConfig rawConfig)
         {
-            ConstantMacroConfig config = rawConfig as ConstantMacroConfig;
-
-            if (config == null)
+            if (rawConfig is not ConstantMacroConfig config)
             {
                 throw new InvalidCastException("Couldn't cast the rawConfig as ConstantMacroConfig");
             }
-            vars[config.VariableName] = config.Value;
+            if (config.Value != null)
+            {
+                vars[config.VariableName] = config.Value;
+            }
         }
 
         public IMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IMacroConfig rawConfig)
         {
-            GeneratedSymbolDeferredMacroConfig deferredConfig = rawConfig as GeneratedSymbolDeferredMacroConfig;
-
-            if (deferredConfig == null)
+            if (rawConfig is not GeneratedSymbolDeferredMacroConfig deferredConfig)
             {
                 throw new InvalidCastException("Couldn't cast the rawConfig as a GeneratedSymbolDeferredMacroConfig");
             }

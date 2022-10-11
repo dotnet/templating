@@ -94,7 +94,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
         {
             _ = templateInfo ?? throw new ArgumentNullException(nameof(templateInfo));
             inputParameters?.VerifyInputData();
-            inputParameters = inputParameters ?? new InputDataSet(templateInfo);
+            inputParameters ??= new InputDataSet(templateInfo);
             cancellationToken.ThrowIfCancellationRequested();
 
             ITemplate? template = LoadTemplate(templateInfo, baselineName);
@@ -212,15 +212,9 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 return;
             }
 
-            if (template.LocaleConfiguration != null)
-            {
-                template.LocaleConfiguration.MountPoint.Dispose();
-            }
+            template.LocaleConfiguration?.MountPoint.Dispose();
 
-            if (template.Configuration != null)
-            {
-                template.Configuration.MountPoint.Dispose();
-            }
+            template.Configuration?.MountPoint.Dispose();
 
             if (template.TemplateSourceRoot != null && template.TemplateSourceRoot != template.Configuration)
             {
@@ -279,8 +273,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                                      !(p.Value is EvaluatedInputParameterData
                                      {
                                          IsEnabledConditionResult: false
-                                     })
-                                     )
+                                     }))
                          .Select(p => p.Value))
             {
                 if (templateParamsBuilder.TryGetValue(inputParam.ParameterDefinition.Name, out ITemplateParameter paramFromTemplate))
@@ -341,13 +334,11 @@ namespace Microsoft.TemplateEngine.Edge.Template
         public ITemplate? LoadTemplate(ITemplateInfo info, string? baselineName)
 #pragma warning restore SA1202 // Elements should be ordered by access
         {
-            IGenerator? generator;
-            if (!_environmentSettings.Components.TryGetComponent(info.GeneratorId, out generator))
+            if (!_environmentSettings.Components.TryGetComponent(info.GeneratorId, out IGenerator? generator))
             {
                 return null;
             }
-            IMountPoint? mountPoint;
-            if (!_environmentSettings.TryGetMountPoint(info.MountPointUri, out mountPoint))
+            if (!_environmentSettings.TryGetMountPoint(info.MountPointUri, out IMountPoint? mountPoint))
             {
                 return null;
             }
@@ -358,10 +349,9 @@ namespace Microsoft.TemplateEngine.Edge.Template
             }
             IFile? localeConfig = string.IsNullOrEmpty(info.LocaleConfigPlace) ? null : mountPoint.FileInfo(info.LocaleConfigPlace!);
             IFile? hostTemplateConfigFile = string.IsNullOrEmpty(info.HostConfigPlace) ? null : mountPoint.FileInfo(info.HostConfigPlace!);
-            ITemplate? template;
             using (Timing.Over(_environmentSettings.Host.Logger, $"Template from config {config.MountPoint.MountPointUri}{config.FullPath}"))
             {
-                if (generator!.TryGetTemplateFromConfigInfo(config, out template, localeConfig, hostTemplateConfigFile, baselineName))
+                if (generator!.TryGetTemplateFromConfigInfo(config, out ITemplate? template, localeConfig, hostTemplateConfigFile, baselineName))
                 {
                     return template;
                 }
@@ -404,7 +394,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 const int _MAX_RETRIES = 3;
                 int retries = 0;
 #pragma warning disable CS0618 // Type or member is obsolete - for backward compatibility
-                while (host.OnParameterError(evaluatedParameterData.ParameterDefinition, "", "Missing required parameter", out newParamValue)
+                while (host.OnParameterError(evaluatedParameterData.ParameterDefinition, string.Empty, "Missing required parameter", out newParamValue)
 #pragma warning restore CS0618 // Type or member is obsolete
                        && string.IsNullOrEmpty(newParamValue)
                        && ++retries < _MAX_RETRIES)

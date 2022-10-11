@@ -14,7 +14,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
 {
     public class EvaluateMacroTests : IClassFixture<EnvironmentSettingsHelper>
     {
-        private IEngineEnvironmentSettings _engineEnvironmentSettings;
+        private readonly IEngineEnvironmentSettings _engineEnvironmentSettings;
 
         public EvaluateMacroTests(EnvironmentSettingsHelper environmentSettingsHelper)
         {
@@ -53,13 +53,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
         public void TestEvaluateMultichoice(string condition, string evaluator, string multichoiceValues, bool expectedResult)
         {
             string variableName = "myPredicate";
-            EvaluateMacroConfig macroConfig = new EvaluateMacroConfig(variableName, null, condition, evaluator);
+            EvaluateMacroConfig macroConfig = new EvaluateMacroConfig(variableName, "bool", condition, evaluator);
 
-            IVariableCollection variables = new VariableCollection();
-            variables["A"] = "A";
-            variables["B"] = "B";
-            variables["C"] = "C";
-            variables["Param"] = new MultiValueParameter(multichoiceValues.TokenizeMultiValueParameter());
+            IVariableCollection variables = new VariableCollection
+            {
+                ["A"] = "A",
+                ["B"] = "B",
+                ["C"] = "C",
+                ["Param"] = new MultiValueParameter(multichoiceValues.TokenizeMultiValueParameter())
+            };
 
             EvaluateMacro macro = new EvaluateMacro();
             macro.EvaluateConfig(_engineEnvironmentSettings, variables, macroConfig);

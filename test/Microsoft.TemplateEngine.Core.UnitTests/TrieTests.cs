@@ -13,7 +13,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
 {
     public class TrieTests : TestBase, IClassFixture<TestLoggerFactory>
     {
-        private ILogger _logger;
+        private readonly ILogger _logger;
 
         public TrieTests(TestLoggerFactory testLoggerFactory)
         {
@@ -36,14 +36,15 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
                                 return 0;
                             },
                             true,
-                            new byte[] { 1, 2, 3 })
-                    )
+                            new byte[] { 1, 2, 3 }))
                 },
                 VariableCollection.Root());
 
             byte[] data = new byte[] { 1, 2, 3, 4, 5 };
-            MemoryStream source = new MemoryStream(data);
-            source.Position = 0;
+            MemoryStream source = new MemoryStream(data)
+            {
+                Position = 0
+            };
             p.Run(source, new MemoryStream());
             Assert.True(testActivated);
         }
@@ -64,8 +65,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
                                 return 0;
                             },
                             true,
-                            new byte[] { 1, 2, 3 })
-                    )
+                            new byte[] { 1, 2, 3 }))
                 },
                 VariableCollection.Root());
 
@@ -90,8 +90,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
                                 return 0;
                             },
                             true,
-                            new byte[] { 1, 2, 3 })
-                    )
+                            new byte[] { 1, 2, 3 }))
                 },
                 VariableCollection.Root());
 
@@ -116,8 +115,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
                                 return 0;
                             },
                             true,
-                            new byte[] { 1, 2, 3 })
-                    )
+                            new byte[] { 1, 2, 3 }))
                 },
                 VariableCollection.Root());
 

@@ -9,7 +9,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config
 {
     internal class ProcessValueFormMacroConfig : IMacroConfig
     {
-        internal ProcessValueFormMacroConfig(string sourceSymbol, string symbolName, string dataType, string valueForm, IReadOnlyDictionary<string, IValueForm> forms)
+        internal ProcessValueFormMacroConfig(string sourceSymbol, string symbolName, string? dataType, string valueForm, IReadOnlyDictionary<string, IValueForm> forms)
         {
             DataType = dataType;
             SourceVariable = sourceSymbol;
@@ -22,7 +22,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config
 
         public string Type => "processValueForm";
 
-        internal string DataType { get; }
+        internal string? DataType { get; }
 
         internal string SourceVariable { get; }
 

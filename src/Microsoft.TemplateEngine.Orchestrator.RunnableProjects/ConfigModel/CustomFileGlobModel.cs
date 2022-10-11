@@ -1,8 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Core.Contracts;
@@ -47,9 +45,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
             List<CustomOperationModel> customOpsForGlob = new List<CustomOperationModel>();
             if (globData.TryGetValue(nameof(Operations), StringComparison.OrdinalIgnoreCase, out JToken? operationData))
             {
-                foreach (JObject operationConfig in (JArray)operationData)
+                foreach (JToken operationConfig in (JArray)operationData)
                 {
-                    customOpsForGlob.Add(CustomOperationModel.FromJObject(operationConfig));
+                    if (operationConfig is JObject obj)
+                    {
+                        customOpsForGlob.Add(CustomOperationModel.FromJObject(obj));
+                    }
                 }
             }
 

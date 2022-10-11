@@ -1,8 +1,6 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
@@ -19,7 +17,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
 {
     public class NowMacroTests : IClassFixture<EnvironmentSettingsHelper>
     {
-        private IEngineEnvironmentSettings _engineEnvironmentSettings;
+        private readonly IEngineEnvironmentSettings _engineEnvironmentSettings;
 
         public NowMacroTests(EnvironmentSettingsHelper environmentSettingsHelper)
         {
@@ -31,7 +29,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
         public void EvaluateNowConfig()
         {
             string variableName = "nowString";
-            string format = "";
+            string format = string.Empty;
             bool utc = true;
             NowMacroConfig macroConfig = new NowMacroConfig(variableName, format, utc);
             Assert.Equal("string", macroConfig.DataType);
@@ -55,11 +53,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
         public void EvaluateNowDeferredConfig()
         {
             string variableName = "nowString";
-            string format = "";
+            string format = string.Empty;
             bool utc = false;
-            Dictionary<string, JToken> jsonParameters = new Dictionary<string, JToken>();
-            jsonParameters.Add("format", format);
-            jsonParameters.Add("utc", utc);
+            Dictionary<string, JToken> jsonParameters = new Dictionary<string, JToken>
+            {
+                { "format", format },
+                { "utc", utc }
+            };
             GeneratedSymbolDeferredMacroConfig deferredConfig = new GeneratedSymbolDeferredMacroConfig("NowMacro", null, variableName, jsonParameters);
 
             IVariableCollection variables = new VariableCollection();
@@ -87,12 +87,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
         public void EvaluateNowOverrideDatatypeInConfig(string type)
         {
             string variableName = "nowString";
-            string format = "";
+            string format = string.Empty;
             bool utc = false;
-            Dictionary<string, JToken> jsonParameters = new Dictionary<string, JToken>();
-            jsonParameters.Add("format", format);
-            jsonParameters.Add("utc", utc);
-            jsonParameters.Add("datatype", type);
+            Dictionary<string, JToken> jsonParameters = new Dictionary<string, JToken>
+            {
+                { "format", format },
+                { "utc", utc },
+                { "datatype", type }
+            };
             GeneratedSymbolDeferredMacroConfig deferredConfig = new GeneratedSymbolDeferredMacroConfig("NowMacro", type, variableName, jsonParameters);
             NowMacro macro = new NowMacro();
             IMacroConfig realConfig = macro.CreateConfig(_engineEnvironmentSettings, deferredConfig);

@@ -1,8 +1,6 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +18,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
 {
     public class GuidMacroTests : IClassFixture<EnvironmentSettingsHelper>
     {
-        private IEngineEnvironmentSettings _engineEnvironmentSettings;
+        private readonly IEngineEnvironmentSettings _engineEnvironmentSettings;
 
         public GuidMacroTests(EnvironmentSettingsHelper environmentSettingsHelper)
         {
@@ -43,8 +41,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
         [Fact(DisplayName = nameof(TestDeferredGuidConfig))]
         public void TestDeferredGuidConfig()
         {
-            Dictionary<string, JToken?> jsonParameters = new();
-            jsonParameters.Add("format", null);
+            Dictionary<string, JToken> jsonParameters = new();
             string variableName = "myGuid1";
             GeneratedSymbolDeferredMacroConfig deferredConfig = new GeneratedSymbolDeferredMacroConfig("GuidMacro", "string", variableName, jsonParameters);
 

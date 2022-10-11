@@ -1,8 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
 using System.Runtime.InteropServices;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Constraints;
@@ -15,7 +13,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 {
     public class OSConstraintTests : IClassFixture<EnvironmentSettingsHelper>
     {
-        private IEngineEnvironmentSettings _sharedSettings;
+        private readonly IEngineEnvironmentSettings _sharedSettings;
 
         public OSConstraintTests(EnvironmentSettingsHelper helper)
         {

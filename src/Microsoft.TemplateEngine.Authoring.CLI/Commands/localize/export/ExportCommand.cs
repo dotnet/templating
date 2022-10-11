@@ -92,7 +92,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands
 
             try
             {
-                await Task.WhenAll(runningExportTasks.Select(t => t.Task)).ConfigureAwait(false);
+                _ = await Task.WhenAll(runningExportTasks.Select(t => t.Task)).ConfigureAwait(false);
             }
             catch (Exception)
             {

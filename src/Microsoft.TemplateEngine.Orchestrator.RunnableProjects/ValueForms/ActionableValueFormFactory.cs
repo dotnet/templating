@@ -1,8 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable enable
-
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
@@ -29,7 +28,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms
             return new ActionableValueForm(name!, this);
         }
 
-        protected abstract string? Process(string? value);
+        protected abstract string Process(string value);
 
         protected class ActionableValueForm : BaseValueForm
         {
@@ -40,8 +39,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ValueForms
                 _factory = factory;
             }
 
-            public override string? Process(string? value, IReadOnlyDictionary<string, IValueForm> otherForms)
+            public override string Process(string value, IReadOnlyDictionary<string, IValueForm> otherForms)
             {
+                if (value is null)
+                {
+                    throw new ArgumentNullException(nameof(value));
+                }
+
                 return _factory.Process(value);
             }
         }

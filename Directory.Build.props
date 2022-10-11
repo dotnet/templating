@@ -4,7 +4,7 @@
     <Import Project="$(RepositoryEngineeringDir)Analyzers.props" />
 
     <PropertyGroup>
-        <LangVersion>10.0</LangVersion>
+        <LangVersion>preview</LangVersion>
         <NETCoreTargetFramework>net7.0</NETCoreTargetFramework>
         <NETStandardTargetFramework>netstandard2.0</NETStandardTargetFramework>
         <NETFullTargetFramework>net472</NETFullTargetFramework>
@@ -13,6 +13,8 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <NoWarn>NU5105;NU5128;NU5100;NU5118;0419,0649</NoWarn>
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     </PropertyGroup>
 
     <PropertyGroup>

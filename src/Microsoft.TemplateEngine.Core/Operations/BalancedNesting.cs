@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Core.Contracts;
@@ -98,7 +97,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
                 {
                     ++_depth;
                 }
-                else if (token == RealEndTokenIndex || token == PseudoEndTokenIndex)
+                else if (token is RealEndTokenIndex or PseudoEndTokenIndex)
                 {
                     --_depth;
                 }
@@ -114,12 +113,12 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
                 if (_depth == 0 && token == PseudoEndTokenIndex)
                 {
-                    processor.Write(_realEndToken.Value, _realEndToken.Start, _realEndToken.Length);
+                    processor.WriteToTarget(_realEndToken.Value, _realEndToken.Start, _realEndToken.Length);
                     return _psuedoEndToken.Length;  // the source buffer needs to skip over this token.
                 }
                 else
                 {
-                    processor.Write(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
+                    processor.WriteToTarget(Tokens[token].Value, Tokens[token].Start, Tokens[token].Length);
                 }
 
                 return 0;

@@ -315,8 +315,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
             IGenerator generator,
             IReadOnlyList<EvalData> parameters,
             IDictionary<string, object> variableCollection,
-            ILogger logger
-        )
+            ILogger logger)
         {
             foreach (EvalData parameter in parameters)
             {
@@ -378,10 +377,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
 
             public DataSource DataSource => _dataSource;
 
-            public object? Value
-            {
-                get { return _value; }
-            }
+            public object? Value => _value;
 
             public void SetValue(object? value, DataSource source)
             {

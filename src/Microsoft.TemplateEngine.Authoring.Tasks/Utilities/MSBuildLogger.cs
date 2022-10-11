@@ -45,6 +45,8 @@ namespace Microsoft.TemplateEngine.Authoring.Tasks.Utilities
                     break;
                 case LogLevel.None:
                     break;
+                default:
+                    break;
             }
         }
 
