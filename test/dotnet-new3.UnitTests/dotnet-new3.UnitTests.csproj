@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
     <PropertyGroup>
         <TargetFramework>netcoreapp2.1</TargetFramework>
+        <CheckEolTargetFramework>false</CheckEolTargetFramework>
         <TestProject>true</TestProject>
     </PropertyGroup>
 
