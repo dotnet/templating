@@ -34,27 +34,44 @@ namespace Microsoft.TemplateEngine.Cli.PostActionProcessors
                 }
                 catch
                 {
-                    values = new[] {entry.Value};
+                    values = new[] { entry.Value };
                 }
 
                 foreach (string file in values)
                 {
-                    Process commandResult = System.Diagnostics.Process.Start(new ProcessStartInfo
+                    try
                     {
-                        RedirectStandardError = false,
-                        RedirectStandardOutput = false,
-                        UseShellExecute = true,
-                        CreateNoWindow = false,
-                        WorkingDirectory = outputBasePath,
-                        FileName = "/bin/sh",
-                        Arguments = $"-c \"chmod {entry.Key} {file}\""
-                    });
+                        Process commandResult = System.Diagnostics.Process.Start(new ProcessStartInfo
+                        {
+                            RedirectStandardError = false,
+                            RedirectStandardOutput = false,
+                            UseShellExecute = false,
+                            CreateNoWindow = false,
+                            WorkingDirectory = outputBasePath,
+                            FileName = "/bin/sh",
+                            Arguments = $"-c \"chmod {entry.Key} {file}\""
+                        });
 
-                    commandResult.WaitForExit();
+                        if (commandResult == null)
+                        {
+                            Reporter.Error.WriteLine(string.Format(LocalizableStrings.UnableToSetPermissions, entry.Key, file));
+                            Reporter.Verbose.WriteLine("Unable to start sub-process.");
+                            allSucceeded = false;
+                            continue;
+                        }
 
-                    if (commandResult.ExitCode != 0)
+                        commandResult.WaitForExit();
+
+                        if (commandResult.ExitCode != 0)
+                        {
+                            Reporter.Error.WriteLine(string.Format(LocalizableStrings.UnableToSetPermissions, entry.Key, file));
+                            allSucceeded = false;
+                        }
+                    }
+                    catch (Exception ex)
                     {
-                        environment.Host.LogMessage(string.Format(LocalizableStrings.UnableToSetPermissions, entry.Key, file));
+                        Reporter.Error.WriteLine(string.Format(LocalizableStrings.UnableToSetPermissions, entry.Key, file));
+                        Reporter.Verbose.WriteLine(string.Format("Details:{0}", ex.ToString()));
                         allSucceeded = false;
                     }
                 }
