@@ -196,7 +196,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             Assert.NotNull(templateConfigFileInfo);
 
             ScannedTemplateInfo config = new ScannedTemplateInfo(_engineEnvironmentSettings, generator, templateConfigFileInfo);
-            ITemplate? template = await generator.LoadTemplateFromTemplateInfoAsync(_engineEnvironmentSettings, config, baselineName: null, cancellationToken: default).ConfigureAwait(false);
+            ITemplate? template = await generator.LoadTemplateAsync(_engineEnvironmentSettings, config, baselineName: null, cancellationToken: default).ConfigureAwait(false);
 
             Assert.NotNull(template);
 

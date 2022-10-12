@@ -13,7 +13,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
     /// </summary>
     public class ScanResult : IDisposable
     {
-        public ScanResult(
+        internal ScanResult(
             IMountPoint mountPoint,
             IReadOnlyList<IScanTemplateInfo> templates,
             IReadOnlyList<ILocalizationLocator> localizations,

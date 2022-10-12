@@ -5,6 +5,9 @@ using System;
 
 namespace Microsoft.TemplateEngine.Abstractions
 {
+    /// <summary>
+    /// Defines the location of a template.
+    /// </summary>
     public interface ITemplateLocator
     {
         /// <summary>

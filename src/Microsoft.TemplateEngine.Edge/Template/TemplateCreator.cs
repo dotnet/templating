@@ -215,7 +215,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
             }
             using (Timing.Over(_environmentSettings.Host.Logger, $"Template from config {info.MountPointUri}{info.ConfigPlace}"))
             {
-                return generator!.LoadTemplateFromTemplateInfoAsync(_environmentSettings, ToITemplateLocator(info), baselineName, cancellationToken);
+                return generator!.LoadTemplateAsync(_environmentSettings, ToITemplateLocator(info), baselineName, cancellationToken);
             }
         }
 
