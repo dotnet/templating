@@ -8,7 +8,7 @@ namespace Microsoft.TemplateEngine.Abstractions
     public interface IValidationInfo
     {
         /// <summary>
-        /// Gets the results of validation.
+        /// Gets the results of template validation.
         /// </summary>
         IReadOnlyList<IValidationEntry> ValidationErrors { get; }
     }

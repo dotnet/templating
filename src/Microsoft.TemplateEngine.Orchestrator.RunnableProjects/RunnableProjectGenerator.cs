@@ -38,7 +38,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         }
 
         /// <inheritdoc/>
-        Task<ITemplate?> IGenerator.LoadTemplateFromTemplateInfoAsync(IEngineEnvironmentSettings settings, ITemplateLocator templateLocator, string? baselineName, CancellationToken cancellationToken)
+        Task<ITemplate?> IGenerator.LoadTemplateAsync(IEngineEnvironmentSettings settings, ITemplateLocator templateLocator, string? baselineName, CancellationToken cancellationToken)
         {
             IMountPoint? mountPoint = null;
             IFile? configFile = null;
@@ -122,7 +122,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             cancellationToken.ThrowIfCancellationRequested();
             if (templateData is not IRunnableProjectConfig templateConfig)
             {
-                throw new InvalidOperationException($"Load template using {nameof(IGenerator.LoadTemplateFromTemplateInfoAsync)} to use this method.");
+                throw new InvalidOperationException($"Load template using {nameof(IGenerator.LoadTemplateAsync)} to use this method.");
             }
             if (templateData.TemplateSourceRoot is null)
             {
@@ -181,7 +181,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             cancellationToken.ThrowIfCancellationRequested();
             if (templateData is not RunnableProjectConfig templateConfig)
             {
-                throw new InvalidOperationException($"Load template using {nameof(IGenerator.LoadTemplateFromTemplateInfoAsync)} to use this method.");
+                throw new InvalidOperationException($"Load template using {nameof(IGenerator.LoadTemplateAsync)} to use this method.");
             }
             if (templateData.TemplateSourceRoot is null)
             {

@@ -27,7 +27,7 @@ namespace Microsoft.TemplateEngine.Abstractions
         IFileSystemInfo? LocaleConfiguration { get; }
 
         /// <summary>
-        /// Gets host file system entry.
+        /// Gets host configuration file system entry.
         /// </summary>
         IFileSystemInfo? HostSpecificConfiguration { get; }
 

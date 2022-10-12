@@ -8,6 +8,9 @@ using Microsoft.TemplateEngine.Abstractions.Parameters;
 
 namespace Microsoft.TemplateEngine.Abstractions
 {
+    /// <summary>
+    /// Common template metadata.
+    /// </summary>
     public interface ITemplateMetadata
     {
         /// <summary>
