@@ -176,36 +176,36 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             Assert.Equal("Failed to load additional configuration file symbols.template.json, the file does not exist.", e.Message);
         }
 
-        //[Fact(DisplayName = nameof(SplitConfigTest))]
-        //public void SplitConfigTest()
-        //{
-        //    string sourcePath = _engineEnvironmentSettings.GetTempVirtualizedPath();
-        //    IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>
-        //    {
-        //        { "templateSource/.template.config/template.json", TemplateJsonWithProperAdditionalConfigFilesString },
-        //        { "templateSource/.template.config/symbols.template.json", SymbolsTemplateJsonString }
-        //    };
-        //    _engineEnvironmentSettings.WriteTemplateSource(sourcePath, templateSourceFiles);
+        [Fact]
+        public void SplitConfigTest()
+        {
+            string sourcePath = _engineEnvironmentSettings.GetTempVirtualizedPath();
+            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>
+            {
+                { "templateSource/.template.config/template.json", TemplateJsonWithProperAdditionalConfigFilesString },
+                { "templateSource/.template.config/symbols.template.json", SymbolsTemplateJsonString }
+            };
+            _engineEnvironmentSettings.WriteTemplateSource(sourcePath, templateSourceFiles);
 
-        //    IGenerator generator = new RunnableProjectGenerator();
+            IGenerator generator = new RunnableProjectGenerator();
 
-        //    using IMountPoint mountPoint = _engineEnvironmentSettings.MountPath(sourcePath);
+            using IMountPoint mountPoint = _engineEnvironmentSettings.MountPath(sourcePath);
 
-        //    IFile? templateConfigFileInfo = mountPoint.FileInfo("templateSource/.template.config/template.json");
-        //    Assert.NotNull(templateConfigFileInfo);
+            IFile? templateConfigFileInfo = mountPoint.FileInfo("templateSource/.template.config/template.json");
+            Assert.NotNull(templateConfigFileInfo);
 
-        //    ScannedTemplateInfo config = new ScannedTemplateInfo(_engineEnvironmentSettings, generator, templateConfigFileInfo);
-        //    bool result = generator.TryLoadTemplateFromTemplateInfo(_engineEnvironmentSettings, config, out ITemplate? template, baselineName: null);
+            ScannedTemplateInfo config = new ScannedTemplateInfo(_engineEnvironmentSettings, generator, templateConfigFileInfo);
+            bool result = generator.TryLoadTemplateFromTemplateInfo(_engineEnvironmentSettings, config, out ITemplate? template, baselineName: null);
 
-        //    Assert.NotNull(template);
+            Assert.NotNull(template);
 
-        //    IDictionary<string, ITemplateParameter> parameters = template!.ParameterDefinitions.ToDictionary(p => p.Name, p => p);
-        //    Assert.Equal(6, parameters.Count);  // 5 in the configs + 1 for 'name' (implicit)
-        //    Assert.True(parameters.ContainsKey("type"));
-        //    Assert.True(parameters.ContainsKey("language"));
-        //    Assert.True(parameters.ContainsKey("RuntimeFrameworkVersion"));
-        //    Assert.True(parameters.ContainsKey("Framework"));
-        //    Assert.True(parameters.ContainsKey("MyThing"));
-        //}
+            IDictionary<string, ITemplateParameter> parameters = template!.ParameterDefinitions.ToDictionary(p => p.Name, p => p);
+            Assert.Equal(6, parameters.Count);  // 5 in the configs + 1 for 'name' (implicit)
+            Assert.True(parameters.ContainsKey("type"));
+            Assert.True(parameters.ContainsKey("language"));
+            Assert.True(parameters.ContainsKey("RuntimeFrameworkVersion"));
+            Assert.True(parameters.ContainsKey("Framework"));
+            Assert.True(parameters.ContainsKey("MyThing"));
+        }
     }
 }

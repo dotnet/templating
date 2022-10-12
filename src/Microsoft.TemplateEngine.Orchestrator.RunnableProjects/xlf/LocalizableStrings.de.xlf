@@ -111,8 +111,13 @@ Details: {1}</target>
 {2} - the comma separated list of prefixes that can be used to define the source of the value</note>
       </trans-unit>
       <trans-unit id="LocalizationModelDeserializer_Error_FailedToParse">
-        <source>Failed to read parse localization file {0}, it will be skipped from further processing.</source>
-        <target state="translated">Fehler beim Lesen der Analyselokalisierungsdatei {0}. Sie wird bei der weiteren Verarbeitung übersprungen.</target>
+        <source>Failed to read or parse localization file {0}, it will be skipped from further processing.</source>
+        <target state="needs-review-translation">Fehler beim Lesen der Analyselokalisierungsdatei {0}. Sie wird bei der weiteren Verarbeitung übersprungen.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="LocalizationModelDeserializer_Error_UnknownLocale">
+        <source>Locale '{0}' does not match any known cultures.</source>
+        <target state="new">Locale '{0}' does not match any known cultures.</target>
         <note />
       </trans-unit>
       <trans-unit id="RunnableProjectGenerator_CannotAddImplicitChoice">

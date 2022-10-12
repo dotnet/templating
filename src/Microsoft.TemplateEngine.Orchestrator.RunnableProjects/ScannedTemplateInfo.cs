@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -26,7 +27,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         internal const string LocalizationFileExtension = ".json";
 
         private readonly IReadOnlyDictionary<string, IFile> _hostConfigFiles;
-        private readonly IReadOnlyDictionary<string, TemplateLocalization> _localizations;
+        private readonly IReadOnlyDictionary<CultureInfo, TemplateLocalization> _localizations;
 
         /// <summary>
         /// Creates instance of the class based on configuration from <paramref name="templateFile"/>.
@@ -37,7 +38,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             _localizations = FindLocalizations();
         }
 
-        public IReadOnlyDictionary<string, ILocalizationLocator> Localizations => _localizations.ToDictionary(l => l.Key, l => (ILocalizationLocator)l.Value);
+        public IReadOnlyDictionary<string, ILocalizationLocator> Localizations => _localizations.ToDictionary(l => l.Key.Name, l => (ILocalizationLocator)l.Value);
 
         public IReadOnlyDictionary<string, string> HostConfigFiles => _hostConfigFiles.ToDictionary(f => f.Key, f => f.Value.FullPath);
 
@@ -61,9 +62,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return allHostFilesForTemplate;
         }
 
-        private IReadOnlyDictionary<string, TemplateLocalization> FindLocalizations()
+        private IReadOnlyDictionary<CultureInfo, TemplateLocalization> FindLocalizations()
         {
-            Dictionary<string, TemplateLocalization> localizations = new();
+            Dictionary<CultureInfo, TemplateLocalization> localizations = new();
             IDirectory? localizeFolder = ConfigDirectory.DirectoryInfo("localize");
             if (localizeFolder == null || !localizeFolder.Exists)
             {
@@ -72,7 +73,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             foreach (IFile locFile in localizeFolder.EnumerateFiles(LocalizationFilePrefix + "*" + LocalizationFileExtension, SearchOption.AllDirectories))
             {
-                string locale = locFile.Name.Substring(LocalizationFilePrefix.Length, locFile.Name.Length - LocalizationFilePrefix.Length - LocalizationFileExtension.Length);
+                string localeStr = locFile.Name.Substring(LocalizationFilePrefix.Length, locFile.Name.Length - LocalizationFilePrefix.Length - LocalizationFileExtension.Length);
+
+                CultureInfo? locale = CultureInfo.GetCultures(CultureTypes.AllCultures).FirstOrDefault(c => c.Name.Equals(localeStr, StringComparison.OrdinalIgnoreCase));
+                if (locale == null)
+                {
+                    Logger.LogWarning(LocalizableStrings.LocalizationModelDeserializer_Error_FailedToParse, locFile.GetDisplayPath());
+                    Logger.LogWarning(LocalizableStrings.LocalizationModelDeserializer_Error_UnknownLocale, localeStr);
+                    continue;
+                }
 
                 try
                 {
@@ -93,14 +102,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         private class TemplateLocalization : ILocalizationLocator
         {
-            public TemplateLocalization(string locale, LocalizationModel model, IFile file)
+            public TemplateLocalization(CultureInfo locale, LocalizationModel model, IFile file)
             {
                 Locale = locale;
                 Model = model;
                 File = file;
             }
 
-            string ILocalizationLocator.Locale => Locale;
+            string ILocalizationLocator.Locale => Locale.Name;
 
             string ILocalizationLocator.ConfigPlace => File.FullPath;
 
@@ -114,7 +123,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             IReadOnlyDictionary<string, IParameterSymbolLocalizationModel> ILocalizationLocator.ParameterSymbols => Model.ParameterSymbols;
 
-            internal string Locale { get; }
+            internal CultureInfo Locale { get; }
 
             internal LocalizationModel Model { get; }
 
