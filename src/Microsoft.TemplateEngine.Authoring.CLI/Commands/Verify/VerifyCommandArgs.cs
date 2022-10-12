@@ -136,8 +136,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
 
             if (
                 indexOfLast >= 1 &&
-                (input[0] == '"' && input[indexOfLast] == '"' || input[0] == '\'' && input[indexOfLast] == '\'')
-            )
+                ((input[0] == '"' && input[indexOfLast] == '"') || (input[0] == '\'' && input[indexOfLast] == '\'')))
             {
                 return input.Substring(1, indexOfLast - 1);
             }

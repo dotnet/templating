@@ -14,7 +14,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
 {
     public class VerificationEngine
     {
-        private static readonly IReadOnlyList<string> _defaultVerificationExcludePatterns = new List<string>()
+        private static readonly IReadOnlyList<string> DefaultVerificationExcludePatterns = new List<string>()
         {
             @"obj/*",
             @"obj\*",
@@ -112,7 +112,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
         {
             List<string> exclusionsList = (options.DisableDefaultVerificationExcludePatterns ?? false)
                 ? new()
-                : new(_defaultVerificationExcludePatterns);
+                : new(DefaultVerificationExcludePatterns);
 
             if (options.VerificationExcludePatterns != null)
             {
@@ -322,7 +322,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
 
                     if (scrubbers.GeneralScrubber != null)
                     {
-                        sb = sb ?? new StringBuilder(content);
+                        sb ??= new StringBuilder(content);
                         scrubbers.GeneralScrubber(sb);
                     }
 

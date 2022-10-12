@@ -103,7 +103,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
         /// <returns></returns>
         public TemplateVerifierOptions WithCustomScrubbers(ScrubbersDefinition scrubbers)
         {
-            this.CustomScrubbers = scrubbers;
+            CustomScrubbers = scrubbers;
             return this;
         }
 
@@ -115,7 +115,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
         /// <returns></returns>
         public TemplateVerifierOptions WithCustomDirectoryVerifier(VerifyDirectory verifier)
         {
-            this.CustomDirectoryVerifier = verifier;
+            CustomDirectoryVerifier = verifier;
             return this;
         }
     }

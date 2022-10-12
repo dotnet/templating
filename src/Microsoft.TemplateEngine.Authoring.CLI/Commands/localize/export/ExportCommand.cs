@@ -86,8 +86,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands
                 ExportOptions exportOptions = new(args.DryRun, targetDirectory: null, args.Languages);
                 runningExportTasks.Add(
                     (templateJsonPath,
-                    new TemplateLocalizer.Core.TemplateLocalizer(LoggerFactory).ExportLocalizationFilesAsync(templateJsonPath, exportOptions, cancellationToken))
-                );
+                    new TemplateLocalizer.Core.TemplateLocalizer(LoggerFactory).ExportLocalizationFilesAsync(templateJsonPath, exportOptions, cancellationToken)));
             }
 
             try

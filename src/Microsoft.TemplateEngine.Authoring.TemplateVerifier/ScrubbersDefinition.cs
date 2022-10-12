@@ -13,7 +13,7 @@ public class ScrubbersDefinition
 
     public ScrubbersDefinition(Action<StringBuilder> scrubber, string? extension = null)
     {
-        this.AddScrubber(scrubber, extension);
+        AddScrubber(scrubber, extension);
     }
 
     public Dictionary<string, Action<StringBuilder>> ScrubersByExtension { get; private set; } = new Dictionary<string, Action<StringBuilder>>();
@@ -32,13 +32,11 @@ public class ScrubbersDefinition
             GeneralScrubber += scrubber;
         }
         // This is to get the same behavior as Verify.NET
-        else if (extension.Trim().StartsWith('.'))
-        {
-            throw new TemplateVerificationException(LocalizableStrings.VerificationEngine_Error_ScrubberExtension, TemplateVerificationErrorCode.InvalidOption);
-        }
         else
         {
-            ScrubersByExtension[extension.Trim()] = scrubber;
+            ScrubersByExtension[extension.Trim()] = extension.Trim().StartsWith('.')
+                ? throw new TemplateVerificationException(LocalizableStrings.VerificationEngine_Error_ScrubberExtension, TemplateVerificationErrorCode.InvalidOption)
+                : scrubber;
         }
 
         return this;

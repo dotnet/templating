@@ -149,8 +149,8 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
                     // We explicitly pass a path - so that the engine then process it and gets the current executing dir
                     // and treats it as a code base of caller of API (as in case of CLI usage we do not want to store
                     // expectation files in CLI sources dir)
-                    Path.Combine(Environment.CurrentDirectory, "_")
-                    ).ConfigureAwait(false);
+                    Path.Combine(Environment.CurrentDirectory, "_"))
+                    .ConfigureAwait(false);
                 return 0;
             }
             catch (Exception e)
@@ -165,7 +165,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
         protected override BinderBase<VerifyCommandArgs> GetModelBinder() => new VerifyModelBinder(this);
 
         /// <summary>
-        /// Case insensitive version for <see cref="System.CommandLine.OptionExtensions.FromAmong{TOption}(TOption, string[])"/>.
+        /// Case insensitive version for <see cref="OptionExtensions.FromAmong{TOption}(TOption, string[])"/>.
         /// </summary>
         private static void FromAmongCaseInsensitive(Option option, string[]? allowedValues = null, string? allowedHiddenValue = null)
         {
@@ -197,7 +197,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
 
             protected override VerifyCommandArgs GetBoundValue(BindingContext bindingContext)
             {
-                return VerifyCommand.ExtractArguments(_verifyCommand, bindingContext.ParseResult);
+                return ExtractArguments(_verifyCommand, bindingContext.ParseResult);
             }
         }
     }

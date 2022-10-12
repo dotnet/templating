@@ -111,32 +111,30 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.IntegrationTests
                 .WithCustomScrubbers(
                     ScrubbersDefinition.Empty
                         .AddScrubber(sb => sb.Replace("Donut", "Veggies"), "txt")
-                        .AddScrubber(sb => sb.Replace(DateTime.UtcNow.ToString("yyyy-MM-dd"), "2000-01-01"))
-                )
+                        .AddScrubber(sb => sb.Replace(DateTime.UtcNow.ToString("yyyy-MM-dd"), "2000-01-01")))
                 .WithCustomDirectoryVerifier(
                     async (content, contentFetcher) =>
                     {
-                        await foreach (var file in contentFetcher.Value)
+                        await foreach (var (filePath, scrubbedContent) in contentFetcher.Value)
                         {
-                            if (Path.GetExtension(file.FilePath).Equals(".cs"))
+                            if (Path.GetExtension(filePath).Equals(".cs"))
                             {
                                 throw new Exception(".cs files should be excluded per VerificationExcludePatterns");
                             }
 
-                            if (Path.GetFileName(file.FilePath).Equals("stdout.txt", StringComparison.OrdinalIgnoreCase)
-                                && !file.ScrubbedContent.Contains("Console"))
+                            if (Path.GetFileName(filePath).Equals("stdout.txt", StringComparison.OrdinalIgnoreCase)
+                                && !scrubbedContent.Contains("Console"))
                             {
                                 throw new Exception("stdout should contain 'Console'");
                             }
 
-                            if (Path.GetExtension(file.FilePath).Equals(".csproj")
-                                && !file.ScrubbedContent.Contains("<ImplicitUsings>enable</ImplicitUsings>"))
+                            if (Path.GetExtension(filePath).Equals(".csproj")
+                                && !scrubbedContent.Contains("<ImplicitUsings>enable</ImplicitUsings>"))
                             {
                                 throw new Exception("Implicit usings should be used");
                             }
                         }
-                    }
-                    );
+                    });
 
             VerificationEngine engine = new VerificationEngine(_log);
             Func<Task> executeTask = () => engine.Execute(options);

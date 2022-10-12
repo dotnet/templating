@@ -7,13 +7,13 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.Commands
 {
     internal class DotnetCommand : TestCommand
     {
-        private readonly string commandName;
+        private readonly string _commandName;
 
         public DotnetCommand(ILogger log, string commandName, params string[] args) : base(log)
         {
             Arguments.Add(commandName);
             Arguments.AddRange(args);
-            this.commandName = commandName;
+            _commandName = commandName;
         }
 
         public DotnetCommand WithCustomHive(string? path = null)

@@ -1,7 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System.Runtime.InteropServices.JavaScript;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
@@ -54,17 +53,15 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.UnitTests
                         .AddScrubber(sb => sb.Replace("bb", "xx"), "cs")
                         .AddScrubber(sb => sb.Replace("cc", "yy"), "dll")
                         .AddScrubber(sb => sb.Replace("123", "yy"), "dll")
-                        .AddScrubber(sb => sb.Replace("aa", "zz"))
-                )
+                        .AddScrubber(sb => sb.Replace("aa", "zz")))
                 .WithCustomDirectoryVerifier(
                     async (content, contentFetcher) =>
                     {
-                        await foreach (var file in contentFetcher.Value)
+                        await foreach (var (filePath, scrubbedContent) in contentFetcher.Value)
                         {
-                            resultContents[file.FilePath] = file.ScrubbedContent;
+                            resultContents[filePath] = scrubbedContent;
                         }
-                    }
-                    );
+                    });
 
             await VerificationEngine.CreateVerificationTask(verifyLocation, "callerLocation", options, fileSystem);
 
