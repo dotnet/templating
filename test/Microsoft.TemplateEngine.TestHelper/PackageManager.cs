@@ -23,9 +23,7 @@ namespace Microsoft.TemplateEngine.TestHelper
         private static readonly SemaphoreSlim Semaphore = new SemaphoreSlim(1, 1);
         private readonly string _packageLocation = TestUtils.CreateTemporaryFolder("packages");
         private readonly ConcurrentDictionary<string, string> _installedPackages = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-#pragma warning disable IDE0044 // Add readonly modifier
-        private volatile Mutex _packMutex = new Mutex(false, "PackMutex");
-#pragma warning restore IDE0044 // Add readonly modifier
+        private static readonly Mutex PackMutex = new Mutex(false, "TemplateEngineTestPackMutex");
 
         public async Task<string> GetNuGetPackage(string templatePackName, string? version = null, NuGetVersion? minimumVersion = null, ILogger? logger = null)
         {
@@ -75,7 +73,7 @@ namespace Microsoft.TemplateEngine.TestHelper
             }
         }
 
-        public string PackNuGetPackage(string projectPath)
+        public string PackNuGetPackage(string projectPath, ILogger? logger = null)
         {
             if (string.IsNullOrWhiteSpace(projectPath))
             {
@@ -87,44 +85,60 @@ namespace Microsoft.TemplateEngine.TestHelper
                 throw new ArgumentException($"{projectPath} doesn't exist", nameof(projectPath));
             }
 
-            _packMutex.WaitOne();
-            var isFound = _installedPackages.TryGetValue(absolutePath, out string? packagePath);
-            if (!isFound)
+            string? packagePath = null;
+            logger ??= NullLogger.Instance;
+            try
             {
-                var info = new ProcessStartInfo("dotnet", $"pack {absolutePath} -o {_packageLocation}")
+                try
                 {
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    RedirectStandardError = true,
-                    RedirectStandardOutput = true
-                };
-                Process p = Process.Start(info) ?? throw new Exception("Failed to start dotnet process.");
-                p.WaitForExit();
-                if (p.ExitCode != 0)
+                    PackMutex.WaitOne();
+                }
+                catch (AbandonedMutexException ex)
                 {
-                    string? stdOut = null;
-                    string? stdErr = null;
-                    try
-                    {
-                        stdOut = p.StandardOutput.ReadToEnd();
-                        stdErr = p.StandardError.ReadToEnd();
-                    }
-                    catch
-                    {
-                        //do nothing in case streams cannot be read
-                    }
-
-                    throw new Exception($"Failed to pack the project {projectPath}: " +
-                        $"{Environment.NewLine}StdOut: {stdOut}." +
-                        $"{Environment.NewLine}StdErr: {stdErr}.");
+                    logger.LogDebug($"AbandonedMutexException on return from WaitOne. Message: {ex.Message}");
                 }
 
-                packagePath = Directory.GetFiles(_packageLocation).Aggregate(
-                    (latest, current) => (latest == null) ? current : File.GetCreationTimeUtc(current) > File.GetCreationTimeUtc(latest) ? current : latest);
-                _installedPackages[absolutePath] = packagePath;
-            }
-            _packMutex.ReleaseMutex();
+                var isFound = _installedPackages.TryGetValue(absolutePath, out packagePath);
+                if (!isFound)
+                {
+                    var info = new ProcessStartInfo("dotnet", $"pack {absolutePath} -o {_packageLocation}")
+                    {
+                        UseShellExecute = false,
+                        CreateNoWindow = true,
+                        RedirectStandardError = true,
+                        RedirectStandardOutput = true
+                    };
+                    Process p = Process.Start(info) ?? throw new Exception("Failed to start dotnet process.");
+                    p.WaitForExit();
+                    if (p.ExitCode != 0)
+                    {
+                        string? stdOut = null;
+                        string? stdErr = null;
+                        try
+                        {
+                            stdOut = p.StandardOutput.ReadToEnd();
+                            stdErr = p.StandardError.ReadToEnd();
+                        }
+                        catch
+                        {
+                            //do nothing in case streams cannot be read
+                        }
 
+                        throw new Exception($"Failed to pack the project {projectPath}: " +
+                            $"{Environment.NewLine}StdOut: {stdOut}." +
+                            $"{Environment.NewLine}StdErr: {stdErr}." +
+                            $"{Environment.NewLine}Exit Code: {p.ExitCode}.");
+                    }
+
+                    packagePath = Directory.GetFiles(_packageLocation).Aggregate(
+                        (latest, current) => (latest == null) ? current : File.GetCreationTimeUtc(current) > File.GetCreationTimeUtc(latest) ? current : latest);
+                    _installedPackages[absolutePath] = packagePath;
+                }
+            }
+            finally
+            {
+                PackMutex.ReleaseMutex();
+            }
             return packagePath!;
         }
 
