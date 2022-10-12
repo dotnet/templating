@@ -316,11 +316,11 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             }
 
             var scanResults = new ScanResult?[allTemplatePackages.Count];
-            Parallel.For(0, allTemplatePackages.Count, (int index) =>
+            Parallel.For(0, allTemplatePackages.Count, async (int index) =>
             {
                 try
                 {
-                    var scanResult = _installScanner.Scan(allTemplatePackages[index].MountPointUri);
+                    var scanResult = await _installScanner.ScanAsync(allTemplatePackages[index].MountPointUri, cancellationToken).ConfigureAwait(false);
                     scanResults[index] = scanResult;
                 }
                 catch (Exception ex)

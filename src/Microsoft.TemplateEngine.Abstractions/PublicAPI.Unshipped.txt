@@ -1,9 +1,9 @@
 ﻿Microsoft.TemplateEngine.Abstractions.IExtendedTemplateLocator
-Microsoft.TemplateEngine.Abstractions.IGenerator.TryLoadTemplateFromTemplateInfo(Microsoft.TemplateEngine.Abstractions.IEngineEnvironmentSettings! settings, Microsoft.TemplateEngine.Abstractions.ITemplateLocator! config, out Microsoft.TemplateEngine.Abstractions.ITemplate? template, string? baselineName = null) -> bool
+Microsoft.TemplateEngine.Abstractions.IGenerator.GetTemplatesFromMountPointAsync(Microsoft.TemplateEngine.Abstractions.Mount.IMountPoint! source, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Abstractions.IScanTemplateInfo!>!>!
+Microsoft.TemplateEngine.Abstractions.IGenerator.LoadTemplateFromTemplateInfoAsync(Microsoft.TemplateEngine.Abstractions.IEngineEnvironmentSettings! settings, Microsoft.TemplateEngine.Abstractions.ITemplateLocator! config, string? baselineName = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Microsoft.TemplateEngine.Abstractions.ITemplate?>!
 Microsoft.TemplateEngine.Abstractions.ITemplate.TemplateSourceRoot.get -> Microsoft.TemplateEngine.Abstractions.Mount.IDirectory!
 Microsoft.TemplateEngine.Abstractions.IExtendedTemplateLocator.HostConfigPlace.get -> string?
 Microsoft.TemplateEngine.Abstractions.IExtendedTemplateLocator.LocaleConfigPlace.get -> string?
-Microsoft.TemplateEngine.Abstractions.IGenerator.GetTemplatesFromMountPoint(Microsoft.TemplateEngine.Abstractions.Mount.IMountPoint! source) -> System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Abstractions.IScanTemplateInfo!>!
 Microsoft.TemplateEngine.Abstractions.IScanTemplateInfo
 Microsoft.TemplateEngine.Abstractions.IScanTemplateInfo.HostConfigFiles.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
 Microsoft.TemplateEngine.Abstractions.IScanTemplateInfo.Localizations.get -> System.Collections.Generic.IReadOnlyDictionary<string!, Microsoft.TemplateEngine.Abstractions.ILocalizationLocator!>!

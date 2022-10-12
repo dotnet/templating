@@ -77,18 +77,19 @@ namespace Microsoft.TemplateEngine.Abstractions
         /// Scans the given mount point <paramref name="source"/> for templates and returns the list of <see cref="ITemplate"/>s that are found.
         /// </summary>
         /// <param name="source">the mount point to load templates from.</param>
+        /// <param name="cancellationToken">cancellation token.</param>
         /// <returns>the list of templates found in <paramref name="source"/> mount point.</returns>
-        IReadOnlyList<IScanTemplateInfo> GetTemplatesFromMountPoint(IMountPoint source);
+        Task<IReadOnlyList<IScanTemplateInfo>> GetTemplatesFromMountPointAsync(IMountPoint source, CancellationToken cancellationToken);
 
         /// <summary>
         /// Attemts to load <see cref="ITemplate"/> from the given <see cref="ITemplateInfo" /> configuration entry.
         /// </summary>
         /// <param name="settings">template engine environment settings.</param>
         /// <param name="config">the locator specifying location of the template.</param>
-        /// <param name="template">loaded template.</param>
         /// <param name="baselineName">baseline to load.</param>
-        /// <returns>true if <paramref name="template"/> can be loaded, false otherwise.</returns>
-        bool TryLoadTemplateFromTemplateInfo(IEngineEnvironmentSettings settings, ITemplateLocator config, out ITemplate? template, string? baselineName = null);
+        /// <param name="cancellationToken">cancellation token.</param>
+        /// <returns><see cref="ITemplate"/> if the template can be loaded from <paramref name="config"/> can be loaded, null otherwise.</returns>
+        Task<ITemplate?> LoadTemplateFromTemplateInfoAsync(IEngineEnvironmentSettings settings, ITemplateLocator config, string? baselineName = null, CancellationToken cancellationToken = default);
 
         #region Obsolete members
 

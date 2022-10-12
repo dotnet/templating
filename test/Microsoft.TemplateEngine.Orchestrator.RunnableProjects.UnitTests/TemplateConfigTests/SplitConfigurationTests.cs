@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.TestHelper;
@@ -177,7 +178,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
         }
 
         [Fact]
-        public void SplitConfigTest()
+        public async Task SplitConfigTest()
         {
             string sourcePath = _engineEnvironmentSettings.GetTempVirtualizedPath();
             IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>
@@ -195,7 +196,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             Assert.NotNull(templateConfigFileInfo);
 
             ScannedTemplateInfo config = new ScannedTemplateInfo(_engineEnvironmentSettings, generator, templateConfigFileInfo);
-            bool result = generator.TryLoadTemplateFromTemplateInfo(_engineEnvironmentSettings, config, out ITemplate? template, baselineName: null);
+            ITemplate? template = await generator.LoadTemplateFromTemplateInfoAsync(_engineEnvironmentSettings, config, baselineName: null, cancellationToken: default).ConfigureAwait(false);
 
             Assert.NotNull(template);
 
