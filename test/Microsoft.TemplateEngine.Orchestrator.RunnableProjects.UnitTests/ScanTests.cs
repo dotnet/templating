@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.TestHelper;
@@ -22,7 +23,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
         }
 
         [Fact]
-        public void CanReadPostActions()
+        public async Task CanReadPostActions()
         {
             var jsonToBe = new
             {
@@ -51,7 +52,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
 
             using IMountPoint mountPoint = environmentSettings.MountPath(sourceBasePath);
             RunnableProjectGenerator generator = new RunnableProjectGenerator();
-            IReadOnlyList<IScanTemplateInfo>? templates = (generator as IGenerator).GetTemplatesFromMountPoint(mountPoint);
+            IReadOnlyList<IScanTemplateInfo>? templates = await (generator as IGenerator).GetTemplatesFromMountPointAsync(mountPoint, default).ConfigureAwait(false);
 
             Assert.Single(templates);
             var template = templates[0];

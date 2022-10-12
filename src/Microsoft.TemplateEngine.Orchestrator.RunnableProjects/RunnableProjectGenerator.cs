@@ -33,22 +33,21 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         Guid IIdentifiedComponent.Id => GeneratorId;
 
         /// <inheritdoc/>
-        IReadOnlyList<IScanTemplateInfo> IGenerator.GetTemplatesFromMountPoint(IMountPoint source)
+        async Task<IReadOnlyList<IScanTemplateInfo>> IGenerator.GetTemplatesFromMountPointAsync(IMountPoint source, CancellationToken cancellationToken)
         {
-            return GetTemplatesFromMountPointInternal(source);
+            return await GetTemplatesFromMountPointInternalAsync(source, cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
-        bool IGenerator.TryLoadTemplateFromTemplateInfo(IEngineEnvironmentSettings settings, ITemplateLocator templateLocator, out ITemplate? template, string? baselineName)
+        Task<ITemplate?> IGenerator.LoadTemplateFromTemplateInfoAsync(IEngineEnvironmentSettings settings, ITemplateLocator templateLocator, string? baselineName, CancellationToken cancellationToken)
         {
-            template = null;
             IMountPoint? mountPoint = null;
             IFile? configFile = null;
             try
             {
                 if (!settings.TryGetMountPoint(templateLocator.MountPointUri, out mountPoint))
                 {
-                    return false;
+                    return Task.FromResult((ITemplate?)null);
                 }
                 if (mountPoint == null)
                 {
@@ -57,7 +56,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 configFile = mountPoint.FileInfo(templateLocator.ConfigPlace);
                 if (configFile == null)
                 {
-                    return false;
+                    return Task.FromResult((ITemplate?)null);
                 }
                 IFile? localeConfig = null;
                 IFile? hostTemplateConfigFile = null;
@@ -67,8 +66,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     hostTemplateConfigFile = string.IsNullOrWhiteSpace(extendedTemplateLocator.HostConfigPlace) ? null : mountPoint.FileInfo(extendedTemplateLocator.HostConfigPlace!);
                 }
 
-                template = new RunnableProjectConfig(settings, this, configFile, hostTemplateConfigFile, localeConfig, baselineName);
-                return true;
+                return Task.FromResult((ITemplate?)new RunnableProjectConfig(settings, this, configFile, hostTemplateConfigFile, localeConfig, baselineName));
             }
             catch (InvalidOperationException)
             {
@@ -94,7 +92,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 //unexpected error - print details
                 settings.Host.Logger.LogError(LocalizableStrings.Authoring_TemplateNotInstalled_Message, configFile?.GetDisplayPath(), ex);
             }
-            return false;
+            return Task.FromResult((ITemplate?)null);
         }
 
         /// <summary>
@@ -125,7 +123,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             cancellationToken.ThrowIfCancellationRequested();
             if (templateData is not IRunnableProjectConfig templateConfig)
             {
-                throw new InvalidOperationException($"Load template using {nameof(IGenerator.TryLoadTemplateFromTemplateInfo)} to use this method.");
+                throw new InvalidOperationException($"Load template using {nameof(IGenerator.LoadTemplateFromTemplateInfoAsync)} to use this method.");
             }
             if (templateData.TemplateSourceRoot is null)
             {
@@ -182,7 +180,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             cancellationToken.ThrowIfCancellationRequested();
             if (templateData is not RunnableProjectConfig templateConfig)
             {
-                throw new InvalidOperationException($"Load template using {nameof(IGenerator.TryLoadTemplateFromTemplateInfo)} to use this method.");
+                throw new InvalidOperationException($"Load template using {nameof(IGenerator.LoadTemplateFromTemplateInfoAsync)} to use this method.");
             }
             if (templateData.TemplateSourceRoot is null)
             {
@@ -237,7 +235,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         [Obsolete]
         IList<ITemplate> IGenerator.GetTemplatesAndLangpacksFromDir(IMountPoint source, out IList<ILocalizationLocator> localizations)
         {
-            IReadOnlyList<ScannedTemplateInfo> foundTemplates = GetTemplatesFromMountPointInternal(source);
+            IReadOnlyList<ScannedTemplateInfo> foundTemplates = Task.Run(async () => await GetTemplatesFromMountPointInternalAsync(source, default).ConfigureAwait(false)).GetAwaiter().GetResult();
             localizations = foundTemplates.SelectMany(t => t.Localizations.Values).ToList();
 
             return foundTemplates.Select(t => (ITemplate)new LegacyTemplate(t, this)).ToList();
@@ -335,7 +333,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             return GetCreationResult(runnableProjectConfig);
         }
 
-        internal IReadOnlyList<ScannedTemplateInfo> GetTemplatesFromMountPointInternal(IMountPoint source)
+        internal Task<IReadOnlyList<ScannedTemplateInfo>> GetTemplatesFromMountPointInternalAsync(IMountPoint source, CancellationToken cancellationToken)
         {
             _ = source ?? throw new ArgumentNullException(nameof(source));
             ILogger logger = source.EnvironmentSettings.Host.LoggerFactory.CreateLogger<RunnableProjectGenerator>();
@@ -344,6 +342,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             foreach (IFile file in folder.EnumerateFiles(TemplateConfigFileName, SearchOption.AllDirectories))
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 logger.LogDebug($"Found {TemplateConfigFileName} at {file.GetDisplayPath()}.");
                 try
                 {
@@ -371,7 +370,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     logger.LogError(LocalizableStrings.Authoring_TemplateNotInstalled_Message, file.GetDisplayPath(), ex);
                 }
             }
-            return templateList;
+            return Task.FromResult((IReadOnlyList<ScannedTemplateInfo>)templateList);
         }
         
          private static void RemoveDisabledParameters(
