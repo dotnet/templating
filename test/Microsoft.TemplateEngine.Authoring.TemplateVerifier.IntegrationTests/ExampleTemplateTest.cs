@@ -34,7 +34,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.IntegrationTests
                 ExpectationsDirectory = "Expectations",
                 OutputDirectory = workingDir,
                 VerifyCommandOutput = true,
-                UniqueFor = UniqueForOption.RuntimeAndVersion,
+                UniqueFor = UniqueForOption.Architecture,
             }
                 .WithCustomScrubbers(
                     ScrubbersDefinition.Empty
