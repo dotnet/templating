@@ -123,8 +123,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 return null;
             }
 
-            IEnumerable<string> availableLocalizations = template.Localizations.Keys;
-            string? bestMatch = GetBestLocaleMatch(availableLocalizations);
+            string? bestMatch = GetBestLocaleMatch(template.Localizations.Keys);
             if (string.IsNullOrWhiteSpace(bestMatch))
             {
                 return null;
@@ -177,13 +176,9 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 IFile? hostFile = mountPoint.FileInfo(path);
                 if (hostFile == null || !hostFile.Exists)
                 {
-                    throw new FileNotFoundException($"Host file {hostFile?.GetDisplayPath()} does not exist.");
+                    throw new FileNotFoundException($"Host file '{hostFile?.GetDisplayPath()}' does not exist.");
                 }
-                using (var sr = new StreamReader(hostFile.OpenRead()))
-                using (var jsonTextReader = new JsonTextReader(sr))
-                {
-                    return JObject.Load(jsonTextReader);
-                }
+                return hostFile.ReadJObjectFromIFile();
             }
             catch (Exception e)
             {
