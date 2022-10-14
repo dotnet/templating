@@ -23,7 +23,8 @@ variables:
     value: NETDevUX
   - name: _PublishUsingPipelines
     value: true
-
+  - name: Codeql.Enabled
+    value: true
   - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
     - group: Templating-SDLValidation-Params
     
