@@ -19,4 +19,6 @@ function retry {
   done
 }
 
-retry curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+install_script="/tmp/azurecli_install.sh"
+curl -sL https://aka.ms/InstallAzureCLIDeb -o "$install_script"
+retry sudo bash "$install_script"
