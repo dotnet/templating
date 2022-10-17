@@ -171,6 +171,9 @@ Do not localize: "template.json"</comment>
   <data name="command_verify_help_customExcludes_description" xml:space="preserve">
     <value>Specifies pattern(s) defining files to be excluded from verification.</value>
   </data>
+  <data name="command_verify_help_customIncludes_description" xml:space="preserve">
+    <value>Specifies pattern(s) defining files to be included to verification (all files are included if not specified).</value>
+  </data>
   <data name="command_verify_help_description" xml:space="preserve">
     <value>Runs the template with specified arguments and compares the result with expectations files.</value>
   </data>
@@ -181,6 +184,9 @@ Do not localize: "template.json"</comment>
   <data name="command_verify_help_disableDiffTool_description" xml:space="preserve">
     <value>If set to true - the diff tool won't be automatically started by the Verifier on verification failures.</value>
     <comment>Do not translate 'true'.</comment>
+  </data>
+  <data name="command_verify_help_distinguisherName_description" xml:space="preserve">
+    <value>Sets optional distinguisher string prepended to the generated scenario name used for naming expectations subdirectories</value>
   </data>
   <data name="command_verify_help_expectationsDirPath_description" xml:space="preserve">
     <value>Specifies path to the directory with expectation files.</value>

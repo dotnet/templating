@@ -17,9 +17,13 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
         private static readonly IReadOnlyList<string> DefaultVerificationExcludePatterns = new List<string>()
         {
             @"obj/*",
+            @"*/obj/*",
             @"obj\*",
+            @"*\obj\*",
             @"bin/*",
+            @"*/bin/*",
             @"bin\*",
+            @"*\bin\*",
             "*.exe",
             "*.dll",
             "*.",
@@ -55,10 +59,19 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             _commandRunner = commandRunner;
         }
 
+        /// <summary>
+        /// Asynchronously performs the scenario and it's verification based on given configuration options.
+        /// </summary>
+        /// <param name="optionsAccessor">Configuration of the scenario and verification.</param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="sourceFile"></param>
+        /// <param name="callerMethod"></param>
+        /// <returns>A <see cref="Task"/> Task to be awaited.</returns>
         public async Task Execute(
             IOptions<TemplateVerifierOptions> optionsAccessor,
             CancellationToken cancellationToken = default,
-            [CallerFilePath] string sourceFile = "")
+            [CallerFilePath] string sourceFile = "",
+            [CallerMemberName] string callerMethod = "")
         {
             if (optionsAccessor == null)
             {
@@ -100,13 +113,20 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
                 }
             }
 
-            await VerifyResult(options, commandResult, string.IsNullOrEmpty(sourceFile) ? string.Empty : Path.GetDirectoryName(sourceFile)!)
+            await VerifyResult(options, commandResult, string.IsNullOrEmpty(sourceFile) ? string.Empty : Path.GetDirectoryName(sourceFile)!, callerMethod)
                 .ConfigureAwait(false);
+
+            // if everything is successful - let's delete the created files (unless placed into explicitly requested dir)
+            if (string.IsNullOrEmpty(options.OutputDirectory) && _fileSystem.DirectoryExists(commandResult.WorkingDirectory))
+            {
+                _fileSystem.DirectoryDelete(commandResult.WorkingDirectory, true);
+            }
         }
 
         internal static Task CreateVerificationTask(
             string contentDir,
             string callerDir,
+            string? callerMethodName,
             TemplateVerifierOptions options,
             IPhysicalFileSystemEx fileSystem)
         {
@@ -119,18 +139,30 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
                 exclusionsList.AddRange(options.VerificationExcludePatterns);
             }
 
-            List<Glob> globs = exclusionsList.Select(pattern => Glob.Parse(pattern)).ToList();
+            List<IPatternMatcher> excludeGlobs = exclusionsList.Select(pattern => (IPatternMatcher)Glob.Parse(pattern)).ToList();
+            List<IPatternMatcher> includeGlobs = new();
+
+            if (options.VerificationIncludePatterns != null)
+            {
+                includeGlobs.AddRange(options.VerificationIncludePatterns.Select(pattern => Glob.Parse(pattern)));
+            }
+
+            if (!includeGlobs.Any())
+            {
+                includeGlobs.Add(MatchAllGlob.Instance);
+            }
 
             if (options.CustomDirectoryVerifier != null)
             {
                 return options.CustomDirectoryVerifier(
                     contentDir,
                     new Lazy<IAsyncEnumerable<(string FilePath, string ScrubbedContent)>>(
-                        GetVerificationContent(contentDir, globs, options.CustomScrubbers, fileSystem)));
+                        GetVerificationContent(contentDir, includeGlobs, excludeGlobs, options.CustomScrubbers, fileSystem)));
             }
 
             VerifySettings verifySettings = new();
 
+            // Scrubbers by file: https://github.com/VerifyTests/Verify/issues/673
             if (options.CustomScrubbers != null)
             {
                 if (options.CustomScrubbers.GeneralScrubber != null)
@@ -144,14 +176,19 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
                 }
             }
 
-            verifySettings.UseTypeName(options.TemplateName);
+            string scenarioPrefix = options.TemplateName;
+            if ((options.PrependCallerMethodNameToScenarioName ?? false) && !string.IsNullOrEmpty(callerMethodName))
+            {
+                scenarioPrefix = callerMethodName + "." + callerMethodName;
+            }
+            verifySettings.UseTypeName(scenarioPrefix);
             string expectationsDir = options.ExpectationsDirectory ?? "VerifyExpectations";
             if (!string.IsNullOrEmpty(callerDir) && !Path.IsPathRooted(expectationsDir))
             {
                 expectationsDir = Path.Combine(callerDir, expectationsDir);
             }
             verifySettings.UseDirectory(expectationsDir);
-            verifySettings.UseMethodName(EncodeArgsAsPath(options.TemplateSpecificArgs));
+            verifySettings.UseMethodName(GetScenarioName(options));
 
             if ((options.UniqueFor ?? UniqueForOption.None) != UniqueForOption.None)
             {
@@ -195,8 +232,20 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
 
             return Verifier.VerifyDirectory(
                 contentDir,
-                (filePath) => !globs.Any(g => g.IsMatch(filePath)),
+                (filePath) => includeGlobs.Any(g => g.IsMatch(filePath)) && !excludeGlobs.Any(g => g.IsMatch(filePath)),
                 settings: verifySettings);
+        }
+
+        private static string GetScenarioName(TemplateVerifierOptions options)
+        {
+            // TBD: once the custom SDK switching feature is implemented - here we should append the sdk distinguisher if UniqueForOption.Runtime requested
+
+            var scenarioName = options.ScenarioDistinguisher + ((options.DoNotAppendParamsToScenarioName ?? false) ? null : EncodeArgsAsPath(options.TemplateSpecificArgs));
+            if (string.IsNullOrEmpty(scenarioName))
+            {
+                scenarioName = "_";
+            }
+            return scenarioName;
         }
 
         private static string EncodeArgsAsPath(IEnumerable<string>? args)
@@ -291,13 +340,19 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
 
         private static async IAsyncEnumerable<(string FilePath, string ScrubbedContent)> GetVerificationContent(
             string contentDir,
-            List<Glob> globs,
+            List<IPatternMatcher> includeMatchers,
+            List<IPatternMatcher> excludeMatchers,
             ScrubbersDefinition? scrubbers,
             IPhysicalFileSystemEx fileSystem)
         {
             foreach (string filePath in fileSystem.EnumerateFiles(contentDir, "*", SearchOption.AllDirectories))
             {
-                if (globs.Any(g => g.IsMatch(filePath)))
+                if (!includeMatchers.Any(g => g.IsMatch(filePath)))
+                {
+                    continue;
+                }
+
+                if (excludeMatchers.Any(g => g.IsMatch(filePath)))
                 {
                     continue;
                 }
@@ -336,7 +391,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             }
         }
 
-        private async Task VerifyResult(TemplateVerifierOptions args, CommandResultData commandResultData, string callerDir)
+        private async Task VerifyResult(TemplateVerifierOptions args, CommandResultData commandResultData, string callerDir, string callerMethodName)
         {
             UsesVerifyAttribute a = new UsesVerifyAttribute();
             // https://github.com/VerifyTests/Verify/blob/d8cbe38f527d6788ecadd6205c82803bec3cdfa6/src/Verify.Xunit/Verifier.cs#L10
@@ -369,7 +424,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
                     .ConfigureAwait(false);
             }
 
-            Task verifyTask = CreateVerificationTask(commandResultData.WorkingDirectory, callerDir, args, _fileSystem);
+            Task verifyTask = CreateVerificationTask(commandResultData.WorkingDirectory, callerDir, callerMethodName, args, _fileSystem);
 
             try
             {

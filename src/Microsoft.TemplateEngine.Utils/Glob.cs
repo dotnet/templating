@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Microsoft.TemplateEngine.Utils
 {
-    public class Glob
+    public class Glob : IPatternMatcher
     {
         private readonly IReadOnlyList<IMatcher> _matchers;
         private readonly bool _negate;
