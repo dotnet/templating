@@ -78,6 +78,11 @@ Do not localize: "template.json"</note>
         <target state="translated">指定要從驗證排除的模式定義檔案。</target>
         <note />
       </trans-unit>
+      <trans-unit id="command_verify_help_customIncludes_description">
+        <source>Specifies pattern(s) defining files to be included to verification (all files are included if not specified).</source>
+        <target state="new">Specifies pattern(s) defining files to be included to verification (all files are included if not specified).</target>
+        <note />
+      </trans-unit>
       <trans-unit id="command_verify_help_description">
         <source>Runs the template with specified arguments and compares the result with expectations files.</source>
         <target state="translated">使用指定的引數執行範本，並將結果與期望檔案比較。</target>
@@ -92,6 +97,11 @@ Do not localize: "template.json"</note>
         <source>If set to true - the diff tool won't be automatically started by the Verifier on verification failures.</source>
         <target state="translated">如果設為 true - 驗證失敗時，驗證器不會自動啟動 Diff 工具。</target>
         <note>Do not translate 'true'.</note>
+      </trans-unit>
+      <trans-unit id="command_verify_help_distinguisherName_description">
+        <source>Sets optional distinguisher string prepended to the generated scenario name used for naming expectations subdirectories</source>
+        <target state="new">Sets optional distinguisher string prepended to the generated scenario name used for naming expectations subdirectories</target>
+        <note />
       </trans-unit>
       <trans-unit id="command_verify_help_expectFailure_description">
         <source>If set to true - 'dotnet new' command is expected to return non-zero return code.</source>

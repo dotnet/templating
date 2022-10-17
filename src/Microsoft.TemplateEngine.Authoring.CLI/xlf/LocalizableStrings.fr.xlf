@@ -78,6 +78,11 @@ Do not localize: "template.json"</note>
         <target state="translated">Spécifie le ou les modèles définissant les fichiers à exclure de la vérification.</target>
         <note />
       </trans-unit>
+      <trans-unit id="command_verify_help_customIncludes_description">
+        <source>Specifies pattern(s) defining files to be included to verification (all files are included if not specified).</source>
+        <target state="new">Specifies pattern(s) defining files to be included to verification (all files are included if not specified).</target>
+        <note />
+      </trans-unit>
       <trans-unit id="command_verify_help_description">
         <source>Runs the template with specified arguments and compares the result with expectations files.</source>
         <target state="translated">Exécute le modèle avec les arguments spécifiés et compare le résultat aux fichiers attendus.</target>
@@ -92,6 +97,11 @@ Do not localize: "template.json"</note>
         <source>If set to true - the diff tool won't be automatically started by the Verifier on verification failures.</source>
         <target state="translated">Si la valeur est définie sur true, l’outil Diff n’est pas automatiquement démarré par le vérificateur en cas d’échecs de vérification.</target>
         <note>Do not translate 'true'.</note>
+      </trans-unit>
+      <trans-unit id="command_verify_help_distinguisherName_description">
+        <source>Sets optional distinguisher string prepended to the generated scenario name used for naming expectations subdirectories</source>
+        <target state="new">Sets optional distinguisher string prepended to the generated scenario name used for naming expectations subdirectories</target>
+        <note />
       </trans-unit>
       <trans-unit id="command_verify_help_expectFailure_description">
         <source>If set to true - 'dotnet new' command is expected to return non-zero return code.</source>
