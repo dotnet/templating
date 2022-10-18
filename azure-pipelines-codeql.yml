@@ -24,7 +24,7 @@ stages:
       - job: Windows_NT_CSharp
         timeoutInMinutes: 90
         pool:
-          name: NetCore1ESPool-Internal
+          name: NetCore1ESPool-Svc-Internal
           demands: ImageOverride -equals windows.vs2019.amd64
 
         steps:

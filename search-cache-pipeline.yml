@@ -16,7 +16,7 @@ parameters:
   default: true
 
 pool:
-  name: NetCore1ESPool-Internal
+  name: NetCore1ESPool-Svc-Internal
   demands: ImageOverride -equals Build.Ubuntu.2204.Amd64
 
 steps:
