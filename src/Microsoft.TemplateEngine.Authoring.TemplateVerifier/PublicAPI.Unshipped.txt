@@ -27,6 +27,8 @@ Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.Disa
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.DisableDiffTool.init -> void
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.DoNotAppendParamsToScenarioName.get -> bool?
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.DoNotAppendParamsToScenarioName.init -> void
+Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.DoNotPrependTemplateToScenarioName.get -> bool?
+Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.DoNotPrependTemplateToScenarioName.init -> void
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.DotnetNewCommandAssemblyPath.get -> string?
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.DotnetNewCommandAssemblyPath.init -> void
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.ExpectationsDirectory.get -> string?

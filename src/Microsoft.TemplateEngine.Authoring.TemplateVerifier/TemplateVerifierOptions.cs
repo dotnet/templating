@@ -105,6 +105,11 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
         public bool? DoNotAppendParamsToScenarioName { get; init; }
 
         /// <summary>
+        /// If set to true - the instantiation params are not appended to verification subdirectories.
+        /// </summary>
+        public bool? DoNotPrependTemplateToScenarioName { get; init; }
+
+        /// <summary>
         /// If set to true - the caller method name is prepended to verification subdirectories.
         /// </summary>
         public bool? PrependCallerMethodNameToScenarioName { get; init; }
