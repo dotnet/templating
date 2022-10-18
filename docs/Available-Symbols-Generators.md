@@ -165,7 +165,7 @@ Uses constant value.
 
 ```
 "symbols":{
-    "myConstant": {
+  "myConstant": {
     "type": "generated",
     "generator": "constant",
     "parameters": {
@@ -197,13 +197,13 @@ The `computed` type symbols can be use for same purpose.
 
 In this sample `IndividualAuth` is `true` if the value of `auth`, another symbol defined in the template, is `IndividualB2C`
 ```
-    "IndividualAuth": {
-      "type": "generated",
-	  "generator": "evaluate",
-	  "parameters": {
-		  "action": "(auth == \"IndividualB2C\")"
-		},
+  "IndividualAuth": {
+    "type": "generated",
+    "generator": "evaluate",
+    "parameters": {
+      "action": "(auth == \"IndividualB2C\")"
     },
+  },
 ```
 ### Related
 [`Implementation class`](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.Orchestrator.RunnableProjects/Macros/EvaluateMacro.cs)
@@ -223,13 +223,13 @@ During evaluation looks for a valid free port number trying to create a socket, 
 In this sample `KestrelPortGenerated` is a symbol that return the number of an available port or 5000.
 
 ```
-"KestrelPortGenerated": {
-  "type": "generated",
-  "generator": "port"
-  "parameters": {
-    "fallback":"5000"
-  }
-},
+  "KestrelPortGenerated": {
+    "type": "generated",
+    "generator": "port"
+    "parameters": {
+      "fallback":"5000"
+    }
+  },
 ```
 
 ### Related
@@ -422,17 +422,17 @@ Tries to match regex pattern against value of source symbol and returns `True` i
 
 ```
 "symbols": {
-    "isMatch": {
-      "type": "generated",
-      "generator": "regexMatch",
-      "dataType": "bool",
-      "replaces": "test.value1",
-      "parameters": {
-        "source": "name",
-        "pattern": "^hello$"
-      }
+  "isMatch": {
+    "type": "generated",
+    "generator": "regexMatch",
+    "dataType": "bool",
+    "replaces": "test.value1",
+    "parameters": {
+    "source": "name",
+    "pattern": "^hello$"
     }
   }
+}
 ```
 
 ### Related
@@ -515,45 +515,45 @@ Symbols definition
 This sample shows how to change the replacement value based on evaluating conditions using other symbols:
 
 ```
-  "symbols": {
-    "company": {
-      "type": "parameter",
-      "dataType": "string",
-      "defaultValue": "Microsoft"
-    },
-    "product": {
-      "type": "parameter",
-      "dataType": "string",
-      "defaultValue": "Visual Studio"
-    },
-    "joinedRename": {
-      "type": "generated",
-      "generator": "join",
-      "fileRename": "Api",
-      "parameters": {
-        "symbols": [
-          {
-            "type": "const",
-            "value": "Source"
-          },
-          {
-            "type": "const",
-            "value": "Api"
-          },
-          {
-            "type": "ref",
-            "value": "company"
-          },
-          {
-            "type": "ref",
-            "value": "product"
-          }
-        ],
-        "separator": "/",
-        "removeEmptyValues": true
-      }
+"symbols": {
+  "company": {
+    "type": "parameter",
+    "dataType": "string",
+    "defaultValue": "Microsoft"
+  },
+  "product": {
+    "type": "parameter",
+    "dataType": "string",
+    "defaultValue": "Visual Studio"
+  },
+  "joinedRename": {
+    "type": "generated",
+    "generator": "join",
+    "fileRename": "Api",
+    "parameters": {
+      "symbols": [
+        {
+          "type": "const",
+          "value": "Source"
+        },
+        {
+          "type": "const",
+          "value": "Api"
+        },
+        {
+          "type": "ref",
+          "value": "company"
+        },
+        {
+          "type": "ref",
+          "value": "product"
+        }
+      ],
+      "separator": "/",
+      "removeEmptyValues": true
     }
   }
+}
 ```
 This sample will rename folder called `Api` into `Source/Api/Microsoft/Visual Studio`. Notice that File API will automatically change `/` into `\` on Windows.
 
@@ -561,56 +561,56 @@ This sample will rename folder called `Api` into `Source/Api/Microsoft/Visual St
 
 `template.json`:
 ```
-  "symbols": {
-    "Platform": {
-      "type": "parameter",
-      "description": "The target framework for the project.",
-      "datatype": "choice",
-      "allowMultipleValues": true,
-      "choices": [
+"symbols": {
+  "Platform": {
+    "type": "parameter",
+    "description": "The target framework for the project.",
+    "datatype": "choice",
+    "allowMultipleValues": true,
+    "choices": [
+      {
+        "choice": "Windows",
+        "description": "Windows Desktop"
+      },
+      {
+        "choice": "WindowsPhone",
+        "description": "Windows Phone"
+      },
+      {
+        "choice": "MacOS",
+        "description": "Macintosh computers"
+      },
+      {
+        "choice": "iOS",
+        "description": "iOS mobile"
+      },
+      {
+        "choice": "android",
+        "description": "android mobile"
+      },
+      {
+        "choice": "nix",
+        "description": "Linux distributions"
+      }
+    ],
+    "defaultValue": "MacOS|iOS"
+  },
+  "joinedRename": {
+    "type": "generated",
+    "generator": "join",
+    "replaces": "SupportedPlatforms",
+    "parameters": {
+      "symbols": [
         {
-          "choice": "Windows",
-          "description": "Windows Desktop"
-        },
-        {
-          "choice": "WindowsPhone",
-          "description": "Windows Phone"
-        },
-        {
-          "choice": "MacOS",
-          "description": "Macintosh computers"
-        },
-        {
-          "choice": "iOS",
-          "description": "iOS mobile"
-        },
-        {
-          "choice": "android",
-          "description": "android mobile"
-        },
-        {
-          "choice": "nix",
-          "description": "Linux distributions"
+          "type": "ref",
+          "value": "Platform"
         }
       ],
-      "defaultValue": "MacOS|iOS"
-    },
-    "joinedRename": {
-      "type": "generated",
-      "generator": "join",
-      "replaces": "SupportedPlatforms",
-      "parameters": {
-        "symbols": [
-          {
-            "type": "ref",
-            "value": "Platform"
-          }
-        ],
-        "separator": ", ",
-        "removeEmptyValues": true,
-      }
+      "separator": ", ",
+      "removeEmptyValues": true,
     }
   }
+}
 ```
 
 `Program.cs`:
