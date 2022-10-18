@@ -59,6 +59,8 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             _commandRunner = commandRunner;
         }
 
+        // TODO: expose verifySettings via Action (so that scrubbers can be defined etc.)
+
         /// <summary>
         /// Asynchronously performs the scenario and it's verification based on given configuration options.
         /// </summary>
@@ -176,11 +178,12 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
                 }
             }
 
-            string scenarioPrefix = options.TemplateName;
+            string scenarioPrefix = (options.DoNotPrependTemplateToScenarioName ?? false) ? string.Empty : options.TemplateName;
             if ((options.PrependCallerMethodNameToScenarioName ?? false) && !string.IsNullOrEmpty(callerMethodName))
             {
-                scenarioPrefix = callerMethodName + "." + callerMethodName;
+                scenarioPrefix += (string.IsNullOrEmpty(scenarioPrefix) ? null : ".") + callerMethodName;
             }
+            scenarioPrefix = string.IsNullOrEmpty(scenarioPrefix) ? "_" : scenarioPrefix;
             verifySettings.UseTypeName(scenarioPrefix);
             string expectationsDir = options.ExpectationsDirectory ?? "VerifyExpectations";
             if (!string.IsNullOrEmpty(callerDir) && !Path.IsPathRooted(expectationsDir))
