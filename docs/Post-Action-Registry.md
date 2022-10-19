@@ -269,21 +269,24 @@ Adds `MyTestProject.csproj` to solution in output directory or its closest paren
 
 Adds `MyTestProject.csproj` in the root of the solution.
 
-```
-"primaryOutputs": [
-    {
-      "path": "MyTestProject.csproj"        
-    }
+```json
+"primaryOutputs": [{
+    "path": "MyTestProject.csproj"
+  }
 ],
 "postActions": [{
-  "description": "Add projects to solution",
-  "manualInstructions": [ { "text": "Add generated project to solution manually." } ],
-  "args": {
-    "inRoot": true
-  },
-  "actionId": "D396686C-DE0E-4DE6-906D-291CD29FC5DE",
-  "continueOnError": true
-}]
+    "description": "Add projects to solution",
+    "manualInstructions": [{
+        "text": "Add generated project to solution manually."
+      }
+    ],
+    "args": {
+      "inRoot": true
+    },
+    "actionId": "D396686C-DE0E-4DE6-906D-291CD29FC5DE",
+    "continueOnError": true
+  }
+]
 ```
 
 # Change file permissions
