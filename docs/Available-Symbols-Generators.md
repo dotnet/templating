@@ -11,7 +11,7 @@ To use a generated symbol inside your `template.json` file:
 1. Use the `"generator": ...` parameter to select the generator to use.    
 This is a sample of definition of a generated symbol, the `port` generator, that generates a random number for an http port.    
 
-```
+```json
 "IISExpressPortGenerated": {    
   "type": "generated",    
   "generator": "port",
@@ -23,7 +23,7 @@ This is a sample of definition of a generated symbol, the `port` generator, that
 
 Most of the generators need to be configured via parameters that let you select the source of the data and select among the options available. Below is a sample of a symbol that use the `now` generator to replace a fixed year indication present in the source files with the current year.
 
-```
+```json
 "copyrightYear": {
   "type": "generated",
   "generator": "now",
@@ -66,7 +66,7 @@ In this sample three symbols are defined:
  - `ownerName` is a parameter which can be set on the command line using `dotnet new` It has a default value of "John Doe", that will be used if the no value is received from the host. The value will be used to replace "John Smith (a)".
  - `nameUpper` and `nameLower` are the symbols that generate the upperCase and lowerCase version of `ownerName` that are used to replace any instance of "John Smith (U)" and "John Smith (l)". 
 
-```
+```json
 "symbols":{
     "ownerName":{
       "type": "parameter",
@@ -120,7 +120,7 @@ In this sample three symbols are defined:
  - `ThisYear` - use the now generator to calculate the current year.
  - `YearReplacer` - ensures that any occurrence of "1234" is replaced. If `MessageYear` was passed in by the user that value will be used. Otherwise `ThisYear` will be used.
 
-```
+```json
   "symbols":{
     "MessageYear":{
       "type": "parameter",
@@ -163,7 +163,7 @@ Uses constant value.
 
 `myConstant` is a symbol that replaces "1234" with "5001"
 
-```
+```json
 "symbols":{
   "myConstant": {
     "type": "generated",
@@ -222,7 +222,7 @@ During evaluation looks for a valid free port number trying to create a socket, 
 ### Samples
 In this sample `KestrelPortGenerated` is a symbol that return the number of an available port or 5000.
 
-```
+```json
   "KestrelPortGenerated": {
     "type": "generated",
     "generator": "port"
@@ -249,7 +249,7 @@ Creates a formatted guid for a replacement. To configure the output format of th
 ### Samples
 This sample creates different symbols showing the different formatting available for the generated guid.
 
-```
+```json
 "symbols":{
   "id01":{
     "type": "generated",
@@ -313,7 +313,7 @@ Creates a symbol from the current date/time.
 ### Samples
 In this sample a symbol is created showing the current data, and replacing any instance of "01/01/1999"    
 
-```
+```json
 "symbols":{
   "createdDate": {
     "type": "generated",
@@ -344,7 +344,7 @@ Creates a random integer value in a specified range.
 ### Samples   
 This sample shows a symbol that generates a value from `0` to `10000` excluded, and replace any instance of `4321`
 
-```
+```json
 "symbols":{
   "myRandomNumber":{
     "type": "generated",
@@ -381,7 +381,7 @@ Replacement steps
 
 ### Samples
 
-```
+```json
 "symbols": {
   "regexExample": {
     "type": "generated",
@@ -420,7 +420,7 @@ Tries to match regex pattern against value of source symbol and returns `True` i
 
 ### Samples
 
-```
+```json
 "symbols": {
   "isMatch": {
     "type": "generated",
@@ -460,7 +460,7 @@ Cases definition
 
 This sample shows how to change the replacement value based on evaluating conditions using other symbols:
 
-```
+```json
 "symbols": {
   "test": {
     "type": "parameter",
@@ -514,7 +514,7 @@ Symbols definition
 
 This sample shows how to change the replacement value based on evaluating conditions using other symbols:
 
-```
+```json
 "symbols": {
   "company": {
     "type": "parameter",
@@ -560,7 +560,7 @@ This sample will rename folder called `Api` into `Source/Api/Microsoft/Visual St
 <a id="multichoice-join-sample"></a>Joining [multi-choice symbol](Reference-for-template.json.md#multichoice-symbols-specifics) values:
 
 `template.json`:
-```
+```json
 "symbols": {
   "Platform": {
     "type": "parameter",

@@ -210,9 +210,9 @@ Only the currently active SDK (queryable via `dotnet --version`, changeable by t
 Defines [project capabilities](https://github.com/microsoft/VSProjectSystem/blob/master/doc/overview/about_project_capabilities.md) that the template requires.
 Commonly used with item templates to define the certain projects it is applicable to. 
 `dotnet new` attempts to find the closest project file using following rules:
-- The project in current directory or `--output` directory (matching `*.*proj` extension)
-- If not found, the parent of above and so on
-- The path to the project can be explicitly specified using `--project` instantiation option. This path takes precedence - so it can be used in case of ambiguity
+- The project in current directory or `--output` directory (matching `*.*proj` extension).
+- If not found, the parent of above and so on.
+- The path to the project can be explicitly specified using `--project` instantiation option. This path takes precedence - so it can be used in case of ambiguity.
 
 Once project is located, its project capabilities are evaluated. The project should be restored, otherwise evaluation fails.
 Only .NET [SDK-style projects](https://docs.microsoft.com/en-us/dotnet/core/project-sdk/overview) are supported.

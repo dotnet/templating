@@ -7,7 +7,7 @@ At a high level, value forms allow the specification of a "replaces"/"replacemen
 
 In my source, the value `"Hi there"` should be replaced by a user supplied value, but, `&quot;Hi there&quot;` should be as well. The user value should be XML encoded for the latter and not for the former. The below snippet from template.json shows how to accomplish this.
 
-```
+```json
 {
   ...
   "symbols": {
@@ -37,35 +37,73 @@ When the value say, `Test ©` is supplied as the value for the parameter `exampl
 ## Available transforms:
 
 **`replace`**   - Perform a replacement with regular expressions
-```
-  `identifier`  -> `replace`
-  `pattern`     -> A regular expression matching the characters to replace
-  `replacement` -> The replacement for the matched characters
+```json
+"forms": {
+    "dotToUnderscore": {
+      "identifier": "replace",
+      "pattern": "\\.",        // A regular expression matching the characters to replace
+      "replacement": "_"       // The replacement for the matched characters
+    }
+}
 ```
 
 **`chain`**     - Performs multiple transformations
-```
-  `identifier`  -> `chain`
-  `steps`       -> An array of names of other transformations (applied in the order they appear in the array)
+```json
+"forms": {
+    "chained": {
+      "identifier": "chain",
+      "steps": [ "dotToUnderscore", "digitToBang" ]  // An array of names of other transformations (applied in the order they appear in the array)
+    },
+}
 ```
 
 **`xmlEncode`** - XML encodes a value
-```
-  `identifier`  -> `xmlEncode`
-```
-
-**`lowerCase`** - Lower cases a value
-```
-  `identifier`  -> `lowerCase` or `lowerCaseInvariant`
-```
-
-**`upperCase`** - Upper cases a value
-```
-  `identifier`  -> `upperCase` or `upperCaseInvariant`
+```json
+"forms": {
+    "encode": {
+      "identifier": "xmlEncode"
+    }
+}
 ```
 
-**`firstLowerCase`** - converts the first letter of the value to lowercase using the casing rules of the current culture. Available since .NET 5.0.300.
+**`lowerCase`** - Converts the letters of the value to lowercase using the casing rules of the current culture.
+```json
+"forms": {
+    "lc": {
+      "identifier": "lowerCase"
+    }
+}
 ```
+
+**`lowerCaseInvariant`** - Converts the letters of the value to lowercase using the casing rules of the invariant culture.
+```json
+"forms": {
+    "lc": {
+      "identifier": "lowerCaseInvariant"
+    }
+}
+```
+
+**`upperCase`** - Converts the letters of the value to uppercase using the casing rules of the current culture.
+```json
+"forms": {
+    "uc": {
+      "identifier": "upperCase"
+    }
+}
+```
+
+**`upperCaseInvariant`** - Converts the letters of the value to uppercase using the casing rules of the invariant culture.
+```json
+"forms": {
+    "uc": {
+      "identifier": "upperCaseInvariant"
+    }
+}
+```
+
+**`firstLowerCase`** - Converts the first letter of the value to lowercase using the casing rules of the current culture. Available since .NET 5.0.300.
+```json
 "forms": {
     "first_lc": {
       "identifier": "firstLowerCase"
@@ -73,8 +111,8 @@ When the value say, `Test ©` is supplied as the value for the parameter `exampl
 }
 ```
 
-**`firstLowerCaseInvariant`** - converts the first letter of the value to lowercase using the casing rules of the invariant culture. Available since .NET 5.0.300.
-```
+**`firstLowerCaseInvariant`** - Converts the first letter of the value to lowercase using the casing rules of the invariant culture. Available since .NET 5.0.300.
+```json
 "forms": {
     "first_lc": {
       "identifier": "firstLowerCaseInvariant"
@@ -82,8 +120,8 @@ When the value say, `Test ©` is supplied as the value for the parameter `exampl
 }
 ```
 
-**`firstUpperCase`** - converts the first letter of the value to uppercase using the casing rules of the current culture. Available since .NET 5.0.300.
-```
+**`firstUpperCase`** - Converts the first letter of the value to uppercase using the casing rules of the current culture. Available since .NET 5.0.300.
+```json
 "forms": {
     "first_uc": {
       "identifier": "firstUpperCase"
@@ -91,8 +129,8 @@ When the value say, `Test ©` is supplied as the value for the parameter `exampl
 }
 ```
 
-**`firstUpperCaseInvariant`** - converts the first letter of the value to uppercase using the casing rules of the invariant culture. Available since .NET 5.0.300.
-```
+**`firstUpperCaseInvariant`** - Converts the first letter of the value to uppercase using the casing rules of the invariant culture. Available since .NET 5.0.300.
+```json
     "forms": {
         "first_uc": {
           "identifier": "firstUpperCaseInvariant"
@@ -100,8 +138,8 @@ When the value say, `Test ©` is supplied as the value for the parameter `exampl
     }
 ```
 
-**`titleCase`** - converts the value to title case using the casing rules of the current culture. See [TextInfo.ToTitleCase(String) documentation](https://docs.microsoft.com/dotnet/api/system.globalization.textinfo.totitlecase) for more details. Available since .NET 5.0.300.
-```
+**`titleCase`** - Converts the value to title case using the casing rules of the current culture. See [TextInfo.ToTitleCase(String) documentation](https://docs.microsoft.com/dotnet/api/system.globalization.textinfo.totitlecase) for more details. Available since .NET 5.0.300.
+```json
 "forms": {
     "title": {
       "identifier": "titleCase"
@@ -109,8 +147,8 @@ When the value say, `Test ©` is supplied as the value for the parameter `exampl
 }
 ```
 
-**`kebabCase`** - converts the value to kebab case using the casing rules of the invariant culture. Available since .NET 5.0.300.
-```
+**`kebabCase`** - Converts the value to kebab case using the casing rules of the invariant culture. Available since .NET 5.0.300.
+```json
 "forms": {
     "kebab": {
       "identifier": "kebabCase"

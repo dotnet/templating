@@ -255,15 +255,15 @@ There are two ways to do it:
 If the file should never be processed by template engine, it can be specified as `copyOnly` in the `sources` section of the `template.json`. For example:
 
 ```json
-  "sources": [
+"sources": [
   {
     "modifiers": [
-    {
-      "copyOnly": [ "Directory.Build.props" ]
-    }
+      {
+        "copyOnly": [ "Directory.Build.props" ]
+      }
     ]
   }
-  ],
+],
 ```
 
 If template engine should not process only part of the file, but other parts should be processed, the conditional processing can be turned off for the section that should not be processed by using directives:

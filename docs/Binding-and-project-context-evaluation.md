@@ -47,9 +47,9 @@ It is possible to bind symbols to MSBuild properties of the current project. The
 Commonly used with item templates to get the information about the project it is added to.
 
 `dotnet new` attempts to find the closest project file using following rules:
-- The project in current directory or `--output` directory (matching `*.*proj` extension)
-- If not found, the parent of above and so on
-- The path to the project can be explicitly specified using `--project` instantiation option. This path takes precedence - so it can be used in case of ambiguity
+- The project in current directory or `--output` directory (matching `*.*proj` extension).
+- If not found, the parent of above and so on.
+- The path to the project can be explicitly specified using `--project` instantiation option. This path takes precedence - so it can be used in case of ambiguity.
 
 Once project is located, its MSBuild properties are evaluated. The project should be restored, otherwise evaluation fails.
 Only .NET [SDK-style projects](https://docs.microsoft.com/en-us/dotnet/core/project-sdk/overview) are supported.
@@ -85,14 +85,14 @@ In addition to that, there is additional `context` source supporting:
 - `context:solutionname` - the name of the solution, which may be different from the project name.
 
 Visual Studio also provides a way to bind to "namespace" via host parameters source:
-```
+```json
   "type": "bind"
   "binding": "namespace"
 ```
 
 or 
 
-```
+```json
   "type": "bind"
   "binding": "host:namespace"
 ```
