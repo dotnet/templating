@@ -13,10 +13,10 @@ namespace Microsoft.TemplateEngine.Abstractions
         /// </summary>
         public enum SeverityLevel
         {
-            Error,
-            Warning,
+            None,
             Info,
-            None
+            Warning,
+            Error,
         }
 
         /// <summary>
