@@ -42,9 +42,9 @@ Microsoft.TemplateEngine.Abstractions.IValidationEntry.ErrorMessage.get -> strin
 Microsoft.TemplateEngine.Abstractions.IValidationEntry.Location.get -> Microsoft.TemplateEngine.Abstractions.IValidationEntry.ErrorLocation?
 Microsoft.TemplateEngine.Abstractions.IValidationEntry.Severity.get -> Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel
 Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel
-Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel.Error = 0 -> Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel
-Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel.Info = 2 -> Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel
-Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel.None = 3 -> Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel
-Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel.Warning = 1 -> Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel
+Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel.Error = 3 -> Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel
+Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel.Info = 1 -> Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel
+Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel.None = 0 -> Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel
+Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel.Warning = 2 -> Microsoft.TemplateEngine.Abstractions.IValidationEntry.SeverityLevel
 Microsoft.TemplateEngine.Abstractions.IValidationInfo
 Microsoft.TemplateEngine.Abstractions.IValidationInfo.ValidationErrors.get -> System.Collections.Generic.IReadOnlyList<Microsoft.TemplateEngine.Abstractions.IValidationEntry!>!
