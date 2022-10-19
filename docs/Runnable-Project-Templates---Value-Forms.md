@@ -36,7 +36,7 @@ When the value say, `Test ©` is supplied as the value for the parameter `exampl
 
 ## Available transforms:
 
-**`replace`**   - Perform a replacement with regular expressions
+**`replace`**   - Performs a replacement with regular expressions
 ```json
 "forms": {
     "dotToUnderscore": {
