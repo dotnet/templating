@@ -17,8 +17,6 @@
   </PropertyGroup>
   <!-- Package Versions -->
   <PropertyGroup>
-    <!-- Pinned Package Versions - Ordered by package name -->
-    <MicrosoftDotNetCliUtilsVersion>6.0.100-rc.1.21423.4</MicrosoftDotNetCliUtilsVersion>
     <!-- Maestro-managed Package Versions - Ordered by repo name -->
     <!-- Dependencies from https://github.com/dotnet/command-line-api -->
     <SystemCommandLinePackageVersion>2.0.0-beta4.22504.1</SystemCommandLinePackageVersion>
