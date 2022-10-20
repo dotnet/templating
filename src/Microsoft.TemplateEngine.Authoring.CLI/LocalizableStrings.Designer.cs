@@ -225,15 +225,6 @@ namespace Microsoft.TemplateEngine.Authoring.CLI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sets optional distinguisher string prepended to the generated scenario name used for naming expectations subdirectories.
-        /// </summary>
-        internal static string command_verify_help_distinguisherName_description {
-            get {
-                return ResourceManager.GetString("command_verify_help_distinguisherName_description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Specifies path to the directory with expectation files..
         /// </summary>
         internal static string command_verify_help_expectationsDirPath_description {
@@ -266,6 +257,15 @@ namespace Microsoft.TemplateEngine.Authoring.CLI {
         internal static string command_verify_help_outputPath_description {
             get {
                 return ResourceManager.GetString("command_verify_help_outputPath_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specifies optional scenario name to be used in the snapshot folder name..
+        /// </summary>
+        internal static string command_verify_help_scenarioName_description {
+            get {
+                return ResourceManager.GetString("command_verify_help_scenarioName_description", resourceCulture);
             }
         }
         

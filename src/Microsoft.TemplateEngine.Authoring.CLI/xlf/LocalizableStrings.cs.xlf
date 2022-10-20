@@ -98,11 +98,6 @@ Do not localize: "template.json"</note>
         <target state="translated">Pokud je nastavená hodnota true, nástroj rozdílu se při neúspěšných ověřeních automaticky nespustí.</target>
         <note>Do not translate 'true'.</note>
       </trans-unit>
-      <trans-unit id="command_verify_help_distinguisherName_description">
-        <source>Sets optional distinguisher string prepended to the generated scenario name used for naming expectations subdirectories</source>
-        <target state="new">Sets optional distinguisher string prepended to the generated scenario name used for naming expectations subdirectories</target>
-        <note />
-      </trans-unit>
       <trans-unit id="command_verify_help_expectFailure_description">
         <source>If set to true - 'dotnet new' command is expected to return non-zero return code.</source>
         <target state="translated">Pokud je nastaveno na true – očekává se, že příkaz dotnet new vrátí nenulový návratový kód.</target>
@@ -121,6 +116,11 @@ Do not localize: "template.json"</note>
       <trans-unit id="command_verify_help_outputPath_description">
         <source>Specifies the path to target directory to output the generated template to.</source>
         <target state="translated">Určuje cestu k cílovému adresáři pro výstup vygenerované šablony.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="command_verify_help_scenarioName_description">
+        <source>Specifies optional scenario name to be used in the snapshot folder name.</source>
+        <target state="new">Specifies optional scenario name to be used in the snapshot folder name.</target>
         <note />
       </trans-unit>
       <trans-unit id="command_verify_help_templateName_description">

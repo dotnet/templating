@@ -44,10 +44,8 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.UnitTests
             TemplateVerifierOptions options = new TemplateVerifierOptions(templateName: "console")
             {
                 TemplateSpecificArgs = null,
-                DisableDiffTool = null,
                 OutputDirectory = verifyLocation,
                 VerificationExcludePatterns = new[] { "*.dll" },
-                VerifyCommandOutput = null,
                 UniqueFor = null,
             }
                 .WithCustomScrubbers(
