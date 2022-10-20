@@ -25,11 +25,11 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
             string? expectationsDirectory,
             string? scenarioDistinguisher,
             string? outputDirectory,
-            bool? disableDiffTool,
-            bool? disableDefaultVerificationExcludePatterns,
+            bool disableDiffTool,
+            bool disableDefaultVerificationExcludePatterns,
             IEnumerable<string>? verificationExcludePatterns,
             IEnumerable<string>? verificationIncludePatterns,
-            bool? verifyCommandOutput,
+            bool verifyCommandOutput,
             bool isCommandExpectedToFail,
             IEnumerable<UniqueForOption>? uniqueForOptions)
         : this(templateName, templateSpecificArgs)
@@ -86,13 +86,13 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
         /// <summary>
         /// If set to true - the diff tool won't be automatically started by the Verifier on verification failures.
         /// </summary>
-        public bool? DisableDiffTool { get; init; }
+        public bool DisableDiffTool { get; init; }
 
         /// <summary>
         /// If set to true - all template output files will be verified, unless <see cref="VerificationExcludePatterns"/> are specified.
         /// Otherwise a default exclusions (to be documented - mostly binaries etc.).
         /// </summary>
-        public bool? DisableDefaultVerificationExcludePatterns { get; init; }
+        public bool DisableDefaultVerificationExcludePatterns { get; init; }
 
         /// <summary>
         /// Set of patterns defining files to be excluded from verification.
@@ -108,7 +108,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
         /// <summary>
         /// If set to true - 'dotnet new' command standard output and error contents will be verified along with the produced template files.
         /// </summary>
-        public bool? VerifyCommandOutput { get; init; }
+        public bool VerifyCommandOutput { get; init; }
 
         /// <summary>
         /// If set to true - 'dotnet new' command is expected to return nonzero return code.

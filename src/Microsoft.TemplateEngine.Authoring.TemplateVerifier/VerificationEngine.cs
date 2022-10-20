@@ -16,18 +16,13 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
     {
         private static readonly IReadOnlyList<string> DefaultVerificationExcludePatterns = new List<string>()
         {
-            @"obj/*",
-            @"*/obj/*",
-            @"obj\*",
-            @"*\obj\*",
-            @"bin/*",
-            @"*/bin/*",
-            @"bin\*",
-            @"*\bin\*",
+            @"**/obj/*",
+            @"**\obj\*",
+            @"**/bin/*",
+            @"**\bin\*",
             "*.exe",
             "*.dll",
             "*.",
-            "*.exe",
         };
 
         private readonly ILogger _logger;
@@ -59,10 +54,8 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             _commandRunner = commandRunner;
         }
 
-        // TODO: expose verifySettings via Action (so that scrubbers can be defined etc.)
-
         /// <summary>
-        /// Asynchronously performs the scenario and it's verification based on given configuration options.
+        /// Asynchronously performs the scenario and its verification based on given configuration options.
         /// </summary>
         /// <param name="optionsAccessor">Configuration of the scenario and verification.</param>
         /// <param name="cancellationToken"></param>
@@ -84,7 +77,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
 
             CommandResultData commandResult = RunDotnetNewCommand(options, _commandRunner, _loggerFactory, _logger);
 
-            if (options.IsCommandExpectedToFail ?? false)
+            if (options.IsCommandExpectedToFail)
             {
                 if (commandResult.ExitCode == 0)
                 {
@@ -104,7 +97,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
 
                 // We do not expect stderr in passing command.
                 // However if verification of stdout and stderr is opted-in - we will let that verification validate the stderr content
-                if (!(options.VerifyCommandOutput ?? false) && !string.IsNullOrEmpty(commandResult.StdErr))
+                if (!options.VerifyCommandOutput && !string.IsNullOrEmpty(commandResult.StdErr))
                 {
                     throw new TemplateVerificationException(
                         string.Format(
@@ -132,7 +125,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             TemplateVerifierOptions options,
             IPhysicalFileSystemEx fileSystem)
         {
-            List<string> exclusionsList = (options.DisableDefaultVerificationExcludePatterns ?? false)
+            List<string> exclusionsList = options.DisableDefaultVerificationExcludePatterns
                 ? new()
                 : new(DefaultVerificationExcludePatterns);
 
@@ -151,7 +144,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
 
             if (!includeGlobs.Any())
             {
-                includeGlobs.Add(MatchAllGlob.Instance);
+                includeGlobs.Add(Glob.MatchAll);
             }
 
             if (options.CustomDirectoryVerifier != null)
@@ -178,8 +171,8 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
                 }
             }
 
-            string scenarioPrefix = (options.DoNotPrependTemplateToScenarioName ?? false) ? string.Empty : options.TemplateName;
-            if (!(options.DoNotPrependCallerMethodNameToScenarioName ?? false) && !string.IsNullOrEmpty(callerMethodName))
+            string scenarioPrefix = options.DoNotPrependTemplateNameToScenarioName ? string.Empty : options.TemplateName;
+            if (!options.DoNotPrependCallerMethodNameToScenarioName && !string.IsNullOrEmpty(callerMethodName))
             {
                 scenarioPrefix = callerMethodName + (string.IsNullOrEmpty(scenarioPrefix) ? null : ".") + scenarioPrefix;
             }
@@ -228,7 +221,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
                 }
             }
 
-            if (options.DisableDiffTool ?? false)
+            if (options.DisableDiffTool)
             {
                 verifySettings.DisableDiff();
             }
@@ -262,7 +255,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
         {
             // TBD: once the custom SDK switching feature is implemented - here we should append the sdk distinguisher if UniqueForOption.Runtime requested
 
-            var scenarioName = options.ScenarioDistinguisher + ((options.DoNotAppendParamsToScenarioName ?? false) ? null : EncodeArgsAsPath(options.TemplateSpecificArgs));
+            var scenarioName = options.ScenarioName + (options.DoNotAppendTemplateArgsToScenarioName ? null : EncodeArgsAsPath(options.TemplateSpecificArgs));
             if (string.IsNullOrEmpty(scenarioName))
             {
                 scenarioName = "_";
@@ -431,7 +424,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             MethodInfo mi = v.Method;
             a.Before(mi);
 
-            if (args.VerifyCommandOutput ?? false)
+            if (args.VerifyCommandOutput)
             {
                 if (_fileSystem.DirectoryExists(Path.Combine(commandResultData.WorkingDirectory, SpecialFiles.StandardStreamsDir)))
                 {
