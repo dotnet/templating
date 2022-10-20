@@ -179,9 +179,9 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             }
 
             string scenarioPrefix = (options.DoNotPrependTemplateToScenarioName ?? false) ? string.Empty : options.TemplateName;
-            if ((options.PrependCallerMethodNameToScenarioName ?? false) && !string.IsNullOrEmpty(callerMethodName))
+            if (!(options.DoNotPrependCallerMethodNameToScenarioName ?? false) && !string.IsNullOrEmpty(callerMethodName))
             {
-                scenarioPrefix += (string.IsNullOrEmpty(scenarioPrefix) ? null : ".") + callerMethodName;
+                scenarioPrefix = callerMethodName + (string.IsNullOrEmpty(scenarioPrefix) ? null : ".") + scenarioPrefix;
             }
             scenarioPrefix = string.IsNullOrEmpty(scenarioPrefix) ? "_" : scenarioPrefix;
             verifySettings.UseTypeName(scenarioPrefix);
@@ -235,8 +235,27 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
 
             return Verifier.VerifyDirectory(
                 contentDir,
-                (filePath) => includeGlobs.Any(g => g.IsMatch(filePath)) && !excludeGlobs.Any(g => g.IsMatch(filePath)),
+                include: (filePath) =>
+                {
+                    string relativePath = fileSystem.PathRelativeTo(filePath, contentDir);
+                    return includeGlobs.Any(g => g.IsMatch(relativePath)) && !excludeGlobs.Any(g => g.IsMatch(relativePath));
+                },
+                fileScrubber: ExtractFileScrubber(options, contentDir, fileSystem),
                 settings: verifySettings);
+        }
+
+        private static FileScrubber? ExtractFileScrubber(TemplateVerifierOptions options, string contentDir, IPhysicalFileSystemEx fileSystem)
+        {
+            if (!(options.CustomScrubbers?.ByPathScrubbers.Any() ?? false))
+            {
+                return null;
+            }
+
+            return (fullPath, builder) =>
+            {
+                string relativePath = fileSystem.PathRelativeTo(fullPath, contentDir);
+                options.CustomScrubbers.ByPathScrubbers.ForEach(scrubberByPath => scrubberByPath(relativePath, builder));
+            };
         }
 
         private static string GetScenarioName(TemplateVerifierOptions options)
@@ -273,11 +292,11 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
 
             Directory.CreateDirectory(workingDir);
             ILogger commandLogger = loggerFactory?.CreateLogger(typeof(DotnetCommand)) ?? logger;
-            string? customHiveLocation = null;
+            string? customHiveLocation = options.SettingsDirectory;
 
             if (!string.IsNullOrEmpty(options.TemplatePath))
             {
-                customHiveLocation = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName(), "home");
+                customHiveLocation ??= Path.Combine(Path.GetTempPath(), Path.GetRandomFileName(), "home");
                 var installCommand =
                     new DotnetCommand(commandLogger, "new", "install", options.TemplatePath)
                         .WithCustomHive(customHiveLocation)
@@ -331,7 +350,8 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             var command = new DotnetCommand(loggerFactory?.CreateLogger(typeof(DotnetCommand)) ?? logger, "new", cmdArgs.ToArray())
                     .WithWorkingDirectory(workingDir);
             var result = commandRunner.RunCommand(command);
-            if (!string.IsNullOrEmpty(customHiveLocation))
+            // Cleanup, unless the settings dir was externally passed
+            if (!string.IsNullOrEmpty(customHiveLocation) && string.IsNullOrEmpty(options.SettingsDirectory))
             {
                 Directory.Delete(customHiveLocation, true);
             }
@@ -350,12 +370,14 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
         {
             foreach (string filePath in fileSystem.EnumerateFiles(contentDir, "*", SearchOption.AllDirectories))
             {
-                if (!includeMatchers.Any(g => g.IsMatch(filePath)))
+                string relativePath = fileSystem.PathRelativeTo(filePath, contentDir);
+
+                if (!includeMatchers.Any(g => g.IsMatch(relativePath)))
                 {
                     continue;
                 }
 
-                if (excludeMatchers.Any(g => g.IsMatch(filePath)))
+                if (excludeMatchers.Any(g => g.IsMatch(relativePath)))
                 {
                     continue;
                 }
@@ -372,9 +394,15 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
                     }
                     StringBuilder? sb = null;
 
-                    if (!string.IsNullOrEmpty(extension) && scrubbers.ScrubersByExtension.TryGetValue(extension, out Action<StringBuilder>? scrubber))
+                    if (scrubbers.ByPathScrubbers.Any())
                     {
                         sb = new StringBuilder(content);
+                        scrubbers.ByPathScrubbers.ForEach(scrubberByPath => scrubberByPath(relativePath, sb));
+                    }
+
+                    if (!string.IsNullOrEmpty(extension) && scrubbers.ScrubersByExtension.TryGetValue(extension, out Action<StringBuilder>? scrubber))
+                    {
+                        sb ??= new StringBuilder(content);
                         scrubber(sb);
                     }
 
@@ -390,7 +418,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
                     }
                 }
 
-                yield return new(filePath, content);
+                yield return new(relativePath, content);
             }
         }
 
