@@ -1,9 +1,8 @@
 ﻿Microsoft.TemplateEngine.Authoring.TemplateVerifier.ScrubbersDefinition
+Microsoft.TemplateEngine.Authoring.TemplateVerifier.ScrubbersDefinition.AddScrubber(Microsoft.TemplateEngine.Authoring.TemplateVerifier.ScrubbersDefinition.ScrubFileByPath! fileScrubber) -> Microsoft.TemplateEngine.Authoring.TemplateVerifier.ScrubbersDefinition!
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.ScrubbersDefinition.AddScrubber(System.Action<System.Text.StringBuilder!>! scrubber, string? extension = null) -> Microsoft.TemplateEngine.Authoring.TemplateVerifier.ScrubbersDefinition!
-Microsoft.TemplateEngine.Authoring.TemplateVerifier.ScrubbersDefinition.GeneralScrubber.get -> System.Action<System.Text.StringBuilder!>?
-Microsoft.TemplateEngine.Authoring.TemplateVerifier.ScrubbersDefinition.ScrubbersDefinition() -> void
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.ScrubbersDefinition.ScrubbersDefinition(System.Action<System.Text.StringBuilder!>! scrubber, string? extension = null) -> void
-Microsoft.TemplateEngine.Authoring.TemplateVerifier.ScrubbersDefinition.ScrubersByExtension.get -> System.Collections.Generic.Dictionary<string!, System.Action<System.Text.StringBuilder!>!>!
+Microsoft.TemplateEngine.Authoring.TemplateVerifier.ScrubbersDefinition.ScrubFileByPath
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerificationErrorCode
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerificationErrorCode.InstallFailed = 106 -> Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerificationErrorCode
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerificationErrorCode.InstantiationFailed = 100 -> Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerificationErrorCode
@@ -27,6 +26,8 @@ Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.Disa
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.DisableDiffTool.init -> void
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.DoNotAppendParamsToScenarioName.get -> bool?
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.DoNotAppendParamsToScenarioName.init -> void
+Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.DoNotPrependCallerMethodNameToScenarioName.get -> bool?
+Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.DoNotPrependCallerMethodNameToScenarioName.init -> void
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.DoNotPrependTemplateToScenarioName.get -> bool?
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.DoNotPrependTemplateToScenarioName.init -> void
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.DotnetNewCommandAssemblyPath.get -> string?
@@ -37,10 +38,10 @@ Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.IsCo
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.IsCommandExpectedToFail.init -> void
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.OutputDirectory.get -> string?
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.OutputDirectory.init -> void
-Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.PrependCallerMethodNameToScenarioName.get -> bool?
-Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.PrependCallerMethodNameToScenarioName.init -> void
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.ScenarioDistinguisher.get -> string?
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.ScenarioDistinguisher.init -> void
+Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.SettingsDirectory.get -> string?
+Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.SettingsDirectory.init -> void
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.StandardOutputFileExtension.get -> string?
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.StandardOutputFileExtension.init -> void
 Microsoft.TemplateEngine.Authoring.TemplateVerifier.TemplateVerifierOptions.TemplateName.get -> string!
