@@ -254,3 +254,6 @@ Microsoft.TemplateEngine.VC.db
 
 # Visual Studio Code
 .vscode/
+
+#Rider
+.idea/
