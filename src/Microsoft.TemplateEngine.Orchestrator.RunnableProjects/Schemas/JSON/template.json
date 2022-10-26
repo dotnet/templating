@@ -689,7 +689,11 @@
                       },
                       "solutionFolder": {
                         "type": "string",
-                        "description": "Defines the destination solution folder path to add the projects to. Optional."
+                        "description": "The destination solution folder path to add the projects to. Can't be used with 'inRoot'. Optional."
+                      },
+                      "inRoot": {
+                        "type": "boolean",
+                        "description": "Places the projects in the root of the solution, rather than creating a solution folder. Cannot be used with 'solutionFolder'. Optional. Available since .NET SDK 7.0.200."
                       }
                     }
                   }
