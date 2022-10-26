@@ -1267,7 +1267,7 @@
               "required": ["type"],
               "properties": {
                 "type": {
-                  "enum": ["os", "host", "workload", "sdk-version"]
+                  "enum": ["os", "host", "workload", "sdk-version", "project-capability"]
                 }
               }
             },
@@ -1287,13 +1287,13 @@
                 "oneOf": [
                   {
                     "type": "string",
-                    "enum": ["Windows", "Unix", "OSX"]
+                    "enum": ["Windows", "Linux", "OSX"]
                   },
                   {
                     "type": "array",
                     "items": {
                       "type": "string",
-                      "enum": ["Windows", "Unix", "OSX"]
+                      "enum": [ "Windows", "Linux", "OSX" ]
                     }
                   }
                 ]
@@ -1362,7 +1362,7 @@
             "description": "SDK version constraint. Allows to restrict the template to be run only on specific .NET SDK version(s).",
             "properties": {
               "type": {
-                "enum": ["sdk-version"]
+                "enum": [ "sdk-version" ]
               },
               "args": {
                 "oneOf": [
@@ -1380,7 +1380,20 @@
                 ]
               }
             }
+          },
+          {
+            "description": "The project context constraint. Allows to restrict the item template to be run only on inside .NET project with certain capabilities.",
+            "properties": {
+              "type": {
+                "enum": [ "project-capability" ]
+              },
+              "args": {
+                "type": "string",
+                "description": "Project capability expression that should be satisfied by the project. Refer to https://docs.microsoft.com/en-us/dotnet/api/microsoft.visualstudio.shell.interop.vsprojectcapabilityexpressionmatcher for more info."
+              }
+            }
           }
+
         ]
       }
     }
