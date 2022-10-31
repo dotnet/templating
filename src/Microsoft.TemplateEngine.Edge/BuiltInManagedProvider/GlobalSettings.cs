@@ -146,59 +146,24 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
             throw new InvalidOperationException();
         }
 
-        private async void FileChanged(object sender, FileSystemEventArgs e)
+        private void FileChanged(object sender, FileSystemEventArgs e)
         {
             // File change might be notified while file is still in progress of being changed.
-            // To make sure file change is done, block the notification until sucessfully locking the file once.
-            CancellationTokenSource cancellationSource = new CancellationTokenSource();
-            var cancellationToken = cancellationSource.Token;
-            IDisposable? mutex = null;
-            bool shouldBreak = false;
+            // To make sure file change is done, block the notification until the file is unlocked.
             for (int i = 0; i < FileReadWriteRetries; i++)
             {
-                try
+                if (_mutex?.IsLocked ?? false)
                 {
-                    mutex = await LockAsync(cancellationToken).ConfigureAwait(false);
+                    if (i == FileReadWriteRetries)
+                    {
+                        throw new Exception($"Waiting untill the file is unlocked failed with {FileReadWriteRetries} retries with {MillisecondsInterval}ms interval.");
+                    }
+                    Task.Delay(MillisecondsInterval).Wait();
                 }
-                catch (Exception ex)
-                {
-                    if (ex is ObjectDisposedException)
-                    {
-                        // This means file change should finish and the notification should be executed anyway.
-                        shouldBreak = true;
-                    }
-                    if (ex is OperationCanceledException)
-                    {
-                        // This should not block the notification though locking the file is canceled.
-                        shouldBreak = true;
-                    }
-
-                    if (i == (FileReadWriteRetries - 1))
-                    {
-                        throw;
-                    }
-                    if (ex is InvalidOperationException)
-                    {
-                        // Potentially the file is still in progress of being changed and
-                        // the file is locked. Then this exception is thrown from LockAsync()
-                        continue;
-                    }
-                }
-                finally
-                {
-                    if (mutex != null)
-                    {
-                        // Successfully locking the file means the file change was done before this lock.
-                        // Notification should continue.
-                        mutex.Dispose();
-                        shouldBreak = true;
-                    }
-                }
-                if (shouldBreak)
+                else
                 {
                     break;
                 }
-                await Task.Delay(MillisecondsInterval, cancellationToken).ConfigureAwait(false);
             }
 
             SettingsChanged?.Invoke();
