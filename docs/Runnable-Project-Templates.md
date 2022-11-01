@@ -434,42 +434,42 @@ Other than the endif keyword, each keyword type can be defined in up to 2 flavor
 
 Here is an example of defining a custom conditional operation (this is the actual predefined C-style line comments conditional configuration, which is the default for .json files)
 ``` JSON
-				"type": "conditional",
-				"configuration": {
-					"if": [ "//#if" ],
-					"else": [ "//#else" ],
-					"elseif": [ "//#elseif" ],
-					"endif": [ "//#endif" ],
-					"actionableIf": [ "////#if" ],
-					"actionableElse": [ "////#else" ],
-					"actionableElseif": [ "////#elseif" ],
-					"actions": [ "cStyleUncomment", "cStyleReduceComment" ],
-					"trim": true,
-					"wholeLine": true,
-					"evaluator": "C++"
-				},
+"type": "conditional",
+"configuration": {
+  "if": [ "//#if" ],
+  "else": [ "//#else" ],
+  "elseif": [ "//#elseif" ],
+  "endif": [ "//#endif" ],
+  "actionableIf": [ "////#if" ],
+  "actionableElse": [ "////#else" ],
+  "actionableElseif": [ "////#elseif" ],
+  "actions": [ "cStyleUncomment", "cStyleReduceComment" ],
+  "trim": true,
+  "wholeLine": true,
+  "evaluator": "C++"
+},
 ```
 
 Because there are actionable keywords, there is an "actions" field provided, which referes to other action(s) to activate when an actionable token is encountered. The other actions remain active until any other token in the conditional config is encountered. In this case, the other actions jobs are to remove comments, and to reduce consecutive double comments to a single comment. 
 
 These other actions are defined as:
 ``` JSON
-			{
-				"type": "replacement",
-				"configuration": {
-					"original": "//",
-					"replacement": "",
-					"id": "cStyleUncomment",
-				},
-			},
-			{
-				"type": "replacement",
-				"configuration": {
-					"original": "////",
-					"replacement": "//",
-					"id": "cStyleReduceComment",
-				},
-			}
+{
+  "type": "replacement",
+  "configuration": {
+    "original": "//",
+    "replacement": "",
+    "id": "cStyleUncomment",
+  },
+},
+{
+  "type": "replacement",
+  "configuration": {
+    "original": "////",
+    "replacement": "//",
+    "id": "cStyleReduceComment",
+  },
+}
 ```
 
 Note that the Id's in the replacement configurations correspond to the actions in the conditional configuration. This is what ties them together - it causes the replacements to be activated / deactivated when the actionable tokens are in / out of scope.
@@ -477,53 +477,53 @@ Note that the Id's in the replacement configurations correspond to the actions i
 Let's look at a specific example of a template file being processed by this configuration, and see what happens:
 
 ``` JSON
-	...
-	//#if (A)
-		// comment related to the 'if' content
-		default content // also appropriate if A is true
-	////#elseif (B)
-		//// comment related to the 'elseif' content
-		//content for when B is true and A is false
-	////#else
-		// comment related to the 'else' content
-		// content for when both A & B are false
-	//#endif
-	...
+...
+//#if (A)
+  // comment related to the 'if' content
+  default content // also appropriate if A is true
+////#elseif (B)
+  //// comment related to the 'elseif' content
+  //content for when B is true and A is false
+////#else
+  // comment related to the 'else' content
+  // content for when both A & B are false
+//#endif
+...
 ```
 
 There are 4 possible scenarios for when this appears in a template file.
 #### 1) No appropriate conditional processing. In this case, the entire block above will be copied to the created template as-is. This includes all the commenting, i.e.:
 ``` JSON
-	//#if (A)
-		// comment related to the 'if' content
-		default content // also appropriate if A is true
-	////#elseif (B)
-		//// comment related to the 'elseif' content
-		//content for when B is true and A is false
-	////#else
-		//// comment related to the 'else' content
-		// content for when both A & B are false
-	//#endif
+//#if (A)
+  // comment related to the 'if' content
+  default content // also appropriate if A is true
+////#elseif (B)
+  //// comment related to the 'elseif' content
+  //content for when B is true and A is false
+////#else
+  //// comment related to the 'else' content
+  // content for when both A & B are false
+//#endif
 ```
 ... which means only the default content under the 'if' will be interpreted in the created template.
 
 #### 2) A is true: Because the conditional token '//#if' was specified in the conditional configuration as an 'if' token (as opposed to an 'actionableIf' token), the 'actions' operations are not activated, so no commenting will change. Thus, the lines between the '//#if' and the '//#elseif' is the only part emitted to the created template, i.e.:
 ``` JSON
-		// comment related to the 'if' content
-		default content // also appropriate if A is true
+  // comment related to the 'if' content
+  default content // also appropriate if A is true
 ```
 
 #### 3) B is true (A is false): The elseif predicate is true, so only content under the elseif will be emitted to the created template. But '////#elseif' is an actionable token, so the 'actions' operations get activated, resulting in this text to be output:
 ``` JSON
-		// comment related to the 'elseif' content
-		content for when B is true and A is false
+  // comment related to the 'elseif' content
+  content for when B is true and A is false
 ```
 Note the comment changes from the original text - they're a results of the other 'actions'.
 
 #### 4) Both A & B are false, so the else should happen. Note that '////#else' is an actionable token, resulting in this text to be output:
 ``` JSON
-		// comment related to the 'else' content
-		 content for when both A & B are false
+  // comment related to the 'else' content
+  content for when both A & B are false
 ```
 
 Predefined conditional exist for each of these file / comment formats, and do not need custom configuration:
