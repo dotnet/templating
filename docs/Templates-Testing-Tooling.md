@@ -1,8 +1,8 @@
 # Overview
 
-Templates Testing Tooling is an engine for snapshot testing of templates instantiations - simplifying automated detection of regresions. It is surfaced via [API](#api) and [CLI tool](#cli).
+Templates Testing Tooling is an engine for snapshot testing of templates instantiations - simplifying automated detection of regressions. It is surfaced via [API](#api) and [CLI tool](#cli).
 
-Tooling currently uses [Verify](https://github.com/VerifyTests/Verify) as an underlying engine to manage the snapshots generation and verification. The API surface of Verify is however intentionally hidden and not accessible.
+Tooling currently uses [Verify](https://github.com/VerifyTests/Verify) as an underlying engine to manage the snapshots generation and verification. The API surface of Verify is however intentionally hidden and not accessible. The way how snapshots are being created, managed and diffed is unchanged - so to learn more about underlying diffing functionality refer to [DiffEngine](https://github.com/VerifyTests/DiffEngine) documentation.
 
 Engine creates a serialized version of outputs of tested scenario and compares those with stored snapshot (if any) and reports success or any found discrepancies. Snapshot created during the first run can be used as a baseline for future runs of the test scenario.
 
