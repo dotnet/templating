@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Installer;
 using Microsoft.TemplateEngine.Edge.Settings;
@@ -17,12 +18,14 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
     {
         private const int FileReadWriteRetries = 20;
         private const int MillisecondsInterval = 20;
+        private static readonly TimeSpan MaxNotificationDelayOnWriterLock = TimeSpan.FromSeconds(1);
         private readonly SettingsFilePaths _paths;
         private readonly IEngineEnvironmentSettings _environmentSettings;
         private readonly string _globalSettingsFile;
         private IDisposable? _watcher;
         private volatile bool _disposed;
         private volatile AsyncMutex? _mutex;
+        private int _waitingInstances;
 
         public GlobalSettings(IEngineEnvironmentSettings environmentSettings, string globalSettingsFile)
         {
@@ -131,7 +134,12 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
 
                 try
                 {
+                    // Ignore FSW notifications received during writing changes (we'll notify synchronously)
+                    Interlocked.Increment(ref _waitingInstances);
                     _environmentSettings.Host.FileSystem.WriteObject(_globalSettingsFile, globalSettingsData);
+                    // We are ready for new notifications now
+                    Interlocked.Exchange(ref _waitingInstances, 0);
+                    SettingsChanged?.Invoke();
                     return;
                 }
                 catch (Exception)
@@ -146,27 +154,43 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
             throw new InvalidOperationException();
         }
 
-        private void FileChanged(object sender, FileSystemEventArgs e)
+        private async void FileChanged(object sender, FileSystemEventArgs e)
         {
-            // File change might be notified while file is still in progress of being changed.
-            // To make sure file change is done, block the notification until the file is unlocked.
-            for (int i = 0; i < FileReadWriteRetries; i++)
+            // make sure the waiting happens only for one notification at the time
+            if (Interlocked.Increment(ref _waitingInstances) > 1)
             {
-                if (_mutex?.IsLocked ?? false)
-                {
-                    if (i == FileReadWriteRetries)
-                    {
-                        throw new Exception($"Waiting untill the file is unlocked failed with {FileReadWriteRetries} retries with {MillisecondsInterval}ms interval.");
-                    }
-                    Task.Delay(MillisecondsInterval).Wait();
-                }
-                else
-                {
-                    break;
-                }
+                return;
             }
 
+            await TryWaitForLock().ConfigureAwait(false);
+
+            // We are ready for new notifications now
+            Interlocked.Exchange(ref _waitingInstances, 0);
+
             SettingsChanged?.Invoke();
+        }
+
+        private async Task<bool> TryWaitForLock()
+        {
+            CancellationTokenSource cts = new();
+            try
+            {
+                cts.CancelAfter(MaxNotificationDelayOnWriterLock);
+                if (!(_mutex?.IsLocked ?? false))
+                {
+                    using (await LockAsync(cts.Token).ConfigureAwait(false))
+                    { }
+                }
+            }
+            catch (Exception e)
+            {
+                _environmentSettings.Host.Logger.LogInformation(
+                    "Failed to wait for GlobalSettings lock to be freed, before notifying about new changes. {error}",
+                    e.Message);
+                return false;
+            }
+
+            return true;
         }
     }
 }
