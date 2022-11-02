@@ -51,5 +51,19 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.IntegrationTests
             VerificationEngine engine = new VerificationEngine(_log);
             await engine.Execute(options);
         }
+
+        [Fact]
+        public async void EditorConfigTests_Empty()
+        {
+            TemplateVerifierOptions options = new TemplateVerifierOptions(templateName: "editorconfig")
+            {
+                TemplateSpecificArgs = new[] { "--empty" },
+                SnapshotsDirectory = "Snapshots",
+                VerifyCommandOutput = true,
+            };
+
+            VerificationEngine engine = new VerificationEngine(_log);
+            await engine.Execute(options).ConfigureAwait(false);
+        }
     }
 }
