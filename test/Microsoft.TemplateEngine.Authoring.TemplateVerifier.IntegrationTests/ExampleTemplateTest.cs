@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.TestHelper;
 using Microsoft.TemplateEngine.Tests;
@@ -8,6 +9,7 @@ using Xunit.Abstractions;
 
 namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.IntegrationTests
 {
+    [UsesVerify]
     public class ExampleTemplateTest : TestBase
     {
         private readonly ILogger _log;
@@ -64,6 +66,20 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.IntegrationTests
 
             VerificationEngine engine = new VerificationEngine(_log);
             await engine.Execute(options).ConfigureAwait(false);
+        }
+
+        [Fact]
+        public async void TestVerify()
+        {
+            VerifierSettings.UseSplitModeForUniqueDirectory();
+            string dirToVerify = Path.Combine(GetSourcesDir(), "Snapshots", "EditorConfigTests_Empty.editorconfig.--empty.verified");
+            VerifySettings verifySettings = new();
+            await Verifier.VerifyDirectory(dirToVerify).ConfigureAwait(false);
+        }
+
+        private string GetSourcesDir([CallerFilePath] string sourceFile = "")
+        {
+            return Path.GetDirectoryName(sourceFile)!;
         }
     }
 }
