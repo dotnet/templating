@@ -33,10 +33,7 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
             _globalSettingsFile = globalSettingsFile ?? throw new ArgumentNullException(nameof(globalSettingsFile));
             _paths = new SettingsFilePaths(environmentSettings);
             environmentSettings.Host.FileSystem.CreateDirectory(Path.GetDirectoryName(_globalSettingsFile));
-            if (environmentSettings.Environment.GetEnvironmentVariable("TEMPLATE_ENGINE_DISABLE_FILEWATCHER") != "1")
-            {
-                _watcher = environmentSettings.Host.FileSystem.WatchFileChanges(_globalSettingsFile, FileChanged);
-            }
+            _watcher = CreateWatcherIfRequested();
         }
 
         public event Action? SettingsChanged;
@@ -135,10 +132,10 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
                 try
                 {
                     // Ignore FSW notifications received during writing changes (we'll notify synchronously)
-                    Interlocked.Increment(ref _waitingInstances);
+                    _watcher?.Dispose();
                     _environmentSettings.Host.FileSystem.WriteObject(_globalSettingsFile, globalSettingsData);
                     // We are ready for new notifications now
-                    Interlocked.Exchange(ref _waitingInstances, 0);
+                    _watcher = CreateWatcherIfRequested();
                     SettingsChanged?.Invoke();
                     return;
                 }
@@ -154,9 +151,27 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
             throw new InvalidOperationException();
         }
 
+        private IDisposable? CreateWatcherIfRequested()
+        {
+            if (_environmentSettings.Environment.GetEnvironmentVariable("TEMPLATE_ENGINE_DISABLE_FILEWATCHER") != "1")
+            {
+                return _environmentSettings.Host.FileSystem.WatchFileChanges(_globalSettingsFile, FileChanged);
+            }
+
+            return null;
+        }
+
+        // This method is called whenever there is a change in global settings. Since the handlers of SettingsChanged event
+        //  first grab the lock (LockAsync) and then read the whole content of GlobalSettings folder - we are here making sure
+        //  to skip unwanted extra calls - all concurrent calls while handler is waiting for a lock leads to duplicate reprocessing
+        //  of a whole global settings folder.
+        //  To prevent this - we try to wait for a lock on behalf of the handler and refuse all concurrent file change notifications in the meantime
         private async void FileChanged(object sender, FileSystemEventArgs e)
         {
-            // make sure the waiting happens only for one notification at the time
+            // Make sure the waiting happens only for one notification at the time - as we do not care about other notifications
+            // until the SettingsChanged is called
+            //  if multiple concurrent call(s) get here, while there is already other caller inside waiting for the lock
+            //  those concurrent callers will just return (as counter is 1 already).
             if (Interlocked.Increment(ref _waitingInstances) > 1)
             {
                 return;
@@ -164,7 +179,7 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
 
             await TryWaitForLock().ConfigureAwait(false);
 
-            // We are ready for new notifications now
+            // We are ready for new notifications now - indicate so by clearing the counter
             Interlocked.Exchange(ref _waitingInstances, 0);
 
             SettingsChanged?.Invoke();
@@ -184,7 +199,7 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
             }
             catch (Exception e)
             {
-                _environmentSettings.Host.Logger.LogInformation(
+                _environmentSettings.Host.Logger.LogDebug(
                     "Failed to wait for GlobalSettings lock to be freed, before notifying about new changes. {error}",
                     e.Message);
                 return false;
