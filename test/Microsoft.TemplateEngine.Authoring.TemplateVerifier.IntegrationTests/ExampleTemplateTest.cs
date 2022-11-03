@@ -19,63 +19,63 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.IntegrationTests
             _log = new XunitLoggerProvider(log).CreateLogger("TestRun");
         }
 
-        [Fact]
-        public async void VerificationEngineSampleDogfoodTest()
-        {
-            string workingDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName().Replace(".", string.Empty));
-            string templateShortName = "TestAssets.SampleTestTemplate";
+        //[Fact]
+        //public async void VerificationEngineSampleDogfoodTest()
+        //{
+        //    string workingDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName().Replace(".", string.Empty));
+        //    string templateShortName = "TestAssets.SampleTestTemplate";
 
-            //get the template location
-            string templateLocation = Path.Combine(TestTemplatesLocation, "TestTemplate");
+        //    //get the template location
+        //    string templateLocation = Path.Combine(TestTemplatesLocation, "TestTemplate");
 
-            TemplateVerifierOptions options = new TemplateVerifierOptions(templateName: templateShortName)
-            {
-                TemplateSpecificArgs = new string[] { "--paramB", "true" },
-                TemplatePath = templateLocation,
-                SnapshotsDirectory = "Snapshots",
-                OutputDirectory = workingDir,
-                VerifyCommandOutput = true,
-                DoNotPrependTemplateNameToScenarioName = true,
-                DoNotAppendTemplateArgsToScenarioName = true,
-                UniqueFor = UniqueForOption.Architecture,
-            }
-                .WithCustomScrubbers(
-                    ScrubbersDefinition.Empty
-                        .AddScrubber(sb => sb.Replace("B is enabled", "*******"))
-                        .AddScrubber((path, content) =>
-                        {
-                            if (path.Replace(Path.DirectorySeparatorChar, '/') == "std-streams/stdout.txt")
-                            {
-                                content.Replace("SampleTestTemplate", "%TEMPLATE%");
-                            }
-                        }));
+        //    TemplateVerifierOptions options = new TemplateVerifierOptions(templateName: templateShortName)
+        //    {
+        //        TemplateSpecificArgs = new string[] { "--paramB", "true" },
+        //        TemplatePath = templateLocation,
+        //        SnapshotsDirectory = "Snapshots",
+        //        OutputDirectory = workingDir,
+        //        VerifyCommandOutput = true,
+        //        DoNotPrependTemplateNameToScenarioName = true,
+        //        DoNotAppendTemplateArgsToScenarioName = true,
+        //        UniqueFor = UniqueForOption.Architecture,
+        //    }
+        //        .WithCustomScrubbers(
+        //            ScrubbersDefinition.Empty
+        //                .AddScrubber(sb => sb.Replace("B is enabled", "*******"))
+        //                .AddScrubber((path, content) =>
+        //                {
+        //                    if (path.Replace(Path.DirectorySeparatorChar, '/') == "std-streams/stdout.txt")
+        //                    {
+        //                        content.Replace("SampleTestTemplate", "%TEMPLATE%");
+        //                    }
+        //                }));
 
-            VerificationEngine engine = new VerificationEngine(_log);
-            await engine.Execute(options);
-        }
+        //    VerificationEngine engine = new VerificationEngine(_log);
+        //    await engine.Execute(options);
+        //}
 
-        [Fact]
-        public async void EditorConfigTests_Empty()
-        {
-            TemplateVerifierOptions options = new TemplateVerifierOptions(templateName: "editorconfig")
-            {
-                TemplateSpecificArgs = new[] { "--empty" },
-                SnapshotsDirectory = "Snapshots",
-                VerifyCommandOutput = true,
-            };
+        //[Fact]
+        //public async void EditorConfigTests_Empty()
+        //{
+        //    TemplateVerifierOptions options = new TemplateVerifierOptions(templateName: "editorconfig")
+        //    {
+        //        TemplateSpecificArgs = new[] { "--empty" },
+        //        SnapshotsDirectory = "Snapshots",
+        //        VerifyCommandOutput = true,
+        //    };
 
-            VerificationEngine engine = new VerificationEngine(_log);
-            await engine.Execute(options).ConfigureAwait(false);
-        }
+        //    VerificationEngine engine = new VerificationEngine(_log);
+        //    await engine.Execute(options).ConfigureAwait(false);
+        //}
 
-        [Fact]
-        public async void TestVerify()
-        {
-            VerifierSettings.UseSplitModeForUniqueDirectory();
-            string dirToVerify = Path.Combine(GetSourcesDir(), "Snapshots", "EditorConfigTests_Empty.editorconfig.--empty.verified");
-            VerifySettings verifySettings = new();
-            await Verifier.VerifyDirectory(dirToVerify).ConfigureAwait(false);
-        }
+        //[Fact]
+        //public async void TestVerify()
+        //{
+        //    VerifierSettings.UseSplitModeForUniqueDirectory();
+        //    string dirToVerify = Path.Combine(GetSourcesDir(), "Snapshots", "EditorConfigTests_Empty.editorconfig.--empty.verified");
+        //    VerifySettings verifySettings = new();
+        //    await Verifier.VerifyDirectory(dirToVerify).ConfigureAwait(false);
+        //}
 
         [Fact]
         public async void TestVerify_NoSplitMode()
