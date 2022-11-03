@@ -243,7 +243,7 @@ Here's a complicated example of a configuration, we'll go over what each piece m
       "flagPrefix": "<!--",
       "operations": [
         {
-          "type": "conditionals",
+          "type": "conditional",
           "configuration": {
             "if": "if",
             "else": "else",
