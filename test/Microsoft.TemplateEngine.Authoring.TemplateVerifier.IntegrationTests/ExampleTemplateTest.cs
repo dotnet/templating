@@ -3,6 +3,7 @@
 
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.TestHelper;
 using Microsoft.TemplateEngine.Tests;
@@ -84,6 +85,16 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.IntegrationTests
             string dirToVerify = Path.Combine(GetSourcesDir(), "Snapshots", "EditorConfigTests_Empty.editorconfig.--empty.verified");
             VerifySettings verifySettings = new();
             await Verifier.VerifyDirectory(dirToVerify).ConfigureAwait(false);
+        }
+
+        [Fact]
+        public void TestVerify_EnumerateFiles()
+        {
+            VerifierSettings.UseSplitModeForUniqueDirectory();
+            string dirToVerify = Path.Combine(GetSourcesDir(), "Snapshots", "EditorConfigTests_Empty.editorconfig.--empty.verified");
+            Directory.EnumerateFiles(dirToVerify, "*", SearchOption.AllDirectories).Count().Should().Be(3);
+            Directory.EnumerateFiles(dirToVerify, "*", SearchOption.AllDirectories).Should()
+                .Contain(f => f.EndsWith(".editorconfig"));
         }
 
         [Fact]
