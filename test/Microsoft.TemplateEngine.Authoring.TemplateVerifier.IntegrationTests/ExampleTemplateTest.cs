@@ -77,6 +77,15 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.IntegrationTests
             await Verifier.VerifyDirectory(dirToVerify).ConfigureAwait(false);
         }
 
+        [Fact]
+        public async void TestVerify_NoSplitMode()
+        {
+            //VerifierSettings.UseSplitModeForUniqueDirectory();
+            string dirToVerify = Path.Combine(GetSourcesDir(), "Snapshots", "EditorConfigTests_Empty.editorconfig.--empty.verified");
+            VerifySettings verifySettings = new();
+            await Verifier.VerifyDirectory(dirToVerify).ConfigureAwait(false);
+        }
+
         private string GetSourcesDir([CallerFilePath] string sourceFile = "")
         {
             return Path.GetDirectoryName(sourceFile)!;
