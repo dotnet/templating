@@ -70,6 +70,14 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.IntegrationTests
         }
 
         [Fact]
+        public async void TestVerify_fileOnly()
+        {
+            string fileToVerify = Path.Combine(GetSourcesDir(), "Snapshots", "EditorConfigTests_Empty.editorconfig.--empty.verified", "editorconfig", ".editorconfig");
+
+            await VerifyFile(fileToVerify);
+        }
+
+        [Fact]
         public async void TestVerify()
         {
             VerifierSettings.UseSplitModeForUniqueDirectory();
