@@ -317,16 +317,6 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
                 cmdArgs.AddRange(options.TemplateSpecificArgs);
             }
 
-            if (!string.IsNullOrEmpty(customHiveLocation))
-            {
-                cmdArgs.Add("--debug:custom-hive");
-                cmdArgs.Add(customHiveLocation);
-            }
-            else
-            {
-                cmdArgs.Add("--debug:ephemeral-hive");
-            }
-
             // let's make sure the template outputs are named and placed deterministically
             if (!cmdArgs.Select(arg => arg.Trim())
                     .Any(arg => new[] { "-n", "--name" }.Contains(arg, StringComparer.OrdinalIgnoreCase)))
@@ -342,9 +332,11 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             }
 
             var command = new DotnetNewCommand(loggerFactory?.CreateLogger(typeof(DotnetCommand)) ?? logger, cmdArgs.ToArray())
+                .WithCustomOrVirtualHive(customHiveLocation)
                 .WithCustomExecutablePath(options.DotnetExecutablePath)
                 .WithEnvironmentVariables(options.Environment)
                 .WithWorkingDirectory(workingDir);
+
             var result = commandRunner.RunCommand(command);
             // Cleanup, unless the settings dir was externally passed
             if (!string.IsNullOrEmpty(customHiveLocation) && string.IsNullOrEmpty(options.SettingsDirectory))
