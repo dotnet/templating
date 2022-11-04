@@ -36,8 +36,8 @@
           "properties": {
             "format": {
               "deprecated": true,
-              "deprecationMessage": "This property is not maintained and may be removed in the future. Use defaultFormat instead, or use guids section.",
-              "description": "This property is not maintained and may be removed in the future. Use defaultFormat instead, or use guids section.",
+              "deprecationMessage": "This property is not maintained and may be removed in the future. Use defaultFormat instead, or use 'guids' section.",
+              "description": "This property is not maintained and may be removed in the future. Use defaultFormat instead, or use 'guids' section.",
               "type": "string"
             },
             "defaultFormat": {
@@ -400,7 +400,7 @@
       }
     },
     "defaultName": {
-      "description": "The name to use during creation if no name has been specified and no other opinionation about naming has been provided from the host.",
+      "description": "The name to use during creation if no name has been specified by the user or provided from the host.",
       "type": "string",
       "minLength": 1
     },
@@ -916,7 +916,7 @@
             }
           },
           {
-            "description": "Lowercases the source value.",
+            "description": "Changes the case of source value to lower-case.",
             "properties": {
               "identifier": {
                 "enum": ["lowerCase"]
@@ -932,10 +932,18 @@
             }
           },
           {
-            "description": "Uppercases the source value.",
+            "description": "Converts the source value to upper-case using the casing rules of the current culture.",
             "properties": {
               "identifier": {
                 "enum": ["upperCase"]
+              }
+            }
+          },
+          {
+            "description": "Converts the source value to upper-case using the casing rules of the invariant culture.",
+            "properties": {
+              "identifier": {
+                "enum": ["upperCaseInvariant"]
               }
             }
           },
@@ -1202,7 +1210,7 @@
                     },
                     "displayName": {
                       "type": "string",
-                      "description": "The friendly name of the choice to be displayed to the user. This property is localizable."
+                      "description": "The friendly name of the choice to be displayed to the user. This property can be localized."
                     }
                   }
                 }
@@ -1241,13 +1249,13 @@
                 "default": false
               },
               "enableQuotelessLiterals": {
-                "description": "Indication whether implicit symbols for each choice value should be added to parameter collection. This allows condition syntax without enquoting choice literals. Valid only for datatype = choice.",
+                "description": "Indication whether implicit symbols for each choice value should be added to parameter collection. This allows condition syntax without using quotes for choice literals. Valid only for datatype = choice.",
                 "type": "boolean",
                 "default": false
               },
               "displayName": {
                 "type": "string",
-                "description": "The friendly name of the symbol to be displayed to the user. This property is localizable."
+                "description": "The friendly name of the symbol to be displayed to the user. This property can be localized."
               },
               "forms": {
                 "type": "object",
