@@ -31,6 +31,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Update="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsLoggingVersion)" />
+    <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsLoggingAbstractionsVersion)" />
+    <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftExtensionsLoggingConsoleVersion)" />
     <PackageReference Update="System.CommandLine" Version="$(SystemCommandLinePackageVersion)" />
     <!--Analyzer dependencies-->
     <PackageReference Update="Microsoft.CodeAnalysis.NetAnalyzers" Version="$(MicrosoftCodeAnalysisNetAnalyzersPackageVersion)" />
