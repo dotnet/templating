@@ -84,7 +84,7 @@ Argument (name) matching: exact short name
 -   Exact match on parameter value
 -   All required parameters should be specified.
 
--   *Example:* `dotnet new console --framework net5.0 --langVersion 9.0`
+-   *Example:* `dotnet new console --framework net7.0 --langVersion 9.0`
 
 #### Error cases
 
@@ -95,7 +95,6 @@ Argument (name) matching: exact short name
 Error: Invalid option(s):
 --framework invalid
    'invalid' is not a valid value for --framework. The possible values are:
-      net5.0          - Target net5.0
       net6.0          - Target net6.0
       net7.0          - Target net7.0
       netcoreapp3.1   - Target netcoreapp3.1
@@ -186,6 +185,9 @@ Argument (name) matching: exact or partial short name or name, optional.
     -   *Example:* `dotnet new list --tag Common`
     -   *Example:* `dotnet new list con --tag Common`
 
+### Template parameter filters
+
+This feature is currently unsupported (support was removed with moving o a new command line parser) - but it's being [tracked](https://github.com/dotnet/templating/issues/4061)
 
 ### Error cases
 
@@ -274,6 +276,10 @@ filters applied.
     -   *Example:* `dotnet new search --package Micro`
     -   *Example:* `dotnet new search con --package Micro`
 
+### Template parameter filters
+
+This feature is currently unsupported (support was removed with moving o a new command line parser) - but it's being [tracked](https://github.com/dotnet/templating/issues/4061)
+
 ### Error cases
 
 #### No argument
@@ -358,7 +364,6 @@ Template options:
                                  netstandard2.1  Target netstandard2.1
                                  netstandard2.0  Target netstandard2.0
                                  net6.0          Target net6.0
-                                 net5.0          Target net5.0
                                  netcoreapp3.1   Target netcoreapp3.1
                                Default: net7.0
   --langVersion <langVersion>  Sets the LangVersion property in the created project file
