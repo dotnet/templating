@@ -1,6 +1,6 @@
 function retry {
   local n=0
-  local max=5
+  local max=15
   local delay=60
   while true; do
     ((n++))
