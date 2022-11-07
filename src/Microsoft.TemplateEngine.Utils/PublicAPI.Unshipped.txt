@@ -8,5 +8,5 @@ Microsoft.TemplateEngine.Utils.DictionaryExtensions.ConflictingKeysResolution.Pr
 Microsoft.TemplateEngine.Utils.DictionaryExtensions.ConflictingKeysResolution.Throw = 2 -> Microsoft.TemplateEngine.Utils.DictionaryExtensions.ConflictingKeysResolution
 Microsoft.TemplateEngine.Utils.IPatternMatcher
 Microsoft.TemplateEngine.Utils.IPatternMatcher.IsMatch(string! test) -> bool
-static Microsoft.TemplateEngine.Utils.DictionaryExtensions.Add<TKey, TValue>(this System.Collections.Generic.IDictionary<TKey, TValue>! dict, System.Collections.Generic.IReadOnlyDictionary<TKey, TValue>! another, Microsoft.TemplateEngine.Utils.DictionaryExtensions.ConflictingKeysResolution conflictingKeysResolution = Microsoft.TemplateEngine.Utils.DictionaryExtensions.ConflictingKeysResolution.Overwrite) -> void
+static Microsoft.TemplateEngine.Utils.DictionaryExtensions.Merge<TKey, TValue>(this System.Collections.Generic.IDictionary<TKey, TValue>! dict, System.Collections.Generic.IReadOnlyDictionary<TKey, TValue>! another, Microsoft.TemplateEngine.Utils.DictionaryExtensions.ConflictingKeysResolution conflictingKeysResolution = Microsoft.TemplateEngine.Utils.DictionaryExtensions.ConflictingKeysResolution.Overwrite) -> void
 static readonly Microsoft.TemplateEngine.Utils.Glob.MatchAll -> Microsoft.TemplateEngine.Utils.IPatternMatcher!

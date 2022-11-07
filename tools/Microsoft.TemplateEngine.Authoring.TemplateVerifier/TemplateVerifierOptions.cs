@@ -147,7 +147,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             Dictionary<string, string> newEnvironemnt = new(environment);
             if (Environment != null)
             {
-                newEnvironemnt.Add(Environment);
+                newEnvironemnt.Merge(Environment);
             }
             Environment = newEnvironemnt;
             return this;

@@ -45,7 +45,7 @@ namespace Microsoft.TemplateEngine.CommandUtils
         {
             if (variables != null)
             {
-                Environment.Add(variables);
+                Environment.Merge(variables);
             }
             return this;
         }

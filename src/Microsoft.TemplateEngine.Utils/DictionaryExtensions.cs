@@ -56,7 +56,7 @@ namespace Microsoft.TemplateEngine.Utils
         /// <param name="another">Dictionary to be merged into current.</param>
         /// <param name="conflictingKeysResolution">Way of resolving keys conflicts.</param>
         /// <exception cref="Exception">Thrown if key is already present in current dictionary and <see cref="ConflictingKeysResolution.Throw"/> strategy was requested.</exception>
-        public static void Add<TKey, TValue>(
+        public static void Merge<TKey, TValue>(
             this IDictionary<TKey, TValue> dict,
             IReadOnlyDictionary<TKey, TValue> another,
             ConflictingKeysResolution conflictingKeysResolution = ConflictingKeysResolution.Overwrite)
@@ -69,7 +69,7 @@ namespace Microsoft.TemplateEngine.Utils
                 }
                 else if (conflictingKeysResolution == ConflictingKeysResolution.Throw)
                 {
-                    throw new Exception($"Key [{pair.Key}] is already present.");
+                    throw new ArgumentException(string.Format(LocalizableStrings.DictionaryExtensions_Error_KeyExists, pair.Key));
                 }
             }
         }
