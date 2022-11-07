@@ -292,6 +292,7 @@
     },
     "guid": {
       "pattern": "^\\{?[0-9A-Fa-f]{8}[-]?([0-9A-Fa-f]{4}[-]?){3}[0-9A-Fa-f]{12}\\}?$",
+      "description": "A guid string to be replaced in source files. Format and casing is not significant in the config as format and casing is preserved based on the particular guid in processed file(s).",
       "type": "string"
     },
     "ice": {
