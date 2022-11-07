@@ -125,7 +125,7 @@ stages:
             name: NetCore-Svc-Public
             demands: ImageOverride -equals Build.Ubuntu.2204.Amd64.Open
           ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-            name: NetCore1ESPool-Internal
+            name: NetCore1ESPool-Svc-Internal
             demands: ImageOverride -equals Build.Ubuntu.2204.Amd64
         strategy:
           matrix:
