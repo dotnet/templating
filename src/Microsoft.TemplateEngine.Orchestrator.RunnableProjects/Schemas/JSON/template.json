@@ -1027,7 +1027,7 @@
             "properties": {
               "type": {
                 "description": "The symbol binds value from external sources.",
-                "enum": [ "bind" ]
+                "enum": ["bind"]
               },
               "binding": {
                 "description": "The source and the name of parameter to take the value from. The syntax is: <external source>:<parameter name>. Well known external sources are: host - a value that is defined by the template engine host; env - environment variable.",
@@ -1064,7 +1064,7 @@
             "properties": {
               "type": {
                 "description": "The value of this symbol is derived from the value of another symbol by the application of value forms.",
-                "enum": [ "derived" ]
+                "enum": ["derived"]
               },
               "valueSource": {
                 "type": "string",
@@ -1105,7 +1105,7 @@
             "properties": {
               "type": {
                 "description": "Defines the high level configuration of symbol.",
-                "enum": [ "generated" ]
+                "enum": ["generated"]
               },
               "replaces": {
                 "type": "string",
@@ -1168,7 +1168,7 @@
             "properties": {
               "type": {
                 "description": "Defines the high level configuration of symbol.",
-                "enum": [ "parameter" ]
+                "enum": ["parameter"]
               },
               "isRequired": {
                 "oneOf": [
@@ -1198,7 +1198,7 @@
                 "description": "An array listing the valid choices for a symbol whose datatype = choice. If not provided, there are no valid choices for the symbol, so it can never be assigned a value.",
                 "type": "array",
                 "items": {
-                  "required": [ "choice" ],
+                  "required": ["choice"],
                   "properties": {
                     "choice": {
                       "description": "A valid value for the symbol.",
@@ -1456,7 +1456,7 @@
             "description": "SDK version constraint. Allows to restrict the template to be run only on specific .NET SDK version(s).",
             "properties": {
               "type": {
-                "enum": [ "sdk-version" ]
+                "enum": ["sdk-version"]
               },
               "args": {
                 "oneOf": [
@@ -1479,7 +1479,7 @@
             "description": "The project context constraint. Allows to restrict the item template to be run only on inside .NET project with certain capabilities.",
             "properties": {
               "type": {
-                "enum": [ "project-capability" ]
+                "enum": ["project-capability"]
               },
               "args": {
                 "type": "string",
