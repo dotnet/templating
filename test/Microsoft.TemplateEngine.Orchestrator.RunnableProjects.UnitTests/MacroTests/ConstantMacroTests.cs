@@ -1,15 +1,15 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Core.Contracts;
-using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros;
-using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config;
 using Microsoft.TemplateEngine.TestHelper;
-using Newtonsoft.Json.Linq;
+using Microsoft.TemplateEngine.Utils;
 using Xunit;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.MacroTests
@@ -20,7 +20,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
 
         public ConstantMacroTests(EnvironmentSettingsHelper environmentSettingsHelper)
         {
-            _engineEnvironmentSettings = environmentSettingsHelper.CreateEnvironment(hostIdentifier: this.GetType().Name, virtualize: true);
+            _engineEnvironmentSettings = environmentSettingsHelper.CreateEnvironment(hostIdentifier: GetType().Name, virtualize: true);
         }
 
         [Fact(DisplayName = nameof(TestConstantConfig))]
@@ -28,33 +28,95 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
         {
             string variableName = "myConstant";
             string value = "1048576";
-            ConstantMacroConfig macroConfig = new ConstantMacroConfig(null, variableName, value);
+            ConstantMacro macro = new();
+            ConstantMacroConfig macroConfig = new(macro, null, variableName, value);
 
             IVariableCollection variables = new VariableCollection();
 
-            ConstantMacro macro = new ConstantMacro();
+            macro.Evaluate(_engineEnvironmentSettings, variables, macroConfig);
+
+            Assert.Equal(value, variables[variableName]);
+        }
+
+        [Fact]
+        public void GeneratedSymbolTest()
+        {
+            string variableName = "myConstant";
+            string value = "1048576";
+            Dictionary<string, string> jsonParameters = new(StringComparer.OrdinalIgnoreCase)
+            {
+                { "value", JExtensions.ToJsonString(value) }
+            };
+
+            ConstantMacro macro = new();
+            GeneratedSymbol symbol = new(variableName, macro.Type, jsonParameters);
+
+            IVariableCollection variables = new VariableCollection();
+
+            macro.Evaluate(_engineEnvironmentSettings, variables, symbol);
+            Assert.Equal(value, variables[variableName]);
+        }
+
+        [Fact]
+        public void GeneratedSymbolTest_Bool()
+        {
+            string variableName = "myConstant";
+            Dictionary<string, string> jsonParameters = new(StringComparer.OrdinalIgnoreCase)
+            {
+                { "value", JExtensions.ToJsonString(true) }
+            };
+
+            ConstantMacro macro = new();
+            GeneratedSymbol symbol = new(variableName, macro.Type, jsonParameters);
+
+            IVariableCollection variables = new VariableCollection();
+
+            macro.Evaluate(_engineEnvironmentSettings, variables, symbol);
+            Assert.Equal("True", variables[variableName]);
+        }
+
+        [Fact]
+        public void GeneratedSymbolTest_Int()
+        {
+            string variableName = "myConstant";
+            Dictionary<string, string> jsonParameters = new(StringComparer.OrdinalIgnoreCase)
+            {
+                { "value", JExtensions.ToJsonString(1000) }
+            };
+
+            ConstantMacro macro = new();
+            GeneratedSymbol symbol = new(variableName, macro.Type, jsonParameters);
+
+            IVariableCollection variables = new VariableCollection();
+
+            macro.Evaluate(_engineEnvironmentSettings, variables, symbol);
+            Assert.Equal("1000", variables[variableName]);
+        }
+
+        [Fact]
+        [Obsolete("EvaluateConfig is deprecated")]
+        public void ObsoleteEvaluateConfigTest()
+        {
+            string variableName = "myConstant";
+            string value = "1048576";
+            ConstantMacro macro = new();
+            ConstantMacroConfig macroConfig = new(macro, null, variableName, value);
+
+            IVariableCollection variables = new VariableCollection();
+
             macro.EvaluateConfig(_engineEnvironmentSettings, variables, macroConfig);
 
             Assert.Equal(value, variables[variableName]);
         }
 
-        [Fact(DisplayName = nameof(TestConstantDeferredConfig))]
-        public void TestConstantDeferredConfig()
+        [Fact]
+        public void InvalidConfigurationTest()
         {
-            string variableName = "myConstant";
-            string value = "1048576";
-            Dictionary<string, JToken> jsonParameters = new Dictionary<string, JToken>
-            {
-                { "value", value }
-            };
-            GeneratedSymbolDeferredMacroConfig deferredConfig = new GeneratedSymbolDeferredMacroConfig("ConstantMacro", null, variableName, jsonParameters);
-
-            IVariableCollection variables = new VariableCollection();
-
-            ConstantMacro macro = new ConstantMacro();
-            IMacroConfig realConfig = macro.CreateConfig(_engineEnvironmentSettings, deferredConfig);
-            macro.EvaluateConfig(_engineEnvironmentSettings, variables, realConfig);
-            Assert.Equal(value, variables[variableName]);
+            ConstantMacro macro = new();
+            Dictionary<string, string> jsonParameters = new(StringComparer.OrdinalIgnoreCase);
+            VariableCollection variables = new();
+            TemplateAuthoringException ex = Assert.Throws<TemplateAuthoringException>(() => macro.Evaluate(_engineEnvironmentSettings, variables, new GeneratedSymbol("test", "constant", jsonParameters)));
+            Assert.Equal("Generated symbol 'test' of type 'constant' should have 'value' property defined.", ex.Message);
         }
     }
 }

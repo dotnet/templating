@@ -2,8 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using FluentAssertions;
+using Microsoft.TemplateEngine.CommandUtils;
 using Microsoft.TemplateEngine.TestHelper;
-using Microsoft.TemplateEngine.TestHelper.Commands;
 using Microsoft.TemplateEngine.Tests;
 using Xunit;
 using Xunit.Abstractions;
@@ -27,12 +27,14 @@ namespace Microsoft.TemplateEngine.Authoring.Tasks.IntegrationTests
             TestUtils.SetupNuGetConfigForPackagesLocation(tmpDir, ShippingPackagesLocation);
 
             new DotnetCommand(_log, "add", "TemplatePackage.csproj", "package", "Microsoft.TemplateEngine.Authoring.Tasks", "--prerelease")
-              .WithWorkingDirectory(tmpDir)
-              .Execute()
-              .Should()
-              .Pass();
+                .WithoutTelemetry()
+                .WithWorkingDirectory(tmpDir)
+                .Execute()
+                .Should()
+                .Pass();
 
             new DotnetCommand(_log, "build")
+                .WithoutTelemetry()
                 .WithWorkingDirectory(tmpDir)
                 .Execute()
                 .Should()
@@ -55,12 +57,14 @@ namespace Microsoft.TemplateEngine.Authoring.Tasks.IntegrationTests
             TestUtils.SetupNuGetConfigForPackagesLocation(tmpDir, ShippingPackagesLocation);
 
             new DotnetCommand(_log, "add", "TemplatePackage.csproj", "package", "Microsoft.TemplateEngine.Authoring.Tasks", "--prerelease")
-              .WithWorkingDirectory(tmpDir)
-              .Execute()
-              .Should()
-              .Pass();
+                .WithoutTelemetry()
+                .WithWorkingDirectory(tmpDir)
+                .Execute()
+                .Should()
+                .Pass();
 
             new DotnetCommand(_log, "build")
+                .WithoutTelemetry()
                 .WithWorkingDirectory(tmpDir)
                 .Execute()
                 .Should()
@@ -84,12 +88,14 @@ namespace Microsoft.TemplateEngine.Authoring.Tasks.IntegrationTests
             TestUtils.SetupNuGetConfigForPackagesLocation(tmpDir, ShippingPackagesLocation);
 
             new DotnetCommand(_log, "add", "TemplatePackage.csproj", "package", "Microsoft.TemplateEngine.Authoring.Tasks", "--prerelease")
-              .WithWorkingDirectory(tmpDir)
-              .Execute()
-              .Should()
-              .Pass();
+                .WithoutTelemetry()
+                .WithWorkingDirectory(tmpDir)
+                .Execute()
+                .Should()
+                .Pass();
 
             new DotnetCommand(_log, "build")
+                .WithoutTelemetry()
                 .WithWorkingDirectory(tmpDir)
                 .Execute()
                 .Should()
@@ -114,12 +120,14 @@ namespace Microsoft.TemplateEngine.Authoring.Tasks.IntegrationTests
             TestUtils.SetupNuGetConfigForPackagesLocation(tmpDir, ShippingPackagesLocation);
 
             new DotnetCommand(_log, "add", "TemplatePackage.csproj", "package", "Microsoft.TemplateEngine.Authoring.Tasks", "--prerelease")
-              .WithWorkingDirectory(tmpDir)
-              .Execute()
-              .Should()
-              .Pass();
+                .WithoutTelemetry()
+                .WithWorkingDirectory(tmpDir)
+                .Execute()
+                .Should()
+                .Pass();
 
             new DotnetCommand(_log, "build")
+                .WithoutTelemetry()
                 .WithWorkingDirectory(tmpDir)
                 .Execute()
                 .Should()
