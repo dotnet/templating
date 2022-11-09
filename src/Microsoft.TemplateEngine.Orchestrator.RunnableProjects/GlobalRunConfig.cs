@@ -9,13 +9,13 @@ using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
-    internal class GlobalRunConfig : IGlobalRunConfig
+    internal class GlobalRunConfig
     {
         public IReadOnlyList<IOperationProvider> Operations { get; init; } = Array.Empty<IOperationProvider>();
 
         public IVariableConfig VariableSetup { get; init; } = VariableConfig.DefaultVariableSetup();
 
-        public IReadOnlyList<IMacroConfig> Macros { get; init; } = Array.Empty<IMacroConfig>();
+        public IReadOnlyList<IMacroConfig> GeneratedSymbolMacros { get; init; } = Array.Empty<IMacroConfig>();
 
         public IReadOnlyList<IMacroConfig> ComputedMacros { get; init; } = Array.Empty<IMacroConfig>();
 

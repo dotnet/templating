@@ -77,7 +77,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             // Running the actual scenario: template files processing and generating output (including macros processing)
             //
 
-            await rpg.CreateAsync(environment, runnableConfig, sourceDir, parametersData, targetDir, CancellationToken.None);
+            await RunnableProjectGenerator.CreateAsync(environment, runnableConfig, sourceDir, parametersData, targetDir, CancellationToken.None);
 
             //
             // Veryfying the outputs
@@ -213,7 +213,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             // Running the actual scenario: template files processing and generating output (including macros processing)
             //
 
-            await rpg.CreateAsync(environment, runnableConfig, sourceDir, parametersData, targetDir, CancellationToken.None);
+            await RunnableProjectGenerator.CreateAsync(environment, runnableConfig, sourceDir, parametersData, targetDir, CancellationToken.None);
 
             //
             // Veryfying the outputs
@@ -311,7 +311,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             // Running the actual scenario: template files processing and generating output (including macros processing)
             //
 
-            await rpg.CreateAsync(environment, runnableConfig, sourceDir, parametersData, targetDir, CancellationToken.None);
+            await RunnableProjectGenerator.CreateAsync(environment, runnableConfig, sourceDir, parametersData, targetDir, CancellationToken.None);
 
             //
             // Veryfying the outputs
@@ -458,7 +458,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             // Running the actual scenario: template files processing and generating output (including macros processing)
             //
 
-            await rpg.CreateAsync(environment, runnableConfig, sourceDir, parametersData, targetDir, CancellationToken.None);
+            await RunnableProjectGenerator.CreateAsync(environment, runnableConfig, sourceDir, parametersData, targetDir, CancellationToken.None);
 
             //
             // Veryfying the outputs
@@ -569,7 +569,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             // Running the actual scenario: template files processing and generating output (including macros processing)
             //
 
-            await rpg.CreateAsync(environment, runnableConfig, sourceDir, parametersData, targetDir, CancellationToken.None);
+            await RunnableProjectGenerator.CreateAsync(environment, runnableConfig, sourceDir, parametersData, targetDir, CancellationToken.None);
 
             //
             // Veryfying the outputs
@@ -640,7 +640,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             // Running the actual scenario: template files processing and generating output (including macros processing)
             //
 
-            await rpg.CreateAsync(settings, runnableConfig, sourceDir, parametersData, targetDir, CancellationToken.None);
+            await RunnableProjectGenerator.CreateAsync(settings, runnableConfig, sourceDir, parametersData, targetDir, CancellationToken.None);
 
             //
             // Veryfying the outputs
@@ -726,7 +726,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             //
             // Running the actual scenario: template files processing and generating output (including macros processing)
             //
-            await rpg.CreateAsync(settings, runnableConfig, sourceDir, parameters, targetDir, CancellationToken.None);
+            await RunnableProjectGenerator.CreateAsync(settings, runnableConfig, sourceDir, parameters, targetDir, CancellationToken.None);
 
             //
             // Veryfying the outputs
@@ -811,7 +811,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             //
             // Running the actual scenario: template files processing and generating output (including macros processing)
             //
-            await rpg.CreateAsync(settings, runnableConfig, sourceDir, parameters, targetDir, CancellationToken.None);
+            await RunnableProjectGenerator.CreateAsync(settings, runnableConfig, sourceDir, parameters, targetDir, CancellationToken.None);
 
             //
             // Veryfying the outputs
