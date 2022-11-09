@@ -3,7 +3,7 @@
   <ProductDependencies>
     <Dependency Name="Microsoft.Extensions.Logging" Version="8.0.0-alpha.1.22530.1">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>c6865355c01e1fb170b65427846d939559ab3789</Sha>
+      <Sha>e6700ea21bbb17ca5058801259bc2d05957814d4</Sha>
     </Dependency>
     <Dependency Name="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0-alpha.1.22530.1">
       <Uri>https://github.com/dotnet/runtime</Uri>
