@@ -242,11 +242,164 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unrecognized evaluator: &apos;{0}&apos;..
+        /// </summary>
+        internal static string EvaluatorSelector_Exception_UnknownEvaluator {
+            get {
+                return ResourceManager.GetString("EvaluatorSelector_Exception_UnknownEvaluator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The high port bound &apos;{0}&apos; is greater than the maximum allowed, &apos;{1}&apos; will be used instead..
+        /// </summary>
+        internal static string GeneratePortNumberConfig_Warning_InvalidHighBound {
+            get {
+                return ResourceManager.GetString("GeneratePortNumberConfig_Warning_InvalidHighBound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The low port bound &apos;{0}&apos; is less than the minimum allowed, &apos;{1}&apos; will be used instead..
+        /// </summary>
+        internal static string GeneratePortNumberConfig_Warning_InvalidLowBound {
+            get {
+                return ResourceManager.GetString("GeneratePortNumberConfig_Warning_InvalidLowBound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The low port bound &apos;{0}&apos; is greater the high port bound &apos;{1}&apos;, the default range [{2}-{3}] will be used instead..
+        /// </summary>
+        internal static string GeneratePortNumberConfig_Warning_InvalidLowHighBound {
+            get {
+                return ResourceManager.GetString("GeneratePortNumberConfig_Warning_InvalidLowHighBound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generated symbol &apos;{0}&apos;: array &apos;{1}&apos; should contain JSON objects with property non-empty &apos;{2}&apos; when &apos;{3}&apos; is &apos;{4}&apos;..
+        /// </summary>
+        internal static string JoinMacroConfig_Exception_ValuePropertyIsEmpty {
+            get {
+                return ResourceManager.GetString("JoinMacroConfig_Exception_ValuePropertyIsEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to read parse localization file {0}, it will be skipped from further processing..
         /// </summary>
         internal static string LocalizationModelDeserializer_Error_FailedToParse {
             get {
                 return ResourceManager.GetString("LocalizationModelDeserializer_Error_FailedToParse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generated symbol &apos;{0}&apos;: array &apos;{1}&apos; should contain JSON objects..
+        /// </summary>
+        internal static string MacroConfig_Exception_ArrayShouldContainObjects {
+            get {
+                return ResourceManager.GetString("MacroConfig_Exception_ArrayShouldContainObjects", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generated symbol &apos;{0}&apos;: &apos;{1}&apos; is not a valid JSON..
+        /// </summary>
+        internal static string MacroConfig_Exception_InvalidJSON {
+            get {
+                return ResourceManager.GetString("MacroConfig_Exception_InvalidJSON", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generated symbol &apos;{0}&apos;: the regex pattern &apos;{1}&apos; is invalid..
+        /// </summary>
+        internal static string MacroConfig_Exception_InvalidRegex {
+            get {
+                return ResourceManager.GetString("MacroConfig_Exception_InvalidRegex", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generated symbol &apos;{0}&apos; of type &apos;{1}&apos; should have &apos;{2}&apos; property defined..
+        /// </summary>
+        internal static string MacroConfig_Exception_MissingMandatoryProperty {
+            get {
+                return ResourceManager.GetString("MacroConfig_Exception_MissingMandatoryProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generated symbol &apos;{0}&apos;: array &apos;{1}&apos; should contain JSON objects with property &apos;{2}&apos;..
+        /// </summary>
+        internal static string MacroConfig_Exception_MissingValueProperty {
+            get {
+                return ResourceManager.GetString("MacroConfig_Exception_MissingValueProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generated symbol &apos;{0}&apos;: &apos;{1}&apos; should be a valid JSON array..
+        /// </summary>
+        internal static string MacroConfig_Exception_ValueShouldBeArray {
+            get {
+                return ResourceManager.GetString("MacroConfig_Exception_ValueShouldBeArray", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generated symbol &apos;{0}&apos;: &apos;{1}&apos; should be a boolean value..
+        /// </summary>
+        internal static string MacroConfig_Exception_ValueShouldBeBoolean {
+            get {
+                return ResourceManager.GetString("MacroConfig_Exception_ValueShouldBeBoolean", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generated symbol &apos;{0}&apos;: &apos;{1}&apos; should be an integer value..
+        /// </summary>
+        internal static string MacroConfig_Exception_ValueShouldBeInteger {
+            get {
+                return ResourceManager.GetString("MacroConfig_Exception_ValueShouldBeInteger", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generated symbol &apos;{0}&apos;: &apos;{1}&apos; should be a string value..
+        /// </summary>
+        internal static string MacroConfig_Exception_ValueShouldBeString {
+            get {
+                return ResourceManager.GetString("MacroConfig_Exception_ValueShouldBeString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to process macro &apos;{0}&apos; of type &apos;{1}&apos;..
+        /// </summary>
+        internal static string MacroProcessingException_Message {
+            get {
+                return ResourceManager.GetString("MacroProcessingException_Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generated symbol &apos;{0}&apos;: type &apos;{1}&apos; is unknown, processing is skipped..
+        /// </summary>
+        internal static string MacroProcessor_Warning_UnknownMacro {
+            get {
+                return ResourceManager.GetString("MacroProcessor_Warning_UnknownMacro", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The symbol &apos;{0}&apos;: unable to find a form &apos;{1}&apos;, the further processing of the symbol will be skipped..
+        /// </summary>
+        internal static string RunnableProjectConfig_OperationSetup_UnknownForm {
+            get {
+                return ResourceManager.GetString("RunnableProjectConfig_OperationSetup_UnknownForm", resourceCulture);
             }
         }
         

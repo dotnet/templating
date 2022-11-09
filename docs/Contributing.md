@@ -66,4 +66,8 @@ We follow the same versioning as https://github.com/dotnet/sdk and release branc
 | Development | *main* |
 | Release | *release/** |
 
+# Ways to contribute
+
+- [create new value form](./contributing/how-to-create-new-value-form.md)
+
 [Top](#top)
