@@ -39,17 +39,17 @@
       <Uri>https://github.com/dotnet/runtime</Uri>
       <Sha>4822e3c3aa77eb82b2fb33c9321f923cf11ddde6</Sha>
     </Dependency>
-    <Dependency Name="NuGet.Credentials" Version="6.3.0-rc.123">
+    <Dependency Name="NuGet.Credentials" Version="6.3.0-rc.128">
       <Uri>https://github.com/nuget/nuget.client</Uri>
-      <Sha>3f9d36bb147ad6a7833772c148d0ac7a11f6c2aa</Sha>
+      <Sha>222ff7a5329be15520034b76fa1a84098d2ae9fd</Sha>
     </Dependency>
-    <Dependency Name="NuGet.Configuration" Version="6.3.0-rc.123">
+    <Dependency Name="NuGet.Configuration" Version="6.3.0-rc.128">
       <Uri>https://github.com/nuget/nuget.client</Uri>
-      <Sha>3f9d36bb147ad6a7833772c148d0ac7a11f6c2aa</Sha>
+      <Sha>222ff7a5329be15520034b76fa1a84098d2ae9fd</Sha>
     </Dependency>
-    <Dependency Name="NuGet.Protocol" Version="6.3.0-rc.123">
+    <Dependency Name="NuGet.Protocol" Version="6.3.0-rc.128">
       <Uri>https://github.com/nuget/nuget.client</Uri>
-      <Sha>3f9d36bb147ad6a7833772c148d0ac7a11f6c2aa</Sha>
+      <Sha>222ff7a5329be15520034b76fa1a84098d2ae9fd</Sha>
     </Dependency>
     <Dependency Name="Microsoft.DotNet.Cli.CommandLine" Version="1.0.0-preview.19208.1">
       <Uri>https://github.com/dotnet/clicommandlineparser</Uri>
@@ -61,9 +61,9 @@
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
-    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="6.0.0-beta.22558.2">
+    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="6.0.0-beta.22558.7">
       <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>841e1fe0d2498a7ac6445e458ae521511ec226ca</Sha>
+      <Sha>a7773a9828c67a9b1fba3d2daee061ec90db3505</Sha>
       <SourceBuild RepoName="arcade" ManagedOnly="true" />
     </Dependency>
   </ToolsetDependencies>
