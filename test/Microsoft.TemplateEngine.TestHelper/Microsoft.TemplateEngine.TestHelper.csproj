@@ -25,6 +25,8 @@
 
   <ItemGroup Condition="$(TargetFramework) == $(NETCoreTargetFramework)">
     <PackageReference Include="Microsoft.DotNet.Cli.Utils" />
+    <!-- Bumping transitive dependency pulled with Microsoft.DotNet.Cli.Utils -->
+    <PackageReference Include="System.Drawing.Common" Version="4.7.2" />
   </ItemGroup>
 
 </Project>
