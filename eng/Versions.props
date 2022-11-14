@@ -13,7 +13,7 @@
     <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">true</StabilizePackageVersion>
     <DotNetFinalVersionKind Condition="'$(StabilizePackageVersion)' == 'true'">release</DotNetFinalVersionKind>
     <PackSpecific Condition="'$(OS)' != 'Windows_NT'">true</PackSpecific>
-    <NewtonsoftJsonPackageVersion>10.0.3</NewtonsoftJsonPackageVersion>
+    <NewtonsoftJsonPackageVersion>13.0.1</NewtonsoftJsonPackageVersion>
     <MicrosoftDotNetCliCommandLinePackageVersion>0.1.1-alpha-167</MicrosoftDotNetCliCommandLinePackageVersion>
   </PropertyGroup>
 </Project>
