@@ -203,6 +203,9 @@ stages:
       # Sourcelink validation isn't passing for Arcade due to some regressions. This should be
       # enabled back once this issue is resolved: https://github.com/dotnet/arcade/issues/2912
       enableSourceLinkValidation: false
+      # disabling temporarily signing validation
+      # causes error NETSDK1192: Targeting .NET 7.0 or higher in Visual Studio 2022 17.3 is not supported.
+      enableSigningValidation: false     
       publishDependsOn:
       - Validate
       # This is to enable SDL runs part of Post-Build Validation Stage
