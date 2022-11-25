@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Edge
 {
@@ -18,7 +19,10 @@ namespace Microsoft.TemplateEngine.Edge
         private const int DefaultBufferWidth = 160;
         private readonly IReadOnlyDictionary<string, string> _environmentVariables;
 
-        public DefaultEnvironment()
+        public DefaultEnvironment() : this(null)
+        { }
+
+        public DefaultEnvironment(IReadOnlyDictionary<string, string>? additionalVirtualEnvironemnt)
         {
             Dictionary<string, string> variables = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             IDictionary env = System.Environment.GetEnvironmentVariables();
@@ -26,6 +30,11 @@ namespace Microsoft.TemplateEngine.Edge
             foreach (string key in env.Keys.OfType<string>())
             {
                 variables[key] = (env[key] as string) ?? string.Empty;
+            }
+
+            if (additionalVirtualEnvironemnt != null)
+            {
+                variables.Merge(additionalVirtualEnvironemnt);
             }
 
             _environmentVariables = variables;
