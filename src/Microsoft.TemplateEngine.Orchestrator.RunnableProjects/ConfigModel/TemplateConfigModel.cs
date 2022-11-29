@@ -434,6 +434,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
             return new TemplateConfigModel(source, logger, baselineName, filename);
         }
 
+        internal void RemoveSymbol(string name)
+        {
+            _symbols.Remove(name);
+        }
+
         /// <summary>
         /// Localizes this <see cref="TemplateConfigModel"/> with given localization model.
         /// </summary>

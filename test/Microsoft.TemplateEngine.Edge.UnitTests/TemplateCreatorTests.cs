@@ -355,11 +355,26 @@ Details: Parameter conditions contain cyclic dependency: [A, B, A] that is preve
             """;
 
         [Theory]
-        [InlineData(false, false, "", false, null)]
-        [InlineData(true, false, "", true, "A")]
-        [InlineData(false, true, "", true, "B")]
-        [InlineData(true, true, "", true, "A, B")]
-        public async void InstantiateAsync_ConditionalParametersRequiredOverwrittenByDisabled(bool a_enable_val, bool b_enable_val, string expectedOutput, bool instantiateShouldFail, string expectedErrorMessage)
+        [InlineData(false, false, null, null, "", false, null)]
+        [InlineData(true, false, null, null, "", true, "A")]
+        [InlineData(true, false, null, "x", "", true, "A")]
+        [InlineData(true, true, "false", "false", "", false, null)]
+        [InlineData(true, false, "true", null, "A,", false, null)]
+        [InlineData(false, true, null, null, "", true, "B")]
+        [InlineData(true, true, null, null, "", true, "A, B")]
+        [InlineData(null, null, null, null, "", true, "Failed to evaluate condition IsEnabled on parameter A")]
+        [InlineData(null, true, null, "true", "", true, "Failed to evaluate condition IsEnabled on parameter A")]
+        [InlineData(true, null, "true", "false", "", true, "Failed to evaluate condition IsEnabled on parameter B")]
+        [InlineData(true, null, "true", null, "", true, "Failed to evaluate condition IsEnabled on parameter B")]
+        [InlineData(null, true, null, null, "", true, "Failed to evaluate condition IsEnabled on parameter A")]
+        public async void InstantiateAsync_ConditionalParametersRequiredOverwrittenByDisabled(
+            bool? a_enable_val,
+            bool? b_enable_val,
+            string? a,
+            string? b,
+            string expectedOutput,
+            bool instantiateShouldFail,
+            string expectedErrorMessage)
         {
             //
             // Template content preparation
@@ -378,14 +393,84 @@ Details: Parameter conditions contain cyclic dependency: [A, B, A] that is preve
                 C
                 #endif
                 """;
+
             IReadOnlyDictionary<string, string?> parameters = new Dictionary<string, string?>()
             {
-                { "A_enable", a_enable_val.ToString() },
-                { "B_enable", b_enable_val.ToString() }
-            };
+                { "A_enable", a_enable_val?.ToString() },
+                { "B_enable", b_enable_val?.ToString() },
+                { "A", a },
+                { "B", b }
+            }
+                .Where(p => p.Value != null)
+                .ToDictionary(p => p.Key, p => p.Value);
 
             await InstantiateAsyncHelper(
                 TemplateConfigEnabledAndRequiredConditionsTogether,
+                sourceSnippet,
+                expectedOutput,
+                expectedErrorMessage,
+                instantiateShouldFail,
+                parameters1: parameters);
+        }
+
+        private const string TemplateConfigEnabledConditionInversed = /*lang=json*/ """
+            {
+                "identity": "test.template",
+                "name": "tst",
+                "shortName": "tst",
+                "symbols": { 
+                    "A": {
+                      "type": "parameter",
+                      "datatype": "string",
+                      "isEnabled": "!A_disable",
+                      "isRequired": false
+                    }, 
+                    "A_disable": {
+                      "type": "parameter",
+                      "datatype": "bool"
+                    },
+                }
+            }
+            """;
+
+        [Theory]
+        [InlineData(false, false, "", false, null)]
+        [InlineData(false, true, "A,", false, null)]
+        [InlineData(true, false, "", false, null)]
+        [InlineData(true, true, "", false, null)]
+        [InlineData(null, false, "", true, "Failed to evaluate condition IsEnabled on parameter A")]
+        [InlineData(null, true, "", true, "Failed to evaluate condition IsEnabled on parameter A")]
+        public async void InstantiateAsync_ConditionalParametersInversedEnablingCondition(
+            bool? a_disable_val,
+            bool? a,
+            string expectedOutput,
+            bool instantiateShouldFail,
+            string expectedErrorMessage)
+        {
+            //
+            // Template content preparation
+            //
+
+            string sourceSnippet = """
+                #if( A )
+                A,
+                #endif
+
+                #if( B )
+                B,
+                #endif 
+                """;
+
+            IReadOnlyDictionary<string, string?> parameters = new Dictionary<string, string?>()
+            {
+                { "A_disable", a_disable_val?.ToString() },
+                { "A", a?.ToString() },
+            }
+                .Where(p => p.Value != null)
+                .ToDictionary(p => p.Key, p => p.Value);
+
+            await InstantiateAsyncHelper(
+                TemplateConfigEnabledConditionInversed,
                 sourceSnippet,
                 expectedOutput,
                 expectedErrorMessage,
@@ -572,7 +657,7 @@ Details: Parameter conditions contain cyclic dependency: [A, B, A] that is preve
             if (instantiateShouldFail)
             {
                 res.ErrorMessage.Should().NotBeNullOrEmpty();
-                res.ErrorMessage.Should().BeEquivalentTo(expectedErrorMessage);
+                res.ErrorMessage.Should().Contain(expectedErrorMessage);
                 res.OutputBaseDirectory.Should().Match(s =>
                     s.IsNullOrEmpty() || !_engineEnvironmentSettings.Host.FileSystem.FileExists(s));
             }
