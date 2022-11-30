@@ -328,7 +328,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             string targetFile = Path.Combine(output, "test.ps1");
             Assert.True(File.Exists(targetFile));
             Assert.Equal(
-                $"# comment B true\r\nB true\r\ncommon text",
+                "# comment B true\r\nB true\r\ncommon text",
                 File.ReadAllText(targetFile).Trim());
         }
     }
