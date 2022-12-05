@@ -61,6 +61,15 @@ namespace Microsoft.TemplateEngine.Core {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Encountered following error when parsing and evaluating expression:.
+        /// </summary>
+        internal static string Error_Evaluation_Expression {
+            get {
+                return ResourceManager.GetString("Error_Evaluation_Expression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unexpected substring after parsed expression:.
         /// </summary>
         internal static string Error_Evaluation_Expression_Substring {

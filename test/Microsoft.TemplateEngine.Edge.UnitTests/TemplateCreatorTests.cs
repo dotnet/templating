@@ -419,11 +419,17 @@ Details: Parameter conditions contain cyclic dependency: [A, B, A] that is preve
                 "name": "tst",
                 "shortName": "tst",
                 "symbols": { 
-                    "A": {
+                    "Ap": {
                       "type": "parameter",
                       "datatype": "string",
                       "isEnabled": "!A_disable",
                       "isRequired": false
+                    },
+                    "A": {
+                      "type": "parameter",
+                      "datatype": "string", 
+                      "isRequired": false,
+                      "defaultValue": "true",
                     }, 
                     "A_disable": {
                       "type": "parameter",
@@ -436,6 +442,7 @@ Details: Parameter conditions contain cyclic dependency: [A, B, A] that is preve
         [Theory]
         [InlineData(false, false, "", false, null)]
         [InlineData(false, true, "A,", false, null)]
+        [InlineData(false, null, "", false, null)]
         [InlineData(true, false, "", false, null)]
         [InlineData(true, true, "", false, null)]
         [InlineData(null, false, "", true, "Failed to evaluate condition IsEnabled on parameter A")]
@@ -452,7 +459,7 @@ Details: Parameter conditions contain cyclic dependency: [A, B, A] that is preve
             //
 
             string sourceSnippet = """
-                #if( A )
+                #if( Ap )
                 A,
                 #endif
 
@@ -464,7 +471,7 @@ Details: Parameter conditions contain cyclic dependency: [A, B, A] that is preve
             IReadOnlyDictionary<string, string?> parameters = new Dictionary<string, string?>()
             {
                 { "A_disable", a_disable_val?.ToString() },
-                { "A", a?.ToString() },
+                { "Ap", a?.ToString() },
             }
                 .Where(p => p.Value != null)
                 .ToDictionary(p => p.Key, p => p.Value);
@@ -476,6 +483,110 @@ Details: Parameter conditions contain cyclic dependency: [A, B, A] that is preve
                 expectedErrorMessage,
                 instantiateShouldFail,
                 parameters1: parameters);
+        }
+
+        private const string TemplateConfigEnabledConditionEvaluationBehavior = """
+            {
+                "identity": "test.template",
+                "name": "tst",
+                "shortName": "tst",
+                "symbols": { 
+                    "A": {
+                      "type": "parameter",
+                      "datatype": "bool", 
+                      "isRequired": false,
+                      "isEnabled": "!IsDisabled",
+                      "defaultValue": true
+                    },
+                    ##Enable_Param 
+                }
+            }
+            """;
+
+        private const string ParamSnippetStringNoDefault = """
+                "IsDisabled": {
+                  "type": "parameter",
+                  "datatype": "string" 
+                }
+            """;
+
+        private const string ParamSnippetStringDefault = """
+                "IsDisabled": {
+                  "type": "parameter",
+                  "datatype": "string",
+                  "defaultValue": "false"
+                }
+            """;
+
+        private const string ParamSnippetBooleanNoDefault = """
+                "IsDisabled": {
+                  "type": "parameter",
+                  "datatype": "bool" 
+                }
+            """;
+
+        private const string ParamSnippetBooleanDefaultFalse = """
+                "IsDisabled": {
+                  "type": "parameter",
+                  "datatype": "bool",
+                  "defaultValue": false
+                }
+            """;
+
+        private const string ParamSnippetBooleanDefaultTrue = """
+                "IsDisabled": {
+                  "type": "parameter",
+                  "datatype": "bool",
+                  "defaultValue": true
+                }
+            """;
+
+        [Theory]
+        [InlineData(ParamSnippetStringNoDefault, "", true, "Failed to evaluate condition IsEnabled on parameter A (condition text: !IsDisabled, evaluation error: Unable to logical not System.String)")]
+        [InlineData(ParamSnippetStringDefault, "A,", false, null)]
+        [InlineData(ParamSnippetBooleanNoDefault, "A,", false, null)]
+        [InlineData(ParamSnippetBooleanDefaultFalse, "A,", false, null)]
+        [InlineData(ParamSnippetBooleanDefaultTrue, "notA,", false, null)]
+        //[InlineData(false, true, "A,", false, null)]
+        public async void InstantiateAsync_ConditionalParametersEvaluationBehavior(
+            string paramSnippet,
+            string expectedOutput,
+            bool instantiateShouldFail,
+            string expectedErrorMessage)
+        {
+            //
+            // Template content preparation
+            //
+
+            string sourceSnippet = """
+                #if (A)
+                A,
+                #endif
+
+                #if (!A)
+                notA,
+                #endif
+
+                #if( B )
+                B,
+                #endif 
+                """;
+
+            //IReadOnlyDictionary<string, string?> parameters = new Dictionary<string, string?>()
+            //{
+            //    { "A", a_disable_val?.ToString() },
+            //    { "Ap", a?.ToString() },
+            //}
+            //    .Where(p => p.Value != null)
+            //    .ToDictionary(p => p.Key, p => p.Value);
+
+            await InstantiateAsyncHelper(
+                TemplateConfigEnabledConditionEvaluationBehavior.Replace("##Enable_Param", paramSnippet),
+                sourceSnippet,
+                expectedOutput,
+                expectedErrorMessage,
+                instantiateShouldFail,
+                parameters1: new Dictionary<string, string?>());
         }
 
         private const string TemplateConfigForExternalConditionsEvaluation = /*lang=json*/ """
