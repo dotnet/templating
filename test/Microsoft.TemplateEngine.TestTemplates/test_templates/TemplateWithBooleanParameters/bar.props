@@ -1,0 +1,15 @@
+<!--'$(A)'-->
+<TargetFramework Condition="'$(A)'">A-true</TargetFramework>
+<TargetFramework Condition="'$(B)'">B-true</TargetFramework>
+<TargetFramework Condition="'$(C)'">C-true</TargetFramework>
+<TargetFramework Condition="'$(D)'">D-true</TargetFramework>
+<!--'$(A)' == true-->
+<TargetFramework Condition="'$(A)' == true">A-true</TargetFramework>
+<TargetFramework Condition="'$(B)' == true">B-true</TargetFramework>
+<TargetFramework Condition="'$(C)' == true">C-true</TargetFramework>
+<TargetFramework Condition="'$(D)' == true">D-true</TargetFramework>
+<!--'$(A)' == 'true'-->
+<TargetFramework Condition="'$(A)' == 'true'">A-true</TargetFramework>
+<TargetFramework Condition="'$(B)' == 'true'">B-true</TargetFramework>
+<TargetFramework Condition="'$(C)' == 'true'">C-true</TargetFramework>
+<TargetFramework Condition="'$(D)' == 'true'">D-true</TargetFramework>

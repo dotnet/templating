@@ -5,11 +5,14 @@
 
 using System.IO.Compression;
 using FluentAssertions;
+using Microsoft.DotNet.Cli.Utils;
 using Microsoft.NET.TestFramework.Assertions;
 using Microsoft.TemplateEngine.TestHelper;
 using VerifyTests;
+using VerifyXunit;
 using Xunit;
 using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace Dotnet_new3.IntegrationTests
 {
@@ -174,7 +177,7 @@ namespace Dotnet_new3.IntegrationTests
         {
             string expectedCta =
 @"For more information, run:
-   dotnet new3 console -h"; 
+   dotnet new3 console -h";
 
             string home = TestUtils.CreateTemporaryFolder("Home");
             string workingDirectory = TestUtils.CreateTemporaryFolder();
@@ -299,7 +302,7 @@ namespace Dotnet_new3.IntegrationTests
                 new DirectoryInfo(Path.Combine(workingDirectory, "alias")).EnumerateFileSystemInfos().Select(fi => fi.Name));
 
         }
-        
+
         [Fact]
         public void CannotOverwriteFilesWithoutForce()
         {
@@ -590,6 +593,38 @@ namespace Dotnet_new3.IntegrationTests
                 .Pass()
                 .And.NotHaveStdErr()
                 .And.HaveStdOutContaining("File actions would have been taken:");
+        }
+
+        [Theory]
+        [InlineData("no options", new[] { "TestAssets.TemplateWithBooleanParameters" })]
+        [InlineData("options without value", new[] { "TestAssets.TemplateWithBooleanParameters", "--A", "--B", "--C", "--D" })]
+        [InlineData("option equals to false", new[] { "TestAssets.TemplateWithBooleanParameters", "--A", "false", "--B", "false", "--C", "false", "--D", "false" })]
+        [InlineData("option equals to true", new[] { "TestAssets.TemplateWithBooleanParameters", "--A", "true", "--B", "true", "--C", "true", "--D", "true" })]
+        public async Task ConditionSyntax_Test(string testName, string[] options)
+        {
+            string home = TestUtils.CreateTemporaryFolder("Home");
+            string workingDirectory = TestUtils.CreateTemporaryFolder();
+            Helpers.InstallTestTemplate("TemplateWithBooleanParameters", _log, workingDirectory, home);
+
+            new DotnetNewCommand(_log, options)
+                .WithCustomHive(home)
+                .WithWorkingDirectory(workingDirectory)
+                .Execute()
+                .Should()
+                .ExitWith(0)
+                .And.NotHaveStdErr()
+                .And.HaveStdOut("The template \"TemplateWithBooleanParameters\" was created successfully.");
+
+            var expectedFiles = new[] { "bar.cs", "bar.props", "bar.vb", "bar-computed.cs" };
+
+            foreach (var file in expectedFiles)
+            {
+                string testFile = Path.Combine(workingDirectory, file);
+                Assert.True(File.Exists(testFile));
+                string content = File.ReadAllText(testFile);
+                await Verifier.Verify(content, _verifySettings)
+                    .UseParameters(testName, file);
+            }
         }
     }
 }
