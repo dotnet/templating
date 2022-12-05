@@ -362,11 +362,11 @@ Details: Parameter conditions contain cyclic dependency: [A, B, A] that is preve
         [InlineData(true, false, "true", null, "A,", false, null)]
         [InlineData(false, true, null, null, "", true, "B")]
         [InlineData(true, true, null, null, "", true, "A, B")]
-        [InlineData(null, null, null, null, "", true, "Failed to evaluate condition IsEnabled on parameter A")]
-        [InlineData(null, true, null, "true", "", true, "Failed to evaluate condition IsEnabled on parameter A")]
-        [InlineData(true, null, "true", "false", "", true, "Failed to evaluate condition IsEnabled on parameter B")]
-        [InlineData(true, null, "true", null, "", true, "Failed to evaluate condition IsEnabled on parameter B")]
-        [InlineData(null, true, null, null, "", true, "Failed to evaluate condition IsEnabled on parameter A")]
+        [InlineData(null, null, null, null, "", false, null)]
+        [InlineData(null, true, null, "true", "B,", false, null)]
+        [InlineData(true, null, "true", "false", "A,", false, null)]
+        [InlineData(true, null, "true", null, "A,", false, null)]
+        [InlineData(null, true, null, null, "", true, "B")]
         public async void InstantiateAsync_ConditionalParametersRequiredOverwrittenByDisabled(
             bool? a_enable_val,
             bool? b_enable_val,
@@ -419,17 +419,11 @@ Details: Parameter conditions contain cyclic dependency: [A, B, A] that is preve
                 "name": "tst",
                 "shortName": "tst",
                 "symbols": { 
-                    "Ap": {
-                      "type": "parameter",
-                      "datatype": "string",
-                      "isEnabled": "!A_disable",
-                      "isRequired": false
-                    },
                     "A": {
                       "type": "parameter",
-                      "datatype": "string", 
-                      "isRequired": false,
-                      "defaultValue": "true",
+                      "datatype": "bool",
+                      "isEnabled": "!A_disable",
+                      "isRequired": false
                     }, 
                     "A_disable": {
                       "type": "parameter",
@@ -445,8 +439,8 @@ Details: Parameter conditions contain cyclic dependency: [A, B, A] that is preve
         [InlineData(false, null, "", false, null)]
         [InlineData(true, false, "", false, null)]
         [InlineData(true, true, "", false, null)]
-        [InlineData(null, false, "", true, "Failed to evaluate condition IsEnabled on parameter A")]
-        [InlineData(null, true, "", true, "Failed to evaluate condition IsEnabled on parameter A")]
+        [InlineData(null, false, "", false, null)]
+        [InlineData(null, true, "A,", false, null)]
         public async void InstantiateAsync_ConditionalParametersInversedEnablingCondition(
             bool? a_disable_val,
             bool? a,
@@ -459,7 +453,7 @@ Details: Parameter conditions contain cyclic dependency: [A, B, A] that is preve
             //
 
             string sourceSnippet = """
-                #if( Ap )
+                #if( A )
                 A,
                 #endif
 
@@ -471,7 +465,7 @@ Details: Parameter conditions contain cyclic dependency: [A, B, A] that is preve
             IReadOnlyDictionary<string, string?> parameters = new Dictionary<string, string?>()
             {
                 { "A_disable", a_disable_val?.ToString() },
-                { "Ap", a?.ToString() },
+                { "A", a?.ToString() },
             }
                 .Where(p => p.Value != null)
                 .ToDictionary(p => p.Key, p => p.Value);
