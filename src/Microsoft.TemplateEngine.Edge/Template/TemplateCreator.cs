@@ -463,11 +463,6 @@ namespace Microsoft.TemplateEngine.Edge.Template
             InputDataSet evaluatedParameterSetData = parametersBuilder.Build(!isEvaluatedExternally, template.Generator, _logger);
             List<string> defaultParamsWithInvalidValues = new List<string>();
 
-            // Remove parameters from template - to prevent their usage in generators
-            evaluatedParameterSetData.Values
-                .Where(v => v is EvaluatedInputParameterData evaluated && evaluated.GetEvaluatedPrecedence() == EvaluatedPrecedence.Disabled)
-                .ForEach(p => template.RemoveParameter(p.ParameterDefinition));
-
             // for params that changed to optional and do not have values - try get 'Default' value (as for required it's not obtained)
             evaluatedParameterSetData.Values
                 .Where(v =>

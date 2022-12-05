@@ -384,7 +384,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
         /// </summary>
         public IReadOnlyList<CustomFileGlobModel> SpecialCustomOperations { get; internal init; } = Array.Empty<CustomFileGlobModel>();
 
-        internal BaseSymbol NameSymbol { get; private set; } = SetupDefaultNameSymbol(null);
+        internal BaseSymbol NameSymbol { get; private init; } = SetupDefaultNameSymbol(null);
 
         private static IReadOnlyList<BindSymbol> ImplicitBindSymbols { get; } = SetupImplicitBindSymbols();
 
@@ -437,6 +437,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
         internal void RemoveSymbol(string name)
         {
             _symbols.Remove(name);
+            if (name.Equals(NameSymbolName, StringComparison.Ordinal))
+            {
+                _symbols[name] = NameSymbol;
+            }
         }
 
         /// <summary>
