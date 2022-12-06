@@ -1,0 +1,38 @@
+name: Bug Report
+description: Create a report to help us improve
+#labels: ["bug", "untriaged"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking time to fill out this bug report!
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: To Reproduce
+      description: Steps to reproduce the behavior.
+      value: |
+        Steps:
+        1. 
+        2. 
+        3. 
+    validations:
+      required: true
+  - type: textarea
+    id: dotnet-version
+    attributes:
+      label: dotnet info
+      description: Provide the output of **`dotnet --info`** to understand what the dotnet version is.
+    validations:
+      required: true
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Provide any details that could help with the investigation.

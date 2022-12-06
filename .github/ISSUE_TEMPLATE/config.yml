@@ -1,0 +1,23 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Issue with Common project and item templates
+    url: https://github.com/dotnet/sdk
+    about: Please open issues related to Common project and item templates in dotnet/sdk.
+  - name: Issue with ASP.NET and Blazor templates
+    url:  https://github.com/dotnet/aspnetcore
+    about: Please open issues relating to ASP.NET and Blazor templates in dotnet/aspnetcore.
+  - name: Issue with ASP.NET Single Page Application templates
+    url:  https://github.com/dotnet/spa-templates
+    about: Please open issues relating to ASP.NET Single Page Application templates in dotnet/spa-templates.
+  - name: Issue with WPF templates
+    url:  https://github.com/dotnet/wpf
+    about: Please open issues relating to WPF templates in dotnet/wpf.
+  - name: Issue with Windows Forms templates
+    url:  https://github.com/dotnet/winforms
+    about: Please open issues relating to Windows Forms templates in dotnet/winforms.
+  - name: Issue with Test templates
+    url:  https://github.com/dotnet/test-templates
+    about: Please open issues relating to Test templates in dotnet/test-templates.
+  - name: Issue with MAUI templates
+    url:  https://github.com/dotnet/maui
+    about: Please open issues relating to MAUI templates in dotnet/maui.
