@@ -104,6 +104,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
             }
 
             string? realName = name ?? fallbackName ?? template.DefaultName;
+            // TODO: add template validation here
             if (string.IsNullOrWhiteSpace(realName))
             {
                 return new TemplateCreationResult(CreationResultStatus.MissingMandatoryParam, template.Name, "--name");

@@ -52,6 +52,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         IReadOnlyList<string> ITemplateInfo.ShortNameList => ConfigurationModel.ShortNameList ?? new List<string>();
 
+        bool ITemplateInfo.PreferDefaultName => ConfigurationModel.PreferDefaultName ?? true;
+
         [Obsolete]
         IReadOnlyDictionary<string, ICacheTag> ITemplateInfo.Tags
         {
@@ -109,7 +111,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         string? ITemplateInfo.LocaleConfigPlace => _localeConfigFile?.FullPath;
 
         //read in simple template model instead
-        bool ITemplate.IsNameAgreementWithFolderPreferred => ConfigurationModel.PreferNameDirectory;
+        bool ITemplate.IsNameAgreementWithFolderPreferred => ConfigurationModel.PreferNameDirectory ?? true;
 
         string? ITemplateInfo.HostConfigPlace => _hostConfigFile?.FullPath;
 

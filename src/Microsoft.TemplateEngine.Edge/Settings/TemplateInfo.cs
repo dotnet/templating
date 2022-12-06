@@ -188,6 +188,9 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         public IReadOnlyList<string> ShortNameList { get; } = new List<string>();
 
+        [JsonProperty]
+        public bool PreferDefaultName { get; }
+
         [JsonIgnore]
         [Obsolete]
         IReadOnlyDictionary<string, ICacheTag> ITemplateInfo.Tags

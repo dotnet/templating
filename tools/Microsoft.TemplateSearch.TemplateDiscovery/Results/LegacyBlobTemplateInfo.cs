@@ -103,6 +103,9 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Results
         public string Name { get; private set; }
 
         [JsonProperty]
+        public bool PreferDefaultName { get; private set; }
+
+        [JsonProperty]
         public string ShortName
         {
             get
