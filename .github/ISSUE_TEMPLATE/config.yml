@@ -1,14 +1,8 @@
 blank_issues_enabled: true
 contact_links:
-  - name: Issue with Common project and item templates
-    url: https://github.com/dotnet/sdk
-    about: Please open issues related to Common project and item templates in dotnet/sdk.
   - name: Issue with ASP.NET and Blazor templates
     url:  https://github.com/dotnet/aspnetcore
     about: Please open issues relating to ASP.NET and Blazor templates in dotnet/aspnetcore.
-  - name: Issue with ASP.NET Single Page Application templates
-    url:  https://github.com/dotnet/spa-templates
-    about: Please open issues relating to ASP.NET Single Page Application templates in dotnet/spa-templates.
   - name: Issue with WPF templates
     url:  https://github.com/dotnet/wpf
     about: Please open issues relating to WPF templates in dotnet/wpf.
@@ -21,3 +15,6 @@ contact_links:
   - name: Issue with MAUI templates
     url:  https://github.com/dotnet/maui
     about: Please open issues relating to MAUI templates in dotnet/maui.
+  - name: Issue or feature for New Project Dialog in Visual Studio or template authoring for Visual Studio
+    url:  https://developercommunity.visualstudio.com/home
+    about: Please open the feedback ticket for Visual Studio.

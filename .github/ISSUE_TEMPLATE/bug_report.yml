@@ -1,14 +1,24 @@
 name: Bug Report
 description: Create a report to help us improve
-#labels: ["bug", "untriaged"]
 body:
   - type: markdown
     attributes:
       value: Thanks for taking time to fill out this bug report!
+  - type: dropdown
+    id: product
+    attributes:
+      label: Product
+      description: Provide which product the issue is related to.
+      options:
+        - dotnet CLI (dotnet new)
+        - Visual Studio
+        - dotnet CLI & Visual Studio
+    validations:
+      required: true
   - type: textarea
     id: description
     attributes:
-      label: Describe the bug
+      label: Describe The Bug
       description: A clear and concise description of what the bug is.
     validations:
       required: true
@@ -27,10 +37,15 @@ body:
   - type: textarea
     id: dotnet-version
     attributes:
-      label: dotnet info
+      label: dotnet Info
       description: Provide the output of **`dotnet --info`** to understand what the dotnet version is.
     validations:
       required: true
+  - type: input
+    id: VS-version
+    attributes:
+      label: Visual Studio Version
+      description: In case the issue is also reproduced in Visual Studio, please additionally specify Visual Studio version.
   - type: textarea
     id: additional-context
     attributes:
