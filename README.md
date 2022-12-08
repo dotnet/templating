@@ -1,4 +1,4 @@
-[![Build Status](https://dev.azure.com/dnceng/public/_apis/build/status/dotnet/templating/templating-ci?branchName=main)](https://dev.azure.com/dnceng/public/_build/latest?definitionId=302&branchName=main) 
+[![Build Status](https://dev.azure.com/dnceng-public/public/_apis/build/status/dotnet/templating/templating-ci?branchName=main)](https://dev.azure.com/dnceng-public/public/_build/latest?definitionId=24&branchName=main) 
 
 # Overview
 
@@ -27,8 +27,8 @@ Issues for the template content should be opened in the corresponding repository
 
 # Template Samples
 
-We have created a [dotnet template samples repo](https://github.com/dotnet/dotnet-template-samples), which shows how you can use
-the Template Engine to create new templates. The samples are setup to be stand alone for specific examples. 
+We have created [dotnet template samples](https://github.com/dotnet/templating/tree/main/dotnet-template-samples), which shows how you can use the template engine to create new templates. The samples are setup to be stand alone for specific examples. 
+More documentation can be found in the [Wiki](https://github.com/dotnet/templating/wiki).
 
 # `dotnet new`
 
@@ -70,25 +70,24 @@ The template "MVC Application" created successfully.
 
 The project was successfully created on disk as expected in `src/MyProject`. From here, we can run normal `dotnet` commands like `dotnet restore` and `dotnet build`.
 
-We have a pretty good help system built in, including template specific help (_for example `dotnet new mvc --help`_). If you're not sure the syntax please try that,
-if you have any difficulties please file a new [issue](https://github.com/dotnet/templating/issues/new).
+We have a pretty good help system built in, including template specific help (_for example `dotnet new mvc --help`_). If you're not sure the syntax please try that, if you have any difficulties please file a new [issue](https://github.com/dotnet/templating/issues/new).
 
-Now that we've covered the basics of using `dotnew new`, lets move on to info for template authors and contributors.
+Now that we've covered the basics of using `dotnet new`, lets move on to info for template authors and contributors.
 
 # Available templates
 
 You can install additional templates that can be used by `dotnet new`. 
-To search for the templates available on NuGet.org, use [`dotnet new --search`](https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-new-search).
+To search for the templates available on NuGet.org, use [`dotnet new search`](https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-new-search).
 ```
-    dotnet new --search web
-    dotnet new --search azure --type project
-    dotnet new --search azure --author Microsoft
+    dotnet new search web
+    dotnet new search azure --type project
+    dotnet new search azure --author Microsoft
 ```
 
 # What to expect when working with this repo
 
-This repo only contains libraries and packages that are used by `dotnet new` and Visual Studio to instantiate the template. There is no UI for this libraries. 
-To build, run and debug `dotnet new`, see the [instuctions in dotnet/sdk repo](https://github.com/dotnet/sdk#how-do-i-build-the-sdk).
+This repo only contains libraries and packages that are used by `dotnet new` and Visual Studio to instantiate the template. There is no UI for these libraries. 
+To build, run and debug `dotnet new`, see the [instructions in dotnet/sdk repo](https://github.com/dotnet/sdk#how-do-i-build-the-sdk).
 
 # How to build, run & debug
 

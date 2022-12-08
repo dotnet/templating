@@ -1,1 +1,2 @@
 ﻿Microsoft.TemplateEngine.Edge.DefaultEnvironment.DefaultEnvironment(System.Collections.Generic.IReadOnlyDictionary<string!, string!>? additionalVirtualEnvironemnt) -> void
+﻿Microsoft.TemplateEngine.Edge.Settings.ITemplateInfoHostJsonCache.HostData.get -> string?
