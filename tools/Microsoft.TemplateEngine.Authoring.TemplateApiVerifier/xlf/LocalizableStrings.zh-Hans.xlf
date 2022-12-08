@@ -24,20 +24,20 @@
         <target state="new">'DotnetExecutablePath' parameter must not be specified when using 'WithInstantiationThroughTemplateCreatorApi'</target>
         <note>Do not translate 'DotnetExecutablePath' and 'WithInstantiationThroughTemplateCreatorApi'</note>
       </trans-unit>
+      <trans-unit id="Error_InstallFail">
+        <source>Failed to install template: {0}, details:{1}.</source>
+        <target state="new">Failed to install template: {0}, details:{1}.</target>
+        <note>{0} is tample name, {1} is error message</note>
+      </trans-unit>
+      <trans-unit id="Error_NoPackages">
+        <source>No packages fetched after installation.</source>
+        <target state="new">No packages fetched after installation.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="Error_TemplateArgsDisalowed">
         <source>'TemplateSpecificArgs' parameter must not be specified when using WithInstantiationThroughTemplateCreatorApi. Parameters should be passed via the argument of 'WithInstantiationThroughTemplateCreatorApi'</source>
         <target state="new">'TemplateSpecificArgs' parameter must not be specified when using WithInstantiationThroughTemplateCreatorApi. Parameters should be passed via the argument of 'WithInstantiationThroughTemplateCreatorApi'</target>
         <note>Do not translate 'TemplateSpecificArgs' and 'WithInstantiationThroughTemplateCreatorApi'</note>
-      </trans-unit>
-      <trans-unit id="Error_TemplatePathDoesNotExist">
-        <source>Valid 'TemplatePath' must be specified when using 'WithInstantiationThroughTemplateCreatorApi'</source>
-        <target state="new">Valid 'TemplatePath' must be specified when using 'WithInstantiationThroughTemplateCreatorApi'</target>
-        <note>Do not translate 'TemplatePath' and 'WithInstantiationThroughTemplateCreatorApi'</note>
-      </trans-unit>
-      <trans-unit id="Error_TemplatePathMissing">
-        <source>Explicit 'TemplatePath' parameter must be specified when using 'WithInstantiationThroughTemplateCreatorApi'</source>
-        <target state="new">Explicit 'TemplatePath' parameter must be specified when using 'WithInstantiationThroughTemplateCreatorApi'</target>
-        <note>Do not translate 'TemplatePath' and 'WithInstantiationThroughTemplateCreatorApi'</note>
       </trans-unit>
     </body>
   </file>

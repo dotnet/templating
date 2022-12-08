@@ -97,29 +97,29 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateApiVerifier {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to install template: {0}, details:{1}..
+        /// </summary>
+        internal static string Error_InstallFail {
+            get {
+                return ResourceManager.GetString("Error_InstallFail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No packages fetched after installation..
+        /// </summary>
+        internal static string Error_NoPackages {
+            get {
+                return ResourceManager.GetString("Error_NoPackages", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;TemplateSpecificArgs&apos; parameter must not be specified when using WithInstantiationThroughTemplateCreatorApi. Parameters should be passed via the argument of &apos;WithInstantiationThroughTemplateCreatorApi&apos;.
         /// </summary>
         internal static string Error_TemplateArgsDisalowed {
             get {
                 return ResourceManager.GetString("Error_TemplateArgsDisalowed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Valid &apos;TemplatePath&apos; must be specified when using &apos;WithInstantiationThroughTemplateCreatorApi&apos;.
-        /// </summary>
-        internal static string Error_TemplatePathDoesNotExist {
-            get {
-                return ResourceManager.GetString("Error_TemplatePathDoesNotExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Explicit &apos;TemplatePath&apos; parameter must be specified when using &apos;WithInstantiationThroughTemplateCreatorApi&apos;.
-        /// </summary>
-        internal static string Error_TemplatePathMissing {
-            get {
-                return ResourceManager.GetString("Error_TemplatePathMissing", resourceCulture);
             }
         }
     }

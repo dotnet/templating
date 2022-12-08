@@ -2,20 +2,18 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Abstractions.Mount;
+using Microsoft.TemplateEngine.Abstractions.Installer;
 using Microsoft.TemplateEngine.Authoring.TemplateVerifier;
 using Microsoft.TemplateEngine.Authoring.TemplateVerifier.Commands;
 using Microsoft.TemplateEngine.Edge;
 using Microsoft.TemplateEngine.Edge.Template;
-using Microsoft.TemplateEngine.Orchestrator.RunnableProjects;
-using Microsoft.TemplateEngine.TestHelper;
+using Microsoft.TemplateEngine.IDE;
+using WellKnownSearchFilters = Microsoft.TemplateEngine.Utils.WellKnownSearchFilters;
 
 namespace Microsoft.TemplateEngine.Authoring.TemplateApiVerifier
 {
     public static class TemplateVerifierOptionsExtensions
     {
-        private static readonly string ExpectedConfigLocation = Path.Combine(".template.config", "template.json");
-
         /// <summary>
         /// Adds custom template instantiator that runs template instantiation in-proc via TemplateCreator API.
         /// </summary>
@@ -52,36 +50,10 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateApiVerifier
                 throw new TemplateVerificationException(LocalizableStrings.Error_DotnetPath, TemplateVerificationErrorCode.InvalidOption);
             }
 
-            if (string.IsNullOrEmpty(options.TemplatePath))
-            {
-                throw new TemplateVerificationException(LocalizableStrings.Error_TemplatePathMissing, TemplateVerificationErrorCode.InvalidOption);
-            }
-
-            if (!Path.Exists(options.TemplatePath))
-            {
-                throw new TemplateVerificationException(LocalizableStrings.Error_TemplatePathDoesNotExist, TemplateVerificationErrorCode.InvalidOption);
-            }
-
             if (options.TemplateSpecificArgs != null)
             {
                 throw new TemplateVerificationException(LocalizableStrings.Error_TemplateArgsDisalowed, TemplateVerificationErrorCode.InvalidOption);
             }
-
-            string templateConfigPath = options.TemplatePath;
-            if (!templateConfigPath.EndsWith(ExpectedConfigLocation, StringComparison.InvariantCultureIgnoreCase))
-            {
-                templateConfigPath = Path.Combine(templateConfigPath, ExpectedConfigLocation);
-
-                if (!File.Exists(templateConfigPath))
-                {
-                    throw new TemplateVerificationException(
-                        string.Format(LocalizableStrings.Error_ConfigDoesntExist, templateConfigPath, ExpectedConfigLocation),
-                        TemplateVerificationErrorCode.InvalidOption);
-                }
-            }
-
-            // the expected nesting is checked and ensured above
-            string templateBasePath = new FileInfo(templateConfigPath).Directory!.Parent!.FullName;
 
             // Create temp folder and instantiate there
             string workingDir = options.OutputDirectory ?? Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
@@ -104,41 +76,44 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateApiVerifier
 
             string outputPath = Path.Combine(workingDir, output!);
 
-            var builtIns = Edge.Components.AllComponents.Concat(Orchestrator.RunnableProjects.Components.AllComponents).ToList();
-            // use "dotnetcli" as a fallback host so the correct host specific files are read.
-            var host = new DefaultTemplateEngineHost(nameof(TemplateVerifierOptionsExtensions), "1.0.0", null, builtIns, new[] { "dotnetcli" });
-            EngineEnvironmentSettings environment = new EngineEnvironmentSettings(
-                host: host,
-                virtualizeSettings: string.IsNullOrEmpty(options.SettingsDirectory),
-                settingsLocation: options.SettingsDirectory,
-                environment: new DefaultEnvironment(options.Environment));
+            var host = new DefaultTemplateEngineHost(
+                nameof(TemplateVerifierOptionsExtensions),
+                "1.0.0",
+                null,
+                new List<(Type, IIdentifiedComponent)>(),
+                Array.Empty<string>());
 
-            using IMountPoint sourceMountPoint = environment.MountPath(templateBasePath);
-            IFile? templateConfig = sourceMountPoint.FileInfo(ExpectedConfigLocation);
+            var bootstrapper = new Bootstrapper(
+                host,
+                virtualizeConfiguration: string.IsNullOrEmpty(options.SettingsDirectory),
+                loadDefaultComponents: true,
+                hostSettingsLocation: options.SettingsDirectory);
 
-            if (templateConfig == null)
+            if (!string.IsNullOrEmpty(options.TemplatePath))
             {
-                throw new TemplateVerificationException(LocalizableStrings.Error_ConfigRetrieval, TemplateVerificationErrorCode.InternalError);
+                await InstallTemplateAsync(bootstrapper, options.TemplatePath).ConfigureAwait(false);
             }
 
-            RunnableProjectGenerator rpg = new();
-            var runnableConfig = new RunnableProjectConfig(environment, rpg, templateConfig);
+            var foundTemplates = await bootstrapper.GetTemplatesAsync(new[] { WellKnownSearchFilters.NameFilter(options.TemplateName) }).ConfigureAwait(false);
 
-            TemplateCreator creator = new(environment);
+            if (foundTemplates.Count == 0)
+            {
+                throw new TemplateVerificationException(LocalizableStrings.Error_NoPackages, TemplateVerificationErrorCode.InstallFailed);
+            }
+
+            ITemplateInfo template = foundTemplates[0].Info;
 
             ITemplateCreationResult result = await
                 (inputDataSet != null
-                    ? creator.InstantiateAsync(
-                        templateInfo: runnableConfig,
+                    ? bootstrapper.CreateAsync(
+                        info: template,
                         name: name,
-                        fallbackName: null,
                         inputParameters: inputDataSet,
                         outputPath: outputPath)
-                    : creator.InstantiateAsync(
-                        templateInfo: runnableConfig,
+                    : bootstrapper.CreateAsync(
+                        info: template,
                         name: name,
-                        fallbackName: null,
-                        inputParameters: inputParameters ?? new Dictionary<string, string?>(),
+                        parameters: inputParameters ?? new Dictionary<string, string?>(),
                         outputPath: outputPath)).ConfigureAwait(false);
 
             return new CommandResultData(
@@ -148,6 +123,18 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateApiVerifier
                 // We do not want ot use result.OutputBaseDirectory as it points to the base of template
                 //  not a working dir of command (which is one level up - as we explicitly specify output subdir, as if '-o' was passed)
                 workingDir);
+        }
+
+        private static async Task InstallTemplateAsync(Bootstrapper bootstrapper, string template)
+        {
+            List<InstallRequest> installRequests = new List<InstallRequest>() { new InstallRequest(Path.GetFullPath(template)) };
+
+            IReadOnlyList<InstallResult> installationResults = await bootstrapper.InstallTemplatePackagesAsync(installRequests).ConfigureAwait(false);
+            InstallResult? failedResult = installationResults.FirstOrDefault(result => !result.Success);
+            if (failedResult != null)
+            {
+                throw new TemplateVerificationException(string.Format("Failed to install template: {0}, details:{1}", failedResult.InstallRequest.PackageIdentifier, failedResult.ErrorMessage), TemplateVerificationErrorCode.InstallFailed);
+            }
         }
 
         private static bool ExtractParameter(

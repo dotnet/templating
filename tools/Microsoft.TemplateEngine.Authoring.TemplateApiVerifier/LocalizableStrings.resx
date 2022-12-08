@@ -134,16 +134,15 @@
     <value>'DotnetExecutablePath' parameter must not be specified when using 'WithInstantiationThroughTemplateCreatorApi'</value>
     <comment>Do not translate 'DotnetExecutablePath' and 'WithInstantiationThroughTemplateCreatorApi'</comment>
   </data>
+  <data name="Error_InstallFail" xml:space="preserve">
+    <value>Failed to install template: {0}, details:{1}.</value>
+    <comment>{0} is tample name, {1} is error message</comment>
+  </data>
+  <data name="Error_NoPackages" xml:space="preserve">
+    <value>No packages fetched after installation.</value>
+  </data>
   <data name="Error_TemplateArgsDisalowed" xml:space="preserve">
     <value>'TemplateSpecificArgs' parameter must not be specified when using WithInstantiationThroughTemplateCreatorApi. Parameters should be passed via the argument of 'WithInstantiationThroughTemplateCreatorApi'</value>
     <comment>Do not translate 'TemplateSpecificArgs' and 'WithInstantiationThroughTemplateCreatorApi'</comment>
-  </data>
-  <data name="Error_TemplatePathDoesNotExist" xml:space="preserve">
-    <value>Valid 'TemplatePath' must be specified when using 'WithInstantiationThroughTemplateCreatorApi'</value>
-    <comment>Do not translate 'TemplatePath' and 'WithInstantiationThroughTemplateCreatorApi'</comment>
-  </data>
-  <data name="Error_TemplatePathMissing" xml:space="preserve">
-    <value>Explicit 'TemplatePath' parameter must be specified when using 'WithInstantiationThroughTemplateCreatorApi'</value>
-    <comment>Do not translate 'TemplatePath' and 'WithInstantiationThroughTemplateCreatorApi'</comment>
   </data>
 </root>
