@@ -336,5 +336,71 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
                 """.UnixifyLineBreaks(),
                File.ReadAllText(targetFile).UnixifyLineBreaks());
         }
+
+        [Fact]
+        internal async Task Test5719()
+        {
+            using Bootstrapper bootstrapper = GetBootstrapper();
+            string templateLocation = GetTestTemplateLocation("TestTemplate2");
+            await InstallTemplateAsync(bootstrapper, templateLocation).ConfigureAwait(false);
+
+            string output = TestUtils.CreateTemporaryFolder();
+
+            IReadOnlyList<ITemplateMatchInfo> foundTemplates = await bootstrapper
+                .GetTemplatesAsync(new[] { WellKnownSearchFilters.NameFilter("TestAssets.SampleTestTemplate2") })
+                .ConfigureAwait(false);
+
+            Dictionary<string, string?> parameters = new()
+            {
+                { "paramA", "true" },
+            };
+
+            ITemplateCreationResult result = await bootstrapper
+                .CreateAsync(foundTemplates[0].Info, "MyProject", output, parameters)
+                .ConfigureAwait(false);
+
+            Assert.Equal(CreationResultStatus.Success, result.Status);
+
+            string targetCsFile = Path.Combine(output, "Test.cs");
+            string targetRazorFile = Path.Combine(output, "TestRazor.razor");
+
+            Assert.Equal(
+                """
+                namespace MyProject.Core;
+                
+                """,
+                File.ReadAllText(targetCsFile));
+            Assert.Equal(
+                """
+                @*Replacement is turned off below*@
+                <IconTemplate>
+                </IconTemplate>
+
+                @*Replacement is turned on below*@
+                <IconMyProject>
+                </IconMyProject>
+                
+                """,
+                File.ReadAllText(targetRazorFile));
+
+            output = TestUtils.CreateTemporaryFolder();
+
+            parameters["paramA"] = "false";
+
+            result = await bootstrapper
+                .CreateAsync(foundTemplates[0].Info, "MyProject", output, parameters)
+                .ConfigureAwait(false);
+
+            Assert.Equal(CreationResultStatus.Success, result.Status);
+
+            targetCsFile = Path.Combine(output, "Test.cs");
+
+            Assert.Equal(
+                """
+                namespace MyProject.Shared;
+                
+                """,
+                File.ReadAllText(targetCsFile));
+        }
     }
 }
