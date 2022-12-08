@@ -116,7 +116,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             await VerifyResult(
                     options,
                     commandResult,
-                    new CallerInfo() { CallerMethod = callerMethod, CallerSourceFile = sourceFile, ContentDirectory = commandResult.WorkingDirectory })
+                    new CallerInfo() { CallerMethod = callerMethod, CallerSourceFile = sourceFile, ContentDirectory = commandResult.InstantiatedContentDirectory })
                 .ConfigureAwait(false);
 
             // if everything is successful - let's delete the created files (unless placed into explicitly requested dir)
