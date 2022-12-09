@@ -255,7 +255,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
         /// <summary>
         /// Indicates whether to use the template's default name or parent folder's name for template name ("preferDefaultName: JSON property).
         /// </summary>
-        public bool? PreferDefaultName { get; internal init; }
+        public bool PreferDefaultName { get; internal init; }
 
         /// <summary>
         /// Gets the collection of template tags ("tags" JSON property).

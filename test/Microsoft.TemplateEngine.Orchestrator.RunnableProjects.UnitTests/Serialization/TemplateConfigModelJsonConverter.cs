@@ -91,9 +91,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Seria
                 writer.WritePropertyName("generatorVersions");
                 writer.WriteValue(value.GeneratorVersions);
             }
-            if (value.PreferDefaultName is not null && value.PreferNameDirectory == true)
+            if (value.PreferNameDirectory)
             {
                 writer.WritePropertyName("preferNameDirectory");
+                writer.WriteValue(value.PreferNameDirectory);
+            }
+            if (value.PreferDefaultName)
+            {
+                writer.WritePropertyName("prefer");
                 writer.WriteValue(value.PreferNameDirectory);
             }
 
