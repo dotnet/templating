@@ -24,7 +24,7 @@ namespace Microsoft.TemplateEngine.IDE
     {
         private readonly ITemplateEngineHost _host;
         private readonly TemplateCreator _templateCreator;
-        private readonly Edge.Settings.TemplatePackageManager _templatePackagesManager;
+        private readonly TemplatePackageManager _templatePackagesManager;
         private readonly EngineEnvironmentSettings _engineEnvironmentSettings;
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace Microsoft.TemplateEngine.IDE
             }
 
             _templateCreator = new TemplateCreator(_engineEnvironmentSettings);
-            _templatePackagesManager = new Edge.Settings.TemplatePackageManager(_engineEnvironmentSettings);
+            _templatePackagesManager = new TemplatePackageManager(_engineEnvironmentSettings);
             if (loadDefaultComponents)
             {
                 LoadDefaultComponents();
@@ -73,7 +73,7 @@ namespace Microsoft.TemplateEngine.IDE
             {
                 AddComponent(component.Type, component.Instance);
             }
-            foreach ((Type Type, IIdentifiedComponent Instance) component in Edge.Components.AllComponents)
+            foreach ((Type Type, IIdentifiedComponent Instance) component in Components.AllComponents)
             {
                 AddComponent(component.Type, component.Instance);
             }
