@@ -10,9 +10,9 @@
       <trans-unit id="Error_ConfigDoesntExist">
         <source>Template config: {0} doesn't exist. When using 'WithInstantiationThroughTemplateCreatorApi' the 'TemplatePath' parameter must specify path to the template.json or to the root of template (containing {1}).</source>
         <target state="new">Template config: {0} doesn't exist. When using 'WithInstantiationThroughTemplateCreatorApi' the 'TemplatePath' parameter must specify path to the template.json or to the root of template (containing {1}).</target>
-        <note>Do not translate 'emplatePath' and 'WithInstantiationThroughTemplateCreatorApi'
+        <note>Do not translate 'TemplatePath' and 'WithInstantiationThroughTemplateCreatorApi'
 
-{0} and {1} contains paths</note>
+{0} and {1} contain paths</note>
       </trans-unit>
       <trans-unit id="Error_ConfigRetrieval">
         <source>Template configuration file could not be retrieved from configured mount point.</source>
@@ -20,14 +20,14 @@
         <note />
       </trans-unit>
       <trans-unit id="Error_DotnetPath">
-        <source>'DotnetExecutablePath' parameter must not be specified when using 'WithInstantiationThroughTemplateCreatorApi'</source>
-        <target state="new">'DotnetExecutablePath' parameter must not be specified when using 'WithInstantiationThroughTemplateCreatorApi'</target>
+        <source>'DotnetExecutablePath' parameter must not be specified when using 'WithInstantiationThroughTemplateCreatorApi'.</source>
+        <target state="new">'DotnetExecutablePath' parameter must not be specified when using 'WithInstantiationThroughTemplateCreatorApi'.</target>
         <note>Do not translate 'DotnetExecutablePath' and 'WithInstantiationThroughTemplateCreatorApi'</note>
       </trans-unit>
       <trans-unit id="Error_InstallFail">
-        <source>Failed to install template: {0}, details:{1}.</source>
-        <target state="new">Failed to install template: {0}, details:{1}.</target>
-        <note>{0} is tample name, {1} is error message</note>
+        <source>Failed to install template: {0}, details: {1}.</source>
+        <target state="new">Failed to install template: {0}, details: {1}.</target>
+        <note>{0} is tamplate name, {1} is error message</note>
       </trans-unit>
       <trans-unit id="Error_NoPackages">
         <source>No packages fetched after installation.</source>
@@ -35,8 +35,8 @@
         <note />
       </trans-unit>
       <trans-unit id="Error_TemplateArgsDisalowed">
-        <source>'TemplateSpecificArgs' parameter must not be specified when using WithInstantiationThroughTemplateCreatorApi. Parameters should be passed via the argument of 'WithInstantiationThroughTemplateCreatorApi'</source>
-        <target state="new">'TemplateSpecificArgs' parameter must not be specified when using WithInstantiationThroughTemplateCreatorApi. Parameters should be passed via the argument of 'WithInstantiationThroughTemplateCreatorApi'</target>
+        <source>'TemplateSpecificArgs' parameter must not be specified when using WithInstantiationThroughTemplateCreatorApi. Parameters should be passed via the argument of 'WithInstantiationThroughTemplateCreatorApi'.</source>
+        <target state="new">'TemplateSpecificArgs' parameter must not be specified when using WithInstantiationThroughTemplateCreatorApi. Parameters should be passed via the argument of 'WithInstantiationThroughTemplateCreatorApi'.</target>
         <note>Do not translate 'TemplateSpecificArgs' and 'WithInstantiationThroughTemplateCreatorApi'</note>
       </trans-unit>
     </body>

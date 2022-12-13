@@ -6,7 +6,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Edge
 {
@@ -39,7 +38,7 @@ namespace Microsoft.TemplateEngine.Edge
         /// <inheritdoc/>
         public string ExpandEnvironmentVariables(string name)
         {
-            return System.Environment.ExpandEnvironmentVariables(name);
+            return Environment.ExpandEnvironmentVariables(name);
         }
 
         /// <inheritdoc/>
@@ -58,7 +57,7 @@ namespace Microsoft.TemplateEngine.Edge
         protected static IReadOnlyDictionary<string, string> FetchEnvironmentVariables()
         {
             Dictionary<string, string> variables = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            IDictionary env = System.Environment.GetEnvironmentVariables();
+            IDictionary env = Environment.GetEnvironmentVariables();
 
             foreach (string key in env.Keys.OfType<string>())
             {
