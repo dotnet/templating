@@ -9,7 +9,7 @@
       </trans-unit>
       <trans-unit id="ConditionEvaluation_Error_MismatchedCondition">
         <source>Failed to evaluate condition {0} on parameter {1} (condition text: {2}, evaluation error: {3}) - condition might be malformed or referenced parameters do not have default nor explicit values.</source>
-        <target state="needs-review-translation">パラメーター {1} の条件 {0} を評価できませんでした (条件テキスト: {2}、 評価エラー: {3}) - 条件の形式に誤りがある可能性があります。</target>
+        <target state="translated">パラメーター {1} の条件 {0} を評価できませんでした (条件テキスト: {2}、 評価エラー: {3}) - 条件の形式に誤りがあるか、参照されたパラメーターに規定値も明示的な値もない可能性があります。</target>
         <note>{0} is the condition type
 {1} is parameter name
 {2} is condition text
@@ -376,7 +376,7 @@ Details: {1}</source>
       <trans-unit id="TemplatePackageManager_Error_FailedToStoreCache">
         <source>Failed to store template cache, details: {0}
 Template cache will be recreated on the next run.</source>
-        <target state="translated">テンプレート キャッシュを保存できませんでした。詳細: {0}
+        <target state="translated">テンプレート キャッシュを格納できませんでした、詳細: {0}
 テンプレート キャッシュは次回の実行時に再作成されます。</target>
         <note>{0} should not end with period - period is a part of the format entry.</note>
       </trans-unit>
