@@ -87,7 +87,8 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateApiVerifier
                 host,
                 virtualizeConfiguration: string.IsNullOrEmpty(options.SettingsDirectory),
                 loadDefaultComponents: true,
-                hostSettingsLocation: options.SettingsDirectory);
+                hostSettingsLocation: options.SettingsDirectory,
+                environment: new VirtualEnvironment(options.Environment, true));
 
             if (!string.IsNullOrEmpty(options.TemplatePath))
             {
@@ -120,7 +121,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateApiVerifier
                 (int)result.Status,
                 result.Status == CreationResultStatus.Success ? string.Format(LocalizableStrings.CreateSuccessful, result.TemplateFullName) : string.Empty,
                 result.ErrorMessage ?? string.Empty,
-                // We do not want ot use result.OutputBaseDirectory as it points to the base of template
+                // We do not want to use result.OutputBaseDirectory as it points to the base of template
                 //  not a working dir of command (which is one level up - as we explicitly specify output subdir, as if '-o' was passed)
                 workingDir);
         }

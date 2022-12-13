@@ -12,33 +12,20 @@ namespace Microsoft.TemplateEngine.Edge
 {
     /// <summary>
     /// Default implementation of <see cref="IEnvironment"/>.
-    /// Gets environment variables from <see cref="System.Environment"/>.
+    /// Gets environment variables from <see cref="Environment"/>.
     /// </summary>
-    public sealed class DefaultEnvironment : IEnvironment
+    public class DefaultEnvironment : IEnvironment
     {
         private const int DefaultBufferWidth = 160;
         private readonly IReadOnlyDictionary<string, string> _environmentVariables;
 
-        public DefaultEnvironment() : this(null)
+        public DefaultEnvironment() : this(FetchEnvironmentVariables())
         { }
 
-        public DefaultEnvironment(IReadOnlyDictionary<string, string>? additionalVirtualEnvironemnt)
+        protected DefaultEnvironment(IReadOnlyDictionary<string, string> environmentVariables)
         {
-            Dictionary<string, string> variables = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            IDictionary env = System.Environment.GetEnvironmentVariables();
-
-            foreach (string key in env.Keys.OfType<string>())
-            {
-                variables[key] = (env[key] as string) ?? string.Empty;
-            }
-
-            if (additionalVirtualEnvironemnt != null)
-            {
-                variables.Merge(additionalVirtualEnvironemnt);
-            }
-
-            _environmentVariables = variables;
-            NewLine = System.Environment.NewLine;
+            _environmentVariables = environmentVariables;
+            NewLine = Environment.NewLine;
         }
 
         /// <inheritdoc/>
@@ -66,6 +53,19 @@ namespace Microsoft.TemplateEngine.Edge
         public IReadOnlyDictionary<string, string> GetEnvironmentVariables()
         {
             return _environmentVariables;
+        }
+
+        protected static IReadOnlyDictionary<string, string> FetchEnvironmentVariables()
+        {
+            Dictionary<string, string> variables = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            IDictionary env = System.Environment.GetEnvironmentVariables();
+
+            foreach (string key in env.Keys.OfType<string>())
+            {
+                variables[key] = (env[key] as string) ?? string.Empty;
+            }
+
+            return variables;
         }
     }
 }

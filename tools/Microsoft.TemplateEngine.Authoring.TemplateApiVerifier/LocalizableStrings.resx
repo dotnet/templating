@@ -123,26 +123,26 @@
   </data>
   <data name="Error_ConfigDoesntExist" xml:space="preserve">
     <value>Template config: {0} doesn't exist. When using 'WithInstantiationThroughTemplateCreatorApi' the 'TemplatePath' parameter must specify path to the template.json or to the root of template (containing {1}).</value>
-    <comment>Do not translate 'emplatePath' and 'WithInstantiationThroughTemplateCreatorApi'
+    <comment>Do not translate 'TemplatePath' and 'WithInstantiationThroughTemplateCreatorApi'
 
-{0} and {1} contains paths</comment>
+{0} and {1} contain paths</comment>
   </data>
   <data name="Error_ConfigRetrieval" xml:space="preserve">
     <value>Template configuration file could not be retrieved from configured mount point.</value>
   </data>
   <data name="Error_DotnetPath" xml:space="preserve">
-    <value>'DotnetExecutablePath' parameter must not be specified when using 'WithInstantiationThroughTemplateCreatorApi'</value>
+    <value>'DotnetExecutablePath' parameter must not be specified when using 'WithInstantiationThroughTemplateCreatorApi'.</value>
     <comment>Do not translate 'DotnetExecutablePath' and 'WithInstantiationThroughTemplateCreatorApi'</comment>
   </data>
   <data name="Error_InstallFail" xml:space="preserve">
-    <value>Failed to install template: {0}, details:{1}.</value>
-    <comment>{0} is tample name, {1} is error message</comment>
+    <value>Failed to install template: {0}, details: {1}.</value>
+    <comment>{0} is tamplate name, {1} is error message</comment>
   </data>
   <data name="Error_NoPackages" xml:space="preserve">
     <value>No packages fetched after installation.</value>
   </data>
   <data name="Error_TemplateArgsDisalowed" xml:space="preserve">
-    <value>'TemplateSpecificArgs' parameter must not be specified when using WithInstantiationThroughTemplateCreatorApi. Parameters should be passed via the argument of 'WithInstantiationThroughTemplateCreatorApi'</value>
+    <value>'TemplateSpecificArgs' parameter must not be specified when using WithInstantiationThroughTemplateCreatorApi. Parameters should be passed via the argument of 'WithInstantiationThroughTemplateCreatorApi'.</value>
     <comment>Do not translate 'TemplateSpecificArgs' and 'WithInstantiationThroughTemplateCreatorApi'</comment>
   </data>
 </root>

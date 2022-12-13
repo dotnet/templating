@@ -37,16 +37,16 @@ namespace Microsoft.TemplateEngine.IDE
         /// <param name="loadDefaultComponents">if true, the default components (providers, installers, generator) will be loaded. Same as calling <see cref="LoadDefaultComponents()"/> after instance is created.</param>
         /// <param name="hostSettingsLocation">the file path to store host specific settings. Use null for default location.
         /// Note: this parameter changes only directory of host and host version specific settings. Global settings path remains unchanged.</param>
-        /// <param name="additionalVirtualEnvironemnt">optional set of environment variables to be used.</param>
+        /// <param name="environment">optional environment to be used (defaults to <see cref="DefaultEnvironment"/>).</param>
         public Bootstrapper(
             ITemplateEngineHost host,
             bool virtualizeConfiguration,
             bool loadDefaultComponents = true,
             string? hostSettingsLocation = null,
-            IReadOnlyDictionary<string, string>? additionalVirtualEnvironemnt = null)
+            IEnvironment? environment = null)
         {
             _host = host ?? throw new ArgumentNullException(nameof(host));
-            IEnvironment environment = new DefaultEnvironment(additionalVirtualEnvironemnt);
+            environment ??= new DefaultEnvironment();
 
             if (string.IsNullOrWhiteSpace(hostSettingsLocation))
             {

@@ -88,7 +88,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateApiVerifier {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &apos;DotnetExecutablePath&apos; parameter must not be specified when using &apos;WithInstantiationThroughTemplateCreatorApi&apos;.
+        ///   Looks up a localized string similar to &apos;DotnetExecutablePath&apos; parameter must not be specified when using &apos;WithInstantiationThroughTemplateCreatorApi&apos;..
         /// </summary>
         internal static string Error_DotnetPath {
             get {
@@ -97,7 +97,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateApiVerifier {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to install template: {0}, details:{1}..
+        ///   Looks up a localized string similar to Failed to install template: {0}, details: {1}..
         /// </summary>
         internal static string Error_InstallFail {
             get {
@@ -115,7 +115,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateApiVerifier {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &apos;TemplateSpecificArgs&apos; parameter must not be specified when using WithInstantiationThroughTemplateCreatorApi. Parameters should be passed via the argument of &apos;WithInstantiationThroughTemplateCreatorApi&apos;.
+        ///   Looks up a localized string similar to &apos;TemplateSpecificArgs&apos; parameter must not be specified when using WithInstantiationThroughTemplateCreatorApi. Parameters should be passed via the argument of &apos;WithInstantiationThroughTemplateCreatorApi&apos;..
         /// </summary>
         internal static string Error_TemplateArgsDisalowed {
             get {
