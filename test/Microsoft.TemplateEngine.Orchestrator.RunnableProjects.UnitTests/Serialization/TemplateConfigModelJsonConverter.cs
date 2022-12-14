@@ -98,7 +98,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Seria
             }
             if (value.PreferDefaultName)
             {
-                writer.WritePropertyName("prefer");
+                writer.WritePropertyName("preferefaultName");
                 writer.WriteValue(value.PreferNameDirectory);
             }
 

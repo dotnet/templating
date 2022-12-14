@@ -480,6 +480,46 @@ Details: Parameter conditions contain cyclic dependency: [A, B, A] that is preve
                 parameters2: parameters);
         }
 
+        private const string TemplateConfigPreferDefaultNameWithDefaultName = /*lang=json*/ """
+            {
+                "identity": "test.template",
+                "name": "tst",
+                "shortName": "tst",
+                "preferDefaultName": true,
+                "defaultName": "defaultName",
+                "sourceName": "sourceFile"
+            }
+            """;
+
+        private const string TemplateConfigPreferDefaultNameWithoutDefaultName = /*lang=json*/ """
+            {
+                "identity": "test.template",
+                "name": "tst",
+                "shortName": "tst",
+                "preferDefaultName": true,
+                "sourceName": "sourceFile"
+            }
+            """;
+
+        [Theory]
+        [InlineData(TemplateConfigPreferDefaultNameWithDefaultName, "thisIsAName", "./thisIsAName.cs")]
+        [InlineData(TemplateConfigPreferDefaultNameWithDefaultName, null, "./defaultName.cs")]
+        [InlineData(TemplateConfigPreferDefaultNameWithoutDefaultName, null, "./tst2.cs")]
+        public async void InstantiateAsync_PreferDefaultName(string templateConfig, string? name, string expectedOutputName)
+        {
+            string sourceSnippet = """
+                using System;
+
+                Console.log("Hello there, this is a test!");
+                """;
+
+            await InstantiateAsyncNameHelper(
+                templateConfig,
+                sourceSnippet,
+                name,
+                expectedOutputName);
+        }
+
         private async Task InstantiateAsyncHelper(
             string templateSnippet,
             string sourceSnippet,
@@ -584,6 +624,64 @@ Details: Parameter conditions contain cyclic dependency: [A, B, A] that is preve
                     .ReadAllText(Path.Combine(res.OutputBaseDirectory!, sourceFileName)).Trim();
                 resultContent.Should().BeEquivalentTo(expectedOutput.Trim());
             }
+        }
+
+        // This is a helper focused on testing the final name of the template during creation
+        private async Task InstantiateAsyncNameHelper(
+            string templateSnippet,
+            string sourceSnippet,
+            string? name,
+            string expectedOutputName,
+            string sourceExtension = ".cs")
+        {
+            //
+            // Template content preparation
+            //
+
+            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>
+            {
+                // template.json
+                { TestFileSystemUtils.DefaultConfigRelativePath, templateSnippet }
+            };
+
+            string sourceFileName = "sourceFile" + sourceExtension;
+
+            //content
+            templateSourceFiles.Add(sourceFileName, sourceSnippet);
+
+            //
+            // Dependencies preparation and mounting
+            //
+
+            string sourceBasePath = _engineEnvironmentSettings.GetTempVirtualizedPath();
+
+            TestFileSystemUtils.WriteTemplateSource(_engineEnvironmentSettings, sourceBasePath, templateSourceFiles);
+            using IMountPoint sourceMountPoint = _engineEnvironmentSettings.MountPath(sourceBasePath);
+            RunnableProjectGenerator rpg = new();
+            // cannot use SimpleConfigModel dirrectly - due to missing easy way of creating ParameterSymbols
+            IFile? templateConfig = sourceMountPoint.FileInfo(TestFileSystemUtils.DefaultConfigRelativePath);
+            Assert.NotNull(templateConfig);
+            var runnableConfig = new RunnableProjectConfig(_engineEnvironmentSettings, rpg, templateConfig);
+
+            TemplateCreator creator = new TemplateCreator(_engineEnvironmentSettings);
+
+            string targetDir = _engineEnvironmentSettings.GetTempVirtualizedPath();
+
+            InputDataSet parameters = new InputDataSet(runnableConfig);
+
+            ITemplateCreationResult res = await creator.InstantiateAsync(
+                templateInfo: runnableConfig,
+                name: name,
+                fallbackName: "tst2",
+                inputParameters: parameters,
+                outputPath: targetDir);
+
+            res.ErrorMessage.Should().BeNull();
+            res.OutputBaseDirectory.Should().NotBeNullOrEmpty();
+
+            res.CreationEffects.Should().NotBeNull();
+            res.CreationEffects!.FileChanges.Should().NotBeNullOrEmpty().And.HaveCount(1);
+            res.CreationEffects.FileChanges[0].TargetRelativePath.Should().Be(expectedOutputName);
         }
 
         private class InputDataBag

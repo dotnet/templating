@@ -189,7 +189,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         public IReadOnlyList<string> ShortNameList { get; } = new List<string>();
 
         [JsonProperty]
-        public bool PreferDefaultName { get; }
+        public bool PreferDefaultName { get; private set; }
 
         [JsonIgnore]
         [Obsolete]
