@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dependencies>
   <ProductDependencies>
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-externals" Version="8.0.0-alpha.1.22579.1">
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-externals" Version="8.0.0-alpha.1.22609.3">
       <Uri>https://github.com/dotnet/source-build-externals</Uri>
-      <Sha>dd9d921db96b4469ebac73ee708cce8a31845c0c</Sha>
+      <Sha>bea048703a1a2a9b5f35b04660b74a63ae2520cd</Sha>
       <SourceBuild RepoName="source-build-externals" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="8.0.0-alpha.1.22579.1">
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="8.0.0-alpha.1.22609.1">
       <Uri>https://github.com/dotnet/source-build-reference-packages</Uri>
-      <Sha>bed0fd20a5a55843c1f04ef195ef2fd7171ae715</Sha>
+      <Sha>847c458e64fdc51b6445eadce74a7998ce4bbbfb</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="8.0.0-alpha.1.22578.1">
+    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="8.0.0-alpha.1.22611.2">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>1771d63827387b49dcd8c33b95f1512f4f11e368</Sha>
+      <Sha>cfdf0f67485ae41f4454a687b1e01ccb32e5e799</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Ref" Version="8.0.0-alpha.1.22578.1">
+    <Dependency Name="Microsoft.NETCore.App.Ref" Version="8.0.0-alpha.1.22611.2">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>1771d63827387b49dcd8c33b95f1512f4f11e368</Sha>
+      <Sha>cfdf0f67485ae41f4454a687b1e01ccb32e5e799</Sha>
     </Dependency>
     <Dependency Name="System.CommandLine" Version="2.0.0-beta4.22568.1">
       <Uri>https://github.com/dotnet/command-line-api</Uri>
@@ -25,9 +25,9 @@
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
-    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="8.0.0-beta.22579.2">
+    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="8.0.0-beta.22612.4">
       <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>6b3bad6673f3ebe89ebe12ea7c4eff1705b893e6</Sha>
+      <Sha>cb37e1f67041bfc6484ec47525bda461606efe92</Sha>
       <SourceBuild RepoName="arcade" ManagedOnly="true" />
     </Dependency>
   </ToolsetDependencies>
