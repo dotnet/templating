@@ -6,9 +6,9 @@
       <Sha>bea048703a1a2a9b5f35b04660b74a63ae2520cd</Sha>
       <SourceBuild RepoName="source-build-externals" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="8.0.0-alpha.1.22609.1">
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="8.0.0-alpha.1.22613.1">
       <Uri>https://github.com/dotnet/source-build-reference-packages</Uri>
-      <Sha>847c458e64fdc51b6445eadce74a7998ce4bbbfb</Sha>
+      <Sha>760f56f2f133a4ea8dab49803bed910a90d72fdf</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
     <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="8.0.0-alpha.1.22611.2">
