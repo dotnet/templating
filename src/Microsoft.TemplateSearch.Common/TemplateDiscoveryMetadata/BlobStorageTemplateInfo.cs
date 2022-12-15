@@ -121,7 +121,7 @@ namespace Microsoft.TemplateSearch.Common
         [JsonProperty]
         public IReadOnlyList<string> ShortNameList { get; private set; }
 
-        [JsonProperty]
+        [JsonIgnore]
         public bool PreferDefaultName { get; private set; }
 
         [JsonIgnore]

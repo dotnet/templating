@@ -102,7 +102,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Results
         [JsonProperty]
         public string Name { get; private set; }
 
-        [JsonProperty]
+        [JsonIgnore]
         public bool PreferDefaultName { get; private set; }
 
         [JsonProperty]
