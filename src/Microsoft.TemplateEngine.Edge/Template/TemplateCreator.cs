@@ -103,9 +103,9 @@ namespace Microsoft.TemplateEngine.Edge.Template
                 return new TemplateCreationResult(CreationResultStatus.NotFound, templateInfo.Name, LocalizableStrings.TemplateCreator_TemplateCreationResult_Error_CouldNotLoadTemplate);
             }
 
-            string? realName = name is not null ? name : templateInfo.PreferDefaultName ? templateInfo.DefaultName : fallbackName;
+            string? realName = name is not null ? name : templateInfo.PreferDefaultName ? templateInfo.DefaultName : null;
+            realName = realName is null ? fallbackName : realName;
 
-            // TODO: add template validation here
             if (string.IsNullOrWhiteSpace(realName))
             {
                 return new TemplateCreationResult(CreationResultStatus.MissingMandatoryParam, template.Name, "--name");

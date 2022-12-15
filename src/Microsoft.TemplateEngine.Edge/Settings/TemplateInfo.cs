@@ -89,6 +89,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             Precedence = template.Precedence;
             Identity = template.Identity;
             DefaultName = template.DefaultName;
+            PreferDefaultName = template.PreferDefaultName;
             HostConfigPlace = template.HostConfigPlace;
             ThirdPartyNotices = template.ThirdPartyNotices;
             BaselineInfo = template.BaselineInfo;

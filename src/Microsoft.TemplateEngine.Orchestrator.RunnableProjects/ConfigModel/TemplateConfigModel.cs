@@ -60,6 +60,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
             Author = source.ToString(nameof(Author));
             Classifications = source.ArrayAsStrings(nameof(Classifications));
             DefaultName = source.ToString(nameof(DefaultName));
+            PreferDefaultName = source.ToBool(nameof(PreferDefaultName));
             Description = source.ToString(nameof(Description)) ?? string.Empty;
             GroupIdentity = source.ToString(nameof(GroupIdentity));
             Precedence = source.ToInt32(nameof(Precedence));

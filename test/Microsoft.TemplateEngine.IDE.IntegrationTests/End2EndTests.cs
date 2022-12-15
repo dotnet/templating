@@ -336,5 +336,61 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
                 """.UnixifyLineBreaks(),
                File.ReadAllText(targetFile).UnixifyLineBreaks());
         }
+
+        [Theory]
+        [InlineData(null, "theDefaultName.cs")]
+        [InlineData("fileName", "fileName.cs")]
+        internal async Task Test_CreateAsync_PreferDefaultNameValidParameters(string? name, string expectedFileName)
+        {
+            using Bootstrapper bootstrapper = GetBootstrapper();
+            string templateLocation = GetTestTemplateLocation("TemplateWithPreferDefaultName");
+            await InstallTemplateAsync(bootstrapper, templateLocation).ConfigureAwait(false);
+
+            string output = TestUtils.CreateTemporaryFolder();
+
+            IReadOnlyList<ITemplateMatchInfo> foundTemplates = await bootstrapper
+                .GetTemplatesAsync(new[] { WellKnownSearchFilters.NameFilter("TestAssets.TemplateWithPreferDefaultName") })
+                .ConfigureAwait(false);
+
+            // Using this parameter with no real info so bootstrapper.CreateAsync is not an ambiguous call
+            Dictionary<string, string?> parameters = new()
+            {
+                { "some", "parameter" },
+            };
+
+            ITemplateCreationResult result = await bootstrapper
+                .CreateAsync(foundTemplates[0].Info, name, output, parameters)
+                .ConfigureAwait(false);
+
+            Assert.Equal(CreationResultStatus.Success, result.Status);
+            string expectedName = Path.Combine(output, expectedFileName);
+            Assert.True(File.Exists(expectedName));
+        }
+
+        [Fact]
+        internal async Task Test_CreateAsync_PreferDefaultNameInvalidParameters()
+        {
+            using Bootstrapper bootstrapper = GetBootstrapper();
+            string templateLocation = GetTestTemplateLocation("TemplateWithPreferDefaultNameButNoDefaultName");
+            await InstallTemplateAsync(bootstrapper, templateLocation).ConfigureAwait(false);
+
+            string output = TestUtils.CreateTemporaryFolder();
+
+            IReadOnlyList<ITemplateMatchInfo> foundTemplates = await bootstrapper
+                .GetTemplatesAsync(new[] { WellKnownSearchFilters.NameFilter("TestAssets.TemplateWithPreferDefaultName") })
+                .ConfigureAwait(false);
+
+            // Using this parameter with no real info so bootstrapper.CreateAsync is not an ambiguous call
+            Dictionary<string, string?> parameters = new()
+            {
+                { "some", "parameter" },
+            };
+
+            ITemplateCreationResult result = await bootstrapper
+                .CreateAsync(foundTemplates[0].Info, null, output, parameters)
+                .ConfigureAwait(false);
+
+            Assert.Equal(CreationResultStatus.MissingMandatoryParam, result.Status);
+        }
     }
 }
