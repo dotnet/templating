@@ -1,8 +1,10 @@
 <!-- Prebuilt baseline changes must be reviewed by @dotnet/source-build-internal -->
 <UsageData>
   <IgnorePatterns>
-    <!-- TODO: Ignore needed until https://github.com/dotnet/runtime/issues/78054 is addressed. -->
+    <!-- TODO: Ignore needed until https://github.com/dotnet/source-build-reference-packages/pull/500 flows in. -->
     <UsagePattern IdentityGlob="Microsoft.Extensions.Logging.Abstractions/*" />
+
+    <!-- TODO: Ignore needed until https://github.com/dotnet/source-build/issues/3188 is addressed. -->
     <UsagePattern IdentityGlob="Microsoft.NETCore.App.Ref/*" />
 
     <UsagePattern IdentityGlob="Microsoft.SourceBuild.Intermediate.*/*" />
