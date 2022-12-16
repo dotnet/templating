@@ -25,8 +25,7 @@
         <ToolsDir>$(RepoRoot)tools\</ToolsDir>
         <ToolsTempDir>$(RepoRoot).tools\</ToolsTempDir>
         <LocalizeDir>$(RepoRoot)localize\</LocalizeDir>
-        <TemplatesDir>$(ArtifactsDir)templates\</TemplatesDir>
-        <TemplatesNoTimestampDir>$(ArtifactsDir)templates-notimestamp\</TemplatesNoTimestampDir>
+        <TemplatesDir>$(RepoRoot)template_feed\</TemplatesDir>
         <SrcDir>$(RepoRoot)src\</SrcDir>
         <TestDir>$(RepoRoot)test\</TestDir>
         <StrongNameKeyId>MicrosoftAspNetCore</StrongNameKeyId>
