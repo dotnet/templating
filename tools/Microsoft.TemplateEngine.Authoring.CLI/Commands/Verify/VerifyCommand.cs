@@ -2,10 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.CommandLine;
-using System.CommandLine.Binding;
 using System.CommandLine.Parsing;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.TemplateEngine.Authoring.TemplateVerifier;
 
 namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
@@ -30,14 +28,6 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
         private readonly Option<string> _templatePathOption = new(new[] { "-p", "--template-path" })
         {
             Description = LocalizableStrings.command_verify_help_templatePath_description,
-        };
-
-        private readonly Option<string> _newCommandPathOption = new("--new-command-assembly")
-        {
-            Description = LocalizableStrings.command_verify_help_newCommandPath_description,
-            //TODO: do we have better way of distinguishing options that might rarely be needed?
-            // if not - we should probably add a link to more detailed help in the command description (mentioning that online help has additional options)
-            IsHidden = true
         };
 
         private readonly Option<string> _templateOutputPathOption = new(new[] { "-o", "--output" })
@@ -94,13 +84,12 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
             AllowMultipleArgumentsPerToken = true,
         };
 
-        public VerifyCommand(ILoggerFactory loggerFactory)
-            : base(CommandName, LocalizableStrings.command_verify_help_description, loggerFactory)
+        public VerifyCommand()
+            : base(CommandName, LocalizableStrings.command_verify_help_description)
         {
             AddArgument(_templateNameArgument);
             AddOption(_remainingArguments);
             AddOption(_templatePathOption);
-            AddOption(_newCommandPathOption);
             AddOption(_templateOutputPathOption);
             AddOption(_snapshotsDirectoryOption);
             AddOption(_scenarioNameOption);
@@ -118,32 +107,33 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
             AddOption(_uniqueForOption);
         }
 
-        internal static VerifyCommandArgs ExtractArguments(VerifyCommand verifyCommand, ParseResult parseResult)
+        protected internal override VerifyCommandArgs ParseContext(ParseResult parseResult)
         {
             return new VerifyCommandArgs(
-                templateName: parseResult.GetValueForArgument(verifyCommand._templateNameArgument),
-                templateSpecificArgs: parseResult.GetValueForOption(verifyCommand._remainingArguments),
-                templatePath: parseResult.GetValueForOption(verifyCommand._templatePathOption),
-                dotnetNewCommandAssemblyPath: parseResult.GetValueForOption(verifyCommand._newCommandPathOption),
-                snapshotsDirectory: parseResult.GetValueForOption(verifyCommand._snapshotsDirectoryOption),
-                scenarioDistinguisher: parseResult.GetValueForOption(verifyCommand._scenarioNameOption),
-                outputDirectory: parseResult.GetValueForOption(verifyCommand._templateOutputPathOption),
-                disableDiffTool: parseResult.GetValueForOption(verifyCommand._disableDiffToolOption),
-                disableDefaultVerificationExcludePatterns: parseResult.GetValueForOption(verifyCommand._disableDefaultExcludePatternsOption),
-                verificationExcludePatterns: parseResult.GetValueForOption(verifyCommand._excludePatternOption),
-                verificationIncludePatterns: parseResult.GetValueForOption(verifyCommand._includePatternOption),
-                verifyCommandOutput: parseResult.GetValueForOption(verifyCommand._verifyCommandOutputOption),
-                isCommandExpectedToFail: parseResult.GetValueForOption(verifyCommand._isCommandExpectedToFailOption),
-                uniqueForOptions: parseResult.GetValueForOption(verifyCommand._uniqueForOption));
+                templateName: parseResult.GetValue(_templateNameArgument),
+                templateSpecificArgs: parseResult.GetValue(_remainingArguments),
+                templatePath: parseResult.GetValue(_templatePathOption),
+                snapshotsDirectory: parseResult.GetValue(_snapshotsDirectoryOption),
+                scenarioDistinguisher: parseResult.GetValue(_scenarioNameOption),
+                outputDirectory: parseResult.GetValue(_templateOutputPathOption),
+                disableDiffTool: parseResult.GetValue(_disableDiffToolOption),
+                disableDefaultVerificationExcludePatterns: parseResult.GetValue(_disableDefaultExcludePatternsOption),
+                verificationExcludePatterns: parseResult.GetValue(_excludePatternOption),
+                verificationIncludePatterns: parseResult.GetValue(_includePatternOption),
+                verifyCommandOutput: parseResult.GetValue(_verifyCommandOutputOption),
+                isCommandExpectedToFail: parseResult.GetValue(_isCommandExpectedToFailOption),
+                uniqueForOptions: parseResult.GetValue(_uniqueForOption));
         }
 
-        protected override async Task<int> ExecuteAsync(VerifyCommandArgs args, CancellationToken cancellationToken = default)
+        protected override async Task<int> ExecuteAsync(VerifyCommandArgs args, ILoggerFactory loggerFactory, CancellationToken cancellationToken)
         {
-            Logger.LogInformation("Running the verification of {templateName}.", args.TemplateName);
+            cancellationToken.ThrowIfCancellationRequested();
+            ILogger logger = loggerFactory.CreateLogger<VerifyCommand>();
+            logger.LogInformation("Running the verification of {templateName}.", args.TemplateName);
 
             try
             {
-                VerificationEngine engine = new VerificationEngine(LoggerFactory ?? NullLoggerFactory.Instance);
+                VerificationEngine engine = new VerificationEngine(loggerFactory);
                 TemplateVerifierOptions options = new(templateName: args.TemplateName)
                 {
                     TemplatePath = args.TemplatePath,
@@ -152,7 +142,6 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
                     DisableDefaultVerificationExcludePatterns = args.DisableDefaultVerificationExcludePatterns,
                     VerificationExcludePatterns = args.VerificationExcludePatterns,
                     VerificationIncludePatterns = args.VerificationIncludePatterns,
-                    DotnetNewCommandAssemblyPath = args.DotnetNewCommandAssemblyPath,
                     SnapshotsDirectory = args.SnapshotsDirectory,
                     ScenarioName = args.ScenarioDistinguisher,
                     OutputDirectory = args.OutputDirectory,
@@ -173,19 +162,17 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
             }
             catch (Exception e)
             {
-                Logger.LogError(LocalizableStrings.command_verify_error_failed);
-                Logger.LogError(e.Message);
+                logger.LogError(LocalizableStrings.command_verify_error_failed);
+                logger.LogError(e.Message);
                 TemplateVerificationException? ex = e as TemplateVerificationException;
                 return (int)(ex?.TemplateVerificationErrorCode ?? TemplateVerificationErrorCode.InternalError);
             }
         }
 
-        protected override BinderBase<VerifyCommandArgs> GetModelBinder() => new VerifyModelBinder(this);
-
         /// <summary>
         /// Case insensitive version for <see cref="OptionExtensions.FromAmong{TOption}(TOption, string[])"/>.
         /// </summary>
-        private static void FromAmongCaseInsensitive(Option option, string[]? allowedValues = null, string? allowedHiddenValue = null)
+        private static void FromAmongCaseInsensitive(Option<IEnumerable<UniqueForOption>> option, string[]? allowedValues = null, string? allowedHiddenValue = null)
         {
             allowedValues ??= Array.Empty<string>();
             option.AddValidator(optionResult => ValidateAllowedValues(optionResult, allowedValues, allowedHiddenValue));
@@ -201,21 +188,6 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
                     LocalizableStrings.command_verify_error_unrecognizedArguments,
                     string.Join(", ", invalidArguments.Select(arg => $"'{arg.Value}'")),
                     string.Join(", ", allowedValues.Select(allowedValue => $"'{allowedValue}'")));
-            }
-        }
-
-        private class VerifyModelBinder : BinderBase<VerifyCommandArgs>
-        {
-            private readonly VerifyCommand _verifyCommand;
-
-            internal VerifyModelBinder(VerifyCommand verifyCommand)
-            {
-                _verifyCommand = verifyCommand;
-            }
-
-            protected override VerifyCommandArgs GetBoundValue(BindingContext bindingContext)
-            {
-                return ExtractArguments(_verifyCommand, bindingContext.ParseResult);
             }
         }
     }

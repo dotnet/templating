@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using Microsoft.Extensions.Options;
+using Microsoft.TemplateEngine.Authoring.TemplateVerifier.Commands;
+using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
 {
@@ -27,9 +29,14 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
         public string? TemplatePath { get; init; }
 
         /// <summary>
-        /// Gets the path to custom assembly implementing the new command.
+        /// Gets the path to custom dotnet executable (e.g. x-copy install scenario).
         /// </summary>
-        public string? DotnetNewCommandAssemblyPath { get; init; }
+        public string? DotnetExecutablePath { get; init; }
+
+        /// <summary>
+        /// Gets the custom environment variable collection to be passed to execution of dotnet commands.
+        /// </summary>
+        public IReadOnlyDictionary<string, string>? Environment { get; private set; }
 
         /// <summary>
         /// Gets the template specific arguments.
@@ -125,11 +132,43 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
         /// </summary>
         public string? StandardOutputFileExtension { get; init; }
 
+        /// <summary>
+        /// Gets the delegate that performs custom generation of template output contents.
+        /// </summary>
+        public RunInstantiation? CustomInstatiation { get; private set; }
+
         // Enable if too many underlying features are asked.
         //  On the other hand if possible, we should wrap everyting and dfo not expose underlying technology to allow for change.
         // public Action<VerifySettings> VerifySettingsAdjustor { get; init; }
 
         TemplateVerifierOptions IOptions<TemplateVerifierOptions>.Value => this;
+
+        /// <summary>
+        /// Adds environment variables collection to be passed to execution of dotnet commands.
+        /// </summary>
+        /// <param name="environment"></param>
+        /// <returns></returns>
+        public TemplateVerifierOptions WithCustomEnvironment(IReadOnlyDictionary<string, string> environment)
+        {
+            Dictionary<string, string> newEnvironemnt = new(environment);
+            if (Environment != null)
+            {
+                newEnvironemnt.Merge(Environment);
+            }
+            Environment = newEnvironemnt;
+            return this;
+        }
+
+        /// <summary>
+        /// Adds environment variable to be passed to execution of dotnet commands.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public TemplateVerifierOptions WithEnvironmentVariable(string name, string value)
+        {
+            return WithCustomEnvironment(new Dictionary<string, string>() { { name, value } });
+        }
 
         /// <summary>
         /// Adds a custom scrubber definition.
@@ -152,6 +191,18 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
         public TemplateVerifierOptions WithCustomDirectoryVerifier(VerifyDirectory verifier)
         {
             CustomDirectoryVerifier = verifier;
+            return this;
+        }
+
+        /// <summary>
+        /// Adds custom template instantiator.
+        /// If custom template generator is provided it's responsible for proper instantiation of a template (as well as installation if needed) based on given options.
+        /// </summary>
+        /// <param name="instantiation"></param>
+        /// <returns></returns>
+        public TemplateVerifierOptions WithCustomInstatiation(RunInstantiation instantiation)
+        {
+            CustomInstatiation = instantiation;
             return this;
         }
     }

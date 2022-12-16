@@ -103,7 +103,7 @@ In this sample three symbols are defined:
 
 
 ## Coalesce
-Behaves like the C# `??` operator. Note: the empty string value is treated as `null`. 
+Behaves like the C# `??` operator. Note: the empty string value and default value of value type is treated as `null`.
 The typical use of this generator is to check if the parameter was provided by user, otherwise set fallback generated value.
 
 #### Parameters

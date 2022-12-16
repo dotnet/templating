@@ -3,7 +3,7 @@
 
 using System;
 using Microsoft.Extensions.Logging;
-using Microsoft.TemplateEngine.Core.Contracts;
+using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Core.Expressions.Cpp;
 using Microsoft.TemplateEngine.Core.Expressions.Cpp2;
 using Microsoft.TemplateEngine.Core.Expressions.MSBuild;
@@ -78,7 +78,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 "C++" => EvaluatorType.CPP,
                 "MSBUILD" => EvaluatorType.MSBuild,
                 "VB" => EvaluatorType.VB,
-                _ => throw new TemplateAuthoringException($"Unrecognized evaluator: '{evaluatorName}'.", evaluatorName),
+                _ => throw new TemplateAuthoringException(string.Format(LocalizableStrings.EvaluatorSelector_Exception_UnknownEvaluator, evaluatorName)),
             };
             return evaluator;
         }

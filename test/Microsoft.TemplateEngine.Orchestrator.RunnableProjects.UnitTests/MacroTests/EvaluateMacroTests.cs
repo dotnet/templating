@@ -1,11 +1,11 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros;
-using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config;
 using Microsoft.TemplateEngine.TestHelper;
 using Microsoft.TemplateEngine.Utils;
 using Xunit;
@@ -18,7 +18,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
 
         public EvaluateMacroTests(EnvironmentSettingsHelper environmentSettingsHelper)
         {
-            _engineEnvironmentSettings = environmentSettingsHelper.CreateEnvironment(hostIdentifier: this.GetType().Name, virtualize: true);
+            _engineEnvironmentSettings = environmentSettingsHelper.CreateEnvironment(hostIdentifier: GetType().Name, virtualize: true);
         }
 
         [Theory(DisplayName = nameof(TestEvaluateConfig))]
@@ -28,12 +28,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
         {
             string variableName = "myPredicate";
             string evaluator = "C++";
-            EvaluateMacroConfig macroConfig = new EvaluateMacroConfig(variableName, "bool", predicate, evaluator);
+            EvaluateMacroConfig macroConfig = new(variableName, "bool", predicate, evaluator);
 
             IVariableCollection variables = new VariableCollection();
 
-            EvaluateMacro macro = new EvaluateMacro();
-            macro.EvaluateConfig(_engineEnvironmentSettings, variables, macroConfig);
+            EvaluateMacro macro = new();
+            macro.Evaluate(_engineEnvironmentSettings, variables, macroConfig);
             Assert.Equal(variables[variableName], expectedResult);
         }
 
@@ -53,7 +53,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
         public void TestEvaluateMultichoice(string condition, string evaluator, string multichoiceValues, bool expectedResult)
         {
             string variableName = "myPredicate";
-            EvaluateMacroConfig macroConfig = new EvaluateMacroConfig(variableName, "bool", condition, evaluator);
+            EvaluateMacroConfig macroConfig = new(variableName, "bool", condition, evaluator);
 
             IVariableCollection variables = new VariableCollection
             {
@@ -63,9 +63,24 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
                 ["Param"] = new MultiValueParameter(multichoiceValues.TokenizeMultiValueParameter())
             };
 
-            EvaluateMacro macro = new EvaluateMacro();
-            macro.EvaluateConfig(_engineEnvironmentSettings, variables, macroConfig);
+            EvaluateMacro macro = new();
+            macro.Evaluate(_engineEnvironmentSettings, variables, macroConfig);
             Assert.Equal(variables[variableName], expectedResult);
+        }
+
+        [Fact]
+        [Obsolete("IMacro.EvaluateConfig is obsolete")]
+        public void ObsoleteEvaluateConfigTest()
+        {
+            string variableName = "myPredicate";
+            string evaluator = "C++";
+            EvaluateMacroConfig macroConfig = new(variableName, "bool", "(7 > 3)", evaluator);
+
+            IVariableCollection variables = new VariableCollection();
+
+            EvaluateMacro macro = new();
+            macro.EvaluateConfig(_engineEnvironmentSettings, variables, macroConfig);
+            Assert.Equal(variables[variableName], true);
         }
     }
 }

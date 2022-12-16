@@ -30,7 +30,7 @@
       </trans-unit>
       <trans-unit id="stringUpdater_log_dataIsUnchanged">
         <source>The contents of the following file seems to be the same as before. The file will not be overwritten. File: '{0}'</source>
-        <target state="translated">下列檔案的內容似乎與之前相同。檔案不會被覆寫。檔案： '{0}'</target>
+        <target state="translated">下列檔案的內容似乎與之前相同。檔案不會被覆寫。檔案: '{0}'</target>
         <note>{0} is a file path.</note>
       </trans-unit>
       <trans-unit id="stringUpdater_log_failedToReadLocFile">

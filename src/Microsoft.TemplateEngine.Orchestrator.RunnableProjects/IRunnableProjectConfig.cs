@@ -5,21 +5,20 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Core.Contracts;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
     internal interface IRunnableProjectConfig
     {
         /// <summary>
-        /// Gets the list of <see cref="IGlobalRunConfig"/> to be applied to specific files included in glob.
+        /// Gets the list of <see cref="GlobalRunConfig"/> to be applied to specific files included in glob.
         /// </summary>
-        IReadOnlyList<(string Glob, IGlobalRunConfig RunConfig)> SpecialOperationConfig { get; }
+        IReadOnlyList<(string Glob, GlobalRunConfig RunConfig)> SpecialOperationConfig { get; }
 
         /// <summary>
-        /// Gets the <see cref="IGlobalRunConfig"/> to be applied to all template files.
+        /// Gets the <see cref="GlobalRunConfig"/> to be applied to all template files.
         /// </summary>
-        IGlobalRunConfig GlobalOperationConfig { get; }
+        GlobalRunConfig GlobalOperationConfig { get; }
 
         /// <summary>
         /// Gets the list of evaluated sources based on configuration. <see cref="Evaluate(IVariableCollection)"/> method should be called first before accessing it.
@@ -43,6 +42,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         /// </summary>
         /// <param name="rootVariableCollection"></param>
         void Evaluate(IVariableCollection rootVariableCollection);
+
+        /// <summary>
+        /// Removes parameter from template.
+        /// </summary>
+        /// <param name="parameter"></param>
+        void RemoveParameter(ITemplateParameter parameter);
 
         Task EvaluateBindSymbolsAsync(IEngineEnvironmentSettings settings, IVariableCollection variableCollection, CancellationToken cancellationToken);
     }

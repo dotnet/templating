@@ -8,10 +8,9 @@ using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros;
-using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config;
 using Microsoft.TemplateEngine.TestHelper;
-using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.MacroTests
@@ -22,34 +21,46 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
 
         public GuidMacroTests(EnvironmentSettingsHelper environmentSettingsHelper)
         {
-            _engineEnvironmentSettings = environmentSettingsHelper.CreateEnvironment(hostIdentifier: this.GetType().Name, virtualize: true);
+            _engineEnvironmentSettings = environmentSettingsHelper.CreateEnvironment(hostIdentifier: GetType().Name, virtualize: true);
         }
 
-        [Fact(DisplayName = nameof(TestGuidConfig))]
-        public void TestGuidConfig()
+        [Fact]
+        public void Test_SimpleMacro()
         {
             string variableName = "TestGuid";
-            IMacroConfig macroConfig = new GuidMacroConfig(variableName, "string", string.Empty, null);
+            GuidMacroConfig macroConfig = new GuidMacroConfig(variableName, "string", string.Empty, null);
 
             IVariableCollection variables = new VariableCollection();
 
-            GuidMacro guidMacro = new GuidMacro();
-            guidMacro.EvaluateConfig(_engineEnvironmentSettings, variables, macroConfig);
+            GuidMacro guidMacro = new();
+            guidMacro.Evaluate(_engineEnvironmentSettings, variables, macroConfig);
             ValidateGuidMacroCreatedParametersWithResolvedValues(variableName, variables);
         }
 
-        [Fact(DisplayName = nameof(TestDeferredGuidConfig))]
-        public void TestDeferredGuidConfig()
+        [Fact]
+        public void GeneratedSymbolTest()
         {
-            Dictionary<string, JToken> jsonParameters = new();
+            Dictionary<string, string> jsonParameters = new(StringComparer.OrdinalIgnoreCase);
             string variableName = "myGuid1";
-            GeneratedSymbolDeferredMacroConfig deferredConfig = new GeneratedSymbolDeferredMacroConfig("GuidMacro", "string", variableName, jsonParameters);
+            GeneratedSymbol symbol = new(variableName, "GuidMacro", jsonParameters);
 
-            GuidMacro guidMacro = new GuidMacro();
+            GuidMacro guidMacro = new();
+            IVariableCollection variables = new VariableCollection();
+            guidMacro.Evaluate(_engineEnvironmentSettings, variables, symbol);
+            ValidateGuidMacroCreatedParametersWithResolvedValues(variableName, variables);
+        }
+
+        [Fact]
+        [Obsolete("IMacro.EvaluateConfig is obsolete")]
+        public void ObsoleteEvaluateConfigTest()
+        {
+            string variableName = "TestGuid";
+            GuidMacroConfig macroConfig = new GuidMacroConfig(variableName, "string", string.Empty, null);
+
             IVariableCollection variables = new VariableCollection();
 
-            IMacroConfig realConfig = guidMacro.CreateConfig(_engineEnvironmentSettings, deferredConfig);
-            guidMacro.EvaluateConfig(_engineEnvironmentSettings, variables, realConfig);
+            GuidMacro guidMacro = new();
+            guidMacro.Evaluate(_engineEnvironmentSettings, variables, macroConfig);
             ValidateGuidMacroCreatedParametersWithResolvedValues(variableName, variables);
         }
 
@@ -86,15 +97,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
         public void TestDefaultFormatIsCaseSensetive()
         {
             string paramNameLower = "TestGuidLower";
-            IMacroConfig macroConfigLower = new GuidMacroConfig(paramNameLower, "string", string.Empty, "n");
+            GuidMacroConfig macroConfigLower = new GuidMacroConfig(paramNameLower, "string", string.Empty, "n");
             string paramNameUpper = "TestGuidUPPER";
-            IMacroConfig macroConfigUpper = new GuidMacroConfig(paramNameUpper, "string", string.Empty, "N");
+            GuidMacroConfig macroConfigUpper = new GuidMacroConfig(paramNameUpper, "string", string.Empty, "N");
 
             IVariableCollection variables = new VariableCollection();
 
-            GuidMacro guidMacro = new GuidMacro();
-            guidMacro.EvaluateConfig(_engineEnvironmentSettings, variables, macroConfigLower);
-            guidMacro.EvaluateConfig(_engineEnvironmentSettings, variables, macroConfigUpper);
+            GuidMacro guidMacro = new();
+            guidMacro.Evaluate(_engineEnvironmentSettings, variables, macroConfigLower);
+            guidMacro.Evaluate(_engineEnvironmentSettings, variables, macroConfigUpper);
 
             Assert.True(variables.ContainsKey(paramNameLower));
             Assert.NotNull(variables[paramNameLower]);
@@ -109,6 +120,39 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
             {
                 Assert.True(char.IsUpper(c) || char.IsDigit(c));
             });
+        }
+
+        [Fact]
+        public void TestDeterministicMode()
+        {
+            Guid deterministicModeValue = new("12345678-1234-1234-1234-1234567890AB");
+            string variableName = "TestGuid";
+            GuidMacroConfig macroConfig = new GuidMacroConfig(variableName, "string", "Nn", "n");
+
+            IVariableCollection variables = new VariableCollection();
+
+            GuidMacro guidMacro = new();
+            guidMacro.EvaluateDeterministically(_engineEnvironmentSettings, variables, macroConfig);
+
+            Assert.Equal(5, variables.Count);
+            Assert.Equal(deterministicModeValue.ToString("n"), variables["TestGuid-n"].ToString());
+            Assert.Equal(deterministicModeValue.ToString("n"), variables["TestGuid-lc-n"].ToString());
+            Assert.Equal(deterministicModeValue.ToString("n").ToUpperInvariant(), variables["TestGuid-N"].ToString());
+            Assert.Equal(deterministicModeValue.ToString("n").ToUpperInvariant(), variables["TestGuid-uc-N"].ToString());
+            Assert.Equal(deterministicModeValue.ToString("n"), variables["TestGuid"].ToString());
+        }
+
+        [Fact]
+        public void DefaultConfigurationTest()
+        {
+            string variableName = "test";
+            Dictionary<string, string> jsonParameters = new(StringComparer.OrdinalIgnoreCase);
+            GuidMacro macro = new();
+            GeneratedSymbol symbol = new(variableName, "guid", jsonParameters, "string");
+            GuidMacroConfig config = new(macro, symbol);
+
+            Assert.Equal("ndbpxNDPBX", config.Format);
+            Assert.Equal("D", config.DefaultFormat);
         }
     }
 }
