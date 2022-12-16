@@ -11,9 +11,6 @@
     <PackageReference Update="Microsoft.Build.Framework" Condition="'$(MicrosoftBuildFrameworkVersion)' != ''" Version="$(MicrosoftBuildFrameworkVersion)" />
     <PackageReference Update="Microsoft.Build.Utilities.Core" Condition="'$(MicrosoftBuildUtilitiesCoreVersion)' != ''" Version="$(MicrosoftBuildUtilitiesCoreVersion)" />
     <PackageReference Update="Newtonsoft.Json" Condition="'$(NewtonsoftJsonVersion)' != ''" Version="$(NewtonsoftJsonVersion)" />
-    <PackageReference Update="Microsoft.Extensions.Logging" Condition="'$(MicrosoftExtensionsLoggingVersion)' != ''" Version="$(MicrosoftExtensionsLoggingVersion)" />
-    <PackageReference Update="Microsoft.Extensions.Logging.Console" Condition="'$(MicrosoftExtensionsLoggingConsoleVersion)' != ''" Version="$(MicrosoftExtensionsLoggingConsoleVersion)" />
-    <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Condition="'$(MicrosoftExtensionsLoggingAbstractionsVersion)' != ''" Version="$(MicrosoftExtensionsLoggingAbstractionsVersion)" />
     <PackageReference Update="NuGet.Configuration" Condition="'$(NuGetConfigurationVersion)' != ''" Version="$(NuGetConfigurationVersion)" />
     <PackageReference Update="NuGet.Credentials" Condition="'$(NuGetCredentialsVersion)' != ''" Version="$(NuGetCredentialsVersion)" />
     <PackageReference Update="NuGet.Protocol" Condition="'$(NuGetProtocolVersion)' != ''" Version="$(NuGetProtocolVersion)" />
@@ -31,9 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsLoggingVersion)" />
-    <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsLoggingAbstractionsVersion)" />
-    <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftExtensionsLoggingConsoleVersion)" />
     <PackageReference Update="System.CommandLine" Version="$(SystemCommandLinePackageVersion)" />
     <!--Analyzer dependencies-->
     <PackageReference Update="Microsoft.CodeAnalysis.NetAnalyzers" Version="$(MicrosoftCodeAnalysisNetAnalyzersPackageVersion)" />

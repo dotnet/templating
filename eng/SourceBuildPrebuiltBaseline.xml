@@ -3,6 +3,7 @@
   <IgnorePatterns>
     <!-- TODO: Ignore needed until https://github.com/dotnet/runtime/issues/78054 is addressed. -->
     <UsagePattern IdentityGlob="Microsoft.Extensions.Logging.Abstractions/*" />
+    <UsagePattern IdentityGlob="Microsoft.NETCore.App.Ref/*" />
 
     <UsagePattern IdentityGlob="Microsoft.SourceBuild.Intermediate.*/*" />
 
