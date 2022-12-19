@@ -199,9 +199,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands
 
         private void PrintResults(IReadOnlyList<ExportResult> results, ILogger logger)
         {
-            using IDisposable? scope = logger.BeginScope("Results");
             logger.LogInformation(LocalizableStrings.command_export_log_executionEnded, results.Count);
-
             foreach (ExportResult result in results)
             {
                 if (result.Succeeded)
