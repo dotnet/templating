@@ -7,7 +7,7 @@
   ],
   "name": "Class Library",
   "generatorVersions": "[1.0.0.0-*)",
-  "description": "A project for creating a class library that targets .NET Standard or .NET Core",
+  "description": "A project for creating a class library that targets .NET or .NET Standard",
   "groupIdentity": "Microsoft.Common.Library",
   "precedence": "8000",
   "identity": "Microsoft.Common.Library.CSharp.6.0",
@@ -85,23 +85,31 @@
       "defaultValue": "false",
       "displayName": "Skip restore"
     },
-    "csharp10orLater": {
+    "csharp9orOlder": {
       "type": "generated",
       "generator": "regexMatch",
       "datatype": "bool",
       "parameters": {
-        "pattern": "^(|10\\.0|10|preview|latest|default|latestMajor)$",
+        "pattern": "^(ISO-1|ISO-2|[1-7]|[8-9]|[8-9]\\.0|7\\.[0-3])$",
         "source": "langVersion"
       }
     },
-    "csharp8orLater": {
+    "csharp7orOlder": {
       "type": "generated",
       "generator": "regexMatch",
       "datatype": "bool",
       "parameters": {
-        "pattern": "^(|8|8\\.0|9|9\\.0|10\\.0|10|preview|latest|default|latestMajor)$",
+        "pattern": "^(ISO-1|ISO-2|[1-7]|7\\.[0-3])$",
         "source": "langVersion"
       }
+    },
+    "csharp10orLater": {
+      "type": "computed",
+      "value": "!csharp9orOlder"
+    },
+    "csharp8orLater": {
+      "type": "computed",
+      "value": "!csharp7orOlder"
     },
     "csharpFeature_ImplicitUsings": {
       "type": "computed",
