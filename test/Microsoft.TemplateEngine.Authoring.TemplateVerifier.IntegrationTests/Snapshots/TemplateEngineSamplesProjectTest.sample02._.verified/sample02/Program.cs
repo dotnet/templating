@@ -7,8 +7,8 @@ namespace sample02
         static void Main(string[] args)
         {
             Console.WriteLine(@"
-Copyright:         John Smith
-Title:             Hello World from dotnet new
+Copyright:         Test Copyright
+Title:             Test Title
 ");
         }
     }

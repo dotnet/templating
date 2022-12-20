@@ -22,4 +22,8 @@
     <Compile Include="..\Shared\**\*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Snapshots\TemplateEngineSamplesProjectTest.sample05._.verified\sample05\README.md" />
+  </ItemGroup>
+
 </Project>

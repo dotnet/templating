@@ -9,7 +9,7 @@ namespace sample04
             Console.WriteLine(@"
 Copyright:         (c) Contoso
 Title:             Contoso Sample
-Background color: aliceblue
+Background color: dimgray
 ");
         }
     }
