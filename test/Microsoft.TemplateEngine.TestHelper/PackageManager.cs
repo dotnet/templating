@@ -21,9 +21,15 @@ namespace Microsoft.TemplateEngine.TestHelper
     {
         private const string NuGetOrgFeed = "https://api.nuget.org/v3/index.json";
         private static readonly SemaphoreSlim Semaphore = new SemaphoreSlim(1, 1);
-        private readonly string _packageLocation = TestUtils.CreateTemporaryFolder("packages");
+        private string _packageLocation = TestUtils.CreateTemporaryFolder("packages");
         private readonly ConcurrentDictionary<string, string> _installedPackages = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         private static readonly Mutex PackMutex = new Mutex(false, "TemplateEngineTestPackMutex");
+
+        public string PackageLocation
+        {
+            get => _packageLocation;
+            set => _packageLocation = value;
+        }
 
         public async Task<string> GetNuGetPackage(string templatePackName, string? version = null, NuGetVersion? minimumVersion = null, ILogger? logger = null)
         {
