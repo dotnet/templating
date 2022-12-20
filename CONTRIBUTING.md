@@ -30,6 +30,9 @@ See our [good first issue](https://github.com/dotnet/templating/contribute) cand
 
 See our [help wanted](https://github.com/dotnet/templating/issues?q=is%3Aopen+is%3Aissue+label%3Ahelp-wanted) issues for a list of issues we think are great for community contribution.
 
+We have a number of features where we are actively looking for the feedback. They are marked with [`gathering-feedback` label](https://github.com/dotnet/templating/issues?q=is%3Aissue+is%3Aopen+label%3Agathering-feedback). 
+If you think they are useful for your templates, please let us know in comments or by reacting on those.
+
 ## Reporting the issues
 
 We always welcome bug reports, feature request and overall feedback. Here are a few tips on how you can make reporting your issue as effective as possible.
@@ -68,6 +71,9 @@ Suggestions for new templates should be opened in closest repository from the li
 
 Before filing a new issue, please search [open issues](https://github.com/dotnet/templating/issues) to check if it already exists.
 If you do find an existing issue, please include your own feedback in the discussion. Do consider upvoting (👍 reaction) the original post, as this helps us prioritize popular issues in our backlog.
+
+We have a number of features where we are actively looking for the feedback. They are marked with [`gathering-feedback` label](https://github.com/dotnet/templating/issues?q=is%3Aissue+is%3Aopen+label%3Agathering-feedback). 
+If you think they are useful for your templates, please let us know in comments or by reacting on those.
 
 ### Use bug report / feature request template
 

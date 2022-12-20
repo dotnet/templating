@@ -74,6 +74,9 @@ See our [good first issue](https://github.com/dotnet/templating/contribute) cand
 
 See our [help wanted](https://github.com/dotnet/templating/issues?q=is%3Aopen+is%3Aissue+label%3Ahelp-wanted) issues for a list of issues we think are great for community contribution.
 
+We have a number of features where we are actively looking for the feedback. They are marked with [`gathering-feedback` label](https://github.com/dotnet/templating/issues?q=is%3Aissue+is%3Aopen+label%3Agathering-feedback). 
+If you think they are useful for your templates, please let us know in comments or by reacting on those.
+
 Check out our [contributing](Contributing.md) page to learn more details.
 
 ## How to build, run & debug
