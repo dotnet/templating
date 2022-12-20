@@ -20,7 +20,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.IntegrationTests
 
         [Theory]
         [InlineData("01-basic-template", "sample01", null, "no args")]
-        [InlineData("02-add-parameters", "sample02", new[] { "--copyrightName", "Test Copyright", "--Title", "Test Title" }, "text args")]
+        [InlineData("02-add-parameters", "sample02", new[] { "--copyrightName", "Test Copyright", "Title", "Test Title" }, "text args")]
         [InlineData("03-optional-page", "sample03", new[] { "--Title", "Test Title", "--EnableContactPage", "true" }, "optional content included")]
         [InlineData("03-optional-page", "sample03", new[] { "--Title", "Test Title" }, "optional content excluded")]
         [InlineData("04-parameter-from-list", "sample04", new[] { "--BackgroundColor", "dimgray" }, "the parameter from the list of options")]
@@ -28,9 +28,9 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.IntegrationTests
         [InlineData("05-multi-project", "sample05", new[] { "--includetest", "false" }, "the optional test project excluded")]
         [InlineData("06-console-csharp-fsharp", "sample06", new[] { "--language", "F#" }, "the F# lang parameter that creates a corresponded project")]
         [InlineData("06-console-csharp-fsharp", "sample06", new[] { "--language", "C#" }, "the C# lang parameter that creates a corresponded project")]
-        [InlineData("07-param-with-custom-short-name", "sample07", new[] { "--preferNameDirectory", "true" }, "custom name directory")]
+        [InlineData("07-param-with-custom-short-name", "sample07", new[] { "preferNameDirectory", "true" }, "custom name directory")]
         [InlineData("08-restore-on-create", "sample08", null, "restore on create")]
-        [InlineData("09-replace-onlyif-after", "sample09", new[] { "--backgroundColor", "grey" }, "replacing with onlyif condition")]
+        [InlineData("09-replace-onlyif-after", "sample09", new[] { "backgroundColor", "grey" }, "replacing with onlyif condition")]
         [InlineData("10-symbol-from-date", "sample10", null, "usage of date generator")]
         [InlineData("11-change-string-casing", "sample11", null, "usage of casing generator")]
         [InlineData("13-constant-value", "sample13", null, "replacing of constant value")]
@@ -43,24 +43,22 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.IntegrationTests
             string caseDescription)
         {
             _log.LogInformation($"Template with {caseDescription}");
-            string workingDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName().Replace(".", string.Empty));
 
             //get the template location
             string templateLocation = Path.Combine(GetSamplesTemplateLocation(), folderName);
 
             TemplateVerifierOptions options = new TemplateVerifierOptions(templateName: shortName)
             {
-                TemplatePath = templateLocation,
-                OutputDirectory = workingDir
+                TemplatePath = templateLocation
             }
              .WithInstantiationThroughTemplateCreatorApi(GetTemplateArgs(args))
              .WithCustomScrubbers(
                 ScrubbersDefinition.Empty
-                .AddScrubber(sb => sb.Replace(DateTime.Now.ToString("MM/dd/yyyy"), "**/**/****"))
                 .AddScrubber(sb => sb.Replace(DateTime.Now.ToString("MM/dd/yyyy"), "**/**/****")));
 
             VerificationEngine engine = new VerificationEngine(_log);
-            await engine.Execute(options);
+            await engine.Execute(options)
+                .ConfigureAwait(false);
         }
 
         private string GetSamplesTemplateLocation() => Path.Combine(CodeBaseRoot, "dotnet-template-samples", "content");
