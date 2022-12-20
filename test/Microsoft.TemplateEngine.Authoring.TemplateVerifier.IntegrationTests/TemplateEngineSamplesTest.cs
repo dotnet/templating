@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Authoring.TemplateApiVerifier;
 using Microsoft.TemplateEngine.TestHelper;
@@ -24,11 +25,9 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.IntegrationTests
         [InlineData("03-optional-page", "sample03", new[] { "enableContactPage", "true" }, "optional content included")]
         [InlineData("03-optional-page", "sample03", null, "optional content excluded")]
         [InlineData("04-parameter-from-list", "sample04", new[] { "BackgroundColor", "dimgray" }, "the parameter from the list of options")]
-        [InlineData("05-multi-project", "sample05", new[] { "--includetest", "true" }, "the optional test project included")]
-        [InlineData("05-multi-project", "sample05", new[] { "--includetest", "false" }, "the optional test project excluded")]
-        [InlineData("06-console-csharp-fsharp", "sample06", new[] { "--language", "F#" }, "the F# lang parameter that creates a corresponded project")]
-        [InlineData("06-console-csharp-fsharp", "sample06", new[] { "--language", "C#" }, "the C# lang parameter that creates a corresponded project")]
-        [InlineData("07-param-with-custom-short-name", "sample07", new[] { "preferNameDirectory", "true" }, "custom name directory")]
+        [InlineData("05-multi-project", "sample05", new[] { "includetest", "true" }, "the optional test project included")]
+        [InlineData("05-multi-project", "sample05", new[] { "includetest", "false" }, "the optional test project excluded")]
+        [InlineData("07-param-with-custom-short-name", "sample07", null, "customised name directory")]
         [InlineData("08-restore-on-create", "sample08", null, "restore on create")]
         [InlineData("09-replace-onlyif-after", "sample09", new[] { "backgroundColor", "grey" }, "replacing with onlyif condition")]
         [InlineData("10-symbol-from-date", "sample10", null, "usage of date generator")]
@@ -49,7 +48,9 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.IntegrationTests
 
             TemplateVerifierOptions options = new TemplateVerifierOptions(templateName: shortName)
             {
-                TemplatePath = templateLocation
+                TemplatePath = templateLocation,
+                DoNotPrependCallerMethodNameToScenarioName = true,
+                ScenarioName = $"{folderName.Substring(folderName.IndexOf("-") + 1)}{ArgsToString(args)}"
             }
              .WithInstantiationThroughTemplateCreatorApi(GetTemplateArgs(args))
              .WithCustomScrubbers(
@@ -75,6 +76,27 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.IntegrationTests
             }
 
             return templateArgs;
+        }
+
+        private string ArgsToString(string[] args)
+        {
+            if (args == null)
+            {
+                return string.Empty;
+            }
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append('.');
+            for (int index = 0; index < args.Length; index = +2)
+            {
+                sb.Append($"{args[index]}={args[index + 1]}");
+                if (index < args.Length - 2)
+                {
+                    sb.Append('.');
+                }
+            }
+
+            return sb.ToString();
         }
     }
 }
