@@ -7,8 +7,15 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
 {
     public class VerifySettingsFixture : IDisposable
     {
+        private static bool s_called;
+
         public VerifySettingsFixture()
         {
+            if (s_called)
+            {
+                return;
+            }
+            s_called = true;
             DerivePathInfo(
                 (_, _, type, method) => new(
                     directory: "Approvals",
