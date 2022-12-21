@@ -111,10 +111,6 @@
     "csharpFeature_TopLevelProgram": {
       "type": "computed",
       "value": "(csharp9orLater == \"true\" && UseProgramMain != \"true\")"
-    },
-    "csharpFeature_FileScopedNamespaces": {
-      "type": "computed",
-      "value": "csharp10orLater == \"true\""
     }
   },
   "primaryOutputs": [
