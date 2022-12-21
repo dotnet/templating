@@ -61,6 +61,13 @@
       "defaultValue": "false",
       "displayName": "Skip restore"
     },
+    "UseProgramMain": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false",
+      "description": "Whether to generate an explicit Program class and Main method instead of top-level statements.",
+      "displayName": "Do not use top-level statements"
+    },
     "csharp9orOlder": {
       "type": "generated",
       "generator": "regexMatch",
