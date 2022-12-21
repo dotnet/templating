@@ -46,13 +46,15 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.IntegrationTests
             //get the template location
             string templateLocation = Path.Combine(GetSamplesTemplateLocation(), folderName);
 
+            var (templateArgs, argsScenarioName) = GetTemplateArgs(args);
+
             TemplateVerifierOptions options = new TemplateVerifierOptions(templateName: shortName)
             {
                 TemplatePath = templateLocation,
                 DoNotPrependCallerMethodNameToScenarioName = true,
-                ScenarioName = $"{folderName.Substring(folderName.IndexOf("-") + 1)}{ArgsToString(args)}"
+                ScenarioName = $"{folderName.Substring(folderName.IndexOf("-") + 1)}{argsScenarioName}"
             }
-             .WithInstantiationThroughTemplateCreatorApi(GetTemplateArgs(args))
+             .WithInstantiationThroughTemplateCreatorApi(templateArgs)
              .WithCustomScrubbers(
                 ScrubbersDefinition.Empty
                 .AddScrubber(sb => sb.Replace(DateTime.Now.ToString("MM/dd/yyyy"), "**/**/****")));
@@ -64,39 +66,28 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.IntegrationTests
 
         private string GetSamplesTemplateLocation() => Path.Combine(CodeBaseRoot, "dotnet-template-samples", "content");
 
-        private Dictionary<string, string?> GetTemplateArgs(string[] args)
+        private (Dictionary<string, string?> Args, string ArgsScenarioName) GetTemplateArgs(string[] args)
         {
             var templateArgs = new Dictionary<string, string?>();
+            StringBuilder sb = new StringBuilder();
+
             if (args != null)
             {
+                sb.Append('.');
+
                 for (int indx = 0; indx < args.Length; indx += 2)
                 {
                     templateArgs.Add(args[indx], args[indx + 1]);
+
+                    sb.Append($"{args[indx]}={args[indx + 1]}");
+                    if (indx < args.Length - 2)
+                    {
+                        sb.Append('.');
+                    }
                 }
             }
 
-            return templateArgs;
-        }
-
-        private string ArgsToString(string[] args)
-        {
-            if (args == null)
-            {
-                return string.Empty;
-            }
-
-            StringBuilder sb = new StringBuilder();
-            sb.Append('.');
-            for (int index = 0; index < args.Length; index = +2)
-            {
-                sb.Append($"{args[index]}={args[index + 1]}");
-                if (index < args.Length - 2)
-                {
-                    sb.Append('.');
-                }
-            }
-
-            return sb.ToString();
+            return (templateArgs, sb.ToString());
         }
     }
 }
