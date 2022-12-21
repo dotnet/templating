@@ -99,7 +99,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
             Name = localizationInfo?.Name ?? template.Name;
             ParameterDefinitions = LocalizeParameters(template, localizationInfo);
-            HostData = hostConfig?.Content;
+            HostData = hostConfig?.Content?.ToString(Formatting.None);
         }
 
 #pragma warning disable CS0618 // Type or member is obsolete

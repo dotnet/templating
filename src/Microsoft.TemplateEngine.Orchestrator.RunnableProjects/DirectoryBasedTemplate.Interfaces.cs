@@ -16,21 +16,21 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         Guid ITemplateLocator.GeneratorId => Generator.Id;
 
-        string? ITemplateMetadata.Author => ConfigModel.Author;
+        string? ITemplateMetadata.Author => ConfigurationModel.Author;
 
-        string? ITemplateMetadata.Description => ConfigModel.Description;
+        string? ITemplateMetadata.Description => ConfigurationModel.Description;
 
-        IReadOnlyList<string> ITemplateMetadata.Classifications => ConfigModel.Classifications;
+        IReadOnlyList<string> ITemplateMetadata.Classifications => ConfigurationModel.Classifications;
 
-        string? ITemplateMetadata.DefaultName => ConfigModel.DefaultName;
+        string? ITemplateMetadata.DefaultName => ConfigurationModel.DefaultName;
 
-        string? ITemplateMetadata.GroupIdentity => ConfigModel.GroupIdentity;
+        string? ITemplateMetadata.GroupIdentity => ConfigurationModel.GroupIdentity;
 
-        int ITemplateMetadata.Precedence => ConfigModel.Precedence;
+        int ITemplateMetadata.Precedence => ConfigurationModel.Precedence;
 
-        string ITemplateMetadata.Name => ConfigModel.Name ?? throw new TemplateValidationException("Template configuration should have name defined");
+        string ITemplateMetadata.Name => ConfigurationModel.Name ?? throw new TemplateValidationException("Template configuration should have name defined");
 
-        IReadOnlyList<string> ITemplateMetadata.ShortNameList => ConfigModel.ShortNameList ?? new List<string>();
+        IReadOnlyList<string> ITemplateMetadata.ShortNameList => ConfigurationModel.ShortNameList ?? new List<string>();
 
         public IParameterDefinitionSet ParameterDefinitions => Parameters;
 
@@ -38,15 +38,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         string ITemplateLocator.ConfigPlace => ConfigFile?.FullPath ?? throw new InvalidOperationException($"{nameof(ConfigFile)} should be set in order to continue");
 
-        string? ITemplateMetadata.ThirdPartyNotices => ConfigModel.ThirdPartyNotices;
+        string? ITemplateMetadata.ThirdPartyNotices => ConfigurationModel.ThirdPartyNotices;
 
-        IReadOnlyDictionary<string, IBaselineInfo> ITemplateMetadata.BaselineInfo => ConfigModel.BaselineInfo;
+        IReadOnlyDictionary<string, IBaselineInfo> ITemplateMetadata.BaselineInfo => ConfigurationModel.BaselineInfo;
 
-        IReadOnlyDictionary<string, string> ITemplateMetadata.TagsCollection => ConfigModel.Tags;
+        IReadOnlyDictionary<string, string> ITemplateMetadata.TagsCollection => ConfigurationModel.Tags;
 
-        IReadOnlyList<Guid> ITemplateMetadata.PostActions => ConfigModel.PostActionModels.Select(pam => pam.ActionId).ToArray();
+        IReadOnlyList<Guid> ITemplateMetadata.PostActions => ConfigurationModel.PostActionModels.Select(pam => pam.ActionId).ToArray();
 
-        IReadOnlyList<TemplateConstraintInfo> ITemplateMetadata.Constraints => ConfigModel.Constraints;
+        IReadOnlyList<TemplateConstraintInfo> ITemplateMetadata.Constraints => ConfigurationModel.Constraints;
 
         public IReadOnlyList<IValidationEntry> ValidationErrors => throw new NotImplementedException();
     }

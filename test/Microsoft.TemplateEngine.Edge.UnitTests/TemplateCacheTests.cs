@@ -178,7 +178,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                     { "ch2", new ParameterChoice("ch2-displ", "ch2-desc") },
                 });
 
-            ITemplate template = A.Fake<ITemplate>();
+            IScanTemplateInfo template = A.Fake<IScanTemplateInfo>();
             A.CallTo(() => template.Identity).Returns("testIdentity");
             A.CallTo(() => template.Name).Returns("testName");
             A.CallTo(() => template.ShortNameList).Returns(new[] { "testShort" });
@@ -189,10 +189,10 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             A.CallTo(() => mountPoint.MountPointUri).Returns("testMount");
 
             ScanResult result = new ScanResult(mountPoint, new[] { template }, Array.Empty<ILocalizationLocator>(), Array.Empty<(string AssemblyPath, Type InterfaceType, IIdentifiedComponent Instance)>());
-            TemplateCache templateCache = new TemplateCache(new[] { result }, new Dictionary<string, DateTime>(), NullLogger.Instance);
+            TemplateCache templateCache = new TemplateCache(new[] { result }, new Dictionary<string, DateTime>(), environmentSettings);
 
             WriteObject(environmentSettings.Host.FileSystem, paths.TemplateCacheFile, templateCache);
-            var readCache = new TemplateCache(ReadObject(environmentSettings.Host.FileSystem, paths.TemplateCacheFile), NullLogger.Instance);
+            var readCache = new TemplateCache(ReadObject(environmentSettings.Host.FileSystem, paths.TemplateCacheFile));
 
             Assert.Single(readCache.TemplateInfo);
             var readTemplate = readCache.TemplateInfo[0];

@@ -48,7 +48,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             ConfigDirectory = templateFile.Parent;
             TemplateSourceRoot = ConfigFile.Parent.Parent;
 
-            ConfigModel = TemplateConfigModel.FromJObject(
+            ConfigurationModel = TemplateConfigModel.FromJObject(
                 MergeAdditionalConfiguration(templateFile.ReadJObjectFromIFile(), templateFile),
                 Logger,
                 baselineName,
@@ -56,7 +56,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             CheckGeneratorVersionRequiredByTemplate();
             PerformTemplateValidation();
-            TemplateIdentity = ConfigModel.Identity ?? throw new InvalidOperationException("Template identity cannot be null");
+            TemplateIdentity = ConfigurationModel.Identity ?? throw new InvalidOperationException("Template identity cannot be null");
         }
 
         /// <summary>
@@ -72,20 +72,20 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             TemplateSourceRoot = templateSource;
 
-            ConfigModel = configModel;
+            ConfigurationModel = configModel;
 
             CheckGeneratorVersionRequiredByTemplate();
             PerformTemplateValidation();
-            TemplateIdentity = ConfigModel.Identity!;
+            TemplateIdentity = ConfigurationModel.Identity!;
         }
 
         public ILogger Logger { get; }
 
         /// <summary>
         /// Gets the configuration model.
-        /// For tes purposes, preloaded model can be used.
+        /// For test purposes, preloaded model can be used.
         /// </summary>
-        public TemplateConfigModel ConfigModel { get; }
+        public TemplateConfigModel ConfigurationModel { get; }
 
         /// <summary>
         /// Gets the directory with source files for the template.
@@ -111,7 +111,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         /// <summary>
         /// Gets the template parameters.
         /// </summary>
-        protected IParameterDefinitionSet Parameters => new ParameterDefinitionSet(ConfigModel.ExtractParameters());
+        protected IParameterDefinitionSet Parameters => new ParameterDefinitionSet(ConfigurationModel.ExtractParameters());
 
         /// <summary>
         /// Verifies that the given localization model was correctly constructed
@@ -126,7 +126,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             bool validModel = true;
             List<string> errorMessages = new List<string>();
             int unusedPostActionLocs = locModel.PostActions.Count;
-            foreach (var postAction in ConfigModel.PostActionModels)
+            foreach (var postAction in ConfigurationModel.PostActionModels)
             {
                 if (postAction.Id == null || !locModel.PostActions.TryGetValue(postAction.Id, out PostActionLocalizationModel postActionLocModel))
                 {
@@ -169,7 +169,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             if (unusedPostActionLocs > 0)
             {
                 // Localizations provide more translations than the number of post actions we have.
-                string excessPostActionLocalizationIds = string.Join(", ", locModel.PostActions.Keys.Where(k => !ConfigModel.PostActionModels.Any(p => p.Id == k)).Select(k => k.ToString()));
+                string excessPostActionLocalizationIds = string.Join(", ", locModel.PostActions.Keys.Where(k => !ConfigurationModel.PostActionModels.Any(p => p.Id == k)).Select(k => k.ToString()));
                 errorMessages.Add(string.Format(LocalizableStrings.Authoring_InvalidPostActionLocalizationIndex, excessPostActionLocalizationIds));
                 validModel = false;
             }
@@ -197,7 +197,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         {
             List<string> errors = new();
             // check if any sources get out of the mount point
-            foreach (ExtendedFileSource source in ConfigModel.Sources)
+            foreach (ExtendedFileSource source in ConfigurationModel.Sources)
             {
                 try
                 {
@@ -255,13 +255,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     throw new TemplateAuthoringException(string.Format(LocalizableStrings.SimpleConfigModel_AuthoringException_MergeConfiguration_InvalidFileName, partialConfigFileName, RunnableProjectGenerator.TemplateConfigFileName), partialConfigFileName);
                 }
 
-                IFile? partialConfigFile = primarySourceConfig.Parent?.EnumerateFiles(partialConfigFileName, SearchOption.TopDirectoryOnly).FirstOrDefault(x => string.Equals(x.Name, partialConfigFileName));
-
-                if (partialConfigFile == null)
-                {
-                    throw new TemplateAuthoringException(string.Format(LocalizableStrings.SimpleConfigModel_AuthoringException_MergeConfiguration_FileNotFound, partialConfigFileName), partialConfigFileName);
-                }
-
+                IFile? partialConfigFile = (primarySourceConfig.Parent?.EnumerateFiles(partialConfigFileName, SearchOption.TopDirectoryOnly).FirstOrDefault(x => string.Equals(x.Name, partialConfigFileName)))
+                    ?? throw new TemplateAuthoringException(
+                        string.Format(
+                            LocalizableStrings.SimpleConfigModel_AuthoringException_MergeConfiguration_FileNotFound,
+                            partialConfigFileName),
+                        partialConfigFileName);
                 JObject partialConfigJson = partialConfigFile.ReadJObjectFromIFile();
                 combinedSource.Merge(partialConfigJson);
             }
@@ -276,12 +275,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         /// <exception cref="InvalidOperationException">when check for the version leads to unexpected result.</exception>
         private void CheckGeneratorVersionRequiredByTemplate()
         {
-            if (string.IsNullOrWhiteSpace(ConfigModel.GeneratorVersions))
+            if (string.IsNullOrWhiteSpace(ConfigurationModel.GeneratorVersions))
             {
                 return;
             }
 
-            string allowedGeneratorVersions = ConfigModel.GeneratorVersions!;
+            string allowedGeneratorVersions = ConfigurationModel.GeneratorVersions!;
 
             if (!VersionStringHelpers.TryParseVersionSpecification(allowedGeneratorVersions, out IVersionSpecification? versionChecker))
             {
@@ -312,23 +311,23 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             List<string> warningMessages = new List<string>();
 
             #region Errors
-            if (string.IsNullOrWhiteSpace(ConfigModel.Identity))
+            if (string.IsNullOrWhiteSpace(ConfigurationModel.Identity))
             {
                 errorMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "identity"));
             }
 
-            if (string.IsNullOrWhiteSpace(ConfigModel.Name))
+            if (string.IsNullOrWhiteSpace(ConfigurationModel.Name))
             {
                 errorMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "name"));
             }
 
-            if ((ConfigModel.ShortNameList?.Count ?? 0) == 0)
+            if ((ConfigurationModel.ShortNameList?.Count ?? 0) == 0)
             {
                 errorMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "shortName"));
             }
 
             var invalidMultichoices =
-                ConfigModel.Symbols
+                ConfigurationModel.Symbols
                     .OfType<ParameterSymbol>()
                     .Where(p => p.AllowMultipleValues)
                     .Where(p => p.Choices.Any(c => !c.Key.IsValidMultiValueParameterValue()));
@@ -349,37 +348,37 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             #region Warnings
             //TODO: the warning messages should be transferred to validate subcommand, as they are not useful for final user, but useful for template author.
             //https://github.com/dotnet/templating/issues/2623
-            if (string.IsNullOrWhiteSpace(ConfigModel.SourceName))
+            if (string.IsNullOrWhiteSpace(ConfigurationModel.SourceName))
             {
                 warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "sourceName"));
             }
 
-            if (string.IsNullOrWhiteSpace(ConfigModel.Author))
+            if (string.IsNullOrWhiteSpace(ConfigurationModel.Author))
             {
                 warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "author"));
             }
 
-            if (string.IsNullOrWhiteSpace(ConfigModel.GroupIdentity))
+            if (string.IsNullOrWhiteSpace(ConfigurationModel.GroupIdentity))
             {
                 warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "groupIdentity"));
             }
 
-            if (string.IsNullOrWhiteSpace(ConfigModel.GeneratorVersions))
+            if (string.IsNullOrWhiteSpace(ConfigurationModel.GeneratorVersions))
             {
                 warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "generatorVersions"));
             }
 
-            if (ConfigModel.Precedence == 0)
+            if (ConfigurationModel.Precedence == 0)
             {
                 warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "precedence"));
             }
 
-            if ((ConfigModel.Classifications?.Count ?? 0) == 0)
+            if ((ConfigurationModel.Classifications?.Count ?? 0) == 0)
             {
                 warningMessages.Add(string.Format(LocalizableStrings.Authoring_MissingValue, "classifications"));
             }
 
-            if (ConfigModel.PostActionModels != null && ConfigModel.PostActionModels.Any(x => x.ManualInstructionInfo == null || x.ManualInstructionInfo.Count == 0))
+            if (ConfigurationModel.PostActionModels != null && ConfigurationModel.PostActionModels.Any(x => x.ManualInstructionInfo == null || x.ManualInstructionInfo.Count == 0))
             {
                 warningMessages.Add(string.Format(LocalizableStrings.Authoring_MalformedPostActionManualInstructions));
             }

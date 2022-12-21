@@ -30,43 +30,43 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         string? ITemplateInfo.HostConfigPlace => _hostConfigFile?.FullPath;
 
-        bool ITemplate.IsNameAgreementWithFolderPreferred => ConfigModel.PreferNameDirectory;
+        bool ITemplate.IsNameAgreementWithFolderPreferred => ConfigurationModel.PreferNameDirectory;
 
         IDirectory ITemplate.TemplateSourceRoot => TemplateSourceRoot;
 
         IReadOnlyList<IValidationEntry> IValidationInfo.ValidationErrors => throw new NotImplementedException();
 
-        string? ITemplateInfo.Author => ConfigModel.Author;
+        string? ITemplateInfo.Author => ConfigurationModel.Author;
 
-        string? ITemplateInfo.Description => ConfigModel.Description;
+        string? ITemplateInfo.Description => ConfigurationModel.Description;
 
-        IReadOnlyList<string> ITemplateInfo.Classifications => ConfigModel.Classifications;
+        IReadOnlyList<string> ITemplateInfo.Classifications => ConfigurationModel.Classifications;
 
-        string? ITemplateInfo.DefaultName => ConfigModel.DefaultName;
+        string? ITemplateInfo.DefaultName => ConfigurationModel.DefaultName;
 
-        string ITemplateInfo.Identity => ConfigModel.Identity;
+        string ITemplateInfo.Identity => ConfigurationModel.Identity;
 
         Guid ITemplateInfo.GeneratorId => Generator.Id;
 
-        string? ITemplateInfo.GroupIdentity => ConfigModel.GroupIdentity;
+        string? ITemplateInfo.GroupIdentity => ConfigurationModel.GroupIdentity;
 
-        int ITemplateInfo.Precedence => ConfigModel.Precedence;
+        int ITemplateInfo.Precedence => ConfigurationModel.Precedence;
 
-        string ITemplateInfo.Name => ConfigModel.Name ?? throw new TemplateAuthoringException("Template configuration should have 'name' defined.", "name");
+        string ITemplateInfo.Name => ConfigurationModel.Name ?? throw new TemplateAuthoringException("Template configuration should have 'name' defined.", "name");
 
-        IReadOnlyList<string> ITemplateInfo.ShortNameList => ConfigModel.ShortNameList ?? new List<string>();
+        IReadOnlyList<string> ITemplateInfo.ShortNameList => ConfigurationModel.ShortNameList ?? new List<string>();
 
-        IParameterDefinitionSet ITemplateInfo.ParameterDefinitions => new ParameterDefinitionSet(ConfigModel.ExtractParameters());
+        IParameterDefinitionSet ITemplateInfo.ParameterDefinitions => new ParameterDefinitionSet(ConfigurationModel.ExtractParameters());
 
-        string? ITemplateInfo.ThirdPartyNotices => ConfigModel.ThirdPartyNotices;
+        string? ITemplateInfo.ThirdPartyNotices => ConfigurationModel.ThirdPartyNotices;
 
-        IReadOnlyDictionary<string, IBaselineInfo> ITemplateInfo.BaselineInfo => ConfigModel.BaselineInfo;
+        IReadOnlyDictionary<string, IBaselineInfo> ITemplateInfo.BaselineInfo => ConfigurationModel.BaselineInfo;
 
-        IReadOnlyDictionary<string, string> ITemplateInfo.TagsCollection => ConfigModel.Tags;
+        IReadOnlyDictionary<string, string> ITemplateInfo.TagsCollection => ConfigurationModel.Tags;
 
-        IReadOnlyList<Guid> ITemplateInfo.PostActions => ConfigModel.PostActionModels.Select(pam => pam.ActionId).ToArray();
+        IReadOnlyList<Guid> ITemplateInfo.PostActions => ConfigurationModel.PostActionModels.Select(pam => pam.ActionId).ToArray();
 
-        IReadOnlyList<TemplateConstraintInfo> ITemplateInfo.Constraints => ConfigModel.Constraints;
+        IReadOnlyList<TemplateConstraintInfo> ITemplateInfo.Constraints => ConfigurationModel.Constraints;
 
         #region Obsolete implementation
 

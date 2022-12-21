@@ -1,10 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
@@ -356,9 +352,9 @@ false,
             var localizationModel = LocalizationModelDeserializer.Deserialize(locFile);
             Assert.True(runnableProjectConfig.VerifyLocalizationModel(localizationModel, locFile));
 
-            runnableProjectConfig.ConfigModel.Localize(localizationModel);
-            runnableProjectConfig.ConfigModel.PostActionModels.Single(model => model.Id == "pa0" && model.Description == "localizedDescription");
-            runnableProjectConfig.ConfigModel.PostActionModels.Single(model => model.Id != "pa0" && model.Description == "text");
+            runnableProjectConfig.ConfigurationModel.Localize(localizationModel);
+            runnableProjectConfig.ConfigurationModel.PostActionModels.Single(model => model.Id == "pa0" && model.Description == "localizedDescription");
+            runnableProjectConfig.ConfigurationModel.PostActionModels.Single(model => model.Id != "pa0" && model.Description == "text");
         }
 
         [Fact]
@@ -409,8 +405,8 @@ false,
             var localizationModel = LocalizationModelDeserializer.Deserialize(locFile);
             Assert.True(runnableProjectConfig.VerifyLocalizationModel(localizationModel, locFile));
 
-            runnableProjectConfig.ConfigModel.Localize(localizationModel);
-            runnableProjectConfig.ConfigModel.PostActionModels.Single(model => model.Id == "pa0" && model.ManualInstructionInfo[0].Text == "localized");
+            runnableProjectConfig.ConfigurationModel.Localize(localizationModel);
+            runnableProjectConfig.ConfigurationModel.PostActionModels.Single(model => model.Id == "pa0" && model.ManualInstructionInfo[0].Text == "localized");
         }
 
         [Fact]
@@ -597,8 +593,8 @@ false,
             LocalizationModel localizationModel = LocalizationModelDeserializer.Deserialize(mountPoint.FileInfo(localizationFile)!);
             Assert.True(runnableProjectConfig.VerifyLocalizationModel(localizationModel, locFile));
 
-            runnableProjectConfig.ConfigModel.Localize(localizationModel);
-            ParameterSymbol actualSymbol = runnableProjectConfig.ConfigModel.Symbols.OfType<ParameterSymbol>().Single(s => s.Name == "test");
+            runnableProjectConfig.ConfigurationModel.Localize(localizationModel);
+            ParameterSymbol actualSymbol = runnableProjectConfig.ConfigurationModel.Symbols.OfType<ParameterSymbol>().Single(s => s.Name == "test");
 
             Assert.Equal("localized displayName", actualSymbol.DisplayName);
             Assert.Equal("localized description", actualSymbol.Description);

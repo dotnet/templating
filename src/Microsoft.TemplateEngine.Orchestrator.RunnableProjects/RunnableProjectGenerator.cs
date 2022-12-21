@@ -15,8 +15,6 @@ using Microsoft.TemplateEngine.Abstractions.Parameters;
 using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Core.Expressions.Cpp2;
-using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig;
-using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Localization;
 using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
@@ -372,44 +370,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
             return Task.FromResult((IReadOnlyList<ScannedTemplateInfo>)templateList);
         }
-        
-         private static void RemoveDisabledParameters(
+
+        private static void RemoveDisabledParameters(
             IParameterSetData parameters,
             IRunnableProjectConfig runnableProjectConfig)
         {
             parameters.Values
                 .Where(v => !v.IsEnabled)
                 .ForEach(p => runnableProjectConfig.RemoveParameter(p.ParameterDefinition));
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         }
 
         private static IVariableCollection SetupVariables(IParameterSetData parameters, IVariableConfig variableConfig)
@@ -468,29 +436,29 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             public IDirectory TemplateSourceRoot => _templateInfo.TemplateSourceRoot;
 
-            public bool IsNameAgreementWithFolderPreferred => _templateInfo.ConfigModel.PreferNameDirectory;
+            public bool IsNameAgreementWithFolderPreferred => _templateInfo.ConfigurationModel.PreferNameDirectory;
 
-            public string? Author => _templateInfo.ConfigModel.Author;
+            public string? Author => _templateInfo.ConfigurationModel.Author;
 
-            public string? Description => _templateInfo.ConfigModel.Description;
+            public string? Description => _templateInfo.ConfigurationModel.Description;
 
-            public IReadOnlyList<string> Classifications => _templateInfo.ConfigModel.Classifications;
+            public IReadOnlyList<string> Classifications => _templateInfo.ConfigurationModel.Classifications;
 
-            public string? DefaultName => _templateInfo.ConfigModel.DefaultName;
+            public string? DefaultName => _templateInfo.ConfigurationModel.DefaultName;
 
-            public string Identity => _templateInfo.ConfigModel.Identity;
+            public string Identity => _templateInfo.ConfigurationModel.Identity;
 
             public Guid GeneratorId => _generator.Id;
 
-            public string? GroupIdentity => _templateInfo.ConfigModel.GroupIdentity;
+            public string? GroupIdentity => _templateInfo.ConfigurationModel.GroupIdentity;
 
-            public int Precedence => _templateInfo.ConfigModel.Precedence;
+            public int Precedence => _templateInfo.ConfigurationModel.Precedence;
 
-            public string Name => _templateInfo.ConfigModel.Name ?? throw new TemplateAuthoringException("Template configuration should have 'name' defined.", "name");
+            public string Name => _templateInfo.ConfigurationModel.Name ?? throw new TemplateAuthoringException("Template configuration should have 'name' defined.", "name");
 
-            public IReadOnlyDictionary<string, string> TagsCollection => _templateInfo.ConfigModel.Tags;
+            public IReadOnlyDictionary<string, string> TagsCollection => _templateInfo.ConfigurationModel.Tags;
 
-            public IParameterDefinitionSet ParameterDefinitions => new ParameterDefinitionSet(_templateInfo.ConfigModel.ExtractParameters());
+            public IParameterDefinitionSet ParameterDefinitions => new ParameterDefinitionSet(_templateInfo.ConfigurationModel.ExtractParameters());
 
             public IReadOnlyList<ITemplateParameter> Parameters => ParameterDefinitions;
 
@@ -502,15 +470,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             public string? HostConfigPlace => throw new NotImplementedException();
 
-            public string? ThirdPartyNotices => _templateInfo.ConfigModel.ThirdPartyNotices;
+            public string? ThirdPartyNotices => _templateInfo.ConfigurationModel.ThirdPartyNotices;
 
-            public IReadOnlyDictionary<string, IBaselineInfo> BaselineInfo => _templateInfo.ConfigModel.BaselineInfo;
+            public IReadOnlyDictionary<string, IBaselineInfo> BaselineInfo => _templateInfo.ConfigurationModel.BaselineInfo;
 
-            public IReadOnlyList<string> ShortNameList => _templateInfo.ConfigModel.ShortNameList;
+            public IReadOnlyList<string> ShortNameList => _templateInfo.ConfigurationModel.ShortNameList;
 
-            public IReadOnlyList<Guid> PostActions => _templateInfo.ConfigModel.PostActionModels.Select(pam => pam.ActionId).ToArray();
+            public IReadOnlyList<Guid> PostActions => _templateInfo.ConfigurationModel.PostActionModels.Select(pam => pam.ActionId).ToArray();
 
-            public IReadOnlyList<TemplateConstraintInfo> Constraints => _templateInfo.ConfigModel.Constraints;
+            public IReadOnlyList<TemplateConstraintInfo> Constraints => _templateInfo.ConfigurationModel.Constraints;
 
             public IReadOnlyList<IValidationEntry> ValidationErrors => _templateInfo.ValidationErrors;
 
