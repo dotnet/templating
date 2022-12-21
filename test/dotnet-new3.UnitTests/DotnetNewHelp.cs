@@ -100,8 +100,11 @@ Options\:
 
   \-\-no\-restore    If specified, skips the automatic restore of the project on create\.
                   bool \- Optional                                                    
-                  Default\: false                                                     
+                  Default\: false
 
+  \-U\|\-\-UseProgramMain  Whether to generate an explicit Program class and Main method instead of top-level statements.
+                       bool - Optional                                                                               
+                       Default: false  
 
 To see help for other template languages \(F#\, VB\)\, use \-\-language option\:
    dotnet new3 classlib \-h \-\-language (F#|VB)";
@@ -340,6 +343,9 @@ Options\:
                   bool \- Optional                                                    
                   Default\: false                                                     
 
+  \-U\|\-\-UseProgramMain  Whether to generate an explicit Program class and Main method instead of top-level statements.
+                       bool - Optional                                                                               
+                       Default: false  
 
 To see help for other template languages \(F#\, VB\)\, use \-\-language option\:
    dotnet new3 console \-h \-\-language (F#|VB)";
