@@ -24,17 +24,17 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.IntegrationTests
         [InlineData("02-add-parameters", "sample02", new[] { "copyrightName", "Test Copyright", "title", "Test Title" }, "text args")]
         [InlineData("03-optional-page", "sample03", new[] { "enableContactPage", "true" }, "optional content included")]
         [InlineData("03-optional-page", "sample03", null, "optional content excluded")]
-        [InlineData("04-parameter-from-list", "sample04", new[] { "BackgroundColor", "dimgray" }, "the parameter from the list of options")]
+        [InlineData("04-parameter-from-list", "sample04", new[] { "BackgroundColor", "dimgray" }, "the choice parameter")]
         [InlineData("05-multi-project", "sample05", new[] { "includetest", "true" }, "the optional test project included")]
         [InlineData("05-multi-project", "sample05", new[] { "includetest", "false" }, "the optional test project excluded")]
-        [InlineData("07-param-with-custom-short-name", "sample07", null, "customised name directory")]
+        [InlineData("07-param-with-custom-short-name", "sample07", null, "customised parameter name")]
         [InlineData("08-restore-on-create", "sample08", null, "restore on create")]
         [InlineData("09-replace-onlyif-after", "sample09", new[] { "backgroundColor", "grey" }, "replacing with onlyif condition")]
         [InlineData("10-symbol-from-date", "sample10", null, "usage of date generator")]
         [InlineData("11-change-string-casing", "sample11", null, "usage of casing generator")]
         [InlineData("13-constant-value", "sample13", null, "replacing of constant value")]
         [InlineData("15-computed-symbol", "sample15", null, "usage computed symbols")]
-        [InlineData("16-string-value-transform", "sample16", null, "usage of string value transformator")]
+        [InlineData("16-string-value-transform", "sample16", null, "usage of derived parameter")]
         public async void TemplateEngineSamplesProjectTest(
             string folderName,
             string shortName,
