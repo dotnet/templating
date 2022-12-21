@@ -108,7 +108,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
 
             if (string.IsNullOrWhiteSpace(realName))
             {
-                return new TemplateCreationResult(CreationResultStatus.MissingMandatoryParam, template.Name, "--name");
+                return new TemplateCreationResult(CreationResultStatus.TemplateIssueDetected, template.Name, "--name");
             }
             if (template.IsNameAgreementWithFolderPreferred && string.IsNullOrEmpty(outputPath))
             {

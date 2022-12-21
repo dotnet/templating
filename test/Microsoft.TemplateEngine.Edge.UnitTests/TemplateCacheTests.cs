@@ -238,15 +238,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 
             Assert.Single(readCache.TemplateInfo);
             var readTemplate = readCache.TemplateInfo[0];
-            if (preferDefaultName)
-            {
-                Assert.True(readTemplate.PreferDefaultName);
-
-            }
-            else
-            {
-                Assert.False(readTemplate.PreferDefaultName);
-            }
+            Assert.Equal(preferDefaultName, readTemplate.PreferDefaultName);
             Assert.Equal(defaultName, readTemplate.DefaultName);
         }
 
