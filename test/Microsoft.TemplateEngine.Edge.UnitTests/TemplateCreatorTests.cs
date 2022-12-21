@@ -691,10 +691,21 @@ Details: Parameter conditions contain cyclic dependency: [A, B, A] that is preve
             }
             """;
 
+        private const string TemplateConfigNoPreferDefaultNameWithDefaultName = /*lang=json*/ """
+            {
+                "identity": "test.template",
+                "name": "tst",
+                "shortName": "tst",
+                "preferDefaultName": false,
+                "sourceName": "sourceFile"
+            }
+            """;
+
         [Theory]
         [InlineData(TemplateConfigPreferDefaultNameWithDefaultName, "thisIsAName", "./thisIsAName.cs")]
         [InlineData(TemplateConfigPreferDefaultNameWithDefaultName, null, "./defaultName.cs")]
         [InlineData(TemplateConfigPreferDefaultNameWithoutDefaultName, null, "./tst2.cs")]
+        [InlineData(TemplateConfigNoPreferDefaultNameWithDefaultName, null, "./tst2.cs")]
         public async void InstantiateAsync_PreferDefaultName(string templateConfig, string? name, string expectedOutputName)
         {
             string sourceSnippet = """
