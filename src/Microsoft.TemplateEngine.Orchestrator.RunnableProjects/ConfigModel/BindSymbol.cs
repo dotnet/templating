@@ -29,11 +29,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
             string? binding = jObject.ToString(nameof(Binding));
             if (string.IsNullOrWhiteSpace(binding))
             {
-                throw new TemplateAuthoringException(string.Format(LocalizableStrings.SymbolModel_Error_MandatoryPropertyMissing, name, BindSymbol.TypeName, nameof(Binding).ToLowerInvariant()), name);
+                throw new TemplateAuthoringException(string.Format(LocalizableStrings.SymbolModel_Error_MandatoryPropertyMissing, name, TypeName, nameof(Binding).ToLowerInvariant()), name);
             }
 
             Binding = binding!;
             DefaultValue = jObject.ToString(nameof(DefaultValue));
+            DataType = jObject.ToString(nameof(DataType));
         }
 
         /// <summary>
@@ -44,6 +45,16 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
         /// <inheritdoc />
         public override string Type => TypeName;
 
+        /// <summary>
+        /// Gets default value of the symbol.
+        /// Corresponds to "defaultValue" JSON property.
+        /// </summary>
         public string? DefaultValue { get; internal init; }
+
+        /// <summary>
+        /// Gets the data type of the symbol.
+        /// Corresponds to "datatype" JSON property.
+        /// </summary>
+        public string? DataType { get; internal init; }
     }
 }
