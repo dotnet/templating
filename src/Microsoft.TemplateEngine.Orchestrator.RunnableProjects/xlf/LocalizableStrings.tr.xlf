@@ -112,7 +112,7 @@ Ayrıntılar: {1}</target>
       </trans-unit>
       <trans-unit id="EvaluatorSelector_Exception_UnknownEvaluator">
         <source>Unrecognized evaluator: '{0}'.</source>
-        <target state="new">Unrecognized evaluator: '{0}'.</target>
+        <target state="translated">Tanınmayan değerlendirici: '{0}'.</target>
         <note>{0} - invalid evaluator value</note>
       </trans-unit>
       <trans-unit id="LocalizationModelDeserializer_Error_FailedToParse">
@@ -122,7 +122,7 @@ Ayrıntılar: {1}</target>
       </trans-unit>
       <trans-unit id="RunnableProjectConfig_OperationSetup_UnknownForm">
         <source>The symbol '{0}': unable to find a form '{1}', the further processing of the symbol will be skipped.</source>
-        <target state="new">The symbol '{0}': unable to find a form '{1}', the further processing of the symbol will be skipped.</target>
+        <target state="translated">'{0}' sembolü '{1}' biçimini bulamıyor, sembol daha fazla işlenmeyecek.</target>
         <note>{0} - the name of the symbol in configuration, {1} - the name of the form in configuration.</note>
       </trans-unit>
       <trans-unit id="RunnableProjectGenerator_CannotAddImplicitChoice">
