@@ -100,11 +100,8 @@ Options\:
 
   \-\-no\-restore    If specified, skips the automatic restore of the project on create\.
                   bool \- Optional                                                    
-                  Default\: false
+                  Default\: false                                                     
 
-  \-U\|\-\-UseProgramMain  Whether to generate an explicit Program class and Main method instead of top-level statements.
-                       bool - Optional                                                                               
-                       Default: false  
 
 To see help for other template languages \(F#\, VB\)\, use \-\-language option\:
    dotnet new3 classlib \-h \-\-language (F#|VB)";
@@ -343,24 +340,21 @@ Options\:
                   bool \- Optional                                                    
                   Default\: false                                                     
 
-  \-U\|\-\-UseProgramMain  Whether to generate an explicit Program class and Main method instead of top-level statements.
-                       bool - Optional                                                                               
-                       Default: false  
 
 To see help for other template languages \(F#\, VB\)\, use \-\-language option\:
    dotnet new3 console \-h \-\-language (F#|VB)";
 
-        string home = TestUtils.CreateTemporaryFolder("Home");
-        string workingDirectory = TestUtils.CreateTemporaryFolder();
+            string home = TestUtils.CreateTemporaryFolder("Home");
+            string workingDirectory = TestUtils.CreateTemporaryFolder();
 
-        new DotnetNewCommand(_log, "console", "--help", "--langVersion", "8.0")
-                .WithCustomHive(home)
-                .WithWorkingDirectory(workingDirectory)
-                .Execute()
-                .Should().Pass()
-                .And.NotHaveStdErr()
-                .And.HaveStdOutMatching(ConsoleHelp)
-                .And.NotHaveStdOutContaining(HelpOutput);
+            new DotnetNewCommand(_log, "console", "--help", "--langVersion", "8.0")
+                    .WithCustomHive(home)
+                    .WithWorkingDirectory(workingDirectory)
+                    .Execute()
+                    .Should().Pass()
+                    .And.NotHaveStdErr()
+                    .And.HaveStdOutMatching(ConsoleHelp)
+                    .And.NotHaveStdOutContaining(HelpOutput);
         }
 
         [Fact]
