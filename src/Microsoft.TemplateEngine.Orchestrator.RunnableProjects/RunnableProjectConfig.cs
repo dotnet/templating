@@ -250,7 +250,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
             BindSymbolEvaluator bindSymbolEvaluator = new BindSymbolEvaluator(settings);
 
-            return bindSymbolEvaluator.EvaluateBindedSymbolsAsync(bindSymbols, variableCollection, cancellationToken);
+            return bindSymbolEvaluator.EvaluateBindSymbolsAsync(bindSymbols, variableCollection, cancellationToken);
         }
 
         /// <summary>
