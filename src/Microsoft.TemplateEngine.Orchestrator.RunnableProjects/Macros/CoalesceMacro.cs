@@ -19,10 +19,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
         {
             if (variableCollection.TryGetValue(config.SourceVariableName, out object currentSourceValue) && currentSourceValue != null)
             {
+                // The value is equal to the coalesce recognized default value (see coalesce macro doc for details).
                 if (config.DefaultValue != null && currentSourceValue.ToString().Equals(config.DefaultValue))
                 {
                     environmentSettings.Host.Logger.LogDebug("[{macro}]: '{var}': source value '{source}' is not used, because it is equal to default value '{default}'.", nameof(CoalesceMacro), config.VariableName, currentSourceValue, config.DefaultValue);
                 }
+                // The value is not specified by user: either coming from default value or host specific default value, etc.
                 else if (variableCollection is ParameterBasedVariableCollection paramsVariableCollection &&
                     paramsVariableCollection.ParameterSetData.TryGetValue(config.SourceVariableName, out ParameterData? parameterData) &&
                     parameterData!.DataSource is not DataSource.User and not DataSource.DefaultIfNoValue)
