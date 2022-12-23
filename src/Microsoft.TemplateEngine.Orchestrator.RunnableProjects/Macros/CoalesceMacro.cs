@@ -19,7 +19,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
         {
             if (variableCollection.TryGetValue(config.SourceVariableName, out object currentSourceValue) && currentSourceValue != null)
             {
-                if (variableCollection is ParameterBasedVariableCollection paramsVariableCollection &&
+                if (config.DefaultValue != null && currentSourceValue.ToString().Equals(config.DefaultValue))
+                {
+                    environmentSettings.Host.Logger.LogDebug("[{macro}]: '{var}': source value '{source}' is not used, because it is equal to default value '{default}'.", nameof(CoalesceMacro), config.VariableName, currentSourceValue, config.DefaultValue);
+                }
+                else if (variableCollection is ParameterBasedVariableCollection paramsVariableCollection &&
                     paramsVariableCollection.ParameterSetData.TryGetValue(config.SourceVariableName, out ParameterData? parameterData) &&
                     parameterData!.DataSource is not DataSource.User and not DataSource.DefaultIfNoValue)
                 {
