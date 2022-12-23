@@ -1,16 +1,12 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Core;
-using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config;
 using Microsoft.TemplateEngine.TestHelper;
-using Microsoft.TemplateEngine.Utils;
 using Xunit;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.MacroTests
@@ -36,7 +32,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
         public void CoalesceMacroTest(string? sourceValue, string? fallbackValue, string? defaultValue, string? expectedResult)
         {
             CoalesceMacro macro = new();
-            CoalesceMacroConfig macroConfig = new(macro, "test", "string", "varA", defaultValue, "varB");
+            CoalesceMacroConfig macroConfig = new("test", "string", "varA", defaultValue, "varB");
 
             VariableCollection variables = new();
             if (sourceValue != null)
@@ -48,7 +44,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
                 variables["varB"] = fallbackValue;
             }
 
-            macro.Evaluate(_engineEnvironmentSettings, variables, macroConfig);
+            macro.EvaluateConfig(_engineEnvironmentSettings, variables, macroConfig);
 
             if (expectedResult == null)
             {
@@ -71,16 +67,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
         {
             CoalesceMacro macro = new();
 
-            Dictionary<string, string> jsonParameters = new(StringComparer.OrdinalIgnoreCase)
-            {
-                { "sourceVariableName", JExtensions.ToJsonString("varA") },
-                { "fallbackVariableName", JExtensions.ToJsonString("varB") }
-            };
-            if (defaultValue != null)
-            {
-                jsonParameters["defaultValue"] = JExtensions.ToJsonString(defaultValue);
-            }
-
             VariableCollection variables = new();
             if (sourceValue != null)
             {
@@ -91,7 +77,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
                 variables["varB"] = fallbackValue;
             }
 
-            macro.Evaluate(_engineEnvironmentSettings, variables, new GeneratedSymbol("test", "coalesce", jsonParameters));
+            macro.EvaluateConfig(_engineEnvironmentSettings, variables, new CoalesceMacroConfig("test", "string", "varA", defaultValue, "varB"));
 
             if (expectedResult == null)
             {
@@ -112,20 +98,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
 
             CoalesceMacro macro = new();
 
-            Dictionary<string, string> jsonParameters = new(StringComparer.OrdinalIgnoreCase)
-            {
-                { "sourceVariableName", JExtensions.ToJsonString("varA") },
-                { "fallbackVariableName", JExtensions.ToJsonString("varB") },
-                { "defaultValue", JExtensions.ToJsonString("0") }
-            };
-
             VariableCollection variables = new()
             {
                 ["varA"] = 0,
                 ["varB"] = 10
             };
 
-            macro.Evaluate(environmentSettings, variables, new GeneratedSymbol("test", "coalesce", jsonParameters));
+            macro.EvaluateConfig(environmentSettings, variables, new CoalesceMacroConfig("test", "string", "varA", "0", "varB"));
             Assert.Equal(10, variables["test"]);
             Assert.Equal("[CoalesceMacro]: 'test': source value '0' is not used, because it is equal to default value '0'.", loggedMessages.First().Message);
         }
@@ -139,48 +118,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
 
             CoalesceMacro macro = new();
 
-            Dictionary<string, string> jsonParameters = new(StringComparer.OrdinalIgnoreCase)
-            {
-                { "sourceVariableName", JExtensions.ToJsonString("varA") },
-                { "fallbackVariableName", JExtensions.ToJsonString("varB") }
-            };
-
             VariableCollection variables = new()
             {
                 ["varA"] = 0,
                 ["varB"] = 10
             };
 
-            macro.Evaluate(environmentSettings, variables, new GeneratedSymbol("test", "coalesce", jsonParameters));
+            macro.EvaluateConfig(environmentSettings, variables, new CoalesceMacroConfig("test", "string", "varA", null, "varB"));
             Assert.Equal(0, variables["test"]);
-        }
-
-        [Fact]
-        public void InvalidConfigurationTest_Source()
-        {
-            CoalesceMacro macro = new();
-
-            Dictionary<string, string> jsonParameters = new(StringComparer.OrdinalIgnoreCase)
-            {
-                { "fallbackVariableName", JExtensions.ToJsonString("varB") }
-            };
-            VariableCollection variables = new();
-            TemplateAuthoringException ex = Assert.Throws<TemplateAuthoringException>(() => macro.Evaluate(_engineEnvironmentSettings, variables, new GeneratedSymbol("test", "coalesce", jsonParameters)));
-            Assert.Equal("Generated symbol 'test' of type 'coalesce' should have 'sourceVariableName' property defined.", ex.Message);
-        }
-
-        [Fact]
-        public void InvalidConfigurationTest_Fallback()
-        {
-            CoalesceMacro macro = new();
-
-            Dictionary<string, string> jsonParameters = new(StringComparer.OrdinalIgnoreCase)
-            {
-                { "sourceVariableName", JExtensions.ToJsonString("varA") }
-            };
-            VariableCollection variables = new();
-            TemplateAuthoringException ex = Assert.Throws<TemplateAuthoringException>(() => macro.Evaluate(_engineEnvironmentSettings, variables, new GeneratedSymbol("test", "coalesce", jsonParameters)));
-            Assert.Equal("Generated symbol 'test' of type 'coalesce' should have 'fallbackVariableName' property defined.", ex.Message);
         }
     }
 }
