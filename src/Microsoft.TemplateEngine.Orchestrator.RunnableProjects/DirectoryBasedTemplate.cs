@@ -36,7 +36,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         /// <summary>
         /// Creates the instance of the class based on configuration from <paramref name="templateFile"/>.
         /// </summary>
-        /// <exception cref="TemplateValidationException">when template configuration is invalid.</exception>
+        /// <exception cref="TemplateAuthoringException">when template configuration is invalid.</exception>
         /// <exception cref="InvalidOperationException">when template identity is null.</exception>
         /// <exception cref="NotSupportedException">when the template is not supported by current generator version.</exception>
         protected DirectoryBasedTemplate(IEngineEnvironmentSettings settings, IGenerator generator, IFile templateFile, string? baselineName = null)
@@ -50,7 +50,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             if (ConfigFile.Parent?.Parent is null)
             {
-                throw new TemplateValidationException(LocalizableStrings.Authoring_TemplateRootOutsideInstallSource);
+                throw new TemplateAuthoringException(LocalizableStrings.Authoring_TemplateRootOutsideInstallSource);
             }
             ConfigDirectory = templateFile.Parent;
             TemplateSourceRoot = ConfigFile.Parent.Parent;

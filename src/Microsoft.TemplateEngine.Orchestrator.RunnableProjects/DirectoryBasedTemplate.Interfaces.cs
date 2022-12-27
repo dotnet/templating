@@ -33,7 +33,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         int ITemplateMetadata.Precedence => ConfigurationModel.Precedence;
 
-        string ITemplateMetadata.Name => ConfigurationModel.Name ?? throw new TemplateValidationException("Template configuration should have name defined");
+        string ITemplateMetadata.Name => ConfigurationModel.Name ?? string.Empty;
 
         IReadOnlyList<string> ITemplateMetadata.ShortNameList => ConfigurationModel.ShortNameList ?? new List<string>();
 

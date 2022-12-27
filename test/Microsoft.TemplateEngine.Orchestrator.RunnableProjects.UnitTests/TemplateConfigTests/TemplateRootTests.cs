@@ -10,6 +10,7 @@ using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Validation;
 using Microsoft.TemplateEngine.TestHelper;
+using Microsoft.TemplateEngine.Utils;
 using Xunit;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.TemplateConfigTests
@@ -90,7 +91,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             IFile? templateConfigFile = mountPoint.FileInfo(pathToTemplateJson);
             Assert.NotNull(templateConfigFile);
 
-            TemplateValidationException e = Assert.Throws<TemplateValidationException>(() => new RunnableProjectConfig(environmentSettings, generator, templateConfigFile));
+            TemplateAuthoringException e = Assert.Throws<TemplateAuthoringException>(() => new RunnableProjectConfig(environmentSettings, generator, templateConfigFile));
             Assert.Equal(expectedErrorMessage, e.Message);
         }
 

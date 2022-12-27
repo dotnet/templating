@@ -78,11 +78,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 throw;
             }
-            catch (TemplateValidationException)
-            {
-                //do nothing
-                //template validation prints all required information
-            }
             catch (NotSupportedException ex)
             {
                 //do not print stack trace for this type.
@@ -280,11 +275,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 template = loadedTemplate;
                 return true;
             }
-            catch (TemplateValidationException)
-            {
-                //do nothing
-                //template validation prints all required information
-            }
             catch (NotSupportedException ex)
             {
                 //do not print stack trace for this type.
@@ -359,11 +349,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     await discoveredTemplate.ValidateAsync(ValidationScope.Scanning, cancellationToken).ConfigureAwait(false);
                     cancellationToken.ThrowIfCancellationRequested();
                     templateList.Add(discoveredTemplate);
-                }
-                catch (TemplateValidationException)
-                {
-                    //do nothing
-                    //template validation prints all required information
                 }
                 catch (NotSupportedException ex)
                 {
