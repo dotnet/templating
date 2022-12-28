@@ -34,7 +34,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         /// <param name="symbols">The symbols to evaluate.</param>
         /// <param name="variableCollection">The variable collection to set results to.</param>
         /// <param name="cancellationToken">The cancellation token that allows cancelling the operation.</param>
-        public async Task EvaluateBindedSymbolsAsync(IEnumerable<BindSymbol> symbols, IVariableCollection variableCollection, CancellationToken cancellationToken)
+        public async Task EvaluateBindSymbolsAsync(IEnumerable<BindSymbol> symbols, IVariableCollection variableCollection, CancellationToken cancellationToken)
         {
             if (!_bindSymbolSources.Any())
             {
@@ -46,26 +46,33 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 string.Join(", ", _bindSymbolSources.Select(s => $"{s.DisplayName}({s.GetType().Name})")));
 
             //set default values for symbols that have them defined
-            foreach (var bindSymbol in symbols)
+            foreach (BindSymbol bindSymbol in symbols)
             {
                 if (!variableCollection.ContainsKey(bindSymbol.Name) && bindSymbol.DefaultValue != null)
                 {
-                    object? value = ParameterConverter.InferTypeAndConvertLiteral(bindSymbol.DefaultValue);
-                    if (value != null)
+                    bool result = ParameterConverter.TryConvertLiteralToDatatype(bindSymbol.DefaultValue, bindSymbol.DataType, out object? value);
+                    if (result && value != null)
                     {
                         variableCollection[bindSymbol.Name] = value;
+                    }
+                    else if (!result && !string.IsNullOrWhiteSpace(bindSymbol.DataType))
+                    {
+                        _logger.LogWarning(LocalizableStrings.BindSymbolEvaluator_Warning_DefaultValueConversionFailure, bindSymbol.Name, bindSymbol.DefaultValue, bindSymbol.DataType);
                     }
                 }
             }
 
-            var bindSymbols = symbols.Where(bs => !string.IsNullOrWhiteSpace(bs.Binding));
+            IEnumerable<BindSymbol> bindSymbols = symbols.Where(bs => !string.IsNullOrWhiteSpace(bs.Binding));
             if (!bindSymbols.Any())
             {
                 _logger.LogDebug("No bind symbols has '{0}' defined.", nameof(BindSymbol.Binding).ToLowerInvariant());
                 return;
             }
 
-            var tasksToRun = bindSymbols.Select(s => new { Symbol = s, Task = GetBoundValueAsync(s.Binding, cancellationToken) }).ToList();
+            IReadOnlyList<(BindSymbol Symbol, Task<string?> Task)> tasksToRun = bindSymbols
+                .Select(s => (s, GetBoundValueAsync(s.Binding, cancellationToken)))
+                .ToList();
+
             try
             {
                 await Task.WhenAll(tasksToRun.Select(t => t.Task)).ConfigureAwait(false);
@@ -76,26 +83,62 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 //errors are handled below
             }
             cancellationToken.ThrowIfCancellationRequested();
+            ProcessEvaluationResults(variableCollection, tasksToRun);
+        }
 
-            foreach (var task in tasksToRun.Where(t => t.Task.IsFaulted || (t.Task.IsCompleted && t.Task.Result == null)))
+        private void ProcessEvaluationResults(IVariableCollection variableCollection, IReadOnlyList<(BindSymbol Symbol, Task<string?> Task)> completedTasks)
+        {
+            foreach ((BindSymbol currentSymbol, Task<string?> currentTask) in completedTasks)
             {
-                _logger.LogWarning(LocalizableStrings.BindSymbolEvaluator_Warning_EvaluationError, task.Symbol.Name);
-            }
-
-            var successfulTasks = tasksToRun.Where(t => t.Task.IsCompleted && t.Task.Result != null);
-            foreach (var task in successfulTasks)
-            {
-                object? value = ParameterConverter.InferTypeAndConvertLiteral(task.Task.Result!);
-
-                if (value != null)
+                if (!currentTask.IsCompleted)
                 {
-                    variableCollection[task.Symbol.Name] = value;
-                    _logger.LogDebug("Variable '{0}' was set to '{1}'.", task.Symbol.Name, value);
+                    throw new InvalidOperationException("The method should be used only after the tasks are completed.");
                 }
-                else
+                if (currentTask.IsFaulted || currentTask.IsCanceled)
                 {
-                    _logger.LogDebug("Variable '{0}' was not set due to its value is null.", task.Symbol.Name);
+                    _logger.LogWarning(LocalizableStrings.BindSymbolEvaluator_Warning_EvaluationError, currentSymbol.Name);
+                    _logger.LogDebug(currentTask.Exception, "The evaluation task has failed: {0}", currentTask.Exception.Message);
+                    continue;
                 }
+
+                if (currentTask.Result is null)
+                {
+                    if (currentSymbol.DefaultValue != null)
+                    {
+                        _logger.LogDebug(
+                            "Failed to evaluate bind symbol '{0}', the returned value is null. The default value '{1}' is used instead.",
+                            currentSymbol.Name,
+                            currentSymbol.DefaultValue);
+                    }
+                    else
+                    {
+                        _logger.LogWarning(LocalizableStrings.BindSymbolEvaluator_Warning_EvaluationError, currentSymbol.Name);
+                    }
+                    continue;
+                }
+
+                string obtainedValue = currentTask.Result!;
+                bool result = ParameterConverter.TryConvertLiteralToDatatype(obtainedValue, currentSymbol.DataType, out object? convertedValue);
+                if (result && convertedValue != null)
+                {
+                    variableCollection[currentSymbol.Name] = convertedValue;
+                    _logger.LogDebug("Variable '{0}' was set to '{1}'.", currentSymbol.Name, convertedValue);
+                    continue;
+                }
+                if (!result)
+                {
+                    _logger.LogWarning(
+                        LocalizableStrings.BindSymbolEvaluator_Warning_ConversionFailure,
+                        currentSymbol.Name,
+                        obtainedValue,
+                        currentSymbol.DataType ?? "<null>");
+                    continue;
+                }
+                _logger.LogDebug(
+                    "Variable '{0}' was not set: the value '{1}' after conversion to datatype '{2}' is null.",
+                    currentSymbol.Name,
+                    obtainedValue,
+                    currentSymbol.DataType ?? "<null>");
             }
         }
 
