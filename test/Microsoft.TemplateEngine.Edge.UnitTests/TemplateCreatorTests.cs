@@ -703,11 +703,11 @@ Details: Parameter conditions contain cyclic dependency: [A, B, A] that is preve
             """;
 
         [Theory]
-        [InlineData(TemplateConfigPreferDefaultNameWithDefaultName, "thisIsAName", "./thisIsAName.cs")]
-        [InlineData(TemplateConfigPreferDefaultNameWithDefaultName, null, "./defaultName.cs")]
-        [InlineData(TemplateConfigPreferDefaultNameWithoutDefaultName, null, "./tst2.cs")]
-        [InlineData(TemplateConfigNoPreferDefaultNameWithDefaultName, null, "./tst2.cs")]
-        public async void InstantiateAsync_PreferDefaultName(string templateConfig, string? name, string expectedOutputName)
+        [InlineData(TemplateConfigPreferDefaultNameWithDefaultName, "thisIsAName", "./thisIsAName.cs", false, "")]
+        [InlineData(TemplateConfigPreferDefaultNameWithDefaultName, null, "./defaultName.cs", false, "")]
+        [InlineData(TemplateConfigNoPreferDefaultNameWithDefaultName, null, "./tst2.cs", false, "")]
+        [InlineData(TemplateConfigPreferDefaultNameWithoutDefaultName, null, "./tst2.cs", true, "--name")]
+        public async void InstantiateAsync_PreferDefaultName(string templateConfig, string? name, string expectedOutputName, bool instanceFailure, string errorMessage)
         {
             string sourceSnippet = """
                 using System;
@@ -719,8 +719,8 @@ Details: Parameter conditions contain cyclic dependency: [A, B, A] that is preve
                 templateConfig,
                 sourceSnippet,
                 sourceSnippet,
-                string.Empty,
-                false,
+                errorMessage,
+                instanceFailure,
                 name: name,
                 expectedOutputName: expectedOutputName);
         }

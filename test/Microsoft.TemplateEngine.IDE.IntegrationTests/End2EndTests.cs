@@ -390,7 +390,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
                 .CreateAsync(foundTemplates[0].Info, null, output, parameters)
                 .ConfigureAwait(false);
 
-            Assert.Equal(CreationResultStatus.MissingMandatoryParam, result.Status);
+            Assert.Equal(CreationResultStatus.TemplateIssueDetected, result.Status);
         }
     }
 }

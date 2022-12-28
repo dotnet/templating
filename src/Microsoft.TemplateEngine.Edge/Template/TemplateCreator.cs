@@ -105,10 +105,36 @@ namespace Microsoft.TemplateEngine.Edge.Template
 
             string? realName = name is not null ? name : templateInfo.PreferDefaultName ? templateInfo.DefaultName : null;
             realName = realName is null ? fallbackName : realName;
+            if (!string.IsNullOrEmpty(name))
+            {
+                realName = name;
+            }
+            else if (templateInfo.PreferDefaultName)
+            {
+                if (string.IsNullOrEmpty(templateInfo.DefaultName))
+                {
+                    return new TemplateCreationResult(CreationResultStatus.TemplateIssueDetected, template.Name, "--name");
+                }
+                realName = templateInfo.DefaultName;
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(fallbackName))
+                {
+                    if (!string.IsNullOrEmpty(templateInfo.DefaultName))
+                    {
+                        realName = templateInfo.DefaultName;
+                    }
+                }
+                else
+                {
+                    realName = fallbackName;
+                }
+            }
 
             if (string.IsNullOrWhiteSpace(realName))
             {
-                return new TemplateCreationResult(CreationResultStatus.TemplateIssueDetected, template.Name, "--name");
+                return new TemplateCreationResult(CreationResultStatus.MissingMandatoryParam, template.Name, "--name");
             }
             if (template.IsNameAgreementWithFolderPreferred && string.IsNullOrEmpty(outputPath))
             {
