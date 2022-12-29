@@ -671,6 +671,15 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to create template due naming issues.
+        /// </summary>
+        internal static string TemplateCreator_TemplateCreationResult_Error_NoDefaultName {
+            get {
+                return ResourceManager.GetString("TemplateCreator_TemplateCreationResult_Error_NoDefaultName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to load host data in {0} at {1}..
         /// </summary>
         internal static string TemplateInfo_Warning_FailedToReadHostData {
