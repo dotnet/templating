@@ -422,6 +422,9 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
                 .ConfigureAwait(false);
 
             Assert.Equal(CreationResultStatus.TemplateIssueDetected, result.Status);
+            Assert.Equal(
+                "Failed to create template: the Template name is not specified. Template configuration does not configure a default name that can be used when name is not specified. Specify the name for the template when instantiating or configure a default name in the template configuration.",
+                result.ErrorMessage);
         }
     }
 }
