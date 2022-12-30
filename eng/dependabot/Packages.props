@@ -10,23 +10,23 @@
     <PackageReference Update="Microsoft.Build.Utilities.Core" Version="17.4.0" />
     <PackageReference Update="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Update="Microsoft.Extensions.Logging" Version="7.0.0" />
-    <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="7.0.0" />
+    <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
     <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
     <PackageReference Update="NuGet.Configuration" Version="6.4.0" />
     <PackageReference Update="NuGet.Credentials" Version="6.4.0" />
     <PackageReference Update="NuGet.Protocol" Version="6.4.0" />
 
     <!--Analyzers-->
-    <PackageReference Update="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4-beta1.22518.1" />
+    <PackageReference Update="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4-beta1.22559.1" />
     <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.435" />
 
     <!--Test dependencies-->
     <PackageReference Update="FakeItEasy" Version="7.3.1" />
     <PackageReference Update="FluentAssertions" Version="6.8.0" />
-    <PackageReference Update="Microsoft.NET.Test.Sdk" Version="17.4.0" />
+    <PackageReference Update="Microsoft.NET.Test.Sdk" Version="17.4.1" />
     <PackageReference Update="xunit.abstractions" Version="2.0.3" />
     <PackageReference Update="Newtonsoft.Json.Schema" Version="3.0.14" />
-    <PackageReference Update="Verify.XUnit" Version="19.3.0" />
-    <PackageReference Update="Verify.DiffPlex" Version="1.3.0" />
+    <PackageReference Update="Verify.XUnit" Version="19.5.0" />
+    <PackageReference Update="Verify.DiffPlex" Version="2.0.1" />
   </ItemGroup>
 </Project>

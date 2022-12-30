@@ -132,9 +132,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 runSpec.SetupFileSource(source);
                 string target = Path.Combine(targetDirectory, source.Target);
-                IDirectory? sourceDirectory =
-                    templateData.TemplateSourceRoot.DirectoryInfo(source.Source) ??
-                    throw new InvalidOperationException($"Cannot access the source directory of the template: {source.Source}.");
+                IDirectory? sourceDirectory = templateData.TemplateSourceRoot.DirectoryInfo(source.Source)
+                    ?? throw new InvalidOperationException($"Cannot access the source directory of the template: {source.Source}.");
                 IReadOnlyList<IFileChange2> fileChanges = orchestrator.GetFileChanges(runSpec, sourceDirectory, target);
 
                 //source and target paths in the file changes are returned relative to source passed
@@ -326,9 +325,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 runSpec.SetupFileSource(source);
                 string target = Path.Combine(targetDirectory, source.Target);
-                IDirectory? sourceDirectory =
-                    templateSourceRoot.DirectoryInfo(source.Source) ??
-                    throw new InvalidOperationException($"Cannot access the source directory of the template: {source.Source}.");
+                IDirectory? sourceDirectory = templateSourceRoot.DirectoryInfo(source.Source)
+                    ?? throw new InvalidOperationException($"Cannot access the source directory of the template: {source.Source}.");
                 orchestrator.Run(runSpec, sourceDirectory, target);
             }
 
