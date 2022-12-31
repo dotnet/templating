@@ -706,7 +706,7 @@ Details: Parameter conditions contain cyclic dependency: [A, B, A] that is preve
         [InlineData(TemplateConfigPreferDefaultNameWithDefaultName, "thisIsAName", "./thisIsAName.cs", false, "")]
         [InlineData(TemplateConfigPreferDefaultNameWithDefaultName, null, "./defaultName.cs", false, "")]
         [InlineData(TemplateConfigNoPreferDefaultNameWithDefaultName, null, "./tst2.cs", false, "")]
-        [InlineData(TemplateConfigPreferDefaultNameWithoutDefaultName, null, "./tst2.cs", true, "Failed to create template: the Template name is not specified. Template configuration does not configure a default name that can be used when name is not specified. Specify the name for the template when instantiating or configure a default name in the template configuration.")]
+        [InlineData(TemplateConfigPreferDefaultNameWithoutDefaultName, null, "./tst2.cs", true, "Failed to create template: the template name is not specified. Template configuration does not configure a default name that can be used when name is not specified. Specify the name for the template when instantiating or configure a default name in the template configuration.")]
         public async void InstantiateAsync_PreferDefaultName(string templateConfig, string? name, string expectedOutputName, bool instanceFailure, string errorMessage)
         {
             string sourceSnippet = """
