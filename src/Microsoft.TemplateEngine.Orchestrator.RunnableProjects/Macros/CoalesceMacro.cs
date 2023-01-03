@@ -4,6 +4,7 @@
 using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Parameters;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros.Config;
@@ -53,26 +54,44 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
                 throw new InvalidCastException("Unable to cast config as a CoalesceMacroConfig");
             }
 
-            object? targetValue = null;
-            if (!string.IsNullOrEmpty(realConfig.SourceVariableName)
-                && vars.TryGetValue(realConfig.SourceVariableName!, out object currentSourceValue)
-                && !Equals(currentSourceValue ?? string.Empty, realConfig.DefaultValue ?? string.Empty))
+            if (!string.IsNullOrEmpty(realConfig.SourceVariableName) && vars.TryGetValue(realConfig.SourceVariableName!, out object currentSourceValue) && currentSourceValue != null)
             {
-                targetValue = currentSourceValue;
-            }
-            else
-            {
-                if (!string.IsNullOrEmpty(realConfig.FallbackVariableName)
-                    && !vars.TryGetValue(realConfig.FallbackVariableName!, out targetValue))
+                // The value is equal to the coalesce recognized default value (see coalesce macro doc for details).
+                if (realConfig.DefaultValue != null && currentSourceValue.ToString().Equals(realConfig.DefaultValue))
                 {
-                    environmentSettings.Host.Logger.LogDebug("Unable to find a variable to fall back to called " + realConfig.FallbackVariableName);
-                    targetValue = realConfig.DefaultValue;
+                    environmentSettings.Host.Logger.LogDebug("[{macro}]: '{var}': source value '{source}' is not used, because it is equal to default value '{default}'.", nameof(CoalesceMacro), realConfig.VariableName, currentSourceValue, realConfig.DefaultValue);
+                }
+                // The value is not specified by user: either coming from default value or host specific default value, etc.
+                else if (vars is ParameterBasedVariableCollection paramsVariableCollection &&
+                    paramsVariableCollection.ParameterSetData.TryGetValue(realConfig.SourceVariableName!, out ParameterData? parameterData) &&
+                    parameterData!.DataSource is not DataSource.User and not DataSource.DefaultIfNoValue)
+                {
+                    environmentSettings.Host.Logger.LogDebug(
+                        "[{macro}]: '{var}': source value '{source}' not specified by user (data source: '{dataSource}'), fall back.",
+                        nameof(CoalesceMacro),
+                        realConfig.VariableName,
+                        currentSourceValue,
+                        parameterData.DataSource);
+                }
+                else if (currentSourceValue is string str && string.IsNullOrEmpty(str))
+                {
+                    //do nothing, empty value for string is equivalent to null.
+                    environmentSettings.Host.Logger.LogDebug("[{macro}]: '{var}': source value '{source}' is an empty string, fall back.", nameof(CoalesceMacro), realConfig.VariableName, currentSourceValue);
+                }
+                else
+                {
+                    vars[realConfig.VariableName] = currentSourceValue;
+                    environmentSettings.Host.Logger.LogDebug("[{macro}]: Assigned variable '{var}' to '{value}'.", nameof(CoalesceMacro), realConfig.VariableName, currentSourceValue);
+                    return;
                 }
             }
-            if (targetValue is not null)
+            if (!string.IsNullOrEmpty(realConfig.FallbackVariableName) && vars.TryGetValue(realConfig.FallbackVariableName!, out object currentFallbackValue) && currentFallbackValue != null)
             {
-                vars[config.VariableName] = targetValue.ToString();
+                vars[realConfig.VariableName] = currentFallbackValue;
+                environmentSettings.Host.Logger.LogDebug("[{macro}]: Assigned variable '{var}' to fallback value '{value}'.", nameof(CoalesceMacro), realConfig.VariableName, currentFallbackValue);
+                return;
             }
+            environmentSettings.Host.Logger.LogDebug("[{macro}]: Variable '{var}' was not assigned, neither source nor fallback variable was found.", nameof(CoalesceMacro), realConfig.VariableName);
         }
     }
 }
