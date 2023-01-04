@@ -344,17 +344,17 @@ Options\:
 To see help for other template languages \(F#\, VB\)\, use \-\-language option\:
    dotnet new3 console \-h \-\-language (F#|VB)";
 
-        string home = TestUtils.CreateTemporaryFolder("Home");
-        string workingDirectory = TestUtils.CreateTemporaryFolder();
+            string home = TestUtils.CreateTemporaryFolder("Home");
+            string workingDirectory = TestUtils.CreateTemporaryFolder();
 
-        new DotnetNewCommand(_log, "console", "--help", "--langVersion", "8.0")
-                .WithCustomHive(home)
-                .WithWorkingDirectory(workingDirectory)
-                .Execute()
-                .Should().Pass()
-                .And.NotHaveStdErr()
-                .And.HaveStdOutMatching(ConsoleHelp)
-                .And.NotHaveStdOutContaining(HelpOutput);
+            new DotnetNewCommand(_log, "console", "--help", "--langVersion", "8.0")
+                    .WithCustomHive(home)
+                    .WithWorkingDirectory(workingDirectory)
+                    .Execute()
+                    .Should().Pass()
+                    .And.NotHaveStdErr()
+                    .And.HaveStdOutMatching(ConsoleHelp)
+                    .And.NotHaveStdOutContaining(HelpOutput);
         }
 
         [Fact]
