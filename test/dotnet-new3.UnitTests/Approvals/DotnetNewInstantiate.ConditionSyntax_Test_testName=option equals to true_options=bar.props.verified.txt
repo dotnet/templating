@@ -1,0 +1,15 @@
+﻿<!--'$(A)'-->
+<TargetFramework>A-true</TargetFramework>
+<TargetFramework>B-true</TargetFramework>
+<TargetFramework>C-true</TargetFramework>
+<TargetFramework>D-true</TargetFramework>
+<!--'$(A)' == true-->
+<TargetFramework>A-true</TargetFramework>
+<TargetFramework>B-true</TargetFramework>
+<TargetFramework>C-true</TargetFramework>
+<TargetFramework>D-true</TargetFramework>
+<!--'$(A)' == 'true'-->
+<TargetFramework>A-true</TargetFramework>
+<TargetFramework>B-true</TargetFramework>
+<TargetFramework>C-true</TargetFramework>
+<TargetFramework>D-true</TargetFramework>
