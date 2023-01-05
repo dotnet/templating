@@ -536,7 +536,6 @@ static Microsoft.TemplateEngine.Core.Util.EngineConfig.DefaultWhitespaces.get ->
 static Microsoft.TemplateEngine.Core.Util.EngineConfig.DefaultWhitespaces.set -> void
 static Microsoft.TemplateEngine.Core.VariableCollection.Root() -> Microsoft.TemplateEngine.Core.VariableCollection!
 static Microsoft.TemplateEngine.Core.VariableCollection.Root(System.Collections.Generic.IDictionary<string!, object!>! values) -> Microsoft.TemplateEngine.Core.VariableCollection!
-static Microsoft.TemplateEngine.Core.VariableCollection.SetupVariables(Microsoft.TemplateEngine.Abstractions.Parameters.IParameterSetData! parameters, Microsoft.TemplateEngine.Core.Contracts.IVariableConfig! variableConfig) -> Microsoft.TemplateEngine.Core.Contracts.IVariableCollection!
 virtual Microsoft.TemplateEngine.Core.Util.Orchestrator.RunSpecLoader(System.IO.Stream! runSpec) -> Microsoft.TemplateEngine.Core.Contracts.IGlobalRunSpec!
 virtual Microsoft.TemplateEngine.Core.Util.Orchestrator.TryGetBufferSize(Microsoft.TemplateEngine.Abstractions.Mount.IFile! sourceFile, out int bufferSize) -> bool
 virtual Microsoft.TemplateEngine.Core.Util.Orchestrator.TryGetFlushThreshold(Microsoft.TemplateEngine.Abstractions.Mount.IFile! sourceFile, out int threshold) -> bool
