@@ -205,7 +205,7 @@ stages:
       enableSourceLinkValidation: false
       # disabling temporarily signing validation
       # causes error NETSDK1192: Targeting .NET 7.0 or higher in Visual Studio 2022 17.3 is not supported.
-      enableSigningValidation: false   
+      enableSigningValidation: false     
       publishDependsOn:
       - Validate
       # This is to enable SDL runs part of Post-Build Validation Stage
