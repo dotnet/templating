@@ -85,6 +85,22 @@ namespace Microsoft.TemplateEngine.Utils
             return literal;
         }
 
+        internal static string? GetDefault(string? dataType)
+        {
+            return dataType switch
+            {
+                string s when string.IsNullOrEmpty(s) => null,
+                string s when s.Equals("bool", StringComparison.OrdinalIgnoreCase) => false.ToString(),
+                string s when s.Equals("choice", StringComparison.OrdinalIgnoreCase) => string.Empty,
+                string s when s.Equals("int", StringComparison.OrdinalIgnoreCase) ||
+                                                   s.Equals("integer", StringComparison.OrdinalIgnoreCase) ||
+                                                   s.Equals("float", StringComparison.OrdinalIgnoreCase) => 0.ToString(),
+                string s when s.Equals("hex", StringComparison.OrdinalIgnoreCase) => "0x0",
+                // this includes text/string as well
+                _ => null,
+            };
+        }
+
         /// <summary>
         /// Tries to convert <paramref name="literal"/> to <paramref name="dataType"/>.
         /// If <paramref name="dataType"/> is null or empty, the type to be inferred. See <see cref="InferTypeAndConvertLiteral(string)"/> for more details.

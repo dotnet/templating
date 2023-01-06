@@ -115,6 +115,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 throw new InvalidOperationException($"{nameof(templateData.TemplateSourceRoot)} cannot be null to continue.");
             }
 
+            RemoveDisabledParameters(parameters, templateConfig);
             IVariableCollection variables = SetupVariables(parameters, templateConfig.GlobalOperationConfig.VariableSetup);
             await templateConfig.EvaluateBindSymbolsAsync(environmentSettings, variables, cancellationToken).ConfigureAwait(false);
             cancellationToken.ThrowIfCancellationRequested();
@@ -307,6 +308,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         {
             cancellationToken.ThrowIfCancellationRequested();
 
+            RemoveDisabledParameters(parameters, runnableProjectConfig);
             IVariableCollection variables = SetupVariables(parameters, runnableProjectConfig.GlobalOperationConfig.VariableSetup);
             await runnableProjectConfig.EvaluateBindSymbolsAsync(environmentSettings, variables, cancellationToken).ConfigureAwait(false);
 
@@ -329,6 +331,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
 
             return GetCreationResult(runnableProjectConfig);
+        }
+
+        private static void RemoveDisabledParameters(
+            IParameterSetData parameters,
+            IRunnableProjectConfig runnableProjectConfig)
+        {
+            parameters.Values
+                .Where(v => !v.IsEnabled)
+                .ForEach(p => runnableProjectConfig.RemoveParameter(p.ParameterDefinition));
         }
 
         private static IVariableCollection SetupVariables(IParameterSetData parameters, IVariableConfig variableConfig)
