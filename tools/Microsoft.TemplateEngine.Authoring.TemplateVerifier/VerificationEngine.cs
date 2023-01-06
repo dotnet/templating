@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.TemplateEngine.Authoring.TemplateVerifier.Commands;
 using Microsoft.TemplateEngine.CommandUtils;
 using Microsoft.TemplateEngine.Utils;
+using VerifyTests.DiffPlex;
 
 namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
 {
@@ -289,7 +290,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
         {
             // Create temp folder and instantiate there
             string workingDir = options.OutputDirectory ?? Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            if (Directory.Exists(workingDir) && Directory.EnumerateFileSystemEntries(workingDir).Any())
+            if (options.EnsureEmptyOutputDirectory && Directory.Exists(workingDir) && Directory.EnumerateFileSystemEntries(workingDir).Any())
             {
                 throw new TemplateVerificationException(LocalizableStrings.VerificationEngine_Error_WorkDirExists, TemplateVerificationErrorCode.WorkingDirectoryExists);
             }
