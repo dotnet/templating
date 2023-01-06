@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NuGet.Protocol" />
+    <PackageReference Include="NuGet.Credentials" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.abstractions" />
     <PackageReference Include="Microsoft.Extensions.Logging" />
