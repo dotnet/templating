@@ -1,5 +1,12 @@
+<!-- Prebuilt baseline changes must be reviewed by @dotnet/source-build-internal -->
 <UsageData>
   <IgnorePatterns>
-    <UsagePattern IdentityGlob="*/*" />
+    <!-- TODO: Ignore needed until https://github.com/dotnet/source-build/issues/3188 is addressed. -->
+    <UsagePattern IdentityGlob="Microsoft.NETCore.App.Ref/*" />
+
+    <UsagePattern IdentityGlob="Microsoft.SourceBuild.Intermediate.*/*" />
+
+    <!-- TODO: Ignore needed until https://github.com/NuGet/Home/issues/11059 is addressed. -->
+    <UsagePattern IdentityGlob="Nuget.*/*" />
   </IgnorePatterns>
 </UsageData>
