@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.TemplateEngine.Authoring.TemplateVerifier.Commands;
 using Microsoft.TemplateEngine.CommandUtils;
 using Microsoft.TemplateEngine.Utils;
+using VerifyTests.DiffPlex;
 
 namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
 {
@@ -30,13 +31,6 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
         private readonly ILoggerFactory? _loggerFactory;
         private readonly ICommandRunner _commandRunner = new CommandRunner();
         private readonly IPhysicalFileSystemEx _fileSystem = new PhysicalFileSystemEx();
-
-        static VerificationEngine()
-        {
-            // Customize diff output of verifier
-            VerifyDiffPlex.Initialize(OutputType.Compact);
-            VerifierSettings.UseSplitModeForUniqueDirectory();
-        }
 
         public VerificationEngine(ILogger logger)
         {
@@ -191,6 +185,8 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             }
             verifySettings.UseDirectory(snapshotsDir);
             verifySettings.UseMethodName(GetScenarioName(options));
+            verifySettings.UseDiffPlex(OutputType.Compact);
+            verifySettings.UseUniqueDirectory();
 
             if ((options.UniqueFor ?? UniqueForOption.None) != UniqueForOption.None)
             {
