@@ -186,7 +186,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             verifySettings.UseDirectory(snapshotsDir);
             verifySettings.UseMethodName(GetScenarioName(options));
             verifySettings.UseDiffPlex(OutputType.Compact);
-            verifySettings.UseUniqueDirectory();
+            verifySettings.UseSplitModeForUniqueDirectory();
 
             if ((options.UniqueFor ?? UniqueForOption.None) != UniqueForOption.None)
             {
