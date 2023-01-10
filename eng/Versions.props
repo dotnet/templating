@@ -26,7 +26,7 @@
     <!-- Dependencies from https://github.com/dotnet/runtime -->
     <MicrosoftNETCoreAppRefPackageVersion>7.0.3</MicrosoftNETCoreAppRefPackageVersion>
     <MicrosoftNETCoreAppRuntimewinx64PackageVersion>7.0.3</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
-    <VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>7.0.3-servicing.23054.15</VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>
+    <VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>7.0.3-servicing.23059.8</VSRedistCommonNetCoreSharedFrameworkx6470PackageVersion>
     <!-- Dependencies from https://github.com/dotnet/roslyn-analyzers -->
     <MicrosoftCodeAnalysisNetAnalyzersPackageVersion>7.0.0-preview1.22559.1</MicrosoftCodeAnalysisNetAnalyzersPackageVersion>
   </PropertyGroup>
