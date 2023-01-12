@@ -5,7 +5,7 @@
 
     <PropertyGroup>
         <LangVersion>preview</LangVersion>
-        <NETCoreTargetFramework>net7.0</NETCoreTargetFramework>
+        <NETCoreTargetFramework>net8.0</NETCoreTargetFramework>
         <NETStandardTargetFramework>netstandard2.0</NETStandardTargetFramework>
         <NETFullTargetFramework>net472</NETFullTargetFramework>
         <Product>Microsoft .NET Core</Product>
