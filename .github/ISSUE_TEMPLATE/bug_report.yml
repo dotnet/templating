@@ -43,7 +43,9 @@ body:
         <details>
           <summary>output</summary>
           <!-- provide the output here -->
- 
+          
+          
+          
         </details>
     validations:
       required: true
