@@ -33,7 +33,7 @@ namespace Microsoft.TemplateEngine.CommandUtils
             return this;
         }
 
-        internal DotnetNewCommand WithNoUpdateCheck(s)
+        internal DotnetNewCommand WithNoUpdateCheck()
         {
             Arguments.Add("--no-update-check");
             return this;
