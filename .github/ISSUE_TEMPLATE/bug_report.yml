@@ -39,6 +39,14 @@ body:
     attributes:
       label: dotnet Info
       description: Provide the output of **`dotnet --info`** to understand what the dotnet version is.
+      value: |
+        <details>
+          <summary>output</summary>
+          <!-- provide the output here -->
+          
+          
+          
+        </details>
     validations:
       required: true
   - type: input
