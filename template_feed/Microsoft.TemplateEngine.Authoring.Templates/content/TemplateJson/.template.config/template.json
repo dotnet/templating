@@ -51,11 +51,17 @@
   "sources": [
     {
       "condition": "CreateTemplateConfigFolder == true",
-      "target": ".template.config/"
+      "target": ".template.config/",
+      "rename": {
+        "_template.json": "template.json"
+      }
     },
     {
       "condition": "CreateTemplateConfigFolder == false",
-      "target": "./"
+      "target": "./",
+      "rename": {
+        "_template.json": "template.json"
+      }
     }
   ],
   "primaryOutputs": [
