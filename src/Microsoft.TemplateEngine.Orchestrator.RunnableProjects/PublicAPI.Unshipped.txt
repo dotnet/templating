@@ -1,2 +1,3 @@
 ﻿Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel.BindSymbol.DataType.get -> string?
 Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel.TemplateConfigModel.Identity.get -> string!
+Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel.TemplateConfigModel.PreferDefaultName.get -> bool
