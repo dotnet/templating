@@ -1,13 +1,13 @@
-# Don't trigger for CI events: push, PR created etc.
-trigger: none
-# Trigger periodically instead.
-schedules:
-- cron: 0 * * * *
-  displayName: Run every hour
+trigger:
+  batch: true
   branches:
     include:
     - main
-  always: true # Trigger even when there are no code changes.
+
+pr:
+  branches:
+    include:
+    - main
 
 parameters:
 - name: publishToBlob
