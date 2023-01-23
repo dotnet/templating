@@ -649,3 +649,5 @@ dotnet_analyzer_diagnostic.severity = none
 
 [*.txt]
 insert_final_newline = false
+[test/**/{Approvals,Snapshots}/**]
+trim_trailing_whitespace = false
