@@ -19,7 +19,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
             Arity = ArgumentArity.ExactlyOne,
             Description = "The root dir for output for this run.",
             IsRequired = true
-        }.AcceptLegalFilePathsOnly();
+        };
 
         private readonly Option<bool> _allowPreviewPacksOption = new Option<bool>("--allowPreviewPacks")
         {
@@ -61,7 +61,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
             Arity = ArgumentArity.OneOrMore,
             Description = $"The list of providers to run. Supported providers: {string.Join(",", Enum.GetValues<SupportedQueries>())}.",
             AllowMultipleArgumentsPerToken = true,
-        }.AcceptOnlyFromAmong(Enum.GetValues<SupportedQueries>().Select(e => e.ToString()).ToArray());
+        };
 
         private readonly Option<DirectoryInfo> _packagesPathOption = new Option<DirectoryInfo>("--packagesPath")
         {
@@ -85,6 +85,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
 
         public TemplateDiscoveryCommand() : base("template-discovery", "Generates the template package search cache file based on the packages available on NuGet.org.")
         {
+            _basePathOption.AcceptLegalFilePathsOnly();
             _queriesOption.AcceptOnlyFromAmong(Enum.GetValues<SupportedQueries>().Select(e => e.ToString()).ToArray());
 
             Options.Add(_basePathOption);
@@ -101,7 +102,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
             Options.Add(_diffOverrideCacheOption);
             Options.Add(_diffOverrideNonPackagesOption);
 
-            this.TreatUnmatchedTokensAsErrors = true;
+            TreatUnmatchedTokensAsErrors = true;
             this.SetHandler(ExecuteAsync, new CommandArgsBinder(this));
         }
 
