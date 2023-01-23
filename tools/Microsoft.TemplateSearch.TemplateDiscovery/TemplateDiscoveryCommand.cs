@@ -87,19 +87,19 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
         {
             _queriesOption.AcceptOnlyFromAmong(Enum.GetValues<SupportedQueries>().Select(e => e.ToString()).ToArray());
 
-            AddOption(_basePathOption);
-            AddOption(_allowPreviewPacksOption);
-            AddOption(_pageSizeOption);
-            AddOption(_onePageOption);
-            AddOption(_savePacksOption);
-            AddOption(_noTemplateJsonFilterOption);
-            AddOption(_testOption);
-            AddOption(_queriesOption);
-            AddOption(_packagesPathOption);
-            AddOption(_verboseOption);
-            AddOption(_diffOption);
-            AddOption(_diffOverrideCacheOption);
-            AddOption(_diffOverrideNonPackagesOption);
+            Options.Add(_basePathOption);
+            Options.Add(_allowPreviewPacksOption);
+            Options.Add(_pageSizeOption);
+            Options.Add(_onePageOption);
+            Options.Add(_savePacksOption);
+            Options.Add(_noTemplateJsonFilterOption);
+            Options.Add(_testOption);
+            Options.Add(_queriesOption);
+            Options.Add(_packagesPathOption);
+            Options.Add(_verboseOption);
+            Options.Add(_diffOption);
+            Options.Add(_diffOverrideCacheOption);
+            Options.Add(_diffOverrideNonPackagesOption);
 
             this.TreatUnmatchedTokensAsErrors = true;
             this.SetHandler(ExecuteAsync, new CommandArgsBinder(this));
