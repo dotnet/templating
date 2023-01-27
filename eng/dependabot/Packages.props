@@ -17,7 +17,7 @@
     <PackageReference Update="NuGet.Protocol" Version="6.4.0" />
 
     <!--Analyzers-->
-    <PackageReference Update="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4-beta1.22559.1" />
+    <PackageReference Update="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4" />
     <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.435" />
 
     <!--Test dependencies-->
@@ -26,7 +26,7 @@
     <PackageReference Update="Microsoft.NET.Test.Sdk" Version="17.4.1" />
     <PackageReference Update="xunit.abstractions" Version="2.0.3" />
     <PackageReference Update="Newtonsoft.Json.Schema" Version="3.0.14" />
-    <PackageReference Update="Verify.XUnit" Version="19.6.0" />
+    <PackageReference Update="Verify.XUnit" Version="19.7.1" />
     <PackageReference Update="Verify.DiffPlex" Version="2.1.0" />
   </ItemGroup>
 </Project>
