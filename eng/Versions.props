@@ -18,7 +18,7 @@
     <!-- Dependencies from https://github.com/dotnet/command-line-api -->
     <SystemCommandLinePackageVersion>2.0.0-beta4.23073.1</SystemCommandLinePackageVersion>
     <!-- Dependencies from https://github.com/dotnet/runtime -->
-    <MicrosoftNETCoreAppRefPackageVersion>8.0.0-alpha.1.23072.5</MicrosoftNETCoreAppRefPackageVersion>
-    <MicrosoftNETCoreAppRuntimewinx64PackageVersion>8.0.0-alpha.1.23072.5</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
+    <MicrosoftNETCoreAppRefPackageVersion>8.0.0-alpha.1.23079.4</MicrosoftNETCoreAppRefPackageVersion>
+    <MicrosoftNETCoreAppRuntimewinx64PackageVersion>8.0.0-alpha.1.23079.4</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
   </PropertyGroup>
 </Project>
