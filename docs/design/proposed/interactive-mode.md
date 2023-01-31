@@ -23,13 +23,30 @@ When a user invokes a template, the command should evaluate the user-provided pa
 
 When interactive mode is entered, the command should prompt the user for each required symbol. If the symbol has a default value, it should be displayed as the default value with some formatting (for example, grayed out text). If the symbol has a description, it should be displayed as part of a prompt. If the symbol has a datatype, the command should validate the input and prompt the user again if the input is invalid. At each stage of the prompt, the user should be able to press a key to skip the prompt and use the default value (if one exists). At each stage of the prompt, the user should be able to press a key to skip all other prompts and use their default values (if they exist). Finally, at each stage of the prompt the user should be able to press a key and quit the entire operation.
 
+### Detecting interactive mode
+
+* If the `--interactive` CLI flag was passed, then interactive mode should be used.
+* If the Console is not a TTY (i.e doesn't have an interactive terminal connected), then interactive mode should not be used. This can be detected via the following mechanisms
+  * if `System.Console.IsOutputRedirected` then the user has redirected stdout, so we shouldn't use interactive mode
+  * If the user's terminal doesn't support ANSI codes, then we shouldn't use interactive mode. Support for ANSI codes can be probed through environment variables as follows
+    * on Windows, if 'WT_SESSION' is non-null then Windows Terminal is being used, so we do support ANSI codes
+    * on all platforms, if the `TERM` variable is set to `dumb` then ANSI codes are not supported
+    * otherwise ANSI codes should be considered to be supported
+
+
+### Breaking out of the prompt loop
+
+CTRL/CMD+C should always allow the user to break out of the prompt loop.
+
 ### Concerns/open questions
 
 * Many templates have symbols that are 'internal' and/or easily confused - e.g. TargetFrameworkOverride and Framework. How to coalesce these to prevent multiple prompts for something a user views as one item?
+  * For the first iteration, we should have a list of symbols to skip
 * Some parameters are not something I'd expect a user to ever want to change - e.g. skipRestore. Should we have another property marker that hides them?
   * For initial version, prompt for these too. We can tweak logic based on feedback.
 * Which of the 'general' invocation options like -n and -o should we present here?
 * Should we have a new `prompt` property for this? Descriptions feel odd grammatically (which is why I didn't use them in the below example).
+  * Yes, and this new property should exist only in the `dotnetcli.host.json` file
 
 ### Examples
 
