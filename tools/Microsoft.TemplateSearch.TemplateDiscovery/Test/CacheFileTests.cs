@@ -84,7 +84,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.Test
             CanSearch(workingDirectory, metadataPath);
 
             //7.0.300
-            sdkVersion = "7.0.300";
+            sdkVersion = "7.0.300-preview.23068.14";
             workingDirectory = TestUtils.CreateTemporaryFolder(sdkVersion);
             UseSdkVersion(workingDirectory, requestedSdkVersion: sdkVersion, resolvedVersionPattern: "7.0.3", rollForward: "latestPatch");
             Console.WriteLine($"Running tests on .NET {sdkVersion} for: {legacyMetadataPath}.");
