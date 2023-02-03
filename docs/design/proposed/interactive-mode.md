@@ -59,6 +59,6 @@ One thing that can't been seen here is the use of choices - the 'framework' para
 
 ## References
 
-* [MSBuild LiveLogger](https://github.com/dotnet/msbuild/tree/main/src/MSBuild/FancyLogger)
+* [MSBuild LiveLogger](https://github.com/dotnet/msbuild/tree/main/src/MSBuild/LiveLogger)
 * [cargo generate](https://github.com/cargo-generate/cargo-generate)
 * [yeoman](https://www.npmjs.com/package/yo)
