@@ -33,15 +33,19 @@ When interactive mode is entered, the command should prompt the user for each re
     * on all platforms, if the `TERM` variable is set to `dumb` then ANSI codes are not supported
     * otherwise ANSI codes should be considered to be supported
 
-
 ### Breaking out of the prompt loop
 
 CTRL/CMD+C should always allow the user to break out of the prompt loop.
+
+### Deciding on default values
+
+Symbols may have a default value configured - if so, that value should be used as the default. Other symbols have an 'implicit default' - such behavior is defined in the ParameterConverter, and should be used if no template-defined default is provided.
 
 ### Concerns/open questions
 
 * Many templates have symbols that are 'internal' and/or easily confused - e.g. TargetFrameworkOverride and Framework. How to coalesce these to prevent multiple prompts for something a user views as one item?
   * For the first iteration, we should have a list of symbols to skip
+  * When these symbols to 'collapse', item templates may need different logic than project templates
 * Some parameters are not something I'd expect a user to ever want to change - e.g. skipRestore. Should we have another property marker that hides them?
   * For initial version, prompt for these too. We can tweak logic based on feedback.
 * Which of the 'general' invocation options like -n and -o should we present here?
