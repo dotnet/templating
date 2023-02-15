@@ -58,6 +58,11 @@ More advanced information can be found in the [Wiki](https://github.com/dotnet/t
 
 Still have a question about template authoring? Do not hesitate to [open new discussion](https://github.com/dotnet/templating/discussions) in GitHub Template Authoring.
 
+### Authoring Tools
+
+Besides the actual implementation of .NET Template Engine, the repo contains various tools that help to author the templates.
+They are not shipped together with .NET SDK, but available on NuGet.org. More information can be found [here](docs/authoring-tools/Authoring-Tools.md)
+
 ### Template Samples
 
 We have created [dotnet template samples](https://github.com/dotnet/templating/tree/main/dotnet-template-samples), which shows how you can use the template engine to create new templates. The samples are setup to be stand alone for specific examples. 

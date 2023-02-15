@@ -22,11 +22,11 @@
 
     <!--Test dependencies-->
     <PackageReference Update="FakeItEasy" Version="7.3.1" />
-    <PackageReference Update="FluentAssertions" Version="6.9.0" />
+    <PackageReference Update="FluentAssertions" Version="6.10.0" />
     <PackageReference Update="Microsoft.NET.Test.Sdk" Version="17.4.1" />
     <PackageReference Update="xunit.abstractions" Version="2.0.3" />
     <PackageReference Update="Newtonsoft.Json.Schema" Version="3.0.14" />
-    <PackageReference Update="Verify.XUnit" Version="19.8.0" />
-    <PackageReference Update="Verify.DiffPlex" Version="2.1.0" />
+    <PackageReference Update="Verify.XUnit" Version="19.9.2" />
+    <PackageReference Update="Verify.DiffPlex" Version="2.2.0" />
   </ItemGroup>
 </Project>
