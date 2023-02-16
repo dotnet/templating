@@ -199,7 +199,7 @@
     <value>{0} is already installed.</value>
   </data>
   <data name="GlobalSettingsTemplatePackageProvider_InstallResult_Error_DuplicatedIdentity" xml:space="preserve">
-    <value>The package with the same identity is already installed {0}. Please consider uninstalling the conflicting template.</value>
+    <value>The package with the same identity is already installed: {0}. Please consider uninstalling the conflicting template.</value>
   </data>
   <data name="GlobalSettingsTemplatePackageProvider_InstallResult_Error_PackageCannotBeInstalled" xml:space="preserve">
     <value>{0} cannot be installed.</value>
