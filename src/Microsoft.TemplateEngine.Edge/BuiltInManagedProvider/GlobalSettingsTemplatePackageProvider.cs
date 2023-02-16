@@ -338,10 +338,9 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
             {
                 if (installedTemplates.FirstOrDefault(s => s.Identity == template.Identity) is ITemplateInfo duplicatedTemplate)
                 {
-                    var managedPackages = await packageManager.GetManagedTemplatePackagesAsync(force, cancellationToken).ConfigureAwait(false);
+                    var managedPackage = await packageManager.GetTemplatePackageAsync(template, cancellationToken).ConfigureAwait(false);
 
-                    if (managedPackages.Any(mp => mp.MountPointUri.Equals(duplicatedTemplate.MountPointUri, StringComparison.OrdinalIgnoreCase))
-                        || !force)
+                    if (managedPackage.MountPointUri.Equals(duplicatedTemplate.MountPointUri, StringComparison.OrdinalIgnoreCase) || !force)
                     {
                         return (InstallerErrorCode.DuplicatedIdentity, string.Format(LocalizableStrings.GlobalSettingsTemplatePackageProvider_InstallResult_Error_DuplicatedIdentity, duplicatedTemplate.Name));
                     }
