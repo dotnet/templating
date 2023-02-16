@@ -385,5 +385,21 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             Assert.False(result[0].Success);
             Assert.Equal(InstallerErrorCode.AlreadyInstalled, result[0].Error);
         }
+
+        [Fact]
+        internal async Task CanInterruptInstallation_WhenTemplatesAreWithOverlappingIdentity()
+        {
+            using Bootstrapper bootstrapper = GetBootstrapper();
+            string templateALocation = GetTestTemplateLocation(Path.Combine("TemplateWithOverlappingIdentity", "TemplateA"));
+            string templateBLocation = GetTestTemplateLocation(Path.Combine("TemplateWithOverlappingIdentity", "TemplateB"));
+
+            await InstallTemplateAsync(bootstrapper, templateALocation).ConfigureAwait(false);
+
+            var templateBInstallationResult = await bootstrapper
+                .InstallTemplatePackagesAsync(new[] { new InstallRequest(Path.GetFullPath(templateBLocation)) })
+                .ConfigureAwait(false);
+
+            Assert.Equal(InstallerErrorCode.DuplicatedIdentity, templateBInstallationResult[0].Error);
+        }
     }
 }

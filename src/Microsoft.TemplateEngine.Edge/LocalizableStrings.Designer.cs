@@ -241,6 +241,15 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The package with the same identity is already installed {0}. Please consider uninstalling the conflicting template..
+        /// </summary>
+        internal static string GlobalSettingsTemplatePackageProvider_InstallResult_Error_DuplicatedIdentity {
+            get {
+                return ResourceManager.GetString("GlobalSettingsTemplatePackageProvider_InstallResult_Error_DuplicatedIdentity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} can be installed by several installers. Specify the installer name to be used..
         /// </summary>
         internal static string GlobalSettingsTemplatePackageProvider_InstallResult_Error_MultipleInstallersCanBeUsed {

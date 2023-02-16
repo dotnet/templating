@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Installer;
 using Microsoft.TemplateEngine.Abstractions.TemplatePackage;
+using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
@@ -172,17 +173,17 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
 
             var packagesInSettings = new List<TemplatePackageData>(await _globalSettings.GetInstalledTemplatePackagesAsync(cancellationToken).ConfigureAwait(false));
             var results = await Task.WhenAll(packages.Select(async package =>
-             {
-                 UninstallResult result = await package.Installer.UninstallAsync(package, this, cancellationToken).ConfigureAwait(false);
-                 if (result.Success)
-                 {
-                     lock (packagesInSettings)
-                     {
-                         packagesInSettings.RemoveAll(p => p.MountPointUri == package.MountPointUri);
-                     }
-                 }
-                 return result;
-             })).ConfigureAwait(false);
+            {
+                UninstallResult result = await package.Installer.UninstallAsync(package, this, cancellationToken).ConfigureAwait(false);
+                if (result.Success)
+                {
+                    lock (packagesInSettings)
+                    {
+                        packagesInSettings.RemoveAll(p => p.MountPointUri == package.MountPointUri);
+                    }
+                }
+                return result;
+            })).ConfigureAwait(false);
             await _globalSettings.SetInstalledTemplatePackagesAsync(packagesInSettings, cancellationToken).ConfigureAwait(false);
             return results;
         }
@@ -305,11 +306,52 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
                 throw new InvalidOperationException($"{nameof(installResult.TemplatePackage)} cannot be null when {nameof(installResult.Success)} is 'true'");
             }
 
+            // We check this after installation to make sure that we captured all templates inside a package
+            var (code, errorMessage) = await EnsureUniqueIdentifierAsync(installResult, installRequest.Force, cancellationToken).ConfigureAwait(false);
+
+            if (code == InstallerErrorCode.DuplicatedIdentity)
+            {
+                await installer.UninstallAsync(installResult.TemplatePackage, this, cancellationToken).ConfigureAwait(false);
+                return InstallResult.CreateFailure(installRequest, code, errorMessage);
+            }
+
             lock (packages)
             {
                 packages.Add(((ISerializableInstaller)installer).Serialize(installResult.TemplatePackage));
             }
             return installResult;
+        }
+
+        private async Task<(InstallerErrorCode, string)> EnsureUniqueIdentifierAsync(InstallResult installResult, bool force, CancellationToken cancellationToken)
+        {
+            if (installResult.TemplatePackage is null)
+            {
+                throw new InvalidOperationException($"No package found in the result of this install operation");
+            }
+
+            var scanResult = new Scanner(_environmentSettings).Scan(installResult.TemplatePackage.MountPointUri, scanForComponents: false);
+
+            var packageManager = new TemplatePackageManager(_environmentSettings);
+            var installedTemplates = await packageManager.GetTemplatesAsync(cancellationToken).ConfigureAwait(false);
+
+            foreach (ITemplate template in scanResult.Templates)
+            {
+                if (installedTemplates.FirstOrDefault(s => s.Identity == template.Identity) is ITemplateInfo duplicatedTemplate)
+                {
+                    var managedPackages = await packageManager.GetManagedTemplatePackagesAsync(force, cancellationToken).ConfigureAwait(false);
+
+                    if (managedPackages.Any(mp => mp.MountPointUri.Equals(duplicatedTemplate.MountPointUri, StringComparison.OrdinalIgnoreCase))
+                        || !force)
+                    {
+                        return (InstallerErrorCode.DuplicatedIdentity, string.Format(LocalizableStrings.GlobalSettingsTemplatePackageProvider_InstallResult_Error_DuplicatedIdentity, duplicatedTemplate.Name));
+                    }
+
+                    _logger.LogWarning(message: $"The template {installResult.TemplatePackage} has the identity conflict with an already existing template {duplicatedTemplate.Name}. " +
+                        $"The template {duplicatedTemplate.Name} will be overwritten.");
+                }
+            }
+
+            return (installResult.Error, installResult?.ErrorMessage ?? string.Empty);
         }
 
         private class InstallRequestEqualityComparer : IEqualityComparer<InstallRequest>
@@ -339,5 +381,6 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
                 return new { a = obj.InstallerName?.ToLowerInvariant(), b = obj.PackageIdentifier.ToLowerInvariant() }.GetHashCode();
             }
         }
+
     }
 }

@@ -105,6 +105,11 @@
         <target state="translated">wersja: {0}</target>
         <note>small letters, string is used in the sentence</note>
       </trans-unit>
+      <trans-unit id="GlobalSettingsTemplatePackageProvider_InstallResult_Error_DuplicatedIdentity">
+        <source>The package with the same identity is already installed {0}. Please consider uninstalling the conflicting template.</source>
+        <target state="new">The package with the same identity is already installed {0}. Please consider uninstalling the conflicting template.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="GlobalSettingsTemplatePackageProvider_InstallResult_Error_MultipleInstallersCanBeUsed">
         <source>{0} can be installed by several installers. Specify the installer name to be used.</source>
         <target state="translated">{0} mogą być instalowane przez kilka instalatorów. Określ nazwę instalatora, która ma być używana.</target>
