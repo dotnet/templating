@@ -329,9 +329,9 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
                 throw new InvalidOperationException($"No package found in the result of this install operation");
             }
 
-            var scanResult = new Scanner(_environmentSettings).Scan(installResult.TemplatePackage.MountPointUri, scanForComponents: false);
+            using var scanResult = new Scanner(_environmentSettings).Scan(installResult.TemplatePackage.MountPointUri, scanForComponents: false);
 
-            var packageManager = new TemplatePackageManager(_environmentSettings);
+            using var packageManager = new TemplatePackageManager(_environmentSettings);
             var installedTemplates = await packageManager.GetTemplatesAsync(cancellationToken).ConfigureAwait(false);
 
             foreach (ITemplate template in scanResult.Templates)
