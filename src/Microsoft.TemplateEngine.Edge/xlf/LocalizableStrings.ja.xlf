@@ -390,6 +390,11 @@ Template cache will be recreated on the next run.</source>
 テンプレート キャッシュは次回の実行時に再作成されます。</target>
         <note>{0} should not end with period - period is a part of the format entry.</note>
       </trans-unit>
+      <trans-unit id="TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict">
+        <source>The template {0} has the identity conflict with an already existing template {1}. The template {1} will be overwritten.</source>
+        <target state="new">The template {0} has the identity conflict with an already existing template {1}. The template {1} will be overwritten.</target>
+        <note>The template {0} has the identity conflict with an already existing template {1}. The template {1} will be overwritten.</note>
+      </trans-unit>
       <trans-unit id="WorkloadConstraint_Error_MismatchedProviders">
         <source>Multiple 'IWorkloadsInfoProvider' components provided by host ({0}), therefore 'WorkloadConstraint' cannot be properly initialized.</source>
         <target state="translated">ホスト ({0}) によって複数の 'IWorkloadsInfoProvider' コンポーネントが提供されたため、'IWorkloadsInfoProvider' を正しく初期化できません。</target>
