@@ -398,4 +398,8 @@ Template cache will be recreated on the next run.</value>
     <value>'IWorkloadsInfoProvider' component provided by host provided some duplicated workloads (duplicates: {0}). Duplicates will be skipped.</value>
     <comment>{0} is the list of duplicates</comment>
   </data>
+  <data name="TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict" xml:space="preserve">
+    <value>The template {0} has the identity conflict with an already existing template {1}. The template {1} will be overwritten.</value>
+    <comment>The template {0} has the identity conflict with an already existing template {1}. The template {1} will be overwritten.</comment>
+  </data>
 </root>

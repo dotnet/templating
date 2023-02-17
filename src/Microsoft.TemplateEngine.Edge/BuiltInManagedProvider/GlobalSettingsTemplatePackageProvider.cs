@@ -336,7 +336,7 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
 
             foreach (ITemplate template in scanResult.Templates)
             {
-                if (installedTemplates.FirstOrDefault(s => s.Identity == template.Identity) is ITemplateInfo duplicatedTemplate)
+                if (installedTemplates.FirstOrDefault(s => s.Identity == template.Identity && s.MountPointUri != template.MountPointUri) is ITemplateInfo duplicatedTemplate)
                 {
                     var managedPackage = await packageManager.GetTemplatePackageAsync(template, cancellationToken).ConfigureAwait(false);
 
@@ -345,8 +345,7 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
                         return (InstallerErrorCode.DuplicatedIdentity, string.Format(LocalizableStrings.GlobalSettingsTemplatePackageProvider_InstallResult_Error_DuplicatedIdentity, duplicatedTemplate.Name));
                     }
 
-                    _logger.LogWarning(message: $"The template {installResult.TemplatePackage} has the identity conflict with an already existing template {duplicatedTemplate.Name}. " +
-                        $"The template {duplicatedTemplate.Name} will be overwritten.");
+                    _logger.LogWarning(string.Format(LocalizableStrings.TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict, installResult.TemplatePackage, duplicatedTemplate.Name));
                 }
             }
 

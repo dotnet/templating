@@ -728,6 +728,15 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The template {0} has the identity conflict with an already existing template {1}. The template {1} will be overwritten..
+        /// </summary>
+        internal static string TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict {
+            get {
+                return ResourceManager.GetString("TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Multiple &apos;IWorkloadsInfoProvider&apos; components provided by host ({0}), therefore &apos;WorkloadConstraint&apos; cannot be properly initialized..
         /// </summary>
         internal static string WorkloadConstraint_Error_MismatchedProviders {
