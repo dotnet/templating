@@ -322,7 +322,7 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
             return installResult;
         }
 
-        private async Task<(InstallerErrorCode, string)> EnsureUniqueIdentifierAsync(InstallResult installResult, bool force, CancellationToken cancellationToken)
+        private async Task<(InstallerErrorCode, string)> EnsureUniqueIdentifierAsync(InstallResult installResult, bool force, CancellationToken cancellationToken = default)
         {
             if (installResult.TemplatePackage is null)
             {
@@ -338,7 +338,7 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
             {
                 if (installedTemplates.FirstOrDefault(s => s.Identity == template.Identity && s.MountPointUri != template.MountPointUri) is ITemplateInfo duplicatedTemplate)
                 {
-                    var managedPackage = await packageManager.GetTemplatePackageAsync(template, cancellationToken).ConfigureAwait(false);
+                    var managedPackage = await packageManager.GetTemplatePackageAsync(duplicatedTemplate, cancellationToken).ConfigureAwait(false);
 
                     if (managedPackage.MountPointUri.Equals(duplicatedTemplate.MountPointUri, StringComparison.OrdinalIgnoreCase) || !force)
                     {
