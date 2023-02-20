@@ -58,6 +58,11 @@ More advanced information can be found in the [Wiki](https://github.com/dotnet/t
 
 Still have a question about template authoring? Do not hesitate to [open new discussion](https://github.com/dotnet/templating/discussions) in GitHub Template Authoring.
 
+### Authoring Tools
+
+Besides the actual implementation of .NET Template Engine, the repo contains various tools that help to author the templates.
+They are not shipped together with .NET SDK, but available on NuGet.org. More information can be found [here](docs/authoring-tools/Authoring-Tools.md)
+
 ### Template Samples
 
 We have created [dotnet template samples](https://github.com/dotnet/templating/tree/main/dotnet-template-samples), which shows how you can use the template engine to create new templates. The samples are setup to be stand alone for specific examples. 
@@ -77,11 +82,11 @@ See our [help wanted](https://github.com/dotnet/templating/issues?q=is%3Aopen+is
 We have a number of features where we are actively looking for the feedback. They are marked with [`gathering-feedback` label](https://github.com/dotnet/templating/issues?q=is%3Aissue+is%3Aopen+label%3Agathering-feedback). 
 If you think they are useful for your templates, please let us know in comments or by reacting on those.
 
-Check out our [contributing](Contributing.md) page to learn more details.
+Check out our [contributing](CONTRIBUTING.md) page to learn more details.
 
 ## How to build, run & debug
 
-Check out our [contributing](Contributing.md#working-with-the-repo) page to learn how you can build, run and debug.
+Check out our [contributing](CONTRIBUTING.md#working-with-the-repo) page to learn how you can build, run and debug.
 
 ## Trademarks
 This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft trademarks or logos is subject to and must follow [Microsoft’s Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks). Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship. Any use of third-party trademarks or logos are subject to those third-party’s policies.

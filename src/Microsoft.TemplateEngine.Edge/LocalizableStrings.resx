@@ -198,6 +198,9 @@
   <data name="GlobalSettingsTemplatePackageProvider_InstallResult_Error_PackageAlreadyInstalled" xml:space="preserve">
     <value>{0} is already installed.</value>
   </data>
+  <data name="GlobalSettingsTemplatePackageProvider_InstallResult_Error_DuplicatedIdentity" xml:space="preserve">
+    <value>The template {0} is already installed from template package {1}. Consider uninstalling the conflicting template.</value>
+  </data>
   <data name="GlobalSettingsTemplatePackageProvider_InstallResult_Error_PackageCannotBeInstalled" xml:space="preserve">
     <value>{0} cannot be installed.</value>
   </data>
@@ -394,5 +397,9 @@ Template cache will be recreated on the next run.</value>
   <data name="WorkloadConstraint_Warning_DuplicateWorkloads" xml:space="preserve">
     <value>'IWorkloadsInfoProvider' component provided by host provided some duplicated workloads (duplicates: {0}). Duplicates will be skipped.</value>
     <comment>{0} is the list of duplicates</comment>
+  </data>
+  <data name="TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict" xml:space="preserve">
+    <value>The template {0} has the identity conflict with an already existing template {1}. The template {1} will be overwritten.</value>
+    <comment>The template {0} has the identity conflict with an already existing template {1}. The template {1} will be overwritten.</comment>
   </data>
 </root>

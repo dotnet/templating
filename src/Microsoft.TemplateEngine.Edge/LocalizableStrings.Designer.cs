@@ -241,6 +241,15 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The template {0} is already installed from template package {1}. Consider uninstalling the conflicting template..
+        /// </summary>
+        internal static string GlobalSettingsTemplatePackageProvider_InstallResult_Error_DuplicatedIdentity {
+            get {
+                return ResourceManager.GetString("GlobalSettingsTemplatePackageProvider_InstallResult_Error_DuplicatedIdentity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} can be installed by several installers. Specify the installer name to be used..
         /// </summary>
         internal static string GlobalSettingsTemplatePackageProvider_InstallResult_Error_MultipleInstallersCanBeUsed {
@@ -715,6 +724,15 @@ namespace Microsoft.TemplateEngine.Edge {
         internal static string TemplatePackageManager_Error_FailedToStoreCache {
             get {
                 return ResourceManager.GetString("TemplatePackageManager_Error_FailedToStoreCache", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The template {0} has the identity conflict with an already existing template {1}. The template {1} will be overwritten..
+        /// </summary>
+        internal static string TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict {
+            get {
+                return ResourceManager.GetString("TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict", resourceCulture);
             }
         }
         

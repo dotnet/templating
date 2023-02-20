@@ -51,6 +51,11 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
         /// <summary>
         /// The requested package is invalid and cannot be processed.
         /// </summary>
-        InvalidPackage = 8
+        InvalidPackage = 8,
+
+        /// <summary>
+        /// The installation fails due to overlapping between templates identity.
+        /// </summary>
+        DuplicatedIdentity = 9,
     }
 }

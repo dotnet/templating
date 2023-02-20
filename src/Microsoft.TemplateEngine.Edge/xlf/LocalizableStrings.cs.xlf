@@ -105,6 +105,11 @@
         <target state="translated">verze {0}</target>
         <note>small letters, string is used in the sentence</note>
       </trans-unit>
+      <trans-unit id="GlobalSettingsTemplatePackageProvider_InstallResult_Error_DuplicatedIdentity">
+        <source>The template {0} is already installed from template package {1}. Consider uninstalling the conflicting template.</source>
+        <target state="new">The template {0} is already installed from template package {1}. Consider uninstalling the conflicting template.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="GlobalSettingsTemplatePackageProvider_InstallResult_Error_MultipleInstallersCanBeUsed">
         <source>{0} can be installed by several installers. Specify the installer name to be used.</source>
         <target state="translated">Balíček {0} může nainstalovat několik různých instalačních programů. Určete název instalačního programu, který se má použít.</target>
@@ -384,6 +389,11 @@ Template cache will be recreated on the next run.</source>
         <target state="translated">Nepovedlo se uložit mezipaměť šablony. Podrobnosti: {0}
 Mezipaměť šablony bude při příštím spuštění znovu vytvořena.</target>
         <note>{0} should not end with period - period is a part of the format entry.</note>
+      </trans-unit>
+      <trans-unit id="TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict">
+        <source>The template {0} has the identity conflict with an already existing template {1}. The template {1} will be overwritten.</source>
+        <target state="new">The template {0} has the identity conflict with an already existing template {1}. The template {1} will be overwritten.</target>
+        <note>The template {0} has the identity conflict with an already existing template {1}. The template {1} will be overwritten.</note>
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Error_MismatchedProviders">
         <source>Multiple 'IWorkloadsInfoProvider' components provided by host ({0}), therefore 'WorkloadConstraint' cannot be properly initialized.</source>
