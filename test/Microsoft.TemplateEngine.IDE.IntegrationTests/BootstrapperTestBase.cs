@@ -14,7 +14,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
         private const string HostIdentifier = "IDE.IntegrationTests";
         private const string HostVersion = "v1.0.0";
 
-        internal static Bootstrapper GetBootstrapper(IEnumerable<string>? additionalVirtualLocations = null, bool loadTestTemplates = false)
+        internal static Bootstrapper GetBootstrapper(IEnumerable<string>? additionalVirtualLocations = null, bool loadTestTemplates = false, bool virtualizeConfiguration = true)
         {
             ITemplateEngineHost host = CreateHost(loadTestTemplates);
             if (additionalVirtualLocations != null)
@@ -24,7 +24,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
                     host.VirtualizeDirectory(virtualLocation);
                 }
             }
-            return new Bootstrapper(host, virtualizeConfiguration: true, loadDefaultComponents: true);
+            return new Bootstrapper(host, virtualizeConfiguration, loadDefaultComponents: true);
         }
 
         internal static async Task InstallTestTemplateAsync(Bootstrapper bootstrapper, params string[] templates)

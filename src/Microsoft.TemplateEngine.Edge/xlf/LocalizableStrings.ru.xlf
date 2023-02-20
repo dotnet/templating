@@ -106,8 +106,8 @@
         <note>small letters, string is used in the sentence</note>
       </trans-unit>
       <trans-unit id="GlobalSettingsTemplatePackageProvider_InstallResult_Error_DuplicatedIdentity">
-        <source>The package with the same identity is already installed: {0}. Please consider uninstalling the conflicting template.</source>
-        <target state="new">The package with the same identity is already installed: {0}. Please consider uninstalling the conflicting template.</target>
+        <source>The template {0} is already installed from template package {1}. Consider uninstalling the conflicting template.</source>
+        <target state="new">The template {0} is already installed from template package {1}. Consider uninstalling the conflicting template.</target>
         <note />
       </trans-unit>
       <trans-unit id="GlobalSettingsTemplatePackageProvider_InstallResult_Error_MultipleInstallersCanBeUsed">

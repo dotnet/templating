@@ -47,6 +47,7 @@ namespace Microsoft.TemplateEngine.TestHelper
             ITemplateEngineHost host = new TestHost(
                 hostIdentifier: hostIdentifier,
                 additionalComponents: additionalComponents,
+                loadDefaultGenerator: loadDefaultGenerator,
                 fileSystem: new MonitoredFileSystem(new PhysicalFileSystem()),
                 fallbackNames: new[] { "dotnetcli" },
                 addLoggerProviders: loggerProviders);

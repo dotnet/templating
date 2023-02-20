@@ -389,17 +389,24 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
         [Fact]
         internal async Task CanInterruptInstallation_WhenTemplatesAreWithOverlappingIdentity()
         {
-            using Bootstrapper bootstrapper = GetBootstrapper();
+            using Bootstrapper bootstrapper = GetBootstrapper(virtualizeConfiguration: false);
             string templateALocation = GetTestTemplateLocation(Path.Combine("TemplateWithOverlappingIdentity", "TemplateA"));
             string templateBLocation = GetTestTemplateLocation(Path.Combine("TemplateWithOverlappingIdentity", "TemplateB"));
 
-            await InstallTemplateAsync(bootstrapper, templateALocation).ConfigureAwait(false);
+            var templateAInstallationResult = await bootstrapper
+                .InstallTemplatePackagesAsync(new[] { new InstallRequest(Path.GetFullPath(templateALocation)) })
+                .ConfigureAwait(false);
+
+            IManagedTemplatePackage? templateA = templateAInstallationResult[0].TemplatePackage;
+            Assert.NotNull(templateA);
 
             var templateBInstallationResult = await bootstrapper
                 .InstallTemplatePackagesAsync(new[] { new InstallRequest(Path.GetFullPath(templateBLocation)) })
                 .ConfigureAwait(false);
 
             Assert.Equal(InstallerErrorCode.DuplicatedIdentity, templateBInstallationResult[0].Error);
+
+            await bootstrapper.UninstallTemplatePackagesAsync(new[] { templateA });
         }
     }
 }

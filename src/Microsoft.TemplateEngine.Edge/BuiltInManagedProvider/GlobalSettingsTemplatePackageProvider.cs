@@ -27,6 +27,8 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
         private readonly Dictionary<Guid, IInstaller> _installersByGuid = new Dictionary<Guid, IInstaller>();
         private readonly Dictionary<string, IInstaller> _installersByName = new Dictionary<string, IInstaller>();
         private readonly GlobalSettings _globalSettings;
+        private readonly Lazy<TemplatePackageManager> _templatePackageManager;
+        private readonly Scanner _scanner;
 
         public GlobalSettingsTemplatePackageProvider(GlobalSettingsTemplatePackageProviderFactory factory, IEngineEnvironmentSettings settings)
         {
@@ -55,6 +57,9 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
             _globalSettings = new GlobalSettings(_environmentSettings, _globalSettingsFilePath);
             // We can't just add "SettingsChanged+=TemplatePackagesChanged", because TemplatePackagesChanged is null at this time.
             _globalSettings.SettingsChanged += () => TemplatePackagesChanged?.Invoke();
+
+            _templatePackageManager = new Lazy<TemplatePackageManager>(() => new TemplatePackageManager(_environmentSettings));
+            _scanner = new Scanner(_environmentSettings);
         }
 
         public event Action? TemplatePackagesChanged;
@@ -204,6 +209,7 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
         public void Dispose()
         {
             _globalSettings.Dispose();
+            _templatePackageManager.Value?.Dispose();
         }
 
         private async Task<UpdateResult> UpdateAsync(List<TemplatePackageData> packages, UpdateRequest updateRequest, CancellationToken cancellationToken)
@@ -307,12 +313,12 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
             }
 
             // We check this after installation to make sure that we captured all templates inside a package
-            var (code, errorMessage) = await EnsureUniqueIdentifierAsync(installResult, installRequest.Force, cancellationToken).ConfigureAwait(false);
+            var (isUniqueIdentifier, errorMessage) = await EnsureUniqueIdentifierAsync(installResult, installRequest.Force, cancellationToken).ConfigureAwait(false);
 
-            if (code == InstallerErrorCode.DuplicatedIdentity)
+            if (!isUniqueIdentifier)
             {
                 await installer.UninstallAsync(installResult.TemplatePackage, this, cancellationToken).ConfigureAwait(false);
-                return InstallResult.CreateFailure(installRequest, code, errorMessage);
+                return InstallResult.CreateFailure(installRequest, InstallerErrorCode.DuplicatedIdentity, errorMessage);
             }
 
             lock (packages)
@@ -322,34 +328,42 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
             return installResult;
         }
 
-        private async Task<(InstallerErrorCode, string)> EnsureUniqueIdentifierAsync(InstallResult installResult, bool force, CancellationToken cancellationToken = default)
+        private async Task<(bool, string)> EnsureUniqueIdentifierAsync(InstallResult installResult, bool force, CancellationToken cancellationToken = default)
         {
             if (installResult.TemplatePackage is null)
             {
                 throw new InvalidOperationException($"No package found in the result of this install operation");
             }
 
-            using var scanResult = new Scanner(_environmentSettings).Scan(installResult.TemplatePackage.MountPointUri, scanForComponents: false);
-
-            using var packageManager = new TemplatePackageManager(_environmentSettings);
-            var installedTemplates = await packageManager.GetTemplatesAsync(cancellationToken).ConfigureAwait(false);
+            using var scanResult = _scanner.Scan(installResult.TemplatePackage.MountPointUri, scanForComponents: false);
+            var installedTemplates = await _templatePackageManager.Value.GetTemplatesAsync(cancellationToken).ConfigureAwait(false);
 
             foreach (ITemplate template in scanResult.Templates)
             {
-                if (installedTemplates.FirstOrDefault(s => s.Identity == template.Identity && s.MountPointUri != template.MountPointUri) is ITemplateInfo duplicatedTemplate)
+                if (installedTemplates.FirstOrDefault(s =>
+                    s.Identity == template.Identity && !s.MountPointUri.Equals(template.MountPointUri, StringComparison.OrdinalIgnoreCase))
+                    is ITemplateInfo duplicatedTemplate)
                 {
-                    var managedPackage = await packageManager.GetTemplatePackageAsync(duplicatedTemplate, cancellationToken).ConfigureAwait(false);
-
-                    if (managedPackage.MountPointUri.Equals(duplicatedTemplate.MountPointUri, StringComparison.OrdinalIgnoreCase) || !force)
+                    var templatePackage = await _templatePackageManager.Value.GetTemplatePackageAsync(duplicatedTemplate, cancellationToken).ConfigureAwait(false);
+                    if ((templatePackage is IManagedTemplatePackage
+                        && templatePackage.MountPointUri.Equals(duplicatedTemplate.MountPointUri, StringComparison.OrdinalIgnoreCase))
+                        || !force)
                     {
-                        return (InstallerErrorCode.DuplicatedIdentity, string.Format(LocalizableStrings.GlobalSettingsTemplatePackageProvider_InstallResult_Error_DuplicatedIdentity, duplicatedTemplate.Name));
+                        return (false, string.Format(
+                            LocalizableStrings.GlobalSettingsTemplatePackageProvider_InstallResult_Error_DuplicatedIdentity,
+                            duplicatedTemplate.Name,
+                            duplicatedTemplate.MountPointUri));
                     }
 
-                    _logger.LogWarning(string.Format(LocalizableStrings.TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict, installResult.TemplatePackage, duplicatedTemplate.Name));
+                    _logger.LogWarning(
+                        string.Format(
+                            LocalizableStrings.TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict,
+                            installResult.TemplatePackage,
+                            duplicatedTemplate.Name));
                 }
             }
 
-            return (installResult.Error, installResult?.ErrorMessage ?? string.Empty);
+            return (true, string.Empty);
         }
 
         private class InstallRequestEqualityComparer : IEqualityComparer<InstallRequest>

@@ -40,7 +40,7 @@ namespace Microsoft.TemplateEngine.TestHelper
             {
                 builtIns.AddRange(additionalComponents);
             }
-            builtIns.AddRange(Edge.Components.AllComponents);
+            builtIns.AddRange(Components.AllComponents);
             if (loadDefaultGenerator)
             {
                 builtIns.AddRange(Orchestrator.RunnableProjects.Components.AllComponents);

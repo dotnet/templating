@@ -241,7 +241,7 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The package with the same identity is already installed: {0}. Please consider uninstalling the conflicting template..
+        ///   Looks up a localized string similar to The template {0} is already installed from template package {1}. Consider uninstalling the conflicting template..
         /// </summary>
         internal static string GlobalSettingsTemplatePackageProvider_InstallResult_Error_DuplicatedIdentity {
             get {
