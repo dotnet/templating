@@ -106,8 +106,10 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
             this.SetHandler(ExecuteAsync, new CommandArgsBinder(this));
         }
 
-        private static async Task<int> ExecuteAsync(CommandArgs config)
+        private static async Task<int> ExecuteAsync(CommandArgs config, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             Verbose.IsEnabled = config.Verbose;
             var cts = new CancellationTokenSource();
             Console.CancelKeyPress += (s, e) =>
