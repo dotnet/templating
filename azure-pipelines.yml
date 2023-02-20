@@ -74,7 +74,7 @@ stages:
       - job: Windows_NT
         timeoutInMinutes: 90
         pool:
-           ${{ if eq(variables['System.TeamProject'], 'public') }}:
+          ${{ if eq(variables['System.TeamProject'], 'public') }}:
             name: NetCore-Public
             vmImage: 1es-windows-2019-open
           ${{ if eq(variables['System.TeamProject'], 'internal') }}:
