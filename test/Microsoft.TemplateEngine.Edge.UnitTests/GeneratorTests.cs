@@ -3,11 +3,11 @@
 
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Abstractions.Constraints;
 using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Abstractions.Parameters;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Edge.Template;
+using Microsoft.TemplateEngine.Mocks;
 using Microsoft.TemplateEngine.TestHelper;
 using Microsoft.TemplateEngine.Tests;
 using Xunit;
@@ -103,90 +103,15 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             public IList<ITemplate> GetTemplatesAndLangpacksFromDir(IMountPoint source, out IList<ILocalizationLocator> localizations)
             {
                 localizations = new List<ILocalizationLocator>();
-                return new List<ITemplate>() { new Template(this, source) };
+                return new List<ITemplate>() { new MockTemplate(this, source) };
             }
 
             public bool TryEvaluateFromString(ILogger logger, string text, IDictionary<string, object> variables, out bool result, out string evaluationError, HashSet<string>? referencedVariablesKeys = null) => throw new NotImplementedException();
 
             public bool TryGetTemplateFromConfigInfo(IFileSystemInfo config, out ITemplate? template, IFileSystemInfo? localeConfig, IFile? hostTemplateConfigFile, string? baselineName = null)
             {
-                template = new Template(this, config.MountPoint);
+                template = new MockTemplate(this, config.MountPoint);
                 return true;
-            }
-
-            internal class Template : ITemplate
-            {
-                private readonly IMountPoint _mountPoint;
-
-                public Template(IGenerator generator, IMountPoint mountPoint)
-                {
-                    Generator = generator;
-                    _mountPoint = mountPoint;
-                }
-
-                public IGenerator Generator { get; }
-
-                public IFileSystemInfo Configuration => _mountPoint.Root;
-
-                public IFileSystemInfo? LocaleConfiguration => null;
-
-                public IDirectory TemplateSourceRoot => _mountPoint.Root;
-
-                public bool IsNameAgreementWithFolderPreferred => false;
-
-                public string? Author => "Microsoft";
-
-                public string? Description => "This is the description";
-
-                public IReadOnlyList<string> Classifications => Array.Empty<string>();
-
-                public string? DefaultName => null;
-
-                public bool PreferDefaultName => false;
-
-                public string Identity => "Static.Test.Template";
-
-                public Guid GeneratorId => Generator.Id;
-
-                public string? GroupIdentity => null;
-
-                public int Precedence => 0;
-
-                public string Name => "Test template";
-
-                public string ShortName => "test-template";
-
-                [Obsolete]
-                public IReadOnlyDictionary<string, ICacheTag> Tags => throw new NotImplementedException();
-
-                public IReadOnlyDictionary<string, string> TagsCollection { get; } = new Dictionary<string, string>();
-
-                [Obsolete]
-                public IReadOnlyDictionary<string, ICacheParameter> CacheParameters => throw new NotImplementedException();
-
-                public IParameterDefinitionSet ParameterDefinitions => ParameterDefinitionSet.Empty;
-
-                public IReadOnlyList<ITemplateParameter> Parameters => ParameterDefinitions;
-
-                public string MountPointUri => _mountPoint.MountPointUri;
-
-                public string ConfigPlace => ".";
-
-                public string? LocaleConfigPlace => null;
-
-                public string? HostConfigPlace => null;
-
-                public string? ThirdPartyNotices => null;
-
-                public IReadOnlyDictionary<string, IBaselineInfo> BaselineInfo { get; } = new Dictionary<string, IBaselineInfo>();
-
-                public bool HasScriptRunningPostActions { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-                public IReadOnlyList<string> ShortNameList => new[] { ShortName };
-
-                public IReadOnlyList<Guid> PostActions => Array.Empty<Guid>();
-
-                public IReadOnlyList<TemplateConstraintInfo> Constraints => Array.Empty<TemplateConstraintInfo>();
             }
 
             internal class CreationEffects : ICreationEffects2, ICreationEffects

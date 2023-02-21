@@ -10,9 +10,10 @@ namespace Microsoft.TemplateEngine.Mocks
 {
     public class MockMountPoint : IMountPoint
     {
-        public MockMountPoint(IEngineEnvironmentSettings environmentSettings)
+        public MockMountPoint(IEngineEnvironmentSettings environmentSettings, string mountPointUri = "")
         {
             EnvironmentSettings = environmentSettings;
+            MountPointUri = mountPointUri;
             MockRoot = new MockDirectory("/", "/", this, null);
         }
 
