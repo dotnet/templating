@@ -74,7 +74,7 @@ stages:
       - job: Windows_NT
         timeoutInMinutes: 90
         pool:
-           ${{ if eq(variables['System.TeamProject'], 'public') }}:
+          ${{ if eq(variables['System.TeamProject'], 'public') }}:
             name: NetCore-Public
             vmImage: 1es-windows-2019-open
           ${{ if eq(variables['System.TeamProject'], 'internal') }}:
@@ -165,7 +165,7 @@ stages:
             ${{ if eq(variables['System.TeamProject'], 'public') }}:
               vmImage: ubuntu-latest 
             ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-              name: NetCore1ESPool-Svc-Internal
+              name: NetCore1ESPool-Internal
               demands: ImageOverride -equals Build.Ubuntu.2204.Amd64
           strategy:
             matrix:
