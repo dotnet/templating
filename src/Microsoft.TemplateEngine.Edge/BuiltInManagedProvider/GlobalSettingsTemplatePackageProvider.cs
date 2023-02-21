@@ -313,7 +313,7 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
             }
 
             // We check this after installation to make sure that we captured all templates inside a package
-            var (isUniqueIdentifier, errorMessage) = await EnsureUniqueIdentifierAsync(installResult, installRequest.Force, cancellationToken).ConfigureAwait(false);
+            var (isUniqueIdentifier, errorMessage) = await CheckTemplateIdentityAsync(installResult, installRequest.Force, cancellationToken).ConfigureAwait(false);
 
             if (!isUniqueIdentifier)
             {
@@ -328,7 +328,7 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
             return installResult;
         }
 
-        private async Task<(bool, string)> EnsureUniqueIdentifierAsync(InstallResult installResult, bool force, CancellationToken cancellationToken = default)
+        private async Task<(bool, string)> CheckTemplateIdentityAsync(InstallResult installResult, bool force, CancellationToken cancellationToken = default)
         {
             if (installResult.TemplatePackage is null)
             {
@@ -345,8 +345,8 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
                     is ITemplateInfo duplicatedTemplate)
                 {
                     var templatePackage = await _templatePackageManager.Value.GetTemplatePackageAsync(duplicatedTemplate, cancellationToken).ConfigureAwait(false);
-                    if ((templatePackage is IManagedTemplatePackage
-                        && templatePackage.MountPointUri.Equals(duplicatedTemplate.MountPointUri, StringComparison.OrdinalIgnoreCase))
+                    var isManagedTemplate = templatePackage is IManagedTemplatePackage;
+                    if ((isManagedTemplate && templatePackage.MountPointUri.Equals(duplicatedTemplate.MountPointUri, StringComparison.OrdinalIgnoreCase))
                         || !force)
                     {
                         return (false, string.Format(
@@ -359,7 +359,8 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
                         string.Format(
                             LocalizableStrings.TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict,
                             installResult.TemplatePackage,
-                            duplicatedTemplate.Name));
+                            duplicatedTemplate.Name,
+                            isManagedTemplate ? templatePackage.MountPointUri : templatePackage.Provider.GetType().Name));
                 }
             }
 
