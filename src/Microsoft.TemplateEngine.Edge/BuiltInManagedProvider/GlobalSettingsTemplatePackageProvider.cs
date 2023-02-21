@@ -340,14 +340,12 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
 
             foreach (ITemplate template in scanResult.Templates)
             {
-                if (installedTemplates.FirstOrDefault(s =>
-                    s.Identity == template.Identity && !s.MountPointUri.Equals(template.MountPointUri, StringComparison.OrdinalIgnoreCase))
-                    is ITemplateInfo duplicatedTemplate)
+                if (installedTemplates.FirstOrDefault(s => s.Identity == template.Identity) is ITemplateInfo duplicatedTemplate)
                 {
                     var templatePackage = await _templatePackageManager.Value.GetTemplatePackageAsync(duplicatedTemplate, cancellationToken).ConfigureAwait(false);
                     var isManagedTemplate = templatePackage is IManagedTemplatePackage;
-                    if ((isManagedTemplate && templatePackage.MountPointUri.Equals(duplicatedTemplate.MountPointUri, StringComparison.OrdinalIgnoreCase))
-                        || !force)
+
+                    if (isManagedTemplate || !force)
                     {
                         return (false, string.Format(
                             LocalizableStrings.GlobalSettingsTemplatePackageProvider_InstallResult_Error_DuplicatedIdentity,
