@@ -31,6 +31,14 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 }
                 foreach (ITemplate template in scanResult.Templates)
                 {
+                    if (templateDeduplicationDictionary.ContainsKey(template.Identity))
+                    {
+                        _logger.LogWarning(string.Format(
+                            LocalizableStrings.TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict,
+                            template.Name,
+                            templateDeduplicationDictionary[template.Identity].Template.Name,
+                            templateDeduplicationDictionary[template.Identity].Template.MountPointUri));
+                    }
                     templateDeduplicationDictionary[template.Identity] = (template, GetBestLocalizationLocatorMatch(scanResult.Localizations, template.Identity));
                 }
             }
