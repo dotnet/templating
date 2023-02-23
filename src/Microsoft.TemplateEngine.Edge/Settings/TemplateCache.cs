@@ -35,14 +35,18 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 {
                     if (templateDeduplicationDictionary.ContainsKey(template.Identity))
                     {
-                        var duplicatedTemplatePackage = allTemplatePackages.FirstOrDefault(tp => tp.MountPointUri == template.MountPointUri);
-
-                        _logger.LogWarning(string.Format(
-                            LocalizableStrings.TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict,
-                            template.Name,
-                            (duplicatedTemplatePackage is IManagedTemplatePackage managedTP) ? managedTP.DisplayName : duplicatedTemplatePackage.MountPointUri,
-                            template.Identity,
-                            templateDeduplicationDictionary[template.Identity].Template.Name));
+                        // add warning for the case when there is an attempt to overwrite existing managed by new managed template
+                        var templatePackage = allTemplatePackages.FirstOrDefault(tp => tp.MountPointUri == template.MountPointUri);
+                        var checkedTemplatePackage = allTemplatePackages.FirstOrDefault(tp => tp.MountPointUri == templateDeduplicationDictionary[template.Identity].Template.MountPointUri);
+                        if (templatePackage is IManagedTemplatePackage managedTP && checkedTemplatePackage is IManagedTemplatePackage)
+                        {
+                            _logger.LogWarning(string.Format(
+                                LocalizableStrings.TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict,
+                                template.Name,
+                                managedTP.DisplayName,
+                                template.Identity,
+                                templateDeduplicationDictionary[template.Identity].Template.Name));
+                        }
                     }
                     templateDeduplicationDictionary[template.Identity] = (template, GetBestLocalizationLocatorMatch(scanResult.Localizations, template.Identity));
                 }

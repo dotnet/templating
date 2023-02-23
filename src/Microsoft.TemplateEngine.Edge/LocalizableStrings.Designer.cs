@@ -719,7 +719,7 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The template {0} installed from package {1} has the identity {2} conflict with an already existing template {3}. The template {3} will be overwritten..
+        ///   Looks up a localized string similar to The template {0} installed from package {1} has the identity {2} that conflicts with an already existing template {3}. The template {3} will be overwritten..
         /// </summary>
         internal static string TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict {
             get {

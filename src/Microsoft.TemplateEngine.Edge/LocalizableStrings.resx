@@ -396,7 +396,7 @@ Template cache will be recreated on the next run.</value>
     <comment>{0} is the list of duplicates</comment>
   </data>
   <data name="TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict" xml:space="preserve">
-    <value>The template {0} installed from package {1} has the identity {2} conflict with an already existing template {3}. The template {3} will be overwritten.</value>
-    <comment>The template 'TemplateB' installed from package 'PackageB' has the identity 'OverlappingIdentity' conflict with an already existing template 'TempalteA'. The template 'TemplateA' will be overwritten.</comment>
+    <value>The template {0} installed from package {1} has the identity {2} that conflicts with an already existing template {3}. The template {3} will be overwritten.</value>
+    <comment>The template 'TemplateB' installed from package 'PackageB' has the identity 'OverlappingIdentity' that conflicts with an already existing template 'TempalteA'. The template 'TemplateA' will be overwritten.</comment>
   </data>
 </root>
