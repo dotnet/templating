@@ -105,6 +105,16 @@
         <target state="translated">versión {0}</target>
         <note>small letters, string is used in the sentence</note>
       </trans-unit>
+      <trans-unit id="GlobalSettingsTemplatePackageProvider_GlobalSettings_Error_CorruptedGlobalSettings">
+        <source>Global settings file {0} was corrupted after the operation.</source>
+        <target state="new">Global settings file {0} was corrupted after the operation.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="GlobalSettingsTemplatePackageProvider_GlobalSettings_Error_UnavailableGlobalSettings">
+        <source>Global settings file {0} is unavailable due to some reason.</source>
+        <target state="new">Global settings file {0} is unavailable due to some reason.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="GlobalSettingsTemplatePackageProvider_InstallResult_Error_MultipleInstallersCanBeUsed">
         <source>{0} can be installed by several installers. Specify the installer name to be used.</source>
         <target state="translated">Se puede instalar {0} con varios instaladores. Especifique el nombre del instalador que va a usar.</target>

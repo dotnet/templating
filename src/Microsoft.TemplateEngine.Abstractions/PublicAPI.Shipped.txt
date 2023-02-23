@@ -66,12 +66,14 @@ Microsoft.TemplateEngine.Abstractions.Installer.IInstallerFactory
 Microsoft.TemplateEngine.Abstractions.Installer.InstallerConstants
 Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode
 Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode.AlreadyInstalled = 6 -> Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode
+Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode.CorruptedGlobalSettings = 10 -> Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode
 Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode.DownloadFailed = 3 -> Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode
 Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode.GenericError = 5 -> Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode
 Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode.InvalidPackage = 8 -> Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode
 Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode.InvalidSource = 2 -> Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode
 Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode.PackageNotFound = 1 -> Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode
 Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode.Success = 0 -> Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode
+Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode.UnavailableGlobalSettings = 9 -> Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode
 Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode.UnsupportedRequest = 4 -> Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode
 Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode.UpdateUninstallFailed = 7 -> Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode
 Microsoft.TemplateEngine.Abstractions.Installer.InstallerOperationResult

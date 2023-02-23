@@ -51,6 +51,16 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
         /// <summary>
         /// The requested package is invalid and cannot be processed.
         /// </summary>
-        InvalidPackage = 8
+        InvalidPackage = 8,
+
+        /// <summary>
+        /// Global settings file is unavailable due to some reason.
+        /// </summary>
+        UnavailableGlobalSettings = 9,
+
+        /// <summary>
+        /// Global settings file is corrupted after the operation including install, uninstall and update.
+        /// </summary>
+        CorruptedGlobalSettings = 10
     }
 }

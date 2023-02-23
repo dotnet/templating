@@ -241,6 +241,24 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Global settings file {0} was corrupted after the operation..
+        /// </summary>
+        internal static string GlobalSettingsTemplatePackageProvider_GlobalSettings_Error_CorruptedGlobalSettings {
+            get {
+                return ResourceManager.GetString("GlobalSettingsTemplatePackageProvider_GlobalSettings_Error_CorruptedGlobalSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Global settings file {0} is unavailable due to some reason..
+        /// </summary>
+        internal static string GlobalSettingsTemplatePackageProvider_GlobalSettings_Error_UnavailableGlobalSettings {
+            get {
+                return ResourceManager.GetString("GlobalSettingsTemplatePackageProvider_GlobalSettings_Error_UnavailableGlobalSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} can be installed by several installers. Specify the installer name to be used..
         /// </summary>
         internal static string GlobalSettingsTemplatePackageProvider_InstallResult_Error_MultipleInstallersCanBeUsed {

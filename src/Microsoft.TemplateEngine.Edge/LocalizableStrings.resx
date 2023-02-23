@@ -395,4 +395,10 @@ Template cache will be recreated on the next run.</value>
     <value>'IWorkloadsInfoProvider' component provided by host provided some duplicated workloads (duplicates: {0}). Duplicates will be skipped.</value>
     <comment>{0} is the list of duplicates</comment>
   </data>
+  <data name="GlobalSettingsTemplatePackageProvider_GlobalSettings_Error_CorruptedGlobalSettings" xml:space="preserve">
+    <value>Global settings file {0} was corrupted after the operation.</value>
+  </data>
+  <data name="GlobalSettingsTemplatePackageProvider_GlobalSettings_Error_UnavailableGlobalSettings" xml:space="preserve">
+    <value>Global settings file {0} is unavailable due to some reason.</value>
+  </data>
 </root>

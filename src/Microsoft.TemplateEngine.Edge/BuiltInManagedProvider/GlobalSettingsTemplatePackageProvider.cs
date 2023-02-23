@@ -126,6 +126,12 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
                 throw new ArgumentException($"{nameof(installRequests)} has duplicate install requests", nameof(installRequest));
             }
 
+            (InstallerErrorCode checkResult, string checkMessage) = await CheckGlobalSettingsAvailability(false, cancellationToken).ConfigureAwait(false);
+            if (checkResult != InstallerErrorCode.Success)
+            {
+                return new List<InstallResult> { InstallResult.CreateFailure(installRequests.FirstOrDefault(), checkResult, checkMessage) };
+            }
+
             using var disposable = await _globalSettings.LockAsync(cancellationToken).ConfigureAwait(false);
             var packages = new List<TemplatePackageData>(await _globalSettings.GetInstalledTemplatePackagesAsync(cancellationToken).ConfigureAwait(false));
             var results = await Task.WhenAll(installRequests.Select(async installRequest =>
@@ -157,6 +163,13 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
                 return await InstallAsync(packages, installRequest, installer, cancellationToken).ConfigureAwait(false);
             })).ConfigureAwait(false);
             await _globalSettings.SetInstalledTemplatePackagesAsync(packages, cancellationToken).ConfigureAwait(false);
+
+            (InstallerErrorCode recheckResult, string recheckMessage) = await CheckGlobalSettingsAvailability(true, cancellationToken).ConfigureAwait(false);
+            if (checkResult != InstallerErrorCode.Success)
+            {
+                return new List<InstallResult> { InstallResult.CreateFailure(installRequests.FirstOrDefault(), recheckResult, recheckMessage) };
+            }
+
             return results;
         }
 
@@ -166,6 +179,12 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
             if (!packages.Any())
             {
                 return new List<UninstallResult>();
+            }
+
+            (InstallerErrorCode checkResult, string checkMessage) = await CheckGlobalSettingsAvailability(false, cancellationToken).ConfigureAwait(false);
+            if (checkResult != InstallerErrorCode.Success)
+            {
+                return new List<UninstallResult> { UninstallResult.CreateFailure(packages.FirstOrDefault(), checkResult, checkMessage) };
             }
 
             using var disposable = await _globalSettings.LockAsync(cancellationToken).ConfigureAwait(false);
@@ -184,6 +203,13 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
                  return result;
              })).ConfigureAwait(false);
             await _globalSettings.SetInstalledTemplatePackagesAsync(packagesInSettings, cancellationToken).ConfigureAwait(false);
+
+            (InstallerErrorCode recheckResult, string recheckMessage) = await CheckGlobalSettingsAvailability(true, cancellationToken).ConfigureAwait(false);
+            if (checkResult != InstallerErrorCode.Success)
+            {
+                return new List<UninstallResult> { UninstallResult.CreateFailure(packages.FirstOrDefault(), recheckResult, recheckMessage) };
+            }
+
             return results;
         }
 
@@ -192,11 +218,24 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
             _ = updateRequests ?? throw new ArgumentNullException(nameof(updateRequests));
             IEnumerable<UpdateRequest> updatesToApply = updateRequests.Where(request => request.Version != request.TemplatePackage.Version);
 
+            (InstallerErrorCode checkResult, string checkMessage) = await CheckGlobalSettingsAvailability(false, cancellationToken).ConfigureAwait(false);
+            if (checkResult != InstallerErrorCode.Success)
+            {
+                return new List<UpdateResult> { UpdateResult.CreateFailure(updatesToApply.FirstOrDefault(), checkResult, checkMessage) };
+            }
+
             using var disposable = await _globalSettings.LockAsync(cancellationToken).ConfigureAwait(false);
 
             var packages = new List<TemplatePackageData>(await _globalSettings.GetInstalledTemplatePackagesAsync(cancellationToken).ConfigureAwait(false));
             var results = await Task.WhenAll(updatesToApply.Select(updateRequest => UpdateAsync(packages, updateRequest, cancellationToken))).ConfigureAwait(false);
             await _globalSettings.SetInstalledTemplatePackagesAsync(packages, cancellationToken).ConfigureAwait(false);
+
+            (InstallerErrorCode recheckResult, string recheckMessage) = await CheckGlobalSettingsAvailability(true, cancellationToken).ConfigureAwait(false);
+            if (checkResult != InstallerErrorCode.Success)
+            {
+                return new List<UpdateResult> { UpdateResult.CreateFailure(updatesToApply.FirstOrDefault(), recheckResult, recheckMessage) };
+            }
+
             return results;
         }
 
@@ -310,6 +349,27 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
                 packages.Add(((ISerializableInstaller)installer).Serialize(installResult.TemplatePackage));
             }
             return installResult;
+        }
+
+        private async Task<(InstallerErrorCode, string)> CheckGlobalSettingsAvailability(bool afterOperation, CancellationToken cancellationToken)
+        {
+            try
+            {
+                // Try to read global settings file to see if it's avaliable
+                await _globalSettings.GetInstalledTemplatePackagesAsync(cancellationToken).ConfigureAwait(false);
+                return (InstallerErrorCode.Success, string.Empty);
+            }
+            catch (Exception)
+            {
+                // Global settings file is corrupted and reading it fails with the exception. Return the error code
+                var errorCode = afterOperation ? InstallerErrorCode.CorruptedGlobalSettings : InstallerErrorCode.UnavailableGlobalSettings;
+                // todo: to be localized.
+                var errorMessage = afterOperation ?
+                    string.Format(LocalizableStrings.GlobalSettingsTemplatePackageProvider_GlobalSettings_Error_CorruptedGlobalSettings, _globalSettingsFilePath)
+                    :
+                    string.Format(LocalizableStrings.GlobalSettingsTemplatePackageProvider_GlobalSettings_Error_UnavailableGlobalSettings, _globalSettingsFilePath);
+                return (errorCode, errorMessage);
+            }
         }
 
         private class InstallRequestEqualityComparer : IEqualityComparer<InstallRequest>
