@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.TemplatePackage;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -16,7 +17,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
     {
         private readonly ILogger _logger;
 
-        public TemplateCache(ScanResult?[] scanResults, Dictionary<string, DateTime> mountPoints, ILogger logger)
+        public TemplateCache(IReadOnlyList<ITemplatePackage> allTemplatePackages, ScanResult?[] scanResults, Dictionary<string, DateTime> mountPoints, ILogger logger)
         {
             _logger = logger;
             // We need this dictionary to de-duplicate templates that have same identity
@@ -29,15 +30,19 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 {
                     continue;
                 }
+
                 foreach (ITemplate template in scanResult.Templates)
                 {
                     if (templateDeduplicationDictionary.ContainsKey(template.Identity))
                     {
+                        var duplicatedTemplatePackage = allTemplatePackages.FirstOrDefault(tp => tp.MountPointUri == template.MountPointUri);
+
                         _logger.LogWarning(string.Format(
                             LocalizableStrings.TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict,
                             template.Name,
-                            templateDeduplicationDictionary[template.Identity].Template.Name,
-                            templateDeduplicationDictionary[template.Identity].Template.MountPointUri));
+                            (duplicatedTemplatePackage is IManagedTemplatePackage managedTP) ? managedTP.DisplayName : duplicatedTemplatePackage.MountPointUri,
+                            template.Identity,
+                            templateDeduplicationDictionary[template.Identity].Template.Name));
                     }
                     templateDeduplicationDictionary[template.Identity] = (template, GetBestLocalizationLocatorMatch(scanResult.Localizations, template.Identity));
                 }

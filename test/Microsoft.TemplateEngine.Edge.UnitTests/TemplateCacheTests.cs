@@ -14,6 +14,7 @@ using Microsoft.TemplateEngine.Abstractions.Constraints;
 using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Abstractions.Parameters;
 using Microsoft.TemplateEngine.Abstractions.PhysicalFileSystem;
+using Microsoft.TemplateEngine.Abstractions.TemplatePackage;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.TestHelper;
 using Microsoft.TemplateEngine.Utils;
@@ -75,7 +76,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 
                 ScanResult result = new ScanResult(mountPoint, new[] { template }, locators, Array.Empty<(string AssemblyPath, Type InterfaceType, IIdentifiedComponent Instance)>());
 
-                TemplateCache templateCache = new TemplateCache(new[] { result }, new Dictionary<string, DateTime>(), NullLogger.Instance);
+                TemplateCache templateCache = new TemplateCache(Array.Empty<ITemplatePackage>(), new[] { result }, new Dictionary<string, DateTime>(), NullLogger.Instance);
 
                 Assert.Equal(currentCulture, templateCache.Locale);
                 Assert.Equal("testIdentity", templateCache.TemplateInfo.Single().Identity);
@@ -107,7 +108,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             A.CallTo(() => mountPoint.MountPointUri).Returns("testMount");
 
             ScanResult result = new ScanResult(mountPoint, new[] { template }, Array.Empty<ILocalizationLocator>(), Array.Empty<(string AssemblyPath, Type InterfaceType, IIdentifiedComponent Instance)>());
-            TemplateCache templateCache = new TemplateCache(new[] { result }, new Dictionary<string, DateTime>(), NullLogger.Instance);
+            TemplateCache templateCache = new TemplateCache(Array.Empty<ITemplatePackage>(), new[] { result }, new Dictionary<string, DateTime>(), NullLogger.Instance);
 
             WriteObject(environmentSettings.Host.FileSystem, paths.TemplateCacheFile, templateCache);
             var readCache = new TemplateCache(ReadObject(environmentSettings.Host.FileSystem, paths.TemplateCacheFile), NullLogger.Instance);
@@ -137,7 +138,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             A.CallTo(() => mountPoint.MountPointUri).Returns("testMount");
 
             ScanResult result = new ScanResult(mountPoint, new[] { template }, Array.Empty<ILocalizationLocator>(), Array.Empty<(string AssemblyPath, Type InterfaceType, IIdentifiedComponent Instance)>());
-            TemplateCache templateCache = new TemplateCache(new[] { result }, new Dictionary<string, DateTime>(), NullLogger.Instance);
+            TemplateCache templateCache = new TemplateCache(Array.Empty<ITemplatePackage>(), new[] { result }, new Dictionary<string, DateTime>(), NullLogger.Instance);
 
             WriteObject(environmentSettings.Host.FileSystem, paths.TemplateCacheFile, templateCache);
             var readCache = new TemplateCache(ReadObject(environmentSettings.Host.FileSystem, paths.TemplateCacheFile), NullLogger.Instance);
@@ -186,7 +187,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             A.CallTo(() => mountPoint.MountPointUri).Returns("testMount");
 
             ScanResult result = new ScanResult(mountPoint, new[] { template }, Array.Empty<ILocalizationLocator>(), Array.Empty<(string AssemblyPath, Type InterfaceType, IIdentifiedComponent Instance)>());
-            TemplateCache templateCache = new TemplateCache(new[] { result }, new Dictionary<string, DateTime>(), NullLogger.Instance);
+            TemplateCache templateCache = new TemplateCache(Array.Empty<ITemplatePackage>(), new[] { result }, new Dictionary<string, DateTime>(), NullLogger.Instance);
 
             WriteObject(environmentSettings.Host.FileSystem, paths.TemplateCacheFile, templateCache);
             var readCache = new TemplateCache(ReadObject(environmentSettings.Host.FileSystem, paths.TemplateCacheFile), NullLogger.Instance);
@@ -231,7 +232,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             A.CallTo(() => mountPoint.MountPointUri).Returns("testMount");
 
             ScanResult result = new ScanResult(mountPoint, new[] { template }, Array.Empty<ILocalizationLocator>(), Array.Empty<(string AssemblyPath, Type InterfaceType, IIdentifiedComponent Instance)>());
-            TemplateCache templateCache = new TemplateCache(new[] { result }, new Dictionary<string, DateTime>(), NullLogger.Instance);
+            TemplateCache templateCache = new TemplateCache(Array.Empty<ITemplatePackage>(), new[] { result }, new Dictionary<string, DateTime>(), NullLogger.Instance);
 
             WriteObject(environmentSettings.Host.FileSystem, paths.TemplateCacheFile, templateCache);
             var readCache = new TemplateCache(ReadObject(environmentSettings.Host.FileSystem, paths.TemplateCacheFile), NullLogger.Instance);
