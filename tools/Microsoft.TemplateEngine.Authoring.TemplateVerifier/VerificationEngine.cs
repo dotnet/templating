@@ -343,6 +343,10 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             {
                 command.WithCustomHive(customHiveLocation);
             }
+            else
+            {
+                command.WithoutCustomHive();
+            }
 
             command
                 .WithCustomExecutablePath(options.DotnetExecutablePath)
