@@ -719,11 +719,23 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The template {0} installed from package {1} has the identity {2} that conflicts with an already existing template {3}. The template {3} will be overwritten..
+        ///   Looks up a localized string similar to 
+        ///      The following templates use the same identity &apos;{0}&apos;:
+        ///        {1}
+        ///      The template from &apos;{2}&apos; will be used. To resolve this conflict, uninstall the conflicting template packages. .
         /// </summary>
         internal static string TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict {
             get {
                 return ResourceManager.GetString("TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to    &apos;{0}&apos; from &apos;{1}&apos;.
+        /// </summary>
+        internal static string TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict_Subentry {
+            get {
+                return ResourceManager.GetString("TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict_Subentry", resourceCulture);
             }
         }
         

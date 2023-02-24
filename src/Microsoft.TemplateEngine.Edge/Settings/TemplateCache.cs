@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.TemplatePackage;
@@ -31,6 +32,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     continue;
                 }
 
+                var overlappingIdentitiesMap = new Dictionary<DuplicatedIdentity, IList<(string TemplateName, string PackageId)>>();
                 foreach (ITemplate template in scanResult.Templates)
                 {
                     if (templateDeduplicationDictionary.ContainsKey(template.Identity))
@@ -38,17 +40,37 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                         // add warning for the case when there is an attempt to overwrite existing managed by new managed template
                         var templatePackage = allTemplatePackages.FirstOrDefault(tp => tp.MountPointUri == template.MountPointUri);
                         var checkedTemplatePackage = allTemplatePackages.FirstOrDefault(tp => tp.MountPointUri == templateDeduplicationDictionary[template.Identity].Template.MountPointUri);
-                        if (templatePackage is IManagedTemplatePackage managedTP && checkedTemplatePackage is IManagedTemplatePackage)
+                        if (templatePackage is IManagedTemplatePackage managedTP && checkedTemplatePackage is IManagedTemplatePackage checkedManagedTP)
                         {
-                            _logger.LogWarning(string.Format(
-                                LocalizableStrings.TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict,
-                                template.Name,
-                                managedTP.DisplayName,
-                                template.Identity,
-                                templateDeduplicationDictionary[template.Identity].Template.Name));
+                            var duplicatedIdentity = new DuplicatedIdentity(template.Identity, managedTP.DisplayName);
+                            if (overlappingIdentitiesMap.ContainsKey(duplicatedIdentity))
+                            {
+                                overlappingIdentitiesMap[duplicatedIdentity].Add((templateDeduplicationDictionary[template.Identity].Template.Name, checkedManagedTP.DisplayName));
+                            }
+                            else
+                            {
+                                overlappingIdentitiesMap.Add(duplicatedIdentity, new List<(string TemplateName, string PackageId)> { (templateDeduplicationDictionary[template.Identity].Template.Name, checkedManagedTP.DisplayName) });
+                            }
                         }
                     }
+
                     templateDeduplicationDictionary[template.Identity] = (template, GetBestLocalizationLocatorMatch(scanResult.Localizations, template.Identity));
+                }
+
+                foreach (var identityTemplates in overlappingIdentitiesMap)
+                {
+                    var templatesList = new StringBuilder();
+                    identityTemplates.Value.Select(t => templatesList.AppendLine(
+                       "\u2022 '" + string.Format(
+                           LocalizableStrings.TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict_Subentry,
+                           t.TemplateName,
+                           t.PackageId)));
+
+                    _logger.LogWarning(string.Format(
+                            LocalizableStrings.TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict,
+                            identityTemplates.Key.Identity,
+                            templatesList.ToString(),
+                            identityTemplates.Key.PackageId));
                 }
             }
 
@@ -155,6 +177,26 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             }
             while (currentCulture.Name != CultureInfo.InvariantCulture.Name);
             return null;
+        }
+
+        private class DuplicatedIdentity
+        {
+            public DuplicatedIdentity(string identity, string packageId)
+            {
+                Identity = identity;
+                PackageId = packageId;
+            }
+
+            public string Identity { get; set; }
+
+            public string PackageId { get; set; }
+        }
+
+        private class DuplicatedIdentityComparer : IEqualityComparer<DuplicatedIdentity>
+        {
+            public bool Equals(DuplicatedIdentity x, DuplicatedIdentity y) => x.Identity == y.Identity;
+
+            public int GetHashCode(DuplicatedIdentity x) => x.Identity.GetHashCode();
         }
     }
 }
