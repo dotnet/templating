@@ -720,9 +720,9 @@ namespace Microsoft.TemplateEngine.Edge {
         
         /// <summary>
         ///   Looks up a localized string similar to 
-        ///      The following templates use the same identity &apos;{0}&apos;:
-        ///        {1}
-        ///      The template from &apos;{2}&apos; will be used. To resolve this conflict, uninstall the conflicting template packages. .
+        ///    The following templates use the same identity &apos;{0}&apos;:
+        ///    {1}
+        ///    The template from &apos;{2}&apos; will be used. To resolve this conflict, uninstall the conflicting template packages. .
         /// </summary>
         internal static string TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict {
             get {
@@ -731,7 +731,7 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to    &apos;{0}&apos; from &apos;{1}&apos;.
+        ///   Looks up a localized string similar to   {0} &apos;{1}&apos; from &apos;{2}&apos;.
         /// </summary>
         internal static string TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict_Subentry {
             get {

@@ -16,11 +16,17 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 {
     internal class TemplateCache
     {
+        private const string BulletSymbol = "\u2022";
+
         private readonly ILogger _logger;
 
         public TemplateCache(IReadOnlyList<ITemplatePackage> allTemplatePackages, ScanResult?[] scanResults, Dictionary<string, DateTime> mountPoints, ILogger logger)
         {
             _logger = logger;
+
+            // this dictionary contains information about managed templates with overlapping identities
+            var overlappingIdentitiesMap = new Dictionary<DuplicatedIdentity, IList<(string TemplateName, string PackageId)>>(new DuplicatedIdentityComparer());
+
             // We need this dictionary to de-duplicate templates that have same identity
             // notice that IEnumerable<ScanResult> that we get in is order by priority which means
             // last template with same Identity wins, others are ignored...
@@ -32,45 +38,15 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     continue;
                 }
 
-                var overlappingIdentitiesMap = new Dictionary<DuplicatedIdentity, IList<(string TemplateName, string PackageId)>>();
                 foreach (ITemplate template in scanResult.Templates)
                 {
                     if (templateDeduplicationDictionary.ContainsKey(template.Identity))
                     {
-                        // add warning for the case when there is an attempt to overwrite existing managed by new managed template
-                        var templatePackage = allTemplatePackages.FirstOrDefault(tp => tp.MountPointUri == template.MountPointUri);
-                        var checkedTemplatePackage = allTemplatePackages.FirstOrDefault(tp => tp.MountPointUri == templateDeduplicationDictionary[template.Identity].Template.MountPointUri);
-                        if (templatePackage is IManagedTemplatePackage managedTP && checkedTemplatePackage is IManagedTemplatePackage checkedManagedTP)
-                        {
-                            var duplicatedIdentity = new DuplicatedIdentity(template.Identity, managedTP.DisplayName);
-                            if (overlappingIdentitiesMap.ContainsKey(duplicatedIdentity))
-                            {
-                                overlappingIdentitiesMap[duplicatedIdentity].Add((templateDeduplicationDictionary[template.Identity].Template.Name, checkedManagedTP.DisplayName));
-                            }
-                            else
-                            {
-                                overlappingIdentitiesMap.Add(duplicatedIdentity, new List<(string TemplateName, string PackageId)> { (templateDeduplicationDictionary[template.Identity].Template.Name, checkedManagedTP.DisplayName) });
-                            }
-                        }
+                        // add data to overlappingIdentitiesMap if there is an attempt to overwrite existing managed by new managed template
+                        CheckForOverlappingIdentity(overlappingIdentitiesMap, template, templateDeduplicationDictionary[template.Identity].Template, allTemplatePackages);
                     }
 
                     templateDeduplicationDictionary[template.Identity] = (template, GetBestLocalizationLocatorMatch(scanResult.Localizations, template.Identity));
-                }
-
-                foreach (var identityTemplates in overlappingIdentitiesMap)
-                {
-                    var templatesList = new StringBuilder();
-                    identityTemplates.Value.Select(t => templatesList.AppendLine(
-                       "\u2022 '" + string.Format(
-                           LocalizableStrings.TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict_Subentry,
-                           t.TemplateName,
-                           t.PackageId)));
-
-                    _logger.LogWarning(string.Format(
-                            LocalizableStrings.TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict,
-                            identityTemplates.Key.Identity,
-                            templatesList.ToString(),
-                            identityTemplates.Key.PackageId));
                 }
             }
 
@@ -84,6 +60,8 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             Locale = CultureInfo.CurrentUICulture.Name;
             TemplateInfo = templates;
             MountPointsInfo = mountPoints;
+
+            PrintOverlappingIdentityWarning(overlappingIdentitiesMap);
         }
 
         public TemplateCache(JObject? contentJobject, ILogger logger)
@@ -177,6 +155,51 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             }
             while (currentCulture.Name != CultureInfo.InvariantCulture.Name);
             return null;
+        }
+
+        private void CheckForOverlappingIdentity(
+            IDictionary<DuplicatedIdentity, IList<(string TemplateName, string PackageId)>> overlappingIdentitiesMap,
+            ITemplate template,
+            ITemplate checkedTemplate,
+            IReadOnlyList<ITemplatePackage> allTemplatePackages)
+        {
+            // add warning for the case when there is an attempt to overwrite existing managed by new managed template
+            var templatePackage = allTemplatePackages.FirstOrDefault(tp => tp.MountPointUri == template.MountPointUri);
+            var checkedTemplatePackage = allTemplatePackages.FirstOrDefault(tp => tp.MountPointUri == checkedTemplate.MountPointUri);
+            if (templatePackage is IManagedTemplatePackage managedTP && checkedTemplatePackage is IManagedTemplatePackage checkedManagedTP)
+            {
+                var duplicatedIdentity = new DuplicatedIdentity(template.Identity, managedTP.DisplayName);
+                if (overlappingIdentitiesMap.ContainsKey(duplicatedIdentity))
+                {
+                    overlappingIdentitiesMap[duplicatedIdentity].Add((checkedTemplate.Name, checkedManagedTP.DisplayName));
+                }
+                else
+                {
+                    overlappingIdentitiesMap.Add(duplicatedIdentity, new List<(string TemplateName, string PackageId)> { (checkedTemplate.Name, checkedManagedTP.DisplayName) });
+                }
+            }
+        }
+
+        private void PrintOverlappingIdentityWarning(IDictionary<DuplicatedIdentity, IList<(string TemplateName, string PackageId)>> overlappingIdentitiesMap)
+        {
+            foreach (var identityTemplates in overlappingIdentitiesMap)
+            {
+                var templatesList = new StringBuilder();
+                foreach (var (templateName, packageId) in identityTemplates.Value)
+                {
+                    templatesList.AppendLine(string.Format(
+                        LocalizableStrings.TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict_Subentry,
+                        BulletSymbol,
+                        templateName,
+                        packageId));
+                }
+
+                _logger.LogWarning(string.Format(
+                        LocalizableStrings.TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict,
+                        identityTemplates.Key.Identity,
+                        templatesList.ToString().TrimEnd(Environment.NewLine.ToCharArray()),
+                        identityTemplates.Key.PackageId));
+            }
         }
 
         private class DuplicatedIdentity
