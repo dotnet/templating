@@ -98,6 +98,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.UnitTests
                 SnapshotsDirectory = snapshotsDir,
                 OutputDirectory = workingDir,
                 VerifyCommandOutput = true,
+                SettingsDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()),
                 UniqueFor = UniqueForOption.OsPlatform | UniqueForOption.OsPlatform,
             };
 
@@ -107,7 +108,6 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.UnitTests
                 .Should()
                 .ThrowAsync<TemplateVerificationException>()
                 .Where(e => e.TemplateVerificationErrorCode == TemplateVerificationErrorCode.InstantiationFailed);
-
         }
 
         [Fact]
