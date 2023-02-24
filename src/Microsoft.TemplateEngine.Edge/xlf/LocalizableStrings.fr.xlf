@@ -395,9 +395,9 @@ The following templates use the same identity '{0}':
 {1}
 The template from '{2}' will be used. To resolve this conflict, uninstall the conflicting template packages.</target>
         <note>
-    The following templates use the same identity 'IDENTITY':
-      * 'TEMPLATE' from 'PACKAGE_ID'
-    The template from 'PACKAGE_ID' will be used. To resolve this conflict, uninstall the conflicting template packages.
+The following templates use the same identity 'IDENTITY':
+  * 'TEMPLATE' from 'PACKAGE_ID'
+The template from 'PACKAGE_ID' will be used. To resolve this conflict, uninstall the conflicting template packages.
     </note>
       </trans-unit>
       <trans-unit id="TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict_Subentry">
