@@ -387,13 +387,13 @@ Pamięć podręczna szablonów zostanie ponownie utworzona przy następnym uruch
       </trans-unit>
       <trans-unit id="TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict">
         <source>
-    The following templates use the same identity '{0}':
-    {1}
-    The template from '{2}' will be used. To resolve this conflict, uninstall the conflicting template packages. </source>
+The following templates use the same identity '{0}':
+{1}
+The template from '{2}' will be used. To resolve this conflict, uninstall the conflicting template packages.</source>
         <target state="new">
-    The following templates use the same identity '{0}':
-    {1}
-    The template from '{2}' will be used. To resolve this conflict, uninstall the conflicting template packages. </target>
+The following templates use the same identity '{0}':
+{1}
+The template from '{2}' will be used. To resolve this conflict, uninstall the conflicting template packages.</target>
         <note>
     The following templates use the same identity 'IDENTITY':
       * 'TEMPLATE' from 'PACKAGE_ID'

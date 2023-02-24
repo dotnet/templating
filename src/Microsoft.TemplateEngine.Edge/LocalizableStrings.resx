@@ -397,9 +397,9 @@ Template cache will be recreated on the next run.</value>
   </data>
   <data name="TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict" xml:space="preserve">
     <value>
-    The following templates use the same identity '{0}':
-    {1}
-    The template from '{2}' will be used. To resolve this conflict, uninstall the conflicting template packages. </value>
+The following templates use the same identity '{0}':
+{1}
+The template from '{2}' will be used. To resolve this conflict, uninstall the conflicting template packages.</value>
     <comment>
     The following templates use the same identity 'IDENTITY':
       * 'TEMPLATE' from 'PACKAGE_ID'

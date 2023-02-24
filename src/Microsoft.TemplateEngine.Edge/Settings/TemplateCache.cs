@@ -171,7 +171,14 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 var duplicatedIdentity = new DuplicatedIdentity(template.Identity, managedTP.DisplayName);
                 if (overlappingIdentitiesMap.ContainsKey(duplicatedIdentity))
                 {
-                    overlappingIdentitiesMap[duplicatedIdentity].Add((checkedTemplate.Name, checkedManagedTP.DisplayName));
+                    // need to substitute key due to changes in template path
+                    // since the key uniqueness is defined by identity only
+                    // see DuplicatedIdentityComparer
+                    var values = overlappingIdentitiesMap[duplicatedIdentity];
+                    values.Add((checkedTemplate.Name, checkedManagedTP.DisplayName));
+
+                    overlappingIdentitiesMap.Remove(duplicatedIdentity);
+                    overlappingIdentitiesMap.Add(duplicatedIdentity, values);
                 }
                 else
                 {
