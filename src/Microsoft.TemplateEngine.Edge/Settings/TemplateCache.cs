@@ -163,63 +163,73 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             ITemplate checkedTemplate,
             IReadOnlyList<ITemplatePackage> allTemplatePackages)
         {
-            // add warning for the case when there is an attempt to overwrite existing managed by new managed template
             var templatePackage = allTemplatePackages.FirstOrDefault(tp => tp.MountPointUri == template.MountPointUri);
             var checkedTemplatePackage = allTemplatePackages.FirstOrDefault(tp => tp.MountPointUri == checkedTemplate.MountPointUri);
-            if (templatePackage is IManagedTemplatePackage managedTP && checkedTemplatePackage is IManagedTemplatePackage checkedManagedTP)
-            {
-                var duplicatedIdentity = new DuplicatedIdentity(template.Identity, managedTP.DisplayName);
-                if (overlappingIdentitiesMap.ContainsKey(duplicatedIdentity))
-                {
-                    // need to substitute key due to changes in template path
-                    // since the key uniqueness is defined by identity only
-                    // see DuplicatedIdentityComparer
-                    var values = overlappingIdentitiesMap[duplicatedIdentity];
-                    values.Add((checkedTemplate.Name, checkedManagedTP.DisplayName));
+            var isTemplatePackageManaged = templatePackage is IManagedTemplatePackage;
+            var checkedTPPath = checkedTemplatePackage is IManagedTemplatePackage checkedManagedTP ? checkedManagedTP.DisplayName : checkedTemplatePackage.MountPointUri;
 
-                    overlappingIdentitiesMap.Remove(duplicatedIdentity);
-                    overlappingIdentitiesMap.Add(duplicatedIdentity, values);
-                }
-                else
-                {
-                    overlappingIdentitiesMap.Add(duplicatedIdentity, new List<(string TemplateName, string PackageId)> { (checkedTemplate.Name, checkedManagedTP.DisplayName) });
-                }
+            var duplicatedIdentity = new DuplicatedIdentity(
+                template.Identity,
+                templatePackage is IManagedTemplatePackage managedTP ? managedTP.DisplayName : string.Empty,
+                isTemplatePackageManaged);
+            if (overlappingIdentitiesMap.ContainsKey(duplicatedIdentity))
+            {
+                // need to substitute key due to changes in template path
+                // since the key uniqueness is defined by identity only
+                // see DuplicatedIdentityComparer
+                var values = overlappingIdentitiesMap[duplicatedIdentity];
+                values.Add((checkedTemplate.Name, checkedTPPath));
+
+                overlappingIdentitiesMap.Remove(duplicatedIdentity);
+                overlappingIdentitiesMap.Add(duplicatedIdentity, values);
+            }
+            else
+            {
+                overlappingIdentitiesMap.Add(duplicatedIdentity, new List<(string TemplateName, string PackageId)> { (checkedTemplate.Name, checkedTPPath) });
             }
         }
 
+        // add warning for the case when there is an attempt to overwrite existing managed by new managed template
         private void PrintOverlappingIdentityWarning(IDictionary<DuplicatedIdentity, IList<(string TemplateName, string PackageId)>> overlappingIdentitiesMap)
         {
             foreach (var identityTemplates in overlappingIdentitiesMap)
             {
-                var templatesList = new StringBuilder();
-                foreach (var (templateName, packageId) in identityTemplates.Value)
+                // we print the message only if managed template wins
+                if (identityTemplates.Key.IsManagedTemplatePackage)
                 {
-                    templatesList.AppendLine(string.Format(
-                        LocalizableStrings.TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict_Subentry,
-                        BulletSymbol,
-                        templateName,
-                        packageId));
-                }
+                    var templatesList = new StringBuilder();
+                    foreach (var (templateName, packageId) in identityTemplates.Value)
+                    {
+                        templatesList.AppendLine(string.Format(
+                            LocalizableStrings.TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict_Subentry,
+                            BulletSymbol,
+                            templateName,
+                            packageId));
+                    }
 
-                _logger.LogWarning(string.Format(
-                        LocalizableStrings.TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict,
-                        identityTemplates.Key.Identity,
-                        templatesList.ToString().TrimEnd(Environment.NewLine.ToCharArray()),
-                        identityTemplates.Key.PackageId));
+                    _logger.LogWarning(string.Format(
+                            LocalizableStrings.TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict,
+                            identityTemplates.Key.Identity,
+                            templatesList.ToString().TrimEnd(Environment.NewLine.ToCharArray()),
+                            identityTemplates.Key.PackageId));
+                }
             }
         }
 
         private class DuplicatedIdentity
         {
-            public DuplicatedIdentity(string identity, string packageId)
+            public DuplicatedIdentity(string identity, string packageId, bool isManagedTemplatePackage)
             {
                 Identity = identity;
                 PackageId = packageId;
+                IsManagedTemplatePackage = isManagedTemplatePackage;
             }
 
             public string Identity { get; set; }
 
             public string PackageId { get; set; }
+
+            public bool IsManagedTemplatePackage { get; set; }
         }
 
         private class DuplicatedIdentityComparer : IEqualityComparer<DuplicatedIdentity>
