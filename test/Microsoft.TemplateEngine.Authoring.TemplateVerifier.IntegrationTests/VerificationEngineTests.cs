@@ -31,7 +31,6 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.IntegrationTests
                 SnapshotsDirectory = snapshotsDir,
                 OutputDirectory = workingDir,
                 VerifyCommandOutput = true,
-                SettingsDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()),
                 UniqueFor = UniqueForOption.OsPlatform | UniqueForOption.OsPlatform,
             };
 
@@ -81,7 +80,6 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.IntegrationTests
                 SnapshotsDirectory = snapshotsDir,
                 OutputDirectory = workingDir2,
                 VerifyCommandOutput = true,
-                SettingsDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()),
                 UniqueFor = UniqueForOption.OsPlatform | UniqueForOption.OsPlatform,
             };
 
@@ -106,7 +104,6 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.IntegrationTests
                 TemplateSpecificArgs = new string[] { "--use-program-main", "-o", templateDir, "--no-restore" },
                 DisableDiffTool = true,
                 OutputDirectory = workingDir,
-                SettingsDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()),
                 VerificationExcludePatterns = new[] { "*.cs" },
                 VerifyCommandOutput = true,
                 UniqueFor = UniqueForOption.OsPlatform | UniqueForOption.OsPlatform,
