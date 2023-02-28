@@ -169,9 +169,9 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             foreach (var identityToTemplates in templateDeduplicationDictionary)
             {
                 // we print the message only if managed template wins and we have > 1 managed templates with overlapping identities
-                var lastTemplate = identityToTemplates.Value.LastOrDefault();
-                var managedTemplates = identityToTemplates.Value.Where(templateInto => templateInto.Template is IManagedTemplatePackage).ToArray();
-                if (lastTemplate.Template is IManagedTemplatePackage && managedTemplates.Length > 1)
+                var lastTemplate = identityToTemplates.Value.Last();
+                var managedTemplates = identityToTemplates.Value.Where(templateInto => templateInto.Template is IManagedTemplatePackage);
+                if (lastTemplate.Template is IManagedTemplatePackage && managedTemplates.Take(2).Count() > 1)
                 {
                     var templatesList = new StringBuilder();
                     foreach (var (templateName, packageId, _) in managedTemplates)
