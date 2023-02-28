@@ -24,13 +24,10 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         {
             _logger = logger;
 
-            // this dictionary contains information about managed templates with overlapping identities
-            var overlappingIdentitiesMap = new Dictionary<DuplicatedIdentity, IList<(string TemplateName, string PackageId)>>(new DuplicatedIdentityComparer());
-
             // We need this dictionary to de-duplicate templates that have same identity
             // notice that IEnumerable<ScanResult> that we get in is order by priority which means
-            // last template with same Identity wins, others are ignored...
-            var templateDeduplicationDictionary = new Dictionary<string, (ITemplate Template, ILocalizationLocator? Localization)>();
+            // last template with same Identity will win, others will be ignored...
+            var templateDeduplicationDictionary = new Dictionary<string, IList<(ITemplate Template, string PackageDisplayName, ILocalizationLocator? Localization)>>();
             foreach (var scanResult in scanResults)
             {
                 if (scanResult == null)
@@ -40,18 +37,28 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
                 foreach (ITemplate template in scanResult.Templates)
                 {
+                    var templatePackageDisplayName = allTemplatePackages.FirstOrDefault(tp => tp.MountPointUri == template.MountPointUri) is IManagedTemplatePackage managedTP
+                        ? managedTP.DisplayName
+                        : string.Empty;
+
                     if (templateDeduplicationDictionary.ContainsKey(template.Identity))
                     {
-                        // add data to overlappingIdentitiesMap if there is an attempt to overwrite existing managed by new managed template
-                        CheckForOverlappingIdentity(overlappingIdentitiesMap, template, templateDeduplicationDictionary[template.Identity].Template, allTemplatePackages);
+                        templateDeduplicationDictionary[template.Identity].Add((template, templatePackageDisplayName, GetBestLocalizationLocatorMatch(scanResult.Localizations, template.Identity)));
                     }
-
-                    templateDeduplicationDictionary[template.Identity] = (template, GetBestLocalizationLocatorMatch(scanResult.Localizations, template.Identity));
+                    else
+                    {
+                        templateDeduplicationDictionary.Add(
+                            template.Identity,
+                            new List<(ITemplate Template, string PackageDisplayName, ILocalizationLocator? Localization)>
+                            {
+                                (template, templatePackageDisplayName, GetBestLocalizationLocatorMatch(scanResult.Localizations, template.Identity))
+                            });
+                    }
                 }
             }
 
             var templates = new List<TemplateInfo>();
-            foreach (var newTemplate in templateDeduplicationDictionary.Values)
+            foreach (var newTemplate in templateDeduplicationDictionary.Values.LastOrDefault())
             {
                 templates.Add(new TemplateInfo(newTemplate.Template, newTemplate.Localization, logger));
             }
@@ -61,7 +68,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             TemplateInfo = templates;
             MountPointsInfo = mountPoints;
 
-            PrintOverlappingIdentityWarning(overlappingIdentitiesMap);
+            PrintOverlappingIdentityWarning(templateDeduplicationDictionary);
         }
 
         public TemplateCache(JObject? contentJobject, ILogger logger)
@@ -157,48 +164,18 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             return null;
         }
 
-        private void CheckForOverlappingIdentity(
-            IDictionary<DuplicatedIdentity, IList<(string TemplateName, string PackageId)>> overlappingIdentitiesMap,
-            ITemplate template,
-            ITemplate checkedTemplate,
-            IReadOnlyList<ITemplatePackage> allTemplatePackages)
-        {
-            var templatePackage = allTemplatePackages.FirstOrDefault(tp => tp.MountPointUri == template.MountPointUri);
-            var checkedTemplatePackage = allTemplatePackages.FirstOrDefault(tp => tp.MountPointUri == checkedTemplate.MountPointUri);
-            var isTemplatePackageManaged = templatePackage is IManagedTemplatePackage;
-            var checkedTPPath = checkedTemplatePackage is IManagedTemplatePackage checkedManagedTP ? checkedManagedTP.DisplayName : checkedTemplatePackage.MountPointUri;
-
-            var duplicatedIdentity = new DuplicatedIdentity(
-                template.Identity,
-                templatePackage is IManagedTemplatePackage managedTP ? managedTP.DisplayName : string.Empty,
-                isTemplatePackageManaged);
-            if (overlappingIdentitiesMap.ContainsKey(duplicatedIdentity))
-            {
-                // need to substitute key due to changes in template path
-                // since the key uniqueness is defined by identity only
-                // see DuplicatedIdentityComparer
-                var values = overlappingIdentitiesMap[duplicatedIdentity];
-                values.Add((checkedTemplate.Name, checkedTPPath));
-
-                overlappingIdentitiesMap.Remove(duplicatedIdentity);
-                overlappingIdentitiesMap.Add(duplicatedIdentity, values);
-            }
-            else
-            {
-                overlappingIdentitiesMap.Add(duplicatedIdentity, new List<(string TemplateName, string PackageId)> { (checkedTemplate.Name, checkedTPPath) });
-            }
-        }
-
         // add warning for the case when there is an attempt to overwrite existing managed by new managed template
-        private void PrintOverlappingIdentityWarning(IDictionary<DuplicatedIdentity, IList<(string TemplateName, string PackageId)>> overlappingIdentitiesMap)
+        private void PrintOverlappingIdentityWarning(IDictionary<string, IList<(ITemplate Template, string PackageDisplayName, ILocalizationLocator? Localization)>> templateDeduplicationDictionary)
         {
-            foreach (var identityTemplates in overlappingIdentitiesMap)
+            foreach (var identityToTemplates in templateDeduplicationDictionary)
             {
-                // we print the message only if managed template wins
-                if (identityTemplates.Key.IsManagedTemplatePackage)
+                // we print the message only if managed template wins and we have > 1 managed templates with overlapping identities
+                var lastTemplate = identityToTemplates.Value.LastOrDefault();
+                var managedTemplates = identityToTemplates.Value.Where(templateInto => templateInto.Template is IManagedTemplatePackage).ToArray();
+                if (lastTemplate.Template is IManagedTemplatePackage && managedTemplates.Length > 1)
                 {
                     var templatesList = new StringBuilder();
-                    foreach (var (templateName, packageId) in identityTemplates.Value)
+                    foreach (var (templateName, packageId, _) in managedTemplates)
                     {
                         templatesList.AppendLine(string.Format(
                             LocalizableStrings.TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict_Subentry,
@@ -209,34 +186,11 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
                     _logger.LogWarning(string.Format(
                             LocalizableStrings.TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict,
-                            identityTemplates.Key.Identity,
+                            identityToTemplates.Key,
                             templatesList.ToString().TrimEnd(Environment.NewLine.ToCharArray()),
-                            identityTemplates.Key.PackageId));
+                            lastTemplate.PackageDisplayName));
                 }
             }
-        }
-
-        private class DuplicatedIdentity
-        {
-            public DuplicatedIdentity(string identity, string packageId, bool isManagedTemplatePackage)
-            {
-                Identity = identity;
-                PackageId = packageId;
-                IsManagedTemplatePackage = isManagedTemplatePackage;
-            }
-
-            public string Identity { get; set; }
-
-            public string PackageId { get; set; }
-
-            public bool IsManagedTemplatePackage { get; set; }
-        }
-
-        private class DuplicatedIdentityComparer : IEqualityComparer<DuplicatedIdentity>
-        {
-            public bool Equals(DuplicatedIdentity x, DuplicatedIdentity y) => x.Identity == y.Identity;
-
-            public int GetHashCode(DuplicatedIdentity x) => x.Identity.GetHashCode();
         }
     }
 }
