@@ -47,19 +47,18 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     }
                     else
                     {
-                        templateDeduplicationDictionary.Add(
-                            template.Identity,
-                            new List<(ITemplate Template, string PackageDisplayName, ILocalizationLocator? Localization)>
-                            {
-                                (template, templatePackageDisplayName, GetBestLocalizationLocatorMatch(scanResult.Localizations, template.Identity))
-                            });
+                        templateDeduplicationDictionary[template.Identity] = new List<(ITemplate Template, string PackageDisplayName, ILocalizationLocator? Localization)>
+                        {
+                            (template, templatePackageDisplayName, GetBestLocalizationLocatorMatch(scanResult.Localizations, template.Identity))
+                        };
                     }
                 }
             }
 
             var templates = new List<TemplateInfo>();
-            foreach (var newTemplate in templateDeduplicationDictionary.Values.LastOrDefault())
+            foreach (var duplicatedIdentities in templateDeduplicationDictionary)
             {
+                var newTemplate = duplicatedIdentities.Value.LastOrDefault();
                 templates.Add(new TemplateInfo(newTemplate.Template, newTemplate.Localization, logger));
             }
 
