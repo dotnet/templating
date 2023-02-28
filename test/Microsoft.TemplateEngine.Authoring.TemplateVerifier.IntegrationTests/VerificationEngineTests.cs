@@ -152,8 +152,6 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier.IntegrationTests
             {
                 TemplateSpecificArgs = new[] { "--empty" },
                 VerifyCommandOutput = true,
-                SettingsDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName())
-
             };
 
             VerificationEngine engine = new VerificationEngine(_log);
