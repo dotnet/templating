@@ -242,9 +242,9 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             InMemoryLoggerProvider loggerProvider = new InMemoryLoggerProvider(loggedMessages);
 
             var expectedOutput = "The following templates use the same identity 'testIdentity':" +
-                "\r\n  • 'TemplateA' from 'PackageA'" +
-                "\r\n  • 'TemplateB' from 'PackageB'" +
-                "\r\nThe template from 'TemplateC' will be used. To resolve this conflict, uninstall the conflicting template packages.";
+                $"{Environment.NewLine}  • 'TemplateA' from 'PackageA'" +
+                $"{Environment.NewLine}  • 'TemplateB' from 'PackageB'" +
+                $"{Environment.NewLine}The template from 'TemplateC' will be used. To resolve this conflict, uninstall the conflicting template packages.";
 
             ScanResult result = new ScanResult(A.Fake<IMountPoint>(), new[] { templateA, templateB, templateC }, Array.Empty<ILocalizationLocator>(), Array.Empty<(string AssemblyPath, Type InterfaceType, IIdentifiedComponent Instance)>());
             _ = new TemplateCache(new[] { managedTPA, managedTPB, managedTPC }, new[] { result }, new Dictionary<string, DateTime>(), loggerProvider.CreateLogger(string.Empty));
@@ -272,8 +272,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             InMemoryLoggerProvider loggerProvider = new InMemoryLoggerProvider(loggedMessages);
 
             var expectedOutput = "The following templates use the same identity 'testIdentity':" +
-                "\r\n  • 'TemplateA' from 'PackageA'" +
-                "\r\nThe template from 'TemplateC' will be used. To resolve this conflict, uninstall the conflicting template packages.";
+                $"{Environment.NewLine}  • 'TemplateA' from 'PackageA'" +
+                $"{Environment.NewLine}The template from 'TemplateC' will be used. To resolve this conflict, uninstall the conflicting template packages.";
 
             ScanResult result = new ScanResult(A.Fake<IMountPoint>(), new[] { templateA, templateB, templateC }, Array.Empty<ILocalizationLocator>(), Array.Empty<(string AssemblyPath, Type InterfaceType, IIdentifiedComponent Instance)>());
             _ = new TemplateCache(new[] { managedTPA, managedTPB, managedTPC }, new[] { result }, new Dictionary<string, DateTime>(), loggerProvider.CreateLogger(string.Empty));
