@@ -27,7 +27,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             // We need this dictionary to de-duplicate templates that have same identity
             // notice that IEnumerable<ScanResult> that we get in is order by priority which means
             // last template with same Identity will win, others will be ignored...
-            var templateDeduplicationDictionary = new Dictionary<string, IList<(ITemplate Template, string PackageDisplayName, ILocalizationLocator? Localization)>>();
+            var templateDeduplicationDictionary = new Dictionary<string, IList<(ITemplate Template, ITemplatePackage TemplatePackage, ILocalizationLocator? Localization)>>();
             foreach (var scanResult in scanResults)
             {
                 if (scanResult == null)
@@ -37,19 +37,17 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
                 foreach (ITemplate template in scanResult.Templates)
                 {
-                    var templatePackageDisplayName = allTemplatePackages.FirstOrDefault(tp => tp.MountPointUri == template.MountPointUri) is IManagedTemplatePackage managedTP
-                        ? managedTP.DisplayName
-                        : string.Empty;
+                    var templatePackage = allTemplatePackages.FirstOrDefault(tp => tp.MountPointUri == template.MountPointUri);
 
                     if (templateDeduplicationDictionary.ContainsKey(template.Identity))
                     {
-                        templateDeduplicationDictionary[template.Identity].Add((template, templatePackageDisplayName, GetBestLocalizationLocatorMatch(scanResult.Localizations, template.Identity)));
+                        templateDeduplicationDictionary[template.Identity].Add((template, templatePackage, GetBestLocalizationLocatorMatch(scanResult.Localizations, template.Identity)));
                     }
                     else
                     {
-                        templateDeduplicationDictionary[template.Identity] = new List<(ITemplate Template, string PackageDisplayName, ILocalizationLocator? Localization)>
+                        templateDeduplicationDictionary[template.Identity] = new List<(ITemplate Template, ITemplatePackage TemplatePackage, ILocalizationLocator? Localization)>
                         {
-                            (template, templatePackageDisplayName, GetBestLocalizationLocatorMatch(scanResult.Localizations, template.Identity))
+                            (template, templatePackage, GetBestLocalizationLocatorMatch(scanResult.Localizations, template.Identity))
                         };
                     }
                 }
@@ -58,7 +56,8 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             var templates = new List<TemplateInfo>();
             foreach (var duplicatedIdentities in templateDeduplicationDictionary)
             {
-                var newTemplate = duplicatedIdentities.Value.LastOrDefault();
+                // last template with same Identity wins, others will be ignored due to applied deduplication logic
+                var newTemplate = duplicatedIdentities.Value.Last();
                 templates.Add(new TemplateInfo(newTemplate.Template, newTemplate.Localization, logger));
             }
 
@@ -164,14 +163,14 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         }
 
         // add warning for the case when there is an attempt to overwrite existing managed by new managed template
-        private void PrintOverlappingIdentityWarning(IDictionary<string, IList<(ITemplate Template, string PackageDisplayName, ILocalizationLocator? Localization)>> templateDeduplicationDictionary)
+        private void PrintOverlappingIdentityWarning(IDictionary<string, IList<(ITemplate Template, ITemplatePackage TemplatePackage, ILocalizationLocator? Localization)>> templateDeduplicationDictionary)
         {
             foreach (var identityToTemplates in templateDeduplicationDictionary)
             {
                 // we print the message only if managed template wins and we have > 1 managed templates with overlapping identities
                 var lastTemplate = identityToTemplates.Value.LastOrDefault();
-                var managedTemplates = identityToTemplates.Value.Where(templateInto => templateInto.Template is IManagedTemplatePackage).ToArray();
-                if (lastTemplate.Template is IManagedTemplatePackage && managedTemplates.Length > 1)
+                var managedTemplates = identityToTemplates.Value.Where(templateInto => templateInto.TemplatePackage is IManagedTemplatePackage).Except(new[] { lastTemplate }).ToArray();
+                if (lastTemplate.TemplatePackage is IManagedTemplatePackage managedPackage && managedTemplates.Length > 0)
                 {
                     var templatesList = new StringBuilder();
                     foreach (var (templateName, packageId, _) in managedTemplates)
@@ -179,15 +178,15 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                         templatesList.AppendLine(string.Format(
                             LocalizableStrings.TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict_Subentry,
                             BulletSymbol,
-                            templateName,
-                            packageId));
+                            templateName.Name,
+                            (packageId as IManagedTemplatePackage)?.DisplayName));
                     }
 
                     _logger.LogWarning(string.Format(
                             LocalizableStrings.TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict,
                             identityToTemplates.Key,
                             templatesList.ToString().TrimEnd(Environment.NewLine.ToCharArray()),
-                            lastTemplate.PackageDisplayName));
+                            lastTemplate.Template.Name));
                 }
             }
         }
