@@ -16,7 +16,7 @@
     <PackageReference Include="NuGet.Configuration" />
     <PackageReference Include="NuGet.Protocol" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
-    <PackageReference Include="System.CommandLine" />
+    <PackageReference Include="System.CommandLine" NoWarn="NU5104" />
     <PackageReference Include="FluentAssertions" />
   </ItemGroup>
 
