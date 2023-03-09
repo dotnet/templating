@@ -385,6 +385,26 @@ Template cache will be recreated on the next run.</source>
 Şablon önbelleği sonraki çalıştırmada yeniden oluşturulacak.</target>
         <note>{0} should not end with period - period is a part of the format entry.</note>
       </trans-unit>
+      <trans-unit id="TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict">
+        <source>
+The following templates use the same identity '{0}':
+{1}
+The template from '{2}' will be used. To resolve this conflict, uninstall the conflicting template packages.</source>
+        <target state="translated">
+Aşağıdaki şablonlar aynı '{0}' kimliğini kullanıyor:
+{1}
+'{2}' paketindeki şablon kullanılacak. Bu çakışmayı çözmek için çakışan şablon paketlerini kaldırın.</target>
+        <note>
+The following templates use the same identity 'IDENTITY':
+  * 'TEMPLATE' from 'PACKAGE_ID'
+The template from 'PACKAGE_ID' will be used. To resolve this conflict, uninstall the conflicting template packages.
+    </note>
+      </trans-unit>
+      <trans-unit id="TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict_Subentry">
+        <source>  {0} '{1}' from '{2}'</source>
+        <target state="translated">  {0} '{2}' paketindeki '{1}' şablonu</target>
+        <note>* 'TEMPLATE' from 'PACKAGE_ID'</note>
+      </trans-unit>
       <trans-unit id="WorkloadConstraint_Error_MismatchedProviders">
         <source>Multiple 'IWorkloadsInfoProvider' components provided by host ({0}), therefore 'WorkloadConstraint' cannot be properly initialized.</source>
         <target state="translated">Ana bilgisayar ({0}) tarafından sağlanan birden çok 'IWorkloadsInfoProvider' bileşeni bulunuyor. Dolayısıyla 'WorkloadConstraint' düzgün başlatılamıyor.</target>
