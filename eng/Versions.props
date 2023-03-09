@@ -1,26 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Dependencies>
-  <ProductDependencies>
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-externals" Version="7.0.0-alpha.1.22463.5">
-      <Uri>https://github.com/dotnet/source-build-externals</Uri>
-      <Sha>6e9ede1f2771f59d80a4050c02d051bbbd457c77</Sha>
-      <SourceBuild RepoName="source-build-externals" ManagedOnly="true" />
-    </Dependency>
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="7.0.0-alpha.1.22408.1">
-      <Uri>https://github.com/dotnet/source-build-reference-packages</Uri>
-      <Sha>ddc5b4880b0bf18783fc6808c4d407214f7bdae1</Sha>
-      <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
-    </Dependency>
-    <Dependency Name="System.CommandLine" Version="2.0.0-beta4.23157.2">
-      <Uri>https://github.com/dotnet/command-line-api</Uri>
-      <Sha>c63e231c1e5102c51bd9247a4f3feec9175d601d</Sha>
-    </Dependency>
-  </ProductDependencies>
-  <ToolsetDependencies>
-    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="7.0.0-beta.23122.4">
-      <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>2e0fab0209c66d181d93b0d03bc267db5bde75be</Sha>
-      <SourceBuild RepoName="arcade" ManagedOnly="true" />
-    </Dependency>
-  </ToolsetDependencies>
-</Dependencies>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- Opt out of certain Arcade features -->
+  <PropertyGroup>
+    <UsingToolXliff>true</UsingToolXliff>
+    <UsingToolNetFrameworkReferenceAssemblies>true</UsingToolNetFrameworkReferenceAssemblies>
+    <VersionPrefix>7.0.300</VersionPrefix>
+    <PreReleaseVersionLabel>preview</PreReleaseVersionLabel>
+    <PreReleaseVersionIteration>true</PreReleaseVersionIteration>
+    <!-- When StabilizePackageVersion is set to 'true', this branch will produce stable outputs for 'Shipping' packages -->
+    <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">false</StabilizePackageVersion>
+    <DotNetFinalVersionKind Condition="'$(StabilizePackageVersion)' == 'true'">release</DotNetFinalVersionKind>
+    <PackSpecific Condition="'$(OS)' != 'Windows_NT'">true</PackSpecific>
+  </PropertyGroup>
+  <!-- Package Versions -->
+  <PropertyGroup>
+    <!-- Maestro-managed Package Versions - Ordered by repo name -->
+    <!-- Dependencies from https://github.com/dotnet/command-line-api -->
+    <SystemCommandLinePackageVersion>2.0.0-beta4.23157.2</SystemCommandLinePackageVersion>
+  </PropertyGroup>
+</Project>
