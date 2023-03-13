@@ -82,10 +82,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 try
                 {
                     LocalizationModel locModel = LocalizationModelDeserializer.Deserialize(locFile);
-                    //if (VerifyLocalizationModel(locModel, locFile))
-                    //{
                     localizations[locale] = new TemplateLocalizationInfo(locale, locModel, locFile);
-                    //}
                 }
                 catch (Exception ex)
                 {

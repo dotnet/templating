@@ -292,17 +292,17 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
                 LogValidationEntries(
                     logger,
-                    string.Format("The template {0} has the following validation errors:", templateDisplayName),
+                    string.Format(LocalizableStrings.Scanner_Validation_Error_Header, templateDisplayName),
                     template.ValidationErrors,
                     IValidationEntry.SeverityLevel.Error);
                 LogValidationEntries(
                     logger,
-                    string.Format("The template {0} has the following validation warnings:", templateDisplayName),
+                    string.Format(LocalizableStrings.Scanner_Validation_Warning_Header, templateDisplayName),
                     template.ValidationErrors,
                     IValidationEntry.SeverityLevel.Warning);
                 LogValidationEntries(
                     logger,
-                    string.Format("The template {0} has the following validation messages:", templateDisplayName),
+                    string.Format(LocalizableStrings.Scanner_Validation_Info_Header, templateDisplayName),
                     template.ValidationErrors,
                     IValidationEntry.SeverityLevel.Info);
 
@@ -312,28 +312,28 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
                     LogValidationEntries(
                         logger,
-                        string.Format("The template {0} has the following validation errors in '{1}' localization:", templateDisplayName, localizationInfo.Locale),
+                        string.Format(LocalizableStrings.Scanner_Validation_LocError_Header, templateDisplayName, localizationInfo.Locale),
                         localizationInfo.ValidationErrors,
                         IValidationEntry.SeverityLevel.Error);
                     LogValidationEntries(
                         logger,
-                        string.Format("The template {0} has the following validation warnings in '{1}' localization:", templateDisplayName, localizationInfo.Locale),
+                        string.Format(LocalizableStrings.Scanner_Validation_LocWarning_Header, templateDisplayName, localizationInfo.Locale),
                         localizationInfo.ValidationErrors,
                         IValidationEntry.SeverityLevel.Warning);
                     LogValidationEntries(
                         logger,
-                        string.Format("The template {0} has the following validation messages in '{1}' localization:", templateDisplayName, localizationInfo.Locale),
+                        string.Format(LocalizableStrings.Scanner_Validation_LocInfo_Header, templateDisplayName, localizationInfo.Locale),
                         localizationInfo.ValidationErrors,
                         IValidationEntry.SeverityLevel.Info);
                 }
 
                 if (!template.IsValid)
                 {
-                    logger.LogError("Failed to install the template {0}: the template is not valid.", templateDisplayName);
+                    logger.LogError(LocalizableStrings.Scanner_Validation_InvalidTemplate, templateDisplayName);
                 }
                 foreach (ILocalizationLocator invalidLoc in template.Localizations.Values.Where(li => !li.IsValid))
                 {
-                    logger.LogWarning("Failed to install the '{0}' localization the template {1}: the localization file is not valid. The localization will be skipped.", invalidLoc.Locale, templateDisplayName);
+                    logger.LogWarning(LocalizableStrings.Scanner_Validation_InvalidTemplateLoc, invalidLoc.Locale, templateDisplayName);
                 }
             }
 
