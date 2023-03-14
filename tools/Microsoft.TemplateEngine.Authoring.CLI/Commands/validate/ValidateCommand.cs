@@ -20,7 +20,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands
             Arity = new ArgumentArity(1, 1)
         };
 
-        public ValidateCommand() : base(CommandName, "Validates the templates at given location.")
+        public ValidateCommand() : base(CommandName, LocalizableStrings.command_validate_help_locationArg_description)
         {
             AddArgument(_templateLocationArg);
         }
@@ -38,7 +38,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands
             using IEngineEnvironmentSettings settings = SetupSettings(loggerFactory);
             Scanner scanner = new(settings);
 
-            logger.LogInformation("Scanning location '{0}' for the templates...", args.TemplateLocation);
+            logger.LogInformation(LocalizableStrings.command_validate_info_scanning_in_progress, args.TemplateLocation);
 
             ScanResult scanResult = await scanner.ScanAsync(
                 args.TemplateLocation,
@@ -66,7 +66,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands
         private void PrintResults(ILogger logger, ScanResult scanResult)
         {
             using var scope = logger.BeginScope("Results");
-            logger.LogInformation("Location '{0}': found {1} templates.", scanResult.MountPoint.MountPointUri, scanResult.Templates.Count);
+            logger.LogInformation(LocalizableStrings.command_validate_info_scanning_completed, scanResult.MountPoint.MountPointUri, scanResult.Templates.Count);
             foreach (IScanTemplateInfo template in scanResult.Templates)
             {
                 string templateDisplayName = GetTemplateDisplayName(template);
@@ -74,7 +74,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands
 
                 LogValidationEntries(
                     sb,
-                    string.Format("Found template {0}:", templateDisplayName),
+                    string.Format(LocalizableStrings.command_validate_info_template_header, templateDisplayName),
                     template.ValidationErrors);
                 foreach (KeyValuePair<string, ILocalizationLocator> locator in template.Localizations)
                 {
@@ -82,28 +82,28 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands
 
                     LogValidationEntries(
                         sb,
-                        string.Format("Found localization {0} for template {1}:", localizationInfo.Locale, templateDisplayName),
+                        string.Format(LocalizableStrings.command_validate_info_template_loc_header, localizationInfo.Locale, templateDisplayName),
                         localizationInfo.ValidationErrors);
                 }
 
                 if (!template.IsValid)
                 {
-                    sb.AppendFormat("Template {0}: the template is not valid.", templateDisplayName);
+                    sb.AppendFormat(LocalizableStrings.command_validate_info_summary_invalid, templateDisplayName);
                 }
                 else
                 {
-                    sb.AppendFormat("Template {0}: the template is valid.", templateDisplayName);
+                    sb.AppendFormat(LocalizableStrings.command_validate_info_summary_valid, templateDisplayName);
                 }
                 sb.AppendLine();
                 foreach (ILocalizationLocator loc in template.Localizations.Values)
                 {
                     if (loc.IsValid)
                     {
-                        sb.AppendFormat("'{0}' localization for the template {1}: the localization file is valid.", loc.Locale, templateDisplayName);
+                        sb.AppendFormat(LocalizableStrings.command_validate_info_summary_loc_valid, loc.Locale, templateDisplayName);
                     }
                     else
                     {
-                        sb.AppendFormat("'{0}' localization for the template {1}: the localization file is not valid. The localization will be skipped.", loc.Locale, templateDisplayName);
+                        sb.AppendFormat(LocalizableStrings.command_validate_info_summary_loc_invalid, loc.Locale, templateDisplayName);
                     }
                     sb.AppendLine();
                 }
@@ -123,7 +123,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands
                 sb.AppendLine(header);
                 if (!errors.Any())
                 {
-                    sb.AppendLine("   <no entries>");
+                    sb.AppendLine("   " + LocalizableStrings.command_validate_info_no_entries);
                 }
                 else
                 {
