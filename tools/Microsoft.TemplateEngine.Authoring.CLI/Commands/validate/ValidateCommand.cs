@@ -16,8 +16,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands
 
         private readonly Argument<string> _templateLocationArg = new("template-location")
         {
-            Description = "The location of template(s) to validate",
-            // 0 for case where only path is specified
+            Description = LocalizableStrings.command_validate_help_description,
             Arity = new ArgumentArity(1, 1)
         };
 
@@ -49,7 +48,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands
             cancellationToken.ThrowIfCancellationRequested();
             logger.LogInformation("Scanning completed");
             PrintResults(logger, scanResult);
-            return 0;
+            return scanResult.Templates.Any(t => !t.IsValid) ? 1 : 0;
         }
 
         private IEngineEnvironmentSettings SetupSettings(ILoggerFactory loggerFactory)
