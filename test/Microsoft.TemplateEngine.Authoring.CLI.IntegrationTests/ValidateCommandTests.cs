@@ -31,10 +31,11 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.IntegrationTests
 
             commandResult
                 .Should()
-                .Pass();
+                .Fail();
 
             return Verify(FormatOutputStreams(commandResult))
-               .UniqueForOSPlatform();
+               .UniqueForOSPlatform()
+               .AddScrubber(text => text.Replace(Path.Combine(TestTemplatesLocation, "Invalid"), "%TEMPLATE_LOCATION%"));
         }
 
         private static string FormatOutputStreams(CommandResult commandResult)

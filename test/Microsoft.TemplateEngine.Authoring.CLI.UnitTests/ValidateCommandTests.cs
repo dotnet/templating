@@ -11,7 +11,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.UnitTests
     public class ValidateCommandTests : TestBase
     {
         [Fact]
-        public async Task ValidateCommand_BasicTest()
+        public async Task ValidateCommand_BasicTest_InvalidTemplate()
         {
             RootCommand root = new()
             {
@@ -19,6 +19,20 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.UnitTests
             };
 
             int result = await root.Parse("validate", Path.Combine(TestTemplatesLocation, "Invalid")).InvokeAsync();
+
+            //there are some invalid templates in location "Invalid"
+            Assert.Equal(1, result);
+        }
+
+        [Fact]
+        public async Task ValidateCommand_BasicTest_ValidTemplate()
+        {
+            RootCommand root = new()
+            {
+                new ValidateCommand()
+            };
+
+            int result = await root.Parse("validate", Path.Combine(TestTemplatesLocation, "TemplateWithSourceName")).InvokeAsync();
 
             Assert.Equal(0, result);
         }

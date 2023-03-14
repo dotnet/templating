@@ -2,18 +2,18 @@
 
 StdOut:
 info: validate[0]
-      Scanning location '{SolutionDirectory}test\Microsoft.TemplateEngine.TestTemplates\test_templates\Invalid' for the templates...
+      Scanning location '%TEMPLATE_LOCATION%' for the templates..
 fail: Microsoft.TemplateEngine.Orchestrator.RunnableProjects.RunnableProjectGenerator[0]
-      Failed to load template from {SolutionDirectory}test\Microsoft.TemplateEngine.TestTemplates\test_templates\Invalid\MissingIdentity/.template.config/template.json.
+      Failed to load template from %TEMPLATE_LOCATION%\MissingIdentity/.template.config/template.json.
       Details: 'identity' is missing or is an empty string.
 warn: Template Engine[0]
-      Failed to read or parse localization file {SolutionDirectory}test\Microsoft.TemplateEngine.TestTemplates\test_templates\Invalid\Localization/InvalidFormat/.template.config/localize/templatestrings.de-DE.json, it will be skipped from further processing.
+      Failed to read or parse localization file %TEMPLATE_LOCATION%\Localization/InvalidFormat/.template.config/localize/templatestrings.de-DE.json, it will be skipped from further processing.
 warn: Template Engine[0]
-      [{SolutionDirectory}test\Microsoft.TemplateEngine.TestTemplates\test_templates\Invalid\Localization/ValidationFailure/.template.config/template.json]: id of the post action 'pa2' at index '3' is not unique. Only the first post action that uses this id will be localized.
+      [%TEMPLATE_LOCATION%\Localization/ValidationFailure/.template.config/template.json]: id of the post action 'pa2' at index '3' is not unique. Only the first post action that uses this id will be localized.
 info: validate[0]
       Scanning completed
 info: validate[0]
-      Location '{SolutionDirectory}test\Microsoft.TemplateEngine.TestTemplates\test_templates\Invalid': found 6 templates.
+      Location '%TEMPLATE_LOCATION%': found 6 templates.
 info: validate[0]
       Found template 'TestAssets.Invalid.InvalidHostData' (TestAssets.Invalid.InvalidHostData):
          [Info][MV011] One or more postActions have a malformed or missing manualInstructions value.
@@ -39,10 +39,10 @@ info: validate[0]
 info: validate[0]
       Found template 'name' (TestAssets.Invalid.Localization.ValidationFailure):
          <no entries>
-      Found localization de-DE for template 'name' (TestAssets.Invalid.Localization.ValidationFailure):
+      Found localization 'de-DE' for template 'name' (TestAssets.Invalid.Localization.ValidationFailure):
          [Error][LOC001] In localization file under the post action with id 'pa1', there are localized strings for manual instruction(s) with ids 'do-not-exist'. These manual instructions do not exist in the template.json file and should be removed from localization file.
          [Error][LOC002] Post action(s) with id(s) 'pa0' specified in the localization file do not exist in the template.json file. Remove the localized strings from the localization file.
-      Found localization tr for template 'name' (TestAssets.Invalid.Localization.ValidationFailure):
+      Found localization 'tr' for template 'name' (TestAssets.Invalid.Localization.ValidationFailure):
          [Error][LOC002] Post action(s) with id(s) 'pa6' specified in the localization file do not exist in the template.json file. Remove the localized strings from the localization file.
       Template 'name' (TestAssets.Invalid.Localization.ValidationFailure): the template is valid.
       'de-DE' localization for the template 'name' (TestAssets.Invalid.Localization.ValidationFailure): the localization file is not valid. The localization will be skipped.
