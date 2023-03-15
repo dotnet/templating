@@ -23,7 +23,7 @@ namespace Microsoft.TemplateEngine.Authoring.Tasks.Tasks
     /// </summary>
     public sealed class ValidateTemplates : Build.Utilities.Task, ICancelableTask
     {
-        private volatile CancellationTokenSource? _cancellationTokenSource;
+        private readonly CancellationTokenSource _cancellationTokenSource = new();
 
         /// <summary>
         /// Gets or sets the path to the template(s) to be validated.
@@ -43,9 +43,7 @@ namespace Microsoft.TemplateEngine.Authoring.Tasks.Tasks
 
             using var loggerProvider = new MSBuildLoggerProvider(Log);
             ILoggerFactory msbuildLoggerFactory = new LoggerFactory(new[] { loggerProvider });
-
-            using CancellationTokenSource cancellationTokenSource = GetOrCreateCancellationTokenSource();
-            CancellationToken cancellationToken = cancellationTokenSource.Token;
+            CancellationToken cancellationToken = _cancellationTokenSource.Token;
 
             try
             {
@@ -60,7 +58,7 @@ namespace Microsoft.TemplateEngine.Authoring.Tasks.Tasks
                 cancellationToken.ThrowIfCancellationRequested();
 
                 LogResults(scanResult);
-                return !Log.HasLoggedErrors && !cancellationToken.IsCancellationRequested;
+                return !Log.HasLoggedErrors;
             }
             catch (Exception ex)
             {
@@ -152,23 +150,6 @@ namespace Microsoft.TemplateEngine.Authoring.Tasks.Tasks
                 }
             }
 
-        }
-
-        private CancellationTokenSource GetOrCreateCancellationTokenSource()
-        {
-            if (_cancellationTokenSource != null)
-            {
-                return _cancellationTokenSource;
-            }
-
-            CancellationTokenSource cts = new();
-            if (Interlocked.CompareExchange(ref _cancellationTokenSource, cts, null) != null)
-            {
-                // Reference was already set. This instance is not needed.
-                cts.Dispose();
-            }
-
-            return _cancellationTokenSource;
         }
     }
 }
