@@ -35,7 +35,7 @@ namespace Microsoft.TemplateEngine.Authoring.Tasks.Tasks
         {
             if (string.IsNullOrWhiteSpace(TemplateLocation))
             {
-                Log.LogError("The property 'TemplateLocation' should be set for 'ValidateTemplates' target.");
+                Log.LogError(LocalizableStrings.Log_Error_MissingRequiredProperty, nameof(TemplateLocation), nameof(ValidateTemplates));
                 return false;
             }
 
@@ -67,7 +67,9 @@ namespace Microsoft.TemplateEngine.Authoring.Tasks.Tasks
             }
         }
 
-        public void Cancel() => GetOrCreateCancellationTokenSource().Cancel();
+        public void Cancel() => _cancellationTokenSource.Cancel();
+
+        public void Dispose() => _cancellationTokenSource.Dispose();
 
         private IEngineEnvironmentSettings SetupSettings(ILoggerFactory loggerFactory)
         {
@@ -83,17 +85,17 @@ namespace Microsoft.TemplateEngine.Authoring.Tasks.Tasks
 
         private void LogResults(ScanResult scanResult)
         {
-            Log.LogMessage("Location '{0}': found {1} templates.", scanResult.MountPoint.MountPointUri, scanResult.Templates.Count);
+            Log.LogMessage(LocalizableStrings.Validate_Log_FoundTemplate, scanResult.MountPoint.MountPointUri, scanResult.Templates.Count);
             foreach (IScanTemplateInfo template in scanResult.Templates)
             {
                 string templateDisplayName = GetTemplateDisplayName(template);
                 StringBuilder sb = new();
 
-                LogValidationEntries("Template configuration", template.ValidationErrors);
+                LogValidationEntries(LocalizableStrings.Validate_Log_TemplateConfiguration_Subcategory, template.ValidationErrors);
                 foreach (KeyValuePair<string, ILocalizationLocator> locator in template.Localizations)
                 {
                     ILocalizationLocator localizationInfo = locator.Value;
-                    LogValidationEntries("Localization", localizationInfo.ValidationErrors);
+                    LogValidationEntries(LocalizableStrings.Validate_Log_TemplateLocalization_Subcategory, localizationInfo.ValidationErrors);
                 }
             }
 
