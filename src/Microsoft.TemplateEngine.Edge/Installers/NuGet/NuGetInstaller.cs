@@ -249,6 +249,18 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                         InstallerErrorCode.InvalidSource,
                         message);
             }
+            catch (InsecureNuGetFeedException e)
+            {
+                string message = e.SourcesList == null || !e.SourcesList.Any()
+                    ? LocalizableStrings.NuGetInstaller_InstallResult_Error_InsecureSource
+                    : string.Format(LocalizableStrings.NuGetInstaller_InstallResult_Error_InsecureSource, string.Join(", ", e.SourcesList));
+
+                return InstallResult.CreateFailure(
+                    installRequest,
+                    InstallerErrorCode.InsecureFeed,
+                    message);
+
+            }
             catch (InvalidNuGetPackageException e)
             {
                 return InstallResult.CreateFailure(

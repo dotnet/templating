@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Installer;
 using Microsoft.TemplateEngine.Abstractions.TemplatePackage;
+using Microsoft.TemplateEngine.Edge.Installers.NuGet;
 using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider

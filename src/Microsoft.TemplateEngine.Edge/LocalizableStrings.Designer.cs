@@ -442,6 +442,15 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The nuget sources {0} are insecure and will not be searched for the template {1}.
+        /// </summary>
+        internal static string NuGetInstaller_InstallResult_Error_InsecureSource {
+            get {
+                return ResourceManager.GetString("NuGetInstaller_InstallResult_Error_InsecureSource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to download {0} from {1}..
         /// </summary>
         internal static string NuGetInstaller_InstallResut_Error_DownloadFailed {

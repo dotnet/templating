@@ -80,6 +80,11 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 (source, packageMetadata) = await GetPackageMetadataAsync(identifier, packageVersion, packagesSources, cancellationToken).ConfigureAwait(false);
             }
 
+            if (source.IsHttp && !force)
+            {
+                throw new InsecureNuGetFeedException($"NuGet feed is insecure", new[] { source.Source });
+            }
+
             FindPackageByIdResource resource;
             SourceRepository repository = SourcesCache.GetOrAdd(source, Repository.Factory.GetCoreV3(source));
             try
