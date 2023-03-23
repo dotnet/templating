@@ -176,7 +176,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
 
                 string[] expectedWarnings = new[]
                 {
-                    "Failed to load the 'de-DE' localization the template 'name' (TestAssets.TemplateWithLocalization): the localization file is not valid. The localization will be skipped.",
+                    "Lokalisierung „de-DE“ der Vorlage 'name' (TestAssets.TemplateWithLocalization) konnte nicht geladen werden: Die Lokalisierungsdatei ist ungültig. Die Lokalisierung wird übersprungen.",
                 };
                 List<InstallRequest> installRequests = new() { new InstallRequest(tmpTemplateLocation) };
                 IReadOnlyList<InstallResult> installationResults = await bootstrapper.InstallTemplatePackagesAsync(installRequests).ConfigureAwait(false);
