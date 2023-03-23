@@ -61,6 +61,11 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
             IEnumerable<PackageSource> packagesSources = LoadNuGetSources(additionalSources?.ToArray() ?? Array.Empty<string>());
 
+            if (!force)
+            {
+                packagesSources = RemoveInsecurePackages(packagesSources);
+            }
+
             PackageSource source;
             IPackageSearchMetadata packageMetadata;
 
@@ -78,11 +83,6 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             {
                 NuGetVersion packageVersion = new NuGetVersion(version);
                 (source, packageMetadata) = await GetPackageMetadataAsync(identifier, packageVersion, packagesSources, cancellationToken).ConfigureAwait(false);
-            }
-
-            if (source.IsHttp && !force)
-            {
-                throw new InsecureNuGetFeedException($"NuGet feed is insecure", new[] { source.Source });
             }
 
             FindPackageByIdResource resource;
@@ -200,6 +200,32 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             var (_, package) = await GetLatestVersionInternalAsync(identifier, packageSources, floatRange, cancellationToken).ConfigureAwait(false);
             bool isLatestVersion = currentVersion != null && currentVersion >= package.Identity.Version;
             return (package.Identity.Version.ToNormalizedString(), isLatestVersion);
+        }
+
+        internal IEnumerable<PackageSource> RemoveInsecurePackages(IEnumerable<PackageSource> packagesSources)
+        {
+            var insecurePackages = new List<PackageSource>();
+            var securePackages = new List<PackageSource>();
+            foreach (var packageSource in packagesSources)
+            {
+                // NuGet IsHttp property can be both http and https sources
+                if (packageSource.IsHttps)
+                {
+                    securePackages.Add(packageSource);
+                }
+                else
+                {
+                    insecurePackages.Add(packageSource);
+                }
+            }
+
+            if (insecurePackages.Any())
+            {
+                var packagesString = string.Join(", ", insecurePackages);
+                _nugetLogger.LogWarning(string.Format(LocalizableStrings.NuGetApiPackageManager_Warning_InsecureFeed, packagesString));
+            }
+
+            return securePackages;
         }
 
         private async Task<(PackageSource, IPackageSearchMetadata)> GetLatestVersionInternalAsync(
@@ -416,5 +442,6 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             }
             return retrievedSources;
         }
+
     }
 }

@@ -197,6 +197,11 @@
         <target state="translated">Не удалось загрузить источник NuGet {0}: недопустимый источник. Он будет пропущен при дальнейшей обработке.</target>
         <note />
       </trans-unit>
+      <trans-unit id="NuGetApiPackageManager_Warning_InsecureFeed">
+        <source>The nuget sources {0} are insecure and will not be searched</source>
+        <target state="new">The nuget sources {0} are insecure and will not be searched</target>
+        <note>{0} - List of nuGet feeds that start with http.</note>
+      </trans-unit>
       <trans-unit id="NuGetApiPackageManager_Warning_PackageNotFound">
         <source>{0} is not found in NuGet feeds {1}.</source>
         <target state="translated">{0} не найдено в веб-каналах NuGet {1}.</target>

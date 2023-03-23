@@ -406,6 +406,15 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The nuget sources {0} are insecure and will not be searched.
+        /// </summary>
+        internal static string NuGetApiPackageManager_Warning_InsecureFeed {
+            get {
+                return ResourceManager.GetString("NuGetApiPackageManager_Warning_InsecureFeed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} is not found in NuGet feeds {1}..
         /// </summary>
         internal static string NuGetApiPackageManager_Warning_PackageNotFound {
@@ -438,15 +447,6 @@ namespace Microsoft.TemplateEngine.Edge {
         internal static string NuGetInstaller_Error_FileAlreadyExists {
             get {
                 return ResourceManager.GetString("NuGetInstaller_Error_FileAlreadyExists", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The nuget sources {0} are insecure and will not be searched for the template {1}.
-        /// </summary>
-        internal static string NuGetInstaller_InstallResult_Error_InsecureSource {
-            get {
-                return ResourceManager.GetString("NuGetInstaller_InstallResult_Error_InsecureSource", resourceCulture);
             }
         }
         
