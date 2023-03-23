@@ -112,6 +112,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 {
                     return new NuGetPackageInfo(
                         packageMetadata.Authors,
+                        packageMetadata.Owners,
+                        verified: packageMetadata.PrefixReserved,
                         filePath,
                         source.Source,
                         packageMetadata.Identity.Id,
