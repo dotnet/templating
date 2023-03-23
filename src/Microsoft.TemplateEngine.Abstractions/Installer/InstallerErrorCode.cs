@@ -52,10 +52,5 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
         /// The requested package is invalid and cannot be processed.
         /// </summary>
         InvalidPackage = 8,
-
-        /// <summary>
-        /// The package feed is not secure (http feed).
-        /// </summary>
-        InsecureFeed = 9
     }
 }

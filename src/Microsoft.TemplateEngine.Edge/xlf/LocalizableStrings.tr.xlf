@@ -198,8 +198,8 @@
         <note />
       </trans-unit>
       <trans-unit id="NuGetApiPackageManager_Warning_InsecureFeed">
-        <source>The nuget sources {0} are insecure and will not be searched</source>
-        <target state="new">The nuget sources {0} are insecure and will not be searched</target>
+        <source>The nuget sources {0} are insecure and will not be searched. If you want to include those source, use --force.</source>
+        <target state="new">The nuget sources {0} are insecure and will not be searched. If you want to include those source, use --force.</target>
         <note>{0} - List of nuGet feeds that start with http.</note>
       </trans-unit>
       <trans-unit id="NuGetApiPackageManager_Warning_PackageNotFound">

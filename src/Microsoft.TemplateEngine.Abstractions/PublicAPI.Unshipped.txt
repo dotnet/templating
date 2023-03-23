@@ -1,5 +1,4 @@
 ﻿Microsoft.TemplateEngine.Abstractions.IExtendedTemplateLocator
-Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode.InsecureFeed = 9 -> Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode
 Microsoft.TemplateEngine.Abstractions.ITemplate.TemplateSourceRoot.get -> Microsoft.TemplateEngine.Abstractions.Mount.IDirectory!
 Microsoft.TemplateEngine.Abstractions.ITemplateMetadata.PreferDefaultName.get -> bool
 Microsoft.TemplateEngine.Abstractions.IValidationInfo.IsValid.get -> bool

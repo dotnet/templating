@@ -406,7 +406,7 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The nuget sources {0} are insecure and will not be searched.
+        ///   Looks up a localized string similar to The nuget sources {0} are insecure and will not be searched. If you want to include those source, use --force..
         /// </summary>
         internal static string NuGetApiPackageManager_Warning_InsecureFeed {
             get {

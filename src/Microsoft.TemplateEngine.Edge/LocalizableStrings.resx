@@ -446,7 +446,7 @@ The template from 'PACKAGE_ID' will be used. To resolve this conflict, uninstall
     <value>Failed to read installed template packages list at {0}. It might be due to the file is corrupted. Please review this file manually and fix the errors in JSON structure, or remove the file to clear up the list of list installed packages and reinstall them again. Details of the error: {1}.</value>
   </data>
   <data name="NuGetApiPackageManager_Warning_InsecureFeed" xml:space="preserve">
-    <value>The nuget sources {0} are insecure and will not be searched</value>
+    <value>The nuget sources {0} are insecure and will not be searched. If you want to include those source, use --force.</value>
     <comment>{0} - List of nuGet feeds that start with http.</comment>
   </data>
 </root>
