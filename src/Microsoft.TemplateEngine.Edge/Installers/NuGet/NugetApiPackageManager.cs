@@ -222,7 +222,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             if (insecurePackages.Any())
             {
                 var packagesString = string.Join(", ", insecurePackages);
-                _nugetLogger.LogWarning(string.Format("LocalizableStrings.NuGetApiPackageManager_Warning_InsecureFeed" + packagesString));
+                _nugetLogger.LogWarning(string.Format(LocalizableStrings.NuGetApiPackageManager_Warning_InsecureFeed, packagesString));
             }
 
             return securePackages;
