@@ -345,15 +345,15 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 {
                     _nugetLogger.LogDebug($"Found {packageMetadata.Count()} versions for {packageIdentifier} in NuGet feed {source.Source}.");
 
-                    // extra call is needed because GetMetadataAsync call doesn't include owners info
+                    // extra call is needed because GetMetadataAsync call doesn't include owners and prefixVerified info
                     // https://github.com/NuGet/NuGetGallery/issues/5647
-                    var packageOwners = await GetPackageOwners(
+                    var (owners, verified) = await GetPackageAdditionalMetadata(
                          repository,
                          packageIdentifier,
                          includePrerelease,
                          cancellationToken).ConfigureAwait(false);
 
-                    return (source, packageMetadata.Select(pm => new NugetPackageMetadata(pm, packageOwners)));
+                    return (source, packageMetadata.Select(pm => new NugetPackageMetadata(pm, owners, verified)));
                 }
                 else
                 {
@@ -375,7 +375,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             return (source, FoundPackages: null);
         }
 
-        private async Task<string> GetPackageOwners(
+        private async Task<(string Owners, bool Verified)> GetPackageAdditionalMetadata(
             SourceRepository repository,
             string packageIdentifier,
             bool includePrerelease,
@@ -383,15 +383,15 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         {
             var nugetSearchClient = await repository.GetResourceAsync<PackageSearchResource>(cancellationToken).ConfigureAwait(false);
 
-            var searchResults = await nugetSearchClient.SearchAsync(
+            var searchResult = (await nugetSearchClient.SearchAsync(
                 packageIdentifier,
                 new SearchFilter(includePrerelease),
                 skip: 0,
                 take: 1,
                 _nugetLogger,
-                cancellationToken).ConfigureAwait(false);
+                cancellationToken).ConfigureAwait(false)).FirstOrDefault();
 
-            return searchResults.FirstOrDefault()?.Owners ?? string.Empty;
+            return (searchResult.Owners ?? string.Empty, searchResult.PrefixReserved);
         }
 
         private IEnumerable<PackageSource> LoadNuGetSources(IEnumerable<string> additionalSources)

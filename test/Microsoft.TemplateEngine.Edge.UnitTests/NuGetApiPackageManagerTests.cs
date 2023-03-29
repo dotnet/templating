@@ -31,7 +31,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             result.FullPath.Should().ContainAll(installPath, "Microsoft.DotNet.Common.ProjectTemplates.5.0");
             Assert.True(File.Exists(result.FullPath));
             result.PackageIdentifier.Should().Be("Microsoft.DotNet.Common.ProjectTemplates.5.0");
-            result.Owners.Should().Be(null);
+            result.Owners.Should().Be(string.Empty);
             result.Verified.Should().BeFalse();
             result.PackageVersion.Should().NotBeNullOrEmpty();
             result.NuGetSource.Should().NotBeNullOrEmpty();

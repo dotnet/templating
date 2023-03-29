@@ -8,12 +8,11 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
     internal class NugetPackageMetadata
     {
-        public NugetPackageMetadata(IPackageSearchMetadata metadata, string owners)
+        public NugetPackageMetadata(IPackageSearchMetadata metadata, string owners, bool verified)
         {
             Authors = metadata.Authors;
             Identity = metadata.Identity;
-            PrefixReserved = metadata.PrefixReserved;
-
+            PrefixReserved = verified;
             Owners = owners;
         }
 
