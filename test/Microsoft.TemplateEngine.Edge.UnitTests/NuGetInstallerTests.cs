@@ -155,7 +155,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             source!.MountPointUri.Should().ContainAll(new[] { installPath, "Microsoft.TemplateEngine.TestTemplates" });
             source.Author.Should().Be("Microsoft");
             source.Owners.Should().BeNull();
-            source.Verified.Should().Be("false");
+            source.Verified.Should().Be("False");
             source.Version.Should().NotBeNullOrEmpty();
             source.DisplayName.Should().StartWith("Microsoft.TemplateEngine.TestTemplates::");
             source.Identifier.Should().Be("Microsoft.TemplateEngine.TestTemplates");
@@ -238,7 +238,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             source!.MountPointUri.Should().ContainAll(new[] { installPath, "Microsoft.TemplateEngine.TestTemplates" });
             source.Author.Should().Be("Microsoft");
             source.Owners.Should().Be("Microsoft");
-            source.Verified.Should().Be("true");
+            source.Verified.Should().Be("True");
             source.Version.Should().Be("1.0.0");
             source.DisplayName.Should().Be("Microsoft.TemplateEngine.TestTemplates::1.0.0");
             source.Identifier.Should().Be("Microsoft.TemplateEngine.TestTemplates");
