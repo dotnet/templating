@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using NuGet.Protocol;
 
 namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
@@ -23,6 +24,22 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             PackageVersion = packageVersion;
         }
 
+        public NuGetPackageInfo(
+            string author,
+            string fullPath,
+            string? nuGetSource,
+            string packageIdentifier,
+            string packageVersion,
+            IEnumerable<PackageVulnerabilityMetadata> vulnerabilities)
+        {
+            Author = author;
+            FullPath = fullPath;
+            NuGetSource = nuGetSource;
+            PackageIdentifier = packageIdentifier;
+            PackageVersion = packageVersion;
+            PackageVulnerabilities = vulnerabilities;
+        }
+
         public string Author { get; }
 
         public string FullPath { get; }
@@ -32,6 +49,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         public string PackageIdentifier { get; }
 
         public string PackageVersion { get; }
+
+        public IEnumerable<PackageVulnerabilityMetadata>? PackageVulnerabilities { get; }
 
         internal NuGetPackageInfo WithFullPath(string newFullPath)
         {

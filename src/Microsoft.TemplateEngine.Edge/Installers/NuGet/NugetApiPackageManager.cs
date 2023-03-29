@@ -80,6 +80,11 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 (source, packageMetadata) = await GetPackageMetadataAsync(identifier, packageVersion, packagesSources, cancellationToken).ConfigureAwait(false);
             }
 
+            if (packageMetadata.Vulnerabilities.Any() && !force)
+            {
+                throw new Exception("Package has vulnerabilities");
+            }
+
             FindPackageByIdResource resource;
             SourceRepository repository = SourcesCache.GetOrAdd(source, Repository.Factory.GetCoreV3(source));
             try
@@ -115,7 +120,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                         filePath,
                         source.Source,
                         packageMetadata.Identity.Id,
-                        packageMetadata.Identity.Version.ToNormalizedString());
+                        packageMetadata.Identity.Version.ToNormalizedString(),
+                        packageMetadata.Vulnerabilities);
                 }
                 else
                 {
