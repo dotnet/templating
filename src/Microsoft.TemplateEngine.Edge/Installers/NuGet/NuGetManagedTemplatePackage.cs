@@ -85,7 +85,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
         public string? Verified
         {
-            get => Details.TryGetValue(VerifiedKey, out string verified) ? verified : "✘";
+            get => Details.TryGetValue(VerifiedKey, out string verified) ? verified : false.ToString();
 
             set
             {
@@ -95,7 +95,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 }
                 else
                 {
-                    Details[VerifiedKey] = bool.TryParse(value, out bool verified) && verified ? "✔" : "✘";
+                    Details[VerifiedKey] = value!;
                 }
             }
         }

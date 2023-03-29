@@ -41,9 +41,9 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                          { "PackageId", "TestPackage" },
                          { "Version", "4.7.0.395" },
                          { "Owners", "test, test2" },
-                         { "Verified", "✔" }
+                         { "Verified", "true" }
                      }),
-                "TestPackage", "4.7.0.395", "TestAuthor", "https://api.nuget.org/v3/index.json", false, "✔", "test, test2"
+                "TestPackage", "4.7.0.395", "TestAuthor", "https://api.nuget.org/v3/index.json", false, "true", "test, test2"
             };
             //skips irrelevant details
             yield return new object?[]
@@ -59,9 +59,9 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                          { "PackageId", "TestPackage" },
                          { "Version", "4.7.0.395" },
                          { "Owners", "test, test2" },
-                         { "Verified", "✘" }
+                         { "Verified", "false" }
                      }),
-                "TestPackage", "4.7.0.395", null, "https://api.nuget.org/v3/index.json", false, "✘", "test, test2"
+                "TestPackage", "4.7.0.395", null, "https://api.nuget.org/v3/index.json", false, "false", "test, test2"
             };
         }
 
@@ -155,7 +155,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             source!.MountPointUri.Should().ContainAll(new[] { installPath, "Microsoft.TemplateEngine.TestTemplates" });
             source.Author.Should().Be("Microsoft");
             source.Owners.Should().BeNull();
-            source.Verified.Should().Be("✘");
+            source.Verified.Should().Be("false");
             source.Version.Should().NotBeNullOrEmpty();
             source.DisplayName.Should().StartWith("Microsoft.TemplateEngine.TestTemplates::");
             source.Identifier.Should().Be("Microsoft.TemplateEngine.TestTemplates");
@@ -238,7 +238,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             source!.MountPointUri.Should().ContainAll(new[] { installPath, "Microsoft.TemplateEngine.TestTemplates" });
             source.Author.Should().Be("Microsoft");
             source.Owners.Should().Be("Microsoft");
-            source.Verified.Should().Be("✔");
+            source.Verified.Should().Be("true");
             source.Version.Should().Be("1.0.0");
             source.DisplayName.Should().Be("Microsoft.TemplateEngine.TestTemplates::1.0.0");
             source.Identifier.Should().Be("Microsoft.TemplateEngine.TestTemplates");

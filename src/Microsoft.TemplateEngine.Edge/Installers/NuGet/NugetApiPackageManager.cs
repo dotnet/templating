@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using NuGet.Configuration;
+using NuGet.Packaging.Core;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
@@ -450,6 +451,25 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 throw new InvalidNuGetSourceException("No NuGet sources are defined or enabled");
             }
             return retrievedSources;
+        }
+
+        private class NugetPackageMetadata
+        {
+            public NugetPackageMetadata(IPackageSearchMetadata metadata, string owners, bool verified)
+            {
+                Authors = metadata.Authors;
+                Identity = metadata.Identity;
+                PrefixReserved = verified;
+                Owners = owners;
+            }
+
+            public string Authors { get; }
+
+            public PackageIdentity Identity { get; }
+
+            public string Owners { get; }
+
+            public bool PrefixReserved { get; }
         }
     }
 }
