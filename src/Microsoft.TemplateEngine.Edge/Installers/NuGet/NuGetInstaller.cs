@@ -65,11 +65,6 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
         public IInstallerFactory Factory { get; }
 
-        /// <remarks>
-        /// The prefix reservation is not applicable to local packages.
-        /// </remarks>
-        private bool PrefixReserved => false;
-
         public Task<bool> CanInstallAsync(InstallRequest installationRequest, CancellationToken cancellationToken)
         {
             try
@@ -219,7 +214,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 {
                     Author = nuGetPackageInfo.Author,
                     Owners = nuGetPackageInfo.Owners,
-                    Verified = nuGetPackageInfo.Verified.ToString(),
+                    Trusted = nuGetPackageInfo.Trusted.ToString(),
                     NuGetSource = nuGetPackageInfo.NuGetSource,
                     Version = nuGetPackageInfo.PackageVersion.ToString(),
                     IsLocalPackage = isLocalPackage
@@ -399,7 +394,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             return new NuGetPackageInfo(
                 nuspec.GetAuthors(),
                 nuspec.GetOwners(),
-                PrefixReserved,
+                // The prefix reservation is not applicable to local packages.
+                trusted: false,
                 packageLocation,
                 null,
                 nuspec.GetId(),
