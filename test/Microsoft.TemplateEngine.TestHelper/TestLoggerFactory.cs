@@ -24,7 +24,16 @@ namespace Microsoft.TemplateEngine.TestHelper
             }
         }
 
-        public void Dispose() => _factories.ForEach(f => f.Dispose());
+        public void Dispose()
+        {
+            while (_factories.Count > 0)
+            {
+                var factory = _factories[0];
+                _factories.RemoveAt(0);
+
+                factory?.Dispose();
+            }
+        }
 
         public ILogger CreateLogger(string categoryName)
         {
