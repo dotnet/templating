@@ -140,8 +140,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
 
                 Assert.Empty(errors);
                 string warning = Assert.Single(warnings);
-                //TODO: the translation is not yet ready.
-                Assert.Equal($"Failed to read or parse localization file {tmpTemplateLocation}{Path.DirectorySeparatorChar}.template.config/localize/templatestrings.de-DE.json, it will be skipped from further processing.", warning);
+                Assert.Equal($"Fehler beim Lesen oder parsen der Lokalisierungsdatei {tmpTemplateLocation}{Path.DirectorySeparatorChar}.template.config/localize/templatestrings.de-DE.json. Sie wird bei der weiteren Verarbeitung übersprungen.", warning);
             }
             finally
             {
@@ -166,19 +165,18 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
                 string output = TestUtils.CreateTemporaryFolder();
                 TestUtils.DirectoryCopy(validTestTemplateLocation, tmpTemplateLocation, copySubDirs: true);
 
-                //TODO: the translation is not yet ready.
                 string[] expectedErrors = new[]
                 {
                     """
-                    The template 'name' (TestAssets.TemplateWithLocalization) has the following validation errors in 'de-DE' localization:
+                    Die Vorlage 'name' (TestAssets.TemplateWithLocalization) weist die folgenden Überprüfungsfehler in Lokalisierung „de-DE“ auf:
                        [Error][LOC001] In der Lokalisierungsdatei unter der POST-Aktion mit der ID „pa1“ befinden sich lokalisierte Zeichenfolgen für manuelle Anweisungen mit den IDs „do-not-exist“. Diese manuellen Anweisungen sind in der Datei „template.json“ nicht vorhanden und sollten aus der Lokalisierungsdatei entfernt werden.
-        
+
                     """
                 };
 
                 string[] expectedWarnings = new[]
                 {
-                    "Failed to load the 'de-DE' localization the template 'name' (TestAssets.TemplateWithLocalization): the localization file is not valid. The localization will be skipped.",
+                    "Lokalisierung „de-DE“ der Vorlage 'name' (TestAssets.TemplateWithLocalization) konnte nicht geladen werden: Die Lokalisierungsdatei ist ungültig. Die Lokalisierung wird übersprungen.",
                 };
                 List<InstallRequest> installRequests = new() { new InstallRequest(tmpTemplateLocation) };
                 IReadOnlyList<InstallResult> installationResults = await bootstrapper.InstallTemplatePackagesAsync(installRequests).ConfigureAwait(false);
