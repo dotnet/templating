@@ -48,7 +48,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.NuGet
             {
                 TotalDownloads = entry.ToInt32("totalDownloads"),
                 Owners = entry.Get<JToken>("owners").JTokenStringOrArrayToCollection(Array.Empty<string>()),
-                Trusted = entry.ToBool("trusted"),
+                Trusted = entry.ToBool("verified"),
                 Description = entry.ToString("description"),
                 IconUrl = entry.ToString("iconUrl")
             };

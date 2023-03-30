@@ -35,7 +35,7 @@ namespace Microsoft.TemplateSearch.Common.Abstractions
         /// Gets the indication if the package is trusted.
         /// </summary>
         /// <remarks>
-        /// For NuGet.org 'trusted' means that package ID is under reserved namespaces, see  <see href="https://docs.microsoft.com/en-us/nuget/nuget-org/id-prefix-reservation"/>.
+        /// For NuGet.org 'verified' means that package ID is under reserved namespaces, see  <see href="https://docs.microsoft.com/en-us/nuget/nuget-org/id-prefix-reservation"/>.
         /// </remarks>
         public bool Trusted { get; }
 
