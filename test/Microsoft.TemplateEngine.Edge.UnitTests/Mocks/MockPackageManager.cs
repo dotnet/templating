@@ -3,6 +3,7 @@
 
 using Microsoft.TemplateEngine.Edge.Installers.NuGet;
 using Microsoft.TemplateEngine.TestHelper;
+using NuGet.Protocol;
 
 namespace Microsoft.TemplateEngine.Edge.UnitTests.Mocks
 {
@@ -30,6 +31,9 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests.Mocks
                 case nameof(InvalidNuGetSourceException): throw new InvalidNuGetSourceException("test message");
                 case nameof(DownloadException): throw new DownloadException(identifier, version ?? string.Empty, new[] { DefaultFeed });
                 case nameof(PackageNotFoundException): throw new PackageNotFoundException(identifier, new[] { DefaultFeed });
+                case nameof(VulnerablePackageException):
+                    var vulnerabilities = GetMockVulnerabilities();
+                    throw new VulnerablePackageException("Test Message", identifier, Enumerable.Empty<PackageVulnerabilityMetadata>());
                 case nameof(Exception): throw new Exception("Generic error");
             }
 
@@ -61,6 +65,38 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests.Mocks
                 nameof(Exception) => throw new Exception("Generic error"),
                 _ => Task.FromResult(("1.0.0", version != "1.0.0")),
             };
+        }
+
+        private IEnumerable<PackageVulnerabilityMetadata> GetMockVulnerabilities()
+        {
+            var vulnerabilitiesInfo = new Dictionary<Uri, int>
+            {
+                { new Uri("https://testUrl1.com"), 1 },
+                { new Uri("https://testUrl2.com"), 2 },
+                { new Uri("https://testUrl3.com"), 3 }
+            };
+
+            var vulnerabilities = new List<PackageVulnerabilityMetadata>();
+            try
+            {
+                foreach (var vulnerability in vulnerabilitiesInfo)
+                {
+                    var vulnerabilityMetadata = new PackageVulnerabilityMetadata();
+                    var uriProperty = vulnerabilityMetadata.GetType().GetProperty("AdvisoryUrl") ?? throw new Exception("No AdvisoryUrl property found");
+                    uriProperty.SetValue(vulnerabilityMetadata, vulnerability.Key);
+
+                    var severityProperty = vulnerabilityMetadata.GetType().GetProperty("severity") ?? throw new Exception("No severity property found");
+                    severityProperty.SetValue(vulnerabilityMetadata, vulnerability.Value);
+
+                    vulnerabilities.Add(vulnerabilityMetadata);
+                }
+
+                return vulnerabilities;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
         }
     }
 }

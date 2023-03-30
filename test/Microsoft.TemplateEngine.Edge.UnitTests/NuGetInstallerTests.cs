@@ -244,6 +244,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         [InlineData(nameof(DownloadException), InstallerErrorCode.DownloadFailed)]
         [InlineData(nameof(PackageNotFoundException), InstallerErrorCode.PackageNotFound)]
         [InlineData(nameof(InvalidNuGetSourceException), InstallerErrorCode.InvalidSource)]
+        [InlineData(nameof(VulnerablePackageException), InstallerErrorCode.VulnerablePackage)]
         [InlineData(nameof(Exception), InstallerErrorCode.GenericError)]
         public async Task Install_RemotePackage_HandleExceptions(string exception, InstallerErrorCode expectedErrorCode)
         {
