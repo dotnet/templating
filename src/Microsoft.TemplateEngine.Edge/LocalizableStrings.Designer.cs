@@ -544,6 +544,15 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The requested package {0} has vulnerabilities..
+        /// </summary>
+        internal static string NuGetInstaller_InstallResut_Error_VulnerablePackage {
+            get {
+                return ResourceManager.GetString("NuGetInstaller_InstallResut_Error_VulnerablePackage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; is not a valid operating system name. Allowed values are: {1}..
         /// </summary>
         internal static string OSConstraint_Error_InvalidOSName {

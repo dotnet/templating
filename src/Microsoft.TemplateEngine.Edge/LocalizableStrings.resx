@@ -272,6 +272,9 @@ Details: {1}.</value>
   <data name="NuGetInstaller_InstallResut_Error_InvalidPackage" xml:space="preserve">
     <value>The NuGet package {0} is invalid.</value>
   </data>
+  <data name="NuGetInstaller_InstallResut_Error_VulnerablePackage" xml:space="preserve">
+    <value>The requested package {0} has vulnerabilities.</value>
+  </data>
   <data name="NuGetInstaller_InstallResut_Error_InvalidSources" xml:space="preserve">
     <value>The configured NuGet sources are invalid: {0}.</value>
   </data>

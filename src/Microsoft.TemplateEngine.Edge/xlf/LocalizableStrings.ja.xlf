@@ -278,6 +278,11 @@ Details: {1}.</source>
 詳細: {1}。</target>
         <note />
       </trans-unit>
+      <trans-unit id="NuGetInstaller_InstallResut_Error_VulnerablePackage">
+        <source>The requested package {0} has vulnerabilities.</source>
+        <target state="new">The requested package {0} has vulnerabilities.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="OSConstraint_Error_InvalidOSName">
         <source>'{0}' is not a valid operating system name. Allowed values are: {1}.</source>
         <target state="translated">'{0}' は有効なオペレーティング システム名ではありません。使用可能な値は {1} です。</target>

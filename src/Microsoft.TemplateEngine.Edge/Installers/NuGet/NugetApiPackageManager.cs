@@ -80,9 +80,9 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 (source, packageMetadata) = await GetPackageMetadataAsync(identifier, packageVersion, packagesSources, cancellationToken).ConfigureAwait(false);
             }
 
-            if (packageMetadata.Vulnerabilities.Any() && !force)
+            if (packageMetadata.Vulnerabilities is not null && !force)
             {
-                throw new Exception("Package has vulnerabilities");
+                throw new VulnerablePackageException("Found package is vulnerable", packageMetadata.Identity.Id, packageMetadata.Vulnerabilities);
             }
 
             FindPackageByIdResource resource;

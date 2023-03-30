@@ -15,22 +15,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
     internal class NuGetPackageInfo
     {
-        public NuGetPackageInfo(string author, string fullPath, string? nuGetSource, string packageIdentifier, string packageVersion)
-        {
-            Author = author;
-            FullPath = fullPath;
-            NuGetSource = nuGetSource;
-            PackageIdentifier = packageIdentifier;
-            PackageVersion = packageVersion;
-        }
-
-        public NuGetPackageInfo(
-            string author,
-            string fullPath,
-            string? nuGetSource,
-            string packageIdentifier,
-            string packageVersion,
-            IEnumerable<PackageVulnerabilityMetadata> vulnerabilities)
+        public NuGetPackageInfo(string author, string fullPath, string? nuGetSource, string packageIdentifier, string packageVersion, IEnumerable<PackageVulnerabilityMetadata>? vulnerabilities = null)
         {
             Author = author;
             FullPath = fullPath;

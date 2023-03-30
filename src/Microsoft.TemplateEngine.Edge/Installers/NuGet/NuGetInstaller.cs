@@ -210,7 +210,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                     installer: this,
                     provider,
                     nuGetPackageInfo.FullPath,
-                    nuGetPackageInfo.PackageIdentifier)
+                    nuGetPackageInfo.PackageIdentifier,
+                    nuGetPackageInfo.PackageVulnerabilities)
                 {
                     Author = nuGetPackageInfo.Author,
                     NuGetSource = nuGetPackageInfo.NuGetSource,
@@ -255,6 +256,13 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                     installRequest,
                     InstallerErrorCode.InvalidPackage,
                     string.Format(LocalizableStrings.NuGetInstaller_InstallResut_Error_InvalidPackage, e.PackageLocation));
+            }
+            catch (VulnerablePackageException e)
+            {
+                return InstallResult.CreateFailure(
+                    installRequest,
+                    InstallerErrorCode.VulnerablePackage,
+                    string.Format(LocalizableStrings.NuGetInstaller_InstallResut_Error_VulnerablePackage, e.PackageIdentifier));
             }
             catch (OperationCanceledException)
             {

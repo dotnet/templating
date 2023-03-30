@@ -9,17 +9,15 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
     internal class VulnerablePackageException : Exception
     {
-        public VulnerablePackageException(string message, IEnumerable<PackageVulnerabilityMetadata> vulnerabilities)
+        public VulnerablePackageException(string message, string packageIdentifier, IEnumerable<PackageVulnerabilityMetadata> vulnerabilities)
             : base(message)
         {
+            PackageIdentifier = packageIdentifier;
             Vulnerabilities = vulnerabilities;
         }
 
-        public IEnumerable<PackageVulnerabilityMetadata> Vulnerabilities { get; private set; }
+        public IEnumerable<PackageVulnerabilityMetadata> Vulnerabilities { get; internal set; }
 
-        private string NiceTableFormat()
-        {
-            return "Some nice table format to list vulnerabilities";
-        }
+        public string PackageIdentifier { get; internal set; }
     }
 }
