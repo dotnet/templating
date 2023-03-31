@@ -85,7 +85,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests.Mocks
                     var uriProperty = vulnerabilityMetadata.GetType().GetProperty("AdvisoryUrl") ?? throw new Exception("No AdvisoryUrl property found");
                     uriProperty.SetValue(vulnerabilityMetadata, vulnerability.Key);
 
-                    var severityProperty = vulnerabilityMetadata.GetType().GetProperty("severity") ?? throw new Exception("No severity property found");
+                    var severityProperty = vulnerabilityMetadata.GetType().GetProperty("Severity") ?? throw new Exception("No severity property found");
                     severityProperty.SetValue(vulnerabilityMetadata, vulnerability.Value);
 
                     vulnerabilities.Add(vulnerabilityMetadata);
