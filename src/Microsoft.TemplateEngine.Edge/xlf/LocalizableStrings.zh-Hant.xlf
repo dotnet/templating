@@ -356,7 +356,7 @@ Details: {0}</source>
       </trans-unit>
       <trans-unit id="TemplateCreator_TemplateCreationResult_Error_NoDefaultName">
         <source>Failed to create template: the template name is not specified. Template configuration does not configure a default name that can be used when name is not specified. Specify the name for the template when instantiating or configure a default name in the template configuration.</source>
-        <target state="new">Failed to create template: the template name is not specified. Template configuration does not configure a default name that can be used when name is not specified. Specify the name for the template when instantiating or configure a default name in the template configuration.</target>
+        <target state="translated">無法建立範本: 未指定範本名稱。範本設定不會設定未指定名稱時可以使用的預設名稱。在範本設定中，於具現化或設定預設名稱時指定範本的名稱。</target>
         <note />
       </trans-unit>
       <trans-unit id="TemplateInfo_Warning_FailedToReadHostData">
@@ -384,6 +384,26 @@ Template cache will be recreated on the next run.</source>
         <target state="translated">無法儲存範本快取{0}
 詳細資料: 範本快取下次執行時將重新建立。</target>
         <note>{0} should not end with period - period is a part of the format entry.</note>
+      </trans-unit>
+      <trans-unit id="TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict">
+        <source>
+The following templates use the same identity '{0}':
+{1}
+The template from '{2}' will be used. To resolve this conflict, uninstall the conflicting template packages.</source>
+        <target state="translated">
+下列範本使用相同的身分識別 '{0}':
+{1}
+會使用來自 '{2}' 的範本。若要解決此衝突，請解除安裝發生衝突的範本套件。</target>
+        <note>
+The following templates use the same identity 'IDENTITY':
+  * 'TEMPLATE' from 'PACKAGE_ID'
+The template from 'PACKAGE_ID' will be used. To resolve this conflict, uninstall the conflicting template packages.
+    </note>
+      </trans-unit>
+      <trans-unit id="TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict_Subentry">
+        <source>  {0} '{1}' from '{2}'</source>
+        <target state="translated">  {0} '{1}' 來自 '{2}'</target>
+        <note>* 'TEMPLATE' from 'PACKAGE_ID'</note>
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Error_MismatchedProviders">
         <source>Multiple 'IWorkloadsInfoProvider' components provided by host ({0}), therefore 'WorkloadConstraint' cannot be properly initialized.</source>

@@ -356,7 +356,7 @@ Dettagli: {0}.</target>
       </trans-unit>
       <trans-unit id="TemplateCreator_TemplateCreationResult_Error_NoDefaultName">
         <source>Failed to create template: the template name is not specified. Template configuration does not configure a default name that can be used when name is not specified. Specify the name for the template when instantiating or configure a default name in the template configuration.</source>
-        <target state="new">Failed to create template: the template name is not specified. Template configuration does not configure a default name that can be used when name is not specified. Specify the name for the template when instantiating or configure a default name in the template configuration.</target>
+        <target state="translated">Non è stato possibile creare il modello: il nome del modello non è specificato. La configurazione del modello non configura un nome predefinito che può essere utilizzato quando il nome non è specificato. Specificare il nome del modello durante la creazione di un'istanza o la configurazione di un nome predefinito nella configurazione del modello.</target>
         <note />
       </trans-unit>
       <trans-unit id="TemplateInfo_Warning_FailedToReadHostData">
@@ -384,6 +384,26 @@ Template cache will be recreated on the next run.</source>
         <target state="translated">Non è stato possibile archiviare la cache dei modelli. Dettagli: {0}
 La cache dei modelli verrà ricreata alla prossima esecuzione.</target>
         <note>{0} should not end with period - period is a part of the format entry.</note>
+      </trans-unit>
+      <trans-unit id="TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict">
+        <source>
+The following templates use the same identity '{0}':
+{1}
+The template from '{2}' will be used. To resolve this conflict, uninstall the conflicting template packages.</source>
+        <target state="translated">
+I modelli seguenti usano la stessa identità '{0}':
+{1}
+Verrà utilizzato il modello di '{2}'. Per risolvere il conflitto, disinstallare i pacchetti di modelli in conflitto.</target>
+        <note>
+The following templates use the same identity 'IDENTITY':
+  * 'TEMPLATE' from 'PACKAGE_ID'
+The template from 'PACKAGE_ID' will be used. To resolve this conflict, uninstall the conflicting template packages.
+    </note>
+      </trans-unit>
+      <trans-unit id="TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict_Subentry">
+        <source>  {0} '{1}' from '{2}'</source>
+        <target state="translated">  {0} '{1}' da '{2}'</target>
+        <note>* 'TEMPLATE' from 'PACKAGE_ID'</note>
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Error_MismatchedProviders">
         <source>Multiple 'IWorkloadsInfoProvider' components provided by host ({0}), therefore 'WorkloadConstraint' cannot be properly initialized.</source>

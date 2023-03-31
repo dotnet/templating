@@ -356,7 +356,7 @@ Details: {0}</source>
       </trans-unit>
       <trans-unit id="TemplateCreator_TemplateCreationResult_Error_NoDefaultName">
         <source>Failed to create template: the template name is not specified. Template configuration does not configure a default name that can be used when name is not specified. Specify the name for the template when instantiating or configure a default name in the template configuration.</source>
-        <target state="new">Failed to create template: the template name is not specified. Template configuration does not configure a default name that can be used when name is not specified. Specify the name for the template when instantiating or configure a default name in the template configuration.</target>
+        <target state="translated">テンプレートを作成できませんでした: テンプレート名が指定されていません。テンプレート構成では、名前が指定されていない場合に使用できる既定の名前は構成されません。インスタンス化時にテンプレートの名前を指定するか、テンプレート構成で既定の名前を構成します。</target>
         <note />
       </trans-unit>
       <trans-unit id="TemplateInfo_Warning_FailedToReadHostData">
@@ -384,6 +384,26 @@ Template cache will be recreated on the next run.</source>
         <target state="translated">テンプレート キャッシュを格納できませんでした、詳細: {0}
 テンプレート キャッシュは次回の実行時に再作成されます。</target>
         <note>{0} should not end with period - period is a part of the format entry.</note>
+      </trans-unit>
+      <trans-unit id="TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict">
+        <source>
+The following templates use the same identity '{0}':
+{1}
+The template from '{2}' will be used. To resolve this conflict, uninstall the conflicting template packages.</source>
+        <target state="translated">
+次のテンプレートは同じ ID '{0}' を使用しています:
+{1}
+'{2}' からのテンプレートが使用されます。この競合を解決するには、競合するテンプレート パッケージをアンインストールしてください。</target>
+        <note>
+The following templates use the same identity 'IDENTITY':
+  * 'TEMPLATE' from 'PACKAGE_ID'
+The template from 'PACKAGE_ID' will be used. To resolve this conflict, uninstall the conflicting template packages.
+    </note>
+      </trans-unit>
+      <trans-unit id="TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict_Subentry">
+        <source>  {0} '{1}' from '{2}'</source>
+        <target state="translated">  '{2}' からの {0} '{1}'</target>
+        <note>* 'TEMPLATE' from 'PACKAGE_ID'</note>
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Error_MismatchedProviders">
         <source>Multiple 'IWorkloadsInfoProvider' components provided by host ({0}), therefore 'WorkloadConstraint' cannot be properly initialized.</source>

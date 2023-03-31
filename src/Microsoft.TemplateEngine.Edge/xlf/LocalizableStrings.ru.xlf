@@ -356,7 +356,7 @@ Details: {0}</source>
       </trans-unit>
       <trans-unit id="TemplateCreator_TemplateCreationResult_Error_NoDefaultName">
         <source>Failed to create template: the template name is not specified. Template configuration does not configure a default name that can be used when name is not specified. Specify the name for the template when instantiating or configure a default name in the template configuration.</source>
-        <target state="new">Failed to create template: the template name is not specified. Template configuration does not configure a default name that can be used when name is not specified. Specify the name for the template when instantiating or configure a default name in the template configuration.</target>
+        <target state="translated">Не удалось создать шаблон: имя шаблона не указано. В конфигурации шаблона не настроено имя по умолчанию, которое можно использовать, если имя не указано. Укажите имя шаблона при создании экземпляра или настройте имя по умолчанию в конфигурации шаблона.</target>
         <note />
       </trans-unit>
       <trans-unit id="TemplateInfo_Warning_FailedToReadHostData">
@@ -384,6 +384,26 @@ Template cache will be recreated on the next run.</source>
         <target state="translated">Не удалось сохранить кэш шаблонов. Сведения: {0}
 Кэш шаблонов будет повторно создан при следующем запуске.</target>
         <note>{0} should not end with period - period is a part of the format entry.</note>
+      </trans-unit>
+      <trans-unit id="TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict">
+        <source>
+The following templates use the same identity '{0}':
+{1}
+The template from '{2}' will be used. To resolve this conflict, uninstall the conflicting template packages.</source>
+        <target state="translated">
+Следующие шаблоны используют одинаковые идентификаторы "{0}":
+{1}
+Будет использован шаблон "{2}". Чтобы устранить этот конфликт, удалите конфликтующие пакеты шаблонов.</target>
+        <note>
+The following templates use the same identity 'IDENTITY':
+  * 'TEMPLATE' from 'PACKAGE_ID'
+The template from 'PACKAGE_ID' will be used. To resolve this conflict, uninstall the conflicting template packages.
+    </note>
+      </trans-unit>
+      <trans-unit id="TemplatePackageManager_Warning_DetectedTemplatesIdentityConflict_Subentry">
+        <source>  {0} '{1}' from '{2}'</source>
+        <target state="translated">  {0} '{1}' из '{2}'</target>
+        <note>* 'TEMPLATE' from 'PACKAGE_ID'</note>
       </trans-unit>
       <trans-unit id="WorkloadConstraint_Error_MismatchedProviders">
         <source>Multiple 'IWorkloadsInfoProvider' components provided by host ({0}), therefore 'WorkloadConstraint' cannot be properly initialized.</source>

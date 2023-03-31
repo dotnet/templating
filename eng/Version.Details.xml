@@ -11,15 +11,15 @@
       <Sha>ddc5b4880b0bf18783fc6808c4d407214f7bdae1</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="System.CommandLine" Version="2.0.0-beta4.23122.2">
+    <Dependency Name="System.CommandLine" Version="2.0.0-beta4.23165.3">
       <Uri>https://github.com/dotnet/command-line-api</Uri>
-      <Sha>2f15c7e27f5cfe353c1de82ec6bca73016e4dbb9</Sha>
+      <Sha>42c58533cdf478b15120542be76f7cbaacaab024</Sha>
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
-    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="7.0.0-beta.23122.4">
+    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="7.0.0-beta.23164.3">
       <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>2e0fab0209c66d181d93b0d03bc267db5bde75be</Sha>
+      <Sha>099bbb071e187ba4e1603004597624e6acae6394</Sha>
       <SourceBuild RepoName="arcade" ManagedOnly="true" />
     </Dependency>
   </ToolsetDependencies>
