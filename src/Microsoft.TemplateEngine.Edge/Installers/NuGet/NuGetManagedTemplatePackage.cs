@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Installer;
 using Microsoft.TemplateEngine.Abstractions.TemplatePackage;
-using NuGet.Protocol;
 
 namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
@@ -27,8 +26,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
           IInstaller installer,
           IManagedTemplatePackageProvider provider,
           string mountPointUri,
-          string packageIdentifier,
-          IEnumerable<PackageVulnerabilityMetadata>? vulnerabilities = null)
+          string packageIdentifier)
         {
             if (string.IsNullOrWhiteSpace(mountPointUri))
             {
@@ -43,7 +41,6 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             ManagedProvider = provider ?? throw new ArgumentNullException(nameof(provider));
             _settings = settings ?? throw new ArgumentNullException(nameof(settings));
             _logger = settings.Host.LoggerFactory.CreateLogger<NuGetInstaller>();
-            Vulnerabilities = vulnerabilities;
 
             Details = new Dictionary<string, string>
             {
@@ -186,8 +183,6 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 }
             }
         }
-
-        public IEnumerable<PackageVulnerabilityMetadata>? Vulnerabilities { get; }
 
         internal Dictionary<string, string> Details { get; }
 

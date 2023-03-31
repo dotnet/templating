@@ -12,6 +12,7 @@ using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Installer;
 using Microsoft.TemplateEngine.Abstractions.TemplatePackage;
 using NuGet.Packaging;
+using NuGet.Protocol;
 
 namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
@@ -210,8 +211,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                     installer: this,
                     provider,
                     nuGetPackageInfo.FullPath,
-                    nuGetPackageInfo.PackageIdentifier,
-                    nuGetPackageInfo.PackageVulnerabilities)
+                    nuGetPackageInfo.PackageIdentifier)
                 {
                     Author = nuGetPackageInfo.Author,
                     NuGetSource = nuGetPackageInfo.NuGetSource,
@@ -219,7 +219,11 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                     IsLocalPackage = isLocalPackage
                 };
 
-                return InstallResult.CreateSuccess(installRequest, package);
+                Dictionary<Uri, int>? vulnerabilities = nuGetPackageInfo.PackageVulnerabilities is null ? null : ConvertVulnerabilityMetadata(nuGetPackageInfo.PackageVulnerabilities);
+                return InstallResult.CreateSuccess(
+                    installRequest,
+                    package,
+                    vulnerabilities);
             }
             catch (DownloadException e)
             {
@@ -262,7 +266,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 return InstallResult.CreateFailure(
                     installRequest,
                     InstallerErrorCode.VulnerablePackage,
-                    string.Format(LocalizableStrings.NuGetInstaller_InstallResut_Error_VulnerablePackage, e.PackageIdentifier));
+                    string.Format(LocalizableStrings.NuGetInstaller_InstallResut_Error_VulnerablePackage, e.PackageIdentifier),
+                    ConvertVulnerabilityMetadata(e.Vulnerabilities));
             }
             catch (OperationCanceledException)
             {
@@ -403,6 +408,18 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 null,
                 nuspec.GetId(),
                 nuspec.GetVersion().ToNormalizedString());
+        }
+
+        // This conversion is necessary as "InstallResult" does not have the support of the NuGet types
+        private Dictionary<Uri, int> ConvertVulnerabilityMetadata(IEnumerable<PackageVulnerabilityMetadata> vulnerabilities)
+        {
+            var dictionaryResult = new Dictionary<Uri, int>();
+            foreach (var vulnerability in vulnerabilities)
+            {
+                dictionaryResult[vulnerability.AdvisoryUrl] = vulnerability.Severity;
+            }
+
+            return dictionaryResult;
         }
     }
 }
