@@ -3,6 +3,7 @@
   <PropertyGroup>
     <GitHubRepositoryName>templating</GitHubRepositoryName>
     <SourceBuildManagedOnly>true</SourceBuildManagedOnly>
+    <PackageVersionPropsFlowType>DependenciesOnly</PackageVersionPropsFlowType>
   </PropertyGroup>
 
 </Project>
