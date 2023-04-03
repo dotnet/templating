@@ -11,19 +11,19 @@ namespace Microsoft.TemplateEngine.Authoring.CLI
     {
         internal static Task<int> Main(string[] args)
         {
-            RootCommand rootCommand = new("dotnet-template-authoring");
+            CliRootCommand rootCommand = new("dotnet-template-authoring");
             rootCommand.Subcommands.Add(new LocalizeCommand());
             rootCommand.Subcommands.Add(new VerifyCommand());
 
             return GetCommandLineConfiguration(rootCommand).InvokeAsync(args);
         }
 
-        internal static CommandLineConfiguration GetCommandLineConfiguration(Command command)
+        internal static CliConfiguration GetCommandLineConfiguration(CliCommand command)
         {
-            CommandLineBuilder builder = new CommandLineBuilder(command)
-                   .UseDefaults()
-                   .EnablePosixBundling(false);
-            return builder.Build();
+            return new CliConfiguration(command)
+            {
+                EnablePosixBundling = false
+            };
         }
     }
 }
