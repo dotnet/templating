@@ -14,9 +14,11 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
     internal class NuGetPackageInfo
     {
-        public NuGetPackageInfo(string author, string fullPath, string? nuGetSource, string packageIdentifier, string packageVersion)
+        public NuGetPackageInfo(string author, string owners, bool trusted, string fullPath, string? nuGetSource, string packageIdentifier, string packageVersion)
         {
             Author = author;
+            Owners = owners;
+            Trusted = trusted;
             FullPath = fullPath;
             NuGetSource = nuGetSource;
             PackageIdentifier = packageIdentifier;
@@ -24,6 +26,10 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         }
 
         public string Author { get; }
+
+        public string Owners { get; }
+
+        public bool Trusted { get; }
 
         public string FullPath { get; }
 
@@ -37,6 +43,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         {
             return new NuGetPackageInfo(
                 Author,
+                Owners,
+                Trusted,
                 newFullPath,
                 NuGetSource,
                 PackageIdentifier,
