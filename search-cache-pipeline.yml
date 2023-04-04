@@ -172,4 +172,4 @@ steps:
       -d nonTemplatePacks.json
       | tee upload-non-template-packs.log
       && grep ".*Number of Transfers Completed: 1" upload-non-template-packs.log || (echo ; echo "Legacy cache file upload failed"; false)
-      
+    displayName: Upload non template packages file to blob storage
