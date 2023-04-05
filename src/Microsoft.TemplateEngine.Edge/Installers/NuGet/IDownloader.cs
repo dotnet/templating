@@ -53,7 +53,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 NuGetSource,
                 PackageIdentifier,
                 PackageVersion,
-                Packagevulnerabilities);
+                PackageVulnerabilities);
         }
     }
 }

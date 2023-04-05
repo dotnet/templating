@@ -360,7 +360,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                          includePrerelease,
                          cancellationToken).ConfigureAwait(false);
 
-                    return (source, packageMetadata.Select(pm => new NugetPackageMetadata(pm, owners, verified)));
+                    return (source, packageMetadata.Select(pm => new NugetPackageMetadata(pm, owners, verified, pm.Vulnerabilities)));
                 }
                 else
                 {
@@ -461,12 +461,13 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
         private class NugetPackageMetadata
         {
-            public NugetPackageMetadata(IPackageSearchMetadata metadata, string owners, bool trusted)
+            public NugetPackageMetadata(IPackageSearchMetadata metadata, string owners, bool trusted, IEnumerable<PackageVulnerabilityMetadata> vulnerabilities)
             {
                 Authors = metadata.Authors;
                 Identity = metadata.Identity;
                 PrefixReserved = trusted;
                 Owners = owners;
+                Vulnerabilities = vulnerabilities;
             }
 
             public string Authors { get; }
@@ -476,6 +477,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             public string Owners { get; }
 
             public bool PrefixReserved { get; }
+
+            public IEnumerable<PackageVulnerabilityMetadata> Vulnerabilities { get; }
         }
     }
 }
