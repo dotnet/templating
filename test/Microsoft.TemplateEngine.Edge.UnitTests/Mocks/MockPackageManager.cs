@@ -33,7 +33,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests.Mocks
                 case nameof(PackageNotFoundException): throw new PackageNotFoundException(identifier, new[] { DefaultFeed });
                 case nameof(VulnerablePackageException):
                     var vulnerabilities = GetMockVulnerabilities();
-                    throw new VulnerablePackageException("Test Message", identifier, Enumerable.Empty<PackageVulnerabilityMetadata>());
+                    version ??= "12.0.3";
+                    throw new VulnerablePackageException("Test Message", identifier, version, Enumerable.Empty<PackageVulnerabilityMetadata>());
                 case nameof(Exception): throw new Exception("Generic error");
             }
 

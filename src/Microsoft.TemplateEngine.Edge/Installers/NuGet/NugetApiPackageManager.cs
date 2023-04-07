@@ -83,7 +83,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
             if (packageMetadata.Vulnerabilities is not null && !force)
             {
-                throw new VulnerablePackageException("Found package is vulnerable", packageMetadata.Identity.Id, packageMetadata.Vulnerabilities);
+                var foundPackageVersion = packageMetadata.Identity.Version.OriginalVersion;
+                throw new VulnerablePackageException("Found package is vulnerable", packageMetadata.Identity.Id, foundPackageVersion, packageMetadata.Vulnerabilities);
             }
 
             FindPackageByIdResource resource;
@@ -360,7 +361,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                          includePrerelease,
                          cancellationToken).ConfigureAwait(false);
 
-                    return (source, packageMetadata.Select(pm => new NugetPackageMetadata(pm, owners, verified, pm.Vulnerabilities)));
+                    return (source, packageMetadata.Select(pm => new NugetPackageMetadata(pm, owners, verified)));
                 }
                 else
                 {
@@ -461,13 +462,13 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
         private class NugetPackageMetadata
         {
-            public NugetPackageMetadata(IPackageSearchMetadata metadata, string owners, bool trusted, IEnumerable<PackageVulnerabilityMetadata> vulnerabilities)
+            public NugetPackageMetadata(IPackageSearchMetadata metadata, string owners, bool trusted)
             {
                 Authors = metadata.Authors;
                 Identity = metadata.Identity;
                 PrefixReserved = trusted;
                 Owners = owners;
-                Vulnerabilities = vulnerabilities;
+                Vulnerabilities = metadata.Vulnerabilities;
             }
 
             public string Authors { get; }

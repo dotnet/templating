@@ -126,6 +126,53 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         }
 
         [Fact]
+        public async Task DownloadPackage_HasVulnerabilities()
+        {
+            string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
+
+            // Getting this version of the package as it has known vulnerabilities
+            NuGetApiPackageManager packageManager = new NuGetApiPackageManager(engineEnvironmentSettings);
+
+            var exception = await Assert.ThrowsAsync<VulnerablePackageException>(() => packageManager.DownloadPackageAsync(
+                installPath,
+                "Newtonsoft.Json",
+                "12.0.3",
+                // add the source for getting vulnerability info
+                additionalSources: new[] { "https://api.nuget.org/v3/index.json" })).ConfigureAwait(false);
+
+            exception.PackageIdentifier.Should().Be("Newtonsoft.Json");
+            exception.PackageVersion.Should().Be("12.0.3");
+            exception.Vulnerabilities.Should().NotBeNullOrEmpty();
+        }
+
+        [Fact]
+        public async Task DownloadPackage_HasVulnerabilitiesForce()
+        {
+            string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
+
+            // Getting this version of the package as it has known vulnerabilities
+            NuGetApiPackageManager packageManager = new NuGetApiPackageManager(engineEnvironmentSettings);
+
+            var result = await packageManager.DownloadPackageAsync(
+                installPath,
+                "Newtonsoft.Json",
+                "12.0.3",
+                // add the source for getting vulnerability info
+                additionalSources: new[] { "https://api.nuget.org/v3/index.json" },
+                force: true).ConfigureAwait(false);
+
+            result.Author.Should().Be("James Newton-King");
+            result.FullPath.Should().ContainAll(installPath, "Newtonsoft.Json", "12.0.3");
+            Assert.True(File.Exists(result.FullPath));
+            result.PackageIdentifier.Should().Be("Newtonsoft.Json");
+            result.PackageVersion.Should().Be("12.0.3");
+            result.NuGetSource.Should().NotBeNullOrEmpty();
+            result.PackageVulnerabilities.Should().NotBeNullOrEmpty();
+        }
+
+        [Fact]
         public async Task GetLatestVersion_Success()
         {
             IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
