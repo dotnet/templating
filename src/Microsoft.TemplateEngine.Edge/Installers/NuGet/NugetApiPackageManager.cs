@@ -212,13 +212,13 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             foreach (var packageSource in packagesSources)
             {
                 // NuGet IsHttp property can be both http and https sources
-                if (packageSource.IsHttps)
+                if (packageSource.IsHttp && !packageSource.IsHttps)
                 {
-                    securePackages.Add(packageSource);
+                    insecurePackages.Add(packageSource);
                 }
                 else
                 {
-                    insecurePackages.Add(packageSource);
+                    securePackages.Add(packageSource);
                 }
             }
 
