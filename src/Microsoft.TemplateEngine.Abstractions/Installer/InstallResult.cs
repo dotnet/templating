@@ -35,7 +35,7 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
         /// Vulnerabilities from installed package.
         /// </summary>
         /// It is a dictionary, as we don't want to add the NuGet Api package to this project.
-        public Dictionary<Uri, int>? Vulnerabilities { get; private set; }
+        public IReadOnlyDictionary<Uri, int>? Vulnerabilities { get; private set; }
 
         /// <summary>
         /// Creates successful result for the operation.

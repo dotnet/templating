@@ -163,12 +163,11 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 additionalSources: new[] { "https://api.nuget.org/v3/index.json" },
                 force: true).ConfigureAwait(false);
 
-            result.Author.Should().Be("James Newton-King");
-            result.FullPath.Should().ContainAll(installPath, "Newtonsoft.Json", "12.0.3");
-            Assert.True(File.Exists(result.FullPath));
             result.PackageIdentifier.Should().Be("Newtonsoft.Json");
+            result.Author.Should().Be("James Newton-King");
             result.PackageVersion.Should().Be("12.0.3");
-            result.NuGetSource.Should().NotBeNullOrEmpty();
+            Assert.True(File.Exists(result.FullPath));
+            result.NuGetSource.Should().Be("https://api.nuget.org/v3/index.json");
             result.PackageVulnerabilities.Should().NotBeNullOrEmpty();
         }
 

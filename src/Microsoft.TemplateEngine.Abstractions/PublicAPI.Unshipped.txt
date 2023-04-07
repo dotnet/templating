@@ -1,6 +1,6 @@
 ﻿Microsoft.TemplateEngine.Abstractions.IExtendedTemplateLocator
 Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode.VulnerablePackage = 9 -> Microsoft.TemplateEngine.Abstractions.Installer.InstallerErrorCode
-Microsoft.TemplateEngine.Abstractions.Installer.InstallResult.Vulnerabilities.get -> System.Collections.Generic.Dictionary<System.Uri!, int>?
+Microsoft.TemplateEngine.Abstractions.Installer.InstallResult.Vulnerabilities.get -> System.Collections.Generic.IReadOnlyDictionary<System.Uri!, int>?
 Microsoft.TemplateEngine.Abstractions.ITemplate.Localization.get -> Microsoft.TemplateEngine.Abstractions.ILocalizationLocator?
 Microsoft.TemplateEngine.Abstractions.ITemplate.TemplateSourceRoot.get -> Microsoft.TemplateEngine.Abstractions.Mount.IDirectory!
 Microsoft.TemplateEngine.Abstractions.ITemplateMetadata.PreferDefaultName.get -> bool
