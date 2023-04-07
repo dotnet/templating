@@ -9,11 +9,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
-using NuGet.Common;
 using NuGet.Configuration;
+using NuGet.Packaging.Core;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
+using ILogger = NuGet.Common.ILogger;
 
 namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
@@ -67,7 +68,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             }
 
             PackageSource source;
-            IPackageSearchMetadata packageMetadata;
+            NugetPackageMetadata packageMetadata;
 
             if (NuGetVersionHelper.TryParseFloatRangeEx(version, out FloatRange floatRange))
             {
@@ -117,6 +118,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 {
                     return new NuGetPackageInfo(
                         packageMetadata.Authors,
+                        packageMetadata.Owners,
+                        trusted: packageMetadata.PrefixReserved,
                         filePath,
                         source.Source,
                         packageMetadata.Identity.Id,
@@ -228,7 +231,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             return securePackages;
         }
 
-        private async Task<(PackageSource, IPackageSearchMetadata)> GetLatestVersionInternalAsync(
+        private async Task<(PackageSource, NugetPackageMetadata)> GetLatestVersionInternalAsync(
             string packageIdentifier,
             IEnumerable<PackageSource> packageSources,
             FloatRange floatRange,
@@ -240,7 +243,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             }
             _ = packageSources ?? throw new ArgumentNullException(nameof(packageSources));
 
-            (PackageSource Source, IEnumerable<IPackageSearchMetadata>? FoundPackages)[] foundPackagesBySource =
+            (PackageSource Source, IEnumerable<NugetPackageMetadata>? FoundPackages)[] foundPackagesBySource =
                 await Task.WhenAll(
                     packageSources.Select(source => GetPackageMetadataAsync(source, packageIdentifier, includePrerelease: true, cancellationToken)))
                           .ConfigureAwait(false);
@@ -254,8 +257,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 .Where(result => result.FoundPackages != null)
                 .SelectMany(result => result.FoundPackages.Select(package => (result.Source, package)));
 
-            (PackageSource, IPackageSearchMetadata)? latestVersion = accumulativeSearchResults.Aggregate(
-                ((PackageSource, IPackageSearchMetadata)?)null,
+            (PackageSource, NugetPackageMetadata)? latestVersion = accumulativeSearchResults.Aggregate(
+                ((PackageSource, NugetPackageMetadata)?)null,
                 (max, current) =>
                 {
                     return
@@ -269,7 +272,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             if (latestVersion == null && floatRange.IsUnrestricted())
             {
                 latestVersion = accumulativeSearchResults.Aggregate(
-                    ((PackageSource, IPackageSearchMetadata)?)null,
+                    ((PackageSource, NugetPackageMetadata)?)null,
                     (max, current) =>
                     {
                         return
@@ -292,7 +295,11 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             return latestVersion.Value;
         }
 
-        private async Task<(PackageSource, IPackageSearchMetadata)> GetPackageMetadataAsync(string packageIdentifier, NuGetVersion packageVersion, IEnumerable<PackageSource> sources, CancellationToken cancellationToken)
+        private async Task<(PackageSource, NugetPackageMetadata)> GetPackageMetadataAsync(
+            string packageIdentifier,
+            NuGetVersion packageVersion,
+            IEnumerable<PackageSource> sources,
+            CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(packageIdentifier))
             {
@@ -304,20 +311,20 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             bool atLeastOneSourceValid = false;
             using CancellationTokenSource linkedCts =
                       CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            List<Task<(PackageSource Source, IEnumerable<IPackageSearchMetadata>? FoundPackages)>> tasks =
+            List<Task<(PackageSource Source, IEnumerable<NugetPackageMetadata>? FoundPackages)>> tasks =
                 sources.Select(source => GetPackageMetadataAsync(source, packageIdentifier, includePrerelease: true, linkedCts.Token)).ToList();
             while (tasks.Any())
             {
-                Task<(PackageSource Source, IEnumerable<IPackageSearchMetadata>? FoundPackages)> finishedTask =
+                Task<(PackageSource Source, IEnumerable<NugetPackageMetadata>? FoundPackages)> finishedTask =
                     await Task.WhenAny(tasks).ConfigureAwait(false);
                 _ = tasks.Remove(finishedTask);
-                (PackageSource foundSource, IEnumerable<IPackageSearchMetadata>? foundPackages) = await finishedTask.ConfigureAwait(false);
+                (PackageSource foundSource, IEnumerable<NugetPackageMetadata>? foundPackages) = await finishedTask.ConfigureAwait(false);
                 if (foundPackages == null)
                 {
                     continue;
                 }
                 atLeastOneSourceValid = true;
-                IPackageSearchMetadata matchedVersion = foundPackages.FirstOrDefault(package => package.Identity.Version == packageVersion);
+                NugetPackageMetadata matchedVersion = foundPackages.FirstOrDefault(package => package.Identity.Version == packageVersion);
                 if (matchedVersion != null)
                 {
                     _nugetLogger.LogDebug($"{packageIdentifier}::{packageVersion} was found in {foundSource.Source}.");
@@ -341,7 +348,11 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             throw new PackageNotFoundException(packageIdentifier, packageVersion, sources.Select(source => source.Source));
         }
 
-        private async Task<(PackageSource Source, IEnumerable<IPackageSearchMetadata>? FoundPackages)> GetPackageMetadataAsync(PackageSource source, string packageIdentifier, bool includePrerelease = false, CancellationToken cancellationToken = default)
+        private async Task<(PackageSource Source, IEnumerable<NugetPackageMetadata>? FoundPackages)> GetPackageMetadataAsync(
+            PackageSource source,
+            string packageIdentifier,
+            bool includePrerelease = false,
+            CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(packageIdentifier))
             {
@@ -354,7 +365,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             {
                 SourceRepository repository = SourcesCache.GetOrAdd(source, Repository.Factory.GetCoreV3(source));
                 PackageMetadataResource resource = await repository.GetResourceAsync<PackageMetadataResource>(cancellationToken).ConfigureAwait(false);
-                IEnumerable<IPackageSearchMetadata> foundPackages = await resource.GetMetadataAsync(
+                IEnumerable<IPackageSearchMetadata> packageMetadata = await resource.GetMetadataAsync(
                     packageIdentifier,
                     includePrerelease: includePrerelease,
                     includeUnlisted: false,
@@ -362,20 +373,31 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                     _nugetLogger,
                     cancellationToken).ConfigureAwait(false);
 
-                if (foundPackages.Any())
+                if (packageMetadata.Any())
                 {
-                    _nugetLogger.LogDebug($"Found {foundPackages.Count()} versions for {packageIdentifier} in NuGet feed {source.Source}.");
+                    _nugetLogger.LogDebug($"Found {packageMetadata.Count()} versions for {packageIdentifier} in NuGet feed {source.Source}.");
+
+                    // extra call is needed because GetMetadataAsync call doesn't include owners and prefixVerified info
+                    // https://github.com/NuGet/NuGetGallery/issues/5647
+                    var (owners, verified) = await GetPackageAdditionalMetadata(
+                         repository,
+                         packageIdentifier,
+                         includePrerelease,
+                         cancellationToken).ConfigureAwait(false);
+
+                    return (source, packageMetadata.Select(pm => new NugetPackageMetadata(pm, owners, verified)));
                 }
                 else
                 {
                     _nugetLogger.LogDebug($"{packageIdentifier} is not found in NuGet feed {source.Source}.");
                 }
-                return (source, foundPackages);
+
+                return (source, Enumerable.Empty<NugetPackageMetadata>());
             }
             catch (TaskCanceledException)
             {
                 //do nothing
-                //GetPackageMetadataAsync may cancel the task in case package is found in another feed.
+                //GetMetadataAsync may cancel the task in case package is found in another feed.
             }
             catch (Exception ex)
             {
@@ -383,6 +405,25 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 _nugetLogger.LogDebug($"Details: {ex}.");
             }
             return (source, FoundPackages: null);
+        }
+
+        private async Task<(string Owners, bool Verified)> GetPackageAdditionalMetadata(
+            SourceRepository repository,
+            string packageIdentifier,
+            bool includePrerelease,
+            CancellationToken cancellationToken)
+        {
+            var nugetSearchClient = await repository.GetResourceAsync<PackageSearchResource>(cancellationToken).ConfigureAwait(false);
+
+            var searchResult = (await nugetSearchClient.SearchAsync(
+                packageIdentifier,
+                new SearchFilter(includePrerelease),
+                skip: 0,
+                take: 1,
+                _nugetLogger,
+                cancellationToken).ConfigureAwait(false)).FirstOrDefault();
+
+            return (searchResult.Owners ?? string.Empty, searchResult.PrefixReserved);
         }
 
         private IEnumerable<PackageSource> LoadNuGetSources(IEnumerable<string> additionalSources)
@@ -441,6 +482,25 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 throw new InvalidNuGetSourceException("No NuGet sources are defined or enabled");
             }
             return retrievedSources;
+        }
+
+        private class NugetPackageMetadata
+        {
+            public NugetPackageMetadata(IPackageSearchMetadata metadata, string owners, bool trusted)
+            {
+                Authors = metadata.Authors;
+                Identity = metadata.Identity;
+                PrefixReserved = trusted;
+                Owners = owners;
+            }
+
+            public string Authors { get; }
+
+            public PackageIdentity Identity { get; }
+
+            public string Owners { get; }
+
+            public bool PrefixReserved { get; }
         }
     }
 }
