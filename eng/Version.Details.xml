@@ -23,6 +23,11 @@
       <Uri>https://github.com/dotnet/command-line-api</Uri>
       <Sha>42c58533cdf478b15120542be76f7cbaacaab024</Sha>
     </Dependency>
+    <Dependency Name="NuGet.Credentials" Version="6.6.0-preview.3.61">
+      <Uri>https://github.com/nuget/nuget.client</Uri>
+      <Sha>0fa557836fa35aee7d60776ef0c88176dbcd22ac</Sha>
+      <SourceBuild RepoName="nuget-client" ManagedOnly="true" />
+    </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
     <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="8.0.0-beta.23205.4">

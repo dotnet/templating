@@ -20,5 +20,7 @@
     <!-- Dependencies from https://github.com/dotnet/runtime -->
     <MicrosoftNETCoreAppRefPackageVersion>8.0.0-preview.3.23170.1</MicrosoftNETCoreAppRefPackageVersion>
     <MicrosoftNETCoreAppRuntimewinx64PackageVersion>8.0.0-preview.3.23170.1</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
+    <!-- Dependencies from https://github.com/nuget/nuget.client -->
+    <NuGetCredentialsPackageVersion>6.6.0-preview.3.61</NuGetCredentialsPackageVersion>
   </PropertyGroup>
 </Project>
