@@ -1,4 +1,4 @@
-function retry {
+retry() {
   local n=0
   local max=15
   local delay=60
