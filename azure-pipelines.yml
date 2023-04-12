@@ -25,6 +25,8 @@ variables:
     value: true
   - name: Codeql.Enabled
     value: true
+  - name: EnableReleaseOneLocBuild
+    value: false
   - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
     - group: Templating-SDLValidation-Params
     
@@ -48,9 +50,9 @@ stages:
           MirrorRepo: templating
           LclSource: lclFilesfromPackage
           LclPackageId: 'LCL-JUNO-PROD-TEMPLATING'
-          MirrorBranch: $(OneLocBuildBranch)
+          MirrorBranch: replace(variables['Build.SourceBranch'], 'refs/heads/', '')
           JobNameSuffix: '_release'
-          condition: eq(variables['Build.SourceBranch'], format('{0}{1}', 'refs/heads/', variables['OneLocBuildBranch'] ))
+          condition: $(EnableReleaseOneLocBuild)
     - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
       - template: /eng/common/templates/job/onelocbuild.yml
         parameters:
