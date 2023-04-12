@@ -26,7 +26,7 @@ variables:
   - name: Codeql.Enabled
     value: true
   - name: EnableReleaseOneLocBuild
-    value: false
+    value: true
   - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
     - group: Templating-SDLValidation-Params
     
