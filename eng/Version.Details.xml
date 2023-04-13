@@ -6,9 +6,9 @@
       <Sha>33edde07d61cf7606d76ada765335fb81f1cbb71</Sha>
       <SourceBuild RepoName="source-build-externals" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="8.0.0-alpha.1.23205.5">
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="8.0.0-alpha.1.23213.2">
       <Uri>https://github.com/dotnet/source-build-reference-packages</Uri>
-      <Sha>09c4d8e93c5b78897bccb4f27e0c373647fb3985</Sha>
+      <Sha>1325ba66a392ff99a6813e6577110fabc1dc075d</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
     <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="8.0.0-preview.3.23170.1">
@@ -25,19 +25,19 @@
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
-    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="8.0.0-beta.23205.4">
+    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="8.0.0-beta.23211.8">
       <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>290a3ecc0e3dabcdcafff632ccbf28d42db8061b</Sha>
+      <Sha>17d9eee32f20a6af0ebb620254a22f601d159578</Sha>
       <SourceBuild RepoName="arcade" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="Microsoft.DotNet.XliffTasks" Version="1.0.0-beta.23180.1" CoherentParentDependency="Microsoft.DotNet.Arcade.Sdk">
+    <Dependency Name="Microsoft.DotNet.XliffTasks" Version="1.0.0-beta.23206.1" CoherentParentDependency="Microsoft.DotNet.Arcade.Sdk">
       <Uri>https://github.com/dotnet/xliff-tasks</Uri>
-      <Sha>a0d9b0e10c67721157c066abb9210d1e3e774014</Sha>
+      <Sha>519d565b45c46ac452fe5a77ab63295138992e07</Sha>
       <SourceBuild RepoName="xliff-tasks" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="Microsoft.SourceLink.GitHub" Version="1.2.0-beta-23202-01" CoherentParentDependency="Microsoft.DotNet.Arcade.Sdk">
+    <Dependency Name="Microsoft.SourceLink.GitHub" Version="8.0.0-beta.23210.3" CoherentParentDependency="Microsoft.DotNet.Arcade.Sdk">
       <Uri>https://github.com/dotnet/sourcelink</Uri>
-      <Sha>47edfd68f25fc5a9dd399b6e3f8f20a355f82e1a</Sha>
+      <Sha>759f344923a0859f3fae83431d0ba1cc62108118</Sha>
       <SourceBuild RepoName="sourcelink" ManagedOnly="true" />
     </Dependency>
   </ToolsetDependencies>

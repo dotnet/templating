@@ -50,21 +50,25 @@ namespace Microsoft.TemplateEngine.Utils
             return allGrouped;
         }
 
-        private readonly struct ValueWrapper<T>
+        private struct ValueWrapper<T>
         {
             public ValueWrapper(T val)
             {
                 Val = val;
             }
 
-            public T Val { get; }
+            public T Val { get; private set; }
 
-            public override readonly bool Equals(object obj)
+#pragma warning disable IDE0251 // Make member 'readonly'
+            public override bool Equals(object obj)
+#pragma warning restore IDE0251 // Make member 'readonly'
             {
                 return obj is ValueWrapper<T> v && Equals(Val, v.Val);
             }
 
-            public override readonly int GetHashCode()
+#pragma warning disable IDE0251 // Make member 'readonly'
+            public override int GetHashCode()
+#pragma warning restore IDE0251 // Make member 'readonly'
             {
                 return Val?.GetHashCode() ?? 0;
             }

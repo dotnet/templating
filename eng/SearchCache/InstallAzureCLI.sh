@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 function retry {
   local n=0
   local max=15
