@@ -22,6 +22,7 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
         private const int FileReadWriteRetries = 20;
         private const int MillisecondsInterval = 20;
         private static readonly TimeSpan MaxNotificationDelayOnWriterLock = TimeSpan.FromSeconds(1);
+        // private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
         private readonly SettingsFilePaths _paths;
         private readonly IEngineEnvironmentSettings _environmentSettings;
         private readonly string _globalSettingsFile;
@@ -103,9 +104,7 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
                             package.ToStringDictionary(propertyName: nameof(TemplatePackageData.Details))));
                     }
 
-                    return CanApplyFirstRunDataMigration()
-                        ? await MigrateCacheMetadataAsync(packages, cancellationToken).ConfigureAwait(false)
-                        : packages;
+                    return packages;
                 }
                 catch (JsonReaderException ex)
                 {
@@ -134,6 +133,11 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
             if (!(_mutex?.IsLocked ?? false))
             {
                 throw new InvalidOperationException($"Before calling {nameof(SetInstalledTemplatePackagesAsync)}, {nameof(LockAsync)} must be called.");
+            }
+
+            if (CanApplyFirstRunDataMigration())
+            {
+                await MigrateCacheMetadataAsync(cancellationToken).ConfigureAwait(false);
             }
 
             var globalSettingsData = new GlobalSettingsData(packages);
@@ -223,7 +227,7 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
             return true;
         }
 
-        private async Task<IReadOnlyList<TemplatePackageData>> MigrateCacheMetadataAsync(IReadOnlyList<TemplatePackageData> packages, CancellationToken cancellationToken)
+        private async Task MigrateCacheMetadataAsync(CancellationToken cancellationToken)
         {
             _logger.LogWarning(LocalizableStrings.GlobalSettingsTemplatePackageProvider_DataMigrationWarning);
 
@@ -235,44 +239,50 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
 
             var updatedPackages = new List<TemplatePackageData>();
             var metadataDownloader = new NuGetApiPackageManager(_environmentSettings);
+            var packages = await GetInstalledTemplatePackagesAsync(cancellationToken).ConfigureAwait(false);
 
-            foreach (var package in packages)
+            try
             {
-                string? packageSource = string.Empty;
-                package.Details?.TryGetValue(sourceFeedKey, out packageSource);
-
-                string? identifier = string.Empty;
-                package.Details?.TryGetValue(packageIdKey, out identifier);
-
-                string? version = string.Empty;
-                package.Details?.TryGetValue(versionKey, out version);
-
-                if (!string.IsNullOrWhiteSpace(packageSource))
+                foreach (var package in packages)
                 {
-                    var updatedPackageMetadata = await metadataDownloader.GetPackageMetadataAsync(
-                        identifier,
-                        version,
-                        packageSource,
-                        CancellationToken.None).ConfigureAwait(false);
+                    string? packageSource = string.Empty;
+                    package.Details?.TryGetValue(sourceFeedKey, out packageSource);
 
-                    var extendedPackageDetails = package.Details.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-                    extendedPackageDetails[trustedKey] = updatedPackageMetadata.Trusted.ToString() ?? false.ToString();
-                    extendedPackageDetails[ownersKey] = updatedPackageMetadata.Owners;
-                    updatedPackages.Add(new TemplatePackageData(package.InstallerId, package.MountPointUri, package.LastChangeTime, extendedPackageDetails));
+                    string? identifier = string.Empty;
+                    package.Details?.TryGetValue(packageIdKey, out identifier);
+
+                    string? version = string.Empty;
+                    package.Details?.TryGetValue(versionKey, out version);
+
+                    if (!string.IsNullOrWhiteSpace(packageSource))
+                    {
+                        var updatedPackageMetadata = await metadataDownloader.GetPackageMetadataAsync(
+                            identifier,
+                            version,
+                            packageSource,
+                            CancellationToken.None).ConfigureAwait(false);
+
+                        var extendedPackageDetails = package.Details.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                        extendedPackageDetails[trustedKey] = updatedPackageMetadata.Trusted.ToString() ?? false.ToString();
+                        extendedPackageDetails[ownersKey] = updatedPackageMetadata.Owners;
+                        updatedPackages.Add(new TemplatePackageData(package.InstallerId, package.MountPointUri, package.LastChangeTime, extendedPackageDetails));
+                    }
+                    else
+                    {
+                        updatedPackages.Add(package);
+                    }
                 }
-                else
-                {
-                    updatedPackages.Add(package);
-                }
+
+                using var stream = _environmentSettings.Host.FileSystem.CreateFile(_paths.FirstRunCookie);
+
+                // cleanup existing cache file
+                await SetInstalledTemplatePackagesAsync(new List<TemplatePackageData>(), cancellationToken).ConfigureAwait(false);
+                await SetInstalledTemplatePackagesAsync(updatedPackages, cancellationToken).ConfigureAwait(false);
             }
-
-            // cleanup existing cache file
-            await SetInstalledTemplatePackagesAsync(new List<TemplatePackageData>(), cancellationToken).ConfigureAwait(false);
-            await SetInstalledTemplatePackagesAsync(updatedPackages, cancellationToken).ConfigureAwait(false);
-
-            _environmentSettings.Host.FileSystem.CreateFile(_paths.FirstRunCookie);
-
-            return updatedPackages;
+            catch
+            {
+                throw;
+            }
         }
     }
 }
