@@ -111,7 +111,7 @@ namespace Microsoft.TemplateEngine.IDE
         /// <summary>
         /// Gets list of available templates, if <paramref name="filters"/> is provided returns only matching templates.
         /// </summary>
-        /// <param name="filters">List of filters to apply. See <see cref="Utils.WellKnownSearchFilters"/> for predefined filters.</param>
+        /// <param name="filters">List of filters to apply. See <see cref="WellKnownSearchFilters"/> for predefined filters.</param>
         /// <param name="exactMatchesOnly">
         /// true: templates should match all filters; false: templates should match any filter.
         /// </param>
@@ -366,7 +366,7 @@ namespace Microsoft.TemplateEngine.IDE
         #region Obsolete
 
         [Obsolete("Use " + nameof(GetTemplatesAsync) + "instead")]
-        public async Task<IReadOnlyCollection<Edge.Template.IFilteredTemplateInfo>> ListTemplates(bool exactMatchesOnly, params Func<ITemplateInfo, Edge.Template.MatchInfo?>[] filters)
+        public async Task<IReadOnlyCollection<IFilteredTemplateInfo>> ListTemplates(bool exactMatchesOnly, params Func<ITemplateInfo, Edge.Template.MatchInfo?>[] filters)
         {
             return TemplateListFilter.FilterTemplates(await _templatePackagesManager.GetTemplatesAsync(default).ConfigureAwait(false), exactMatchesOnly, filters);
         }

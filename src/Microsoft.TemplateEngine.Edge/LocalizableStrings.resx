@@ -448,4 +448,8 @@ The template from 'PACKAGE_ID' will be used. To resolve this conflict, uninstall
   <data name="TemplateCreator_TemplateCreationResult_Error_InvalidTemplate" xml:space="preserve">
     <value>The template is invalid and cannot be instantiated.</value>
   </data>
+  <data name="GlobalSettingsTemplatePackageProvider_DataMigrationWarning" xml:space="preserve">
+    <value>Initial data migration may take some time, depending on the size and complexity of the existing cache data. Please do not make any changes to the system during this process.</value>
+    <comment>The note about the initial data migration.</comment>
+  </data>
 </root>

@@ -94,7 +94,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 throw new InvalidNuGetSourceException("Failed to load NuGet source", new[] { source.Source }, e);
             }
 
-            string filePath = Path.Combine(downloadPath, packageMetadata.Identity.Id + "." + packageMetadata.Identity.Version + ".nupkg");
+            string filePath = GetFilePath(downloadPath, packageMetadata.Identity.Id, packageMetadata.Identity.Version.ToString());
             if (!force && _environmentSettings.Host.FileSystem.FileExists(filePath))
             {
                 _nugetLogger.LogError(string.Format(LocalizableStrings.NuGetApiPackageManager_Error_FileAlreadyExists, filePath));
@@ -198,6 +198,24 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             var (_, package) = await GetLatestVersionInternalAsync(identifier, packageSources, floatRange, cancellationToken).ConfigureAwait(false);
             bool isLatestVersion = currentVersion != null && currentVersion >= package.Identity.Version;
             return (package.Identity.Version.ToNormalizedString(), isLatestVersion);
+        }
+
+        public async Task<NuGetPackageInfo> GetPackageMetadataAsync(
+            string identifier,
+            string version,
+            string source,
+            CancellationToken cancellationToken)
+        {
+            var (_, packageMetadata) = await GetPackageMetadataAsync(identifier, new NuGetVersion(version), new[] { new PackageSource(source) }, cancellationToken).ConfigureAwait(false);
+
+            return new NuGetPackageInfo(
+                       packageMetadata.Authors,
+                       packageMetadata.Owners,
+                       trusted: packageMetadata.PrefixReserved,
+                       string.Empty,
+                       source,
+                       packageMetadata.Identity.Id,
+                       packageMetadata.Identity.Version.ToNormalizedString());
         }
 
         private async Task<(PackageSource, NugetPackageMetadata)> GetLatestVersionInternalAsync(
@@ -453,7 +471,9 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             return retrievedSources;
         }
 
-        private class NugetPackageMetadata
+        private string GetFilePath(string downloadPath, string identifier, string version) => Path.Combine(downloadPath, identifier + "." + version + ".nupkg");
+
+        internal class NugetPackageMetadata
         {
             public NugetPackageMetadata(IPackageSearchMetadata metadata, string owners, bool trusted)
             {

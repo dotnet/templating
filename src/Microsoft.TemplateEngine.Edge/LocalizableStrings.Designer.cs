@@ -250,6 +250,15 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Initial data migration may take some time, depending on the size and complexity of the existing cache data. Please do not make any changes to the system during this process..
+        /// </summary>
+        internal static string GlobalSettingsTemplatePackageProvider_DataMigrationWarning {
+            get {
+                return ResourceManager.GetString("GlobalSettingsTemplatePackageProvider_DataMigrationWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} can be installed by several installers. Specify the installer name to be used..
         /// </summary>
         internal static string GlobalSettingsTemplatePackageProvider_InstallResult_Error_MultipleInstallersCanBeUsed {

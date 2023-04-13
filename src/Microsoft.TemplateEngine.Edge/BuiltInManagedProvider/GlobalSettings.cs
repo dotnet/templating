@@ -4,11 +4,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Installer;
+using Microsoft.TemplateEngine.Edge.Installers.NuGet;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -23,6 +25,7 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
         private readonly SettingsFilePaths _paths;
         private readonly IEngineEnvironmentSettings _environmentSettings;
         private readonly string _globalSettingsFile;
+        private readonly ILogger _logger;
         private IDisposable? _watcher;
         private volatile bool _disposed;
         private volatile AsyncMutex? _mutex;
@@ -33,7 +36,9 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
             _environmentSettings = environmentSettings ?? throw new ArgumentNullException(nameof(environmentSettings));
             _globalSettingsFile = globalSettingsFile ?? throw new ArgumentNullException(nameof(globalSettingsFile));
             _paths = new SettingsFilePaths(environmentSettings);
+            _logger = _environmentSettings.Host.LoggerFactory.CreateLogger<GlobalSettings>();
             environmentSettings.Host.FileSystem.CreateDirectory(Path.GetDirectoryName(_globalSettingsFile));
+
             _watcher = CreateWatcherIfRequested();
         }
 
@@ -98,7 +103,9 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
                             package.ToStringDictionary(propertyName: nameof(TemplatePackageData.Details))));
                     }
 
-                    return packages;
+                    return _environmentSettings.Host.FileSystem.FileExists(_paths.FirstRunCookie)
+                        ? packages
+                        : await MigrateCacheMetadataAsync(packages, cancellationToken).ConfigureAwait(false);
                 }
                 catch (JsonReaderException ex)
                 {
@@ -212,6 +219,59 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
             }
 
             return true;
+        }
+
+        private async Task<IReadOnlyList<TemplatePackageData>> MigrateCacheMetadataAsync(IReadOnlyList<TemplatePackageData> packages, CancellationToken cancellationToken)
+        {
+            _logger.LogWarning(LocalizableStrings.GlobalSettingsTemplatePackageProvider_DataMigrationWarning);
+
+            string sourceFeedKey = "NuGetSource";
+            string packageIdKey = "PackageId";
+            string versionKey = "Version";
+            string ownersKey = "Owners";
+            string trustedKey = "Trusted";
+
+            var updatedPackages = new List<TemplatePackageData>();
+            var metadataDownloader = new NuGetApiPackageManager(_environmentSettings);
+
+            foreach (var package in packages)
+            {
+                string? packageSource = string.Empty;
+                package.Details?.TryGetValue(sourceFeedKey, out packageSource);
+
+                string? identifier = string.Empty;
+                package.Details?.TryGetValue(packageIdKey, out identifier);
+
+                string? version = string.Empty;
+                package.Details?.TryGetValue(versionKey, out version);
+
+                if (!string.IsNullOrWhiteSpace(packageSource))
+                {
+                    var updatedPackageMetadata = await metadataDownloader.GetPackageMetadataAsync(
+                        identifier,
+                        version,
+                        packageSource,
+                        CancellationToken.None).ConfigureAwait(false);
+
+                    var extendedPackageDetails = package.Details.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                    extendedPackageDetails[trustedKey] = updatedPackageMetadata.Trusted.ToString() ?? false.ToString();
+                    extendedPackageDetails[ownersKey] = updatedPackageMetadata.Owners;
+                    updatedPackages.Add(new TemplatePackageData(package.InstallerId, package.MountPointUri, package.LastChangeTime, extendedPackageDetails));
+                }
+                else
+                {
+                    updatedPackages.Add(package);
+                }
+            }
+
+            using var disposable = await LockAsync(cancellationToken).ConfigureAwait(false);
+            // cleanup existing cache file
+            await SetInstalledTemplatePackagesAsync(new List<TemplatePackageData>(), CancellationToken.None).ConfigureAwait(false);
+            await SetInstalledTemplatePackagesAsync(updatedPackages, CancellationToken.None).ConfigureAwait(false);
+
+            _environmentSettings.Host.FileSystem.CreateFile(_paths.FirstRunCookie);
+
+            return updatedPackages;
         }
     }
 }

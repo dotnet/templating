@@ -105,6 +105,11 @@
         <target state="translated">버전 {0}</target>
         <note>small letters, string is used in the sentence</note>
       </trans-unit>
+      <trans-unit id="GlobalSettingsTemplatePackageProvider_DataMigrationWarning">
+        <source>Initial data migration may take some time, depending on the size and complexity of the existing cache data. Please do not make any changes to the system during this process.</source>
+        <target state="new">Initial data migration may take some time, depending on the size and complexity of the existing cache data. Please do not make any changes to the system during this process.</target>
+        <note>The note about the initial data migration.</note>
+      </trans-unit>
       <trans-unit id="GlobalSettingsTemplatePackageProvider_InstallResult_Error_MultipleInstallersCanBeUsed">
         <source>{0} can be installed by several installers. Specify the installer name to be used.</source>
         <target state="translated">{0}은(는) 여러 설치 관리자가 설치할 수 있습니다. 사용할 설치 관리자 이름을 지정합니다.</target>
