@@ -54,8 +54,8 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands
         private IEngineEnvironmentSettings SetupSettings(ILoggerFactory loggerFactory)
         {
             var builtIns = new List<(Type InterfaceType, IIdentifiedComponent Instance)>();
-            builtIns.AddRange(Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Components.AllComponents);
-            builtIns.AddRange(Microsoft.TemplateEngine.Edge.Components.AllComponents);
+            builtIns.AddRange(Orchestrator.RunnableProjects.Components.AllComponents);
+            builtIns.AddRange(Components.AllComponents);
 
             ITemplateEngineHost host = new DefaultTemplateEngineHost("template-validator", "1.0", builtIns: builtIns, loggerFactory: loggerFactory);
             IEngineEnvironmentSettings engineEnvironmentSettings = new EngineEnvironmentSettings(host, virtualizeSettings: true);

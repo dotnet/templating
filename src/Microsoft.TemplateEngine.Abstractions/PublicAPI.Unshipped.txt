@@ -1,4 +1,5 @@
-﻿Microsoft.TemplateEngine.Abstractions.IExtendedTemplateLocator
+﻿Microsoft.TemplateEngine.Abstractions.IEngineEnvironmentSettings.TabCompletionMode.get -> bool
+Microsoft.TemplateEngine.Abstractions.IExtendedTemplateLocator
 Microsoft.TemplateEngine.Abstractions.ITemplate.Localization.get -> Microsoft.TemplateEngine.Abstractions.ILocalizationLocator?
 Microsoft.TemplateEngine.Abstractions.ITemplate.TemplateSourceRoot.get -> Microsoft.TemplateEngine.Abstractions.Mount.IDirectory!
 Microsoft.TemplateEngine.Abstractions.ITemplateMetadata.PreferDefaultName.get -> bool

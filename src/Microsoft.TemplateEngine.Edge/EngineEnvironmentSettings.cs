@@ -25,8 +25,8 @@ namespace Microsoft.TemplateEngine.Edge
         /// </param>
         /// <param name="environment">implementation of <see cref="IEnvironment"/> to use. If not specified, <see cref="DefaultEnvironment"/> will be used.</param>
         /// <param name="componentManager">implementation of <see cref="IComponentManager"/> to use. If not specified, built-in implementation will be used.</param>
-        /// <param name="pathInfo">implememtation of <see cref="IPathInfo"/> to use. If not specified, <see cref="DefaultPathInfo"/> will be used (if <paramref name="settingsLocation"/> is used, settings location will be overriden as mentioned in <paramref name="settingsLocation"/> description). <br/>
-        /// If <paramref name="pathInfo"/> is specified, do not provide <paramref name="settingsLocation"/>.
+        /// <param name="pathInfo">implementation of <see cref="IPathInfo"/> to use. If not specified, <see cref="DefaultPathInfo"/> will be used (if <paramref name="settingsLocation"/> is used, settings location will be overriden as mentioned in <paramref name="settingsLocation"/> description). <br/>
+        /// <param name="tabCompletionMode">specifies if tab completion mode is enabled.</param>.
         /// </param>
         public EngineEnvironmentSettings(
             ITemplateEngineHost host,
@@ -34,7 +34,8 @@ namespace Microsoft.TemplateEngine.Edge
             string? settingsLocation = null,
             IEnvironment? environment = null,
             IComponentManager? componentManager = null,
-            IPathInfo? pathInfo = null)
+            IPathInfo? pathInfo = null,
+            bool tabCompletionMode = false)
         {
             if (pathInfo != null && !string.IsNullOrWhiteSpace(settingsLocation))
             {
@@ -49,6 +50,7 @@ namespace Microsoft.TemplateEngine.Edge
                 Host.VirtualizeDirectory(Paths.GlobalSettingsDir);
             }
             Components = componentManager ?? new ComponentManager(this);
+            TabCompletionMode = tabCompletionMode;
             // In past we created this folder as some file was created
             // Checking if folder exists/create folder consumes time + is error prone(we could forget)
             // Hence it should be done once, question is when and by who...
@@ -66,6 +68,8 @@ namespace Microsoft.TemplateEngine.Edge
         public IPathInfo Paths { get; }
 
         public IComponentManager Components { get; }
+
+        public bool TabCompletionMode { get; }
 
         public void Dispose()
         {

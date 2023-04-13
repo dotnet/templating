@@ -103,9 +103,9 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
                             package.ToStringDictionary(propertyName: nameof(TemplatePackageData.Details))));
                     }
 
-                    return _environmentSettings.Host.FileSystem.FileExists(_paths.FirstRunCookie)
-                        ? packages
-                        : await MigrateCacheMetadataAsync(packages, cancellationToken).ConfigureAwait(false);
+                    return CanApplyFirstRunDataMigration()
+                        ? await MigrateCacheMetadataAsync(packages, cancellationToken).ConfigureAwait(false)
+                        : packages;
                 }
                 catch (JsonReaderException ex)
                 {
@@ -163,6 +163,8 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
             }
             throw new InvalidOperationException();
         }
+
+        private bool CanApplyFirstRunDataMigration() => !_environmentSettings.Host.FileSystem.FileExists(_paths.FirstRunCookie) && !_environmentSettings.TabCompletionMode;
 
         private IDisposable? CreateWatcherIfRequested()
         {
@@ -264,10 +266,9 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
                 }
             }
 
-            using var disposable = await LockAsync(cancellationToken).ConfigureAwait(false);
             // cleanup existing cache file
-            await SetInstalledTemplatePackagesAsync(new List<TemplatePackageData>(), CancellationToken.None).ConfigureAwait(false);
-            await SetInstalledTemplatePackagesAsync(updatedPackages, CancellationToken.None).ConfigureAwait(false);
+            await SetInstalledTemplatePackagesAsync(new List<TemplatePackageData>(), cancellationToken).ConfigureAwait(false);
+            await SetInstalledTemplatePackagesAsync(updatedPackages, cancellationToken).ConfigureAwait(false);
 
             _environmentSettings.Host.FileSystem.CreateFile(_paths.FirstRunCookie);
 
