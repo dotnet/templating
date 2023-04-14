@@ -1,0 +1,7 @@
+parameters:
+  MirrorBranch: 'default'
+
+jobs:
+  - job: doingwork
+    steps:
+      - script: echo ${{ parameters.MirrorBranch }}
