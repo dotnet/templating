@@ -50,9 +50,9 @@ stages:
           MirrorRepo: templating
           LclSource: lclFilesfromPackage
           LclPackageId: 'LCL-JUNO-PROD-TEMPLATING'
-          MirrorBranch: replace(variables['Build.SourceBranch'], 'refs/heads/', '')
+          MirrorBranch: ${{ replace(variables['Build.SourceBranch'], 'refs/heads/', '') }}
           JobNameSuffix: '_release'
-          condition: $(EnableReleaseOneLocBuild)
+          condition: ${{ variables.EnableReleaseOneLocBuild }}
     - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
       - template: /eng/common/templates/job/onelocbuild.yml
         parameters:
