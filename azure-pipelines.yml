@@ -43,6 +43,11 @@ stages:
 - stage: build
   displayName: Build
   jobs:
+  - job: test_variable
+    steps:
+      - script: echo $(EnableReleaseOneLocBuild)
+      - script: echo 'print this text on condition'
+        condition: ${{ variables.EnableReleaseOneLocBuild }}
   - ${{ if and( ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
     - ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/release/') }}:
       - template: /eng/common/templates/job/onelocbuild.yml
