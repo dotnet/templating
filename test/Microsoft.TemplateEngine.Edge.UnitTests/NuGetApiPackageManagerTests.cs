@@ -125,8 +125,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             exception.Message.Should().NotBeNullOrEmpty();
         }
 
-        [Fact]
-        public async Task DownloadPackage_HasVulnerabilities()
+        // Disabled until we can find a suitable package to test
+        internal async Task DownloadPackage_HasVulnerabilities()
         {
             string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
             IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
@@ -146,8 +146,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             exception.Vulnerabilities.Should().NotBeNullOrEmpty();
         }
 
-        [Fact]
-        public async Task DownloadPackage_HasVulnerabilitiesForce()
+        // Disabled until we can find a suitable package to test
+        internal async Task DownloadPackage_HasVulnerabilitiesForce()
         {
             string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
             IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);

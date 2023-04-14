@@ -1,7 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
 using System.Reflection;
 using FluentAssertions;
 using Microsoft.TemplateEngine.Abstractions;
@@ -427,6 +426,38 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             updatedSource.NuGetSource.Should().Be(MockPackageManager.DefaultFeed);
             Assert.False(File.Exists(oldMountPoint));
             Assert.True(File.Exists(updatedSource.MountPointUri));
+        }
+
+        // Test disabled while we do not find a good package to test
+        internal async Task Update_CannotUpdateVulnerabilities()
+        {
+            MockInstallerFactory factory = new MockInstallerFactory();
+            MockManagedTemplatePackageProvider provider = new MockManagedTemplatePackageProvider();
+            string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
+            MockPackageManager mockPackageManager = new MockPackageManager(_packageManager, TestPackageProjectPath);
+
+            NuGetInstaller installer = new NuGetInstaller(factory, engineEnvironmentSettings, installPath, mockPackageManager, mockPackageManager);
+            InstallRequest request = new InstallRequest("Package to be downloaded", "version with no vulnerabilities");
+
+            InstallResult installResult = await installer.InstallAsync(request, provider, CancellationToken.None).ConfigureAwait(false);
+
+            Assert.True(installResult.Success);
+            Assert.Equal(request, installResult.InstallRequest);
+            Assert.Equal(InstallerErrorCode.Success, installResult.Error);
+            installResult.ErrorMessage.Should().BeNullOrEmpty();
+
+            var source = installResult.TemplatePackage as NuGetManagedTemplatePackage;
+            Assert.NotNull(source);
+            string oldMountPoint = source!.MountPointUri;
+            Assert.True(File.Exists(oldMountPoint));
+            UpdateRequest updateRequest = new UpdateRequest(source, "version with vulnerabilities");
+
+            UpdateResult updateResult = await installer.UpdateAsync(updateRequest, provider, CancellationToken.None).ConfigureAwait(false);
+            Assert.False(installResult.Success);
+            Assert.Equal(InstallerErrorCode.VulnerablePackage, updateResult.Error);
+            updateResult.ErrorMessage.Should().NotBeNullOrEmpty();
+            updateResult.Vulnerabilities.Should().NotBeNullOrEmpty();
         }
 
         [Theory]
