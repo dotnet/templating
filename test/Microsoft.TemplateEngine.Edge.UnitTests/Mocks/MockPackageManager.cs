@@ -34,7 +34,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests.Mocks
                 case nameof(VulnerablePackageException):
                     var vulnerabilities = GetMockVulnerabilities();
                     version ??= "12.0.3";
-                    throw new VulnerablePackageException("Test Message", identifier, version, Enumerable.Empty<PackageVulnerabilityMetadata>());
+                    throw new VulnerablePackageException("Test Message", identifier, version, vulnerabilities);
                 case nameof(Exception): throw new Exception("Generic error");
             }
 

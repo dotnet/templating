@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.Reflection;
 using FluentAssertions;
 using Microsoft.TemplateEngine.Abstractions;
@@ -252,7 +253,6 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         [InlineData(nameof(DownloadException), InstallerErrorCode.DownloadFailed)]
         [InlineData(nameof(PackageNotFoundException), InstallerErrorCode.PackageNotFound)]
         [InlineData(nameof(InvalidNuGetSourceException), InstallerErrorCode.InvalidSource)]
-        [InlineData(nameof(VulnerablePackageException), InstallerErrorCode.VulnerablePackage)]
         [InlineData(nameof(Exception), InstallerErrorCode.GenericError)]
         public async Task Install_RemotePackage_HandleExceptions(string exception, InstallerErrorCode expectedErrorCode)
         {
@@ -272,6 +272,27 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             Assert.Equal(expectedErrorCode, installResult.Error);
             installResult.ErrorMessage.Should().NotBeNullOrEmpty();
             installResult.TemplatePackage.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task Install_RemotePackage_HandleVulnerablePackage()
+        {
+            MockInstallerFactory factory = new MockInstallerFactory();
+            MockManagedTemplatePackageProvider provider = new MockManagedTemplatePackageProvider();
+            string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
+            MockPackageManager mockPackageManager = new MockPackageManager();
+
+            NuGetInstaller installer = new NuGetInstaller(factory, engineEnvironmentSettings, installPath, mockPackageManager, mockPackageManager);
+            InstallRequest request = new InstallRequest(nameof(VulnerablePackageException));
+
+            InstallResult installResult = await installer.InstallAsync(request, provider, CancellationToken.None).ConfigureAwait(false);
+            Assert.False(installResult.Success);
+            Assert.Equal(request, installResult.InstallRequest);
+            Assert.Equal(InstallerErrorCode.VulnerablePackage, installResult.Error);
+            installResult.ErrorMessage.Should().NotBeNullOrEmpty();
+            installResult.TemplatePackage.Should().BeNull();
+            installResult.Vulnerabilities.Should().NotBeNullOrEmpty();
         }
 
         [Fact]
