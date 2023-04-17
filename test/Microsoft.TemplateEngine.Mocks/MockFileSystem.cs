@@ -33,9 +33,8 @@ namespace Microsoft.TemplateEngine.Mocks
                 LastWriteTimeUtc = lastWriteTime ?? DateTime.UtcNow
             };
 
-            string currentParent = Path.GetDirectoryName(filePath);
-
-            while (currentParent.IndexOfAny(new[] { '\\', '/' }) != currentParent.Length - 1)
+            string? currentParent = Path.GetDirectoryName(filePath);
+            while (currentParent is not null && currentParent.IndexOfAny(new[] { '\\', '/' }) != currentParent.Length - 1)
             {
                 _directories.Add(currentParent);
                 currentParent = Path.GetDirectoryName(currentParent);
@@ -76,12 +75,12 @@ namespace Microsoft.TemplateEngine.Mocks
 
         public Stream OpenRead(string path)
         {
-            if (!_files.TryGetValue(path, out FileSystemFile file))
+            if (!_files.TryGetValue(path, out FileSystemFile? file))
             {
                 throw new Exception($"File {path} does no texist");
             }
 
-            MemoryStream s = new MemoryStream(file.Data);
+            MemoryStream s = new MemoryStream(file.Data!);
             return s;
         }
 
@@ -117,7 +116,7 @@ namespace Microsoft.TemplateEngine.Mocks
 
         public string ReadAllText(string path)
         {
-            return Encoding.UTF8.GetString(_files[path].Data);
+            return Encoding.UTF8.GetString(_files[path].Data!);
         }
 
         public byte[] ReadAllBytes(string path)

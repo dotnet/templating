@@ -1,17 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <!-- Opt out of certain Arcade features -->
+<Project>
+
   <PropertyGroup>
     <UsingToolXliff>true</UsingToolXliff>
-    <UsingToolNetFrameworkReferenceAssemblies>true</UsingToolNetFrameworkReferenceAssemblies>
     <VersionPrefix>8.0.100</VersionPrefix>
     <PreReleaseVersionLabel>preview</PreReleaseVersionLabel>
     <PreReleaseVersionIteration>4</PreReleaseVersionIteration>
     <!-- When StabilizePackageVersion is set to 'true', this branch will produce stable outputs for 'Shipping' packages -->
     <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">false</StabilizePackageVersion>
     <DotNetFinalVersionKind Condition="'$(StabilizePackageVersion)' == 'true'">release</DotNetFinalVersionKind>
-    <PackSpecific Condition="'$(OS)' != 'Windows_NT'">true</PackSpecific>
   </PropertyGroup>
+
   <!-- Package Versions -->
   <PropertyGroup>
     <!-- Maestro-managed Package Versions - Ordered by repo name -->
@@ -21,4 +19,5 @@
     <MicrosoftNETCoreAppRefPackageVersion>8.0.0-preview.3.23170.1</MicrosoftNETCoreAppRefPackageVersion>
     <MicrosoftNETCoreAppRuntimewinx64PackageVersion>8.0.0-preview.3.23170.1</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
   </PropertyGroup>
+
 </Project>

@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <Dependencies>
   <ProductDependencies>
     <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-externals" Version="8.0.0-alpha.1.23203.1">

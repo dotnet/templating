@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <TargetFramework>$(NETCoreTargetFramework)</TargetFramework>
-    <IsPackable>false</IsPackable>
+    <TargetFramework>$(NetCurrent)</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -21,6 +21,5 @@
     <Content Include="Snapshots\**\*" />
     <None Include="Snapshots\**\*" CopyToOutputDirectory="Never" />
   </ItemGroup>
-
   
 </Project>

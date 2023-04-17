@@ -1,12 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?>
 <Project>
+
+  <ItemGroup Condition="'$(IsTestProject)' == 'true'">
+    <PackageReference  Include="Newtonsoft.Json" />
+    <!-- FakeItEasy is the remaining dependency in the repository that brings NETStandard.Library/1.6.1 in.
+         Bump the transitive Castle.Core dependency to avoid bringing in the .NET Standard 1.5 dependency graph which
+         contains vulnerable packages. Remove this when https://github.com/FakeItEasy/FakeItEasy/issues/1925 is fixed and consumed. -->
+    <PackageReference Include="Castle.Core" Condition="'@(PackageReference)' != '' and @(PackageReference->AnyHaveMetadataValue('Identity', 'FakeItEasy'))" />
+  </ItemGroup>
+
   <Import Project="..\Directory.Build.targets" />
 
-  <!-- forces the version in sub dependencies -->
-  <!-- xunit.assert has this dependency, so applying to all test projects-->
-  <ItemGroup>
-    <PackageReference Condition="'$(IsTestProject)' == 'true'" Include="System.Net.Http" Version="4.3.4" />
-    <PackageReference Condition="'$(IsTestProject)' == 'true'" Include="System.Security.Cryptography.X509Certificates" Version="4.3.0" /> 
-    <PackageReference Condition="'$(IsTestProject)' == 'true'" Include="Newtonsoft.Json" Version="13.0.1" />
-  </ItemGroup>
 </Project>

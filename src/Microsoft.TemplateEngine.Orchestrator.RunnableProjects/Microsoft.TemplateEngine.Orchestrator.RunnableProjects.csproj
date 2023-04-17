@@ -1,7 +1,7 @@
-<Project ToolsVersion="15.0" Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <TargetFrameworks Condition="'$(PackSpecific)' != 'true'">$(NETStandardTargetFramework);$(NETFullTargetFramework)</TargetFrameworks>
-    <TargetFrameworks Condition="'$(PackSpecific)' == 'true'">$(NETStandardTargetFramework)</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;$(NetFrameworkToolCurrent)</TargetFrameworks>
     <Description>An extension for Template Engine that allows projects that still run to be used as templates</Description>
     <IsPackable>true</IsPackable>
     <EnablePublicApiAnalyzer>true</EnablePublicApiAnalyzer>
@@ -23,18 +23,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="LocalizableStrings.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>LocalizableStrings.resx</DependentUpon>
-    </Compile>
+    <Compile Update="LocalizableStrings.Designer.cs"
+             DesignTime="True"
+             AutoGen="True"
+             DependentUpon="LocalizableStrings.resx" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="LocalizableStrings.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>LocalizableStrings.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
+    <EmbeddedResource Update="LocalizableStrings.resx"
+                      Generator="ResXFileCodeGenerator"
+                      LastGenOutput="LocalizableStrings.Designer.cs" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties schemas_4json_4template_1json__JsonSchema="http://json-schema.org/2020-12/schema#" /></VisualStudio></ProjectExtensions>
