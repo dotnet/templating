@@ -1,22 +1,25 @@
-<?xml version="1.0" encoding="utf-8"?>
 <Project>
-  <Import Project="$(DotNetPackageVersionPropsPath)" Condition="'$(DotNetPackageVersionPropsPath)' != ''" />
 
   <Import Project="$(RepositoryEngineeringDir)Package.props" />
+  <Import Project="Sdk.targets" Sdk="Microsoft.DotNet.Arcade.Sdk" />
 
-  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' AND '$(BuildingInsideVisualStudio)' != 'true'">
-    <FrameworkReference
-        Update="Microsoft.NETCore.App"
-        TargetingPackVersion="$(MicrosoftNETCoreAppRefPackageVersion)"
-        RuntimeFrameworkVersion="$(MicrosoftNETCoreAppRuntimewinx64PackageVersion)" />
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' and
+                        '$(BuildingInsideVisualStudio)' != 'true'">
+    <!-- Bump the NetCurrent framework reference to use the "latest" targeting and runtime pack version. -->
+    <KnownFrameworkReference Update="@(KnownFrameworkReference->WithMetadataValue('Identity', 'Microsoft.NETCore.App')->WithMetadataValue('TargetFramework', '$(NetCurrent)'))"
+                             TargetingPackVersion="$(MicrosoftNETCoreAppRefPackageVersion)"
+                             DefaultRuntimeFrameworkVersion="$(MicrosoftNETCoreAppRuntimewinx64PackageVersion)"
+                             LatestRuntimeFrameworkVersion="$(MicrosoftNETCoreAppRuntimewinx64PackageVersion)" />
   </ItemGroup>
-
 
   <ItemGroup>
     <None Include="$(RepoRoot)LICENSE.txt" PackagePath="LICENSE.txt" Pack="true"/>
     <None Include="$(RepoRoot)THIRD-PARTY-NOTICES.txt" PackagePath="THIRD-PARTY-NOTICES.txt" Pack="true"/>
   </ItemGroup>
 
-  <!-- Leave this file here, even if it's empty. It stops chaining imports. -->
-  <Import Project="Sdk.targets" Sdk="Microsoft.DotNet.Arcade.Sdk" />
+  <ItemGroup>
+    <!-- Upgrade the NETStandard.Library transitive xunit dependency to avoid transitive 1.x NS dependencies. -->
+    <PackageReference Include="NETStandard.Library" Version="2.0.3" PrivateAssets="all" Condition="'$(TargetFrameworkIdentifier)' != '.NETStandard'" />
+  </ItemGroup>
+
 </Project>

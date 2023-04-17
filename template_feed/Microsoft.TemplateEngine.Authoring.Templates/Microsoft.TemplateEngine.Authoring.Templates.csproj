@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <TargetFramework>$(NETCoreTargetFramework)</TargetFramework>
+    <TargetFramework>$(NetCurrent)</TargetFramework>
     <IncludeBuildOutput>False</IncludeBuildOutput>
     <IncludeSource>False</IncludeSource>
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
@@ -21,10 +22,9 @@
     <SuppressDependenciesWhenPacking>True</SuppressDependenciesWhenPacking>
     <ExcludeFromSourceBuild>true</ExcludeFromSourceBuild>
   </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Remove="Microsoft.NETCore.App" />
-    <Content Include="content\**">
-      <PackagePath>content</PackagePath>
-    </Content>
+    <Content Include="content\**" PackagePath="content" />
   </ItemGroup>
+
 </Project>

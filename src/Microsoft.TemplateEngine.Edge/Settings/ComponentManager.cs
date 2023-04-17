@@ -8,7 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
-#if !NETFULL
+#if NET
 using System.Runtime.Loader;
 #endif
 
@@ -287,7 +287,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             if (!ReflectionLoadProbingPath.HasLoaded(asmName))
             {
                 AssemblyName name = new AssemblyName(asmName);
-#if !NETFULL
+#if NET
                 AssemblyLoadContext.Default.LoadFromAssemblyName(name);
 #else
                 AppDomain.CurrentDomain.Load(name);

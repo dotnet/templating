@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <TargetFramework>$(NetCurrent)</TargetFramework>
     <OutputType>Exe</OutputType>
-    <TargetFramework>$(NETCoreTargetFramework)</TargetFramework>
     <Nullable>enable</Nullable>
     <IsPackable>true</IsPackable>
     <IsShipping>false</IsShipping>

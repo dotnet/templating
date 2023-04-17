@@ -1,6 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <TargetFramework>$(NETCoreTargetFramework)</TargetFramework>
+    <TargetFramework>$(NetCurrent)</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
@@ -16,14 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="NuGetTemplateSearchInfoWithInvalidData.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="NuGetTemplateSearchInfo.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="NuGetTemplateSearchInfo_v2.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Update="NuGetTemplateSearchInfoWithInvalidData.json" CopyToOutputDirectory="Always" />
+    <None Update="NuGetTemplateSearchInfo.json" CopyToOutputDirectory="Always" />
+    <None Update="NuGetTemplateSearchInfo_v2.json" CopyToOutputDirectory="Always" />
   </ItemGroup>
+
 </Project>

@@ -3,15 +3,13 @@
   <!-- Packages in this file have versions updated periodically by Dependabot. Versions managed by Darc/Maestro should be in ..\Package.props. -->
 
   <ItemGroup>
-    <PackageReference Update="System.Diagnostics.Process" Version="4.3.0" />
-    <PackageReference Update="System.IO.Compression" Version="4.3.0" />
-    <PackageReference Update="System.Runtime.Loader" Version="4.3.0" />
     <PackageReference Update="Microsoft.Build.Framework" Version="17.5.0" />
     <PackageReference Update="Microsoft.Build.Utilities.Core" Version="17.5.0" />
     <PackageReference Update="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Update="Microsoft.Extensions.Logging" Version="7.0.0" />
     <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
     <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
+    <PackageReference Update="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Update="NuGet.Configuration" Version="6.5.0" />
     <PackageReference Update="NuGet.Credentials" Version="6.5.0" />
     <PackageReference Update="NuGet.Protocol" Version="6.5.0" />
@@ -21,6 +19,8 @@
     <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.435" />
 
     <!--Test dependencies-->
+    <!-- Remove this dependency when https://github.com/FakeItEasy/FakeItEasy/issues/1925 is fixed and consumed. -->
+    <PackageReference Update="Castle.Core" Version="5.1.1" />
     <PackageReference Update="FakeItEasy" Version="7.3.1" />
     <PackageReference Update="FluentAssertions" Version="6.10.0" />
     <PackageReference Update="Microsoft.NET.Test.Sdk" Version="17.5.0" />
