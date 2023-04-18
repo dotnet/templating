@@ -11,17 +11,17 @@
       <Sha>def2e2c6dc5064319250e2868a041a3dc07f9579</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="VS.Redist.Common.NetCore.SharedFramework.x64.6.0" Version="6.0.17-servicing.23212.18">
+    <Dependency Name="VS.Redist.Common.NetCore.SharedFramework.x64.6.0" Version="6.0.17-servicing.23217.9">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
-      <Sha>ea0418c9be5fd59911882a59916c64fed035fb76</Sha>
+      <Sha>6e89d2b65b0f8fc739d861077a2665e94d03d875</Sha>
     </Dependency>
     <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="6.0.17">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
-      <Sha>ea0418c9be5fd59911882a59916c64fed035fb76</Sha>
+      <Sha>6e89d2b65b0f8fc739d861077a2665e94d03d875</Sha>
     </Dependency>
     <Dependency Name="Microsoft.NETCore.App.Ref" Version="6.0.17">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
-      <Sha>ea0418c9be5fd59911882a59916c64fed035fb76</Sha>
+      <Sha>6e89d2b65b0f8fc739d861077a2665e94d03d875</Sha>
     </Dependency>
     <Dependency Name="System.CommandLine" Version="2.0.0-beta3.22222.1">
       <Uri>https://github.com/dotnet/command-line-api</Uri>
@@ -33,7 +33,7 @@
     </Dependency>
     <Dependency Name="Microsoft.Extensions.Logging.Abstractions" Version="6.0.4">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
-      <Sha>ea0418c9be5fd59911882a59916c64fed035fb76</Sha>
+      <Sha>6e89d2b65b0f8fc739d861077a2665e94d03d875</Sha>
     </Dependency>
     <Dependency Name="Microsoft.Extensions.Logging.Console" Version="6.0.0">
       <Uri>https://github.com/dotnet/runtime</Uri>
