@@ -1,0 +1,108 @@
+{
+  "author": "Test Asset",
+  "classifications": [ "Test Asset" ],
+  "name": "TemplateWithComputedSymbolDependsOnGeneratedSymbol",
+  "tags": { "type": "project" },
+  "generatorVersions": "[1.0.0.0-*)",
+  "groupIdentity": "TestAssets.TemplateWithComSymDependsOnGenSym",
+  "precedence": "100",
+  "identity": "TestAssets.TemplateWithComSymDependsOnGenSym",
+  "shortName": "TestAssets.TemplateWithComSymDependsOnGenSym",
+  "symbols": {
+    "Connection": {
+      "type": "parameter",
+      "datatype": "choice",
+      "choices": [
+        {
+          "choice": "none",
+          "description": "local network"
+        },
+        {
+          "choice": "vpn",
+          "description": "virtual private network"
+        }
+      ],
+      "defaultValue": "none",
+      "description": "The option of the action"
+    },
+    "ActionOption": {
+      "type": "parameter",
+      "datatype": "choice",
+      "choices": [
+        {
+          "choice": "none",
+          "description": "No action"
+        },
+        {
+          "choice": "recommended",
+          "description": "Recommend to do something"
+        }
+      ],
+      "defaultValue": "none",
+      "description": "The option of the action"
+    },
+    "DoInjection": {
+      "displayName": "Do Injection",
+      "description": "Indicate if doing Injection or not",
+      "type": "parameter",
+      "datatype": "bool"
+    },
+    "DoActionInjection": {
+      "type": "generated",
+      "generator": "switch",
+      "parameters": {
+        "evaluator": "C++",
+        "datatype": "bool",
+        "cases": [
+          {
+            "condition": "(ActionOption == 'recommended')",
+            "value": "true"
+          },
+          {
+            "condition": "(ActionOption == 'none')",
+            "value": "false"
+          }
+        ]
+      }
+    },
+    "HaveInjection": {
+      "type": "generated",
+      "generator": "coalesce",
+      "parameters": {
+        "sourceVariableName": "DoInjection",
+        "fallbackVariableName": "DoActionInjection"
+      }
+    },
+    "UseCustomLogic": {
+      "type": "computed",
+      "datatype": "bool",
+      "value": "HaveInjection && Connection != 'none'",
+      "FileRename": "LogicValue",
+      "replaces": "UseCustomLogic_Value"
+    },
+    "ConnectWithAction": {
+      "type": "generated",
+      "generator": "join",
+      "parameters": {
+        "symbols": [
+          {
+            "type": "ref",
+            "value": "Connection"
+          },
+          {
+            "type": "ref",
+            "value": "ActionOption"
+          }
+        ],
+        "separator": "_"
+      }
+    },
+    "ConnectWithActionCapitalCase": {
+      "type": "derived",
+      "valueSource": "ConnectWithAction",
+      "valueTransform": "firstUpperCase",
+      "FileRename": "ConnectionInfo",
+      "replaces": "ConnectWithAction_PlaceHolder"
+    }
+  }
+}

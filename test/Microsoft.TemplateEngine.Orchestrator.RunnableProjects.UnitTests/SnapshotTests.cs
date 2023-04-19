@@ -71,6 +71,58 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             VerificationEngine engine = new VerificationEngine(_log);
             return engine.Execute(options);
         }
+
+        [Fact]
+        public Task TestComputedSymbolDependsOnGeneratedSymbol()
+        {
+            string templateLocation = GetTestTemplateLocation("TemplateWithComputedSymbolDependsOnGeneratedSymbol");
+            var templateParams = new Dictionary<string, string?>()
+            {
+                { "Connection", "vpn" },
+                { "ActionOption", "recommended" }
+            };
+            string workingDir = TestUtils.CreateTemporaryFolder();
+
+            TemplateVerifierOptions options =
+                new TemplateVerifierOptions(templateName: "TestAssets.TemplateWithComSymDependsOnGenSym")
+                {
+                    TemplatePath = templateLocation,
+                    OutputDirectory = workingDir,
+                    DoNotAppendTemplateArgsToScenarioName = true,
+                    DoNotPrependTemplateNameToScenarioName = true,
+                    SnapshotsDirectory = "Approvals"
+                }
+                .WithInstantiationThroughTemplateCreatorApi(templateParams);
+
+            VerificationEngine engine = new VerificationEngine(_log);
+            return engine.Execute(options);
+        }
+
+        [Fact]
+        public Task TestComputedSymbolDependsOnGeneratedSymbol_DifferentOrder()
+        {
+            string templateLocation = GetTestTemplateLocation("TemplateWithComputedSymbolDependsOnGeneratedSymbol_DifferentOrder");
+            var templateParams = new Dictionary<string, string?>()
+            {
+                { "Connection", "vpn" },
+                { "ActionOption", "recommended" }
+            };
+            string workingDir = TestUtils.CreateTemporaryFolder();
+
+            TemplateVerifierOptions options =
+                new TemplateVerifierOptions(templateName: "TestAssets.TemplateWithComSymDependsOnGenSym_DiffOrder")
+                {
+                    TemplatePath = templateLocation,
+                    OutputDirectory = workingDir,
+                    DoNotAppendTemplateArgsToScenarioName = true,
+                    DoNotPrependTemplateNameToScenarioName = true,
+                    SnapshotsDirectory = "Approvals"
+                }
+                .WithInstantiationThroughTemplateCreatorApi(templateParams);
+
+            VerificationEngine engine = new VerificationEngine(_log);
+            return engine.Execute(options);
+        }
     }
 }
 
