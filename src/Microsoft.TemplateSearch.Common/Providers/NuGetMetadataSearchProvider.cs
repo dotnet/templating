@@ -70,15 +70,9 @@ namespace Microsoft.TemplateSearch.Common.Providers
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (_searchCache == null)
-            {
-                _logger.LogDebug("Initializing search cache...");
-                string metadataLocation = await GetSearchFileAsync(cancellationToken).ConfigureAwait(false);
-                _searchCache = TemplateSearchCache.FromJObject(_environmentSettings.Host.FileSystem.ReadObject(metadataLocation), _logger, _additionalDataReaders);
-                _logger.LogDebug("Search cache was successfully setup.");
-            }
+            await InitializeSearchCacheAsync(cancellationToken).ConfigureAwait(false);
 
-            IEnumerable<TemplatePackageSearchData> filteredPackages = _searchCache.TemplatePackages.Where(package => packFilter(package));
+            IEnumerable<TemplatePackageSearchData>? filteredPackages = _searchCache?.TemplatePackages.Where(package => packFilter(package));
             _logger.LogDebug("Retrieved {0} packages matching package search criteria.", filteredPackages.Count());
 
             List<(ITemplatePackageInfo PackageInfo, IReadOnlyList<ITemplateInfo> MatchedTemplates)> matchingTemplates = filteredPackages
@@ -88,6 +82,17 @@ namespace Microsoft.TemplateSearch.Common.Providers
 
             _logger.LogDebug("Retrieved {0} packages matching template search criteria.", matchingTemplates.Count);
             return matchingTemplates;
+        }
+
+        internal async Task InitializeSearchCacheAsync(CancellationToken cancellationToken)
+        {
+            if (_searchCache == null)
+            {
+                _logger.LogDebug("Initializing search cache...");
+                string metadataLocation = await GetSearchFileAsync(cancellationToken).ConfigureAwait(false);
+                _searchCache = TemplateSearchCache.FromJObject(_environmentSettings.Host.FileSystem.ReadObject(metadataLocation), _logger, _additionalDataReaders);
+                _logger.LogDebug("Search cache was successfully setup.");
+            }
         }
 
         internal async Task<string> GetSearchFileAsync(CancellationToken cancellationToken)

@@ -73,5 +73,44 @@ namespace Microsoft.TemplateEngine.Utils
                 }
             }
         }
+
+        /// <summary>
+        /// Adds a content to given dictionary if specified value satisfies condition.
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="dict">Dictionary that will contained specified key/value.</param>
+        /// <param name="key">Dictionary key.</param>
+        /// <param name="value">Dictionary value.</param>
+        /// <param name="condition">Insertion condition.</param>
+        /// <exception cref="Exception">Thrown if key is already present in current dictionary and <see cref="ConflictingKeysResolution.Throw"/> strategy was requested.</exception>
+        public static bool TryAdd<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, TValue value, Predicate<TValue> condition)
+        {
+            if (condition(value))
+            {
+                dict[key] = value!;
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Adds a content to given dictionary if specified value satisfies condition; otherwise removes the key from the dictionary.
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="dict">Dictionary that will contained specified key/value.</param>
+        /// <param name="key">Dictionary key.</param>
+        /// <param name="value">Dictionary value.</param>
+        /// <param name="condition">Insertion condition.</param>
+        /// <exception cref="Exception">Thrown if key is already present in current dictionary and <see cref="ConflictingKeysResolution.Throw"/> strategy was requested.</exception>
+        public static void UpdateOrRemoveValue<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, TValue value, Predicate<TValue> condition)
+        {
+            if (!dict.TryAdd(key, value!, condition))
+            {
+                dict.Remove(key);
+            }
+        }
     }
 }
