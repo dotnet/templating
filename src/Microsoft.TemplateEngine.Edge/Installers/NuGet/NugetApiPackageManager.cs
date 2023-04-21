@@ -49,6 +49,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         /// <exception cref="InvalidNuGetSourceException">when sources passed to install request are not valid NuGet sources or failed to read default NuGet configuration.</exception>
         /// <exception cref="DownloadException">when the download of the package failed.</exception>
         /// <exception cref="PackageNotFoundException">when the package cannot be find in default or passed to install request NuGet feeds.</exception>
+        /// <exception cref="VulnerablePackageException">when the package has any vulnerabilities.</exception>
         public async Task<NuGetPackageInfo> DownloadPackageAsync(string downloadPath, string identifier, string? version = null, IEnumerable<string>? additionalSources = null, bool force = false, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(identifier))
@@ -81,10 +82,10 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 (source, packageMetadata) = await GetPackageMetadataAsync(identifier, packageVersion, packagesSources, cancellationToken).ConfigureAwait(false);
             }
 
-            if (packageMetadata.Vulnerabilities is not null && !force)
+            if (packageMetadata.Vulnerabilities.Any() && !force)
             {
                 var foundPackageVersion = packageMetadata.Identity.Version.OriginalVersion;
-                throw new VulnerablePackageException("Found package is vulnerable", packageMetadata.Identity.Id, foundPackageVersion, packageMetadata.Vulnerabilities);
+                throw new VulnerablePackageException($"Found package is vulnerable source: {source}", packageMetadata.Identity.Id, foundPackageVersion, packageMetadata.Vulnerabilities);
             }
 
             FindPackageByIdResource resource;
@@ -468,7 +469,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 Identity = metadata.Identity;
                 PrefixReserved = trusted;
                 Owners = owners;
-                Vulnerabilities = metadata.Vulnerabilities;
+                Vulnerabilities = Vulnerabilities = metadata.Vulnerabilities?.ToList() ?? new List<PackageVulnerabilityMetadata>();
             }
 
             public string Authors { get; }
@@ -479,7 +480,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
             public bool PrefixReserved { get; }
 
-            public IEnumerable<PackageVulnerabilityMetadata> Vulnerabilities { get; }
+            public IReadOnlyList<PackageVulnerabilityMetadata> Vulnerabilities { get; }
         }
     }
 }
