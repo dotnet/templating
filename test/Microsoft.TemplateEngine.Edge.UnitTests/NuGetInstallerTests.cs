@@ -428,7 +428,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             Assert.True(File.Exists(updatedSource.MountPointUri));
         }
 
-        // Test disabled while we do not find a good package to test
+        [Fact]
         internal async Task Update_CannotUpdateVulnerabilities()
         {
             MockInstallerFactory factory = new MockInstallerFactory();
@@ -438,7 +438,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             MockPackageManager mockPackageManager = new MockPackageManager(_packageManager, TestPackageProjectPath);
 
             NuGetInstaller installer = new NuGetInstaller(factory, engineEnvironmentSettings, installPath, mockPackageManager, mockPackageManager);
-            InstallRequest request = new InstallRequest("Package to be downloaded", "version with no vulnerabilities");
+            InstallRequest request = new InstallRequest("VulnerablePackageException", "2.0.10");
 
             InstallResult installResult = await installer.InstallAsync(request, provider, CancellationToken.None).ConfigureAwait(false);
 
@@ -451,10 +451,10 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             Assert.NotNull(source);
             string oldMountPoint = source!.MountPointUri;
             Assert.True(File.Exists(oldMountPoint));
-            UpdateRequest updateRequest = new UpdateRequest(source, "version with vulnerabilities");
+            UpdateRequest updateRequest = new UpdateRequest(source, "12.0.3");
 
             UpdateResult updateResult = await installer.UpdateAsync(updateRequest, provider, CancellationToken.None).ConfigureAwait(false);
-            Assert.False(installResult.Success);
+            Assert.False(updateResult.Success);
             Assert.Equal(InstallerErrorCode.VulnerablePackage, updateResult.Error);
             updateResult.ErrorMessage.Should().NotBeNullOrEmpty();
             updateResult.Vulnerabilities.Should().NotBeNullOrEmpty();

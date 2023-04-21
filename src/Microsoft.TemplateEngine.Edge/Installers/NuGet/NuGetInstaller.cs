@@ -5,12 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Installer;
 using Microsoft.TemplateEngine.Abstractions.TemplatePackage;
+using Microsoft.TemplateEngine.Utils;
 using NuGet.Packaging;
 using NuGet.Protocol;
 
@@ -206,6 +208,9 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                         .ConfigureAwait(false);
                 }
 
+                var convertedVulnerabilities = ConvertVulnerabilityMetadata(nuGetPackageInfo.PackageVulnerabilities) ?? new Dictionary<int, IList<string>>();
+                StringBuilder sb = new StringBuilder();
+                convertedVulnerabilities.ForEach(v => sb.AppendLine($"Severity {v.Key}: {string.Join(",", v.Value)}"));
                 NuGetManagedTemplatePackage package = new NuGetManagedTemplatePackage(
                     _environmentSettings,
                     installer: this,
@@ -215,17 +220,14 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 {
                     Author = nuGetPackageInfo.Author,
                     Owners = nuGetPackageInfo.Owners,
+                    Vulnerabilities = sb.ToString(),
                     Trusted = nuGetPackageInfo.Trusted.ToString(),
                     NuGetSource = nuGetPackageInfo.NuGetSource,
                     Version = nuGetPackageInfo.PackageVersion.ToString(),
                     IsLocalPackage = isLocalPackage
                 };
 
-                Dictionary<Uri, int>? vulnerabilities = nuGetPackageInfo.PackageVulnerabilities is null ? null : ConvertVulnerabilityMetadata(nuGetPackageInfo.PackageVulnerabilities);
-                return InstallResult.CreateSuccess(
-                    installRequest,
-                    package,
-                    vulnerabilities);
+                return InstallResult.CreateSuccess(installRequest, package, convertedVulnerabilities);
             }
             catch (DownloadException e)
             {
@@ -416,15 +418,27 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         }
 
         // This conversion is necessary as "InstallResult" does not have the support of the NuGet types
-        private Dictionary<Uri, int> ConvertVulnerabilityMetadata(IEnumerable<PackageVulnerabilityMetadata> vulnerabilities)
+        private Dictionary<int, IList<string>>? ConvertVulnerabilityMetadata(IEnumerable<PackageVulnerabilityMetadata>? vulnerabilities)
         {
-            var dictionaryResult = new Dictionary<Uri, int>();
-            foreach (var vulnerability in vulnerabilities)
+            if (vulnerabilities is null)
             {
-                dictionaryResult[vulnerability.AdvisoryUrl] = vulnerability.Severity;
+                return null;
             }
 
-            return dictionaryResult;
+            var dictionaryResult = new SortedDictionary<int, IList<string>>();
+            foreach (var vulnerability in vulnerabilities)
+            {
+                if (dictionaryResult.ContainsKey(vulnerability.Severity))
+                {
+                    dictionaryResult[vulnerability.Severity].Add(vulnerability?.AdvisoryUrl?.AbsoluteUri ?? string.Empty);
+                }
+                else
+                {
+                    dictionaryResult.Add(vulnerability.Severity, new List<string>() { vulnerability?.AdvisoryUrl?.AbsoluteUri ?? string.Empty });
+                }
+            }
+
+            return dictionaryResult.ToDictionary(entry => entry.Key, entry => entry.Value);
         }
     }
 }

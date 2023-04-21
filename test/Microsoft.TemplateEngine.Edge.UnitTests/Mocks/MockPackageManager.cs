@@ -31,10 +31,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests.Mocks
                 case nameof(InvalidNuGetSourceException): throw new InvalidNuGetSourceException("test message");
                 case nameof(DownloadException): throw new DownloadException(identifier, version ?? string.Empty, new[] { DefaultFeed });
                 case nameof(PackageNotFoundException): throw new PackageNotFoundException(identifier, new[] { DefaultFeed });
-                case nameof(VulnerablePackageException):
-                    var vulnerabilities = GetMockVulnerabilities();
-                    version ??= "12.0.3";
-                    throw new VulnerablePackageException("Test Message", identifier, version, vulnerabilities);
+                case nameof(VulnerablePackageException) when version == "12.0.3":
+                    throw new VulnerablePackageException("Test Message", identifier, version, GetMockVulnerabilities());
                 case nameof(Exception): throw new Exception("Generic error");
             }
 
@@ -52,14 +50,15 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests.Mocks
                 ? Path.GetFileName(testPackageLocation)
                 : $"{Path.GetFileNameWithoutExtension(testPackageLocation)}.{version}.nupkg";
             File.Copy(testPackageLocation, Path.Combine(downloadPath, targetFileName));
-            return Task.FromResult(new NuGetPackageInfo(
-                "Microsoft",
-                "Microsoft",
-                true,
-                Path.Combine(downloadPath, targetFileName),
-                DefaultFeed,
-                identifier,
-                version ?? string.Empty));
+            return Task.FromResult(
+                new NuGetPackageInfo(
+                    "Microsoft",
+                    "Microsoft",
+                    true,
+                    Path.Combine(downloadPath, targetFileName),
+                    DefaultFeed,
+                    identifier,
+                    version ?? string.Empty));
         }
 
         public Task<(string LatestVersion, bool IsLatestVersion)> GetLatestVersionAsync(string identifier, string? version = null, string? additionalNuGetSource = null, CancellationToken cancellationToken = default)
