@@ -6,7 +6,6 @@
         {
 #if (UseCustomLogic)
             Console.WriteLine("Start custom logic.");
-            Console.WriteLine("Doing connection: ConnectWithAction_PlaceHolder.");
 #else
             Console.WriteLine("No custom logic is needed.");
 #endif

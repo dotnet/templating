@@ -79,30 +79,6 @@
       "value": "HaveInjection && Connection != 'none'",
       "FileRename": "LogicValue",
       "replaces": "UseCustomLogic_Value"
-    },
-    "ConnectWithAction": {
-      "type": "generated",
-      "generator": "join",
-      "parameters": {
-        "symbols": [
-          {
-            "type": "ref",
-            "value": "Connection"
-          },
-          {
-            "type": "ref",
-            "value": "ActionOption"
-          }
-        ],
-        "separator": "_"
-      }
-    },
-    "ConnectWithActionCapitalCase": {
-      "type": "derived",
-      "valueSource": "ConnectWithAction",
-      "valueTransform": "firstUpperCase",
-      "FileRename": "ConnectionInfo",
-      "replaces": "ConnectWithAction_PlaceHolder"
     }
   }
 }

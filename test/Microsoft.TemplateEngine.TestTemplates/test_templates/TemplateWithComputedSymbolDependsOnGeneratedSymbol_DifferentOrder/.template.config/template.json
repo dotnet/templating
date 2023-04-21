@@ -54,13 +54,6 @@
       "FileRename": "LogicValue",
       "replaces": "UseCustomLogic_Value"
     },
-    "ConnectWithActionCapitalCase": {
-      "type": "derived",
-      "valueSource": "ConnectWithAction",
-      "valueTransform": "firstUpperCase",
-      "FileRename": "ConnectionInfo",
-      "replaces": "ConnectWithAction_PlaceHolder"
-    },
     "DoActionInjection": {
       "type": "generated",
       "generator": "switch",
@@ -85,23 +78,6 @@
       "parameters": {
         "sourceVariableName": "DoInjection",
         "fallbackVariableName": "DoActionInjection"
-      }
-    },
-    "ConnectWithAction": {
-      "type": "generated",
-      "generator": "join",
-      "parameters": {
-        "symbols": [
-          {
-            "type": "ref",
-            "value": "Connection"
-          },
-          {
-            "type": "ref",
-            "value": "ActionOption"
-          }
-        ],
-        "separator": "_"
       }
     }
   }
