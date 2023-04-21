@@ -123,6 +123,110 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             VerificationEngine engine = new VerificationEngine(_log);
             return engine.Execute(options);
         }
+
+        [Fact]
+        public Task TestComputedSymbolUsedInDerivedSymbol()
+        {
+            string templateLocation = GetTestTemplateLocation("TemplateWithComputedSymbolInDerivedSymbol");
+            var templateParams = new Dictionary<string, string?>()
+            {
+                { "firstName", "Will" },
+                { "lastName", "Smith" }
+            };
+            string workingDir = TestUtils.CreateTemporaryFolder();
+
+            TemplateVerifierOptions options =
+                new TemplateVerifierOptions(templateName: "TestAssets.TemplateWithComSymInDerSym")
+                {
+                    TemplatePath = templateLocation,
+                    OutputDirectory = workingDir,
+                    DoNotAppendTemplateArgsToScenarioName = true,
+                    DoNotPrependTemplateNameToScenarioName = true,
+                    SnapshotsDirectory = "Approvals"
+                }
+                .WithInstantiationThroughTemplateCreatorApi(templateParams);
+
+            VerificationEngine engine = new VerificationEngine(_log);
+            return engine.Execute(options);
+        }
+
+        [Fact]
+        public Task TestComputedSymbolUsedInDerivedSymbol_DifferentOrder()
+        {
+            string templateLocation = GetTestTemplateLocation("TemplateWithComputedSymbolInDerivedSymbol_DifferentOrder");
+            var templateParams = new Dictionary<string, string?>()
+            {
+                { "firstName", "Will" },
+                { "lastName", "Smith" }
+            };
+            string workingDir = TestUtils.CreateTemporaryFolder();
+
+            TemplateVerifierOptions options =
+                new TemplateVerifierOptions(templateName: "TestAssets.TemplateWithComSymInDerSym_DiffOrder")
+                {
+                    TemplatePath = templateLocation,
+                    OutputDirectory = workingDir,
+                    DoNotAppendTemplateArgsToScenarioName = true,
+                    DoNotPrependTemplateNameToScenarioName = true,
+                    SnapshotsDirectory = "Approvals"
+                }
+                .WithInstantiationThroughTemplateCreatorApi(templateParams);
+
+            VerificationEngine engine = new VerificationEngine(_log);
+            return engine.Execute(options);
+        }
+
+        [Fact]
+        public Task TestDerivedSymbolUsedInComputedSymbol()
+        {
+            string templateLocation = GetTestTemplateLocation("TemplateWithDerivedSymbolInComputedSymbol");
+            var templateParams = new Dictionary<string, string?>()
+            {
+                { "firstName", "will" },
+                { "lastName", "smith" }
+            };
+            string workingDir = TestUtils.CreateTemporaryFolder();
+
+            TemplateVerifierOptions options =
+                new TemplateVerifierOptions(templateName: "TestAssets.TemplateWithDerSymInComSym")
+                {
+                    TemplatePath = templateLocation,
+                    OutputDirectory = workingDir,
+                    DoNotAppendTemplateArgsToScenarioName = true,
+                    DoNotPrependTemplateNameToScenarioName = true,
+                    SnapshotsDirectory = "Approvals"
+                }
+                .WithInstantiationThroughTemplateCreatorApi(templateParams);
+
+            VerificationEngine engine = new VerificationEngine(_log);
+            return engine.Execute(options);
+        }
+
+        [Fact]
+        public Task TestDerivedSymbolUsedInComputedSymbol_DifferentOrder()
+        {
+            string templateLocation = GetTestTemplateLocation("TemplateWithDerivedSymbolInComputedSymbol_DifferentOrder");
+            var templateParams = new Dictionary<string, string?>()
+            {
+                { "firstName", "Will" },
+                { "lastName", "smith" }
+            };
+            string workingDir = TestUtils.CreateTemporaryFolder();
+
+            TemplateVerifierOptions options =
+                new TemplateVerifierOptions(templateName: "TestAssets.TemplateWithDerSymInComSym_DiffOrder")
+                {
+                    TemplatePath = templateLocation,
+                    OutputDirectory = workingDir,
+                    DoNotAppendTemplateArgsToScenarioName = true,
+                    DoNotPrependTemplateNameToScenarioName = true,
+                    SnapshotsDirectory = "Approvals"
+                }
+                .WithInstantiationThroughTemplateCreatorApi(templateParams);
+
+            VerificationEngine engine = new VerificationEngine(_log);
+            return engine.Execute(options);
+        }
     }
 }
 
