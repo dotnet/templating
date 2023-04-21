@@ -283,7 +283,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             MockPackageManager mockPackageManager = new MockPackageManager();
 
             NuGetInstaller installer = new NuGetInstaller(factory, engineEnvironmentSettings, installPath, mockPackageManager, mockPackageManager);
-            InstallRequest request = new InstallRequest(nameof(VulnerablePackageException));
+            InstallRequest request = new InstallRequest(nameof(VulnerablePackageException), "12.0.3");
 
             InstallResult installResult = await installer.InstallAsync(request, provider, CancellationToken.None).ConfigureAwait(false);
             Assert.False(installResult.Success);
@@ -438,7 +438,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             MockPackageManager mockPackageManager = new MockPackageManager(_packageManager, TestPackageProjectPath);
 
             NuGetInstaller installer = new NuGetInstaller(factory, engineEnvironmentSettings, installPath, mockPackageManager, mockPackageManager);
-            InstallRequest request = new InstallRequest("VulnerablePackageException", "2.0.10");
+            InstallRequest request = new InstallRequest(nameof(VulnerablePackageException), "2.0.10");
 
             InstallResult installResult = await installer.InstallAsync(request, provider, CancellationToken.None).ConfigureAwait(false);
 
