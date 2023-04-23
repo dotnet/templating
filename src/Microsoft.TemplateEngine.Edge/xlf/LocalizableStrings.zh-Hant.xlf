@@ -278,9 +278,14 @@ Details: {1}.</source>
 詳細資料: {1}</target>
         <note />
       </trans-unit>
-      <trans-unit id="NuGetInstaller_InstallResut_Error_VulnerablePackage">
+      <trans-unit id="NuGetInstaller_InstallResult_Error_VulnerablePackage">
         <source>The requested package {0} has vulnerabilities.</source>
         <target state="new">The requested package {0} has vulnerabilities.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="NuGetInstaller_UpdateCheck_Error_VulnerablePackage">
+        <source>The checked package {0} has vulnerabilities.</source>
+        <target state="new">The checked package {0} has vulnerabilities.</target>
         <note />
       </trans-unit>
       <trans-unit id="OSConstraint_Error_InvalidOSName">

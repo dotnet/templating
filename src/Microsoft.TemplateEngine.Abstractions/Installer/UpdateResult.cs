@@ -11,14 +11,14 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
     /// </summary>
     public sealed class UpdateResult : InstallerOperationResult
     {
-        private UpdateResult(UpdateRequest request, IManagedTemplatePackage templatePackage, Dictionary<int, IList<string>>? vulnerabilities = null)
+        private UpdateResult(UpdateRequest request, IManagedTemplatePackage templatePackage, List<(int Severity, List<string> AdvisoryUrl)>? vulnerabilities = null)
             : base(templatePackage)
         {
             UpdateRequest = request;
             Vulnerabilities = vulnerabilities;
         }
 
-        private UpdateResult(UpdateRequest request, InstallerErrorCode error, string errorMessage, Dictionary<int, IList<string>>? vulnerabilities = null)
+        private UpdateResult(UpdateRequest request, InstallerErrorCode error, string errorMessage, List<(int Severity, List<string> AdvisoryUrl)>? vulnerabilities = null)
              : base(error, errorMessage)
         {
             UpdateRequest = request;
@@ -40,8 +40,7 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
         /// <summary>
         /// Vulnerabilities from installed package.
         /// </summary>
-        /// It is a dictionary, as we don't want to add the NuGet Api package to this project.
-        public IReadOnlyDictionary<int, IList<string>>? Vulnerabilities { get; private set; }
+        public List<(int Severity, List<string> AdvisoryUrl)>? Vulnerabilities { get; private set; }
 
         /// <summary>
         /// Creates successful result for the operation.
@@ -50,7 +49,7 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
         /// <param name="templatePackage">the updated <see cref="IManagedTemplatePackage"/>.</param>
         /// <param name="vulnerabilities">Package vulnerabilities associated with the update request.</param>
         /// <returns></returns>
-        public static UpdateResult CreateSuccess(UpdateRequest request, IManagedTemplatePackage templatePackage, Dictionary<int, IList<string>>? vulnerabilities = null)
+        public static UpdateResult CreateSuccess(UpdateRequest request, IManagedTemplatePackage templatePackage, List<(int Severity, List<string> AdvisoryUrl)>? vulnerabilities = null)
         {
             return new UpdateResult(request, templatePackage, vulnerabilities);
         }
@@ -63,7 +62,7 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
         /// <param name="localizedFailureMessage">detailed error message.</param>
         /// <param name="vulnerabilities">Package vulnerabilities associated with the update request.</param>
         /// <returns></returns>
-        public static UpdateResult CreateFailure(UpdateRequest request, InstallerErrorCode error, string localizedFailureMessage, Dictionary<int, IList<string>>? vulnerabilities = null)
+        public static UpdateResult CreateFailure(UpdateRequest request, InstallerErrorCode error, string localizedFailureMessage, List<(int Severity, List<string> AdvisoryUrl)>? vulnerabilities = null)
         {
             return new UpdateResult(request, error, localizedFailureMessage, vulnerabilities);
         }

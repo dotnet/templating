@@ -122,7 +122,21 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                     {
                         try
                         {
-                            (string latestVersion, bool isLatestVersion) = await _updateChecker.GetLatestVersionAsync(nugetPackage.Identifier, nugetPackage.Version, nugetPackage.NuGetSource, cancellationToken).ConfigureAwait(false);
+                            (string latestVersion, bool isLatestVersion, IReadOnlyList<PackageVulnerabilityMetadata>? vulnerabilities) = await _updateChecker.GetLatestVersionAsync(
+                                nugetPackage.Identifier,
+                                nugetPackage.Version,
+                                nugetPackage.NuGetSource,
+                                cancellationToken).ConfigureAwait(false);
+
+                            if (vulnerabilities != null && vulnerabilities.Any())
+                            {
+                                throw new VulnerablePackageException(
+                                    $"The checked package is vulnerable.",
+                                    nugetPackage.Identifier,
+                                    nugetPackage?.Version ?? string.Empty,
+                                    vulnerabilities);
+                            }
+
                             return CheckUpdateResult.CreateSuccess(package, latestVersion, isLatestVersion);
                         }
                         catch (PackageNotFoundException e)
@@ -149,6 +163,14 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                                 package,
                                 InstallerErrorCode.GenericError,
                                 LocalizableStrings.NuGetInstaller_InstallResut_Error_OperationCancelled);
+                        }
+                        catch (VulnerablePackageException e)
+                        {
+                            return CheckUpdateResult.CreateFailure(
+                                package,
+                                InstallerErrorCode.VulnerablePackage,
+                                string.Format(LocalizableStrings.NuGetInstaller_UpdateCheck_Error_VulnerablePackage, nugetPackage.Identifier),
+                                ConvertVulnerabilityMetadata(e.Vulnerabilities));
                         }
                         catch (Exception e)
                         {
@@ -208,9 +230,10 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                         .ConfigureAwait(false);
                 }
 
-                var convertedVulnerabilities = ConvertVulnerabilityMetadata(nuGetPackageInfo.PackageVulnerabilities) ?? new Dictionary<int, IList<string>>();
+                var convertedVulnerabilities = ConvertVulnerabilityMetadata(nuGetPackageInfo.PackageVulnerabilities);
                 StringBuilder sb = new StringBuilder();
-                convertedVulnerabilities.ForEach(v => sb.AppendLine($"Severity {v.Key}: {string.Join(",", v.Value)}"));
+                convertedVulnerabilities?.ForEach(v => sb.AppendLine($"Severity {v.Severity}: {string.Join(",", v.AdvisoryUrl)}"));
+
                 NuGetManagedTemplatePackage package = new NuGetManagedTemplatePackage(
                     _environmentSettings,
                     installer: this,
@@ -270,7 +293,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 return InstallResult.CreateFailure(
                     installRequest,
                     InstallerErrorCode.VulnerablePackage,
-                    string.Format(LocalizableStrings.NuGetInstaller_InstallResut_Error_VulnerablePackage, e.PackageIdentifier),
+                    string.Format(LocalizableStrings.NuGetInstaller_InstallResult_Error_VulnerablePackage, e.PackageIdentifier),
                     ConvertVulnerabilityMetadata(e.Vulnerabilities));
             }
             catch (OperationCanceledException)
@@ -418,27 +441,18 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         }
 
         // This conversion is necessary as "InstallResult" does not have the support of the NuGet types
-        private Dictionary<int, IList<string>>? ConvertVulnerabilityMetadata(IEnumerable<PackageVulnerabilityMetadata>? vulnerabilities)
+        private List<(int Severity, List<string> AdvisoryUrl)>? ConvertVulnerabilityMetadata(IEnumerable<PackageVulnerabilityMetadata>? vulnerabilities)
         {
             if (vulnerabilities is null)
             {
                 return null;
             }
 
-            var dictionaryResult = new SortedDictionary<int, IList<string>>();
-            foreach (var vulnerability in vulnerabilities)
-            {
-                if (dictionaryResult.ContainsKey(vulnerability.Severity))
-                {
-                    dictionaryResult[vulnerability.Severity].Add(vulnerability?.AdvisoryUrl?.AbsoluteUri ?? string.Empty);
-                }
-                else
-                {
-                    dictionaryResult.Add(vulnerability.Severity, new List<string>() { vulnerability?.AdvisoryUrl?.AbsoluteUri ?? string.Empty });
-                }
-            }
-
-            return dictionaryResult.ToDictionary(entry => entry.Key, entry => entry.Value);
+            return vulnerabilities.GroupBy(x => x.Severity)
+                .Select(g => (
+                    Severity: g.Key,
+                    AdvisoryUrl: g.Select(x => x.AdvisoryUrl.AbsoluteUri).ToList()))
+                .ToList();
         }
     }
 }

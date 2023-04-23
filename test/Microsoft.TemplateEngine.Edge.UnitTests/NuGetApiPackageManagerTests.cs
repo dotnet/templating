@@ -186,7 +186,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
 
             NuGetApiPackageManager packageManager = new NuGetApiPackageManager(engineEnvironmentSettings);
-            (string latestVersion, bool isLatestVersion) = await packageManager.GetLatestVersionAsync("Microsoft.DotNet.Common.ProjectTemplates.5.0", additionalSource: _additionalSources.FirstOrDefault()).ConfigureAwait(false);
+            (string latestVersion, bool isLatestVersion, _) = await packageManager.GetLatestVersionAsync("Microsoft.DotNet.Common.ProjectTemplates.5.0", additionalSource: _additionalSources.FirstOrDefault()).ConfigureAwait(false);
 
             latestVersion.Should().NotBeNullOrEmpty();
             isLatestVersion.Should().BeFalse();
@@ -198,7 +198,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
 
             NuGetApiPackageManager packageManager = new NuGetApiPackageManager(engineEnvironmentSettings);
-            (string latestVersion, bool isLatestVersion) = await packageManager.GetLatestVersionAsync(
+            (string latestVersion, bool isLatestVersion, _) = await packageManager.GetLatestVersionAsync(
                 "Microsoft.DotNet.Common.ProjectTemplates.5.0", "5.0.0", additionalSource: _additionalSources.First()).ConfigureAwait(false);
 
             latestVersion.Should().NotBe("5.0.0");

@@ -61,7 +61,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests.Mocks
                     version ?? string.Empty));
         }
 
-        public Task<(string LatestVersion, bool IsLatestVersion)> GetLatestVersionAsync(string identifier, string? version = null, string? additionalNuGetSource = null, CancellationToken cancellationToken = default)
+        public Task<(string LatestVersion, bool IsLatestVersion, IReadOnlyList<PackageVulnerabilityMetadata>? Vulnerabilities)> GetLatestVersionAsync(string identifier, string? version = null, string? additionalNuGetSource = null, CancellationToken cancellationToken = default)
         {
             // names of exceptions throw them for test purposes
             return identifier switch
@@ -69,8 +69,9 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests.Mocks
                 nameof(InvalidNuGetSourceException) => throw new InvalidNuGetSourceException("test message"),
                 nameof(DownloadException) => throw new DownloadException(identifier, version ?? string.Empty, new[] { DefaultFeed }),
                 nameof(PackageNotFoundException) => throw new PackageNotFoundException(identifier, new[] { DefaultFeed }),
+                nameof(VulnerablePackageException) when version == "12.0.0" => throw new VulnerablePackageException("Test Message", identifier, version, GetMockVulnerabilities()),
                 nameof(Exception) => throw new Exception("Generic error"),
-                _ => Task.FromResult(("1.0.0", version != "1.0.0")),
+                _ => Task.FromResult(("1.0.0", version != "1.0.0", (IReadOnlyList<PackageVulnerabilityMetadata>?)null)),
             };
         }
 

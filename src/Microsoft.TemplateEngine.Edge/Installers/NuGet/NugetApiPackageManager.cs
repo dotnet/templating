@@ -185,7 +185,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         /// <returns>the latest version for the <paramref name="identifier"/> and indication if installed version is latest.</returns>
         /// <exception cref="InvalidNuGetSourceException">when sources passed to install request are not valid NuGet feeds or failed to read default NuGet configuration.</exception>
         /// <exception cref="PackageNotFoundException">when the package cannot be find in default or source NuGet feeds.</exception>
-        public async Task<(string LatestVersion, bool IsLatestVersion)> GetLatestVersionAsync(string identifier, string? version = null, string? additionalSource = null, CancellationToken cancellationToken = default)
+        public async Task<(string LatestVersion, bool IsLatestVersion, IReadOnlyList<PackageVulnerabilityMetadata>? Vulnerabilities)> GetLatestVersionAsync(string identifier, string? version = null, string? additionalSource = null, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(identifier))
             {
@@ -205,7 +205,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             IEnumerable<PackageSource> packageSources = LoadNuGetSources(additionalSources);
             var (_, package) = await GetLatestVersionInternalAsync(identifier, packageSources, floatRange, cancellationToken).ConfigureAwait(false);
             bool isLatestVersion = currentVersion != null && currentVersion >= package.Identity.Version;
-            return (package.Identity.Version.ToNormalizedString(), isLatestVersion);
+
+            return (package.Identity.Version.ToNormalizedString(), isLatestVersion, package.Vulnerabilities);
         }
 
         private async Task<(PackageSource, NugetPackageMetadata)> GetLatestVersionInternalAsync(

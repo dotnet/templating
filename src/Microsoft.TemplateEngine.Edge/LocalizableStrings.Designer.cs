@@ -442,6 +442,15 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The requested package {0} has vulnerabilities..
+        /// </summary>
+        internal static string NuGetInstaller_InstallResult_Error_VulnerablePackage {
+            get {
+                return ResourceManager.GetString("NuGetInstaller_InstallResult_Error_VulnerablePackage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to download {0} from {1}..
         /// </summary>
         internal static string NuGetInstaller_InstallResut_Error_DownloadFailed {
@@ -544,11 +553,11 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The requested package {0} has vulnerabilities..
+        ///   Looks up a localized string similar to The checked package {0} has vulnerabilities..
         /// </summary>
-        internal static string NuGetInstaller_InstallResut_Error_VulnerablePackage {
+        internal static string NuGetInstaller_UpdateCheck_Error_VulnerablePackage {
             get {
-                return ResourceManager.GetString("NuGetInstaller_InstallResut_Error_VulnerablePackage", resourceCulture);
+                return ResourceManager.GetString("NuGetInstaller_UpdateCheck_Error_VulnerablePackage", resourceCulture);
             }
         }
         

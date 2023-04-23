@@ -326,11 +326,38 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             Assert.False(result.IsLatestVersion);
         }
 
+        [Fact]
+        public async Task GetLatestVersion_RemotePackageWithVulnerabilities()
+        {
+            MockManagedTemplatePackageProvider provider = new MockManagedTemplatePackageProvider();
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
+            MockPackageManager mockPackageManager = new MockPackageManager(_packageManager, TestPackageProjectPath);
+
+            NuGetInstaller installer = new NuGetInstaller(new MockInstallerFactory(), engineEnvironmentSettings, _environmentSettingsHelper.CreateTemporaryFolder(), mockPackageManager, mockPackageManager);
+            InstallRequest request = new InstallRequest(nameof(VulnerablePackageException), "1.0.0");
+            InstallResult installResult = await installer.InstallAsync(request, provider, CancellationToken.None).ConfigureAwait(false);
+
+            Assert.True(installResult.Success);
+            Assert.Equal(request, installResult.InstallRequest);
+
+            NuGetManagedTemplatePackage? source = installResult.TemplatePackage as NuGetManagedTemplatePackage;
+            Assert.NotNull(source);
+            source.Version = "12.0.0";
+            IReadOnlyList<CheckUpdateResult> checkUpdateResults = await installer.GetLatestVersionAsync(new[] { source! }, provider, CancellationToken.None).ConfigureAwait(false);
+
+            Assert.Single(checkUpdateResults);
+            CheckUpdateResult result = checkUpdateResults.Single();
+
+            Assert.False(result.Success);
+            result.ErrorMessage.Should().NotBeNullOrEmpty();
+        }
+
         [Theory]
         [InlineData(nameof(PackageNotFoundException), InstallerErrorCode.PackageNotFound)]
         [InlineData(nameof(InvalidNuGetSourceException), InstallerErrorCode.InvalidSource)]
+        [InlineData(nameof(VulnerablePackageException), InstallerErrorCode.VulnerablePackage, "12.0.0")]
         [InlineData(nameof(Exception), InstallerErrorCode.GenericError)]
-        public async Task GetLatestVersion_RemotePackage_HandleExceptions(string exception, InstallerErrorCode expectedErrorCode)
+        public async Task GetLatestVersion_RemotePackage_HandleExceptions(string exception, InstallerErrorCode expectedErrorCode, string version = "1.0.0")
         {
             MockInstallerFactory factory = new MockInstallerFactory();
             MockManagedTemplatePackageProvider provider = new MockManagedTemplatePackageProvider();
@@ -339,7 +366,10 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             MockPackageManager mockPackageManager = new MockPackageManager();
 
             NuGetInstaller installer = new NuGetInstaller(factory, engineEnvironmentSettings, installPath, mockPackageManager, mockPackageManager);
-            NuGetManagedTemplatePackage source = new NuGetManagedTemplatePackage(engineEnvironmentSettings, installer, provider, installPath, exception);
+            NuGetManagedTemplatePackage source = new NuGetManagedTemplatePackage(engineEnvironmentSettings, installer, provider, installPath, exception)
+            {
+                Version = version
+            };
             IReadOnlyList<CheckUpdateResult> checkUpdateResults = await installer.GetLatestVersionAsync(new[] { source }, provider, CancellationToken.None).ConfigureAwait(false);
 
             Assert.Single(checkUpdateResults);
