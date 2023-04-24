@@ -223,6 +223,12 @@
   <data name="HostParametersBindSource_Name" xml:space="preserve">
     <value>Host defined parameters</value>
   </data>
+  <data name="NuGetApiPackageManager_UpdateCheckError_VulnerablePackage" xml:space="preserve">
+    <value>The checked package {0} is vulnerable.</value>
+  </data>
+  <data name="NuGetApiPackageManager_DownloadError_VulnerablePackage" xml:space="preserve">
+    <value>Found package is vulnerable source: {0}</value>
+  </data>
   <data name="NuGetApiPackageManager_Error_FailedToLoadSource" xml:space="preserve">
     <value>Failed to load the NuGet source {0}.</value>
   </data>

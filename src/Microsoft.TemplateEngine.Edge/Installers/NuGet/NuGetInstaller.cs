@@ -5,16 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Installer;
 using Microsoft.TemplateEngine.Abstractions.TemplatePackage;
-using Microsoft.TemplateEngine.Utils;
 using NuGet.Packaging;
-using NuGet.Protocol;
 
 namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
@@ -122,7 +119,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                     {
                         try
                         {
-                            (string latestVersion, bool isLatestVersion, IReadOnlyList<PackageVulnerabilityMetadata>? vulnerabilities) = await _updateChecker.GetLatestVersionAsync(
+                            (string latestVersion, bool isLatestVersion, IReadOnlyList<VulnerabilityInfo> vulnerabilities) = await _updateChecker.GetLatestVersionAsync(
                                 nugetPackage.Identifier,
                                 nugetPackage.Version,
                                 nugetPackage.NuGetSource,
@@ -131,7 +128,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                             if (vulnerabilities != null && vulnerabilities.Any())
                             {
                                 throw new VulnerablePackageException(
-                                    $"The checked package is vulnerable.",
+                                    string.Format(LocalizableStrings.NuGetApiPackageManager_UpdateCheckError_VulnerablePackage, nugetPackage.Identifier),
                                     nugetPackage.Identifier,
                                     nugetPackage?.Version ?? string.Empty,
                                     vulnerabilities);
@@ -144,7 +141,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                             return CheckUpdateResult.CreateFailure(
                                 package,
                                 InstallerErrorCode.PackageNotFound,
-                                string.Format(LocalizableStrings.NuGetInstaller_Error_FailedToReadPackage, e.PackageIdentifier, string.Join(", ", e.SourcesList)));
+                                string.Format(LocalizableStrings.NuGetInstaller_Error_FailedToReadPackage, e.PackageIdentifier, string.Join(", ", e.SourcesList)),
+                                Array.Empty<VulnerabilityInfo>());
                         }
                         catch (InvalidNuGetSourceException e)
                         {
@@ -155,14 +153,16 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                             return CheckUpdateResult.CreateFailure(
                                 package,
                                 InstallerErrorCode.InvalidSource,
-                                message);
+                                message,
+                                Array.Empty<VulnerabilityInfo>());
                         }
                         catch (OperationCanceledException)
                         {
                             return CheckUpdateResult.CreateFailure(
                                 package,
                                 InstallerErrorCode.GenericError,
-                                LocalizableStrings.NuGetInstaller_InstallResut_Error_OperationCancelled);
+                                LocalizableStrings.NuGetInstaller_InstallResut_Error_OperationCancelled,
+                                Array.Empty<VulnerabilityInfo>());
                         }
                         catch (VulnerablePackageException e)
                         {
@@ -170,7 +170,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                                 package,
                                 InstallerErrorCode.VulnerablePackage,
                                 string.Format(LocalizableStrings.NuGetInstaller_UpdateCheck_Error_VulnerablePackage, nugetPackage.Identifier),
-                                ConvertVulnerabilityMetadata(e.Vulnerabilities));
+                                e.Vulnerabilities);
                         }
                         catch (Exception e)
                         {
@@ -178,7 +178,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                             return CheckUpdateResult.CreateFailure(
                                 package,
                                 InstallerErrorCode.GenericError,
-                                string.Format(LocalizableStrings.NuGetInstaller_InstallResut_Error_UpdateCheckGeneric, package.DisplayName, e.Message));
+                                string.Format(LocalizableStrings.NuGetInstaller_InstallResut_Error_UpdateCheckGeneric, package.DisplayName, e.Message),
+                                Array.Empty<VulnerabilityInfo>());
                         }
                     }
                     else
@@ -186,7 +187,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                         return CheckUpdateResult.CreateFailure(
                             package,
                             InstallerErrorCode.UnsupportedRequest,
-                            string.Format(LocalizableStrings.NuGetInstaller_InstallResut_Error_PackageNotSupported, package.DisplayName, Factory.Name));
+                            string.Format(LocalizableStrings.NuGetInstaller_InstallResut_Error_PackageNotSupported, package.DisplayName, Factory.Name),
+                            Array.Empty<VulnerabilityInfo>());
                     }
                 })).ConfigureAwait(false);
         }
@@ -201,7 +203,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 return InstallResult.CreateFailure(
                     installRequest,
                     InstallerErrorCode.UnsupportedRequest,
-                    string.Format(LocalizableStrings.NuGetInstaller_InstallResut_Error_PackageNotSupported, installRequest.DisplayName, Factory.Name));
+                    string.Format(LocalizableStrings.NuGetInstaller_InstallResut_Error_PackageNotSupported, installRequest.DisplayName, Factory.Name),
+                    Array.Empty<VulnerabilityInfo>());
             }
 
             try
@@ -230,10 +233,6 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                         .ConfigureAwait(false);
                 }
 
-                var convertedVulnerabilities = ConvertVulnerabilityMetadata(nuGetPackageInfo.PackageVulnerabilities);
-                StringBuilder sb = new StringBuilder();
-                convertedVulnerabilities?.ForEach(v => sb.AppendLine($"Severity {v.Severity}: {string.Join(",", v.AdvisoryUrl)}"));
-
                 NuGetManagedTemplatePackage package = new NuGetManagedTemplatePackage(
                     _environmentSettings,
                     installer: this,
@@ -243,14 +242,13 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 {
                     Author = nuGetPackageInfo.Author,
                     Owners = nuGetPackageInfo.Owners,
-                    Vulnerabilities = sb.ToString(),
                     Trusted = nuGetPackageInfo.Trusted.ToString(),
                     NuGetSource = nuGetPackageInfo.NuGetSource,
                     Version = nuGetPackageInfo.PackageVersion.ToString(),
                     IsLocalPackage = isLocalPackage
                 };
 
-                return InstallResult.CreateSuccess(installRequest, package, convertedVulnerabilities);
+                return InstallResult.CreateSuccess(installRequest, package, nuGetPackageInfo.PackageVulnerabilities);
             }
             catch (DownloadException e)
             {
@@ -261,14 +259,16 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 return InstallResult.CreateFailure(
                     installRequest,
                     InstallerErrorCode.DownloadFailed,
-                    string.Format(LocalizableStrings.NuGetInstaller_InstallResut_Error_DownloadFailed, installRequest.DisplayName, packageLocation));
+                    string.Format(LocalizableStrings.NuGetInstaller_InstallResut_Error_DownloadFailed, installRequest.DisplayName, packageLocation),
+                    Array.Empty<VulnerabilityInfo>());
             }
             catch (PackageNotFoundException e)
             {
                 return InstallResult.CreateFailure(
                     installRequest,
                     InstallerErrorCode.PackageNotFound,
-                    string.Format(LocalizableStrings.NuGetInstaller_Error_FailedToReadPackage, e.PackageIdentifier, string.Join(", ", e.SourcesList)));
+                    string.Format(LocalizableStrings.NuGetInstaller_Error_FailedToReadPackage, e.PackageIdentifier, string.Join(", ", e.SourcesList)),
+                    Array.Empty<VulnerabilityInfo>());
             }
             catch (InvalidNuGetSourceException e)
             {
@@ -279,14 +279,16 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 return InstallResult.CreateFailure(
                         installRequest,
                         InstallerErrorCode.InvalidSource,
-                        message);
+                        message,
+                        Array.Empty<VulnerabilityInfo>());
             }
             catch (InvalidNuGetPackageException e)
             {
                 return InstallResult.CreateFailure(
                     installRequest,
                     InstallerErrorCode.InvalidPackage,
-                    string.Format(LocalizableStrings.NuGetInstaller_InstallResut_Error_InvalidPackage, e.PackageLocation));
+                    string.Format(LocalizableStrings.NuGetInstaller_InstallResut_Error_InvalidPackage, e.PackageLocation),
+                    Array.Empty<VulnerabilityInfo>());
             }
             catch (VulnerablePackageException e)
             {
@@ -294,14 +296,15 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                     installRequest,
                     InstallerErrorCode.VulnerablePackage,
                     string.Format(LocalizableStrings.NuGetInstaller_InstallResult_Error_VulnerablePackage, e.PackageIdentifier),
-                    ConvertVulnerabilityMetadata(e.Vulnerabilities));
+                    e.Vulnerabilities);
             }
             catch (OperationCanceledException)
             {
                 return InstallResult.CreateFailure(
                     installRequest,
                     InstallerErrorCode.GenericError,
-                    LocalizableStrings.NuGetInstaller_InstallResut_Error_OperationCancelled);
+                    LocalizableStrings.NuGetInstaller_InstallResut_Error_OperationCancelled,
+                    Array.Empty<VulnerabilityInfo>());
             }
             catch (Exception e)
             {
@@ -309,7 +312,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 return InstallResult.CreateFailure(
                     installRequest,
                     InstallerErrorCode.GenericError,
-                    string.Format(LocalizableStrings.NuGetInstaller_InstallResut_Error_InstallGeneric, installRequest.DisplayName, e.Message));
+                    string.Format(LocalizableStrings.NuGetInstaller_InstallResut_Error_InstallGeneric, installRequest.DisplayName, e.Message),
+                    Array.Empty<VulnerabilityInfo>());
             }
         }
 
@@ -369,7 +373,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 {
                     throw new InvalidOperationException($"{nameof(uninstallResult.ErrorMessage)} cannot be null when {nameof(uninstallResult.Success)} is 'true'");
                 }
-                return UpdateResult.CreateFailure(updateRequest, uninstallResult.Error, uninstallResult.ErrorMessage);
+                return UpdateResult.CreateFailure(updateRequest, uninstallResult.Error, uninstallResult.ErrorMessage, Array.Empty<VulnerabilityInfo>());
             }
 
             Dictionary<string, string> installationDetails = new Dictionary<string, string>();
@@ -437,22 +441,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 packageLocation,
                 null,
                 nuspec.GetId(),
-                nuspec.GetVersion().ToNormalizedString());
-        }
-
-        // This conversion is necessary as "InstallResult" does not have the support of the NuGet types
-        private List<(int Severity, List<string> AdvisoryUrl)>? ConvertVulnerabilityMetadata(IEnumerable<PackageVulnerabilityMetadata>? vulnerabilities)
-        {
-            if (vulnerabilities is null)
-            {
-                return null;
-            }
-
-            return vulnerabilities.GroupBy(x => x.Severity)
-                .Select(g => (
-                    Severity: g.Key,
-                    AdvisoryUrl: g.Select(x => x.AdvisoryUrl.AbsoluteUri).ToList()))
-                .ToList();
+                nuspec.GetVersion().ToNormalizedString(),
+                Array.Empty<VulnerabilityInfo>());
         }
     }
 }

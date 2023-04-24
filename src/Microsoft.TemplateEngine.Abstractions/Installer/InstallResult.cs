@@ -11,14 +11,14 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
     /// </summary>
     public sealed class InstallResult : InstallerOperationResult
     {
-        private InstallResult(InstallRequest request, IManagedTemplatePackage templatePackage, List<(int Severity, List<string> AdvisoryUrl)>? vulnerabilities = null)
+        private InstallResult(InstallRequest request, IManagedTemplatePackage templatePackage, IReadOnlyList<VulnerabilityInfo> vulnerabilities)
             : base(templatePackage)
         {
             InstallRequest = request;
             Vulnerabilities = vulnerabilities;
         }
 
-        private InstallResult(InstallRequest request, InstallerErrorCode error, string errorMessage, List<(int Severity, List<string> AdvisoryUrl)>? vulnerabilities = null)
+        private InstallResult(InstallRequest request, InstallerErrorCode error, string errorMessage, IReadOnlyList<VulnerabilityInfo> vulnerabilities)
              : base(error, errorMessage)
         {
             InstallRequest = request;
@@ -31,9 +31,9 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
         public InstallRequest InstallRequest { get; private set; }
 
         /// <summary>
-        /// Vulnerabilities from installed package.
+        /// Gets vulnerabilities from installed package.
         /// </summary>
-        public List<(int Severity, List<string> AdvisoryUrl)>? Vulnerabilities { get; private set; }
+        public IReadOnlyList<VulnerabilityInfo> Vulnerabilities { get; private set; }
 
         /// <summary>
         /// Creates successful result for the operation.
@@ -42,7 +42,7 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
         /// <param name="templatePackage">the installed <see cref="IManagedTemplatePackage"/>.</param>
         /// <param name="vulnerabilities">Package vulnerabilities associated with the installation request.</param>
         /// <returns></returns>
-        public static InstallResult CreateSuccess(InstallRequest request, IManagedTemplatePackage templatePackage, List<(int Severity, List<string> AdvisoryUrl)>? vulnerabilities = null)
+        public static InstallResult CreateSuccess(InstallRequest request, IManagedTemplatePackage templatePackage, IReadOnlyList<VulnerabilityInfo> vulnerabilities)
         {
             return new InstallResult(request, templatePackage, vulnerabilities);
         }
@@ -55,9 +55,6 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
         /// <param name="localizedFailureMessage">detailed error message.</param>
         /// <param name="vulnerabilities">Package vulnerabilities associated with the check request.</param>
         /// <returns></returns>
-        public static InstallResult CreateFailure(InstallRequest request, InstallerErrorCode error, string localizedFailureMessage, List<(int Severity, List<string> AdvisoryUrl)>? vulnerabilities = null)
-        {
-            return new InstallResult(request, error, localizedFailureMessage, vulnerabilities);
-        }
+        public static InstallResult CreateFailure(InstallRequest request, InstallerErrorCode error, string localizedFailureMessage, IReadOnlyList<VulnerabilityInfo> vulnerabilities) => new InstallResult(request, error, localizedFailureMessage, vulnerabilities);
     }
 }

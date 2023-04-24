@@ -4,12 +4,12 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using NuGet.Protocol;
+using Microsoft.TemplateEngine.Abstractions.Installer;
 
 namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
     internal interface IUpdateChecker
     {
-        Task<(string LatestVersion, bool IsLatestVersion, IReadOnlyList<PackageVulnerabilityMetadata>? Vulnerabilities)> GetLatestVersionAsync(string identifier, string? version = null, string? additionalNuGetSource = null, CancellationToken cancellationToken = default);
+        Task<(string LatestVersion, bool IsLatestVersion, IReadOnlyList<VulnerabilityInfo> Vulnerabilities)> GetLatestVersionAsync(string identifier, string? version = null, string? additionalNuGetSource = null, CancellationToken cancellationToken = default);
     }
 }

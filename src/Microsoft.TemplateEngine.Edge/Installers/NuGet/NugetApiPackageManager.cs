@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Installer;
 using NuGet.Configuration;
 using NuGet.Packaging.Core;
 using NuGet.Protocol;
@@ -85,7 +86,11 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             if (packageMetadata.Vulnerabilities.Any() && !force)
             {
                 var foundPackageVersion = packageMetadata.Identity.Version.OriginalVersion;
-                throw new VulnerablePackageException($"Found package is vulnerable source: {source}", packageMetadata.Identity.Id, foundPackageVersion, packageMetadata.Vulnerabilities);
+                throw new VulnerablePackageException(
+                    string.Format(LocalizableStrings.NuGetApiPackageManager_DownloadError_VulnerablePackage, source),
+                    packageMetadata.Identity.Id,
+                    foundPackageVersion,
+                    ConvertVulnerabilityMetadata(packageMetadata.Vulnerabilities));
             }
 
             FindPackageByIdResource resource;
@@ -126,7 +131,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                         source.Source,
                         packageMetadata.Identity.Id,
                         packageMetadata.Identity.Version.ToNormalizedString(),
-                        packageMetadata.Vulnerabilities);
+                        ConvertVulnerabilityMetadata(packageMetadata.Vulnerabilities));
                 }
                 else
                 {
@@ -185,7 +190,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         /// <returns>the latest version for the <paramref name="identifier"/> and indication if installed version is latest.</returns>
         /// <exception cref="InvalidNuGetSourceException">when sources passed to install request are not valid NuGet feeds or failed to read default NuGet configuration.</exception>
         /// <exception cref="PackageNotFoundException">when the package cannot be find in default or source NuGet feeds.</exception>
-        public async Task<(string LatestVersion, bool IsLatestVersion, IReadOnlyList<PackageVulnerabilityMetadata>? Vulnerabilities)> GetLatestVersionAsync(string identifier, string? version = null, string? additionalSource = null, CancellationToken cancellationToken = default)
+        public async Task<(string LatestVersion, bool IsLatestVersion, IReadOnlyList<VulnerabilityInfo> Vulnerabilities)> GetLatestVersionAsync(string identifier, string? version = null, string? additionalSource = null, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(identifier))
             {
@@ -206,7 +211,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             var (_, package) = await GetLatestVersionInternalAsync(identifier, packageSources, floatRange, cancellationToken).ConfigureAwait(false);
             bool isLatestVersion = currentVersion != null && currentVersion >= package.Identity.Version;
 
-            return (package.Identity.Version.ToNormalizedString(), isLatestVersion, package.Vulnerabilities);
+            return (package.Identity.Version.ToNormalizedString(), isLatestVersion, ConvertVulnerabilityMetadata(package.Vulnerabilities));
         }
 
         private async Task<(PackageSource, NugetPackageMetadata)> GetLatestVersionInternalAsync(
@@ -460,6 +465,21 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 throw new InvalidNuGetSourceException("No NuGet sources are defined or enabled");
             }
             return retrievedSources;
+        }
+
+        private IReadOnlyList<VulnerabilityInfo> ConvertVulnerabilityMetadata(IEnumerable<PackageVulnerabilityMetadata>? vulnerabilities)
+        {
+            if (vulnerabilities is null)
+            {
+                return Array.Empty<VulnerabilityInfo>();
+            }
+
+            return vulnerabilities.GroupBy(x => x.Severity)
+                .Select(g => new VulnerabilityInfo(
+                    g.Key,
+                    g.Select(x => x.AdvisoryUrl.AbsoluteUri).ToArray()))
+                .OrderBy(x => x.Severity)
+                .ToList();
         }
 
         private class NugetPackageMetadata

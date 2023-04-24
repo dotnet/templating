@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions.TemplatePackage;
 
@@ -17,13 +18,14 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
             TemplatePackage = templatePackage;
             LatestVersion = latestVersion;
             IsLatestVersion = isLatest;
+            Vulnerabilities = Array.Empty<VulnerabilityInfo>();
         }
 
         private CheckUpdateResult(
             InstallerErrorCode error,
             string errorMessage,
             IManagedTemplatePackage templatePackage,
-            List<(int Severity, List<string> AdvisoryUrl)>? vulnerabilities = null)
+            IReadOnlyList<VulnerabilityInfo> vulnerabilities)
              : base(error, errorMessage, templatePackage)
         {
             TemplatePackage = templatePackage;
@@ -42,9 +44,9 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
         public bool IsLatestVersion { get; private set; }
 
         /// <summary>
-        /// Vulnerabilities from checked package.
+        /// Gets vulnerabilities from checked package.
         /// </summary>
-        public List<(int Severity, List<string> AdvisoryUrl)>? Vulnerabilities { get; private set; }
+        public IReadOnlyList<VulnerabilityInfo> Vulnerabilities { get; private set; }
 
         /// <inheritdoc/>
         public override IManagedTemplatePackage TemplatePackage { get; }
@@ -73,7 +75,7 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
             IManagedTemplatePackage templatePackage,
             InstallerErrorCode error,
             string localizedFailureMessage,
-            List<(int Severity, List<string> AdvisoryUrl)>? vulnerabilities = null)
+            IReadOnlyList<VulnerabilityInfo> vulnerabilities)
         {
             return new CheckUpdateResult(error, localizedFailureMessage, templatePackage, vulnerabilities);
         }

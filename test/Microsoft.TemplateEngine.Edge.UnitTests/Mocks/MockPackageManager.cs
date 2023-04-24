@@ -1,9 +1,9 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using Microsoft.TemplateEngine.Abstractions.Installer;
 using Microsoft.TemplateEngine.Edge.Installers.NuGet;
 using Microsoft.TemplateEngine.TestHelper;
-using NuGet.Protocol;
 
 namespace Microsoft.TemplateEngine.Edge.UnitTests.Mocks
 {
@@ -58,10 +58,11 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests.Mocks
                     Path.Combine(downloadPath, targetFileName),
                     DefaultFeed,
                     identifier,
-                    version ?? string.Empty));
+                    version ?? string.Empty,
+                    Array.Empty<VulnerabilityInfo>()));
         }
 
-        public Task<(string LatestVersion, bool IsLatestVersion, IReadOnlyList<PackageVulnerabilityMetadata>? Vulnerabilities)> GetLatestVersionAsync(string identifier, string? version = null, string? additionalNuGetSource = null, CancellationToken cancellationToken = default)
+        public Task<(string LatestVersion, bool IsLatestVersion, IReadOnlyList<VulnerabilityInfo> Vulnerabilities)> GetLatestVersionAsync(string identifier, string? version = null, string? additionalNuGetSource = null, CancellationToken cancellationToken = default)
         {
             // names of exceptions throw them for test purposes
             return identifier switch
@@ -71,40 +72,15 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests.Mocks
                 nameof(PackageNotFoundException) => throw new PackageNotFoundException(identifier, new[] { DefaultFeed }),
                 nameof(VulnerablePackageException) when version == "12.0.0" => throw new VulnerablePackageException("Test Message", identifier, version, GetMockVulnerabilities()),
                 nameof(Exception) => throw new Exception("Generic error"),
-                _ => Task.FromResult(("1.0.0", version != "1.0.0", (IReadOnlyList<PackageVulnerabilityMetadata>?)null)),
+                _ => Task.FromResult(("1.0.0", version != "1.0.0", (IReadOnlyList<VulnerabilityInfo>)new List<VulnerabilityInfo>())),
             };
         }
 
-        private IEnumerable<PackageVulnerabilityMetadata> GetMockVulnerabilities()
+        private IReadOnlyList<VulnerabilityInfo> GetMockVulnerabilities() => new List<VulnerabilityInfo>()
         {
-            var vulnerabilitiesInfo = new Dictionary<Uri, int>
-            {
-                { new Uri("https://testUrl1.com"), 1 },
-                { new Uri("https://testUrl2.com"), 2 },
-                { new Uri("https://testUrl3.com"), 3 }
-            };
-
-            var vulnerabilities = new List<PackageVulnerabilityMetadata>();
-            try
-            {
-                foreach (var vulnerability in vulnerabilitiesInfo)
-                {
-                    var vulnerabilityMetadata = new PackageVulnerabilityMetadata();
-                    var uriProperty = vulnerabilityMetadata.GetType().GetProperty("AdvisoryUrl") ?? throw new Exception("No AdvisoryUrl property found");
-                    uriProperty.SetValue(vulnerabilityMetadata, vulnerability.Key);
-
-                    var severityProperty = vulnerabilityMetadata.GetType().GetProperty("Severity") ?? throw new Exception("No severity property found");
-                    severityProperty.SetValue(vulnerabilityMetadata, vulnerability.Value);
-
-                    vulnerabilities.Add(vulnerabilityMetadata);
-                }
-
-                return vulnerabilities;
-            }
-            catch (Exception e)
-            {
-                throw e;
-            }
-        }
+            new VulnerabilityInfo(1, new List<string>() { "https://testUrl1.com" }),
+            new VulnerabilityInfo(2, new List<string>() { "https://testUrl2.com" }),
+            new VulnerabilityInfo(3, new List<string>() { "https://testUrl3.com" })
+        };
     }
 }

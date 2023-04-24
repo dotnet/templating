@@ -334,6 +334,15 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Found package is vulnerable source: {0}.
+        /// </summary>
+        internal static string NuGetApiPackageManager_DownloadError_VulnerablePackage {
+            get {
+                return ResourceManager.GetString("NuGetApiPackageManager_DownloadError_VulnerablePackage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to load the NuGet source {0}..
         /// </summary>
         internal static string NuGetApiPackageManager_Error_FailedToLoadSource {
@@ -375,6 +384,15 @@ namespace Microsoft.TemplateEngine.Edge {
         internal static string NuGetApiPackageManager_Error_NoSources {
             get {
                 return ResourceManager.GetString("NuGetApiPackageManager_Error_NoSources", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The checked package {0} is vulnerable..
+        /// </summary>
+        internal static string NuGetApiPackageManager_UpdateCheckError_VulnerablePackage {
+            get {
+                return ResourceManager.GetString("NuGetApiPackageManager_UpdateCheckError_VulnerablePackage", resourceCulture);
             }
         }
         

@@ -20,7 +20,6 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         private const string NuGetSourceKey = "NuGetSource";
         private const string PackageIdKey = "PackageId";
         private const string PackageVersionKey = "Version";
-        private const string VulnerabilitiesKey = "Vulnerabilities";
 
         private readonly IEngineEnvironmentSettings _settings;
         private readonly ILogger _logger;
@@ -222,23 +221,6 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             }
         }
 
-        public string? Vulnerabilities
-        {
-            get => Details.TryGetValue(VulnerabilitiesKey, out string vulnerabilities) ? vulnerabilities : null;
-
-            set
-            {
-                if (!string.IsNullOrWhiteSpace(value))
-                {
-                    Details[VulnerabilitiesKey] = value!;
-                }
-                else
-                {
-                    Details.Remove(VulnerabilitiesKey);
-                }
-            }
-        }
-
         internal Dictionary<string, string> Details { get; }
 
         public static NuGetManagedTemplatePackage Deserialize(
@@ -270,10 +252,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             {
                 details[NuGetSourceKey] = NuGetSource!;
             }
-            if (!string.IsNullOrWhiteSpace(Vulnerabilities))
-            {
-                details[VulnerabilitiesKey] = Vulnerabilities!;
-            }
+
             return details;
         }
     }

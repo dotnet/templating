@@ -3,13 +3,13 @@
 
 using System;
 using System.Collections.Generic;
-using NuGet.Protocol;
+using Microsoft.TemplateEngine.Abstractions.Installer;
 
 namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
     internal class VulnerablePackageException : Exception
     {
-        public VulnerablePackageException(string message, string packageIdentifier, string packageVersion, IEnumerable<PackageVulnerabilityMetadata> vulnerabilities)
+        public VulnerablePackageException(string message, string packageIdentifier, string packageVersion, IReadOnlyList<VulnerabilityInfo> vulnerabilities)
             : base(message)
         {
             PackageIdentifier = packageIdentifier;
@@ -17,7 +17,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             PackageVersion = packageVersion;
         }
 
-        public IEnumerable<PackageVulnerabilityMetadata> Vulnerabilities { get; internal set; }
+        public IReadOnlyList<VulnerabilityInfo> Vulnerabilities { get; internal set; }
 
         public string PackageIdentifier { get; internal set; }
 
