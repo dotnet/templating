@@ -75,7 +75,7 @@ stages:
         timeoutInMinutes: 90
         pool:
           ${{ if eq(variables['System.TeamProject'], 'public') }}:
-            name: NetCore-Public
+            name: NetCore-Svc-Public
             vmImage: 1es-windows-2019-open
           ${{ if eq(variables['System.TeamProject'], 'internal') }}:
             name: NetCore1ESPool-Internal
