@@ -486,7 +486,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     {
                         if (ConfigurationModel.Forms.TryGetValue(derivedSymbol.ValueTransform, out _))
                         {
-                            computedMacros.Add(new ProcessValueFormMacroConfig(derivedSymbol.ValueSource, symbol.Name, derivedSymbol.DataType, derivedSymbol.ValueTransform, ConfigurationModel.Forms));
+                            generatedSymbolMacros.Add(new ProcessValueFormMacroConfig(derivedSymbol.ValueSource, symbol.Name, derivedSymbol.DataType, derivedSymbol.ValueTransform, ConfigurationModel.Forms));
                         }
                         else
                         {
@@ -516,7 +516,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                                 }
                                 if (generateMacros)
                                 {
-                                    computedMacros.Add(new ProcessValueFormMacroConfig(sourceVariable, symbolName, "string", formName, ConfigurationModel.Forms));
+                                    generatedSymbolMacros.Add(new ProcessValueFormMacroConfig(sourceVariable, symbolName, "string", formName, ConfigurationModel.Forms));
                                 }
                             }
                             else

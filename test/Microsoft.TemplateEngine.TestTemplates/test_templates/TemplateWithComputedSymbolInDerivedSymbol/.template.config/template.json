@@ -1,0 +1,35 @@
+{
+  "author": "Test Asset",
+  "classifications": [ "Test Asset" ],
+  "name": "TemplateWithComputedSymbolInDerivedSymbol",
+  "tags": { "type": "project" },
+  "generatorVersions": "[1.0.0.0-*)",
+  "groupIdentity": "TestAssets.TemplateWithComSymInDerSym",
+  "precedence": "100",
+  "identity": "TestAssets.TemplateWithComSymInDerSym",
+  "shortName": "TestAssets.TemplateWithComSymInDerSym",
+  "symbols": {
+    "firstName": {
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "john",
+      "description":"first name"
+    },
+    "lastName": {
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "smith",
+      "description":"last name"
+    },
+    "IsWillSmith": {
+      "type": "computed",
+      "value": "firstName == 'Will' && lastName == 'Smith'"
+    },
+    "Identify": {
+      "type": "derived",
+      "valueSource": "IsWillSmith",
+      "valueTransform": "upperCase",
+      "replaces": "Assertion"
+    }
+  }
+}

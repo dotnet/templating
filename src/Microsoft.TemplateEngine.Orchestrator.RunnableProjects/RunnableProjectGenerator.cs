@@ -374,16 +374,16 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         private static void ProcessMacros(IEngineEnvironmentSettings environmentSettings, GlobalRunConfig runConfig, IVariableCollection variableCollection)
         {
             MacrosOperationConfig? macroProcessor = null;
-            if (runConfig.ComputedMacros != null)
-            {
-                macroProcessor = new MacrosOperationConfig();
-                macroProcessor.ProcessMacros(environmentSettings, runConfig.ComputedMacros, variableCollection);
-            }
-
             if (runConfig.GeneratedSymbolMacros != null)
             {
-                macroProcessor ??= new MacrosOperationConfig();
+                macroProcessor = new MacrosOperationConfig();
                 macroProcessor.ProcessMacros(environmentSettings, runConfig.GeneratedSymbolMacros, variableCollection);
+            }
+
+            if (runConfig.ComputedMacros != null)
+            {
+                macroProcessor ??= new MacrosOperationConfig();
+                macroProcessor.ProcessMacros(environmentSettings, runConfig.ComputedMacros, variableCollection);
             }
         }
 
