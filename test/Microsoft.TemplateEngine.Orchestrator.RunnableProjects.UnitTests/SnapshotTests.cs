@@ -125,7 +125,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
         }
 
         [Fact]
-        public Task TestComputedSymbolUsedInDerivedSymbol()
+        public Task TestComputedSymbolUsedInDerivedSymbol_InvalidConfiguration()
         {
             string templateLocation = GetTestTemplateLocation("TemplateWithComputedSymbolInDerivedSymbol");
             var templateParams = new Dictionary<string, string?>()
@@ -151,18 +151,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
         }
 
         [Fact]
-        public Task TestComputedSymbolUsedInDerivedSymbol_DifferentOrder()
+        public Task TestGeneratedSymbolUsedInDerivedSymbol_InvalidConfiguration()
         {
-            string templateLocation = GetTestTemplateLocation("TemplateWithComputedSymbolInDerivedSymbol_DifferentOrder");
-            var templateParams = new Dictionary<string, string?>()
-            {
-                { "firstName", "Will" },
-                { "lastName", "Smith" }
-            };
+            string templateLocation = GetTestTemplateLocation("TemplateWithGeneratedSymbolInDerivedSymbol");
             string workingDir = TestUtils.CreateTemporaryFolder();
 
             TemplateVerifierOptions options =
-                new TemplateVerifierOptions(templateName: "TestAssets.TemplateWithComSymInDerSym_DiffOrder")
+                new TemplateVerifierOptions(templateName: "TestAssets.TemplateWithGenSymInDerSym")
                 {
                     TemplatePath = templateLocation,
                     OutputDirectory = workingDir,
@@ -170,7 +165,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
                     DoNotPrependTemplateNameToScenarioName = true,
                     SnapshotsDirectory = "Approvals"
                 }
-                .WithInstantiationThroughTemplateCreatorApi(templateParams);
+                .WithInstantiationThroughTemplateCreatorApi(new Dictionary<string, string?>()
+                {
+                    { "firstName", "pEtRo" }
+                });
 
             VerificationEngine engine = new VerificationEngine(_log);
             return engine.Execute(options);

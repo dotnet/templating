@@ -4,8 +4,7 @@
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Welcome, Will Smith.");
-            Console.WriteLine("This is Will Smith: TRUE.");
+            Console.WriteLine("This is: .");
         }
     }
 }
