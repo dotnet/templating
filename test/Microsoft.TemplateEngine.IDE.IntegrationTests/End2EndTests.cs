@@ -1,8 +1,10 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using Microsoft.TemplateEngine.Edge.Template;
 using Microsoft.TemplateEngine.TestHelper;
-using Microsoft.TemplateEngine.Utils;
+using ITemplateMatchInfo = Microsoft.TemplateEngine.Abstractions.TemplateFiltering.ITemplateMatchInfo;
+using WellKnownSearchFilters = Microsoft.TemplateEngine.Utils.WellKnownSearchFilters;
 
 namespace Microsoft.TemplateEngine.IDE.IntegrationTests
 {
@@ -72,6 +74,32 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             Assert.True(File.Exists(targetFile));
 
             await Verify(File.ReadAllText(targetFile));
+        }
+
+        [Fact]
+        internal async Task Test_CreateAsync_ExplicitNameSymbol()
+        {
+            using Bootstrapper bootstrapper = GetBootstrapper();
+            string templateLocation = GetTestTemplateLocation("TemplateEchoBot");
+            await InstallTemplateAsync(bootstrapper, templateLocation).ConfigureAwait(false);
+
+            string output = TestUtils.CreateTemporaryFolder();
+            IReadOnlyList<ITemplateMatchInfo> foundTemplates = await bootstrapper
+                .GetTemplatesAsync(new[] { WellKnownSearchFilters.NameFilter("echobot") })
+                .ConfigureAwait(false);
+
+            Dictionary<string, string?> parameters = new()
+            {
+                { "Framework", "net6.0" },
+                { "name", "EchoBot" },
+                { "output", "EchoBot" }
+            };
+
+            ITemplateCreationResult result = await bootstrapper
+                .CreateAsync(foundTemplates[0].Info, "EchoBot23", output, parameters)
+                .ConfigureAwait(false);
+            Assert.Equal(CreationResultStatus.Success, result.Status);
+            Assert.True(Directory.GetFiles(output).Length > 0);
         }
     }
 }
