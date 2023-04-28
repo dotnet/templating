@@ -365,6 +365,32 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             }
         }
 
+        [Fact]
+        internal async Task Test_CreateAsync_ExplicitNameSymbol()
+        {
+            using Bootstrapper bootstrapper = GetBootstrapper();
+            string templateLocation = GetTestTemplateLocation("TemplateEchoBot");
+            await InstallTemplateAsync(bootstrapper, templateLocation).ConfigureAwait(false);
+
+            string output = TestUtils.CreateTemporaryFolder();
+            IReadOnlyList<ITemplateMatchInfo> foundTemplates = await bootstrapper
+                .GetTemplatesAsync(new[] { WellKnownSearchFilters.NameFilter("echobot") })
+                .ConfigureAwait(false);
+
+            Dictionary<string, string?> parameters = new()
+            {
+                { "Framework", "net6.0" },
+                { "name", "EchoBot" },
+                { "output", "EchoBot" }
+            };
+
+            ITemplateCreationResult result = await bootstrapper
+                .CreateAsync(foundTemplates[0].Info, "EchoBot23", output, parameters)
+                .ConfigureAwait(false);
+            Assert.Equal(CreationResultStatus.Success, result.Status);
+            Assert.True(Directory.GetFiles(output).Length > 0);
+        }
+
         [Theory]
         [InlineData(null, "theDefaultName.cs")]
         [InlineData("fileName", "fileName.cs")]
