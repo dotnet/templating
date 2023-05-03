@@ -5,7 +5,7 @@
       "description": "Indicates limitations on the valid values a symbol may be assigned. When specified, the symbol value is attempted to be converted to this type. The datatype \"choice\" is supported only for parameter symbols and requires providing symbols.choices configuration for the symbol.",
       "anyOf": [
         {
-          "enum": ["choice", "bool", "float", "int", "hex", "text"]
+          "enum": [ "choice", "bool", "float", "int", "hex", "text" ]
         },
         {
           "pattern": "^(integer|string)$"
@@ -15,7 +15,7 @@
     "generatorConstant": {
       "properties": {
         "generator": {
-          "enum": ["constant"]
+          "enum": [ "constant" ]
         },
         "parameters": {
           "properties": {
@@ -30,7 +30,7 @@
     "generatorGuid": {
       "properties": {
         "generator": {
-          "enum": ["guid"]
+          "enum": [ "guid" ]
         },
         "parameters": {
           "properties": {
@@ -51,7 +51,7 @@
     "generatorNow": {
       "properties": {
         "generator": {
-          "enum": ["now"]
+          "enum": [ "now" ]
         },
         "parameters": {
           "properties": {
@@ -70,10 +70,10 @@
     "generatorRandom": {
       "properties": {
         "generator": {
-          "enum": ["random"]
+          "enum": [ "random" ]
         },
         "parameters": {
-          "required": ["low"],
+          "required": [ "low" ],
           "properties": {
             "low": {
               "description": "An integer value indicating the low-end of the range to generate the random number in.",
@@ -90,7 +90,7 @@
     "generatorRegex": {
       "properties": {
         "generator": {
-          "enum": ["regex"]
+          "enum": [ "regex" ]
         },
         "parameters": {
           "properties": {
@@ -102,7 +102,7 @@
               "description": "An ordered list of key-value pairs indicating the regex replacement actions. Each element of the list must contain exactly the keys 'regex' and 'replacement' - along with their values. These replacements will be applied to the result of the previous replacement (except the first, which acts on the original value from the source).",
               "type": "array",
               "items": {
-                "required": ["regex", "replacement"],
+                "required": [ "regex", "replacement" ],
                 "properties": {
                   "regex": {
                     "description": "The regular expression to use to locate the sequence to replace.",
@@ -122,10 +122,10 @@
     "generatorRegexMatch": {
       "properties": {
         "generator": {
-          "enum": ["regexMatch"]
+          "enum": [ "regexMatch" ]
         },
         "datatype": {
-          "enum": ["bool"]
+          "enum": [ "bool" ]
         },
         "parameters": {
           "properties": {
@@ -144,11 +144,11 @@
     "generatorCoalesce": {
       "properties": {
         "generator": {
-          "enum": ["coalesce"]
+          "enum": [ "coalesce" ]
         },
         "parameters": {
           "type": "object",
-          "required": ["sourceVariableName", "fallbackVariableName"],
+          "required": [ "sourceVariableName", "fallbackVariableName" ],
           "properties": {
             "sourceVariableName": {
               "type": "string",
@@ -170,10 +170,10 @@
     "generatorCasing": {
       "properties": {
         "generator": {
-          "enum": ["casing"]
+          "enum": [ "casing" ]
         },
         "parameters": {
-          "required": ["source"],
+          "required": [ "source" ],
           "properties": {
             "source": {
               "description": "The name of the symbol whose value should have its case changed.",
@@ -191,7 +191,7 @@
     "generatorPort": {
       "properties": {
         "generator": {
-          "enum": ["port"]
+          "enum": [ "port" ]
         },
         "parameters": {
           "properties": {
@@ -217,13 +217,13 @@
     "generatorSwitch": {
       "properties": {
         "generator": {
-          "enum": ["switch"]
+          "enum": [ "switch" ]
         },
         "parameters": {
           "properties": {
             "evaluator": {
               "description": "The style of evaluator to use.",
-              "enum": ["C++", "C++2", "MSBUILD", "VB"],
+              "enum": [ "C++", "C++2", "MSBUILD", "VB" ],
               "default": "C++"
             },
             "datatype": {
@@ -234,7 +234,7 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": ["condition", "value"],
+                "required": [ "condition", "value" ],
                 "properties": {
                   "condition": {
                     "description": "An expression to be interpreted by the specified evaluator type.",
@@ -254,7 +254,7 @@
     "generatorJoin": {
       "properties": {
         "generator": {
-          "enum": ["join"]
+          "enum": [ "join" ]
         },
         "parameters": {
           "properties": {
@@ -273,11 +273,11 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": ["value"],
+                "required": [ "value" ],
                 "properties": {
                   "type": {
                     "description": "\"ref\" to reference value from another symbol or \"const\" for string constant, defaults to \"const\".",
-                    "enum": ["ref", "const"]
+                    "enum": [ "ref", "const" ]
                   },
                   "value": {
                     "description": "Either name of another symbol or string constant.",
@@ -339,7 +339,7 @@
               "$ref": "#/definitions/ice"
             }
           ],
-          "default": ["**/*"]
+          "default": [ "**/*" ]
         },
         "copyOnly": {
           "description": "The set of globbing patterns indicating the content that was included by sources.include, that hasn't been excluded by sources.exclude that should be placed in the user's directory without modification.",
@@ -348,7 +348,7 @@
               "$ref": "#/definitions/ice"
             }
           ],
-          "default": ["**/node_modules/**/*"]
+          "default": [ "**/node_modules/**/*" ]
         },
         "rename": {
           "description": "The set of explicit renames to perform. Each key is a path to a file in the source, each value is a path to the target location.",
@@ -445,7 +445,7 @@
         "type": "object",
         "allOf": [
           {
-            "required": ["actionId", "manualInstructions"],
+            "required": [ "actionId", "manualInstructions" ],
             "properties": {
               "actionId": {
                 "description": "A guid uniquely defining the action. The value must correspond to a post-action known by the broker.",
@@ -493,7 +493,7 @@
                 "type": "array",
                 "items": {
                   "type": "object",
-                  "required": ["text"],
+                  "required": [ "text" ],
                   "properties": {
                     "condition": {
                       "type": "string"
@@ -514,7 +514,7 @@
             "oneOf": [
               {
                 "not": {
-                  "required": ["actionId"],
+                  "required": [ "actionId" ],
                   "properties": {
                     "actionId": {
                       "enum": [
@@ -534,7 +534,7 @@
                 "description": "Instruction display - shows a message given by description and manualInstructions as well as an optional command line to ask the user to execute.",
                 "properties": {
                   "actionId": {
-                    "enum": ["AC1156F7-BB77-4DB8-B28F-24EEBCCA1E5C"]
+                    "enum": [ "AC1156F7-BB77-4DB8-B28F-24EEBCCA1E5C" ]
                   },
                   "args": {
                     "properties": {
@@ -554,10 +554,10 @@
                 "description": "Process start - starts a process.",
                 "properties": {
                   "actionId": {
-                    "enum": ["3A7C4B45-1F5D-4A30-959A-51B88E82B5D2"]
+                    "enum": [ "3A7C4B45-1F5D-4A30-959A-51B88E82B5D2" ]
                   },
                   "args": {
-                    "required": ["executable"],
+                    "required": [ "executable" ],
                     "properties": {
                       "redirectStandardOutput": {
                         "description": "Whether or not to redirect stdout for the process (prevents output from being displayed if true).",
@@ -585,15 +585,15 @@
                 "description": "Add reference - adds a reference to a project, package or framework assembly.",
                 "properties": {
                   "actionId": {
-                    "enum": ["B17581D1-C5C9-4489-8F0A-004BE667B814"]
+                    "enum": [ "B17581D1-C5C9-4489-8F0A-004BE667B814" ]
                   },
                   "args": {
-                    "required": ["referenceType", "reference"],
+                    "required": [ "referenceType", "reference" ],
                     "properties": {
                       "referenceType": {
                         "description": "The type of reference to add. project = A project to project reference. package = A NuGet package reference. framework - A framework assembly reference.",
                         "type": "string",
-                        "enum": ["project", "package", "framework"],
+                        "enum": [ "project", "package", "framework" ],
                         "default": "false"
                       },
                       "projectFileExtensions": {
@@ -632,7 +632,7 @@
                 "description": "chmod - runs chmod on a particular file.",
                 "properties": {
                   "actionId": {
-                    "enum": ["cb9a6cf3-4f5c-4860-b9d2-03a574959774"]
+                    "enum": [ "cb9a6cf3-4f5c-4860-b9d2-03a574959774" ]
                   },
                   "args": {
                     "type": "object",
@@ -660,7 +660,7 @@
                 "description": "NuGet package restore - restores NuGet packages for all primary outputs with file extensions *.proj or *.sln.",
                 "properties": {
                   "actionId": {
-                    "enum": ["210D431B-A78B-4D2F-B762-4ED3E3EA9025"]
+                    "enum": [ "210D431B-A78B-4D2F-B762-4ED3E3EA9025" ]
                   },
                   "args": {
                     "properties": {
@@ -688,7 +688,7 @@
                 "description": "Add to solution - Adds one or more of the primary outputs to the first sln file found (searches up the directory tree from the output folder).",
                 "properties": {
                   "actionId": {
-                    "enum": ["D396686C-DE0E-4DE6-906D-291CD29FC5DE"]
+                    "enum": [ "D396686C-DE0E-4DE6-906D-291CD29FC5DE" ]
                   },
                   "args": {
                     "properties": {
@@ -728,7 +728,7 @@
                 "description": "Open in editor - Adds one or more of the primary outputs to the first sln file found (searches up the directory tree from the output folder).",
                 "properties": {
                   "actionId": {
-                    "enum": ["84C0DA21-51C8-4541-9940-6CA19AF04EE6"]
+                    "enum": [ "84C0DA21-51C8-4541-9940-6CA19AF04EE6" ]
                   },
                   "args": {
                     "properties": {
@@ -747,7 +747,7 @@
     },
     "precedence": {
       "description": "A value used to determine how preferred this template is among the other templates with the same groupIdentity (higher values are more preferred).",
-      "type": ["integer", "string"],
+      "type": [ "integer", "string" ],
       "pattern": "^([0-9]+)$",
       "default": 0
     },
@@ -764,7 +764,7 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["path"],
+        "required": [ "path" ],
         "properties": {
           "path": {
             "description": "The path to the file in the template content whose corresponding output file should be included as a primary output.",
@@ -823,7 +823,7 @@
         "oneOf": [
           {
             "not": {
-              "required": ["identifier"],
+              "required": [ "identifier" ],
               "properties": {
                 "identifier": {
                   "enum": [
@@ -855,7 +855,7 @@
             "description": "Lowercases the source value in a culture invariant way.",
             "properties": {
               "identifier": {
-                "enum": ["lowerCaseInvariant"]
+                "enum": [ "lowerCaseInvariant" ]
               }
             }
           },
@@ -863,7 +863,7 @@
             "description": "XML encodes the source value.",
             "properties": {
               "identifier": {
-                "enum": ["xmlEncode"]
+                "enum": [ "xmlEncode" ]
               }
             }
           },
@@ -871,7 +871,7 @@
             "description": "Converts the source value to a string suitable for a C# identifier.",
             "properties": {
               "identifier": {
-                "enum": ["safe_name"]
+                "enum": [ "safe_name" ]
               }
             }
           },
@@ -879,16 +879,16 @@
             "description": "Converts the source value to a lowercase string suitable for a C# identifier.",
             "properties": {
               "identifier": {
-                "enum": ["lower_safe_name"]
+                "enum": [ "lower_safe_name" ]
               }
             }
           },
           {
-            "required": ["pattern", "replacement"],
+            "required": [ "pattern", "replacement" ],
             "description": "Performs a regular expression replacement on the source value.",
             "properties": {
               "identifier": {
-                "enum": ["replace"]
+                "enum": [ "replace" ]
               },
               "pattern": {
                 "description": "A regular expression whose matches will be replaced with the literal value specified in replacement.",
@@ -904,7 +904,7 @@
             "description": "Converts the source value to a string suitable for a C# namespace.",
             "properties": {
               "identifier": {
-                "enum": ["safe_namespace"]
+                "enum": [ "safe_namespace" ]
               }
             }
           },
@@ -912,16 +912,16 @@
             "description": "Converts the source value to a lowercase string suitable for a C# namespace.",
             "properties": {
               "identifier": {
-                "enum": ["lower_safe_namespace"]
+                "enum": [ "lower_safe_namespace" ]
               }
             }
           },
           {
-            "required": ["steps"],
+            "required": [ "steps" ],
             "description": "Performs a series of transforms.",
             "properties": {
               "identifier": {
-                "enum": ["chain"]
+                "enum": [ "chain" ]
               },
               "steps": {
                 "type": "array",
@@ -936,7 +936,7 @@
             "description": "Changes the case of source value to lower-case.",
             "properties": {
               "identifier": {
-                "enum": ["lowerCase"]
+                "enum": [ "lowerCase" ]
               }
             }
           },
@@ -944,7 +944,7 @@
             "description": "Returns the source value.",
             "properties": {
               "identifier": {
-                "enum": ["identity"]
+                "enum": [ "identity" ]
               }
             }
           },
@@ -952,7 +952,7 @@
             "description": "Converts the source value to upper-case using the casing rules of the current culture.",
             "properties": {
               "identifier": {
-                "enum": ["upperCase"]
+                "enum": [ "upperCase" ]
               }
             }
           },
@@ -960,7 +960,7 @@
             "description": "Converts the source value to upper-case using the casing rules of the invariant culture.",
             "properties": {
               "identifier": {
-                "enum": ["upperCaseInvariant"]
+                "enum": [ "upperCaseInvariant" ]
               }
             }
           },
@@ -968,7 +968,7 @@
             "description": "JSON encodes the source value.",
             "properties": {
               "identifier": {
-                "enum": ["jsonEncode"]
+                "enum": [ "jsonEncode" ]
               }
             }
           },
@@ -976,7 +976,7 @@
             "description": "Converts the first letter of the value to lowercase using the casing rules of the current culture.",
             "properties": {
               "identifier": {
-                "enum": ["firstLowerCase"]
+                "enum": [ "firstLowerCase" ]
               }
             }
           },
@@ -984,7 +984,7 @@
             "description": "Converts the first letter of the value to lowercase using the casing rules of the invariant culture.",
             "properties": {
               "identifier": {
-                "enum": ["firstLowerCaseInvariant"]
+                "enum": [ "firstLowerCaseInvariant" ]
               }
             }
           },
@@ -992,7 +992,7 @@
             "description": "Converts the first letter of the value to uppercase using the casing rules of the current culture.",
             "properties": {
               "identifier": {
-                "enum": ["firstUpperCase"]
+                "enum": [ "firstUpperCase" ]
               }
             }
           },
@@ -1000,7 +1000,7 @@
             "description": "Converts the first letter of the value to uppercase using the casing rules of the invariant culture.",
             "properties": {
               "identifier": {
-                "enum": ["firstUpperCaseInvariant"]
+                "enum": [ "firstUpperCaseInvariant" ]
               }
             }
           },
@@ -1008,7 +1008,7 @@
             "description": "Converts the value to title case using the casing rules of the current culture.",
             "properties": {
               "identifier": {
-                "enum": ["titleCase"]
+                "enum": [ "titleCase" ]
               }
             }
           },
@@ -1016,7 +1016,7 @@
             "description": "Converts the value to kebab case using the casing rules of the invariant culture.",
             "properties": {
               "identifier": {
-                "enum": ["kebabCase"]
+                "enum": [ "kebabCase" ]
               }
             }
           }
@@ -1028,23 +1028,23 @@
       "type": "object",
       "additionalProperties": {
         "type": "object",
-        "required": ["type"],
+        "required": [ "type" ],
         "properties": {
           "datatype": {
             "$ref": "#/definitions/datatype"
           },
           "type": {
             "type": "string",
-            "enum": ["bind", "derived", "generated", "parameter", "computed"]
+            "enum": [ "bind", "derived", "generated", "parameter", "computed" ]
           }
         },
         "oneOf": [
           {
-            "required": ["binding"],
+            "required": [ "binding" ],
             "properties": {
               "type": {
                 "description": "The symbol binds value from external sources.",
-                "enum": ["bind"]
+                "enum": [ "bind" ]
               },
               "binding": {
                 "description": "The source and the name of parameter to take the value from. The syntax is: <external source>:<parameter name>. Well known external sources are: host - a value that is defined by the template engine host; env - environment variable.",
@@ -1063,25 +1063,29 @@
                 "description": "Defines the portion of file names which will be replaced by symbol value."
               },
               "onlyIf": {
-                "properties": {
-                  "after": {
-                    "description": "The replacement string occurs after this value.",
-                    "type": "string"
-                  },
-                  "before": {
-                    "description": "The replacement string occurs before this value.",
-                    "type": "string"
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "after": {
+                      "description": "The replacement string occurs after this value.",
+                      "type": "string"
+                    },
+                    "before": {
+                      "description": "The replacement string occurs before this value.",
+                      "type": "string"
+                    }
                   }
                 }
               }
             }
           },
           {
-            "required": ["valueSource", "valueTransform"],
+            "required": [ "valueSource", "valueTransform" ],
             "properties": {
               "type": {
                 "description": "The value of this symbol is derived from the value of another symbol by the application of value forms.",
-                "enum": ["derived"]
+                "enum": [ "derived" ]
               },
               "valueSource": {
                 "type": "string",
@@ -1104,25 +1108,29 @@
                 "description": "Defines the portion of file names which will be replaced by symbol value."
               },
               "onlyIf": {
-                "properties": {
-                  "after": {
-                    "description": "The replacement string occurs after this value.",
-                    "type": "string"
-                  },
-                  "before": {
-                    "description": "The replacement string occurs before this value.",
-                    "type": "string"
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "after": {
+                      "description": "The replacement string occurs after this value.",
+                      "type": "string"
+                    },
+                    "before": {
+                      "description": "The replacement string occurs before this value.",
+                      "type": "string"
+                    }
                   }
                 }
               }
             }
           },
           {
-            "required": ["generator"],
+            "required": [ "generator" ],
             "properties": {
               "type": {
                 "description": "Defines the high level configuration of symbol.",
-                "enum": ["generated"]
+                "enum": [ "generated" ]
               },
               "replaces": {
                 "type": "string",
@@ -1133,14 +1141,18 @@
                 "description": "Defines the portion of file names which will be replaced by symbol value."
               },
               "onlyIf": {
-                "properties": {
-                  "after": {
-                    "description": "The replacement string occurs after this value.",
-                    "type": "string"
-                  },
-                  "before": {
-                    "description": "The replacement string occurs before this value.",
-                    "type": "string"
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "after": {
+                      "description": "The replacement string occurs after this value.",
+                      "type": "string"
+                    },
+                    "before": {
+                      "description": "The replacement string occurs before this value.",
+                      "type": "string"
+                    }
                   }
                 }
               }
@@ -1185,7 +1197,7 @@
             "properties": {
               "type": {
                 "description": "Defines the high level configuration of symbol.",
-                "enum": ["parameter"]
+                "enum": [ "parameter" ]
               },
               "isRequired": {
                 "oneOf": [
@@ -1215,7 +1227,7 @@
                 "description": "An array listing the valid choices for a symbol whose datatype = choice. If not provided, there are no valid choices for the symbol, so it can never be assigned a value.",
                 "type": "array",
                 "items": {
-                  "required": ["choice"],
+                  "required": [ "choice" ],
                   "properties": {
                     "choice": {
                       "description": "A valid value for the symbol.",
@@ -1301,7 +1313,7 @@
             "properties": {
               "type": {
                 "description": "Defines the high level configuration of symbol.",
-                "enum": ["computed"]
+                "enum": [ "computed" ]
               },
               "value": {
                 "description": "An evaluate-able condition whose result defines the value of the symbol.",
@@ -1337,7 +1349,7 @@
     "tags": {
       "description": "Common information about templates, these are effectively interchangeable with choice type parameter symbols.",
       "type": "object",
-      "required": ["type"],
+      "required": [ "type" ],
       "properties": {
         "language": {
           "description": "The programming language the template primarily contains or is intended for use with.",
@@ -1345,7 +1357,7 @@
         },
         "type": {
           "description": "The type of template: project or item.",
-          "enum": ["project", "item", "solution"]
+          "enum": [ "project", "item", "solution" ]
         }
       }
     },
@@ -1362,7 +1374,7 @@
       "type": "object",
       "additionalProperties": {
         "type": "object",
-        "required": ["type"],
+        "required": [ "type" ],
         "properties": {
           "type": {
             "type": "string",
@@ -1375,7 +1387,7 @@
         "oneOf": [
           {
             "not": {
-              "required": ["type"],
+              "required": [ "type" ],
               "properties": {
                 "type": {
                   "enum": [
@@ -1390,7 +1402,7 @@
             },
             "properties": {
               "args": {
-                "type": ["array", "object", "string"]
+                "type": [ "array", "object", "string" ]
               }
             }
           },
@@ -1398,19 +1410,19 @@
             "description": "Operating system constraint. Allows to restrict the template to be run only on specific operating systems.",
             "properties": {
               "type": {
-                "enum": ["os"]
+                "enum": [ "os" ]
               },
               "args": {
                 "oneOf": [
                   {
                     "type": "string",
-                    "enum": ["Windows", "Linux", "OSX"]
+                    "enum": [ "Windows", "Linux", "OSX" ]
                   },
                   {
                     "type": "array",
                     "items": {
                       "type": "string",
-                      "enum": ["Windows", "Linux", "OSX"]
+                      "enum": [ "Windows", "Linux", "OSX" ]
                     }
                   }
                 ]
@@ -1421,13 +1433,13 @@
             "description": "Host constraint. Allows to restrict the template to be run only on specific applications using template engine.",
             "properties": {
               "type": {
-                "enum": ["host"]
+                "enum": [ "host" ]
               },
               "args": {
                 "type": "array",
                 "items": {
                   "type": "object",
-                  "required": ["hostname"],
+                  "required": [ "hostname" ],
                   "properties": {
                     "hostname": {
                       "type": "string",
@@ -1435,11 +1447,11 @@
                       "oneOf": [
                         {
                           "not": {
-                            "enum": ["dotnetcli", "vs", "vs-mac", "ide"]
+                            "enum": [ "dotnetcli", "vs", "vs-mac", "ide" ]
                           }
                         },
                         {
-                          "enum": ["dotnetcli", "vs", "vs-mac", "ide"]
+                          "enum": [ "dotnetcli", "vs", "vs-mac", "ide" ]
                         }
                       ]
                     },
@@ -1456,7 +1468,7 @@
             "description": "Installed workload constraint. Allows to restrict the template to be run only on host with specific workloads installed.",
             "properties": {
               "type": {
-                "enum": ["workload"]
+                "enum": [ "workload" ]
               },
               "args": {
                 "oneOf": [
@@ -1479,7 +1491,7 @@
             "description": "SDK version constraint. Allows to restrict the template to be run only on specific .NET SDK version(s).",
             "properties": {
               "type": {
-                "enum": ["sdk-version"]
+                "enum": [ "sdk-version" ]
               },
               "args": {
                 "oneOf": [
@@ -1502,7 +1514,7 @@
             "description": "The project context constraint. Allows to restrict the item template to be run only on inside .NET project with certain capabilities.",
             "properties": {
               "type": {
-                "enum": ["project-capability"]
+                "enum": [ "project-capability" ]
               },
               "args": {
                 "type": "string",
