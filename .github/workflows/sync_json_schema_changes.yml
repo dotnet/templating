@@ -52,5 +52,5 @@ jobs:
             ```
             ${{ github.event.head_commit.modified | join('\n') }}
             ```
-          base: "main"
+          base: "master"
           labels: "auto-generated"
