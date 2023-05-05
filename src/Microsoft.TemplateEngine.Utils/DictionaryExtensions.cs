@@ -105,9 +105,9 @@ namespace Microsoft.TemplateEngine.Utils
         /// <param name="value">Dictionary value.</param>
         /// <param name="condition">Insertion condition.</param>
         /// <exception cref="Exception">Thrown if key is already present in current dictionary and <see cref="ConflictingKeysResolution.Throw"/> strategy was requested.</exception>
-        public static void UpdateOrRemoveValue<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, TValue value, Predicate<TValue> condition)
+        public static void UpdateOrRemoveValue<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, TValue? value, Predicate<TValue> condition)
         {
-            if (!dict.TryAdd(key, value!, condition))
+            if (value is null || !dict.TryAdd(key, value, condition))
             {
                 dict.Remove(key);
             }

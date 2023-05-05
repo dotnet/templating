@@ -115,19 +115,19 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         public string? Trusted
         {
             get => Details.TryGetValue(TrustedKey, out string trusted) ? trusted : false.ToString();
-            set => Details.UpdateOrRemoveValue(TrustedKey, value!, InsertionCondition);
+            set => Details.UpdateOrRemoveValue(TrustedKey, value, InsertionCondition);
         }
 
         public string? Author
         {
             get => Details.TryGetValue(AuthorKey, out string author) ? author : null;
-            set => Details.UpdateOrRemoveValue(AuthorKey, value!, InsertionCondition);
+            set => Details.UpdateOrRemoveValue(AuthorKey, value, InsertionCondition);
         }
 
         public string? Owners
         {
             get => Details.TryGetValue(OwnersKey, out string owners) ? owners : null;
-            set => Details.UpdateOrRemoveValue(OwnersKey, value!, InsertionCondition);
+            set => Details.UpdateOrRemoveValue(OwnersKey, value, InsertionCondition);
         }
 
         public bool IsLocalPackage
@@ -146,13 +146,13 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         public string? NuGetSource
         {
             get => Details.TryGetValue(NuGetSourceKey, out string nugetSource) ? nugetSource : null;
-            set => Details.UpdateOrRemoveValue(NuGetSourceKey, value!, InsertionCondition);
+            set => Details.UpdateOrRemoveValue(NuGetSourceKey, value, InsertionCondition);
         }
 
         public string? Version
         {
             get => Details.TryGetValue(PackageVersionKey, out string version) ? version : null;
-            set => Details.UpdateOrRemoveValue(PackageVersionKey, value!, InsertionCondition);
+            set => Details.UpdateOrRemoveValue(PackageVersionKey, value, InsertionCondition);
         }
 
         internal Dictionary<string, string> Details { get; }
@@ -179,6 +179,6 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             return details;
         }
 
-        private bool InsertionCondition(string entry) => !string.IsNullOrEmpty(entry);
+        private bool InsertionCondition(string? entry) => !string.IsNullOrEmpty(entry);
     }
 }
