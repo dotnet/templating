@@ -431,7 +431,7 @@ Adds a new JSON property in an existing JSON file.
 ## Example
 ```
 "postActions": [{  `
-  `"description": "Make scripts executable",`
+  `"description": "Adds a new JSON property in an existing JSON file.",`
   `"manualInstructions": [ { "text": "Add a new property 'LogLevel' with value 'Information' to '.\deployment.json' under existing property 'moduleConfiguration:edgeAgent:properties.desired'" }  ],`
   `"actionId": "695A3659-EB40-4FF5-A6A6-C9C4E629FCB0",`
   `"args": {`

@@ -125,6 +125,19 @@
         "+x": "*.sh"
       },
       "continueOnError": true
+    },
+    {
+      "description": "Add a property to an existing JSON file",
+      "manualInstructions": [
+        {
+          "text": "Chech if jsonFileName is specified."
+        }
+      ],
+      "actionId": "695A3659-EB40-4FF5-A6A6-C9C4E629FCB0",
+      "args": {
+        "jsonFileName": "test.json"
+      },
+      "continueOnError": true
     }
   ]
 }
