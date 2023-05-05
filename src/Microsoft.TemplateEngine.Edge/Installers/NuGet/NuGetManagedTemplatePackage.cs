@@ -21,6 +21,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         private const string NuGetSourceKey = "NuGetSource";
         private const string PackageIdKey = "PackageId";
         private const string PackageVersionKey = "Version";
+
         private readonly IEngineEnvironmentSettings _settings;
         private readonly ILogger _logger;
 
@@ -169,13 +170,23 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
         public IReadOnlyDictionary<string, string> GetDetails()
         {
-            var details = new Dictionary<string, string>();
-
-            details.TryAdd(AuthorKey, Author ?? string.Empty, InsertionCondition);
-            details.TryAdd(OwnersKey, Owners ?? string.Empty, InsertionCondition);
-            details.TryAdd(TrustedKey, Trusted ?? string.Empty, InsertionCondition);
-            details.TryAdd(NuGetSourceKey, NuGetSource ?? string.Empty, InsertionCondition);
-
+            Dictionary<string, string> details = new Dictionary<string, string>();
+            if (!string.IsNullOrWhiteSpace(Author))
+            {
+                details[AuthorKey] = Author!;
+            }
+            if (!string.IsNullOrWhiteSpace(Owners))
+            {
+                details[OwnersKey] = Owners!;
+            }
+            if (!string.IsNullOrWhiteSpace(Trusted))
+            {
+                details[TrustedKey] = Trusted!;
+            }
+            if (!string.IsNullOrWhiteSpace(NuGetSource))
+            {
+                details[NuGetSourceKey] = NuGetSource!;
+            }
             return details;
         }
 
