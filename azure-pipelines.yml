@@ -36,6 +36,7 @@ variables:
   - ${{ if eq(variables['System.TeamProject'], 'public') }}:
     - name: _InternalRuntimeDownloadArgs
       value: ''
+  - template: /eng/common/templates/variables/pool-providers.yml
 
 stages:
 - stage: build
@@ -75,10 +76,10 @@ stages:
         timeoutInMinutes: 90
         pool:
           ${{ if eq(variables['System.TeamProject'], 'public') }}:
-            name: NetCore-Svc-Public
+            name: $(DncEngPublicBuildPool)
             vmImage: 1es-windows-2019-open
           ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-            name: NetCore1ESPool-Internal
+            name: $(DncEngInternalBuildPool)
             demands: ImageOverride -equals windows.vs2019.amd64
         variables:
         - _InternalBuildArgs: ''
@@ -165,7 +166,7 @@ stages:
             ${{ if eq(variables['System.TeamProject'], 'public') }}:
               vmImage: ubuntu-latest 
             ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-              name: NetCore1ESPool-Internal
+              name: $(DncEngInternalBuildPool)
               demands: ImageOverride -equals Build.Ubuntu.2204.Amd64
           strategy:
             matrix:
