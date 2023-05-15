@@ -21,4 +21,8 @@
     <Content Include="nupkg_templates\**" />
     <None Include="nupkg_templates\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="test_templates\TemplateWithGeneratedSymbolInDerivedSymbol\.template.config\template.json" />
+    <None Remove="test_templates\TemplateWithGeneratedSymbolInDerivedSymbol\Program.cs" />
+  </ItemGroup>
 </Project>
