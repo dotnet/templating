@@ -25,6 +25,11 @@ Do not localize: actionId</note>
         <target state="translated">在 '{1}' 中所設定的引數 '{0}' 未列在 '{2}' 中，並將略過處理。</target>
         <note />
       </trans-unit>
+      <trans-unit id="Authoring_CyclicDependencyInSymbols">
+        <source>Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation.</source>
+        <target state="new">Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="Authoring_InvalidJsonElementInLocalizationFile">
         <source>Localization file should only contain elements with type 'string'. Remove elements that are not strings.</source>
         <target state="translated">當地語系化檔案應只包含類型為 'string' 的元素。請移除非字串的元素。</target>

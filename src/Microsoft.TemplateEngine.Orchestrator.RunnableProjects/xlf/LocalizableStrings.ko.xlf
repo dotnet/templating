@@ -25,6 +25,11 @@ Do not localize: actionId</note>
         <target state="translated">'{1}'에서 구성된 '{0}' 인수가 '{2}' 나열되어 있지 않으므로 처리를 건너뜁니다.</target>
         <note />
       </trans-unit>
+      <trans-unit id="Authoring_CyclicDependencyInSymbols">
+        <source>Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation.</source>
+        <target state="new">Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="Authoring_InvalidJsonElementInLocalizationFile">
         <source>Localization file should only contain elements with type 'string'. Remove elements that are not strings.</source>
         <target state="translated">현지화 파일에는 ‘문자열’ 형식의 요소만 포함되어야 합니다. 문자열이 아닌 요소를 제거하세요.</target>

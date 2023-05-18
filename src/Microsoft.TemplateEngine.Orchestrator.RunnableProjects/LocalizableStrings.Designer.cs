@@ -97,6 +97,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation..
+        /// </summary>
+        internal static string Authoring_CyclicDependencyInSymbols {
+            get {
+                return ResourceManager.GetString("Authoring_CyclicDependencyInSymbols", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Localization file should only contain elements with type &apos;string&apos;. Remove elements that are not strings..
         /// </summary>
         internal static string Authoring_InvalidJsonElementInLocalizationFile {

@@ -25,6 +25,11 @@ Do not localize: actionId</note>
         <target state="translated">'{1}' で構成された引数 '{0}' は、'{2}' に一覧表示されていないので、処理のためにスキップされます。</target>
         <note />
       </trans-unit>
+      <trans-unit id="Authoring_CyclicDependencyInSymbols">
+        <source>Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation.</source>
+        <target state="new">Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="Authoring_InvalidJsonElementInLocalizationFile">
         <source>Localization file should only contain elements with type 'string'. Remove elements that are not strings.</source>
         <target state="translated">ローカライズ ファイルには、'string' 型の要素のみを含める必要があります。文字列以外の要素を削除してください。</target>

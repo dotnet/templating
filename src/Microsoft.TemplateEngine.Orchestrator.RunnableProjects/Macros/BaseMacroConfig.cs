@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
@@ -35,6 +36,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
         public string Type { get; }
 
         internal string DataType { get; } = "string";
+
+        internal HashSet<BaseMacroConfig> Dependencies { get; set; } = new HashSet<BaseMacroConfig>();
 
         internal abstract void Evaluate(IEngineEnvironmentSettings environmentSettings, IVariableCollection vars);
 

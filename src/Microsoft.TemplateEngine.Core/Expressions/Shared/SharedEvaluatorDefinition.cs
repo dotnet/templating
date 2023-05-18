@@ -71,6 +71,34 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
             }
         }
 
+        /// <summary>
+        /// Creates the expression based on passed string.
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="text">The string to be inspected and turned into expression.</param>
+        /// <param name="variables">Variables to be substituted within the expression.</param>
+        /// <param name="evaluableExpressionError">Error message detailing failing building evaluable expression.</param>
+        /// <param name="referencedVariablesKeys">If passed (if not null) it will be populated with references to variables used within the inspected expression.</param>
+        /// <returns></returns>
+        public static IEvaluable GetEvaluableExpression(
+            ILogger logger,
+            string text,
+            IVariableCollection variables,
+            out string evaluableExpressionError,
+            HashSet<string> referencedVariablesKeys)
+        {
+            using (MemoryStream ms = new(Encoding.UTF8.GetBytes(text)))
+            using (MemoryStream res = new())
+            {
+                EngineConfig cfg = new(logger, variables);
+                IProcessorState state = new ProcessorState(ms, res, (int)ms.Length, (int)ms.Length, cfg, NoOperationProviders);
+                int len = (int)ms.Length;
+                int pos = 0;
+
+                return GetEvaluableExpression(state, ref len, ref pos, out evaluableExpressionError, referencedVariablesKeys, true);
+            }
+        }
+
         protected static int Compare(object left, object right)
         {
             if (Equals(right, NullToken))
@@ -96,7 +124,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
 
         protected abstract ITokenTrie GetSymbols(IProcessorState processor);
 
-        private static bool Evaluate(
+        private static IEvaluable GetEvaluableExpression(
             IProcessorState processor,
             ref int bufferLength,
             ref int currentBufferPosition,
@@ -116,41 +144,61 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
                 x => faultedSection = processor.Encoding.GetString(x.ToArray()),
                 referencedVariablesKeys);
 
-            bool result;
             if (faultedSection != null)
             {
                 faultedMessage = faultedSection;
-                result = false;
             }
-            else
-            {
-                // Buffer continues after expression - let's populate error only if this is single expression evaluation
-                //  as we want to avoid creation of message that would contain whole template content after some condition
-                if (shouldProcessWholeBuffer && bufferLength != 0)
-                {
-                    faultedMessage = LocalizableStrings.Error_Evaluation_Expression_Substring +
-                                     processor.Encoding.GetString(
-                                         processor.CurrentBuffer,
-                                         currentBufferPosition,
-                                         bufferLength - currentBufferPosition);
-                }
 
-                try
-                {
-                    object evalResult = expression.Evaluate();
-                    result = (bool)Convert.ChangeType(evalResult, typeof(bool));
-                }
-                catch (Exception e)
-                {
-                    faultedMessage = faultedMessage == null
-                        ? e.Message
-                        : (faultedMessage + Environment.NewLine + e.Message);
-                    result = false;
-                }
+            // Buffer continues after expression - let's populate error only if this is single expression evaluation
+            //  as we want to avoid creation of message that would contain whole template content after some condition
+            else if (shouldProcessWholeBuffer && bufferLength != 0)
+            {
+                faultedMessage = LocalizableStrings.Error_Evaluation_Expression_Substring +
+                                 processor.Encoding.GetString(
+                                     processor.CurrentBuffer,
+                                     currentBufferPosition,
+                                     bufferLength - currentBufferPosition);
+            }
+
+            return expression;
+        }
+
+        private static bool Evaluate(
+            IProcessorState processor,
+            ref int bufferLength,
+            ref int currentBufferPosition,
+            out string faultedMessage,
+            HashSet<string> referencedVariablesKeys,
+            // indicates whether passed buffer within processor contains only the analyzed expression,
+            //  or it can possibly contain other content (e.g. the full template)
+            bool shouldProcessWholeBuffer)
+        {
+            IEvaluable expression = GetEvaluableExpression(
+                processor,
+                ref bufferLength,
+                ref currentBufferPosition,
+                out faultedMessage,
+                referencedVariablesKeys,
+                shouldProcessWholeBuffer);
+
+            bool result;
+
+            try
+            {
+                object evalResult = expression.Evaluate();
+                result = (bool)Convert.ChangeType(evalResult, typeof(bool));
+            }
+            catch (Exception e)
+            {
+                faultedMessage = faultedMessage == null
+                    ? e.Message
+                    : (faultedMessage + Environment.NewLine + e.Message);
+                result = false;
             }
 
             if (!string.IsNullOrEmpty(faultedMessage))
             {
+                result = false;
                 processor.Config.Logger.LogDebug(LocalizableStrings.Error_Evaluation_Expression + faultedMessage);
             }
             return result;

@@ -25,6 +25,11 @@ Do not localize: actionId</note>
         <target state="translated">'{1}' içinde yapılandırılmış '{0}' bağımsız değişkeni '{2}' içinde listelenmediğinden işlenmeden atlanacak.</target>
         <note />
       </trans-unit>
+      <trans-unit id="Authoring_CyclicDependencyInSymbols">
+        <source>Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation.</source>
+        <target state="new">Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="Authoring_InvalidJsonElementInLocalizationFile">
         <source>Localization file should only contain elements with type 'string'. Remove elements that are not strings.</source>
         <target state="translated">Yerelleştirme dosyası yalnızca ‘dize’ türünde öğeler içermelidir. Dize olmayan öğeleri kaldırın.</target>

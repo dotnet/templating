@@ -135,6 +135,9 @@ Do not localize: actionId</comment>
   <data name="Authoring_CONFIG0204_UnknownArgumentForReplace" xml:space="preserve">
     <value>The argument '{0}' configured in '{1}' is not listed in '{2}' and will be skipped for processing.</value>
   </data>
+  <data name="Authoring_CyclicDependencyInSymbols" xml:space="preserve">
+    <value>Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation.</value>
+  </data>
   <data name="Authoring_InvalidJsonElementInLocalizationFile" xml:space="preserve">
     <value>Localization file should only contain elements with type 'string'. Remove elements that are not strings.</value>
   </data>

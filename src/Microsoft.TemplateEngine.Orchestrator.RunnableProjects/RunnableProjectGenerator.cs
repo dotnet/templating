@@ -14,13 +14,16 @@ using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Abstractions.Parameters;
 using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Core.Contracts;
+using Microsoft.TemplateEngine.Core.Expressions;
 using Microsoft.TemplateEngine.Core.Expressions.Cpp2;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Validation;
 using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 {
-    public sealed class RunnableProjectGenerator : IGenerator
+    public sealed class RunnableProjectGenerator : IGenerator, IExpressionEvaluator
     {
         internal const string TemplateConfigDirectoryName = ".template.config";
         internal const string TemplateConfigFileName = "template.json";
@@ -136,7 +139,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             IVariableCollection variables = SetupVariables(parameters, templateConfig.GlobalOperationConfig.VariableSetup);
             await templateConfig.EvaluateBindSymbolsAsync(environmentSettings, variables, cancellationToken).ConfigureAwait(false);
             cancellationToken.ThrowIfCancellationRequested();
-            MacroProcessor.ProcessMacros(environmentSettings, templateConfig.GlobalOperationConfig, variables);
+            new MacrosSorter(
+                templateConfig.GlobalOperationConfig.SymbolNames,
+                templateConfig.GlobalOperationConfig.EvaluableMacros)
+                .SortMacroConfigsByDependencies(out IReadOnlyList<BaseMacroConfig> sortedMacroConfigs);
+            MacroProcessor.ProcessMacros(environmentSettings, sortedMacroConfigs, variables);
             templateConfig.Evaluate(variables);
 
             IOrchestrator basicOrchestrator = new Core.Util.Orchestrator(environmentSettings.Host.Logger, environmentSettings.Host.FileSystem);
@@ -196,6 +203,18 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 parameters,
                 targetDirectory,
                 cancellationToken);
+        }
+
+        IEvaluable IExpressionEvaluator.GetEvaluableExpression(
+            ILogger logger,
+            string text,
+            IDictionary<string, object> variables,
+            out string evaluableExpressionError,
+            HashSet<string>? referencedVariablesKeys)
+        {
+            VariableCollection variableCollection = new(null, variables);
+
+            return Cpp2StyleEvaluatorDefinition.GetEvaluableExpression(logger, text, variableCollection, out evaluableExpressionError, referencedVariablesKeys);
         }
 
         #region Obsolete members
@@ -312,7 +331,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             await runnableProjectConfig.EvaluateBindSymbolsAsync(environmentSettings, variables, cancellationToken).ConfigureAwait(false);
 
             cancellationToken.ThrowIfCancellationRequested();
-            MacroProcessor.ProcessMacros(environmentSettings, runnableProjectConfig.GlobalOperationConfig, variables);
+            new MacrosSorter(
+                runnableProjectConfig.GlobalOperationConfig.SymbolNames,
+                runnableProjectConfig.GlobalOperationConfig.EvaluableMacros)
+                    .SortMacroConfigsByDependencies(out IReadOnlyList<BaseMacroConfig> sortedMacroConfigs);
+            MacroProcessor.ProcessMacros(environmentSettings, sortedMacroConfigs, variables);
+            MacroProcessor.ProcessMacros(environmentSettings, sortedMacroConfigs, variables);
             runnableProjectConfig.Evaluate(variables);
 
             IOrchestrator basicOrchestrator = new Core.Util.Orchestrator(environmentSettings.Host.Logger, environmentSettings.Host.FileSystem);

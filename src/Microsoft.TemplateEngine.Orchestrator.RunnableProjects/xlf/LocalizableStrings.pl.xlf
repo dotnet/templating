@@ -25,6 +25,11 @@ Do not localize: actionId</note>
         <target state="translated">Argument „{0}” skonfigurowany w „{1}” nie jest wymieniony na liście „{2}” i zostanie pominięty na potrzeby przetworzenia.</target>
         <note />
       </trans-unit>
+      <trans-unit id="Authoring_CyclicDependencyInSymbols">
+        <source>Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation.</source>
+        <target state="new">Parameter conditions contain cyclic dependency: [{0}] that is preventing deterministic evaluation.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="Authoring_InvalidJsonElementInLocalizationFile">
         <source>Localization file should only contain elements with type 'string'. Remove elements that are not strings.</source>
         <target state="translated">Plik lokalizacji powinien zawierać tylko elementy typu „ciąg”. Usuń elementy, które nie są ciągami.</target>

@@ -71,6 +71,28 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             VerificationEngine engine = new VerificationEngine(_log);
             return engine.Execute(options);
         }
+
+        [Fact]
+        public Task TestTemplateWithGeneratedInComputed()
+        {
+            string templateLocation = GetTestTemplateLocation("TemplateWithGeneratedInComputed");
+
+            string workingDir = TestUtils.CreateTemporaryFolder();
+
+            TemplateVerifierOptions options =
+                new TemplateVerifierOptions(templateName: "TestAssets.TemplateWithGeneratedInComputed")
+                {
+                    TemplatePath = templateLocation,
+                    OutputDirectory = workingDir,
+                    DoNotAppendTemplateArgsToScenarioName = true,
+                    DoNotPrependTemplateNameToScenarioName = true,
+                    SnapshotsDirectory = "Approvals"
+                }
+                .WithInstantiationThroughTemplateCreatorApi(new Dictionary<string, string?>());
+
+            VerificationEngine engine = new VerificationEngine(_log);
+            return engine.Execute(options);
+        }
     }
 }
 

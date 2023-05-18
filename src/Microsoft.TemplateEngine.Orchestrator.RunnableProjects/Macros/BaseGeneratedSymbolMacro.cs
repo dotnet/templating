@@ -2,7 +2,9 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Core.Expressions;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
@@ -12,9 +14,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
     /// </summary>
     /// <typeparam name="T">The macro config.</typeparam>
 #pragma warning disable CS0618 // Type or member is obsolete
-    internal abstract class BaseGeneratedSymbolMacro<T> : BaseMacro<T>, IGeneratedSymbolMacro, IDeferredMacro where T : BaseMacroConfig, IMacroConfig
+    internal abstract class BaseGeneratedSymbolMacro<T> : BaseMacro<T>, IGeneratedSymbolMacro, IDeferredMacro
+        where T : BaseMacroConfig, IMacroConfig
 #pragma warning restore CS0618 // Type or member is obsolete
     {
+        public IList<string> Dependencies { get; set; } = new List<string>();
+
+        public IDictionary<string, IEvaluable> ConditionToExpressionMap { get; set; } = new Dictionary<string, IEvaluable>();
+
         public IMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IMacroConfig rawConfig)
         {
             if (rawConfig is not IGeneratedSymbolConfig deferredConfig)
