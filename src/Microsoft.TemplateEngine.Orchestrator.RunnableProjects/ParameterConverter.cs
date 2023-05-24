@@ -212,10 +212,6 @@ namespace Microsoft.TemplateEngine.Utils
                             .Where(r => !string.IsNullOrEmpty(r))
                             .Select(r => r!)
                             .ToList();
-                    if (val.Count <= 1)
-                    {
-                        return val.Count == 0 ? string.Empty : val[0];
-                    }
 
                     return new MultiValueParameter(val);
                 }
