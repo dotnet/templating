@@ -7,11 +7,11 @@ using Microsoft.TemplateEngine.Abstractions.TemplatePackage;
 
 namespace Microsoft.TemplateEngine.Edge.UnitTests.Fakes
 {
-    internal class ManagedFakeFactory : ITemplatePackageProviderFactory
+    internal class FakeManagedPackageProviderFactory : ITemplatePackageProviderFactory
     {
         private static readonly List<WeakReference<ITemplatePackageProvider>> AllCreatedProviders = new List<WeakReference<ITemplatePackageProvider>>();
 
-        public string DisplayName => nameof(ManagedFakeFactory);
+        public string DisplayName => nameof(FakeManagedPackageProviderFactory);
 
         public Guid Id { get; } = new Guid("{61CFA828-97B6-44EB-A44D-0AE673D6DF58}");
 
@@ -28,7 +28,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests.Fakes
         private const string ManagedPackageMountPoint = "ManagedMount";
         private const string ManagedPackageIdentifier = "ManagedPackage";
 
-        public ITemplatePackageProviderFactory Factory => new ManagedFakeFactory();
+        public ITemplatePackageProviderFactory Factory => new FakeManagedPackageProviderFactory();
 
         public event Action? TemplatePackagesChanged
         {

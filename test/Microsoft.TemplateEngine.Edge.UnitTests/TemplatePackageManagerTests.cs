@@ -110,11 +110,12 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                    (typeof(IGenerator), GetGeneratorMock()),
                    (typeof(IInstallerFactory), GetInstallerFactoryMock()),
                    (typeof(IMountPointFactory), new MountPointFactoryMock()),
-                   (typeof(ITemplatePackageProviderFactory), new ManagedFakeFactory())
+                   (typeof(ITemplatePackageProviderFactory), new FakeManagedPackageProviderFactory())
                });
 
-            var (package, templates) = await new TemplatePackageManager(engineEnvironmentSettings)
+            var result = await new TemplatePackageManager(engineEnvironmentSettings)
                 .GetManagedTemplatePackageAsync(packageIdentifier, version, default).ConfigureAwait(false);
+            var (package, templates) = result;
 
             Assert.NotNull(templates);
             Assert.Single(templates);
@@ -132,7 +133,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                    (typeof(IGenerator), GetGeneratorMock()),
                    (typeof(IInstallerFactory), GetInstallerFactoryMock()),
                    (typeof(IMountPointFactory), new MountPointFactoryMock()),
-                   (typeof(ITemplatePackageProviderFactory), new ManagedFakeFactory())
+                   (typeof(ITemplatePackageProviderFactory), new FakeManagedPackageProviderFactory())
                });
 
             var (package, templates) = await new TemplatePackageManager(engineEnvironmentSettings)
