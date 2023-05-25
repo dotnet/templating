@@ -223,11 +223,12 @@ namespace Microsoft.TemplateEngine.Edge.Settings
         /// <param name="packageVersion">The template package version.</param>
         /// <param name="cancellationToken">A cancellation token to cancel the asynchronous operation.</param>
         /// <returns>The managed template package and the containing templates.</returns>
+        /// <exception cref="InvalidOperationException"> Throws an exception when no package is found. </exception>
         public async Task<(IManagedTemplatePackage? Package, IEnumerable<ITemplateInfo>? Templates)> GetManagedTemplatePackageAsync(string packageIdentifier, string? packageVersion = null, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var templatePackages = await GetTemplatePackagesAsync(false, cancellationToken).ConfigureAwait(false);
-            var foundPackage = templatePackages.Select(tp => tp as IManagedTemplatePackage)
+            var templatePackages = await GetManagedTemplatePackagesAsync(false, cancellationToken).ConfigureAwait(false);
+            var foundPackage = templatePackages
                 .FirstOrDefault(tp =>
                 {
                     if (tp?.Identifier == packageIdentifier)
@@ -244,7 +245,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 return (foundPackage, templates);
             }
 
-            return (null, null);
+            throw new InvalidOperationException($"Package with identifier: {packageIdentifier} was not found");
         }
 
         private void EnsureProvidersLoaded()

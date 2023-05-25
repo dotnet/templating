@@ -125,7 +125,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 
         [Theory]
         [InlineData("ManagedPackage", "1.0.1")]
-        public async Task CantGetManagedPackageWithTemplatesDueToVersionMismatch(string packageIdentifier, string? version)
+        public async Task CantGetManagedPackageWithTemplatesDueToVersionMismatchAsync(string packageIdentifier, string? version)
         {
             var engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(
                additionalComponents: new List<(Type, IIdentifiedComponent)>
@@ -136,11 +136,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                    (typeof(ITemplatePackageProviderFactory), new FakeManagedPackageProviderFactory())
                });
 
-            var (package, templates) = await new TemplatePackageManager(engineEnvironmentSettings)
-                .GetManagedTemplatePackageAsync(packageIdentifier, version, default).ConfigureAwait(false);
-
-            Assert.Null(templates);
-            Assert.Null(package);
+            var packageManager = new TemplatePackageManager(engineEnvironmentSettings);
+            await Assert.ThrowsAsync<InvalidOperationException>(async () => await packageManager.GetManagedTemplatePackageAsync(packageIdentifier, version, default).ConfigureAwait(false));
         }
 
         [Fact]
