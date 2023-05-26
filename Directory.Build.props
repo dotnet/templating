@@ -15,6 +15,7 @@
         <NoWarn>NU5105;NU5128;NU5100;NU5118;0419,0649</NoWarn>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
     <PropertyGroup>

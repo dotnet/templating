@@ -1,11 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#if !NET6_0_OR_GREATER
-using System;
-using System.Collections.Generic;
-using System.Linq;
-#endif
 using System.Globalization;
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
@@ -310,6 +305,60 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 
             var warningMessages = loggedMessages.Where(log => log.Item1 == LogLevel.Warning);
             Assert.Empty(warningMessages);
+        }
+
+        [Fact]
+        public void CanHandleHostData()
+        {
+            IEngineEnvironmentSettings environmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
+            SettingsFilePaths paths = new SettingsFilePaths(environmentSettings);
+
+            string hostfile =
+                /*lang=json,strict*/
+                """
+                   {
+                      "$schema": "http://json.schemastore.org/dotnetcli.host",
+                      "symbolInfo": {
+                        "useArtifacts": {
+                          "longName": "use-artifacts",
+                          "shortName": ""
+                        },
+                        "inherit": {
+                          "shortName": ""
+                        }
+                      }
+                    }
+                """;
+
+            string hostFileFormatted = JObject.Parse(hostfile).ToString(Formatting.None);
+            const string hostFileLocation = ".template.config/dotnetcli.host.json";
+
+            IDictionary<string, string?> templateSourceFiles = new Dictionary<string, string?>
+            {
+                // template.json
+                { hostFileLocation, hostfile }
+            };
+            string sourceBasePath = environmentSettings.GetTempVirtualizedPath();
+            TestFileSystemUtils.WriteTemplateSource(environmentSettings, sourceBasePath, templateSourceFiles);
+
+            var template = GetFakedTemplate("testIdentity", sourceBasePath, "testName");
+            A.CallTo(() => template.HostConfigFiles).Returns(new Dictionary<string, string>() { { "dotnetcli", hostFileLocation } });
+            using IMountPoint sourceMountPoint = environmentSettings.MountPath(sourceBasePath);
+            A.CallTo(() => template.GeneratorId).Returns(new("0C434DF7-E2CB-4DEE-B216-D7C58C8EB4B3")); // runnable projects generator ID
+
+            ScanResult result = new ScanResult(sourceMountPoint, new[] { template }, Array.Empty<ILocalizationLocator>(), Array.Empty<(string AssemblyPath, Type InterfaceType, IIdentifiedComponent Instance)>());
+            TemplateCache templateCache = new TemplateCache(Array.Empty<ITemplatePackage>(), new[] { result }, new Dictionary<string, DateTime>(), environmentSettings);
+
+            Assert.Equal(hostFileLocation, templateCache.TemplateInfo[0].HostConfigPlace);
+            Assert.Equal(hostFileFormatted, templateCache.TemplateInfo[0].HostData);
+
+            WriteObject(environmentSettings.Host.FileSystem, paths.TemplateCacheFile, templateCache);
+            var readCache = new TemplateCache(ReadObject(environmentSettings.Host.FileSystem, paths.TemplateCacheFile));
+
+            Assert.Single(readCache.TemplateInfo);
+            var readTemplate = readCache.TemplateInfo[0];
+            Assert.Equal(hostFileLocation, readTemplate.HostConfigPlace);
+            Assert.Equal(hostFileFormatted, readTemplate.HostData);
         }
 
         private IScanTemplateInfo GetFakedTemplate(string identity, string mountPointUri, string name)
