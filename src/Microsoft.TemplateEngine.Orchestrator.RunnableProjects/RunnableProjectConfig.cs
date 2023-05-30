@@ -14,7 +14,6 @@ using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Core.Contracts;
-using Microsoft.TemplateEngine.Core.Expressions.Cpp2;
 using Microsoft.TemplateEngine.Core.Operations;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
@@ -202,27 +201,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
         }
 
         /// <summary>
-        /// Evaluates the conditions in template configurations: computed symbols, conditions in special custom operations, in sources anr primary outputs.
+        /// Evaluates the conditions in template configurations: conditions in special custom operations, in sources and primary outputs.
         /// File renames are also applied at this step.
         /// </summary>
         /// <param name="rootVariableCollection"></param>
         public void Evaluate(IVariableCollection rootVariableCollection)
         {
-            bool stable = false;
-            Dictionary<string, bool> computed = new Dictionary<string, bool>();
-
-            while (!stable)
-            {
-                stable = true;
-                foreach (ComputedSymbol symbol in ConfigurationModel.Symbols.OfType<ComputedSymbol>())
-                {
-                    bool value = Cpp2StyleEvaluatorDefinition.EvaluateFromString(EngineEnvironmentSettings.Host.Logger, symbol.Value, rootVariableCollection);
-                    stable &= computed.TryGetValue(symbol.Name, out bool currentValue) && currentValue == value;
-                    rootVariableCollection[symbol.Name] = value;
-                    computed[symbol.Name] = value;
-                }
-            }
-
             // evaluate the file glob (specials) conditions
             // the result is needed for SpecialOperationConfig
             foreach (CustomFileGlobModel fileGlobModel in ConfigurationModel.SpecialCustomOperations)
@@ -367,8 +351,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             }
 
             IVariableConfig variableConfig = customGlobModel != null ? customGlobModel.VariableFormat : VariableConfig.Default;
-            List<BaseMacroConfig> generatedSymbolMacros = new();
-            List<BaseMacroConfig> computedMacros = new();
 
             List<IReplacementTokens> macroGeneratedReplacements = new();
 
@@ -376,8 +358,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             if (generateMacros)
             {
-                generatedSymbolMacros = ProduceGeneratedSymbolsMacroConfig();
-                computedMacros = ProduceComputedMacroConfig();
+                macros.AddRange(ProduceGeneratedSymbolsMacroConfig());
+                macros.AddRange(ProduceComputedMacroConfig());
             }
 
             foreach (BaseSymbol symbol in ConfigurationModel.Symbols)
@@ -386,7 +368,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 {
                     if (ConfigurationModel.Forms.TryGetValue(derivedSymbol.ValueTransform, out _))
                     {
-                        computedMacros.Add(new ProcessValueFormMacroConfig(derivedSymbol.ValueSource, symbol.Name, derivedSymbol.DataType, derivedSymbol.ValueTransform, ConfigurationModel.Forms));
+                        macros.Add(new ProcessValueFormMacroConfig(derivedSymbol.ValueSource, symbol.Name, derivedSymbol.DataType, derivedSymbol.ValueTransform, ConfigurationModel.Forms));
                     }
                     else
                     {
@@ -415,7 +397,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                                 }
                                 if (generateMacros)
                                 {
-                                    computedMacros.Add(new ProcessValueFormMacroConfig(sourceVariable, symbolName, "string", formName, ConfigurationModel.Forms));
+                                    macros.Add(new ProcessValueFormMacroConfig(sourceVariable, symbolName, "string", formName, ConfigurationModel.Forms));
                                 }
                             }
                             else
@@ -457,16 +439,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 }
             }
 
-            macros.AddRange(generatedSymbolMacros);
-            macros.AddRange(computedMacros);
-
             GlobalRunConfig config = new()
             {
                 Operations = operations,
                 VariableSetup = variableConfig,
-                GeneratedSymbolMacros = generatedSymbolMacros,
-                ComputedMacros = computedMacros,
-                EvaluableMacros = macros,
+                Macros = macros,
                 SymbolNames = ConfigurationModel.Symbols.Select(x => x.Name).ToList(),
                 Replacements = macroGeneratedReplacements,
                 CustomOperations = customOperationConfig
@@ -521,7 +498,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             {
                 if (generatedSymbolMacros.TryGetValue(generatedSymbolConfig.Type, out var generatedSymbolMacro))
                 {
-                    var macroConfig = resolver.Resolve(generatedSymbolMacro, generatedSymbolConfig);
+                    var macroConfig = resolver.Resolve(generatedSymbolMacro, generatedSymbolConfig, EngineEnvironmentSettings);
                     if (macroConfig != null)
                     {
                         generatedMacroConfigs.Add(macroConfig);

@@ -79,6 +79,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
 
             string workingDir = TestUtils.CreateTemporaryFolder();
 
+            var templateParams = new Dictionary<string, string?>()
+            {
+                { "dependencyInjection", "true" },
+                { "navigation", "regions" }
+            };
+
             TemplateVerifierOptions options =
                 new TemplateVerifierOptions(templateName: "TestAssets.TemplateWithGeneratedInComputed")
                 {
@@ -88,10 +94,146 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
                     DoNotPrependTemplateNameToScenarioName = true,
                     SnapshotsDirectory = "Approvals"
                 }
+                .WithInstantiationThroughTemplateCreatorApi(templateParams);
+
+            VerificationEngine engine = new VerificationEngine(_log);
+            return engine.Execute(options);
+        }
+
+        [Fact]
+        public Task TestTemplateWithGeneratedSwitchInComputed()
+        {
+            string templateLocation = GetTestTemplateLocation("TemplateWithGeneratedSwitchInComputed");
+
+            string workingDir = TestUtils.CreateTemporaryFolder();
+
+            var templateParams = new Dictionary<string, string?>()
+            {
+                { "dependencyInjection", "true" },
+                { "navigation", "regions" }
+            };
+
+            TemplateVerifierOptions options =
+                new TemplateVerifierOptions(templateName: "TestAssets.TemplateWithGeneratedSwitchInComputed")
+                {
+                    TemplatePath = templateLocation,
+                    OutputDirectory = workingDir,
+                    DoNotAppendTemplateArgsToScenarioName = true,
+                    DoNotPrependTemplateNameToScenarioName = true,
+                    SnapshotsDirectory = "Approvals"
+                }
+                .WithInstantiationThroughTemplateCreatorApi(templateParams);
+
+            VerificationEngine engine = new VerificationEngine(_log);
+            return engine.Execute(options);
+        }
+
+        [Fact]
+        public Task TestTemplateWithComputedInGenerated()
+        {
+            string templateLocation = GetTestTemplateLocation("TemplateWithComputedInGenerated");
+
+            TemplateVerifierOptions options =
+                new TemplateVerifierOptions(templateName: "TestAssets.TemplateWithComputedInGenerated")
+                {
+                    TemplatePath = templateLocation,
+                    OutputDirectory = TestUtils.CreateTemporaryFolder(),
+                    DoNotAppendTemplateArgsToScenarioName = true,
+                    DoNotPrependTemplateNameToScenarioName = true,
+                    SnapshotsDirectory = "Approvals"
+                }
                 .WithInstantiationThroughTemplateCreatorApi(new Dictionary<string, string?>());
 
             VerificationEngine engine = new VerificationEngine(_log);
             return engine.Execute(options);
+        }
+
+        [Fact]
+        public Task TestTemplateWithComputedInDerivedThroughGenerated()
+        {
+            string templateLocation = GetTestTemplateLocation("TemplateWithComputedInDerivedThroughGenerated");
+
+            TemplateVerifierOptions options =
+                new TemplateVerifierOptions(templateName: "TestAssets.TemplateWithComputedInDerivedThroughGenerated")
+                {
+                    TemplatePath = templateLocation,
+                    OutputDirectory = TestUtils.CreateTemporaryFolder(),
+                    DoNotAppendTemplateArgsToScenarioName = true,
+                    DoNotPrependTemplateNameToScenarioName = true,
+                    SnapshotsDirectory = "Approvals"
+                }
+                .WithInstantiationThroughTemplateCreatorApi(new Dictionary<string, string?>());
+
+            VerificationEngine engine = new VerificationEngine(_log);
+            return engine.Execute(options);
+        }
+
+        [Fact]
+        public Task TestTemplateWithBrokenGeneratedInComputed()
+        {
+            string templateLocation = GetTestTemplateLocation("TemplateWithBrokenGeneratedInComputed");
+            var templateParams = new Dictionary<string, string?>()
+            {
+                { "dependencyInjection", "true" }
+            };
+
+            TemplateVerifierOptions options =
+                new TemplateVerifierOptions(templateName: "TestAssets.TemplateWithBrokenGeneratedInComputed")
+                {
+                    TemplatePath = templateLocation,
+                    OutputDirectory = TestUtils.CreateTemporaryFolder(),
+                    DoNotAppendTemplateArgsToScenarioName = true,
+                    DoNotPrependTemplateNameToScenarioName = true,
+                    SnapshotsDirectory = "Approvals",
+                    VerifyCommandOutput = true
+                }
+                .WithInstantiationThroughTemplateCreatorApi(templateParams);
+
+            return new VerificationEngine(_log)
+                .Execute(options);
+        }
+
+        [Fact]
+        public Task TestTemplateWithVariablesInGeneratedThatUsedInComputed()
+        {
+            string templateLocation = GetTestTemplateLocation("TemplateWithBrokenGeneratedInComputed");
+
+            TemplateVerifierOptions options =
+                new TemplateVerifierOptions(templateName: "TestAssets.TemplateWithBrokenGeneratedInComputed")
+                {
+                    TemplatePath = templateLocation,
+                    OutputDirectory = TestUtils.CreateTemporaryFolder(),
+                    DoNotAppendTemplateArgsToScenarioName = true,
+                    DoNotPrependTemplateNameToScenarioName = true,
+                    SnapshotsDirectory = "Approvals",
+                    VerifyCommandOutput = true
+                }
+                .WithInstantiationThroughTemplateCreatorApi(new Dictionary<string, string?>());
+
+            return new VerificationEngine(_log)
+                .Execute(options);
+        }
+
+        [Fact]
+        public Task TestTemplateWithCircleDependencyInMacros()
+        {
+            string templateLocation = GetTestTemplateLocation("TemplateWithCircleDependencyInMacros");
+
+            TemplateVerifierOptions options =
+                new TemplateVerifierOptions(templateName: "TestAssets.TemplateWithCircleDependencyInMacros")
+                {
+                    TemplatePath = templateLocation,
+                    OutputDirectory = TestUtils.CreateTemporaryFolder(),
+                    DoNotAppendTemplateArgsToScenarioName = true,
+                    DoNotPrependTemplateNameToScenarioName = true,
+                    SnapshotsDirectory = "Approvals",
+                    IsCommandExpectedToFail = true,
+                    VerifyCommandOutput = true
+                }
+                .WithInstantiationThroughTemplateCreatorApi(new Dictionary<string, string?>());
+
+            return new VerificationEngine(_log)
+                .Execute(options);
         }
     }
 }

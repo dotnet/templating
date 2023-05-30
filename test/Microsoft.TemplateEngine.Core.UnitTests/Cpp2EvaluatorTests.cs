@@ -73,7 +73,7 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
         }
 
         [Fact]
-        public void VerifyCpp2EvaluatorTrueBoolenVariable()
+        public void VerifyCpp2EvaluatorTrueBooleanVariable()
         {
             VariableCollection vc = new VariableCollection
             {

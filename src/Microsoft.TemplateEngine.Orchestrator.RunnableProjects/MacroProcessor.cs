@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros;
@@ -26,6 +28,19 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             foreach (BaseMacroConfig config in macroConfigs)
             {
+                // Errors in macro dependencies are not supposed to interrupt template generation.
+                // Skip this macro and add info in the output.
+                if (config.Dependencies.Any() && config.Dependencies.Any(d => d.MacroErrors.Any()))
+                {
+                    environmentSettings.Host.Logger.LogWarning(
+                        string.Format(
+                            LocalizableStrings.MacroProcessing_Warning_DependencyErrors,
+                            config.VariableName,
+                            string.Join(",", config.Dependencies.SelectMany(d => d.MacroErrors))));
+
+                    continue;
+                }
+
                 try
                 {
                     if (deterministicMode)
@@ -37,7 +52,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                         config.Evaluate(environmentSettings, variables);
                     }
                 }
-                catch (Exception ex)
+                //TemplateAuthoringException means that config was invalid, just pass it.
+                catch (Exception ex) when (ex is not TemplateAuthoringException)
                 {
                     throw new MacroProcessingException(config, ex);
                 }

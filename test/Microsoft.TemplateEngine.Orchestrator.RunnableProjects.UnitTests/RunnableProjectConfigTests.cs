@@ -1,9 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
@@ -14,7 +11,6 @@ using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Serializa
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Validation;
 using Microsoft.TemplateEngine.TestHelper;
 using Newtonsoft.Json.Linq;
-using Xunit;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
 {
@@ -84,7 +80,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
         [InlineData(InvalidMultiChoiceDefinition, false, true)]
         [InlineData(ValidChoiceDefinition, true, true)]
         [InlineData(InvalidMultiChoiceDefinition, true, false)]
-        public async Task PerformTemplateValidation_ChoiceValuesValidation(string paramDefintion, bool isMultichoice, bool expectedToBeValid)
+        public async Task PerformTemplateValidation_ChoiceValuesValidation(string paramDefinition, bool isMultichoice, bool expectedToBeValid)
         {
             //
             // Template content preparation
@@ -92,7 +88,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
 
             Guid inputTestGuid = new("12aa8f4e-a4aa-4ac1-927c-94cb99485ef1");
             string contentFileNamePrefix = "content - ";
-            JObject choiceParam = JObject.Parse(paramDefintion);
+            JObject choiceParam = JObject.Parse(paramDefinition);
             choiceParam["AllowMultipleValues"] = isMultichoice;
             TemplateConfigModel config = new TemplateConfigModel("test")
             {

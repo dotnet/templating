@@ -47,47 +47,25 @@
         }
       ]
     },
+    "presetDependencyInjectionDefault": {
+      "type": "generated",
+      "generator": "constant",
+      "parameters": {
+        "value": "false"
+      }
+    },
+    "presetNavigationDefault": {
+      "type": "generated",
+      "generator": "constant",
+      "parameters": {
+        "value": "blank"
+      }
+    },
     "dependencyInjection": {
       "displayName": "Dependency Injection",
       "description": "Use dependency injection for registering and accessing services",
       "type": "parameter",
       "datatype": "bool"
-    },
-    "switchCheck": {
-      "type": "generated",
-      "generator": "switch",
-      "datatype": "string",
-      "parameters": {
-        "evaluator": "C++",
-        "cases": [
-          {
-            "condition": "(preset == 'recommended')",
-            "value": "regions"
-          },
-          {
-            "condition": "(preset == 'blank')",
-            "value": "blank"
-          }
-        ]
-      }
-    },
-    "switchCheck2": {
-      "type": "generated",
-      "generator": "switch",
-      "datatype": "string",
-      "parameters": {
-        "evaluator": "C++",
-        "cases": [
-          {
-            "condition": "(useDependencyInjection && navigationEvaluator != 'blank')",
-            "value": "regions"
-          },
-          {
-            "condition": "(!useDependencyInjection || navigationEvaluator == 'blank')",
-            "value": "blank"
-          }
-        ]
-      }
     },
     "navigationEvaluator": {
       "type": "generated",

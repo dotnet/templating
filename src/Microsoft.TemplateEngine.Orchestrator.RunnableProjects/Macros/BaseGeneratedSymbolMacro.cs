@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
-using Microsoft.TemplateEngine.Core.Expressions;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
@@ -19,8 +18,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 #pragma warning restore CS0618 // Type or member is obsolete
     {
         public IList<string> Dependencies { get; set; } = new List<string>();
-
-        public IDictionary<string, IEvaluable> ConditionToExpressionMap { get; set; } = new Dictionary<string, IEvaluable>();
 
         public IMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IMacroConfig rawConfig)
         {

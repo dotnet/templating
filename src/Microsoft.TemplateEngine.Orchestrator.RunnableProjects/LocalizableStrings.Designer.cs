@@ -278,6 +278,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Template authoring error encountered while processing macro &apos;{0}&apos;: Variable &apos;{1}&apos;. Neither source nor fallback variable was found..
+        /// </summary>
+        internal static string CoalesceMacro_Exception_MissedVariables {
+            get {
+                return ResourceManager.GetString("CoalesceMacro_Exception_MissedVariables", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unrecognized evaluator: &apos;{0}&apos;..
         /// </summary>
         internal static string EvaluatorSelector_Exception_UnknownEvaluator {
@@ -418,6 +427,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         internal static string MacroConfig_Exception_ValueShouldBeString {
             get {
                 return ResourceManager.GetString("MacroConfig_Exception_ValueShouldBeString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; was not processed due to the next issues in dependencises: &apos;{1}&apos;..
+        /// </summary>
+        internal static string MacroProcessing_Warning_DependencyErrors {
+            get {
+                return ResourceManager.GetString("MacroProcessing_Warning_DependencyErrors", resourceCulture);
             }
         }
         

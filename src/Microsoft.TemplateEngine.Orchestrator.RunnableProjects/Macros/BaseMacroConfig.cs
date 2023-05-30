@@ -37,7 +37,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 
         internal string DataType { get; } = "string";
 
-        internal HashSet<BaseMacroConfig> Dependencies { get; set; } = new HashSet<BaseMacroConfig>();
+        internal HashSet<BaseMacroConfig> Dependencies { get; private set; } = new HashSet<BaseMacroConfig>();
+
+        internal IList<string> MacroErrors { get; set; } = new List<string>();
 
         internal abstract void Evaluate(IEngineEnvironmentSettings environmentSettings, IVariableCollection vars);
 

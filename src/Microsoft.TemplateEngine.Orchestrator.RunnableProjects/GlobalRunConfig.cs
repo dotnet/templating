@@ -15,16 +15,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
         public IVariableConfig VariableSetup { get; init; } = VariableConfig.Default;
 
-        public IReadOnlyList<BaseMacroConfig> GeneratedSymbolMacros { get; init; } = Array.Empty<BaseMacroConfig>();
-
-        public IReadOnlyList<BaseMacroConfig> ComputedMacros { get; init; } = Array.Empty<BaseMacroConfig>();
-
         public IReadOnlyList<IReplacementTokens> Replacements { get; init; } = Array.Empty<IReplacementTokens>();
 
         public IReadOnlyList<CustomOperationModel> CustomOperations { get; init; } = Array.Empty<CustomOperationModel>();
 
         public IReadOnlyList<string> SymbolNames { get; init; } = Array.Empty<string>();
 
-        public IReadOnlyList<BaseMacroConfig> EvaluableMacros { get; init; } = Array.Empty<BaseMacroConfig>();
+        public IReadOnlyList<BaseMacroConfig> Macros { get; init; } = Array.Empty<BaseMacroConfig>();
     }
 }
