@@ -233,7 +233,7 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
                         nugetPackage.NuGetSource,
                         CancellationToken.None).ConfigureAwait(false);
 
-                    nugetPackage.Trusted = verified.ToString();
+                    nugetPackage.Reserved = verified.ToString();
                     nugetPackage.Owners = owner;
 
                     updatedPackages.Add(((ISerializableInstaller)installer).Serialize(nugetPackage));
