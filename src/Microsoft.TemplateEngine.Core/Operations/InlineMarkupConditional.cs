@@ -13,10 +13,10 @@ namespace Microsoft.TemplateEngine.Core.Operations
 {
     public class InlineMarkupConditional : IOperationProvider
     {
-        private readonly string _id;
+        private readonly string? _id;
         private readonly bool _initialState;
 
-        public InlineMarkupConditional(MarkupTokens tokens, bool wholeLine, bool trimWhitespace, ConditionEvaluator evaluator, string variableFormat, string id, bool initialState)
+        public InlineMarkupConditional(MarkupTokens tokens, bool wholeLine, bool trimWhitespace, ConditionEvaluator evaluator, string variableFormat, string? id, bool initialState)
         {
             Tokens = tokens;
             _id = id;
@@ -29,7 +29,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
 
         public ConditionEvaluator Evaluator { get; }
 
-        public string Id => _id;
+        public string? Id => _id;
 
         public MarkupTokens Tokens { get; }
 
@@ -80,7 +80,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
             private readonly ITokenTrie _scanBackTrie;
             private readonly ITokenTrie _structureTrie;
 
-            internal Impl(InlineMarkupConditional definition, IReadOnlyList<IToken> tokens, ITokenTrie structureTrie, ITokenTrie closeConditionTrie, ITokenTrie scanBackTrie, MarkupTokenMapping mapping, string id, bool initialState)
+            internal Impl(InlineMarkupConditional definition, IReadOnlyList<IToken> tokens, ITokenTrie structureTrie, ITokenTrie closeConditionTrie, ITokenTrie scanBackTrie, MarkupTokenMapping mapping, string? id, bool initialState)
             {
                 _definition = definition;
                 Id = id;
@@ -92,7 +92,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
                 IsInitialStateOn = string.IsNullOrEmpty(id) || initialState;
             }
 
-            public string Id { get; }
+            public string? Id { get; }
 
             public IReadOnlyList<IToken> Tokens { get; }
 

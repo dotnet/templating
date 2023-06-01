@@ -369,8 +369,8 @@ Microsoft.TemplateEngine.Core.Operations.Include.SourceStreamOpener.get -> Syste
 Microsoft.TemplateEngine.Core.Operations.Include.StartToken.get -> Microsoft.TemplateEngine.Core.Contracts.ITokenConfig!
 Microsoft.TemplateEngine.Core.Operations.InlineMarkupConditional.Evaluator.get -> Microsoft.TemplateEngine.Core.Operations.ConditionEvaluator!
 Microsoft.TemplateEngine.Core.Operations.InlineMarkupConditional.GetOperation(System.Text.Encoding! encoding, Microsoft.TemplateEngine.Core.Contracts.IProcessorState! processorState) -> Microsoft.TemplateEngine.Core.Contracts.IOperation!
-Microsoft.TemplateEngine.Core.Operations.InlineMarkupConditional.Id.get -> string!
-Microsoft.TemplateEngine.Core.Operations.InlineMarkupConditional.InlineMarkupConditional(Microsoft.TemplateEngine.Core.Operations.MarkupTokens! tokens, bool wholeLine, bool trimWhitespace, Microsoft.TemplateEngine.Core.Operations.ConditionEvaluator! evaluator, string! variableFormat, string! id, bool initialState) -> void
+Microsoft.TemplateEngine.Core.Operations.InlineMarkupConditional.Id.get -> string?
+Microsoft.TemplateEngine.Core.Operations.InlineMarkupConditional.InlineMarkupConditional(Microsoft.TemplateEngine.Core.Operations.MarkupTokens! tokens, bool wholeLine, bool trimWhitespace, Microsoft.TemplateEngine.Core.Operations.ConditionEvaluator! evaluator, string! variableFormat, string? id, bool initialState) -> void
 Microsoft.TemplateEngine.Core.Operations.InlineMarkupConditional.Tokens.get -> Microsoft.TemplateEngine.Core.Operations.MarkupTokens!
 Microsoft.TemplateEngine.Core.Operations.InlineMarkupConditional.VariableFormat.get -> string!
 Microsoft.TemplateEngine.Core.Operations.MarkupTokens.CloseConditionExpression.get -> Microsoft.TemplateEngine.Core.Contracts.ITokenConfig!
