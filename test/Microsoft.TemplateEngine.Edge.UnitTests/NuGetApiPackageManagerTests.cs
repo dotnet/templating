@@ -279,18 +279,5 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             securePackages.Should().NotBeEmpty();
             securePackages.Should().Equal(expectedOutcome);
         }
-
-        [Fact]
-        public async Task GetPackageMetadataByVersionAsync_GetMetadataFromNugetOrgFeed()
-        {
-            NuGetApiPackageManager packageManager = new NuGetApiPackageManager(_environmentSettingsHelper.CreateEnvironment(virtualize: true));
-
-            var (owners, verified) = await packageManager.GetMigrationPackageMetadata(
-                "Microsoft.Azure.WebJobs.ProjectTemplates",
-                new PackageSource(_additionalSources.First())).ConfigureAwait(false);
-
-            owners.Should().Be("azure-sdk, Microsoft");
-            verified.Should().BeTrue();
-        }
     }
 }

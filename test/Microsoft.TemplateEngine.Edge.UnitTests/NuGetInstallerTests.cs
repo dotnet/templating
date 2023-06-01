@@ -333,7 +333,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
             MockPackageManager mockPackageManager = new MockPackageManager(_packageManager, TestPackageProjectPath);
 
-            NuGetInstaller installer = new NuGetInstaller(new MockInstallerFactory(), engineEnvironmentSettings, _environmentSettingsHelper.CreateTemporaryFolder(), mockPackageManager, mockPackageManager, mockPackageManager);
+            NuGetInstaller installer = new NuGetInstaller(
+                new MockInstallerFactory(), engineEnvironmentSettings, _environmentSettingsHelper.CreateTemporaryFolder(), mockPackageManager, mockPackageManager, mockPackageManager);
             InstallRequest request = new InstallRequest(nameof(VulnerablePackageException), "1.0.0");
             InstallResult installResult = await installer.InstallAsync(request, provider, CancellationToken.None).ConfigureAwait(false);
 
