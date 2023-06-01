@@ -11,7 +11,7 @@ using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 {
-    internal class JoinMacro : BaseGeneratedSymbolMacro<JoinMacroConfig>
+    internal class JoinMacro : BaseGeneratedSymbolMacro<JoinMacroConfig>, IGeneratedSymbolMacroConfigCreator<BaseMacroConfig>
     {
         public override Guid Id { get; } = new Guid("6A2C58E5-8743-484B-AF3C-536770D31CEE");
 
@@ -51,6 +51,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             environmentSettings.Host.Logger.LogDebug("[{macro}]: Variable '{var}' was assigned to value '{value}'.", nameof(JoinMacro), config.VariableName, result);
         }
 
-        protected override JoinMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig) => new(this, deferredConfig);
+        BaseMacroConfig IGeneratedSymbolMacroConfigCreator<BaseMacroConfig>.CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig)
+            => new JoinMacroConfig(this, deferredConfig);
     }
 }

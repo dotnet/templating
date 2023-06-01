@@ -8,7 +8,7 @@ using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 {
-    internal class GuidMacro : BaseNondeterministicGenSymMacro<GuidMacroConfig>
+    internal class GuidMacro : BaseNondeterministicGenSymMacro<GuidMacroConfig>, IGeneratedSymbolMacroConfigCreator<BaseMacroConfig>
     {
         internal const string MacroType = "guid";
         private static readonly Guid DeterministicModeValue = new("12345678-1234-1234-1234-1234567890AB");
@@ -20,13 +20,17 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
         public override void Evaluate(IEngineEnvironmentSettings environmentSettings, IVariableCollection vars, GuidMacroConfig config)
             => EvaluateInternal(Guid.NewGuid(), environmentSettings, vars, config);
 
-        public override void EvaluateDeterministically(IEngineEnvironmentSettings environmentSettings, IVariableCollection variables, GuidMacroConfig config)
+        public override void EvaluateDeterministically(
+            IEngineEnvironmentSettings environmentSettings,
+            IVariableCollection variables,
+            GuidMacroConfig config)
         {
             environmentSettings.Host.Logger.LogDebug("[{macro}]: deterministic mode enabled.", nameof(GuidMacro));
             EvaluateInternal(DeterministicModeValue, environmentSettings, variables, config);
         }
 
-        protected override GuidMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig) => new(this, deferredConfig);
+        BaseMacroConfig IGeneratedSymbolMacroConfigCreator<BaseMacroConfig>.CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig)
+            => new GuidMacroConfig(this, deferredConfig);
 
         private void EvaluateInternal(Guid g, IEngineEnvironmentSettings environmentSettings, IVariableCollection vars, GuidMacroConfig config)
         {

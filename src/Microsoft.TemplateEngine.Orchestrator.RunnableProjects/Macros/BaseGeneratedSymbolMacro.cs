@@ -28,12 +28,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             return CreateConfig(environmentSettings, deferredConfig);
         }
 
-        public void Evaluate(IEngineEnvironmentSettings environmentSettings, IVariableCollection vars, IGeneratedSymbolConfig deferredConfig)
-        {
-            Evaluate(environmentSettings, vars, CreateConfig(environmentSettings, deferredConfig));
-        }
-
-        protected abstract T CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig);
+        public void Evaluate(
+            IEngineEnvironmentSettings environmentSettings,
+            IVariableCollection variables,
+            IGeneratedSymbolConfig config) => Evaluate(environmentSettings, variables, config);
     }
 
     /// <summary>
@@ -50,8 +48,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
     /// Base class for the macro defined via generated symbol, that may run undeterministially and implements deterministic mode for the macro as generated symbol.
     /// </summary>
     /// <typeparam name="T">The macro config.</typeparam>
-    internal abstract class BaseNondeterministicGenSymMacro<T> : BaseNondeterministicMacro<T>, IDeterministicModeMacro<IGeneratedSymbolConfig> where T : BaseMacroConfig, IMacroConfig
+    internal abstract class BaseNondeterministicGenSymMacro<T> : BaseNondeterministicMacro<T>, IDeterministicModeMacro<T> where T : BaseMacroConfig, IMacroConfig
     {
-        public void EvaluateDeterministically(IEngineEnvironmentSettings environmentSettings, IVariableCollection variables, IGeneratedSymbolConfig config) => EvaluateDeterministically(environmentSettings, variables, CreateConfig(environmentSettings, config));
+        public void EvaluateDeterministically(
+            IEngineEnvironmentSettings environmentSettings,
+            IVariableCollection variables,
+            IGeneratedSymbolConfig config)
+                => EvaluateDeterministically(environmentSettings, variables, config);
     }
 }

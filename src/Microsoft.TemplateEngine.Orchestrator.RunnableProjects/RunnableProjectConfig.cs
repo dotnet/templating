@@ -492,17 +492,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 .ToDictionary(m => m.Type, m => m);
 
             var generatedMacroConfigs = new List<BaseMacroConfig>();
-            var resolver = new GeneratedMacrosResolver();
-
             foreach (var generatedSymbolConfig in generatedSymbolsConfigs)
             {
-                if (generatedSymbolMacros.TryGetValue(generatedSymbolConfig.Type, out var generatedSymbolMacro))
+                if (generatedSymbolMacros.TryGetValue(generatedSymbolConfig.Type, out var generatedSymbolMacro)
+                    && generatedSymbolMacro is IGeneratedSymbolMacroConfigCreator<BaseMacroConfig> gmcc)
                 {
-                    var macroConfig = resolver.Resolve(generatedSymbolMacro, generatedSymbolConfig, EngineEnvironmentSettings);
-                    if (macroConfig != null)
-                    {
-                        generatedMacroConfigs.Add(macroConfig);
-                    }
+                    generatedMacroConfigs.Add(gmcc.CreateConfig(EngineEnvironmentSettings, generatedSymbolConfig));
                 }
                 else
                 {

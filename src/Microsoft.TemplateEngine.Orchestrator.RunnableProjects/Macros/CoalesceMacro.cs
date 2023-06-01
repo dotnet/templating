@@ -9,7 +9,7 @@ using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 {
-    internal class CoalesceMacro : BaseGeneratedSymbolMacro<CoalesceMacroConfig>
+    internal class CoalesceMacro : BaseGeneratedSymbolMacro<CoalesceMacroConfig>, IGeneratedSymbolMacroConfigCreator<BaseMacroConfig>
     {
         public override string Type => "coalesce";
 
@@ -58,6 +58,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             config.MacroErrors.Add(string.Format(LocalizableStrings.CoalesceMacro_Exception_MissedVariables, nameof(CoalesceMacro), config.VariableName));
         }
 
-        protected override CoalesceMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig) => new(this, deferredConfig);
+        BaseMacroConfig IGeneratedSymbolMacroConfigCreator<BaseMacroConfig>.CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig)
+            => new CoalesceMacroConfig(this, deferredConfig);
     }
 }

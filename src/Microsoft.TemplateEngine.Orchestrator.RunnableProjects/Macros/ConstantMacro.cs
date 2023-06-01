@@ -8,7 +8,7 @@ using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 {
-    internal class ConstantMacro : BaseGeneratedSymbolMacro<ConstantMacroConfig>
+    internal class ConstantMacro : BaseGeneratedSymbolMacro<ConstantMacroConfig>, IGeneratedSymbolMacroConfigCreator<BaseMacroConfig>
     {
         public override Guid Id { get; } = new Guid("370996FE-2943-4AED-B2F6-EC03F0B75B4A");
 
@@ -20,6 +20,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             environmentSettings.Host.Logger.LogDebug("[{macro}]: Variable '{var}' was assigned to value '{value}'.", nameof(ConstantMacro), config.VariableName, config.Value);
         }
 
-        protected override ConstantMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig) => new(this, deferredConfig);
+        BaseMacroConfig IGeneratedSymbolMacroConfigCreator<BaseMacroConfig>.CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig)
+            => new ConstantMacroConfig(this, deferredConfig);
     }
 }
