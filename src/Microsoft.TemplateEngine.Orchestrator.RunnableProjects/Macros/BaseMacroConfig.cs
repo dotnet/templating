@@ -3,8 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Core;
+using Microsoft.TemplateEngine.Core.Expressions.Cpp2;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 using Microsoft.TemplateEngine.Utils;
 using Newtonsoft.Json.Linq;
@@ -201,6 +205,32 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
                 throw new TemplateAuthoringException(string.Format(LocalizableStrings.MacroConfig_Exception_MissingMandatoryProperty, config.VariableName, Type, parameterName), config.VariableName);
             }
             return ConvertJTokenToJArray(token, config, parameterName);
+        }
+
+        protected void PopulateMacroConfigDependencies(
+            string condition,
+            BaseMacroConfig currentMacro,
+            IReadOnlyList<BaseMacroConfig> macroConfigs,
+            IReadOnlyList<string> symbols)
+        {
+            var referencedVariablesKeys = new HashSet<string>();
+            var expression = Cpp2StyleEvaluatorDefinition.GetEvaluableExpression(
+                NullLogger<RunnableProjectGenerator>.Instance,
+                condition,
+                new VariableCollection(null, symbols.ToDictionary(s => s, s => s as object)),
+                out var evaluableExpressionError,
+                referencedVariablesKeys);
+
+            referencedVariablesKeys.ForEach(rv => PopulateMacroConfigDependency(rv, currentMacro, macroConfigs));
+        }
+
+        private void PopulateMacroConfigDependency(string referencedValue, BaseMacroConfig currentMacro, IReadOnlyList<BaseMacroConfig> macroConfigs)
+        {
+            var macroConfig = macroConfigs.FirstOrDefault(mc => mc.VariableName == referencedValue);
+            if (macroConfig != null)
+            {
+                currentMacro.Dependencies.Add(macroConfig);
+            }
         }
     }
 }

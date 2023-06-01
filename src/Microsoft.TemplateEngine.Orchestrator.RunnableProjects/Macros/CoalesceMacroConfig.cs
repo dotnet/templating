@@ -2,11 +2,12 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 {
-    internal class CoalesceMacroConfig : BaseMacroConfig<CoalesceMacro, CoalesceMacroConfig>
+    internal class CoalesceMacroConfig : BaseMacroConfig<CoalesceMacro, CoalesceMacroConfig>, IMacroDependency
     {
         internal CoalesceMacroConfig(
             CoalesceMacro macro,
@@ -45,5 +46,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
         internal string? DefaultValue { get; }
 
         internal string FallbackVariableName { get; }
+
+        public void Resolve(IReadOnlyList<BaseMacroConfig> macroConfigs, IReadOnlyList<string> symbols, BaseMacroConfig macroConfig)
+        {
+            PopulateMacroConfigDependencies(SourceVariableName, macroConfig, macroConfigs, symbols);
+            PopulateMacroConfigDependencies(FallbackVariableName, macroConfig, macroConfigs, symbols);
+        }
     }
 }

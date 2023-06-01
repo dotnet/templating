@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
@@ -11,14 +12,16 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
     {
         private readonly IReadOnlyList<BaseMacroConfig> _macroConfigs;
 
-        private readonly MacroConfigDependencyResolver _macroConfigsDependenciesResolver;
-
         internal MacrosSorter(IReadOnlyList<string> symbols, IReadOnlyList<BaseMacroConfig> macroConfigs)
         {
             _macroConfigs = macroConfigs;
-
-            _macroConfigsDependenciesResolver = new MacroConfigDependencyResolver(symbols, macroConfigs);
-            _macroConfigs.ForEach(_macroConfigsDependenciesResolver.Resolve);
+            _macroConfigs.ForEach(mc =>
+            {
+                if (mc is IMacroDependency macroWithDeps)
+                {
+                    macroWithDeps.Resolve(_macroConfigs, symbols, mc);
+                }
+            });
         }
 
         public void SortMacroConfigsByDependencies(out IReadOnlyList<BaseMacroConfig> macroConfigs)

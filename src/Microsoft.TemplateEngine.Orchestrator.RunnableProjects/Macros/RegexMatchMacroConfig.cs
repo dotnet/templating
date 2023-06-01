@@ -2,11 +2,12 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Generic;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 {
-    internal class RegexMatchMacroConfig : BaseMacroConfig<RegexMatchMacro, RegexMatchMacroConfig>
+    internal class RegexMatchMacroConfig : BaseMacroConfig<RegexMatchMacro, RegexMatchMacroConfig>, IMacroDependency
     {
         internal RegexMatchMacroConfig(RegexMatchMacro macro, string variableName, string? dataType, string sourceVariable, string pattern)
              : base(macro, variableName, dataType ?? "bool")
@@ -37,5 +38,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
         internal string Source { get; }
 
         internal string Pattern { get; }
+
+        public void Resolve(IReadOnlyList<BaseMacroConfig> macroConfigs, IReadOnlyList<string> symbols, BaseMacroConfig macroConfig) =>
+            PopulateMacroConfigDependencies(Source, macroConfig, macroConfigs, symbols);
     }
 }
