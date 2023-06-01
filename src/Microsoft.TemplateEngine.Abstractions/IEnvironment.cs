@@ -22,6 +22,11 @@ namespace Microsoft.TemplateEngine.Abstractions
         int ConsoleBufferWidth { get; }
 
         /// <summary>
+        /// The flag specifies if the operations are requested for tab completion mode..
+        /// </summary>
+        bool TabCompletionMode { get; }
+
+        /// <summary>
         /// Replaces the name of each environment variable embedded in the specified string with the string equivalent of the value of the variable, then returns the resulting string. Equivalent to <see cref="Environment.ExpandEnvironmentVariables(string)"/>.
         /// </summary>
         /// <param name="name"></param>

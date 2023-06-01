@@ -362,6 +362,8 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
 
             public int ConsoleBufferWidth => 100;
 
+            public bool TabCompletionMode => false;
+
             public void SetEnvironmentVariable(string name, string? value)
             {
                 if (value != null)

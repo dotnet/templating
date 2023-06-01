@@ -62,5 +62,14 @@ namespace Microsoft.TemplateEngine.Abstractions.Installer
         /// <param name="cancellationToken"></param>
         /// <returns><see cref="UpdateResult"/> containing the result for operation and installed <see cref="InstallerOperationResult.TemplatePackage"/> if update was successful.</returns>
         Task<UpdateResult> UpdateAsync(UpdateRequest updateRequest, IManagedTemplatePackageProvider provider, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Returns owner and reserved property values for the template package based on id and source feed.
+        /// </summary>
+        /// <param name="packageIdentifier">Package Id.</param>
+        /// <param name="sourceFeed">Package source feed.</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>The package metadata required for package migration.</returns>
+        Task<(string Owners, bool Verified)> GetMigrationPackageMetadata(string packageIdentifier, string sourceFeed, CancellationToken cancellationToken);
     }
 }

@@ -13,7 +13,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
     {
         private readonly IEngineEnvironmentSettings _environmentSettings;
         private string? _aliasesFile;
-        private string? _firstRunCookie;
+        private string? _firstCacheMigrationCookie;
         private string? _scratchDir;
         private string? _settingsFile;
         private string? _contentDir;
@@ -30,7 +30,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
 
         internal string Content => GetOrComputePath(ref _contentDir, BaseDir, "content");
 
-        internal string FirstRunCookie => GetOrComputePath(ref _firstRunCookie, BaseDir, ".firstrun");
+        internal string FirstCacheMigrationCookie => GetOrComputePath(ref _firstCacheMigrationCookie, _environmentSettings.Paths.GlobalSettingsDir, ".firstcachemigration");
 
         internal string ScratchDir => GetOrComputePath(ref _scratchDir, BaseDir, "scratch");
 

@@ -241,20 +241,38 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to read installed template packages list at {0}. It might be due to the file is corrupted. Please review this file manually and fix the errors in JSON structure, or remove the file to clear up the list of list installed packages and reinstall them again. Details of the error: {1}..
+        ///   Looks up a localized string similar to The migration has failed..
         /// </summary>
-        internal static string GlobalSettings_Error_CorruptedSettings {
+        internal static string GlobalSettings_DataMigrationFailure {
             get {
-                return ResourceManager.GetString("GlobalSettings_Error_CorruptedSettings", resourceCulture);
+                return ResourceManager.GetString("GlobalSettings_DataMigrationFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The migration is completed successfully..
+        /// </summary>
+        internal static string GlobalSettings_DataMigrationSuccess {
+            get {
+                return ResourceManager.GetString("GlobalSettings_DataMigrationSuccess", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Initial data migration may take some time, depending on the size and complexity of the existing cache data. Please do not make any changes to the system during this process..
         /// </summary>
-        internal static string GlobalSettingsTemplatePackageProvider_DataMigrationWarning {
+        internal static string GlobalSettings_DataMigrationWarning {
             get {
-                return ResourceManager.GetString("GlobalSettingsTemplatePackageProvider_DataMigrationWarning", resourceCulture);
+                return ResourceManager.GetString("GlobalSettings_DataMigrationWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to read installed template packages list at {0}. It might be due to the file is corrupted. Please review this file manually and fix the errors in JSON structure, or remove the file to clear up the list of list installed packages and reinstall them again. Details of the error: {1}..
+        /// </summary>
+        internal static string GlobalSettings_Error_CorruptedSettings {
+            get {
+                return ResourceManager.GetString("GlobalSettings_Error_CorruptedSettings", resourceCulture);
             }
         }
         
@@ -343,6 +361,15 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Found package is vulnerable source: {0}.
+        /// </summary>
+        internal static string NuGetApiPackageManager_DownloadError_VulnerablePackage {
+            get {
+                return ResourceManager.GetString("NuGetApiPackageManager_DownloadError_VulnerablePackage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to load the NuGet source {0}..
         /// </summary>
         internal static string NuGetApiPackageManager_Error_FailedToLoadSource {
@@ -388,6 +415,15 @@ namespace Microsoft.TemplateEngine.Edge {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The checked package {0} is vulnerable..
+        /// </summary>
+        internal static string NuGetApiPackageManager_UpdateCheckError_VulnerablePackage {
+            get {
+                return ResourceManager.GetString("NuGetApiPackageManager_UpdateCheckError_VulnerablePackage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to remove {0} after failed download. Remove the file manually if it exists..
         /// </summary>
         internal static string NuGetApiPackageManager_Warning_FailedToDelete {
@@ -411,6 +447,15 @@ namespace Microsoft.TemplateEngine.Edge {
         internal static string NuGetApiPackageManager_Warning_FailedToLoadSource {
             get {
                 return ResourceManager.GetString("NuGetApiPackageManager_Warning_FailedToLoadSource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The NuGet sources {0} are insecure and will not be searched. If you want to include those sources for search, use --force..
+        /// </summary>
+        internal static string NuGetApiPackageManager_Warning_InsecureFeed {
+            get {
+                return ResourceManager.GetString("NuGetApiPackageManager_Warning_InsecureFeed", resourceCulture);
             }
         }
         
@@ -447,6 +492,15 @@ namespace Microsoft.TemplateEngine.Edge {
         internal static string NuGetInstaller_Error_FileAlreadyExists {
             get {
                 return ResourceManager.GetString("NuGetInstaller_Error_FileAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The requested package {0} has vulnerabilities..
+        /// </summary>
+        internal static string NuGetInstaller_InstallResult_Error_VulnerablePackage {
+            get {
+                return ResourceManager.GetString("NuGetInstaller_InstallResult_Error_VulnerablePackage", resourceCulture);
             }
         }
         
@@ -549,6 +603,15 @@ namespace Microsoft.TemplateEngine.Edge {
         internal static string NuGetInstaller_InstallResut_Error_UpdateCheckGeneric {
             get {
                 return ResourceManager.GetString("NuGetInstaller_InstallResut_Error_UpdateCheckGeneric", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The checked package {0} has vulnerabilities..
+        /// </summary>
+        internal static string NuGetInstaller_UpdateCheck_Error_VulnerablePackage {
+            get {
+                return ResourceManager.GetString("NuGetInstaller_UpdateCheck_Error_VulnerablePackage", resourceCulture);
             }
         }
         
@@ -712,6 +775,15 @@ namespace Microsoft.TemplateEngine.Edge {
         internal static string TemplateInfo_Warning_FailedToReadHostData {
             get {
                 return ResourceManager.GetString("TemplateInfo_Warning_FailedToReadHostData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to retrieve package with identifier &apos;{0}&apos;..
+        /// </summary>
+        internal static string TemplatePackageManager_Error_FailedToFindPackage {
+            get {
+                return ResourceManager.GetString("TemplatePackageManager_Error_FailedToFindPackage", resourceCulture);
             }
         }
         

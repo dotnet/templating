@@ -35,10 +35,5 @@ namespace Microsoft.TemplateEngine.Abstractions
         /// Component manager for this instance of settings.
         /// </summary>
         IComponentManager Components { get; }
-
-        /// <summary>
-        /// Flag specifies if tab completion mode is enabled.
-        /// </summary>
-        bool TabCompletionMode { get; }
     }
 }

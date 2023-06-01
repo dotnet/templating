@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Text.RegularExpressions;
+using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Edge.Template;
 using Microsoft.TemplateEngine.TestHelper;
 using ITemplateMatchInfo = Microsoft.TemplateEngine.Abstractions.TemplateFiltering.ITemplateMatchInfo;
@@ -423,6 +424,33 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
                 result.ErrorMessage);
         }
 
+        [Fact]
+        internal async Task PostAction_WithFileRename_Test()
+        {
+            using Bootstrapper bootstrapper = GetBootstrapper();
+            string templateLocation = GetTestTemplateLocation("PostActions/WithFileRename");
+            await InstallTemplateAsync(bootstrapper, templateLocation).ConfigureAwait(false);
+
+            string output = TestUtils.CreateTemporaryFolder();
+            IReadOnlyList<ITemplateMatchInfo> foundTemplates = await bootstrapper
+                .GetTemplatesAsync(new[] { WellKnownSearchFilters.NameFilter("TestAssets.PostActions.AddJsonProperty.WithSourceNameChangeInJson") })
+                .ConfigureAwait(false);
+
+            // Using this parameter with no real info so bootstrapper.CreateAsync is not an ambiguous call
+            Dictionary<string, string?> parameters = new();
+
+            ITemplateCreationResult result = await bootstrapper
+                .CreateAsync(foundTemplates[0].Info, "CompanyProject", output, parameters)
+                .ConfigureAwait(false);
+
+            IPostAction postAction = Assert.Single(result.CreationResult!.PostActions);
+            Assert.Equal("testfile.json", postAction.Args["jsonFileName"]);
+            Assert.Equal("moduleConfiguration:edgeAgent:properties.desired:modules", postAction.Args["parentPropertyPath"]);
+            Assert.Equal("CompanyProject", postAction.Args["newJsonPropertyName"]);
+            Assert.Equal("${MODULEDIR<../CompanyProject>}", postAction.Args["newJsonPropertyValue"]);
+            Assert.Equal("Add CompanyProject property to testfile.json manually.", postAction.ManualInstructions);
+        }
+
         private Dictionary<string, string> ExpectedOutputWithConditions()
         {
             var expects = new Dictionary<string, string>
@@ -468,6 +496,40 @@ baz
 bar
 baz
 "
+                },
+                {
+"Package.appxmanifest",
+@"<?xml version=""1.0"" encoding=""utf-8""?>
+
+<Package
+  xmlns=""http://schemas.microsoft.com/appx/manifest/foundation/windows10""
+  xmlns:mp=""http://schemas.microsoft.com/appx/2014/phone/manifest""
+  xmlns:uap=""http://schemas.microsoft.com/appx/manifest/uap/windows10"">
+
+  <Identity Name=""Microsoft.UWPAppExample"" Publisher=""CN=Microsoft Corporation"" Version=""1.0.0.0"" ProcessorArchitecture=""x86"" />
+
+  <Properties>
+    <DisplayName>UWP App Example</DisplayName>
+    <PublisherDisplayName>Microsoft Corporation</PublisherDisplayName>
+    <Logo>Assets\StoreLogo-sdk.png</Logo>
+  </Properties>
+
+  <Resources>
+    <Resource Language=""en-us""/>
+    <!-- comment A is false -->
+    <Resource Language=""zh-cn""/>
+  </Resources>
+
+  <Dependencies>
+    <!-- comment B is true -->
+    <TargetDeviceFamily Name=""Windows.Universal"" MinVersion=""10.0.10240.0"" MaxVersionTested=""10.0.22000.0"" />
+  </Dependencies>
+
+  <Applications>
+    <Application Id=""App"" Executable=""UWPAppExample.exe"" EntryPoint=""UWPAppExample.App"">
+  </Applications>
+
+</Package>"
                 },
                 {
 "test.axaml",

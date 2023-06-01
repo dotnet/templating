@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Installer;
 using Microsoft.TemplateEngine.Abstractions.TemplatePackage;
+using Microsoft.TemplateEngine.Edge.Installers.NuGet;
 using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
@@ -23,8 +24,8 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
 
         private readonly IEngineEnvironmentSettings _environmentSettings;
         private readonly ILogger _logger;
-        private readonly Dictionary<Guid, IInstaller> _installersByGuid = new Dictionary<Guid, IInstaller>();
-        private readonly Dictionary<string, IInstaller> _installersByName = new Dictionary<string, IInstaller>();
+        private readonly IDictionary<Guid, IInstaller> _installersByGuid = new Dictionary<Guid, IInstaller>();
+        private readonly IDictionary<string, IInstaller> _installersByName = new Dictionary<string, IInstaller>();
         private readonly GlobalSettings _globalSettings;
 
         public GlobalSettingsTemplatePackageProvider(GlobalSettingsTemplatePackageProviderFactory factory, IEngineEnvironmentSettings settings)
@@ -51,7 +52,7 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
             }
 
             _globalSettingsFilePath = Path.Combine(_environmentSettings.Paths.GlobalSettingsDir, "packages.json");
-            _globalSettings = new GlobalSettings(_environmentSettings, _globalSettingsFilePath);
+            _globalSettings = new GlobalSettings(_environmentSettings, _globalSettingsFilePath, CollectPackageMetadataUpdatesAsync);
             // We can't just add "SettingsChanged+=TemplatePackagesChanged", because TemplatePackagesChanged is null at this time.
             _globalSettings.SettingsChanged += () => TemplatePackagesChanged?.Invoke();
         }
@@ -127,6 +128,7 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
             }
 
             using var disposable = await _globalSettings.LockAsync(cancellationToken).ConfigureAwait(false);
+
             var packages = new List<TemplatePackageData>(await _globalSettings.GetInstalledTemplatePackagesAsync(cancellationToken).ConfigureAwait(false));
             var results = await Task.WhenAll(installRequests.Select(async installRequest =>
             {
@@ -143,14 +145,16 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
                     return InstallResult.CreateFailure(
                         installRequest,
                         InstallerErrorCode.UnsupportedRequest,
-                        string.Format(LocalizableStrings.GlobalSettingsTemplatePackageProvider_InstallResult_Error_PackageCannotBeInstalled, installRequest.PackageIdentifier));
+                        string.Format(LocalizableStrings.GlobalSettingsTemplatePackageProvider_InstallResult_Error_PackageCannotBeInstalled, installRequest.PackageIdentifier),
+                        Array.Empty<VulnerabilityInfo>());
                 }
                 if (installersThatCanInstall.Count > 1)
                 {
                     return InstallResult.CreateFailure(
                         installRequest,
                         InstallerErrorCode.UnsupportedRequest,
-                        string.Format(LocalizableStrings.GlobalSettingsTemplatePackageProvider_InstallResult_Error_MultipleInstallersCanBeUsed, installRequest.PackageIdentifier));
+                        string.Format(LocalizableStrings.GlobalSettingsTemplatePackageProvider_InstallResult_Error_MultipleInstallersCanBeUsed, installRequest.PackageIdentifier),
+                        Array.Empty<VulnerabilityInfo>());
                 }
 
                 IInstaller installer = installersThatCanInstall[0];
@@ -169,7 +173,6 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
             }
 
             using var disposable = await _globalSettings.LockAsync(cancellationToken).ConfigureAwait(false);
-
             var packagesInSettings = new List<TemplatePackageData>(await _globalSettings.GetInstalledTemplatePackagesAsync(cancellationToken).ConfigureAwait(false));
             var results = await Task.WhenAll(packages.Select(async package =>
              {
@@ -196,8 +199,52 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
 
             var packages = new List<TemplatePackageData>(await _globalSettings.GetInstalledTemplatePackagesAsync(cancellationToken).ConfigureAwait(false));
             var results = await Task.WhenAll(updatesToApply.Select(updateRequest => UpdateAsync(packages, updateRequest, cancellationToken))).ConfigureAwait(false);
+
             await _globalSettings.SetInstalledTemplatePackagesAsync(packages, cancellationToken).ConfigureAwait(false);
             return results;
+        }
+
+        public async Task<IReadOnlyList<TemplatePackageData>> CollectPackageMetadataUpdatesAsync(IReadOnlyList<TemplatePackageData> packages)
+        {
+            var relevantFeeds = new[] { "https://api.nuget.org/v3/index.json" };
+            var updatedPackages = new List<TemplatePackageData>();
+
+            foreach (var package in packages)
+            {
+                if (!_installersByGuid.TryGetValue(package.InstallerId, out var installer))
+                {
+                    updatedPackages.Add(package);
+                    continue;
+                }
+
+                var managedPackage = ((ISerializableInstaller)installer).Deserialize(this, package);
+                if (managedPackage is not NuGetManagedTemplatePackage nugetPackage
+                    || nugetPackage.NuGetSource is null
+                    || !relevantFeeds.Contains(nugetPackage.NuGetSource))
+                {
+                    updatedPackages.Add(package);
+                    continue;
+                }
+
+                try
+                {
+                    var (owner, verified) = await installer.GetMigrationPackageMetadata(
+                        managedPackage.Identifier,
+                        nugetPackage.NuGetSource,
+                        CancellationToken.None).ConfigureAwait(false);
+
+                    nugetPackage.Trusted = verified.ToString();
+                    nugetPackage.Owners = owner;
+
+                    updatedPackages.Add(((ISerializableInstaller)installer).Serialize(nugetPackage));
+                }
+                catch
+                {
+                    // just ignore if the package wasn't found
+                }
+            }
+
+            return updatedPackages;
         }
 
         public void Dispose()
@@ -210,7 +257,7 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
             (InstallerErrorCode result, string message) = await EnsureInstallPrerequisites(packages, updateRequest.TemplatePackage.Identifier, updateRequest.Version, updateRequest.TemplatePackage.Installer, cancellationToken, update: true).ConfigureAwait(false);
             if (result != InstallerErrorCode.Success)
             {
-                return UpdateResult.CreateFailure(updateRequest, result, message);
+                return UpdateResult.CreateFailure(updateRequest, result, message, Array.Empty<VulnerabilityInfo>());
             }
 
             UpdateResult updateResult = await updateRequest.TemplatePackage.Installer.UpdateAsync(updateRequest, provider: this, cancellationToken).ConfigureAwait(false);
@@ -292,7 +339,7 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
                 forceUpdate: installRequest.Force).ConfigureAwait(false);
             if (result != InstallerErrorCode.Success)
             {
-                return InstallResult.CreateFailure(installRequest, result, message);
+                return InstallResult.CreateFailure(installRequest, result, message, Array.Empty<VulnerabilityInfo>());
             }
 
             InstallResult installResult = await installer.InstallAsync(installRequest, this, cancellationToken).ConfigureAwait(false);

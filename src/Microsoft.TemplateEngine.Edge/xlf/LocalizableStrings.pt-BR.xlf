@@ -105,11 +105,6 @@
         <target state="translated">versão {0}</target>
         <note>small letters, string is used in the sentence</note>
       </trans-unit>
-      <trans-unit id="GlobalSettingsTemplatePackageProvider_DataMigrationWarning">
-        <source>Initial data migration may take some time, depending on the size and complexity of the existing cache data. Please do not make any changes to the system during this process.</source>
-        <target state="new">Initial data migration may take some time, depending on the size and complexity of the existing cache data. Please do not make any changes to the system during this process.</target>
-        <note>The note about the initial data migration.</note>
-      </trans-unit>
       <trans-unit id="GlobalSettingsTemplatePackageProvider_InstallResult_Error_MultipleInstallersCanBeUsed">
         <source>{0} can be installed by several installers. Specify the installer name to be used.</source>
         <target state="translated">{0} pode ser instalado por vários instaladores. Especifique o nome do instalador a ser utilizado.</target>
@@ -134,6 +129,21 @@
         <source>{0} was successfully uninstalled.</source>
         <target state="translated">{0} foi desinstalado com sucesso.</target>
         <note />
+      </trans-unit>
+      <trans-unit id="GlobalSettings_DataMigrationFailure">
+        <source>The migration has failed.</source>
+        <target state="new">The migration has failed.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="GlobalSettings_DataMigrationSuccess">
+        <source>The migration is completed successfully.</source>
+        <target state="new">The migration is completed successfully.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="GlobalSettings_DataMigrationWarning">
+        <source>Initial data migration may take some time, depending on the size and complexity of the existing cache data. Please do not make any changes to the system during this process.</source>
+        <target state="new">Initial data migration may take some time, depending on the size and complexity of the existing cache data. Please do not make any changes to the system during this process.</target>
+        <note>The note about the initial data migration.</note>
       </trans-unit>
       <trans-unit id="GlobalSettings_Error_CorruptedSettings">
         <source>Failed to read installed template packages list at {0}. It might be due to the file is corrupted. Please review this file manually and fix the errors in JSON structure, or remove the file to clear up the list of list installed packages and reinstall them again. Details of the error: {1}.</source>
@@ -162,6 +172,11 @@
         <target state="translated">Parâmetros definidos pelo host</target>
         <note />
       </trans-unit>
+      <trans-unit id="NuGetApiPackageManager_DownloadError_VulnerablePackage">
+        <source>Found package is vulnerable source: {0}</source>
+        <target state="translated">O pacote encontrado é uma fonte vulnerável: {0}</target>
+        <note />
+      </trans-unit>
       <trans-unit id="NuGetApiPackageManager_Error_FailedToLoadSource">
         <source>Failed to load the NuGet source {0}.</source>
         <target state="translated">Falha no carregamento da fonte NuGet {0}.</target>
@@ -187,6 +202,11 @@
         <target state="translated">Nenhuma fonte NuGet está definida ou habilitada.</target>
         <note />
       </trans-unit>
+      <trans-unit id="NuGetApiPackageManager_UpdateCheckError_VulnerablePackage">
+        <source>The checked package {0} is vulnerable.</source>
+        <target state="translated">O pacote verificado {0} está vulnerável.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="NuGetApiPackageManager_Warning_FailedToDelete">
         <source>Failed to remove {0} after failed download. Remove the file manually if it exists.</source>
         <target state="translated">Falha ao remover {0} após o download falhar. Remova o arquivo manualmente, caso existir.</target>
@@ -200,6 +220,11 @@
       <trans-unit id="NuGetApiPackageManager_Warning_FailedToLoadSource">
         <source>Failed to load NuGet source {0}: the source is not valid. It will be skipped in further processing.</source>
         <target state="translated">Falha no carregamento da fonte NuGet {0}: a fonte não é válida. Ela será ignorada num processamento posterior.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="NuGetApiPackageManager_Warning_InsecureFeed">
+        <source>The NuGet sources {0} are insecure and will not be searched. If you want to include those sources for search, use --force.</source>
+        <target state="translated">As fontes do NuGet {0} não são seguras e não serão pesquisadas. Se você quiser incluir essas fontes para pesquisa, use --force.</target>
         <note />
       </trans-unit>
       <trans-unit id="NuGetApiPackageManager_Warning_PackageNotFound">
@@ -281,6 +306,16 @@ Detalhes: {1}.</target>
 Details: {1}.</source>
         <target state="translated">Falha ao verificar a atualização do pacote {0},
 Detalhes: {1}.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="NuGetInstaller_InstallResult_Error_VulnerablePackage">
+        <source>The requested package {0} has vulnerabilities.</source>
+        <target state="translated">O pacote solicitado {0} tem vulnerabilidades.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="NuGetInstaller_UpdateCheck_Error_VulnerablePackage">
+        <source>The checked package {0} has vulnerabilities.</source>
+        <target state="translated">O pacote verificado {0} tem vulnerabilidades.</target>
         <note />
       </trans-unit>
       <trans-unit id="OSConstraint_Error_InvalidOSName">
@@ -378,6 +413,11 @@ Detalhes: {0}</target>
         <source>Failed to load host data in {0} at {1}.</source>
         <target state="translated">Falha ao carregar os dados do host em {0} às {1}.</target>
         <note>{0} - path to template location, {1} relative path inside template location.</note>
+      </trans-unit>
+      <trans-unit id="TemplatePackageManager_Error_FailedToFindPackage">
+        <source>Failed to retrieve package with identifier '{0}'.</source>
+        <target state="new">Failed to retrieve package with identifier '{0}'.</target>
+        <note />
       </trans-unit>
       <trans-unit id="TemplatePackageManager_Error_FailedToGetTemplatePackages">
         <source>Failed to retrieve template packages from provider '{0}'.

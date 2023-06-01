@@ -18,11 +18,12 @@ namespace Microsoft.TemplateEngine.Edge
         private const int DefaultBufferWidth = 160;
         private readonly IReadOnlyDictionary<string, string> _environmentVariables;
 
-        public DefaultEnvironment() : this(FetchEnvironmentVariables())
+        public DefaultEnvironment() : this(FetchEnvironmentVariables(), tabCompletionMode: false)
         { }
 
-        protected DefaultEnvironment(IReadOnlyDictionary<string, string> environmentVariables)
+        protected DefaultEnvironment(IReadOnlyDictionary<string, string> environmentVariables, bool tabCompletionMode)
         {
+            TabCompletionMode = tabCompletionMode;
             _environmentVariables = environmentVariables;
             NewLine = Environment.NewLine;
         }
@@ -34,6 +35,8 @@ namespace Microsoft.TemplateEngine.Edge
         // Console.BufferWidth can throw if there's no console, such as when output is redirected, so
         // first check if it is redirected, and fall back to a default value if needed.
         public int ConsoleBufferWidth => Console.IsOutputRedirected ? DefaultBufferWidth : Console.BufferWidth;
+
+        public bool TabCompletionMode { get; }
 
         /// <inheritdoc/>
         public string ExpandEnvironmentVariables(string name)

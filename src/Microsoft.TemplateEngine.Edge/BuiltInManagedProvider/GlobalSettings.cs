@@ -4,13 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Installer;
-using Microsoft.TemplateEngine.Edge.Installers.NuGet;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -22,25 +20,32 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
         private const int FileReadWriteRetries = 20;
         private const int MillisecondsInterval = 20;
         private static readonly TimeSpan MaxNotificationDelayOnWriterLock = TimeSpan.FromSeconds(1);
-        // private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
         private readonly SettingsFilePaths _paths;
         private readonly IEngineEnvironmentSettings _environmentSettings;
+        private readonly Func<IReadOnlyList<TemplatePackageData>, Task<IReadOnlyList<TemplatePackageData>>> _packageMetadataCollectorAsyncDelegate;
         private readonly string _globalSettingsFile;
         private readonly ILogger _logger;
+        private readonly string _globalSettingsPreMigrationVersion;
         private IDisposable? _watcher;
         private volatile bool _disposed;
         private volatile AsyncMutex? _mutex;
+        private volatile AsyncMutex? _cacheMigrationMutex;
         private int _waitingInstances;
 
-        public GlobalSettings(IEngineEnvironmentSettings environmentSettings, string globalSettingsFile)
+        public GlobalSettings(
+            IEngineEnvironmentSettings environmentSettings,
+            string globalSettingsFile,
+            Func<IReadOnlyList<TemplatePackageData>, Task<IReadOnlyList<TemplatePackageData>>> packageMetadataCollectorAsyncDelegate)
         {
             _environmentSettings = environmentSettings ?? throw new ArgumentNullException(nameof(environmentSettings));
             _globalSettingsFile = globalSettingsFile ?? throw new ArgumentNullException(nameof(globalSettingsFile));
             _paths = new SettingsFilePaths(environmentSettings);
             _logger = _environmentSettings.Host.LoggerFactory.CreateLogger<GlobalSettings>();
             environmentSettings.Host.FileSystem.CreateDirectory(Path.GetDirectoryName(_globalSettingsFile));
-
+            _packageMetadataCollectorAsyncDelegate = packageMetadataCollectorAsyncDelegate;
             _watcher = CreateWatcherIfRequested();
+
+            _globalSettingsPreMigrationVersion = Path.Combine(_environmentSettings.Paths.GlobalSettingsDir, "packages_premigration.json");
         }
 
         public event Action? SettingsChanged;
@@ -86,6 +91,132 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
                 return Array.Empty<TemplatePackageData>();
             }
 
+            if (CanApplyFirstRunDataMigration())
+            {
+                await MigrateCacheMetadataAsync(cancellationToken).ConfigureAwait(false);
+            }
+
+            return await ReadTemplatePackagesAsync(cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task SetInstalledTemplatePackagesAsync(
+            IReadOnlyList<TemplatePackageData> packages,
+            CancellationToken cancellationToken = default)
+        {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(nameof(GlobalSettings));
+            }
+
+            if (!(_mutex?.IsLocked ?? false))
+            {
+                throw new InvalidOperationException($"Before calling {nameof(SetInstalledTemplatePackagesAsync)}, {nameof(LockAsync)} must be called.");
+            }
+
+            var globalSettingsData = new GlobalSettingsData(packages);
+
+            for (int i = 0; i < FileReadWriteRetries; i++)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                try
+                {
+                    // Ignore FSW notifications received during writing changes (we'll notify synchronously)
+                    _watcher?.Dispose();
+                    _environmentSettings.Host.FileSystem.WriteObject(_globalSettingsFile, globalSettingsData);
+                    // We are ready for new notifications now
+                    _watcher = CreateWatcherIfRequested();
+
+                    SettingsChanged?.Invoke();
+                    return;
+                }
+                catch (Exception)
+                {
+                    if (i == (FileReadWriteRetries - 1))
+                    {
+                        throw;
+                    }
+                }
+                await Task.Delay(MillisecondsInterval, cancellationToken).ConfigureAwait(false);
+            }
+            throw new InvalidOperationException();
+        }
+
+        private async Task MigrateCacheMetadataAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                if ((_mutex is null || !_mutex.IsLocked)
+                    && (_cacheMigrationMutex is null || !_cacheMigrationMutex.IsLocked))
+                {
+                    using (await LockCacheMigrationAsync(cancellationToken).ConfigureAwait(false))
+                    {
+                        if (!CanApplyFirstRunDataMigration())
+                        {
+                            return;
+                        }
+                        using (await LockAsync(cancellationToken).ConfigureAwait(false))
+                        {
+                            // duplicate existing cache file
+                            _environmentSettings.Host.FileSystem.FileCopy(_globalSettingsFile, _globalSettingsPreMigrationVersion, overwrite: true);
+
+                            _logger.LogInformation(LocalizableStrings.GlobalSettings_DataMigrationWarning);
+
+                            var packages = await ReadTemplatePackagesAsync(cancellationToken).ConfigureAwait(false);
+                            var updatedPackages = await _packageMetadataCollectorAsyncDelegate(packages).ConfigureAwait(false);
+
+                            await SetInstalledTemplatePackagesAsync(updatedPackages, cancellationToken).ConfigureAwait(false);
+
+                            _logger.LogInformation(LocalizableStrings.GlobalSettings_DataMigrationSuccess + $" {DateTime.UtcNow}.");
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // if something goes wrong overwrite package.json with content of temporary cache file
+                _environmentSettings.Host.FileSystem.FileCopy(_globalSettingsPreMigrationVersion, _globalSettingsFile, overwrite: true);
+                _logger.LogInformation(LocalizableStrings.GlobalSettings_DataMigrationFailure + $" {DateTime.UtcNow}.");
+            }
+            finally
+            {
+                // create migration cookie in any case
+                using var stream = _environmentSettings.Host.FileSystem.CreateFile(_paths.FirstCacheMigrationCookie);
+                stream.Close();
+            }
+        }
+
+        private async Task<IDisposable> LockCacheMigrationAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (_cacheMigrationMutex?.IsLocked ?? false)
+            {
+                throw new InvalidOperationException("Cache lock is already taken.");
+            }
+            var mutex = await AsyncMutex.WaitAsync($"Global\\B480B813-5244-446D-9458-35E31472CC10", cancellationToken).ConfigureAwait(false);
+            _cacheMigrationMutex = mutex;
+
+            return mutex;
+        }
+
+        private bool CanApplyFirstRunDataMigration() =>
+            !_environmentSettings.Host.FileSystem.FileExists(_paths.FirstCacheMigrationCookie)
+            && !_environmentSettings.Environment.TabCompletionMode;
+
+        private IDisposable? CreateWatcherIfRequested()
+        {
+            if (_environmentSettings.Environment.GetEnvironmentVariable("TEMPLATE_ENGINE_DISABLE_FILEWATCHER") != "1")
+            {
+                return _environmentSettings.Host.FileSystem.WatchFileChanges(_globalSettingsFile, FileChanged);
+            }
+
+            return null;
+        }
+
+        private async Task<IReadOnlyList<TemplatePackageData>> ReadTemplatePackagesAsync(CancellationToken cancellationToken)
+        {
+            var packages = new List<TemplatePackageData>();
+
             for (int i = 0; i < FileReadWriteRetries; i++)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -93,7 +224,6 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
                 try
                 {
                     var jObject = _environmentSettings.Host.FileSystem.ReadObject(_globalSettingsFile);
-                    var packages = new List<TemplatePackageData>();
 
                     foreach (var package in jObject.Get<JArray>(nameof(GlobalSettingsData.Packages)) ?? new JArray())
                     {
@@ -120,64 +250,8 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
                 }
                 await Task.Delay(MillisecondsInterval, cancellationToken).ConfigureAwait(false);
             }
+
             throw new InvalidOperationException();
-        }
-
-        public async Task SetInstalledTemplatePackagesAsync(IReadOnlyList<TemplatePackageData> packages, CancellationToken cancellationToken)
-        {
-            if (_disposed)
-            {
-                throw new ObjectDisposedException(nameof(GlobalSettings));
-            }
-
-            if (!(_mutex?.IsLocked ?? false))
-            {
-                throw new InvalidOperationException($"Before calling {nameof(SetInstalledTemplatePackagesAsync)}, {nameof(LockAsync)} must be called.");
-            }
-
-            if (CanApplyFirstRunDataMigration())
-            {
-                await MigrateCacheMetadataAsync(cancellationToken).ConfigureAwait(false);
-            }
-
-            var globalSettingsData = new GlobalSettingsData(packages);
-
-            for (int i = 0; i < FileReadWriteRetries; i++)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                try
-                {
-                    // Ignore FSW notifications received during writing changes (we'll notify synchronously)
-                    _watcher?.Dispose();
-                    _environmentSettings.Host.FileSystem.WriteObject(_globalSettingsFile, globalSettingsData);
-                    // We are ready for new notifications now
-                    _watcher = CreateWatcherIfRequested();
-                    SettingsChanged?.Invoke();
-                    return;
-                }
-                catch (Exception)
-                {
-                    if (i == (FileReadWriteRetries - 1))
-                    {
-                        throw;
-                    }
-                }
-                await Task.Delay(MillisecondsInterval, cancellationToken).ConfigureAwait(false);
-            }
-            throw new InvalidOperationException();
-        }
-
-        private bool CanApplyFirstRunDataMigration() => !_environmentSettings.Host.FileSystem.FileExists(_paths.FirstRunCookie) && !_environmentSettings.TabCompletionMode;
-
-        private IDisposable? CreateWatcherIfRequested()
-        {
-            if (_environmentSettings.Environment.GetEnvironmentVariable("TEMPLATE_ENGINE_DISABLE_FILEWATCHER") != "1")
-            {
-                return _environmentSettings.Host.FileSystem.WatchFileChanges(_globalSettingsFile, FileChanged);
-            }
-
-            return null;
         }
 
         // This method is called whenever there is a change in global settings. Since the handlers of SettingsChanged event
@@ -225,64 +299,6 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
             }
 
             return true;
-        }
-
-        private async Task MigrateCacheMetadataAsync(CancellationToken cancellationToken)
-        {
-            _logger.LogWarning(LocalizableStrings.GlobalSettingsTemplatePackageProvider_DataMigrationWarning);
-
-            string sourceFeedKey = "NuGetSource";
-            string packageIdKey = "PackageId";
-            string versionKey = "Version";
-            string ownersKey = "Owners";
-            string trustedKey = "Trusted";
-
-            var updatedPackages = new List<TemplatePackageData>();
-            var metadataDownloader = new NuGetApiPackageManager(_environmentSettings);
-            var packages = await GetInstalledTemplatePackagesAsync(cancellationToken).ConfigureAwait(false);
-
-            try
-            {
-                foreach (var package in packages)
-                {
-                    string? packageSource = string.Empty;
-                    package.Details?.TryGetValue(sourceFeedKey, out packageSource);
-
-                    string? identifier = string.Empty;
-                    package.Details?.TryGetValue(packageIdKey, out identifier);
-
-                    string? version = string.Empty;
-                    package.Details?.TryGetValue(versionKey, out version);
-
-                    if (!string.IsNullOrWhiteSpace(packageSource))
-                    {
-                        var updatedPackageMetadata = await metadataDownloader.GetPackageMetadataAsync(
-                            identifier,
-                            version,
-                            packageSource,
-                            CancellationToken.None).ConfigureAwait(false);
-
-                        var extendedPackageDetails = package.Details.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-                        extendedPackageDetails[trustedKey] = updatedPackageMetadata.Trusted.ToString() ?? false.ToString();
-                        extendedPackageDetails[ownersKey] = updatedPackageMetadata.Owners;
-                        updatedPackages.Add(new TemplatePackageData(package.InstallerId, package.MountPointUri, package.LastChangeTime, extendedPackageDetails));
-                    }
-                    else
-                    {
-                        updatedPackages.Add(package);
-                    }
-                }
-
-                using var stream = _environmentSettings.Host.FileSystem.CreateFile(_paths.FirstRunCookie);
-
-                // cleanup existing cache file
-                await SetInstalledTemplatePackagesAsync(new List<TemplatePackageData>(), cancellationToken).ConfigureAwait(false);
-                await SetInstalledTemplatePackagesAsync(updatedPackages, cancellationToken).ConfigureAwait(false);
-            }
-            catch
-            {
-                throw;
-            }
         }
     }
 }

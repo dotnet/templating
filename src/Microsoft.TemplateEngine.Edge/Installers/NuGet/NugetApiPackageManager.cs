@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
+using Microsoft.TemplateEngine.Abstractions.Installer;
 using NuGet.Configuration;
 using NuGet.Packaging.Core;
 using NuGet.Protocol;
@@ -18,7 +19,7 @@ using ILogger = NuGet.Common.ILogger;
 
 namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
-    internal class NuGetApiPackageManager : IDownloader, IUpdateChecker
+    internal class NuGetApiPackageManager : IDownloader, IUpdateChecker, IMetadataReader
     {
         private static readonly ConcurrentDictionary<PackageSource, SourceRepository> SourcesCache = new();
         private readonly IEngineEnvironmentSettings _environmentSettings;
@@ -49,6 +50,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         /// <exception cref="InvalidNuGetSourceException">when sources passed to install request are not valid NuGet sources or failed to read default NuGet configuration.</exception>
         /// <exception cref="DownloadException">when the download of the package failed.</exception>
         /// <exception cref="PackageNotFoundException">when the package cannot be find in default or passed to install request NuGet feeds.</exception>
+        /// <exception cref="VulnerablePackageException">when the package has any vulnerabilities.</exception>
         public async Task<NuGetPackageInfo> DownloadPackageAsync(string downloadPath, string identifier, string? version = null, IEnumerable<string>? additionalSources = null, bool force = false, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(identifier))
@@ -61,6 +63,11 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             }
 
             IEnumerable<PackageSource> packagesSources = LoadNuGetSources(additionalSources?.ToArray() ?? Array.Empty<string>());
+
+            if (!force)
+            {
+                packagesSources = RemoveInsecurePackages(packagesSources);
+            }
 
             PackageSource source;
             NugetPackageMetadata packageMetadata;
@@ -81,6 +88,16 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 (source, packageMetadata) = await GetPackageMetadataAsync(identifier, packageVersion, packagesSources, cancellationToken).ConfigureAwait(false);
             }
 
+            if (packageMetadata.Vulnerabilities.Any() && !force)
+            {
+                var foundPackageVersion = packageMetadata.Identity.Version.OriginalVersion;
+                throw new VulnerablePackageException(
+                    string.Format(LocalizableStrings.NuGetApiPackageManager_DownloadError_VulnerablePackage, source),
+                    packageMetadata.Identity.Id,
+                    foundPackageVersion,
+                    ConvertVulnerabilityMetadata(packageMetadata.Vulnerabilities));
+            }
+
             FindPackageByIdResource resource;
             SourceRepository repository = SourcesCache.GetOrAdd(source, Repository.Factory.GetCoreV3(source));
             try
@@ -94,7 +111,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 throw new InvalidNuGetSourceException("Failed to load NuGet source", new[] { source.Source }, e);
             }
 
-            string filePath = GetFilePath(downloadPath, packageMetadata.Identity.Id, packageMetadata.Identity.Version.ToString());
+            string filePath = Path.Combine(downloadPath, packageMetadata.Identity.Id + "." + packageMetadata.Identity.Version + ".nupkg");
             if (!force && _environmentSettings.Host.FileSystem.FileExists(filePath))
             {
                 _nugetLogger.LogError(string.Format(LocalizableStrings.NuGetApiPackageManager_Error_FileAlreadyExists, filePath));
@@ -118,7 +135,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                         filePath,
                         source.Source,
                         packageMetadata.Identity.Id,
-                        packageMetadata.Identity.Version.ToNormalizedString());
+                        packageMetadata.Identity.Version.ToNormalizedString(),
+                        ConvertVulnerabilityMetadata(packageMetadata.Vulnerabilities));
                 }
                 else
                 {
@@ -177,7 +195,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         /// <returns>the latest version for the <paramref name="identifier"/> and indication if installed version is latest.</returns>
         /// <exception cref="InvalidNuGetSourceException">when sources passed to install request are not valid NuGet feeds or failed to read default NuGet configuration.</exception>
         /// <exception cref="PackageNotFoundException">when the package cannot be find in default or source NuGet feeds.</exception>
-        public async Task<(string LatestVersion, bool IsLatestVersion)> GetLatestVersionAsync(string identifier, string? version = null, string? additionalSource = null, CancellationToken cancellationToken = default)
+        public async Task<(string LatestVersion, bool IsLatestVersion, IReadOnlyList<VulnerabilityInfo> Vulnerabilities)> GetLatestVersionAsync(string identifier, string? version = null, string? additionalSource = null, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(identifier))
             {
@@ -197,25 +215,122 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             IEnumerable<PackageSource> packageSources = LoadNuGetSources(additionalSources);
             var (_, package) = await GetLatestVersionInternalAsync(identifier, packageSources, floatRange, cancellationToken).ConfigureAwait(false);
             bool isLatestVersion = currentVersion != null && currentVersion >= package.Identity.Version;
-            return (package.Identity.Version.ToNormalizedString(), isLatestVersion);
+
+            return (package.Identity.Version.ToNormalizedString(), isLatestVersion, ConvertVulnerabilityMetadata(package.Vulnerabilities));
         }
 
-        public async Task<NuGetPackageInfo> GetPackageMetadataAsync(
-            string identifier,
-            string version,
-            string source,
+        /// <inheritdoc/>
+        public async Task<(string Owners, bool Verified)> GetMigrationPackageMetadata(
+            string packageIdentifier,
+            PackageSource source,
+            CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(packageIdentifier))
+            {
+                throw new ArgumentException($"{nameof(packageIdentifier)} cannot be null or empty", nameof(packageIdentifier));
+            }
+
+            _ = source ?? throw new ArgumentNullException(nameof(source));
+
+            _nugetLogger.LogDebug($"Searching for {packageIdentifier}: in {source.Source}.");
+            try
+            {
+                SourceRepository repository = SourcesCache.GetOrAdd(source, Repository.Factory.GetCoreV3(source));
+                PackageMetadataResource resource = await repository.GetResourceAsync<PackageMetadataResource>(cancellationToken).ConfigureAwait(false);
+                return await GetPackageAdditionalMetadata(
+                    repository, packageIdentifier, includePrerelease: true, cancellationToken).ConfigureAwait(false);
+            }
+            catch (TaskCanceledException)
+            {
+                //do nothing
+                //GetMetadataAsync may cancel the task in case package is found in another feed.
+            }
+            catch (Exception ex)
+            {
+                _nugetLogger.LogDebug(string.Format(LocalizableStrings.NuGetApiPackageManager_Error_FailedToReadPackage, source.Source));
+                _nugetLogger.LogDebug($"Details: {ex}.");
+            }
+
+            return (string.Empty, false);
+        }
+
+        internal IEnumerable<PackageSource> RemoveInsecurePackages(IEnumerable<PackageSource> packagesSources)
+        {
+            var insecurePackages = new List<PackageSource>();
+            var securePackages = new List<PackageSource>();
+            foreach (var packageSource in packagesSources)
+            {
+                // NuGet IsHttp property can be both http and https sources
+                if (packageSource.IsHttp && !packageSource.IsHttps)
+                {
+                    insecurePackages.Add(packageSource);
+                }
+                else
+                {
+                    securePackages.Add(packageSource);
+                }
+            }
+
+            if (insecurePackages.Any())
+            {
+                var packagesString = string.Join(", ", insecurePackages.Select(package => package.Source));
+                _nugetLogger.LogWarning(string.Format(LocalizableStrings.NuGetApiPackageManager_Warning_InsecureFeed, packagesString));
+            }
+
+            return securePackages;
+        }
+
+        internal async Task<(PackageSource, NugetPackageMetadata)> GetPackageMetadataAsync(
+            string packageIdentifier,
+            NuGetVersion packageVersion,
+            IEnumerable<PackageSource> sources,
             CancellationToken cancellationToken)
         {
-            var (_, packageMetadata) = await GetPackageMetadataAsync(identifier, new NuGetVersion(version), new[] { new PackageSource(source) }, cancellationToken).ConfigureAwait(false);
+            if (string.IsNullOrWhiteSpace(packageIdentifier))
+            {
+                throw new ArgumentException($"{nameof(packageIdentifier)} cannot be null or empty", nameof(packageIdentifier));
+            }
+            _ = packageVersion ?? throw new ArgumentNullException(nameof(packageVersion));
+            _ = sources ?? throw new ArgumentNullException(nameof(sources));
 
-            return new NuGetPackageInfo(
-                       packageMetadata.Authors,
-                       packageMetadata.Owners,
-                       trusted: packageMetadata.PrefixReserved,
-                       string.Empty,
-                       source,
-                       packageMetadata.Identity.Id,
-                       packageMetadata.Identity.Version.ToNormalizedString());
+            bool atLeastOneSourceValid = false;
+            using CancellationTokenSource linkedCts =
+                      CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            List<Task<(PackageSource Source, IEnumerable<NugetPackageMetadata>? FoundPackages)>> tasks =
+                sources.Select(source => GetPackageMetadataAsync(source, packageIdentifier, includePrerelease: true, linkedCts.Token)).ToList();
+            while (tasks.Any())
+            {
+                Task<(PackageSource Source, IEnumerable<NugetPackageMetadata>? FoundPackages)> finishedTask =
+                    await Task.WhenAny(tasks).ConfigureAwait(false);
+                _ = tasks.Remove(finishedTask);
+                (PackageSource foundSource, IEnumerable<NugetPackageMetadata>? foundPackages) = await finishedTask.ConfigureAwait(false);
+                if (foundPackages == null)
+                {
+                    continue;
+                }
+                atLeastOneSourceValid = true;
+                NugetPackageMetadata matchedVersion = foundPackages.FirstOrDefault(package => package.Identity.Version == packageVersion);
+                if (matchedVersion != null)
+                {
+                    _nugetLogger.LogDebug($"{packageIdentifier}::{packageVersion} was found in {foundSource.Source}.");
+                    linkedCts.Cancel();
+                    return (foundSource, matchedVersion);
+                }
+                else
+                {
+                    _nugetLogger.LogDebug($"{packageIdentifier}::{packageVersion} is not found in NuGet feed {foundSource.Source}.");
+                }
+            }
+            if (!atLeastOneSourceValid)
+            {
+                throw new InvalidNuGetSourceException("Failed to load NuGet sources", sources.Select(s => s.Source));
+            }
+            _nugetLogger.LogWarning(
+                string.Format(
+                    LocalizableStrings.NuGetApiPackageManager_Warning_PackageNotFound,
+                    $"{packageIdentifier}::{packageVersion}",
+                    string.Join(", ", sources.Select(source => source.Source))));
+            throw new PackageNotFoundException(packageIdentifier, packageVersion, sources.Select(source => source.Source));
         }
 
         private async Task<(PackageSource, NugetPackageMetadata)> GetLatestVersionInternalAsync(
@@ -280,59 +395,6 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             }
 
             return latestVersion.Value;
-        }
-
-        private async Task<(PackageSource, NugetPackageMetadata)> GetPackageMetadataAsync(
-            string packageIdentifier,
-            NuGetVersion packageVersion,
-            IEnumerable<PackageSource> sources,
-            CancellationToken cancellationToken)
-        {
-            if (string.IsNullOrWhiteSpace(packageIdentifier))
-            {
-                throw new ArgumentException($"{nameof(packageIdentifier)} cannot be null or empty", nameof(packageIdentifier));
-            }
-            _ = packageVersion ?? throw new ArgumentNullException(nameof(packageVersion));
-            _ = sources ?? throw new ArgumentNullException(nameof(sources));
-
-            bool atLeastOneSourceValid = false;
-            using CancellationTokenSource linkedCts =
-                      CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            List<Task<(PackageSource Source, IEnumerable<NugetPackageMetadata>? FoundPackages)>> tasks =
-                sources.Select(source => GetPackageMetadataAsync(source, packageIdentifier, includePrerelease: true, linkedCts.Token)).ToList();
-            while (tasks.Any())
-            {
-                Task<(PackageSource Source, IEnumerable<NugetPackageMetadata>? FoundPackages)> finishedTask =
-                    await Task.WhenAny(tasks).ConfigureAwait(false);
-                _ = tasks.Remove(finishedTask);
-                (PackageSource foundSource, IEnumerable<NugetPackageMetadata>? foundPackages) = await finishedTask.ConfigureAwait(false);
-                if (foundPackages == null)
-                {
-                    continue;
-                }
-                atLeastOneSourceValid = true;
-                NugetPackageMetadata matchedVersion = foundPackages.FirstOrDefault(package => package.Identity.Version == packageVersion);
-                if (matchedVersion != null)
-                {
-                    _nugetLogger.LogDebug($"{packageIdentifier}::{packageVersion} was found in {foundSource.Source}.");
-                    linkedCts.Cancel();
-                    return (foundSource, matchedVersion);
-                }
-                else
-                {
-                    _nugetLogger.LogDebug($"{packageIdentifier}::{packageVersion} is not found in NuGet feed {foundSource.Source}.");
-                }
-            }
-            if (!atLeastOneSourceValid)
-            {
-                throw new InvalidNuGetSourceException("Failed to load NuGet sources", sources.Select(s => s.Source));
-            }
-            _nugetLogger.LogWarning(
-                string.Format(
-                    LocalizableStrings.NuGetApiPackageManager_Warning_PackageNotFound,
-                    $"{packageIdentifier}::{packageVersion}",
-                    string.Join(", ", sources.Select(source => source.Source))));
-            throw new PackageNotFoundException(packageIdentifier, packageVersion, sources.Select(source => source.Source));
         }
 
         private async Task<(PackageSource Source, IEnumerable<NugetPackageMetadata>? FoundPackages)> GetPackageMetadataAsync(
@@ -471,7 +533,20 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             return retrievedSources;
         }
 
-        private string GetFilePath(string downloadPath, string identifier, string version) => Path.Combine(downloadPath, identifier + "." + version + ".nupkg");
+        private IReadOnlyList<VulnerabilityInfo> ConvertVulnerabilityMetadata(IEnumerable<PackageVulnerabilityMetadata>? vulnerabilities)
+        {
+            if (vulnerabilities is null)
+            {
+                return Array.Empty<VulnerabilityInfo>();
+            }
+
+            return vulnerabilities.GroupBy(x => x.Severity)
+                .Select(g => new VulnerabilityInfo(
+                    g.Key,
+                    g.Select(x => x.AdvisoryUrl.AbsoluteUri).ToArray()))
+                .OrderBy(x => x.Severity)
+                .ToList();
+        }
 
         internal class NugetPackageMetadata
         {
@@ -481,6 +556,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 Identity = metadata.Identity;
                 PrefixReserved = trusted;
                 Owners = owners;
+                Vulnerabilities = Vulnerabilities = metadata.Vulnerabilities?.ToList() ?? new List<PackageVulnerabilityMetadata>();
             }
 
             public string Authors { get; }
@@ -490,6 +566,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             public string Owners { get; }
 
             public bool PrefixReserved { get; }
+
+            public IReadOnlyList<PackageVulnerabilityMetadata> Vulnerabilities { get; }
         }
     }
 }

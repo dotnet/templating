@@ -35,6 +35,8 @@ namespace Microsoft.TemplateEngine.Mocks
 
         public int ConsoleBufferWidth { get; set; } = 160;
 
+        public bool TabCompletionMode => false;
+
         public string ExpandEnvironmentVariables(string name)
         {
             return Environment.ExpandEnvironmentVariables(name);

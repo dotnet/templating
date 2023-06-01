@@ -23,8 +23,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         {
             var envSettings = _helper.CreateEnvironment();
             var settingsFile = Path.Combine(_helper.CreateTemporaryFolder(), "settings.json");
-            using var globalSettings1 = new GlobalSettings(envSettings, settingsFile);
-            using var globalSettings2 = new GlobalSettings(envSettings, settingsFile);
+            using var globalSettings1 = new GlobalSettings(envSettings, settingsFile, GetFakePackageMetadataCollector);
+            using var globalSettings2 = new GlobalSettings(envSettings, settingsFile, GetFakePackageMetadataCollector);
             var disposable = await globalSettings1.LockAsync(default).ConfigureAwait(false);
             bool exceptionThrown = false;
             using var cts = new CancellationTokenSource(50);
@@ -48,8 +48,11 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         {
             var envSettings = _helper.CreateEnvironment();
             var settingsFile = Path.Combine(_helper.CreateTemporaryFolder(), "settings.json");
-            using var globalSettings1 = new GlobalSettings(envSettings, settingsFile);
-            using var globalSettings2 = new GlobalSettings(envSettings, settingsFile);
+            // mock .firstcachemigration file to prevent initial data migration
+            File.Create(Path.Combine(envSettings.Paths.GlobalSettingsDir, ".firstcachemigration")).Close();
+
+            using var globalSettings1 = new GlobalSettings(envSettings, settingsFile, GetFakePackageMetadataCollector);
+            using var globalSettings2 = new GlobalSettings(envSettings, settingsFile, GetFakePackageMetadataCollector);
             var taskSource = new TaskCompletionSource<TemplatePackageData>();
             globalSettings2.SettingsChanged += async () => taskSource.TrySetResult((await globalSettings2.GetInstalledTemplatePackagesAsync(default).ConfigureAwait(false)).Single());
             var mutex = await globalSettings1.LockAsync(default).ConfigureAwait(false);
@@ -76,7 +79,9 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         {
             var envSettings = _helper.CreateEnvironment();
             var settingsFile = Path.Combine(_helper.CreateTemporaryFolder(), "settings.json");
-            using var globalSettings1 = new GlobalSettings(envSettings, settingsFile);
+            using var globalSettings1 = new GlobalSettings(envSettings, settingsFile, GetFakePackageMetadataCollector);
+            // mock .firstcachemigration file to prevent initial data migration
+            File.Create(Path.Combine(envSettings.Paths.GlobalSettingsDir, ".firstcachemigration")).Close();
 
             #region Open1AndPopulateAndSave
 
@@ -94,16 +99,20 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 
             #region Open2LoadAndLock
 
-            using var globalSettings2 = new GlobalSettings(envSettings, settingsFile);
-            Assert.Equal((await globalSettings1.GetInstalledTemplatePackagesAsync(default).ConfigureAwait(false))[0].InstallerId, (await globalSettings2.GetInstalledTemplatePackagesAsync(default).ConfigureAwait(false))[0].InstallerId);
+            using var globalSettings2 = new GlobalSettings(envSettings, settingsFile, GetFakePackageMetadataCollector);
+            Assert.Equal(
+                (await globalSettings1.GetInstalledTemplatePackagesAsync(default).ConfigureAwait(false))[0].InstallerId,
+                (await globalSettings2.GetInstalledTemplatePackagesAsync(default).ConfigureAwait(false))[0].InstallerId);
             var mutex2 = await globalSettings2.LockAsync(default).ConfigureAwait(false);
 
             #endregion Open2LoadAndLock
 
             #region Open3Load
 
-            using var globalSettings3 = new GlobalSettings(envSettings, settingsFile);
-            Assert.Equal((await globalSettings1.GetInstalledTemplatePackagesAsync(default).ConfigureAwait(false))[0].InstallerId, (await globalSettings3.GetInstalledTemplatePackagesAsync(default).ConfigureAwait(false))[0].InstallerId);
+            using var globalSettings3 = new GlobalSettings(envSettings, settingsFile, GetFakePackageMetadataCollector);
+            Assert.Equal(
+                (await globalSettings1.GetInstalledTemplatePackagesAsync(default).ConfigureAwait(false))[0].InstallerId,
+                (await globalSettings3.GetInstalledTemplatePackagesAsync(default).ConfigureAwait(false))[0].InstallerId);
 
             #endregion Open3Load
 
@@ -115,14 +124,16 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         {
             var envSettings = _helper.CreateEnvironment(environment: new MockEnvironment(new Dictionary<string, string> { { "TEMPLATE_ENGINE_DISABLE_FILEWATCHER", "1" } }));
             var settingsFile = Path.Combine(_helper.CreateTemporaryFolder(), "settings.json");
-            using var globalSettings1 = new GlobalSettings(envSettings, settingsFile);
+            using var globalSettings1 = new GlobalSettings(envSettings, settingsFile, GetFakePackageMetadataCollector);
             Assert.Empty(((MonitoredFileSystem)envSettings.Host.FileSystem).FilesWatched);
 
             envSettings = _helper.CreateEnvironment();
             settingsFile = Path.Combine(_helper.CreateTemporaryFolder(), "settings.json");
-            using var globalSettings2 = new GlobalSettings(envSettings, settingsFile);
+            using var globalSettings2 = new GlobalSettings(envSettings, settingsFile, GetFakePackageMetadataCollector);
             Assert.Single(((MonitoredFileSystem)envSettings.Host.FileSystem).FilesWatched);
             Assert.Equal(settingsFile, ((MonitoredFileSystem)envSettings.Host.FileSystem).FilesWatched.Single());
         }
+
+        private Task<IReadOnlyList<TemplatePackageData>> GetFakePackageMetadataCollector(IReadOnlyList<TemplatePackageData> input) => Task.FromResult(input);
     }
 }
