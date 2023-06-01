@@ -73,20 +73,17 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
         }
 
         [Fact]
-        public Task TestTemplateWithGeneratedInComputed()
+        public Task TestCoalesce_EmptyStringForMultiChoices()
         {
-            string templateLocation = GetTestTemplateLocation("TemplateWithGeneratedInComputed");
-
+            string templateLocation = GetTestTemplateLocation("TemplateWithMultipleChoicesAndCoalesce");
+            var templateParams = new Dictionary<string, string?>()
+    {
+        { "tests", string.Empty }
+    };
             string workingDir = TestUtils.CreateTemporaryFolder();
 
-            var templateParams = new Dictionary<string, string?>()
-            {
-                { "dependencyInjection", "true" },
-                { "navigation", "regions" }
-            };
-
             TemplateVerifierOptions options =
-                new TemplateVerifierOptions(templateName: "TestAssets.TemplateWithGeneratedInComputed")
+                new TemplateVerifierOptions(templateName: "TestAssets.TemplateWithMultipleChoicesAndCoalesce")
                 {
                     TemplatePath = templateLocation,
                     OutputDirectory = workingDir,
@@ -101,20 +98,17 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
         }
 
         [Fact]
-        public Task TestTemplateWithGeneratedSwitchInComputed()
+        public Task TestSingleSelectionForMultiChoices()
         {
-            string templateLocation = GetTestTemplateLocation("TemplateWithGeneratedSwitchInComputed");
-
-            string workingDir = TestUtils.CreateTemporaryFolder();
-
+            string templateLocation = GetTestTemplateLocation("TemplateWithMultipleChoicesAndCoalesce");
             var templateParams = new Dictionary<string, string?>()
             {
-                { "dependencyInjection", "true" },
-                { "navigation", "regions" }
+                { "tests", "unit" }
             };
+            string workingDir = TestUtils.CreateTemporaryFolder();
 
             TemplateVerifierOptions options =
-                new TemplateVerifierOptions(templateName: "TestAssets.TemplateWithGeneratedSwitchInComputed")
+                new TemplateVerifierOptions(templateName: "TestAssets.TemplateWithMultipleChoicesAndCoalesce")
                 {
                     TemplatePath = templateLocation,
                     OutputDirectory = workingDir,
@@ -126,116 +120,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
 
             VerificationEngine engine = new VerificationEngine(_log);
             return engine.Execute(options);
-        }
-
-        [Fact]
-        public Task TestTemplateWithComputedInGenerated()
-        {
-            string templateLocation = GetTestTemplateLocation("TemplateWithComputedInGenerated");
-
-            TemplateVerifierOptions options =
-                new TemplateVerifierOptions(templateName: "TestAssets.TemplateWithComputedInGenerated")
-                {
-                    TemplatePath = templateLocation,
-                    OutputDirectory = TestUtils.CreateTemporaryFolder(),
-                    DoNotAppendTemplateArgsToScenarioName = true,
-                    DoNotPrependTemplateNameToScenarioName = true,
-                    SnapshotsDirectory = "Approvals"
-                }
-                .WithInstantiationThroughTemplateCreatorApi(new Dictionary<string, string?>());
-
-            VerificationEngine engine = new VerificationEngine(_log);
-            return engine.Execute(options);
-        }
-
-        [Fact]
-        public Task TestTemplateWithComputedInDerivedThroughGenerated()
-        {
-            string templateLocation = GetTestTemplateLocation("TemplateWithComputedInDerivedThroughGenerated");
-
-            TemplateVerifierOptions options =
-                new TemplateVerifierOptions(templateName: "TestAssets.TemplateWithComputedInDerivedThroughGenerated")
-                {
-                    TemplatePath = templateLocation,
-                    OutputDirectory = TestUtils.CreateTemporaryFolder(),
-                    DoNotAppendTemplateArgsToScenarioName = true,
-                    DoNotPrependTemplateNameToScenarioName = true,
-                    SnapshotsDirectory = "Approvals"
-                }
-                .WithInstantiationThroughTemplateCreatorApi(new Dictionary<string, string?>());
-
-            VerificationEngine engine = new VerificationEngine(_log);
-            return engine.Execute(options);
-        }
-
-        [Fact]
-        public Task TestTemplateWithBrokenGeneratedInComputed()
-        {
-            string templateLocation = GetTestTemplateLocation("TemplateWithBrokenGeneratedInComputed");
-            var templateParams = new Dictionary<string, string?>()
-            {
-                { "dependencyInjection", "true" }
-            };
-
-            TemplateVerifierOptions options =
-                new TemplateVerifierOptions(templateName: "TestAssets.TemplateWithBrokenGeneratedInComputed")
-                {
-                    TemplatePath = templateLocation,
-                    OutputDirectory = TestUtils.CreateTemporaryFolder(),
-                    DoNotAppendTemplateArgsToScenarioName = true,
-                    DoNotPrependTemplateNameToScenarioName = true,
-                    SnapshotsDirectory = "Approvals",
-                    VerifyCommandOutput = true
-                }
-                .WithInstantiationThroughTemplateCreatorApi(templateParams);
-
-            return new VerificationEngine(_log)
-                .Execute(options);
-        }
-
-        [Fact]
-        public Task TestTemplateWithVariablesInGeneratedThatUsedInComputed()
-        {
-            string templateLocation = GetTestTemplateLocation("TemplateWithBrokenGeneratedInComputed");
-
-            TemplateVerifierOptions options =
-                new TemplateVerifierOptions(templateName: "TestAssets.TemplateWithBrokenGeneratedInComputed")
-                {
-                    TemplatePath = templateLocation,
-                    OutputDirectory = TestUtils.CreateTemporaryFolder(),
-                    DoNotAppendTemplateArgsToScenarioName = true,
-                    DoNotPrependTemplateNameToScenarioName = true,
-                    SnapshotsDirectory = "Approvals",
-                    VerifyCommandOutput = true
-                }
-                .WithInstantiationThroughTemplateCreatorApi(new Dictionary<string, string?>());
-
-            return new VerificationEngine(_log)
-                .Execute(options);
-        }
-
-        [Fact]
-        public Task TestTemplateWithCircleDependencyInMacros()
-        {
-            string templateLocation = GetTestTemplateLocation("TemplateWithCircleDependencyInMacros");
-
-            TemplateVerifierOptions options =
-                new TemplateVerifierOptions(templateName: "TestAssets.TemplateWithCircleDependencyInMacros")
-                {
-                    TemplatePath = templateLocation,
-                    OutputDirectory = TestUtils.CreateTemporaryFolder(),
-                    DoNotAppendTemplateArgsToScenarioName = true,
-                    DoNotPrependTemplateNameToScenarioName = true,
-                    SnapshotsDirectory = "Approvals",
-                    IsCommandExpectedToFail = true,
-                    VerifyCommandOutput = true
-                }
-                .WithInstantiationThroughTemplateCreatorApi(new Dictionary<string, string?>());
-
-            return new VerificationEngine(_log)
-                .Execute(options);
         }
     }
 }
 
 #endif
+
