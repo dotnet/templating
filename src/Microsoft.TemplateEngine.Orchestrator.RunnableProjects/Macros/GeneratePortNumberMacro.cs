@@ -30,6 +30,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
         }
 
         BaseMacroConfig IGeneratedSymbolMacroConfigCreator<BaseMacroConfig>.CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig)
-            => new GeneratePortNumberConfig(environmentSettings.Host.Logger, this, deferredConfig);
+            => CreateConfig(environmentSettings, deferredConfig);
+
+        protected override GeneratePortNumberConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig) => new(environmentSettings.Host.Logger, this, deferredConfig);
     }
 }

@@ -39,6 +39,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 
         BaseMacroConfig IGeneratedSymbolMacroConfigCreator<BaseMacroConfig>.CreateConfig(
             IEngineEnvironmentSettings environmentSettings,
-            IGeneratedSymbolConfig deferredConfig) => new SwitchMacroConfig(this, deferredConfig);
+            IGeneratedSymbolConfig deferredConfig) => CreateConfig(environmentSettings, deferredConfig);
+
+        protected override SwitchMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig) => new(this, deferredConfig);
     }
 }

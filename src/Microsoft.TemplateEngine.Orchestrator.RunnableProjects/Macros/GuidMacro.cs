@@ -32,6 +32,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
         BaseMacroConfig IGeneratedSymbolMacroConfigCreator<BaseMacroConfig>.CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig)
             => new GuidMacroConfig(this, deferredConfig);
 
+        protected override GuidMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig) => new(this, deferredConfig);
+
         private void EvaluateInternal(Guid g, IEngineEnvironmentSettings environmentSettings, IVariableCollection vars, GuidMacroConfig config)
         {
             for (int i = 0; i < config.Format.Length; ++i)

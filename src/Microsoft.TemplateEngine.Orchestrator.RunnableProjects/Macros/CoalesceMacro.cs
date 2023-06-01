@@ -59,6 +59,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
         }
 
         BaseMacroConfig IGeneratedSymbolMacroConfigCreator<BaseMacroConfig>.CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig)
+            => CreateConfig(environmentSettings, deferredConfig);
+
+        protected override CoalesceMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig)
             => new CoalesceMacroConfig(this, deferredConfig);
     }
 }

@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
-using System.Collections.Generic;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 
@@ -13,12 +12,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
     /// </summary>
     /// <typeparam name="T">The macro config.</typeparam>
 #pragma warning disable CS0618 // Type or member is obsolete
-    internal abstract class BaseGeneratedSymbolMacro<T> : BaseMacro<T>, IGeneratedSymbolMacro, IDeferredMacro
-        where T : BaseMacroConfig, IMacroConfig
+    internal abstract class BaseGeneratedSymbolMacro<T> : BaseMacro<T>, IGeneratedSymbolMacro, IDeferredMacro where T : BaseMacroConfig, IMacroConfig
 #pragma warning restore CS0618 // Type or member is obsolete
     {
-        public IList<string> Dependencies { get; set; } = new List<string>();
-
         public IMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IMacroConfig rawConfig)
         {
             if (rawConfig is not IGeneratedSymbolConfig deferredConfig)
@@ -28,10 +24,13 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             return CreateConfig(environmentSettings, deferredConfig);
         }
 
-        public void Evaluate(
-            IEngineEnvironmentSettings environmentSettings,
-            IVariableCollection variables,
-            IGeneratedSymbolConfig config) => Evaluate(environmentSettings, variables, config);
+        public void Evaluate(IEngineEnvironmentSettings environmentSettings, IVariableCollection vars, IGeneratedSymbolConfig deferredConfig)
+        {
+            Evaluate(environmentSettings, vars, CreateConfig(environmentSettings, deferredConfig));
+        }
+
+        // Macro Config used in Evaluation
+        protected abstract T CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig);
     }
 
     /// <summary>
@@ -48,12 +47,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
     /// Base class for the macro defined via generated symbol, that may run undeterministially and implements deterministic mode for the macro as generated symbol.
     /// </summary>
     /// <typeparam name="T">The macro config.</typeparam>
-    internal abstract class BaseNondeterministicGenSymMacro<T> : BaseNondeterministicMacro<T>, IDeterministicModeMacro<T> where T : BaseMacroConfig, IMacroConfig
+    internal abstract class BaseNondeterministicGenSymMacro<T> : BaseNondeterministicMacro<T>, IDeterministicModeMacro<IGeneratedSymbolConfig> where T : BaseMacroConfig, IMacroConfig
     {
-        public void EvaluateDeterministically(
-            IEngineEnvironmentSettings environmentSettings,
-            IVariableCollection variables,
-            IGeneratedSymbolConfig config)
-                => EvaluateDeterministically(environmentSettings, variables, config);
+        public void EvaluateDeterministically(IEngineEnvironmentSettings environmentSettings, IVariableCollection variables, IGeneratedSymbolConfig config) => EvaluateDeterministically(environmentSettings, variables, CreateConfig(environmentSettings, config));
     }
 }
