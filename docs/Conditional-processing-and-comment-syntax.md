@@ -59,7 +59,10 @@ To learn more about conditional expressions evaluation go to [Conditions](Condit
 |[JSX Files](#jsx-files)| Jsx and Tsx files.|   
 |[Other File](#other-file-types)| Default rules for file type not in this list.|  
 
-## Language Source Files
+## Known Issues
+
+|----------|---------------|  
+|[Conditional statements overlaps with Replacement functionality](#https://github.com/dotnet/templating/issues/6536)| There is a problem with using different type of [conditional comments](#Introduction) in replacement statements. In order to workaround it avoid using comments (e.g. '\\') as a part of candidate string for replacing.|
 
 #### File Extensions
 `.cs`, `.fs`,`.cpp`, `.h`, `.hpp`, `.cake`.
