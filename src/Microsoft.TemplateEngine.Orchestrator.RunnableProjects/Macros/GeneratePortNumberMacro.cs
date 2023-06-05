@@ -8,7 +8,7 @@ using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 {
-    internal class GeneratePortNumberMacro : BaseNondeterministicGenSymMacro<GeneratePortNumberConfig>, IGeneratedSymbolMacroConfigCreator<BaseMacroConfig>
+    internal class GeneratePortNumberMacro : BaseNondeterministicGenSymMacro<GeneratePortNumberConfig>
     {
         public override Guid Id { get; } = new Guid("D49B3690-B1E5-410F-A260-E1D7E873D8B2");
 
@@ -29,9 +29,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             environmentSettings.Host.Logger.LogDebug("[{macro}]: Variable '{var}' was assigned to value '{value}' in deterministic mode.", nameof(GeneratePortNumberMacro), config.VariableName, config.Low);
         }
 
-        BaseMacroConfig IGeneratedSymbolMacroConfigCreator<BaseMacroConfig>.CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig)
-            => CreateConfig(environmentSettings, deferredConfig);
-
-        protected override GeneratePortNumberConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig) => new(environmentSettings.Host.Logger, this, deferredConfig);
+        public override GeneratePortNumberConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig) => new(environmentSettings.Host.Logger, this, deferredConfig);
     }
 }

@@ -354,7 +354,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             List<IReplacementTokens> macroGeneratedReplacements = new();
 
-            List<BaseMacroConfig> macros = new();
+            List<IMacroConfig> macros = new();
 
             if (generateMacros)
             {
@@ -485,19 +485,18 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
             filenameReplacements.Add(new ReplacementTokens(sourceVariable, replacementConfig));
         }
 
-        private List<BaseMacroConfig> ProduceGeneratedSymbolsMacroConfig()
+        private List<IMacroConfig> ProduceGeneratedSymbolsMacroConfig()
         {
             var generatedSymbolsConfigs = ConfigurationModel.Symbols.OfType<IGeneratedSymbolConfig>().ToList();
-            var generatedSymbolMacros = EngineEnvironmentSettings.Components.OfType<IGeneratedSymbolMacro>()
+            Dictionary<string, IGeneratedSymbolMacro> generatedSymbolMacros = EngineEnvironmentSettings.Components.OfType<IGeneratedSymbolMacro>()
                 .ToDictionary(m => m.Type, m => m);
 
-            var generatedMacroConfigs = new List<BaseMacroConfig>();
+            var generatedMacroConfigs = new List<IMacroConfig>();
             foreach (var generatedSymbolConfig in generatedSymbolsConfigs)
             {
-                if (generatedSymbolMacros.TryGetValue(generatedSymbolConfig.Type, out var generatedSymbolMacro)
-                    && generatedSymbolMacro is IGeneratedSymbolMacroConfigCreator<BaseMacroConfig> gmcc)
+                if (generatedSymbolMacros.TryGetValue(generatedSymbolConfig.Type, out var generatedSymbolMacro))
                 {
-                    generatedMacroConfigs.Add(gmcc.CreateConfig(EngineEnvironmentSettings, generatedSymbolConfig));
+                    generatedMacroConfigs.Add(generatedSymbolMacro.CreateConfig(EngineEnvironmentSettings, generatedSymbolConfig));
                 }
                 else
                 {

@@ -8,7 +8,7 @@ using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 {
-    internal class SwitchMacro : BaseGeneratedSymbolMacro<SwitchMacroConfig>, IGeneratedSymbolMacroConfigCreator<BaseMacroConfig>
+    internal class SwitchMacro : BaseGeneratedSymbolMacro<SwitchMacroConfig>
     {
         public override Guid Id { get; } = new Guid("B57D64E0-9B4F-4ABE-9366-711170FD5294");
 
@@ -37,10 +37,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             environmentSettings.Host.Logger.LogDebug("[{macro}]: Assigned variable '{var}' to '{value}'.", nameof(SwitchMacro), config.VariableName, result);
         }
 
-        BaseMacroConfig IGeneratedSymbolMacroConfigCreator<BaseMacroConfig>.CreateConfig(
-            IEngineEnvironmentSettings environmentSettings,
-            IGeneratedSymbolConfig deferredConfig) => CreateConfig(environmentSettings, deferredConfig);
-
-        protected override SwitchMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig) => new(this, deferredConfig);
+        public override SwitchMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig) => new(this, deferredConfig);
     }
 }

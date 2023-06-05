@@ -39,7 +39,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             IEnvironment environment = A.Fake<IEnvironment>();
             A.CallTo(() => environment.GetEnvironmentVariable("TEMPLATE_ENGINE_ENABLE_DETERMINISTIC_MODE")).Returns("true");
 
-            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true, environment: environment, additionalComponents: new[] { (typeof(IGeneratedSymbolMacro), (IIdentifiedComponent)macro) });
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true, environment: environment, additionalComponents: new[] { (typeof(IMacro), (IIdentifiedComponent)macro) });
 
             var macros = new[] { (BaseMacroConfig)new UndeterministicMacroConfig(macro, "test"), new GuidMacroConfig("test-guid", "string", "Nn", "n") };
 
@@ -63,6 +63,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
 
             public Guid Id { get; } = new Guid("{3DBC6AAB-5D13-40E9-9EC8-0467A7AA7335}");
 
+            public IMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig generatedSymbolConfig) => new FailMacroConfig(generatedSymbolConfig.VariableName);
+
             public void Evaluate(IEngineEnvironmentSettings environmentSettings, IVariableCollection variables, FailMacroConfig config) => throw new Exception("Failed to evaluate");
 
             public void Evaluate(IEngineEnvironmentSettings environmentSettings, IVariableCollection variables, IGeneratedSymbolConfig generatedSymbolConfig) => throw new Exception("Failed to evaluate");
@@ -76,6 +78,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
 
             public Guid Id { get; } = new Guid("{3DBC6AAB-5D13-40E9-9EC8-0467A7AA7335}");
 
+            public IMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig generatedSymbolConfig) => new FailMacroConfig(generatedSymbolConfig.VariableName);
+
             public void Evaluate(IEngineEnvironmentSettings environmentSettings, IVariableCollection variables, FailMacroConfig config) => throw new Exception("Failed to evaluate");
 
             public void Evaluate(IEngineEnvironmentSettings environmentSettings, IVariableCollection variables, IGeneratedSymbolConfig generatedSymbolConfig) => throw new TemplateAuthoringException("bad config");
@@ -88,38 +92,42 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             public FailMacroConfig(string variableName) : base("fail", variableName, "string")
             {
             }
-
-            internal override void Evaluate(IEngineEnvironmentSettings environmentSettings, IVariableCollection vars) => throw new Exception("Failed to evaluate");
-
-            internal override void EvaluateDeterministically(IEngineEnvironmentSettings environmentSettings, IVariableCollection vars) => Evaluate(environmentSettings, vars);
         }
 
-        private class UndeterministicMacro : IDeterministicModeMacro<UndeterministicMacroConfig>, IGeneratedSymbolMacro, IDeterministicModeMacro<IGeneratedSymbolConfig>
+        private class UndeterministicMacro : IDeterministicModeMacro, IDeterministicModeMacro<UndeterministicMacroConfig>, IGeneratedSymbolMacro, IGeneratedSymbolMacro<UndeterministicMacroConfig>
         {
             public string Type => "undeterministic";
 
             public Guid Id { get; } = new Guid("{3DBC6AAB-5D13-40E9-9EC8-0467A7AA7335}");
+
+            public UndeterministicMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig generatedSymbolConfig)
+            {
+                return new UndeterministicMacroConfig(this, generatedSymbolConfig.VariableName);
+            }
 
             public void Evaluate(IEngineEnvironmentSettings environmentSettings, IVariableCollection variables, UndeterministicMacroConfig config)
             {
                 variables[config.VariableName] = "undeterministic";
             }
 
-            public void Evaluate(IEngineEnvironmentSettings environmentSettings, IVariableCollection variables, IGeneratedSymbolConfig generatedSymbolConfig)
+            public void EvaluateConfig(IEngineEnvironmentSettings environmentSettings, IVariableCollection variables, IMacroConfig config)
             {
-                variables[generatedSymbolConfig.VariableName] = "undeterministic";
+                variables[config.VariableName] = "undeterministic";
             }
-
-            public void EvaluateConfig(IEngineEnvironmentSettings environmentSettings, IVariableCollection vars, IMacroConfig config) => throw new NotImplementedException();
 
             public void EvaluateDeterministically(IEngineEnvironmentSettings environmentSettings, IVariableCollection variables, UndeterministicMacroConfig config)
             {
                 variables[config.VariableName] = "deterministic";
             }
 
-            public void EvaluateDeterministically(IEngineEnvironmentSettings environmentSettings, IVariableCollection variables, IGeneratedSymbolConfig config)
+            public void EvaluateConfigDeterministically(IEngineEnvironmentSettings environmentSettings, IVariableCollection variables, IMacroConfig config)
             {
                 variables[config.VariableName] = "deterministic";
+            }
+
+            IMacroConfig IGeneratedSymbolMacro.CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig generatedSymbolConfig)
+            {
+                return new UndeterministicMacroConfig(this, generatedSymbolConfig.VariableName);
             }
         }
 
@@ -131,10 +139,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             {
                 _macro = macro;
             }
-
-            internal override void Evaluate(IEngineEnvironmentSettings environmentSettings, IVariableCollection vars) => _macro.Evaluate(environmentSettings, vars, this);
-
-            internal override void EvaluateDeterministically(IEngineEnvironmentSettings environmentSettings, IVariableCollection vars) => _macro.EvaluateDeterministically(environmentSettings, vars, this);
         }
     }
 }

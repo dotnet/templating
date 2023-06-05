@@ -2,15 +2,14 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Generic;
-using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions
 {
-    internal interface IMacroDependency
+    //TODO: doc
+    public interface IMacroConfigDependency
     {
-        void Resolve(
-            IReadOnlyList<BaseMacroConfig> macroConfigs,
-            IReadOnlyList<string> symbols,
-            BaseMacroConfig macroConfig);
+        public HashSet<string> Dependencies { get; }
+
+        public void ResolveSymbolDependencies(IReadOnlyList<string> symbols);
     }
 }

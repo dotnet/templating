@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Core.Expressions.Cpp2;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
@@ -35,19 +34,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             }
         }
 
+        public HashSet<string> Dependencies { get; private set; } = new HashSet<string>();
+
         public string VariableName { get; }
 
         public string Type { get; }
 
         internal string DataType { get; } = "string";
 
-        internal HashSet<BaseMacroConfig> Dependencies { get; private set; } = new HashSet<BaseMacroConfig>();
-
         internal IList<string> MacroErrors { get; set; } = new List<string>();
-
-        internal abstract void Evaluate(IEngineEnvironmentSettings environmentSettings, IVariableCollection vars);
-
-        internal virtual void EvaluateDeterministically(IEngineEnvironmentSettings environmentSettings, IVariableCollection vars) => Evaluate(environmentSettings, vars);
     }
 
     internal abstract class BaseMacroConfig<TMacro, TMacroConfig> : BaseMacroConfig, IMacroConfig
@@ -55,29 +50,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
         where TMacroConfig : BaseMacroConfig<TMacro, TMacroConfig>, IMacroConfig
     {
         protected BaseMacroConfig(TMacro macro, string variableName, string? dataType = null)
-            : base(macro.Type, variableName, dataType)
-        {
-            Macro = macro ?? throw new ArgumentNullException(nameof(macro));
-        }
-
-        internal TMacro Macro { get; }
-
-        internal override void Evaluate(IEngineEnvironmentSettings environmentSettings, IVariableCollection vars)
-        {
-            Macro.Evaluate(environmentSettings, vars, (TMacroConfig)this);
-        }
-
-        internal override void EvaluateDeterministically(IEngineEnvironmentSettings environmentSettings, IVariableCollection vars)
-        {
-            if (Macro is IDeterministicModeMacro<TMacroConfig> deterministicMacro)
-            {
-                deterministicMacro.EvaluateDeterministically(environmentSettings, vars, (TMacroConfig)this);
-            }
-            else
-            {
-                Evaluate(environmentSettings, vars);
-            }
-        }
+            : base(macro.Type, variableName, dataType) { }
 
         protected static string? GetOptionalParameterValue(IGeneratedSymbolConfig config, string parameterName, string? defaultValue = default)
         {
@@ -209,8 +182,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 
         protected void PopulateMacroConfigDependencies(
             string condition,
-            BaseMacroConfig currentMacro,
-            IReadOnlyList<BaseMacroConfig> macroConfigs,
             IReadOnlyList<string> symbols)
         {
             var referencedVariablesKeys = new HashSet<string>();
@@ -221,16 +192,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
                 out var evaluableExpressionError,
                 referencedVariablesKeys);
 
-            referencedVariablesKeys.ForEach(rv => PopulateMacroConfigDependency(rv, currentMacro, macroConfigs));
+            referencedVariablesKeys.ForEach(PopulateMacroConfigDependency);
         }
 
-        private void PopulateMacroConfigDependency(string referencedValue, BaseMacroConfig currentMacro, IReadOnlyList<BaseMacroConfig> macroConfigs)
+        private void PopulateMacroConfigDependency(string referencedValue)
         {
-            var macroConfig = macroConfigs.FirstOrDefault(mc => mc.VariableName == referencedValue);
-            if (macroConfig != null)
-            {
-                currentMacro.Dependencies.Add(macroConfig);
-            }
+            Dependencies.Add(referencedValue);
         }
     }
 }
