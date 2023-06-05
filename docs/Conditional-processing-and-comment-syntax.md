@@ -1,6 +1,7 @@
 # Table of contents
 
 - [Introduction](#introduction)
+- [Known Issues](#known-issues)
 - [Language Source Files](#language-source-files)
   - [Samples](#samples)
   - [Ignore conditions expressions in language files](#ignore-conditions-expressions-in-language-files)
@@ -61,8 +62,9 @@ To learn more about conditional expressions evaluation go to [Conditions](Condit
 
 ## Known Issues
 
+| Name     | Description   |  
 |----------|---------------|  
-|[Conditional statements overlaps with Replacement functionality](#https://github.com/dotnet/templating/issues/6536)| There is a problem with using different type of [conditional comments](#Introduction) in replacement statements. In order to workaround it avoid using comments (e.g. '\\') as a part of candidate string for replacing.|
+|[Conditional statement overlaps with Replacement functionality](https://github.com/dotnet/templating/issues/6536)| There is a problem with using different types of conditional comments in replacement statements. In order to workaround it avoid using comments (e.g. "//") as a part of the candidate string for replacing.|
 
 #### File Extensions
 `.cs`, `.fs`,`.cpp`, `.h`, `.hpp`, `.cake`.
