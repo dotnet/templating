@@ -84,7 +84,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
             ILogger logger,
             string text,
             IVariableCollection variables,
-            out string evaluableExpressionError,
+            out string? evaluableExpressionError,
             HashSet<string> referencedVariablesKeys)
         {
             using (MemoryStream ms = new(Encoding.UTF8.GetBytes(text)))
@@ -128,13 +128,13 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
             IProcessorState processor,
             ref int bufferLength,
             ref int currentBufferPosition,
-            out string faultedMessage,
+            out string? faultedMessage,
             HashSet<string> referencedVariablesKeys)
         {
             faultedMessage = null;
             ITokenTrie tokens = Instance.GetSymbols(processor);
             ScopeBuilder<Operators, TTokens> builder = processor.ScopeBuilder(tokens, Map, DereferenceInLiteralsSetting);
-            string faultedSection = null;
+            string? faultedSection = null;
 
             return builder.Build(
                 ref bufferLength,
@@ -153,13 +153,14 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
             //  or it can possibly contain other content (e.g. the full template)
             bool shouldProcessWholeBuffer)
         {
-            string faultedSection = null;
+            string? faultedSection = null;
+
             IEvaluable expression = GetEvaluableExpression(
                 processor,
-            faultedMessage = null;
-            ITokenTrie tokens = Instance.GetSymbols(processor);
-            ScopeBuilder<Operators, TTokens> builder = processor.ScopeBuilder(tokens, Map, DereferenceInLiteralsSetting);
-            string? faultedSection = null;
+                ref bufferLength,
+                ref currentBufferPosition,
+                out faultedMessage,
+                referencedVariablesKeys ?? new HashSet<string>());
 
             bool result;
             if (faultedSection != null)
@@ -203,8 +204,8 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
 
         private static int? AttemptBooleanComparison(object? left, object? right)
         {
-            bool leftIsBool = Map.TryConvert(left, out bool lb);
-            bool rightIsBool = Map.TryConvert(right, out bool rb);
+            bool leftIsBool = Map.TryConvert(left!, out bool lb);
+            bool rightIsBool = Map.TryConvert(right!, out bool rb);
 
             if (!leftIsBool || !rightIsBool)
             {
@@ -246,12 +247,12 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
 
         private static int? AttemptNumericComparison(object? left, object? right)
         {
-            bool leftIsDouble = Map.TryConvert(left, out double ld);
-            bool rightIsDouble = Map.TryConvert(right, out double rd);
+            bool leftIsDouble = Map.TryConvert(left!, out double ld);
+            bool rightIsDouble = Map.TryConvert(right!, out double rd);
 
             if (!leftIsDouble)
             {
-                if (!Map.TryConvert(left, out long ll))
+                if (!Map.TryConvert(left!, out long ll))
                 {
                     return null;
                 }
@@ -261,7 +262,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
 
             if (!rightIsDouble)
             {
-                if (!Map.TryConvert(right, out long rl))
+                if (!Map.TryConvert(right!, out long rl))
                 {
                     return null;
                 }
