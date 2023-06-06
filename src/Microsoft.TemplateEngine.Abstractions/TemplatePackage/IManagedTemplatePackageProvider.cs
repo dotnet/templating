@@ -50,5 +50,12 @@ namespace Microsoft.TemplateEngine.Abstractions.TemplatePackage
         /// <param name="cancellationToken"></param>
         /// <returns>List of <see cref="InstallResult"/> with installation results.</returns>
         Task<IReadOnlyList<InstallResult>> InstallAsync(IEnumerable<InstallRequest> installRequests, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Updates the template packages metadata given in <paramref name="templatePackages"/>.
+        /// </summary>
+        /// <param name="templatePackages">List of <see cref="IManagedTemplatePackage"/> to be saved.</param>
+        /// <param name="cancellationToken"></param>
+        Task UpdateTemplatePackageMetadataAsync(IEnumerable<IManagedTemplatePackage> templatePackages, CancellationToken cancellationToken);
     }
 }

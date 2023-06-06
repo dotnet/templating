@@ -306,9 +306,17 @@ namespace Microsoft.TemplateEngine.IDE
             }
 
             IEnumerable<IGrouping<IManagedTemplatePackageProvider, IManagedTemplatePackage>> requestsGroupedByProvider = managedPackages.GroupBy(package => package.ManagedProvider, package => package);
-            IReadOnlyList<CheckUpdateResult>[] results = await Task.WhenAll(requestsGroupedByProvider.Select(packages => packages.Key.GetLatestVersionsAsync(packages, cancellationToken))).ConfigureAwait(false);
+            (IManagedTemplatePackageProvider Provider, IReadOnlyList<CheckUpdateResult> CheckUpdateResults)[] packagesGroupedByProvider = await Task.WhenAll(requestsGroupedByProvider.Select(
+                async packages => (packages.Key, await packages.Key.GetLatestVersionsAsync(packages, cancellationToken).ConfigureAwait(false)))).ConfigureAwait(false);
 
-            return results.SelectMany(result => result).ToList();
+            var packages = new List<CheckUpdateResult>();
+            foreach (var (provider, checkUpdateResults) in packagesGroupedByProvider)
+            {
+                packages.AddRange(checkUpdateResults);
+                await provider.UpdateTemplatePackageMetadataAsync(checkUpdateResults.Select(r => r.TemplatePackage), cancellationToken).ConfigureAwait(false);
+            }
+
+            return packages;
         }
 
         /// <summary>
