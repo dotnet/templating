@@ -59,6 +59,7 @@ namespace Microsoft.TemplateEngine.Utils
 
             public T Val { get; private set; }
 
+#pragma warning disable IDE0251 // Make member 'readonly'
             public override bool Equals(object obj)
             {
                 return obj is ValueWrapper<T> v && Equals(Val, v.Val);
@@ -68,6 +69,7 @@ namespace Microsoft.TemplateEngine.Utils
             {
                 return Val?.GetHashCode() ?? 0;
             }
+#pragma warning restore IDE0251 // Make member 'readonly'
         }
 
         private class ValueWrapperComparer<T> : IEqualityComparer<ValueWrapper<T>>
