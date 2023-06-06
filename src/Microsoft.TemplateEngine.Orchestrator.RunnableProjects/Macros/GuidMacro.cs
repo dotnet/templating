@@ -8,7 +8,7 @@ using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 {
-    internal class GuidMacro : BaseNondeterministicGenSymMacro<GuidMacroConfig>, IGeneratedSymbolMacroConfigCreator<BaseMacroConfig>
+    internal class GuidMacro : BaseNondeterministicGenSymMacro<GuidMacroConfig>
     {
         internal const string MacroType = "guid";
         private static readonly Guid DeterministicModeValue = new("12345678-1234-1234-1234-1234567890AB");
@@ -29,10 +29,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             EvaluateInternal(DeterministicModeValue, environmentSettings, variables, config);
         }
 
-        BaseMacroConfig IGeneratedSymbolMacroConfigCreator<BaseMacroConfig>.CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig)
-            => new GuidMacroConfig(this, deferredConfig);
-
-        protected override GuidMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig) => new(this, deferredConfig);
+        public override GuidMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig) => new(this, deferredConfig);
 
         private void EvaluateInternal(Guid g, IEngineEnvironmentSettings environmentSettings, IVariableCollection vars, GuidMacroConfig config)
         {

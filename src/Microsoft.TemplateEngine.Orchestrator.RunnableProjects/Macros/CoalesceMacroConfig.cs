@@ -7,7 +7,7 @@ using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 {
-    internal class CoalesceMacroConfig : BaseMacroConfig<CoalesceMacro, CoalesceMacroConfig>, IMacroDependency
+    internal class CoalesceMacroConfig : BaseMacroConfig<CoalesceMacro, CoalesceMacroConfig>, IMacroConfigDependency
     {
         internal CoalesceMacroConfig(
             CoalesceMacro macro,
@@ -47,10 +47,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 
         internal string FallbackVariableName { get; }
 
-        public void Resolve(IReadOnlyList<BaseMacroConfig> macroConfigs, IReadOnlyList<string> symbols, BaseMacroConfig macroConfig)
+        public void ResolveSymbolDependencies(IReadOnlyList<string> symbols)
         {
-            PopulateMacroConfigDependencies(SourceVariableName, macroConfig, macroConfigs, symbols);
-            PopulateMacroConfigDependencies(FallbackVariableName, macroConfig, macroConfigs, symbols);
+            PopulateMacroConfigDependencies(SourceVariableName, symbols);
+            PopulateMacroConfigDependencies(FallbackVariableName, symbols);
         }
     }
 }

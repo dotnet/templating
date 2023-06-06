@@ -9,7 +9,7 @@ using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 {
-    internal class RegexMacro : BaseGeneratedSymbolMacro<RegexMacroConfig>, IGeneratedSymbolMacroConfigCreator<BaseMacroConfig>
+    internal class RegexMacro : BaseGeneratedSymbolMacro<RegexMacroConfig>
     {
         public override Guid Id { get; } = new Guid("8A4D4937-E23F-426D-8398-3BDBD1873ADB");
 
@@ -37,9 +37,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             environmentSettings.Host.Logger.LogDebug("[{macro}]: Assigned variable '{var}' to '{value}'.", nameof(RegexMacro), config.VariableName, value);
         }
 
-        BaseMacroConfig IGeneratedSymbolMacroConfigCreator<BaseMacroConfig>.CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig)
-            => CreateConfig(environmentSettings, deferredConfig);
-
-        protected override RegexMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig) => new(this, deferredConfig);
+        public override RegexMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig) => new(this, deferredConfig);
     }
 }

@@ -7,7 +7,7 @@ using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 {
-    internal class RegexMatchMacroConfig : BaseMacroConfig<RegexMatchMacro, RegexMatchMacroConfig>, IMacroDependency
+    internal class RegexMatchMacroConfig : BaseMacroConfig<RegexMatchMacro, RegexMatchMacroConfig>, IMacroConfigDependency
     {
         internal RegexMatchMacroConfig(RegexMatchMacro macro, string variableName, string? dataType, string sourceVariable, string pattern)
              : base(macro, variableName, dataType ?? "bool")
@@ -39,7 +39,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 
         internal string Pattern { get; }
 
-        public void Resolve(IReadOnlyList<BaseMacroConfig> macroConfigs, IReadOnlyList<string> symbols, BaseMacroConfig macroConfig) =>
-            PopulateMacroConfigDependencies(Source, macroConfig, macroConfigs, symbols);
+        public void ResolveSymbolDependencies(IReadOnlyList<string> symbols) =>
+            PopulateMacroConfigDependencies(Source, symbols);
     }
 }

@@ -7,7 +7,7 @@ using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 {
-    internal class EvaluateMacroConfig : BaseMacroConfig<EvaluateMacro, EvaluateMacroConfig>, IMacroDependency
+    internal class EvaluateMacroConfig : BaseMacroConfig<EvaluateMacro, EvaluateMacroConfig>, IMacroConfigDependency
     {
         private const EvaluatorType DefaultEvaluator = EvaluatorType.CPP2;
         private static readonly EvaluateMacro DefaultMacro = new();
@@ -31,7 +31,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 
         internal ConditionStringEvaluator Evaluator { get; private set; } = EvaluatorSelector.SelectStringEvaluator(DefaultEvaluator);
 
-        public void Resolve(IReadOnlyList<BaseMacroConfig> macroConfigs, IReadOnlyList<string> symbols, BaseMacroConfig macroConfig)
-            => PopulateMacroConfigDependencies(Condition, macroConfig, macroConfigs, symbols);
+        public void ResolveSymbolDependencies(IReadOnlyList<string> symbols) => PopulateMacroConfigDependencies(Condition, symbols);
     }
 }

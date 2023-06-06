@@ -8,7 +8,7 @@ using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 {
-    internal class CaseChangeMacro : BaseGeneratedSymbolMacro<CaseChangeMacroConfig>, IGeneratedSymbolMacroConfigCreator<BaseMacroConfig>
+    internal class CaseChangeMacro : BaseGeneratedSymbolMacro<CaseChangeMacroConfig>
     {
         public override Guid Id { get; } = new Guid("10919118-4E13-4FA9-825C-3B4DA855578E");
 
@@ -33,9 +33,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             environmentSettings.Host.Logger.LogDebug("[{macro}]: Assigned variable '{var}' to '{value}'.", nameof(CaseChangeMacro), config.VariableName, value);
         }
 
-        BaseMacroConfig IGeneratedSymbolMacroConfigCreator<BaseMacroConfig>.CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig)
-            => CreateConfig(environmentSettings, deferredConfig);
-
-        protected override CaseChangeMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig) => new(this, deferredConfig);
+        public override CaseChangeMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig) => new(this, deferredConfig);
     }
 }
