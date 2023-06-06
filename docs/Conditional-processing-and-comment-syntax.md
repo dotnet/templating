@@ -62,9 +62,9 @@ To learn more about conditional expressions evaluation go to [Conditions](Condit
 
 ## Known Issues
 
-| Name     | Description   |  
-|----------|---------------|  
-|[Conditional statement overlaps with Replacement functionality](https://github.com/dotnet/templating/issues/6536)| There is a problem with using different types of conditional comments in replacement statements. In order to workaround it avoid using comments (e.g. "//") as a part of the candidate string for replacing.|
+| Name     | Description   | Incorrect Use   | Correct Use    |  
+|----------|---------------|-----------------|----------------| 
+|[Conditional statement overlaps with Replacement functionality](https://github.com/dotnet/templating/issues/6536)| There is a problem with using different types of conditional comments in replacement statements. In order to workaround it avoid using comments (e.g. "//") as a part of the candidate string for replacing.| "http://localhost:"| "localhost:"|
 
 #### File Extensions
 `.cs`, `.fs`,`.cpp`, `.h`, `.hpp`, `.cake`.
