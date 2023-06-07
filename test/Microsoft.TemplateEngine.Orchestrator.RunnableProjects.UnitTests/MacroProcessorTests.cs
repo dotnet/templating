@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using FakeItEasy;
+using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Core;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
@@ -29,6 +31,118 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
 
             MacroProcessingException e = Assert.Throws<MacroProcessingException>(() => MacroProcessor.ProcessMacros(engineEnvironmentSettings, macros, new VariableCollection()));
             Assert.Equal("Failed to evaluate", e.InnerException?.Message);
+        }
+
+        [Fact]
+        public void CanPrintWarningOnUnknownMacroConfig()
+        {
+            List<(LogLevel Level, string Message)> loggedMessages = new();
+            InMemoryLoggerProvider loggerProvider = new(loggedMessages);
+
+            var engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(
+                virtualize: true, environment: A.Fake<IEnvironment>(), addLoggerProviders: new[] { loggerProvider });
+
+            var macroConfigs = new[] { new FakeMacroConfig(new FakeMacro(), "testVariable") };
+            MacroProcessor.ProcessMacros(engineEnvironmentSettings, macroConfigs, new VariableCollection());
+
+            Assert.True(loggedMessages.Count == 1);
+            Assert.Equal("Generated symbol 'testVariable': type 'Fake' is unknown, processing is skipped.", loggedMessages.First().Message);
+        }
+
+        [Fact]
+        public void CanProcessMacroWithCustomMacroAsDependency()
+        {
+            var fakeMacroVariableName = "testVariable";
+            List<(LogLevel Level, string Message)> loggedMessages = new();
+            InMemoryLoggerProvider loggerProvider = new(loggedMessages);
+            var generatedConfig = A.Fake<IGeneratedSymbolConfig>();
+            A.CallTo(() => generatedConfig.Parameters).Returns(new Dictionary<string, string>()
+            {
+                { "sourceVariableName",  JExtensions.ToJsonString("dummy") },
+                { "fallbackVariableName",  JExtensions.ToJsonString(fakeMacroVariableName) }
+            });
+            A.CallTo(() => generatedConfig.VariableName).Returns("coalesceTest");
+
+            var coalesceMacroConfig = new CoalesceMacroConfig(new CoalesceMacro(), generatedConfig);
+            coalesceMacroConfig.Dependencies.Add(fakeMacroVariableName);
+
+            var engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true, environment: A.Fake<IEnvironment>(), addLoggerProviders: new[] { loggerProvider });
+
+            var fakeMacro = new FakeMacro();
+            var variableCollection = new Dictionary<string, object>() { { fakeMacroVariableName, fakeMacro } };
+
+            MacroProcessor.ProcessMacros(engineEnvironmentSettings, new[] { coalesceMacroConfig }, new VariableCollection(default, variableCollection));
+
+            Assert.True(variableCollection.Count == 2);
+            Assert.True(variableCollection.Values.Select(v => v.GetHashCode() == fakeMacro.GetHashCode()).Count() == 2);
+        }
+
+        [Fact]
+        public void CanSortMacrosWithDependencies()
+        {
+            var switchMacroName = "switchMacro";
+            var coalesceMacroName = "coalesceMacro";
+            var evaluateMacroName = "evaluateMacro";
+            var joinMacroName = "joinMacro";
+
+            var symbols = new string[] { switchMacroName, coalesceMacroName, evaluateMacroName, joinMacroName };
+
+            var evaluateMacroConfig = new EvaluateMacroConfig(evaluateMacroName, string.Empty, "condition");
+            var fakeCoalesceGeneratedSymbols = A.Fake<IGeneratedSymbolConfig>();
+            A.CallTo(() => fakeCoalesceGeneratedSymbols.Parameters).Returns(new Dictionary<string, string>()
+            {
+                { "sourceVariableName",  JExtensions.ToJsonString("dummy") },
+                { "fallbackVariableName",  JExtensions.ToJsonString("dummy") }
+            });
+            A.CallTo(() => fakeCoalesceGeneratedSymbols.VariableName).Returns(coalesceMacroName);
+            var coalesceMacroConfig = new CoalesceMacroConfig(new CoalesceMacro(), fakeCoalesceGeneratedSymbols);
+            coalesceMacroConfig.Dependencies.Add(evaluateMacroName);
+
+            var switchMacroConfig = new SwitchMacroConfig(new SwitchMacro(), switchMacroName, string.Empty, string.Empty, new List<(string?, string)>());
+            switchMacroConfig.Dependencies.Add(coalesceMacroName);
+            switchMacroConfig.Dependencies.Add(evaluateMacroName);
+
+            var fakeJoinGeneratedSymbols = A.Fake<IGeneratedSymbolConfig>();
+            A.CallTo(() => fakeJoinGeneratedSymbols.VariableName).Returns(joinMacroName);
+            A.CallTo(() => fakeJoinGeneratedSymbols.Parameters).Returns(new Dictionary<string, string>()
+            {
+                { "symbols",  /*lang=json,strict*/ "[ {\"value\":\"dummy\"  } ]" },
+                { "fallbackVariableName",  JExtensions.ToJsonString("dummy") }
+            });
+            var joinMacroConfig = new JoinMacroConfig(new JoinMacro(), fakeJoinGeneratedSymbols);
+            joinMacroConfig.Dependencies.Add(switchMacroName);
+            var macroConfigs = new[] { (BaseMacroConfig)joinMacroConfig, switchMacroConfig, evaluateMacroConfig, coalesceMacroConfig };
+
+            var sortedItems = MacroProcessor.SortMacroConfigsByDependencies(symbols, macroConfigs);
+
+            sortedItems.Select(si => si.VariableName).Should().Equal(new[] { evaluateMacroName, coalesceMacroName, switchMacroName, joinMacroName });
+        }
+
+        [Fact]
+        public void CanThrowErrorOnSortWhenMacrosHaveDepsCircle()
+        {
+            var switchMacroName = "switchMacro";
+            var coalesceMacroName = "coalesceMacro";
+
+            var symbols = new string[] { switchMacroName, coalesceMacroName };
+
+            var fakeCoalesceGeneratedSymbols = A.Fake<IGeneratedSymbolConfig>();
+            A.CallTo(() => fakeCoalesceGeneratedSymbols.Parameters).Returns(new Dictionary<string, string>()
+            {
+                { "sourceVariableName",  JExtensions.ToJsonString("dummy") },
+                { "fallbackVariableName",  JExtensions.ToJsonString("dummy") }
+            });
+            A.CallTo(() => fakeCoalesceGeneratedSymbols.VariableName).Returns(coalesceMacroName);
+            var coalesceMacroConfig = new CoalesceMacroConfig(new CoalesceMacro(), fakeCoalesceGeneratedSymbols);
+            coalesceMacroConfig.Dependencies.Add(switchMacroName);
+
+            var switchMacroConfig = new SwitchMacroConfig(new SwitchMacro(), switchMacroName, string.Empty, string.Empty, new List<(string?, string)>());
+            switchMacroConfig.Dependencies.Add(coalesceMacroName);
+            var macroConfigs = new[] { (BaseMacroConfig)switchMacroConfig, coalesceMacroConfig };
+
+            Action sorting = () => { MacroProcessor.SortMacroConfigsByDependencies(symbols, macroConfigs); };
+            sorting.Should().Throw<TemplateAuthoringException>()
+                .Which.Message.Should().Contain("Parameter conditions contain cyclic dependency: [switchMacro, coalesceMacro, switchMacro] that is preventing deterministic evaluation.");
         }
 
         [Fact]
@@ -139,6 +253,25 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             {
                 _macro = macro;
             }
+        }
+
+        private class FakeMacroConfig : BaseMacroConfig<FakeMacro, FakeMacroConfig>
+        {
+            public FakeMacroConfig(FakeMacro macro, string variableName, string? dataType = null) : base(macro, variableName, dataType) { }
+
+            public FakeMacroConfig(FakeMacro macro, IGeneratedSymbolConfig generatedSymbolConfig) : base(macro, generatedSymbolConfig.VariableName) { }
+        }
+
+        private class FakeMacro : BaseGeneratedSymbolMacro<FakeMacroConfig>
+        {
+            public override string Type => "Fake";
+
+            public override Guid Id => new Guid("{3DBC6AAB-5D13-40E9-3EC8-0467A7AA7334}");
+
+            public override FakeMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig) => new(this, deferredConfig);
+
+            public override void Evaluate(IEngineEnvironmentSettings environmentSettings, IVariableCollection variableCollection, FakeMacroConfig config)
+            { }
         }
     }
 }

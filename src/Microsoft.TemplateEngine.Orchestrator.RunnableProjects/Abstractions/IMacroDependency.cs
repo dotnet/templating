@@ -5,11 +5,21 @@ using System.Collections.Generic;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions
 {
-    //TODO: doc
+    /// <summary>
+    /// Represents a dependency configuration for a macro.
+    /// </summary>
     public interface IMacroConfigDependency
     {
-        public HashSet<string> Dependencies { get; }
+        /// <summary>
+        /// Gets the set of dependencies required by the macro.
+        /// </summary>
+        HashSet<string> Dependencies { get; }
 
-        public void ResolveSymbolDependencies(IReadOnlyList<string> symbols);
+        /// <summary>
+        /// Resolves the symbol dependencies based on the provided list of symbols.
+        /// </summary>
+        /// <param name="symbols">The list of symbols to resolve dependencies for.</param>
+        void ResolveSymbolDependencies(IReadOnlyList<string> symbols);
     }
+
 }
