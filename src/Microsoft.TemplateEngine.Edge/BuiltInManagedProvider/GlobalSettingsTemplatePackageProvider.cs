@@ -102,6 +102,9 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
             {
                 result.AddRange(task.Result);
             }
+
+            await UpdateTemplatePackageMetadataAsync(result.Select(r => r.TemplatePackage), cancellationToken).ConfigureAwait(false);
+
             return result;
         }
 
