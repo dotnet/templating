@@ -80,7 +80,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
         /// <param name="evaluableExpressionError">Error message detailing failing building evaluable expression.</param>
         /// <param name="referencedVariablesKeys">If passed (if not null) it will be populated with references to variables used within the inspected expression.</param>
         /// <returns></returns>
-        public static IEvaluable GetEvaluableExpression(
+        public static IEvaluable? GetEvaluableExpression(
             ILogger logger,
             string text,
             IVariableCollection variables,
@@ -124,7 +124,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
 
         protected abstract ITokenTrie GetSymbols(IProcessorState processor);
 
-        private static IEvaluable GetEvaluableExpression(
+        private static IEvaluable? GetEvaluableExpression(
             IProcessorState processor,
             ref int bufferLength,
             ref int currentBufferPosition,
@@ -155,7 +155,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
         {
             string? faultedSection = null;
 
-            IEvaluable expression = GetEvaluableExpression(
+            IEvaluable? expression = GetEvaluableExpression(
                 processor,
                 ref bufferLength,
                 ref currentBufferPosition,
