@@ -5,8 +5,10 @@ using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Abstractions;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros;
+using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Fakes;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Serialization;
 using Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Validation;
 using Microsoft.TemplateEngine.TestHelper;
@@ -72,6 +74,25 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
                 }
                 ],
                 "defaultValue ": "ThirdChoice "
+            }
+            """;
+
+        private const string ValidComputedDefinition = /*lang=json,strict*/ """
+            {
+                "type": "computed",
+                "datatype": "bool",
+                "value": "10 != 11"
+            }
+            """;
+
+        private const string ValidCustomMacroDefinition = /*lang=json,strict*/ """
+            {
+                "type": "fake",
+                "generator": "fake",
+                "parameters": {
+                  "source": "dummy",
+                  "pattern": "^hello$"
+                }
             }
             """;
 
@@ -142,6 +163,80 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
                     "Choice parameter 'ParamA' is invalid. It allows multiple values ('AllowMultipleValues=true'), while some of the configured choices contain separator characters ('|', ','). Invalid choices: {First|Choice}",
                     validationError.ErrorMessage);
             }
+        }
+
+        [Fact]
+        public void VerifyComputedSymbolsParsedCorrectly()
+        {
+            //
+            // Template content preparation
+            //
+
+            //fill test data here
+            TemplateConfigModel config = new TemplateConfigModel("test")
+            {
+                Name = "name",
+                ShortNameList = new[] { "shortName" },
+                Symbols = new[]
+                {
+                    new ComputedSymbol("computed1", JObject.Parse(ValidComputedDefinition)),
+                    new ComputedSymbol("computed2", JObject.Parse(ValidComputedDefinition))
+                }
+            };
+
+            //
+            // Dependencies preparation and mounting
+            //
+
+            IEngineEnvironmentSettings environmentSettings = _environmentSettingsHelper.CreateEnvironment();
+
+            string sourceBasePath = environmentSettings.GetTempVirtualizedPath();
+            using IMountPoint mountPoint = environmentSettings.MountPath(sourceBasePath);
+            using RunnableProjectConfig templateConfig = new RunnableProjectConfig(environmentSettings, new RunnableProjectGenerator(), config, mountPoint.Root);
+
+            //verify
+            Assert.Equal(7, templateConfig.GlobalOperationConfig.Macros.Count);
+            Assert.Equal(2, templateConfig.GlobalOperationConfig.Macros.Count(m => m.Type == "evaluate"));
+            Assert.Equal(4, templateConfig.GlobalOperationConfig.SymbolNames.Count);
+        }
+
+        [Fact]
+        public void VerifyCustomGeneratedSymbolsParsedCorrectly()
+        {
+            //
+            // Template content preparation
+            //
+
+            //fill test data here
+            TemplateConfigModel config = new TemplateConfigModel("test")
+            {
+                Name = "name",
+                ShortNameList = new[] { "shortName" },
+                Symbols = new[]
+                {
+                    new GeneratedSymbol("fake1", JObject.Parse(ValidCustomMacroDefinition))
+                }
+            };
+
+            //
+            // Dependencies preparation and mounting
+            //
+
+            IEngineEnvironmentSettings environmentSettings = _environmentSettingsHelper.CreateEnvironment(
+                additionalComponents: new[]
+                    {
+                        (typeof(IMacro), (IIdentifiedComponent)new FakeMacro()),
+                        (typeof(IGeneratedSymbolMacro), new FakeMacro())
+                    });
+
+            string sourceBasePath = environmentSettings.GetTempVirtualizedPath();
+            using IMountPoint mountPoint = environmentSettings.MountPath(sourceBasePath);
+            using RunnableProjectConfig templateConfig = new RunnableProjectConfig(environmentSettings, new RunnableProjectGenerator(), config, mountPoint.Root);
+
+            //verify
+            Assert.Equal(6, templateConfig.GlobalOperationConfig.Macros.Count);
+            Assert.Equal(1, templateConfig.GlobalOperationConfig.Macros.Count(m => m.Type == "fake"));
+            Assert.Equal(3, templateConfig.GlobalOperationConfig.SymbolNames.Count);
         }
     }
 }
