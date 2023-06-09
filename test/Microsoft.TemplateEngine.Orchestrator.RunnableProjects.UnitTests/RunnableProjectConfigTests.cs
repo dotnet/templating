@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using FakeItEasy;
+using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
@@ -197,7 +198,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             //verify
             Assert.Equal(7, templateConfig.GlobalOperationConfig.Macros.Count);
             Assert.Equal(2, templateConfig.GlobalOperationConfig.Macros.Count(m => m.Type == "evaluate"));
-            Assert.Equal(4, templateConfig.GlobalOperationConfig.SymbolNames.Count);
+            // default symbols are different for OS
+            templateConfig.GlobalOperationConfig.SymbolNames.Count.Should().BeGreaterThanOrEqualTo(3);
         }
 
         [Fact]
@@ -236,7 +238,47 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             //verify
             Assert.Equal(6, templateConfig.GlobalOperationConfig.Macros.Count);
             Assert.Equal(1, templateConfig.GlobalOperationConfig.Macros.Count(m => m.Type == "fake"));
-            Assert.Equal(3, templateConfig.GlobalOperationConfig.SymbolNames.Count);
+            // default symbols are different for OS
+            templateConfig.GlobalOperationConfig.SymbolNames.Count.Should().BeGreaterThanOrEqualTo(2);
+        }
+
+        [Fact]
+        public void VerifyDerivedSymbolsParsedCorrectly()
+        {
+            //
+            // Template content preparation
+            //
+
+            //fill test data here
+            TemplateConfigModel config = new TemplateConfigModel("test")
+            {
+                Name = "name",
+                ShortNameList = new[] { "shortName" },
+                Symbols = new[]
+                {
+                    (BaseSymbol)new ParameterSymbol("original", "whatever"),
+                    new DerivedSymbol("derivedTest", valueTransform: "fakeForm", valueSource: "original", replaces: "something")
+                }
+            };
+
+            //
+            // Dependencies preparation and mounting
+            //
+
+            IEngineEnvironmentSettings environmentSettings = _environmentSettingsHelper.CreateEnvironment(
+                additionalComponents: new[]
+                    {
+                        (typeof(IMacro), (IIdentifiedComponent)new FakeMacro()),
+                        (typeof(IGeneratedSymbolMacro), new FakeMacro())
+                    });
+
+            string sourceBasePath = environmentSettings.GetTempVirtualizedPath();
+            using IMountPoint mountPoint = environmentSettings.MountPath(sourceBasePath);
+            using RunnableProjectConfig templateConfig = new RunnableProjectConfig(environmentSettings, new RunnableProjectGenerator(), config, mountPoint.Root);
+
+            //verify
+            Assert.Equal(7, templateConfig.GlobalOperationConfig.Macros.Count);
+            Assert.Equal(1, templateConfig.GlobalOperationConfig.Macros.Count(m => m.VariableName == "derivedTest{-VALUE-FORMS-}identity"));
         }
     }
 }
