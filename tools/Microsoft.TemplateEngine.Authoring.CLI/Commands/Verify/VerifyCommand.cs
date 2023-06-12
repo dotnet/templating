@@ -171,7 +171,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.Commands.Verify
         }
 
         /// <summary>
-        /// Case insensitive version for <see cref="OptionExtensions.FromAmong{TOption}(TOption, string[])"/>.
+        /// Case insensitive version for <see cref="CliOption{TOption}.AcceptOnlyFromAmong(string[])"/>.
         /// </summary>
         private static void FromAmongCaseInsensitive(CliOption<IEnumerable<UniqueForOption>> option, string[]? allowedValues = null, string? allowedHiddenValue = null)
         {

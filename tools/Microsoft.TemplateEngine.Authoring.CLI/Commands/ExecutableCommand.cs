@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging.Console;
 namespace Microsoft.TemplateEngine.Authoring.CLI.Commands
 {
     /// <summary>
-    /// Represents a <see cref="Command"/> together with its action.
+    /// Represents a <see cref="CliCommand"/> together with its action.
     /// </summary>
     internal abstract class ExecutableCommand<TModel> : CliCommand where TModel : class
     {
