@@ -30,15 +30,18 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
                 }
             }
 
+            // Need to virtualize paths before mocking a file content.
+            var bootstrapper = new Bootstrapper(host, virtualizeConfiguration: true, loadDefaultComponents: true);
             // Mocks .templateengine\package.json
             if (!string.IsNullOrEmpty(packageJsonContent))
             {
+                var path = Path.Combine(new EngineEnvironmentSettings(host).Paths.GlobalSettingsDir, "packages.json");
                 host.FileSystem.WriteAllText(
-                    Path.Combine(new EngineEnvironmentSettings(host).Paths.GlobalSettingsDir, "packages.json"),
+                    path.Replace('\\', '/'),
                     packageJsonContent);
             }
 
-            return new Bootstrapper(host, virtualizeConfiguration: true, loadDefaultComponents: true);
+            return bootstrapper;
         }
 
         internal static async Task InstallTestTemplateAsync(Bootstrapper bootstrapper, params string[] templates)
