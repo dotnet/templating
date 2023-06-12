@@ -3,7 +3,6 @@
     <TargetFrameworks Condition="'$(PackSpecific)' != 'true'">$(NETCoreTargetFramework);$(NETFullTargetFramework)</TargetFrameworks>
     <TargetFrameworks Condition="'$(PackSpecific)' == 'true'">$(NETCoreTargetFramework)</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,4 +20,9 @@
   <ItemGroup>
     <Compile Include="..\Shared\**\*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
+  
+  <Target Name="RenameFile" AfterTargets="Build">
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\NuGet_testFeed.config" DestinationFiles="$(OutputPath)NuGet.config" />
+  </Target>
+
 </Project>

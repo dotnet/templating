@@ -157,6 +157,11 @@
         <target state="translated">Parametry definované hostitelem</target>
         <note />
       </trans-unit>
+      <trans-unit id="NuGetApiPackageManager_DownloadError_VulnerablePackage">
+        <source>Found package is vulnerable source: {0}</source>
+        <target state="translated">Nalezený balíček je ohroženým zdrojem: {0}</target>
+        <note />
+      </trans-unit>
       <trans-unit id="NuGetApiPackageManager_Error_FailedToLoadSource">
         <source>Failed to load the NuGet source {0}.</source>
         <target state="translated">Nepovedlo se načíst zdroj NuGet {0}.</target>
@@ -182,6 +187,11 @@
         <target state="translated">Nejsou definované ani povolené žádné zdroje NuGet.</target>
         <note />
       </trans-unit>
+      <trans-unit id="NuGetApiPackageManager_UpdateCheckError_VulnerablePackage">
+        <source>The checked package {0} is vulnerable.</source>
+        <target state="translated">Zkontrolovaný balíček {0} je ohrožený.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="NuGetApiPackageManager_Warning_FailedToDelete">
         <source>Failed to remove {0} after failed download. Remove the file manually if it exists.</source>
         <target state="translated">Po neúspěšném stažení se nepovedlo odebrat soubor {0}. Pokud existuje, odeberte ho ručně.</target>
@@ -195,6 +205,11 @@
       <trans-unit id="NuGetApiPackageManager_Warning_FailedToLoadSource">
         <source>Failed to load NuGet source {0}: the source is not valid. It will be skipped in further processing.</source>
         <target state="translated">Nepovedlo se načíst zdroj Nuget {0}: zdroj není platný. Při dalším zpracování se přeskočí.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="NuGetApiPackageManager_Warning_InsecureFeed">
+        <source>The NuGet sources {0} are insecure and will not be searched. If you want to include those sources for search, use --force.</source>
+        <target state="translated">Zdroje NuGet {0} jsou nezabezpečené a nebudou se prohledávat. Pokud chcete zahrnout tyto zdroje pro vyhledávání, použijte --force.</target>
         <note />
       </trans-unit>
       <trans-unit id="NuGetApiPackageManager_Warning_PackageNotFound">
@@ -276,6 +291,16 @@ Podrobnosti: {1}</target>
 Details: {1}.</source>
         <target state="translated">U balíčku {0} se nepovedlo zkontrolovat aktualizace. 
 Podrobnosti: {1}.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="NuGetInstaller_InstallResult_Error_VulnerablePackage">
+        <source>The requested package {0} has vulnerabilities.</source>
+        <target state="translated">Požadovaný balíček {0} obsahuje ohrožení zabezpečení.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="NuGetInstaller_UpdateCheck_Error_VulnerablePackage">
+        <source>The checked package {0} has vulnerabilities.</source>
+        <target state="translated">Zkontrolovaný balíček {0} obsahuje ohrožení zabezpečení.</target>
         <note />
       </trans-unit>
       <trans-unit id="OSConstraint_Error_InvalidOSName">
@@ -373,6 +398,11 @@ Podrobnosti: {0}.</target>
         <source>Failed to load host data in {0} at {1}.</source>
         <target state="translated">Nepovedlo se načíst data hostitele v {0} v {1}.</target>
         <note>{0} - path to template location, {1} relative path inside template location.</note>
+      </trans-unit>
+      <trans-unit id="TemplatePackageManager_Error_FailedToFindPackage">
+        <source>Failed to retrieve package with identifier '{0}'.</source>
+        <target state="translated">Načtení balíčku s identifikátorem {0} se nezdařilo.</target>
+        <note />
       </trans-unit>
       <trans-unit id="TemplatePackageManager_Error_FailedToGetTemplatePackages">
         <source>Failed to retrieve template packages from provider '{0}'.

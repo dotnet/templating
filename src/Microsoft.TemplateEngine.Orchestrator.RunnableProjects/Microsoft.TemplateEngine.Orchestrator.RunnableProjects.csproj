@@ -6,7 +6,6 @@
     <IsPackable>true</IsPackable>
     <EnablePublicApiAnalyzer>true</EnablePublicApiAnalyzer>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -35,6 +34,12 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>LocalizableStrings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests" Key="$(TemplateEnginePublicKey)" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" Key="$(DynamicProxyGenAssembly2PublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.TemplateEngine.Edge.UnitTests" Key="$(TemplateEnginePublicKey)" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties schemas_4json_4template_1json__JsonSchema="http://json-schema.org/2020-12/schema#" /></VisualStudio></ProjectExtensions>

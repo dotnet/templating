@@ -17,7 +17,7 @@ parameters:
 
 pool:
   name: NetCore1ESPool-Internal
-  demands: ImageOverride -equals Build.Ubuntu.2204.Amd64
+  demands: ImageOverride -equals Build.Ubuntu.2004.Amd64
 
 steps:
 - checkout: self
@@ -93,13 +93,12 @@ steps:
     version: 7.0.100
     installationPath: $(Build.SourcesDirectory)/.dotnet
 
-- bash: >
-    curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin
-    -Channel 7.0.2xx
-    -Quality daily
-    -InstallDir $(Build.SourcesDirectory)/.dotnet
-    -SkipNonVersionedFiles
-  displayName: Install daily .NET 7.0.2xx
+- task: UseDotNet@2
+  displayName: 'Use .NET 7.0.200'
+  inputs:
+    packageType: sdk
+    version: 7.0.200
+    installationPath: $(Build.SourcesDirectory)/.dotnet
 
 - bash: >
     curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin

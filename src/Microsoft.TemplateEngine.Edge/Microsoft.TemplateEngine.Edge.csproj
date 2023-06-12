@@ -6,7 +6,6 @@
     <IsPackable>true</IsPackable>
     <EnablePublicApiAnalyzer>true</EnablePublicApiAnalyzer>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Nullable>enable</Nullable>
     <DefineConstants Condition="'$(TargetFramework)' == '$(NETFullTargetFramework)'">$(DefineConstants);NETFULL</DefineConstants>
   </PropertyGroup>
 
@@ -42,6 +41,11 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>LocalizableStrings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Microsoft.TemplateEngine.Edge.UnitTests" Key="$(TemplateEnginePublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.TemplateEngine.Cli.UnitTests" Key="$(TemplateEnginePublicKey)" />
   </ItemGroup>
 
 </Project>

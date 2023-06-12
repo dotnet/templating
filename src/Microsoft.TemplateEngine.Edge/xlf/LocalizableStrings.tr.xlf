@@ -157,6 +157,11 @@
         <target state="translated">Ana bilgisayar tanımlı parametreler</target>
         <note />
       </trans-unit>
+      <trans-unit id="NuGetApiPackageManager_DownloadError_VulnerablePackage">
+        <source>Found package is vulnerable source: {0}</source>
+        <target state="translated">Bulunan paket savunmasız kaynak: {0}</target>
+        <note />
+      </trans-unit>
       <trans-unit id="NuGetApiPackageManager_Error_FailedToLoadSource">
         <source>Failed to load the NuGet source {0}.</source>
         <target state="translated">{0} NuGet kaynağı yüklenemedi.</target>
@@ -182,6 +187,11 @@
         <target state="translated">Tanımlanmış veya etkinleştirilmiş NuGet kaynağı yok.</target>
         <note />
       </trans-unit>
+      <trans-unit id="NuGetApiPackageManager_UpdateCheckError_VulnerablePackage">
+        <source>The checked package {0} is vulnerable.</source>
+        <target state="translated">Denetlenen {0} paketi savunmasız.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="NuGetApiPackageManager_Warning_FailedToDelete">
         <source>Failed to remove {0} after failed download. Remove the file manually if it exists.</source>
         <target state="translated">Başarısız indirme işleminden sonra {0} kaldırılamadı. Varsa, dosyayı el ile kaldırın.</target>
@@ -195,6 +205,11 @@
       <trans-unit id="NuGetApiPackageManager_Warning_FailedToLoadSource">
         <source>Failed to load NuGet source {0}: the source is not valid. It will be skipped in further processing.</source>
         <target state="translated">{0} NuGet kaynağı yüklenemedi: kaynak geçerli değil. Daha fazla işlemede atlanacak.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="NuGetApiPackageManager_Warning_InsecureFeed">
+        <source>The NuGet sources {0} are insecure and will not be searched. If you want to include those sources for search, use --force.</source>
+        <target state="translated">{0} NuGet kaynakları güvenli değil ve aranmaz. Bu kaynakları aramaya dahil etmek istiyorsanız --force komutunu kullanın.</target>
         <note />
       </trans-unit>
       <trans-unit id="NuGetApiPackageManager_Warning_PackageNotFound">
@@ -276,6 +291,16 @@ Ayrıntılar: {1}.</target>
 Details: {1}.</source>
         <target state="translated">{0} paketi için güncelleştirme denetimi başarısız oldu.
 Ayrıntılar: {1}.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="NuGetInstaller_InstallResult_Error_VulnerablePackage">
+        <source>The requested package {0} has vulnerabilities.</source>
+        <target state="translated">İstenen {0} paketinde güvenlik açıkları var.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="NuGetInstaller_UpdateCheck_Error_VulnerablePackage">
+        <source>The checked package {0} has vulnerabilities.</source>
+        <target state="translated">Denetlenen {0} paketinde güvenlik açıkları var.</target>
         <note />
       </trans-unit>
       <trans-unit id="OSConstraint_Error_InvalidOSName">
@@ -373,6 +398,11 @@ Ayrıntılar: {0}.</target>
         <source>Failed to load host data in {0} at {1}.</source>
         <target state="translated">{1} konumundaki {0} içinde yer alan konak verileri yüklenemedi.</target>
         <note>{0} - path to template location, {1} relative path inside template location.</note>
+      </trans-unit>
+      <trans-unit id="TemplatePackageManager_Error_FailedToFindPackage">
+        <source>Failed to retrieve package with identifier '{0}'.</source>
+        <target state="translated">'{0}' tanımlayıcısına sahip paket alınamadı.</target>
+        <note />
       </trans-unit>
       <trans-unit id="TemplatePackageManager_Error_FailedToGetTemplatePackages">
         <source>Failed to retrieve template packages from provider '{0}'.

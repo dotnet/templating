@@ -157,6 +157,11 @@
         <target state="translated">Parámetros definidos por el host</target>
         <note />
       </trans-unit>
+      <trans-unit id="NuGetApiPackageManager_DownloadError_VulnerablePackage">
+        <source>Found package is vulnerable source: {0}</source>
+        <target state="translated">El paquete encontrado es de un origen vulnerable: {0}</target>
+        <note />
+      </trans-unit>
       <trans-unit id="NuGetApiPackageManager_Error_FailedToLoadSource">
         <source>Failed to load the NuGet source {0}.</source>
         <target state="translated">No se pudo cargar el origen de NuGet {0}</target>
@@ -182,6 +187,11 @@
         <target state="translated">No hay ninguna fuente de NuGet definida o habilitada.</target>
         <note />
       </trans-unit>
+      <trans-unit id="NuGetApiPackageManager_UpdateCheckError_VulnerablePackage">
+        <source>The checked package {0} is vulnerable.</source>
+        <target state="translated">El paquete comprobado {0} es vulnerable.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="NuGetApiPackageManager_Warning_FailedToDelete">
         <source>Failed to remove {0} after failed download. Remove the file manually if it exists.</source>
         <target state="translated">No se pudo quitar {0} después del error de descarga. Quite el archivo manualmente si existe.</target>
@@ -195,6 +205,11 @@
       <trans-unit id="NuGetApiPackageManager_Warning_FailedToLoadSource">
         <source>Failed to load NuGet source {0}: the source is not valid. It will be skipped in further processing.</source>
         <target state="translated">No se pudo cargar el origen de NuGet {0}: el origen no es válido. Se omitirá en un proceso posterior.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="NuGetApiPackageManager_Warning_InsecureFeed">
+        <source>The NuGet sources {0} are insecure and will not be searched. If you want to include those sources for search, use --force.</source>
+        <target state="translated">Los orígenes de NuGet {0} no son seguros y no se buscarán. Si desea incluir esos orígenes para la búsqueda, use --force.</target>
         <note />
       </trans-unit>
       <trans-unit id="NuGetApiPackageManager_Warning_PackageNotFound">
@@ -276,6 +291,16 @@ Detalles: {1}.</target>
 Details: {1}.</source>
         <target state="translated">No se pudo comprobar la actualización del paquete {0}.
 Detalles: {1}.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="NuGetInstaller_InstallResult_Error_VulnerablePackage">
+        <source>The requested package {0} has vulnerabilities.</source>
+        <target state="translated">El paquete solicitado {0} tiene vulnerabilidades.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="NuGetInstaller_UpdateCheck_Error_VulnerablePackage">
+        <source>The checked package {0} has vulnerabilities.</source>
+        <target state="translated">El paquete comprobado {0} tiene vulnerabilidades.</target>
         <note />
       </trans-unit>
       <trans-unit id="OSConstraint_Error_InvalidOSName">
@@ -373,6 +398,11 @@ Detalles: {0}.</target>
         <source>Failed to load host data in {0} at {1}.</source>
         <target state="translated">No se pudieron cargar los datos de host en {0} en {1}.</target>
         <note>{0} - path to template location, {1} relative path inside template location.</note>
+      </trans-unit>
+      <trans-unit id="TemplatePackageManager_Error_FailedToFindPackage">
+        <source>Failed to retrieve package with identifier '{0}'.</source>
+        <target state="translated">Ha ocurrido un error al recuperar el paquete con el identificador "{0}".</target>
+        <note />
       </trans-unit>
       <trans-unit id="TemplatePackageManager_Error_FailedToGetTemplatePackages">
         <source>Failed to retrieve template packages from provider '{0}'.
