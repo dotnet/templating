@@ -15,7 +15,11 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
         private const string HostIdentifier = "IDE.IntegrationTests";
         private const string HostVersion = "v1.0.0";
 
-        internal static Bootstrapper GetBootstrapper(IEnumerable<string>? additionalVirtualLocations = null, bool loadTestTemplates = false, IEnumerable<ILoggerProvider>? addLoggerProviders = null)
+        internal static Bootstrapper GetBootstrapper(
+            IEnumerable<string>? additionalVirtualLocations = null,
+            bool loadTestTemplates = false,
+            IEnumerable<ILoggerProvider>? addLoggerProviders = null,
+            string packageJsonContent = "")
         {
             ITemplateEngineHost host = CreateHost(loadTestTemplates, addLoggerProviders);
             if (additionalVirtualLocations != null)
@@ -25,6 +29,15 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
                     host.VirtualizeDirectory(virtualLocation);
                 }
             }
+
+            // Mocks .templateengine\package.json
+            if (!string.IsNullOrEmpty(packageJsonContent))
+            {
+                host.FileSystem.WriteAllText(
+                    Path.Combine(new EngineEnvironmentSettings(host).Paths.GlobalSettingsDir, "packages.json"),
+                    packageJsonContent);
+            }
+
             return new Bootstrapper(host, virtualizeConfiguration: true, loadDefaultComponents: true);
         }
 
