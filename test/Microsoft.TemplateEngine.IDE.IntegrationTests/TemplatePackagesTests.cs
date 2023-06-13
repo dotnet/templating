@@ -23,7 +23,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
                 "PackageId": "Sln",
                 "Author": "Enrico Sada",
                 "NuGetSource": "https://api.nuget.org/v3/index.json",
-                "Version": "0.3.0"
+                "Version": "0.2.0"
             },
             "InstallerId": "015dcbac-b4a5-49ea-94a6-061616eb60e2",
             "LastChangeTime": "2023-04-13T15:17:16.4866397Z",
@@ -34,11 +34,11 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
                 "PackageId": "Boxed.Templates",
                 "Author": "Muhammad Rehan Saeed (RehanSaeed.com)",
                 "NuGetSource": "https://api.nuget.org/v3/index.json",
-                "Version": "7.14.0"
+                "Version": "7.4.0"
             },
             "InstallerId": "015dcbac-b4a5-49ea-94a6-061616eb60e2",
             "LastChangeTime": "2023-06-01T11:32:14.867341Z",
-            "MountPointUri": "packages\\Boxed.Templates.7.14.0.nupkg"
+            "MountPointUri": "packages\\Boxed.Templates.7.4.0.nupkg"
         }
     ]
 }
@@ -219,12 +219,17 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
                 .GetLatestVersionsAsync(installedPackages, CancellationToken.None).ConfigureAwait(false);
 
             var updatedPackages = await bootstrapper.GetManagedTemplatePackagesAsync(CancellationToken.None);
+
             Assert.Equal(2, updatedPackages.Count);
-            var slnPackageDetails = updatedPackages[0].GetDetails();
+            var slnPackage = updatedPackages[0];
+            Assert.Equal("0.2.0", slnPackage.Version);
+            var slnPackageDetails = slnPackage.GetDetails();
             Assert.Equal("enricosada", slnPackageDetails["Owners"]);
             Assert.False(bool.Parse(slnPackageDetails["Reserved"]));
 
-            var boxPackageDetails = updatedPackages[1].GetDetails();
+            var boxPackage = updatedPackages[1];
+            Assert.Equal("7.4.0", boxPackage.Version);
+            var boxPackageDetails = boxPackage.GetDetails();
             Assert.Equal("BlackLight", boxPackageDetails["Owners"]);
             Assert.True(bool.Parse(boxPackageDetails["Reserved"]));
         }
