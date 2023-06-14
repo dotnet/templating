@@ -25,6 +25,8 @@ variables:
     value: true
   - name: Codeql.Enabled
     value: true
+  - name: EnableReleaseOneLocBuild
+    value: false
   - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
     - group: Templating-SDLValidation-Params
     
@@ -43,15 +45,19 @@ stages:
   displayName: Build
   jobs:
   - ${{ if and( ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+    # The localization setup for release/ branches. Note difference in package ID. Should not be used with main branch.
+    # Used for release/x.0.100, release/x.0.200, release/x.0.300, release/x.0.400 branches only.
+    # When the branch is setup for localizaiton, set 'EnableReleaseOneLocBuild' to true.
     - ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/release/') }}:
       - template: /eng/common/templates/job/onelocbuild.yml
         parameters:
           MirrorRepo: templating
           LclSource: lclFilesfromPackage
           LclPackageId: 'LCL-JUNO-PROD-TEMPLATING'
-          MirrorBranch: $(OneLocBuildBranch)
+          MirrorBranch: replace(variables['Build.SourceBranch'], 'refs/heads/', '')
           JobNameSuffix: '_release'
-          condition: eq(variables['Build.SourceBranch'], format('{0}{1}', 'refs/heads/', variables['OneLocBuildBranch'] ))
+          condition: $(EnableReleaseOneLocBuild)
+    # The localization setup for main branch. Note difference in package ID. Should not be used with release/ branches.
     - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
       - template: /eng/common/templates/job/onelocbuild.yml
         parameters:
