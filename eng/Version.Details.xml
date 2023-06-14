@@ -11,17 +11,17 @@
       <Sha>def2e2c6dc5064319250e2868a041a3dc07f9579</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="VS.Redist.Common.NetCore.SharedFramework.x64.6.0" Version="6.0.18-servicing.23272.16">
+    <Dependency Name="VS.Redist.Common.NetCore.SharedFramework.x64.6.0" Version="6.0.19-servicing.23313.13">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
-      <Sha>bb9f3c3cee21b449c6a2348eecf316d05b274389</Sha>
+      <Sha>e2176dfe59cc071eb14362fb0c9cfea329d7b72e</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="6.0.18">
+    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="6.0.19">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
-      <Sha>bb9f3c3cee21b449c6a2348eecf316d05b274389</Sha>
+      <Sha>e2176dfe59cc071eb14362fb0c9cfea329d7b72e</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Ref" Version="6.0.18">
+    <Dependency Name="Microsoft.NETCore.App.Ref" Version="6.0.19">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
-      <Sha>bb9f3c3cee21b449c6a2348eecf316d05b274389</Sha>
+      <Sha>e2176dfe59cc071eb14362fb0c9cfea329d7b72e</Sha>
     </Dependency>
     <Dependency Name="System.CommandLine" Version="2.0.0-beta3.22222.1">
       <Uri>https://github.com/dotnet/command-line-api</Uri>
@@ -33,7 +33,7 @@
     </Dependency>
     <Dependency Name="Microsoft.Extensions.Logging.Abstractions" Version="6.0.4">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
-      <Sha>bb9f3c3cee21b449c6a2348eecf316d05b274389</Sha>
+      <Sha>61d7c70aaf511967552702f22c27a41649c5ffe8</Sha>
     </Dependency>
     <Dependency Name="Microsoft.Extensions.Logging.Console" Version="6.0.0">
       <Uri>https://github.com/dotnet/runtime</Uri>
