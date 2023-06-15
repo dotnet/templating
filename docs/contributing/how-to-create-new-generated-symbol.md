@@ -72,7 +72,7 @@ The very basic implementation may be:
 
     internal class HelloMacroConfig : BaseMacroConfig<HelloMacro, HelloMacroConfig>, IMacroConfigDependency
     {
-        internal HelloMacroConfig(HelloMacro macro, string variableName, string? dataType = null, string nameToGreet, string sourceVariable) : base(macro, variableName, dataType)
+        internal HelloMacroConfig(HelloMacro macro, string variableName, string nameToGreet, string sourceVariable, string? dataType = null) : base(macro, variableName, dataType)
         {
             if (string.IsNullOrEmpty(nameToGreet))
             {
@@ -105,6 +105,56 @@ The very basic implementation may be:
         }
     }
 ```
+
+Unit test example for checking the custom macro:
+```CSharp
+        public class HelloMacroTests : IClassFixture<EnvironmentSettingsHelper>
+    {
+        private readonly IEngineEnvironmentSettings _engineEnvironmentSettings;
+
+        public HelloMacroTests(EnvironmentSettingsHelper environmentSettingsHelper)
+        {
+            _engineEnvironmentSettings = environmentSettingsHelper.CreateEnvironment(hostIdentifier: GetType().Name, virtualize: true);
+        }
+
+        [Fact(DisplayName = nameof(TestEvaluationOfHelloMacro))]
+        public void TestEvaluationOfHelloMacro()
+        {
+            string variableName = "myHelloMacro";
+            string sourceVariable = "originalValue";
+
+            HelloMacro macro = new();
+            HelloMacroConfig macroConfig = new(macro, variableName, "name to greet", sourceVariable);
+            IVariableCollection variables = new VariableCollection();
+
+            macro.Evaluate(_engineEnvironmentSettings, variables, macroConfig);
+
+            string newValue = (string)variables[variableName];
+            Assert.True(variables.Count == 1);
+            Assert.Equal("Hello name to greet!", newValue);
+        }
+
+        [Fact(DisplayName = nameof(TestEvaluationOfHelloMacro))]
+        public void TestDependencyResolutionOfHelloMacro()
+        {
+            string variableName = "myHelloMacro";
+            string sourceVariable = "originalValue";
+
+            HelloMacro macro = new();
+            HelloMacroConfig macroConfig = new(macro, variableName, "name to greet", sourceVariable);
+
+            IVariableCollection variables = new VariableCollection();
+            string sourceValue = "dependentMacro";
+            variables[sourceVariable] = sourceValue;
+
+            macroConfig.ResolveSymbolDependencies(variables.Select(v => v.Key).ToList());
+
+            Assert.True(macroConfig.Dependencies.Count == 1);
+            Assert.Equal(sourceVariable, macroConfig.Dependencies.First());
+        }
+    }
+```
+This test should be placed under folder: [`MacroTests`](../../test/Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests/MacroTests/).
 `IMacroConfigDependency` interface depicts macro capability to derive it value(s) from other macros.
 Dependencies are defined based on passed `IReadOnlyList<string> symbols` collection. An example of implemetation can be find here: [`CoalesceMacroConfig.cs`](../../src/Microsoft.TemplateEngine.Orchestrator.RunnableProjects/Macros/CoalesceMacroConfig.cs).
 
