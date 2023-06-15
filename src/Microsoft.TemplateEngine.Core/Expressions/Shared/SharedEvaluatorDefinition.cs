@@ -39,7 +39,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
         /// Inspect the passed string, creates the expression, substitutes parameters within expression, evaluates substituted expression and returns result.
         /// If non-null bag for variable references is passed, it will be populated with references of variables used within the evaluable expression.
         /// </summary>
-        /// <param name="logger"></param>
+        /// <param name="logger">The logger to be used to log the messages during evaluation.</param>
         /// <param name="text">The string to be inspected and turned into expression.</param>
         /// <param name="variables">Variables to be substituted within the expression.</param>
         /// <returns></returns>
@@ -52,7 +52,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
         /// Inspect the passed string, creates the expression, substitutes parameters within expression, evaluates substituted expression and returns result.
         /// If non-null bag for variable references is passed, it will be populated with references of variables used within the evaluable expression.
         /// </summary>
-        /// <param name="logger"></param>
+        /// <param name="logger">The logger to be used to log the messages during evaluation.</param>
         /// <param name="text">The string to be inspected and turned into expression.</param>
         /// <param name="variables">Variables to be substituted within the expression.</param>
         /// <param name="faultedMessage">Error message detailing failing evaluation, should it fail.</param>
@@ -75,12 +75,12 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
         /// Creates the evaluable expression based on passed string,
         /// collects used symbols in the expression and reports if any errors occurs on expression creation.
         /// </summary>
-        /// <param name="logger"></param>
+        /// <param name="logger">The logger to be used to log the messages during building the evaluable expression.</param>
         /// <param name="text">The string to be inspected and turned into expression.</param>
         /// <param name="variables">Variables to be substituted within the expression.</param>
         /// <param name="evaluableExpressionError">Error message detailing failing building evaluable expression.</param>
         /// <param name="referencedVariablesKeys">If passed (if not null) it will be populated with references to variables used within the inspected expression.</param>
-        /// <returns></returns>
+        /// <returns>Evaluable expression that represents decomposed <paramref name="text"></paramref>.</returns>
         public static IEvaluable? GetEvaluableExpression(
             ILogger logger,
             string text,
