@@ -170,6 +170,11 @@ Detalles: {1}</target>
         <target state="translated">La configuración regional "{0}" no coincide con ninguna referencia cultural conocida.</target>
         <note />
       </trans-unit>
+      <trans-unit id="MacroConfig_Exception_AccessToDependencies">
+        <source>The method '{0}' must be called prior '{1}' property reading.</source>
+        <target state="new">The method '{0}' must be called prior '{1}' property reading.</target>
+        <note>erty name.</note>
+      </trans-unit>
       <trans-unit id="MacroProcessing_Warning_DependencyErrors">
         <source>'{0}' was not processed due to the next issues in dependencises: '{1}'.</source>
         <target state="new">'{0}' was not processed due to the next issues in dependencises: '{1}'.</target>

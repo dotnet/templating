@@ -92,7 +92,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
                 "generator": "fake",
                 "parameters": {
                   "source": "dummy",
-                  "pattern": "^hello$"
+                  "pattern": "^hello$",
+                  "name": "dummy"
                 }
             }
             """;
@@ -197,9 +198,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
 
             //verify
             Assert.Equal(7, templateConfig.GlobalOperationConfig.Macros.Count);
-            Assert.Equal(2, templateConfig.GlobalOperationConfig.Macros.Count(m => m.Type == "evaluate"));
+            var evaluatedMacros = templateConfig.GlobalOperationConfig.Macros.Where(m => m.Type == "evaluate");
+            Assert.Equal(2, evaluatedMacros.Count());
+            evaluatedMacros.Select(m => m.VariableName).Should().Equal(new string[] { "computed1", "computed2" });
             // default symbols are different for OS
             templateConfig.GlobalOperationConfig.SymbolNames.Count.Should().BeGreaterThanOrEqualTo(3);
+            templateConfig.GlobalOperationConfig.SymbolNames.Should().Contain(new string[] { "computed1", "computed2" });
         }
 
         [Fact]
@@ -235,11 +239,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             using IMountPoint mountPoint = environmentSettings.MountPath(sourceBasePath);
             using RunnableProjectConfig templateConfig = new RunnableProjectConfig(environmentSettings, new RunnableProjectGenerator(), config, mountPoint.Root);
 
+            var customMacros = templateConfig.GlobalOperationConfig.Macros.Where(m => m.Type == "fake");
             //verify
             Assert.Equal(6, templateConfig.GlobalOperationConfig.Macros.Count);
-            Assert.Equal(1, templateConfig.GlobalOperationConfig.Macros.Count(m => m.Type == "fake"));
+            Assert.Single(customMacros);
+            Assert.Equal("fake1", customMacros.First().VariableName);
             // default symbols are different for OS
             templateConfig.GlobalOperationConfig.SymbolNames.Count.Should().BeGreaterThanOrEqualTo(2);
+            templateConfig.GlobalOperationConfig.SymbolNames.Should().Contain(new string[] { "fake1" });
         }
 
         [Fact]
@@ -279,6 +286,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             //verify
             Assert.Equal(7, templateConfig.GlobalOperationConfig.Macros.Count);
             Assert.Equal(1, templateConfig.GlobalOperationConfig.Macros.Count(m => m.VariableName == "derivedTest{-VALUE-FORMS-}identity"));
+
+            templateConfig.GlobalOperationConfig.SymbolNames.Should().Contain(new string[] { "original", "derivedTest" });
         }
     }
 }

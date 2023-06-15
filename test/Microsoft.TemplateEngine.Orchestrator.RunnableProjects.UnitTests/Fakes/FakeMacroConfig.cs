@@ -8,17 +8,21 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Fakes
 {
     internal class FakeMacroConfig : BaseMacroConfig<FakeMacro, FakeMacroConfig>, IMacroConfigDependency
     {
-        public FakeMacroConfig(FakeMacro macro, string variableName, string sourceName, string? dataType = null) : base(macro, variableName, dataType)
+        public FakeMacroConfig(FakeMacro macro, string variableName, string sourceName, string nameToGreet = "", string? dataType = null) : base(macro, variableName, dataType)
         {
             Source = sourceName;
+            NameToGreet = nameToGreet;
         }
 
         public FakeMacroConfig(FakeMacro macro, IGeneratedSymbolConfig generatedSymbolConfig) : base(macro, generatedSymbolConfig.VariableName)
         {
             Source = GetMandatoryParameterValue(generatedSymbolConfig, "source");
+            NameToGreet = GetMandatoryParameterValue(generatedSymbolConfig, "name");
         }
 
         public string Source { get; }
+
+        public string NameToGreet { get; }
 
         public void ResolveSymbolDependencies(IReadOnlyList<string> symbols) => PopulateMacroConfigDependencies(Source, symbols);
     }

@@ -72,7 +72,8 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
         }
 
         /// <summary>
-        /// Creates the expression based on passed string.
+        /// Creates the evaluable expression based on passed string,
+        /// collects used symbols in the expression and reports if any errors occurs on expression creation.
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="text">The string to be inspected and turned into expression.</param>

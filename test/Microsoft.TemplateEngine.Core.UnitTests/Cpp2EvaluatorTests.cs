@@ -214,5 +214,35 @@ namespace Microsoft.TemplateEngine.Core.UnitTests
             Assert.Null(faultedMessage);
             Assert.True(result);
         }
+
+        [Fact(DisplayName = nameof(VerifyEvaluableExpressionNoVarsCollectionProvided))]
+        public void VerifyEvaluableExpressionNoVarsCollectionProvided()
+        {
+            VariableCollection vc = new VariableCollection();
+            HashSet<string> referencedVariablesKeys = new HashSet<string>();
+            var result = Cpp2StyleEvaluatorDefinition.GetEvaluableExpression(
+                _logger, "navigate == true", vc, out string? faultedMessage, referencedVariablesKeys);
+
+            Assert.Null(faultedMessage);
+            Assert.NotNull(result);
+            Assert.Empty(vc);
+        }
+
+        [Fact(DisplayName = nameof(VerifyEvaluableExpressionVarsCollectionProvided))]
+        public void VerifyEvaluableExpressionVarsCollectionProvided()
+        {
+            VariableCollection vc = new VariableCollection()
+            {
+                { "navigate", "true" }
+            };
+            HashSet<string> referencedVariablesKeys = new HashSet<string>();
+            var result = Cpp2StyleEvaluatorDefinition.GetEvaluableExpression(
+                _logger, "navigate == true", vc, out string? faultedMessage, referencedVariablesKeys);
+
+            Assert.Null(faultedMessage);
+            Assert.NotNull(result);
+            Assert.Single(referencedVariablesKeys);
+            Assert.Equal("navigate", referencedVariablesKeys.First());
+        }
     }
 }

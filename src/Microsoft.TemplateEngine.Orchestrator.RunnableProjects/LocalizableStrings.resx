@@ -236,6 +236,10 @@ Details: {1}</value>
   <data name="LocalizationModelDeserializer_Error_UnknownLocale" xml:space="preserve">
     <value>Locale '{0}' does not match any known cultures.</value>
   </data>
+  <data name="MacroConfig_Exception_AccessToDependencies" xml:space="preserve">
+    <value>The method '{0}' must be called prior '{1}' property reading.</value>
+    <comment>erty name.</comment>
+  </data>
   <data name="MacroConfig_Exception_ArrayShouldContainObjects" xml:space="preserve">
     <value>Generated symbol '{0}': array '{1}' should contain JSON objects.</value>
     <comment>{0} - name of generated symbol, {1} - the invalid property name.</comment>

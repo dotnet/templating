@@ -34,11 +34,11 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             }
         }
 
-        public HashSet<string> Dependencies { get; private set; } = new HashSet<string>();
-
         public string VariableName { get; }
 
         public string Type { get; }
+
+        internal bool MacroDependenciesResolved { get; set; }
 
         internal string DataType { get; } = "string";
 
@@ -49,8 +49,25 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
         where TMacro : IMacro<TMacroConfig>
         where TMacroConfig : BaseMacroConfig<TMacro, TMacroConfig>, IMacroConfig
     {
+        private HashSet<string> _dependencies = new HashSet<string>();
+
         protected BaseMacroConfig(TMacro macro, string variableName, string? dataType = null)
             : base(macro.Type, variableName, dataType) { }
+
+        public HashSet<string> Dependencies
+        {
+            get
+            {
+                if (!MacroDependenciesResolved)
+                {
+                    throw new ArgumentException(string.Format(
+                        LocalizableStrings.MacroConfig_Exception_AccessToDependencies, nameof(PopulateMacroConfigDependency), nameof(Dependencies)));
+                }
+
+                return _dependencies;
+            }
+            set => _dependencies = value;
+        }
 
         protected static string? GetOptionalParameterValue(IGeneratedSymbolConfig config, string parameterName, string? defaultValue = default)
         {
@@ -198,6 +215,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
         private void PopulateMacroConfigDependency(string referencedValue)
         {
             Dependencies.Add(referencedValue);
+            MacroDependenciesResolved = true;
         }
     }
 }

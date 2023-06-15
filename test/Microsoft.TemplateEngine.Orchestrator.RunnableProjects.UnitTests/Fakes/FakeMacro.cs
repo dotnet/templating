@@ -16,6 +16,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Fakes
         public override FakeMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig deferredConfig) => new(this, deferredConfig);
 
         public override void Evaluate(IEngineEnvironmentSettings environmentSettings, IVariableCollection variableCollection, FakeMacroConfig config)
-        { }
+        {
+            string fakeMessage = $"Hello {config.NameToGreet}!";
+            variableCollection[config.VariableName] = fakeMessage;
+        }
+
     }
 }

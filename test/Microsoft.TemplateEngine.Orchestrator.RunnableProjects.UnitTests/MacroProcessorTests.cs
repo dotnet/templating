@@ -54,6 +54,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
         public void CanProcessMacroWithCustomMacroAsDependency()
         {
             var fakeMacroVariableName = "testVariable";
+            var coalesceVariableName = "coalesceTest";
             List<(LogLevel Level, string Message)> loggedMessages = new();
             InMemoryLoggerProvider loggerProvider = new(loggedMessages);
             var generatedConfig = A.Fake<IGeneratedSymbolConfig>();
@@ -62,20 +63,31 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
                 { "sourceVariableName",  JExtensions.ToJsonString("dummy") },
                 { "fallbackVariableName",  JExtensions.ToJsonString(fakeMacroVariableName) }
             });
-            A.CallTo(() => generatedConfig.VariableName).Returns("coalesceTest");
+            A.CallTo(() => generatedConfig.VariableName).Returns(coalesceVariableName);
 
             var coalesceMacroConfig = new CoalesceMacroConfig(new CoalesceMacro(), generatedConfig);
             coalesceMacroConfig.Dependencies.Add(fakeMacroVariableName);
 
-            var engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true, environment: A.Fake<IEnvironment>(), addLoggerProviders: new[] { loggerProvider });
+            var engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true, environment: A.Fake<IEnvironment>(), additionalComponents: new[] { (typeof(IMacro), (IIdentifiedComponent)new FakeMacro()) }, addLoggerProviders: new[] { loggerProvider });
 
             var fakeMacro = new FakeMacro();
+            var customGeneratedConfig = A.Fake<IGeneratedSymbolConfig>();
+            A.CallTo(() => customGeneratedConfig.Parameters).Returns(new Dictionary<string, string>()
+            {
+                { "source",  JExtensions.ToJsonString("dummy") },
+                { "name",  JExtensions.ToJsonString(fakeMacroVariableName) },
+            });
+            A.CallTo(() => customGeneratedConfig.VariableName).Returns(fakeMacroVariableName);
+            var fakeMacroConfig = new FakeMacroConfig(new FakeMacro(), customGeneratedConfig);
             var variableCollection = new Dictionary<string, object>() { { fakeMacroVariableName, fakeMacro } };
 
-            MacroProcessor.ProcessMacros(engineEnvironmentSettings, new[] { coalesceMacroConfig }, new VariableCollection(default, variableCollection));
+            MacroProcessor.ProcessMacros(engineEnvironmentSettings, new[] { (IMacroConfig)coalesceMacroConfig, fakeMacroConfig }, new VariableCollection(default, variableCollection));
 
             Assert.True(variableCollection.Count == 2);
             Assert.True(variableCollection.Values.Select(v => v.GetHashCode() == fakeMacro.GetHashCode()).Count() == 2);
+            variableCollection.Select(v => v.Key).Should().Equal(new[] { fakeMacroVariableName, coalesceVariableName });
+            Assert.True(coalesceMacroConfig.Dependencies.Count == 1);
+            Assert.Equal(fakeMacroVariableName, coalesceMacroConfig.Dependencies.First());
         }
 
         [Fact]

@@ -4,7 +4,7 @@ The supported symbol types are:
 - Derived - defines transformation of another symbol.  The value of this symbol is derived from the value of another symbol by applying the defined form.
 - Computed - the boolean value is evaluated during the processing of the template based on the other symbol values.
 - Generated - the value is computed by a built-in symbol value generator.
-There are no restrictions on symbol nesting: e.g. generated/computed/derived symbols can be used in any type of other symbols. The only rule is in avoiding circular dependencies such as:
+There are no restrictions on symbol order: e.g. generated/computed/derived symbols can be used in any type of other symbols. The only rule is in avoiding circular dependencies such as:
 ```json
 "symbols": {
   "switchCheck": {

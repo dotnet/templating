@@ -350,6 +350,15 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The method &apos;{0}&apos; must be called prior &apos;{1}&apos; property reading..
+        /// </summary>
+        internal static string MacroConfig_Exception_AccessToDependencies {
+            get {
+                return ResourceManager.GetString("MacroConfig_Exception_AccessToDependencies", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Generated symbol &apos;{0}&apos;: array &apos;{1}&apos; should contain JSON objects..
         /// </summary>
         internal static string MacroConfig_Exception_ArrayShouldContainObjects {
