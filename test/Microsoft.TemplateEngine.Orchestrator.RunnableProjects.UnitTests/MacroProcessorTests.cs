@@ -93,45 +93,62 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
         [Fact]
         public void CanProcessCustomMacroWithDeps()
         {
-            var dependentMacroVariableName = "testVariable";
             List<(LogLevel Level, string Message)> loggedMessages = new();
             InMemoryLoggerProvider loggerProvider = new(loggedMessages);
 
-            var coalesceMacroName = "coalesceMacro";
-            var coalesceGeneratedConfig = A.Fake<IGeneratedSymbolConfig>();
+            string coalesceMacroName = "coalesceMacro";
+            IGeneratedSymbolConfig coalesceGeneratedConfig = A.Fake<IGeneratedSymbolConfig>();
             A.CallTo(() => coalesceGeneratedConfig.Parameters).Returns(new Dictionary<string, string>()
             {
                 { "sourceVariableName",  JExtensions.ToJsonString("dummy") },
-                { "fallbackVariableName",  JExtensions.ToJsonString("dummy") }
+                { "fallbackVariableName",  JExtensions.ToJsonString("dummy2") }
             });
             A.CallTo(() => coalesceGeneratedConfig.VariableName).Returns(coalesceMacroName);
-            var coalesceMacroConfig = new CoalesceMacroConfig(new CoalesceMacro(), coalesceGeneratedConfig);
+            CoalesceMacroConfig coalesceMacroConfig = new(new CoalesceMacro(), coalesceGeneratedConfig);
 
-            var switchMacroName = "switchMacro";
-            var switchMacroConfig = new SwitchMacroConfig(new SwitchMacro(), switchMacroName, string.Empty, string.Empty, new List<(string?, string)>());
+            string switchMacroName = "switchMacro";
+            SwitchMacroConfig switchMacroConfig = new(
+                new SwitchMacro(),
+                switchMacroName,
+                "C++",
+                "string",
+                new List<(string?, string)>()
+                {
+                    ("(dummy == \"A\")", "val1"),
+                    (null, "defVal")
+                });
 
-            var customMacroName = "customMacro";
-            var customGeneratedConfig = A.Fake<IGeneratedSymbolConfig>();
+            string customMacroName = "customMacro";
+            IGeneratedSymbolConfig customGeneratedConfig = A.Fake<IGeneratedSymbolConfig>();
             A.CallTo(() => customGeneratedConfig.Parameters).Returns(new Dictionary<string, string>()
             {
-                { "source",  JExtensions.ToJsonString(dependentMacroVariableName) },
+                { "source",  JExtensions.ToJsonString(switchMacroName) },
             });
             A.CallTo(() => customGeneratedConfig.VariableName).Returns(customMacroName);
-            var customMacroConfig = new FakeMacroConfig(new FakeMacro(), customGeneratedConfig);
-            customMacroConfig.Dependencies.Add(coalesceGeneratedConfig.VariableName);
-            customMacroConfig.Dependencies.Add(switchMacroName);
+            FakeMacroConfig customMacroConfig = new(new FakeMacro(), customGeneratedConfig);
 
-            var engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(
                 virtualize: true,
                 environment: A.Fake<IEnvironment>(),
                 addLoggerProviders: new[] { loggerProvider },
                 additionalComponents: new[] { (typeof(IMacro), (IIdentifiedComponent)new FakeMacro()) });
-            var variableCollection = new VariableCollection();
+            VariableCollection variableCollection = new()
+            {
+                ["dummy"] = "A",
+                ["dummy2"] = "B",
+                ["testVariable"] = "test"
+            };
 
-            MacroProcessor.ProcessMacros(engineEnvironmentSettings, new[] { (BaseMacroConfig)switchMacroConfig, customMacroConfig, coalesceMacroConfig }, variableCollection);
+            IReadOnlyList<IMacroConfig> macroConfigs = new[] { (IMacroConfig)customMacroConfig, coalesceMacroConfig, switchMacroConfig };
+
+            IReadOnlyList<IMacroConfig> sortedMacroConfigs = MacroProcessor.SortMacroConfigsByDependencies(new[] { "dummy", "dummy2", "coalesceMacro", "switchMacro", "customMacro", "testVariable" }, macroConfigs);
+            MacroProcessor.ProcessMacros(engineEnvironmentSettings, sortedMacroConfigs, variableCollection);
 
             // Custom macro was processed without errors
             Assert.True(!loggedMessages.Any(lm => lm.Level == LogLevel.Error));
+            Assert.Equal("A", variableCollection["coalesceMacro"]);
+            Assert.Equal("val1", variableCollection["switchMacro"]);
+            Assert.Equal("val1", variableCollection["customMacro"]);
         }
 
         [Fact]
@@ -250,7 +267,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
 
             IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true, environment: environment, additionalComponents: new[] { (typeof(IMacro), (IIdentifiedComponent)macro) });
 
-            var macros = new[] { (BaseMacroConfig)new UndeterministicMacroConfig(macro, "test"), new GuidMacroConfig("test-guid", "string", "Nn", "n") };
+            IReadOnlyList<IMacroConfig> macros = new[] { (IMacroConfig)new UndeterministicMacroConfig("test"), new GuidMacroConfig("test-guid", "string", "Nn", "n") };
 
             IVariableCollection collection = new VariableCollection();
 
@@ -264,6 +281,65 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
             MacroProcessor.ProcessMacros(engineEnvironmentSettings, macros, collection);
             Assert.Equal("undeterministic", collection["test"]);
             Assert.NotEqual(new Guid("12345678-1234-1234-1234-1234567890AB").ToString("n"), collection["test-guid"]);
+        }
+
+        [Fact]
+        public void CanProcessMacroWithCustomMacroAsDependency_IndependentImplementation()
+        {
+            List<(LogLevel Level, string Message)> loggedMessages = new();
+            InMemoryLoggerProvider loggerProvider = new(loggedMessages);
+
+            string coalesceMacroName = "coalesceMacro";
+            IGeneratedSymbolConfig coalesceGeneratedConfig = A.Fake<IGeneratedSymbolConfig>();
+            A.CallTo(() => coalesceGeneratedConfig.Parameters).Returns(new Dictionary<string, string>()
+            {
+                { "sourceVariableName",  JExtensions.ToJsonString("dummy") },
+                { "fallbackVariableName",  JExtensions.ToJsonString("dummy2") }
+            });
+            A.CallTo(() => coalesceGeneratedConfig.VariableName).Returns(coalesceMacroName);
+            CoalesceMacroConfig coalesceMacroConfig = new(new CoalesceMacro(), coalesceGeneratedConfig);
+
+            string switchMacroName = "switchMacro";
+            SwitchMacroConfig switchMacroConfig = new(
+                new SwitchMacro(),
+                switchMacroName,
+                "C++",
+                "string",
+                new List<(string?, string)>()
+                {
+                    ("(dummy == \"A\")", "val1"),
+                    (null, "defVal")
+                });
+
+            string customMacroName = "customMacro";
+            IGeneratedSymbolConfig customGeneratedConfig = A.Fake<IGeneratedSymbolConfig>();
+            A.CallTo(() => customGeneratedConfig.Parameters).Returns(new Dictionary<string, string>()
+            {
+                { "source",  JExtensions.ToJsonString(switchMacroName) },
+            });
+            A.CallTo(() => customGeneratedConfig.VariableName).Returns(customMacroName);
+            DependencyMacroConfig customMacroConfig = new(customMacroName, switchMacroName);
+
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(
+                virtualize: true,
+                environment: A.Fake<IEnvironment>(),
+                addLoggerProviders: new[] { loggerProvider },
+                additionalComponents: new[] { (typeof(IMacro), (IIdentifiedComponent)new DependencyMacro()) });
+            VariableCollection variableCollection = new()
+            {
+                ["dummy2"] = "B",
+            };
+
+            IReadOnlyList<IMacroConfig> macroConfigs = new[] { (IMacroConfig)switchMacroConfig, customMacroConfig, coalesceMacroConfig };
+
+            IReadOnlyList<IMacroConfig> sortedMacroConfigs = MacroProcessor.SortMacroConfigsByDependencies(new[] { "dummy", "dummy2", coalesceMacroName, switchMacroName, customMacroName }, macroConfigs);
+            MacroProcessor.ProcessMacros(engineEnvironmentSettings, sortedMacroConfigs, variableCollection);
+
+            // Custom macro was processed without errors
+            Assert.True(!loggedMessages.Any(lm => lm.Level == LogLevel.Error));
+            Assert.Equal("B", variableCollection[coalesceMacroName]);
+            Assert.Equal("defVal", variableCollection[switchMacroName]);
+            Assert.Equal("defVal", variableCollection[customMacroName]);
         }
 
         private class FailMacro : IMacro<FailMacroConfig>, IGeneratedSymbolMacro
@@ -311,7 +387,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
 
             public UndeterministicMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig generatedSymbolConfig)
             {
-                return new UndeterministicMacroConfig(this, generatedSymbolConfig.VariableName);
+                return new UndeterministicMacroConfig(generatedSymbolConfig.VariableName);
             }
 
             public void Evaluate(IEngineEnvironmentSettings environmentSettings, IVariableCollection variables, UndeterministicMacroConfig config)
@@ -336,17 +412,74 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
 
             IMacroConfig IGeneratedSymbolMacro.CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig generatedSymbolConfig)
             {
-                return new UndeterministicMacroConfig(this, generatedSymbolConfig.VariableName);
+                return new UndeterministicMacroConfig(generatedSymbolConfig.VariableName);
             }
         }
 
-        private class UndeterministicMacroConfig : BaseMacroConfig
+        private class UndeterministicMacroConfig : IMacroConfig
         {
-            private readonly UndeterministicMacro _macro;
-
-            public UndeterministicMacroConfig(UndeterministicMacro macro, string variableName) : base("undeterministic", variableName, "string")
+            public UndeterministicMacroConfig(string variableName)
             {
-                _macro = macro;
+                VariableName = variableName;
+            }
+
+            public string VariableName { get; }
+
+            public string Type => "undeterministic";
+        }
+
+        private class DependencyMacro : IGeneratedSymbolMacro, IGeneratedSymbolMacro<DependencyMacroConfig>
+        {
+            public string Type => "dependency";
+
+            public Guid Id { get; } = new Guid("{545064DA-74B3-4A78-8B1A-A6B17B36E48D}");
+
+            public IMacroConfig CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig generatedSymbolConfig)
+            {
+                return new DependencyMacroConfig(generatedSymbolConfig.VariableName, generatedSymbolConfig.Parameters["dependentSymbolName"]);
+            }
+
+            public void Evaluate(IEngineEnvironmentSettings environmentSettings, IVariableCollection variables, DependencyMacroConfig config)
+            {
+                variables[config.VariableName] = variables[config.DependentSymbolName];
+            }
+
+            public void EvaluateConfig(IEngineEnvironmentSettings environmentSettings, IVariableCollection vars, IMacroConfig config)
+            {
+                if (config is DependencyMacroConfig dmc)
+                {
+                    vars[config.VariableName] = vars[dmc.DependentSymbolName];
+                }
+            }
+
+            DependencyMacroConfig IGeneratedSymbolMacro<DependencyMacroConfig>.CreateConfig(IEngineEnvironmentSettings environmentSettings, IGeneratedSymbolConfig generatedSymbolConfig)
+            {
+                return new DependencyMacroConfig(generatedSymbolConfig.VariableName, generatedSymbolConfig.Parameters["dependentSymbolName"]);
+            }
+        }
+
+        private class DependencyMacroConfig : IMacroConfig, IMacroConfigDependency
+        {
+            public DependencyMacroConfig(string variableName, string dependentSymbolName)
+            {
+                VariableName = variableName;
+                DependentSymbolName = dependentSymbolName;
+            }
+
+            public string VariableName { get; }
+
+            public string DependentSymbolName { get; }
+
+            public string Type => "dependency";
+
+            public HashSet<string> Dependencies { get; private set; } = new HashSet<string>();
+
+            public void ResolveSymbolDependencies(IReadOnlyList<string> symbols)
+            {
+                Dependencies = new HashSet<string>()
+                {
+                    DependentSymbolName
+                };
             }
         }
     }
