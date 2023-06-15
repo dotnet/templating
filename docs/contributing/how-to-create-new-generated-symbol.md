@@ -108,7 +108,7 @@ The very basic implementation may be:
 
 Unit test example for checking the custom macro:
 ```CSharp
-        public class HelloMacroTests : IClassFixture<EnvironmentSettingsHelper>
+    public class HelloMacroTests : IClassFixture<EnvironmentSettingsHelper>
     {
         private readonly IEngineEnvironmentSettings _engineEnvironmentSettings;
 
@@ -155,6 +155,7 @@ Unit test example for checking the custom macro:
     }
 ```
 This test should be placed under folder: [`MacroTests`](../../test/Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests/MacroTests/).
+
 `IMacroConfigDependency` interface depicts macro capability to derive it value(s) from other macros.
 Dependencies are defined based on passed `IReadOnlyList<string> symbols` collection. An example of implemetation can be find here: [`CoalesceMacroConfig.cs`](../../src/Microsoft.TemplateEngine.Orchestrator.RunnableProjects/Macros/CoalesceMacroConfig.cs).
 
