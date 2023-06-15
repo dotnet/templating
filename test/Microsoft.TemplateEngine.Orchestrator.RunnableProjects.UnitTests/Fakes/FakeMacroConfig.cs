@@ -17,13 +17,20 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Fakes
         public FakeMacroConfig(FakeMacro macro, IGeneratedSymbolConfig generatedSymbolConfig) : base(macro, generatedSymbolConfig.VariableName)
         {
             Source = GetMandatoryParameterValue(generatedSymbolConfig, "source");
+            Fallback = GetOptionalParameterValue(generatedSymbolConfig, "fallback");
             NameToGreet = GetMandatoryParameterValue(generatedSymbolConfig, "name");
         }
 
         public string Source { get; }
 
+        public string? Fallback { get; }
+
         public string NameToGreet { get; }
 
-        public void ResolveSymbolDependencies(IReadOnlyList<string> symbols) => PopulateMacroConfigDependencies(Source, symbols);
+        public void ResolveSymbolDependencies(IReadOnlyList<string> symbols)
+        {
+            MacroDependenciesResolved = true;
+            PopulateMacroConfigDependencies(Source, symbols);
+        }
     }
 }

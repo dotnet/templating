@@ -65,7 +65,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 
         internal IReadOnlyList<(string Regex, string Replacement)> Steps { get; private set; }
 
-        public void ResolveSymbolDependencies(IReadOnlyList<string> symbols) =>
-             PopulateMacroConfigDependencies(Source, symbols);
+        public void ResolveSymbolDependencies(IReadOnlyList<string> symbols)
+        {
+            MacroDependenciesResolved = true;
+            PopulateMacroConfigDependencies(Source, symbols);
+        }
     }
 }

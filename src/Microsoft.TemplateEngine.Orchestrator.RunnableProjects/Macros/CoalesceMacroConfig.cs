@@ -49,6 +49,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 
         public void ResolveSymbolDependencies(IReadOnlyList<string> symbols)
         {
+            MacroDependenciesResolved = true;
             PopulateMacroConfigDependencies(SourceVariableName, symbols);
             PopulateMacroConfigDependencies(FallbackVariableName, symbols);
         }

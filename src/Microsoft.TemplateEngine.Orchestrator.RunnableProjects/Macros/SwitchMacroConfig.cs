@@ -59,6 +59,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 
         public void ResolveSymbolDependencies(IReadOnlyList<string> symbols)
         {
+            MacroDependenciesResolved = true;
             foreach ((string? condition, string _) in Cases)
             {
                 if (!string.IsNullOrEmpty(condition))

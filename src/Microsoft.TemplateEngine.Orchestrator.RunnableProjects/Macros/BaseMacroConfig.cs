@@ -38,8 +38,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 
         public string Type { get; }
 
-        internal bool MacroDependenciesResolved { get; set; }
-
         internal string DataType { get; } = "string";
 
         internal IList<string> MacroErrors { get; set; } = new List<string>();
@@ -68,6 +66,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
             }
             set => _dependencies = value;
         }
+
+        protected bool MacroDependenciesResolved { get; set; }
 
         protected static string? GetOptionalParameterValue(IGeneratedSymbolConfig config, string parameterName, string? defaultValue = default)
         {
@@ -215,7 +215,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
         private void PopulateMacroConfigDependency(string referencedValue)
         {
             Dependencies.Add(referencedValue);
-            MacroDependenciesResolved = true;
         }
     }
 }

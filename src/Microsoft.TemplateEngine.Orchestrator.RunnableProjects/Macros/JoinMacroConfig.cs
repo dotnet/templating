@@ -79,7 +79,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 
         internal bool RemoveEmptyValues { get; private set; }
 
-        public void ResolveSymbolDependencies(IReadOnlyList<string> symbols) =>
+        public void ResolveSymbolDependencies(IReadOnlyList<string> symbols)
+        {
+            MacroDependenciesResolved = true;
             Symbols.ForEach(s => PopulateMacroConfigDependencies(s.Value, symbols));
+        }
     }
 }

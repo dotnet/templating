@@ -31,6 +31,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 
         internal ConditionStringEvaluator Evaluator { get; private set; } = EvaluatorSelector.SelectStringEvaluator(DefaultEvaluator);
 
-        public void ResolveSymbolDependencies(IReadOnlyList<string> symbols) => PopulateMacroConfigDependencies(Condition, symbols);
+        public void ResolveSymbolDependencies(IReadOnlyList<string> symbols)
+        {
+            MacroDependenciesResolved = true;
+            PopulateMacroConfigDependencies(Condition, symbols);
+        }
     }
 }

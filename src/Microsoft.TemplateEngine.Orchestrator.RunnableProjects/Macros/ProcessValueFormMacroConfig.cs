@@ -38,7 +38,10 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
 
         internal IValueForm Form { get; }
 
-        public void ResolveSymbolDependencies(IReadOnlyList<string> symbols) =>
+        public void ResolveSymbolDependencies(IReadOnlyList<string> symbols)
+        {
+            MacroDependenciesResolved = true;
             PopulateMacroConfigDependencies(SourceVariable, symbols);
+        }
     }
 }
