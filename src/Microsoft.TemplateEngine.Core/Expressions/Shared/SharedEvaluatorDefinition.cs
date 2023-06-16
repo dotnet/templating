@@ -42,7 +42,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
         /// <param name="logger">The logger to be used to log the messages during evaluation.</param>
         /// <param name="text">The string to be inspected and turned into expression.</param>
         /// <param name="variables">Variables to be substituted within the expression.</param>
-        /// <returns></returns>
+        /// <returns>A boolean value indicating the result of the evaluation.</returns>
         public static bool EvaluateFromString(ILogger logger, string text, IVariableCollection variables)
         {
             return EvaluateFromString(logger, text, variables, out string? _, null);
@@ -57,7 +57,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
         /// <param name="variables">Variables to be substituted within the expression.</param>
         /// <param name="faultedMessage">Error message detailing failing evaluation, should it fail.</param>
         /// <param name="referencedVariablesKeys">If passed (if not null) it will be populated with references to variables used within the inspected expression.</param>
-        /// <returns></returns>
+        /// <returns>A boolean value indicating the result of the evaluation.</returns>
         public static bool EvaluateFromString(ILogger logger, string text, IVariableCollection variables, out string? faultedMessage, HashSet<string>? referencedVariablesKeys = null)
         {
             using (MemoryStream ms = new(Encoding.UTF8.GetBytes(text)))
