@@ -279,13 +279,14 @@ namespace Dotnet_new3.IntegrationTests
         public void CannotInstallUnknownRemotePackage()
         {
             var home = TestUtils.CreateTemporaryFolder("Home");
+            string unknownPackage = "non-existent_package";
 
-            new DotnetNewCommand(_log, "-i", "BlaBlaBla")
+            new DotnetNewCommand(_log, "-i", unknownPackage)
                .WithCustomHive(home)
                .WithWorkingDirectory(TestUtils.CreateTemporaryFolder())
                .Execute()
                .Should().Fail()
-               .And.HaveStdErrContaining("BlaBlaBla could not be installed, the package does not exist");
+               .And.HaveStdErrContaining($"{unknownPackage} could not be installed, the package does not exist");
         }
 
         [Fact]
