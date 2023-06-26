@@ -18,7 +18,7 @@
 
     <!--Analyzers-->
     <PackageReference Update="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4" />
-    <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.435" />
+    <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.507" />
 
     <!--Test dependencies-->
     <PackageReference Update="FakeItEasy" Version="7.4.0" />
