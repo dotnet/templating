@@ -19,9 +19,9 @@
       <Uri>https://github.com/dotnet/runtime</Uri>
       <Sha>37c0371ab3f7651d64a6dfe4c2e8677206fa34ee</Sha>
     </Dependency>
-    <Dependency Name="System.CommandLine" Version="2.0.0-beta4.23319.1">
+    <Dependency Name="System.CommandLine" Version="2.0.0-beta4.23326.1">
       <Uri>https://github.com/dotnet/command-line-api</Uri>
-      <Sha>6daed85086c41a1cd72a97f298f9cfe2beafa3f4</Sha>
+      <Sha>f6ff2f1a94a58617e744f8fe0d469a2a420a6259</Sha>
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
