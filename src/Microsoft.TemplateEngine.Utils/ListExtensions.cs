@@ -66,7 +66,9 @@ namespace Microsoft.TemplateEngine.Utils
                 return obj is ValueWrapper<T> v && Equals(Val, v.Val);
             }
 
+#pragma warning disable IDE0251 // Make member 'readonly'
             public override int GetHashCode()
+#pragma warning restore IDE0251 // Make member 'readonly'
             {
                 return Val?.GetHashCode() ?? 0;
             }
