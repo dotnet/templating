@@ -59,16 +59,12 @@ namespace Microsoft.TemplateEngine.Utils
 
             public T Val { get; private set; }
 
-#pragma warning disable IDE0251 // Make member 'readonly'
-            public override bool Equals(object obj)
-#pragma warning restore IDE0251 // Make member 'readonly'
+            public override readonly bool Equals(object obj)
             {
                 return obj is ValueWrapper<T> v && Equals(Val, v.Val);
             }
 
-#pragma warning disable IDE0251 // Make member 'readonly'
-            public override int GetHashCode()
-#pragma warning restore IDE0251 // Make member 'readonly'
+            public override readonly int GetHashCode()
             {
                 return Val?.GetHashCode() ?? 0;
             }
