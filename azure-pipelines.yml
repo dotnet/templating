@@ -90,9 +90,11 @@ stages:
               ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
                 _SignType: test
                 _DotNetPublishToBlobFeed : false
+                _Test: -integrationTest
               ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
                 _SignType: real
                 _DotNetPublishToBlobFeed : true
+                _Test: ''
             ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
               Build_Debug:
                 _BuildConfig: Debug
@@ -113,7 +115,7 @@ stages:
         - script: eng/common/cibuild.cmd
             -configuration $(_BuildConfig)
             -prepareMachine
-            -integrationTest
+            $(_Test)
             $(_InternalBuildArgs)
             $(_InternalRuntimeDownloadArgs)
           displayName: Windows Build / Publish
