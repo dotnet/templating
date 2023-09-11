@@ -23,5 +23,6 @@
     <!-- Dependencies from https://github.com/dotnet/runtime -->
     <MicrosoftNETCoreAppRefPackageVersion>8.0.0-rc.2.23457.7</MicrosoftNETCoreAppRefPackageVersion>
     <MicrosoftNETCoreAppRuntimewinx64PackageVersion>8.0.0-rc.2.23457.7</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
+    <VSRedistCommonNetCoreSharedFrameworkx6480PackageVersion>8.0.0-rc.2.23457.7</VSRedistCommonNetCoreSharedFrameworkx6480PackageVersion>
   </PropertyGroup>
 </Project>
