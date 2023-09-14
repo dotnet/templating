@@ -10,7 +10,7 @@ The attached notices are provided for information only.
 
 ---------------------------------------------------------
 
-Newtonsoft.Json 13.0.1 - MIT
+Newtonsoft.Json 13.0.3 - MIT
 
 
 (c) 2008 VeriSign, Inc.
