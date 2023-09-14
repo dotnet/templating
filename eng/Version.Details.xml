@@ -11,17 +11,17 @@
       <Sha>def2e2c6dc5064319250e2868a041a3dc07f9579</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="VS.Redist.Common.NetCore.SharedFramework.x64.6.0" Version="6.0.23-servicing.23431.21">
+    <Dependency Name="VS.Redist.Common.NetCore.SharedFramework.x64.6.0" Version="6.0.23-servicing.23463.4">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
-      <Sha>211b7ecbebe2576cbbbc205a3658361441018b61</Sha>
+      <Sha>ca8b53290abed6b00ae7a9cc331fbc69bc06026c</Sha>
     </Dependency>
     <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="6.0.23">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
-      <Sha>211b7ecbebe2576cbbbc205a3658361441018b61</Sha>
+      <Sha>ca8b53290abed6b00ae7a9cc331fbc69bc06026c</Sha>
     </Dependency>
     <Dependency Name="Microsoft.NETCore.App.Ref" Version="6.0.23">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
-      <Sha>211b7ecbebe2576cbbbc205a3658361441018b61</Sha>
+      <Sha>ca8b53290abed6b00ae7a9cc331fbc69bc06026c</Sha>
     </Dependency>
     <Dependency Name="System.CommandLine" Version="2.0.0-beta4.22351.1">
       <Uri>https://github.com/dotnet/command-line-api</Uri>
