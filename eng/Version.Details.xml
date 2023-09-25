@@ -6,22 +6,22 @@
       <Sha>6dbf3aaa0fc9664df86462f5c70b99800934fccd</Sha>
       <SourceBuild RepoName="source-build-externals" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="8.0.0-alpha.1.23469.1">
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="8.0.0-alpha.1.23471.1">
       <Uri>https://github.com/dotnet/source-build-reference-packages</Uri>
-      <Sha>d825c6693d4e26f63aaa93c3c1d057faa098e347</Sha>
+      <Sha>7b55da982fc6e71c1776c4de89111aee0eecb45a</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="8.0.0-rc.2.23470.7">
+    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="8.0.0-rtm.23472.12">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>49bf70a429a6122217f2c88e778ce8115ceac3bd</Sha>
+      <Sha>e95228dbcf7a69f87b00da969b0cabf2e62ab207</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Ref" Version="8.0.0-rc.2.23470.7">
+    <Dependency Name="Microsoft.NETCore.App.Ref" Version="8.0.0-rtm.23472.12">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>49bf70a429a6122217f2c88e778ce8115ceac3bd</Sha>
+      <Sha>e95228dbcf7a69f87b00da969b0cabf2e62ab207</Sha>
     </Dependency>
-    <Dependency Name="VS.Redist.Common.NetCore.SharedFramework.x64.8.0" Version="8.0.0-rc.2.23470.7">
+    <Dependency Name="VS.Redist.Common.NetCore.SharedFramework.x64.8.0" Version="8.0.0-rtm.23472.12">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>49bf70a429a6122217f2c88e778ce8115ceac3bd</Sha>
+      <Sha>e95228dbcf7a69f87b00da969b0cabf2e62ab207</Sha>
     </Dependency>
     <Dependency Name="System.CommandLine" Version="2.0.0-beta4.23407.1">
       <Uri>https://github.com/dotnet/command-line-api</Uri>
