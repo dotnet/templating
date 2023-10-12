@@ -180,6 +180,8 @@ dotnet_diagnostic.IDE0010.severity = suggestion
 dotnet_diagnostic.IDE0021.severity = suggestion
 #Use expression body for methods
 dotnet_diagnostic.IDE0022.severity = suggestion
+#Use collection initializers
+dotnet_diagnostic.IDE0028.severity = suggestion
 #Use auto-implemented property
 dotnet_diagnostic.IDE0032.severity = suggestion
 #Use conditional expression for return
@@ -198,6 +200,10 @@ dotnet_diagnostic.IDE0160.severity = suggestion
 dotnet_diagnostic.IDE0210.severity = suggestion
 #Use primary constructor
 dotnet_diagnostic.IDE0290.severity = suggestion
+#Collection initialization can be simplified
+dotnet_diagnostic.IDE0300.severity = suggestion
+#Collection initialization can be simplified
+dotnet_diagnostic.IDE0301.severity = suggestion
 
 # License header
 file_header_template = Licensed to the .NET Foundation under one or more agreements.\nThe .NET Foundation licenses this file to you under the MIT license.
@@ -572,11 +578,23 @@ dotnet_diagnostic.SA1649.severity = none
 # Test methods should not be skipped
 dotnet_diagnostic.xUnit1004.severity = warning
 
+# Test methods should not call ConfigureAwait(), as it may bypass parallelization limits.
+dotnet_diagnostic.xUnit1030.severity = suggestion
+
+# Test methods must not use blocking task operations, as they can cause deadlocks. Use an async test method and await instead.
+dotnet_diagnostic.xUnit1031.severity = suggestion
+
 # Do not use invalid equality check
 dotnet_diagnostic.xUnit2001.severity = warning
 
+# Do not use Assert.Equal() to check for collection size. Use Assert.Single instead.
+dotnet_diagnostic.xUnit2013.severity = suggestion
+
 # Do not use obsolete throws check to check for asynchronously thrown exception
 dotnet_diagnostic.xUnit2019.severity = warning
+
+# Do not use Assert.True(false, message) to fail a test. Use Assert.Fail(message) instead.
+dotnet_diagnostic.xUnit2020.severity = suggestion
 
 # test code files
 [test/**/*.{cs,vb}]
