@@ -11,17 +11,17 @@
       <Sha>def2e2c6dc5064319250e2868a041a3dc07f9579</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="VS.Redist.Common.NetCore.SharedFramework.x64.6.0" Version="6.0.23-servicing.23463.4">
+    <Dependency Name="VS.Redist.Common.NetCore.SharedFramework.x64.6.0" Version="6.0.23-servicing.23480.2">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
-      <Sha>ca8b53290abed6b00ae7a9cc331fbc69bc06026c</Sha>
+      <Sha>e0f0de876a67755a2c6cd2dc730c13f5959bdea8</Sha>
     </Dependency>
     <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="6.0.23">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
-      <Sha>ca8b53290abed6b00ae7a9cc331fbc69bc06026c</Sha>
+      <Sha>e0f0de876a67755a2c6cd2dc730c13f5959bdea8</Sha>
     </Dependency>
     <Dependency Name="Microsoft.NETCore.App.Ref" Version="6.0.23">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
-      <Sha>ca8b53290abed6b00ae7a9cc331fbc69bc06026c</Sha>
+      <Sha>e0f0de876a67755a2c6cd2dc730c13f5959bdea8</Sha>
     </Dependency>
     <Dependency Name="System.CommandLine" Version="2.0.0-beta3.22222.1">
       <Uri>https://github.com/dotnet/command-line-api</Uri>
@@ -57,9 +57,9 @@
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
-    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="6.0.0-beta.23409.1">
+    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="6.0.0-beta.23511.8">
       <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>c6613f71edcdc0e782300e3a0f2c74ebd51c0e40</Sha>
+      <Sha>06ccd9430e2e3bd29a381a5b27e7976d11b0ed18</Sha>
       <SourceBuild RepoName="arcade" ManagedOnly="true" />
     </Dependency>
   </ToolsetDependencies>
