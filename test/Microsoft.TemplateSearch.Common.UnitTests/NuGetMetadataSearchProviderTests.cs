@@ -35,7 +35,7 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
             var searchCoordinator = new TemplateSearchCoordinator(engineEnvironmentSettings);
             async Task<IReadOnlyList<SearchResult>> Search()
             {
-                var result = await searchCoordinator.SearchAsync(p => true, Filter, default).ConfigureAwait(false);
+                var result = await searchCoordinator.SearchAsync(p => true, Filter, default);
                 if (result != null && result.Count > 0 && !string.IsNullOrWhiteSpace(result[0].ErrorMessage))
                 {
                     var errorMessage = result[0].ErrorMessage;
@@ -73,7 +73,7 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
                     .ToList();
 
             var searchCoordinator = new TemplateSearchCoordinator(engineEnvironmentSettings);
-            var searchResult = await searchCoordinator.SearchAsync(p => true, Filter, default).ConfigureAwait(false);
+            var searchResult = await searchCoordinator.SearchAsync(p => true, Filter, default);
 
             Assert.NotNull(searchResult);
             Assert.Single(searchResult);
@@ -102,7 +102,7 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
                     .ToList();
 
             var searchCoordinator = new TemplateSearchCoordinator(engineEnvironmentSettings);
-            var searchResult = await searchCoordinator.SearchAsync(p => true, Filter, default).ConfigureAwait(false);
+            var searchResult = await searchCoordinator.SearchAsync(p => true, Filter, default);
 
             Assert.NotNull(searchResult);
             Assert.Single(searchResult);
@@ -133,7 +133,7 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
             var searchCoordinator = new TemplateSearchCoordinator(engineEnvironmentSettings);
             async Task<IReadOnlyList<SearchResult>> Search()
             {
-                var result = await searchCoordinator.SearchAsync(p => true, Filter, default).ConfigureAwait(false);
+                var result = await searchCoordinator.SearchAsync(p => true, Filter, default);
                 if (result != null && result.Count > 0 && !string.IsNullOrWhiteSpace(result[0].ErrorMessage))
                 {
                     var errorMessage = result[0].ErrorMessage;
@@ -192,7 +192,7 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
                     .ToList();
 
             var searchCoordinator = new TemplateSearchCoordinator(engineEnvironmentSettings);
-            var searchResult = await searchCoordinator.SearchAsync(p => true, Filter, default).ConfigureAwait(false);
+            var searchResult = await searchCoordinator.SearchAsync(p => true, Filter, default);
 
             Assert.NotNull(searchResult);
             Assert.Single(searchResult);
@@ -225,7 +225,7 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
                     .ToList();
 
             var searchCoordinator = new TemplateSearchCoordinator(engineEnvironmentSettings);
-            var searchResult = await searchCoordinator.SearchAsync(p => true, Filter, default).ConfigureAwait(false);
+            var searchResult = await searchCoordinator.SearchAsync(p => true, Filter, default);
 
             Assert.NotNull(searchResult);
             Assert.Single(searchResult);
@@ -258,7 +258,7 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
                     .ToList();
 
             var searchCoordinator = new TemplateSearchCoordinator(engineEnvironmentSettings);
-            var searchResult = await searchCoordinator.SearchAsync(p => true, Filter, default).ConfigureAwait(false);
+            var searchResult = await searchCoordinator.SearchAsync(p => true, Filter, default);
 
             Assert.NotNull(searchResult);
             Assert.Single(searchResult);
@@ -291,7 +291,7 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
                     .ToList();
 
             var searchCoordinator = new TemplateSearchCoordinator(engineEnvironmentSettings);
-            var searchResult = await searchCoordinator.SearchAsync(p => true, Filter, default).ConfigureAwait(false);
+            var searchResult = await searchCoordinator.SearchAsync(p => true, Filter, default);
 
             Assert.NotNull(searchResult);
             Assert.Single(searchResult);

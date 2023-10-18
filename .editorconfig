@@ -580,9 +580,6 @@ dotnet_diagnostic.SA1649.severity = none
 # Test methods should not be skipped
 dotnet_diagnostic.xUnit1004.severity = warning
 
-# Test methods should not call ConfigureAwait(), as it may bypass parallelization limits.
-dotnet_diagnostic.xUnit1030.severity = suggestion
-
 # Do not use invalid equality check
 dotnet_diagnostic.xUnit2001.severity = warning
 
