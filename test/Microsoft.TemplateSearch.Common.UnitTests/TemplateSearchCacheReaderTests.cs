@@ -31,7 +31,7 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
 
             var parsedCache = TemplateSearchCache.FromJObject(cache, environmentSettings.Host.Logger);
 
-            Assert.Equal(1, parsedCache.TemplatePackages.Count);
+            Assert.Single(parsedCache.TemplatePackages);
             Assert.Equal(2, parsedCache.TemplatePackages.Sum(p => p.Templates.Count));
 
             Assert.IsAssignableFrom<ITemplateInfo>(parsedCache.TemplatePackages[0].Templates[0]);
@@ -52,7 +52,7 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
 
             var parsedCache = TemplateSearchCache.FromJObject(cache, environmentSettings.Host.Logger);
 
-            Assert.Equal(1, parsedCache.TemplatePackages.Count);
+            Assert.Single(parsedCache.TemplatePackages);
             Assert.Equal(3, parsedCache.TemplatePackages.Sum(p => p.Templates.Count));
 
             Assert.IsAssignableFrom<ITemplateInfo>(parsedCache.TemplatePackages[0].Templates[0]);
@@ -77,7 +77,7 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
 
             var parsedCache = TemplateSearchCache.FromJObject(cache, environmentSettings.Host.Logger);
 
-            Assert.Equal(1, parsedCache.TemplatePackages.Count);
+            Assert.Single(parsedCache.TemplatePackages);
             Assert.Equal(1, parsedCache.TemplatePackages.Sum(p => p.Templates.Count));
 
             Assert.IsAssignableFrom<ITemplateInfo>(parsedCache.TemplatePackages[0].Templates[0]);

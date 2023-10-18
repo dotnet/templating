@@ -47,7 +47,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             var templates = await new TemplatePackageManager(engineEnvironmentSettings).GetTemplatesAsync(default)
                 .ConfigureAwait(false);
 
-            Assert.Equal(1, templates.Count);
+            Assert.Single(templates);
             Assert.Equal("sample99", templates.Single().ShortNameList[0]);
         }
 
@@ -78,7 +78,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             var templates = await new TemplatePackageManager(engineEnvironmentSettings).GetTemplatesAsync(default)
                 .ConfigureAwait(false);
 
-            Assert.Equal(1, templates.Count);
+            Assert.Single(templates);
             Assert.Equal("sample49", templates.Single().ShortNameList[0]);
         }
 

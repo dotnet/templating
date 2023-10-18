@@ -589,9 +589,6 @@ dotnet_diagnostic.xUnit1031.severity = suggestion
 # Do not use invalid equality check
 dotnet_diagnostic.xUnit2001.severity = warning
 
-# Do not use Assert.Equal() to check for collection size. Use Assert.Single instead.
-dotnet_diagnostic.xUnit2013.severity = suggestion
-
 # Do not use obsolete throws check to check for asynchronously thrown exception
 dotnet_diagnostic.xUnit2019.severity = warning
 

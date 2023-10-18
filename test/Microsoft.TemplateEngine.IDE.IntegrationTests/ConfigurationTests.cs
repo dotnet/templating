@@ -61,7 +61,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             InstallRequest installRequest = new InstallRequest("Microsoft.DotNet.Web.ProjectTemplates.5.0", "5.0.0");
             IReadOnlyList<InstallResult> installResult = await bootstrapper.InstallTemplatePackagesAsync(new[] { installRequest }, InstallationScope.Global, CancellationToken.None).ConfigureAwait(false);
 
-            Assert.Equal(1, installResult.Count);
+            Assert.Single(installResult);
             Assert.True(installResult[0].Success);
             bootstrapper.Dispose();
 

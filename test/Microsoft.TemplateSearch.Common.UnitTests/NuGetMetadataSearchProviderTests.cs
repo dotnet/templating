@@ -50,7 +50,7 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
             var searchResult = await TestUtils.AttemptSearch<IReadOnlyList<SearchResult>, HttpRequestException>(3, TimeSpan.FromSeconds(10), Search);
 
             Assert.NotNull(searchResult);
-            Assert.Equal(1, searchResult.Count);
+            Assert.Single(searchResult);
             Assert.True(searchResult[0].Success);
             Assert.True(string.IsNullOrWhiteSpace(searchResult[0].ErrorMessage));
             Assert.True(searchResult[0].SearchHits.Count > 0);
@@ -76,7 +76,7 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
             var searchResult = await searchCoordinator.SearchAsync(p => true, Filter, default).ConfigureAwait(false);
 
             Assert.NotNull(searchResult);
-            Assert.Equal(1, searchResult.Count);
+            Assert.Single(searchResult);
             Assert.True(searchResult[0].Success);
             Assert.True(string.IsNullOrWhiteSpace(searchResult[0].ErrorMessage));
             Assert.True(searchResult[0].SearchHits.Count > 0);
@@ -105,7 +105,7 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
             var searchResult = await searchCoordinator.SearchAsync(p => true, Filter, default).ConfigureAwait(false);
 
             Assert.NotNull(searchResult);
-            Assert.Equal(1, searchResult.Count);
+            Assert.Single(searchResult);
             Assert.False(searchResult[0].Success);
             Assert.False(string.IsNullOrWhiteSpace(searchResult[0].ErrorMessage));
             Assert.True(searchResult[0].SearchHits.Count == 0);
@@ -147,7 +147,7 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
             var searchResult = await TestUtils.AttemptSearch<IReadOnlyList<SearchResult>, HttpRequestException>(3, TimeSpan.FromSeconds(10), Search);
 
             Assert.NotNull(searchResult);
-            Assert.Equal(1, searchResult.Count);
+            Assert.Single(searchResult);
             Assert.False(searchResult[0].Success);
             Assert.False(string.IsNullOrWhiteSpace(searchResult[0].ErrorMessage));
             Assert.True(searchResult[0].SearchHits.Count == 0);
@@ -157,7 +157,7 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
             searchResult = await TestUtils.AttemptSearch<IReadOnlyList<SearchResult>, HttpRequestException>(3, TimeSpan.FromSeconds(10), Search);
 
             Assert.NotNull(searchResult);
-            Assert.Equal(1, searchResult.Count);
+            Assert.Single(searchResult);
             Assert.True(searchResult[0].Success);
             Assert.True(string.IsNullOrWhiteSpace(searchResult[0].ErrorMessage));
             Assert.True(searchResult[0].SearchHits.Count > 0);
@@ -166,7 +166,7 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
             searchResult = await TestUtils.AttemptSearch<IReadOnlyList<SearchResult>, HttpRequestException>(3, TimeSpan.FromSeconds(10), Search);
 
             Assert.NotNull(searchResult);
-            Assert.Equal(1, searchResult.Count);
+            Assert.Single(searchResult);
             Assert.True(searchResult[0].Success);
             Assert.True(string.IsNullOrWhiteSpace(searchResult[0].ErrorMessage));
             Assert.True(searchResult[0].SearchHits.Count > 0);
@@ -195,7 +195,7 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
             var searchResult = await searchCoordinator.SearchAsync(p => true, Filter, default).ConfigureAwait(false);
 
             Assert.NotNull(searchResult);
-            Assert.Equal(1, searchResult.Count);
+            Assert.Single(searchResult);
             Assert.False(searchResult[0].Success);
             Assert.False(string.IsNullOrWhiteSpace(searchResult[0].ErrorMessage));
             Assert.Equal("The template search cache data is not supported.", searchResult[0].ErrorMessage);
@@ -228,7 +228,7 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
             var searchResult = await searchCoordinator.SearchAsync(p => true, Filter, default).ConfigureAwait(false);
 
             Assert.NotNull(searchResult);
-            Assert.Equal(1, searchResult.Count);
+            Assert.Single(searchResult);
             Assert.False(searchResult[0].Success);
             Assert.False(string.IsNullOrWhiteSpace(searchResult[0].ErrorMessage));
             Assert.True(searchResult[0].SearchHits.Count == 0);
@@ -261,7 +261,7 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
             var searchResult = await searchCoordinator.SearchAsync(p => true, Filter, default).ConfigureAwait(false);
 
             Assert.NotNull(searchResult);
-            Assert.Equal(1, searchResult.Count);
+            Assert.Single(searchResult);
             Assert.False(searchResult[0].Success);
             Assert.False(string.IsNullOrWhiteSpace(searchResult[0].ErrorMessage));
             Assert.True(searchResult[0].SearchHits.Count == 0);
@@ -294,7 +294,7 @@ namespace Microsoft.TemplateSearch.Common.UnitTests
             var searchResult = await searchCoordinator.SearchAsync(p => true, Filter, default).ConfigureAwait(false);
 
             Assert.NotNull(searchResult);
-            Assert.Equal(1, searchResult.Count);
+            Assert.Single(searchResult);
             Assert.False(searchResult[0].Success);
             Assert.False(string.IsNullOrWhiteSpace(searchResult[0].ErrorMessage));
             Assert.True(searchResult[0].SearchHits.Count == 0);

@@ -289,7 +289,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
                 fileRenames: new Dictionary<string, string>(),
                 symbolBasedFileRenames: symbolBasedRenames);
 
-            Assert.Equal(1, allChanges.Count);
+            Assert.Single(allChanges);
             Assert.Equal("Replace1Value_file.txt", allChanges["Replace1_file.txt"]);
         }
 

@@ -81,7 +81,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 
             var constraints = await constraintManager.GetConstraintsAsync(new[] { templateInfo }, default).ConfigureAwait(false);
 
-            Assert.Equal(1, constraints.Count);
+            Assert.Single(constraints);
             Assert.Equal("test-1", constraints.Single().Type);
         }
 

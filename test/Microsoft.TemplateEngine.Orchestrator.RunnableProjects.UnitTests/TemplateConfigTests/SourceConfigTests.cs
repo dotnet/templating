@@ -116,7 +116,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             IEnumerable<IFileChange2> changes = result.FileChanges.Cast<IFileChange2>();
             Assert.All(result.FileChanges.Cast<IFileChange2>(), c => c.SourceRelativePath.StartsWith("./"));
 
-            Assert.Equal(1, result.FileChanges.Count);
+            Assert.Single(result.FileChanges);
 
             Assert.Equal(ChangeKind.Create, result.FileChanges.Single().ChangeKind);
             Assert.True(string.Equals(result.FileChanges.Single().TargetRelativePath, "./something.txt"), "didn't copy the correct file");
@@ -167,7 +167,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             IEnumerable<IFileChange2> changes = result.FileChanges.Cast<IFileChange2>();
             Assert.All(result.FileChanges.Cast<IFileChange2>(), c => c.SourceRelativePath.StartsWith("./"));
 
-            Assert.Equal(1, result.FileChanges.Count);
+            Assert.Single(result.FileChanges);
             Assert.Equal(ChangeKind.Create, result.FileChanges.Single().ChangeKind);
             Assert.True(string.Equals(result.FileChanges.Single().TargetRelativePath, "./copy.me"), "didn't copy the correct file");
         }
@@ -217,7 +217,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             IEnumerable<IFileChange2> changes = result.FileChanges.Cast<IFileChange2>();
             Assert.All(result.FileChanges.Cast<IFileChange2>(), c => c.SourceRelativePath.StartsWith("./"));
 
-            Assert.Equal(1, result.FileChanges.Count);
+            Assert.Single(result.FileChanges);
             Assert.Equal(ChangeKind.Create, result.FileChanges.Single().ChangeKind);
             Assert.True(string.Equals(result.FileChanges.Single().TargetRelativePath, "./copy.me"), "didn't copy the correct file");
         }
@@ -272,7 +272,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Templ
             IEnumerable<IFileChange2> changes = result.FileChanges.Cast<IFileChange2>();
             Assert.All(result.FileChanges.Cast<IFileChange2>(), c => c.SourceRelativePath.StartsWith("./"));
 
-            Assert.Equal(1, result.FileChanges.Count);
+            Assert.Single(result.FileChanges);
             Assert.Equal(ChangeKind.Create, result.FileChanges.Single().ChangeKind);
             Assert.True(string.Equals(result.FileChanges.Single().TargetRelativePath, "./include.xyz"), "include modifier didn't properly override exclude modifier");
         }
