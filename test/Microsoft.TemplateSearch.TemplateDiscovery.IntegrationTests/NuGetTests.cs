@@ -44,7 +44,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.IntegrationTests
                 }
                 else
                 {
-                    Assert.True(false, "HTTP request failed.");
+                    Assert.Fail("HTTP request failed.");
                 }
             }
         }
