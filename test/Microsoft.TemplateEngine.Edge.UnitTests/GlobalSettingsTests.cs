@@ -64,7 +64,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             var firstFinishedTask = await Task.WhenAny(timeoutTask, taskSource.Task).ConfigureAwait(false);
             Assert.Equal(taskSource.Task, firstFinishedTask);
 
-            var newData2 = taskSource.Task.Result;
+            var newData2 = await taskSource.Task;
             Assert.Equal(newData.InstallerId, newData2.InstallerId);
             Assert.Equal(newData.MountPointUri, newData2.MountPointUri);
             Assert.Equal(newData.Details?["a"], newData2.Details?["a"]);
