@@ -180,6 +180,8 @@ dotnet_diagnostic.IDE0010.severity = suggestion
 dotnet_diagnostic.IDE0021.severity = suggestion
 #Use expression body for methods
 dotnet_diagnostic.IDE0022.severity = suggestion
+#Use collection initializers
+dotnet_diagnostic.IDE0028.severity = suggestion
 #Use auto-implemented property
 dotnet_diagnostic.IDE0032.severity = suggestion
 #Use conditional expression for return
@@ -198,6 +200,12 @@ dotnet_diagnostic.IDE0160.severity = suggestion
 dotnet_diagnostic.IDE0210.severity = suggestion
 #Use primary constructor
 dotnet_diagnostic.IDE0290.severity = suggestion
+#Collection initialization can be simplified
+dotnet_diagnostic.IDE0300.severity = suggestion
+#Collection initialization can be simplified
+dotnet_diagnostic.IDE0301.severity = suggestion
+#Collection initialization can be simplified
+dotnet_diagnostic.IDE0305.severity = suggestion
 
 # License header
 file_header_template = Licensed to the .NET Foundation under one or more agreements.\nThe .NET Foundation licenses this file to you under the MIT license.
