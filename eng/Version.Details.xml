@@ -11,17 +11,17 @@
       <Sha>b4fa7f2e1e65ef49881be2ab2df27624280a8c55</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="8.0.0-rtm.23518.12">
+    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="8.0.0-rtm.23518.26">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>eff79a52a1dea57ffadd8f48cb6e87b4f0669810</Sha>
+      <Sha>c6e7ebdcb1b99c72990ae9f5ff95a75d5bb0f3ce</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Ref" Version="8.0.0-rtm.23518.12">
+    <Dependency Name="Microsoft.NETCore.App.Ref" Version="8.0.0-rtm.23518.26">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>eff79a52a1dea57ffadd8f48cb6e87b4f0669810</Sha>
+      <Sha>c6e7ebdcb1b99c72990ae9f5ff95a75d5bb0f3ce</Sha>
     </Dependency>
-    <Dependency Name="VS.Redist.Common.NetCore.SharedFramework.x64.8.0" Version="8.0.0-rtm.23518.12">
+    <Dependency Name="VS.Redist.Common.NetCore.SharedFramework.x64.8.0" Version="8.0.0-rtm.23518.26">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>eff79a52a1dea57ffadd8f48cb6e87b4f0669810</Sha>
+      <Sha>c6e7ebdcb1b99c72990ae9f5ff95a75d5bb0f3ce</Sha>
     </Dependency>
     <Dependency Name="System.CommandLine" Version="2.0.0-beta4.23407.1">
       <Uri>https://github.com/dotnet/command-line-api</Uri>
