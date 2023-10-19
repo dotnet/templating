@@ -172,6 +172,8 @@ dotnet_code_quality.ca1822.api_surface = private, internal
 dotnet_code_quality.ca2208.api_surface = public
 dotnet_diagnostic.CS1591.severity = suggestion
 dotnet_analyzer_diagnostic.category-Style.severity = warning
+#Remove unnecessary usings/imports
+dotnet_diagnostic.IDE0005.severity = suggestion
 #Use explicit type instead of var
 dotnet_diagnostic.IDE0008.severity = suggestion
 #Add missing cases to switch statement
