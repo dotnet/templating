@@ -19,6 +19,10 @@
       <Uri>https://github.com/dotnet/runtime</Uri>
       <Sha>b9159ab91a5dbd124dd15d78ed073c52eba8c31b</Sha>
     </Dependency>
+    <Dependency Name="VS.Redist.Common.NetCore.SharedFramework.x64.8.0" Version="8.0.0-rtm.23519.13">
+      <Uri>https://github.com/dotnet/runtime</Uri>
+      <Sha>86c949374ed95989e7f1b81cb70b1e8b09bb3251</Sha>
+    </Dependency>
     <Dependency Name="System.CommandLine" Version="2.0.0-beta4.23407.1">
       <Uri>https://github.com/dotnet/command-line-api</Uri>
       <Sha>a045dd54a4c44723c215d992288160eb1401bb7f</Sha>
