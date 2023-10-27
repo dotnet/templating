@@ -4,13 +4,13 @@
   <PropertyGroup>
     <UsingToolXliff>true</UsingToolXliff>
     <UsingToolNetFrameworkReferenceAssemblies>true</UsingToolNetFrameworkReferenceAssemblies>
-    <VersionPrefix>8.0.200</VersionPrefix>
+    <VersionPrefix>9.0.100</VersionPrefix>
     <!-- When StabilizePackageVersion is set to 'true', this branch will produce stable outputs for 'Shipping' packages -->
     <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">true</StabilizePackageVersion>
     <DotNetFinalVersionKind Condition="'$(StabilizePackageVersion)' == 'true'">release</DotNetFinalVersionKind>
     <PackSpecific Condition="'$(OS)' != 'Windows_NT'">true</PackSpecific>
     <!-- Calculate prerelease label -->
-    <PreReleaseVersionLabel Condition="'$(StabilizePackageVersion)' != 'true'">preview</PreReleaseVersionLabel>
+    <PreReleaseVersionLabel Condition="'$(StabilizePackageVersion)' != 'true'">alpha</PreReleaseVersionLabel>
     <PreReleaseVersionLabel Condition="'$(StabilizePackageVersion)' == 'true' and $(VersionPrefix.EndsWith('00'))">rtm</PreReleaseVersionLabel>
     <PreReleaseVersionLabel Condition="'$(StabilizePackageVersion)' == 'true' and !$(VersionPrefix.EndsWith('00'))">servicing</PreReleaseVersionLabel>
     <PreReleaseVersionIteration Condition="'$(StabilizePackageVersion)' != 'true'">
@@ -22,8 +22,7 @@
     <!-- Dependencies from https://github.com/dotnet/command-line-api -->
     <SystemCommandLinePackageVersion>2.0.0-beta4.23407.1</SystemCommandLinePackageVersion>
     <!-- Dependencies from https://github.com/dotnet/runtime -->
-    <MicrosoftNETCoreAppRefPackageVersion>8.0.0</MicrosoftNETCoreAppRefPackageVersion>
-    <MicrosoftNETCoreAppRuntimewinx64PackageVersion>8.0.0</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
-    <VSRedistCommonNetCoreSharedFrameworkx6480PackageVersion>8.0.0-rtm.23524.7</VSRedistCommonNetCoreSharedFrameworkx6480PackageVersion>
+    <MicrosoftNETCoreAppRefPackageVersion>9.0.0-alpha.1.23523.1</MicrosoftNETCoreAppRefPackageVersion>
+    <MicrosoftNETCoreAppRuntimewinx64PackageVersion>9.0.0-alpha.1.23523.1</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
   </PropertyGroup>
 </Project>
