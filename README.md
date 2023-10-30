@@ -29,7 +29,7 @@ The key packages are:
 
 `dotnet new` CLI is now located in [dotnet/sdk](https://github.com/dotnet/sdk/tree/main/src/Cli/Microsoft.TemplateEngine.Cli) repo.
 
-The issues for `dotnet new` CLI UX should be opened in the that repository.
+The issues for `dotnet new` CLI UX should be opened in that repository.
 
 ### Template Content Repositories
 
