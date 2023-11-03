@@ -4,14 +4,6 @@
 
   <Import Project="$(RepositoryEngineeringDir)Package.props" />
 
-  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' AND '$(BuildingInsideVisualStudio)' != 'true'">
-    <FrameworkReference
-        Update="Microsoft.NETCore.App"
-        TargetingPackVersion="$(MicrosoftNETCoreAppRefPackageVersion)"
-        RuntimeFrameworkVersion="$(MicrosoftNETCoreAppRuntimewinx64PackageVersion)" />
-  </ItemGroup>
-
-
   <ItemGroup>
     <None Include="$(RepoRoot)LICENSE.txt" PackagePath="LICENSE.txt" Pack="true"/>
     <None Include="$(RepoRoot)THIRD-PARTY-NOTICES.txt" PackagePath="THIRD-PARTY-NOTICES.txt" Pack="true"/>
