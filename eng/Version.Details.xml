@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dependencies>
   <ProductDependencies>
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-externals" Version="9.0.0-alpha.1.23530.1">
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-externals" Version="9.0.0-alpha.1.23556.2">
       <Uri>https://github.com/dotnet/source-build-externals</Uri>
-      <Sha>ebe0ddc3a293df4ea172129b02adc25855d9976e</Sha>
+      <Sha>283f1ead54cc527da6e9745b6f36a086ac997211</Sha>
       <SourceBuild RepoName="source-build-externals" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="9.0.0-alpha.1.23530.1">
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="9.0.0-alpha.1.23556.4">
       <Uri>https://github.com/dotnet/source-build-reference-packages</Uri>
-      <Sha>65d856fde9705faa6e3dd35854d6912cf078ccfc</Sha>
+      <Sha>c1d9595e9c236001fd1412ed94972b9e5e5d8f3d</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
     <Dependency Name="System.CommandLine" Version="2.0.0-beta4.23407.1">
@@ -17,14 +17,14 @@
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
-    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="9.0.0-beta.23531.4">
+    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="9.0.0-beta.23557.7">
       <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>16a344fc2ff2eecac5b03b88c96e99d7796e5125</Sha>
+      <Sha>aa0317458d29ec79935ca04fa47d3a6f14a0944f</Sha>
       <SourceBuild RepoName="arcade" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="Microsoft.DotNet.XliffTasks" Version="9.0.0-beta.23531.4">
+    <Dependency Name="Microsoft.DotNet.XliffTasks" Version="9.0.0-beta.23557.7">
       <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>16a344fc2ff2eecac5b03b88c96e99d7796e5125</Sha>
+      <Sha>aa0317458d29ec79935ca04fa47d3a6f14a0944f</Sha>
     </Dependency>
   </ToolsetDependencies>
 </Dependencies>
