@@ -11,13 +11,13 @@
       <Sha>b5ceed90b72d1b05975dd95fedd86c2455969adb</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="9.0.0-alpha.1.23563.1">
+    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="9.0.0-alpha.1.23570.1">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>0dc5b590fa1fdf00bef65bb8c59b13f2dc601a0d</Sha>
+      <Sha>57085686bf7223e2305720383f4e00695321919a</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Ref" Version="9.0.0-alpha.1.23563.1">
+    <Dependency Name="Microsoft.NETCore.App.Ref" Version="9.0.0-alpha.1.23570.1">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>0dc5b590fa1fdf00bef65bb8c59b13f2dc601a0d</Sha>
+      <Sha>57085686bf7223e2305720383f4e00695321919a</Sha>
     </Dependency>
     <Dependency Name="VS.Redist.Common.NetCore.SharedFramework.x64.8.0" Version="8.0.0-rtm.23524.7">
       <Uri>https://github.com/dotnet/runtime</Uri>
