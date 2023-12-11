@@ -6,8 +6,8 @@
     <PackageReference Update="System.Diagnostics.Process" Version="4.3.0" />
     <PackageReference Update="System.IO.Compression" Version="4.3.0" />
     <PackageReference Update="System.Runtime.Loader" Version="4.3.0" />
-    <PackageReference Update="Microsoft.Build.Framework" Version="17.7.2" />
-    <PackageReference Update="Microsoft.Build.Utilities.Core" Version="17.7.2" />
+    <PackageReference Update="Microsoft.Build.Framework" Version="17.8.3" />
+    <PackageReference Update="Microsoft.Build.Utilities.Core" Version="17.8.3" />
     <PackageReference Update="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Update="Microsoft.Extensions.Logging" Version="7.0.0" />
     <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="7.0.0" />
