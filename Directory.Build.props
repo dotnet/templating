@@ -7,7 +7,7 @@
         <LangVersion>preview</LangVersion>
         <NETCoreTargetFramework>net8.0</NETCoreTargetFramework>
         <NETStandardTargetFramework>netstandard2.0</NETStandardTargetFramework>
-        <NETFullTargetFramework>net472</NETFullTargetFramework>
+        <NETFullTargetFramework>net48</NETFullTargetFramework>
         <Product>Microsoft .NET Core</Product>
         <Copyright>$(CopyrightNetFoundation)</Copyright>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>

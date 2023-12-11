@@ -27,6 +27,6 @@
     <PackageReference Update="xunit.abstractions" Version="2.0.3" />
     <PackageReference Update="Newtonsoft.Json.Schema" Version="3.0.15" />
     <PackageReference Update="Verify.XUnit" Version="22.1.4" />
-    <PackageReference Update="Verify.DiffPlex" Version="2.2.1" />
+    <PackageReference Update="Verify.DiffPlex" Version="2.3.0" />
   </ItemGroup>
 </Project>
