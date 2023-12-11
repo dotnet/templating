@@ -21,7 +21,7 @@
     <PackageReference Update="StyleCop.Analyzers" Version="1.2.0-beta.507" />
 
     <!--Test dependencies-->
-    <PackageReference Update="FakeItEasy" Version="7.4.0" />
+    <PackageReference Update="FakeItEasy" Version="8.0.0" />
     <PackageReference Update="FluentAssertions" Version="6.12.0" />
     <PackageReference Update="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Update="xunit.abstractions" Version="2.0.3" />
