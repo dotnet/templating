@@ -6,7 +6,7 @@
     <UsingToolNetFrameworkReferenceAssemblies>true</UsingToolNetFrameworkReferenceAssemblies>
     <VersionPrefix>8.0.200</VersionPrefix>
     <!-- When StabilizePackageVersion is set to 'true', this branch will produce stable outputs for 'Shipping' packages -->
-    <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">false</StabilizePackageVersion>
+    <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">true</StabilizePackageVersion>
     <DotNetFinalVersionKind Condition="'$(StabilizePackageVersion)' == 'true'">release</DotNetFinalVersionKind>
     <PackSpecific Condition="'$(OS)' != 'Windows_NT'">true</PackSpecific>
     <!-- Calculate prerelease label -->
