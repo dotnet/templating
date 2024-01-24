@@ -8,4 +8,4 @@ Microsoft.TemplateEngine.Edge.VirtualEnvironment
 Microsoft.TemplateEngine.Edge.VirtualEnvironment.VirtualEnvironment(System.Collections.Generic.IReadOnlyDictionary<string!, string!>? virtualEnvironment, bool includeRealEnvironment) -> void
 static Microsoft.TemplateEngine.Edge.DefaultEnvironment.FetchEnvironmentVariables() -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
 Microsoft.TemplateEngine.Edge.FilterableTemplateInfo.PreferDefaultName.get -> bool
-Microsoft.TemplateEngine.Edge.DefaultTemplateEngineHost.WorkingDirectory.get -> string
+Microsoft.TemplateEngine.Edge.DefaultTemplateEngineHost.WorkingDirectory.get -> string!
