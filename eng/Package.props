@@ -4,7 +4,7 @@
   <!-- Override package versions in dependabot\Packages.props for source build -->
   <!-- Packages must be set to their package version property if it exists (ex. BenchmarkDotNetVersion) since source-build uses
   these properties to override package versions if necessary. -->
-  <ItemGroup Condition="'$(DotNetBuildFromSource)' == 'true'">
+  <ItemGroup Condition="'$(DotNetBuildSourceOnly)' == 'true'">
     <PackageReference Update="System.Diagnostics.Process" Condition="'$(SystemDiagnosticsProcessVersion)' != ''" Version="$(SystemDiagnosticsProcessVersion)" />
     <PackageReference Update="System.IO.Compression" Condition="'$(SystemIOCompressionVersion)' != ''" Version="$(SystemIOCompressionVersion)" />
     <PackageReference Update="System.Runtime.Loader" Condition="'$(SystemRuntimeLoaderVersion)' != ''" Version="$(SystemRuntimeLoaderVersion)" />
