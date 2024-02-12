@@ -45,18 +45,6 @@ stages:
   displayName: Build
   jobs:
   - ${{ if and( ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-    # The localization setup for release/ branches. Note difference in package ID. Should not be used with main branch.
-    # Used for release/x.0.100, release/x.0.200, release/x.0.300, release/x.0.400 branches only.
-    # When the branch is setup for localizaiton, set 'EnableReleaseOneLocBuild' to true.
-    - ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/release/') }}:
-      - template: /eng/common/templates/job/onelocbuild.yml
-        parameters:
-          MirrorRepo: templating
-          LclSource: lclFilesfromPackage
-          LclPackageId: 'LCL-JUNO-PROD-TEMPLATING'
-          MirrorBranch: ${{ replace(variables['Build.SourceBranch'], 'refs/heads/', '') }}
-          JobNameSuffix: '_release'
-          condition: ${{ variables.EnableReleaseOneLocBuild }}
     # The localization setup for main branch. Note difference in package ID. Should not be used with release/ branches.
     - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
       - template: /eng/common/templates/job/onelocbuild.yml
@@ -92,10 +80,8 @@ stages:
 
         # Only enable publishing in non-public, non PR scenarios.
         - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-          # DotNet-Blob-Feed provides: dotnetfeed-storage-access-key-1
           # DotNet-Symbol-Server-Pats provides: microsoft-symbol-server-pat, symweb-symbol-server-pat
           # Publish-Build-Assets provides: MaestroAccessToken, BotAccount-dotnet-maestro-bot-PAT
-          - group: DotNet-Blob-Feed
           - group: Publish-Build-Assets
           - _InternalBuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
               /p:DotNetPublishUsingPipelines=$(_PublishUsingPipelines)
@@ -108,10 +94,8 @@ stages:
               # PRs or external builds are not signed.
               ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
                 _SignType: test
-                _DotNetPublishToBlobFeed : false
               ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
                 _SignType: real
-                _DotNetPublishToBlobFeed : true
             ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
               Build_Debug:
                 _BuildConfig: Debug
@@ -217,6 +201,8 @@ stages:
         enable: true
         continueOnError: false
         params: ' -SourceToolsList @("policheck","credscan")
+        -ArtifactToolsList @("binskim")
+        -BinskimAdditionalRunConfigParams @("IgnorePdbLoadError < True","Recurse < True")
         -TsaInstanceURL $(_TsaInstanceURL)
         -TsaProjectName $(_TsaProjectName)
         -TsaNotificationEmail $(_TsaNotificationEmail)
