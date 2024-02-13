@@ -19,7 +19,7 @@
   <PropertyGroup>
     <!-- Maestro-managed Package Versions - Ordered by repo name -->
     <!-- Dependencies from https://github.com/dotnet/command-line-api -->
-    <SystemCommandLinePackageVersion>2.0.0-beta4.24102.1</SystemCommandLinePackageVersion>
+    <SystemCommandLinePackageVersion>2.0.0-beta4.24112.1</SystemCommandLinePackageVersion>
     <!-- Dependencies from https://github.com/dotnet/runtime -->
     <MicrosoftNETCoreAppRefPackageVersion>9.0.0-preview.2.24105.1</MicrosoftNETCoreAppRefPackageVersion>
     <MicrosoftNETCoreAppRuntimewinx64PackageVersion>9.0.0-preview.2.24105.1</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
