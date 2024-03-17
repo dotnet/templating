@@ -51,6 +51,8 @@ namespace Microsoft.TemplateSearch.Common
 
             JArray? data = cacheObject.Get<JArray>(nameof(TemplatePackages))
                 ?? throw new Exception(LocalizableStrings.TemplateSearchCache_Exception_NotValid);
+
+            DateTimeOffset? lastUpdateTime = cacheObject.Property(nameof(LastUpdateTime))?.Value.ToObject<DateTimeOffset>();
             List<TemplatePackageSearchData> templatePackages = new();
             foreach (JToken templatePackage in data)
             {
@@ -67,7 +69,7 @@ namespace Microsoft.TemplateSearch.Common
                     logger.LogDebug($"Failed to read template package data {templatePackage}, details: {ex}");
                 }
             }
-            return new TemplateSearchCache(templatePackages, version!);
+            return new TemplateSearchCache(templatePackages, version!, lastUpdateTime);
         }
 
         internal static IDictionary<string, object> ReadAdditionalData(

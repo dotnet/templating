@@ -8,7 +8,8 @@
       "name": "Run template scanner",
       "type": "coreclr",
       "request": "launch",
-      "program": "${workspaceFolder}\\artifacts\\bin\\Microsoft.TemplateSearch.TemplateDiscovery\\Debug\\net9.0\\Microsoft.TemplateSearch.TemplateDiscovery.dll",
+      "program": "${workspaceFolder}\\artifacts\\bin\\Microsoft.TemplateSearch.TemplateDiscovery\\Debug\\net8.0\\Microsoft.TemplateSearch.TemplateDiscovery.dll",
+      "cwd": "${workspaceFolder}",
       "args": [
         "--basePath",
         "./templates",
@@ -17,8 +18,41 @@
         "--diff",
         "true",
         "--test",
-        "--allowPreviewPacks"
-      ]
+        "--allowPreviewPacks",
+        "--diff-override-cache",
+        "E:\\Code\\dotnet-templating\\templates\\SearchCache\\oldcache.json"
+      ],
+      "env": {
+        "DOTNET_ROOT": "${workspaceFolder}\\.dotnet",
+        "DOTNET_HOST_PATH": "${workspaceFolder}\\.dotnet\\dotnet.exe",
+      },
+      "windows": {
+        "env": {
+          "PATH": "${workspaceFolder}\\.dotnet;${env:PATH}"
+        }
+      },
+      "linux": {
+        "env": {
+          "PATH": "${workspaceFolder}/.dotnet:${env:PATH}"
+        }
+      },
+      "osx": {
+        "env": {
+          "PATH": "${workspaceFolder}/.dotnet:${env:PATH}"
+        }
+      }
+    },
+    {
+      "name": "Attach",
+      "type": "coreclr",
+      "request": "attach"
+    },
+    {
+      "name": "C#: Scanner Debug",
+      "type": "dotnet",
+      "request": "launch",
+      "projectPath": "${workspaceFolder}/tools/Microsoft.TemplateSearch.TemplateDiscovery/Microsoft.TemplateSearch.TemplateDiscovery.csproj",
+      "launchConfigurationId": "scan"
     }
   ]
 }

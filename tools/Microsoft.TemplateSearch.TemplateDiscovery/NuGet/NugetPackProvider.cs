@@ -2,48 +2,114 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Logging;
 using Microsoft.TemplateSearch.Common.Abstractions;
 using Microsoft.TemplateSearch.TemplateDiscovery.PackChecking;
-using Newtonsoft.Json.Linq;
 using NuGet.Common;
 using NuGet.Protocol;
+using NuGet.Protocol.Catalog;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
 
 namespace Microsoft.TemplateSearch.TemplateDiscovery.NuGet
 {
-    internal class NuGetPackProvider : IPackProvider
+    internal class TemplatePackageLeafProcessor(Func<PackageDetailsCatalogLeaf, bool> filter) : ICatalogLeafProcessor
+    {
+        private readonly Dictionary<string, string> _packageVersions = new Dictionary<string, string>();
+
+        public List<KeyValuePair<string, string>> Packages => _packageVersions.ToList();
+
+        public int PackageCount => _packageVersions.Count;
+
+        public Task<bool> ProcessPackageDeleteAsync(PackageDeleteCatalogLeaf leaf)
+        {
+            if (_packageVersions.TryGetValue(leaf.PackageId, out var _))
+            {
+                lock (_packageVersions)
+                {
+                    _packageVersions.Remove(leaf.PackageId);
+                }
+            }
+            return Task.FromResult(true);
+        }
+
+        public Task<bool> ProcessPackageDetailsAsync(PackageDetailsCatalogLeaf leaf)
+        {
+            if (filter.Invoke(leaf))
+            {
+                ExtractNugetPackageInfo(leaf);
+                return Task.FromResult(true);
+            }
+            return Task.FromResult(true);
+        }
+
+        private void ExtractNugetPackageInfo(PackageDetailsCatalogLeaf leaf)
+        {
+            lock (_packageVersions)
+            {
+                _packageVersions[leaf.PackageId] = leaf.PackageVersion;
+            }
+        }
+    }
+
+    internal class MemoryCursor(DateTimeOffset initialCursor) : ICursor
+    {
+        public DateTimeOffset? Cursor { get; set; } = initialCursor;
+
+        public Task<DateTimeOffset?> GetAsync()
+        {
+            return Task.FromResult(Cursor);
+        }
+
+        public Task SetAsync(DateTimeOffset value)
+        {
+            Cursor = value;
+            return Task.CompletedTask;
+        }
+    }
+
+    internal class NuGetPackProvider : IPackProvider, IDisposable
     {
         private const string NuGetOrgFeed = "https://api.nuget.org/v3/index.json";
         private const string DownloadPackageFileNameFormat = "{0}.{1}.nupkg";
         private const string DownloadedPacksDir = "DownloadedPacks";
         private readonly string _packageTempPath;
-        private readonly int _pageSize;
-        private readonly bool _runOnlyOnePage;
         private readonly SourceRepository _repository;
         private readonly SourceCacheContext _cacheContext = new SourceCacheContext();
         private readonly FindPackageByIdResource _downloadResource;
+        private readonly Uri _searchUrl;
         private readonly bool _includePreview;
-        private readonly string _searchUriFormat;
+        private readonly Func<PackageDetailsCatalogLeaf, bool> _filter;
+        private readonly TemplatePackageLeafProcessor _processor;
+        private readonly PackageSearchResource _searchResource;
+        private readonly CatalogProcessor _catalogProcessor;
+        private readonly HttpClient _httpClient;
 
-        internal NuGetPackProvider(string name, string query, DirectoryInfo packageTempBasePath, int pageSize, bool runOnlyOnePage, bool includePreviewPacks)
+        internal NuGetPackProvider(string name, DateTimeOffset previousCache, Func<PackageDetailsCatalogLeaf, bool> filter, DirectoryInfo packageTempBasePath, bool includePreviewPacks)
         {
             Name = name;
-            _pageSize = pageSize;
-            _runOnlyOnePage = runOnlyOnePage;
             _packageTempPath = Path.GetFullPath(Path.Combine(packageTempBasePath.FullName, DownloadedPacksDir, Name));
             _repository = Repository.Factory.GetCoreV3(NuGetOrgFeed);
-            ServiceIndexResourceV3 indexResource = _repository.GetResource<ServiceIndexResourceV3>();
-            IReadOnlyList<ServiceIndexEntry> searchResources = indexResource.GetServiceEntries("SearchQueryService");
             _downloadResource = _repository.GetResource<FindPackageByIdResource>();
+            var index = _repository.GetResource<ServiceIndexResourceV3>();
+            _searchUrl = index.GetServiceEntryUris(ServiceTypes.SearchQueryService)[0];
             _includePreview = includePreviewPacks;
+            _filter = filter;
 
-            if (!searchResources.Any())
+            DateTimeOffset cursor = previousCache;
+            _processor = new TemplatePackageLeafProcessor(_filter);
+            _searchResource = _repository.GetResource<PackageSearchResource>();
+            CatalogProcessorSettings settings = new()
             {
-                throw new Exception($"{NuGetOrgFeed} does not support search API (SearchQueryService)");
-            }
+                DefaultMinCommitTimestamp = cursor
+            };
 
-            _searchUriFormat = $"{searchResources[0].Uri}?{query}&skip={{0}}&take={{1}}&prerelease={includePreviewPacks}&semVerLevel=2.0.0";
+            var loggerFactory = new LoggerFactory();
+            var cursor2 = new MemoryCursor(cursor);
+            _httpClient = new HttpClient(new HttpClientHandler() { CheckCertificateRevocationList = true });
+            var simpleHttpClient = new SimpleHttpClient(_httpClient, loggerFactory.CreateLogger<SimpleHttpClient>());
+            var client = new CatalogClient(simpleHttpClient, loggerFactory.CreateLogger<CatalogClient>());
+            _catalogProcessor = new CatalogProcessor(cursor2, client, _processor, settings, loggerFactory.CreateLogger<CatalogProcessor>());
 
             if (!Directory.Exists(_packageTempPath))
             {
@@ -57,79 +123,30 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.NuGet
 
         public async IAsyncEnumerable<ITemplatePackageInfo> GetCandidatePacksAsync([EnumeratorCancellation] CancellationToken token)
         {
-            int skip = 0;
-            bool done = false;
-            int packCount = 0;
-
-            int totalPackCount = 0;
-            int pageSize = _pageSize;
-
-            do
+            await _catalogProcessor.ProcessAsync().ConfigureAwait(false);
+            var count = 0;
+            foreach ((var packageId, var packageVersion) in _processor.Packages)
             {
-                //NuGet search API limit is 3000, so try to get all the packages exceeding the limit.
-                if (skip + pageSize > 3000)
+                count = count++;
+                if (count % 100 == 0)
                 {
-                    //get all the packages up to 3000
-                    pageSize = skip + pageSize - 3000;
+                    Console.WriteLine($"Processed {count} packages");
                 }
-                if (skip >= 3000)
+                var filters = new SearchFilter(packageVersion.Contains("-"))
                 {
-                    //try to get all remaining packages
-                    skip = 3000;
-                    pageSize = totalPackCount - 3000;
-
-                    //pageSize limit is 1000
-                    //therefore max amount of packages that can be retrieved is 4000.
-                    if (pageSize > 1000)
-                    {
-                        pageSize = 1000;
-                    }
-                }
-                string queryString = string.Format(_searchUriFormat, skip, pageSize);
-
-                Uri queryUri = new Uri(queryString);
-                using (HttpClient client = new HttpClient(new HttpClientHandler() { CheckCertificateRevocationList = true }))
-                using (HttpResponseMessage response = await client.GetAsync(queryUri, token).ConfigureAwait(false))
+                    IncludeDelisted = true
+                };
+                var details = (await _searchResource.SearchAsync($"id:{packageId} version:{packageVersion}", filters, 0, 1, NullLogger.Instance, token).ConfigureAwait(false)).First();
+                var templatePackage = new NuGetPackageSourceInfo(packageId, packageVersion)
                 {
-                    if (response.IsSuccessStatusCode)
-                    {
-                        string responseText = await response.Content.ReadAsStringAsync(token).ConfigureAwait(false);
-
-                        NuGetPackageSearchResult resultsForPage = NuGetPackageSearchResult.FromJObject(JObject.Parse(responseText));
-                        totalPackCount = resultsForPage.TotalHits;
-                        if (resultsForPage.Data.Count > 0)
-                        {
-                            skip += pageSize;
-                            packCount += resultsForPage.Data.Count;
-                            foreach (NuGetPackageSourceInfo sourceInfo in resultsForPage.Data)
-                            {
-                                yield return sourceInfo;
-                            }
-                        }
-                        //4000 is NuGet limit, stop after 4000 is processed.
-                        if (totalPackCount == packCount || (totalPackCount > 4000 && packCount == 4000))
-                        {
-                            if (totalPackCount > 4000)
-                            {
-                                Console.WriteLine($"Warning: {totalPackCount} packages were found, but only first 4000 packages can be retrieved. Other packages will be skipped.");
-                            }
-                            done = true;
-                        }
-                        else if (skip > 3000 || skip >= totalPackCount)
-                        {
-                            Console.WriteLine($"Failed to get all search results from NuGet: expected {totalPackCount}, retrieved: {packCount}.");
-                            throw new Exception("Failed to get search results from NuGet search API.");
-                        }
-
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Unexpected response from NuGet: code {response.StatusCode}, details: {response}.");
-                        throw new Exception("Failed to get search results from NuGet search API.");
-                    }
-                }
+                    Description = details.Description,
+                    IconUrl = details.IconUrl?.ToString(),
+                    Owners = details.Owners.Split(";"),
+                    TotalDownloads = details.DownloadCount ?? 0,
+                    Reserved = details.PrefixReserved,
+                };
+                yield return templatePackage;
             }
-            while (!done && !_runOnlyOnePage);
         }
 
         public async Task<IDownloadedPackInfo> DownloadPackageAsync(ITemplatePackageInfo packinfo, CancellationToken token)
@@ -173,18 +190,9 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.NuGet
             }
         }
 
-        public async Task<int> GetPackageCountAsync(CancellationToken token)
+        public Task<int> GetPackageCountAsync(CancellationToken token)
         {
-            string queryString = string.Format(_searchUriFormat, 0, _pageSize);
-            Uri queryUri = new Uri(queryString);
-            using (HttpClient client = new HttpClient(new HttpClientHandler() { CheckCertificateRevocationList = true }))
-            using (HttpResponseMessage response = await client.GetAsync(queryUri, token).ConfigureAwait(false))
-            {
-                response.EnsureSuccessStatusCode();
-                string responseText = await response.Content.ReadAsStringAsync(token).ConfigureAwait(false);
-                NuGetPackageSearchResult resultsForPage = NuGetPackageSearchResult.FromJObject(JObject.Parse(responseText));
-                return resultsForPage.TotalHits;
-            }
+            return Task.FromResult(_processor.PackageCount);
         }
 
         public async Task DeleteDownloadedPacksAsync()
@@ -259,6 +267,8 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.NuGet
                 return default;
             }
         }
+
+        public void Dispose() => _httpClient.Dispose();
 
         private class NuGetPackInfo : ITemplatePackageInfo
         {

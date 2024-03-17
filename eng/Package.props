@@ -17,6 +17,7 @@
     <PackageReference Update="NuGet.Configuration" Condition="'$(NuGetConfigurationVersion)' != ''" Version="$(NuGetConfigurationVersion)" />
     <PackageReference Update="NuGet.Credentials" Condition="'$(NuGetCredentialsVersion)' != ''" Version="$(NuGetCredentialsVersion)" />
     <PackageReference Update="NuGet.Protocol" Condition="'$(NuGetProtocolVersion)' != ''" Version="$(NuGetProtocolVersion)" />
+    <PackageReference Update="NuGet.Protocol.Catalog" Condition="'$(NuGetProtocolCatalogVersion)' != ''" Version="$(NuGetProtocolCatalogVersion)" />
 
     <PackageReference Update="Microsoft.CodeAnalysis.PublicApiAnalyzers" Condition="'$(MicrosoftCodeAnalysisPublicApiAnalyzersVersion)' != ''" Version="$(MicrosoftCodeAnalysisPublicApiAnalyzersVersion)" />
     <PackageReference Update="StyleCop.Analyzers" Condition="'$(StyleCopAnalyzersVersion)' != ''" Version="$(StyleCopAnalyzersVersion)" />

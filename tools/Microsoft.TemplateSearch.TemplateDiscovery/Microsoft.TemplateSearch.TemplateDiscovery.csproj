@@ -20,6 +20,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
     <PackageReference Include="System.CommandLine" />
     <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="NuGet.Protocol.Catalog" />
   </ItemGroup>
 
   <ItemGroup>

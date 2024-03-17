@@ -55,7 +55,8 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
                     await CheckRemovedPackagesAsync(newCache, filteredPackages, scanningStats, token).ConfigureAwait(false);
                 }
                 DisplayScanningStats(scanningStats);
-                return new PackSourceCheckResult(new TemplateSearchCache(newCache.Values.ToList()), filteredPackages.Values.ToList(), _additionalDataProducers);
+                var startTime = System.Diagnostics.Process.GetCurrentProcess().StartTime.ToDateTimeOffset();
+                return new PackSourceCheckResult(new TemplateSearchCache(newCache.Values.ToList(), startTime), filteredPackages.Values.ToList(), _additionalDataProducers);
             }
             finally
             {
@@ -89,7 +90,6 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
                 cancellationToken.ThrowIfCancellationRequested();
                 int count = -1;
                 Console.WriteLine($"Processing pack provider {packProvider.Name}:");
-                Console.WriteLine($"{await packProvider.GetPackageCountAsync(cancellationToken).ConfigureAwait(false)} packs discovered, starting processing");
 
                 await foreach (ITemplatePackageInfo sourceInfo in packProvider.GetCandidatePacksAsync(cancellationToken).ConfigureAwait(false))
                 {
@@ -121,6 +121,8 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.PackChecking
                     }
                     await ProcessTemplatePackageAsync(packInfo, newCache, filteredPackages, scanningStats, oldTemplateVersion, oldNonTemplateVersion, cancellationToken).ConfigureAwait(false);
                 }
+
+                Console.WriteLine($"{await packProvider.GetPackageCountAsync(cancellationToken).ConfigureAwait(false)} packs discovered");
                 ProcessCount(count);
                 Console.WriteLine($"All packs from pack provider {packProvider.Name} are processed");
             }

@@ -25,19 +25,19 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.NuGet
             Version = version;
         }
 
-        public string Name { get; private set; }
+        public string Name { get; init; }
 
-        public string Version { get; private set; }
+        public string Version { get; init; }
 
-        public long TotalDownloads { get; private set; }
+        public long TotalDownloads { get; set; }
 
-        public IReadOnlyList<string> Owners { get; private set; } = Array.Empty<string>();
+        public IReadOnlyList<string> Owners { get; set; } = Array.Empty<string>();
 
-        public bool Reserved { get; private set; }
+        public bool Reserved { get; set; }
 
-        public string? Description { get; private set; }
+        public string? Description { get; set; }
 
-        public string? IconUrl { get; private set; }
+        public string? IconUrl { get; set; }
 
         //property names are explained here: https://docs.microsoft.com/en-us/nuget/api/search-query-service-resource
         internal static NuGetPackageSourceInfo FromJObject(JObject entry)

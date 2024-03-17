@@ -51,7 +51,7 @@ namespace Microsoft.TemplateSearch.Common
                 }
                 packageData.Add(new TemplatePackageSearchData(new PackInfo(package.Key, package.Value.Version, package.Value.TotalDownloads, package.Value.Owners, package.Value.Reserved), templateData));
             }
-            return new TemplateSearchCache(packageData);
+            return new TemplateSearchCache(packageData, DateTimeOffset.MinValue);
         }
 
         internal static bool TryReadDiscoveryMetadata(IEngineEnvironmentSettings environmentSettings, string filePath, IReadOnlyDictionary<string, Func<object, object>>? additionalDataReaders, out TemplateDiscoveryMetadata? discoveryMetadata)

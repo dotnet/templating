@@ -12,18 +12,20 @@ namespace Microsoft.TemplateSearch.Common
     {
         private const string CurrentVersion = "2.0";
 
-        internal TemplateSearchCache(IReadOnlyList<TemplatePackageSearchData> data)
+        internal TemplateSearchCache(IReadOnlyList<TemplatePackageSearchData> data, DateTimeOffset lastUpdateTime)
         {
             // when creating from freshly-generated data, order the results for clarity
             TemplatePackages = data.OrderBy(x => x.Name, StringComparer.OrdinalIgnoreCase).ToArray();
             Version = CurrentVersion;
+            LastUpdateTime = lastUpdateTime;
         }
 
-        private TemplateSearchCache(IReadOnlyList<TemplatePackageSearchData> data, string version)
+        private TemplateSearchCache(IReadOnlyList<TemplatePackageSearchData> data, string version, DateTimeOffset? lastUpdateTime)
         {
             // don't order results when creating from a read file
             TemplatePackages = data;
             Version = version;
+            LastUpdateTime = lastUpdateTime;
         }
 
         [JsonProperty]
@@ -31,5 +33,8 @@ namespace Microsoft.TemplateSearch.Common
 
         [JsonProperty]
         internal string Version { get; private set; }
+
+        [JsonProperty]
+        internal DateTimeOffset? LastUpdateTime { get; private set; }
     }
 }

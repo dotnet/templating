@@ -11,8 +11,6 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
 {
     internal class TemplateDiscoveryCommand : CliCommand
     {
-        private const int DefaultPageSize = 100;
-
         private readonly CliOption<DirectoryInfo> _basePathOption = new("--basePath")
         {
             Arity = ArgumentArity.ExactlyOne,
@@ -23,17 +21,6 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
         private readonly CliOption<bool> _allowPreviewPacksOption = new("--allowPreviewPacks")
         {
             Description = "Include preview packs in the results (by default, preview packs are ignored and the latest stable pack is used.",
-        };
-
-        private readonly CliOption<int> _pageSizeOption = new("--pageSize")
-        {
-            Description = "(debugging) The chunk size for interactions with the source.",
-            DefaultValueFactory = (r) => DefaultPageSize,
-        };
-
-        private readonly CliOption<bool> _onePageOption = new("--onePage")
-        {
-            Description = "(debugging) Only process one page of template packs.",
         };
 
         private readonly CliOption<bool> _savePacksOption = new("--savePacks")
@@ -91,8 +78,6 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
 
             Options.Add(_basePathOption);
             Options.Add(_allowPreviewPacksOption);
-            Options.Add(_pageSizeOption);
-            Options.Add(_onePageOption);
             Options.Add(_savePacksOption);
             Options.Add(_noTemplateJsonFilterOption);
             Options.Add(_testOption);
@@ -109,9 +94,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
                 var config = new CommandArgs(parseResult.GetValue(_basePathOption) ?? throw new Exception("Output path is not set"))
                 {
                     LocalPackagePath = parseResult.GetValue(_packagesPathOption),
-                    PageSize = parseResult.GetValue(_pageSizeOption),
                     SaveCandidatePacks = parseResult.GetValue(_savePacksOption),
-                    RunOnlyOnePage = parseResult.GetValue(_onePageOption),
                     IncludePreviewPacks = parseResult.GetValue(_allowPreviewPacksOption),
                     DontFilterOnTemplateJson = parseResult.GetValue(_noTemplateJsonFilterOption),
                     Verbose = parseResult.GetValue(_verboseOption),

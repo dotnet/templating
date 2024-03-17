@@ -9,30 +9,35 @@ using Microsoft.TemplateSearch.TemplateDiscovery.Filters;
 using Microsoft.TemplateSearch.TemplateDiscovery.PackChecking;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NuGet.Protocol.Catalog;
 
 namespace Microsoft.TemplateSearch.TemplateDiscovery.NuGet
 {
     internal class NuGetPackSourceCheckerFactory : IPackCheckerFactory
     {
-        private static readonly Dictionary<SupportedQueries, string> SupportedProviders = new Dictionary<SupportedQueries, string>()
+        private static readonly Dictionary<SupportedQueries, Func<PackageDetailsCatalogLeaf, bool>> SupportedProviders = new Dictionary<SupportedQueries, Func<PackageDetailsCatalogLeaf, bool>>()
         {
-            { SupportedQueries.PackageTypeQuery, "packageType=Template" },
-            { SupportedQueries.TemplateQuery, "q=template" }
+            { SupportedQueries.PackageTypeQuery, l => l.PackageTypes?.Any(t => t.Name.Equals("Template", StringComparison.OrdinalIgnoreCase)) ?? false },
+            { SupportedQueries.TemplateQuery, l => l.PackageId?.Contains("template", StringComparison.OrdinalIgnoreCase) ?? l.Tags?.Any(t => t.Contains("template", StringComparison.OrdinalIgnoreCase)) ?? false }
         };
 
         public async Task<PackSourceChecker> CreatePackSourceCheckerAsync(CommandArgs config, CancellationToken cancellationToken)
         {
             List<IPackProvider> providers = new List<IPackProvider>();
 
+            TemplateSearchCache? existingCache = config.DiffMode ? await LoadExistingCacheAsync(config, cancellationToken).ConfigureAwait(false) : null;
+            var previousCache = existingCache?.LastUpdateTime ?? DateTimeOffset.MinValue;
+            IEnumerable<FilteredPackageInfo>? knownPackages = config.DiffMode ? await LoadKnownPackagesListAsync(config, cancellationToken).ConfigureAwait(false) : null;
+
             if (!config.Queries.Any())
             {
-                providers.AddRange(SupportedProviders.Select(kvp => new NuGetPackProvider(kvp.Key.ToString(), kvp.Value, config.OutputPath, config.PageSize, config.RunOnlyOnePage, config.IncludePreviewPacks)));
+                providers.AddRange(SupportedProviders.Select(kvp => new NuGetPackProvider(kvp.Key.ToString(), previousCache, kvp.Value, config.OutputPath, config.IncludePreviewPacks)));
             }
             else
             {
                 foreach (SupportedQueries provider in config.Queries.Distinct())
                 {
-                    providers.Add(new NuGetPackProvider(provider.ToString(), SupportedProviders[provider], config.OutputPath, config.PageSize, config.RunOnlyOnePage, config.IncludePreviewPacks));
+                    providers.Add(new NuGetPackProvider(provider.ToString(), previousCache, SupportedProviders[provider], config.OutputPath, config.IncludePreviewPacks));
                 }
             }
 
@@ -51,9 +56,6 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.NuGet
             {
                 new CliHostDataProducer()
             };
-
-            TemplateSearchCache? existingCache = config.DiffMode ? await LoadExistingCacheAsync(config, cancellationToken).ConfigureAwait(false) : null;
-            IEnumerable<FilteredPackageInfo>? knownPackages = config.DiffMode ? await LoadKnownPackagesListAsync(config, cancellationToken).ConfigureAwait(false) : null;
 
             return new PackSourceChecker(providers, preFilterer, additionalDataProducers, config.SaveCandidatePacks, existingCache, knownPackages);
         }

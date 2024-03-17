@@ -20,11 +20,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery
 
         internal DirectoryInfo OutputPath { get; init; }
 
-        internal int PageSize { get; init; }
-
         internal bool SaveCandidatePacks { get; init; }
-
-        internal bool RunOnlyOnePage { get; init; }
 
         internal bool IncludePreviewPacks { get; init; }
 
