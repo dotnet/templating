@@ -38,7 +38,14 @@ variables:
   - ${{ if eq(variables['System.TeamProject'], 'public') }}:
     - name: _InternalRuntimeDownloadArgs
       value: ''
-  - template: /eng/common/templates/variables/pool-providers.yml
+  - template: /eng/common/templates-official/variables/pool-providers.yml
+
+resources:
+  repositories:
+  - repository: 1esPipelines
+    type: git
+    name: 1ESPipelineTemplates/1ESPipelineTemplates
+    ref: refs/tags/release
 
 stages:
 - stage: build
@@ -47,7 +54,7 @@ stages:
   - ${{ if and( ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
     # The localization setup for main branch. Note difference in package ID. Should not be used with release/ branches.
     - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
-      - template: /eng/common/templates/job/onelocbuild.yml
+      - template: /eng/common/templates-official/job/onelocbuild.yml
         parameters:
           MirrorRepo: templating
           LclSource: lclFilesfromPackage
@@ -55,7 +62,7 @@ stages:
           MirrorBranch: 'main'
           JobNameSuffix: '_main'
           condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
-  - template: /eng/common/templates/jobs/jobs.yml
+  - template: /eng/common/templates-official/jobs/jobs.yml
     parameters:
       enableMicrobuild: true
       enablePublishBuildArtifacts: true
@@ -185,7 +192,7 @@ stages:
             condition: succeeded()
 
 - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-  - template: eng\common\templates\post-build\post-build.yml
+  - template: eng/common/templates-official/post-build/post-build.yml
     parameters:
       publishingInfraVersion: 3
       # Symbol validation isn't being very reliable lately. This should be enabled back
