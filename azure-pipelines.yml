@@ -47,6 +47,15 @@ resources:
     name: 1ESPipelineTemplates/1ESPipelineTemplates
     ref: refs/tags/release
 
+parameters:
+- name: buildConfigurationsWindows
+  type: object
+  default:
+  - buildConfig: Release
+    signType: real
+  - buildConfig: Debug
+    signType: test
+
 extends:
   ${{ if notin(variables['Build.Reason'], 'PullRequest') }}:
     template: v1/1ES.Official.PipelineTemplate.yml@1esPipelines
@@ -86,60 +95,60 @@ extends:
           enableTelemetry: true
           helixRepo: dotnet/templating
           jobs:
-          - job: Windows_NT
-            timeoutInMinutes: 90
-            pool:
-              ${{ if eq(variables['System.TeamProject'], 'public') }}:
-                name: $(DncEngPublicBuildPool)
-                vmImage: 1es-windows-2019-open
-              ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+          - ${{ each config in parameters.buildConfigurationsWindows }}:
+            - job: Windows_NT
+              timeoutInMinutes: 90
+              pool:
                 name: $(DncEngInternalBuildPool)
                 demands: ImageOverride -equals windows.vs2019.amd64
-            variables:
-            - _InternalBuildArgs: ''
-    
-            # Only enable publishing in non-public, non PR scenarios.
-            - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-              # DotNet-Symbol-Server-Pats provides: microsoft-symbol-server-pat, symweb-symbol-server-pat
-              # Publish-Build-Assets provides: MaestroAccessToken, BotAccount-dotnet-maestro-bot-PAT
-              - group: Publish-Build-Assets
-              - _InternalBuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
-                  /p:DotNetPublishUsingPipelines=$(_PublishUsingPipelines)
-                  /p:OfficialBuildId=$(BUILD.BUILDNUMBER)
-    
-            strategy:
-              matrix:
-                Build_Release:
-                  _BuildConfig: Release
-                  # PRs or external builds are not signed.
-                  ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
-                    _SignType: test
-                  ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-                    _SignType: real
-                ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
-                  Build_Debug:
-                    _BuildConfig: Debug
-                    _SignType: test
-    
-            steps:
-            - checkout: self
-              clean: true
-            - ${{ if ne(variables['System.TeamProject'], 'public') }}:
-              - task: PowerShell@2
-                displayName: Setup Private Feeds Credentials
-                inputs:
-                  filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.ps1
-                  arguments: -ConfigFile $(Build.SourcesDirectory)/NuGet.config -Password $Env:Token
-                env:
-                  Token: $(dn-bot-dnceng-artifact-feeds-rw)
-            # Use utility script to run script command dependent on agent OS.
-            - script: eng/common/cibuild.cmd
-                -configuration $(_BuildConfig)
-                -prepareMachine
-                -integrationTest
-                $(_InternalBuildArgs)
-                $(_InternalRuntimeDownloadArgs)
-              displayName: Windows Build / Publish
+              _SignType: ${{ config.signType }}
+              _BuildConfig: ${{ config.buildConfig }}
+              variables:
+              - _InternalBuildArgs: ''
+              
+      
+              # Only enable publishing in non-public, non PR scenarios.
+              - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+                # DotNet-Symbol-Server-Pats provides: microsoft-symbol-server-pat, symweb-symbol-server-pat
+                # Publish-Build-Assets provides: MaestroAccessToken, BotAccount-dotnet-maestro-bot-PAT
+                - group: Publish-Build-Assets
+                - _InternalBuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
+                    /p:DotNetPublishUsingPipelines=$(_PublishUsingPipelines)
+                    /p:OfficialBuildId=$(BUILD.BUILDNUMBER)
+      
+              # strategy:
+              #   matrix:
+              #     Build_Release:
+              #       _BuildConfig: Release
+              #       # PRs or external builds are not signed.
+              #       ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
+              #         _SignType: test
+              #       ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+              #         _SignType: real
+              #     ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
+              #       Build_Debug:
+              #         _BuildConfig: Debug
+              #         _SignType: test
+      
+              steps:
+              - checkout: self
+                clean: true
+              - ${{ if ne(variables['System.TeamProject'], 'public') }}:
+                - task: PowerShell@2
+                  displayName: Setup Private Feeds Credentials
+                  inputs:
+                    filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.ps1
+                    arguments: -ConfigFile $(Build.SourcesDirectory)/NuGet.config -Password $Env:Token
+                  env:
+                    Token: $(dn-bot-dnceng-artifact-feeds-rw)
+              # Use utility script to run script command dependent on agent OS.
+              - script: eng/common/cibuild.cmd
+                  -configuration $(_BuildConfig)
+                  -prepareMachine
+                  -integrationTest
+                  $(_InternalBuildArgs)
+                  $(_InternalRuntimeDownloadArgs)
+                displayName: Windows Build / Publish
     
           - ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
             - job: OSX
