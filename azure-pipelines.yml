@@ -53,7 +53,7 @@ parameters:
   default:
   # Always build the Release configuration, but never sign for PRs.
   - buildConfig: Release
-    ${{ if in(variables['Build.Reason'], 'PullRequest')) }}:
+    ${{ if notin(variables['Build.Reason'], 'PullRequest') }}:
       signType: real
     ${{ else }}:
       signType: test
