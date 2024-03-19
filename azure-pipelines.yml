@@ -29,7 +29,6 @@ variables:
     value: false
   - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
     - group: Templating-SDLValidation-Params
-    
   - ${{ if ne(variables['System.TeamProject'], 'public') }}:
     - group: DotNetBuilds storage account read tokens
     - name: _InternalRuntimeDownloadArgs
@@ -47,8 +46,9 @@ resources:
     name: 1ESPipelineTemplates/1ESPipelineTemplates
     ref: refs/tags/release
 
+# This is necessary because 1ES doesn't work using strategy & matrix
 parameters:
-- name: buildConfigurationsWindows
+- name: buildConfigurations
   type: object
   default:
   # Always build the Release configuration, but never sign for PRs.
@@ -94,9 +94,9 @@ extends:
           enableTelemetry: true
           helixRepo: dotnet/templating
           jobs:
-          - ${{ each config in parameters.buildConfigurationsWindows }}:
+          - ${{ each config in parameters.buildConfigurations }}:
             - job: Windows_NT_${{ config.buildConfig }}
-              displayName: Windows_NT ${{ config.buildConfig }}  
+              displayName: Windows_NT ${{ config.buildConfig }}
               timeoutInMinutes: 90
               pool:
                 name: $(DncEngInternalBuildPool)
@@ -115,21 +115,7 @@ extends:
                 - _InternalBuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
                     /p:DotNetPublishUsingPipelines=$(_PublishUsingPipelines)
                     /p:OfficialBuildId=$(BUILD.BUILDNUMBER)
-              
-              # strategy:
-              #   matrix:
-              #     Build_Release:
-              #       _BuildConfig: Release
-              #       # PRs or external builds are not signed.
-              #       ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
-              #         _SignType: test
-              #       ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-              #         _SignType: real
-              #     ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
-              #       Build_Debug:
-              #         _BuildConfig: Debug
-              #         _SignType: test
-      
+
               steps:
               - checkout: self
                 clean: true
@@ -149,69 +135,63 @@ extends:
                   $(_InternalBuildArgs)
                   $(_InternalRuntimeDownloadArgs)
                 displayName: Windows Build / Publish
+
+          - ${{ if in(variables['Build.Reason'], 'PullRequest') }}:
+            - ${{ each config in parameters.buildConfigurations }}:
+              - job: OSX_${{ config.buildConfig }}
+                displayName: OSX ${{ config.buildConfig }}
+                pool:
+                  vmImage: 'macOS-latest'
+                variables:
+                - _BuildConfig: ${{ config.buildConfig }}
+                - _SignType: none
+                steps:
+                - ${{ if ne(variables['System.TeamProject'], 'public') }}:
+                  - task: Bash@3
+                    displayName: Setup Private Feeds Credentials
+                    inputs:
+                      filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.sh
+                      arguments: $(Build.SourcesDirectory)/NuGet.config $Token
+                    env:
+                      Token: $(dn-bot-dnceng-artifact-feeds-rw)
+                - script: eng/common/cibuild.sh
+                    --configuration $(_BuildConfig)
+                    --prepareMachine
+                    --integrationTest
+                    $(_InternalRuntimeDownloadArgs)
+                  name: Build
+                  displayName: Build
     
-          - ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
-            - job: OSX
-              pool:
-                vmImage: 'macOS-latest'
-              strategy:
-                matrix:
-                  debug_configuration:
-                    _BuildConfig: Debug
-                    _SignType: none
-                  release_configuration:
-                    _BuildConfig: Release
-                    _SignType: none
-              steps:
-              - ${{ if ne(variables['System.TeamProject'], 'public') }}:
-                - task: Bash@3
-                  displayName: Setup Private Feeds Credentials
-                  inputs:
-                    filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.sh
-                    arguments: $(Build.SourcesDirectory)/NuGet.config $Token
-                  env:
-                    Token: $(dn-bot-dnceng-artifact-feeds-rw)
-              - script: eng/common/cibuild.sh
-                  --configuration $(_BuildConfig)
-                  --prepareMachine
-                  --integrationTest
-                  $(_InternalRuntimeDownloadArgs)
-                name: Build
-                displayName: Build
-    
-          - ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
-            - job: Linux
-              pool:
-                ${{ if eq(variables['System.TeamProject'], 'public') }}:
-                  vmImage: ubuntu-latest 
-                ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-                  name: $(DncEngInternalBuildPool)
-                  demands: ImageOverride -equals Build.Ubuntu.2204.Amd64
-              strategy:
-                matrix:
-                  debug_configuration:
-                    _BuildConfig: Debug
-                    _SignType: none
-                  release_configuration:
-                    _BuildConfig: Release
-                    _SignType: none
-              steps:
-              - ${{ if ne(variables['System.TeamProject'], 'public') }}:
-                - task: Bash@3
-                  displayName: Setup Private Feeds Credentials
-                  inputs:
-                    filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.sh
-                    arguments: $(Build.SourcesDirectory)/NuGet.config $Token
-                  env:
-                    Token: $(dn-bot-dnceng-artifact-feeds-rw)
-              - script: eng/common/cibuild.sh
-                  --configuration $(_BuildConfig)
-                  --prepareMachine
-                  --integrationTest
-                  $(_InternalRuntimeDownloadArgs)
-                name: Build
-                displayName: Build
-                condition: succeeded()
+          - ${{ if in(variables['Build.Reason'], 'PullRequest') }}:
+            - ${{ each config in parameters.buildConfigurations }}:
+              - job: Linux_${{ config.buildConfig }}
+                displayName: Linux ${{ config.buildConfig }}
+                pool:
+                  ${{ if eq(variables['System.TeamProject'], 'public') }}:
+                    vmImage: ubuntu-latest 
+                  ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+                    name: $(DncEngInternalBuildPool)
+                    demands: ImageOverride -equals Build.Ubuntu.2204.Amd64
+                variables:
+                - _BuildConfig: ${{ config.buildConfig }}
+                - _SignType: none
+                steps:
+                - ${{ if ne(variables['System.TeamProject'], 'public') }}:
+                  - task: Bash@3
+                    displayName: Setup Private Feeds Credentials
+                    inputs:
+                      filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.sh
+                      arguments: $(Build.SourcesDirectory)/NuGet.config $Token
+                    env:
+                      Token: $(dn-bot-dnceng-artifact-feeds-rw)
+                - script: eng/common/cibuild.sh
+                    --configuration $(_BuildConfig)
+                    --prepareMachine
+                    --integrationTest
+                    $(_InternalRuntimeDownloadArgs)
+                  name: Build
+                  displayName: Build
+                  condition: succeeded()
     
     - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
       - template: eng/common/templates-official/post-build/post-build.yml@self
