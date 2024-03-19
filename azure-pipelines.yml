@@ -39,12 +39,6 @@ variables:
     - name: _InternalRuntimeDownloadArgs
       value: ''
   - template: /eng/common/templates-official/variables/pool-providers.yml
-  - :
-    - name: _signType
-      value: real
-  - ${{ else }}:
-    - name: _signType
-      value: test
 
 resources:
   repositories:
