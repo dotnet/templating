@@ -59,7 +59,7 @@ parameters:
   default:
   # Always build the Release configuration, but never sign for PRs.
   - buildConfig: Release
-    signType: ${{ variables._signType }}
+    signType: $(_signType)
   - buildConfig: Debug
     signType: test
 
