@@ -39,7 +39,7 @@ variables:
     - name: _InternalRuntimeDownloadArgs
       value: ''
   - template: /eng/common/templates-official/variables/pool-providers.yml
-  - ${{ if notin(variables['Build.Reason'], 'PullRequest') }}:
+  - :
     - name: _signType
       value: real
   - ${{ else }}:
@@ -59,9 +59,7 @@ parameters:
   default:
   # Always build the Release configuration, but never sign for PRs.
   - buildConfig: Release
-    signType: $(_signType)
   - buildConfig: Debug
-    signType: test
 
 extends:
   ${{ if notin(variables['Build.Reason'], 'PullRequest') }}:
@@ -109,12 +107,12 @@ extends:
               pool:
                 name: $(DncEngInternalBuildPool)
                 demands: ImageOverride -equals windows.vs2019.amd64
-              _SignType: ${{ config.signType }}
               _BuildConfig: ${{ config.buildConfig }}
               variables:
-              - _InternalBuildArgs: ''
-              
-      
+              - _SignType: test
+              - ${{ if notin(variables['Build.Reason'], 'PullRequest') }}:
+                - _SignType: real
+              - _InternalBuildArgs: ''              
               # Only enable publishing in non-public, non PR scenarios.
               - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
                 # DotNet-Symbol-Server-Pats provides: microsoft-symbol-server-pat, symweb-symbol-server-pat
@@ -123,7 +121,7 @@ extends:
                 - _InternalBuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
                     /p:DotNetPublishUsingPipelines=$(_PublishUsingPipelines)
                     /p:OfficialBuildId=$(BUILD.BUILDNUMBER)
-      
+              
               # strategy:
               #   matrix:
               #     Build_Release:
