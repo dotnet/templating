@@ -39,6 +39,12 @@ variables:
     - name: _InternalRuntimeDownloadArgs
       value: ''
   - template: /eng/common/templates-official/variables/pool-providers.yml
+  - ${{ if notin(variables['Build.Reason'], 'PullRequest') }}:
+    - name: _signType
+      value: real
+    ${{ else }}:
+    - name: _signType
+      value: test
 
 resources:
   repositories:
@@ -53,10 +59,7 @@ parameters:
   default:
   # Always build the Release configuration, but never sign for PRs.
   - buildConfig: Release
-    ${{ if notin(variables['Build.Reason'], 'PullRequest') }}:
-      signType: real
-    ${{ else }}:
-      signType: test
+    signType: ${{ variables._signType }}
   - buildConfig: Debug
     signType: test
 
