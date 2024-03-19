@@ -51,8 +51,12 @@ parameters:
 - name: buildConfigurationsWindows
   type: object
   default:
+  # Always build the Release configuration, but never sign for PRs.
   - buildConfig: Release
-    signType: real
+    ${{ if in(variables['Build.Reason'], 'PullRequest')) }}:
+      signType: real
+    ${{ else }}:
+      signType: test
   - buildConfig: Debug
     signType: test
 
