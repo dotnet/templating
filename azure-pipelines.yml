@@ -96,7 +96,7 @@ extends:
           helixRepo: dotnet/templating
           jobs:
           - ${{ each config in parameters.buildConfigurationsWindows }}:
-            - job: Windows_NT
+            - job: Windows_NT ${{ config.buildConfig }}
               timeoutInMinutes: 90
               pool:
                 name: $(DncEngInternalBuildPool)
