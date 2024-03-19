@@ -76,7 +76,7 @@ extends:
       - ${{ if and( ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
         # The localization setup for main branch. Note difference in package ID. Should not be used with release/ branches.
         - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
-          - template: /eng/common/templates-official/job/onelocbuild.yml
+          - template: /eng/common/templates-official/job/onelocbuild.yml@self
             parameters:
               MirrorRepo: templating
               LclSource: lclFilesfromPackage
@@ -84,7 +84,7 @@ extends:
               MirrorBranch: 'main'
               JobNameSuffix: '_main'
               condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
-      - template: /eng/common/templates-official/jobs/jobs.yml
+      - template: /eng/common/templates-official/jobs/jobs.yml@self
         parameters:
           enableMicrobuild: true
           enablePublishBuildArtifacts: true
@@ -214,7 +214,7 @@ extends:
                 condition: succeeded()
     
     - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-      - template: eng/common/templates-official/post-build/post-build.yml
+      - template: eng/common/templates-official/post-build/post-build.yml@self
         parameters:
           publishingInfraVersion: 3
           # Symbol validation isn't being very reliable lately. This should be enabled back
