@@ -101,8 +101,8 @@ extends:
               pool:
                 name: $(DncEngInternalBuildPool)
                 demands: ImageOverride -equals windows.vs2019.amd64
-              _BuildConfig: ${{ config.buildConfig }}
               variables:
+              - _BuildConfig: ${{ config.buildConfig }}
               - _SignType: test
               - ${{ if notin(variables['Build.Reason'], 'PullRequest') }}:
                 - _SignType: real
