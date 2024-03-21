@@ -29,7 +29,6 @@ variables:
     value: false
   - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
     - group: Templating-SDLValidation-Params
-    
   - ${{ if ne(variables['System.TeamProject'], 'public') }}:
     - group: DotNetBuilds storage account read tokens
     - name: _InternalRuntimeDownloadArgs
@@ -38,177 +37,190 @@ variables:
   - ${{ if eq(variables['System.TeamProject'], 'public') }}:
     - name: _InternalRuntimeDownloadArgs
       value: ''
-  - template: /eng/common/templates/variables/pool-providers.yml
+  - template: /eng/common/templates-official/variables/pool-providers.yml
 
-stages:
-- stage: build
-  displayName: Build
-  jobs:
-  - ${{ if and( ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-    # The localization setup for main branch. Note difference in package ID. Should not be used with release/ branches.
-    - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
-      - template: /eng/common/templates/job/onelocbuild.yml
-        parameters:
-          MirrorRepo: templating
-          LclSource: lclFilesfromPackage
-          LclPackageId: 'LCL-JUNO-PROD-TMPLTNGMAIN'
-          MirrorBranch: 'main'
-          JobNameSuffix: '_main'
-          condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
-  - template: /eng/common/templates/jobs/jobs.yml
-    parameters:
-      enableMicrobuild: true
-      enablePublishBuildArtifacts: true
-      enablePublishTestResults: true
-      enablePublishBuildAssets: true
-      enablePublishUsingPipelines: ${{ variables._PublishUsingPipelines }}
-      enableSourceBuild: true
-      enableTelemetry: true
-      helixRepo: dotnet/templating
+resources:
+  repositories:
+  - repository: 1esPipelines
+    type: git
+    name: 1ESPipelineTemplates/1ESPipelineTemplates
+    ref: refs/tags/release
+
+# This is necessary because 1ES doesn't work using strategy & matrix
+parameters:
+- name: buildConfigurations
+  type: object
+  default:
+  # Always build the Release configuration, but never sign for PRs.
+  - buildConfig: Release
+  - buildConfig: Debug
+
+extends:
+  ${{ if notin(variables['Build.Reason'], 'PullRequest') }}:
+    template: v1/1ES.Official.PipelineTemplate.yml@1esPipelines
+  ${{ else }}:
+    template: v1/1ES.Unofficial.PipelineTemplate.yml@1esPipelines
+  parameters:
+    sdl:
+      sourceAnalysisPool:
+        name: $(DncEngInternalBuildPool)
+        image: 1es-windows-2022
+        os: windows
+    customBuildTags:
+    - ES365AIMigrationTooling
+    stages:
+    - stage: build
+      displayName: Build
       jobs:
-      - job: Windows_NT
-        timeoutInMinutes: 90
-        pool:
-          ${{ if eq(variables['System.TeamProject'], 'public') }}:
-            name: $(DncEngPublicBuildPool)
-            vmImage: 1es-windows-2019-open
-          ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-            name: $(DncEngInternalBuildPool)
-            demands: ImageOverride -equals windows.vs2019.amd64
-        variables:
-        - _InternalBuildArgs: ''
+      - ${{ if and( ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+        # The localization setup for main branch. Note difference in package ID. Should not be used with release/ branches.
+        - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
+          - template: /eng/common/templates-official/job/onelocbuild.yml@self
+            parameters:
+              MirrorRepo: templating
+              LclSource: lclFilesfromPackage
+              LclPackageId: 'LCL-JUNO-PROD-TMPLTNGMAIN'
+              MirrorBranch: 'main'
+              JobNameSuffix: '_main'
+              condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+      - template: /eng/common/templates-official/jobs/jobs.yml@self
+        parameters:
+          enableMicrobuild: true
+          enablePublishBuildArtifacts: true
+          enablePublishTestResults: true
+          enablePublishBuildAssets: true
+          enablePublishUsingPipelines: ${{ variables._PublishUsingPipelines }}
+          enableSourceBuild: true
+          enableTelemetry: true
+          helixRepo: dotnet/templating
+          jobs:
+          - ${{ each config in parameters.buildConfigurations }}:
+            - job: Windows_NT_${{ config.buildConfig }}
+              displayName: Windows_NT ${{ config.buildConfig }}
+              timeoutInMinutes: 90
+              pool:
+                name: $(DncEngInternalBuildPool)
+                demands: ImageOverride -equals windows.vs2019.amd64
+              variables:
+              - _BuildConfig: ${{ config.buildConfig }}
+              - _SignType: test
+              - ${{ if notin(variables['Build.Reason'], 'PullRequest') }}:
+                - _SignType: real
+              - _InternalBuildArgs: ''              
+              # Only enable publishing in non-public, non PR scenarios.
+              - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+                # DotNet-Symbol-Server-Pats provides: microsoft-symbol-server-pat, symweb-symbol-server-pat
+                # Publish-Build-Assets provides: MaestroAccessToken, BotAccount-dotnet-maestro-bot-PAT
+                - group: Publish-Build-Assets
+                - _InternalBuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
+                    /p:DotNetPublishUsingPipelines=$(_PublishUsingPipelines)
+                    /p:OfficialBuildId=$(BUILD.BUILDNUMBER)
 
-        # Only enable publishing in non-public, non PR scenarios.
-        - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-          # DotNet-Symbol-Server-Pats provides: microsoft-symbol-server-pat, symweb-symbol-server-pat
-          # Publish-Build-Assets provides: MaestroAccessToken, BotAccount-dotnet-maestro-bot-PAT
-          - group: Publish-Build-Assets
-          - _InternalBuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
-              /p:DotNetPublishUsingPipelines=$(_PublishUsingPipelines)
-              /p:OfficialBuildId=$(BUILD.BUILDNUMBER)
+              steps:
+              - checkout: self
+                clean: true
+              - ${{ if ne(variables['System.TeamProject'], 'public') }}:
+                - task: PowerShell@2
+                  displayName: Setup Private Feeds Credentials
+                  inputs:
+                    filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.ps1
+                    arguments: -ConfigFile $(Build.SourcesDirectory)/NuGet.config -Password $Env:Token
+                  env:
+                    Token: $(dn-bot-dnceng-artifact-feeds-rw)
+              # Use utility script to run script command dependent on agent OS.
+              - script: eng/common/cibuild.cmd
+                  -configuration $(_BuildConfig)
+                  -prepareMachine
+                  -integrationTest
+                  $(_InternalBuildArgs)
+                  $(_InternalRuntimeDownloadArgs)
+                displayName: Windows Build / Publish
 
-        strategy:
-          matrix:
-            Build_Release:
-              _BuildConfig: Release
-              # PRs or external builds are not signed.
-              ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
-                _SignType: test
-              ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-                _SignType: real
-            ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
-              Build_Debug:
-                _BuildConfig: Debug
-                _SignType: test
-
-        steps:
-        - checkout: self
-          clean: true
-        - ${{ if ne(variables['System.TeamProject'], 'public') }}:
-          - task: PowerShell@2
-            displayName: Setup Private Feeds Credentials
-            inputs:
-              filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.ps1
-              arguments: -ConfigFile $(Build.SourcesDirectory)/NuGet.config -Password $Env:Token
-            env:
-              Token: $(dn-bot-dnceng-artifact-feeds-rw)
-        # Use utility script to run script command dependent on agent OS.
-        - script: eng/common/cibuild.cmd
-            -configuration $(_BuildConfig)
-            -prepareMachine
-            -integrationTest
-            $(_InternalBuildArgs)
-            $(_InternalRuntimeDownloadArgs)
-          displayName: Windows Build / Publish
-
-      - ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
-        - job: OSX
-          pool:
-            vmImage: 'macOS-latest'
-          strategy:
-            matrix:
-              debug_configuration:
-                _BuildConfig: Debug
-                _SignType: none
-              release_configuration:
-                _BuildConfig: Release
-                _SignType: none
-          steps:
-          - ${{ if ne(variables['System.TeamProject'], 'public') }}:
-            - task: Bash@3
-              displayName: Setup Private Feeds Credentials
-              inputs:
-                filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.sh
-                arguments: $(Build.SourcesDirectory)/NuGet.config $Token
-              env:
-                Token: $(dn-bot-dnceng-artifact-feeds-rw)
-          - script: eng/common/cibuild.sh
-              --configuration $(_BuildConfig)
-              --prepareMachine
-              --integrationTest
-              $(_InternalRuntimeDownloadArgs)
-            name: Build
-            displayName: Build
-
-      - ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
-        - job: Linux
-          pool:
-            ${{ if eq(variables['System.TeamProject'], 'public') }}:
-              vmImage: ubuntu-latest 
-            ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-              name: $(DncEngInternalBuildPool)
-              demands: ImageOverride -equals Build.Ubuntu.2204.Amd64
-          strategy:
-            matrix:
-              debug_configuration:
-                _BuildConfig: Debug
-                _SignType: none
-              release_configuration:
-                _BuildConfig: Release
-                _SignType: none
-          steps:
-          - ${{ if ne(variables['System.TeamProject'], 'public') }}:
-            - task: Bash@3
-              displayName: Setup Private Feeds Credentials
-              inputs:
-                filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.sh
-                arguments: $(Build.SourcesDirectory)/NuGet.config $Token
-              env:
-                Token: $(dn-bot-dnceng-artifact-feeds-rw)
-          - script: eng/common/cibuild.sh
-              --configuration $(_BuildConfig)
-              --prepareMachine
-              --integrationTest
-              $(_InternalRuntimeDownloadArgs)
-            name: Build
-            displayName: Build
-            condition: succeeded()
-
-- ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-  - template: eng\common\templates\post-build\post-build.yml
-    parameters:
-      publishingInfraVersion: 3
-      # Symbol validation isn't being very reliable lately. This should be enabled back
-      # once this issue is resolved: https://github.com/dotnet/arcade/issues/2871
-      enableSymbolValidation: false
-      # Sourcelink validation isn't passing for Arcade due to some regressions. This should be
-      # enabled back once this issue is resolved: https://github.com/dotnet/arcade/issues/2912
-      enableSourceLinkValidation: false
-      publishDependsOn:
-      - Validate
-      # This is to enable SDL runs part of Post-Build Validation Stage
-      SDLValidationParameters:
-        enable: true
-        continueOnError: false
-        params: ' -SourceToolsList @("policheck","credscan")
-        -ArtifactToolsList @("binskim")
-        -BinskimAdditionalRunConfigParams @("IgnorePdbLoadError < True","Recurse < True")
-        -TsaInstanceURL $(_TsaInstanceURL)
-        -TsaProjectName $(_TsaProjectName)
-        -TsaNotificationEmail $(_TsaNotificationEmail)
-        -TsaCodebaseAdmin $(_TsaCodebaseAdmin)
-        -TsaBugAreaPath $(_TsaBugAreaPath)
-        -TsaIterationPath $(_TsaIterationPath)
-        -TsaRepositoryName $(_TsaRepsitoryName)
-        -TsaCodebaseName $(_TsaCodebaseName)
-        -TsaPublish $True'
+          - ${{ if in(variables['Build.Reason'], 'PullRequest') }}:
+            - ${{ each config in parameters.buildConfigurations }}:
+              - job: OSX_${{ config.buildConfig }}
+                displayName: OSX ${{ config.buildConfig }}
+                pool:
+                  vmImage: 'macOS-latest'
+                variables:
+                - _BuildConfig: ${{ config.buildConfig }}
+                - _SignType: none
+                steps:
+                - ${{ if ne(variables['System.TeamProject'], 'public') }}:
+                  - task: Bash@3
+                    displayName: Setup Private Feeds Credentials
+                    inputs:
+                      filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.sh
+                      arguments: $(Build.SourcesDirectory)/NuGet.config $Token
+                    env:
+                      Token: $(dn-bot-dnceng-artifact-feeds-rw)
+                - script: eng/common/cibuild.sh
+                    --configuration $(_BuildConfig)
+                    --prepareMachine
+                    --integrationTest
+                    $(_InternalRuntimeDownloadArgs)
+                  name: Build
+                  displayName: Build
+    
+          - ${{ if in(variables['Build.Reason'], 'PullRequest') }}:
+            - ${{ each config in parameters.buildConfigurations }}:
+              - job: Linux_${{ config.buildConfig }}
+                displayName: Linux ${{ config.buildConfig }}
+                pool:
+                  ${{ if eq(variables['System.TeamProject'], 'public') }}:
+                    name: $(DncEngPublicBuildPool)
+                    image: 1es-ubuntu-2204-open
+                    os: linux
+                  ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+                    name: $(DncEngInternalBuildPool)
+                    image: 1es-ubuntu-2204
+                    os: linux
+                variables:
+                - _BuildConfig: ${{ config.buildConfig }}
+                - _SignType: none
+                steps:
+                - ${{ if ne(variables['System.TeamProject'], 'public') }}:
+                  - task: Bash@3
+                    displayName: Setup Private Feeds Credentials
+                    inputs:
+                      filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.sh
+                      arguments: $(Build.SourcesDirectory)/NuGet.config $Token
+                    env:
+                      Token: $(dn-bot-dnceng-artifact-feeds-rw)
+                - script: eng/common/cibuild.sh
+                    --configuration $(_BuildConfig)
+                    --prepareMachine
+                    --integrationTest
+                    $(_InternalRuntimeDownloadArgs)
+                  name: Build
+                  displayName: Build
+                  condition: succeeded()
+    
+    - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+      - template: eng/common/templates-official/post-build/post-build.yml@self
+        parameters:
+          publishingInfraVersion: 3
+          # Symbol validation isn't being very reliable lately. This should be enabled back
+          # once this issue is resolved: https://github.com/dotnet/arcade/issues/2871
+          enableSymbolValidation: false
+          # Sourcelink validation isn't passing for Arcade due to some regressions. This should be
+          # enabled back once this issue is resolved: https://github.com/dotnet/arcade/issues/2912
+          enableSourceLinkValidation: false
+          publishDependsOn:
+          - Validate
+          # This is to enable SDL runs part of Post-Build Validation Stage
+          SDLValidationParameters:
+            enable: true
+            continueOnError: false
+            params: ' -SourceToolsList @("policheck","credscan")
+            -ArtifactToolsList @("binskim")
+            -BinskimAdditionalRunConfigParams @("IgnorePdbLoadError < True","Recurse < True")
+            -TsaInstanceURL $(_TsaInstanceURL)
+            -TsaProjectName $(_TsaProjectName)
+            -TsaNotificationEmail $(_TsaNotificationEmail)
+            -TsaCodebaseAdmin $(_TsaCodebaseAdmin)
+            -TsaBugAreaPath $(_TsaBugAreaPath)
+            -TsaIterationPath $(_TsaIterationPath)
+            -TsaRepositoryName $(_TsaRepsitoryName)
+            -TsaCodebaseName $(_TsaCodebaseName)
+            -TsaPublish $True'
