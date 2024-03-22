@@ -168,10 +168,13 @@ extends:
                 displayName: Linux ${{ config.buildConfig }}
                 pool:
                   ${{ if eq(variables['System.TeamProject'], 'public') }}:
-                    vmImage: ubuntu-latest 
+                    name: $(DncEngPublicBuildPool)
+                    image: 1es-ubuntu-2204-open
+                    os: linux
                   ${{ if eq(variables['System.TeamProject'], 'internal') }}:
                     name: $(DncEngInternalBuildPool)
-                    demands: ImageOverride -equals Build.Ubuntu.2204.Amd64
+                    image: 1es-ubuntu-2204
+                    os: linux
                 variables:
                 - _BuildConfig: ${{ config.buildConfig }}
                 - _SignType: none
