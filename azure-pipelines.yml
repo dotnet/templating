@@ -34,7 +34,8 @@ variables:
   - ${{ if eq(variables['System.TeamProject'], 'public') }}:
     - name: _InternalRuntimeDownloadArgs
       value: ''
-  - template: /eng/common/templates-official/variables/pool-providers.yml
+  - name: DncEngInternalBuildPool
+    value: NetCore1ESPool-Svc-Internal
 
 resources:
   repositories:
