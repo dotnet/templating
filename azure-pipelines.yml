@@ -68,7 +68,6 @@ extends:
         os: windows
     customBuildTags:
     - ES365AIMigrationTooling
-
     stages:
     - stage: build
       displayName: Build
@@ -183,7 +182,7 @@ extends:
     
           - ${{ if in(variables['Build.Reason'], 'PullRequest') }}:
             - ${{ each config in parameters.buildConfigurations }}:
-              - job: Linux_${{ config.buildConfig  }}
+              - job: Linux_${{ config.buildConfig }}
                 displayName: Linux ${{ config.buildConfig }}
                 pool:
                   ${{ if eq(variables['System.TeamProject'], 'public') }}:
