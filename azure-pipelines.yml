@@ -168,7 +168,7 @@ extends:
                     ${{ if eq(variables['System.TeamProject'], 'public') }}:
                       name: $(DncEngPublicBuildPool)
                       image: 1es-ubuntu-2204-open
-                      os: linuxvmImage: ubuntu-latest
+                      os: linux
                     ${{ if eq(variables['System.TeamProject'], 'internal') }}:
                       name: $(DncEngInternalBuildPool)
                       image: 1es-ubuntu-2204
