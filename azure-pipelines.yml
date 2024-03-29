@@ -153,7 +153,7 @@ extends:
                   $(_InternalRuntimeDownloadArgs)
                 displayName: Windows Build / Publish
     
-          - ${{ in(variables['Build.Reason'], 'PullRequest') }}:
+          - ${{ if in(variables['Build.Reason'], 'PullRequest') }}:
             - ${{ each config in parameters.buildConfigurations }}:
               - job: OSX_${{ config.buildConfig  }}
                 displayName: OSX ${{ config.buildConfig }}
