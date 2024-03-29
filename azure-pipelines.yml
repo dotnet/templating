@@ -183,7 +183,7 @@ extends:
                   displayName: Build
     
           - ${{ if in(variables['Build.Reason'], 'PullRequest') }}:
-            - ${{ each config in parameters.buildConfigurations
+            - ${{ each config in parameters.buildConfigurations }}:
               - job: Linux_${{ config.buildConfig }}
                 displayName: Linux ${{ config.buildConfig }}
                 pool:
