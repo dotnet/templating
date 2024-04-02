@@ -390,7 +390,9 @@ Examples:
             Assert.True(AtLeastOneRowIsNotEmpty(tableOutput, "Downloads"), "'Downloads' column contains empty values");
         }
 
-        [Fact]
+#pragma warning disable xUnit1004 // Test methods should not be skipped
+        [Fact(Skip = "Test is failing because of sorting and changes on live nuget.org")]
+#pragma warning restore xUnit1004 // Test methods should not be skipped
         public void CanSortByDownloadCountAndThenByName()
         {
             var commandResult = new DotnetNewCommand(_log, "console", "--search")
