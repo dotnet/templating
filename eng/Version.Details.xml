@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dependencies>
   <ProductDependencies>
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-externals" Version="7.0.0-alpha.1.24162.2">
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-externals" Version="7.0.0-alpha.1.24201.2">
       <Uri>https://github.com/dotnet/source-build-externals</Uri>
-      <Sha>936411dd5d047cef6674b47872104a3a59cf5754</Sha>
+      <Sha>3099976c92865c40a0edd6ff80926dc85acd7b13</Sha>
       <SourceBuild RepoName="source-build-externals" ManagedOnly="true" />
     </Dependency>
     <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="7.0.0-alpha.1.22408.1">
@@ -33,9 +33,9 @@
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
-    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="7.0.0-beta.24176.7">
+    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="7.0.0-beta.24179.7">
       <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>ea5ae5b4a608862561d02a158dfaac443fbaaff1</Sha>
+      <Sha>d0ab6f8c61222a6383dc2109d039b437ba9afa92</Sha>
       <SourceBuild RepoName="arcade" ManagedOnly="true" />
     </Dependency>
   </ToolsetDependencies>
