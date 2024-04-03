@@ -66,8 +66,6 @@ extends:
         name: $(DncEngInternalBuildPool)
         image: 1es-windows-2022
         os: windows
-    customBuildTags:
-    - ES365AIMigrationTooling
     stages:
     - stage: build
       displayName: Build
@@ -100,7 +98,8 @@ extends:
               timeoutInMinutes: 90
               pool:
                 name: $(DncEngInternalBuildPool)
-                demands: ImageOverride -equals 1es-windows-2022
+                image: 1es-windows-2022
+                os: windows
               variables:
               - _BuildConfig: ${{ config.buildConfig }}
               - _SignType: test
