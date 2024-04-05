@@ -41,6 +41,7 @@ The templates are located in the following repositories:
 |Common project and item templates|[dotnet/sdk](https://github.com/dotnet/sdk)|
 |ASP.NET and Blazor templates|[dotnet/aspnetcore](https://github.com/dotnet/aspnetcore)|
 |ASP.NET Single Page Application templates| [dotnet/spa-templates](https://github.com/dotnet/spa-templates)|
+|Aspire templates|[dotnet/aspire](https://github.com/dotnet/aspire)|
 |WPF templates|[dotnet/wpf](https://github.com/dotnet/wpf)|
 |Windows Forms templates|[dotnet/winforms](https://github.com/dotnet/winforms)|
 |Test templates|[dotnet/test-templates](https://github.com/dotnet/test-templates)|
