@@ -200,7 +200,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 
             NuGetApiPackageManager packageManager = new NuGetApiPackageManager(engineEnvironmentSettings);
             (string latestVersion, bool isLatestVersion, _) = await packageManager.GetLatestVersionAsync(
-                "Microsoft.DotNet.Common.ProjectTemplates.5.0", "5.0.0", additionalSource: _additionalSources.First());
+                "Microsoft.DotNet.Common.ProjectTemplates.5.0", "5.0.0", additionalSource: _additionalSources[0]);
 
             latestVersion.Should().NotBe("5.0.0");
             isLatestVersion.Should().BeFalse();
