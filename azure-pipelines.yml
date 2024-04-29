@@ -53,7 +53,6 @@ parameters:
   default:
   # Always build the Release configuration, but never sign for PRs.
   - buildConfig: Release
-  - buildConfig: Debug
 
 extends:
   ${{ if notin(variables['Build.Reason'], 'PullRequest') }}:
@@ -66,8 +65,6 @@ extends:
         name: $(DncEngInternalBuildPool)
         image: 1es-windows-2022
         os: windows
-    customBuildTags:
-    - ES365AIMigrationTooling
     stages:
     - stage: build
       displayName: Build
