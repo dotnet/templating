@@ -53,7 +53,6 @@ parameters:
   default:
   # Always build the Release configuration, but never sign for PRs.
   - buildConfig: Release
-  - buildConfig: Debug
 
 extends:
   ${{ if notin(variables['Build.Reason'], 'PullRequest') }}:
