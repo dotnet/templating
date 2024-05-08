@@ -97,7 +97,8 @@ extends:
               timeoutInMinutes: 90
               pool:
                 name: $(DncEngInternalBuildPool)
-                demands: ImageOverride -equals windows.vs2019.amd64
+                image: 1es-windows-2022
+                os: windows
               variables:
               - _BuildConfig: ${{ config.buildConfig }}
               - _SignType: test
@@ -112,7 +113,6 @@ extends:
                 - _InternalBuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
                     /p:DotNetPublishUsingPipelines=$(_PublishUsingPipelines)
                     /p:OfficialBuildId=$(BUILD.BUILDNUMBER)
-
               steps:
               - checkout: self
                 clean: true
@@ -221,3 +221,4 @@ extends:
             -TsaRepositoryName $(_TsaRepsitoryName)
             -TsaCodebaseName $(_TsaCodebaseName)
             -TsaPublish $True'
+
