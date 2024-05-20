@@ -13,13 +13,13 @@
       <Sha>4642f9b75b588565642dd00dabcfedfe67ca106f</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="9.0.0-preview.5.24262.2">
+    <Dependency Name="Microsoft.NETCore.App.Runtime.win-x64" Version="9.0.0-preview.5.24269.2">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>073e35e7e32624e0f841d94364d2f28c73662ff7</Sha>
+      <Sha>5f067ce8b50087e032d13a1b97ae5ec39fc54739</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.NETCore.App.Ref" Version="9.0.0-preview.5.24262.2">
+    <Dependency Name="Microsoft.NETCore.App.Ref" Version="9.0.0-preview.5.24269.2">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>073e35e7e32624e0f841d94364d2f28c73662ff7</Sha>
+      <Sha>5f067ce8b50087e032d13a1b97ae5ec39fc54739</Sha>
     </Dependency>
     <Dependency Name="System.CommandLine" Version="2.0.0-beta4.24209.3">
       <Uri>https://github.com/dotnet/command-line-api</Uri>
