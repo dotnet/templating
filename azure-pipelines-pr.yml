@@ -112,6 +112,7 @@ stages:
               arguments: -ConfigFile $(Build.SourcesDirectory)/NuGet.config -Password $Env:Token
             env:
               Token: $(dn-bot-dnceng-artifact-feeds-rw)
+          - task: NuGetAuthenticate@1
         # Use utility script to run script command dependent on agent OS.
         - script: eng/common/cibuild.cmd
             -configuration $(_BuildConfig)
@@ -142,6 +143,7 @@ stages:
                 arguments: $(Build.SourcesDirectory)/NuGet.config $Token
               env:
                 Token: $(dn-bot-dnceng-artifact-feeds-rw)
+            - task: NuGetAuthenticate@1
           - script: eng/common/cibuild.sh
               --configuration $(_BuildConfig)
               --prepareMachine
@@ -175,6 +177,7 @@ stages:
                 arguments: $(Build.SourcesDirectory)/NuGet.config $Token
               env:
                 Token: $(dn-bot-dnceng-artifact-feeds-rw)
+            - task: NuGetAuthenticate@1
           - script: eng/common/cibuild.sh
               --configuration $(_BuildConfig)
               --prepareMachine
