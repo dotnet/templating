@@ -31,7 +31,7 @@ variables:
     - group: Templating-SDLValidation-Params
     
   - ${{ if ne(variables['System.TeamProject'], 'public') }}:
-    - group: DotNetBuilds storage account read tokens
+    # Variable replaced by get-federated-access-token
     - name: _InternalRuntimeDownloadArgs
       value: /p:DotNetRuntimeSourceFeed=https://dotnetbuilds.blob.core.windows.net/internal 
         /p:DotNetRuntimeSourceFeedKey=$(dotnetbuilds-internal-container-read-token-base64)
@@ -80,7 +80,6 @@ stages:
 
         # Only enable publishing in non-public, non PR scenarios.
         - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-          # DotNet-Symbol-Server-Pats provides: microsoft-symbol-server-pat, symweb-symbol-server-pat
           # Publish-Build-Assets provides: MaestroAccessToken, BotAccount-dotnet-maestro-bot-PAT
           - group: Publish-Build-Assets
           - _InternalBuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
@@ -113,6 +112,16 @@ stages:
             env:
               Token: $(dn-bot-dnceng-artifact-feeds-rw)
           - task: NuGetAuthenticate@1
+
+          # Obtain the delegation SAS token for internal runtime downloads.
+          - template: /eng/common/templates/steps/get-delegation-sas.yml
+            parameters:
+              federatedServiceConnection: dotnetbuilds-internal-read
+              outputVariableName: dotnetbuilds-internal-container-read-token-base64
+              base64Encode: true
+              storageAccount: dotnetbuilds
+              container: internal
+
         # Use utility script to run script command dependent on agent OS.
         - script: eng/common/cibuild.cmd
             -configuration $(_BuildConfig)
