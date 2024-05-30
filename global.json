@@ -3,7 +3,7 @@
     "dotnet": "9.0.100-preview.4.24267.66",
     "runtimes": {
       "dotnet": [
-        "$(MicrosoftNETCoreAppRefPackageVersion)"
+        "8.0.7-servicing.24270.14"
       ]
     }
   },
