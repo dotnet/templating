@@ -3,11 +3,12 @@
     "dotnet": "9.0.100-preview.4.24267.66",
     "runtimes": {
       "dotnet": [
-        "8.0.7-servicing.24270.14"
+        "8.0.7-servicing.24270.14",
+        "$(MicrosoftNETCoreAppRefPackageVersion)"
       ]
     }
   },
   "msbuild-sdks": {
-    "Microsoft.DotNet.Arcade.Sdk": "9.0.0-beta.24279.3"
+    "Microsoft.DotNet.Arcade.Sdk": "9.0.0-beta.24278.1"
   }
 }
