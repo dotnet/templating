@@ -19,7 +19,7 @@ parameters:
   default: false
 
 steps:
-- ${{ if and(parameters.enableInternalSources, ne(variables['System.TeamProject'], 'public') }}:
+- ${{ if ne(variables['System.TeamProject'], 'public') }}:
   - template: /eng/common/core-templates/steps/get-delegation-sas.yml
     parameters:
       federatedServiceConnection: ${{ parameters.federatedServiceConnection }}
