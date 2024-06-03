@@ -160,15 +160,10 @@ stages:
                 _BuildConfig: Release
                 _SignType: none
           steps:
-          - ${{ if ne(variables['System.TeamProject'], 'public') }}:
-            - task: Bash@3
-              displayName: Setup Private Feeds Credentials
-              inputs:
-                filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.sh
-                arguments: $(Build.SourcesDirectory)/NuGet.config $Token
-              env:
-                Token: $(dn-bot-dnceng-artifact-feeds-rw)
-            - task: NuGetAuthenticate@1
+
+          - template: /eng/common/templates/steps/enable-internal-runtimes.yml
+          - template: /eng/common/templates/steps/enable-internal-sources.yml
+
           - script: eng/common/cibuild.sh
               --configuration $(_BuildConfig)
               --prepareMachine
