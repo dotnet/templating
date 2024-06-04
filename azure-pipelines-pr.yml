@@ -31,7 +31,7 @@ variables:
     - group: Templating-SDLValidation-Params
     
   - ${{ if ne(variables['System.TeamProject'], 'public') }}:
-    - group: DotNetBuilds storage account read tokens
+    # Variable replaced by enable-internal-runtimes.yml
     - name: _InternalRuntimeDownloadArgs
       value: /p:DotNetRuntimeSourceFeed=https://dotnetbuilds.blob.core.windows.net/internal 
         /p:DotNetRuntimeSourceFeedKey=$(dotnetbuilds-internal-container-read-token-base64)
@@ -63,6 +63,8 @@ stages:
       enablePublishBuildAssets: true
       enablePublishUsingPipelines: ${{ variables._PublishUsingPipelines }}
       enableSourceBuild: true
+      sourceBuildParameters:
+        enableInternalSources: true
       enableTelemetry: true
       helixRepo: dotnet/templating
       jobs:
@@ -80,7 +82,6 @@ stages:
 
         # Only enable publishing in non-public, non PR scenarios.
         - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-          # DotNet-Symbol-Server-Pats provides: microsoft-symbol-server-pat, symweb-symbol-server-pat
           # Publish-Build-Assets provides: MaestroAccessToken, BotAccount-dotnet-maestro-bot-PAT
           - group: Publish-Build-Assets
           - _InternalBuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
@@ -104,15 +105,10 @@ stages:
         steps:
         - checkout: self
           clean: true
-        - ${{ if ne(variables['System.TeamProject'], 'public') }}:
-          - task: PowerShell@2
-            displayName: Setup Private Feeds Credentials
-            inputs:
-              filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.ps1
-              arguments: -ConfigFile $(Build.SourcesDirectory)/NuGet.config -Password $Env:Token
-            env:
-              Token: $(dn-bot-dnceng-artifact-feeds-rw)
-          - task: NuGetAuthenticate@1
+
+        - template: /eng/common/templates/steps/enable-internal-runtimes.yml
+        - template: /eng/common/templates/steps/enable-internal-sources.yml
+
         # Use utility script to run script command dependent on agent OS.
         - script: eng/common/cibuild.cmd
             -configuration $(_BuildConfig)
@@ -135,15 +131,10 @@ stages:
                 _BuildConfig: Release
                 _SignType: none
           steps:
-          - ${{ if ne(variables['System.TeamProject'], 'public') }}:
-            - task: Bash@3
-              displayName: Setup Private Feeds Credentials
-              inputs:
-                filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.sh
-                arguments: $(Build.SourcesDirectory)/NuGet.config $Token
-              env:
-                Token: $(dn-bot-dnceng-artifact-feeds-rw)
-            - task: NuGetAuthenticate@1
+
+          - template: /eng/common/templates/steps/enable-internal-runtimes.yml
+          - template: /eng/common/templates/steps/enable-internal-sources.yml
+
           - script: eng/common/cibuild.sh
               --configuration $(_BuildConfig)
               --prepareMachine
@@ -169,15 +160,10 @@ stages:
                 _BuildConfig: Release
                 _SignType: none
           steps:
-          - ${{ if ne(variables['System.TeamProject'], 'public') }}:
-            - task: Bash@3
-              displayName: Setup Private Feeds Credentials
-              inputs:
-                filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.sh
-                arguments: $(Build.SourcesDirectory)/NuGet.config $Token
-              env:
-                Token: $(dn-bot-dnceng-artifact-feeds-rw)
-            - task: NuGetAuthenticate@1
+
+          - template: /eng/common/templates/steps/enable-internal-runtimes.yml
+          - template: /eng/common/templates/steps/enable-internal-sources.yml
+
           - script: eng/common/cibuild.sh
               --configuration $(_BuildConfig)
               --prepareMachine
