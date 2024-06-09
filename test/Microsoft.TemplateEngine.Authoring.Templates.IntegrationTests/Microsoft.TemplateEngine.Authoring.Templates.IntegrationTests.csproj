@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFramework>$(NETCoreTargetFramework)</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
