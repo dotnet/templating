@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFrameworks>$(NETCoreTargetFramework);$(NETFullTargetFramework)</TargetFrameworks>
-    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>

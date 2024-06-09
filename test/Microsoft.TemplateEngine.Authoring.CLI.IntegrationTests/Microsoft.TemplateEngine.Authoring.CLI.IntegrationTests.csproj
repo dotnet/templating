@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>$(NETCoreTargetFramework)</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,5 +19,5 @@
     <Content Include="Snapshots\**\*" />
     <None Include="Snapshots\**\*" CopyToOutputDirectory="Never" />
   </ItemGroup>
-  
+
 </Project>
