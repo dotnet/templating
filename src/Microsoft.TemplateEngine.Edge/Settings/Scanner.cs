@@ -8,7 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-#if !NETFULL
+#if !NETFRAMEWORK
 using System.Runtime.Loader;
 #endif
 using Microsoft.Extensions.Logging;
@@ -279,7 +279,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 {
                     Assembly? assembly = null;
 
-#if !NETFULL
+#if !NETFRAMEWORK
                     if (file.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) > -1 || file.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) > -1)
                     {
                         using (Stream fileStream = _environmentSettings.Host.FileSystem.OpenRead(file))

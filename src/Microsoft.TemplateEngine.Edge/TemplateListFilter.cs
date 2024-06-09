@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 
-#if NETFULL
+#if NETFRAMEWORK
 using System.Linq;
 #endif
 
@@ -57,7 +57,7 @@ namespace Microsoft.TemplateEngine.Edge
                 }
             }
 
-#if !NETFULL
+#if !NETFRAMEWORK
             return matchingTemplates;
 #else
             return matchingTemplates.ToList();
@@ -101,7 +101,7 @@ namespace Microsoft.TemplateEngine.Edge
                 }
             }
 
-#if !NETFULL
+#if !NETFRAMEWORK
             return matchingTemplates;
 #else
             return matchingTemplates.ToList();
@@ -134,7 +134,7 @@ namespace Microsoft.TemplateEngine.Edge
                 }
             }
 
-#if !NETFULL
+#if !NETFRAMEWORK
             return matchingTemplates;
 #else
             return matchingTemplates.ToList();
