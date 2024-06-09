@@ -6,11 +6,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-#if !NETFULL
+#if NET
 using System.Runtime.Loader;
 #endif
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;
@@ -279,8 +279,8 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 {
                     Assembly? assembly = null;
 
-#if !NETFULL
-                    if (file.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) > -1 || file.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) > -1)
+#if NET
+                    if (file.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) > -1)
                     {
                         using (Stream fileStream = _environmentSettings.Host.FileSystem.OpenRead(file))
                         {
@@ -288,7 +288,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                         }
                     }
 #else
-                    if (file.IndexOf("net4", StringComparison.OrdinalIgnoreCase) > -1)
+                    if (file.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) > -1 || file.IndexOf("net4", StringComparison.OrdinalIgnoreCase) > -1)
                     {
                         byte[] fileBytes = _environmentSettings.Host.FileSystem.ReadAllBytes(file);
                         assembly = Assembly.Load(fileBytes);

@@ -11,6 +11,7 @@
     <PreReleaseVersionLabel Condition="'$(StabilizePackageVersion)' == 'true' and !$(VersionPrefix.EndsWith('00'))">servicing</PreReleaseVersionLabel>
     <PreReleaseVersionIteration Condition="'$(StabilizePackageVersion)' != 'true'">6</PreReleaseVersionIteration>
     <UsingToolXliff>true</UsingToolXliff>
+    <FlagNetStandard1XDependencies>true</FlagNetStandard1XDependencies>
   </PropertyGroup>
   <!-- Package Versions -->
   <PropertyGroup>

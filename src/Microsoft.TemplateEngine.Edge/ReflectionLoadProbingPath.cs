@@ -7,11 +7,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-
-#if !NETFULL
-
+#if NET
 using System.Runtime.Loader;
-
 #endif
 
 namespace Microsoft.TemplateEngine.Edge
@@ -32,7 +29,7 @@ namespace Microsoft.TemplateEngine.Edge
         internal static void Add(string basePath)
         {
             Instance.Add(new ReflectionLoadProbingPath(basePath));
-#if !NETFULL
+#if NET
             AssemblyLoadContext.Default.Resolving += Resolving;
 #else
             AppDomain.CurrentDomain.AssemblyResolve += Resolving;
@@ -49,7 +46,7 @@ namespace Microsoft.TemplateEngine.Edge
             Instance.Clear();
         }
 
-#if !NETFULL
+#if NET
 
         private static Assembly? SelectBestMatch(AssemblyLoadContext loadContext, AssemblyName match, IEnumerable<FileInfo> candidates)
 #else
@@ -73,7 +70,7 @@ namespace Microsoft.TemplateEngine.Edge
                         continue;
                     }
 
-#if !NETFULL
+#if NET
                     AssemblyName candidateName = AssemblyLoadContext.GetAssemblyName(file.FullName);
 #else
                     AssemblyName candidateName = AssemblyName.GetAssemblyName(file.FullName);
@@ -186,7 +183,7 @@ namespace Microsoft.TemplateEngine.Edge
                     try
                     {
                         string attempt = bestMatch.Pop();
-#if !NETFULL
+#if NET
                         Assembly result = loadContext.LoadFromAssemblyPath(attempt);
 #else
                         Assembly result = Assembly.LoadFile(attempt);
@@ -202,14 +199,14 @@ namespace Microsoft.TemplateEngine.Edge
             });
         }
 
-#if !NETFULL
+#if NET
 
         private static Assembly? Resolving(AssemblyLoadContext assemblyLoadContext, AssemblyName assemblyName)
 #else
         private static Assembly? Resolving(object sender, ResolveEventArgs resolveEventArgs)
 #endif
         {
-#if !NETFULL
+#if NET
             string stringName = assemblyName.Name;
 #else
             string stringName = resolveEventArgs.Name;
@@ -228,7 +225,7 @@ namespace Microsoft.TemplateEngine.Edge
                         && (x.FullName.IndexOf($"{Path.DirectorySeparatorChar}netstandard", StringComparison.OrdinalIgnoreCase) > -1
                         || x.FullName.IndexOf($"{Path.DirectorySeparatorChar}netcoreapp", StringComparison.OrdinalIgnoreCase) > -1))
                         .OrderByDescending(x => x.FullName);
-#if !NETFULL
+#if NET
                     found = SelectBestMatch(assemblyLoadContext, assemblyName, files);
 #else
                     found = SelectBestMatch(sender, assemblyName, files);
@@ -238,7 +235,7 @@ namespace Microsoft.TemplateEngine.Edge
                 {
                     FileInfo f = new FileInfo(Path.Combine(selector._path, stringName + ".dll"));
                     FileInfo[] files = { f };
-#if !NETFULL
+#if NET
                     found = SelectBestMatch(assemblyLoadContext, assemblyName, files);
 #else
                     found = SelectBestMatch(sender, assemblyName, files);
@@ -249,7 +246,7 @@ namespace Microsoft.TemplateEngine.Edge
                 {
                     foreach (AssemblyName reference in found.GetReferencedAssemblies())
                     {
-#if !NETFULL
+#if NET
                         Resolving(assemblyLoadContext, reference);
 #else
                         ResolveEventArgs referenceArgs = new ResolveEventArgs(reference.FullName, found);

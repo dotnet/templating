@@ -3,6 +3,8 @@
       <TargetFrameworks Condition="'$(PackSpecific)' != 'true'">$(NETCoreTargetFramework);$(NETFullTargetFramework)</TargetFrameworks>
       <TargetFrameworks Condition="'$(PackSpecific)' == 'true'">$(NETCoreTargetFramework)</TargetFrameworks>
       <ImplicitUsings>enable</ImplicitUsings>
+      <!-- TODO: Remove when https://github.com/VerifyTests/Verify/pull/1220 is merged and consumed. -->
+      <FlagNetStandard1XDependencies>false</FlagNetStandard1XDependencies>
     </PropertyGroup>
     <ItemGroup>
       <None Remove="xunit.runner.json" />
