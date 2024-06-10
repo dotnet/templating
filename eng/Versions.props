@@ -19,5 +19,9 @@
     <!-- Dependencies from https://github.com/dotnet/runtime -->
     <MicrosoftNETCoreAppRefPackageVersion>9.0.0-preview.6.24302.3</MicrosoftNETCoreAppRefPackageVersion>
     <MicrosoftNETCoreAppRuntimewinx64PackageVersion>9.0.0-preview.6.24302.3</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
+    <!-- TODO: Remove when Arcade updated xunit to latest version. -->
+    <XUnitVersion>2.8.1</XUnitVersion>
+    <XUnitRunnerVisualStudioVersion>2.8.1</XUnitRunnerVisualStudioVersion>
+    <XUnitAnalyzersVersion>1.14.0</XUnitAnalyzersVersion>
   </PropertyGroup>
 </Project>
