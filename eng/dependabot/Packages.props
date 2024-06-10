@@ -3,7 +3,6 @@
   <!-- Packages in this file have versions updated periodically by Dependabot. Versions managed by Darc/Maestro should be in ..\Package.props. -->
 
   <ItemGroup>
-    <PackageReference Update="System.Runtime.Loader" Version="4.3.0" />
     <PackageReference Update="Microsoft.Build.Framework" Version="17.8.3" />
     <PackageReference Update="Microsoft.Build.Utilities.Core" Version="17.8.3" />
     <PackageReference Update="Newtonsoft.Json" Version="13.0.3" />
