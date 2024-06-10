@@ -57,7 +57,6 @@ namespace Microsoft.TemplateEngine.Core.Operations
             private readonly IToken _startToken;
             private readonly IToken _realEndToken;
             private readonly IToken _pseudoEndToken;
-            private readonly string? _id;
             private readonly string? _resetFlag;
             private int _depth;
 
@@ -66,14 +65,14 @@ namespace Microsoft.TemplateEngine.Core.Operations
                 _startToken = start;
                 _realEndToken = realEnd;
                 _pseudoEndToken = pseudoEnd;
-                _id = id;
+                Id = id;
                 _resetFlag = resetFlag;
                 Tokens = new[] { _startToken, _realEndToken, _pseudoEndToken };
                 _depth = 0;
                 IsInitialStateOn = string.IsNullOrEmpty(id) || initialState;
             }
 
-            public string? Id => _id;
+            public string? Id { get; }
 
             public IReadOnlyList<IToken> Tokens { get; }
 
