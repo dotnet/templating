@@ -5,6 +5,5 @@
   <PropertyGroup>
     <ExcludeFromSourceBuild>true</ExcludeFromSourceBuild>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
-    <IsPackable>false</IsPackable>
   </PropertyGroup>
 </Project>
