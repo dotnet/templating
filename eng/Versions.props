@@ -16,8 +16,8 @@
     <!-- Command-line-api dependencies -->
     <SystemCommandLinePackageVersion>2.0.0-beta4.24209.3</SystemCommandLinePackageVersion>
     <!-- Runtime dependencies -->
-    <MicrosoftNETCoreAppRefPackageVersion>9.0.0-preview.6.24302.3</MicrosoftNETCoreAppRefPackageVersion>
-    <MicrosoftNETCoreAppRuntimewinx64PackageVersion>9.0.0-preview.6.24302.3</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
+    <MicrosoftNETCoreAppRefPackageVersion>9.0.0-preview.6.24307.2</MicrosoftNETCoreAppRefPackageVersion>
+    <MicrosoftNETCoreAppRuntimewinx64PackageVersion>9.0.0-preview.6.24307.2</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
     <!-- TODO: Remove when Arcade updated xunit to latest version. -->
     <XUnitVersion>2.8.1</XUnitVersion>
     <XUnitRunnerVisualStudioVersion>2.8.1</XUnitRunnerVisualStudioVersion>
