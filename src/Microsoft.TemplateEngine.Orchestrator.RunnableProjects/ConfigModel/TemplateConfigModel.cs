@@ -1,10 +1,6 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
@@ -23,7 +19,6 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
     public sealed class TemplateConfigModel
     {
         private const string NameSymbolName = "name";
-        private readonly ILogger? _logger;
         private readonly Dictionary<string, IValueForm> _forms = SetupValueFormMapForTemplate();
 
         // validation entries:
@@ -52,7 +47,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
 
         private TemplateConfigModel(JObject source, ILogger? logger, string? baselineName = null)
         {
-            _logger = logger;
+            ILogger? logger1 = logger;
 
             string? identity = source.ToString(nameof(Identity));
             if (string.IsNullOrWhiteSpace(identity))
@@ -187,14 +182,14 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
             {
                 if (prop.Value is not JObject obj)
                 {
-                    _logger?.LogWarning(LocalizableStrings.SimpleConfigModel_Error_Constraints_InvalidSyntax, nameof(Constraints).ToLowerInvariant());
+                    logger1?.LogWarning(LocalizableStrings.SimpleConfigModel_Error_Constraints_InvalidSyntax, nameof(Constraints).ToLowerInvariant());
                     continue;
                 }
 
                 string? type = obj.ToString(nameof(TemplateConstraintInfo.Type));
                 if (string.IsNullOrWhiteSpace(type))
                 {
-                    _logger?.LogWarning(LocalizableStrings.SimpleConfigModel_Error_Constraints_MissingType, obj.ToString(), nameof(TemplateConstraintInfo.Type).ToLowerInvariant());
+                    logger1?.LogWarning(LocalizableStrings.SimpleConfigModel_Error_Constraints_MissingType, obj.ToString(), nameof(TemplateConstraintInfo.Type).ToLowerInvariant());
                     continue;
                 }
                 obj.TryGetValue(nameof(TemplateConstraintInfo.Args), StringComparison.OrdinalIgnoreCase, out JToken? args);

@@ -1,9 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using Microsoft.TemplateEngine.Core.Contracts;
 using Microsoft.TemplateEngine.Core.Util;
@@ -48,20 +45,19 @@ namespace Microsoft.TemplateEngine.Core.Operations
         {
             private readonly Include _source;
             private readonly ITokenTrie _endTokenMatcher;
-            private readonly string? _id;
 
             public Implementation(IToken token, ITokenTrie endTokenMatcher, Include source, string? id, bool initialState)
             {
                 Tokens = new[] { token };
                 _source = source;
                 _endTokenMatcher = endTokenMatcher;
-                _id = id;
+                Id = id;
                 IsInitialStateOn = string.IsNullOrEmpty(id) || initialState;
             }
 
             public IReadOnlyList<IToken> Tokens { get; }
 
-            public string? Id => _id;
+            public string? Id { get; }
 
             public bool IsInitialStateOn { get; }
 

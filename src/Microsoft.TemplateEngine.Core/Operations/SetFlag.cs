@@ -1,7 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System.Collections.Generic;
 using System.Text;
 using Microsoft.TemplateEngine.Core.Contracts;
 
@@ -61,19 +60,18 @@ namespace Microsoft.TemplateEngine.Core.Operations
         private class Implementation : IOperation
         {
             private readonly SetFlag _owner;
-            private readonly string? _id;
 
             public Implementation(SetFlag owner, IReadOnlyList<IToken> tokens, string? id, bool initialState)
             {
                 _owner = owner;
                 Tokens = tokens;
-                _id = id;
+                Id = id;
                 IsInitialStateOn = string.IsNullOrEmpty(id) || initialState;
             }
 
             public IReadOnlyList<IToken> Tokens { get; }
 
-            public string? Id => _id;
+            public string? Id { get; }
 
             public bool IsInitialStateOn { get; }
 

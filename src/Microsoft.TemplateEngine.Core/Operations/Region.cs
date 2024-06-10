@@ -1,7 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System.Collections.Generic;
 using System.Text;
 using Microsoft.TemplateEngine.Core.Contracts;
 
@@ -47,7 +46,6 @@ namespace Microsoft.TemplateEngine.Core.Operations
             private readonly bool _includeRegion;
             private readonly bool _startAndEndAreSame;
             private readonly Region _definition;
-            private readonly string? _id;
             private bool _waitingForEnd;
 
             public Implementation(Region owner, IToken startToken, IToken endToken, bool include, bool toggle, string? id, bool initialState)
@@ -58,13 +56,13 @@ namespace Microsoft.TemplateEngine.Core.Operations
                 _startAndEndAreSame = toggle;
 
                 Tokens = toggle ? new[] { startToken } : new[] { startToken, endToken };
-                _id = id;
+                Id = id;
                 IsInitialStateOn = string.IsNullOrEmpty(id) || initialState;
             }
 
             public IReadOnlyList<IToken> Tokens { get; }
 
-            public string? Id => _id;
+            public string? Id { get; }
 
             public bool IsInitialStateOn { get; }
 
