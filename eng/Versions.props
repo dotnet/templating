@@ -4,7 +4,6 @@
     <!-- When StabilizePackageVersion is set to 'true', this branch will produce stable outputs for 'Shipping' packages -->
     <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">false</StabilizePackageVersion>
     <DotNetFinalVersionKind Condition="'$(StabilizePackageVersion)' == 'true'">release</DotNetFinalVersionKind>
-    <PackSpecific Condition="'$(OS)' != 'Windows_NT'">true</PackSpecific>
     <!-- Calculate prerelease label -->
     <PreReleaseVersionLabel Condition="'$(StabilizePackageVersion)' != 'true'">preview</PreReleaseVersionLabel>
     <PreReleaseVersionLabel Condition="'$(StabilizePackageVersion)' == 'true' and $(VersionPrefix.EndsWith('00'))">rtm</PreReleaseVersionLabel>
@@ -21,5 +20,9 @@
     <!-- Dependencies from https://github.com/dotnet/runtime -->
     <MicrosoftNETCoreAppRefPackageVersion>9.0.0-preview.6.24302.3</MicrosoftNETCoreAppRefPackageVersion>
     <MicrosoftNETCoreAppRuntimewinx64PackageVersion>9.0.0-preview.6.24302.3</MicrosoftNETCoreAppRuntimewinx64PackageVersion>
+    <!-- TODO: Remove when Arcade updated xunit to latest version. -->
+    <XUnitVersion>2.8.1</XUnitVersion>
+    <XUnitRunnerVisualStudioVersion>2.8.1</XUnitRunnerVisualStudioVersion>
+    <XUnitAnalyzersVersion>1.14.0</XUnitAnalyzersVersion>
   </PropertyGroup>
 </Project>

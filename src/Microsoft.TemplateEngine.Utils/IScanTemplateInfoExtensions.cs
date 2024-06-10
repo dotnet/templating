@@ -1,9 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Constraints;
 using Microsoft.TemplateEngine.Abstractions.Parameters;
@@ -23,14 +20,12 @@ namespace Microsoft.TemplateEngine.Utils
         private class LegacyTemplateInfo : ITemplateInfo
         {
             private readonly IScanTemplateInfo _templateInfo;
-            private readonly string? _locFilePath;
-            private readonly string? _hostFilePath;
 
             internal LegacyTemplateInfo(IScanTemplateInfo templateInfo, string? locFilePath = null, string? hostFilePath = null)
             {
                 _templateInfo = templateInfo;
-                _locFilePath = locFilePath;
-                _hostFilePath = hostFilePath;
+                LocaleConfigPlace = locFilePath;
+                HostConfigPlace = hostFilePath;
             }
 
             public string? Author => _templateInfo.Author;
@@ -73,9 +68,9 @@ namespace Microsoft.TemplateEngine.Utils
 
             public string ConfigPlace => _templateInfo.ConfigPlace;
 
-            public string? LocaleConfigPlace => _locFilePath;
+            public string? LocaleConfigPlace { get; }
 
-            public string? HostConfigPlace => _hostFilePath;
+            public string? HostConfigPlace { get; }
 
             public string? ThirdPartyNotices => _templateInfo.ThirdPartyNotices;
 

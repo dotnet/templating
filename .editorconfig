@@ -17,6 +17,19 @@ spelling_exclusion_path = exclusion.dic
 [*.json]
 indent_size = 2
 
+# Xml config files
+[*.{props,targets,config,nuspec}]
+indent_size = 2
+
+# Xml files
+[*.{xml,stylecop,resx,ruleset}]
+indent_size = 2
+
+# Xml project files
+[*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,nativeproj,locproj}]
+charset = utf-8
+indent_size = 2
+
 # Generated code
 [*{_AssemblyInfo.cs,.notsupported.cs}]
 generated_code = true

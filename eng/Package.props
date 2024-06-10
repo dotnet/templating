@@ -1,9 +1,11 @@
 <Project>
+
   <!-- Import references updated by Dependabot. This file is for package references updated manually or by Darc/Maestro. -->
   <Import Project="dependabot\Packages.props" />
+
   <!-- Override package versions in dependabot\Packages.props for source build -->
   <!-- Packages must be set to their package version property if it exists (ex. BenchmarkDotNetVersion) since source-build uses
-  these properties to override package versions if necessary. -->
+       these properties to override package versions if necessary. -->
   <ItemGroup Condition="'$(DotNetBuildSourceOnly)' == 'true'">
     <PackageReference Update="Microsoft.Build.Framework" Condition="'$(MicrosoftBuildFrameworkVersion)' != ''" Version="$(MicrosoftBuildFrameworkVersion)" />
     <PackageReference Update="Microsoft.Build.Utilities.Core" Condition="'$(MicrosoftBuildUtilitiesCoreVersion)' != ''" Version="$(MicrosoftBuildUtilitiesCoreVersion)" />
@@ -20,7 +22,6 @@
 
     <PackageReference Update="FakeItEasy" Condition="'$(FakeItEasyVersion)' != ''" Version="$(FakeItEasyVersion)" />
     <PackageReference Update="FluentAssertions" Condition="'$(FluentAssertionsVersion)' != ''" Version="$(FluentAssertionsVersion)" />
-    <PackageReference Update="Microsoft.NET.Test.Sdk" Condition="'$(MicrosoftNETTestSdkVersion)' != ''" Version="$(MicrosoftNETTestSdkVersion)" />
     <PackageReference Update="xunit.abstractions" Condition="'$(xunitabstractionsVersion)' != ''" Version="$(xunitabstractionsVersion)" />
     <PackageReference Update="Newtonsoft.Json.Schema" Condition="'$(NewtonsoftJsonSchemaVersion)' != ''" Version="$(NewtonsoftJsonSchemaVersion)" />
     <PackageReference Update="Verify.XUnit" Condition="'$(VerifyXUnitVersion)' != ''" Version="$(VerifyXUnitVersion)" />
@@ -35,4 +36,5 @@
     <PackageReference Update="xunit" Version="$(XUnitVersion)" />
     <PackageReference Update="Microsoft.DotNet.Cli.Utils" Version="$(MicrosoftDotNetCliUtilsVersion)" />
   </ItemGroup>
+
 </Project>

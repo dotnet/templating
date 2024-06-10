@@ -1,11 +1,7 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 #if NET
 using System.Runtime.Loader;
@@ -33,6 +29,8 @@ namespace Microsoft.TemplateEngine.Edge
             AssemblyLoadContext.Default.Resolving += Resolving;
 #else
             AppDomain.CurrentDomain.AssemblyResolve += Resolving;
+#else
+            AssemblyLoadContext.Default.Resolving += Resolving;
 #endif
         }
 
@@ -47,7 +45,6 @@ namespace Microsoft.TemplateEngine.Edge
         }
 
 #if NET
-
         private static Assembly? SelectBestMatch(AssemblyLoadContext loadContext, AssemblyName match, IEnumerable<FileInfo> candidates)
 #else
         private static Assembly? SelectBestMatch(object sender, AssemblyName match, IEnumerable<FileInfo> candidates)
@@ -200,7 +197,6 @@ namespace Microsoft.TemplateEngine.Edge
         }
 
 #if NET
-
         private static Assembly? Resolving(AssemblyLoadContext assemblyLoadContext, AssemblyName assemblyName)
 #else
         private static Assembly? Resolving(object sender, ResolveEventArgs resolveEventArgs)

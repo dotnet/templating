@@ -1,8 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Microsoft.TemplateEngine.Core.Contracts;
 
@@ -112,7 +110,7 @@ namespace Microsoft.TemplateEngine.Core.Operations
             public int HandleMatch(IProcessorState processor, int bufferLength, ref int currentBufferPosition, int token)
             {
                 IReadOnlyList<SpecializedPhase> nextPhases = _currentPhase?.Next ?? _entryPoints;
-                SpecializedPhase match = nextPhases.FirstOrDefault(x => x.Match == token);
+                SpecializedPhase? match = nextPhases.FirstOrDefault(x => x.Match == token);
 
                 if (match != null)
                 {
@@ -146,13 +144,6 @@ namespace Microsoft.TemplateEngine.Core.Operations
             public byte[]? Replacement { get; set; }
 
             public List<int> ResetsWith { get; }
-        }
-
-        private class SpecializedPhasedOperationConfig
-        {
-            public IReadOnlyList<SpecializedPhase>? EntryPoints { get; set; }
-
-            public IReadOnlyList<ITokenConfig>? Tokens { get; set; }
         }
     }
 }

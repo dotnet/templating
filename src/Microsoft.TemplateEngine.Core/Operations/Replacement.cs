@@ -1,8 +1,6 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Microsoft.TemplateEngine.Core.Contracts;
 
@@ -44,20 +42,19 @@ namespace Microsoft.TemplateEngine.Core.Operations
         {
             private readonly byte[] _replacement;
             private readonly IToken _token;
-            private readonly string? _id;
 
             public Implementation(IToken token, byte[] replaceWith, string? id, bool initialState)
             {
                 _replacement = replaceWith;
                 _token = token;
-                _id = id;
+                Id = id;
                 Tokens = new[] { token };
                 IsInitialStateOn = string.IsNullOrEmpty(id) || initialState;
             }
 
             public IReadOnlyList<IToken> Tokens { get; }
 
-            public string? Id => _id;
+            public string? Id { get; }
 
             public bool IsInitialStateOn { get; }
 

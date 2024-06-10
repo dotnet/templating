@@ -1,13 +1,7 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Installer;
 using NuGet.Configuration;
@@ -338,7 +332,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                     continue;
                 }
                 atLeastOneSourceValid = true;
-                NugetPackageMetadata matchedVersion = foundPackages.FirstOrDefault(package => package.Identity.Version == packageVersion);
+                NugetPackageMetadata? matchedVersion = foundPackages.FirstOrDefault(package => package.Identity.Version == packageVersion);
                 if (matchedVersion != null)
                 {
                     _nugetLogger.LogDebug($"{packageIdentifier}::{packageVersion} was found in {foundSource.Source}.");
