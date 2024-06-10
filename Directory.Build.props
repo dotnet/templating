@@ -11,7 +11,7 @@
     <Copyright>$(CopyrightNetFoundation)</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <NoWarn>NU5105;NU5128;NU5100;NU5118;0419,0649</NoWarn>
+    <NoWarn>$(NoWarn);NU5105;NU5128;NU5100;NU5118;0419,0649</NoWarn>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -34,7 +34,7 @@
 
   <ItemGroup Condition="'$(EnableAnalyzers)' == 'true'">
     <PackageReference Include="StyleCop.Analyzers" PrivateAssets="all" />
-    <PackageReference Condition="'$(EnablePublicApiAnalyzer)' == 'true'" Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
+    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="all" Condition="'$(EnablePublicApiAnalyzer)' == 'true'" />
   </ItemGroup>
 
 </Project>

@@ -1,23 +1,17 @@
 <Project>
 
-  <Import Project="$(RepositoryEngineeringDir)Package.props" />
   <Import Project="Sdk.targets" Sdk="Microsoft.DotNet.Arcade.Sdk" />
 
-  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' AND '$(BuildingInsideVisualStudio)' != 'true'">
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' and '$(BuildingInsideVisualStudio)' != 'true'">
     <FrameworkReference
         Update="Microsoft.NETCore.App"
         TargetingPackVersion="$(MicrosoftNETCoreAppRefPackageVersion)"
         RuntimeFrameworkVersion="$(MicrosoftNETCoreAppRuntimewinx64PackageVersion)" />
   </ItemGroup>
 
-  <!-- TODO: Remove with transitive pinning when enabling NuGet Central Package Management. -->
-  <ItemGroup Condition="'$(IsTestProject)' == 'true'">
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-  </ItemGroup>
-
   <ItemGroup>
-    <None Include="$(RepoRoot)LICENSE.txt" PackagePath="LICENSE.txt" Pack="true"/>
-    <None Include="$(RepoRoot)THIRD-PARTY-NOTICES.txt" PackagePath="THIRD-PARTY-NOTICES.txt" Pack="true"/>
+    <None Include="$(RepoRoot)LICENSE.txt" PackagePath="LICENSE.txt" Pack="true" />
+    <None Include="$(RepoRoot)THIRD-PARTY-NOTICES.txt" PackagePath="THIRD-PARTY-NOTICES.txt" Pack="true" />
   </ItemGroup>
 
 </Project>

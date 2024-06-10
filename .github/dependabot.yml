@@ -1,7 +1,7 @@
 version: 2
 updates:
   - package-ecosystem: "nuget"
-    directory: "/eng/dependabot"
+    directory: "/"
     open-pull-requests-limit: 10
     schedule:
       interval: "weekly"
@@ -9,3 +9,7 @@ updates:
     labels:
       - "dependencies"
       - "dependabot: main"
+    ignore:
+      - dependency-name: "Microsoft.*"
+      - dependency-name: "NuGet.*"
+      - dependency-name: "System.*"
