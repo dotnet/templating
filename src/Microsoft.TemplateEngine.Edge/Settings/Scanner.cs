@@ -5,8 +5,6 @@ using System.Reflection;
 #if NET
 using System.Runtime.Loader;
 #endif
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Mount;

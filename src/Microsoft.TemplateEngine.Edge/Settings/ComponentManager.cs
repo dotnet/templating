@@ -2,11 +2,10 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Reflection;
+using Microsoft.TemplateEngine.Abstractions;
 #if NET
 using System.Runtime.Loader;
 #endif
-using System.Threading.Tasks;
-using Microsoft.TemplateEngine.Abstractions;
 
 namespace Microsoft.TemplateEngine.Edge.Settings
 {
