@@ -2,7 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Reflection;
-#if !NETFULL
+#if !NETFRAMEWORK
 using System.Runtime.Loader;
 #endif
 using Microsoft.Extensions.Logging;
@@ -273,7 +273,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                 {
                     Assembly? assembly = null;
 
-#if NETFULL
+#if NETFRAMEWORK
                     if (file.IndexOf("net4", StringComparison.OrdinalIgnoreCase) > -1)
                     {
                         byte[] fileBytes = _environmentSettings.Host.FileSystem.ReadAllBytes(file);

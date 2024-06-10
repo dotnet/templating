@@ -50,7 +50,7 @@ namespace Microsoft.TemplateEngine.Edge
                 }
             }
 
-#if NETFULL
+#if NETFRAMEWORK
             return matchingTemplates.ToList();
 #else
             return matchingTemplates;
@@ -94,7 +94,7 @@ namespace Microsoft.TemplateEngine.Edge
                 }
             }
 
-#if NETFULL
+#if NETFRAMEWORK
             return matchingTemplates.ToList();
 #else
             return matchingTemplates;
@@ -127,7 +127,7 @@ namespace Microsoft.TemplateEngine.Edge
                 }
             }
 
-#if NETFULL
+#if NETFRAMEWORK
             return matchingTemplates.ToList();
 #else
             return matchingTemplates;
