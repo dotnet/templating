@@ -29,8 +29,6 @@ namespace Microsoft.TemplateEngine.Edge
             AssemblyLoadContext.Default.Resolving += Resolving;
 #else
             AppDomain.CurrentDomain.AssemblyResolve += Resolving;
-#else
-            AssemblyLoadContext.Default.Resolving += Resolving;
 #endif
         }
 
