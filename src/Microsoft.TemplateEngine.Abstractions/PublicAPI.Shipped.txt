@@ -414,8 +414,8 @@ Microsoft.TemplateEngine.Abstractions.ITemplate.Generator.get -> Microsoft.Templ
 Microsoft.TemplateEngine.Abstractions.ITemplate.LocaleConfiguration.get -> Microsoft.TemplateEngine.Abstractions.Mount.IFileSystemInfo?
 Microsoft.TemplateEngine.Abstractions.ITemplateParameter.AllowMultipleValues.get -> bool
 Microsoft.TemplateEngine.Abstractions.PrecedenceDefinition
-Microsoft.TemplateEngine.Abstractions.PrecedenceDefinition.ConditionalyDisabled = 4 -> Microsoft.TemplateEngine.Abstractions.PrecedenceDefinition
-Microsoft.TemplateEngine.Abstractions.PrecedenceDefinition.ConditionalyRequired = 1 -> Microsoft.TemplateEngine.Abstractions.PrecedenceDefinition
+Microsoft.TemplateEngine.Abstractions.PrecedenceDefinition.ConditionallyDisabled = 4 -> Microsoft.TemplateEngine.Abstractions.PrecedenceDefinition
+Microsoft.TemplateEngine.Abstractions.PrecedenceDefinition.ConditionallyRequired = 1 -> Microsoft.TemplateEngine.Abstractions.PrecedenceDefinition
 Microsoft.TemplateEngine.Abstractions.PrecedenceDefinition.Disabled = 5 -> Microsoft.TemplateEngine.Abstractions.PrecedenceDefinition
 Microsoft.TemplateEngine.Abstractions.PrecedenceDefinition.Implicit = 3 -> Microsoft.TemplateEngine.Abstractions.PrecedenceDefinition
 Microsoft.TemplateEngine.Abstractions.PrecedenceDefinition.Optional = 2 -> Microsoft.TemplateEngine.Abstractions.PrecedenceDefinition

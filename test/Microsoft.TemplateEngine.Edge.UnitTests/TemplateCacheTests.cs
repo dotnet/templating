@@ -148,7 +148,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             SettingsFilePaths paths = new SettingsFilePaths(environmentSettings);
 
             ITemplateParameter param1 = new TemplateParameter("param1", "parameter", "string");
-            ITemplateParameter param2 = new TemplateParameter("param2", "parameter", "string", new TemplateParameterPrecedence(PrecedenceDefinition.ConditionalyRequired, isRequiredCondition: "param1 == \"foo\""));
+            ITemplateParameter param2 = new TemplateParameter("param2", "parameter", "string", new TemplateParameterPrecedence(PrecedenceDefinition.ConditionallyRequired, isRequiredCondition: "param1 == \"foo\""));
             ITemplateParameter param3 = new TemplateParameter(
                 "param3",
                 "parameter",

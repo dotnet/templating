@@ -221,7 +221,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
 
             if (!string.IsNullOrEmpty(isEnabledCondition))
             {
-                return new TemplateParameterPrecedence(PrecedenceDefinition.ConditionalyDisabled, isRequiredCondition, isEnabledCondition, isRequired);
+                return new TemplateParameterPrecedence(PrecedenceDefinition.ConditionallyDisabled, isRequiredCondition, isEnabledCondition, isRequired);
             }
 
             if (isTag)
@@ -231,7 +231,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
 
             if (!string.IsNullOrEmpty(isRequiredCondition))
             {
-                return new TemplateParameterPrecedence(PrecedenceDefinition.ConditionalyRequired, isRequiredCondition, null);
+                return new TemplateParameterPrecedence(PrecedenceDefinition.ConditionallyRequired, isRequiredCondition, null);
             }
 
             if (isRequired)
