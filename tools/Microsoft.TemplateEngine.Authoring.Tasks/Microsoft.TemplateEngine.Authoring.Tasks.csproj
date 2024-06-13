@@ -36,8 +36,7 @@
 
   <ItemGroup>
     <EmbeddedResource Update="LocalizableStrings.resx"
-                      Generator="ResXFileCodeGenerator"
-                      LastGenOutput="LocalizableStrings.Designer.cs" />
+                      GenerateSource="true" />
   </ItemGroup>
 
   <Target Name="AddBuildOutputToPackageNet" DependsOnTargets="Publish" Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'">
