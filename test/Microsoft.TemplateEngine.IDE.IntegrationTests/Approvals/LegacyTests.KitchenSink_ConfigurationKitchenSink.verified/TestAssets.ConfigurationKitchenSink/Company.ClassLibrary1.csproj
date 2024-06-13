@@ -11,7 +11,6 @@
     <None Include="Foo1.cs" />
     <None Include="Foo2.cs" />
 
-
     <None Include="Foo5.cs" Condition="'$(defaultFalse)' == 'true'" />
     <None Include="Foo5.5.cs" />
 

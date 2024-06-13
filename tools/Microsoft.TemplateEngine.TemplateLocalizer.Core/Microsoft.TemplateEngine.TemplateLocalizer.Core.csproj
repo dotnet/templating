@@ -21,13 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="LocalizableStrings.Designer.cs"
-             DesignTime="True"
-             AutoGen="True"
-             DependentUpon="LocalizableStrings.resx" />
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Update="LocalizableStrings.resx"
                       GenerateSource="true" />
   </ItemGroup>
