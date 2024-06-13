@@ -39,7 +39,7 @@
     <PackageVersion Include="Verify.XUnit" Version="25.0.2" />
     <PackageVersion Include="xunit.abstractions" Version="2.0.3" />
     <!-- Xunit version is managed by Arcade. -->
-    <PackageVersion Include="xunit" Version="$(XUnitVersion)" />
+    <PackageVersion Include="xunit.extensibility.execution" Version="$(XUnitVersion)" />
   </ItemGroup>
 
   <!-- DotNetBuild overrides -->
