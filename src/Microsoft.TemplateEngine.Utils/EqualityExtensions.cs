@@ -11,7 +11,7 @@ namespace Microsoft.TemplateEngine.Utils
             return items.AllAreTheSame(selector, (x, y) => x?.Equals(y) ?? (y == null));
         }
 
-        public static bool AllAreTheSame<T, TValue>(this IEnumerable<T> items, Func<T, TValue?> selector, IEqualityComparer<TValue?> comparer)
+        public static bool AllAreTheSame<T, TValue>(this IEnumerable<T> items, Func<T, TValue?> selector, IEqualityComparer<TValue?>? comparer = null)
             where TValue : IEquatable<TValue?>
         {
             comparer ??= EqualityComparer<TValue?>.Default;
@@ -19,7 +19,7 @@ namespace Microsoft.TemplateEngine.Utils
             return items.AllAreTheSame(selector, comparer.Equals);
         }
 
-        public static bool AllAreTheSame<T, TValue>(this IEnumerable<T> items, Func<T, TValue?> selector, Func<TValue?, TValue?, bool> comparer)
+        public static bool AllAreTheSame<T, TValue>(this IEnumerable<T> items, Func<T, TValue?> selector, Func<TValue?, TValue?, bool>? comparer = null)
             where TValue : IEquatable<TValue?>
         {
             comparer ??= EqualityComparer<TValue?>.Default.Equals;
