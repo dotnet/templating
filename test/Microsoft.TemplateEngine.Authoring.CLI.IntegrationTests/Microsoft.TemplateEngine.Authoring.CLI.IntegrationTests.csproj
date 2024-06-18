@@ -8,6 +8,8 @@
     <ProjectReference Include="$(ToolsDir)Microsoft.TemplateEngine.Authoring.CLI\Microsoft.TemplateEngine.Authoring.CLI.csproj" />
     <ProjectReference Include="$(TestDir)Microsoft.TemplateEngine.TestTemplates\Microsoft.TemplateEngine.TestTemplates.csproj" />
     <ProjectReference Include="$(TestDir)Microsoft.TemplateEngine.TestHelper\Microsoft.TemplateEngine.TestHelper.csproj" />
+
+    <PackageReference Include="Polyfill" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>

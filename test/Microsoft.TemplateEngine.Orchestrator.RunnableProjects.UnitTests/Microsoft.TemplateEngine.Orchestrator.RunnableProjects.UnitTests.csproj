@@ -13,6 +13,7 @@
     <PackageReference Include="FakeItEasy" />
     <PackageReference Include="Verify.XUnit" />
     <PackageReference Include="Verify.DiffPlex" />
+    <PackageReference Include="Polyfill" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>

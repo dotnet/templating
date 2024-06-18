@@ -1,21 +1,16 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.Runtime.CompilerServices;
 using VerifyTests.DiffPlex;
 
 namespace Microsoft.TemplateEngine.Authoring.CLI.IntegrationTests
 {
-    public class VerifySettingsFixture : IDisposable
+    public static class ModuleInit
     {
-        private static bool s_called;
-
-        public VerifySettingsFixture()
+        [ModuleInitializer]
+        public static void Init()
         {
-            if (s_called)
-            {
-                return;
-            }
-            s_called = true;
             DerivePathInfo(
                 (_, _, type, method) => new(
                     directory: "Snapshots",
@@ -25,7 +20,5 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.IntegrationTests
             // Customize diff output of verifier
             VerifyDiffPlex.Initialize(OutputType.Compact);
         }
-
-        public void Dispose() { }
     }
 }
