@@ -29,15 +29,6 @@ variables:
     value: false
   - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
     - group: Templating-SDLValidation-Params
-    
-  - ${{ if ne(variables['System.TeamProject'], 'public') }}:
-    # Variable replaced by enable-internal-runtimes.yml
-    - name: _InternalRuntimeDownloadArgs
-      value: /p:DotNetRuntimeSourceFeed=https://dotnetbuilds.blob.core.windows.net/internal 
-        /p:DotNetRuntimeSourceFeedKey=$(dotnetbuilds-internal-container-read-token-base64)
-  - ${{ if eq(variables['System.TeamProject'], 'public') }}:
-    - name: _InternalRuntimeDownloadArgs
-      value: ''
   - template: /eng/common/templates/variables/pool-providers.yml
 
 stages:
@@ -106,16 +97,12 @@ stages:
         - checkout: self
           clean: true
 
-        - template: /eng/common/templates/steps/enable-internal-runtimes.yml
-        - template: /eng/common/templates/steps/enable-internal-sources.yml
-
         # Use utility script to run script command dependent on agent OS.
         - script: eng/common/cibuild.cmd
             -configuration $(_BuildConfig)
             -prepareMachine
             -integrationTest
             $(_InternalBuildArgs)
-            $(_InternalRuntimeDownloadArgs)
           displayName: Windows Build / Publish
 
       - ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
@@ -131,15 +118,10 @@ stages:
                 _BuildConfig: Release
                 _SignType: none
           steps:
-
-          - template: /eng/common/templates/steps/enable-internal-runtimes.yml
-          - template: /eng/common/templates/steps/enable-internal-sources.yml
-
           - script: eng/common/cibuild.sh
               --configuration $(_BuildConfig)
               --prepareMachine
               --integrationTest
-              $(_InternalRuntimeDownloadArgs)
             name: Build
             displayName: Build
 
@@ -147,7 +129,7 @@ stages:
         - job: Linux
           pool:
             ${{ if eq(variables['System.TeamProject'], 'public') }}:
-              vmImage: ubuntu-latest 
+              vmImage: ubuntu-latest
             ${{ if eq(variables['System.TeamProject'], 'internal') }}:
               name: $(DncEngInternalBuildPool)
               demands: ImageOverride -equals Build.Ubuntu.2204.Amd64
@@ -160,15 +142,10 @@ stages:
                 _BuildConfig: Release
                 _SignType: none
           steps:
-
-          - template: /eng/common/templates/steps/enable-internal-runtimes.yml
-          - template: /eng/common/templates/steps/enable-internal-sources.yml
-
           - script: eng/common/cibuild.sh
               --configuration $(_BuildConfig)
               --prepareMachine
               --integrationTest
-              $(_InternalRuntimeDownloadArgs)
             name: Build
             displayName: Build
             condition: succeeded()

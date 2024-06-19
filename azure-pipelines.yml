@@ -29,14 +29,6 @@ variables:
     value: false
   - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
     - group: Templating-SDLValidation-Params
-  - ${{ if ne(variables['System.TeamProject'], 'public') }}:
-    # Variable replaced by enable-internal-runtimes.yml
-    - name: _InternalRuntimeDownloadArgs
-      value: /p:DotNetRuntimeSourceFeed=https://dotnetbuilds.blob.core.windows.net/internal 
-        /p:DotNetRuntimeSourceFeedKey=$(dotnetbuilds-internal-container-read-token-base64)
-  - ${{ if eq(variables['System.TeamProject'], 'public') }}:
-    - name: _InternalRuntimeDownloadArgs
-      value: ''
   - template: /eng/common/templates-official/variables/pool-providers.yml
 
 resources:
@@ -106,7 +98,7 @@ extends:
               - _SignType: test
               - ${{ if notin(variables['Build.Reason'], 'PullRequest') }}:
                 - _SignType: real
-              - _InternalBuildArgs: ''              
+              - _InternalBuildArgs: ''
               # Only enable publishing in non-public, non PR scenarios.
               - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
                 # DotNet-Symbol-Server-Pats provides: microsoft-symbol-server-pat, symweb-symbol-server-pat
@@ -119,16 +111,12 @@ extends:
               - checkout: self
                 clean: true
 
-              - template: /eng/common/templates-official/steps/enable-internal-runtimes.yml
-              - template: /eng/common/templates-official/steps/enable-internal-sources.yml
-
               # Use utility script to run script command dependent on agent OS.
               - script: eng/common/cibuild.cmd
                   -configuration $(_BuildConfig)
                   -prepareMachine
                   -integrationTest
                   $(_InternalBuildArgs)
-                  $(_InternalRuntimeDownloadArgs)
                 displayName: Windows Build / Publish
 
           - ${{ if in(variables['Build.Reason'], 'PullRequest') }}:
@@ -141,18 +129,13 @@ extends:
                 - _BuildConfig: ${{ config.buildConfig }}
                 - _SignType: none
                 steps:
-                
-                - template: /eng/common/templates-official/steps/enable-internal-runtimes.yml
-                - template: /eng/common/templates-official/steps/enable-internal-sources.yml
-                
                 - script: eng/common/cibuild.sh
                     --configuration $(_BuildConfig)
                     --prepareMachine
                     --integrationTest
-                    $(_InternalRuntimeDownloadArgs)
                   name: Build
                   displayName: Build
-    
+
           - ${{ if in(variables['Build.Reason'], 'PullRequest') }}:
             - ${{ each config in parameters.buildConfigurations }}:
               - job: Linux_${{ config.buildConfig }}
@@ -170,19 +153,14 @@ extends:
                 - _BuildConfig: ${{ config.buildConfig }}
                 - _SignType: none
                 steps:
-                
-                - template: /eng/common/templates-official/steps/enable-internal-runtimes.yml
-                - template: /eng/common/templates-official/steps/enable-internal-sources.yml
-                
                 - script: eng/common/cibuild.sh
                     --configuration $(_BuildConfig)
                     --prepareMachine
                     --integrationTest
-                    $(_InternalRuntimeDownloadArgs)
                   name: Build
                   displayName: Build
                   condition: succeeded()
-    
+
     - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
       - template: eng/common/templates-official/post-build/post-build.yml@self
         parameters:
