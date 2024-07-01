@@ -113,7 +113,7 @@ stages:
             env:
               Token: $(dn-bot-dnceng-artifact-feeds-rw)
 
-        - template: eng/common/templates/steps/enable-internal-runtimes.yml
+        - template: /eng/common/templates/steps/enable-internal-runtimes.yml
 
         # Use utility script to run script command dependent on agent OS.
         - script: eng/common/cibuild.cmd
@@ -146,7 +146,7 @@ stages:
               env:
                 Token: $(dn-bot-dnceng-artifact-feeds-rw)
 
-          - template: eng/common/templates/steps/enable-internal-runtimes.yml
+          - template: /eng/common/templates/steps/enable-internal-runtimes.yml
 
           - script: eng/common/cibuild.sh
               --configuration $(_BuildConfig)
@@ -182,7 +182,7 @@ stages:
               env:
                 Token: $(dn-bot-dnceng-artifact-feeds-rw)
 
-          - template: eng/common/templates/steps/enable-internal-runtimes.yml
+          - template: /eng/common/templates/steps/enable-internal-runtimes.yml
 
           - script: eng/common/cibuild.sh
               --configuration $(_BuildConfig)
