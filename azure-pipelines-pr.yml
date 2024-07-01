@@ -26,11 +26,10 @@ variables:
 
   - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
     - group: Templating-SDLValidation-Params
-    
+
   - ${{ if ne(variables['System.TeamProject'], 'public') }}:
-    - group: DotNetBuilds storage account read tokens
     - name: _InternalRuntimeDownloadArgs
-      value: /p:DotNetRuntimeSourceFeed=https://dotnetbuilds.blob.core.windows.net/internal 
+      value: /p:DotNetRuntimeSourceFeed=https://dotnetbuilds.blob.core.windows.net/internal
         /p:DotNetRuntimeSourceFeedKey=$(dotnetbuilds-internal-container-read-token-base64)
   - ${{ if eq(variables['System.TeamProject'], 'public') }}:
     - name: _InternalRuntimeDownloadArgs
@@ -56,6 +55,8 @@ stages:
       enablePublishBuildAssets: true
       enablePublishUsingPipelines: ${{ variables._PublishUsingPipelines }}
       enableSourceBuild: true
+      sourceBuildParameters:
+        enableInternalSources: true
       enableTelemetry: true
       helixRepo: dotnet/templating
       jobs:
@@ -107,6 +108,9 @@ stages:
               arguments: -ConfigFile $(Build.SourcesDirectory)/NuGet.config -Password $Env:Token
             env:
               Token: $(dn-bot-dnceng-artifact-feeds-rw)
+
+        - template: /eng/common/templates/steps/enable-internal-runtimes.yml
+
         # Use utility script to run script command dependent on agent OS.
         - script: eng/common/cibuild.cmd
             -configuration $(_BuildConfig)
@@ -137,6 +141,9 @@ stages:
                 arguments: $(Build.SourcesDirectory)/NuGet.config $Token
               env:
                 Token: $(dn-bot-dnceng-artifact-feeds-rw)
+
+          - template: /eng/common/templates/steps/enable-internal-runtimes.yml
+
           - script: eng/common/cibuild.sh
               --configuration $(_BuildConfig)
               --prepareMachine
@@ -170,6 +177,9 @@ stages:
                 arguments: $(Build.SourcesDirectory)/NuGet.config $Token
               env:
                 Token: $(dn-bot-dnceng-artifact-feeds-rw)
+
+          - template: /eng/common/templates/steps/enable-internal-runtimes.yml
+
           - script: eng/common/cibuild.sh
               --configuration $(_BuildConfig)
               --prepareMachine
