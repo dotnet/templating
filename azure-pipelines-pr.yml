@@ -29,15 +29,6 @@ variables:
     value: false
   - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
     - group: Templating-SDLValidation-Params
-    
-  - ${{ if ne(variables['System.TeamProject'], 'public') }}:
-    - group: DotNetBuilds storage account read tokens
-    - name: _InternalRuntimeDownloadArgs
-      value: /p:DotNetRuntimeSourceFeed=https://dotnetbuilds.blob.core.windows.net/internal 
-        /p:DotNetRuntimeSourceFeedKey=$(dotnetbuilds-internal-container-read-token-base64)
-  - ${{ if eq(variables['System.TeamProject'], 'public') }}:
-    - name: _InternalRuntimeDownloadArgs
-      value: ''
   - template: /eng/common/templates/variables/pool-providers.yml
 
 stages:
@@ -108,21 +99,12 @@ stages:
         steps:
         - checkout: self
           clean: true
-        - ${{ if ne(variables['System.TeamProject'], 'public') }}:
-          - task: PowerShell@2
-            displayName: Setup Private Feeds Credentials
-            inputs:
-              filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.ps1
-              arguments: -ConfigFile $(Build.SourcesDirectory)/NuGet.config -Password $Env:Token
-            env:
-              Token: $(dn-bot-dnceng-artifact-feeds-rw)
         # Use utility script to run script command dependent on agent OS.
         - script: eng/common/cibuild.cmd
             -configuration $(_BuildConfig)
             -prepareMachine
             -integrationTest
             $(_InternalBuildArgs)
-            $(_InternalRuntimeDownloadArgs)
           displayName: Windows Build / Publish
 
       - ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
@@ -138,19 +120,10 @@ stages:
                 _BuildConfig: Release
                 _SignType: none
           steps:
-          - ${{ if ne(variables['System.TeamProject'], 'public') }}:
-            - task: Bash@3
-              displayName: Setup Private Feeds Credentials
-              inputs:
-                filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.sh
-                arguments: $(Build.SourcesDirectory)/NuGet.config $Token
-              env:
-                Token: $(dn-bot-dnceng-artifact-feeds-rw)
           - script: eng/common/cibuild.sh
               --configuration $(_BuildConfig)
               --prepareMachine
               --integrationTest
-              $(_InternalRuntimeDownloadArgs)
             name: Build
             displayName: Build
 
@@ -158,7 +131,7 @@ stages:
         - job: Linux
           pool:
             ${{ if eq(variables['System.TeamProject'], 'public') }}:
-              vmImage: ubuntu-latest 
+              vmImage: ubuntu-latest
             ${{ if eq(variables['System.TeamProject'], 'internal') }}:
               name: $(DncEngInternalBuildPool)
               demands: ImageOverride -equals Build.Ubuntu.2204.Amd64
@@ -171,19 +144,10 @@ stages:
                 _BuildConfig: Release
                 _SignType: none
           steps:
-          - ${{ if ne(variables['System.TeamProject'], 'public') }}:
-            - task: Bash@3
-              displayName: Setup Private Feeds Credentials
-              inputs:
-                filePath: $(Build.SourcesDirectory)/eng/common/SetupNugetSources.sh
-                arguments: $(Build.SourcesDirectory)/NuGet.config $Token
-              env:
-                Token: $(dn-bot-dnceng-artifact-feeds-rw)
           - script: eng/common/cibuild.sh
               --configuration $(_BuildConfig)
               --prepareMachine
               --integrationTest
-              $(_InternalRuntimeDownloadArgs)
             name: Build
             displayName: Build
             condition: succeeded()
