@@ -1,14 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
 <Project>
-  <Import Project="$(DotNetPackageVersionPropsPath)" Condition="'$(DotNetPackageVersionPropsPath)' != ''" />
 
-  <Import Project="$(RepositoryEngineeringDir)Package.props" />
+  <Import Project="Sdk.targets" Sdk="Microsoft.DotNet.Arcade.Sdk" />
 
   <ItemGroup>
-    <None Include="$(RepoRoot)LICENSE.txt" PackagePath="LICENSE.txt" Pack="true"/>
-    <None Include="$(RepoRoot)THIRD-PARTY-NOTICES.txt" PackagePath="THIRD-PARTY-NOTICES.txt" Pack="true"/>
+    <None Include="$(RepoRoot)LICENSE.txt" PackagePath="LICENSE.txt" Pack="true" />
+    <None Include="$(RepoRoot)THIRD-PARTY-NOTICES.txt" PackagePath="THIRD-PARTY-NOTICES.txt" Pack="true" />
   </ItemGroup>
 
-  <!-- Leave this file here, even if it's empty. It stops chaining imports. -->
-  <Import Project="Sdk.targets" Sdk="Microsoft.DotNet.Arcade.Sdk" />
 </Project>
