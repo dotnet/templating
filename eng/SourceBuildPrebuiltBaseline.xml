@@ -3,9 +3,5 @@
 
 <UsageData>
   <IgnorePatterns>
-    <!-- TODO: Ignore needed until https://github.com/dotnet/source-build/issues/3188 is addressed. -->
-    <UsagePattern IdentityGlob="Microsoft.NETCore.App.Ref/*" />
-
-    <UsagePattern IdentityGlob="Microsoft.SourceBuild.Intermediate.*/*" />
   </IgnorePatterns>
 </UsageData>
