@@ -140,6 +140,7 @@ extends:
                 displayName: OSX ${{ config.buildConfig }}
                 pool:
                   vmImage: 'macOS-latest'
+                  os: macOS
                 variables:
                 - _BuildConfig: ${{ config.buildConfig }}
                 - _SignType: none
