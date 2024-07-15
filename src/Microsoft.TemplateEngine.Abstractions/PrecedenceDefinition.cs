@@ -19,7 +19,7 @@ public enum PrecedenceDefinition
     /// <summary>
     /// Set if and only if only the IsRequiredCondition is set.
     /// </summary>
-    ConditionalyRequired,
+    ConditionallyRequired,
 
     /// <summary>
     /// Parameter value is not required from user.
@@ -34,7 +34,7 @@ public enum PrecedenceDefinition
     /// <summary>
     /// Parameter might become disabled - value would not be needed nor used in such case.
     /// </summary>
-    ConditionalyDisabled,
+    ConditionallyDisabled,
 
     /// <summary>
     /// Parameter is disabled - it's value is not required and will not be used.
