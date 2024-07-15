@@ -27,7 +27,6 @@ variables:
   - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
     - group: Templating-SDLValidation-Params
   - ${{ if ne(variables['System.TeamProject'], 'public') }}:
-    - group: DotNetBuilds storage account read tokens
     - name: _InternalRuntimeDownloadArgs
       value: /p:DotNetRuntimeSourceFeed=https://dotnetbuilds.blob.core.windows.net/internal
         /p:DotNetRuntimeSourceFeedKey=$(dotnetbuilds-internal-container-read-token-base64)
@@ -86,6 +85,8 @@ extends:
           enablePublishBuildAssets: true
           enablePublishUsingPipelines: ${{ variables._PublishUsingPipelines }}
           enableSourceBuild: true
+          sourceBuildParameters:
+            enableInternalSources: true
           enableTelemetry: true
           helixRepo: dotnet/templating
           jobs:
@@ -101,7 +102,7 @@ extends:
               - _SignType: test
               - ${{ if notin(variables['Build.Reason'], 'PullRequest') }}:
                 - _SignType: real
-              - _InternalBuildArgs: ''              
+              - _InternalBuildArgs: ''
               # Only enable publishing in non-public, non PR scenarios.
               - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
                 # DotNet-Symbol-Server-Pats provides: microsoft-symbol-server-pat, symweb-symbol-server-pat
@@ -122,6 +123,9 @@ extends:
                     arguments: -ConfigFile $(Build.SourcesDirectory)/NuGet.config -Password $Env:Token
                   env:
                     Token: $(dn-bot-dnceng-artifact-feeds-rw)
+
+              - template: /eng/common/templates-official/steps/enable-internal-runtimes.yml
+
               # Use utility script to run script command dependent on agent OS.
               - script: eng/common/cibuild.cmd
                   -configuration $(_BuildConfig)
@@ -135,7 +139,9 @@ extends:
               - job: OSX_${{ config.buildConfig }}
                 displayName: OSX ${{ config.buildConfig }}
                 pool:
+                  name: 'Azure Pipelines'
                   vmImage: 'macOS-latest'
+                  os: macOS
                 variables:
                 - _BuildConfig: ${{ config.buildConfig }}
                 - _SignType: none
@@ -148,6 +154,9 @@ extends:
                       arguments: $(Build.SourcesDirectory)/NuGet.config $Token
                     env:
                       Token: $(dn-bot-dnceng-artifact-feeds-rw)
+
+                - template: /eng/common/templates-official/steps/enable-internal-runtimes.yml
+
                 - script: eng/common/cibuild.sh
                     --configuration $(_BuildConfig)
                     --prepareMachine
@@ -155,7 +164,7 @@ extends:
                     $(_InternalRuntimeDownloadArgs)
                   name: Build
                   displayName: Build
-    
+
           - ${{ if in(variables['Build.Reason'], 'PullRequest') }}:
             - ${{ each config in parameters.buildConfigurations }}:
               - job: Linux_${{ config.buildConfig }}
@@ -181,6 +190,9 @@ extends:
                       arguments: $(Build.SourcesDirectory)/NuGet.config $Token
                     env:
                       Token: $(dn-bot-dnceng-artifact-feeds-rw)
+
+                - template: /eng/common/templates-official/steps/enable-internal-runtimes.yml
+
                 - script: eng/common/cibuild.sh
                     --configuration $(_BuildConfig)
                     --prepareMachine
@@ -189,7 +201,7 @@ extends:
                   name: Build
                   displayName: Build
                   condition: succeeded()
-    
+
     - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
       - template: eng/common/templates-official/post-build/post-build.yml@self
         parameters:
