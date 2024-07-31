@@ -27,5 +27,9 @@
       <Sha>73f0850939d96131c28cf6ea6ee5aacb4da0083a</Sha>
       <SourceBuild RepoName="xliff-tasks" ManagedOnly="true" />
     </Dependency>
+    <Dependency Name="System.Formats.Asn1" Version="6.0.1">
+      <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
+      <Sha>c76ac565499f3e7c657126d46c00b67a0d74832c</Sha>
+    </Dependency>
   </ToolsetDependencies>
 </Dependencies>
