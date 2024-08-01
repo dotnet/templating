@@ -24,6 +24,6 @@
   </PropertyGroup>
   <PropertyGroup>
     <!-- Non-maestro versions -->
-    <SystemFormatsAsn1Version>6.0.1</SystemFormatsAsn1Version>
+    <SystemFormatsAsn1Version>8.0.1</SystemFormatsAsn1Version>
   </PropertyGroup>
 </Project>
