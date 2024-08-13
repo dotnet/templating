@@ -6,6 +6,9 @@
     <!-- TODO: Ignore needed until https://github.com/dotnet/source-build/issues/3188 is addressed. -->
     <UsagePattern IdentityGlob="Microsoft.NETCore.App.Ref/*" />
 
+    <!-- Lifted to live version in VMR. -->
+    <UsagePattern IdentityGlob="System.Formats.Asn1/8.0.*" />
+
     <UsagePattern IdentityGlob="Microsoft.SourceBuild.Intermediate.*/*" />
   </IgnorePatterns>
 </UsageData>
