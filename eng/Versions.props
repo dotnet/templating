@@ -22,4 +22,8 @@
     <!-- Dependencies from https://github.com/dotnet/command-line-api -->
     <SystemCommandLinePackageVersion>2.0.0-beta4.24324.3</SystemCommandLinePackageVersion>
   </PropertyGroup>
+  <PropertyGroup>
+    <!-- Non-maestro versions -->
+    <SystemFormatsAsn1Version>8.0.1</SystemFormatsAsn1Version>
+  </PropertyGroup>
 </Project>
