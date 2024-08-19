@@ -1,31 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dependencies>
   <ProductDependencies>
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-externals" Version="8.0.0-alpha.1.23518.1">
+    <!-- Intermediate is necessary for source build. -->
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-externals" Version="10.0.0-alpha.1.24415.1">
       <Uri>https://github.com/dotnet/source-build-externals</Uri>
-      <Sha>3dc05150cf234f76f6936dcb2853d31a0da1f60e</Sha>
+      <Sha>2cef086137a68586fdd69848261e2a8cf8c48b73</Sha>
       <SourceBuild RepoName="source-build-externals" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="8.0.0-alpha.1.24251.1">
+    <!-- Intermediate is necessary for source build. -->
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="9.0.0-alpha.1.24413.1">
       <Uri>https://github.com/dotnet/source-build-reference-packages</Uri>
-      <Sha>6f814daa935e08b578b1c0c65a1f26ea3317f517</Sha>
+      <Sha>1b838a42e4952b8fdf212cb1b43c5ce4d69f27b3</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="System.CommandLine" Version="2.0.0-beta4.23407.1">
+    <Dependency Name="System.CommandLine" Version="2.0.0-beta4.24324.3">
       <Uri>https://github.com/dotnet/command-line-api</Uri>
-      <Sha>a045dd54a4c44723c215d992288160eb1401bb7f</Sha>
+      <Sha>803d8598f98fb4efd94604b32627ee9407f246db</Sha>
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
-    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="8.0.0-beta.24413.2">
+    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="9.0.0-beta.24408.2">
       <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>51321b7e150a2f426cb9e1334687bdfab68ec323</Sha>
-      <SourceBuild RepoName="arcade" ManagedOnly="true" />
+      <Sha>60ae233c3d77f11c5fdb53e570b64d503b13ba59</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.DotNet.XliffTasks" Version="1.0.0-beta.23475.1" CoherentParentDependency="Microsoft.DotNet.Arcade.Sdk">
-      <Uri>https://github.com/dotnet/xliff-tasks</Uri>
-      <Sha>73f0850939d96131c28cf6ea6ee5aacb4da0083a</Sha>
-      <SourceBuild RepoName="xliff-tasks" ManagedOnly="true" />
+    <!-- Intermediate is necessary for source build. -->
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.arcade" Version="9.0.0-beta.24408.2">
+      <Uri>https://github.com/dotnet/arcade</Uri>
+      <Sha>60ae233c3d77f11c5fdb53e570b64d503b13ba59</Sha>
+      <SourceBuild RepoName="arcade" ManagedOnly="true" />
     </Dependency>
     <Dependency Name="System.Formats.Asn1" Version="8.0.1">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>

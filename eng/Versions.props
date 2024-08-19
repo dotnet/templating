@@ -1,26 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <!-- Opt out of certain Arcade features -->
+<Project>
   <PropertyGroup>
-    <UsingToolXliff>true</UsingToolXliff>
-    <UsingToolNetFrameworkReferenceAssemblies>true</UsingToolNetFrameworkReferenceAssemblies>
-    <VersionPrefix>8.0.402</VersionPrefix>
+    <VersionPrefix>9.0.100</VersionPrefix>
     <!-- When StabilizePackageVersion is set to 'true', this branch will produce stable outputs for 'Shipping' packages -->
-    <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">true</StabilizePackageVersion>
+    <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">false</StabilizePackageVersion>
     <DotNetFinalVersionKind Condition="'$(StabilizePackageVersion)' == 'true'">release</DotNetFinalVersionKind>
-    <PackSpecific Condition="'$(OS)' != 'Windows_NT'">true</PackSpecific>
     <!-- Calculate prerelease label -->
-    <PreReleaseVersionLabel Condition="'$(StabilizePackageVersion)' != 'true'">preview</PreReleaseVersionLabel>
+    <PreReleaseVersionLabel Condition="'$(StabilizePackageVersion)' != 'true'">rc</PreReleaseVersionLabel>
     <PreReleaseVersionLabel Condition="'$(StabilizePackageVersion)' == 'true' and $(VersionPrefix.EndsWith('00'))">rtm</PreReleaseVersionLabel>
     <PreReleaseVersionLabel Condition="'$(StabilizePackageVersion)' == 'true' and !$(VersionPrefix.EndsWith('00'))">servicing</PreReleaseVersionLabel>
-    <PreReleaseVersionIteration Condition="'$(StabilizePackageVersion)' != 'true'">
-    </PreReleaseVersionIteration>
+    <PreReleaseVersionIteration Condition="'$(StabilizePackageVersion)' != 'true'">2</PreReleaseVersionIteration>
+    <UsingToolXliff>true</UsingToolXliff>
+    <FlagNetStandard1XDependencies>true</FlagNetStandard1XDependencies>
   </PropertyGroup>
-  <!-- Package Versions -->
   <PropertyGroup>
-    <!-- Maestro-managed Package Versions - Ordered by repo name -->
-    <!-- Dependencies from https://github.com/dotnet/command-line-api -->
-    <SystemCommandLinePackageVersion>2.0.0-beta4.23407.1</SystemCommandLinePackageVersion>
+    <!-- Command-line-api dependencies -->
+    <SystemCommandLinePackageVersion>2.0.0-beta4.24324.3</SystemCommandLinePackageVersion>
   </PropertyGroup>
   <PropertyGroup>
     <!-- Non-maestro versions -->
