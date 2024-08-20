@@ -3,5 +3,7 @@
 
 <UsageData>
   <IgnorePatterns>
+    <!-- Lifted to live version in VMR. -->
+    <UsagePattern IdentityGlob="System.Formats.Asn1/8.0.*" />
   </IgnorePatterns>
 </UsageData>

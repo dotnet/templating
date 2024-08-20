@@ -29,5 +29,9 @@
       <Sha>60ae233c3d77f11c5fdb53e570b64d503b13ba59</Sha>
       <SourceBuild RepoName="arcade" ManagedOnly="true" />
     </Dependency>
+    <Dependency Name="System.Formats.Asn1" Version="8.0.1">
+      <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
+      <Sha>2aade6beb02ea367fd97c4070a4198802fe61c03</Sha>
+    </Dependency>
   </ToolsetDependencies>
 </Dependencies>
