@@ -59,7 +59,7 @@
     <PackageVersion Update="NuGet.Credentials" Version="$(NuGetCredentialsVersion)" Condition="'$(NuGetCredentialsVersion)' != ''" />
     <PackageVersion Update="NuGet.Protocol" Version="$(NuGetProtocolVersion)" Condition="'$(NuGetProtocolVersion)' != ''" />
     <PackageVersion Update="System.Formats.Asn1" Version="$(SystemFormatsAsn1Version)" Condition="'$(SystemFormatsAsn1Version)' != ''" />
-    <PackageVersion Update="System.Text.Json" Version="$(SystemTextJsonVersoin)" Condition="'$(SystemTextJsonVersion)' != ''" />
+    <PackageVersion Update="System.Text.Json" Version="$(SystemTextJsonVersion)" Condition="'$(SystemTextJsonVersion)' != ''" />
   </ItemGroup>
 
 </Project>
