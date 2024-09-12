@@ -57,6 +57,10 @@ extends:
         name: $(DncEngInternalBuildPool)
         image: 1es-windows-2022
         os: windows
+      policheck:
+        enabled: true
+      tsa:
+        enabled: true
     stages:
     - stage: build
       displayName: Build
@@ -87,6 +91,11 @@ extends:
           jobs:
           - ${{ each config in parameters.buildConfigurations }}:
             - job: Windows_NT_${{ config.buildConfig }}
+              templateContext:
+                outputs:
+                  - output: pipelineArtifact
+                    targetPath: $(Build.SourcesDirectory)/artifacts/bin
+                    artifactName: Templating
               displayName: Windows_NT ${{ config.buildConfig }}
               timeoutInMinutes: 90
               pool:
