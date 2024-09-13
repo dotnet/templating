@@ -5,6 +5,6 @@
     "areaPath": "DevDiv\\NET Tools\\SDK",
     "iterationPath": "DevDiv",
     "notificationAliases": [ "dotnetdevexcli@microsoft.com" ],
-    "repositoryName":"templating",
+    "repositoryName": "templating",
     "codebaseName": "templating"
 }

@@ -59,6 +59,8 @@ extends:
         enabled: true
       tsa:
         enabled: true
+      binskim:
+        analyzeTargetGlob: $(Build.SourcesDirectory)/artifacts/bin/**.dll;$(Build.SourcesDirectory)/artifacts/bin/**.exe;
     stages:
     - stage: build
       displayName: Build
@@ -89,11 +91,6 @@ extends:
           jobs:
           - ${{ each config in parameters.buildConfigurations }}:
             - job: Windows_NT_${{ config.buildConfig }}
-              templateContext:
-                outputs:
-                  - output: pipelineArtifact
-                    targetPath: $(Build.SourcesDirectory)/artifacts/bin
-                    artifactName: Templating
               displayName: Windows_NT ${{ config.buildConfig }}
               timeoutInMinutes: 90
               pool:
