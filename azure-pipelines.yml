@@ -80,6 +80,8 @@ extends:
           enablePublishBuildAssets: true
           enablePublishUsingPipelines: ${{ variables._PublishUsingPipelines }}
           enableSourceBuild: true
+          sourceBuildParameters:
+            enableInternalSources: true
           enableTelemetry: true
           helixRepo: dotnet/templating
           jobs:
@@ -108,6 +110,7 @@ extends:
               steps:
               - checkout: self
                 clean: true
+
               # Use utility script to run script command dependent on agent OS.
               - script: eng/common/cibuild.cmd
                   -configuration $(_BuildConfig)
