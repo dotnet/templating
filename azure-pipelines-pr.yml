@@ -27,8 +27,6 @@ variables:
     value: true
   - name: EnableReleaseOneLocBuild
     value: false
-  - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-    - group: Templating-SDLValidation-Params
   - template: /eng/common/templates/variables/pool-providers.yml
 
 stages:
@@ -149,32 +147,3 @@ stages:
             name: Build
             displayName: Build
             condition: succeeded()
-
-- ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-  - template: eng\common\templates\post-build\post-build.yml
-    parameters:
-      publishingInfraVersion: 3
-      # Symbol validation isn't being very reliable lately. This should be enabled back
-      # once this issue is resolved: https://github.com/dotnet/arcade/issues/2871
-      enableSymbolValidation: false
-      # Sourcelink validation isn't passing for Arcade due to some regressions. This should be
-      # enabled back once this issue is resolved: https://github.com/dotnet/arcade/issues/2912
-      enableSourceLinkValidation: false
-      publishDependsOn:
-      - Validate
-      # This is to enable SDL runs part of Post-Build Validation Stage
-      SDLValidationParameters:
-        enable: true
-        continueOnError: false
-        params: ' -SourceToolsList @("policheck","credscan")
-        -ArtifactToolsList @("binskim")
-        -BinskimAdditionalRunConfigParams @("IgnorePdbLoadError < True","Recurse < True")
-        -TsaInstanceURL $(_TsaInstanceURL)
-        -TsaProjectName $(_TsaProjectName)
-        -TsaNotificationEmail $(_TsaNotificationEmail)
-        -TsaCodebaseAdmin $(_TsaCodebaseAdmin)
-        -TsaBugAreaPath $(_TsaBugAreaPath)
-        -TsaIterationPath $(_TsaIterationPath)
-        -TsaRepositoryName $(_TsaRepsitoryName)
-        -TsaCodebaseName $(_TsaCodebaseName)
-        -TsaPublish $True'
