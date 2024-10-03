@@ -2,15 +2,15 @@
 <Dependencies>
   <ProductDependencies>
     <!-- Intermediate is necessary for source build. -->
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-externals" Version="9.0.0-alpha.1.24467.1">
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-externals" Version="10.0.0-alpha.1.24502.3">
       <Uri>https://github.com/dotnet/source-build-externals</Uri>
-      <Sha>4e60131607fd144eb86fe4487f1a37da940ca990</Sha>
+      <Sha>85c00cd57c77e94d63f80eac12b834ea14ae5907</Sha>
       <SourceBuild RepoName="source-build-externals" ManagedOnly="true" />
     </Dependency>
     <!-- Intermediate is necessary for source build. -->
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="9.0.0-alpha.1.24413.1">
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="10.0.0-alpha.1.24480.3">
       <Uri>https://github.com/dotnet/source-build-reference-packages</Uri>
-      <Sha>1b838a42e4952b8fdf212cb1b43c5ce4d69f27b3</Sha>
+      <Sha>6d8940439f10f5f1f997f09fc6a64a9aab039950</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
     <Dependency Name="System.CommandLine" Version="2.0.0-beta4.24324.3">
@@ -19,14 +19,14 @@
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
-    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="9.0.0-beta.24501.3">
+    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="10.0.0-beta.24501.6">
       <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>e879259c14f58a55983b9a70dd3034cc650ee961</Sha>
+      <Sha>121ea593b1d0860ae0e5f5747850a60b23cc2968</Sha>
     </Dependency>
     <!-- Intermediate is necessary for source build. -->
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.arcade" Version="9.0.0-beta.24501.3">
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.arcade" Version="10.0.0-beta.24501.6">
       <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>e879259c14f58a55983b9a70dd3034cc650ee961</Sha>
+      <Sha>121ea593b1d0860ae0e5f5747850a60b23cc2968</Sha>
       <SourceBuild RepoName="arcade" ManagedOnly="true" />
     </Dependency>
     <Dependency Name="System.Formats.Asn1" Version="8.0.1">
