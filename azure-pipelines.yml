@@ -60,7 +60,7 @@ extends:
       tsa:
         enabled: true
       binskim:
-        analyzeTargetGlob: $(Build.SourcesDirectory)/artifacts/bin/**.dll;$(Build.SourcesDirectory)/artifacts/bin/**.exe;
+        analyzeTargetGlob: +:f|**\*.dll;+:f|**\*.exe;
     stages:
     - stage: build
       displayName: Build
