@@ -19,6 +19,6 @@
   </PropertyGroup>
   <PropertyGroup>
     <!-- Non-maestro versions -->
-    <SystemFormatsAsn1Version>9.0.0-rtm.24516.5</SystemFormatsAsn1Version>
+    <SystemFormatsAsn1Version>9.0.0</SystemFormatsAsn1Version>
   </PropertyGroup>
 </Project>
