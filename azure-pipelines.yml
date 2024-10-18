@@ -27,6 +27,8 @@ variables:
     value: true
   - name: EnableReleaseOneLocBuild
     value: false
+  - name: GDN_ALLOW_ANALYZE_NO_TARGETS
+    value: true
   - template: /eng/common/templates-official/variables/pool-providers.yml
 
 resources:
@@ -60,7 +62,7 @@ extends:
       tsa:
         enabled: true
       binskim:
-        analyzeTargetGlob: +:f|**\*.dll;+:f|**\*.exe;
+        analyzeTargetGlob: +:f|artifacts\bin\**\*.dll;+:f|artifacts\bin\**\*.exe;
     stages:
     - stage: build
       displayName: Build
