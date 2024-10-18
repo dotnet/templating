@@ -84,6 +84,7 @@ extends:
           enablePublishBuildAssets: true
           enablePublishUsingPipelines: ${{ variables._PublishUsingPipelines }}
           enableSourceBuild: true
+          publishAssetsImmediately: true
           sourceBuildParameters:
             enableInternalSources: true
           enableTelemetry: true
