@@ -36,7 +36,7 @@
   <ItemGroup>
     <PackageVersion Include="FakeItEasy" Version="8.1.0" />
     <PackageVersion Include="FluentAssertions" Version="6.12.0" />
-    <PackageVersion Include="Newtonsoft.Json.Schema" Version="3.0.15" />
+    <PackageVersion Include="Newtonsoft.Json.Schema" Version="4.0.1" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageVersion Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
     <PackageVersion Include="Verify.DiffPlex" Version="3.0.0" />
