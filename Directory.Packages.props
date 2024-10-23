@@ -34,7 +34,7 @@
 
   <!-- External dependencies -->
   <ItemGroup>
-    <PackageVersion Include="FakeItEasy" Version="8.0.0" />
+    <PackageVersion Include="FakeItEasy" Version="8.1.0" />
     <PackageVersion Include="FluentAssertions" Version="6.12.0" />
     <PackageVersion Include="Newtonsoft.Json.Schema" Version="3.0.15" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
