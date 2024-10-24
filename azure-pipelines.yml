@@ -62,8 +62,7 @@ extends:
       tsa:
         enabled: true
       binskim:
-        preReleaseVersion: '4.3.1'
-        analyzeTargetGlob: +:f|artifacts\bin\**\*.dll;+:f|artifacts\bin\**\*.exe;
+        analyzeTargetGlob: +:f|eng\**\*.props;+:f|artifacts\bin\**\*.dll;+:f|artifacts\bin\**\*.exe;
     stages:
     - stage: build
       displayName: Build
