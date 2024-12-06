@@ -1,1 +1,0 @@
-This file was added to the repo to allow binskim filtering to work as they required the folder to exist and not be empty.

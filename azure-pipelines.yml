@@ -45,6 +45,8 @@ parameters:
   default:
   # Always build the Release configuration, but never sign for PRs.
   - buildConfig: Release
+  ### ARCADE ###
+  preSteps: []
 
 extends:
   ${{ if notin(variables['Build.Reason'], 'PullRequest') }}:
@@ -90,6 +92,7 @@ extends:
             enableInternalSources: true
           enableTelemetry: true
           helixRepo: dotnet/templating
+          preSteps: ${{ parameters.preSteps }}
           jobs:
           - ${{ each config in parameters.buildConfigurations }}:
             - job: Windows_NT_${{ config.buildConfig }}
