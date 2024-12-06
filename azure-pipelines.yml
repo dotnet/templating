@@ -45,8 +45,6 @@ parameters:
   default:
   # Always build the Release configuration, but never sign for PRs.
   - buildConfig: Release
-  ### ARCADE ###
-  preSteps: []
 
 extends:
   ${{ if notin(variables['Build.Reason'], 'PullRequest') }}:
@@ -93,7 +91,10 @@ extends:
             enableInternalSources: true
           enableTelemetry: true
           helixRepo: dotnet/templating
-          preSteps: ${{ parameters.preSteps }}
+          # WORKAROUND: BinSkim requires the folder exist prior to scanning.
+          preSteps:
+          - powershell: New-Item -ItemType Directory -Path $(Build.SourcesDirectory)/artifacts/bin -Force
+            displayName: Create artifacts/bin directory
           jobs:
           - ${{ each config in parameters.buildConfigurations }}:
             - job: Windows_NT_${{ config.buildConfig }}
