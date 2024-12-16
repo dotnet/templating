@@ -61,8 +61,6 @@ extends:
         enabled: true
       tsa:
         enabled: true
-      binskim:
-        analyzeTargetGlob: +:f|eng\**\*.props;+:f|artifacts\bin\**\*.dll;+:f|artifacts\bin\**\*.exe;
     stages:
     - stage: build
       displayName: Build
@@ -92,6 +90,10 @@ extends:
           enableTelemetry: true
           helixRepo: dotnet/templating
           # WORKAROUND: BinSkim requires the folder exist prior to scanning.
+          templateContext:
+            sdl:
+              binskim:
+                analyzeTargetGlob: +:f|artifacts\bin\**\*.dll;+:f|artifacts\bin\**\*.exe;
           preSteps:
           - powershell: New-Item -ItemType Directory -Path $(Build.SourcesDirectory)/artifacts/bin -Force
             displayName: Create artifacts/bin directory
