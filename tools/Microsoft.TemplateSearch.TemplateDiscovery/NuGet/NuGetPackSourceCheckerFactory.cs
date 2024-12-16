@@ -80,7 +80,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.NuGet
         private static async Task<TemplateSearchCache?> LoadExistingCacheAsync(CommandArgs config, CancellationToken cancellationToken)
         {
             Verbose.WriteLine($"Loading existing cache information.");
-            const string uri = "https://dotnet-templating.azureedge.net/search/NuGetTemplateSearchInfoVer2.json";
+            const string uri = "https://dotnet-templating-hrdkctdrgkacbyek.b01.azurefd.net/search/NuGetTemplateSearchInfoVer2.json";
 
             FileInfo? cacheFileLocation = config.DiffOverrideSearchCacheLocation;
 
