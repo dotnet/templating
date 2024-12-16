@@ -27,8 +27,6 @@ variables:
     value: true
   - name: EnableReleaseOneLocBuild
     value: false
-  - name: GDN_ALLOW_ANALYZE_NO_TARGETS
-    value: true
   - template: /eng/common/templates-official/variables/pool-providers.yml
 
 resources:
@@ -89,11 +87,11 @@ extends:
             enableInternalSources: true
           enableTelemetry: true
           helixRepo: dotnet/templating
-          # WORKAROUND: BinSkim requires the folder exist prior to scanning.
           templateContext:
             sdl:
               binskim:
                 analyzeTargetGlob: +:f|artifacts\bin\**\*.dll;+:f|artifacts\bin\**\*.exe;
+          # WORKAROUND: BinSkim requires the folder exist prior to scanning.
           preSteps:
           - powershell: New-Item -ItemType Directory -Path $(Build.SourcesDirectory)/artifacts/bin -Force
             displayName: Create artifacts/bin directory
