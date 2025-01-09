@@ -10,5 +10,11 @@
     <UsagePattern IdentityGlob="System.Formats.Asn1/8.0.*" />
 
     <UsagePattern IdentityGlob="Microsoft.SourceBuild.Intermediate.*/*" />
+
+    <!-- These are upgraded to latest versions in product build and can be baselined for repo build -->
+    <UsagePattern IdentityGlob="Microsoft.Bcl.AsyncInterfaces/8.0.*" />
+    <UsagePattern IdentityGlob="Microsoft.Extensions.DependencyInjection.Abstractions/8.0.*" />
+    <UsagePattern IdentityGlob="Microsoft.Extensions.Logging.Abstractions/8.0.*" />
+    <UsagePattern IdentityGlob="System.Diagnostics.DiagnosticSource/8.0.*" />
   </IgnorePatterns>
 </UsageData>
