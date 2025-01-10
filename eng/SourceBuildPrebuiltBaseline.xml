@@ -3,14 +3,9 @@
 
 <UsageData>
   <IgnorePatterns>
-    <!-- TODO: Ignore needed until https://github.com/dotnet/source-build/issues/3188 is addressed. -->
-    <UsagePattern IdentityGlob="Microsoft.NETCore.App.Ref/*" />
-
     <!-- Lifted to live version in VMR. -->
-    <UsagePattern IdentityGlob="System.Formats.Asn1/8.0.*" />
-
-    <UsagePattern IdentityGlob="Microsoft.SourceBuild.Intermediate.*/*" />
-
+    <UsagePattern IdentityGlob="System.Formats.Asn1/9.0.*" />
+    
     <!-- These are upgraded to latest versions in product build and can be baselined for repo build -->
     <UsagePattern IdentityGlob="Microsoft.Bcl.AsyncInterfaces/8.0.*" />
     <UsagePattern IdentityGlob="Microsoft.Extensions.DependencyInjection.Abstractions/8.0.*" />
