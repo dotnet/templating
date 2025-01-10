@@ -13,7 +13,8 @@
     <FlagNetStandard1XDependencies>true</FlagNetStandard1XDependencies>
   </PropertyGroup>
   <PropertyGroup>
-    <!-- Command-line-api dependencies -->
+    <!-- Non-maestro versions -->
+    <SystemFormatsAsn1Version>9.0.0</SystemFormatsAsn1Version>
     <SystemCommandLinePackageVersion>2.0.0-beta4.24528.1</SystemCommandLinePackageVersion>
   </PropertyGroup>
 </Project>
