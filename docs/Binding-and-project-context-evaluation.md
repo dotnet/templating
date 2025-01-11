@@ -57,9 +57,9 @@ As mentioned above, different hosts may expose different bindable properties for
 | HostIdentifier | dotnetcli | Uniquely identifies this host |
 | WorkingDirectory | System.Environment.CurrentDirectory | The full path that the template engine was invoked from |
 | prefs:language | C# | For templates that support multiple programming languages, which one should be chosen if no explicit choice is made |
-| dotnet-cli-version | <varies> | The exact SemVer version of the .NET SDK being run for this invocation of the Template Engine - for example 8.0.404 or 9.0.100-rc.2 |
-| RuntimeFrameworkVersion | <varies> | The exact SemVer version of the Microsoft.NETCore.App Runtime (aka the .NET Runtime) being used by the .NET SDK for this invocation of the Template Engine - for example 8.0.10 or 9.0.0-rc.2.24473.5 |
-| NetStandardImplicitPackageVersion | <varies> | The version of the NetStandard.Library that would be inserted by the .NET SDK - this is deprecated and seems to be mostly wrong, do not use it. | 
+| dotnet-cli-version | \<varies\> | The exact SemVer version of the .NET SDK being run for this invocation of the Template Engine - for example 8.0.404 or 9.0.100-rc.2 |
+| RuntimeFrameworkVersion | \<varies\> | The exact SemVer version of the Microsoft.NETCore.App Runtime (aka the .NET Runtime) being used by the .NET SDK for this invocation of the Template Engine - for example 8.0.10 or 9.0.0-rc.2.24473.5 |
+| NetStandardImplicitPackageVersion | \<varies\> | The version of the NetStandard.Library that would be inserted by the .NET SDK - this is deprecated and seems to be mostly wrong, do not use it. | 
 
 #### Visual Studio
 
