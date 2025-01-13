@@ -62,4 +62,11 @@
     <PackageVersion Update="System.Text.Json" Version="$(SystemTextJsonVersion)" Condition="'$(SystemTextJsonVersion)' != ''" />
   </ItemGroup>
 
+  <!-- Logging dependencies -->
+  <ItemGroup>
+    <PackageReference Update="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsLoggingPackageVersion)" />
+    <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftExtensionsLoggingConsolePackageVersion)" />
+    <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsLoggingAbstractionsPackageVersion)" />
+  </ItemGroup>
+
 </Project>
