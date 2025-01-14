@@ -15,7 +15,7 @@ namespace Microsoft.TemplateEngine.Edge
         private readonly ILogger<TemplateConstraintManager> _logger;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private readonly Dictionary<string, ITemplateConstraint> _templateConstraints = new();
-        private readonly Dictionary<string, TemplateConstraintResult> _evaluatedConstraints = new();
+        private readonly Dictionary<(string Type, string? Args), TemplateConstraintResult> _evaluatedConstraints = new();
 
         public TemplateConstraintManager(IEngineEnvironmentSettings engineEnvironmentSettings)
         {
@@ -58,13 +58,18 @@ namespace Microsoft.TemplateEngine.Edge
         public async Task<TemplateConstraintResult> EvaluateConstraintAsync(string type, string? args, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (_evaluatedConstraints.TryGetValue(type, out TemplateConstraintResult result))
+            if (_evaluatedConstraints.TryGetValue((type, args), out TemplateConstraintResult result))
             {
                 return result;
             }
 
             if (!_templateConstraints.TryGetValue(type, out ITemplateConstraint constraint))
             {
+                if (_evaluatedConstraints.TryGetValue((type, null), out result))
+                {
+                    return result;
+                }
+
                 _logger.LogDebug($"The constraint '{type}' is unknown.");
                 return TemplateConstraintResult.CreateInitializationFailure(type, string.Format(LocalizableStrings.TemplateConstraintManager_Error_UnknownType, type));
             }
@@ -72,7 +77,7 @@ namespace Microsoft.TemplateEngine.Edge
             try
             {
                 result = constraint.Evaluate(args);
-                _evaluatedConstraints.Add(type, result);
+                _evaluatedConstraints.Add((type, args), result);
                 return result;
             }
             catch (Exception e)
@@ -159,7 +164,7 @@ namespace Microsoft.TemplateEngine.Edge
                 {
                     exception = exception is not null ? exception.InnerException ?? exception : exception;
                     _logger.LogDebug($"The constraint '{constraintFactory.Type}' failed to be initialized, details: {exception}.");
-                    _evaluatedConstraints.Add(constraintFactory.Type, TemplateConstraintResult.CreateInitializationFailure(constraintFactory.Type, string.Format(LocalizableStrings.TemplateConstraintManager_Error_FailedToInitialize, constraintFactory.Type, exception?.Message)));
+                    _evaluatedConstraints.Add((constraintFactory.Type, null), TemplateConstraintResult.CreateInitializationFailure(constraintFactory.Type, string.Format(LocalizableStrings.TemplateConstraintManager_Error_FailedToInitialize, constraintFactory.Type, exception?.Message)));
                 }
                 else
                 {
