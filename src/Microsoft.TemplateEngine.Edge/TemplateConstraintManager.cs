@@ -14,21 +14,16 @@ namespace Microsoft.TemplateEngine.Edge
     {
         private readonly ILogger<TemplateConstraintManager> _logger;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-        private readonly Dictionary<string, Task<ITemplateConstraint>> _templateConstrains = new Dictionary<string, Task<ITemplateConstraint>>();
+        private readonly Dictionary<string, ITemplateConstraint> _templateConstraints = new();
+        private readonly Dictionary<string, TemplateConstraintResult> _evaluatedConstraints = new();
 
         public TemplateConstraintManager(IEngineEnvironmentSettings engineEnvironmentSettings)
         {
             _logger = engineEnvironmentSettings.Host.LoggerFactory.CreateLogger<TemplateConstraintManager>();
-
-            var constraintFactories = engineEnvironmentSettings.Components.OfType<ITemplateConstraintFactory>();
-            _logger.LogDebug($"Found {constraintFactories.Count()} constraints factories, initializing.");
-            foreach (var constraintFactory in constraintFactories)
-            {
-                _templateConstrains[constraintFactory.Type] = constraintFactory.CreateTemplateConstraintAsync(engineEnvironmentSettings, _cancellationTokenSource.Token);
-            }
-
+            InitializeTemplateConstraints(engineEnvironmentSettings).GetAwaiter().GetResult();
         }
 
+#pragma warning disable CS1998
         /// <summary>
         /// Returns the list of initialized <see cref="ITemplateConstraint"/>s.
         /// Only returns the list of <see cref="ITemplateConstraint"/> that were initialized successfully.
@@ -40,45 +35,17 @@ namespace Microsoft.TemplateEngine.Edge
         public async Task<IReadOnlyList<ITemplateConstraint>> GetConstraintsAsync(IEnumerable<ITemplateInfo>? templates = null, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            IEnumerable<(string Type, Task<ITemplateConstraint> Task)> constraintsToInitialize;
-            if (templates?.Any() ?? false)
+            var uniqueConstraints = templates?.SelectMany(ti => ti.Constraints.Select(c => c.Type)).Distinct() ?? _templateConstraints.Keys;
+            List<ITemplateConstraint> templateConstraints = [];
+            foreach (var constraint in uniqueConstraints)
             {
-                List<string> uniqueConstraints = templates.SelectMany(ti => ti.Constraints.Select(c => c.Type)).Distinct().ToList();
-                constraintsToInitialize = _templateConstrains.Where(kvp => uniqueConstraints.Contains(kvp.Key)).Select(kvp => (kvp.Key, kvp.Value));
-            }
-            else
-            {
-                constraintsToInitialize = _templateConstrains.Select(kvp => (kvp.Key, kvp.Value));
-            }
-
-            try
-            {
-                _logger.LogDebug($"Waiting for {constraintsToInitialize.Count()} to be initialized.");
-                await CancellableWhenAll(constraintsToInitialize.Select(c => c.Task), cancellationToken).ConfigureAwait(false);
-                _logger.LogDebug($"{constraintsToInitialize.Count()} constraints were initialized.");
-                return constraintsToInitialize.Select(c => c.Task.Result).ToList();
-            }
-            catch (TaskCanceledException)
-            {
-                throw;
-            }
-            catch (Exception)
-            {
-                foreach (var constraint in constraintsToInitialize)
+                if (_templateConstraints.TryGetValue(constraint, out var result))
                 {
-                    if (constraint.Task.IsFaulted || constraint.Task.IsCanceled)
-                    {
-                        _logger.LogWarning(LocalizableStrings.TemplateConstraintManager_Error_FailedToInitialize, constraint.Type, constraint.Task.Exception.Message);
-                        _logger.LogDebug($"Details: {constraint.Task.Exception}.");
-                    }
+                    templateConstraints.Add(result);
                 }
-                _logger.LogDebug($"{constraintsToInitialize.Count(c => c.Task.Status == TaskStatus.RanToCompletion)} constraints were initialized.");
-                return constraintsToInitialize
-                    .Where(c => c.Task.Status == TaskStatus.RanToCompletion)
-                    .Select(c => c.Task.Result)
-                    .ToList();
             }
 
+            return templateConstraints;
         }
 
         /// <summary>
@@ -91,50 +58,31 @@ namespace Microsoft.TemplateEngine.Edge
         public async Task<TemplateConstraintResult> EvaluateConstraintAsync(string type, string? args, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (!_templateConstrains.TryGetValue(type, out Task<ITemplateConstraint> task))
+            if (_evaluatedConstraints.TryGetValue(type, out TemplateConstraintResult result))
+            {
+                return result;
+            }
+
+            if (!_templateConstraints.TryGetValue(type, out ITemplateConstraint constraint))
             {
                 _logger.LogDebug($"The constraint '{type}' is unknown.");
                 return TemplateConstraintResult.CreateInitializationFailure(type, string.Format(LocalizableStrings.TemplateConstraintManager_Error_UnknownType, type));
             }
 
-            if (!task.IsCompleted)
-            {
-                try
-                {
-                    _logger.LogDebug($"The constraint '{type}' is not initialized, waiting for initialization.");
-                    await CancellableWhenAll(new[] { task }, cancellationToken).ConfigureAwait(false);
-                    _logger.LogDebug($"The constraint '{type}' is initialized successfully.");
-                }
-                catch (TaskCanceledException)
-                {
-                    throw;
-                }
-                catch (Exception)
-                {
-                    //handled below
-                }
-            }
-
-            cancellationToken.ThrowIfCancellationRequested();
-
-            if (task.IsFaulted || task.IsCanceled)
-            {
-                var exception = task.Exception is not null ? task.Exception.InnerException ?? task.Exception : task.Exception;
-                _logger.LogDebug($"The constraint '{type}' failed to be initialized, details: {exception}.");
-                return TemplateConstraintResult.CreateInitializationFailure(type, string.Format(LocalizableStrings.TemplateConstraintManager_Error_FailedToInitialize, type, exception?.Message));
-            }
-
             try
             {
-                return task.Result.Evaluate(args);
+                result = constraint.Evaluate(args);
+                _evaluatedConstraints.Add(type, result);
+                return result;
             }
             catch (Exception e)
             {
                 _logger.LogDebug($"The constraint '{type}' failed to be evaluated for the args '{args}', details: {e}.");
-                return TemplateConstraintResult.CreateEvaluationFailure(task.Result, string.Format(LocalizableStrings.TemplateConstraintManager_Error_FailedToEvaluate, type, args, e.Message));
+                return TemplateConstraintResult.CreateEvaluationFailure(constraint, string.Format(LocalizableStrings.TemplateConstraintManager_Error_FailedToEvaluate, type, args, e.Message));
             }
 
         }
+#pragma warning restore CS1998
 
         /// <summary>
         /// Evaluates the constraints with given <paramref name="templates"/>.
@@ -146,73 +94,19 @@ namespace Microsoft.TemplateEngine.Edge
         public async Task<IReadOnlyList<(ITemplateInfo Template, IReadOnlyList<TemplateConstraintResult> Result)>> EvaluateConstraintsAsync(IEnumerable<ITemplateInfo> templates, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-
-            var requiredConstraints = templates.SelectMany(t => t.Constraints).Select(c => c.Type).Distinct();
-            var tasksToWait = new List<Task>();
-            foreach (var constraintType in requiredConstraints)
+            List<(ITemplateInfo Template, IReadOnlyList<TemplateConstraintResult> Result)> list = [];
+            foreach (var template in templates)
             {
-                if (!_templateConstrains.TryGetValue(constraintType, out Task<ITemplateConstraint> task))
-                {
-                    //handled below
-                    continue;
-                }
-                tasksToWait.Add(task);
-            }
-
-            if (tasksToWait.Any(t => !t.IsCompleted))
-            {
-                try
-                {
-                    var notCompletedTasks = tasksToWait.Where(t => !t.IsCompleted);
-                    _logger.LogDebug($"The constraint(s) are not initialized, waiting for initialization.");
-                    await CancellableWhenAll(notCompletedTasks, cancellationToken).ConfigureAwait(false);
-                    _logger.LogDebug($"The constraint(s) are initialized successfully.");
-                }
-                catch (TaskCanceledException)
-                {
-                    throw;
-                }
-                catch (Exception)
-                {
-                    //handled below
-                }
-            }
-            cancellationToken.ThrowIfCancellationRequested();
-
-            List<(ITemplateInfo, IReadOnlyList<TemplateConstraintResult>)> evaluationResult = new();
-            foreach (ITemplateInfo template in templates)
-            {
-                List<TemplateConstraintResult> constraintResults = new();
+                List<TemplateConstraintResult> results = [];
                 foreach (var constraint in template.Constraints)
                 {
-                    if (!_templateConstrains.TryGetValue(constraint.Type, out Task<ITemplateConstraint> task))
-                    {
-                        _logger.LogDebug($"The constraint '{constraint.Type}' is unknown.");
-                        constraintResults.Add(TemplateConstraintResult.CreateInitializationFailure(constraint.Type, string.Format(LocalizableStrings.TemplateConstraintManager_Error_UnknownType, constraint.Type)));
-                        continue;
-                    }
-
-                    if (task.IsFaulted || task.IsCanceled)
-                    {
-                        var exception = task.Exception is not null ? task.Exception.InnerException ?? task.Exception : task.Exception;
-                        _logger.LogDebug($"The constraint '{constraint.Type}' failed to be initialized, details: {exception}.");
-                        constraintResults.Add(TemplateConstraintResult.CreateInitializationFailure(constraint.Type, string.Format(LocalizableStrings.TemplateConstraintManager_Error_FailedToInitialize, constraint.Type, exception?.Message)));
-                        continue;
-                    }
-
-                    try
-                    {
-                        constraintResults.Add(task.Result.Evaluate(constraint.Args));
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.LogDebug($"The constraint '{constraint.Type}' failed to be evaluated for the args '{constraint.Args}', details: {e}.");
-                        constraintResults.Add(TemplateConstraintResult.CreateEvaluationFailure(_templateConstrains[constraint.Type].Result, string.Format(LocalizableStrings.TemplateConstraintManager_Error_FailedToEvaluate, constraint.Type, constraint.Args, e.Message)));
-                    }
+                    results.Add(await EvaluateConstraintAsync(constraint.Type, constraint.Args, cancellationToken).ConfigureAwait(false));
                 }
-                evaluationResult.Add((template, constraintResults));
+
+                list.Add((template, results));
             }
-            return evaluationResult;
+
+            return list;
         }
 
         /// <inheritdoc/>
@@ -234,6 +128,44 @@ namespace Microsoft.TemplateEngine.Edge
 
             //throws exceptions
             await Task.WhenAll(tasks).ConfigureAwait(false);
+        }
+
+        private async Task InitializeTemplateConstraints(IEngineEnvironmentSettings engineEnvironmentSettings)
+        {
+            var constraintFactories = engineEnvironmentSettings.Components.OfType<ITemplateConstraintFactory>();
+            _logger.LogDebug($"Found {constraintFactories.Count()} constraints factories, initializing.");
+            foreach (var constraintFactory in constraintFactories)
+            {
+                ITemplateConstraint? constraint = null;
+                Exception? exception = null;
+
+                try
+                {
+                    constraint = await constraintFactory.CreateTemplateConstraintAsync(engineEnvironmentSettings, _cancellationTokenSource.Token).ConfigureAwait(false);
+                }
+                catch (TaskCanceledException)
+                {
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    //handled below
+                    exception = e;
+                }
+
+                _cancellationTokenSource.Token.ThrowIfCancellationRequested();
+
+                if (constraint is null)
+                {
+                    exception = exception is not null ? exception.InnerException ?? exception : exception;
+                    _logger.LogDebug($"The constraint '{constraintFactory.Type}' failed to be initialized, details: {exception}.");
+                    _evaluatedConstraints.Add(constraintFactory.Type, TemplateConstraintResult.CreateInitializationFailure(constraintFactory.Type, string.Format(LocalizableStrings.TemplateConstraintManager_Error_FailedToInitialize, constraintFactory.Type, exception?.Message)));
+                }
+                else
+                {
+                    _templateConstraints[constraintFactory.Type] = constraint;
+                }
+            }
         }
     }
 }
