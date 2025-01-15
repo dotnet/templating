@@ -674,9 +674,10 @@ dotnet_analyzer_diagnostic.severity = none
 [*.txt]
 insert_final_newline = false
 
+[test/**/{Approvals,Snapshots}/**]
+trim_trailing_whitespace = false
+
 # Build Checks
 [*.csproj]
 build_check.BC0201.AllowUninitializedPropertiesInConditions=true
 build_check.BC0202.AllowUninitializedPropertiesInConditions=true
-[test/**/{Approvals,Snapshots}/**]
-trim_trailing_whitespace = false
