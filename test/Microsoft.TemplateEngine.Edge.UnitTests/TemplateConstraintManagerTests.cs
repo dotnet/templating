@@ -227,7 +227,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 
             public async Task<ITemplateConstraint> CreateTemplateConstraintAsync(IEngineEnvironmentSettings environmentSettings, CancellationToken cancellationToken)
             {
-                await Task.Delay(30000);
+                await Task.Delay(3000);
                 throw new Exception("creation failed");
             }
         }
