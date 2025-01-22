@@ -20,7 +20,7 @@
   <PropertyGroup>
     <!-- Maestro-managed Package Versions - Ordered by repo name -->
     <!-- Dependencies from https://github.com/dotnet/command-line-api -->
-    <SystemCommandLinePackageVersion>2.0.0-beta4.25071.2</SystemCommandLinePackageVersion>
+    <SystemCommandLinePackageVersion>2.0.0-beta4.25072.1</SystemCommandLinePackageVersion>
   </PropertyGroup>
   <PropertyGroup>
     <!-- Non-maestro versions -->
