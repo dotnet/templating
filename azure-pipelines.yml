@@ -27,8 +27,6 @@ variables:
     value: true
   - name: EnableReleaseOneLocBuild
     value: false
-  - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-    - group: Templating-SDLValidation-Params
   - template: /eng/common/templates-official/variables/pool-providers.yml
 
 resources:
@@ -54,6 +52,10 @@ extends:
         name: $(DncEngInternalBuildPool)
         image: 1es-windows-2022
         os: windows
+      policheck:
+        enabled: true
+      tsa:
+        enabled: true
     stages:
     - stage: build
       displayName: Build
@@ -77,8 +79,19 @@ extends:
           enablePublishBuildAssets: true
           enablePublishUsingPipelines: ${{ variables._PublishUsingPipelines }}
           enableSourceBuild: true
+          publishAssetsImmediately: true
+          sourceBuildParameters:
+            enableInternalSources: true
           enableTelemetry: true
           helixRepo: dotnet/templating
+          templateContext:
+            sdl:
+              binskim:
+                analyzeTargetGlob: +:f|artifacts\bin\**\*.dll;+:f|artifacts\bin\**\*.exe;
+          # WORKAROUND: BinSkim requires the folder exist prior to scanning.
+          preSteps:
+          - powershell: New-Item -ItemType Directory -Path $(Build.SourcesDirectory)/artifacts/bin -Force
+            displayName: Create artifacts/bin directory
           jobs:
           - ${{ each config in parameters.buildConfigurations }}:
             - job: Windows_NT_${{ config.buildConfig }}
@@ -105,6 +118,7 @@ extends:
               steps:
               - checkout: self
                 clean: true
+
               # Use utility script to run script command dependent on agent OS.
               - script: eng/common/cibuild.cmd
                   -configuration $(_BuildConfig)
@@ -154,33 +168,3 @@ extends:
                   name: Build
                   displayName: Build
                   condition: succeeded()
-
-    - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-      - template: eng/common/templates-official/post-build/post-build.yml@self
-        parameters:
-          publishingInfraVersion: 3
-          # Symbol validation isn't being very reliable lately. This should be enabled back
-          # once this issue is resolved: https://github.com/dotnet/arcade/issues/2871
-          enableSymbolValidation: false
-          # Sourcelink validation isn't passing for Arcade due to some regressions. This should be
-          # enabled back once this issue is resolved: https://github.com/dotnet/arcade/issues/2912
-          enableSourceLinkValidation: false
-          publishDependsOn:
-          - Validate
-          # This is to enable SDL runs part of Post-Build Validation Stage
-          SDLValidationParameters:
-            enable: true
-            continueOnError: false
-            params: ' -SourceToolsList @("policheck","credscan")
-            -ArtifactToolsList @("binskim")
-            -BinskimAdditionalRunConfigParams @("IgnorePdbLoadError < True","Recurse < True")
-            -TsaInstanceURL $(_TsaInstanceURL)
-            -TsaProjectName $(_TsaProjectName)
-            -TsaNotificationEmail $(_TsaNotificationEmail)
-            -TsaCodebaseAdmin $(_TsaCodebaseAdmin)
-            -TsaBugAreaPath $(_TsaBugAreaPath)
-            -TsaIterationPath $(_TsaIterationPath)
-            -TsaRepositoryName $(_TsaRepsitoryName)
-            -TsaCodebaseName $(_TsaCodebaseName)
-            -TsaPublish $True'
-
