@@ -14,11 +14,11 @@
   </PropertyGroup>
   <PropertyGroup>
     <!-- Non-maestro versions -->
-    <SystemFormatsAsn1Version>9.0.0</SystemFormatsAsn1Version>
+    <SystemFormatsAsn1Version>10.0.0-preview.2.25120.9</SystemFormatsAsn1Version>
     <SystemCommandLinePackageVersion>2.0.0-beta4.25071.2</SystemCommandLinePackageVersion>
-    <MicrosoftExtensionsLoggingPackageVersion>9.0.0</MicrosoftExtensionsLoggingPackageVersion>
-    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>9.0.0</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
-    <MicrosoftExtensionsLoggingConsolePackageVersion>9.0.0</MicrosoftExtensionsLoggingConsolePackageVersion>
-    <MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>9.0.0</MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>
+    <MicrosoftExtensionsLoggingPackageVersion>10.0.0-preview.2.25120.9</MicrosoftExtensionsLoggingPackageVersion>
+    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>10.0.0-preview.2.25120.9</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
+    <MicrosoftExtensionsLoggingConsolePackageVersion>10.0.0-preview.2.25120.9</MicrosoftExtensionsLoggingConsolePackageVersion>
+    <MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>10.0.0-preview.2.25120.9</MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>
   </PropertyGroup>
 </Project>
