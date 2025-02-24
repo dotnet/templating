@@ -30,25 +30,25 @@
       <SourceBuild RepoName="arcade" ManagedOnly="true" />
     </Dependency>
     <!-- Dependencies required for source build. We'll still update manually -->
-    <Dependency Name="System.Formats.Asn1" Version="10.0.0-preview.2.25120.9">
+    <Dependency Name="System.Formats.Asn1" Version="10.0.0-preview.2.25121.10">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>df368a0caf3918eac20d586ce493ec1782568497</Sha>
+      <Sha>8ed081e7ddc399c9d240ba4546002bdbb4e2330c</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging" Version="10.0.0-preview.2.25120.9">
+    <Dependency Name="Microsoft.Extensions.Logging" Version="10.0.0-preview.2.25121.10">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>df368a0caf3918eac20d586ce493ec1782568497</Sha>
+      <Sha>8ed081e7ddc399c9d240ba4546002bdbb4e2330c</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0-preview.2.25120.9">
+    <Dependency Name="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0-preview.2.25121.10">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>df368a0caf3918eac20d586ce493ec1782568497</Sha>
+      <Sha>8ed081e7ddc399c9d240ba4546002bdbb4e2330c</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging.Console" Version="10.0.0-preview.2.25120.9">
+    <Dependency Name="Microsoft.Extensions.Logging.Console" Version="10.0.0-preview.2.25121.10">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>df368a0caf3918eac20d586ce493ec1782568497</Sha>
+      <Sha>8ed081e7ddc399c9d240ba4546002bdbb4e2330c</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0-preview.2.25120.9">
+    <Dependency Name="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0-preview.2.25121.10">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>df368a0caf3918eac20d586ce493ec1782568497</Sha>
+      <Sha>8ed081e7ddc399c9d240ba4546002bdbb4e2330c</Sha>
     </Dependency>
   </ToolsetDependencies>
 </Dependencies>
