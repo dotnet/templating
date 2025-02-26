@@ -30,25 +30,25 @@
       <SourceBuild RepoName="arcade" ManagedOnly="true" />
     </Dependency>
     <!-- Dependencies required for source build. We'll still update manually -->
-    <Dependency Name="System.Formats.Asn1" Version="10.0.0-preview.2.25121.10">
+    <Dependency Name="System.Formats.Asn1" Version="10.0.0-preview.2.25125.14">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>8ed081e7ddc399c9d240ba4546002bdbb4e2330c</Sha>
+      <Sha>143f7e2ca0da249a03d183b388b2a70af9379edb</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging" Version="10.0.0-preview.2.25121.10">
+    <Dependency Name="Microsoft.Extensions.Logging" Version="10.0.0-preview.2.25125.14">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>8ed081e7ddc399c9d240ba4546002bdbb4e2330c</Sha>
+      <Sha>143f7e2ca0da249a03d183b388b2a70af9379edb</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0-preview.2.25121.10">
+    <Dependency Name="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0-preview.2.25125.14">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>8ed081e7ddc399c9d240ba4546002bdbb4e2330c</Sha>
+      <Sha>143f7e2ca0da249a03d183b388b2a70af9379edb</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging.Console" Version="10.0.0-preview.2.25121.10">
+    <Dependency Name="Microsoft.Extensions.Logging.Console" Version="10.0.0-preview.2.25125.14">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>8ed081e7ddc399c9d240ba4546002bdbb4e2330c</Sha>
+      <Sha>143f7e2ca0da249a03d183b388b2a70af9379edb</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0-preview.2.25121.10">
+    <Dependency Name="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0-preview.2.25125.14">
       <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>8ed081e7ddc399c9d240ba4546002bdbb4e2330c</Sha>
+      <Sha>143f7e2ca0da249a03d183b388b2a70af9379edb</Sha>
     </Dependency>
   </ToolsetDependencies>
 </Dependencies>
