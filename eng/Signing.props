@@ -5,19 +5,7 @@
   </PropertyGroup>
   
   <!--
-    These are third party libraries that we use in Arcade. We need to sign them even if they
-    are already signed. However, they must be signed with a 3rd party certificate.
+    Arcade no longer signs so signing the test biinaries used in arcade is no longer needed.
   -->
-  <ItemGroup>
-    <FileSignInfo Include="Argon.dll" CertificateName="3PartySHA2" />
-    <FileSignInfo Include="DiffEngine.dll" CertificateName="3PartySHA2" />
-    <FileSignInfo Include="DiffPlex.dll" CertificateName="3PartySHA2" />
-    <FileSignInfo Include="Verify.DiffPlex.dll" CertificateName="3PartySHA2" />
-    <FileSignInfo Include="Verify.dll" CertificateName="3PartySHA2" />
-    <FileSignInfo Include="Verify.Xunit.dll" CertificateName="3PartySHA2" />
-    <FileSignInfo Include="EmptyFiles.dll" CertificateName="3PartySHA2" />
-    <FileSignInfo Include="AwesomeAssertions.dll" CertificateName="3PartySHA2" />
-    <FileSignInfo Include="SimpleInfoName.dll" CertificateName="3PartySHA2" />
-  </ItemGroup>
 
 </Project>
