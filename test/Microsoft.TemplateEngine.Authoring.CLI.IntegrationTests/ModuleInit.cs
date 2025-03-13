@@ -4,21 +4,20 @@
 using System.Runtime.CompilerServices;
 using VerifyTests.DiffPlex;
 
-namespace Microsoft.TemplateEngine.Authoring.CLI.IntegrationTests
-{
-    public static class ModuleInit
-    {
-        [ModuleInitializer]
-        public static void Init()
-        {
-            DerivePathInfo(
-                (_, _, type, method) => new(
-                    directory: "Snapshots",
-                    typeName: type.Name,
-                    methodName: method.Name));
+namespace Microsoft.TemplateEngine.Authoring.CLI.IntegrationTests;
 
-            // Customize diff output of verifier
-            VerifyDiffPlex.Initialize(OutputType.Compact);
-        }
+public static class ModuleInit
+{
+    [ModuleInitializer]
+    public static void Init()
+    {
+        DerivePathInfo(
+            (_, _, type, method) => new(
+                directory: "Snapshots",
+                typeName: type.Name,
+                methodName: method.Name));
+
+        // Customize diff output of verifier
+        VerifyDiffPlex.Initialize(OutputType.Compact);
     }
 }
