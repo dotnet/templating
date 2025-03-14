@@ -9,7 +9,6 @@ using Microsoft.TemplateEngine.Utils;
 
 namespace Microsoft.TemplateEngine.IDE.IntegrationTests
 {
-    [Collection("Verify Tests")]
     public class BasicTests : BootstrapperTestBase, IClassFixture<PackageManager>
     {
         private readonly PackageManager _packageManager;

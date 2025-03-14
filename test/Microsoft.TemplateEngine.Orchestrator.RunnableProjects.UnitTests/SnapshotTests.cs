@@ -12,7 +12,6 @@ using Xunit.Abstractions;
 
 namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests
 {
-    [Collection("Verify Tests")]
     public class SnapshotTests : TestBase
     {
         private readonly ILogger _log;
