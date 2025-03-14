@@ -11,7 +11,7 @@
     <ItemsToSign Remove="$(ArtifactsNonShippingPackagesDir)**\Microsoft.TemplateEngine.Mocks.*.nupkg" />
     <ItemsToSign Remove="$(ArtifactsNonShippingPackagesDir)**\Microsoft.TemplateEngine.TestHelper.*.nupkg" />
     <ItemsToSign Remove="$(ArtifactsNonShippingPackagesDir)**\Microsoft.TemplateEngine.TestTemplates.*.nupkg" />
-    <ItemsToSign Remove="$(ArtifactsNonShippingPackagesDir)**\Microsoft.TeamplateSearch.TemplateDiscovery.*.nupkg" />
+    <ItemsToSign Remove="$(ArtifactsNonShippingPackagesDir)**\Microsoft.TemplateSearch.TemplateDiscovery.*.nupkg" />
   </ItemGroup>
 
 </Project>
