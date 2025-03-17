@@ -8,6 +8,14 @@
     Arcade no longer signs so signing the test binaries used in arcade is no longer needed. Don't sign the test binaries.
   -->
   <ItemGroup>
+    <FileSignInfo Include="Argon.dll" CertificateName="3PartySHA2" />
+    <FileSignInfo Include="DiffEngine.dll" CertificateName="3PartySHA2" />
+    <FileSignInfo Include="DiffPlex.dll" CertificateName="3PartySHA2" />
+    <FileSignInfo Include="Verify.DiffPlex.dll" CertificateName="3PartySHA2" />
+    <FileSignInfo Include="Verify.dll" CertificateName="3PartySHA2" />
+    <FileSignInfo Include="Verify.Xunit.dll" CertificateName="3PartySHA2" />
+    <FileSignInfo Include="EmptyFiles.dll" CertificateName="3PartySHA2" />
+    <FileSignInfo Include="SimpleInfoName.dll" CertificateName="3PartySHA2" />
     <ItemsToSign Remove="$(ArtifactsNonShippingPackagesDir)**\Microsoft.TemplateEngine.Mocks.*.nupkg" />
     <ItemsToSign Remove="$(ArtifactsNonShippingPackagesDir)**\Microsoft.TemplateEngine.TestHelper.*.nupkg" />
     <ItemsToSign Remove="$(ArtifactsNonShippingPackagesDir)**\Microsoft.TemplateEngine.TestTemplates.*.nupkg" />
