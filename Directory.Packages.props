@@ -41,6 +41,7 @@
     <PackageVersion Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
     <PackageVersion Include="Verify.DiffPlex" Version="3.0.0" />
     <PackageVersion Include="Verify.XUnit" Version="25.0.2" />
+    <PackageVersion Include="XUnit" Version="$(XUnitVersion)" />
     <PackageVersion Include="xunit.abstractions" Version="2.0.3" />
     <!-- Xunit version is managed by Arcade. -->
     <PackageVersion Include="xunit.extensibility.execution" Version="$(XUnitVersion)" />
