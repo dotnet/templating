@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <VersionPrefix>9.0.300</VersionPrefix>
+    <VersionPrefix>10.0.100</VersionPrefix>
     <!-- When StabilizePackageVersion is set to 'true', this branch will produce stable outputs for 'Shipping' packages -->
     <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">false</StabilizePackageVersion>
     <DotNetFinalVersionKind Condition="'$(StabilizePackageVersion)' == 'true'">release</DotNetFinalVersionKind>
@@ -8,18 +8,14 @@
     <PreReleaseVersionLabel Condition="'$(StabilizePackageVersion)' != 'true'">preview</PreReleaseVersionLabel>
     <PreReleaseVersionLabel Condition="'$(StabilizePackageVersion)' == 'true' and $(VersionPrefix.EndsWith('00'))">rtm</PreReleaseVersionLabel>
     <PreReleaseVersionLabel Condition="'$(StabilizePackageVersion)' == 'true' and !$(VersionPrefix.EndsWith('00'))">servicing</PreReleaseVersionLabel>
-    <PreReleaseVersionIteration Condition="'$(StabilizePackageVersion)' != 'true'">
-    </PreReleaseVersionIteration>
+    <PreReleaseVersionIteration Condition="'$(StabilizePackageVersion)' != 'true'">3</PreReleaseVersionIteration>
     <UsingToolXliff>true</UsingToolXliff>
     <FlagNetStandard1XDependencies>true</FlagNetStandard1XDependencies>
   </PropertyGroup>
   <PropertyGroup>
-    <!-- Command-line-api dependencies -->
-    <SystemCommandLinePackageVersion>2.0.0-beta4.24324.3</SystemCommandLinePackageVersion>
-  </PropertyGroup>
-  <PropertyGroup>
     <!-- Non-maestro versions -->
     <SystemFormatsAsn1Version>9.0.0</SystemFormatsAsn1Version>
+    <SystemCommandLinePackageVersion>2.0.0-beta4.25071.2</SystemCommandLinePackageVersion>
     <MicrosoftExtensionsLoggingPackageVersion>9.0.0</MicrosoftExtensionsLoggingPackageVersion>
     <MicrosoftExtensionsLoggingAbstractionsPackageVersion>9.0.0</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
     <MicrosoftExtensionsLoggingConsolePackageVersion>9.0.0</MicrosoftExtensionsLoggingConsolePackageVersion>
