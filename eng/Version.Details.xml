@@ -2,31 +2,31 @@
 <Dependencies>
   <ProductDependencies>
     <!-- Intermediate is necessary for source build. -->
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-externals" Version="10.0.606301">
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-externals" Version="10.0.616001">
       <Uri>https://github.com/dotnet/source-build-externals</Uri>
-      <Sha>c9e4423c80e00371e43e306ee6e2e97fd2196af9</Sha>
+      <Sha>96dceea0417e9ff1b47664c2d2998b9abf541f0c</Sha>
       <SourceBuild RepoName="source-build-externals" ManagedOnly="true" />
     </Dependency>
     <!-- Intermediate is necessary for source build. -->
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="10.0.606402">
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="10.0.616701">
       <Uri>https://github.com/dotnet/source-build-reference-packages</Uri>
-      <Sha>43f2c55c61e6233cc1a5c0d162359367aad8975b</Sha>
+      <Sha>12b07db19093502e1530df6058699bb43bb9b4ba</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="System.CommandLine" Version="2.0.0-beta4.24528.1">
+    <Dependency Name="System.CommandLine" Version="2.0.0-beta4.25071.2">
       <Uri>https://github.com/dotnet/command-line-api</Uri>
-      <Sha>feb61c7f328a2401d74f4317b39d02126cfdfe24</Sha>
+      <Sha>3bbb940ceeb3254790899d751a8d418348563d40</Sha>
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
-    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="10.0.0-beta.25061.1">
+    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="10.0.0-beta.25164.6">
       <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>98b4ae348fa01b99dc6fbfc8f601efd9b90090db</Sha>
+      <Sha>1912d9f4fc410d421a01b5a09131aae234b603fa</Sha>
     </Dependency>
     <!-- Intermediate is necessary for source build. -->
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.arcade" Version="10.0.0-beta.25061.1">
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.arcade" Version="10.0.0-beta.25164.6">
       <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>98b4ae348fa01b99dc6fbfc8f601efd9b90090db</Sha>
+      <Sha>1912d9f4fc410d421a01b5a09131aae234b603fa</Sha>
       <SourceBuild RepoName="arcade" ManagedOnly="true" />
     </Dependency>
     <!-- Dependencies required for source build. We'll still update manually -->
