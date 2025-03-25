@@ -15,7 +15,7 @@
   <PropertyGroup>
     <!-- Non-maestro versions -->
     <SystemFormatsAsn1Version>9.0.0</SystemFormatsAsn1Version>
-    <SystemCommandLinePackageVersion>2.0.0-beta5.25170.1</SystemCommandLinePackageVersion>
+    <SystemCommandLinePackageVersion>2.0.0-beta5.25174.1</SystemCommandLinePackageVersion>
     <MicrosoftExtensionsLoggingPackageVersion>9.0.0</MicrosoftExtensionsLoggingPackageVersion>
     <MicrosoftExtensionsLoggingAbstractionsPackageVersion>9.0.0</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
     <MicrosoftExtensionsLoggingConsolePackageVersion>9.0.0</MicrosoftExtensionsLoggingConsolePackageVersion>
