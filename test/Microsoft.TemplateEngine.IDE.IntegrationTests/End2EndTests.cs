@@ -221,7 +221,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             Assert.Equal(
                 """
                 var str = "myVal";
-
+                
                 """,
                 fileContent);
         }

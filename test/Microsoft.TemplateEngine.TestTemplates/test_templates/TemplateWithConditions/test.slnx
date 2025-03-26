@@ -1,9 +1,9 @@
-﻿#if (A)
-# comment foo
+﻿<!--#if (A) -->
+<!-- comment foo -->
 foo
-#endif
-##if (B)
-## comment bar
-#bar
-#endif
+<!--#endif -->
+<!--#if (B)
+<!-- comment bar -- >
+bar
+#endif -->
 baz
