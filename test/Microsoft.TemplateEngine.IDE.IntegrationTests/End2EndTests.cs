@@ -99,7 +99,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
                 """
                 The port is (\d{4,5})
                 The port is (\d{4,5})
-
+                
                 """).Success);
             Assert.NotEqual(
                 """
@@ -192,7 +192,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             Assert.Equal(
                 """
                 var str = "fallback";
-
+                
                 """,
                 fileContent);
         }
@@ -252,7 +252,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             Assert.Equal(
                 """
                 var str = "fallback";
-
+                
                 """,
                 fileContent);
         }
@@ -281,7 +281,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             Assert.Equal(
                 """
                 var str = "A";
-
+                
                 """,
                 fileContent);
         }
