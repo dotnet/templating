@@ -13,9 +13,9 @@
       <Sha>1556b6c639edcaee959013681afcf2e66b118537</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="System.CommandLine" Version="2.0.0-beta4.25071.2">
+    <Dependency Name="System.CommandLine" Version="2.0.0-beta5.25174.1">
       <Uri>https://github.com/dotnet/command-line-api</Uri>
-      <Sha>3bbb940ceeb3254790899d751a8d418348563d40</Sha>
+      <Sha>599faf215f4c0efe952d0251ab8fba4761f14a19</Sha>
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
