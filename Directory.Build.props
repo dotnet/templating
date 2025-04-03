@@ -31,6 +31,9 @@
     <EnableAnalyzers>true</EnableAnalyzers>
     <!-- Disable analyzers in sourcebuild -->
     <EnableAnalyzers Condition="'$(DotNetBuildSourceOnly)' == 'true'">false</EnableAnalyzers>
+
+    <!-- Enable reproducible build per binskim -->
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(EnableAnalyzers)' == 'true'">
