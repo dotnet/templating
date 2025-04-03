@@ -16,17 +16,17 @@
     <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="17.8.3" />
    
     <!-- NuGet dependencies -->
-    <PackageVersion Include="NuGet.Configuration" Version="6.8.1" />
-    <PackageVersion Include="NuGet.Credentials" Version="6.8.1" />
-    <PackageVersion Include="NuGet.Protocol" Version="6.8.1" />
+    <PackageVersion Include="NuGet.Configuration" Version="6.12.1" />
+    <PackageVersion Include="NuGet.Credentials" Version="6.12.1" />
+    <PackageVersion Include="NuGet.Protocol" Version="6.12.1" />
 
     <!-- Roslyn-analyzers dependencies -->
     <PackageVersion Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4" />
 
     <!-- Runtime dependencies -->    
-    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsLoggingAbstractionsPackageVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftExtensionsLoggingConsolePackageVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsLoggingPackageVersion)" />
     <PackageVersion Include="Microsoft.IO.Redist" Version="6.0.1" />
     <PackageVersion Include="System.Formats.Asn1" Version="$(SystemFormatsAsn1Version)" />
   </ItemGroup>
@@ -58,12 +58,4 @@
     <PackageVersion Update="NuGet.Credentials" Version="$(NuGetCredentialsVersion)" Condition="'$(NuGetCredentialsVersion)' != ''" />
     <PackageVersion Update="NuGet.Protocol" Version="$(NuGetProtocolVersion)" Condition="'$(NuGetProtocolVersion)' != ''" />
   </ItemGroup>
-
-  <!-- Logging dependencies -->
-  <ItemGroup>
-    <PackageReference Update="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsLoggingPackageVersion)" />
-    <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftExtensionsLoggingConsolePackageVersion)" />
-    <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsLoggingAbstractionsPackageVersion)" />
-  </ItemGroup>
-
 </Project>
