@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dependencies>
   <ProductDependencies>
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-externals" Version="8.0.0-alpha.1.25202.2">
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-externals" Version="8.0.0-alpha.1.23518.1">
       <Uri>https://github.com/dotnet/source-build-externals</Uri>
-      <Sha>16bcad1c13be082bd52ce178896d1119a73081a9</Sha>
+      <Sha>3dc05150cf234f76f6936dcb2853d31a0da1f60e</Sha>
       <SourceBuild RepoName="source-build-externals" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="8.0.0-alpha.1.25163.2">
+    <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-reference-packages" Version="8.0.0-alpha.1.24251.1">
       <Uri>https://github.com/dotnet/source-build-reference-packages</Uri>
-      <Sha>b09e26d761555d806f31af68d6fe5dfdeebf6e38</Sha>
+      <Sha>6f814daa935e08b578b1c0c65a1f26ea3317f517</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="System.CommandLine" Version="2.0.0-beta4.24517.1">
+    <Dependency Name="System.CommandLine" Version="2.0.0-beta4.23407.1">
       <Uri>https://github.com/dotnet/command-line-api</Uri>
-      <Sha>31ab5077b28e4ebe8229e7d2ba8ae1307b1ce360</Sha>
+      <Sha>a045dd54a4c44723c215d992288160eb1401bb7f</Sha>
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
