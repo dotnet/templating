@@ -29,7 +29,7 @@
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsLoggingPackageVersion)" />
     <PackageVersion Include="Microsoft.IO.Redist" Version="6.0.1" /> <!-- Pin transitive dependency to avoid vulnerable 6.0.0 version. -->
     <PackageVersion Include="System.Formats.Asn1" Version="8.0.1" /> <!-- Pin transitive dependency to avoid vulnerable 8.0.0 version. -->
-    <PackageVersion Include="System.Text.Json" Version="8.0.5" /> <!-- Pin transitive dependency to avoid vulnerable 8.0.0 version. -->
+    <PackageVersion Include="System.Text.Json" Version="9.0.3" /> <!-- Pin transitive dependency to avoid vulnerable 8.0.0 version. -->
   </ItemGroup>
 
   <!-- External dependencies -->
