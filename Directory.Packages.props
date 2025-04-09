@@ -27,25 +27,27 @@
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsLoggingAbstractionsPackageVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftExtensionsLoggingConsolePackageVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsLoggingPackageVersion)" />
-    <PackageVersion Include="Microsoft.IO.Redist" Version="6.0.1" />
-    <PackageVersion Include="System.Formats.Asn1" Version="$(SystemFormatsAsn1Version)" />
+    <PackageVersion Include="Microsoft.IO.Redist" Version="6.0.1" /> <!-- Pin transitive dependency to avoid vulnerable 6.0.0 version. -->
+    <PackageVersion Include="System.Formats.Asn1" Version="8.0.1" /> <!-- Pin transitive dependency to avoid vulnerable 8.0.0 version. -->
+    <PackageVersion Include="System.Text.Json" Version="8.0.5" /> <!-- Pin transitive dependency to avoid vulnerable 8.0.0 version. -->
   </ItemGroup>
 
   <!-- External dependencies -->
   <ItemGroup>
-    <PackageVersion Include="FakeItEasy" Version="8.0.0" />
-    <PackageVersion Include="FluentAssertions" Version="6.12.0" />
-    <PackageVersion Include="Newtonsoft.Json.Schema" Version="3.0.15" />
+    <PackageVersion Include="FakeItEasy" Version="8.1.0" />
+    <PackageVersion Include="AwesomeAssertions" Version="8.0.2" />
+    <PackageVersion Include="Newtonsoft.Json.Schema" Version="4.0.1" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageVersion Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
     <PackageVersion Include="Verify.DiffPlex" Version="3.0.0" />
     <PackageVersion Include="Verify.XUnit" Version="25.0.2" />
+    <PackageVersion Include="XUnit" Version="$(XUnitVersion)" />
     <PackageVersion Include="xunit.abstractions" Version="2.0.3" />
     <!-- Xunit version is managed by Arcade. -->
     <PackageVersion Include="xunit.extensibility.execution" Version="$(XUnitVersion)" />
   </ItemGroup>
 
-  <!-- DotNetBuild overrides -->
+  <!-- DotNetBuild overrides needed until https://github.com/dotnet/source-build/issues/4467 is implemented. -->
   <ItemGroup>
     <PackageVersion Update="Microsoft.Build.Framework" Version="$(MicrosoftBuildFrameworkVersion)" Condition="'$(MicrosoftBuildFrameworkVersion)' != ''" />
     <PackageVersion Update="Microsoft.Build.Utilities.Core" Version="$(MicrosoftBuildUtilitiesCoreVersion)" Condition="'$(MicrosoftBuildUtilitiesCoreVersion)' != ''" />
@@ -57,5 +59,7 @@
     <PackageVersion Update="NuGet.Configuration" Version="$(NuGetConfigurationVersion)" Condition="'$(NuGetConfigurationVersion)' != ''" />
     <PackageVersion Update="NuGet.Credentials" Version="$(NuGetCredentialsVersion)" Condition="'$(NuGetCredentialsVersion)' != ''" />
     <PackageVersion Update="NuGet.Protocol" Version="$(NuGetProtocolVersion)" Condition="'$(NuGetProtocolVersion)' != ''" />
+    <PackageVersion Update="System.Formats.Asn1" Version="$(SystemFormatsAsn1Version)" Condition="'$(SystemFormatsAsn1Version)' != ''" />
+    <PackageVersion Update="System.Text.Json" Version="$(SystemTextJsonVersion)" Condition="'$(SystemTextJsonVersion)' != ''" />
   </ItemGroup>
 </Project>
