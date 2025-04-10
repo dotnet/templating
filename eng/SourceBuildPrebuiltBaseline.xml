@@ -10,5 +10,8 @@
     <UsagePattern IdentityGlob="Microsoft.Extensions.DependencyInjection.Abstractions/9.0.*" />
     <UsagePattern IdentityGlob="Microsoft.Extensions.Logging.Abstractions/9.0.*" />
     <UsagePattern IdentityGlob="System.Diagnostics.DiagnosticSource/9.0.*" />
+    <UsagePattern IdentityGlob="System.IO.Pipelines/9.0.*" />
+    <UsagePattern IdentityGlob="System.Text.Encodings.Web/9.0.*" />
+    <UsagePattern IdentityGlob="System.Text.Json/9.0.*" />
   </IgnorePatterns>
 </UsageData>
