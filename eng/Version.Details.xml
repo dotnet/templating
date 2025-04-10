@@ -50,5 +50,25 @@
       <Uri>https://github.com/dotnet/runtime</Uri>
       <Sha>831d23e56149cd59c40fc00c7feb7c5334bd19c4</Sha>
     </Dependency>
+    <Dependency Name="Microsoft.Bcl.AsyncInterfaces" Version="9.0.3">
+      <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
+      <Sha>feff23845f6205a1ece39e1bd9b978948a52295a</Sha>
+    </Dependency>
+    <Dependency Name="System.Diagnostics.DiagnosticSource" Version="9.0.3">
+      <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
+      <Sha>feff23845f6205a1ece39e1bd9b978948a52295a</Sha>
+    </Dependency>
+    <Dependency Name="System.Text.Json" Version="9.0.3">
+      <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
+      <Sha>feff23845f6205a1ece39e1bd9b978948a52295a</Sha>
+    </Dependency>
+    <Dependency Name="System.IO.Pipelines" Version="9.0.3">
+      <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
+      <Sha>feff23845f6205a1ece39e1bd9b978948a52295a</Sha>
+    </Dependency>
+    <Dependency Name="System.Text.Encodings.Web" Version="9.0.3">
+      <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
+      <Sha>feff23845f6205a1ece39e1bd9b978948a52295a</Sha>
+    </Dependency>
   </ToolsetDependencies>
 </Dependencies>

@@ -20,5 +20,10 @@
     <MicrosoftExtensionsLoggingAbstractionsPackageVersion>9.0.3</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
     <MicrosoftExtensionsLoggingConsolePackageVersion>9.0.3</MicrosoftExtensionsLoggingConsolePackageVersion>
     <MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>9.0.3</MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>
+    <MicrosoftBclAsyncInterfacesPackageVersion>9.0.3</MicrosoftBclAsyncInterfacesPackageVersion>
+    <SystemDiagnosticsDiagnosticSourcePackageVersion>9.0.3</SystemDiagnosticsDiagnosticSourcePackageVersion>
+    <SystemIOPipelinesPackageVersion>9.0.3</SystemIOPipelinesPackageVersion>
+    <SystemTextEncodingsWebPackageVersion>9.0.3</SystemTextEncodingsWebPackageVersion>
+    <SystemTextJsonPackageVersion>9.0.3</SystemTextJsonPackageVersion>
   </PropertyGroup>
 </Project>
