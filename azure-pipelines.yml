@@ -45,10 +45,7 @@ parameters:
   - buildConfig: Release
 
 extends:
-  ${{ if notin(variables['Build.Reason'], 'PullRequest') }}:
-    template: v1/1ES.Official.PipelineTemplate.yml@1esPipelines
-  ${{ else }}:
-    template: v1/1ES.Unofficial.PipelineTemplate.yml@1esPipelines
+  template: v1/1ES.Official.PipelineTemplate.yml@1esPipelines
   parameters:
     sdl:
       sourceAnalysisPool:
@@ -90,7 +87,7 @@ extends:
           templateContext:
             sdl:
               binskim:
-                analyzeTargetGlob: +:f|artifacts\bin\**\*.dll;+:f|artifacts\bin\**\*.exe;
+                analyzeTargetGlob: +:f|artifacts\bin\**\*.dll;+:f|artifacts\bin\**\*.exe;-:f|artifacts\bin\**\xunit*.dll;-:f|artifacts\bin\**\verify*.dll;
           # WORKAROUND: BinSkim requires the folder exist prior to scanning.
           preSteps:
           - powershell: New-Item -ItemType Directory -Path $(Build.SourcesDirectory)/artifacts/bin -Force
@@ -119,9 +116,6 @@ extends:
                     /p:DotNetPublishUsingPipelines=$(_PublishUsingPipelines)
                     /p:OfficialBuildId=$(BUILD.BUILDNUMBER)
               steps:
-              - checkout: self
-                clean: true
-
               # Use utility script to run script command dependent on agent OS.
               - script: eng/common/cibuild.cmd
                   -configuration $(_BuildConfig)
