@@ -78,7 +78,7 @@ extends:
           enablePublishTestResults: true
           enablePublishBuildAssets: true
           enablePublishUsingPipelines: ${{ variables._PublishUsingPipelines }}
-          enableSourceBuild: false
+          enableSourceBuild: true
           publishAssetsImmediately: true
           sourceBuildParameters:
             enableInternalSources: true
