@@ -7,7 +7,7 @@ disabled: false
 where: 
 configuration:
   resourceManagementConfiguration:
-    scheduledSearches:
+    eventResponderTasks:
     - if:
       - payloadType: Issues
       - labelAdded:
