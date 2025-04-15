@@ -1,6 +1,9 @@
-id: 
-name: GitOps.PullRequestIssueManagement
-description: GitOps.PullRequestIssueManagement primitive
+# Automation in the `/.github/policies` folder is processed by the dotnet-policy-service app,
+# operated by the [microsoft1estools](https://github.com/microsoft1estools) team.
+# See https://github.com/apps/dotnet-policy-service for more info.
+id: breaking-change
+name: breaking-change
+description: When an issue or PR is labeled as a breaking change, add the label that a breaking change doc is needed, and comment with the breaking change process.
 owner: 
 resource: repository
 disabled: false
