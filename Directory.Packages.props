@@ -16,31 +16,36 @@
     <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="17.8.3" />
    
     <!-- NuGet dependencies -->
-    <PackageVersion Include="NuGet.Configuration" Version="6.8.1" />
-    <PackageVersion Include="NuGet.Credentials" Version="6.8.1" />
-    <PackageVersion Include="NuGet.Protocol" Version="6.8.1" />
+    <PackageVersion Include="NuGet.Configuration" Version="6.13.2" />
+    <PackageVersion Include="NuGet.Credentials" Version="6.13.2" />
+    <PackageVersion Include="NuGet.Protocol" Version="6.13.2" />
 
     <!-- Roslyn-analyzers dependencies -->
     <PackageVersion Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4" />
 
     <!-- Runtime dependencies -->    
-    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsLoggingAbstractionsPackageVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftExtensionsLoggingConsolePackageVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsLoggingPackageVersion)" />
+    <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="$(MicrosoftBclAsyncInterfacesPackageVersion)" />
     <PackageVersion Include="Microsoft.IO.Redist" Version="6.0.1" /> <!-- Pin transitive dependency to avoid vulnerable 6.0.0 version. -->
+    <PackageVersion Include="System.Diagnostics.DiagnosticSource" Version="$(SystemDiagnosticsDiagnosticSourcePackageVersion)" />
     <PackageVersion Include="System.Formats.Asn1" Version="8.0.1" /> <!-- Pin transitive dependency to avoid vulnerable 8.0.0 version. -->
-    <PackageVersion Include="System.Text.Json" Version="8.0.5" /> <!-- Pin transitive dependency to avoid vulnerable 8.0.0 version. -->
+    <PackageVersion Include="System.IO.Pipelines" Version="$(SystemIOPipelinesPackageVersion)" />
+    <PackageVersion Include="System.Text.Encodings.Web" Version="$(SystemTextEncodingsWebPackageVersion)" />
+    <PackageVersion Include="System.Text.Json" Version="$(SystemTextJsonPackageVersion)" /> <!-- Pin transitive dependency to avoid vulnerable 8.0.0 version. -->
   </ItemGroup>
 
   <!-- External dependencies -->
   <ItemGroup>
     <PackageVersion Include="FakeItEasy" Version="8.1.0" />
-    <PackageVersion Include="FluentAssertions" Version="6.12.0" />
+    <PackageVersion Include="AwesomeAssertions" Version="8.0.2" />
     <PackageVersion Include="Newtonsoft.Json.Schema" Version="4.0.1" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageVersion Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
     <PackageVersion Include="Verify.DiffPlex" Version="3.0.0" />
     <PackageVersion Include="Verify.XUnit" Version="25.0.2" />
+    <PackageVersion Include="XUnit" Version="$(XUnitVersion)" />
     <PackageVersion Include="xunit.abstractions" Version="2.0.3" />
     <!-- Xunit version is managed by Arcade. -->
     <PackageVersion Include="xunit.extensibility.execution" Version="$(XUnitVersion)" />
@@ -61,12 +66,4 @@
     <PackageVersion Update="System.Formats.Asn1" Version="$(SystemFormatsAsn1Version)" Condition="'$(SystemFormatsAsn1Version)' != ''" />
     <PackageVersion Update="System.Text.Json" Version="$(SystemTextJsonVersion)" Condition="'$(SystemTextJsonVersion)' != ''" />
   </ItemGroup>
-
-  <!-- Logging dependencies -->
-  <ItemGroup>
-    <PackageReference Update="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsLoggingPackageVersion)" />
-    <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftExtensionsLoggingConsolePackageVersion)" />
-    <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsLoggingAbstractionsPackageVersion)" />
-  </ItemGroup>
-
 </Project>
