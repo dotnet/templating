@@ -37,6 +37,9 @@
 
     <!-- The minimum .NET Framework version supported by templating packages. -->
     <NetFrameworkMinimum>net472</NetFrameworkMinimum>
+
+    <!-- Only build the latest .NETCoreApp TFM when building source-only. -->
+    <NetMinimum Condition="'$(DotNetBuildSourceOnly)' == 'true'">$(NetCurrent)</NetMinimum>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(EnableAnalyzers)' == 'true'">
