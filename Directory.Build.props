@@ -27,6 +27,9 @@
     <EnableAnalyzers>true</EnableAnalyzers>
     <!-- Disable analyzers in sourcebuild -->
     <EnableAnalyzers Condition="'$(DotNetBuildSourceOnly)' == 'true'">false</EnableAnalyzers>
+
+    <!-- Make packages target net472 instead of net481 for compatibility with the msbuild task package. -->
+    <NetFrameworkCurrent>net472</NetFrameworkCurrent>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(EnableAnalyzers)' == 'true'">
