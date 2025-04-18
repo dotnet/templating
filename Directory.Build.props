@@ -40,9 +40,6 @@
 
     <!-- Only build the latest .NETCoreApp TFM when building source-only. -->
     <NetMinimum Condition="'$(DotNetBuildSourceOnly)' == 'true'">$(NetCurrent)</NetMinimum>
-
-    <!-- Make packages target net472 instead of net481 for compatibility with the msbuild task package. -->
-    <NetFrameworkCurrent>net472</NetFrameworkCurrent>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(EnableAnalyzers)' == 'true'">
