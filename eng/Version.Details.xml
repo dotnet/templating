@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dependencies>
+  <Source Uri="https://github.com/dotnet/dotnet" Mapping="templating" Sha="721dc7a2a59416b21fc49447d264009d708d6000" BarId="265489" />
   <ProductDependencies>
     <!-- Intermediate is necessary for source build. -->
     <Dependency Name="Microsoft.SourceBuild.Intermediate.source-build-externals" Version="10.0.622301">
@@ -13,15 +14,15 @@
       <Sha>65dce0e04c42107e92af4287fe8b5022407b7440</Sha>
       <SourceBuild RepoName="source-build-reference-packages" ManagedOnly="true" />
     </Dependency>
-    <Dependency Name="System.CommandLine" Version="2.0.0-beta5.25222.1">
-      <Uri>https://github.com/dotnet/command-line-api</Uri>
-      <Sha>8b30ff9e4900d220c2979f1bbb5647154e438edd</Sha>
+    <Dependency Name="System.CommandLine" Version="2.0.0-beta5.25223.119">
+      <Uri>https://github.com/dotnet/dotnet</Uri>
+      <Sha>721dc7a2a59416b21fc49447d264009d708d6000</Sha>
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
-    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="10.0.0-beta.25222.2">
-      <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>80d7b4ee29c31c0886b139ad02d85da48b543cd6</Sha>
+    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="10.0.0-beta.25223.119">
+      <Uri>https://github.com/dotnet/dotnet</Uri>
+      <Sha>721dc7a2a59416b21fc49447d264009d708d6000</Sha>
     </Dependency>
     <!-- Intermediate is necessary for source build. -->
     <Dependency Name="Microsoft.SourceBuild.Intermediate.arcade" Version="10.0.0-beta.25222.2">
@@ -30,9 +31,9 @@
       <SourceBuild RepoName="arcade" ManagedOnly="true" />
     </Dependency>
     <!-- Dependencies required for source build. We'll still update manually -->
-    <Dependency Name="System.Formats.Asn1" Version="9.0.0">
-      <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>d3981726bc8b0e179db50301daf9f22d42393096</Sha>
+    <Dependency Name="System.Formats.Asn1" Version="9.0.3">
+      <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
+      <Sha>831d23e56149cd59c40fc00c7feb7c5334bd19c4</Sha>
     </Dependency>
     <Dependency Name="Microsoft.Extensions.Logging" Version="9.0.3">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
