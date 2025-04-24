@@ -14,16 +14,16 @@
   </PropertyGroup>
   <PropertyGroup>
     <!-- Non-maestro versions -->
-    <SystemFormatsAsn1Version>9.0.0</SystemFormatsAsn1Version>
-    <SystemCommandLinePackageVersion>2.0.0-beta5.25222.1</SystemCommandLinePackageVersion>
-    <MicrosoftExtensionsLoggingPackageVersion>9.0.3</MicrosoftExtensionsLoggingPackageVersion>
-    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>9.0.3</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
-    <MicrosoftExtensionsLoggingConsolePackageVersion>9.0.3</MicrosoftExtensionsLoggingConsolePackageVersion>
-    <MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>9.0.3</MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>
-    <MicrosoftBclAsyncInterfacesPackageVersion>9.0.3</MicrosoftBclAsyncInterfacesPackageVersion>
-    <SystemDiagnosticsDiagnosticSourcePackageVersion>9.0.3</SystemDiagnosticsDiagnosticSourcePackageVersion>
-    <SystemIOPipelinesPackageVersion>9.0.3</SystemIOPipelinesPackageVersion>
-    <SystemTextEncodingsWebPackageVersion>9.0.3</SystemTextEncodingsWebPackageVersion>
-    <SystemTextJsonPackageVersion>9.0.3</SystemTextJsonPackageVersion>
+    <SystemFormatsAsn1Version>10.0.0-preview.4.25223.119</SystemFormatsAsn1Version>
+    <SystemCommandLinePackageVersion>2.0.0-beta5.25223.119</SystemCommandLinePackageVersion>
+    <MicrosoftExtensionsLoggingPackageVersion>10.0.0-preview.4.25223.119</MicrosoftExtensionsLoggingPackageVersion>
+    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>10.0.0-preview.4.25223.119</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
+    <MicrosoftExtensionsLoggingConsolePackageVersion>10.0.0-preview.4.25223.119</MicrosoftExtensionsLoggingConsolePackageVersion>
+    <MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>10.0.0-preview.4.25223.119</MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>
+    <MicrosoftBclAsyncInterfacesPackageVersion>10.0.0-preview.4.25223.119</MicrosoftBclAsyncInterfacesPackageVersion>
+    <SystemDiagnosticsDiagnosticSourcePackageVersion>10.0.0-preview.4.25223.119</SystemDiagnosticsDiagnosticSourcePackageVersion>
+    <SystemIOPipelinesPackageVersion>10.0.0-preview.4.25223.119</SystemIOPipelinesPackageVersion>
+    <SystemTextEncodingsWebPackageVersion>10.0.0-preview.4.25223.119</SystemTextEncodingsWebPackageVersion>
+    <SystemTextJsonPackageVersion>10.0.0-preview.4.25223.119</SystemTextJsonPackageVersion>
   </PropertyGroup>
 </Project>
