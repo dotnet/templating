@@ -31,45 +31,45 @@
       <SourceBuild RepoName="arcade" ManagedOnly="true" />
     </Dependency>
     <!-- Dependencies required for source build. We'll still update manually -->
-    <Dependency Name="System.Formats.Asn1" Version="10.0.0-preview.4.25223.119">
-      <Uri>https://github.com/dotnet/dotnet</Uri>
-      <Sha>721dc7a2a59416b21fc49447d264009d708d6000</Sha>
+    <Dependency Name="System.Formats.Asn1" Version="9.0.3">
+      <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
+      <Sha>831d23e56149cd59c40fc00c7feb7c5334bd19c4</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging" Version="10.0.0-preview.4.25223.119">
-      <Uri>https://github.com/dotnet/dotnet</Uri>
-      <Sha>721dc7a2a59416b21fc49447d264009d708d6000</Sha>
+    <Dependency Name="Microsoft.Extensions.Logging" Version="9.0.3">
+      <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
+      <Sha>831d23e56149cd59c40fc00c7feb7c5334bd19c4</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0-preview.4.25223.119">
-      <Uri>https://github.com/dotnet/dotnet</Uri>
-      <Sha>721dc7a2a59416b21fc49447d264009d708d6000</Sha>
+    <Dependency Name="Microsoft.Extensions.Logging.Abstractions" Version="9.0.3">
+      <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
+      <Sha>831d23e56149cd59c40fc00c7feb7c5334bd19c4</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging.Console" Version="10.0.0-preview.4.25223.119">
-      <Uri>https://github.com/dotnet/dotnet</Uri>
-      <Sha>721dc7a2a59416b21fc49447d264009d708d6000</Sha>
+    <Dependency Name="Microsoft.Extensions.Logging.Console" Version="9.0.3">
+      <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
+      <Sha>831d23e56149cd59c40fc00c7feb7c5334bd19c4</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0-preview.4.25223.119">
-      <Uri>https://github.com/dotnet/dotnet</Uri>
-      <Sha>721dc7a2a59416b21fc49447d264009d708d6000</Sha>
+    <Dependency Name="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.3">
+      <Uri>https://github.com/dotnet/runtime</Uri>
+      <Sha>831d23e56149cd59c40fc00c7feb7c5334bd19c4</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Bcl.AsyncInterfaces" Version="10.0.0-preview.4.25223.119">
-      <Uri>https://github.com/dotnet/dotnet</Uri>
-      <Sha>721dc7a2a59416b21fc49447d264009d708d6000</Sha>
+    <Dependency Name="Microsoft.Bcl.AsyncInterfaces" Version="9.0.3">
+      <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
+      <Sha>feff23845f6205a1ece39e1bd9b978948a52295a</Sha>
     </Dependency>
-    <Dependency Name="System.Diagnostics.DiagnosticSource" Version="10.0.0-preview.4.25223.119">
-      <Uri>https://github.com/dotnet/dotnet</Uri>
-      <Sha>721dc7a2a59416b21fc49447d264009d708d6000</Sha>
+    <Dependency Name="System.Diagnostics.DiagnosticSource" Version="9.0.3">
+      <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
+      <Sha>feff23845f6205a1ece39e1bd9b978948a52295a</Sha>
     </Dependency>
-    <Dependency Name="System.Text.Json" Version="10.0.0-preview.4.25223.119">
-      <Uri>https://github.com/dotnet/dotnet</Uri>
-      <Sha>721dc7a2a59416b21fc49447d264009d708d6000</Sha>
+    <Dependency Name="System.Text.Json" Version="9.0.3">
+      <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
+      <Sha>feff23845f6205a1ece39e1bd9b978948a52295a</Sha>
     </Dependency>
-    <Dependency Name="System.IO.Pipelines" Version="10.0.0-preview.4.25223.119">
-      <Uri>https://github.com/dotnet/dotnet</Uri>
-      <Sha>721dc7a2a59416b21fc49447d264009d708d6000</Sha>
+    <Dependency Name="System.IO.Pipelines" Version="9.0.3">
+      <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
+      <Sha>feff23845f6205a1ece39e1bd9b978948a52295a</Sha>
     </Dependency>
-    <Dependency Name="System.Text.Encodings.Web" Version="10.0.0-preview.4.25223.119">
-      <Uri>https://github.com/dotnet/dotnet</Uri>
-      <Sha>721dc7a2a59416b21fc49447d264009d708d6000</Sha>
+    <Dependency Name="System.Text.Encodings.Web" Version="9.0.3">
+      <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
+      <Sha>feff23845f6205a1ece39e1bd9b978948a52295a</Sha>
     </Dependency>
   </ToolsetDependencies>
 </Dependencies>
