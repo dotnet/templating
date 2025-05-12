@@ -34,6 +34,8 @@ namespace Microsoft.TemplateEngine.Utils.UnitTests
 
             var entries = virtualized.EnumerateFileSystemEntries(Directory.GetCurrentDirectory(), "*", SearchOption.TopDirectoryOnly).ToList();
             Assert.Single(entries);
+
+            Assert.Equal(testFilePath, entries[0]);
         }
     }
 }
