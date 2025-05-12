@@ -81,6 +81,8 @@ namespace Microsoft.TemplateEngine.Utils
                 currentDir = dir;
             }
 
+            Console.WriteLine($"Creating file {parts[parts.Length - 1]} in {currentDir.FullPath}");
+
             if (!currentDir.Files.TryGetValue(parts[parts.Length - 1], out FileSystemFile targetFile))
             {
                 targetFile = new FileSystemFile(parts[parts.Length - 1], Path.Combine(currentDir.FullPath, parts[parts.Length - 1]));
