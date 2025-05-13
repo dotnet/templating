@@ -698,58 +698,8 @@ namespace Microsoft.TemplateEngine.Utils
 
         private bool IsPathInCone(string path, out string processedPath)
         {
-            if (!Path.IsPathRooted(path))
-            {
-                path = Path.Combine(GetCurrentDirectory(), path);
-            }
-
-            path = path.Replace('\\', '/');
-
-            bool leadSlash = path[0] == '/';
-
-            if (leadSlash)
-            {
-                path = path.Substring(1);
-            }
-
-            string[] parts = path.Split('/');
-
-            List<string> realParts = new();
-
-            for (int i = 0; i < parts.Length; ++i)
-            {
-                if (string.IsNullOrEmpty(parts[i]))
-                {
-                    continue;
-                }
-
-                switch (parts[i])
-                {
-                    case ".":
-                        continue;
-                    case "..":
-                        realParts.RemoveAt(realParts.Count - 1);
-                        break;
-                    default:
-                        realParts.Add(parts[i]);
-                        break;
-                }
-            }
-
-            if (leadSlash)
-            {
-                realParts.Insert(0, string.Empty);
-            }
-
-            processedPath = string.Join(Path.DirectorySeparatorChar + string.Empty, realParts);
-            if (processedPath.Equals(_root.FullPath) || processedPath.StartsWith(_root.FullPath.TrimEnd('/', '\\') + Path.DirectorySeparatorChar))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            processedPath = Path.IsPathRooted(path) ? path : Path.Combine(GetCurrentDirectory(), path);
+            return processedPath.Equals(_root.FullPath) || processedPath.StartsWith(_root.FullPath);
         }
 
         private class FileSystemDirectory
