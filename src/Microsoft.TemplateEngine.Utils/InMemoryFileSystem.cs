@@ -697,7 +697,11 @@ namespace Microsoft.TemplateEngine.Utils
         private bool IsPathInCone(string path, out string processedPath)
         {
             processedPath = Path.IsPathRooted(path) ? path : Path.Combine(GetCurrentDirectory(), path);
-            return processedPath.Equals(_root.FullPath) || processedPath.StartsWith(_root.FullPath);
+            processedPath = processedPath
+                .Replace('/', Path.DirectorySeparatorChar)
+                .Replace('\\', Path.DirectorySeparatorChar)
+                .Replace($"{Path.DirectorySeparatorChar}.{Path.DirectorySeparatorChar}", $"{Path.DirectorySeparatorChar}");
+            return processedPath.StartsWith(_root.FullPath);
         }
 
         private class FileSystemDirectory
