@@ -40,6 +40,8 @@
 
     <!-- Only build the latest .NETCoreApp TFM when building source-only. -->
     <NetMinimum Condition="'$(DotNetBuildSourceOnly)' == 'true'">$(NetCurrent)</NetMinimum>
+
+    <PublishWindowsPdb>false</PublishWindowsPdb>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(EnableAnalyzers)' == 'true'">
