@@ -14,16 +14,16 @@
   </PropertyGroup>
   <PropertyGroup>
     <!-- Non-maestro versions -->
-    <SystemFormatsAsn1Version>10.0.0-preview.5.25272.110</SystemFormatsAsn1Version>
-    <SystemCommandLinePackageVersion>2.0.0-beta5.25272.110</SystemCommandLinePackageVersion>
-    <MicrosoftExtensionsLoggingPackageVersion>10.0.0-preview.5.25272.110</MicrosoftExtensionsLoggingPackageVersion>
-    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>10.0.0-preview.5.25272.110</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
-    <MicrosoftExtensionsLoggingConsolePackageVersion>10.0.0-preview.5.25272.110</MicrosoftExtensionsLoggingConsolePackageVersion>
-    <MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>10.0.0-preview.5.25272.110</MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>
-    <MicrosoftBclAsyncInterfacesPackageVersion>10.0.0-preview.5.25272.110</MicrosoftBclAsyncInterfacesPackageVersion>
-    <SystemDiagnosticsDiagnosticSourcePackageVersion>10.0.0-preview.5.25272.110</SystemDiagnosticsDiagnosticSourcePackageVersion>
-    <SystemIOPipelinesPackageVersion>10.0.0-preview.5.25272.110</SystemIOPipelinesPackageVersion>
-    <SystemTextEncodingsWebPackageVersion>10.0.0-preview.5.25272.110</SystemTextEncodingsWebPackageVersion>
-    <SystemTextJsonPackageVersion>10.0.0-preview.5.25272.110</SystemTextJsonPackageVersion>
+    <SystemFormatsAsn1Version>10.0.0-preview.5.25272.113</SystemFormatsAsn1Version>
+    <SystemCommandLinePackageVersion>2.0.0-beta5.25272.113</SystemCommandLinePackageVersion>
+    <MicrosoftExtensionsLoggingPackageVersion>10.0.0-preview.5.25272.113</MicrosoftExtensionsLoggingPackageVersion>
+    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>10.0.0-preview.5.25272.113</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
+    <MicrosoftExtensionsLoggingConsolePackageVersion>10.0.0-preview.5.25272.113</MicrosoftExtensionsLoggingConsolePackageVersion>
+    <MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>10.0.0-preview.5.25272.113</MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>
+    <MicrosoftBclAsyncInterfacesPackageVersion>10.0.0-preview.5.25272.113</MicrosoftBclAsyncInterfacesPackageVersion>
+    <SystemDiagnosticsDiagnosticSourcePackageVersion>10.0.0-preview.5.25272.113</SystemDiagnosticsDiagnosticSourcePackageVersion>
+    <SystemIOPipelinesPackageVersion>10.0.0-preview.5.25272.113</SystemIOPipelinesPackageVersion>
+    <SystemTextEncodingsWebPackageVersion>10.0.0-preview.5.25272.113</SystemTextEncodingsWebPackageVersion>
+    <SystemTextJsonPackageVersion>10.0.0-preview.5.25272.113</SystemTextJsonPackageVersion>
   </PropertyGroup>
 </Project>
