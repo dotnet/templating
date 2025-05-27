@@ -1,57 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dependencies>
-  <Source Uri="https://github.com/dotnet/dotnet" Mapping="templating" Sha="fe130649db3bba145dd5f2aed8ca458ec2b976b1" BarId="269604" />
+  <Source Uri="https://github.com/dotnet/dotnet" Mapping="templating" Sha="a8d08848979d35be20f84d277264fd13888348b1" BarId="269648" />
   <ProductDependencies>
-    <Dependency Name="System.CommandLine" Version="2.0.0-beta5.25276.102">
+    <Dependency Name="System.CommandLine" Version="2.0.0-beta5.25276.104">
       <Uri>https://github.com/dotnet/dotnet</Uri>
-      <Sha>fe130649db3bba145dd5f2aed8ca458ec2b976b1</Sha>
+      <Sha>a8d08848979d35be20f84d277264fd13888348b1</Sha>
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
-    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="10.0.0-beta.25276.102">
+    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="10.0.0-beta.25276.104">
       <Uri>https://github.com/dotnet/dotnet</Uri>
-      <Sha>fe130649db3bba145dd5f2aed8ca458ec2b976b1</Sha>
+      <Sha>a8d08848979d35be20f84d277264fd13888348b1</Sha>
     </Dependency>
     <!-- Dependencies required for source build. We'll still update manually -->
-    <Dependency Name="System.Formats.Asn1" Version="10.0.0-preview.5.25276.102">
+    <Dependency Name="System.Formats.Asn1" Version="10.0.0-preview.5.25276.104">
       <Uri>https://github.com/dotnet/dotnet</Uri>
-      <Sha>fe130649db3bba145dd5f2aed8ca458ec2b976b1</Sha>
+      <Sha>a8d08848979d35be20f84d277264fd13888348b1</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging" Version="10.0.0-preview.5.25276.102">
+    <Dependency Name="Microsoft.Extensions.Logging" Version="10.0.0-preview.5.25276.104">
       <Uri>https://github.com/dotnet/dotnet</Uri>
-      <Sha>fe130649db3bba145dd5f2aed8ca458ec2b976b1</Sha>
+      <Sha>a8d08848979d35be20f84d277264fd13888348b1</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0-preview.5.25276.102">
+    <Dependency Name="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0-preview.5.25276.104">
       <Uri>https://github.com/dotnet/dotnet</Uri>
-      <Sha>fe130649db3bba145dd5f2aed8ca458ec2b976b1</Sha>
+      <Sha>a8d08848979d35be20f84d277264fd13888348b1</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging.Console" Version="10.0.0-preview.5.25276.102">
+    <Dependency Name="Microsoft.Extensions.Logging.Console" Version="10.0.0-preview.5.25276.104">
       <Uri>https://github.com/dotnet/dotnet</Uri>
-      <Sha>fe130649db3bba145dd5f2aed8ca458ec2b976b1</Sha>
+      <Sha>a8d08848979d35be20f84d277264fd13888348b1</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0-preview.5.25276.102">
+    <Dependency Name="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0-preview.5.25276.104">
       <Uri>https://github.com/dotnet/dotnet</Uri>
-      <Sha>fe130649db3bba145dd5f2aed8ca458ec2b976b1</Sha>
+      <Sha>a8d08848979d35be20f84d277264fd13888348b1</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Bcl.AsyncInterfaces" Version="10.0.0-preview.5.25276.102">
+    <Dependency Name="Microsoft.Bcl.AsyncInterfaces" Version="10.0.0-preview.5.25276.104">
       <Uri>https://github.com/dotnet/dotnet</Uri>
-      <Sha>fe130649db3bba145dd5f2aed8ca458ec2b976b1</Sha>
+      <Sha>a8d08848979d35be20f84d277264fd13888348b1</Sha>
     </Dependency>
-    <Dependency Name="System.Diagnostics.DiagnosticSource" Version="10.0.0-preview.5.25276.102">
+    <Dependency Name="System.Diagnostics.DiagnosticSource" Version="10.0.0-preview.5.25276.104">
       <Uri>https://github.com/dotnet/dotnet</Uri>
-      <Sha>fe130649db3bba145dd5f2aed8ca458ec2b976b1</Sha>
+      <Sha>a8d08848979d35be20f84d277264fd13888348b1</Sha>
     </Dependency>
-    <Dependency Name="System.Text.Json" Version="10.0.0-preview.5.25276.102">
+    <Dependency Name="System.Text.Json" Version="10.0.0-preview.5.25276.104">
       <Uri>https://github.com/dotnet/dotnet</Uri>
-      <Sha>fe130649db3bba145dd5f2aed8ca458ec2b976b1</Sha>
+      <Sha>a8d08848979d35be20f84d277264fd13888348b1</Sha>
     </Dependency>
-    <Dependency Name="System.IO.Pipelines" Version="10.0.0-preview.5.25276.102">
+    <Dependency Name="System.IO.Pipelines" Version="10.0.0-preview.5.25276.104">
       <Uri>https://github.com/dotnet/dotnet</Uri>
-      <Sha>fe130649db3bba145dd5f2aed8ca458ec2b976b1</Sha>
+      <Sha>a8d08848979d35be20f84d277264fd13888348b1</Sha>
     </Dependency>
-    <Dependency Name="System.Text.Encodings.Web" Version="10.0.0-preview.5.25276.102">
+    <Dependency Name="System.Text.Encodings.Web" Version="10.0.0-preview.5.25276.104">
       <Uri>https://github.com/dotnet/dotnet</Uri>
-      <Sha>fe130649db3bba145dd5f2aed8ca458ec2b976b1</Sha>
+      <Sha>a8d08848979d35be20f84d277264fd13888348b1</Sha>
     </Dependency>
   </ToolsetDependencies>
 </Dependencies>
