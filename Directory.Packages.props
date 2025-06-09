@@ -16,9 +16,9 @@
     <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="17.8.3" />
    
     <!-- NuGet dependencies -->
-    <PackageVersion Include="NuGet.Configuration" Version="6.12.1" />
-    <PackageVersion Include="NuGet.Credentials" Version="6.12.1" />
-    <PackageVersion Include="NuGet.Protocol" Version="6.12.1" />
+    <PackageVersion Include="NuGet.Configuration" Version="6.12.4" />
+    <PackageVersion Include="NuGet.Credentials" Version="6.12.4" />
+    <PackageVersion Include="NuGet.Protocol" Version="6.12.4" />
 
     <!-- Roslyn-analyzers dependencies -->
     <PackageVersion Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4" />
@@ -29,6 +29,7 @@
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsLoggingPackageVersion)" />
     <PackageVersion Include="Microsoft.IO.Redist" Version="6.0.1" />
     <PackageVersion Include="System.Formats.Asn1" Version="$(SystemFormatsAsn1Version)" />
+    <PackageVersion Include="System.Text.Json" Version="$(SystemTextJsonPackageVersion)" />
   </ItemGroup>
 
   <!-- External dependencies -->
@@ -57,5 +58,6 @@
     <PackageVersion Update="NuGet.Configuration" Version="$(NuGetConfigurationVersion)" Condition="'$(NuGetConfigurationVersion)' != ''" />
     <PackageVersion Update="NuGet.Credentials" Version="$(NuGetCredentialsVersion)" Condition="'$(NuGetCredentialsVersion)' != ''" />
     <PackageVersion Update="NuGet.Protocol" Version="$(NuGetProtocolVersion)" Condition="'$(NuGetProtocolVersion)' != ''" />
+    <PackageVersion Update="System.Text.Json" Version="$(SystemTextJsonVersion)" Condition="'$(SystemTextJsonVersion)' != ''" />
   </ItemGroup>
 </Project>

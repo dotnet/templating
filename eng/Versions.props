@@ -24,5 +24,6 @@
     <MicrosoftExtensionsLoggingAbstractionsPackageVersion>9.0.3</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
     <MicrosoftExtensionsLoggingConsolePackageVersion>9.0.3</MicrosoftExtensionsLoggingConsolePackageVersion>
     <MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>9.0.3</MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>
+    <SystemTextJsonPackageVersion>9.0.3</SystemTextJsonPackageVersion>
   </PropertyGroup>
 </Project>
