@@ -34,6 +34,18 @@
       <Uri>https://github.com/dotnet/runtime</Uri>
       <Sha>d3981726bc8b0e179db50301daf9f22d42393096</Sha>
     </Dependency>
+    <Dependency Name="System.IO.Pipelines" Version="9.0.3">
+      <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
+      <Sha>831d23e56149cd59c40fc00c7feb7c5334bd19c4</Sha>
+    </Dependency>
+    <Dependency Name="System.Text.Encodings.Web" Version="9.0.3">
+      <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
+      <Sha>831d23e56149cd59c40fc00c7feb7c5334bd19c4</Sha>
+    </Dependency>
+    <Dependency Name="System.Text.Json" Version="9.0.3">
+      <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
+      <Sha>831d23e56149cd59c40fc00c7feb7c5334bd19c4</Sha>
+    </Dependency>
     <Dependency Name="Microsoft.Extensions.Logging" Version="9.0.3">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
       <Sha>831d23e56149cd59c40fc00c7feb7c5334bd19c4</Sha>
@@ -50,9 +62,33 @@
       <Uri>https://github.com/dotnet/runtime</Uri>
       <Sha>831d23e56149cd59c40fc00c7feb7c5334bd19c4</Sha>
     </Dependency>
-    <Dependency Name="System.Text.Json" Version="9.0.3">
-      <Uri>https://github.com/dotnet/runtime</Uri>
-      <Sha>831d23e56149cd59c40fc00c7feb7c5334bd19c4</Sha>
+    <Dependency Name="NuGet.Common" Version="6.12.4">
+      <Uri>https://github.com/nuget/nuget.client</Uri>
+      <Sha>95a470a557091cdbdc9f68a178b60bd19329942c</Sha>
+    </Dependency>
+    <Dependency Name="NuGet.Configuration" Version="6.12.4">
+      <Uri>https://github.com/nuget/nuget.client</Uri>
+      <Sha>95a470a557091cdbdc9f68a178b60bd19329942c</Sha>
+    </Dependency>
+    <Dependency Name="NuGet.Credentials" Version="6.12.4">
+      <Uri>https://github.com/nuget/nuget.client</Uri>
+      <Sha>95a470a557091cdbdc9f68a178b60bd19329942c</Sha>
+    </Dependency>
+    <Dependency Name="NuGet.Frameworks" Version="6.12.4">
+      <Uri>https://github.com/nuget/nuget.client</Uri>
+      <Sha>95a470a557091cdbdc9f68a178b60bd19329942c</Sha>
+    </Dependency>
+    <Dependency Name="NuGet.Packaging" Version="6.12.4">
+      <Uri>https://github.com/nuget/nuget.client</Uri>
+      <Sha>95a470a557091cdbdc9f68a178b60bd19329942c</Sha>
+    </Dependency>
+    <Dependency Name="NuGet.Protocol" Version="6.12.4">
+      <Uri>https://github.com/nuget/nuget.client</Uri>
+      <Sha>95a470a557091cdbdc9f68a178b60bd19329942c</Sha>
+    </Dependency>
+    <Dependency Name="NuGet.Versioning" Version="6.12.4">
+      <Uri>https://github.com/nuget/nuget.client</Uri>
+      <Sha>95a470a557091cdbdc9f68a178b60bd19329942c</Sha>
     </Dependency>
   </ToolsetDependencies>
 </Dependencies>
