@@ -27,12 +27,12 @@
     <MicrosoftExtensionsLoggingAbstractionsVersion>9.0.3</MicrosoftExtensionsLoggingAbstractionsVersion>
     <MicrosoftExtensionsLoggingConsoleVersion>9.0.3</MicrosoftExtensionsLoggingConsoleVersion>
     <MicrosoftExtensionsDependencyInjectionAbstractionsVersion>9.0.3</MicrosoftExtensionsDependencyInjectionAbstractionsVersion>
-    <NuGetCommonVersion>16.12.4</NuGetCommonVersion>
-    <NuGetConfigurationVersion>16.12.4</NuGetConfigurationVersion>
-    <NuGetCredentialsVersion>16.12.4</NuGetCredentialsVersion>
-    <NuGetFrameworksVersion>16.12.4</NuGetFrameworksVersion>
-    <NuGetPackagingVersion>16.12.4</NuGetPackagingVersion>
-    <NuGetProtocolVersion>16.12.4</NuGetProtocolVersion>
-    <NuGetVersioningVersion>16.12.4</NuGetVersioningVersion>
+    <NuGetCommonVersion>6.12.4</NuGetCommonVersion>
+    <NuGetConfigurationVersion>6.12.4</NuGetConfigurationVersion>
+    <NuGetCredentialsVersion>6.12.4</NuGetCredentialsVersion>
+    <NuGetFrameworksVersion>6.12.4</NuGetFrameworksVersion>
+    <NuGetPackagingVersion>6.12.4</NuGetPackagingVersion>
+    <NuGetProtocolVersion>6.12.4</NuGetProtocolVersion>
+    <NuGetVersioningVersion>6.12.4</NuGetVersioningVersion>
   </PropertyGroup>
 </Project>
