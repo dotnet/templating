@@ -52,6 +52,5 @@
     <PackageVersion Update="Microsoft.Build.Utilities.Core" Version="$(MicrosoftBuildUtilitiesCoreVersion)" Condition="'$(MicrosoftBuildUtilitiesCoreVersion)' != ''" />
     <PackageVersion Update="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="$(MicrosoftCodeAnalysisPublicApiAnalyzersVersion)" Condition="'$(MicrosoftCodeAnalysisPublicApiAnalyzersVersion)' != ''" />
     <PackageVersion Update="Newtonsoft.Json" Version="$(NewtonsoftJsonVersion)" Condition="'$(NewtonsoftJsonVersion)' != ''" />
-    <PackageVersion Update="System.Text.Json" Version="$(SystemTextJsonVersion)" Condition="'$(SystemTextJsonVersion)' != ''" />
   </ItemGroup>
 </Project>
