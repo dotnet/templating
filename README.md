@@ -11,7 +11,7 @@
 
 ## Overview
 
-This repository is the home for the .NET Template Engine. It contains the libraries for template instantiation  and template package management used in [`dotnet new`](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-new) and [New Project Dialog](https://learn.microsoft.com/en-us/visualstudio/ide/create-new-project?view=vs-2022) and New Item Dialog in Visual Studio and Visual Studio for Mac. The libraries are also distributed as the NuGet packages on nuget.org.
+This repository is the home for the .NET Template Engine. It contains the libraries for template installation and template package management used in [`dotnet new`](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-new) and [New Project Dialog](https://learn.microsoft.com/en-us/visualstudio/ide/create-new-project?view=vs-2022) and New Item Dialog in Visual Studio and Visual Studio for Mac. The libraries are also distributed as the NuGet packages on nuget.org.
 
 The key packages are:
 |Package name| Description|
