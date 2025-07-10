@@ -202,6 +202,8 @@ dotnet_diagnostic.IDE0032.severity = suggestion
 dotnet_diagnostic.IDE0040.severity = suggestion
 #Use conditional expression for return
 dotnet_diagnostic.IDE0046.severity = suggestion
+#false positives, see https://github.com/dotnet/roslyn/issues/79286
+dotnet_diagnostic.IDE0048.severity = silent
 #Remove unused private member
 dotnet_diagnostic.IDE0051.severity = suggestion
 #Remove unnecessary expression value
