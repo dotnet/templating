@@ -16,15 +16,10 @@ namespace Microsoft.TemplateEngine.Authoring.CLI
             rootCommand.Subcommands.Add(new VerifyCommand());
             rootCommand.Subcommands.Add(new ValidateCommand());
 
-            return GetCommandLineConfiguration(rootCommand).InvokeAsync(args);
-        }
-
-        internal static CommandLineConfiguration GetCommandLineConfiguration(Command command)
-        {
-            return new CommandLineConfiguration(command)
+            return rootCommand.Parse(args, new CommandLineConfiguration(rootCommand)
             {
-                EnablePosixBundling = false
-            };
+                EnablePosixBundling = false,
+            }).InvokeAsync();
         }
     }
 }
