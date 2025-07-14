@@ -16,10 +16,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI
             rootCommand.Subcommands.Add(new VerifyCommand());
             rootCommand.Subcommands.Add(new ValidateCommand());
 
-            return rootCommand.Parse(args, new CommandLineConfiguration(rootCommand)
-            {
-                EnablePosixBundling = false,
-            }).InvokeAsync();
+            return rootCommand.Parse(args, new() { EnablePosixBundling = false }).InvokeAsync();
         }
     }
 }
