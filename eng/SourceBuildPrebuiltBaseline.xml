@@ -10,5 +10,15 @@
     <UsagePattern IdentityGlob="Microsoft.Extensions.DependencyInjection.Abstractions/9.0.*" />
     <UsagePattern IdentityGlob="Microsoft.Extensions.Logging.Abstractions/9.0.*" />
     <UsagePattern IdentityGlob="System.Diagnostics.DiagnosticSource/9.0.*" />
+    <UsagePattern IdentityGlob="NuGet.Common/6.12.*" />
+    <UsagePattern IdentityGlob="NuGet.Configuration/6.12.*" />
+    <UsagePattern IdentityGlob="NuGet.Credentials/6.12.*" />
+    <UsagePattern IdentityGlob="NuGet.Frameworks/6.12.*" />
+    <UsagePattern IdentityGlob="NuGet.Packaging/6.12.*" />
+    <UsagePattern IdentityGlob="NuGet.Protocol/6.12.*" />
+    <UsagePattern IdentityGlob="NuGet.Versioning/6.12.*" />
+    <UsagePattern IdentityGlob="System.IO.Pipelines/9.0.*" />
+    <UsagePattern IdentityGlob="System.Text.Encodings.Web/9.0.*" />
+    <UsagePattern IdentityGlob="System.Text.Json/9.0.*" />
   </IgnorePatterns>
 </UsageData>
