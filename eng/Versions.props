@@ -1,4 +1,5 @@
 <Project>
+  <Import Project="Version.Details.props" Condition="Exists('Version.Details.props')" />
   <PropertyGroup>
     <VersionPrefix>10.0.100</VersionPrefix>
     <!-- When StabilizePackageVersion is set to 'true', this branch will produce stable outputs for 'Shipping' packages -->
@@ -11,19 +12,5 @@
     <PreReleaseVersionIteration Condition="'$(StabilizePackageVersion)' != 'true'">1</PreReleaseVersionIteration>
     <UsingToolXliff>true</UsingToolXliff>
     <FlagNetStandard1XDependencies>true</FlagNetStandard1XDependencies>
-  </PropertyGroup>
-  <PropertyGroup>
-    <!-- Non-maestro versions -->
-    <SystemFormatsAsn1Version>9.0.3</SystemFormatsAsn1Version>
-    <SystemCommandLinePackageVersion>2.0.0-rc.1.25377.103</SystemCommandLinePackageVersion>
-    <MicrosoftExtensionsLoggingPackageVersion>9.0.3</MicrosoftExtensionsLoggingPackageVersion>
-    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>9.0.3</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
-    <MicrosoftExtensionsLoggingConsolePackageVersion>9.0.3</MicrosoftExtensionsLoggingConsolePackageVersion>
-    <MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>9.0.3</MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>
-    <MicrosoftBclAsyncInterfacesPackageVersion>9.0.3</MicrosoftBclAsyncInterfacesPackageVersion>
-    <SystemDiagnosticsDiagnosticSourcePackageVersion>9.0.3</SystemDiagnosticsDiagnosticSourcePackageVersion>
-    <SystemIOPipelinesPackageVersion>9.0.3</SystemIOPipelinesPackageVersion>
-    <SystemTextEncodingsWebPackageVersion>9.0.3</SystemTextEncodingsWebPackageVersion>
-    <SystemTextJsonPackageVersion>9.0.3</SystemTextJsonPackageVersion>
   </PropertyGroup>
 </Project>
