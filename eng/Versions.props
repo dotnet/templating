@@ -20,9 +20,19 @@
   <PropertyGroup>
     <!-- Non-maestro versions -->
     <SystemFormatsAsn1Version>9.0.0</SystemFormatsAsn1Version>
-    <MicrosoftExtensionsLoggingPackageVersion>9.0.3</MicrosoftExtensionsLoggingPackageVersion>
-    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>9.0.3</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
-    <MicrosoftExtensionsLoggingConsolePackageVersion>9.0.3</MicrosoftExtensionsLoggingConsolePackageVersion>
-    <MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>9.0.3</MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>
+    <SystemIOPipelinesVersion>9.0.3</SystemIOPipelinesVersion>
+    <SystemTextEncodingsWebVersion>9.0.3</SystemTextEncodingsWebVersion>
+    <SystemTextJsonVersion>9.0.3</SystemTextJsonVersion>
+    <MicrosoftExtensionsLoggingVersion>9.0.3</MicrosoftExtensionsLoggingVersion>
+    <MicrosoftExtensionsLoggingAbstractionsVersion>9.0.3</MicrosoftExtensionsLoggingAbstractionsVersion>
+    <MicrosoftExtensionsLoggingConsoleVersion>9.0.3</MicrosoftExtensionsLoggingConsoleVersion>
+    <MicrosoftExtensionsDependencyInjectionAbstractionsVersion>9.0.3</MicrosoftExtensionsDependencyInjectionAbstractionsVersion>
+    <NuGetCommonVersion>6.12.4</NuGetCommonVersion>
+    <NuGetConfigurationVersion>6.12.4</NuGetConfigurationVersion>
+    <NuGetCredentialsVersion>6.12.4</NuGetCredentialsVersion>
+    <NuGetFrameworksVersion>6.12.4</NuGetFrameworksVersion>
+    <NuGetPackagingVersion>6.12.4</NuGetPackagingVersion>
+    <NuGetProtocolVersion>6.12.4</NuGetProtocolVersion>
+    <NuGetVersioningVersion>6.12.4</NuGetVersioningVersion>
   </PropertyGroup>
 </Project>
