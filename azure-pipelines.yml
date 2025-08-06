@@ -45,7 +45,10 @@ parameters:
   - buildConfig: Release
 
 extends:
-  template: v1/1ES.Official.PipelineTemplate.yml@1esPipelines
+  ${{ if ne(variables['Build.Reason'], 'PullRequest') }}:
+    template: v1/1ES.Official.PipelineTemplate.yml@1esPipelines
+  ${{ else }}:
+    template: v1/1ES.Unofficial.PipelineTemplate.yml@1esPipelines
   parameters:
     sdl:
       sourceAnalysisPool:
