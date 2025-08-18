@@ -51,7 +51,7 @@ stages:
       enablePublishTestResults: true
       enablePublishBuildAssets: true
       enablePublishUsingPipelines: ${{ variables._PublishUsingPipelines }}
-      enableSourceBuild: true
+      enableSourceBuild: false
       sourceBuildParameters:
         enableInternalSources: true
       enableTelemetry: true
