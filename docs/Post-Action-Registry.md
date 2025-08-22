@@ -504,16 +504,17 @@ Creates a new `dotnet.config` file with the specified section, key, and value, o
    - dotnet new (2.0.0 or higher)
 
 ## Example
+
 ```
-"postActions": [{  `
-  `"description": "Add dotnet.config",`
-  `"manualInstructions": [ { "text": "Create or update dotnet.config file'" }  ],`
-  `"actionId": "597E7933-0D87-452C-B094-8FA0EEF7FD97",`
-  `"args": {`
-    `"section": "dotnet.test.runner",`
-    `"key": "name",`
-    `"value": "Microsoft.Testing.Platform",`
-  `},`
-  `"continueOnError": true`
-`}]
+"postActions": [{
+  "description": "Add dotnet.config",
+  "manualInstructions": [ { "text": "Create or update dotnet.config file'" }  ],
+  "actionId": "597E7933-0D87-452C-B094-8FA0EEF7FD97",
+  "args": {
+    "section": "dotnet.test.runner",
+    "key": "name",
+    "value": "Microsoft.Testing.Platform",
+  },
+  "continueOnError": true
+}]
 ```
