@@ -10,6 +10,7 @@
 | [Change file permissions (Unix/OS X)](#change-file-permissions) | `CB9A6CF3-4F5C-4860-B9D2-03A574959774` |
 | [Display manual instructions](#display-manual-instructions) | `AC1156F7-BB77-4DB8-B28F-24EEBCCA1E5C` |
 | [Add a property to an existing JSON file](#add-a-property-to-an-existing-json-file) | `695A3659-EB40-4FF5-A6A6-C9C4E629FCB0` |
+| [Create or update 'dotnet.config' file](#create-or-update-dotnet-config-file) | `597E7933-0D87-452C-B094-8FA0EEF7FD97` |
 
 # Base configuration
 Each post action has set of standard properties as well as custom properties defined by certain post action.
@@ -483,6 +484,35 @@ Adds a new JSON property in an existing JSON file.
     `"parentPropertyPath": "moduleConfiguration:edgeAgent:properties.desired",`
     `"newJsonPropertyName": "LogLevel",`
     `"newJsonPropertyValue": "Information"`
+  `},`
+  `"continueOnError": true`
+`}]
+```
+
+# Create or update dotnet.config file
+
+Creates a new `dotnet.config` file with the specified section, key, and value, or updates an existing `dotnet.config`.
+
+- **Action ID** : 597E7933-0D87-452C-B094-8FA0EEF7FD97
+- **Specific Configuration** :
+   - `args`:
+      - `section (string)`: The section name (for example, `dotnet.test.runner`).
+      - `key (string)`: The key to set under the given section (for example, `name`).
+      - `value (string)`: The value to set for the given key (for example, `Microsoft.Testing.Platform`).
+- **Supported in** :
+   - dotnet new3
+   - dotnet new (2.0.0 or higher)
+
+## Example
+```
+"postActions": [{  `
+  `"description": "Add dotnet.config",`
+  `"manualInstructions": [ { "text": "Create or update dotnet.config file'" }  ],`
+  `"actionId": "597E7933-0D87-452C-B094-8FA0EEF7FD97",`
+  `"args": {`
+    `"section": "dotnet.test.runner",`
+    `"key": "name",`
+    `"value": "Microsoft.Testing.Platform",`
   `},`
   `"continueOnError": true`
 `}]
