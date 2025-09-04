@@ -10,7 +10,6 @@ using WellKnownSearchFilters = Microsoft.TemplateEngine.Utils.WellKnownSearchFil
 
 namespace Microsoft.TemplateEngine.IDE.IntegrationTests
 {
-    [Collection("Verify Tests")]
     public class End2EndTests : BootstrapperTestBase
     {
         [Fact]
