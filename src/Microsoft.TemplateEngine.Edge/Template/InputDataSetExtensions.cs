@@ -61,10 +61,10 @@ internal static class InputDataSetExtensions
         {
             PrecedenceDefinition.Required => EvaluatedPrecedence.Required,
             // Conditionally required state is only set if enabled condition is not  present
-            PrecedenceDefinition.ConditionalyRequired => dt!.IsRequiredConditionResult!.Value ? EvaluatedPrecedence.Required : EvaluatedPrecedence.Optional,
+            PrecedenceDefinition.ConditionallyRequired => dt!.IsRequiredConditionResult!.Value ? EvaluatedPrecedence.Required : EvaluatedPrecedence.Optional,
             PrecedenceDefinition.Optional => EvaluatedPrecedence.Optional,
             PrecedenceDefinition.Implicit => EvaluatedPrecedence.Implicit,
-            PrecedenceDefinition.ConditionalyDisabled => !dt!.IsEnabledConditionResult!.Value
+            PrecedenceDefinition.ConditionallyDisabled => !dt!.IsEnabledConditionResult!.Value
                                 ? EvaluatedPrecedence.Disabled
                                 :
                                 (dt.IsRequiredConditionResult.HasValue && dt.IsRequiredConditionResult.Value) || dt.ParameterDefinition.Precedence.IsRequired
