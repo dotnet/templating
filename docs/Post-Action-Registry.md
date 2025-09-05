@@ -500,8 +500,7 @@ Creates a new `dotnet.config` file with the specified section, key, and value, o
       - `key (string)`: The key to set under the given section (for example, `name`).
       - `value (string)`: The value to set for the given key (for example, `Microsoft.Testing.Platform`).
 - **Supported in** :
-   - dotnet new3
-   - dotnet new (2.0.0 or higher)
+   - .NET 10 SDK or later
 
 ## Example
 
