@@ -1,38 +1,16 @@
 <Project>
+  <Import Project="Version.Details.props" Condition="Exists('Version.Details.props')" />
   <PropertyGroup>
-    <VersionPrefix>9.0.305</VersionPrefix>
+    <VersionPrefix>11.0.100</VersionPrefix>
     <!-- When StabilizePackageVersion is set to 'true', this branch will produce stable outputs for 'Shipping' packages -->
-    <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">true</StabilizePackageVersion>
+    <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">false</StabilizePackageVersion>
     <DotNetFinalVersionKind Condition="'$(StabilizePackageVersion)' == 'true'">release</DotNetFinalVersionKind>
     <!-- Calculate prerelease label -->
-    <PreReleaseVersionLabel Condition="'$(StabilizePackageVersion)' != 'true'">preview</PreReleaseVersionLabel>
+    <PreReleaseVersionLabel Condition="'$(StabilizePackageVersion)' != 'true'">alpha</PreReleaseVersionLabel>
     <PreReleaseVersionLabel Condition="'$(StabilizePackageVersion)' == 'true' and $(VersionPrefix.EndsWith('00'))">rtm</PreReleaseVersionLabel>
     <PreReleaseVersionLabel Condition="'$(StabilizePackageVersion)' == 'true' and !$(VersionPrefix.EndsWith('00'))">servicing</PreReleaseVersionLabel>
-    <PreReleaseVersionIteration Condition="'$(StabilizePackageVersion)' != 'true'">
-    </PreReleaseVersionIteration>
+    <PreReleaseVersionIteration Condition="'$(StabilizePackageVersion)' != 'true'">1</PreReleaseVersionIteration>
     <UsingToolXliff>true</UsingToolXliff>
     <FlagNetStandard1XDependencies>true</FlagNetStandard1XDependencies>
-  </PropertyGroup>
-  <PropertyGroup>
-    <!-- Command-line-api dependencies -->
-    <SystemCommandLinePackageVersion>2.0.0-beta4.24324.3</SystemCommandLinePackageVersion>
-  </PropertyGroup>
-  <PropertyGroup>
-    <!-- Non-maestro versions -->
-    <SystemFormatsAsn1Version>9.0.0</SystemFormatsAsn1Version>
-    <SystemIOPipelinesVersion>9.0.3</SystemIOPipelinesVersion>
-    <SystemTextEncodingsWebVersion>9.0.3</SystemTextEncodingsWebVersion>
-    <SystemTextJsonVersion>9.0.3</SystemTextJsonVersion>
-    <MicrosoftExtensionsLoggingVersion>9.0.3</MicrosoftExtensionsLoggingVersion>
-    <MicrosoftExtensionsLoggingAbstractionsVersion>9.0.3</MicrosoftExtensionsLoggingAbstractionsVersion>
-    <MicrosoftExtensionsLoggingConsoleVersion>9.0.3</MicrosoftExtensionsLoggingConsoleVersion>
-    <MicrosoftExtensionsDependencyInjectionAbstractionsVersion>9.0.3</MicrosoftExtensionsDependencyInjectionAbstractionsVersion>
-    <NuGetCommonVersion>6.12.4</NuGetCommonVersion>
-    <NuGetConfigurationVersion>6.12.4</NuGetConfigurationVersion>
-    <NuGetCredentialsVersion>6.12.4</NuGetCredentialsVersion>
-    <NuGetFrameworksVersion>6.12.4</NuGetFrameworksVersion>
-    <NuGetPackagingVersion>6.12.4</NuGetPackagingVersion>
-    <NuGetProtocolVersion>6.12.4</NuGetProtocolVersion>
-    <NuGetVersioningVersion>6.12.4</NuGetVersioningVersion>
   </PropertyGroup>
 </Project>
