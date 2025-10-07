@@ -215,6 +215,9 @@ file_header_template = Licensed to the .NET Foundation under one or more agreeme
 # Ensure minimum API surface is respected
 dotnet_diagnostic.BCL0001.severity = warning
 
+# Don't require explicit access modifiers for interface members (conflicts with IDE0040)
+dotnet_diagnostic.SA1400.severity = none
+
 # AppContext default value expected to be true
 dotnet_diagnostic.BCL0010.severity = warning
 
