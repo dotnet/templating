@@ -186,6 +186,8 @@ dotnet_diagnostic.IDE0028.severity = suggestion
 dotnet_diagnostic.IDE0032.severity = suggestion
 #Use conditional expression for return
 dotnet_diagnostic.IDE0046.severity = suggestion
+#Remove unread private member
+dotnet_diagnostic.IDE0052.severity = suggestion
 #Remove unnecessary expression value
 dotnet_diagnostic.IDE0058.severity = suggestion
 #Add missing cases to switch expression
@@ -206,6 +208,10 @@ dotnet_diagnostic.IDE0300.severity = suggestion
 dotnet_diagnostic.IDE0301.severity = suggestion
 #Collection initialization can be simplified
 dotnet_diagnostic.IDE0305.severity = suggestion
+#Simplify collection initialization
+dotnet_diagnostic.IDE0306.severity = suggestion
+#Lambda expression can be simplified
+dotnet_diagnostic.IDE0350.severity = suggestion
 
 # License header
 file_header_template = Licensed to the .NET Foundation under one or more agreements.\nThe .NET Foundation licenses this file to you under the MIT license.
