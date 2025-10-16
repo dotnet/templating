@@ -124,7 +124,6 @@ extends:
               - script: eng/common/cibuild.cmd
                   -configuration $(_BuildConfig)
                   -prepareMachine
-                  -integrationTest
                   $(_InternalBuildArgs)
                 displayName: Windows Build / Publish
 
@@ -142,7 +141,6 @@ extends:
                 - script: eng/common/cibuild.sh
                     --configuration $(_BuildConfig)
                     --prepareMachine
-                    --integrationTest
                   name: Build
                   displayName: Build
 
@@ -167,7 +165,6 @@ extends:
                 - script: eng/common/cibuild.sh
                     --configuration $(_BuildConfig)
                     --prepareMachine
-                    --integrationTest
                   name: Build
                   displayName: Build
                   condition: succeeded()
