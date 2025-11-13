@@ -1,8 +1,8 @@
 {
   "tools": {
-    "dotnet": "8.0.121"
+    "dotnet": "8.0.122"
   },
   "msbuild-sdks": {
-    "Microsoft.DotNet.Arcade.Sdk": "8.0.0-beta.25555.2"
+    "Microsoft.DotNet.Arcade.Sdk": "8.0.0-beta.25562.3"
   }
 }
