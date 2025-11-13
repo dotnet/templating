@@ -121,12 +121,20 @@ extends:
               steps:
               # Use utility script to run script command dependent on agent OS.
               - template: /eng/common/templates-official/steps/enable-internal-sources.yml@self
-              - script: eng/common/cibuild.cmd
-                  -configuration $(_BuildConfig)
-                  -prepareMachine
-                  -integrationTest
-                  $(_InternalBuildArgs)
-                displayName: Windows Build / Publish
+              - ${{ if in(variables['Build.Reason'], 'PullRequest') }}:
+                - script: eng/common/cibuild.cmd
+                    -configuration $(_BuildConfig)
+                    -prepareMachine
+                    -integrationTest
+                    $(_InternalBuildArgs)
+                  displayName: Windows Build / Publish
+              - ${{ else }}:
+                - script: eng/common/cibuild.cmd
+                    -configuration $(_BuildConfig)
+                    -prepareMachine
+                    /p:Test=false
+                    $(_InternalBuildArgs)
+                  displayName: Windows Build / Publish
 
           - ${{ if in(variables['Build.Reason'], 'PullRequest') }}:
             - ${{ each config in parameters.buildConfigurations }}:
