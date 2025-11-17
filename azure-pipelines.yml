@@ -1,181 +1,51 @@
+variables:
+  - name: _PublishUsingPipelines
+    value: false
+  - template: /eng/common/templates-official/variables/pool-providers.yml@self
+
 trigger:
   batch: true
   branches:
     include:
-    - stabilize
-    - main
-    - release/*
-    - internal/release/*
-    - feature/*
-    - legacy/*
-pr:
-  branches:
-    include:
-    - stabilize
-    - main
-    - release/*
-    - feature/*
-    - legacy/*
+      - main
+      - release/*
 
-variables:
-  # Cannot use key:value syntax in root defined variables
-  - name: _TeamName
-    value: NETDevUX
-  - name: _PublishUsingPipelines
-    value: true
-  - name: Codeql.Enabled
-    value: true
-  - name: EnableReleaseOneLocBuild
-    value: false
-  - template: /eng/common/templates-official/variables/pool-providers.yml
+pr: none
 
 resources:
   repositories:
-  - repository: 1esPipelines
+  - repository: 1ESPipelineTemplates
     type: git
     name: 1ESPipelineTemplates/1ESPipelineTemplates
     ref: refs/tags/release
-
-# This is necessary because 1ES doesn't work using strategy & matrix
-parameters:
-- name: buildConfigurations
-  type: object
-  default:
-  # Always build the Release configuration, but never sign for PRs.
-  - buildConfig: Release
-
 extends:
-  ${{ if ne(variables['Build.Reason'], 'PullRequest') }}:
-    template: v1/1ES.Official.PipelineTemplate.yml@1esPipelines
-  ${{ else }}:
-    template: v1/1ES.Unofficial.PipelineTemplate.yml@1esPipelines
+  template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
   parameters:
     sdl:
+      createAdoIssuesForJustificationsForDisablement: false
       sourceAnalysisPool:
         name: $(DncEngInternalBuildPool)
         image: 1es-windows-2022
         os: windows
-      policheck:
-        enabled: true
-      tsa:
-        enabled: true
     stages:
     - stage: build
       displayName: Build
       jobs:
-      - ${{ if and( ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-        # The localization setup for main branch. Note difference in package ID. Should not be used with release/ branches.
-        - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
-          - template: /eng/common/templates-official/job/onelocbuild.yml@self
-            parameters:
-              MirrorRepo: templating
-              LclSource: lclFilesfromPackage
-              LclPackageId: 'LCL-JUNO-PROD-TMPLTNGMAIN'
-              MirrorBranch: 'main'
-              JobNameSuffix: '_main'
-              condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+      # The localization setup for main branch. Note difference in package ID. Should not be used with release/ branches.
+      - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
+        - template: /eng/common/templates-official/job/onelocbuild.yml@self
+          parameters:
+            MirrorRepo: templating
+            LclSource: lclFilesfromPackage
+            LclPackageId: 'LCL-JUNO-PROD-TMPLTNGMAIN'
+            MirrorBranch: 'main'
+            JobNameSuffix: '_main'
+            condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
       - template: /eng/common/templates-official/jobs/jobs.yml@self
         parameters:
-          enableMicrobuild: true
           enablePublishBuildArtifacts: true
-          enablePublishTestResults: true
-          enablePublishBuildAssets: true
-          enablePublishUsingPipelines: ${{ variables._PublishUsingPipelines }}
-          enableSourceBuild: true
+          enablePublishBuildAssets: false
+          enablePublishTestResults: false
           publishAssetsImmediately: true
-          sourceBuildParameters:
-            enableInternalSources: true
+          isAssetlessBuild: true
           enableTelemetry: true
-          helixRepo: dotnet/templating
-          templateContext:
-            sdl:
-              binskim:
-                analyzeTargetGlob: +:f|artifacts\bin\**\*.dll;+:f|artifacts\bin\**\*.exe;-:f|artifacts\bin\**\xunit*.dll;-:f|artifacts\bin\**\verify*.dll;
-          # WORKAROUND: BinSkim requires the folder exist prior to scanning.
-          preSteps:
-          - powershell: New-Item -ItemType Directory -Path $(Build.SourcesDirectory)/artifacts/bin -Force
-            displayName: Create artifacts/bin directory
-          jobs:
-          - ${{ each config in parameters.buildConfigurations }}:
-            - job: Windows_NT_${{ config.buildConfig }}
-              displayName: Windows_NT ${{ config.buildConfig }}
-              timeoutInMinutes: 90
-              pool:
-                name: $(DncEngInternalBuildPool)
-                image: 1es-windows-2022
-                os: windows
-              variables:
-              - _BuildConfig: ${{ config.buildConfig }}
-              - _SignType: test
-              - ${{ if notin(variables['Build.Reason'], 'PullRequest') }}:
-                - _SignType: real
-              - _InternalBuildArgs: ''
-              # Only enable publishing in non-public, non PR scenarios.
-              - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-                # DotNet-Symbol-Server-Pats provides: microsoft-symbol-server-pat, symweb-symbol-server-pat
-                # Publish-Build-Assets provides: MaestroAccessToken, BotAccount-dotnet-maestro-bot-PAT
-                - group: Publish-Build-Assets
-                - _InternalBuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
-                    /p:DotNetPublishUsingPipelines=$(_PublishUsingPipelines)
-                    /p:OfficialBuildId=$(BUILD.BUILDNUMBER)
-              steps:
-              # Use utility script to run script command dependent on agent OS.
-              - template: /eng/common/templates-official/steps/enable-internal-sources.yml@self
-              - ${{ if in(variables['Build.Reason'], 'PullRequest') }}:
-                - script: eng/common/cibuild.cmd
-                    -configuration $(_BuildConfig)
-                    -prepareMachine
-                    -integrationTest
-                    $(_InternalBuildArgs)
-                  displayName: Windows Build / Publish
-              - ${{ else }}:
-                - script: eng/common/cibuild.cmd
-                    -configuration $(_BuildConfig)
-                    -prepareMachine
-                    /p:Test=false
-                    $(_InternalBuildArgs)
-                  displayName: Windows Build / Publish
-
-          - ${{ if in(variables['Build.Reason'], 'PullRequest') }}:
-            - ${{ each config in parameters.buildConfigurations }}:
-              - job: OSX_${{ config.buildConfig }}
-                displayName: OSX ${{ config.buildConfig }}
-                pool:
-                  vmImage: 'macOS-latest'
-                variables:
-                - _BuildConfig: ${{ config.buildConfig }}
-                - _SignType: none
-                steps:
-                - template: /eng/common/templates-official/steps/enable-internal-sources.yml@self
-                - script: eng/common/cibuild.sh
-                    --configuration $(_BuildConfig)
-                    --prepareMachine
-                    --integrationTest
-                  name: Build
-                  displayName: Build
-
-          - ${{ if in(variables['Build.Reason'], 'PullRequest') }}:
-            - ${{ each config in parameters.buildConfigurations }}:
-              - job: Linux_${{ config.buildConfig }}
-                displayName: Linux ${{ config.buildConfig }}
-                pool:
-                  ${{ if eq(variables['System.TeamProject'], 'public') }}:
-                    name: $(DncEngPublicBuildPool)
-                    image: 1es-ubuntu-2204-open
-                    os: linux
-                  ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-                    name: $(DncEngInternalBuildPool)
-                    image: 1es-ubuntu-2204
-                    os: linux
-                variables:
-                - _BuildConfig: ${{ config.buildConfig }}
-                - _SignType: none
-                steps:
-                - template: /eng/common/templates-official/steps/enable-internal-sources.yml@self
-                - script: eng/common/cibuild.sh
-                    --configuration $(_BuildConfig)
-                    --prepareMachine
-                    --integrationTest
-                  name: Build
-                  displayName: Build
-                  condition: succeeded()
