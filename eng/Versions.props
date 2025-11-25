@@ -4,13 +4,12 @@
 
   <PropertyGroup>
     <VersionPrefix>11.0.100</VersionPrefix>
-
     <PreReleaseVersionLabel>alpha</PreReleaseVersionLabel>
-    <PreReleaseVersionIteration>1</PreReleaseVersionIteration>
+    <PreReleaseVersionIteration></PreReleaseVersionIteration>
     <!-- Allowed values: '', 'prerelease', 'release'. Set to 'release' when stabilizing. -->
     <DotNetFinalVersionKind></DotNetFinalVersionKind>
 
-    <!-- Arcade feature flags-->
+    <!-- Arcade features-->
     <UsingToolXliff>true</UsingToolXliff>
   </PropertyGroup>
 
