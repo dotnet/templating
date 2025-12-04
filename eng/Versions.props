@@ -1,16 +1,14 @@
 <Project>
-
-  <Import Project="Version.Details.props" />
-
+  <Import Project="Version.Details.props" Condition="Exists('Version.Details.props')" />
   <PropertyGroup>
-    <VersionPrefix>10.0.102</VersionPrefix>
+    <VersionPrefix>10.0.101</VersionPrefix>
+    <!-- When StabilizePackageVersion is set to 'true', this branch will produce stable outputs for 'Shipping' packages -->
+    <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">false</StabilizePackageVersion>
+    <DotNetFinalVersionKind Condition="'$(StabilizePackageVersion)' == 'true'">release</DotNetFinalVersionKind>
+    <!-- Calculate prerelease label -->
     <PreReleaseVersionLabel>servicing</PreReleaseVersionLabel>
     <PreReleaseVersionIteration></PreReleaseVersionIteration>
-    <!-- Allowed values: '', 'prerelease', 'release'. Set to 'release' when stabilizing. -->
-    <DotNetFinalVersionKind></DotNetFinalVersionKind>
-
-    <!-- Opt-in/out repo features -->
     <UsingToolXliff>true</UsingToolXliff>
+    <FlagNetStandard1XDependencies>true</FlagNetStandard1XDependencies>
   </PropertyGroup>
-
 </Project>
