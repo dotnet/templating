@@ -2,55 +2,28 @@ trigger:
   batch: true
   branches:
     include:
-    - stabilize
     - main
     - release/*
-    - internal/release/*
-    - feature/*
-    - legacy/*
 pr:
   branches:
     include:
-    - stabilize
     - main
     - release/*
-    - feature/*
-    - legacy/*
 
 variables:
-  # Cannot use key:value syntax in root defined variables
-  - name: _TeamName
-    value: NETDevUX
-  - name: _PublishUsingPipelines
-    value: true
-  - name: Codeql.Enabled
-    value: true
-  - name: EnableReleaseOneLocBuild
-    value: false
   - template: /eng/common/templates/variables/pool-providers.yml
 
 stages:
 - stage: build
   displayName: Build
   jobs:
-  - ${{ if and( ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-    # The localization setup for main branch. Note difference in package ID. Should not be used with release/ branches.
-    - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
-      - template: /eng/common/templates/job/onelocbuild.yml
-        parameters:
-          MirrorRepo: templating
-          LclSource: lclFilesfromPackage
-          LclPackageId: 'LCL-JUNO-PROD-TMPLTNGMAIN'
-          MirrorBranch: 'main'
-          JobNameSuffix: '_main'
-          condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
   - template: /eng/common/templates/jobs/jobs.yml
     parameters:
       enableMicrobuild: true
       enablePublishBuildArtifacts: true
       enablePublishTestResults: true
       enablePublishBuildAssets: true
-      enablePublishUsingPipelines: ${{ variables._PublishUsingPipelines }}
+      enablePublishUsingPipelines: false
       enableSourceBuild: true
       sourceBuildParameters:
         enableInternalSources: true
