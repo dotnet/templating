@@ -95,9 +95,6 @@ extends:
           preSteps:
           - powershell: New-Item -ItemType Directory -Path $(Build.SourcesDirectory)/artifacts/bin -Force
             displayName: Create artifacts/bin directory
-          - powershell: |
-              eng/common/dotnet-install.ps1 -Version 9.0.100 -InstallDir "$(Build.SourcesDirectory)\.dotnet" -NoPath
-            displayName: Install .NET 9 SDK
           jobs:
           - ${{ each config in parameters.buildConfigurations }}:
             - job: Windows_NT_${{ config.buildConfig }}
@@ -150,8 +147,6 @@ extends:
                 - _SignType: none
                 steps:
                 - template: /eng/common/templates-official/steps/enable-internal-sources.yml@self
-                - script: ./eng/common/dotnet-install.sh --version 9.0.100 --install-dir $(Build.SourcesDirectory)/.dotnet --no-path
-                  displayName: Install .NET 9 SDK
                 - script: eng/common/cibuild.sh
                     --configuration $(_BuildConfig)
                     --prepareMachine
@@ -177,8 +172,6 @@ extends:
                 - _SignType: none
                 steps:
                 - template: /eng/common/templates-official/steps/enable-internal-sources.yml@self
-                - script: ./eng/common/dotnet-install.sh --version 9.0.100 --install-dir $(Build.SourcesDirectory)/.dotnet --no-path
-                  displayName: Install .NET 9 SDK
                 - script: eng/common/cibuild.sh
                     --configuration $(_BuildConfig)
                     --prepareMachine
