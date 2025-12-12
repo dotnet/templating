@@ -30,7 +30,7 @@
     <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="$(MicrosoftBclAsyncInterfacesPackageVersion)" />
     <PackageVersion Include="Microsoft.IO.Redist" Version="6.0.1" /> <!-- Pin transitive dependency to avoid vulnerable 6.0.0 version. -->
     <PackageVersion Include="System.Diagnostics.DiagnosticSource" Version="$(SystemDiagnosticsDiagnosticSourcePackageVersion)" />
-    <PackageVersion Include="System.Formats.Asn1" Version="8.0.1" /> <!-- Pin transitive dependency to avoid vulnerable 8.0.0 version. -->
+    <PackageVersion Include="System.Formats.Asn1" Version="10.0.1" /> <!-- Pin transitive dependency to avoid vulnerable 8.0.0 version. -->
     <PackageVersion Include="System.IO.Pipelines" Version="$(SystemIOPipelinesPackageVersion)" />
     <PackageVersion Include="System.Text.Encodings.Web" Version="$(SystemTextEncodingsWebPackageVersion)" />
     <PackageVersion Include="System.Text.Json" Version="$(SystemTextJsonPackageVersion)" /> <!-- Pin transitive dependency to avoid vulnerable 8.0.0 version. -->
