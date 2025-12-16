@@ -390,8 +390,8 @@ function InitializeVisualStudioMSBuild([bool]$install, [object]$vsRequirements =
 
   # If the version of msbuild is going to be xcopied,
   # use this version. Version matches a package here:
-  # https://dev.azure.com/dnceng/public/_artifacts/feed/dotnet-eng/NuGet/Microsoft.DotNet.Arcade.MSBuild.Xcopy/versions/17.14.16
-  $defaultXCopyMSBuildVersion = '17.14.16'
+  # https://dev.azure.com/dnceng/public/_artifacts/feed/dotnet-eng/NuGet/Microsoft.DotNet.Arcade.MSBuild.Xcopy/versions/18.0.0
+  $defaultXCopyMSBuildVersion = '18.0.0'
 
   if (!$vsRequirements) {
     if (Get-Member -InputObject $GlobalJson.tools -Name 'vs') {
@@ -556,19 +556,26 @@ function LocateVisualStudio([object]$vsRequirements = $null){
     })
   }
 
-  if (!$vsRequirements) { $vsRequirements = $GlobalJson.tools.vs }
+  if (!$vsRequirements) {
+    if (Get-Member -InputObject $GlobalJson.tools -Name 'vs' -ErrorAction SilentlyContinue) {
+      $vsRequirements = $GlobalJson.tools.vs
+    } else {
+      $vsRequirements = $null
+    }
+  }
+
   $args = @('-latest', '-format', 'json', '-requires', 'Microsoft.Component.MSBuild', '-products', '*')
 
   if (!$excludePrereleaseVS) {
     $args += '-prerelease'
   }
 
-  if (Get-Member -InputObject $vsRequirements -Name 'version') {
+  if ($vsRequirements -and (Get-Member -InputObject $vsRequirements -Name 'version' -ErrorAction SilentlyContinue)) {
     $args += '-version'
     $args += $vsRequirements.version
   }
 
-  if (Get-Member -InputObject $vsRequirements -Name 'components') {
+  if ($vsRequirements -and (Get-Member -InputObject $vsRequirements -Name 'components' -ErrorAction SilentlyContinue)) {
     foreach ($component in $vsRequirements.components) {
       $args += '-requires'
       $args += $component

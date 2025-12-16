@@ -175,7 +175,7 @@ stages:
             os: windows
           ${{ else }}:
             name: $(DncEngInternalBuildPool)
-            demands: ImageOverride -equals windows.vs2022.amd64
+            demands: ImageOverride -equals windows.vs2026preview.scout.amd64
       steps:
       - template: /eng/common/core-templates/post-build/setup-maestro-vars.yml
         parameters:
@@ -236,7 +236,7 @@ stages:
             os: windows
           ${{ else }}:
             name: $(DncEngInternalBuildPool)
-            demands: ImageOverride -equals windows.vs2022.amd64
+            demands: ImageOverride -equals windows.vs2026preview.scout.amd64
       steps:
       - template: /eng/common/core-templates/post-build/setup-maestro-vars.yml
         parameters:
