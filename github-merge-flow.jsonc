@@ -1,7 +1,7 @@
 // IMPORTANT: This file is read by the merge flow from main branch only. 
 {
     "merge-flow-configurations": {
-        // Automate opening PRs to merge cli release/8.0.1xx to 8.0.4xx
+        // Automate opening PRs to merge sdk repos from release/8.0.1xx to 8.0.4xx
         "release/8.0.1xx":{
             "MergeToBranch": "release/8.0.4xx",
             "ExtraSwitches": "-QuietComments"
