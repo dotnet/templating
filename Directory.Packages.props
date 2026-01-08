@@ -14,7 +14,7 @@
     <!-- MSBuild dependencies -->
     <PackageVersion Include="Microsoft.Build.Framework" Version="17.11.48" />
     <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="17.11.48" />
-
+   
     <!-- NuGet dependencies -->
     <PackageVersion Include="NuGet.Configuration" Version="6.13.2" />
     <PackageVersion Include="NuGet.Credentials" Version="6.13.2" />
