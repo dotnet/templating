@@ -45,7 +45,7 @@ parameters:
   - buildConfig: Release
 
 extends:
-  ${{ if ne(variables['Build.Reason'], 'PullRequest') }}:
+  ${{ if and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.DefinitionName'], 'templating-official-ci')) }}:
     template: v1/1ES.Official.PipelineTemplate.yml@1esPipelines
   ${{ else }}:
     template: v1/1ES.Unofficial.PipelineTemplate.yml@1esPipelines
@@ -87,6 +87,8 @@ extends:
             enableInternalSources: true
           enableTelemetry: true
           helixRepo: dotnet/templating
+          ${{ if ne(variables['Build.DefinitionName'], 'templating-official-ci') }}:
+            microbuildUseESRP: false
           templateContext:
             sdl:
               binskim:
@@ -107,7 +109,7 @@ extends:
               variables:
               - _BuildConfig: ${{ config.buildConfig }}
               - _SignType: test
-              - ${{ if notin(variables['Build.Reason'], 'PullRequest') }}:
+              - ${{ if and(notin(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.DefinitionName'], 'templating-official-ci')) }}:
                 - _SignType: real
               - _InternalBuildArgs: ''
               # Only enable publishing in non-public, non PR scenarios.
