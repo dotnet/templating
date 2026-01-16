@@ -74,110 +74,117 @@ extends:
               MirrorBranch: 'main'
               JobNameSuffix: '_main'
               condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
-      - template: /eng/common/templates-official/jobs/jobs.yml@self
-        parameters:
-          enableMicrobuild: true
-          enablePublishBuildArtifacts: true
-          enablePublishTestResults: true
-          enablePublishBuildAssets: true
-          enablePublishUsingPipelines: ${{ variables._PublishUsingPipelines }}
-          enableSourceBuild: true
-          publishAssetsImmediately: true
-          sourceBuildParameters:
-            enableInternalSources: true
-          enableTelemetry: true
-          helixRepo: dotnet/templating
-          ${{ if ne(variables['Build.DefinitionName'], 'templating-official-ci') }}:
-            microbuildUseESRP: false
-          templateContext:
-            sdl:
-              binskim:
-                analyzeTargetGlob: +:f|artifacts\bin\**\*.dll;+:f|artifacts\bin\**\*.exe;-:f|artifacts\bin\**\xunit*.dll;-:f|artifacts\bin\**\verify*.dll;
-          # WORKAROUND: BinSkim requires the folder exist prior to scanning.
-          preSteps:
-          - powershell: New-Item -ItemType Directory -Path $(Build.SourcesDirectory)/artifacts/bin -Force
-            displayName: Create artifacts/bin directory
-          jobs:
-          - ${{ each config in parameters.buildConfigurations }}:
-            - job: Windows_NT_${{ config.buildConfig }}
-              displayName: Windows_NT ${{ config.buildConfig }}
-              timeoutInMinutes: 90
-              pool:
-                name: $(DncEngInternalBuildPool)
-                image: 1es-windows-2022
-                os: windows
-              variables:
-              - _BuildConfig: ${{ config.buildConfig }}
-              - _SignType: test
-              - ${{ if and(notin(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.DefinitionName'], 'templating-official-ci')) }}:
-                - _SignType: real
-              - _InternalBuildArgs: ''
-              # Only enable publishing in non-public, non PR scenarios.
-              - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
-                # DotNet-Symbol-Server-Pats provides: microsoft-symbol-server-pat, symweb-symbol-server-pat
-                # Publish-Build-Assets provides: MaestroAccessToken, BotAccount-dotnet-maestro-bot-PAT
-                - group: Publish-Build-Assets
-                - _InternalBuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
-                    /p:DotNetPublishUsingPipelines=$(_PublishUsingPipelines)
-                    /p:OfficialBuildId=$(BUILD.BUILDNUMBER)
-              steps:
-              # Use utility script to run script command dependent on agent OS.
-              - template: /eng/common/templates-official/steps/enable-internal-sources.yml@self
-              - ${{ if in(variables['Build.Reason'], 'PullRequest') }}:
-                - script: eng/common/cibuild.cmd
-                    -configuration $(_BuildConfig)
-                    -prepareMachine
-                    -integrationTest
-                    $(_InternalBuildArgs)
-                  displayName: Windows Build / Publish
-              - ${{ else }}:
-                - script: eng/common/cibuild.cmd
-                    -configuration $(_BuildConfig)
-                    -prepareMachine
-                    /p:Test=false
-                    $(_InternalBuildArgs)
-                  displayName: Windows Build / Publish
-
-          - ${{ if in(variables['Build.Reason'], 'PullRequest') }}:
+      - ${{ if eq(variables['Build.DefinitionName'], 'templating-official-ci') }}:
+        - template: /eng/common/templates-official/jobs/jobs.yml@self
+          parameters:
+            enablePublishBuildArtifacts: true
+            enablePublishBuildAssets: false
+            enablePublishTestResults: false
+            publishAssetsImmediately: true
+            isAssetlessBuild: true
+            enableTelemetry: true
+      - ${{ else }}:
+        - template: /eng/common/templates-official/jobs/jobs.yml@self
+          parameters:
+            enableMicrobuild: true
+            enablePublishBuildArtifacts: true
+            enablePublishTestResults: true
+            enablePublishBuildAssets: true
+            enablePublishUsingPipelines: ${{ variables._PublishUsingPipelines }}
+            publishAssetsImmediately: true
+            enableTelemetry: true
+            helixRepo: dotnet/templating
+            ${{ if ne(variables['Build.DefinitionName'], 'templating-official-ci') }}:
+              microbuildUseESRP: false
+            templateContext:
+              sdl:
+                binskim:
+                  analyzeTargetGlob: +:f|artifacts\bin\**\*.dll;+:f|artifacts\bin\**\*.exe;-:f|artifacts\bin\**\xunit*.dll;-:f|artifacts\bin\**\verify*.dll;
+            # WORKAROUND: BinSkim requires the folder exist prior to scanning.
+            preSteps:
+            - powershell: New-Item -ItemType Directory -Path $(Build.SourcesDirectory)/artifacts/bin -Force
+              displayName: Create artifacts/bin directory
+            jobs:
             - ${{ each config in parameters.buildConfigurations }}:
-              - job: OSX_${{ config.buildConfig }}
-                displayName: OSX ${{ config.buildConfig }}
+              - job: Windows_NT_${{ config.buildConfig }}
+                displayName: Windows_NT ${{ config.buildConfig }}
+                timeoutInMinutes: 90
                 pool:
-                  vmImage: 'macOS-latest'
+                  name: $(DncEngInternalBuildPool)
+                  image: 1es-windows-2022
+                  os: windows
                 variables:
                 - _BuildConfig: ${{ config.buildConfig }}
-                - _SignType: none
+                - _SignType: test
+                - ${{ if and(notin(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.DefinitionName'], 'templating-official-ci')) }}:
+                  - _SignType: real
+                - _InternalBuildArgs: ''
+                # Only enable publishing in non-public, non PR scenarios.
+                - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+                  # DotNet-Symbol-Server-Pats provides: microsoft-symbol-server-pat, symweb-symbol-server-pat
+                  # Publish-Build-Assets provides: MaestroAccessToken, BotAccount-dotnet-maestro-bot-PAT
+                  - group: Publish-Build-Assets
+                  - _InternalBuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
+                      /p:DotNetPublishUsingPipelines=$(_PublishUsingPipelines)
+                      /p:OfficialBuildId=$(BUILD.BUILDNUMBER)
                 steps:
+                # Use utility script to run script command dependent on agent OS.
                 - template: /eng/common/templates-official/steps/enable-internal-sources.yml@self
-                - script: eng/common/cibuild.sh
-                    --configuration $(_BuildConfig)
-                    --prepareMachine
-                    --integrationTest
-                  name: Build
-                  displayName: Build
+                - ${{ if in(variables['Build.Reason'], 'PullRequest') }}:
+                  - script: eng/common/cibuild.cmd
+                      -configuration $(_BuildConfig)
+                      -prepareMachine
+                      -integrationTest
+                      $(_InternalBuildArgs)
+                    displayName: Windows Build / Publish
+                - ${{ else }}:
+                  - script: eng/common/cibuild.cmd
+                      -configuration $(_BuildConfig)
+                      -prepareMachine
+                      /p:Test=false
+                      $(_InternalBuildArgs)
+                    displayName: Windows Build / Publish
 
-          - ${{ if in(variables['Build.Reason'], 'PullRequest') }}:
-            - ${{ each config in parameters.buildConfigurations }}:
-              - job: Linux_${{ config.buildConfig }}
-                displayName: Linux ${{ config.buildConfig }}
-                pool:
-                  ${{ if eq(variables['System.TeamProject'], 'public') }}:
-                    name: $(DncEngPublicBuildPool)
-                    image: 1es-ubuntu-2204-open
-                    os: linux
-                  ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-                    name: $(DncEngInternalBuildPool)
-                    image: 1es-ubuntu-2204
-                    os: linux
-                variables:
-                - _BuildConfig: ${{ config.buildConfig }}
-                - _SignType: none
-                steps:
-                - template: /eng/common/templates-official/steps/enable-internal-sources.yml@self
-                - script: eng/common/cibuild.sh
-                    --configuration $(_BuildConfig)
-                    --prepareMachine
-                    --integrationTest
-                  name: Build
-                  displayName: Build
-                  condition: succeeded()
+            - ${{ if in(variables['Build.Reason'], 'PullRequest') }}:
+              - ${{ each config in parameters.buildConfigurations }}:
+                - job: OSX_${{ config.buildConfig }}
+                  displayName: OSX ${{ config.buildConfig }}
+                  pool:
+                    vmImage: 'macOS-latest'
+                  variables:
+                  - _BuildConfig: ${{ config.buildConfig }}
+                  - _SignType: none
+                  steps:
+                  - template: /eng/common/templates-official/steps/enable-internal-sources.yml@self
+                  - script: eng/common/cibuild.sh
+                      --configuration $(_BuildConfig)
+                      --prepareMachine
+                      --integrationTest
+                    name: Build
+                    displayName: Build
+
+            - ${{ if in(variables['Build.Reason'], 'PullRequest') }}:
+              - ${{ each config in parameters.buildConfigurations }}:
+                - job: Linux_${{ config.buildConfig }}
+                  displayName: Linux ${{ config.buildConfig }}
+                  pool:
+                    ${{ if eq(variables['System.TeamProject'], 'public') }}:
+                      name: $(DncEngPublicBuildPool)
+                      image: 1es-ubuntu-2204-open
+                      os: linux
+                    ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+                      name: $(DncEngInternalBuildPool)
+                      image: 1es-ubuntu-2204
+                      os: linux
+                  variables:
+                  - _BuildConfig: ${{ config.buildConfig }}
+                  - _SignType: none
+                  steps:
+                  - template: /eng/common/templates-official/steps/enable-internal-sources.yml@self
+                  - script: eng/common/cibuild.sh
+                      --configuration $(_BuildConfig)
+                      --prepareMachine
+                      --integrationTest
+                    name: Build
+                    displayName: Build
+                    condition: succeeded()
