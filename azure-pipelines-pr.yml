@@ -127,7 +127,7 @@ stages:
               is1ESPipeline: false
               args:
                 displayName: Publish TestResults Artifact
-                pathToPublish: $(Build.ArtifactStagingDirectory)/artifacts/TestResults/$(_BuildConfig)
+                pathToPublish: $(System.DefaultWorkingDirectory)/artifacts/TestResults/$(_BuildConfig)
                 publishLocation: Container
                 artifactName: $(Agent.Os)_$(Agent.JobName)_TestResults_Attempt$(System.JobAttempt)
                 continueOnError: true
