@@ -122,6 +122,16 @@ stages:
               --integrationTest
             name: Build
             displayName: Build
+          - template: /eng/common/core-templates/steps/publish-build-artifacts.yml
+            parameters:
+              is1ESPipeline: false
+              args:
+                displayName: Publish TestResults Artifact
+                pathToPublish: $(Build.ArtifactStagingDirectory)/artifacts/TestResults/$(_BuildConfig)
+                publishLocation: Container
+                artifactName: $(Agent.Os)_$(Agent.JobName)_TestResults_Attempt$(System.JobAttempt)
+                continueOnError: true
+                condition: always()
 
       - ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
         - job: Linux
