@@ -28,6 +28,8 @@ variables:
   - name: EnableReleaseOneLocBuild
     value: false
   - template: /eng/common/templates/variables/pool-providers.yml
+  - name: system.debug
+    value: true
 
 stages:
 - stage: build
@@ -120,7 +122,7 @@ stages:
               --configuration $(_BuildConfig)
               --prepareMachine
               --integrationTest
-              --verbosity diagnostic
+              --verbosity detailed
             name: Build
             displayName: Build
           - template: /eng/common/core-templates/steps/publish-build-artifacts.yml
