@@ -120,6 +120,7 @@ stages:
               --configuration $(_BuildConfig)
               --prepareMachine
               --integrationTest
+              --verbosity diagnostic
             name: Build
             displayName: Build
           - template: /eng/common/core-templates/steps/publish-build-artifacts.yml
