@@ -28,8 +28,6 @@ variables:
   - name: EnableReleaseOneLocBuild
     value: false
   - template: /eng/common/templates/variables/pool-providers.yml
-  - name: system.debug
-    value: true
 
 stages:
 - stage: build
@@ -122,19 +120,8 @@ stages:
               --configuration $(_BuildConfig)
               --prepareMachine
               --integrationTest
-              --verbosity detailed
             name: Build
             displayName: Build
-          - template: /eng/common/core-templates/steps/publish-build-artifacts.yml
-            parameters:
-              is1ESPipeline: false
-              args:
-                displayName: Publish TestResults Artifact
-                pathToPublish: $(System.DefaultWorkingDirectory)/artifacts/TestResults/$(_BuildConfig)
-                publishLocation: Container
-                artifactName: $(Agent.Os)_$(Agent.JobName)_TestResults_Attempt$(System.JobAttempt)
-                continueOnError: true
-                condition: always()
 
       - ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
         - job: Linux
