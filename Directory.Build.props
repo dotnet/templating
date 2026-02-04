@@ -42,6 +42,8 @@
     <NetMinimum Condition="'$(DotNetBuildSourceOnly)' == 'true'">$(NetCurrent)</NetMinimum>
 
     <PublishWindowsPdb>false</PublishWindowsPdb>
+
+    <NoWarn Condition="'$(DotNetBuildSourceOnly)' == 'true'">$(NoWarn);IDE0370</NoWarn>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(EnableAnalyzers)' == 'true'">
