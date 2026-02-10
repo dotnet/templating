@@ -7,7 +7,7 @@ This file should be imported by eng/Versions.props
   <PropertyGroup>
     <!-- dotnet/dotnet dependencies -->
     <MicrosoftDotNetArcadeSdkPackageVersion>10.0.0-beta.26109.105</MicrosoftDotNetArcadeSdkPackageVersion>
-    <SystemCommandLinePackageVersion>2.0.4</SystemCommandLinePackageVersion>
+    <SystemCommandLinePackageVersion>2.0.1</SystemCommandLinePackageVersion>
     <!-- _git/dotnet-runtime dependencies -->
     <MicrosoftBclAsyncInterfacesPackageVersion>10.0.1</MicrosoftBclAsyncInterfacesPackageVersion>
     <MicrosoftExtensionsLoggingPackageVersion>10.0.1</MicrosoftExtensionsLoggingPackageVersion>
