@@ -13,6 +13,6 @@
     "dotnet": "11.0.100-preview.1.26104.118"
   },
   "msbuild-sdks": {
-    "Microsoft.DotNet.Arcade.Sdk": "11.0.0-beta.26115.104"
+    "Microsoft.DotNet.Arcade.Sdk": "11.0.0-beta.26116.109"
   }
 }
