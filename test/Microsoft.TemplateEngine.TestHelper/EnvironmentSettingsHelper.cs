@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Edge;
 using Microsoft.TemplateEngine.Utils;
-using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace Microsoft.TemplateEngine.TestHelper
 {

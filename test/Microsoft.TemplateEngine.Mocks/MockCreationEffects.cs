@@ -3,7 +3,7 @@
 
 using System.Text;
 using Microsoft.TemplateEngine.Abstractions;
-using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace Microsoft.TemplateEngine.Mocks
 {
@@ -49,9 +49,9 @@ namespace Microsoft.TemplateEngine.Mocks
 
         public void Deserialize(IXunitSerializationInfo info)
         {
-            _primaryOutputs = info.GetValue<string[]>("primaryOutputs");
-            _mockFileChanges = info.GetValue<MockFileChange[]>("fileChanges");
-            _absentFiles = info.GetValue<string[]>("absentFiles");
+            _primaryOutputs = info.GetValue<string[]>("primaryOutputs")!;
+            _mockFileChanges = info.GetValue<MockFileChange[]>("fileChanges")!;
+            _absentFiles = info.GetValue<string[]>("absentFiles")!;
         }
 
         public void Serialize(IXunitSerializationInfo info)
