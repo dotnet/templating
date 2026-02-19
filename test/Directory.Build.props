@@ -4,6 +4,13 @@
 
   <PropertyGroup>
     <ExcludeFromSourceOnlyBuild>true</ExcludeFromSourceOnlyBuild>
+    <TestRunnerName>XUnitV3</TestRunnerName>
+    <!-- TODO: Fix xUnit1051 (use TestContext.Current.CancellationToken) incrementally and remove this suppression. -->
+    <NoWarn>$(NoWarn);xUnit1051</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
 
 </Project>

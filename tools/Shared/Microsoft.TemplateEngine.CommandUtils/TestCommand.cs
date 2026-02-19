@@ -4,7 +4,6 @@
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Utils;
-using Xunit.Abstractions;
 
 namespace Microsoft.TemplateEngine.CommandUtils
 {

@@ -1,7 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -363,9 +362,6 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             return result;
         }
 
-        private static void DummyMethod()
-        { }
-
         private static async IAsyncEnumerable<(string FilePath, string ScrubbedContent)> GetVerificationContent(
             string contentDir,
             List<IPatternMatcher> includeMatchers,
@@ -429,14 +425,6 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
 
         private async Task VerifyResult(TemplateVerifierOptions args, IInstantiationResult commandResultData, CallerInfo callerInfo)
         {
-            UseVerifyAttribute a = new UseVerifyAttribute();
-
-            // https://github.com/VerifyTests/Verify/blob/d8cbe38f527d6788ecadd6205c82803bec3cdfa6/src/Verify.Xunit/Verifier.cs#L10
-            //  need to simulate execution from tests
-            var v = DummyMethod;
-            MethodInfo mi = v.Method;
-            a.Before(mi);
-
             if (args.VerifyCommandOutput)
             {
                 if (_fileSystem.DirectoryExists(Path.Combine(commandResultData.InstantiatedContentDirectory, SpecialFiles.StandardStreamsDir)))
