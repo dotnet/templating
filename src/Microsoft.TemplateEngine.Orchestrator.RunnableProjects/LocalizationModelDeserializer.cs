@@ -131,10 +131,16 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             foreach (var postActionParts in strings.GroupBy(p => p.NameParts.FirstOrDefault()))
             {
+                if (string.IsNullOrEmpty(postActionParts.Key))
+                {
+                    // Post action with no ID. Ignore.
+                    continue;
+                }
+
                 string postActionId = postActionParts.Key;
                 string? description = postActionParts.SingleOrDefault(p => p.NameParts.Skip(1).FirstOrDefault() == "description").LocalizedString;
                 var instructions = LoadManualInstructionModels(postActionParts
-                    .Where(s => s.NameParts.Skip(1).FirstOrDefault().StartsWith("manualInstructions"))
+                    .Where(s => s.NameParts.Skip(1).FirstOrDefault()?.StartsWith("manualInstructions") == true)
                     .Select(s => (s.NameParts.Skip(2), s.LocalizedString)));
 
                 results[postActionId] = new PostActionLocalizationModel()
@@ -162,6 +168,12 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
 
             foreach (var instructionParts in strings.GroupBy(p => p.NameParts.FirstOrDefault()))
             {
+                if (string.IsNullOrEmpty(instructionParts.Key))
+                {
+                    // Instruction with no ID. Ignore.
+                    continue;
+                }
+
                 string id = instructionParts.Key;
                 string? text = instructionParts.SingleOrDefault(p => p.NameParts.Skip(1).FirstOrDefault() == "text").LocalizedString;
                 results[id] = text;

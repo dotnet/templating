@@ -1,9 +1,0 @@
-<!-- When altering this file or making other Source Build related changes, include @dotnet/source-build as a reviewer. -->
-<!-- See aka.ms/dotnet/prebuilts for guidance on what pre-builts are and how to eliminate them. -->
-
-<UsageData>
-  <IgnorePatterns>
-    <!-- Lifted to live version in VMR. -->
-    <UsagePattern IdentityGlob="System.Formats.Asn1/8.0.*" />
-  </IgnorePatterns>
-</UsageData>

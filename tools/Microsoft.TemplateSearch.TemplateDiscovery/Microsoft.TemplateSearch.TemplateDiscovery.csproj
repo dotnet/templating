@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>$(NetCurrent)</TargetFramework>
+    <TargetFrameworks>$(NetMinimum);$(NetCurrent)</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <IsPackable>true</IsPackable>
     <IsShipping>false</IsShipping>
@@ -10,7 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="Xunit" />
+    <PackageReference Include="Verify.Xunit" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
     <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="NuGet.Configuration" />

@@ -7,6 +7,7 @@
     <Product>Microsoft .NET</Product>
     <Copyright>$(CopyrightNetFoundation)</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/dotnet/templating</PackageProjectUrl>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <NoWarn>$(NoWarn);NU5105;NU5128;NU5100;NU5118;0419,0649</NoWarn>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
@@ -30,6 +31,19 @@
     <EnableAnalyzers>true</EnableAnalyzers>
     <!-- Disable analyzers in sourcebuild -->
     <EnableAnalyzers Condition="'$(DotNetBuildSourceOnly)' == 'true'">false</EnableAnalyzers>
+
+    <!-- Enable reproducible build per binskim -->
+    <Deterministic>true</Deterministic>
+
+    <!-- The minimum .NET Framework version supported by templating packages. -->
+    <NetFrameworkMinimum>net472</NetFrameworkMinimum>
+
+    <!-- Only build the latest .NETCoreApp TFM when building source-only. -->
+    <NetMinimum Condition="'$(DotNetBuildSourceOnly)' == 'true'">$(NetCurrent)</NetMinimum>
+
+    <PublishWindowsPdb>false</PublishWindowsPdb>
+
+    <NoWarn Condition="'$(DotNetBuildSourceOnly)' == 'true'">$(NoWarn);IDE0370</NoWarn>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(EnableAnalyzers)' == 'true'">

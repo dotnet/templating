@@ -5,7 +5,6 @@ using Microsoft.TemplateEngine.CommandUtils;
 using Microsoft.TemplateEngine.TestHelper;
 using Microsoft.TemplateEngine.Tests;
 using Newtonsoft.Json.Linq;
-using Xunit;
 using Xunit.Abstractions;
 
 namespace Microsoft.TemplateSearch.TemplateDiscovery.IntegrationTests
@@ -191,7 +190,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.IntegrationTests
                 .And.HaveStdOutContaining(
 @"Template packages:
    new: 1
-      Test.Templates::1.0.0
+      Test.Templates@1.0.0
    updated: 0
    removed: 0
    not changed: 0")
@@ -232,7 +231,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.IntegrationTests
                 .And.HaveStdOutContaining(
 @"Template packages:
    new: 1
-      Microsoft.Azure.WebJobs.ProjectTemplates::1.0.0
+      Microsoft.Azure.WebJobs.ProjectTemplates@1.0.0
    updated: 0
    removed: 0
    not changed: 1")
@@ -279,7 +278,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.IntegrationTests
                 .And.HaveStdOutContaining(
 @"Template packages:
    new: 1
-      Test.Templates::1.0.0
+      Test.Templates@1.0.0
    updated: 0
    removed: 0
    not changed: 0")
@@ -366,7 +365,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.IntegrationTests
                 .And.HaveStdOutContaining(
 @"Template packages:
    new: 1
-      Test.Templates::1.0.0
+      Test.Templates@1.0.0
    updated: 0
    removed: 0
    not changed: 0")
@@ -407,7 +406,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.IntegrationTests
    new: 0
    updated: 0
    removed: 1
-      Test.Templates::1.0.0
+      Test.Templates@1.0.0
    not changed: 0")
                 .And.HaveStdOutContaining(
 @"Non template packages:
@@ -417,7 +416,7 @@ namespace Microsoft.TemplateSearch.TemplateDiscovery.IntegrationTests
    not changed: 0")
                 .And.HaveStdOutContaining(
 @"[Error]: the following 1 packages were removed
-   Test.Templates::1.0.0
+   Test.Templates@1.0.0
 Checking template packages via API: 
 Package Test.Templates was unlisted.");
 
