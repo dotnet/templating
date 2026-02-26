@@ -6,19 +6,19 @@ This file should be imported by eng/Versions.props
 <Project>
   <PropertyGroup>
     <!-- _git/dotnet-dotnet dependencies -->
-    <MicrosoftBclAsyncInterfacesPackageVersion>10.0.2</MicrosoftBclAsyncInterfacesPackageVersion>
-    <MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>10.0.2</MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>
-    <MicrosoftExtensionsLoggingPackageVersion>10.0.2</MicrosoftExtensionsLoggingPackageVersion>
-    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>10.0.2</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
-    <MicrosoftExtensionsLoggingConsolePackageVersion>10.0.2</MicrosoftExtensionsLoggingConsolePackageVersion>
-    <SystemCommandLinePackageVersion>2.0.2</SystemCommandLinePackageVersion>
-    <SystemDiagnosticsDiagnosticSourcePackageVersion>10.0.2</SystemDiagnosticsDiagnosticSourcePackageVersion>
-    <SystemFormatsAsn1PackageVersion>10.0.2</SystemFormatsAsn1PackageVersion>
-    <SystemIOPipelinesPackageVersion>10.0.2</SystemIOPipelinesPackageVersion>
-    <SystemTextEncodingsWebPackageVersion>10.0.2</SystemTextEncodingsWebPackageVersion>
-    <SystemTextJsonPackageVersion>10.0.2</SystemTextJsonPackageVersion>
+    <MicrosoftBclAsyncInterfacesPackageVersion>10.0.3</MicrosoftBclAsyncInterfacesPackageVersion>
+    <MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>10.0.3</MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>
+    <MicrosoftExtensionsLoggingPackageVersion>10.0.3</MicrosoftExtensionsLoggingPackageVersion>
+    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>10.0.3</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
+    <MicrosoftExtensionsLoggingConsolePackageVersion>10.0.3</MicrosoftExtensionsLoggingConsolePackageVersion>
+    <SystemCommandLinePackageVersion>2.0.3</SystemCommandLinePackageVersion>
+    <SystemDiagnosticsDiagnosticSourcePackageVersion>10.0.3</SystemDiagnosticsDiagnosticSourcePackageVersion>
+    <SystemFormatsAsn1PackageVersion>10.0.3</SystemFormatsAsn1PackageVersion>
+    <SystemIOPipelinesPackageVersion>10.0.3</SystemIOPipelinesPackageVersion>
+    <SystemTextEncodingsWebPackageVersion>10.0.3</SystemTextEncodingsWebPackageVersion>
+    <SystemTextJsonPackageVersion>10.0.3</SystemTextJsonPackageVersion>
     <!-- dotnet/dotnet dependencies -->
-    <MicrosoftDotNetArcadeSdkPackageVersion>10.0.0-beta.26117.109</MicrosoftDotNetArcadeSdkPackageVersion>
+    <MicrosoftDotNetArcadeSdkPackageVersion>10.0.0-beta.26125.125</MicrosoftDotNetArcadeSdkPackageVersion>
   </PropertyGroup>
   <!--Property group for alternate package version names-->
   <PropertyGroup>
