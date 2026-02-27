@@ -51,9 +51,6 @@ stages:
       enablePublishTestResults: true
       enablePublishBuildAssets: true
       enablePublishUsingPipelines: ${{ variables._PublishUsingPipelines }}
-      enableSourceBuild: true
-      sourceBuildParameters:
-        enableInternalSources: true
       enableTelemetry: true
       helixRepo: dotnet/templating
       jobs:

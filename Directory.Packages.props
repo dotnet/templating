@@ -14,7 +14,7 @@
     <!-- MSBuild dependencies -->
     <PackageVersion Include="Microsoft.Build.Framework" Version="17.11.48" />
     <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="17.11.48" />
-
+   
     <!-- NuGet dependencies -->
     <PackageVersion Include="NuGet.Configuration" Version="6.13.2" />
     <PackageVersion Include="NuGet.Credentials" Version="6.13.2" />
@@ -45,10 +45,13 @@
     <PackageVersion Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
     <PackageVersion Include="Verify.DiffPlex" Version="3.0.0" />
     <PackageVersion Include="Verify.XUnit" Version="25.0.2" />
+    <PackageVersion Include="Verify.XunitV3" Version="28.12.0" />
     <PackageVersion Include="XUnit" Version="$(XUnitVersion)" />
     <PackageVersion Include="xunit.abstractions" Version="2.0.3" />
     <!-- Xunit version is managed by Arcade. -->
     <PackageVersion Include="xunit.extensibility.execution" Version="$(XUnitVersion)" />
+    <PackageVersion Include="xunit.v3.assert" Version="$(XUnitV3Version)" />
+    <PackageVersion Include="xunit.v3.extensibility.core" Version="$(XUnitV3Version)" />
   </ItemGroup>
 
   <!-- Overrides needed until https://github.com/dotnet/source-build/issues/4467 is implemented. -->
