@@ -1,14 +1,16 @@
 <Project>
-  <Import Project="Version.Details.props" Condition="Exists('Version.Details.props')" />
+
+  <Import Project="Version.Details.props" />
+
   <PropertyGroup>
-    <VersionPrefix>10.0.300</VersionPrefix>
-    <!-- When StabilizePackageVersion is set to 'true', this branch will produce stable outputs for 'Shipping' packages.
-         NOTE: This repository stabilizes via VMR and this should not be set except in dev scenarios -->
-    <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">false</StabilizePackageVersion>
-    <DotNetFinalVersionKind Condition="'$(StabilizePackageVersion)' == 'true'">release</DotNetFinalVersionKind>
+    <VersionPrefix>11.0.100</VersionPrefix>
     <PreReleaseVersionLabel>preview</PreReleaseVersionLabel>
-    <PreReleaseVersionIteration></PreReleaseVersionIteration>
+    <PreReleaseVersionIteration>3</PreReleaseVersionIteration>
+    <!-- Allowed values: '', 'prerelease', 'release'. Set to 'release' when stabilizing. -->
+    <DotNetFinalVersionKind></DotNetFinalVersionKind>
+
+    <!-- Arcade features-->
     <UsingToolXliff>true</UsingToolXliff>
-    <FlagNetStandard1XDependencies>true</FlagNetStandard1XDependencies>
   </PropertyGroup>
+
 </Project>
