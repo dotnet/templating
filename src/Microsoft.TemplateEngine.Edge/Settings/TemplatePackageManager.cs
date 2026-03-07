@@ -342,7 +342,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
             }
 
             var scanResults = new ScanResult?[allTemplatePackages.Count];
-            Parallel.For(0, allTemplatePackages.Count, async (index) =>
+            await Task.WhenAll(Enumerable.Range(0, allTemplatePackages.Count).Select(async index =>
             {
                 try
                 {
@@ -354,7 +354,7 @@ namespace Microsoft.TemplateEngine.Edge.Settings
                     _logger.LogWarning(LocalizableStrings.TemplatePackageManager_Error_FailedToScan, allTemplatePackages[index].MountPointUri, ex.Message);
                     _logger.LogDebug($"Stack trace: {ex.StackTrace}");
                 }
-            });
+            })).ConfigureAwait(false);
             cancellationToken.ThrowIfCancellationRequested();
             cache = new TemplateCache(allTemplatePackages, scanResults, mountPoints, _environmentSettings);
             foreach (var scanResult in scanResults)

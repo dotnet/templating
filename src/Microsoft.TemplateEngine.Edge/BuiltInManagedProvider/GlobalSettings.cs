@@ -56,8 +56,8 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
             {
                 return;
             }
-            _watcher?.Dispose();
             _disposed = true;
+            _watcher?.Dispose();
             _watcher = null;
         }
 
@@ -167,6 +167,11 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
         //  To prevent this - we try to wait for a lock on behalf of the handler and refuse all concurrent file change notifications in the meantime
         private async void FileChanged(object sender, FileSystemEventArgs e)
         {
+            if (_disposed)
+            {
+                return;
+            }
+
             // Make sure the waiting happens only for one notification at the time - as we do not care about other notifications
             // until the SettingsChanged is called
             //  if multiple concurrent call(s) get here, while there is already other caller inside waiting for the lock
@@ -176,12 +181,24 @@ namespace Microsoft.TemplateEngine.Edge.BuiltInManagedProvider
                 return;
             }
 
-            await TryWaitForLock().ConfigureAwait(false);
+            try
+            {
+                await TryWaitForLock().ConfigureAwait(false);
 
-            // We are ready for new notifications now - indicate so by clearing the counter
-            Interlocked.Exchange(ref _waitingInstances, 0);
+                if (_disposed)
+                {
+                    return;
+                }
 
-            SettingsChanged?.Invoke();
+                // We are ready for new notifications now - indicate so by clearing the counter
+                Interlocked.Exchange(ref _waitingInstances, 0);
+
+                SettingsChanged?.Invoke();
+            }
+            catch (ObjectDisposedException)
+            {
+                // Object was disposed while async operation was in flight - safe to ignore
+            }
         }
 
         private async Task<bool> TryWaitForLock()
