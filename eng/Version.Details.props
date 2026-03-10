@@ -5,11 +5,12 @@ This file should be imported by eng/Versions.props
 -->
 <Project>
   <PropertyGroup>
-    <!-- dotnet/dotnet dependencies -->
-    <MicrosoftDotNetArcadeSdkPackageVersion>10.0.0-beta.26154.108</MicrosoftDotNetArcadeSdkPackageVersion>
+    <!-- dotnet-dotnet dependencies -->
+    <MicrosoftDotNetArcadeSdkPackageVersion>10.0.0-beta.26159.104</MicrosoftDotNetArcadeSdkPackageVersion>
     <SystemCommandLinePackageVersion>2.0.1</SystemCommandLinePackageVersion>
-    <!-- _git/dotnet-runtime dependencies -->
+    <!-- dotnet-runtime dependencies -->
     <MicrosoftBclAsyncInterfacesPackageVersion>10.0.1</MicrosoftBclAsyncInterfacesPackageVersion>
+    <MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>10.0.1</MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>
     <MicrosoftExtensionsLoggingPackageVersion>10.0.1</MicrosoftExtensionsLoggingPackageVersion>
     <MicrosoftExtensionsLoggingAbstractionsPackageVersion>10.0.1</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
     <MicrosoftExtensionsLoggingConsolePackageVersion>10.0.1</MicrosoftExtensionsLoggingConsolePackageVersion>
@@ -18,16 +19,15 @@ This file should be imported by eng/Versions.props
     <SystemIOPipelinesPackageVersion>10.0.1</SystemIOPipelinesPackageVersion>
     <SystemTextEncodingsWebPackageVersion>10.0.1</SystemTextEncodingsWebPackageVersion>
     <SystemTextJsonPackageVersion>10.0.1</SystemTextJsonPackageVersion>
-    <!-- dotnet/runtime dependencies -->
-    <MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>10.0.1</MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>
   </PropertyGroup>
   <!--Property group for alternate package version names-->
   <PropertyGroup>
-    <!-- dotnet/dotnet dependencies -->
+    <!-- dotnet-dotnet dependencies -->
     <MicrosoftDotNetArcadeSdkVersion>$(MicrosoftDotNetArcadeSdkPackageVersion)</MicrosoftDotNetArcadeSdkVersion>
     <SystemCommandLineVersion>$(SystemCommandLinePackageVersion)</SystemCommandLineVersion>
-    <!-- _git/dotnet-runtime dependencies -->
+    <!-- dotnet-runtime dependencies -->
     <MicrosoftBclAsyncInterfacesVersion>$(MicrosoftBclAsyncInterfacesPackageVersion)</MicrosoftBclAsyncInterfacesVersion>
+    <MicrosoftExtensionsDependencyInjectionAbstractionsVersion>$(MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion)</MicrosoftExtensionsDependencyInjectionAbstractionsVersion>
     <MicrosoftExtensionsLoggingVersion>$(MicrosoftExtensionsLoggingPackageVersion)</MicrosoftExtensionsLoggingVersion>
     <MicrosoftExtensionsLoggingAbstractionsVersion>$(MicrosoftExtensionsLoggingAbstractionsPackageVersion)</MicrosoftExtensionsLoggingAbstractionsVersion>
     <MicrosoftExtensionsLoggingConsoleVersion>$(MicrosoftExtensionsLoggingConsolePackageVersion)</MicrosoftExtensionsLoggingConsoleVersion>
@@ -36,7 +36,5 @@ This file should be imported by eng/Versions.props
     <SystemIOPipelinesVersion>$(SystemIOPipelinesPackageVersion)</SystemIOPipelinesVersion>
     <SystemTextEncodingsWebVersion>$(SystemTextEncodingsWebPackageVersion)</SystemTextEncodingsWebVersion>
     <SystemTextJsonVersion>$(SystemTextJsonPackageVersion)</SystemTextJsonVersion>
-    <!-- dotnet/runtime dependencies -->
-    <MicrosoftExtensionsDependencyInjectionAbstractionsVersion>$(MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion)</MicrosoftExtensionsDependencyInjectionAbstractionsVersion>
   </PropertyGroup>
 </Project>
