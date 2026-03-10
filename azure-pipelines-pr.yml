@@ -78,6 +78,7 @@ stages:
           matrix:
             Build_Release:
               _BuildConfig: Release
+              _ExtraBuildArgs: ''
               # PRs or external builds are not signed.
               ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
                 _SignType: test
@@ -87,6 +88,10 @@ stages:
               Build_Debug:
                 _BuildConfig: Debug
                 _SignType: test
+                # Disable publish for Debug to avoid concurrent uploads to the same
+                # PackageArtifacts/BlobArtifacts containers as the Release build,
+                # which causes "Blob is incomplete" artifact corruption.
+                _ExtraBuildArgs: '/p:Publish=false'
 
         steps:
         - checkout: self
@@ -98,6 +103,7 @@ stages:
             -prepareMachine
             -integrationTest
             $(_InternalBuildArgs)
+            $(_ExtraBuildArgs)
           displayName: Windows Build / Publish
 
       - ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
@@ -109,14 +115,20 @@ stages:
               debug_configuration:
                 _BuildConfig: Debug
                 _SignType: none
+                # Disable publish for Debug to avoid concurrent uploads to the same
+                # PackageArtifacts/BlobArtifacts containers as the Release build,
+                # which causes "Blob is incomplete" artifact corruption.
+                _ExtraBuildArgs: '/p:Publish=false'
               release_configuration:
                 _BuildConfig: Release
                 _SignType: none
+                _ExtraBuildArgs: ''
           steps:
           - script: eng/common/cibuild.sh
               --configuration $(_BuildConfig)
               --prepareMachine
               --integrationTest
+              $(_ExtraBuildArgs)
             name: Build
             displayName: Build
 
@@ -133,14 +145,20 @@ stages:
               debug_configuration:
                 _BuildConfig: Debug
                 _SignType: none
+                # Disable publish for Debug to avoid concurrent uploads to the same
+                # PackageArtifacts/BlobArtifacts containers as the Release build,
+                # which causes "Blob is incomplete" artifact corruption.
+                _ExtraBuildArgs: '/p:Publish=false'
               release_configuration:
                 _BuildConfig: Release
                 _SignType: none
+                _ExtraBuildArgs: ''
           steps:
           - script: eng/common/cibuild.sh
               --configuration $(_BuildConfig)
               --prepareMachine
               --integrationTest
+              $(_ExtraBuildArgs)
             name: Build
             displayName: Build
             condition: succeeded()
