@@ -1,7 +1,9 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+#if !XUNIT_V3
 using System.Reflection;
+#endif
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -173,7 +175,8 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
 
             // UseFileName replaces the entire type+method+parameters naming.
             // This prevents Verify.XunitV3 from auto-appending [Theory] parameters
-            // (which it does under MTP but not under VSTest adapter).
+            // to snapshot file paths, which breaks matching since TemplateVerifier
+            // already manages naming uniqueness via ScenarioName.
             string scenarioPrefix = options.DoNotPrependTemplateNameToScenarioName ? string.Empty : options.TemplateName;
             if (!options.DoNotPrependCallerMethodNameToScenarioName && !string.IsNullOrEmpty(callerInfo.CallerMethod))
             {
@@ -183,6 +186,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             string scenarioName = GetScenarioName(options);
             string fileName = string.IsNullOrEmpty(scenarioName) ? scenarioPrefix : $"{scenarioPrefix}.{scenarioName}";
             verifySettings.UseFileName(fileName);
+
             string snapshotsDir = options.SnapshotsDirectory ?? "Snapshots";
             if (!string.IsNullOrEmpty(callerInfo.CallerDirectory) && !Path.IsPathRooted(snapshotsDir))
             {
@@ -433,6 +437,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
 
         private async Task VerifyResult(TemplateVerifierOptions args, IInstantiationResult commandResultData, CallerInfo callerInfo)
         {
+#if !XUNIT_V3
             UseVerifyAttribute a = new UseVerifyAttribute();
 
             // https://github.com/VerifyTests/Verify/blob/d8cbe38f527d6788ecadd6205c82803bec3cdfa6/src/Verify.Xunit/Verifier.cs#L10
@@ -440,6 +445,7 @@ namespace Microsoft.TemplateEngine.Authoring.TemplateVerifier
             var v = DummyMethod;
             MethodInfo mi = v.Method;
             a.Before(mi);
+#endif
 
             if (args.VerifyCommandOutput)
             {
