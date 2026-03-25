@@ -220,9 +220,9 @@ namespace Microsoft.TemplateEngine
                 {
                     return [];
                 }
-                return element is not JsonObject jObj ? [] : jObj.ToList();
+                return element is not JsonObject jObj ? [] : GetObjectProperties(jObj);
             }
-            return obj.ToList();
+            return GetObjectProperties(obj);
         }
 
         internal static T? Get<T>(this JsonNode? token, string? key)
@@ -552,6 +552,50 @@ namespace Microsoft.TemplateEngine
                         : null;
                 }
             }
+        }
+
+        /// <summary>
+        /// Enumerates the properties of a <see cref="JsonObject"/>, handling duplicate keys gracefully.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="JsonObject"/> lazily initializes its internal dictionary when first accessed.
+        /// If the underlying JSON contains duplicate property keys, initialization throws
+        /// <see cref="ArgumentException"/>. In that case this method falls back to re-parsing via
+        /// <see cref="JsonDocument"/>, which supports duplicate keys.
+        /// </remarks>
+        private static IReadOnlyList<KeyValuePair<string, JsonNode?>> GetObjectProperties(JsonObject obj)
+        {
+            try
+            {
+                return obj.ToList();
+            }
+            catch (ArgumentException)
+            {
+                // The JsonObject contains duplicate property keys (malformed JSON).
+                // Fall back to JsonDocument-based enumeration which supports duplicate keys.
+                return GetObjectPropertiesViaDocument(obj);
+            }
+        }
+
+        /// <summary>
+        /// Enumerates the properties of a <see cref="JsonObject"/> by re-parsing its JSON text via
+        /// <see cref="JsonDocument"/>, which tolerates duplicate keys.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="JsonObject.WriteTo"/> falls back to the underlying <see cref="System.Text.Json.JsonElement"/>
+        /// when the internal dictionary has not yet been initialized, so <see cref="JsonNode.ToJsonString"/> is
+        /// safe to call even after a failed <see cref="JsonObject"/> initialization.
+        /// </remarks>
+        private static List<KeyValuePair<string, JsonNode?>> GetObjectPropertiesViaDocument(JsonObject obj)
+        {
+            string json = obj.ToJsonString();
+            var result = new List<KeyValuePair<string, JsonNode?>>();
+            using JsonDocument doc = JsonDocument.Parse(json, DocOptions);
+            foreach (JsonProperty prop in doc.RootElement.EnumerateObject())
+            {
+                result.Add(new KeyValuePair<string, JsonNode?>(prop.Name, ParseJsonNode(prop.Value.GetRawText())));
+            }
+            return result;
         }
     }
 }
