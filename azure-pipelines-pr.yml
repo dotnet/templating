@@ -59,7 +59,7 @@ stages:
         pool:
           ${{ if eq(variables['System.TeamProject'], 'public') }}:
             name: $(DncEngPublicBuildPool)
-            vmImage: windows.vs2026.amd64.open
+            demands: ImageOverride -equals windows.vs2026.amd64.open
           ${{ if eq(variables['System.TeamProject'], 'internal') }}:
             name: $(DncEngInternalBuildPool)
             demands: ImageOverride -equals windows.vs2026.amd64
@@ -137,7 +137,7 @@ stages:
           pool:
             ${{ if eq(variables['System.TeamProject'], 'public') }}:
               name: $(DncEngPublicBuildPool)
-              vmImage: build.azurelinux.3.amd64.open
+              demands: ImageOverride -equals build.azurelinux.3.amd64.open
             ${{ if eq(variables['System.TeamProject'], 'internal') }}:
               name: $(DncEngInternalBuildPool)
               demands: ImageOverride -equals build.azurelinux.3.amd64
