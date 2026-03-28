@@ -59,10 +59,10 @@ stages:
         pool:
           ${{ if eq(variables['System.TeamProject'], 'public') }}:
             name: $(DncEngPublicBuildPool)
-            vmImage: 1es-windows-2019-open
+            demands: ImageOverride -equals windows.vs2026.amd64.open
           ${{ if eq(variables['System.TeamProject'], 'internal') }}:
             name: $(DncEngInternalBuildPool)
-            demands: ImageOverride -equals windows.vs2019.amd64
+            demands: ImageOverride -equals windows.vs2026.amd64
         variables:
         - _InternalBuildArgs: ''
 
@@ -136,10 +136,11 @@ stages:
         - job: Linux
           pool:
             ${{ if eq(variables['System.TeamProject'], 'public') }}:
-              vmImage: ubuntu-latest
+              name: $(DncEngPublicBuildPool)
+              demands: ImageOverride -equals build.azurelinux.3.amd64.open
             ${{ if eq(variables['System.TeamProject'], 'internal') }}:
               name: $(DncEngInternalBuildPool)
-              demands: ImageOverride -equals Build.Ubuntu.2204.Amd64
+              demands: ImageOverride -equals build.azurelinux.3.amd64
           strategy:
             matrix:
               debug_configuration:
