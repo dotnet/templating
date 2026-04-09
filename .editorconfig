@@ -194,8 +194,6 @@ dotnet_diagnostic.IDE0008.severity = suggestion
 dotnet_diagnostic.IDE0010.severity = suggestion
 #Simplify LINQ expression
 dotnet_diagnostic.IDE0120.severity = suggestion
-#Use of the null-forgiving operator
-dotnet_diagnostic.IDE0370.severity = suggestion
 #Use expression body for constructors
 dotnet_diagnostic.IDE0021.severity = suggestion
 #Use expression body for methods
