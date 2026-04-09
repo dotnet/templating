@@ -166,7 +166,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             Assert.True(localizedTemplates.Count != 0, "Test template couldn't be loaded.");
             var template = localizedTemplates.FirstOrDefault(t => t.Identity == "TestAssets.TemplateWithLocalization");
             Assert.NotNull(template);
-            localizationTemplate = template!;
+            localizationTemplate = template;
 
             return env;
         }
