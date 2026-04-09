@@ -205,8 +205,8 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
 
         private static int? AttemptBooleanComparison(object? left, object? right)
         {
-            bool leftIsBool = Map.TryConvert(left!, out bool lb);
-            bool rightIsBool = Map.TryConvert(right!, out bool rb);
+            bool leftIsBool = Map.TryConvert(left, out bool lb);
+            bool rightIsBool = Map.TryConvert(right, out bool rb);
 
             if (!leftIsBool || !rightIsBool)
             {
