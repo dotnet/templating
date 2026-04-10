@@ -117,7 +117,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                     continue;
                 }
 
-                string obtainedValue = currentTask.Result!;
+                string obtainedValue = currentTask.Result;
                 bool result = ParameterConverter.TryConvertLiteralToDatatype(obtainedValue, currentSymbol.DataType, out object? convertedValue);
                 if (result && convertedValue != null)
                 {
