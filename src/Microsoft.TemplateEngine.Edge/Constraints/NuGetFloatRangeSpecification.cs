@@ -30,7 +30,9 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
         {
             if (FloatRange.TryParse(value, out FloatRange? versionRange))
             {
-                version = new NuGetFloatRangeSpecification(versionRange);
+#pragma warning disable IDE0370
+                version = new NuGetFloatRangeSpecification(versionRange!);
+#pragma warning restore IDE0370
                 return true;
             }
             version = null;
