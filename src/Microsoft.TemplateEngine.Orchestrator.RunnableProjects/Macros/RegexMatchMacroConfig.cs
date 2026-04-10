@@ -32,7 +32,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.Macros
         {
             Source = GetMandatoryParameterValue(generatedSymbolConfig, "source");
             Pattern = GetMandatoryParameterValue(generatedSymbolConfig, "pattern");
-            IsValidRegex(Pattern!, generatedSymbolConfig);
+            IsValidRegex(Pattern, generatedSymbolConfig);
         }
 
         internal string Source { get; }
