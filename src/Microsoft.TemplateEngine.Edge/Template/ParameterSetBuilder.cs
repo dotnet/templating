@@ -150,7 +150,7 @@ namespace Microsoft.TemplateEngine.Edge.Template
                     _resolvedValues.Select(p => p.Value.ToParameterData()).ToList());
             }
 
-            return _result!;
+            return _result;
         }
 
         public void SetParameterDefault(IGenerator generator, ITemplateParameter parameter, IEngineEnvironmentSettings environment, bool useHostDefaults, bool isRequired, List<string> paramsWithInvalidValues)
