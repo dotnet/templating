@@ -196,7 +196,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
             bool isEnabled = true;
             if (jObject != null && jObject.TryGetValue("IsEnabled", StringComparison.OrdinalIgnoreCase, out JToken? isEnabledToken))
             {
-                if (isEnabledToken!.TryParseBool(out bool enabledConst))
+                if (isEnabledToken.TryParseBool(out bool enabledConst))
                 {
                     isEnabled = enabledConst;
                 }

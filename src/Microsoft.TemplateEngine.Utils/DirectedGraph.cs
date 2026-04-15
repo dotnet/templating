@@ -149,7 +149,7 @@ namespace Microsoft.TemplateEngine.Utils
             var dependentsMap = vertices.ToDictionary(v => v, v => new HashSet<T>());
             foreach (KeyValuePair<T, HashSet<T>> keyValuePair in dependenciesMap)
             {
-                foreach (T dependency in keyValuePair.Value!)
+                foreach (T dependency in keyValuePair.Value)
                 {
                     _ = dependentsMap[dependency].Add(keyValuePair.Key);
                 }
