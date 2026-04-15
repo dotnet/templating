@@ -479,7 +479,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 
             var source = installResult.TemplatePackage as NuGetManagedTemplatePackage;
             Assert.NotNull(source);
-            string oldMountPoint = source!.MountPointUri;
+            string oldMountPoint = source.MountPointUri;
             Assert.True(File.Exists(oldMountPoint));
             UpdateRequest updateRequest = new UpdateRequest(source, "12.0.3");
 
