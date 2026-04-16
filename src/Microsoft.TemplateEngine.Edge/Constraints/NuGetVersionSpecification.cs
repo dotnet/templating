@@ -30,7 +30,9 @@ namespace Microsoft.TemplateEngine.Edge.Constraints
         {
             if (NuGetVersion.TryParse(value, out NuGetVersion? nuGetVersion))
             {
+#pragma warning disable IDE0370
                 version = new NuGetVersionSpecification(nuGetVersion!);
+#pragma warning restore IDE0370
                 return true;
             }
             version = null;

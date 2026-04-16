@@ -186,7 +186,9 @@ namespace Microsoft.TemplateEngine.TestHelper
                 else
                 {
                     _nugetLogger.LogDebug($"[NuGet Package Manager] Getting package metadata {identifier}::{version}.");
+#pragma warning disable IDE0370
                     packageVersion = new NuGetVersion(version!);
+#pragma warning restore IDE0370
                     (source, packageMetadata) = await GetPackageMetadataAsync(identifier, packageVersion, packagesSources, cancellationToken);
                 }
 
@@ -318,7 +320,7 @@ namespace Microsoft.TemplateEngine.TestHelper
                         continue;
                     }
                     atLeastOneSourceValid = true;
-                    IPackageSearchMetadata? matchedVersion = foundPackages!.FirstOrDefault(package => package.Identity.Version == packageVersion);
+                    IPackageSearchMetadata? matchedVersion = foundPackages.FirstOrDefault(package => package.Identity.Version == packageVersion);
                     if (matchedVersion != null)
                     {
                         _nugetLogger.LogDebug($"[NuGet Package Manager] Processed source {foundSource.Source}, found {matchedVersion.Identity.Id}:: {matchedVersion.Identity.Version} package, cancelling other tasks.");
