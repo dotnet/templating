@@ -6,18 +6,18 @@ This file should be imported by eng/Versions.props
 <Project>
   <PropertyGroup>
     <!-- dotnet-dotnet dependencies -->
-    <MicrosoftBclAsyncInterfacesPackageVersion>10.0.5</MicrosoftBclAsyncInterfacesPackageVersion>
-    <MicrosoftDotNetArcadeSdkPackageVersion>10.0.0-beta.26215.116</MicrosoftDotNetArcadeSdkPackageVersion>
-    <MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>10.0.5</MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>
-    <MicrosoftExtensionsLoggingPackageVersion>10.0.5</MicrosoftExtensionsLoggingPackageVersion>
-    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>10.0.5</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
-    <MicrosoftExtensionsLoggingConsolePackageVersion>10.0.5</MicrosoftExtensionsLoggingConsolePackageVersion>
-    <SystemCommandLinePackageVersion>2.0.5</SystemCommandLinePackageVersion>
-    <SystemDiagnosticsDiagnosticSourcePackageVersion>10.0.5</SystemDiagnosticsDiagnosticSourcePackageVersion>
-    <SystemFormatsAsn1PackageVersion>10.0.5</SystemFormatsAsn1PackageVersion>
-    <SystemIOPipelinesPackageVersion>10.0.5</SystemIOPipelinesPackageVersion>
-    <SystemTextEncodingsWebPackageVersion>10.0.5</SystemTextEncodingsWebPackageVersion>
-    <SystemTextJsonPackageVersion>10.0.5</SystemTextJsonPackageVersion>
+    <MicrosoftBclAsyncInterfacesPackageVersion>10.0.6</MicrosoftBclAsyncInterfacesPackageVersion>
+    <MicrosoftDotNetArcadeSdkPackageVersion>10.0.0-beta.26215.119</MicrosoftDotNetArcadeSdkPackageVersion>
+    <MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>10.0.6</MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>
+    <MicrosoftExtensionsLoggingPackageVersion>10.0.6</MicrosoftExtensionsLoggingPackageVersion>
+    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>10.0.6</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
+    <MicrosoftExtensionsLoggingConsolePackageVersion>10.0.6</MicrosoftExtensionsLoggingConsolePackageVersion>
+    <SystemCommandLinePackageVersion>2.0.6</SystemCommandLinePackageVersion>
+    <SystemDiagnosticsDiagnosticSourcePackageVersion>10.0.6</SystemDiagnosticsDiagnosticSourcePackageVersion>
+    <SystemFormatsAsn1PackageVersion>10.0.6</SystemFormatsAsn1PackageVersion>
+    <SystemIOPipelinesPackageVersion>10.0.6</SystemIOPipelinesPackageVersion>
+    <SystemTextEncodingsWebPackageVersion>10.0.6</SystemTextEncodingsWebPackageVersion>
+    <SystemTextJsonPackageVersion>10.0.6</SystemTextJsonPackageVersion>
   </PropertyGroup>
   <!--Property group for alternate package version names-->
   <PropertyGroup>
