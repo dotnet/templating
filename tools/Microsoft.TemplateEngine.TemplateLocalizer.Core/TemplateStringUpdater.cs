@@ -120,7 +120,7 @@ namespace Microsoft.TemplateEngine.TemplateLocalizer.Core
                     localizedText = templateString.Value;
                 }
 
-                valuesToWrite.Add((templateString.LocalizationKey, localizedText!));
+                valuesToWrite.Add((templateString.LocalizationKey, localizedText));
 
                 // A translation and the related comment should be next to each other. Write the comment now before any other text.
                 string commentKey = "_" + templateString.LocalizationKey + ".comment";

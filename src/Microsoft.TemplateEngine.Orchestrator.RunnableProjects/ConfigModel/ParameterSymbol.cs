@@ -197,7 +197,9 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.ConfigModel
             bool isEnabled = true;
             if (jObject != null && jObject.TryGetValue("IsEnabled", out JsonNode? isEnabledToken))
             {
+#pragma warning disable IDE0370
                 if (isEnabledToken!.TryParseBool(out bool enabledConst))
+#pragma warning restore IDE0370
                 {
                     isEnabled = enabledConst;
                 }

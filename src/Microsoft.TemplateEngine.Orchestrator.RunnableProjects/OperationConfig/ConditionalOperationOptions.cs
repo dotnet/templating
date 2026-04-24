@@ -41,7 +41,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.OperationConfig
             string? id = rawConfiguration.ToString("id");
             if (!string.IsNullOrWhiteSpace(id))
             {
-                options.Id = id!;
+                options.Id = id;
             }
 
             return options;
