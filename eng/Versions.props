@@ -1,7 +1,7 @@
 <Project>
   <Import Project="Version.Details.props" Condition="Exists('Version.Details.props')" />
   <PropertyGroup>
-    <VersionPrefix>10.0.300</VersionPrefix>
+    <VersionPrefix>10.0.400</VersionPrefix>
     <!-- When StabilizePackageVersion is set to 'true', this branch will produce stable outputs for 'Shipping' packages.
          NOTE: This repository stabilizes via VMR and this should not be set except in dev scenarios -->
     <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">false</StabilizePackageVersion>
