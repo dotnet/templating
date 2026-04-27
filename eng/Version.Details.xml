@@ -2,9 +2,9 @@
 <Dependencies>
   <Source Uri="https://github.com/dotnet/dotnet" Mapping="templating" Sha="5b150b1d949d9509e9822fa44fd52923d1d162e5" BarId="311030" />
   <ProductDependencies>
-    <Dependency Name="System.CommandLine" Version="2.0.7">
+    <Dependency Name="System.CommandLine" Version="2.0.6">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-dotnet</Uri>
-      <Sha>b16286c2284fecf303dbc12a0bb152476d662e44</Sha>
+      <Sha>47fb725acf5d7094af51aebbb5b7e5c44a3b2a77</Sha>
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
@@ -13,45 +13,45 @@
       <Sha>5b150b1d949d9509e9822fa44fd52923d1d162e5</Sha>
     </Dependency>
     <!-- Dependencies required for source build. We'll still update manually -->
-    <Dependency Name="System.Formats.Asn1" Version="10.0.7">
+    <Dependency Name="System.Formats.Asn1" Version="10.0.6">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-dotnet</Uri>
-      <Sha>b16286c2284fecf303dbc12a0bb152476d662e44</Sha>
+      <Sha>47fb725acf5d7094af51aebbb5b7e5c44a3b2a77</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging" Version="10.0.7">
+    <Dependency Name="Microsoft.Extensions.Logging" Version="10.0.6">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-dotnet</Uri>
-      <Sha>b16286c2284fecf303dbc12a0bb152476d662e44</Sha>
+      <Sha>47fb725acf5d7094af51aebbb5b7e5c44a3b2a77</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging.Abstractions" Version="10.0.7">
+    <Dependency Name="Microsoft.Extensions.Logging.Abstractions" Version="10.0.6">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-dotnet</Uri>
-      <Sha>b16286c2284fecf303dbc12a0bb152476d662e44</Sha>
+      <Sha>47fb725acf5d7094af51aebbb5b7e5c44a3b2a77</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging.Console" Version="10.0.7">
+    <Dependency Name="Microsoft.Extensions.Logging.Console" Version="10.0.6">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-dotnet</Uri>
-      <Sha>b16286c2284fecf303dbc12a0bb152476d662e44</Sha>
+      <Sha>47fb725acf5d7094af51aebbb5b7e5c44a3b2a77</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.7">
+    <Dependency Name="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.6">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-dotnet</Uri>
-      <Sha>b16286c2284fecf303dbc12a0bb152476d662e44</Sha>
+      <Sha>47fb725acf5d7094af51aebbb5b7e5c44a3b2a77</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Bcl.AsyncInterfaces" Version="10.0.7">
+    <Dependency Name="Microsoft.Bcl.AsyncInterfaces" Version="10.0.6">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-dotnet</Uri>
-      <Sha>b16286c2284fecf303dbc12a0bb152476d662e44</Sha>
+      <Sha>47fb725acf5d7094af51aebbb5b7e5c44a3b2a77</Sha>
     </Dependency>
-    <Dependency Name="System.Diagnostics.DiagnosticSource" Version="10.0.7">
+    <Dependency Name="System.Diagnostics.DiagnosticSource" Version="10.0.6">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-dotnet</Uri>
-      <Sha>b16286c2284fecf303dbc12a0bb152476d662e44</Sha>
+      <Sha>47fb725acf5d7094af51aebbb5b7e5c44a3b2a77</Sha>
     </Dependency>
-    <Dependency Name="System.Text.Json" Version="10.0.7">
+    <Dependency Name="System.Text.Json" Version="10.0.6">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-dotnet</Uri>
-      <Sha>b16286c2284fecf303dbc12a0bb152476d662e44</Sha>
+      <Sha>47fb725acf5d7094af51aebbb5b7e5c44a3b2a77</Sha>
     </Dependency>
-    <Dependency Name="System.IO.Pipelines" Version="10.0.7">
+    <Dependency Name="System.IO.Pipelines" Version="10.0.6">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-dotnet</Uri>
-      <Sha>b16286c2284fecf303dbc12a0bb152476d662e44</Sha>
+      <Sha>47fb725acf5d7094af51aebbb5b7e5c44a3b2a77</Sha>
     </Dependency>
-    <Dependency Name="System.Text.Encodings.Web" Version="10.0.7">
+    <Dependency Name="System.Text.Encodings.Web" Version="10.0.6">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-dotnet</Uri>
-      <Sha>b16286c2284fecf303dbc12a0bb152476d662e44</Sha>
+      <Sha>47fb725acf5d7094af51aebbb5b7e5c44a3b2a77</Sha>
     </Dependency>
   </ToolsetDependencies>
 </Dependencies>
