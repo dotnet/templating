@@ -30,11 +30,6 @@
         "release/10.0.3xx":{
             "MergeToBranch": "release/10.0.4xx",
             "ExtraSwitches": "-QuietComments"
-        },
-        // Automate opening PRs to merge sdk repos from release/10.0.4xx to main
-        "release/10.0.4xx":{
-            "MergeToBranch": "main",
-            "ExtraSwitches": "-QuietComments"
         }
     }
 }
