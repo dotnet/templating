@@ -1,7 +1,7 @@
 steps:
-- template: /eng/common/core-templates/steps/component-governance.yml
+- template: /eng/common/core-templates/steps/source-index-stage1-publish.yml
   parameters:
-    is1ESPipeline: true
+    is1ESPipeline: false
 
     ${{ each parameter in parameters }}:
       ${{ parameter.key }}: ${{ parameter.value }}
