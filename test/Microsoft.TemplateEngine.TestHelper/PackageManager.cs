@@ -313,8 +313,8 @@ namespace Microsoft.TemplateEngine.TestHelper
                 {
                     var finishedTask = await Task.WhenAny(tasks);
                     tasks.Remove(finishedTask);
-                    (PackageSource foundSource, IEnumerable<IPackageSearchMetadata> foundPackages) = await finishedTask;
-                    _nugetLogger.LogDebug($"[NuGet Package Manager] Processed source {foundSource.Source}, found {foundPackages.Count()} packages.");
+                    (PackageSource foundSource, IEnumerable<IPackageSearchMetadata>? foundPackages) = await finishedTask;
+                    _nugetLogger.LogDebug($"[NuGet Package Manager] Processed source {foundSource.Source}, found {foundPackages?.Count()} packages.");
                     if (foundPackages == null)
                     {
                         continue;
