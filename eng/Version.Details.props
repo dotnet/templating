@@ -6,31 +6,29 @@ This file should be imported by eng/Versions.props
 <Project>
   <PropertyGroup>
     <!-- dotnet-dotnet dependencies -->
-    <MicrosoftDotNetArcadeSdkPackageVersion>10.0.0-beta.26276.118</MicrosoftDotNetArcadeSdkPackageVersion>
-    <SystemCommandLinePackageVersion>2.0.10</SystemCommandLinePackageVersion>
-    <!-- dotnet-runtime dependencies -->
-    <MicrosoftBclAsyncInterfacesPackageVersion>10.0.1</MicrosoftBclAsyncInterfacesPackageVersion>
-    <MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>10.0.1</MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>
-    <MicrosoftExtensionsLoggingPackageVersion>10.0.1</MicrosoftExtensionsLoggingPackageVersion>
-    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>10.0.1</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
-    <MicrosoftExtensionsLoggingConsolePackageVersion>10.0.1</MicrosoftExtensionsLoggingConsolePackageVersion>
-    <SystemDiagnosticsDiagnosticSourcePackageVersion>10.0.1</SystemDiagnosticsDiagnosticSourcePackageVersion>
-    <SystemFormatsAsn1PackageVersion>10.0.1</SystemFormatsAsn1PackageVersion>
-    <SystemIOPipelinesPackageVersion>10.0.1</SystemIOPipelinesPackageVersion>
-    <SystemTextEncodingsWebPackageVersion>10.0.1</SystemTextEncodingsWebPackageVersion>
-    <SystemTextJsonPackageVersion>10.0.1</SystemTextJsonPackageVersion>
+    <MicrosoftBclAsyncInterfacesPackageVersion>10.0.7</MicrosoftBclAsyncInterfacesPackageVersion>
+    <MicrosoftDotNetArcadeSdkPackageVersion>10.0.0-beta.26277.101</MicrosoftDotNetArcadeSdkPackageVersion>
+    <MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>10.0.7</MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>
+    <MicrosoftExtensionsLoggingPackageVersion>10.0.7</MicrosoftExtensionsLoggingPackageVersion>
+    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>10.0.7</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
+    <MicrosoftExtensionsLoggingConsolePackageVersion>10.0.7</MicrosoftExtensionsLoggingConsolePackageVersion>
+    <SystemCommandLinePackageVersion>2.0.8</SystemCommandLinePackageVersion>
+    <SystemDiagnosticsDiagnosticSourcePackageVersion>10.0.7</SystemDiagnosticsDiagnosticSourcePackageVersion>
+    <SystemFormatsAsn1PackageVersion>10.0.7</SystemFormatsAsn1PackageVersion>
+    <SystemIOPipelinesPackageVersion>10.0.7</SystemIOPipelinesPackageVersion>
+    <SystemTextEncodingsWebPackageVersion>10.0.7</SystemTextEncodingsWebPackageVersion>
+    <SystemTextJsonPackageVersion>10.0.7</SystemTextJsonPackageVersion>
   </PropertyGroup>
   <!--Property group for alternate package version names-->
   <PropertyGroup>
     <!-- dotnet-dotnet dependencies -->
-    <MicrosoftDotNetArcadeSdkVersion>$(MicrosoftDotNetArcadeSdkPackageVersion)</MicrosoftDotNetArcadeSdkVersion>
-    <SystemCommandLineVersion>$(SystemCommandLinePackageVersion)</SystemCommandLineVersion>
-    <!-- dotnet-runtime dependencies -->
     <MicrosoftBclAsyncInterfacesVersion>$(MicrosoftBclAsyncInterfacesPackageVersion)</MicrosoftBclAsyncInterfacesVersion>
+    <MicrosoftDotNetArcadeSdkVersion>$(MicrosoftDotNetArcadeSdkPackageVersion)</MicrosoftDotNetArcadeSdkVersion>
     <MicrosoftExtensionsDependencyInjectionAbstractionsVersion>$(MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion)</MicrosoftExtensionsDependencyInjectionAbstractionsVersion>
     <MicrosoftExtensionsLoggingVersion>$(MicrosoftExtensionsLoggingPackageVersion)</MicrosoftExtensionsLoggingVersion>
     <MicrosoftExtensionsLoggingAbstractionsVersion>$(MicrosoftExtensionsLoggingAbstractionsPackageVersion)</MicrosoftExtensionsLoggingAbstractionsVersion>
     <MicrosoftExtensionsLoggingConsoleVersion>$(MicrosoftExtensionsLoggingConsolePackageVersion)</MicrosoftExtensionsLoggingConsoleVersion>
+    <SystemCommandLineVersion>$(SystemCommandLinePackageVersion)</SystemCommandLineVersion>
     <SystemDiagnosticsDiagnosticSourceVersion>$(SystemDiagnosticsDiagnosticSourcePackageVersion)</SystemDiagnosticsDiagnosticSourceVersion>
     <SystemFormatsAsn1Version>$(SystemFormatsAsn1PackageVersion)</SystemFormatsAsn1Version>
     <SystemIOPipelinesVersion>$(SystemIOPipelinesPackageVersion)</SystemIOPipelinesVersion>
