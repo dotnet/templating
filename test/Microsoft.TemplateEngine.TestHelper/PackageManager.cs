@@ -258,7 +258,7 @@ namespace Microsoft.TemplateEngine.TestHelper
                         packageSources.Select(source =>
                             Task.Run(() => GetPackageMetadataAsync(source, packageIdentifier, includePrerelease: true, cancellationToken))));
 
-                if (!foundPackagesBySource.Where(result => result.FoundPackages != null).Any())
+                if (!foundPackagesBySource.Any(result => result.FoundPackages != null))
                 {
                     _nugetLogger.LogError($"[NuGet Package Manager] Failed to load NuGet sources {string.Join(";", packageSources.Select(source => source.Source))}.");
                     throw new Exception($"Failed to load NuGet sources {string.Join(";", packageSources.Select(source => source.Source))}");
@@ -313,12 +313,13 @@ namespace Microsoft.TemplateEngine.TestHelper
                 {
                     var finishedTask = await Task.WhenAny(tasks);
                     tasks.Remove(finishedTask);
-                    (PackageSource foundSource, IEnumerable<IPackageSearchMetadata> foundPackages) = await finishedTask;
-                    _nugetLogger.LogDebug($"[NuGet Package Manager] Processed source {foundSource.Source}, found {foundPackages.Count()} packages.");
+                    (PackageSource foundSource, IEnumerable<IPackageSearchMetadata>? foundPackages) = await finishedTask;
                     if (foundPackages == null)
                     {
+                        _nugetLogger.LogDebug($"[NuGet Package Manager] Processed source {foundSource.Source}, no metadata found.");
                         continue;
                     }
+                    _nugetLogger.LogDebug($"[NuGet Package Manager] Processed source {foundSource.Source}, found {foundPackages.Count()} packages.");
                     atLeastOneSourceValid = true;
                     IPackageSearchMetadata? matchedVersion = foundPackages.FirstOrDefault(package => package.Identity.Version == packageVersion);
                     if (matchedVersion != null)
