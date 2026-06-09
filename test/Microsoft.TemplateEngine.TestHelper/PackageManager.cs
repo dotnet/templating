@@ -197,7 +197,8 @@ namespace Microsoft.TemplateEngine.TestHelper
                 SourceRepository repository = Repository.Factory.GetCoreV3(source);
                 try
                 {
-                    resource = await repository.GetResourceAsync<FindPackageByIdResource>(cancellationToken);
+                    resource = await repository.GetResourceAsync<FindPackageByIdResource>(cancellationToken)
+                        ?? throw new InvalidOperationException($"The source '{source.Source}' does not provide {nameof(FindPackageByIdResource)}.");
                 }
                 catch (Exception e)
                 {
@@ -314,12 +315,11 @@ namespace Microsoft.TemplateEngine.TestHelper
                     var finishedTask = await Task.WhenAny(tasks);
                     tasks.Remove(finishedTask);
                     (PackageSource foundSource, IEnumerable<IPackageSearchMetadata>? foundPackages) = await finishedTask;
+                    _nugetLogger.LogDebug($"[NuGet Package Manager] Processed source {foundSource.Source}, found {foundPackages?.Count()} packages.");
                     if (foundPackages == null)
                     {
-                        _nugetLogger.LogDebug($"[NuGet Package Manager] Processed source {foundSource.Source}, no metadata found.");
                         continue;
                     }
-                    _nugetLogger.LogDebug($"[NuGet Package Manager] Processed source {foundSource.Source}, found {foundPackages.Count()} packages.");
                     atLeastOneSourceValid = true;
                     IPackageSearchMetadata? matchedVersion = foundPackages.FirstOrDefault(package => package.Identity.Version == packageVersion);
                     if (matchedVersion != null)
@@ -356,7 +356,8 @@ namespace Microsoft.TemplateEngine.TestHelper
                 {
                     _nugetLogger.LogDebug($"[NuGet Package Manager] Getting metadata for package {packageIdentifier} from source {source.Source}.");
                     SourceRepository repository = Repository.Factory.GetCoreV3(source);
-                    PackageMetadataResource resource = await repository.GetResourceAsync<PackageMetadataResource>(cancellationToken);
+                    PackageMetadataResource resource = await repository.GetResourceAsync<PackageMetadataResource>(cancellationToken)
+                        ?? throw new InvalidOperationException($"The source '{source.Source}' does not provide {nameof(PackageMetadataResource)}.");
                     IEnumerable<IPackageSearchMetadata> foundPackages = await resource.GetMetadataAsync(
                         packageIdentifier,
                         includePrerelease: includePrerelease,
