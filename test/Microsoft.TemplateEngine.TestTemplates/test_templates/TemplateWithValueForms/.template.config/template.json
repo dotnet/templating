@@ -80,6 +80,9 @@
     "kebab": {
       "identifier": "kebabCase"
     },
+    "snake": {
+      "identifier": "snakeCase"
+    },
     "title": {
       "identifier": "titleCase"
     }

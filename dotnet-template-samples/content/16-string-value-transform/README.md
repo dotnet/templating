@@ -14,7 +14,7 @@ See
 Details
 
  - A `derived` `type` with a value transformation is performed using [value forms](https://github.com/dotnet/templating/blob/main/docs/Value-Forms.md) (`ValueForms` type).
- - The sample uses `replace`, `titleCase`, `kebabCase`, `firstLowerCaseInvariant` and `chain` value forms.
+ - The sample uses `replace`, `titleCase`, `kebabCase`, `snakeCase`, `firstLowerCaseInvariant` and `chain` value forms.
  - More value forms can be found in [the source code](https://github.com/dotnet/templating/tree/main/src/Microsoft.TemplateEngine.Orchestrator.RunnableProjects/ValueForms).
 
 Related

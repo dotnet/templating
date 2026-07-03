@@ -36,6 +36,12 @@
       "valueSource": "pascalCasedName",
       "replaces": "John Smith (kebab-case)",
       "valueTransform": "kebabCase"
+    },
+    "snakeCasedName": {
+      "type": "derived",
+      "valueSource": "snakeCasedName",
+      "replaces": "John Smith (snake_case)",
+      "valueTransform": "snakeCase"
     }
   },
   "forms" :{
@@ -56,6 +62,9 @@
     },
     "kebabCase": {
       "identifier": "kebabCase"
+    },
+    "snakeCase": {
+      "identifier": "snakeCase"
     },
     "firtstLowerCase": {
       "identifier": "firstLowerCaseInvariant"
