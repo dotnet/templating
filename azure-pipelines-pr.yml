@@ -62,10 +62,10 @@ stages:
         pool:
           ${{ if eq(variables['System.TeamProject'], 'public') }}:
             name: $(DncEngPublicBuildPool)
-            vmImage: 1es-windows-2019-open
+            vmImage: 1es-windows-2022-open
           ${{ if eq(variables['System.TeamProject'], 'internal') }}:
             name: $(DncEngInternalBuildPool)
-            demands: ImageOverride -equals windows.vs2019.amd64
+            demands: ImageOverride -equals windows.vs2022.amd64
         variables:
         - _InternalBuildArgs: ''
 
