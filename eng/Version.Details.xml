@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dependencies>
-  <Source Uri="https://github.com/dotnet/dotnet" Mapping="templating" Sha="2bfeeca8154302b64c94d589c50021d026bf2c15" BarId="323623" />
+  <Source Uri="https://github.com/dotnet/dotnet" Mapping="templating" Sha="9fdedcf2112169f417c342f87c5e69b02b72dd2c" BarId="323684" />
   <ProductDependencies>
     <Dependency Name="System.CommandLine" Version="2.0.10">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-dotnet</Uri>
@@ -8,9 +8,9 @@
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
-    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="10.0.0-beta.26370.112">
+    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="10.0.0-beta.26370.117">
       <Uri>https://github.com/dotnet/dotnet</Uri>
-      <Sha>2bfeeca8154302b64c94d589c50021d026bf2c15</Sha>
+      <Sha>9fdedcf2112169f417c342f87c5e69b02b72dd2c</Sha>
     </Dependency>
     <!-- Dependencies required for source build. We'll still update manually -->
     <Dependency Name="System.Formats.Asn1" Version="10.0.10">
