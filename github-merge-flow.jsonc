@@ -21,13 +21,8 @@
             "MergeToBranch": "release/10.0.1xx",
             "ExtraSwitches": "-QuietComments"
         },
-        // Automate opening PRs to merge sdk repos from release/10.0.1xx to release/10.0.3xx
+        // Automate opening PRs to merge sdk repos from release/10.0.1xx to release/10.0.4xx
         "release/10.0.1xx":{
-            "MergeToBranch": "release/10.0.3xx",
-            "ExtraSwitches": "-QuietComments"
-        },
-        // Automate opening PRs to merge sdk repos from release/10.0.3xx to release/10.0.4xx
-        "release/10.0.3xx":{
             "MergeToBranch": "release/10.0.4xx",
             "ExtraSwitches": "-QuietComments"
         }
