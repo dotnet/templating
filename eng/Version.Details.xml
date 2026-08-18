@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dependencies>
-  <Source Uri="https://github.com/dotnet/dotnet" Mapping="templating" Sha="6d74ae6b519e5d52fe08ceea411e4d641f363c0c" BarId="327614" />
+  <Source Uri="https://github.com/dotnet/dotnet" Mapping="templating" Sha="07280ccb1b0a3e0affb64ce3d07abe9eda48ed19" BarId="327431" />
   <ProductDependencies>
-    <Dependency Name="System.CommandLine" Version="2.0.11">
-      <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-dotnet</Uri>
-      <Sha>e2f47b0110ed922f21a1522da67279133ce28f32</Sha>
+    <Dependency Name="System.CommandLine" Version="2.0.12">
+      <Uri>https://github.com/dotnet/dotnet</Uri>
+      <Sha>07280ccb1b0a3e0affb64ce3d07abe9eda48ed19</Sha>
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
