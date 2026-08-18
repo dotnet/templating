@@ -8,50 +8,50 @@
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
-    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="10.0.0-beta.26417.106">
+    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="10.0.0-beta.26418.111">
       <Uri>https://github.com/dotnet/dotnet</Uri>
-      <Sha>07280ccb1b0a3e0affb64ce3d07abe9eda48ed19</Sha>
+      <Sha>6d74ae6b519e5d52fe08ceea411e4d641f363c0c</Sha>
     </Dependency>
     <!-- Dependencies required for source build. We'll still update manually -->
-    <Dependency Name="System.Formats.Asn1" Version="10.0.7">
+    <Dependency Name="System.Formats.Asn1" Version="10.0.11">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-dotnet</Uri>
-      <Sha>b16286c2284fecf303dbc12a0bb152476d662e44</Sha>
+      <Sha>e2f47b0110ed922f21a1522da67279133ce28f32</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging" Version="10.0.7">
+    <Dependency Name="Microsoft.Extensions.Logging" Version="10.0.11">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-dotnet</Uri>
-      <Sha>b16286c2284fecf303dbc12a0bb152476d662e44</Sha>
+      <Sha>e2f47b0110ed922f21a1522da67279133ce28f32</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging.Abstractions" Version="10.0.7">
+    <Dependency Name="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-dotnet</Uri>
-      <Sha>b16286c2284fecf303dbc12a0bb152476d662e44</Sha>
+      <Sha>e2f47b0110ed922f21a1522da67279133ce28f32</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.Logging.Console" Version="10.0.7">
+    <Dependency Name="Microsoft.Extensions.Logging.Console" Version="10.0.11">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-dotnet</Uri>
-      <Sha>b16286c2284fecf303dbc12a0bb152476d662e44</Sha>
+      <Sha>e2f47b0110ed922f21a1522da67279133ce28f32</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.7">
+    <Dependency Name="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.11">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-dotnet</Uri>
-      <Sha>b16286c2284fecf303dbc12a0bb152476d662e44</Sha>
+      <Sha>e2f47b0110ed922f21a1522da67279133ce28f32</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.Bcl.AsyncInterfaces" Version="10.0.7">
+    <Dependency Name="Microsoft.Bcl.AsyncInterfaces" Version="10.0.11">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-dotnet</Uri>
-      <Sha>b16286c2284fecf303dbc12a0bb152476d662e44</Sha>
+      <Sha>e2f47b0110ed922f21a1522da67279133ce28f32</Sha>
     </Dependency>
-    <Dependency Name="System.Diagnostics.DiagnosticSource" Version="10.0.7">
+    <Dependency Name="System.Diagnostics.DiagnosticSource" Version="10.0.11">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-dotnet</Uri>
-      <Sha>b16286c2284fecf303dbc12a0bb152476d662e44</Sha>
+      <Sha>e2f47b0110ed922f21a1522da67279133ce28f32</Sha>
     </Dependency>
-    <Dependency Name="System.Text.Json" Version="10.0.7">
+    <Dependency Name="System.Text.Json" Version="10.0.11">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-dotnet</Uri>
-      <Sha>b16286c2284fecf303dbc12a0bb152476d662e44</Sha>
+      <Sha>e2f47b0110ed922f21a1522da67279133ce28f32</Sha>
     </Dependency>
-    <Dependency Name="System.IO.Pipelines" Version="10.0.7">
+    <Dependency Name="System.IO.Pipelines" Version="10.0.11">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-dotnet</Uri>
-      <Sha>b16286c2284fecf303dbc12a0bb152476d662e44</Sha>
+      <Sha>e2f47b0110ed922f21a1522da67279133ce28f32</Sha>
     </Dependency>
-    <Dependency Name="System.Text.Encodings.Web" Version="10.0.7">
+    <Dependency Name="System.Text.Encodings.Web" Version="10.0.11">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-dotnet</Uri>
-      <Sha>b16286c2284fecf303dbc12a0bb152476d662e44</Sha>
+      <Sha>e2f47b0110ed922f21a1522da67279133ce28f32</Sha>
     </Dependency>
   </ToolsetDependencies>
 </Dependencies>
