@@ -1,4 +1,4 @@
 * @dotnet/templating-engine-maintainers 
-/docs/ @dotnet/templating-engine-maintainers @baronfel
-/eng/ @dotnet/templating-engine-maintainers @GangWang01
-global.json @dotnet/templating-engine-maintainers @GangWang01
+/docs/ @dotnet/templating-engine-maintainers
+/eng/ @dotnet/templating-engine-maintainers
+global.json @dotnet/templating-engine-maintainers

@@ -1,0 +1,56 @@
+<Project>
+
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+    <!-- Using multiple feeds isn't supported by Maestro: https://github.com/dotnet/arcade/issues/14155. -->
+    <NoWarn>$(NoWarn);NU1507</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Command-line-api dependencies -->
+    <PackageVersion Include="System.CommandLine" Version="$(SystemCommandLinePackageVersion)" />
+
+    <!-- MSBuild dependencies -->
+    <PackageVersion Include="Microsoft.Build.Framework" Version="17.8.3" />
+    <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="17.8.3" />
+   
+    <!-- NuGet dependencies -->
+    <PackageVersion Include="NuGet.Configuration" Version="$(NuGetConfigurationVersion)" />
+    <PackageVersion Include="NuGet.Credentials" Version="$(NuGetCredentialsVersion)" />
+    <PackageVersion Include="NuGet.Protocol" Version="$(NuGetProtocolVersion)" />
+
+    <!-- Roslyn-analyzers dependencies -->
+    <PackageVersion Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4" />
+
+    <!-- Runtime dependencies -->    
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftExtensionsLoggingAbstractionsVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftExtensionsLoggingConsoleVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsLoggingVersion)" />
+    <PackageVersion Include="Microsoft.IO.Redist" Version="6.0.1" />
+    <PackageVersion Include="System.Formats.Asn1" Version="$(SystemFormatsAsn1Version)" />
+    <PackageVersion Include="System.Text.Json" Version="$(SystemTextJsonVersion)" />
+  </ItemGroup>
+
+  <!-- External dependencies -->
+  <ItemGroup>
+    <PackageVersion Include="FakeItEasy" Version="8.0.0" />
+    <PackageVersion Include="FluentAssertions" Version="6.12.0" />
+    <PackageVersion Include="Newtonsoft.Json.Schema" Version="3.0.15" />
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageVersion Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
+    <PackageVersion Include="Verify.DiffPlex" Version="3.0.0" />
+    <PackageVersion Include="Verify.XUnit" Version="25.0.2" />
+    <PackageVersion Include="xunit.abstractions" Version="2.0.3" />
+    <!-- Xunit version is managed by Arcade. -->
+    <PackageVersion Include="xunit.extensibility.execution" Version="$(XUnitVersion)" />
+  </ItemGroup>
+
+  <!-- DotNetBuild overrides -->
+  <ItemGroup>
+    <PackageVersion Update="Microsoft.Build.Framework" Version="$(MicrosoftBuildFrameworkVersion)" Condition="'$(MicrosoftBuildFrameworkVersion)' != ''" />
+    <PackageVersion Update="Microsoft.Build.Utilities.Core" Version="$(MicrosoftBuildUtilitiesCoreVersion)" Condition="'$(MicrosoftBuildUtilitiesCoreVersion)' != ''" />
+    <PackageVersion Update="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="$(MicrosoftCodeAnalysisPublicApiAnalyzersVersion)" Condition="'$(MicrosoftCodeAnalysisPublicApiAnalyzersVersion)' != ''" />
+    <PackageVersion Update="Newtonsoft.Json" Version="$(NewtonsoftJsonVersion)" Condition="'$(NewtonsoftJsonVersion)' != ''" />
+  </ItemGroup>
+</Project>
