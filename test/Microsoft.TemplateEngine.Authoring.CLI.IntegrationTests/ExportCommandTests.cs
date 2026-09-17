@@ -244,7 +244,7 @@ namespace Microsoft.TemplateEngine.Authoring.CLI.IntegrationTests
             string? thisDir = Path.GetDirectoryName(typeof(ExportCommandTests).Assembly.Location);
             Assert.NotNull(thisDir);
             string templateJsonPath = Path.GetFullPath(Path.Combine(
-                thisDir!,
+                thisDir,
                 "..",
                 "..",
                 "..",

@@ -172,10 +172,14 @@ dotnet_code_quality.ca1822.api_surface = private, internal
 dotnet_code_quality.ca2208.api_surface = public
 dotnet_diagnostic.CS1591.severity = suggestion
 dotnet_analyzer_diagnostic.category-Style.severity = warning
+#Name can be simplified
+dotnet_diagnostic.IDE0002.severity = suggestion
 #Use explicit type instead of var
 dotnet_diagnostic.IDE0008.severity = suggestion
 #Add missing cases to switch statement
 dotnet_diagnostic.IDE0010.severity = suggestion
+#Simplify LINQ expression
+dotnet_diagnostic.IDE0120.severity = suggestion
 #Use expression body for constructors
 dotnet_diagnostic.IDE0021.severity = suggestion
 #Use expression body for methods
@@ -186,6 +190,10 @@ dotnet_diagnostic.IDE0028.severity = suggestion
 dotnet_diagnostic.IDE0032.severity = suggestion
 #Use conditional expression for return
 dotnet_diagnostic.IDE0046.severity = suggestion
+#Remove unused private member
+dotnet_diagnostic.IDE0051.severity = suggestion
+#Remove unread private member
+dotnet_diagnostic.IDE0052.severity = suggestion
 #Remove unnecessary expression value
 dotnet_diagnostic.IDE0058.severity = suggestion
 #Add missing cases to switch expression
@@ -206,6 +214,10 @@ dotnet_diagnostic.IDE0300.severity = suggestion
 dotnet_diagnostic.IDE0301.severity = suggestion
 #Collection initialization can be simplified
 dotnet_diagnostic.IDE0305.severity = suggestion
+#Simplify collection initialization
+dotnet_diagnostic.IDE0306.severity = suggestion
+#Lambda expression can be simplified
+dotnet_diagnostic.IDE0350.severity = suggestion
 
 # License header
 file_header_template = Licensed to the .NET Foundation under one or more agreements.\nThe .NET Foundation licenses this file to you under the MIT license.
@@ -214,6 +226,9 @@ file_header_template = Licensed to the .NET Foundation under one or more agreeme
 [*.{cs,vb}]
 # Ensure minimum API surface is respected
 dotnet_diagnostic.BCL0001.severity = warning
+
+# Don't require explicit access modifiers for interface members (conflicts with IDE0040)
+dotnet_diagnostic.SA1400.severity = none
 
 # AppContext default value expected to be true
 dotnet_diagnostic.BCL0010.severity = warning

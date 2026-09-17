@@ -4,7 +4,7 @@
   <PropertyGroup>
     <UsingToolXliff>true</UsingToolXliff>
     <UsingToolNetFrameworkReferenceAssemblies>true</UsingToolNetFrameworkReferenceAssemblies>
-    <VersionPrefix>8.0.101</VersionPrefix>
+    <VersionPrefix>8.0.132</VersionPrefix>
     <!-- When StabilizePackageVersion is set to 'true', this branch will produce stable outputs for 'Shipping' packages -->
     <StabilizePackageVersion Condition="'$(StabilizePackageVersion)' == ''">true</StabilizePackageVersion>
     <DotNetFinalVersionKind Condition="'$(StabilizePackageVersion)' == 'true'">release</DotNetFinalVersionKind>
@@ -20,6 +20,14 @@
   <PropertyGroup>
     <!-- Maestro-managed Package Versions - Ordered by repo name -->
     <!-- Dependencies from https://github.com/dotnet/command-line-api -->
-    <SystemCommandLinePackageVersion>2.0.0-beta4.23407.1</SystemCommandLinePackageVersion>
+    <SystemCommandLinePackageVersion>2.0.0-beta4.24517.1</SystemCommandLinePackageVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <!-- Non-maestro versions -->
+    <SystemFormatsAsn1Version>8.0.1</SystemFormatsAsn1Version>
+    <MicrosoftExtensionsLoggingPackageVersion>8.0.1</MicrosoftExtensionsLoggingPackageVersion>
+    <MicrosoftExtensionsLoggingAbstractionsPackageVersion>8.0.2</MicrosoftExtensionsLoggingAbstractionsPackageVersion>
+    <MicrosoftExtensionsLoggingConsolePackageVersion>8.0.1</MicrosoftExtensionsLoggingConsolePackageVersion>
+    <MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>8.0.2</MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>
   </PropertyGroup>
 </Project>

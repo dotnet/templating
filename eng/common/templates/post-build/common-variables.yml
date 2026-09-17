@@ -1,13 +1,11 @@
 variables:
-  - group: Publish-Build-Assets
-
   # Whether the build is internal or not
   - name: IsInternalBuild
     value: ${{ and(ne(variables['System.TeamProject'], 'public'), contains(variables['Build.SourceBranch'], 'internal')) }}
 
   # Default Maestro++ API Endpoint and API Version
   - name: MaestroApiEndPoint
-    value: "https://maestro-prod.westus2.cloudapp.azure.com"
+    value: "https://maestro.dot.net"
   - name: MaestroApiAccessToken
     value: $(MaestroAccessToken)
   - name: MaestroApiVersion

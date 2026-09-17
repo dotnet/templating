@@ -205,8 +205,8 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
 
         private static int? AttemptBooleanComparison(object? left, object? right)
         {
-            bool leftIsBool = Map.TryConvert(left!, out bool lb);
-            bool rightIsBool = Map.TryConvert(right!, out bool rb);
+            bool leftIsBool = Map.TryConvert(left, out bool lb);
+            bool rightIsBool = Map.TryConvert(right, out bool rb);
 
             if (!leftIsBool || !rightIsBool)
             {
@@ -248,12 +248,12 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
 
         private static int? AttemptNumericComparison(object? left, object? right)
         {
-            bool leftIsDouble = Map.TryConvert(left!, out double ld);
-            bool rightIsDouble = Map.TryConvert(right!, out double rd);
+            bool leftIsDouble = Map.TryConvert(left, out double ld);
+            bool rightIsDouble = Map.TryConvert(right, out double rd);
 
             if (!leftIsDouble)
             {
-                if (!Map.TryConvert(left!, out long ll))
+                if (!Map.TryConvert(left, out long ll))
                 {
                     return null;
                 }
@@ -263,7 +263,7 @@ namespace Microsoft.TemplateEngine.Core.Expressions.Shared
 
             if (!rightIsDouble)
             {
-                if (!Map.TryConvert(right!, out long rl))
+                if (!Map.TryConvert(right, out long rl))
                 {
                     return null;
                 }
