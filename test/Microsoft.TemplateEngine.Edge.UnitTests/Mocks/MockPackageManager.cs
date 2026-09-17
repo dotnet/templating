@@ -13,6 +13,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests.Mocks
     internal class MockPackageManager : IDownloader, IUpdateChecker
     {
         internal const string DefaultFeed = "test_feed";
+        private readonly NuGetPackageInfo? _downloadResult;
         private readonly PackageManager? _packageManager;
         private readonly string? _packageToPack;
 
@@ -26,8 +27,19 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests.Mocks
             _packageToPack = packageToPack;
         }
 
+        internal MockPackageManager(NuGetPackageInfo downloadResult)
+        {
+            _downloadResult = downloadResult;
+        }
+
+        internal IReadOnlyList<string>? LastAdditionalSources { get; private set; }
+
+        internal string? LastAdditionalNuGetSource { get; private set; }
+
         public Task<NuGetPackageInfo> DownloadPackageAsync(string downloadPath, string identifier, string? version = null, IEnumerable<string>? additionalSources = null, bool force = false, CancellationToken cancellationToken = default)
         {
+            LastAdditionalSources = additionalSources?.ToArray();
+
             // names of exceptions throw them for test purposes
             switch (identifier)
             {
@@ -39,6 +51,10 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests.Mocks
                 case nameof(Exception): throw new Exception("Generic error");
             }
 
+            if (_downloadResult != null)
+            {
+                return Task.FromResult(_downloadResult);
+            }
             if (_packageManager == null)
             {
                 throw new InvalidOperationException($"{nameof(_packageManager)} was not initialized");
@@ -81,6 +97,8 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests.Mocks
 
         Task<(string LatestVersion, bool IsLatestVersion, NugetPackageMetadata PackageMetadata)> IUpdateChecker.GetLatestVersionAsync(string identifier, string? version, string? additionalNuGetSource, CancellationToken cancellationToken)
         {
+            LastAdditionalNuGetSource = additionalNuGetSource;
+
             // names of exceptions throw them for test purposes
             return identifier switch
             {

@@ -120,7 +120,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                             (string version, bool isLatestVersion, NugetPackageMetadata packageMetadata) = await _updateChecker.GetLatestVersionAsync(
                                 nugetPackage.Identifier,
                                 nugetPackage.Version,
-                                nugetPackage.NuGetSource,
+                                additionalNuGetSource: null,
                                 cancellationToken).ConfigureAwait(false);
 
                             if (packageMetadata.Vulnerabilities != null && packageMetadata.Vulnerabilities.Any())
@@ -377,12 +377,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 return UpdateResult.CreateFailure(updateRequest, uninstallResult.Error, uninstallResult.ErrorMessage, []);
             }
 
-            Dictionary<string, string> installationDetails = new Dictionary<string, string>();
-            if (updateRequest.TemplatePackage is NuGetManagedTemplatePackage nuGetManagedSource && !string.IsNullOrWhiteSpace(nuGetManagedSource.NuGetSource))
-            {
-                installationDetails.Add(InstallerConstants.NuGetSourcesKey, nuGetManagedSource.NuGetSource!);
-            }
-            InstallRequest installRequest = new InstallRequest(updateRequest.TemplatePackage.Identifier, updateRequest.Version, details: installationDetails);
+            InstallRequest installRequest = new InstallRequest(updateRequest.TemplatePackage.Identifier, updateRequest.Version);
             return UpdateResult.FromInstallResult(updateRequest, await InstallAsync(installRequest, provider, cancellationToken).ConfigureAwait(false));
         }
 
