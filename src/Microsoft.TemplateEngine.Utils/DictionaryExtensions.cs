@@ -88,7 +88,7 @@ namespace Microsoft.TemplateEngine.Utils
         {
             if (condition(value))
             {
-                dict[key] = value!;
+                dict[key] = value;
                 return true;
             }
 

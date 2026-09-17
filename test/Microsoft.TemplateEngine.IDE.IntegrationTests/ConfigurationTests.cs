@@ -16,7 +16,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
         {
             var userProfileDir = Environment.GetEnvironmentVariable(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "USERPROFILE" : "HOME");
             Assert.NotNull(userProfileDir);
-            var hostDir = Path.Combine(userProfileDir!, ".templateengine", nameof(PhysicalConfigurationTest).ToString());
+            var hostDir = Path.Combine(userProfileDir, ".templateengine", nameof(PhysicalConfigurationTest).ToString());
             try
             {
                 var builtIns = BuiltInTemplatePackagesProviderFactory.GetComponents(TestTemplatesLocation);
@@ -42,7 +42,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             string? userProfileDir = Environment.GetEnvironmentVariable(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "USERPROFILE" : "HOME");
             Assert.NotNull(userProfileDir);
 
-            string baseDir = Path.Combine(userProfileDir!, ".templateengine");
+            string baseDir = Path.Combine(userProfileDir, ".templateengine");
             var hostDir = Path.Combine(baseDir, nameof(VirtualConfigurationTest).ToString());
 
             var builtIns = BuiltInTemplatePackagesProviderFactory.GetComponents(TestTemplatesLocation);
@@ -82,7 +82,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
         {
             var userProfileDir = Environment.GetEnvironmentVariable(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "USERPROFILE" : "HOME");
             Assert.NotNull(userProfileDir);
-            var unexpectedHostDir = Path.Combine(userProfileDir!, ".templateengine", nameof(PhysicalConfigurationTest_WithChangedHostLocation).ToString());
+            var unexpectedHostDir = Path.Combine(userProfileDir, ".templateengine", nameof(PhysicalConfigurationTest_WithChangedHostLocation).ToString());
             var expectedHostDir = TestUtils.CreateTemporaryFolder();
 
             var builtIns = BuiltInTemplatePackagesProviderFactory.GetComponents(TestTemplatesLocation);

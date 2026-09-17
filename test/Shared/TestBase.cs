@@ -69,6 +69,7 @@ namespace Microsoft.TemplateEngine.Tests
             {
                 throw new InvalidOperationException("The codebase root was not found");
             }
+#pragma warning disable IDE0370
             if (!File.Exists(Path.Combine(codeBaseRoot!, "Microsoft.TemplateEngine.sln")))
             {
                 throw new InvalidOperationException("Microsoft.TemplateEngine.sln was not found in codebase root");
@@ -78,6 +79,7 @@ namespace Microsoft.TemplateEngine.Tests
                 throw new InvalidOperationException("Microsoft.TemplateEngine.TestTemplates was not found in test/");
             }
             return codeBaseRoot!;
+#pragma warning restore IDE0370
         }
     }
 }

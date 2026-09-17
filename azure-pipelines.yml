@@ -47,7 +47,7 @@ parameters:
   - buildConfig: Release
 
 extends:
-  ${{ if notin(variables['Build.Reason'], 'PullRequest') }}:
+  ${{ if ne(variables['Build.Reason'], 'PullRequest') }}:
     template: v1/1ES.Official.PipelineTemplate.yml@1esPipelines
   ${{ else }}:
     template: v1/1ES.Unofficial.PipelineTemplate.yml@1esPipelines
@@ -100,8 +100,6 @@ extends:
               # Only enable publishing in non-public, non PR scenarios.
               - ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
                 # DotNet-Symbol-Server-Pats provides: microsoft-symbol-server-pat, symweb-symbol-server-pat
-                # Publish-Build-Assets provides: MaestroAccessToken, BotAccount-dotnet-maestro-bot-PAT
-                - group: Publish-Build-Assets
                 - _InternalBuildArgs: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName)
                     /p:DotNetPublishUsingPipelines=$(_PublishUsingPipelines)
                     /p:OfficialBuildId=$(BUILD.BUILDNUMBER)
@@ -109,12 +107,20 @@ extends:
               - checkout: self
                 clean: true
               # Use utility script to run script command dependent on agent OS.
-              - script: eng/common/cibuild.cmd
-                  -configuration $(_BuildConfig)
-                  -prepareMachine
-                  -integrationTest
-                  $(_InternalBuildArgs)
-                displayName: Windows Build / Publish
+              - ${{ if in(variables['Build.Reason'], 'PullRequest') }}:
+                - script: eng/common/cibuild.cmd
+                    -configuration $(_BuildConfig)
+                    -prepareMachine
+                    -integrationTest
+                    $(_InternalBuildArgs)
+                  displayName: Windows Build / Publish
+              - ${{ else }}:
+                - script: eng/common/cibuild.cmd
+                    -configuration $(_BuildConfig)
+                    -prepareMachine
+                    /p:Test=false
+                    $(_InternalBuildArgs)
+                  displayName: Windows Build / Publish
 
           - ${{ if in(variables['Build.Reason'], 'PullRequest') }}:
             - ${{ each config in parameters.buildConfigurations }}:

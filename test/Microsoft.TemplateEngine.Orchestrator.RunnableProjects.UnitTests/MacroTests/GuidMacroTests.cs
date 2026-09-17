@@ -62,7 +62,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
         {
             Assert.True(variables.ContainsKey(variableName));
             Assert.NotNull(variables[variableName]);
-            Guid paramValue = Guid.Parse((string)variables[variableName]!);
+            Guid paramValue = Guid.Parse((string)variables[variableName]);
 
             // check that all the param name variants were created, and their values all resolve to the same guid.
             string guidFormats = GuidMacroConfig.DefaultFormats;
@@ -70,7 +70,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
             {
                 string otherFormatVariableName = variableName + "-" + guidFormats[i];
                 Assert.NotNull(variables[otherFormatVariableName]);
-                Guid testValue = Guid.Parse((string)variables[otherFormatVariableName]!);
+                Guid testValue = Guid.Parse((string)variables[otherFormatVariableName]);
                 Assert.Equal(paramValue, testValue);
 
                 // Test the new formats - that distinguish upper and lower case by tags that are
@@ -80,8 +80,8 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects.UnitTests.Macro
                     (char.IsUpper(guidFormats[i]) ? GuidMacroConfig.UpperCaseDenominator : GuidMacroConfig.LowerCaseDenominator) +
                     guidFormats[i];
 
-                string resolvedValue = (string)variables[otherFormatVariableName]!;
-                testValue = Guid.Parse((string)variables[otherFormatVariableName]!);
+                string resolvedValue = (string)variables[otherFormatVariableName];
+                testValue = Guid.Parse((string)variables[otherFormatVariableName]);
                 Assert.Equal(paramValue, testValue);
                 Assert.Equal(char.IsUpper(guidFormats[i]), char.IsUpper(resolvedValue.First(char.IsLetter)));
             }
