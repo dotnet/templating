@@ -326,6 +326,35 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         }
 
         [Fact]
+        public async Task GetLatestVersion_RemotePackage_DoesNotUseStoredSource()
+        {
+            MockManagedTemplatePackageProvider provider = new MockManagedTemplatePackageProvider();
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
+            MockPackageManager mockPackageManager = new MockPackageManager();
+            NuGetInstaller installer = new NuGetInstaller(
+                new MockInstallerFactory(),
+                engineEnvironmentSettings,
+                _environmentSettingsHelper.CreateTemporaryFolder(),
+                mockPackageManager,
+                mockPackageManager);
+            NuGetManagedTemplatePackage source = new NuGetManagedTemplatePackage(
+                engineEnvironmentSettings,
+                installer,
+                provider,
+                "test.nupkg",
+                "Test.Package")
+            {
+                NuGetSource = "https://disabled.test/v3/index.json",
+                Version = "1.0.0"
+            };
+
+            IReadOnlyList<CheckUpdateResult> results = await installer.GetLatestVersionAsync(new[] { source }, provider, CancellationToken.None);
+
+            results.Single().Success.Should().BeTrue();
+            mockPackageManager.LastAdditionalNuGetSource.Should().BeNull();
+        }
+
+        [Fact]
         public async Task GetLatestVersion_RemotePackageWithVulnerabilities()
         {
             MockManagedTemplatePackageProvider provider = new MockManagedTemplatePackageProvider();
@@ -455,6 +484,47 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             updatedSource.NuGetSource.Should().Be(MockPackageManager.DefaultFeed);
             Assert.False(File.Exists(oldMountPoint));
             Assert.True(File.Exists(updatedSource.MountPointUri));
+        }
+
+        [Fact]
+        public async Task Update_RemotePackage_DoesNotUseStoredSource()
+        {
+            MockManagedTemplatePackageProvider provider = new MockManagedTemplatePackageProvider();
+            string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
+            string installedPackagePath = Path.Combine(installPath, "Test.Package.1.0.0.nupkg");
+            File.WriteAllText(installedPackagePath, string.Empty);
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
+            MockPackageManager mockPackageManager = new MockPackageManager(
+                new NuGetPackageInfo(
+                    string.Empty,
+                    string.Empty,
+                    false,
+                    Path.Combine(installPath, "Test.Package.2.0.0.nupkg"),
+                    "https://enabled.test/v3/index.json",
+                    "Test.Package",
+                    "2.0.0",
+                    Array.Empty<VulnerabilityInfo>()));
+            NuGetInstaller installer = new NuGetInstaller(
+                new MockInstallerFactory(),
+                engineEnvironmentSettings,
+                installPath,
+                mockPackageManager,
+                mockPackageManager);
+            NuGetManagedTemplatePackage source = new NuGetManagedTemplatePackage(
+                engineEnvironmentSettings,
+                installer,
+                provider,
+                installedPackagePath,
+                "Test.Package")
+            {
+                NuGetSource = "https://disabled.test/v3/index.json",
+                Version = "1.0.0"
+            };
+
+            UpdateResult result = await installer.UpdateAsync(new UpdateRequest(source, "2.0.0"), provider, CancellationToken.None);
+
+            result.Success.Should().BeTrue();
+            mockPackageManager.LastAdditionalSources.Should().BeEmpty();
         }
 
         [Fact]
