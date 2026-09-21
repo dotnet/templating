@@ -22,5 +22,20 @@ namespace Microsoft.TemplateEngine.Utils.UnitTests
             Assert.True(virtualized1.FileExists(testFilePath));
             Assert.True(virtualized2.FileExists(testFilePath));
         }
+
+        [Fact]
+        public void VerifyRootCanBeVirtualized()
+        {
+            IPhysicalFileSystem mockFileSystem = new MockFileSystem();
+            IPhysicalFileSystem virtualized = new InMemoryFileSystem(Path.GetPathRoot(Directory.GetCurrentDirectory())!, mockFileSystem);
+
+            string testFilePath = Path.Combine(Directory.GetCurrentDirectory(), "test.txt");
+            virtualized.WriteAllText(testFilePath, "test");
+
+            var entries = virtualized.EnumerateFileSystemEntries(Directory.GetCurrentDirectory(), "*", SearchOption.TopDirectoryOnly).ToList();
+            Assert.Single(entries);
+
+            Assert.Equal(testFilePath, entries[0]);
+        }
     }
 }
