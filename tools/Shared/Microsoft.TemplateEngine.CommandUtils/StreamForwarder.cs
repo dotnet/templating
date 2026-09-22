@@ -49,29 +49,44 @@ namespace Microsoft.TemplateEngine.CommandUtils
             return this;
         }
 
-        public Task BeginRead(TextReader reader) => Task.Run(() => Read(reader));
+        // Use a dedicated long-running thread rather than a thread-pool thread (Task.Run).
+        // Under load (e.g. CI running many tests in parallel) the thread pool can be
+        // starved, delaying the reader from draining the child's redirected stream. When
+        // that happens the OS pipe buffer fills, the child blocks on Console.Write, and an
+        // asynchronous console logger (AddSimpleConsole) can drop queued messages when its
+        // bounded flush-on-dispose (~1.5s) times out - producing truncated captured output.
+        public Task BeginRead(TextReader reader) =>
+            Task.Factory.StartNew(
+                () => Read(reader),
+                CancellationToken.None,
+                TaskCreationOptions.LongRunning,
+                TaskScheduler.Default);
 
         public void Read(TextReader reader)
         {
-            int bufferSize = 1;
+            // Read in reasonably sized chunks so the pipe is drained quickly and the child
+            // process is never blocked writing to a full pipe for long.
+            const int bufferSize = 4096;
             char currentCharacter;
 
             char[] buffer = new char[bufferSize];
             _builder = new StringBuilder();
 
-            // Using Read with buffer size 1 to prevent looping endlessly
-            // like we would when using Read() with no buffer
-            while ((_ = reader.Read(buffer, 0, bufferSize)) > 0)
+            int read;
+            while ((read = reader.Read(buffer, 0, bufferSize)) > 0)
             {
-                currentCharacter = buffer[0];
+                for (int i = 0; i < read; i++)
+                {
+                    currentCharacter = buffer[i];
 
-                if (currentCharacter == FlushBuilderCharacter)
-                {
-                    WriteBuilder();
-                }
-                else if (currentCharacter != CarriageReturn)
-                {
-                    _ = _builder.Append(currentCharacter);
+                    if (currentCharacter == FlushBuilderCharacter)
+                    {
+                        WriteBuilder();
+                    }
+                    else if (currentCharacter != CarriageReturn)
+                    {
+                        _ = _builder.Append(currentCharacter);
+                    }
                 }
             }
 
