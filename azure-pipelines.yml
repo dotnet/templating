@@ -106,6 +106,11 @@ extends:
                 os: windows
               variables:
               - _BuildConfig: ${{ config.buildConfig }}
+              # Only Windows Release publishes packages to avoid concurrent uploads
+              # to the shared PackageArtifacts/BlobArtifacts containers.
+              - _ExtraBuildArgs: ''
+              - ${{ if ne(config.buildConfig, 'Release') }}:
+                - _ExtraBuildArgs: '/p:Publish=false'
               - _SignType: test
               - ${{ if notin(variables['Build.Reason'], 'PullRequest') }}:
                 - _SignType: real
@@ -127,6 +132,7 @@ extends:
                     -prepareMachine
                     -integrationTest
                     $(_InternalBuildArgs)
+                    $(_ExtraBuildArgs)
                   displayName: Windows Build / Publish
               - ${{ else }}:
                 - script: eng/common/cibuild.cmd
@@ -134,6 +140,7 @@ extends:
                     -prepareMachine
                     /p:Test=false
                     $(_InternalBuildArgs)
+                    $(_ExtraBuildArgs)
                   displayName: Windows Build / Publish
 
           - ${{ if in(variables['Build.Reason'], 'PullRequest') }}:
@@ -150,6 +157,7 @@ extends:
                     --configuration $(_BuildConfig)
                     --prepareMachine
                     --integrationTest
+                    /p:Publish=false
                   name: Build
                   displayName: Build
 
@@ -174,6 +182,7 @@ extends:
                     --configuration $(_BuildConfig)
                     --prepareMachine
                     --integrationTest
+                    /p:Publish=false
                   name: Build
                   displayName: Build
                   condition: succeeded()
