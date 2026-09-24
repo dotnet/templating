@@ -5,8 +5,8 @@
 trigger: none
 # Trigger periodically instead.
 schedules:
-- cron: 0 * * * *
-  displayName: Run every hour
+- cron: 0 0 * * *
+  displayName: Run once a day
   branches:
     include:
     - main
@@ -69,6 +69,16 @@ extends:
           continueOnError: true
           condition: always()
 
+        - task: PublishTestResults@2
+          displayName: Publish Test Results
+          inputs:
+            testResultsFormat: xUnit
+            testResultsFiles: '*.xml'
+            searchFolder: $(Build.SourcesDirectory)/artifacts/TestResults/Debug
+            mergeTestResults: true
+          continueOnError: true
+          condition: always()
+
         - task: UseDotNet@2
           displayName: Use .NET 6.0.100
           inputs:
@@ -127,8 +137,14 @@ extends:
             -SkipNonVersionedFiles
           displayName: Install latest daily .NET version
 
-        - bash: >
-            $(Build.SourcesDirectory)/.dotnet/dotnet $(Build.SourcesDirectory)/artifacts/bin/Microsoft.TemplateSearch.TemplateDiscovery/Debug/net8.0/Microsoft.TemplateSearch.TemplateDiscovery.dll --basePath $(System.DefaultWorkingDirectory)/NugetDownloadDirectory --allowPreviewPacks -v --test --diff $(EnableDiffMode)
+        - bash: |
+            projectPath=$(Build.SourcesDirectory)/tools/Microsoft.TemplateSearch.TemplateDiscovery/Microsoft.TemplateSearch.TemplateDiscovery.csproj
+            netCurrent=$($(Build.SourcesDirectory)/.dotnet/dotnet msbuild $projectPath -getProperty:NetCurrent)
+            echo "Resolved NetCurrent: $netCurrent"
+            $(Build.SourcesDirectory)/.dotnet/dotnet run --no-build \
+              --framework $netCurrent \
+              --project $projectPath \
+              -- --basePath $(System.DefaultWorkingDirectory)/NugetDownloadDirectory --allowPreviewPacks -v --test --diff $(EnableDiffMode)
           displayName: Run Cache Updater
 
         - task: CopyFiles@2

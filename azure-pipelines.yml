@@ -111,7 +111,7 @@ extends:
                 timeoutInMinutes: 90
                 pool:
                   name: $(DncEngInternalBuildPool)
-                  image: 1es-windows-2022
+                  image: windows.vs2026.amd64
                   os: windows
                 variables:
                 - _BuildConfig: ${{ config.buildConfig }}
@@ -170,11 +170,11 @@ extends:
                   pool:
                     ${{ if eq(variables['System.TeamProject'], 'public') }}:
                       name: $(DncEngPublicBuildPool)
-                      image: 1es-ubuntu-2204-open
+                      image: build.azurelinux.3.amd64.open
                       os: linux
                     ${{ if eq(variables['System.TeamProject'], 'internal') }}:
                       name: $(DncEngInternalBuildPool)
-                      image: 1es-ubuntu-2204
+                      image: build.azurelinux.3.amd64
                       os: linux
                   variables:
                   - _BuildConfig: ${{ config.buildConfig }}

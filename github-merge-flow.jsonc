@@ -21,19 +21,14 @@
             "MergeToBranch": "release/10.0.1xx",
             "ExtraSwitches": "-QuietComments"
         },
-        // Automate opening PRs to merge sdk repos from release/10.0.1xx to release/10.0.2xx
+        // Automate opening PRs to merge sdk repos from release/10.0.1xx to release/10.0.3xx
         "release/10.0.1xx":{
-            "MergeToBranch": "release/10.0.2xx",
-            "ExtraSwitches": "-QuietComments"
-        },
-        // Automate opening PRs to merge sdk repos from release/10.0.2xx to release/10.0.3xx
-        "release/10.0.2xx":{
             "MergeToBranch": "release/10.0.3xx",
             "ExtraSwitches": "-QuietComments"
         },
-        // Automate opening PRs to merge sdk repos from release/10.0.3xx to main
+        // Automate opening PRs to merge sdk repos from release/10.0.3xx to release/10.0.4xx
         "release/10.0.3xx":{
-            "MergeToBranch": "main",
+            "MergeToBranch": "release/10.0.4xx",
             "ExtraSwitches": "-QuietComments"
         }
     }
