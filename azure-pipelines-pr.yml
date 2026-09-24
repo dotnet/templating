@@ -81,6 +81,7 @@ stages:
           matrix:
             Build_Release:
               _BuildConfig: Release
+              _ExtraBuildArgs: ''
               # PRs or external builds are not signed.
               ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
                 _SignType: test
@@ -90,6 +91,8 @@ stages:
               Build_Debug:
                 _BuildConfig: Debug
                 _SignType: test
+                # Only Windows Release publishes to the shared artifact containers.
+                _ExtraBuildArgs: '/p:Publish=false'
 
         steps:
         - checkout: self
@@ -101,6 +104,7 @@ stages:
             -prepareMachine
             -integrationTest
             $(_InternalBuildArgs)
+            $(_ExtraBuildArgs)
           displayName: Windows Build / Publish
 
       - ${{ if or(eq(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'PullRequest')) }}:
@@ -120,6 +124,7 @@ stages:
               --configuration $(_BuildConfig)
               --prepareMachine
               --integrationTest
+              /p:Publish=false
             name: Build
             displayName: Build
 
@@ -144,6 +149,7 @@ stages:
               --configuration $(_BuildConfig)
               --prepareMachine
               --integrationTest
+              /p:Publish=false
             name: Build
             displayName: Build
             condition: succeeded()
