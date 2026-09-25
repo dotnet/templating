@@ -6,8 +6,8 @@ This file should be imported by eng/Versions.props
 <Project>
   <PropertyGroup>
     <!-- dotnet-dotnet dependencies -->
-    <MicrosoftDotNetArcadeSdkPackageVersion>10.0.0-beta.26472.101</MicrosoftDotNetArcadeSdkPackageVersion>
-    <SystemCommandLinePackageVersion>2.0.13</SystemCommandLinePackageVersion>
+    <MicrosoftDotNetArcadeSdkPackageVersion>10.0.0-beta.26473.102</MicrosoftDotNetArcadeSdkPackageVersion>
+    <SystemCommandLinePackageVersion>2.0.14</SystemCommandLinePackageVersion>
     <!-- dotnet-runtime dependencies -->
     <MicrosoftBclAsyncInterfacesPackageVersion>10.0.1</MicrosoftBclAsyncInterfacesPackageVersion>
     <MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>10.0.1</MicrosoftExtensionsDependencyInjectionAbstractionsPackageVersion>
