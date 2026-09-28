@@ -132,10 +132,5 @@ jobs:
         ArtifactName: Loc
       condition: ${{ parameters.condition }}
 
-    - task: PublishBuildArtifacts@1
-      displayName: Publish LocProject.json
-      inputs:
-        PathtoPublish: '$(System.DefaultWorkingDirectory)/eng/Localize/'
-        PublishLocation: Container
-        ArtifactName: Loc
-      condition: ${{ parameters.condition }}
+    ${{ each parameter in parameters }}:
+      ${{ parameter.key }}: ${{ parameter.value }}
