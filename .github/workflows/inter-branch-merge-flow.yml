@@ -11,3 +11,5 @@ permissions:
 jobs:
   Merge:
     uses: dotnet/arcade/.github/workflows/inter-branch-merge-base.yml@main
+    with: 
+      configuration_file_branch: 'archive'
