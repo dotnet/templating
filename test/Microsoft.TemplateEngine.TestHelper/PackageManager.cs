@@ -185,7 +185,7 @@ namespace Microsoft.TemplateEngine.TestHelper
                 }
                 else
                 {
-                    _nugetLogger.LogDebug($"[NuGet Package Manager] Getting package metadata {identifier}::{version}.");
+                    _nugetLogger.LogDebug($"[NuGet Package Manager] Getting package metadata {identifier}@{version}.");
 #pragma warning disable IDE0370
                     packageVersion = new NuGetVersion(version!);
 #pragma warning restore IDE0370
@@ -197,7 +197,8 @@ namespace Microsoft.TemplateEngine.TestHelper
                 SourceRepository repository = Repository.Factory.GetCoreV3(source);
                 try
                 {
-                    resource = await repository.GetResourceAsync<FindPackageByIdResource>(cancellationToken);
+                    resource = await repository.GetResourceAsync<FindPackageByIdResource>(cancellationToken)
+                        ?? throw new InvalidOperationException($"The source '{source.Source}' does not provide {nameof(FindPackageByIdResource)}.");
                 }
                 catch (Exception e)
                 {
@@ -286,7 +287,7 @@ namespace Microsoft.TemplateEngine.TestHelper
 
                         return current.package.Identity.Version > max.package.Identity.Version ? current : max;
                     });
-                _nugetLogger.LogDebug($"[NuGet Package Manager] Latest version is {latestVersion.Item2.Identity.Id}::{latestVersion.Item2.Identity.Version}, source: {latestVersion.Item1.Source}.");
+                _nugetLogger.LogDebug($"[NuGet Package Manager] Latest version is {latestVersion.Item2.Identity.Id}@{latestVersion.Item2.Identity.Version}, source: {latestVersion.Item1.Source}.");
                 return latestVersion;
             }
 
@@ -314,17 +315,18 @@ namespace Microsoft.TemplateEngine.TestHelper
                     var finishedTask = await Task.WhenAny(tasks);
                     tasks.Remove(finishedTask);
                     (PackageSource foundSource, IEnumerable<IPackageSearchMetadata>? foundPackages) = await finishedTask;
+                    _nugetLogger.LogDebug(foundPackages == null
+                        ? $"[NuGet Package Manager] Processed source {foundSource.Source}, no metadata found."
+                        : $"[NuGet Package Manager] Processed source {foundSource.Source}, found {foundPackages.Count()} packages.");
                     if (foundPackages == null)
                     {
-                        _nugetLogger.LogDebug($"[NuGet Package Manager] Processed source {foundSource.Source}, no metadata found.");
                         continue;
                     }
-                    _nugetLogger.LogDebug($"[NuGet Package Manager] Processed source {foundSource.Source}, found {foundPackages.Count()} packages.");
                     atLeastOneSourceValid = true;
                     IPackageSearchMetadata? matchedVersion = foundPackages.FirstOrDefault(package => package.Identity.Version == packageVersion);
                     if (matchedVersion != null)
                     {
-                        _nugetLogger.LogDebug($"[NuGet Package Manager] Processed source {foundSource.Source}, found {matchedVersion.Identity.Id}:: {matchedVersion.Identity.Version} package, cancelling other tasks.");
+                        _nugetLogger.LogDebug($"[NuGet Package Manager] Processed source {foundSource.Source}, found {matchedVersion.Identity.Id}@{matchedVersion.Identity.Version} package, cancelling other tasks.");
                         linkedCts.Cancel();
                         return (foundSource, matchedVersion);
                     }
@@ -356,7 +358,8 @@ namespace Microsoft.TemplateEngine.TestHelper
                 {
                     _nugetLogger.LogDebug($"[NuGet Package Manager] Getting metadata for package {packageIdentifier} from source {source.Source}.");
                     SourceRepository repository = Repository.Factory.GetCoreV3(source);
-                    PackageMetadataResource resource = await repository.GetResourceAsync<PackageMetadataResource>(cancellationToken);
+                    PackageMetadataResource resource = await repository.GetResourceAsync<PackageMetadataResource>(cancellationToken)
+                        ?? throw new InvalidOperationException($"The source '{source.Source}' does not provide {nameof(PackageMetadataResource)}.");
                     IEnumerable<IPackageSearchMetadata> foundPackages = await resource.GetMetadataAsync(
                         packageIdentifier,
                         includePrerelease: includePrerelease,
