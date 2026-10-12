@@ -439,6 +439,3 @@ namespace Microsoft.TemplateEngine.TestHelper
         }
     }
 }
-
-
-{"content":[{"text":"
