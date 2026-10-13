@@ -86,9 +86,8 @@ stages:
               Build_Debug:
                 _BuildConfig: Debug
                 _SignType: test
-                # Disable publish for Debug to avoid concurrent uploads to the same
-                # PackageArtifacts/BlobArtifacts containers as the Release build,
-                # which causes "Blob is incomplete" artifact corruption.
+                # Only Windows Release publishes packages to avoid concurrent uploads
+                # to the shared PackageArtifacts/BlobArtifacts containers.
                 _ExtraBuildArgs: '/p:Publish=false'
 
         steps:
@@ -113,14 +112,13 @@ stages:
               debug_configuration:
                 _BuildConfig: Debug
                 _SignType: none
-                # Disable publish for Debug to avoid concurrent uploads to the same
-                # PackageArtifacts/BlobArtifacts containers as the Release build,
-                # which causes "Blob is incomplete" artifact corruption.
+                # Only Windows Release publishes packages to avoid concurrent uploads
+                # to the shared PackageArtifacts/BlobArtifacts containers.
                 _ExtraBuildArgs: '/p:Publish=false'
               release_configuration:
                 _BuildConfig: Release
                 _SignType: none
-                _ExtraBuildArgs: ''
+                _ExtraBuildArgs: '/p:Publish=false'
           steps:
           - script: eng/common/cibuild.sh
               --configuration $(_BuildConfig)
@@ -144,14 +142,13 @@ stages:
               debug_configuration:
                 _BuildConfig: Debug
                 _SignType: none
-                # Disable publish for Debug to avoid concurrent uploads to the same
-                # PackageArtifacts/BlobArtifacts containers as the Release build,
-                # which causes "Blob is incomplete" artifact corruption.
+                # Only Windows Release publishes packages to avoid concurrent uploads
+                # to the shared PackageArtifacts/BlobArtifacts containers.
                 _ExtraBuildArgs: '/p:Publish=false'
               release_configuration:
                 _BuildConfig: Release
                 _SignType: none
-                _ExtraBuildArgs: ''
+                _ExtraBuildArgs: '/p:Publish=false'
           steps:
           - script: eng/common/cibuild.sh
               --configuration $(_BuildConfig)
