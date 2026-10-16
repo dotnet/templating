@@ -157,3 +157,12 @@ When the value say, `Test ©` is supplied as the value for the parameter `exampl
     }
 }
 ```
+
+**`snakeCase`** - Converts the value to snake case using the casing rules of the invariant culture. Available since .NET 9.0.100.
+```json
+"forms": {
+    "snakeCase": {
+      "identifier": "snakeCase"
+    }
+}
+```

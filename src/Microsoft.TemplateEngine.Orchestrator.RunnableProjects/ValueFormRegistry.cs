@@ -29,6 +29,7 @@ namespace Microsoft.TemplateEngine.Orchestrator.RunnableProjects
                 new FirstUpperCaseInvariantValueFormFactory(),
                 new FirstLowerCaseInvariantValueFormFactory(),
                 new KebabCaseValueFormFactory(),
+                new SnakeCaseValueFormFactory(),
                 new TitleCaseValueFormFactory(),
             };
 
