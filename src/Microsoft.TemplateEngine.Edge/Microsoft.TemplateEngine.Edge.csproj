@@ -43,6 +43,7 @@
   <ItemGroup>
     <InternalsVisibleTo Include="Microsoft.TemplateEngine.Edge.UnitTests" Key="$(TemplateEnginePublicKey)" />
     <InternalsVisibleTo Include="Microsoft.TemplateEngine.Cli.UnitTests" Key="$(TemplateEnginePublicKey)" />
+    <InternalsVisibleTo Include="Microsoft.TemplateEngine.IDE.IntegrationTests" Key="$(TemplateEnginePublicKey)" />
   </ItemGroup>
 
 </Project>
