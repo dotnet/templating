@@ -458,6 +458,15 @@ namespace Microsoft.TemplateEngine.Edge {
                 return ResourceManager.GetString("NuGetInstaller_Error_FailedToReadPackage", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Package source mapping is enabled, but no source was found for package {0}..
+        /// </summary>
+        internal static string NuGetInstaller_Error_PackageSourceMappingMatchNotFound {
+            get {
+                return ResourceManager.GetString("NuGetInstaller_Error_PackageSourceMappingMatchNotFound", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to File {0} already exists..
