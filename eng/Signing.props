@@ -5,8 +5,7 @@
   </PropertyGroup>
   
   <!--
-    These are third party libraries that we use in Arcade. We need to sign them even if they
-    are already signed. However, they must be signed with a 3rd party certificate.
+    Arcade no longer signs so signing the test binaries used in arcade is no longer needed. Don't sign the test binaries.
   -->
   <ItemGroup>
     <FileSignInfo Include="Argon.dll" CertificateName="3PartySHA2" />
@@ -16,8 +15,11 @@
     <FileSignInfo Include="Verify.dll" CertificateName="3PartySHA2" />
     <FileSignInfo Include="Verify.Xunit.dll" CertificateName="3PartySHA2" />
     <FileSignInfo Include="EmptyFiles.dll" CertificateName="3PartySHA2" />
-    <FileSignInfo Include="FluentAssertions.dll" CertificateName="3PartySHA2" />
     <FileSignInfo Include="SimpleInfoName.dll" CertificateName="3PartySHA2" />
+    <ItemsToSign Remove="$(ArtifactsNonShippingPackagesDir)**\Microsoft.TemplateEngine.Mocks.*.nupkg" />
+    <ItemsToSign Remove="$(ArtifactsNonShippingPackagesDir)**\Microsoft.TemplateEngine.TestHelper.*.nupkg" />
+    <ItemsToSign Remove="$(ArtifactsNonShippingPackagesDir)**\Microsoft.TemplateEngine.TestTemplates.*.nupkg" />
+    <ItemsToSign Remove="$(ArtifactsNonShippingPackagesDir)**\Microsoft.TemplateSearch.TemplateDiscovery.*.nupkg" />
   </ItemGroup>
 
 </Project>
