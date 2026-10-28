@@ -1,4 +1,5 @@
 <Project>
+
   <PropertyGroup>
     <UseDotNetCertificate>true</UseDotNetCertificate>
   </PropertyGroup>
@@ -18,4 +19,5 @@
     <FileSignInfo Include="FluentAssertions.dll" CertificateName="3PartySHA2" />
     <FileSignInfo Include="SimpleInfoName.dll" CertificateName="3PartySHA2" />
   </ItemGroup>
+
 </Project>

@@ -1,12 +1,6 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Installer;
@@ -151,27 +145,27 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                                 e.PackageSourceMappingMatchNotFound
                                     ? string.Format(LocalizableStrings.NuGetInstaller_Error_PackageSourceMappingMatchNotFound, e.PackageIdentifier)
                                     : string.Format(LocalizableStrings.NuGetInstaller_Error_FailedToReadPackage, e.PackageIdentifier, string.Join(", ", e.SourcesList)),
-                                Array.Empty<VulnerabilityInfo>());
+                                []);
                         }
                         catch (InvalidNuGetSourceException e)
                         {
                             string message = e.SourcesList == null || !e.SourcesList.Any()
-                                ? LocalizableStrings.NuGetInstaller_InstallResut_Error_InvalidSources_None
-                                : string.Format(LocalizableStrings.NuGetInstaller_InstallResut_Error_InvalidSources, string.Join(", ", e.SourcesList));
+                                ? LocalizableStrings.NuGetInstaller_InstallResult_Error_InvalidSources_None
+                                : string.Format(LocalizableStrings.NuGetInstaller_InstallResult_Error_InvalidSources, string.Join(", ", e.SourcesList));
 
                             return CheckUpdateResult.CreateFailure(
                                 package,
                                 InstallerErrorCode.InvalidSource,
                                 message,
-                                Array.Empty<VulnerabilityInfo>());
+                                []);
                         }
                         catch (OperationCanceledException)
                         {
                             return CheckUpdateResult.CreateFailure(
                                 package,
                                 InstallerErrorCode.GenericError,
-                                LocalizableStrings.NuGetInstaller_InstallResut_Error_OperationCancelled,
-                                Array.Empty<VulnerabilityInfo>());
+                                LocalizableStrings.NuGetInstaller_InstallResult_Error_OperationCancelled,
+                                []);
                         }
                         catch (VulnerablePackageException e)
                         {
@@ -187,8 +181,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                             return CheckUpdateResult.CreateFailure(
                                 package,
                                 InstallerErrorCode.GenericError,
-                                string.Format(LocalizableStrings.NuGetInstaller_InstallResut_Error_UpdateCheckGeneric, package.DisplayName, e.Message),
-                                Array.Empty<VulnerabilityInfo>());
+                                string.Format(LocalizableStrings.NuGetInstaller_InstallResult_Error_UpdateCheckGeneric, package.DisplayName, e.Message),
+                                []);
                         }
                     }
                     else
@@ -196,8 +190,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                         return CheckUpdateResult.CreateFailure(
                             package,
                             InstallerErrorCode.UnsupportedRequest,
-                            string.Format(LocalizableStrings.NuGetInstaller_InstallResut_Error_PackageNotSupported, package.DisplayName, Factory.Name),
-                            Array.Empty<VulnerabilityInfo>());
+                            string.Format(LocalizableStrings.NuGetInstaller_InstallResult_Error_PackageNotSupported, package.DisplayName, Factory.Name),
+                            []);
                     }
                 })).ConfigureAwait(false);
         }
@@ -212,8 +206,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 return InstallResult.CreateFailure(
                     installRequest,
                     InstallerErrorCode.UnsupportedRequest,
-                    string.Format(LocalizableStrings.NuGetInstaller_InstallResut_Error_PackageNotSupported, installRequest.DisplayName, Factory.Name),
-                    Array.Empty<VulnerabilityInfo>());
+                    string.Format(LocalizableStrings.NuGetInstaller_InstallResult_Error_PackageNotSupported, installRequest.DisplayName, Factory.Name),
+                    []);
             }
 
             try
@@ -226,7 +220,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 }
                 else
                 {
-                    string[] additionalNuGetSources = Array.Empty<string>();
+                    string[] additionalNuGetSources = [];
                     if (installRequest.Details != null && installRequest.Details.TryGetValue(InstallerConstants.NuGetSourcesKey, out string nugetSources))
                     {
                         additionalNuGetSources = nugetSources.Split(InstallerConstants.NuGetSourcesSeparator);
@@ -268,8 +262,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 return InstallResult.CreateFailure(
                     installRequest,
                     InstallerErrorCode.DownloadFailed,
-                    string.Format(LocalizableStrings.NuGetInstaller_InstallResut_Error_DownloadFailed, installRequest.DisplayName, packageLocation),
-                    Array.Empty<VulnerabilityInfo>());
+                    string.Format(LocalizableStrings.NuGetInstaller_InstallResult_Error_DownloadFailed, installRequest.DisplayName, packageLocation),
+                    []);
             }
             catch (PackageNotFoundException e)
             {
@@ -279,27 +273,27 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                     e.PackageSourceMappingMatchNotFound
                         ? string.Format(LocalizableStrings.NuGetInstaller_Error_PackageSourceMappingMatchNotFound, e.PackageIdentifier)
                         : string.Format(LocalizableStrings.NuGetInstaller_Error_FailedToReadPackage, e.PackageIdentifier, string.Join(", ", e.SourcesList)),
-                    Array.Empty<VulnerabilityInfo>());
+                    []);
             }
             catch (InvalidNuGetSourceException e)
             {
                 string message = e.SourcesList == null || !e.SourcesList.Any()
-                    ? LocalizableStrings.NuGetInstaller_InstallResut_Error_InvalidSources_None
-                    : string.Format(LocalizableStrings.NuGetInstaller_InstallResut_Error_InvalidSources, string.Join(", ", e.SourcesList));
+                    ? LocalizableStrings.NuGetInstaller_InstallResult_Error_InvalidSources_None
+                    : string.Format(LocalizableStrings.NuGetInstaller_InstallResult_Error_InvalidSources, string.Join(", ", e.SourcesList));
 
                 return InstallResult.CreateFailure(
                         installRequest,
                         InstallerErrorCode.InvalidSource,
                         message,
-                        Array.Empty<VulnerabilityInfo>());
+                        []);
             }
             catch (InvalidNuGetPackageException e)
             {
                 return InstallResult.CreateFailure(
                     installRequest,
                     InstallerErrorCode.InvalidPackage,
-                    string.Format(LocalizableStrings.NuGetInstaller_InstallResut_Error_InvalidPackage, e.PackageLocation),
-                    Array.Empty<VulnerabilityInfo>());
+                    string.Format(LocalizableStrings.NuGetInstaller_InstallResult_Error_InvalidPackage, e.PackageLocation),
+                    []);
             }
             catch (VulnerablePackageException e)
             {
@@ -314,8 +308,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 return InstallResult.CreateFailure(
                     installRequest,
                     InstallerErrorCode.GenericError,
-                    LocalizableStrings.NuGetInstaller_InstallResut_Error_OperationCancelled,
-                    Array.Empty<VulnerabilityInfo>());
+                    LocalizableStrings.NuGetInstaller_InstallResult_Error_OperationCancelled,
+                    []);
             }
             catch (Exception e)
             {
@@ -323,8 +317,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 return InstallResult.CreateFailure(
                     installRequest,
                     InstallerErrorCode.GenericError,
-                    string.Format(LocalizableStrings.NuGetInstaller_InstallResut_Error_InstallGeneric, installRequest.DisplayName, e.Message),
-                    Array.Empty<VulnerabilityInfo>());
+                    string.Format(LocalizableStrings.NuGetInstaller_InstallResult_Error_InstallGeneric, installRequest.DisplayName, e.Message),
+                    []);
             }
         }
 
@@ -349,7 +343,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 return Task.FromResult(UninstallResult.CreateFailure(
                     templatePackage,
                     InstallerErrorCode.UnsupportedRequest,
-                    string.Format(LocalizableStrings.NuGetInstaller_InstallResut_Error_PackageNotSupported, templatePackage.DisplayName, Factory.Name)));
+                    string.Format(LocalizableStrings.NuGetInstaller_InstallResult_Error_PackageNotSupported, templatePackage.DisplayName, Factory.Name)));
             }
             try
             {
@@ -362,7 +356,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 return Task.FromResult(UninstallResult.CreateFailure(
                     templatePackage,
                     InstallerErrorCode.GenericError,
-                    string.Format(LocalizableStrings.NuGetInstaller_InstallResut_Error_UninstallGeneric, templatePackage.DisplayName, e.Message)));
+                    string.Format(LocalizableStrings.NuGetInstaller_InstallResult_Error_UninstallGeneric, templatePackage.DisplayName, e.Message)));
             }
         }
 
@@ -384,7 +378,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 {
                     throw new InvalidOperationException($"{nameof(uninstallResult.ErrorMessage)} cannot be null when {nameof(uninstallResult.Success)} is 'true'");
                 }
-                return UpdateResult.CreateFailure(updateRequest, uninstallResult.Error, uninstallResult.ErrorMessage, Array.Empty<VulnerabilityInfo>());
+                return UpdateResult.CreateFailure(updateRequest, uninstallResult.Error, uninstallResult.ErrorMessage, []);
             }
 
             InstallRequest installRequest = new InstallRequest(updateRequest.TemplatePackage.Identifier, updateRequest.Version);
@@ -448,7 +442,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 null,
                 nuspec.GetId(),
                 nuspec.GetVersion().ToNormalizedString(),
-                Array.Empty<VulnerabilityInfo>());
+                []);
         }
     }
 }
