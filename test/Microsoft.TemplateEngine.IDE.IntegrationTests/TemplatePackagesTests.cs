@@ -1,14 +1,20 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using FakeItEasy;
 using FluentAssertions;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Abstractions.Installer;
 using Microsoft.TemplateEngine.Abstractions.Mount;
 using Microsoft.TemplateEngine.Abstractions.TemplatePackage;
+using Microsoft.TemplateEngine.Edge.Installers.NuGet;
 using Microsoft.TemplateEngine.Edge.Settings;
 using Microsoft.TemplateEngine.Mocks;
 using Microsoft.TemplateEngine.TestHelper;
+using NuGet.Packaging.Core;
+using NuGet.Protocol.Core.Types;
+using NuGet.Versioning;
+using static Microsoft.TemplateEngine.Edge.Installers.NuGet.NuGetApiPackageManager;
 
 namespace Microsoft.TemplateEngine.IDE.IntegrationTests
 {
@@ -22,7 +28,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             "Details": {
                 "PackageId": "Sln",
                 "Author": "Enrico Sada",
-                "NuGetSource": "https://api.nuget.org/v3/index.json",
+                "NuGetSource": "https://example.invalid/v3/index.json",
                 "Version": "0.2.0"
             },
             "InstallerId": "015dcbac-b4a5-49ea-94a6-061616eb60e2",
@@ -33,7 +39,7 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             "Details": {
                 "PackageId": "Boxed.Templates",
                 "Author": "Muhammad Rehan Saeed (RehanSaeed.com)",
-                "NuGetSource": "https://api.nuget.org/v3/index.json",
+                "NuGetSource": "https://example.invalid/v3/index.json",
                 "Version": "7.4.0"
             },
             "InstallerId": "015dcbac-b4a5-49ea-94a6-061616eb60e2",
@@ -211,11 +217,13 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
         [Fact]
         internal async Task CanUpdateAllPackagesMetadataOnGetLatestVersion()
         {
-            using Bootstrapper bootstrapper = GetBootstrapper(packageJsonContent: ValidPackageJsonFile);
+            using Bootstrapper bootstrapper = GetBootstrapperWithPackageMetadata();
             var installedPackages = await bootstrapper.GetManagedTemplatePackagesAsync(CancellationToken.None);
 
             // implicitly populates packages metadata
-            await bootstrapper.GetLatestVersionsAsync(installedPackages, CancellationToken.None);
+            var checkUpdateResults = await bootstrapper.GetLatestVersionsAsync(installedPackages, CancellationToken.None);
+            Assert.Equal(2, checkUpdateResults.Count);
+            Assert.All(checkUpdateResults, result => Assert.True(result.Success, result.ErrorMessage));
 
             var updatedPackages = await bootstrapper.GetManagedTemplatePackagesAsync(CancellationToken.None);
 
@@ -236,23 +244,27 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
         [Fact]
         internal async Task CanUpdateSpecifiedPackageMetadataOnGetLatestVersion()
         {
-            using Bootstrapper bootstrapper = GetBootstrapper(packageJsonContent: ValidPackageJsonFile);
+            using Bootstrapper bootstrapper = GetBootstrapperWithPackageMetadata();
             var installedPackages = await bootstrapper.GetManagedTemplatePackagesAsync(CancellationToken.None);
-            var boxedTemplatePackage = installedPackages.FirstOrDefault(ip => ip.Identifier == "Boxed.Templates");
+            var boxedTemplatePackage = Assert.Single(installedPackages, ip => ip.Identifier == "Boxed.Templates");
 
             // implicitly populates package metadata
-            await bootstrapper.GetLatestVersionsAsync(new[] { boxedTemplatePackage! }, CancellationToken.None);
+            var checkUpdateResults = await bootstrapper.GetLatestVersionsAsync(new[] { boxedTemplatePackage }, CancellationToken.None);
+            var checkUpdateResult = Assert.Single(checkUpdateResults);
+            Assert.True(checkUpdateResult.Success, checkUpdateResult.ErrorMessage);
 
             var updatedPackages = await bootstrapper.GetManagedTemplatePackagesAsync(CancellationToken.None);
             Assert.Equal(2, updatedPackages.Count);
             var slnPackageDetails = updatedPackages[0].GetDetails();
             Assert.False(slnPackageDetails.TryGetValue("Owners", out var _));
             Assert.False(bool.Parse(slnPackageDetails["Reserved"]));
+            Assert.Equal("0.2.0", updatedPackages[0].Version);
 
             // the specified package has updated metadata
             var boxPackageDetails = updatedPackages[1].GetDetails();
             Assert.Equal("BlackLight", boxPackageDetails["Owners"]);
             Assert.True(bool.Parse(boxPackageDetails["Reserved"]));
+            Assert.Equal("7.4.0", updatedPackages[1].Version);
         }
 
         [Fact]
@@ -464,6 +476,21 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             Assert.Equal(InstallerErrorCode.AlreadyInstalled, result[0].Error);
         }
 
+        private static Bootstrapper GetBootstrapperWithPackageMetadata()
+        {
+            var packageManager = new MetadataPackageManager();
+            var factory = A.Fake<IInstallerFactory>();
+            A.CallTo(() => factory.Id).Returns(NuGetInstallerFactory.FactoryId);
+            A.CallTo(() => factory.Name).Returns("NuGet");
+            A.CallTo(() => factory.CreateInstaller(A<IEngineEnvironmentSettings>.Ignored, A<string>.Ignored))
+                .ReturnsLazily((IEngineEnvironmentSettings settings, string installPath) =>
+                    new NuGetInstaller(factory, settings, installPath, packageManager, packageManager));
+
+            var bootstrapper = GetBootstrapper(packageJsonContent: ValidPackageJsonFile);
+            bootstrapper.AddComponent(typeof(IInstallerFactory), factory);
+            return bootstrapper;
+        }
+
         internal class MountPointFactoryMock : IMountPointFactory
         {
             public Guid Id => Guid.Empty;
@@ -472,6 +499,37 @@ namespace Microsoft.TemplateEngine.IDE.IntegrationTests
             {
                 mountPoint = new MockMountPoint(environmentSettings);
                 return true;
+            }
+        }
+
+        private sealed class MetadataPackageManager : IUpdateChecker, IDownloader
+        {
+            public Task<(string LatestVersion, bool IsLatestVersion, NugetPackageMetadata PackageMetadata)> GetLatestVersionAsync(
+                string identifier,
+                string? version = null,
+                string? additionalNuGetSource = null,
+                CancellationToken cancellationToken = default)
+            {
+                var (latestVersion, owners, reserved) = identifier switch
+                {
+                    "Sln" => ("0.3.0", "enricosada", false),
+                    "Boxed.Templates" => ("8.0.0", "BlackLight", true),
+                    _ => throw new InvalidOperationException($"Unexpected package: {identifier}")
+                };
+                var metadata = A.Fake<IPackageSearchMetadata>();
+                A.CallTo(() => metadata.Identity).Returns(new PackageIdentity(identifier, NuGetVersion.Parse(latestVersion)));
+                return Task.FromResult((latestVersion, version == latestVersion, new NugetPackageMetadata(metadata, owners, reserved)));
+            }
+
+            public Task<NuGetPackageInfo> DownloadPackageAsync(
+                string downloadPath,
+                string identifier,
+                string? version = null,
+                IEnumerable<string>? additionalSources = null,
+                bool force = false,
+                CancellationToken cancellationToken = default)
+            {
+                throw new InvalidOperationException("Metadata update checks must not download packages.");
             }
         }
     }
