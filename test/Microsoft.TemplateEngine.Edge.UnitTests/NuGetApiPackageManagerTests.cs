@@ -313,36 +313,37 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             sources.Select(source => source.Name).Should().BeEquivalentTo("template-feed", "other-feed");
         }
 
-        [Fact]
-        public void LoadNuGetSources_AdditionalSourceSpecified_AllowsAdditionalSourceAndFiltersConfiguredSources()
+        [Theory]
+        [InlineData("https://additional.test/v3/index.json")]
+        [InlineData("https://templates.test/v3/index.json")]
+        public void LoadNuGetSources_PackageSourceMappingEnabledAndAdditionalSourceSpecified_Throws(string additionalSource)
         {
             IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
             NuGetApiPackageManager packageManager = new NuGetApiPackageManager(engineEnvironmentSettings);
             ISettings settings = CreateSettingsWithPackageSourceMapping();
 
-            IEnumerable<PackageSource> sources = packageManager.LoadNuGetSources(
+            Action action = () => packageManager.LoadNuGetSources(
                 "Contoso.Templates",
-                new[] { "https://additional.test/v3/index.json" },
+                new[] { additionalSource },
                 settings);
 
-            sources.Should().ContainSingle()
-                .Which.Source.Should().Be("https://additional.test/v3/index.json");
+            action.Should().Throw<InvalidNuGetSourceException>();
         }
 
         [Fact]
-        public void LoadNuGetSources_ConfiguredAdditionalSource_DoesNotBypassPackageSourceMapping()
+        public void LoadNuGetSources_PackageSourceMappingEnabledAndNoSourcesEnabled_ThrowsInvalidNuGetSourceException()
         {
             IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
             NuGetApiPackageManager packageManager = new NuGetApiPackageManager(engineEnvironmentSettings);
-            ISettings settings = CreateSettingsWithPackageSourceMapping();
+            ISettings settings = CreateSettingsWithPackageSourceMapping(
+                disableAllSources: true);
 
-            IEnumerable<PackageSource> sources = packageManager.LoadNuGetSources(
-                "Exact.Templates",
-                new[] { "https://templates.test/v3/index.json" },
+            Action action = () => packageManager.LoadNuGetSources(
+                "Microsoft.TemplateEngine.TestTemplates",
+                Array.Empty<string>(),
                 settings);
 
-            sources.Should().ContainSingle()
-                .Which.Name.Should().Be("other-feed");
+            action.Should().Throw<InvalidNuGetSourceException>();
         }
 
         [Fact]
@@ -408,10 +409,18 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 
         private ISettings CreateSettingsWithPackageSourceMapping(
             bool disableTemplateSource = false,
+            bool disableAllSources = false,
             bool includePackageSourceMapping = true)
         {
             string settingsDirectory = _environmentSettingsHelper.CreateTemporaryFolder();
-            string disabledSources = disableTemplateSource
+            string disabledSources = disableAllSources
+                ? """
+                  <disabledPackageSources>
+                    <add key="template-feed" value="true" />
+                    <add key="other-feed" value="true" />
+                  </disabledPackageSources>
+                  """
+                : disableTemplateSource
                 ? """
                   <disabledPackageSources>
                     <add key="template-feed" value="true" />
