@@ -342,7 +342,6 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 "Microsoft.TemplateEngine.TestTemplates",
                 Array.Empty<string>(),
                 settings);
-
             action.Should().Throw<InvalidNuGetSourceException>();
         }
 
