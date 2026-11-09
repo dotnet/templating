@@ -18,7 +18,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             PackageSourceMappingMatchNotFound = packageSourceMappingMatchNotFound;
         }
 
-        public PackageNotFoundException(string packageIdentifier, NuGetVersion packageVersion, IEnumerable<string> attemptedSources) : base($"{packageIdentifier}::{packageVersion} was not found in NuGet feeds {string.Join(";", attemptedSources)}")
+        public PackageNotFoundException(string packageIdentifier, NuGetVersion packageVersion, IEnumerable<string> attemptedSources) : base($"{packageIdentifier}@{packageVersion} was not found in NuGet feeds {string.Join(";", attemptedSources)}")
         {
             PackageIdentifier = packageIdentifier;
             PackageVersion = packageVersion;
