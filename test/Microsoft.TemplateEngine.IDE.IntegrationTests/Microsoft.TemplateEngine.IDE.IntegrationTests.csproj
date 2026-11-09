@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FakeItEasy" />
     <PackageReference Include="AwesomeAssertions" />
     <PackageReference Include="Verify.XUnit" />
     <PackageReference Include="Verify.DiffPlex" />
