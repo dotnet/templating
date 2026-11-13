@@ -52,6 +52,32 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         }
 
         [Fact]
+        public async Task DownloadPackage_VirtualizedFileSystem_VerifiesPhysicalTemporaryPackage()
+        {
+            using var feed = new MockNuGetFeed("Templates");
+            string source = feed.BaseAddress + "index.json";
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
+            string installPath = Path.Combine(engineEnvironmentSettings.Paths.GlobalSettingsDir, "packages");
+            var verifier = new PhysicalFileVerifyingPackageVerifier(feed.PackageContent);
+            var packageManager = new NuGetApiPackageManager(engineEnvironmentSettings, verifier);
+
+            NuGetPackageInfo result = await packageManager.DownloadPackageAsync(
+                installPath,
+                "Templates",
+                "1.0.0",
+                additionalSources: new[] { source },
+                force: true);
+
+            string temporaryPackagePath = verifier.PackagePath ?? throw new InvalidOperationException("The package verifier was not called.");
+            Assert.False(File.Exists(temporaryPackagePath));
+            Assert.True(engineEnvironmentSettings.Host.FileSystem.FileExists(result.FullPath));
+            using Stream installedPackage = engineEnvironmentSettings.Host.FileSystem.OpenRead(result.FullPath);
+            using var downloadedPackage = new MemoryStream();
+            await installedPackage.CopyToAsync(downloadedPackage);
+            Assert.Equal(feed.PackageContent, downloadedPackage.ToArray());
+        }
+
+        [Fact]
         public async Task GetLatestVersion_MismatchedMetadataId_ThrowsPackageNotFound()
         {
             const string identifier = "Requested.Package";
@@ -95,12 +121,13 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         [Fact]
         public async Task DownloadPackage_PackageValidationFailure_RemovesTemporaryPackage()
         {
-            string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
             IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
+            string installPath = Path.Combine(engineEnvironmentSettings.Paths.GlobalSettingsDir, "packages");
+            var verifier = new FailingNuGetPackageVerifier();
 
             NuGetApiPackageManager packageManager = new NuGetApiPackageManager(
                 engineEnvironmentSettings,
-                new FailingNuGetPackageVerifier());
+                verifier);
 
             var exception = await Assert.ThrowsAsync<DownloadException>(() => packageManager.DownloadPackageAsync(
                 installPath,
@@ -111,7 +138,10 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             var validationException = Assert.IsType<InvalidDataException>(exception.InnerException);
             validationException.Message.Should().Be("Package validation failed.");
 
-            Directory.EnumerateFiles(installPath).Should().BeEmpty();
+            Assert.False(engineEnvironmentSettings.Host.FileSystem.FileExists(
+                Path.Combine(installPath, "Microsoft.DotNet.Common.ProjectTemplates.5.0.5.0.0.nupkg")));
+            string temporaryPackagePath = verifier.PackagePath ?? throw new InvalidOperationException("The package verifier was not called.");
+            Assert.False(File.Exists(temporaryPackagePath));
         }
 
         [Fact]
@@ -536,7 +566,32 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 
             public Task VerifyAsync(string packagePath, SourceRepository repository, ISettings settings, ILogger logger, CancellationToken cancellationToken)
             {
+                PackagePath = packagePath;
                 throw new InvalidDataException("Package validation failed.");
+            }
+
+            public string? PackagePath { get; private set; }
+        }
+
+        private sealed class PhysicalFileVerifyingPackageVerifier : INuGetPackageVerifier
+        {
+            private readonly byte[] _expectedContent;
+
+            public PhysicalFileVerifyingPackageVerifier(byte[] expectedContent)
+            {
+                _expectedContent = expectedContent;
+            }
+
+            public bool IsEnabled => true;
+
+            public string? PackagePath { get; private set; }
+
+            public Task VerifyAsync(string packagePath, SourceRepository repository, ISettings settings, ILogger logger, CancellationToken cancellationToken)
+            {
+                PackagePath = packagePath;
+                Assert.True(File.Exists(packagePath));
+                Assert.Equal(_expectedContent, File.ReadAllBytes(packagePath));
+                return Task.CompletedTask;
             }
         }
     }
