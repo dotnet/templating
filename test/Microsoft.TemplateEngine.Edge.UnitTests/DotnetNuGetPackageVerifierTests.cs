@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.IO.Compression;
+using System.Security;
+using FakeItEasy;
 using Microsoft.TemplateEngine.Edge.Installers.NuGet;
 using Microsoft.TemplateEngine.TestHelper;
 using NuGet.Common;
@@ -43,9 +45,12 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 writer.Write("Content added after signing.");
             }
 
-            var exception = await Assert.ThrowsAsync<InvalidDataException>(() => VerifyAsync(packagePath));
+            ILogger logger = A.Fake<ILogger>();
+            var exception = await Assert.ThrowsAsync<SecurityException>(() => VerifyAsync(packagePath, logger: logger));
 
-            Assert.Contains("NU3008", exception.Message);
+            Assert.Contains("dotnet nuget verify --all", exception.Message);
+            Assert.Contains("failed with exit code 1", exception.Message);
+            A.CallTo(() => logger.Log(A<LogLevel>._, A<string>.That.Matches(message => message.Contains("NU3008")))).MustHaveHappened();
         }
 
         [Fact]
@@ -76,7 +81,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             return packagePath;
         }
 
-        private Task VerifyAsync(string packagePath, string policy = "accept")
+        private Task VerifyAsync(string packagePath, string policy = "accept", ILogger? logger = null)
         {
             string directory = _environmentSettingsHelper.CreateTemporaryFolder();
             File.WriteAllText(
@@ -96,7 +101,7 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 packagePath,
                 Repository.Factory.GetCoreV3(directory),
                 settings,
-                NullLogger.Instance,
+                logger ?? NullLogger.Instance,
                 CancellationToken.None);
         }
     }
