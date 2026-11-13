@@ -4,9 +4,14 @@
 using FluentAssertions;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Edge.Installers.NuGet;
+using Microsoft.TemplateEngine.Edge.UnitTests.Mocks;
 using Microsoft.TemplateEngine.TestHelper;
+using NuGet.Common;
 using NuGet.Configuration;
+using NuGet.Protocol.Core.Types;
+using NuGet.Versioning;
 using Xunit;
+using NuGetSettings = NuGet.Configuration.Settings;
 
 namespace Microsoft.TemplateEngine.Edge.UnitTests
 {
@@ -18,6 +23,75 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         public NuGetApiPackageManagerTests(EnvironmentSettingsHelper environmentSettingsHelper)
         {
             _environmentSettingsHelper = environmentSettingsHelper;
+        }
+
+        [Theory]
+        [InlineData("1.0.0")]
+        [InlineData(null)]
+        [InlineData("*")]
+        [InlineData("1.*")]
+        [InlineData("*-*")]
+        public async Task DownloadPackage_MismatchedMetadataId_ThrowsPackageNotFound(string? version)
+        {
+            const string identifier = "Requested.Package";
+            using var feed = new MockNuGetFeed("Other.Package");
+            string source = feed.BaseAddress + "index.json";
+            string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
+            var settings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
+            var manager = new NuGetApiPackageManager(settings);
+
+            var exception = await Assert.ThrowsAsync<PackageNotFoundException>(() => manager.DownloadPackageAsync(
+                installPath, identifier, version, additionalSources: new[] { source }, force: true));
+
+            exception.PackageIdentifier.Should().Be(identifier);
+            NuGetVersion.TryParse(version, out NuGetVersion? expectedVersion);
+            Assert.Equal(expectedVersion, exception.PackageVersion);
+            exception.SourcesList.Should().Equal(source);
+            Directory.GetFiles(installPath).Should().BeEmpty();
+            feed.Requests.Should().NotContain(path => path.StartsWith("/flatcontainer/", StringComparison.Ordinal));
+        }
+
+        [Fact]
+        public async Task DownloadPackage_VirtualizedFileSystem_VerifiesPhysicalTemporaryPackage()
+        {
+            using var feed = new MockNuGetFeed("Templates");
+            string source = feed.BaseAddress + "index.json";
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
+            string installPath = Path.Combine(engineEnvironmentSettings.Paths.GlobalSettingsDir, "packages");
+            var verifier = new PhysicalFileVerifyingPackageVerifier(feed.PackageContent);
+            var packageManager = new NuGetApiPackageManager(engineEnvironmentSettings, verifier);
+
+            NuGetPackageInfo result = await packageManager.DownloadPackageAsync(
+                installPath,
+                "Templates",
+                "1.0.0",
+                additionalSources: new[] { source },
+                force: true);
+
+            string temporaryPackagePath = verifier.PackagePath ?? throw new InvalidOperationException("The package verifier was not called.");
+            Assert.False(File.Exists(temporaryPackagePath));
+            Assert.True(engineEnvironmentSettings.Host.FileSystem.FileExists(result.FullPath));
+            using Stream installedPackage = engineEnvironmentSettings.Host.FileSystem.OpenRead(result.FullPath);
+            using var downloadedPackage = new MemoryStream();
+            await installedPackage.CopyToAsync(downloadedPackage);
+            Assert.Equal(feed.PackageContent, downloadedPackage.ToArray());
+        }
+
+        [Fact]
+        public async Task GetLatestVersion_MismatchedMetadataId_ThrowsPackageNotFound()
+        {
+            const string identifier = "Requested.Package";
+            using var feed = new MockNuGetFeed("Other.Package");
+            string source = feed.BaseAddress + "index.json";
+            var settings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
+            var manager = new NuGetApiPackageManager(settings);
+
+            var exception = await Assert.ThrowsAsync<PackageNotFoundException>(() => manager.GetLatestVersionAsync(
+                identifier, additionalSource: source));
+
+            exception.PackageIdentifier.Should().Be(identifier);
+            exception.PackageVersion.Should().BeNull();
+            exception.SourcesList.Should().Equal(source);
         }
 
         [Fact]
@@ -41,6 +115,33 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             result.Reserved.Should().BeFalse();
             result.PackageVersion.Should().NotBeNullOrEmpty();
             result.NuGetSource.Should().NotBeNullOrEmpty();
+            Directory.EnumerateFiles(installPath, "*.tmp").Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task DownloadPackage_PackageValidationFailure_RemovesTemporaryPackage()
+        {
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
+            string installPath = Path.Combine(engineEnvironmentSettings.Paths.GlobalSettingsDir, "packages");
+            var verifier = new FailingNuGetPackageVerifier();
+
+            NuGetApiPackageManager packageManager = new NuGetApiPackageManager(
+                engineEnvironmentSettings,
+                verifier);
+
+            var exception = await Assert.ThrowsAsync<DownloadException>(() => packageManager.DownloadPackageAsync(
+                installPath,
+                "Microsoft.DotNet.Common.ProjectTemplates.5.0",
+                "5.0.0",
+                additionalSources: new[] { "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-public/nuget/v3/index.json" }));
+
+            var validationException = Assert.IsType<InvalidDataException>(exception.InnerException);
+            validationException.Message.Should().Be("Package validation failed.");
+
+            Assert.False(engineEnvironmentSettings.Host.FileSystem.FileExists(
+                Path.Combine(installPath, "Microsoft.DotNet.Common.ProjectTemplates.5.0.5.0.0.nupkg")));
+            string temporaryPackagePath = verifier.PackagePath ?? throw new InvalidOperationException("The package verifier was not called.");
+            Assert.False(File.Exists(temporaryPackagePath));
         }
 
         [Fact]
@@ -455,7 +556,42 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 {packageSourceMapping}
                 </configuration>
                 """);
-            return global::NuGet.Configuration.Settings.LoadSpecificSettings(settingsDirectory, "NuGet.config");
+            return NuGetSettings.LoadSpecificSettings(settingsDirectory, "NuGet.config");
+        }
+
+        private sealed class FailingNuGetPackageVerifier : INuGetPackageVerifier
+        {
+            public bool IsEnabled => true;
+
+            public Task VerifyAsync(string packagePath, SourceRepository repository, ISettings settings, ILogger logger, CancellationToken cancellationToken)
+            {
+                PackagePath = packagePath;
+                throw new InvalidDataException("Package validation failed.");
+            }
+
+            public string? PackagePath { get; private set; }
+        }
+
+        private sealed class PhysicalFileVerifyingPackageVerifier : INuGetPackageVerifier
+        {
+            private readonly byte[] _expectedContent;
+
+            public PhysicalFileVerifyingPackageVerifier(byte[] expectedContent)
+            {
+                _expectedContent = expectedContent;
+            }
+
+            public bool IsEnabled => true;
+
+            public string? PackagePath { get; private set; }
+
+            public Task VerifyAsync(string packagePath, SourceRepository repository, ISettings settings, ILogger logger, CancellationToken cancellationToken)
+            {
+                PackagePath = packagePath;
+                Assert.True(File.Exists(packagePath));
+                Assert.Equal(_expectedContent, File.ReadAllBytes(packagePath));
+                return Task.CompletedTask;
+            }
         }
     }
 }
