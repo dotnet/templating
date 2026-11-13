@@ -121,11 +121,11 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 throw new DownloadException(packageMetadata.Identity.Id, packageMetadata.Identity.Version.ToNormalizedString(), new[] { source.Source });
             }
 
-            string temporaryFilePath = filePath + "." + Guid.NewGuid().ToString("N") + ".tmp";
+            string temporaryFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N") + ".tmp");
             try
             {
                 bool downloadSucceeded;
-                using (Stream packageStream = _environmentSettings.Host.FileSystem.CreateFile(temporaryFilePath))
+                using (Stream packageStream = new FileStream(temporaryFilePath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
                 {
                     downloadSucceeded = await resource.CopyNupkgToStreamAsync(
                         packageMetadata.Identity.Id,
@@ -171,7 +171,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             }
             finally
             {
-                TryDeleteFile(temporaryFilePath);
+                TryDeleteTemporaryFile(temporaryFilePath);
             }
 
             async Task VerifyPackageAsync(string packagePath, CancellationToken cancellationToken)
@@ -203,6 +203,22 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 try
                 {
                     _environmentSettings.Host.FileSystem.FileDelete(filePath);
+                }
+                catch (Exception ex)
+                {
+                    _nugetLogger.LogWarning(
+                        string.Format(
+                            LocalizableStrings.NuGetApiPackageManager_Warning_FailedToDelete,
+                            filePath));
+                    _nugetLogger.LogDebug($"Details: {ex}.");
+                }
+            }
+
+            void TryDeleteTemporaryFile(string filePath)
+            {
+                try
+                {
+                    File.Delete(filePath);
                 }
                 catch (Exception ex)
                 {
