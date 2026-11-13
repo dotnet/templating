@@ -18,7 +18,7 @@ designed to separate gathering, instantiating and processing templates.
 
 # Overview of the subsystems
 
-## [IEngineEnvironmentSettings](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.Abstractions/IEngineEnvironmentSettings.cs) 
+## [IEngineEnvironmentSettings](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.Abstractions/IEngineEnvironmentSettings.cs)
 
 This is responsible for holding all properties of the environment.
 
@@ -69,7 +69,7 @@ and
 
 `ComponentManager` is responsible for loading [components](#components) provided by the host from
 `ITemplateEngineHost.BuiltIns`. Additional components can be added via
-`IComponentManager.AddComponent`. Similar to templates, components are also 
+`IComponentManager.AddComponent`. Similar to templates, components are also
 dynamically loaded from template packages during scanning. `ComponentManager`
 implementation is not publicly accessible; however, it is used when default
 implementation of `IEngineEnvironmentSettings` is used.
@@ -120,9 +120,9 @@ instantiate the class when needed.
 
 ### Supplying parameters conditions results
 
-It is possible to supply evaluation results of parameters conditions when instantiating template via Edge API [`TemplateCreator.InstantiateAsync`](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.Edge/Template/TemplateCreator.cs#L89). Example use case is instantiation from Visual Studio host, that will leverage condition evaluator integrated within the New Project Dialog. 
+It is possible to supply evaluation results of parameters conditions when instantiating template via Edge API [`TemplateCreator.InstantiateAsync`](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.Edge/Template/TemplateCreator.cs#L89). Example use case is instantiation from Visual Studio host, that will leverage condition evaluator integrated within the New Project Dialog.
 
-This can be achieved by passing the structured [`InputDataSet`](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.Edge/Template/InputDataSet.cs) argument that is populated with [`EvaluatedInputParameterData`](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.Edge/Template/EvaluatedInputParameterData.cs) objects for evaluated parameters. 
+This can be achieved by passing the structured [`InputDataSet`](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.Edge/Template/InputDataSet.cs) argument that is populated with [`EvaluatedInputParameterData`](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.Edge/Template/EvaluatedInputParameterData.cs) objects for evaluated parameters.
 
 It is currently not possible to provide just partial external evaluation - meaning that the template engine evaluates either all the parameter conditions or none. If the [`InputDataSet`](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.Edge/Template/InputDataSet.cs) collection contains at least one [`EvaluatedInputParameterData`](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.Edge/Template/EvaluatedInputParameterData.cs) element, results of all parameter conditions are expected to be passed.
 
@@ -178,7 +178,7 @@ be split into two main categories:
 
     -   mount points
 
-## Template package providers 
+## Template package providers
 
 Template package providers responsible for providing template packages the
 template engine needs to manage. There are two kinds of providers:
@@ -243,6 +243,12 @@ Template engine provides two installer implementations:
 You can use them when implementing your own providers, they are available from
 IComponentManager.
 
+When package verification is enabled, downloaded signed NuGet packages are
+verified using `dotnet nuget verify --all` before installation. Unsigned packages
+are accepted only when NuGet's `signatureValidationMode` is `accept` and the
+source does not declare `allRepositorySigned=true`. A client policy of `require`
+or a repository signing requirement rejects unsigned packages.
+
 ## [Mount point](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.Abstractions/Mount/IMountPoint.cs)
 
 Template package location is represented by mount point URI. Mount point that
@@ -268,14 +274,14 @@ Template engine host works with constraint using `TemplateConstraintManager` cla
 
 The template may define `bind` symbols. Those symbols might be bound to values provided externally using bind symbol source components.
 Default sources are:
-- host provided parameters - uses prefix `host:`. Binds symbol to parameters provided by the host. 
+- host provided parameters - uses prefix `host:`. Binds symbol to parameters provided by the host.
 - environment variables - uses prefix `env:`. Binds symbol to environment variables.
 
 These components are defined in `Microsoft.TemplateEngine.Edge` and are part of mandatory components collection to be loaded.
 
-If the `binding` does not have prefix, or prefixed value cannot be evaluated the evaluation without prefix is performed as the fallback. 
+If the `binding` does not have prefix, or prefixed value cannot be evaluated the evaluation without prefix is performed as the fallback.
 In case there are more than one component which returns the value, the component priority will be used to define the value to be bounded. In case of same priorities, the evaluation results in error.
-The template author needs to explicitly specify the prefix in this case. It is possible to restrict usage of prefix with setting `IBindSymbolSource.RequiresPrefixMatch` to `true`. 
+The template author needs to explicitly specify the prefix in this case. It is possible to restrict usage of prefix with setting `IBindSymbolSource.RequiresPrefixMatch` to `true`.
 
 
 ## Registering the components
@@ -325,7 +331,7 @@ It is possible to register additional components to in the following way:
 Note that components are not persisted, so they should be added each time
 EngineEnvironmentSettings instance is created.
 
-# Microsoft.TemplateEngine.IDE 
+# Microsoft.TemplateEngine.IDE
 
 The package provides
 [Bootstrapper](https://github.com/dotnet/templating/blob/main/src/Microsoft.TemplateEngine.IDE/Bootstrapper.cs)
