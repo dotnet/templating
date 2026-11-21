@@ -10,6 +10,7 @@ using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
 using ILogger = NuGet.Common.ILogger;
+using NuGetSettings = NuGet.Configuration.Settings;
 
 namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 {
@@ -18,6 +19,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
         private static readonly ConcurrentDictionary<PackageSource, SourceRepository> SourcesCache = new();
         private readonly IEngineEnvironmentSettings _environmentSettings;
         private readonly ILogger _nugetLogger;
+        private readonly INuGetPackageVerifier _packageVerifier;
 
         private readonly SourceCacheContext _cacheSettings = new SourceCacheContext()
         {
@@ -25,10 +27,11 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             DirectDownload = true
         };
 
-        internal NuGetApiPackageManager(IEngineEnvironmentSettings settings)
+        internal NuGetApiPackageManager(IEngineEnvironmentSettings settings, INuGetPackageVerifier? packageVerifier = null)
         {
             _environmentSettings = settings ?? throw new ArgumentNullException(nameof(settings));
             _nugetLogger = new NuGetLogger(_environmentSettings.Host.LoggerFactory);
+            _packageVerifier = packageVerifier ?? new DotnetNuGetPackageVerifier();
         }
 
         /// <summary>
@@ -111,50 +114,46 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 _nugetLogger.LogError(string.Format(LocalizableStrings.NuGetApiPackageManager_Error_FileAlreadyExists, filePath));
                 throw new DownloadException(packageMetadata.Identity.Id, packageMetadata.Identity.Version.ToNormalizedString(), new[] { source.Source });
             }
+
+            string temporaryFilePath = filePath + "." + Guid.NewGuid().ToString("N") + ".tmp";
             try
             {
-                using Stream packageStream = _environmentSettings.Host.FileSystem.CreateFile(filePath);
-                if (await resource.CopyNupkgToStreamAsync(
-                    packageMetadata.Identity.Id,
-                    packageMetadata.Identity.Version,
-                    packageStream,
-                    _cacheSettings,
-                    _nugetLogger,
-                    cancellationToken).ConfigureAwait(false))
+                bool downloadSucceeded;
+                using (Stream packageStream = _environmentSettings.Host.FileSystem.CreateFile(temporaryFilePath))
                 {
-                    return new NuGetPackageInfo(
-                        packageMetadata.Authors,
-                        packageMetadata.Owners,
-                        reserved: packageMetadata.PrefixReserved,
-                        filePath,
-                        source.Source,
+                    downloadSucceeded = await resource.CopyNupkgToStreamAsync(
                         packageMetadata.Identity.Id,
-                        packageMetadata.Identity.Version.ToNormalizedString(),
-                        packageMetadata.Vulnerabilities);
+                        packageMetadata.Identity.Version,
+                        packageStream,
+                        _cacheSettings,
+                        _nugetLogger,
+                        cancellationToken).ConfigureAwait(false);
                 }
-                else
+
+                if (!downloadSucceeded)
                 {
                     _nugetLogger.LogWarning(
                         string.Format(
                             LocalizableStrings.NuGetApiPackageManager_Warning_FailedToDownload,
                             $"{packageMetadata.Identity.Id}@{packageMetadata.Identity.Version}",
                             source.Source));
-                    try
-                    {
-                        _environmentSettings.Host.FileSystem.FileDelete(filePath);
-                    }
-                    catch (Exception ex)
-                    {
-                        _nugetLogger.LogWarning(
-                            string.Format(
-                                LocalizableStrings.NuGetApiPackageManager_Warning_FailedToDelete,
-                                filePath));
-                        _nugetLogger.LogDebug($"Details: {ex}.");
-                    }
                     throw new DownloadException(packageMetadata.Identity.Id, packageMetadata.Identity.Version.ToNormalizedString(), new[] { source.Source });
                 }
+
+                await VerifyPackageAsync(temporaryFilePath, cancellationToken).ConfigureAwait(false);
+                TryCopyFile(temporaryFilePath, filePath);
+
+                return new NuGetPackageInfo(
+                    packageMetadata.Authors,
+                    packageMetadata.Owners,
+                    reserved: packageMetadata.PrefixReserved,
+                    filePath,
+                    source.Source,
+                    packageMetadata.Identity.Id,
+                    packageMetadata.Identity.Version.ToNormalizedString(),
+                    packageMetadata.Vulnerabilities);
             }
-            catch (Exception e)
+            catch (Exception e) when (e is not DownloadException)
             {
                 _nugetLogger.LogWarning(
                     string.Format(
@@ -162,6 +161,39 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                         $"{packageMetadata.Identity.Id}@{packageMetadata.Identity.Version}",
                         source.Source));
                 _nugetLogger.LogDebug($"Details: {e}.");
+                throw new DownloadException(packageMetadata.Identity.Id, packageMetadata.Identity.Version.ToNormalizedString(), new[] { source.Source }, e);
+            }
+            finally
+            {
+                TryDeleteFile(temporaryFilePath);
+            }
+
+            async Task VerifyPackageAsync(string packagePath, CancellationToken cancellationToken)
+            {
+                if (!_packageVerifier.IsEnabled)
+                {
+                    return;
+                }
+
+                ISettings settings = NuGetSettings.LoadDefaultSettings(Directory.GetCurrentDirectory());
+                await _packageVerifier.VerifyAsync(packagePath, repository, settings, _nugetLogger, cancellationToken).ConfigureAwait(false);
+            }
+
+            void TryCopyFile(string sourceFilePath, string destinationFilePath)
+            {
+                try
+                {
+                    _environmentSettings.Host.FileSystem.FileCopy(sourceFilePath, destinationFilePath, overwrite: true);
+                }
+                catch (Exception)
+                {
+                    TryDeleteFile(destinationFilePath);
+                    throw;
+                }
+            }
+
+            void TryDeleteFile(string filePath)
+            {
                 try
                 {
                     _environmentSettings.Host.FileSystem.FileDelete(filePath);
@@ -174,7 +206,6 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                             filePath));
                     _nugetLogger.LogDebug($"Details: {ex}.");
                 }
-                throw new DownloadException(packageMetadata.Identity.Id, packageMetadata.Identity.Version.ToNormalizedString(), new[] { source.Source }, e.InnerException);
             }
         }
 
@@ -234,12 +265,6 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 throw new InvalidNuGetSourceException($"Failed to load NuGet sources configured for the folder {currentDirectory}", ex);
             }
 
-            PackageSourceMapping packageSourceMapping = PackageSourceMapping.GetPackageSourceMapping(settings);
-            if (packageSourceMapping.IsEnabled && additionalSources.Any(source => !string.IsNullOrWhiteSpace(source)))
-            {
-                throw new InvalidNuGetSourceException("Additional sources cannot be used when package source mapping is enabled");
-            }
-
             List<PackageSource> customSources = new List<PackageSource>();
             foreach (string source in additionalSources)
             {
@@ -262,6 +287,7 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             }
 
             IReadOnlyList<PackageSource> enabledSources = defaultSources;
+            PackageSourceMapping packageSourceMapping = PackageSourceMapping.GetPackageSourceMapping(settings);
             if (packageSourceMapping.IsEnabled)
             {
                 var mappedSourceNames = new HashSet<string>(
@@ -275,11 +301,6 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             IEnumerable<PackageSource> retrievedSources = customSources.Concat(defaultSources);
             if (!retrievedSources.Any())
             {
-                if (!enabledSources.Any())
-                {
-                    _nugetLogger.LogError(LocalizableStrings.NuGetApiPackageManager_Error_NoSources);
-                    throw new InvalidNuGetSourceException("No NuGet sources are defined or enabled");
-                }
                 if (packageSourceMapping.IsEnabled)
                 {
                     throw new PackageNotFoundException(
@@ -287,6 +308,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                         enabledSources.Select(source => source.Source),
                         packageSourceMappingMatchNotFound: true);
                 }
+                _nugetLogger.LogError(LocalizableStrings.NuGetApiPackageManager_Error_NoSources);
+                throw new InvalidNuGetSourceException("No NuGet sources are defined or enabled");
             }
             return retrievedSources;
         }
@@ -341,7 +364,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
 
             var accumulativeSearchResults = foundPackagesBySource
                 .Where(result => result.FoundPackages != null)
-                .SelectMany(result => result.FoundPackages.Select(package => (result.Source, package)));
+                .SelectMany(result => result.FoundPackages.Select(package => (result.Source, package)))
+                .Where(result => string.Equals(result.package.Identity.Id, packageIdentifier, StringComparison.OrdinalIgnoreCase));
 
             (PackageSource, NugetPackageMetadata)? latestVersion = accumulativeSearchResults.Aggregate(
                 ((PackageSource, NugetPackageMetadata)?)null,
@@ -410,7 +434,8 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                     continue;
                 }
                 atLeastOneSourceValid = true;
-                NugetPackageMetadata? matchedVersion = foundPackages.FirstOrDefault(package => package.Identity.Version == packageVersion);
+                NugetPackageMetadata? matchedVersion = foundPackages.FirstOrDefault(package =>
+                    string.Equals(package.Identity.Id, packageIdentifier, StringComparison.OrdinalIgnoreCase) && package.Identity.Version == packageVersion);
                 if (matchedVersion != null)
                 {
                     _nugetLogger.LogDebug($"{packageIdentifier}@{packageVersion} was found in {foundSource.Source}.");

@@ -4,9 +4,14 @@
 using FluentAssertions;
 using Microsoft.TemplateEngine.Abstractions;
 using Microsoft.TemplateEngine.Edge.Installers.NuGet;
+using Microsoft.TemplateEngine.Edge.UnitTests.Mocks;
 using Microsoft.TemplateEngine.TestHelper;
+using NuGet.Common;
 using NuGet.Configuration;
+using NuGet.Protocol.Core.Types;
+using NuGet.Versioning;
 using Xunit;
+using NuGetSettings = NuGet.Configuration.Settings;
 
 namespace Microsoft.TemplateEngine.Edge.UnitTests
 {
@@ -18,6 +23,49 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
         public NuGetApiPackageManagerTests(EnvironmentSettingsHelper environmentSettingsHelper)
         {
             _environmentSettingsHelper = environmentSettingsHelper;
+        }
+
+        [Theory]
+        [InlineData("1.0.0")]
+        [InlineData(null)]
+        [InlineData("*")]
+        [InlineData("1.*")]
+        [InlineData("*-*")]
+        public async Task DownloadPackage_MismatchedMetadataId_ThrowsPackageNotFound(string? version)
+        {
+            const string identifier = "Requested.Package";
+            using var feed = new MockNuGetFeed("Other.Package");
+            string source = feed.BaseAddress + "index.json";
+            string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
+            var settings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
+            var manager = new NuGetApiPackageManager(settings);
+
+            var exception = await Assert.ThrowsAsync<PackageNotFoundException>(() => manager.DownloadPackageAsync(
+                installPath, identifier, version, additionalSources: new[] { source }, force: true));
+
+            exception.PackageIdentifier.Should().Be(identifier);
+            NuGetVersion.TryParse(version, out NuGetVersion? expectedVersion);
+            Assert.Equal(expectedVersion, exception.PackageVersion);
+            exception.SourcesList.Should().Equal(source);
+            Directory.GetFiles(installPath).Should().BeEmpty();
+            feed.Requests.Should().NotContain(path => path.StartsWith("/flatcontainer/", StringComparison.Ordinal));
+        }
+
+        [Fact]
+        public async Task GetLatestVersion_MismatchedMetadataId_ThrowsPackageNotFound()
+        {
+            const string identifier = "Requested.Package";
+            using var feed = new MockNuGetFeed("Other.Package");
+            string source = feed.BaseAddress + "index.json";
+            var settings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
+            var manager = new NuGetApiPackageManager(settings);
+
+            var exception = await Assert.ThrowsAsync<PackageNotFoundException>(() => manager.GetLatestVersionAsync(
+                identifier, additionalSource: source));
+
+            exception.PackageIdentifier.Should().Be(identifier);
+            exception.PackageVersion.Should().BeNull();
+            exception.SourcesList.Should().Equal(source);
         }
 
         [Fact]
@@ -41,6 +89,29 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             result.Reserved.Should().BeFalse();
             result.PackageVersion.Should().NotBeNullOrEmpty();
             result.NuGetSource.Should().NotBeNullOrEmpty();
+            Directory.EnumerateFiles(installPath, "*.tmp").Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task DownloadPackage_PackageValidationFailure_RemovesTemporaryPackage()
+        {
+            string installPath = _environmentSettingsHelper.CreateTemporaryFolder();
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
+
+            NuGetApiPackageManager packageManager = new NuGetApiPackageManager(
+                engineEnvironmentSettings,
+                new FailingNuGetPackageVerifier());
+
+            var exception = await Assert.ThrowsAsync<DownloadException>(() => packageManager.DownloadPackageAsync(
+                installPath,
+                "Microsoft.DotNet.Common.ProjectTemplates.5.0",
+                "5.0.0",
+                additionalSources: new[] { "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-public/nuget/v3/index.json" }));
+
+            var validationException = Assert.IsType<InvalidDataException>(exception.InnerException);
+            validationException.Message.Should().Be("Package validation failed.");
+
+            Directory.EnumerateFiles(installPath).Should().BeEmpty();
         }
 
         [Fact]
@@ -313,36 +384,36 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             sources.Select(source => source.Name).Should().BeEquivalentTo("template-feed", "other-feed");
         }
 
-        [Theory]
-        [InlineData("https://additional.test/v3/index.json")]
-        [InlineData("https://templates.test/v3/index.json")]
-        public void LoadNuGetSources_PackageSourceMappingEnabledAndAdditionalSourceSpecified_Throws(string additionalSource)
+        [Fact]
+        public void LoadNuGetSources_AdditionalSourceSpecified_AllowsAdditionalSourceAndFiltersConfiguredSources()
         {
             IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
             NuGetApiPackageManager packageManager = new NuGetApiPackageManager(engineEnvironmentSettings);
             ISettings settings = CreateSettingsWithPackageSourceMapping();
 
-            Action action = () => packageManager.LoadNuGetSources(
+            IEnumerable<PackageSource> sources = packageManager.LoadNuGetSources(
                 "Contoso.Templates",
-                new[] { additionalSource },
+                new[] { "https://additional.test/v3/index.json" },
                 settings);
 
-            action.Should().Throw<InvalidNuGetSourceException>();
+            sources.Should().ContainSingle()
+                .Which.Source.Should().Be("https://additional.test/v3/index.json");
         }
 
         [Fact]
-        public void LoadNuGetSources_PackageSourceMappingEnabledAndNoSourcesEnabled_ThrowsInvalidNuGetSourceException()
+        public void LoadNuGetSources_ConfiguredAdditionalSource_DoesNotBypassPackageSourceMapping()
         {
             IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
             NuGetApiPackageManager packageManager = new NuGetApiPackageManager(engineEnvironmentSettings);
-            ISettings settings = CreateSettingsWithPackageSourceMapping(
-                disableAllSources: true);
+            ISettings settings = CreateSettingsWithPackageSourceMapping();
 
-            Action action = () => packageManager.LoadNuGetSources(
-                "Microsoft.TemplateEngine.TestTemplates",
-                Array.Empty<string>(),
+            IEnumerable<PackageSource> sources = packageManager.LoadNuGetSources(
+                "Exact.Templates",
+                new[] { "https://templates.test/v3/index.json" },
                 settings);
-            action.Should().Throw<InvalidNuGetSourceException>();
+
+            sources.Should().ContainSingle()
+                .Which.Name.Should().Be("other-feed");
         }
 
         [Fact]
@@ -408,18 +479,10 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 
         private ISettings CreateSettingsWithPackageSourceMapping(
             bool disableTemplateSource = false,
-            bool disableAllSources = false,
             bool includePackageSourceMapping = true)
         {
             string settingsDirectory = _environmentSettingsHelper.CreateTemporaryFolder();
-            string disabledSources = disableAllSources
-                ? """
-                  <disabledPackageSources>
-                    <add key="template-feed" value="true" />
-                    <add key="other-feed" value="true" />
-                  </disabledPackageSources>
-                  """
-                : disableTemplateSource
+            string disabledSources = disableTemplateSource
                 ? """
                   <disabledPackageSources>
                     <add key="template-feed" value="true" />
@@ -455,7 +518,17 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 {packageSourceMapping}
                 </configuration>
                 """);
-            return global::NuGet.Configuration.Settings.LoadSpecificSettings(settingsDirectory, "NuGet.config");
+            return NuGetSettings.LoadSpecificSettings(settingsDirectory, "NuGet.config");
+        }
+
+        private sealed class FailingNuGetPackageVerifier : INuGetPackageVerifier
+        {
+            public bool IsEnabled => true;
+
+            public Task VerifyAsync(string packagePath, SourceRepository repository, ISettings settings, ILogger logger, CancellationToken cancellationToken)
+            {
+                throw new InvalidDataException("Package validation failed.");
+            }
         }
     }
 }
