@@ -176,7 +176,21 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 }
 
                 ISettings settings = NuGetSettings.LoadDefaultSettings(Directory.GetCurrentDirectory());
-                await _packageVerifier.VerifyAsync(packagePath, repository, settings, _nugetLogger, cancellationToken).ConfigureAwait(false);
+                string verificationFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N") + ".nupkg");
+                try
+                {
+                    using (Stream packageStream = _environmentSettings.Host.FileSystem.OpenRead(packagePath))
+                    using (Stream verificationFile = new FileStream(verificationFilePath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+                    {
+                        await packageStream.CopyToAsync(verificationFile, 81920, cancellationToken).ConfigureAwait(false);
+                    }
+
+                    await _packageVerifier.VerifyAsync(verificationFilePath, repository, settings, _nugetLogger, cancellationToken).ConfigureAwait(false);
+                }
+                finally
+                {
+                    TryDeletePhysicalFile(verificationFilePath);
+                }
             }
 
             void TryCopyFile(string sourceFilePath, string destinationFilePath)
@@ -197,6 +211,22 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 try
                 {
                     _environmentSettings.Host.FileSystem.FileDelete(filePath);
+                }
+                catch (Exception ex)
+                {
+                    _nugetLogger.LogWarning(
+                        string.Format(
+                            LocalizableStrings.NuGetApiPackageManager_Warning_FailedToDelete,
+                            filePath));
+                    _nugetLogger.LogDebug($"Details: {ex}.");
+                }
+            }
+
+            void TryDeletePhysicalFile(string filePath)
+            {
+                try
+                {
+                    File.Delete(filePath);
                 }
                 catch (Exception ex)
                 {

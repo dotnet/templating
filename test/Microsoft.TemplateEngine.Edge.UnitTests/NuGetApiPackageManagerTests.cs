@@ -114,6 +114,40 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             Directory.EnumerateFiles(installPath).Should().BeEmpty();
         }
 
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task DownloadPackage_VirtualizedPath_VerifiesAndCleansUp(bool failVerification)
+        {
+            const string identifier = "Test.Package";
+            using var feed = new MockNuGetFeed(identifier);
+            IEngineEnvironmentSettings settings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
+            string installPath = Path.Combine(settings.Paths.GlobalSettingsDir, "packages");
+            var verifier = new RecordingNuGetPackageVerifier(failVerification);
+            var manager = new NuGetApiPackageManager(settings, verifier);
+
+            if (failVerification)
+            {
+                await Assert.ThrowsAsync<DownloadException>(() => manager.DownloadPackageAsync(
+                    installPath, identifier, "1.0.0", new[] { feed.BaseAddress + "index.json" }, force: true));
+            }
+            else
+            {
+                NuGetPackageInfo result = await manager.DownloadPackageAsync(
+                    installPath, identifier, "1.0.0", new[] { feed.BaseAddress + "index.json" }, force: true);
+                settings.Host.FileSystem.ReadAllBytes(result.FullPath).Should().Equal(feed.PackageContent);
+            }
+
+            verifier.Content.Should().Equal(feed.PackageContent);
+            verifier.PackagePath.Should().NotBeNull();
+            File.Exists(verifier.PackagePath!).Should().BeFalse();
+            settings.Host.FileSystem.EnumerateFiles(installPath, "*.tmp", SearchOption.TopDirectoryOnly).Should().BeEmpty();
+            if (failVerification)
+            {
+                settings.Host.FileSystem.EnumerateFiles(installPath, "*.nupkg", SearchOption.TopDirectoryOnly).Should().BeEmpty();
+            }
+        }
+
         [Fact]
         public async Task DownloadPackage_LatestFromNugetOrgFeed()
         {
@@ -528,6 +562,27 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
             public Task VerifyAsync(string packagePath, SourceRepository repository, ISettings settings, ILogger logger, CancellationToken cancellationToken)
             {
                 throw new InvalidDataException("Package validation failed.");
+            }
+        }
+
+        private sealed class RecordingNuGetPackageVerifier(bool failVerification) : INuGetPackageVerifier
+        {
+            public bool IsEnabled => true;
+
+            public byte[]? Content { get; private set; }
+
+            public string? PackagePath { get; private set; }
+
+            public Task VerifyAsync(string packagePath, SourceRepository repository, ISettings settings, ILogger logger, CancellationToken cancellationToken)
+            {
+                PackagePath = packagePath;
+                Content = File.ReadAllBytes(packagePath);
+                if (failVerification)
+                {
+                    throw new InvalidDataException("Package validation failed.");
+                }
+
+                return Task.CompletedTask;
             }
         }
     }
