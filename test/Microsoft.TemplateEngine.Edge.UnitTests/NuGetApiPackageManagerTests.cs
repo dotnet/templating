@@ -450,6 +450,38 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
                 .Which.Name.Should().Be("other-feed");
         }
 
+        [Theory]
+        [InlineData("https://additional.test/v3/index.json")]
+        [InlineData("https://templates.test/v3/index.json")]
+        public void LoadNuGetSources_PackageSourceMappingEnabledAndAdditionalSourceSpecified_Throws(string additionalSource)
+        {
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
+            NuGetApiPackageManager packageManager = new NuGetApiPackageManager(engineEnvironmentSettings);
+            ISettings settings = CreateSettingsWithPackageSourceMapping();
+
+            Action action = () => packageManager.LoadNuGetSources(
+                "Contoso.Templates",
+                new[] { additionalSource },
+                settings);
+
+            action.Should().Throw<InvalidNuGetSourceException>();
+        }
+
+        [Fact]
+        public void LoadNuGetSources_PackageSourceMappingEnabledAndNoSourcesEnabled_ThrowsInvalidNuGetSourceException()
+        {
+            IEngineEnvironmentSettings engineEnvironmentSettings = _environmentSettingsHelper.CreateEnvironment(virtualize: true);
+            NuGetApiPackageManager packageManager = new NuGetApiPackageManager(engineEnvironmentSettings);
+            ISettings settings = CreateSettingsWithPackageSourceMapping(
+                disableAllSources: true);
+
+            Action action = () => packageManager.LoadNuGetSources(
+                "Microsoft.TemplateEngine.TestTemplates",
+                Array.Empty<string>(),
+                settings);
+            action.Should().Throw<InvalidNuGetSourceException>();
+        }
+
         [Fact]
         public void RemoveInsecurePackages_AllInsecure()
         {
@@ -513,10 +545,18 @@ namespace Microsoft.TemplateEngine.Edge.UnitTests
 
         private ISettings CreateSettingsWithPackageSourceMapping(
             bool disableTemplateSource = false,
+            bool disableAllSources = false,
             bool includePackageSourceMapping = true)
         {
             string settingsDirectory = _environmentSettingsHelper.CreateTemporaryFolder();
-            string disabledSources = disableTemplateSource
+            string disabledSources = disableAllSources
+                ? """
+                  <disabledPackageSources>
+                    <add key="template-feed" value="true" />
+                    <add key="other-feed" value="true" />
+                  </disabledPackageSources>
+                  """
+                : disableTemplateSource
                 ? """
                   <disabledPackageSources>
                     <add key="template-feed" value="true" />
