@@ -295,6 +295,12 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                 throw new InvalidNuGetSourceException($"Failed to load NuGet sources configured for the folder {currentDirectory}", ex);
             }
 
+            PackageSourceMapping packageSourceMapping = PackageSourceMapping.GetPackageSourceMapping(settings);
+            if (packageSourceMapping.IsEnabled && additionalSources.Any(source => !string.IsNullOrWhiteSpace(source)))
+            {
+                throw new InvalidNuGetSourceException("Additional sources cannot be used when package source mapping is enabled");
+            }
+
             List<PackageSource> customSources = new List<PackageSource>();
             foreach (string source in additionalSources)
             {
@@ -317,7 +323,6 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             }
 
             IReadOnlyList<PackageSource> enabledSources = defaultSources;
-            PackageSourceMapping packageSourceMapping = PackageSourceMapping.GetPackageSourceMapping(settings);
             if (packageSourceMapping.IsEnabled)
             {
                 var mappedSourceNames = new HashSet<string>(
@@ -331,6 +336,11 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
             IEnumerable<PackageSource> retrievedSources = customSources.Concat(defaultSources);
             if (!retrievedSources.Any())
             {
+                if (!enabledSources.Any())
+                {
+                    _nugetLogger.LogError(LocalizableStrings.NuGetApiPackageManager_Error_NoSources);
+                    throw new InvalidNuGetSourceException("No NuGet sources are defined or enabled");
+                }
                 if (packageSourceMapping.IsEnabled)
                 {
                     throw new PackageNotFoundException(
@@ -338,8 +348,6 @@ namespace Microsoft.TemplateEngine.Edge.Installers.NuGet
                         enabledSources.Select(source => source.Source),
                         packageSourceMappingMatchNotFound: true);
                 }
-                _nugetLogger.LogError(LocalizableStrings.NuGetApiPackageManager_Error_NoSources);
-                throw new InvalidNuGetSourceException("No NuGet sources are defined or enabled");
             }
             return retrievedSources;
         }
